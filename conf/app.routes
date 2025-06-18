@@ -1,5 +1,13 @@
 # microservice specific routes
 
-->         /hmrc-frontend           hmrcfrontend.Routes
-GET        /                        uk.gov.hmrc.agentregistrationfrontend.controllers.HelloWorldController.helloWorld
-GET        /assets/*file            controllers.Assets.versioned(path = "/public", file: Asset)
+->         /hmrc-frontend                       hmrcfrontend.Routes
+GET        /                                    uk.gov.hmrc.agentregistrationfrontend.controllers.HelloWorldController.helloWorld
+GET        /assets/*file                        controllers.Assets.versioned(path = "/public", file: Asset)
+
+GET        /start-grs-journey                   uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.startJourney(partyType: String, isTransactor: Boolean ?= false)
+GET        /start-grs-journey-registrant        uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.startRegistrantJourney(isTransactor: Boolean ?= false)
+GET        /start-grs-journey-transactor        uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.startTransactorJourney
+
+GET        /grs-callback/:partyType             uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.journeyCallback(partyType: String, journeyId: String)
+GET        /grs-callback-registrant             uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.registrantJourneyCallback(journeyId: String)
+GET        /grs-callback-transactor             uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.transactorJourneyCallback(journeyId: String)
