@@ -1,2 +1,4 @@
-service.name = agent-registration-frontend
+service.name = Agent Registration
 service.text = This is your new service
+
+transactorName.optFullNamePageLabel = Who are you registering on behalf of?
