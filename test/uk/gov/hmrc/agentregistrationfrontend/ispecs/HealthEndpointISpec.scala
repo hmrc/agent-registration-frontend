@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,26 +12,26 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardPage
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.HmrcStandardPageParams
+package uk.gov.hmrc.agentregistrationfrontend.ispecs
 
-@this(
-  appConfig: AppConfig,
-  hmrcStandardPage: HmrcStandardPage
-)
+import play.api.libs.ws.WSClient
 
-@(pageTitle: Option[String] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+class HealthEndpointISpec
+  extends ISpec {
 
-@hmrcStandardPage(
-  HmrcStandardPageParams(
-    pageTitle = pageTitle,
-    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
-  )
-)(contentBlock)
+  private val wsClient = app.injector.instanceOf[WSClient]
+  private val baseUrl  = s"http://localhost:$port"
 
-@{
-    //$COVERAGE-OFF$
+  "service health endpoint should respond with 200 status" in {
+      val response =
+        wsClient
+          .url(s"$baseUrl/ping/ping")
+          .get()
+          .futureValue
+
+      response.status shouldBe 200
+      response.body shouldBe ""
+  }
 }

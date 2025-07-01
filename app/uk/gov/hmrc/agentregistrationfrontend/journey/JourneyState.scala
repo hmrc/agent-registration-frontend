@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,26 +12,25 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardPage
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.HmrcStandardPageParams
+package uk.gov.hmrc.agentregistrationfrontend.journey
 
-@this(
-  appConfig: AppConfig,
-  hmrcStandardPage: HmrcStandardPage
-)
+import enumeratum.{Enum, EnumEntry}
+import play.api.libs.json.Format
+import uk.gov.hmrc.agentregistrationfrontend.util.EnumFormat
 
-@(pageTitle: Option[String] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+import scala.collection.immutable
 
-@hmrcStandardPage(
-  HmrcStandardPageParams(
-    pageTitle = pageTitle,
-    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
-  )
-)(contentBlock)
+sealed trait JourneyState extends EnumEntry
 
-@{
-    //$COVERAGE-OFF$
+object JourneyState {
+  implicit val format: Format[JourneyState] = EnumFormat(JourneyStates)
+}
+
+object JourneyStates extends Enum[JourneyState] {
+  case object InProgress extends JourneyState
+  case object Finished extends JourneyState
+
+  override def values: immutable.IndexedSeq[JourneyState] = findValues
 }

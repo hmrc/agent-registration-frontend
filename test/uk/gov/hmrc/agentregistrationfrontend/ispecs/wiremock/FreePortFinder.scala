@@ -14,27 +14,27 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.config
+package uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock
 
-import com.google.inject.{AbstractModule, Provides, Singleton}
-import play.api.i18n.{I18nSupport, MessagesApi}
+object FreePortFinder {
 
-import java.time.{Clock, ZoneOffset}
+  //TODO: discuss if this is really needed, all tests are run in containers, default port should be always free
+  def findFreePort(initial: Int = 11111): Int = {
+    import java.net.ServerSocket
 
-class Module extends AbstractModule {
+    def isPortFree(port: Int): Boolean = {
+      try {
+        val socket = new ServerSocket(port)
+        socket.close()
+        true
+      } catch {
+        case _: Exception => false
+      }
+    }
 
-  override def configure(): Unit = {
-    bind(classOf[AppConfig]).asEagerSingleton()
-  }
-
-  @Provides
-  @Singleton
-  def clock(): Clock = Clock.systemDefaultZone.withZone(ZoneOffset.UTC)
-
-  @Provides
-  @Singleton
-  def i18nSupport(api: MessagesApi): I18nSupport = new I18nSupport {
-    override def messagesApi: MessagesApi = api
+    Iterator.from(initial).find(isPortFree).getOrElse(
+      throw new RuntimeException("No free port found")
+    )
   }
 
 }

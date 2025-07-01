@@ -1,5 +1,5 @@
-@*
- * Copyright 2025 HM Revenue & Customs
+/*
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,19 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.govukfrontend.views.html.components.Text
+package uk.gov.hmrc.agentregistrationfrontend.util
 
-@this(layout: Layout)
+import enumeratum.{Enum, EnumEntry}
+import play.api.libs.json._
 
-@(pageTitle: String, heading: String, message: String)(implicit request: RequestHeader, messages: Messages)
-
-@layout(pageTitle = Some(pageTitle)) {
-    <h1 class="govuk-heading-xl">@{Text(heading).asHtml}</h1>
-    <p class="govuk-body">@{Text(message).asHtml}</p>
-}
-
-@{
-    //$COVERAGE-OFF$
+object EnumFormat {
+  def apply[T <: EnumEntry](e: Enum[T]): Format[T] = Format(
+    Reads {
+      case JsString(value) => e.withNameOption(value).map(JsSuccess(_)).getOrElse[JsResult[T]](JsError(s"Unknown ${e.getClass.getSimpleName} value: $value"))
+      case _               => JsError("Can only parse String")
+    },
+    Writes(v => JsString(v.entryName)))
 }

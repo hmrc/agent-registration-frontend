@@ -16,26 +16,28 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
-import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.journey.JourneyService
 import uk.gov.hmrc.agentregistrationfrontend.views.Views
+import uk.gov.hmrc.agentregistrationfrontend.views.html.HelloWorldPage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.Future
 
 @Singleton
-class HelloWorldController @Inject()(
-                                      mcc: MessagesControllerComponents,
-                                      views: Views,
-                                      i18n: I18nSupport,
-                                      actions: Actions,
-                                    )
-  extends FrontendController(mcc) {
+class JourneyController @Inject()(
+  mcc: MessagesControllerComponents,
+  journeyService: JourneyService,
+  views: Views
+  )
+    extends FrontendController(mcc) {
 
-  import i18n._
+  val initializeJourney: Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(Ok(views.helloWorldPage()))
+  }
 
-  val helloWorld: Action[AnyContent] = actions.getJourneyInProgress { implicit request =>
-    Ok(views.helloWorldPage())
+  val tryToRestoreJourney: Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(Ok(views.helloWorldPage()))
   }
 }

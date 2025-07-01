@@ -1,5 +1,5 @@
-@*
- * Copyright 2025 HM Revenue & Customs
+/*
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,19 +12,10 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.govukfrontend.views.html.components.Text
+package uk.gov.hmrc.agentregistrationfrontend.testsupport
 
-@this(layout: Layout)
+import org.scalatest.freespec.AnyFreeSpec
 
-@(pageTitle: String, heading: String, message: String)(implicit request: RequestHeader, messages: Messages)
-
-@layout(pageTitle = Some(pageTitle)) {
-    <h1 class="govuk-heading-xl">@{Text(heading).asHtml}</h1>
-    <p class="govuk-body">@{Text(message).asHtml}</p>
-}
-
-@{
-    //$COVERAGE-OFF$
-}
+trait UnitSpec extends AnyFreeSpec with RichMatchers
