@@ -1,11 +1,8 @@
 # microservice specific routes
 
-->         /hmrc-frontend           hmrcfrontend.Routes
+GET        /                                  uk.gov.hmrc.agentregistrationfrontend.controllers.HelloWorldController.helloWorld
 
-GET        /                        uk.gov.hmrc.agentregistrationfrontend.controllers.HelloWorldController.helloWorld
+GET        /try-to-restore-application        uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.initializeApplication
 
-GET        /try-to-restore-journey      uk.gov.hmrc.agentregistrationfrontend.controllers.JourneyController.initializeJourney
+GET        /new-application                   uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.tryToRestoreApplication
 
-GET        /new-journey      uk.gov.hmrc.agentregistrationfrontend.controllers.JourneyController.tryToRestoreJourney
-
-GET        /assets/*file            controllers.Assets.versioned(path = "/public", file: Asset)

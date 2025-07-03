@@ -17,8 +17,8 @@
 package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.mvc.{Request, WrappedRequest}
-import uk.gov.hmrc.agentregistrationfrontend.journey.SessionId
 import uk.gov.hmrc.agentregistrationfrontend.model.Utr
+import uk.gov.hmrc.agentregistrationfrontend.model.application.SessionId
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 

@@ -19,33 +19,34 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionRefiner, Request, Result}
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.journey.{JourneyId, JourneyService}
+import uk.gov.hmrc.agentregistrationfrontend.model.application.ApplicationId
+import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class GetJourneyActionRefiner @Inject() (
-    journeyService: JourneyService,
-    appConfig:      AppConfig
+class GetApplicationActionRefiner @Inject() (
+                                          applicationService: ApplicationService,
+                                          appConfig:      AppConfig
 )(implicit ec: ExecutionContext)
-  extends ActionRefiner[AuthorisedUtrRequest, JourneyRequest]
+  extends ActionRefiner[AuthorisedUtrRequest, ApplicationRequest]
     with RequestAwareLogging {
 
-  override protected def refine[A](request: AuthorisedUtrRequest[A]): Future[Either[Result, JourneyRequest[A]]] = {
+  override protected def refine[A](request: AuthorisedUtrRequest[A]): Future[Either[Result, ApplicationRequest[A]]] = {
     implicit val r: Request[A] = request
 
       for {
-          maybeJourney <- journeyService.find(request.sessionId)
+          maybeApplication <- applicationService.find(request.sessionId)
         } yield {
-          maybeJourney match {
-            case Some(journey) => Right(new JourneyRequest(journey, request))
+          maybeApplication match {
+            case Some(application) => Right(new ApplicationRequest(application, request))
             case None =>
-              logger.warn(s"Journey not found based on the sessionId from session, redirecting to the restore-journey route")
+              logger.warn(s"Application not found based on the sessionId from session, redirecting to the restore-application route")
               Left(
                 Redirect(
-                  uk.gov.hmrc.agentregistrationfrontend.controllers.routes.JourneyController.tryToRestoreJourney
+                  uk.gov.hmrc.agentregistrationfrontend.controllers.routes.ApplicationController.tryToRestoreApplication
                 )
               )
           }

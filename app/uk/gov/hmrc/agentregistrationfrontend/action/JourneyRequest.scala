@@ -17,12 +17,12 @@
 package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.mvc.{Request, WrappedRequest}
-import uk.gov.hmrc.agentregistrationfrontend.journey.{Journey, JourneyId}
+import uk.gov.hmrc.agentregistrationfrontend.model.application.{Application, ApplicationId}
 
-class JourneyRequest[A](
-    val journey: Journey,
-    val request: Request[A]
+class ApplicationRequest[A](
+                         val application: Application,
+                         val request: Request[A]
 ) extends WrappedRequest[A](request) {
 
-  val journeyId: JourneyId = journey.journeyId
+  val applicationId: ApplicationId = application.applicationId
 }

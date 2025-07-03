@@ -32,9 +32,9 @@ import scala.util.Try
 class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configuration) {
 
   val thisFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.this-frontend", configuration)
-  val feedbackFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-frontend-sign-in", configuration)
-  val basFrontendSignBaseInBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-frontend-sign-in", configuration)
-  val basFrontendSignOutUrlBase: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-frontend-sign-out", configuration)
+  val feedbackFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.feedback-frontend", configuration)
+  val basFrontendSignBaseInBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-in", configuration)
+  val basFrontendSignOutUrlBase: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-out", configuration)
 
   def signInUri(continueUri: Uri): Uri = {
     val queryParams = Map(
@@ -46,8 +46,8 @@ class AppConfig @Inject()(servicesConfig: ServicesConfig, configuration: Configu
 
   val welshLanguageSupportEnabled: Boolean = configuration.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
 
-  object JourneyRepo {
-    val journeyRepoTtl: FiniteDuration = ConfigHelper.readFiniteDuration("mongodb.journey-repo.journey-repo-ttl", servicesConfig)
+  object ApplicationRepo {
+    val applicationRepoTtl: FiniteDuration = ConfigHelper.readFiniteDuration("mongodb.application-repo-ttl", servicesConfig)
   }
 
 
@@ -64,7 +64,7 @@ object ConfigHelper {
   def readConfigAsValidUrlString(configPath: String, configuration: Configuration): String = {
     val url: String = configuration.get[String](configPath)
     Try(new java.net.URI(url).toURL).fold[String](
-      e => throw new RuntimeException(s"Invalid URL in config under [$configPath]", e),
+      e => throw new RuntimeException(s"Invalid URL in config under [$configPath], value was [$url]", e),
       _ => url
     )
   }

@@ -16,6 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action
 
-object JourneyIdKey {
-  val journeyIdKey: String = "agent-registration-frontend.journeyId"
+object ApplicationIdKey {
+  val applicationIdKey: String = "agent-registration-frontend.applicationId"
 }

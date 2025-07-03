@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.journey
+package uk.gov.hmrc.agentregistrationfrontend.model.application
 
 import play.api.libs.json.{Format, Json, OFormat, OWrites}
 import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 
-private[journey] object JourneyFormat {
+object ApplicationFormat {
 
-  val format: OFormat[Journey] = {
+  val format: OFormat[Application] = {
 
     implicit val instantFormat: Format[Instant] = MongoJavatimeFormats.instantFormat
 
     @SuppressWarnings(Array("org.wartremover.warts.Any"))
-    val defaultFormat: OFormat[Journey] = Json.format[Journey]
+    val defaultFormat: OFormat[Application] = Json.format[Application]
 
     //we need to write some extra fields on the top of the structure so it's
     //possible to index on them and use them in queries
-    val customWrites = OWrites[Journey](j =>
+    val customWrites = OWrites[Application](j =>
       defaultFormat.writes(j) ++ Json.obj(
         "createdAt" -> MongoJavatimeFormats.instantFormat.writes(j.createdAt),
         "lastUpdated" -> MongoJavatimeFormats.instantFormat.writes(j.lastUpdated)

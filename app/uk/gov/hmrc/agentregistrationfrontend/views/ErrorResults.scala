@@ -16,29 +16,32 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.views
 
-import play.api.i18n.{Messages, MessagesProvider}
+import play.api.i18n.{I18nSupport, Messages, MessagesApi, MessagesProvider}
 import play.api.mvc.Results.Unauthorized
-import play.api.mvc.{RequestHeader, Result}
+import play.api.mvc.RequestHeader
+import play.api.mvc.Result
+import play.twirl.api.Html
 import uk.gov.hmrc.agentregistrationfrontend.config.ErrorHandler
+import uk.gov.hmrc.agentregistrationfrontend.views.html.ErrorTemplate
 import uk.gov.hmrc.agentregistrationfrontend.views.html.HelloWorldPage
 
 import javax.inject.Inject
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
-class Views @Inject() (
-    val helloWorldPage: HelloWorldPage,
-    errorHandler: ErrorHandler,
-)(implicit executionContext: ExecutionContext, messagesProvider: MessagesProvider) {
+class ErrorResults @Inject() (
+  errorTemplate: ErrorTemplate,
+  i18n: I18nSupport,
+  messagesApi: MessagesApi
+) {
 
-  def unauthorised(implicit request: RequestHeader): Future[Result] =
-    errorHandler.standardErrorTemplate(
-        pageTitle = Messages("unauthorised.title"),
-        heading = Messages("unauthorised.heading"),
-        message = "")
-      .map(html => Unauthorized(html))
+  import i18n._
+
+  def unauthorised(implicit request: RequestHeader): Result = Unauthorized(
+    errorTemplate(
+      pageTitle = Messages("unauthorised.title"),
+      heading = Messages("unauthorised.heading"),
+      message = ""
+    )
+  )
 }
-
-
-class ViewsTestOnly @Inject() (
-
-)

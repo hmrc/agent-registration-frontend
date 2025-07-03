@@ -18,10 +18,10 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 
 import com.google.inject.{Inject, Singleton}
 import play.api.mvc._
-import uk.gov.hmrc.agentregistrationfrontend.journey.SessionId
 import uk.gov.hmrc.agentregistrationfrontend.model.Utr
+import uk.gov.hmrc.agentregistrationfrontend.model.application.SessionId
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-import uk.gov.hmrc.agentregistrationfrontend.views.Views
+import uk.gov.hmrc.agentregistrationfrontend.views.ErrorResults
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -35,8 +35,8 @@ final class AuthorisedUtrRequest[A](
 
 @Singleton
 class AuthorisedUtrAction @Inject()(
-    views: Views,
-    cc:           MessagesControllerComponents
+                                     errorResults: ErrorResults,
+                                     cc:           MessagesControllerComponents
 )
   extends ActionRefiner[AuthenticatedRequest, AuthorisedUtrRequest]
     with RequestAwareLogging {
@@ -46,21 +46,21 @@ class AuthorisedUtrAction @Inject()(
     val hasActiveSaEnrolment: Boolean = request.hasActiveSaEnrolment
     val maybeUtr: Option[Utr] = request.utr
 
-    val result: Future[Either[Result, AuthorisedUtrRequest[A]]] =
+    val result: Either[Result, AuthorisedUtrRequest[A]] =
       (hasActiveSaEnrolment, maybeUtr) match {
         case (_, None) =>
           logger.info("Authorisation outcome: Failed. Reason: - no present UTR")(request)
-          views.unauthorised.map(Left(_))
+          Left(errorResults.unauthorised)
         case (false, _) =>
           logger.info("Authorisation outcome: Failed. Reason: - no active IR-SA enrolment")(request)
-          views.unauthorised.map(Left(_))
-        case (true, Some(utr)) => Future.successful(Right(new AuthorisedUtrRequest[A](
+          Left(errorResults.unauthorised)
+        case (true, Some(utr)) => Right(new AuthorisedUtrRequest[A](
             request = request,
             utr = utr
-          )))
+          ))
       }
 
-    result
+    Future.successful(result)
   }
   implicit override protected def executionContext: ExecutionContext = cc.executionContext
 }

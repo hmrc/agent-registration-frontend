@@ -2,9 +2,12 @@ import uk.gov.hmrc.DefaultBuildSettings
 
 val strictBuilding: SettingKey[Boolean] = StrictBuilding.strictBuilding //defining here so it can be set before running sbt like `sbt 'set Global / strictBuilding := true' ...`
 StrictBuilding.strictBuildingSetting
+val playPort: Int = 22201
+PlayKeys.playRunHooks += PlayRunHook(playPort)
 
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "2.13.16"
+
 
 lazy val microservice = Project("agent-registration-frontend", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
@@ -32,4 +35,4 @@ lazy val microservice = Project("agent-registration-frontend", file("."))
   .settings(SbtUpdatesSettings.sbtUpdatesSettings *)
   .settings(CodeCoverageSettings.settings *)
   .settings(WartRemoverSettings.wartRemoverSettings)
-  .settings(PlayKeys.playDefaultPort := 22201)
+  .settings(PlayKeys.playDefaultPort := playPort)

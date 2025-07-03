@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.journey
+package uk.gov.hmrc.agentregistrationfrontend.model.application
 
 import enumeratum.{Enum, EnumEntry}
 import play.api.libs.json.Format
@@ -22,15 +22,15 @@ import uk.gov.hmrc.agentregistrationfrontend.util.EnumFormat
 
 import scala.collection.immutable
 
-sealed trait JourneyState extends EnumEntry
+sealed trait ApplicationState extends EnumEntry
 
-object JourneyState {
-  implicit val format: Format[JourneyState] = EnumFormat(JourneyStates)
+object ApplicationState {
+  implicit val format: Format[ApplicationState] = EnumFormat(ApplicationStates)
 }
 
-object JourneyStates extends Enum[JourneyState] {
-  case object InProgress extends JourneyState
-  case object Finished extends JourneyState
+object ApplicationStates extends Enum[ApplicationState] {
+  case object InProgress extends ApplicationState
+  case object Submitted extends ApplicationState
 
-  override def values: immutable.IndexedSeq[JourneyState] = findValues
+  override def values: immutable.IndexedSeq[ApplicationState] = findValues
 }

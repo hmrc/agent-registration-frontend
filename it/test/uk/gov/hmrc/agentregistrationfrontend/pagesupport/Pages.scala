@@ -17,29 +17,29 @@ class Pages(baseUrl: String)(implicit webDriver: WebDriver) {
   val doYouWantToSignInPage = new DoYouWantToSignInPage(baseUrl = baseUrl)
   val doYouWantYourRefundViaBankTransferPage = new DoYouWantYourRefundViaBankTransferPage(baseUrl = baseUrl)
 
-  val weNeedYouToConfirmYourIdentityBankTransferPage = new ConfirmYourIdentityPage(baseUrl            = baseUrl, pathForJourneyType = bankTransferRelativeUrl)
-  val weNeedYouToConfirmYourIdentityChequePage = new ConfirmYourIdentityPage(baseUrl            = baseUrl, pathForJourneyType = chequeRelativeUrl)
+  val weNeedYouToConfirmYourIdentityBankTransferPage = new ConfirmYourIdentityPage(baseUrl            = baseUrl, pathForApplicationType = bankTransferRelativeUrl)
+  val weNeedYouToConfirmYourIdentityChequePage = new ConfirmYourIdentityPage(baseUrl            = baseUrl, pathForApplicationType = chequeRelativeUrl)
 
-  val whatIsYourP800ReferenceBankTransferPage = new EnterYourP800ReferencePage(baseUrl            = baseUrl, pathForJourneyType = bankTransferRelativeUrl)
-  val whatIsYourP800ReferenceChequePage = new EnterYourP800ReferencePage(baseUrl            = baseUrl, pathForJourneyType = chequeRelativeUrl)
+  val whatIsYourP800ReferenceBankTransferPage = new EnterYourP800ReferencePage(baseUrl            = baseUrl, pathForApplicationType = bankTransferRelativeUrl)
+  val whatIsYourP800ReferenceChequePage = new EnterYourP800ReferencePage(baseUrl            = baseUrl, pathForApplicationType = chequeRelativeUrl)
 
-  val enterYourNationalInsuranceNumberBankTransferPage = new EnterYourNationalInsuranceNumberPage(baseUrl            = baseUrl, pathForJourneyType = bankTransferRelativeUrl)
-  val enterYourNationalInsuranceNumberChequePage = new EnterYourNationalInsuranceNumberPage(baseUrl            = baseUrl, pathForJourneyType = chequeRelativeUrl)
+  val enterYourNationalInsuranceNumberBankTransferPage = new EnterYourNationalInsuranceNumberPage(baseUrl            = baseUrl, pathForApplicationType = bankTransferRelativeUrl)
+  val enterYourNationalInsuranceNumberChequePage = new EnterYourNationalInsuranceNumberPage(baseUrl            = baseUrl, pathForApplicationType = chequeRelativeUrl)
 
   // bank transfer only
   val enterYourDateOfBirthPage = new EnterYourDateOfBirthPage(baseUrl = baseUrl)
 
-  val checkYourAnswersBankTransferPage = new CheckYourAnswersPage(baseUrl            = baseUrl, pathForJourneyType = bankTransferRelativeUrl)
-  val checkYourAnswersChequePage = new CheckYourAnswersPage(baseUrl            = baseUrl, pathForJourneyType = chequeRelativeUrl)
+  val checkYourAnswersBankTransferPage = new CheckYourAnswersPage(baseUrl            = baseUrl, pathForApplicationType = bankTransferRelativeUrl)
+  val checkYourAnswersChequePage = new CheckYourAnswersPage(baseUrl            = baseUrl, pathForApplicationType = chequeRelativeUrl)
 
-  val yourIdentityIsConfirmedBankTransferPage = new YourIdentityIsConfirmedPage(baseUrl            = baseUrl, pathForJourneyType = bankTransferRelativeUrl)
-  val yourIdentityIsConfirmedChequePage = new YourIdentityIsConfirmedPage(baseUrl            = baseUrl, pathForJourneyType = chequeRelativeUrl)
+  val yourIdentityIsConfirmedBankTransferPage = new YourIdentityIsConfirmedPage(baseUrl            = baseUrl, pathForApplicationType = bankTransferRelativeUrl)
+  val yourIdentityIsConfirmedChequePage = new YourIdentityIsConfirmedPage(baseUrl            = baseUrl, pathForApplicationType = chequeRelativeUrl)
 
-  val cannotConfirmYourIdentityTryAgainBankTransferPage = new CannotConfirmYourIdentityTryAgainPage(baseUrl            = baseUrl, pathForJourneyType = bankTransferRelativeUrl)
-  val cannotConfirmYourIdentityTryAgainChequePage = new CannotConfirmYourIdentityTryAgainPage(baseUrl            = baseUrl, pathForJourneyType = chequeRelativeUrl)
+  val cannotConfirmYourIdentityTryAgainBankTransferPage = new CannotConfirmYourIdentityTryAgainPage(baseUrl            = baseUrl, pathForApplicationType = bankTransferRelativeUrl)
+  val cannotConfirmYourIdentityTryAgainChequePage = new CannotConfirmYourIdentityTryAgainPage(baseUrl            = baseUrl, pathForApplicationType = chequeRelativeUrl)
 
-  val noMoreAttemptsLeftToConfirmYourIdentityBankTransferPage = new NoMoreAttemptsLeftToConfirmYourIdentityPage(baseUrl            = baseUrl, pathForJourneyType = bankTransferRelativeUrl)
-  val noMoreAttemptsLeftToConfirmYourIdentityChequePage = new NoMoreAttemptsLeftToConfirmYourIdentityPage(baseUrl            = baseUrl, pathForJourneyType = chequeRelativeUrl)
+  val noMoreAttemptsLeftToConfirmYourIdentityBankTransferPage = new NoMoreAttemptsLeftToConfirmYourIdentityPage(baseUrl            = baseUrl, pathForApplicationType = bankTransferRelativeUrl)
+  val noMoreAttemptsLeftToConfirmYourIdentityChequePage = new NoMoreAttemptsLeftToConfirmYourIdentityPage(baseUrl            = baseUrl, pathForApplicationType = chequeRelativeUrl)
 
   val refundRequestNotSubmittedPage = new RefundRequestNotSubmittedPage(baseUrl = baseUrl)
   val verifyingBankAccountPage = new VerifyingBankAccountPage(baseUrl       = baseUrl, consentStatus = ConsentStatus.Authorised, TdAll.tdAll.consentId, Some(TdAll.tdAll.bankReferenceId), "")
@@ -68,14 +68,14 @@ class Pages(baseUrl: String)(implicit webDriver: WebDriver) {
 
   val enterNameOfYourBankAccountPage = new EnterNameOfYourBankAccountPage(baseUrl = baseUrl)
 
-  val requestReceivedBankTransferPage = new RequestReceivedPage(baseUrl            = baseUrl, pathForJourneyType = bankTransferRelativeUrl)
-  val requestReceivedChequePage = new RequestReceivedPage(baseUrl            = baseUrl, pathForJourneyType = chequeRelativeUrl)
+  val requestReceivedBankTransferPage = new RequestReceivedPage(baseUrl            = baseUrl, pathForApplicationType = bankTransferRelativeUrl)
+  val requestReceivedChequePage = new RequestReceivedPage(baseUrl            = baseUrl, pathForApplicationType = chequeRelativeUrl)
 
   // Page Stubs
   val govUkRouteInPage = new GovUkRouteInPage(baseUrl = baseUrl)
   val ptaSignInPage = new PtaSignInPage(baseUrl = baseUrl)
   val generalIncomeTaxEnquiriesPage = new GeneralIncomeTaxEnquiriesPage(baseUrl = baseUrl)
   val bankStubPage = new BankStubPage(baseUrl = baseUrl)
-  val feedbackFrontendStubPageBankTransfer = new FeedbackFrontendStubPage(baseUrl            = baseUrl, pathForJourneyType = bankTransferRelativeUrl)
-  val feedbackFrontendStubPageCheque = new FeedbackFrontendStubPage(baseUrl            = baseUrl, pathForJourneyType = chequeRelativeUrl)
+  val feedbackFrontendStubPageBankTransfer = new FeedbackFrontendStubPage(baseUrl            = baseUrl, pathForApplicationType = bankTransferRelativeUrl)
+  val feedbackFrontendStubPageCheque = new FeedbackFrontendStubPage(baseUrl            = baseUrl, pathForApplicationType = chequeRelativeUrl)
 }

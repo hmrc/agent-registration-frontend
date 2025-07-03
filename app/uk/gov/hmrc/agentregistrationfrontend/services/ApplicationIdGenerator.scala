@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.journey
+package uk.gov.hmrc.agentregistrationfrontend.services
 
-import play.api.libs.json.{Format, Json}
+import org.bson.types.ObjectId
+import uk.gov.hmrc.agentregistrationfrontend.model.application.ApplicationId
 
-object JourneyId {
-  implicit val format: Format[JourneyId] = Json.valueFormat
+import javax.inject.Singleton
 
+@Singleton
+class ApplicationIdGenerator {
+  def nextApplicationId(): ApplicationId = ApplicationId(ObjectId.get().toHexString)
 }
-
-final case class JourneyId(value: String)
-

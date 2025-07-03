@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.journey
+package uk.gov.hmrc.agentregistrationfrontend.model.application
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Format

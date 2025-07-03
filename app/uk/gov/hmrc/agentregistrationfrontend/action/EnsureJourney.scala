@@ -18,27 +18,27 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.mvc.Results.Redirect
 import play.api.mvc.{ActionFilter, Call, Result}
-import uk.gov.hmrc.agentregistrationfrontend.journey.Journey
+import uk.gov.hmrc.agentregistrationfrontend.model.application.Application
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class EnsureJourney @Inject() ()(implicit ec: ExecutionContext) extends RequestAwareLogging{
+class EnsureApplication @Inject() ()(implicit ec: ExecutionContext) extends RequestAwareLogging{
 
   /**
-   * Check if journey matches predicate. If it doesn't, it will send the Redirect.
+   * Check if application matches predicate. If it doesn't, it will send the Redirect.
    */
-  def ensureJourney(predicate: Journey => Boolean, redirectF: Journey => Call, hintWhyRedirecting: String): ActionFilter[JourneyRequest] = new ActionFilter[JourneyRequest] {
-    override def filter[A](request: JourneyRequest[A]): Future[Option[Result]] = {
-      implicit val r: JourneyRequest[A] = request
-      val journey = request.journey
+  def ensureApplication(predicate: Application => Boolean, redirectF: Application => Call, hintWhyRedirecting: String): ActionFilter[ApplicationRequest] = new ActionFilter[ApplicationRequest] {
+    override def filter[A](request: ApplicationRequest[A]): Future[Option[Result]] = {
+      implicit val r: ApplicationRequest[A] = request
+      val application = request.application
       val result: Option[Result] =
-        if (predicate(journey)) None
+        if (predicate(application)) None
         else {
-          val call = redirectF(journey)
-          logger.warn(s"$hintWhyRedirecting (current journey state: ${request.journey.hasFinished.toString}), redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page.")
+          val call = redirectF(application)
+          logger.warn(s"$hintWhyRedirecting (current application state: ${request.application.hasFinished.toString}), redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page.")
           Some(Redirect(call))
         }
       Future.successful(result)

@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.config
 
 import com.google.inject.{AbstractModule, Provides, Singleton}
 import play.api.i18n.{I18nSupport, MessagesApi}
+import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
 
 import java.time.{Clock, ZoneOffset}
 
@@ -35,6 +36,12 @@ class Module extends AbstractModule {
   @Singleton
   def i18nSupport(api: MessagesApi): I18nSupport = new I18nSupport {
     override def messagesApi: MessagesApi = api
+  }
+
+  @Provides
+  @Singleton
+  def authorisedFunctions(ac: AuthConnector): AuthorisedFunctions = new AuthorisedFunctions {
+    override def authConnector: AuthConnector = ac
   }
 
 }

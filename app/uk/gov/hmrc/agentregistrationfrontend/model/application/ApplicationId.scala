@@ -14,24 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.journey
+package uk.gov.hmrc.agentregistrationfrontend.model.application
 
-import java.time.{Clock, Instant}
-import javax.inject.{Inject, Singleton}
+import play.api.libs.json.{Format, Json}
 
-@Singleton
-class JourneyFactory @Inject() (
-    clock:                  Clock,
-    journeyIdGenerator:     JourneyIdGenerator
-) {
-
-  def makeNewJourney(sessionId: SessionId): Journey = Journey(
-    _id                           = journeyIdGenerator.nextJourneyId(),
-    createdAt                     = Instant.now(clock),
-    sessionId = sessionId,
-    journeyState = JourneyStates.InProgress,
-    nino                          = None,
-    utr                    = None
-  )
+object ApplicationId {
+  implicit val format: Format[ApplicationId] = Json.valueFormat
 
 }
+
+final case class ApplicationId(value: String)
+

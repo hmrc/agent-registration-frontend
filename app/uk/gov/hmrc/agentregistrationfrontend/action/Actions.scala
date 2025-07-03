@@ -26,15 +26,15 @@ class Actions @Inject() (
     actionBuilder:                          DefaultActionBuilder,
     authenticatedAction: AuthenticatedAction,
     authorisedUtrAction: AuthorisedUtrAction,
-    getJourneyActionRefiner:                GetJourneyActionRefiner,
-    ensureJourney:                          EnsureJourney
+    getApplicationActionRefiner:                GetApplicationActionRefiner,
+    ensureApplication:                          EnsureApplication
 ) {
 
   val default: ActionBuilder[Request, AnyContent] = actionBuilder
 
-  val getJourneyInProgress: ActionBuilder[JourneyRequest, AnyContent] =
+  val getApplicationInProgress: ActionBuilder[ApplicationRequest, AnyContent] =
     default
     .andThen(authenticatedAction)
     .andThen(authorisedUtrAction)
-    .andThen(getJourneyActionRefiner)
+    .andThen(getApplicationActionRefiner)
 }

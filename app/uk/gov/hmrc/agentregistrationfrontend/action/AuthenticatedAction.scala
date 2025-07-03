@@ -20,11 +20,11 @@ import com.google.inject.{Inject, Singleton}
 import play.api.mvc.Results._
 import play.api.mvc._
 import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.config.{AppConfig, ErrorHandler}
 import uk.gov.hmrc.agentregistrationfrontend.model.Utr
 import uk.gov.hmrc.agentregistrationfrontend.util.{Errors, RequestAwareLogging}
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
-import uk.gov.hmrc.agentregistrationfrontend.views.Views
+import uk.gov.hmrc.agentregistrationfrontend.views.ErrorResults
 import uk.gov.hmrc.auth.core._
 import uk.gov.hmrc.auth.core.retrieve._
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
@@ -34,7 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class AuthenticatedAction @Inject() (
                                       af:           AuthorisedFunctions,
-                                      views: Views,
+                                      errorResults: ErrorResults,
                                       appConfig:   AppConfig,
                                       cc:           MessagesControllerComponents)(
     implicit
@@ -60,13 +60,14 @@ class AuthenticatedAction @Inject() (
       }
       .recoverWith {
         case _: NoActiveSession =>
-          //TODO: SafeRedirectUrl?
           Future.successful(Left(Redirect(
             url = appConfig.signInUri(uri"""${appConfig.thisFrontendBaseUrl}${request.uri}""").toString()
           )))
         case e: AuthorisationException =>
           logger.info(s"Authentication outcome: Failed. Unauthorised because of ${e.reason}, $e")
-          views.unauthorised.map(Left(_))
+          Future.successful(Left(
+            errorResults.unauthorised
+          ))
       }
   }
 

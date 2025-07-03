@@ -19,7 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers
 import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.views.Views
+import uk.gov.hmrc.agentregistrationfrontend.views.ErrorResults
+import uk.gov.hmrc.agentregistrationfrontend.views.html.HelloWorldPage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.{Inject, Singleton}
@@ -27,15 +28,16 @@ import javax.inject.{Inject, Singleton}
 @Singleton
 class HelloWorldController @Inject()(
                                       mcc: MessagesControllerComponents,
-                                      views: Views,
+                                      views: ErrorResults,
                                       i18n: I18nSupport,
                                       actions: Actions,
+                                      helloWorldPage: HelloWorldPage
                                     )
   extends FrontendController(mcc) {
 
   import i18n._
 
-  val helloWorld: Action[AnyContent] = actions.getJourneyInProgress { implicit request =>
-    Ok(views.helloWorldPage())
+  val helloWorld: Action[AnyContent] = actions.getApplicationInProgress { implicit request =>
+    Ok(helloWorldPage())
   }
 }

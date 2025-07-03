@@ -18,8 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.repository
 
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.journey.{Journey, JourneyId, SessionId}
-import uk.gov.hmrc.agentregistrationfrontend.repository.JourneyRepo._
+import uk.gov.hmrc.agentregistrationfrontend.model.application.{Application, ApplicationId, SessionId}
+import uk.gov.hmrc.agentregistrationfrontend.repository.ApplicationRepo._
 import uk.gov.hmrc.agentregistrationfrontend.repository.Repo.{IdExtractor, IdString}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs
@@ -30,32 +30,32 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-final class JourneyRepo @Inject() (
+final class ApplicationRepo @Inject()(
     mongoComponent: MongoComponent,
     config:         AppConfig
 )(implicit ec: ExecutionContext)
-  extends Repo[JourneyId, Journey](
-    collectionName = "journey",
+  extends Repo[ApplicationId, Application](
+    collectionName = "application",
     mongoComponent = mongoComponent,
-    indexes        = JourneyRepo.indexes(config.JourneyRepo.journeyRepoTtl),
-    extraCodecs    = Seq(Codecs.playFormatCodec(Journey.format)),
+    indexes        = ApplicationRepo.indexes(config.ApplicationRepo.applicationRepoTtl),
+    extraCodecs    = Seq(Codecs.playFormatCodec(Application.format)),
     replaceIndexes = true
   ) {
 
-  def findBySessionId(sessionId: SessionId): Future[Option[Journey]] =
+  def findBySessionId(sessionId: SessionId): Future[Option[Application]] =
     collection
       .find(filter = Filters.eq("sessionId", sessionId.value))
       .headOption()
 }
 
-object JourneyRepo {
+object ApplicationRepo {
 
-  implicit val journeyId: IdString[JourneyId] = new IdString[JourneyId] {
-    override def idString(i: JourneyId): String = i.value
+  implicit val applicationId: IdString[ApplicationId] = new IdString[ApplicationId] {
+    override def idString(i: ApplicationId): String = i.value
   }
 
-  implicit val journeyIdExtractor: IdExtractor[Journey, JourneyId] = new IdExtractor[Journey, JourneyId] {
-    override def id(j: Journey): JourneyId = j.journeyId
+  implicit val applicationIdExtractor: IdExtractor[Application, ApplicationId] = new IdExtractor[Application, ApplicationId] {
+    override def id(j: Application): ApplicationId = j.applicationId
   }
 
   def indexes(cacheTtl: FiniteDuration): Seq[IndexModel] = Seq(
