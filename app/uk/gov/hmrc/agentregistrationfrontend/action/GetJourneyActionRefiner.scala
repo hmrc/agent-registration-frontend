@@ -43,12 +43,9 @@ class GetApplicationActionRefiner @Inject() (
           maybeApplication match {
             case Some(application) => Right(new ApplicationRequest(application, request))
             case None =>
-              logger.warn(s"Application not found based on the sessionId from session, redirecting to the restore-application route")
-              Left(
-                Redirect(
-                  uk.gov.hmrc.agentregistrationfrontend.controllers.routes.ApplicationController.tryToRestoreApplication
-                )
-              )
+              val redirect = uk.gov.hmrc.agentregistrationfrontend.controllers.routes.ApplicationController.initializeApplication
+              logger.warn(s"Application not found based on the sessionId from session, redirecting to ${redirect.url}")
+              Left(Redirect(redirect))
           }
         }
     }

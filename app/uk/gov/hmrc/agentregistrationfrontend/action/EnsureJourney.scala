@@ -38,15 +38,13 @@ class EnsureApplication @Inject() ()(implicit ec: ExecutionContext) extends Requ
         if (predicate(application)) None
         else {
           val call = redirectF(application)
-          logger.warn(s"$hintWhyRedirecting (current application state: ${request.application.hasFinished.toString}), redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page.")
+          logger.warn(s"$hintWhyRedirecting (current application state: ${request.application.applicationState}), redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page.")
           Some(Redirect(call))
         }
       Future.successful(result)
     }
 
     override protected def executionContext: ExecutionContext = ec
-
-
 
   }
 }

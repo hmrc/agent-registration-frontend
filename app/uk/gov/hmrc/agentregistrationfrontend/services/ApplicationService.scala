@@ -37,12 +37,13 @@ class ApplicationService @Inject()(
     val maybeApplicationFromBackend: Option[Application] = None //this is a placeholder
     maybeApplicationFromBackend
       .map(_.copy(sessionId = request.sessionId))
-      .getOrElse(newApplication())
+      .getOrElse(upsertNewApplication())
 
   }
 
-  def newApplication()(implicit request: AuthorisedUtrRequest[_]): Future[Application] = {
-    val application: Application = applicationFactory.makeNewApplication(sessionId = request.sessionId)
+  def upsertNewApplication()(implicit request: AuthorisedUtrRequest[_]): Future[Application] = {
+    val application: Application = applicationFactory
+      .makeNewApplication(sessionId = request.sessionId)
 
     upsert(application)
       .map{ _ =>

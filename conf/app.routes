@@ -1,8 +1,9 @@
 # microservice specific routes
 
-GET        /                                  uk.gov.hmrc.agentregistrationfrontend.controllers.HelloWorldController.helloWorld
+GET        /                                  uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.landing
 
-GET        /try-to-restore-application        uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.initializeApplication
+GET        /new-application                   uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.initializeApplication
 
-GET        /new-application                   uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.tryToRestoreApplication
+
+GET        /application-submitted             uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.applicationSubmitted
 

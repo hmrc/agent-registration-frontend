@@ -32,9 +32,25 @@ class Actions @Inject() (
 
   val default: ActionBuilder[Request, AnyContent] = actionBuilder
 
-  val getApplicationInProgress: ActionBuilder[ApplicationRequest, AnyContent] =
-    default
+  val authorisedUtr = default
     .andThen(authenticatedAction)
     .andThen(authorisedUtrAction)
+
+  val getApplicationInProgress: ActionBuilder[ApplicationRequest, AnyContent] =
+    authorisedUtr
     .andThen(getApplicationActionRefiner)
+      .andThen(ensureApplication.ensureApplication(
+        predicate = _.isInProgress,
+        redirectF = _ => uk.gov.hmrc.agentregistrationfrontend.controllers.routes.ApplicationController.applicationSubmitted,
+        hintWhyRedirecting = "The application is in the final state"
+      ))
+
+  val getApplicationSubmitted: ActionBuilder[ApplicationRequest, AnyContent] =
+    authorisedUtr
+    .andThen(getApplicationActionRefiner)
+      .andThen(ensureApplication.ensureApplication(
+        predicate = _.hasFinished,
+        redirectF = _ => uk.gov.hmrc.agentregistrationfrontend.controllers.routes.ApplicationController.landing,
+        hintWhyRedirecting = "The application is not in the final state"
+      ))
 }
