@@ -16,78 +16,75 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.util
 
-import play.api.mvc.{Request, RequestHeader}
+import play.api.mvc.Request
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.UpstreamErrorResponse
 
 import scala.concurrent.Future
 
-object Errors extends RequestAwareLogging {
+object Errors
+extends RequestAwareLogging:
 
-  /**
-   * Creates a requirement which has to pass in order to continue computation.
-   * If it fails it will result in Upstream4xxResponse.
-   */
-  def require(requirement: Boolean, message: => String)(implicit request: RequestHeader): Unit = {
-    if (!requirement) {
+  /** Creates a requirement which has to pass in order to continue computation. If it fails it will result in Upstream4xxResponse.
+    */
+  def require(
+    requirement: Boolean,
+    message: => String
+  )(implicit request: RequestHeader): Unit =
+    if !requirement then
       logger.error(s"Requirement failed: $message")
       throw UpstreamErrorResponse(message, play.mvc.Http.Status.BAD_REQUEST)
-    } else ()
-  }
+    else ()
 
-  def requireF(requirement: Boolean, message: => String)(implicit request: Request[_]): Future[Unit] = {
-    if (!requirement) {
+  def requireF(
+    requirement: Boolean,
+    message: => String
+  )(implicit request: Request[?]): Future[Unit] =
+    if !requirement then
       logger.error(s"Requirement failed: $message")
       Future.failed(UpstreamErrorResponse(message, play.mvc.Http.Status.BAD_REQUEST))
-    } else Future.successful(())
-  }
+    else Future.successful(())
 
-  @inline def throwBadRequestException(message: => String)(implicit request: RequestHeader): Nothing = {
+  @inline def throwBadRequestException(message: => String)(implicit request: RequestHeader): Nothing =
     logger.error(message)
     throw UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.BAD_REQUEST
     )
-  }
 
-  @inline def throwBadRequestExceptionF(message: => String)(implicit request: RequestHeader): Future[Nothing] = {
+  @inline def throwBadRequestExceptionF(message: => String)(implicit request: RequestHeader): Future[Nothing] =
     logger.error(message)
     Future.failed(UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.BAD_REQUEST
     ))
-  }
 
-  @inline def throwNotFoundException(message: => String)(implicit request: RequestHeader): Nothing = {
+  @inline def throwNotFoundException(message: => String)(implicit request: RequestHeader): Nothing =
     logger.error(message)
     throw UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.NOT_FOUND
     )
-  }
 
-  @inline def throwServerErrorException(message: => String)(implicit request: RequestHeader): Nothing = {
+  @inline def throwServerErrorException(message: => String)(implicit request: RequestHeader): Nothing =
     logger.error(message)
     throw UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.INTERNAL_SERVER_ERROR
     )
-  }
 
-  /**
-   * Call this to ensure that we don't do stupid things,
-   * like make illegal transitions (eg. from Finished to New)
-   */
-  def sanityCheck(requirement: Boolean, message: => String)(implicit request: RequestHeader): Unit = {
-    if (!requirement) {
+  /** Call this to ensure that we don't do stupid things, like make illegal transitions (eg. from Finished to New)
+    */
+  def sanityCheck(
+    requirement: Boolean,
+    message: => String
+  )(implicit request: RequestHeader): Unit =
+    if !requirement then
       logger.error(message)
       throw UpstreamErrorResponse(message, play.mvc.Http.Status.INTERNAL_SERVER_ERROR)
-    } else ()
-  }
+    else ()
 
-  def notImplemented(message: => String = "")(implicit request: RequestHeader): Nothing = {
+  def notImplemented(message: => String = "")(implicit request: RequestHeader): Nothing =
     val m = s"Unimplemented: $message"
     logger.error(m)
     throw UpstreamErrorResponse(m, play.mvc.Http.Status.NOT_IMPLEMENTED)
-  }
-
-}

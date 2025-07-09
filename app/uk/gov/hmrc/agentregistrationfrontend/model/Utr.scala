@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.model
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.Format
 
-final case class Utr(value: String) extends AnyVal
+final case class Utr(  value: String)
 
-object Utr {
-  implicit val format: Format[Utr] = Json.valueFormat[Utr]
-}
+object Utr:
+  given format: Format[Utr] = summon[Format[String]].inmap(Utr(_), _.value)

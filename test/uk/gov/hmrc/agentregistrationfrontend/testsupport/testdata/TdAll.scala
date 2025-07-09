@@ -16,19 +16,17 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-object TdAll {
+object TdAll:
 
-  def apply(): TdAll = new TdAll {
-  }
+  def apply(): TdAll = new TdAll {}
 
   val tdAll: TdAll = new TdAll {}
-}
 
 /**
  * TestData (Td), All instances
  */
 trait TdAll
   extends AnyRef
-  with TdBase
-  with TdRequest
+    with TdBase
+    with TdRequest
 

@@ -16,47 +16,37 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.util
 
-import play.api.i18n._
+import play.api.i18n.*
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.http.{HeaderCarrier, SessionKeys}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
 
 import javax.inject.Inject
 
-/**
- * I'm repeating a pattern which was brought originally by play-framework
- * and putting some more data which can be derived from a request
- *
- * Use it to provide HeaderCarrier, Lang, or Messages
- */
-class RequestSupport @Inject() (i18nSupport: I18nSupport) {
+/** I'm repeating a pattern which was brought originally by play-framework and putting some more data which can be derived from a request
+  *
+  * Use it to provide HeaderCarrier, Lang, or Messages
+  */
+class RequestSupport @Inject() (i18nSupport: I18nSupport):
 
-  def lang(implicit requestHeader: RequestHeader): Lang = i18nSupport.request2Messages(requestHeader).lang
+  def lang(using requestHeader: RequestHeader): Lang = i18nSupport.request2Messages(requestHeader).lang
 
-  implicit def legacyMessages(implicit requestHeader: RequestHeader): Messages = {
-    i18nSupport.request2Messages(requestHeader)
-  }
+  given legacyMessages(using requestHeader: RequestHeader): Messages = i18nSupport.request2Messages(requestHeader)
 
-  implicit def hc(implicit request: RequestHeader): HeaderCarrier = RequestSupport.hc
-}
+  given hc(using request: RequestHeader): HeaderCarrier = RequestSupport.hc
 
-object RequestSupport {
+object RequestSupport:
 
-  implicit def hc(implicit request: RequestHeader): HeaderCarrier = HcProvider.headerCarrier
+  given hc(using request: RequestHeader): HeaderCarrier = HcProvider.headerCarrier
 
-  /**
-   * Naive way of checking if user is logged in. Use it in views only.
-   * For more real check see auth.AuthService
-   */
-  def isLoggedIn(implicit request: RequestHeader): Boolean = request.session.get(SessionKeys.authToken).isDefined
+  /** Naive way of checking if user is logged in. Use it in views only. For more real check see auth.AuthService
+    */
+  def isLoggedIn(using request: RequestHeader): Boolean = request.session.get(SessionKeys.authToken).isDefined
 
-  /**
-   * This is because we want to give responsibility of creation of HeaderCarrier to the platform code.
-   * If they refactor how hc is created our code will pick it up automatically.
-   */
-  private object HcProvider extends FrontendHeaderCarrierProvider {
-    def headerCarrier(implicit request: RequestHeader): HeaderCarrier = hc(request)
-  }
-
-}
-
+  /** This is because we want to give responsibility of creation of HeaderCarrier to the platform code. If they refactor how hc is created our code will pick it
+    * up automatically.
+    */
+  private object HcProvider
+  extends FrontendHeaderCarrierProvider:
+    def headerCarrier(using request: RequestHeader): HeaderCarrier = this.hc(request)

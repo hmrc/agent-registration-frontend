@@ -22,42 +22,29 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
 import play.api.Logger
 
-import scala.util.chaining.scalaUtilChainingOps
-
-trait WireMockSupport extends BeforeAndAfterAll with BeforeAndAfterEach {
+trait WireMockSupport extends BeforeAndAfterAll, BeforeAndAfterEach:
   self: Suite =>
 
   private val logger = Logger(getClass)
-  implicit val wireMockServer: WireMockServer = new WireMockServer(WireMockConfiguration.wireMockConfig().port(WireMockSupport.port))
+  implicit val wireMockServer: WireMockServer = WireMockServer(WireMockConfiguration.wireMockConfig().port(WireMockSupport.port))
 
   WireMock.configureFor(WireMockSupport.port)
 
-  override protected def beforeAll(): Unit = {
+  override protected def beforeAll(): Unit =
     logger.info("Starting wiremock server...")
     wireMockServer.start()
     logger.info(s"Starting wiremock server - done, running=${wireMockServer.isRunning.toString} on ${wireMockServer.port().toString} port")
-  }
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     logger.info("Resetting wire mock server ...")
     WireMock.reset()
     logger.info("Resetting wire mock server - done")
-  }
 
-  override protected def afterAll(): Unit = {
+  override protected def afterAll(): Unit =
     logger.info("Stopping wire mock server ...")
     wireMockServer.stop()
     logger.info("Stopping wire mock server - done")
-  }
-}
 
-object WireMockSupport {
-  private val logger: Logger = Logger(getClass)
-
-  lazy val port: Int = logger
-    .info("Finding free port for wiremock server...")
-    .pipe(_ => FreePortFinder.findFreePort())
-    .tap(port => logger.info(s"Found free port for wiremock server - $port"))
-
-}
+object WireMockSupport:
+  lazy val port: Int = 11111
 

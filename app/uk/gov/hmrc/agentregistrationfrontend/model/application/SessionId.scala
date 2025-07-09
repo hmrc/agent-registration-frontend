@@ -16,14 +16,18 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.model.application
 
-import play.api.libs.functional.syntax._
+import play.api.libs.functional.syntax.*
 import play.api.libs.json.Format
 
 final case class SessionId(value: String)
 
-object SessionId {
-  //bridge between two domain worlds
-  implicit def fromLoggingSessionId(sid: uk.gov.hmrc.http.SessionId): SessionId = SessionId(sid.value)
-  implicit def fromLoggingSessionId(sid: Option[uk.gov.hmrc.http.SessionId]): Option[SessionId] = sid.map(x => x: SessionId)
-  implicit val format: Format[SessionId] = implicitly[Format[String]].inmap(SessionId(_), _.value)
-}
+object SessionId:
+
+  // bridge between two domain worlds
+  given Conversion[uk.gov.hmrc.http.SessionId, SessionId] with
+    def apply(sid: uk.gov.hmrc.http.SessionId): SessionId = SessionId(sid.value)
+
+  given Conversion[Option[uk.gov.hmrc.http.SessionId], Option[SessionId]] with
+    def apply(sid: Option[uk.gov.hmrc.http.SessionId]): Option[SessionId] = sid.map(x => summon[Conversion[uk.gov.hmrc.http.SessionId, SessionId]](x))
+
+  given Format[SessionId] = summon[Format[String]].inmap(SessionId(_), _.value)

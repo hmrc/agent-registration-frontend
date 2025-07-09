@@ -16,21 +16,13 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.model.application
 
-import enumeratum.{Enum, EnumEntry}
 import play.api.libs.json.Format
 import uk.gov.hmrc.agentregistrationfrontend.util.EnumFormat
 
-import scala.collection.immutable
+enum ApplicationState:
 
-sealed trait ApplicationState extends EnumEntry
+  case InProgress
+  case Submitted
 
-object ApplicationState {
-  implicit val format: Format[ApplicationState] = EnumFormat(ApplicationStates)
-}
-
-object ApplicationStates extends Enum[ApplicationState] {
-  case object InProgress extends ApplicationState
-  case object Submitted extends ApplicationState
-
-  override def values: immutable.IndexedSeq[ApplicationState] = findValues
-}
+object ApplicationState:
+  given Format[ApplicationState] = EnumFormat.enumFormat[ApplicationState]

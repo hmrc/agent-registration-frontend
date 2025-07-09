@@ -16,41 +16,38 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action
 
-import play.api.mvc._
-import uk.gov.hmrc.agentregistrationfrontend.util.SafeEquals.EqualsOps
+import play.api.mvc.*
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class Actions @Inject() (
-    actionBuilder:                          DefaultActionBuilder,
-    authenticatedAction: AuthenticatedAction,
-    authorisedUtrAction: AuthorisedUtrAction,
-    getApplicationActionRefiner:                GetApplicationActionRefiner,
-    ensureApplication:                          EnsureApplication
-) {
+  actionBuilder: DefaultActionBuilder,
+  authenticatedAction: AuthenticatedAction,
+  authorisedUtrAction: AuthorisedUtrAction,
+  getApplicationActionRefiner: GetApplicationActionRefiner,
+  ensureApplication: EnsureApplication
+):
 
   val default: ActionBuilder[Request, AnyContent] = actionBuilder
 
-  val authorisedUtr = default
+  val authorisedUtr: ActionBuilder[AuthorisedUtrRequest, AnyContent] = default
     .andThen(authenticatedAction)
     .andThen(authorisedUtrAction)
 
-  val getApplicationInProgress: ActionBuilder[ApplicationRequest, AnyContent] =
-    authorisedUtr
+  val getApplicationInProgress: ActionBuilder[ApplicationRequest, AnyContent] = authorisedUtr
     .andThen(getApplicationActionRefiner)
-      .andThen(ensureApplication.ensureApplication(
-        predicate = _.isInProgress,
-        redirectF = _ => uk.gov.hmrc.agentregistrationfrontend.controllers.routes.ApplicationController.applicationSubmitted,
-        hintWhyRedirecting = "The application is in the final state"
-      ))
+    .andThen(ensureApplication.ensureApplication(
+      predicate = _.isInProgress,
+      redirectF = _ => uk.gov.hmrc.agentregistrationfrontend.controllers.routes.ApplicationController.applicationSubmitted,
+      hintWhyRedirecting = "The application is in the final state"
+    ))
 
-  val getApplicationSubmitted: ActionBuilder[ApplicationRequest, AnyContent] =
-    authorisedUtr
+  val getApplicationSubmitted: ActionBuilder[ApplicationRequest, AnyContent] = authorisedUtr
     .andThen(getApplicationActionRefiner)
-      .andThen(ensureApplication.ensureApplication(
-        predicate = _.hasFinished,
-        redirectF = _ => uk.gov.hmrc.agentregistrationfrontend.controllers.routes.ApplicationController.landing,
-        hintWhyRedirecting = "The application is not in the final state"
-      ))
-}
+    .andThen(ensureApplication.ensureApplication(
+      predicate = _.hasFinished,
+      redirectF = _ => uk.gov.hmrc.agentregistrationfrontend.controllers.routes.ApplicationController.landing,
+      hintWhyRedirecting = "The application is not in the final state"
+    ))

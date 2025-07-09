@@ -16,26 +16,21 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.views
 
-import play.api.i18n.{I18nSupport, Messages, MessagesApi, MessagesProvider}
+import play.api.i18n.I18nSupport
+import play.api.i18n.Messages
 import play.api.mvc.Results.Unauthorized
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
-import play.twirl.api.Html
-import uk.gov.hmrc.agentregistrationfrontend.config.ErrorHandler
 import uk.gov.hmrc.agentregistrationfrontend.views.html.ErrorTemplate
-import uk.gov.hmrc.agentregistrationfrontend.views.html.HelloWorldPage
 
 import javax.inject.Inject
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
 class ErrorResults @Inject() (
   errorTemplate: ErrorTemplate,
-  i18n: I18nSupport,
-  messagesApi: MessagesApi
-) {
+  i18n: I18nSupport
+):
 
-  import i18n._
+  import i18n.*
 
   def unauthorised(implicit request: RequestHeader): Result = Unauthorized(
     errorTemplate(
@@ -44,4 +39,3 @@ class ErrorResults @Inject() (
       message = ""
     )
   )
-}

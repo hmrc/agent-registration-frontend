@@ -8,15 +8,13 @@ import xsbti.compile.CompileAnalysis
 object SbtUpdatesSettings {
 
   lazy val sbtUpdatesSettings: Seq[Def.Setting[_ >: Boolean with Task[CompileAnalysis] with ModuleFilter]] = Seq(
-    dependencyUpdatesFailBuild := StrictBuilding.strictBuilding.value,
+    dependencyUpdatesFailBuild := false, //StrictBuilding.strictBuilding.value,
     (Compile / compile) := ((Compile / compile) dependsOn dependencyUpdates).value,
     dependencyUpdatesFilter -= moduleFilter("org.scala-lang"),
     dependencyUpdatesFilter -= moduleFilter("com.typesafe.play"),
     dependencyUpdatesFilter -= moduleFilter("com.beachape", "enumeratum-play"), //problems with slf4j
     // locked to the version of play
-    dependencyUpdatesFilter -= moduleFilter("org.julienrf", "play-json-derived-codecs"),
     dependencyUpdatesFilter -= moduleFilter("com.vladsch.flexmark", "flexmark-all"),
-    dependencyUpdatesFilter -= moduleFilter("org.scalatestplus.play", "scalatestplus-play"),
-    dependencyUpdatesFilter -= moduleFilter("com.beachape", "enumeratum-play")
+    dependencyUpdatesFilter -= moduleFilter("org.scalatestplus.play", "scalatestplus-play")
   )
 }

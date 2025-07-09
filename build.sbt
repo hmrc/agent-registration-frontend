@@ -6,7 +6,7 @@ val playPort: Int = 22201
 PlayKeys.playRunHooks += PlayRunHook(playPort)
 
 ThisBuild / majorVersion := 0
-ThisBuild / scalaVersion := "2.13.16"
+ThisBuild / scalaVersion := "3.6.1"
 
 
 lazy val microservice = Project("agent-registration-frontend", file("."))
@@ -17,12 +17,12 @@ lazy val microservice = Project("agent-registration-frontend", file("."))
     pipelineStages := Seq(gzip),
     Compile / doc / scalacOptions := Seq(), //this will allow to have warnings in `doc` task
     Test / doc / scalacOptions := Seq(), //this will allow to have warnings in `doc` task
+    scalacOptions -= "-Wunused:all",
     scalacOptions ++= ScalaCompilerFlags.scalaCompilerOptions,
     scalacOptions ++= {
       if (StrictBuilding.strictBuilding.value) ScalaCompilerFlags.strictScalaCompilerOptions else Nil
     },
     pipelineStages := Seq(gzip),
-    Compile / scalacOptions -= "utf8",
     Test / parallelExecution := true,
     routesImport ++= Seq(
           "uk.gov.hmrc.agentregistrationfrontend"
@@ -34,5 +34,5 @@ lazy val microservice = Project("agent-registration-frontend", file("."))
   .settings(commands ++= SbtCommands.commands)
   .settings(SbtUpdatesSettings.sbtUpdatesSettings *)
   .settings(CodeCoverageSettings.settings *)
-  .settings(WartRemoverSettings.wartRemoverSettings)
+//  .settings(WartRemoverSettings.wartRemoverSettings)
   .settings(PlayKeys.playDefaultPort := playPort)

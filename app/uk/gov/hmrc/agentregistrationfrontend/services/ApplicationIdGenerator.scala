@@ -22,6 +22,5 @@ import uk.gov.hmrc.agentregistrationfrontend.model.application.ApplicationId
 import javax.inject.Singleton
 
 @Singleton
-class ApplicationIdGenerator {
+class ApplicationIdGenerator:
   def nextApplicationId(): ApplicationId = ApplicationId(ObjectId.get().toHexString)
-}

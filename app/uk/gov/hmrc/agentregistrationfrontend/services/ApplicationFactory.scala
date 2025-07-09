@@ -16,24 +16,26 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.services
 
-import uk.gov.hmrc.agentregistrationfrontend.model.application.{Application, ApplicationStates, SessionId}
+import uk.gov.hmrc.agentregistrationfrontend.model.application.Application
+import uk.gov.hmrc.agentregistrationfrontend.model.application.ApplicationState
+import uk.gov.hmrc.agentregistrationfrontend.model.application.SessionId
 
-import java.time.{Clock, Instant}
-import javax.inject.{Inject, Singleton}
+import java.time.Clock
+import java.time.Instant
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
-class ApplicationFactory @Inject()(
-    clock:                  Clock,
-    applicationIdGenerator:     ApplicationIdGenerator
-) {
+class ApplicationFactory @Inject() (
+  clock: Clock,
+  applicationIdGenerator: ApplicationIdGenerator
+):
 
   def makeNewApplication(sessionId: SessionId): Application = Application(
-    _id                           = applicationIdGenerator.nextApplicationId(),
-    createdAt                     = Instant.now(clock),
+    _id = applicationIdGenerator.nextApplicationId(),
+    createdAt = Instant.now(clock),
     sessionId = sessionId,
-    applicationState = ApplicationStates.InProgress,
-    nino                          = None,
-    utr                    = None
+    applicationState = ApplicationState.InProgress,
+    nino = None,
+    utr = None
   )
-
-}

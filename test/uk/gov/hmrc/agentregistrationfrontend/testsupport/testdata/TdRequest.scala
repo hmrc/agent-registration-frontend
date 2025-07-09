@@ -20,8 +20,7 @@ import play.api.mvc.{AnyContentAsEmpty, Request}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport._
 
-
-trait TdRequest {
+trait TdRequest:
 
   lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
     .withAuthToken()
@@ -31,7 +30,7 @@ trait TdRequest {
     .withTrueClientPort()
     .withDeviceId()
 
-  lazy val request: Request[_] = fakeRequest
+  lazy val request: Request[?] = fakeRequest
 
   lazy val requestNotLoggedIn: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
     .withAkamaiReputationHeader()
@@ -46,5 +45,3 @@ trait TdRequest {
   lazy val trueClientIp: String = "client-ip-123"
   lazy val trueClientPort: String = "client-port-123"
   lazy val deviceIdInRequest: String = "device-id-123"
-
-}

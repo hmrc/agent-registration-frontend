@@ -17,14 +17,11 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
 import play.api.i18n.I18nSupport
-import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.ErrorResults
-import uk.gov.hmrc.agentregistrationfrontend.views.html.HelloWorldPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -41,9 +38,9 @@ class ApplicationController @Inject() (
   simplePage: SimplePage,
   i18nSupport: I18nSupport
 )(implicit executionContext: ExecutionContext)
-extends FrontendController(mcc) {
+extends FrontendController(mcc):
 
-  import i18nSupport._
+  import i18nSupport.*
 
   val initializeApplication: Action[AnyContent] = actions.authorisedUtr.async { implicit request =>
     applicationService
@@ -68,5 +65,3 @@ extends FrontendController(mcc) {
       )
     )))
   }
-
-}

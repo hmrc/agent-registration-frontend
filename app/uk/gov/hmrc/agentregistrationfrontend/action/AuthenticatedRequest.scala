@@ -16,19 +16,20 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action
 
-import play.api.mvc.{Request, WrappedRequest}
+import play.api.mvc.Request
+import play.api.mvc.WrappedRequest
 import uk.gov.hmrc.agentregistrationfrontend.model.Utr
 import uk.gov.hmrc.agentregistrationfrontend.model.application.SessionId
 import uk.gov.hmrc.auth.core.Enrolments
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
-final class AuthenticatedRequest[A](val request: Request[A],
-                                    val enrolments: Enrolments,
-                                    val utr: Option[Utr],
-                                    val credentials: Option[Credentials],
-                                    val sessionId: SessionId
-                                   ) extends WrappedRequest[A](request) {
+final class AuthenticatedRequest[A](
+  val request: Request[A],
+  val enrolments: Enrolments,
+  val utr: Option[Utr],
+  val credentials: Option[Credentials],
+  val sessionId: SessionId
+)
+extends WrappedRequest[A](request):
 
   lazy val hasActiveSaEnrolment: Boolean = enrolments.enrolments.exists(e => e.key == "IR-SA" && e.isActivated)
-
-}

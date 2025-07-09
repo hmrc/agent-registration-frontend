@@ -22,13 +22,13 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
 
 /** A logger which is aware of the request. It will append to the message extra information such as session ID, request ID, user agent, referer, and device ID
- * etc.
- *
- * Logged messages are enriched with request-specific context.
- */
+  * etc.
+  *
+  * Logged messages are enriched with request-specific context.
+  */
 class RequestAwareLogger(
-                          delegateLogger: Logger
-                        ) {
+  delegateLogger: Logger
+):
 
   def debug(message: => String)(implicit request: RequestHeader): Unit = logMessage(message, Debug)
 
@@ -39,36 +39,36 @@ class RequestAwareLogger(
   def error(message: => String)(implicit request: RequestHeader): Unit = logMessage(message, Error)
 
   def debug(
-             message: => String,
-             ex: Throwable
-           )(implicit request: RequestHeader): Unit = logMessage(
+    message: => String,
+    ex: Throwable
+  )(implicit request: RequestHeader): Unit = logMessage(
     message,
     ex,
     Debug
   )
 
   def info(
-            message: => String,
-            ex: Throwable
-          )(implicit request: RequestHeader): Unit = logMessage(
+    message: => String,
+    ex: Throwable
+  )(implicit request: RequestHeader): Unit = logMessage(
     message,
     ex,
     Info
   )
 
   def warn(
-            message: => String,
-            ex: Throwable
-          )(implicit request: RequestHeader): Unit = logMessage(
+    message: => String,
+    ex: Throwable
+  )(implicit request: RequestHeader): Unit = logMessage(
     message,
     ex,
     Warn
   )
 
   def error(
-             message: => String,
-             ex: Throwable
-           )(implicit request: RequestHeader): Unit = logMessage(
+    message: => String,
+    ex: Throwable
+  )(implicit request: RequestHeader): Unit = logMessage(
     message,
     ex,
     Error
@@ -86,51 +86,43 @@ class RequestAwareLogger(
 
   private def deviceId(implicit r: RequestHeader) = s"[DeviceId: ${hc.deviceID.getOrElse("")}]"
 
-  private def makeRichMessage(message: String)(implicit request: RequestHeader): String = {
-    request match {
+  private def makeRichMessage(message: String)(implicit request: RequestHeader): String =
+    request match
       case _ => s"$message $context "
-    }
-  }
 
   private sealed trait LogLevel
 
   private case object Debug
-    extends LogLevel
+  extends LogLevel
 
   private case object Info
-    extends LogLevel
+  extends LogLevel
 
   private case object Warn
-    extends LogLevel
+  extends LogLevel
 
   private case object Error
-    extends LogLevel
+  extends LogLevel
 
   private def logMessage(
-                          message: => String,
-                          level: LogLevel
-                        )(implicit request: RequestHeader): Unit = {
+    message: => String,
+    level: LogLevel
+  )(implicit request: RequestHeader): Unit =
     lazy val richMessage = makeRichMessage(message)
-    level match {
+    level match
       case Debug => delegateLogger.debug(richMessage)
       case Info => delegateLogger.info(richMessage)
       case Warn => delegateLogger.warn(richMessage)
       case Error => delegateLogger.error(richMessage)
-    }
-  }
 
   private def logMessage(
-                          message: => String,
-                          ex: Throwable,
-                          level: LogLevel
-                        )(implicit request: RequestHeader): Unit = {
+    message: => String,
+    ex: Throwable,
+    level: LogLevel
+  )(implicit request: RequestHeader): Unit =
     lazy val richMessage = makeRichMessage(message)
-    level match {
+    level match
       case Debug => delegateLogger.debug(richMessage, ex)
       case Info => delegateLogger.info(richMessage, ex)
       case Warn => delegateLogger.warn(richMessage, ex)
       case Error => delegateLogger.error(richMessage, ex)
-    }
-  }
-
-}

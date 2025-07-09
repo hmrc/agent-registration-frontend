@@ -21,36 +21,34 @@ import uk.gov.hmrc.http.{HeaderNames, SessionKeys}
 
 import java.time.LocalDate
 
-object TdSupport {
+object TdSupport:
 
-  implicit class FakeRequestOps[T](r: FakeRequest[T]) {
-
-    def withAuthToken(authToken: String = TdAll.tdAll.authToken): FakeRequest[T] = r.withSession((SessionKeys.authToken, authToken))
+  extension [T](r: FakeRequest[T])
+    def withAuthToken(authToken: String = TdAll.tdAll.authToken): FakeRequest[T] =
+      r.withSession((SessionKeys.authToken, authToken))
 
     def withAkamaiReputationHeader(
-        akamaiReputationValue: String = TdAll.tdAll.akamaiReputationValue
-    ): FakeRequest[T] = r.withHeaders(
-      HeaderNames.akamaiReputation -> akamaiReputationValue
-    )
+                                    akamaiReputationValue: String = TdAll.tdAll.akamaiReputationValue
+                                  ): FakeRequest[T] =
+      r.withHeaders(HeaderNames.akamaiReputation -> akamaiReputationValue)
 
-    def withRequestId(requestId: String = TdAll.tdAll.requestId): FakeRequest[T] = r.withHeaders(
-      HeaderNames.xRequestId -> requestId
-    )
+    def withRequestId(requestId: String = TdAll.tdAll.requestId): FakeRequest[T] =
+      r.withHeaders(HeaderNames.xRequestId -> requestId)
 
-    def withTrueClientIp(ip: String = TdAll.tdAll.trueClientIp): FakeRequest[T] = r.withHeaders(
-      HeaderNames.trueClientIp -> ip
-    )
+    def withTrueClientIp(ip: String = TdAll.tdAll.trueClientIp): FakeRequest[T] =
+      r.withHeaders(HeaderNames.trueClientIp -> ip)
 
-    def withTrueClientPort(port: String = TdAll.tdAll.trueClientPort): FakeRequest[T] = r.withHeaders(
-      HeaderNames.trueClientPort -> port
-    )
+    def withTrueClientPort(port: String = TdAll.tdAll.trueClientPort): FakeRequest[T] =
+      r.withHeaders(HeaderNames.trueClientPort -> port)
 
-    def withDeviceId(deviceId: String = TdAll.tdAll.deviceIdInRequest): FakeRequest[T] = r.withHeaders(
-      HeaderNames.deviceID -> deviceId
-    )
-  }
+    def withDeviceId(deviceId: String = TdAll.tdAll.deviceIdInRequest): FakeRequest[T] =
+      r.withHeaders(HeaderNames.deviceID -> deviceId)
 
-  implicit def toSome[T](t: T): Option[T] = Some(t)
-  implicit def toLocalDate(s: String): LocalDate = LocalDate.parse(s)
-  implicit def toOptionLocalDate(s: String): Option[LocalDate] = Some(LocalDate.parse(s))
-}
+  given [T]: Conversion[T, Option[T]] with
+    def apply(t: T): Option[T] = Some(t)
+
+  given Conversion[String, LocalDate] with
+    def apply(s: String): LocalDate = LocalDate.parse(s)
+
+  given Conversion[String, Option[LocalDate]] with
+    def apply(s: String): Option[LocalDate] = Some(LocalDate.parse(s))

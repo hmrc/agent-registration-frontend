@@ -17,34 +17,38 @@
 package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.mvc.Results.Redirect
-import play.api.mvc.{ActionFilter, Call, Result}
+import play.api.mvc.ActionFilter
+import play.api.mvc.Call
+import play.api.mvc.Result
 import uk.gov.hmrc.agentregistrationfrontend.model.application.Application
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
-class EnsureApplication @Inject() ()(implicit ec: ExecutionContext) extends RequestAwareLogging{
+class EnsureApplication @Inject() ()(implicit ec: ExecutionContext)
+extends RequestAwareLogging:
 
-  /**
-   * Check if application matches predicate. If it doesn't, it will send the Redirect.
-   */
-  def ensureApplication(predicate: Application => Boolean, redirectF: Application => Call, hintWhyRedirecting: String): ActionFilter[ApplicationRequest] = new ActionFilter[ApplicationRequest] {
-    override def filter[A](request: ApplicationRequest[A]): Future[Option[Result]] = {
-      implicit val r: ApplicationRequest[A] = request
-      val application = request.application
-      val result: Option[Result] =
-        if (predicate(application)) None
-        else {
-          val call = redirectF(application)
-          logger.warn(s"$hintWhyRedirecting (current application state: ${request.application.applicationState}), redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page.")
-          Some(Redirect(call))
-        }
-      Future.successful(result)
-    }
+  /** Check if application matches predicate. If it doesn't, it will send the Redirect.
+    */
+  def ensureApplication(
+    predicate: Application => Boolean,
+    redirectF: Application => Call,
+    hintWhyRedirecting: String
+  ): ActionFilter[ApplicationRequest] =
+    new ActionFilter[ApplicationRequest]:
+      override def filter[A](request: ApplicationRequest[A]): Future[Option[Result]] =
+        implicit val r: ApplicationRequest[A] = request
+        val application = request.application
+        val result: Option[Result] =
+          if predicate(application) then None
+          else
+            val call = redirectF(application)
+            logger.warn(s"$hintWhyRedirecting (current application state: ${request.application.applicationState.toString}), redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page.")
+            Some(Redirect(call))
+        Future.successful(result)
 
-    override protected def executionContext: ExecutionContext = ec
-
-  }
-}
+      override protected def executionContext: ExecutionContext = ec

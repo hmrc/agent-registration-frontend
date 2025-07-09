@@ -19,27 +19,24 @@ package uk.gov.hmrc.agentregistrationfrontend.ispecs
 import com.google.inject.AbstractModule
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.freespec.AnyFreeSpecLike
-import org.scalatest.matchers.should.Matchers
 import org.scalatest.time.{Millis, Seconds, Span}
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.test.{DefaultTestServerFactory, TestServerFactory}
 import play.api.{Application, Logging, Mode}
 import play.core.server.ServerConfig
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.{FreePortFinder, WireMockSupport}
+import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.WireMockSupport
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.RichMatchers
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 
 import java.time.{Clock, Instant, ZoneId}
-import scala.util.chaining.scalaUtilChainingOps
 
 trait ISpec
   extends AnyFreeSpecLike
     with RichMatchers
     with BeforeAndAfterEach
     with GuiceOneServerPerSuite
-    with WireMockSupport
-    {
+    with WireMockSupport:
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(timeout = scaled(Span(3, Seconds)), interval = scaled(Span(300, Millis)))
   private val testServerPort = ISpec.testServerPort
@@ -59,38 +56,27 @@ trait ISpec
     "auditing.traceRequests" -> false
   )
 
-  lazy val overridingsModule: AbstractModule = new AbstractModule {
-    override def configure(): Unit = {
+  lazy val overridingsModule: AbstractModule = new AbstractModule:
+    override def configure(): Unit =
       bind(classOf[Clock]).toInstance(clock)
-    }
-  }
 
   override def fakeApplication(): Application =
-    new GuiceApplicationBuilder()
+    GuiceApplicationBuilder()
       .overrides(GuiceableModule.fromGuiceModules(Seq(overridingsModule)))
       .configure(configMap).build()
 
   override protected def testServerFactory: TestServerFactory = CustomTestServerFactory
 
-  object CustomTestServerFactory extends DefaultTestServerFactory {
-    override protected def serverConfig(app: Application): ServerConfig = {
+  object CustomTestServerFactory extends DefaultTestServerFactory:
+    override protected def serverConfig(app: Application): ServerConfig =
       val sc = ServerConfig(port = Some(testServerPort), sslPort = None, mode = Mode.Test, rootDir = app.path)
       sc.copy(configuration = sc.configuration.withFallback(overrideServerConfiguration(app)))
-    }
-  }
 
-  override def beforeEach(): Unit = {
+  override def beforeEach(): Unit =
     super.beforeEach()
-  }
 
 //  lazy val pages = new Pages(baseUrl)
 
-}
+object ISpec extends Logging:
 
-object ISpec extends Logging {
-
-  lazy val testServerPort: Int = logger
-    .info("Finding free port for wiremock server...")
-    .pipe(_ => FreePortFinder.findFreePort(initial = 19001))
-    .tap(port => logger.info(s"Found free port for wiremock server - $port"))
-}
+  lazy val testServerPort: Int = 19001

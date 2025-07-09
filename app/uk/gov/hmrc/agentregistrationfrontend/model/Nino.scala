@@ -15,12 +15,11 @@
  */
 
 package uk.gov.hmrc.agentregistrationfrontend.model
-import play.api.libs.json.{Format, Json}
 
-//TODO: discuss if rely on mdtp-identifiers or if implement validation rules here
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.Format
 
-final case class Nino(value: String) extends AnyVal
+final case class Nino(value: String)
 
-object Nino {
-  implicit val format: Format[Nino] = Json.valueFormat[Nino]
-}
+object Nino:
+  given format: Format[Nino] = summon[Format[String]].inmap(Nino(_), _.value)

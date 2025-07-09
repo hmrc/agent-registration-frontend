@@ -16,12 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.model.application
 
-import play.api.libs.json.{Format, Json}
-
-object ApplicationId {
-  implicit val format: Format[ApplicationId] = Json.valueFormat
-
-}
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.Format
 
 final case class ApplicationId(value: String)
 
+object ApplicationId:
+  given Format[ApplicationId] = summon[Format[String]].inmap(ApplicationId(_), _.value)

@@ -17,46 +17,53 @@
 package uk.gov.hmrc.agentregistrationfrontend.repository
 
 import org.bson.codecs.Codec
-import org.mongodb.scala.model.{Filters, IndexModel, ReplaceOptions}
+import org.mongodb.scala.SingleObservableFuture
+import org.mongodb.scala.model.Filters
+import org.mongodb.scala.model.IndexModel
+import org.mongodb.scala.model.ReplaceOptions
 import org.mongodb.scala.result.DeleteResult
-import play.api.libs.json._
-import uk.gov.hmrc.agentregistrationfrontend.repository.Repo.{IdExtractor, IdString}
+import play.api.libs.json.*
+import uk.gov.hmrc.agentregistrationfrontend.repository.Repo.IdExtractor
+import uk.gov.hmrc.agentregistrationfrontend.repository.Repo.IdString
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 import scala.reflect.ClassTag
 
 @SuppressWarnings(Array("org.wartremover.warts.Any"))
-abstract class Repo[ID, A: ClassTag](
-    collectionName: String,
-    mongoComponent: MongoComponent,
-    indexes:        Seq[IndexModel],
-    extraCodecs:    Seq[Codec[_]],
-    replaceIndexes: Boolean         = false
-)(implicit
+abstract class Repo[
+  ID,
+  A: ClassTag
+](
+  collectionName: String,
+  mongoComponent: MongoComponent,
+  indexes: Seq[IndexModel],
+  extraCodecs: Seq[Codec[?]],
+  replaceIndexes: Boolean = false
+)(using
   domainFormat: OFormat[A],
   executionContext: ExecutionContext,
-  idString:               IdString[ID],
-  idExtractor:      IdExtractor[A, ID]
+  idString: IdString[ID],
+  idExtractor: IdExtractor[A, ID]
 )
-  extends PlayMongoRepository[A](
-    mongoComponent = mongoComponent,
-    collectionName = collectionName,
-    domainFormat   = domainFormat,
-    indexes        = indexes,
-    replaceIndexes = replaceIndexes,
-    extraCodecs    = extraCodecs
-  ) {
+extends PlayMongoRepository[A](
+  mongoComponent = mongoComponent,
+  collectionName = collectionName,
+  domainFormat = domainFormat,
+  indexes = indexes,
+  replaceIndexes = replaceIndexes,
+  extraCodecs = extraCodecs
+):
 
-  /**
-   * Update or Insert (UpSert)
-   */
+  /** Update or Insert (UpSert)
+    */
   def upsert(a: A): Future[Unit] = collection
     .replaceOne(
-      filter      = Filters.eq("_id", idString.idString(idExtractor.id(a))),
+      filter = Filters.eq("_id", idString.idString(idExtractor.id(a))),
       replacement = a,
-      options     = ReplaceOptions().upsert(true)
+      options = ReplaceOptions().upsert(true)
     )
     .toFuture()
     .map(_ => ())
@@ -72,21 +79,15 @@ abstract class Repo[ID, A: ClassTag](
       filter = Filters.eq("_id", idString.idString(i))
     ).headOption()
 
-  def drop(): Future[Unit] =
-    collection
-      .drop()
-      .toFuture()
-      .map(_ => ())
+  def drop(): Future[Unit] = collection
+    .drop()
+    .toFuture()
+    .map(_ => ())
 
-}
+object Repo:
 
-object Repo {
-
-  trait IdString[I] {
+  trait IdString[I]:
     def idString(i: I): String
-  }
 
-  trait IdExtractor[A, ID] {
+  trait IdExtractor[A, ID]:
     def id(a: A): ID
-  }
-}

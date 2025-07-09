@@ -16,18 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.ispecs
 
-import play.api.test.FakeRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.ErrorHandler
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 
 class ErrorHandlerSpec
-  extends ISpec {
+  extends ISpec:
 
   private val handler = app.injector.instanceOf[ErrorHandler]
 
-  "standardErrorTemplate should render HTML" in {
-      val html = handler.standardErrorTemplate("title", "heading", "message")(TdAll.tdAll.fakeRequest).futureValue
-      html.contentType shouldBe "text/html"
-  }
-
-}
+  "standardErrorTemplate should render HTML" in :
+    val html = handler.standardErrorTemplate("title", "heading", "message")(TdAll.tdAll.fakeRequest).futureValue
+    html.contentType shouldBe "text/html"

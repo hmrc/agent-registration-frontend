@@ -16,51 +16,57 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.repository
 
-import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions, Indexes}
+import org.mongodb.scala.model.Filters
+import org.mongodb.scala.model.IndexModel
+import org.mongodb.scala.model.IndexOptions
+import org.mongodb.scala.model.Indexes
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.application.{Application, ApplicationId, SessionId}
-import uk.gov.hmrc.agentregistrationfrontend.repository.ApplicationRepo._
-import uk.gov.hmrc.agentregistrationfrontend.repository.Repo.{IdExtractor, IdString}
+import uk.gov.hmrc.agentregistrationfrontend.model.application.Application
+import uk.gov.hmrc.agentregistrationfrontend.model.application.ApplicationId
+import uk.gov.hmrc.agentregistrationfrontend.model.application.SessionId
+import uk.gov.hmrc.agentregistrationfrontend.repository.ApplicationRepo.*
+import uk.gov.hmrc.agentregistrationfrontend.repository.Repo.IdExtractor
+import uk.gov.hmrc.agentregistrationfrontend.repository.Repo.IdString
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs
 
 import java.util.concurrent.TimeUnit
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
-final class ApplicationRepo @Inject()(
-    mongoComponent: MongoComponent,
-    config:         AppConfig
+final class ApplicationRepo @Inject() (
+  mongoComponent: MongoComponent,
+  config: AppConfig
 )(implicit ec: ExecutionContext)
-  extends Repo[ApplicationId, Application](
-    collectionName = "application",
-    mongoComponent = mongoComponent,
-    indexes        = ApplicationRepo.indexes(config.ApplicationRepo.applicationRepoTtl),
-    extraCodecs    = Seq(Codecs.playFormatCodec(Application.format)),
-    replaceIndexes = true
-  ) {
+extends Repo[ApplicationId, Application](
+  collectionName = "application",
+  mongoComponent = mongoComponent,
+  indexes = ApplicationRepo.indexes(config.ApplicationRepo.applicationRepoTtl),
+  extraCodecs = Seq(Codecs.playFormatCodec(Application.format)),
+  replaceIndexes = true
+):
 
-  def findBySessionId(sessionId: SessionId): Future[Option[Application]] =
-    collection
-      .find(filter = Filters.eq("sessionId", sessionId.value))
-      .headOption()
-}
+  def findBySessionId(sessionId: SessionId): Future[Option[Application]] = collection
+    .find(filter = Filters.eq("sessionId", sessionId.value))
+    .headOption()
 
-object ApplicationRepo {
+object ApplicationRepo:
 
-  implicit val applicationId: IdString[ApplicationId] = new IdString[ApplicationId] {
-    override def idString(i: ApplicationId): String = i.value
-  }
+  implicit val applicationId: IdString[ApplicationId] =
+    new IdString[ApplicationId]:
+      override def idString(i: ApplicationId): String = i.value
 
-  implicit val applicationIdExtractor: IdExtractor[Application, ApplicationId] = new IdExtractor[Application, ApplicationId] {
-    override def id(j: Application): ApplicationId = j.applicationId
-  }
+  implicit val applicationIdExtractor: IdExtractor[Application, ApplicationId] =
+    new IdExtractor[Application, ApplicationId]:
+      override def id(j: Application): ApplicationId = j.applicationId
 
   def indexes(cacheTtl: FiniteDuration): Seq[IndexModel] = Seq(
     IndexModel(
-      keys         = Indexes.ascending("lastUpdated"),
+      keys = Indexes.ascending("lastUpdated"),
       indexOptions = IndexOptions().expireAfter(cacheTtl.toSeconds, TimeUnit.SECONDS).name("lastUpdatedIdx")
     ),
     IndexModel(
@@ -72,4 +78,3 @@ object ApplicationRepo {
       IndexOptions().name("utr")
     )
   )
-}

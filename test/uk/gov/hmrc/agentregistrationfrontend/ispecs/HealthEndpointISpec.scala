@@ -16,22 +16,21 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.ispecs
 
-import play.api.libs.ws.WSClient
+import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.DefaultBodyReadables.*
 
 class HealthEndpointISpec
-  extends ISpec {
+  extends ISpec:
 
   private val wsClient = app.injector.instanceOf[WSClient]
-  private val baseUrl  = s"http://localhost:$port"
+  private val baseUrl = s"http://localhost:${port.toString}"
 
-  "service health endpoint should respond with 200 status" in {
-      val response =
-        wsClient
-          .url(s"$baseUrl/ping/ping")
-          .get()
-          .futureValue
+  "service health endpoint should respond with 200 status" in :
+    val response: WSResponse =
+      wsClient
+        .url(s"$baseUrl/ping/ping")
+        .get()
+        .futureValue
 
-      response.status shouldBe 200
-      response.body shouldBe ""
-  }
-}
+    response.status shouldBe 200
+    response.body[String] shouldBe ""

@@ -18,59 +18,48 @@ package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.mvc.Request
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedUtrRequest
-import uk.gov.hmrc.agentregistrationfrontend.model.application.{Application, ApplicationId, SessionId}
+import uk.gov.hmrc.agentregistrationfrontend.model.application.Application
+import uk.gov.hmrc.agentregistrationfrontend.model.application.ApplicationId
+import uk.gov.hmrc.agentregistrationfrontend.model.application.SessionId
 import uk.gov.hmrc.agentregistrationfrontend.repository.ApplicationRepo
-import uk.gov.hmrc.agentregistrationfrontend.util.{Errors, RequestAwareLogging}
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
-class ApplicationService @Inject()(
-                                    applicationRepo:    ApplicationRepo,
-                                    applicationFactory: ApplicationFactory
-)(implicit ec: ExecutionContext) extends RequestAwareLogging {
+class ApplicationService @Inject() (
+  applicationRepo: ApplicationRepo,
+  applicationFactory: ApplicationFactory
+)(implicit ec: ExecutionContext)
+extends RequestAwareLogging:
 
-  def tryRestoreApplication()(implicit request: AuthorisedUtrRequest[_]) = {
-
-    //TODO: find application in backend, if found return it, if not create a new application
-    val maybeApplicationFromBackend: Option[Application] = None //this is a placeholder
-    maybeApplicationFromBackend
-      .map(_.copy(sessionId = request.sessionId))
-      .getOrElse(upsertNewApplication())
-
-  }
-
-  def upsertNewApplication()(implicit request: AuthorisedUtrRequest[_]): Future[Application] = {
+  def upsertNewApplication()(implicit request: AuthorisedUtrRequest[?]): Future[Application] =
     val application: Application = applicationFactory
       .makeNewApplication(sessionId = request.sessionId)
 
     upsert(application)
-      .map{ _ =>
+      .map { _ =>
         logger.info(s"Started new application [applicationId:${application.id.value}]")
         application
       }
-  }
 
-  def get(applicationId: ApplicationId)(implicit request: Request[_]): Future[Application] = find(applicationId).map { maybeApplication =>
+  def get(applicationId: ApplicationId)(implicit request: Request[?]): Future[Application] = find(applicationId).map { maybeApplication =>
     maybeApplication
       .getOrElse(Errors.throwServerErrorException(s"Expected application to be found"))
   }
 
-
-  def upsert[J <: Application](application: J)(implicit request: Request[_]): Future[J] = {
+  def upsert[J <: Application](application: J)(implicit request: Request[?]): Future[J] =
     logger.info(s"Upserting new application...")
     applicationRepo
       .upsert(application)
       .map(_ => application)
-  }
 
-  def find(applicationId: ApplicationId): Future[Option[Application]] =
-    applicationRepo
-      .findById(applicationId)
+  def find(applicationId: ApplicationId): Future[Option[Application]] = applicationRepo
+    .findById(applicationId)
 
-  def find(sessionId: SessionId): Future[Option[Application]] =
-    applicationRepo
-      .findBySessionId(sessionId)
-
-}
+  def find(sessionId: SessionId): Future[Option[Application]] = applicationRepo
+    .findBySessionId(sessionId)

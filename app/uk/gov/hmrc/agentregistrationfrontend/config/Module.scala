@@ -16,17 +16,21 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.config
 
-import com.google.inject.{AbstractModule, Provides, Singleton}
-import play.api.i18n.{I18nSupport, MessagesApi}
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisedFunctions}
+import com.google.inject.AbstractModule
+import com.google.inject.Provides
+import com.google.inject.Singleton
+import play.api.i18n.I18nSupport
+import play.api.i18n.MessagesApi
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.auth.core.AuthorisedFunctions
 
-import java.time.{Clock, ZoneOffset}
+import java.time.Clock
+import java.time.ZoneOffset
 
-class Module extends AbstractModule {
+class Module
+extends AbstractModule:
 
-  override def configure(): Unit = {
-    bind(classOf[AppConfig]).asEagerSingleton()
-  }
+  override def configure(): Unit = bind(classOf[AppConfig]).asEagerSingleton()
 
   @Provides
   @Singleton
@@ -34,14 +38,12 @@ class Module extends AbstractModule {
 
   @Provides
   @Singleton
-  def i18nSupport(api: MessagesApi): I18nSupport = new I18nSupport {
-    override def messagesApi: MessagesApi = api
-  }
+  def i18nSupport(api: MessagesApi): I18nSupport =
+    new I18nSupport:
+      override def messagesApi: MessagesApi = api
 
   @Provides
   @Singleton
-  def authorisedFunctions(ac: AuthConnector): AuthorisedFunctions = new AuthorisedFunctions {
-    override def authConnector: AuthConnector = ac
-  }
-
-}
+  def authorisedFunctions(ac: AuthConnector): AuthorisedFunctions =
+    new AuthorisedFunctions:
+      override def authConnector: AuthConnector = ac

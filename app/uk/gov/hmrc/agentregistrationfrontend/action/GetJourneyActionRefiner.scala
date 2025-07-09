@@ -17,38 +17,36 @@
 package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.mvc.Results.Redirect
-import play.api.mvc.{ActionRefiner, Request, Result}
+import play.api.mvc.ActionRefiner
+import play.api.mvc.Request
+import play.api.mvc.Result
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.application.ApplicationId
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class GetApplicationActionRefiner @Inject() (
-                                          applicationService: ApplicationService,
-                                          appConfig:      AppConfig
+  applicationService: ApplicationService,
+  appConfig: AppConfig
 )(implicit ec: ExecutionContext)
-  extends ActionRefiner[AuthorisedUtrRequest, ApplicationRequest]
-    with RequestAwareLogging {
+extends ActionRefiner[AuthorisedUtrRequest, ApplicationRequest]
+with RequestAwareLogging:
 
-  override protected def refine[A](request: AuthorisedUtrRequest[A]): Future[Either[Result, ApplicationRequest[A]]] = {
+  override protected def refine[A](request: AuthorisedUtrRequest[A]): Future[Either[Result, ApplicationRequest[A]]] =
     implicit val r: Request[A] = request
 
-      for {
-          maybeApplication <- applicationService.find(request.sessionId)
-        } yield {
-          maybeApplication match {
-            case Some(application) => Right(new ApplicationRequest(application, request))
-            case None =>
-              val redirect = uk.gov.hmrc.agentregistrationfrontend.controllers.routes.ApplicationController.initializeApplication
-              logger.warn(s"Application not found based on the sessionId from session, redirecting to ${redirect.url}")
-              Left(Redirect(redirect))
-          }
-        }
-    }
+    for
+      maybeApplication <- applicationService.find(request.sessionId)
+    yield maybeApplication match
+      case Some(application) => Right(new ApplicationRequest(application, request))
+      case None =>
+        val redirect = uk.gov.hmrc.agentregistrationfrontend.controllers.routes.ApplicationController.initializeApplication
+        logger.warn(s"Application not found based on the sessionId from session, redirecting to ${redirect.url}")
+        Left(Redirect(redirect))
 
   override protected def executionContext: ExecutionContext = ec
-}

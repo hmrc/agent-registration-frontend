@@ -21,17 +21,15 @@ import uk.gov.hmrc.agentregistrationfrontend.model.{Nino, Utr}
 import java.time.format.DateTimeFormatter
 import java.time.{Instant, LocalDateTime, ZoneOffset}
 
-trait TdBase {
+trait TdBase:
 
   lazy val dateString: String = "2059-11-25"
   lazy val timeString: String = s"${dateString}T16:33:51.880"
-  lazy val localDateTime: LocalDateTime = {
-    //the frozen time has to be in future otherwise the applications will disappear from mongodb because of expiry index
+  lazy val localDateTime: LocalDateTime =
+    // the frozen time has to be in future otherwise the applications will disappear from mongodb because of expiry index
     LocalDateTime.parse(timeString, DateTimeFormatter.ISO_DATE_TIME)
-  }
   lazy val instant: Instant = localDateTime.toInstant(ZoneOffset.UTC)
-  lazy val newInstant: Instant = instant.plusSeconds(20) //used when a new application is created from existing one
+  lazy val newInstant: Instant = instant.plusSeconds(20) // used when a new application is created from existing one
 
   lazy val nino: Nino = Nino("LM001014C")
   lazy val utr: Utr = Utr("1234567895")
-}
