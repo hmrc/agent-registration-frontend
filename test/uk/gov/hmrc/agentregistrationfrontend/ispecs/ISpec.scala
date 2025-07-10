@@ -54,7 +54,10 @@ trait ISpec
     "auditing.consumer.baseUri.port" -> WireMockSupport.port,
     "auditing.enabled" -> false,
     "auditing.traceRequests" -> false
-  )
+  ) ++ configOverridings
+
+  protected def configOverridings: Map[String, Any] = Map[String, Any]()
+
 
   lazy val overridingsModule: AbstractModule = new AbstractModule:
     override def configure(): Unit =
