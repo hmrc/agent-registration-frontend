@@ -30,18 +30,18 @@ class RequestAwareLogger(
   delegateLogger: Logger
 ):
 
-  def debug(message: => String)(implicit request: RequestHeader): Unit = logMessage(message, Debug)
+  def debug(message: => String)(using request: RequestHeader): Unit = logMessage(message, Debug)
 
-  def info(message: => String)(implicit request: RequestHeader): Unit = logMessage(message, Info)
+  def info(message: => String)(using request: RequestHeader): Unit = logMessage(message, Info)
 
-  def warn(message: => String)(implicit request: RequestHeader): Unit = logMessage(message, Warn)
+  def warn(message: => String)(using request: RequestHeader): Unit = logMessage(message, Warn)
 
-  def error(message: => String)(implicit request: RequestHeader): Unit = logMessage(message, Error)
+  def error(message: => String)(using request: RequestHeader): Unit = logMessage(message, Error)
 
   def debug(
     message: => String,
     ex: Throwable
-  )(implicit request: RequestHeader): Unit = logMessage(
+  )(using request: RequestHeader): Unit = logMessage(
     message,
     ex,
     Debug
@@ -50,7 +50,7 @@ class RequestAwareLogger(
   def info(
     message: => String,
     ex: Throwable
-  )(implicit request: RequestHeader): Unit = logMessage(
+  )(using request: RequestHeader): Unit = logMessage(
     message,
     ex,
     Info
@@ -59,7 +59,7 @@ class RequestAwareLogger(
   def warn(
     message: => String,
     ex: Throwable
-  )(implicit request: RequestHeader): Unit = logMessage(
+  )(using request: RequestHeader): Unit = logMessage(
     message,
     ex,
     Warn
@@ -68,25 +68,25 @@ class RequestAwareLogger(
   def error(
     message: => String,
     ex: Throwable
-  )(implicit request: RequestHeader): Unit = logMessage(
+  )(using request: RequestHeader): Unit = logMessage(
     message,
     ex,
     Error
   )
 
-  private def context(implicit request: RequestHeader) = s"[Context: ${request.method} ${request.path}] $sessionId $requestId $userAgent $referer $deviceId"
+  private def context(using request: RequestHeader) = s"[Context: ${request.method} ${request.path}] $sessionId $requestId $userAgent $referer $deviceId"
 
-  private def sessionId(implicit request: RequestHeader) = s"[SessionId: ${hc.sessionId.map(_.toString).getOrElse("")}]"
+  private def sessionId(using request: RequestHeader) = s"[SessionId: ${hc.sessionId.map(_.toString).getOrElse("")}]"
 
-  private def requestId(implicit request: RequestHeader) = s"[RequestId: ${hc.requestId.map(_.toString).getOrElse("")}]"
+  private def requestId(using request: RequestHeader) = s"[RequestId: ${hc.requestId.map(_.toString).getOrElse("")}]"
 
-  private def referer(implicit r: RequestHeader) = s"[Referer: ${r.headers.get(HeaderNames.REFERER).getOrElse("")}]"
+  private def referer(using r: RequestHeader) = s"[Referer: ${r.headers.get(HeaderNames.REFERER).getOrElse("")}]"
 
-  private def userAgent(implicit r: RequestHeader) = s"[UserAgent: ${r.headers.get(HeaderNames.USER_AGENT).getOrElse("")}]"
+  private def userAgent(using r: RequestHeader) = s"[UserAgent: ${r.headers.get(HeaderNames.USER_AGENT).getOrElse("")}]"
 
-  private def deviceId(implicit r: RequestHeader) = s"[DeviceId: ${hc.deviceID.getOrElse("")}]"
+  private def deviceId(using r: RequestHeader) = s"[DeviceId: ${hc.deviceID.getOrElse("")}]"
 
-  private def makeRichMessage(message: String)(implicit request: RequestHeader): String =
+  private def makeRichMessage(message: String)(using request: RequestHeader): String =
     request match
       case _ => s"$message $context "
 
@@ -107,7 +107,7 @@ class RequestAwareLogger(
   private def logMessage(
     message: => String,
     level: LogLevel
-  )(implicit request: RequestHeader): Unit =
+  )(using request: RequestHeader): Unit =
     lazy val richMessage = makeRichMessage(message)
     level match
       case Debug => delegateLogger.debug(richMessage)
@@ -119,7 +119,7 @@ class RequestAwareLogger(
     message: => String,
     ex: Throwable,
     level: LogLevel
-  )(implicit request: RequestHeader): Unit =
+  )(using request: RequestHeader): Unit =
     lazy val richMessage = makeRichMessage(message)
     level match
       case Debug => delegateLogger.debug(richMessage, ex)

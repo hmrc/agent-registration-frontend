@@ -32,7 +32,7 @@ class ErrorResults @Inject() (
 
   import i18n.*
 
-  def unauthorised(implicit request: RequestHeader): Result = Unauthorized(
+  def unauthorised(using request: RequestHeader): Result = Unauthorized(
     errorTemplate(
       pageTitle = Messages("unauthorised.title"),
       heading = Messages("unauthorised.heading"),

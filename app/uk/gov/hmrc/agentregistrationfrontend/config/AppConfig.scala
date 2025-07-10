@@ -39,7 +39,7 @@ class AppConfig @Inject() (
   val basFrontendSignOutUrlBase: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-out", configuration)
 
   def signInUri(continueUri: Uri): Uri = uri"$basFrontendSignBaseInBaseUrl"
-    .addParam("continue", continueUri.toString())
+    .addParam("continue_url", continueUri.toString())
     .addParam("origin", "agent-registration-frontend")
 
   val welshLanguageSupportEnabled: Boolean = configuration.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)

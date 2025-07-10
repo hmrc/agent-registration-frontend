@@ -29,7 +29,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class EnsureApplication @Inject() ()(implicit ec: ExecutionContext)
+class EnsureApplication @Inject() ()(using ec: ExecutionContext)
 extends RequestAwareLogging:
 
   /** Check if application matches predicate. If it doesn't, it will send the Redirect.
@@ -41,7 +41,7 @@ extends RequestAwareLogging:
   ): ActionFilter[ApplicationRequest] =
     new ActionFilter[ApplicationRequest]:
       override def filter[A](request: ApplicationRequest[A]): Future[Option[Result]] =
-        implicit val r: ApplicationRequest[A] = request
+        given r: ApplicationRequest[A] = request
         val application = request.application
         val result: Option[Result] =
           if predicate(application) then None

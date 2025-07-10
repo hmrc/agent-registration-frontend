@@ -33,12 +33,12 @@ import scala.concurrent.Future
 class GetApplicationActionRefiner @Inject() (
   applicationService: ApplicationService,
   appConfig: AppConfig
-)(implicit ec: ExecutionContext)
+)(using ec: ExecutionContext)
 extends ActionRefiner[AuthorisedUtrRequest, ApplicationRequest]
 with RequestAwareLogging:
 
   override protected def refine[A](request: AuthorisedUtrRequest[A]): Future[Either[Result, ApplicationRequest[A]]] =
-    implicit val r: Request[A] = request
+    given r: Request[A] = request
 
     for
       maybeApplication <- applicationService.find(request.sessionId)

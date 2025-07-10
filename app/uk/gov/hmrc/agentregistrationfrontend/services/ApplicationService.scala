@@ -34,10 +34,10 @@ import scala.concurrent.Future
 class ApplicationService @Inject() (
   applicationRepo: ApplicationRepo,
   applicationFactory: ApplicationFactory
-)(implicit ec: ExecutionContext)
+)(using ec: ExecutionContext)
 extends RequestAwareLogging:
 
-  def upsertNewApplication()(implicit request: AuthorisedUtrRequest[?]): Future[Application] =
+  def upsertNewApplication()(using request: AuthorisedUtrRequest[?]): Future[Application] =
     val application: Application = applicationFactory
       .makeNewApplication(sessionId = request.sessionId)
 
@@ -47,12 +47,12 @@ extends RequestAwareLogging:
         application
       }
 
-  def get(applicationId: ApplicationId)(implicit request: Request[?]): Future[Application] = find(applicationId).map { maybeApplication =>
+  def get(applicationId: ApplicationId)(using request: Request[?]): Future[Application] = find(applicationId).map { maybeApplication =>
     maybeApplication
       .getOrElse(Errors.throwServerErrorException(s"Expected application to be found"))
   }
 
-  def upsert[J <: Application](application: J)(implicit request: Request[?]): Future[J] =
+  def upsert[J <: Application](application: J)(using request: Request[?]): Future[J] =
     logger.info(s"Upserting new application...")
     applicationRepo
       .upsert(application)

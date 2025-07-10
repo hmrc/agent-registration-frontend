@@ -43,17 +43,17 @@ extends ActionRefiner[AuthenticatedRequest, AuthorisedUtrRequest]
 with RequestAwareLogging:
 
   override protected def refine[A](request: AuthenticatedRequest[A]): Future[Either[Result, AuthorisedUtrRequest[A]]] =
-    implicit val r: AuthenticatedRequest[A] = request
+    given AuthenticatedRequest[A] = request
     val hasActiveSaEnrolment: Boolean = request.hasActiveSaEnrolment
     val maybeUtr: Option[Utr] = request.utr
 
     val result: Either[Result, AuthorisedUtrRequest[A]] =
       (hasActiveSaEnrolment, maybeUtr) match
         case (_, None) =>
-          logger.info("Authorisation outcome: Failed. Reason: - no present UTR")(request)
+          logger.info("Authorisation outcome: Failed. Reason: - no present UTR")
           Left(errorResults.unauthorised)
         case (false, _) =>
-          logger.info("Authorisation outcome: Failed. Reason: - no active IR-SA enrolment")(request)
+          logger.info("Authorisation outcome: Failed. Reason: - no active IR-SA enrolment")
           Left(errorResults.unauthorised)
         case (true, Some(utr)) =>
           Right(new AuthorisedUtrRequest[A](
@@ -62,4 +62,4 @@ with RequestAwareLogging:
           ))
     Future.successful(result)
 
-  override protected implicit def executionContext: ExecutionContext = cc.executionContext
+  override protected def executionContext: ExecutionContext = cc.executionContext

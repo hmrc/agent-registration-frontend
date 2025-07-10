@@ -17,32 +17,28 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import play.api.test.FakeRequest
-import uk.gov.hmrc.http.{HeaderNames, SessionKeys}
+import uk.gov.hmrc.http.HeaderNames
+import uk.gov.hmrc.http.SessionKeys
 
 import java.time.LocalDate
 
 object TdSupport:
 
   extension [T](r: FakeRequest[T])
-    def withAuthToken(authToken: String = TdAll.tdAll.authToken): FakeRequest[T] =
-      r.withSession((SessionKeys.authToken, authToken))
+
+    def withAuthToken(authToken: String = "authorization-value-123"): FakeRequest[T] = r.withSession((SessionKeys.authToken, authToken))
 
     def withAkamaiReputationHeader(
-                                    akamaiReputationValue: String = TdAll.tdAll.akamaiReputationValue
-                                  ): FakeRequest[T] =
-      r.withHeaders(HeaderNames.akamaiReputation -> akamaiReputationValue)
+      akamaiReputationValue: String = "akamai-reputation-value-123"
+    ): FakeRequest[T] = r.withHeaders(HeaderNames.akamaiReputation -> akamaiReputationValue)
 
-    def withRequestId(requestId: String = TdAll.tdAll.requestId): FakeRequest[T] =
-      r.withHeaders(HeaderNames.xRequestId -> requestId)
+    def withRequestId(requestId: String = "request-id-value-123"): FakeRequest[T] = r.withHeaders(HeaderNames.xRequestId -> requestId)
 
-    def withTrueClientIp(ip: String = TdAll.tdAll.trueClientIp): FakeRequest[T] =
-      r.withHeaders(HeaderNames.trueClientIp -> ip)
+    def withTrueClientIp(ip: String = "client-ip-123"): FakeRequest[T] = r.withHeaders(HeaderNames.trueClientIp -> ip)
 
-    def withTrueClientPort(port: String = TdAll.tdAll.trueClientPort): FakeRequest[T] =
-      r.withHeaders(HeaderNames.trueClientPort -> port)
+    def withTrueClientPort(port: String = "client-port-123"): FakeRequest[T] = r.withHeaders(HeaderNames.trueClientPort -> port)
 
-    def withDeviceId(deviceId: String = TdAll.tdAll.deviceIdInRequest): FakeRequest[T] =
-      r.withHeaders(HeaderNames.deviceID -> deviceId)
+    def withDeviceId(deviceId: String = "device-id-123"): FakeRequest[T] = r.withHeaders(HeaderNames.deviceID -> deviceId)
 
   given [T]: Conversion[T, Option[T]] with
     def apply(t: T): Option[T] = Some(t)

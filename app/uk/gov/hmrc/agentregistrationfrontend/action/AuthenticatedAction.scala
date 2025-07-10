@@ -41,13 +41,13 @@ class AuthenticatedAction @Inject() (
   appConfig: AppConfig,
   cc: MessagesControllerComponents
 )(
-  implicit ec: ExecutionContext
+  using ec: ExecutionContext
 )
 extends ActionRefiner[Request, AuthenticatedRequest]
 with RequestAwareLogging:
 
   override protected def refine[A](request: Request[A]): Future[Either[Result, AuthenticatedRequest[A]]] =
-    implicit val r: Request[A] = request
+    given r: Request[A] = request
 
     af.authorised().retrieve(
       Retrievals.allEnrolments and Retrievals.saUtr and Retrievals.credentials

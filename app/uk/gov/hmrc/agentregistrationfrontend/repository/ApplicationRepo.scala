@@ -37,11 +37,13 @@ import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
+import ApplicationRepo.given
+
 @Singleton
 final class ApplicationRepo @Inject() (
   mongoComponent: MongoComponent,
   config: AppConfig
-)(implicit ec: ExecutionContext)
+)(using ec: ExecutionContext)
 extends Repo[ApplicationId, Application](
   collectionName = "application",
   mongoComponent = mongoComponent,
@@ -56,11 +58,11 @@ extends Repo[ApplicationId, Application](
 
 object ApplicationRepo:
 
-  implicit val applicationId: IdString[ApplicationId] =
+  given IdString[ApplicationId] =
     new IdString[ApplicationId]:
       override def idString(i: ApplicationId): String = i.value
 
-  implicit val applicationIdExtractor: IdExtractor[Application, ApplicationId] =
+  given IdExtractor[Application, ApplicationId] =
     new IdExtractor[Application, ApplicationId]:
       override def id(j: Application): ApplicationId = j.applicationId
 

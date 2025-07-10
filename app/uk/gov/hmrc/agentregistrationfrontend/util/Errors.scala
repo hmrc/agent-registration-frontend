@@ -30,7 +30,7 @@ extends RequestAwareLogging:
   def require(
     requirement: Boolean,
     message: => String
-  )(implicit request: RequestHeader): Unit =
+  )(using request: RequestHeader): Unit =
     if !requirement then
       logger.error(s"Requirement failed: $message")
       throw UpstreamErrorResponse(message, play.mvc.Http.Status.BAD_REQUEST)
@@ -39,34 +39,34 @@ extends RequestAwareLogging:
   def requireF(
     requirement: Boolean,
     message: => String
-  )(implicit request: Request[?]): Future[Unit] =
+  )(using request: Request[?]): Future[Unit] =
     if !requirement then
       logger.error(s"Requirement failed: $message")
       Future.failed(UpstreamErrorResponse(message, play.mvc.Http.Status.BAD_REQUEST))
     else Future.successful(())
 
-  @inline def throwBadRequestException(message: => String)(implicit request: RequestHeader): Nothing =
+  @inline def throwBadRequestException(message: => String)(using request: RequestHeader): Nothing =
     logger.error(message)
     throw UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.BAD_REQUEST
     )
 
-  @inline def throwBadRequestExceptionF(message: => String)(implicit request: RequestHeader): Future[Nothing] =
+  @inline def throwBadRequestExceptionF(message: => String)(using request: RequestHeader): Future[Nothing] =
     logger.error(message)
     Future.failed(UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.BAD_REQUEST
     ))
 
-  @inline def throwNotFoundException(message: => String)(implicit request: RequestHeader): Nothing =
+  @inline def throwNotFoundException(message: => String)(using request: RequestHeader): Nothing =
     logger.error(message)
     throw UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.NOT_FOUND
     )
 
-  @inline def throwServerErrorException(message: => String)(implicit request: RequestHeader): Nothing =
+  @inline def throwServerErrorException(message: => String)(using request: RequestHeader): Nothing =
     logger.error(message)
     throw UpstreamErrorResponse(
       message,
@@ -78,13 +78,13 @@ extends RequestAwareLogging:
   def sanityCheck(
     requirement: Boolean,
     message: => String
-  )(implicit request: RequestHeader): Unit =
+  )(using request: RequestHeader): Unit =
     if !requirement then
       logger.error(message)
       throw UpstreamErrorResponse(message, play.mvc.Http.Status.INTERNAL_SERVER_ERROR)
     else ()
 
-  def notImplemented(message: => String = "")(implicit request: RequestHeader): Nothing =
+  def notImplemented(message: => String = "")(using request: RequestHeader): Nothing =
     val m = s"Unimplemented: $message"
     logger.error(m)
     throw UpstreamErrorResponse(m, play.mvc.Http.Status.NOT_IMPLEMENTED)

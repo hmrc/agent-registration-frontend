@@ -21,6 +21,8 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedUtrRequest
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -37,18 +39,20 @@ class ApplicationController @Inject() (
   applicationService: ApplicationService,
   simplePage: SimplePage,
   i18nSupport: I18nSupport
-)(implicit executionContext: ExecutionContext)
+)(using executionContext: ExecutionContext)
 extends FrontendController(mcc):
 
   import i18nSupport.*
 
-  val initializeApplication: Action[AnyContent] = actions.authorisedUtr.async { implicit request =>
+  val initializeApplication: Action[AnyContent] = actions.authorisedUtr.async { request =>
+    given AuthorisedUtrRequest[AnyContent] = request
     applicationService
       .upsertNewApplication()
       .map(_ => Redirect(routes.ApplicationController.landing.url))
   }
 
-  val landing: Action[AnyContent] = actions.getApplicationInProgress.async { implicit request =>
+  val landing: Action[AnyContent] = actions.getApplicationInProgress.async { request =>
+    given r: ApplicationRequest[AnyContent] = request
     Future.successful(Ok(simplePage(
       h1 = "Landing page...",
       bodyText = Some(
@@ -57,7 +61,8 @@ extends FrontendController(mcc):
     )))
   }
 
-  val applicationSubmitted: Action[AnyContent] = actions.getApplicationSubmitted.async { implicit request =>
+  val applicationSubmitted: Action[AnyContent] = actions.getApplicationSubmitted.async { request =>
+    given ApplicationRequest[AnyContent] = request
     Future.successful(Ok(simplePage(
       h1 = "Application Submitted",
       bodyText = Some(

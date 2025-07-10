@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-import play.api.mvc.{AnyContentAsEmpty, Request}
+import play.api.mvc.AnyContentAsEmpty
+import play.api.mvc.Request
 import play.api.test.FakeRequest
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport._
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.*
 
 trait TdRequest:
 
