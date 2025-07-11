@@ -14,23 +14,21 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardPage
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.HmrcStandardPageParams
+@this(layout: Layout)
 
-@this(
-  appConfig: AppConfig,
-  hmrcStandardPage: HmrcStandardPage
+@(
+        h1: String,
+        bodyText: Option[String])(implicit
+        request: RequestHeader,
+        messages: Messages
 )
 
-@(pageTitle: Option[String] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
-
-@hmrcStandardPage(
-  HmrcStandardPageParams(
-    pageTitle = pageTitle,
-    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
-  )
-)(contentBlock)
+@layout(pageTitle = Some("agent-registration-frontend")) {
+    <h1 class="govuk-heading-xl">@h1</h1>
+    @bodyText.map {bodyText =>
+        <p class="govuk-body">@bodyText</p>
+    }
+}
 
 @{
     //$COVERAGE-OFF$

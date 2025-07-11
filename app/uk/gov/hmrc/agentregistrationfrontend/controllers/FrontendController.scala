@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,26 +12,19 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardPage
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.HmrcStandardPageParams
+package uk.gov.hmrc.agentregistrationfrontend.controllers
 
-@this(
-  appConfig: AppConfig,
-  hmrcStandardPage: HmrcStandardPage
+import play.api.i18n.I18nSupport
+import play.api.i18n.MessagesApi
+import play.api.mvc.MessagesControllerComponents
+
+abstract class FrontendController(
+  mcc: MessagesControllerComponents
 )
+extends uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController(mcc)
+with I18nSupport:
 
-@(pageTitle: Option[String] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
-
-@hmrcStandardPage(
-  HmrcStandardPageParams(
-    pageTitle = pageTitle,
-    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
-  )
-)(contentBlock)
-
-@{
-    //$COVERAGE-OFF$
-}
+  override def messagesApi: MessagesApi = mcc.messagesApi
+  implicit val ec: scala.concurrent.ExecutionContext = mcc.executionContext
