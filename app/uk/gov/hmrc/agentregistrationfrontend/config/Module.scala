@@ -38,12 +38,6 @@ extends AbstractModule:
 
   @Provides
   @Singleton
-  def i18nSupport(api: MessagesApi): I18nSupport =
-    new I18nSupport:
-      override def messagesApi: MessagesApi = api
-
-  @Provides
-  @Singleton
   def authorisedFunctions(ac: AuthConnector): AuthorisedFunctions =
     new AuthorisedFunctions:
       override def authConnector: AuthConnector = ac

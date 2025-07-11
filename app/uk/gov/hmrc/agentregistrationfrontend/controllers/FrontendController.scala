@@ -14,24 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport
+package uk.gov.hmrc.agentregistrationfrontend.controllers
 
-import org.scalatest.*
-import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
-import org.scalatest.diagrams.Diagrams
-import org.scalatest.matchers.should.Matchers
+import play.api.i18n.I18nSupport
+import play.api.i18n.MessagesApi
+import play.api.mvc.MessagesControllerComponents
 
-object RichMatchers extends RichMatchers
+abstract class FrontendController(
+  mcc: MessagesControllerComponents
+)
+extends uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController(mcc)
+with I18nSupport:
 
-trait RichMatchers
-  extends Matchers,
-    Diagrams,
-    TryValues,
-    EitherValues,
-    OptionValues,
-    AppendedClues,
-    ScalaFutures,
-    StreamlinedXml,
-    Inside,
-    Eventually,
-    IntegrationPatience
+  override def messagesApi: MessagesApi = mcc.messagesApi
+  implicit val ec: scala.concurrent.ExecutionContext = mcc.executionContext

@@ -16,8 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.views
 
-import play.api.i18n.I18nSupport
-import play.api.i18n.Messages
+import play.api.i18n.{I18nSupport, Messages, MessagesApi}
 import play.api.mvc.Results.Unauthorized
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
@@ -27,10 +26,8 @@ import javax.inject.Inject
 
 class ErrorResults @Inject() (
   errorTemplate: ErrorTemplate,
-  i18n: I18nSupport
-):
-
-  import i18n.*
+  override val messagesApi: MessagesApi
+) extends I18nSupport:
 
   def unauthorised(using request: RequestHeader): Result = Unauthorized(
     errorTemplate(
