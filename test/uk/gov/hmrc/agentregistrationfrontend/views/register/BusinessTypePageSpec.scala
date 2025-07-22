@@ -48,5 +48,18 @@ class BusinessTypePageSpec extends ViewSpecSupport {
       )
       doc.mainContent.extractRadios(1).value shouldBe expectedRadioGroup
     }
+
+    "render a details element with content for when the business type is not listed" in {
+      val expectedSummary  = "The business is set up as something else"
+      val expectedDetails = "To get an agent services account your business must be a sole trader, limited company, partnership or limited liability partnership."
+      val expectedLinkText = "Finish and sign out"
+      val details = doc.select("details")
+      details.size() shouldBe 1
+      details.text() shouldBe s"$expectedSummary $expectedDetails $expectedLinkText"
+    }
+
+    "render a save and continue button" in {
+      doc.select("button[type=submit]").text() shouldBe "Save and continue"
+    }
   }
 }
