@@ -1,9 +1,12 @@
 # microservice specific routes
 
-GET        /                                  uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.landing
+GET     /                                  uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.landing
 
-GET        /new-application                   uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.initializeApplication
+GET     /new-application                   uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.initializeApplication
+GET     /application-submitted             uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.applicationSubmitted
 
-
-GET        /application-submitted             uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.applicationSubmitted
-
+# Register routes
+GET     /register                                      uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.startRegistration
+## About your application routes
+GET     /register/about-your-application/business-type uk.gov.hmrc.agentregistrationfrontend.controllers.BusinessTypeController.show
+POST    /register/about-your-application/business-type uk.gov.hmrc.agentregistrationfrontend.controllers.BusinessTypeController.submit

@@ -23,11 +23,17 @@
   hmrcStandardPage: HmrcStandardPage
 )
 
-@(pageTitle: Option[String] = None)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+@(
+        pageTitle: String,
+        hasErrors: Boolean = false
+)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+
+@errorPrefix = @{if(hasErrors) s"${messages("common.errorPrefix")}: " else ""}
+@gdsTitle = @{s"$errorPrefix$pageTitle - ${messages("service.name")} - GOV.UK"}
 
 @hmrcStandardPage(
   HmrcStandardPageParams(
-    pageTitle = pageTitle,
+    pageTitle = Some(gdsTitle),
     isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
   )
 )(contentBlock)

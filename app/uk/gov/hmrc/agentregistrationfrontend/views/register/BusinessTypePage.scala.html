@@ -1,0 +1,89 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.model.BusinessType
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
+
+@this(
+        layout: Layout,
+        govukRadios: GovukRadios,
+        govukButton: GovukButton,
+        formWithCSRF: FormWithCSRF,
+        govukErrorSummary: GovukErrorSummary,
+        govukDetails: GovukDetails
+)
+
+@(
+        form: Form[String]
+)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{
+    "businessType"
+}
+@title = @{
+    messages(s"$key.title")
+}
+@detailsHtml = {
+    <p class="govuk-body">
+    @messages(s"$key.other.description")
+    </p>
+    <p class="govuk-body">
+        <a class="govuk-link" href="routes.TODO">@messages(s"$key.other.signOut")</a>
+    </p>
+}
+
+@layout(pageTitle = title, hasErrors = form.hasErrors) {
+
+    @if(form.errors.nonEmpty) {
+        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))
+    }
+
+    <h2 class="govuk-caption-xl">@messages("about-application.title")</h2>
+
+    @formWithCSRF(action = routes.BusinessTypeController.submit) {
+        @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(title),
+                    isPageHeading = true,
+                    classes = "govuk-fieldset__legend--xl"
+                ))
+            )),
+            items = BusinessType.names.map(businessType =>
+                RadioItem(
+                    content = Text(messages(s"$key.$businessType")),
+                    value = Some(businessType)
+                )
+            )
+        ).withFormField(form(key)))
+
+        @govukDetails(Details(
+            summary = Text(messages(s"$key.other")),
+            content = HtmlContent(detailsHtml)
+        ))
+
+        @govukButton(Button(
+            content = Text(messages("common.saveAndContinue"))
+        ))
+    }
+}

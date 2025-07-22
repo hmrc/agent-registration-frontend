@@ -8,7 +8,6 @@ PlayKeys.playRunHooks += PlayRunHook(playPort)
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "3.6.1"
 
-
 lazy val microservice = Project("agent-registration-frontend", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin)
@@ -36,3 +35,9 @@ lazy val microservice = Project("agent-registration-frontend", file("."))
   .settings(CodeCoverageSettings.settings *)
 //  .settings(WartRemoverSettings.wartRemoverSettings)
   .settings(PlayKeys.playDefaultPort := playPort)
+  .settings(
+    TwirlKeys.templateImports ++= Seq(
+      "uk.gov.hmrc.govukfrontend.views.html.components._",
+      "uk.gov.hmrc.hmrcfrontend.views.html.components._"
+    )
+  )

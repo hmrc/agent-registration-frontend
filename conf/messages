@@ -1,2 +1,20 @@
-service.name = agent-registration-frontend
+service.name = Apply for an agent services account
 service.text = This is your new service
+
+common.saveAndContinue = Save and continue
+common.errorPrefix = Error
+
+# About your application
+about-application.title = About your application
+
+# About your application - business type
+businessType.title = How is your business set up?
+businessType.sole-trader = Sole trader
+businessType.limited-company = Limited company
+businessType.general-partnership = Partnership
+businessType.limited-liability-partnership = Limited liability partnership
+businessType.other = The business is set up as something else
+businessType.other.description = To get an agent services account your business must be a sole trader, limited company, partnership or limited liability partnership.
+businessType.other.signOut = Finish and sign out
+businessType.error.required = Tell us how your business is set up
+businessType.error.invalid = Tell us how your business is set up
