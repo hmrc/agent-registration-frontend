@@ -2,6 +2,11 @@
 
 GET     /                                  uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.landing
 
+# Sign out routes
+GET     /sign-out                         uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.signOut
+GET     /time-out                         uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timeOut
+GET     /timed-out                        uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timedOut
+
 GET     /new-application                   uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.initializeApplication
 GET     /application-submitted             uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.applicationSubmitted
 

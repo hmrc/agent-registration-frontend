@@ -17,7 +17,6 @@
 @import uk.gov.hmrc.agentregistrationfrontend.model.BusinessType
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
-@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
 
@@ -26,7 +25,6 @@
         govukRadios: GovukRadios,
         govukButton: GovukButton,
         formWithCSRF: FormWithCSRF,
-        govukErrorSummary: GovukErrorSummary,
         govukDetails: GovukDetails
 )
 
@@ -45,18 +43,14 @@
 }
 @detailsHtml = {
     <p class="govuk-body">
-    @messages(s"$key.other.description")
+        @messages(s"$key.other.description")
     </p>
     <p class="govuk-body">
         <a class="govuk-link" href="routes.TODO">@messages(s"$key.other.signOut")</a>
     </p>
 }
 
-@layout(pageTitle = title, hasErrors = form.hasErrors) {
-
-    @if(form.errors.nonEmpty) {
-        @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))
-    }
+@layout(pageTitle = title, maybeForm = Some(form)) {
 
     <h2 class="govuk-caption-xl">@messages("about-application.title")</h2>
 

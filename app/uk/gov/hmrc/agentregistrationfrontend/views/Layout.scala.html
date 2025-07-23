@@ -15,26 +15,51 @@
  *@
 
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcStandardPage
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardPage, HmrcReportTechnicalIssueHelper, HmrcTimeoutDialogHelper}
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.HmrcStandardPageParams
+@import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
 
 @this(
-  appConfig: AppConfig,
-  hmrcStandardPage: HmrcStandardPage
+        appConfig: AppConfig,
+        hmrcStandardPage: HmrcStandardPage,
+        hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
+        hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper,
+        govukErrorSummary: GovukErrorSummary
 )
 
 @(
         pageTitle: String,
-        hasErrors: Boolean = false
+        maybeForm: Option[Form[?]] = None
 )(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
-@errorPrefix = @{if(hasErrors) s"${messages("common.errorPrefix")}: " else ""}
+@isSignedIn = @{
+    try { request.session.get("authToken").isDefined } catch { case _: Throwable => false }
+}
+@head = {
+    @if(isSignedIn) {
+        @hmrcTimeoutDialogHelper(
+            signOutUrl = routes.SignOutController.signOut.url,
+            timeoutUrl = Some(routes.SignOutController.timeOut.url)
+        )
+    }
+}
+@errorPrefix = @{if(maybeForm.exists(_.hasErrors)) s"${messages("common.errorPrefix")}: " else ""}
 @gdsTitle = @{s"$errorPrefix$pageTitle - ${messages("service.name")} - GOV.UK"}
+@contentWithErrorsAndHelp = {
+    @maybeForm.map { form =>
+        @if(form.hasErrors) {
+            @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))
+        }
+    }
+    @contentBlock
+    @hmrcReportTechnicalIssueHelper()
+}
 
 @hmrcStandardPage(
   HmrcStandardPageParams(
     pageTitle = Some(gdsTitle),
     isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
   )
-)(contentBlock)
-    
+)(contentWithErrorsAndHelp)

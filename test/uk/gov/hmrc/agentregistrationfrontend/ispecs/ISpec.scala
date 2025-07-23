@@ -20,6 +20,7 @@ import com.google.inject.AbstractModule
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.freespec.AnyFreeSpecLike
 import org.scalatest.time.{Millis, Seconds, Span}
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.test.{DefaultTestServerFactory, TestServerFactory}
@@ -54,18 +55,18 @@ trait ISpec
     "auditing.consumer.baseUri.port" -> WireMockSupport.port,
     "auditing.enabled" -> false,
     "auditing.traceRequests" -> false
-  ) ++ configOverridings
+  ) ++ configOverrides
 
-  protected def configOverridings: Map[String, Any] = Map[String, Any]()
+  protected def configOverrides: Map[String, Any] = Map[String, Any]()
 
 
-  lazy val overridingsModule: AbstractModule = new AbstractModule:
+  lazy val overridesModule: AbstractModule = new AbstractModule:
     override def configure(): Unit =
       bind(classOf[Clock]).toInstance(clock)
 
   override def fakeApplication(): Application =
     GuiceApplicationBuilder()
-      .overrides(GuiceableModule.fromGuiceModules(Seq(overridingsModule)))
+      .overrides(GuiceableModule.fromGuiceModules(Seq(overridesModule)))
       .configure(configMap).build()
 
   override protected def testServerFactory: TestServerFactory = CustomTestServerFactory

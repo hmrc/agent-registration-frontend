@@ -25,7 +25,13 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 
-trait ViewSpecSupport extends AnyWordSpecLike with Matchers with OptionValues with BeforeAndAfterEach with GuiceOneAppPerSuite with ViewSpecHelper {
+trait ViewSpecSupport 
+  extends AnyWordSpecLike 
+    with Matchers 
+    with OptionValues 
+    with BeforeAndAfterEach 
+    with GuiceOneAppPerSuite 
+    with ViewSpecHelper {
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   implicit val messages: Messages = app.injector.instanceOf[MessagesApi].preferred(request)
