@@ -48,5 +48,19 @@ class UserRolePageSpec extends ViewSpecSupport {
     "render a save and continue button" in {
       doc.select("button[type=submit]").text() shouldBe "Save and continue"
     }
+    
+    "render a form error when the form contains an error" in {
+      val field = "userRole"
+      val errorMessage = "Tell us how your business is set up"
+      val formWithError = ConfirmationForm
+        .form(field)
+        .withError(field, errorMessage)
+      val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
+      errorDoc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
+      errorDoc.select(".govuk-error-summary__title").text() shouldBe "There is a problem"
+      errorDoc.select(".govuk-error-summary__list > li > a").attr("href") shouldBe s"#$field"
+      errorDoc.select(".govuk-error-message").text() shouldBe s"Error: $errorMessage"
+    }
+
   }
 }
