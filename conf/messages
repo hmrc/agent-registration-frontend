@@ -7,7 +7,7 @@ common.errorPrefix = Error
 # About your application
 about-application.title = About your application
 
-# About your application - business type
+# About your application / business type
 businessType.title = How is your business set up?
 businessType.sole-trader = Sole trader
 businessType.limited-company = Limited company
@@ -18,3 +18,8 @@ businessType.other.description = To get an agent services account your business 
 businessType.other.signOut = Finish and sign out
 businessType.error.required = Tell us how your business is set up
 businessType.error.invalid = Tell us how your business is set up
+
+# Timed out
+timed-out.header = You have been signed out
+timed-out.p1 = You have not done anything for 15 minutes, so we have signed you out to keep your account secure.
+timed-out.link = Sign in again

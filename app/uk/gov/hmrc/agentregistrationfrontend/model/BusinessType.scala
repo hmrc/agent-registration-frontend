@@ -16,20 +16,15 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.model
 
-enum BusinessType(val name: String):
+enum BusinessType(val name: String) :
   case SoleTrader extends BusinessType("sole-trader")
   case LimitedCompany extends BusinessType("limited-company")
   case GeneralPartnership extends BusinessType("general-partnership")
   case LimitedLiabilityPartnership extends BusinessType("limited-liability-partnership")
 
-  def isPartnership: Boolean = this match {
-    case GeneralPartnership | LimitedLiabilityPartnership => true
-    case _ => false
-  }
-
   override def toString: String = name
 
-object BusinessType {
+object BusinessType :
 
     def names: Seq[String] = Seq(
       SoleTrader.name,
@@ -39,4 +34,3 @@ object BusinessType {
     )
     def fromName(name: String): Option[BusinessType] = values.find(_.name == name)
     def all: Seq[BusinessType] = values.toSeq
-}
