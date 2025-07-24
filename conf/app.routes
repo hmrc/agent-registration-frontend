@@ -15,3 +15,6 @@ GET     /register                                      uk.gov.hmrc.agentregistra
 ## About your application routes
 GET     /register/about-your-application/business-type uk.gov.hmrc.agentregistrationfrontend.controllers.BusinessTypeController.show
 POST    /register/about-your-application/business-type uk.gov.hmrc.agentregistrationfrontend.controllers.BusinessTypeController.submit
+
+GET     /register/about-your-application/user-role uk.gov.hmrc.agentregistrationfrontend.controllers.UserRoleController.show
+POST    /register/about-your-application/user-role uk.gov.hmrc.agentregistrationfrontend.controllers.UserRoleController.submit
