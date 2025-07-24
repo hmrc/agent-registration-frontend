@@ -27,9 +27,6 @@ class SignOutControllerISpec
   private val wsClient = app.injector.instanceOf[WSClient]
   private val baseUrl = "http://localhost:22201/agent-registration"
   private val signOutViaBasGatewayUrl = uri"http://localhost:9099/bas-gateway/sign-out-without-state"
-  private val signOutUrl = uri"$baseUrl/sign-out"
-  private val timeOutUrl = uri"$baseUrl/time-out"
-  private val timedOutUrl = uri"$baseUrl/timed-out"
 
   private def signOutWithContinue(continue: String): String =
     uri"$signOutViaBasGatewayUrl?${Map("continue" -> continue)}".toString
@@ -47,6 +44,7 @@ class SignOutControllerISpec
     response.header("Location").value shouldBe signOutWithContinue(baseUrl)
 
   "GET /time-out" in :
+    val timedOutUrl = uri"$baseUrl/timed-out"
     val response: WSResponse =
       wsClient
         .url(s"$baseUrl/time-out")
