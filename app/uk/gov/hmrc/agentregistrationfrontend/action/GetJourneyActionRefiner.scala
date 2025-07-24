@@ -23,6 +23,7 @@ import play.api.mvc.Result
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.sessionId
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,17 +32,16 @@ import scala.concurrent.Future
 
 @Singleton
 class GetApplicationActionRefiner @Inject() (
-  applicationService: ApplicationService,
-  appConfig: AppConfig
+  applicationService: ApplicationService
 )(using ec: ExecutionContext)
-extends ActionRefiner[AuthorisedUtrRequest, ApplicationRequest]
+extends ActionRefiner[Request, ApplicationRequest]
 with RequestAwareLogging:
 
-  override protected def refine[A](request: AuthorisedUtrRequest[A]): Future[Either[Result, ApplicationRequest[A]]] =
+  override protected def refine[A](request: Request[A]): Future[Either[Result, ApplicationRequest[A]]] =
     given r: Request[A] = request
 
     for
-      maybeApplication <- applicationService.find(request.sessionId)
+      maybeApplication <- applicationService.find(sessionId)
     yield maybeApplication match
       case Some(application) => Right(new ApplicationRequest(application, request))
       case None =>

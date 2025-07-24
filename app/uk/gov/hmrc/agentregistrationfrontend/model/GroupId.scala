@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.util
+package uk.gov.hmrc.agentregistrationfrontend.model
 
-object SafeEquals:
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.Format
 
-  /** Simple safe equals so we don't have to import cats
-    */
-  extension [A](v: A)
-    @SuppressWarnings(Array("org.wartremover.warts.Equals"))
-    def ===(other: A): Boolean = v == other
-    @SuppressWarnings(Array("org.wartremover.warts.Equals"))
-    def =!=(other: A): Boolean = v != other
+final case class GroupId(  value: String)
+
+object GroupId:
+  given format: Format[GroupId] = summon[Format[String]].inmap(GroupId(_), _.value)

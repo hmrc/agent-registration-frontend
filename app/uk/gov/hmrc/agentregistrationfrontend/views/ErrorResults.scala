@@ -29,10 +29,10 @@ class ErrorResults @Inject() (
   override val messagesApi: MessagesApi
 ) extends I18nSupport:
 
-  def unauthorised(using request: RequestHeader): Result = Unauthorized(
+  def unauthorised(message: String = "")(using request: RequestHeader): Result = Unauthorized(
     errorTemplate(
       pageTitle = Messages("unauthorised.title"),
       heading = Messages("unauthorised.heading"),
-      message = ""
+      message = message
     )
   )

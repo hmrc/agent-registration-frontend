@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.util
 
 import play.api.mvc.Request
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.http.UpstreamErrorResponse
+import uk.gov.hmrc.http.{HttpErrorFunctions, UpstreamErrorResponse}
 
 import scala.concurrent.Future
 
@@ -88,3 +88,5 @@ extends RequestAwareLogging:
     val m = s"Unimplemented: $message"
     logger.error(m)
     throw UpstreamErrorResponse(m, play.mvc.Http.Status.NOT_IMPLEMENTED)
+
+  val httpErrorFunctions: HttpErrorFunctions = new HttpErrorFunctions {}

@@ -24,19 +24,17 @@ import javax.inject.Singleton
 @Singleton
 class Actions @Inject() (
   actionBuilder: DefaultActionBuilder,
-  authenticatedAction: AuthenticatedAction,
-  authorisedUtrAction: AuthorisedUtrAction,
+  authorisedAction: AuthorisedAction,
   getApplicationActionRefiner: GetApplicationActionRefiner,
   ensureApplication: EnsureApplication
 ):
 
   val default: ActionBuilder[Request, AnyContent] = actionBuilder
 
-  val authorisedUtr: ActionBuilder[AuthorisedUtrRequest, AnyContent] = default
-    .andThen(authenticatedAction)
-    .andThen(authorisedUtrAction)
+  val authorised: ActionBuilder[Request, AnyContent] = default
+    .andThen(authorisedAction)
 
-  val getApplicationInProgress: ActionBuilder[ApplicationRequest, AnyContent] = authorisedUtr
+  val getApplicationInProgress: ActionBuilder[ApplicationRequest, AnyContent] = authorised
     .andThen(getApplicationActionRefiner)
     .andThen(ensureApplication.ensureApplication(
       predicate = _.isInProgress,
@@ -44,7 +42,7 @@ class Actions @Inject() (
       hintWhyRedirecting = "The application is in the final state"
     ))
 
-  val getApplicationSubmitted: ActionBuilder[ApplicationRequest, AnyContent] = authorisedUtr
+  val getApplicationSubmitted: ActionBuilder[ApplicationRequest, AnyContent] = authorised
     .andThen(getApplicationActionRefiner)
     .andThen(ensureApplication.ensureApplication(
       predicate = _.hasFinished,

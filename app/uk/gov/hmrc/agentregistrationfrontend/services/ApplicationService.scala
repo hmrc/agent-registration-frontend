@@ -17,13 +17,13 @@
 package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.mvc.Request
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedUtrRequest
 import uk.gov.hmrc.agentregistrationfrontend.model.application.Application
 import uk.gov.hmrc.agentregistrationfrontend.model.application.ApplicationId
 import uk.gov.hmrc.agentregistrationfrontend.model.application.SessionId
 import uk.gov.hmrc.agentregistrationfrontend.repository.ApplicationRepo
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.sessionId
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,9 +37,9 @@ class ApplicationService @Inject() (
 )(using ec: ExecutionContext)
 extends RequestAwareLogging:
 
-  def upsertNewApplication()(using request: AuthorisedUtrRequest[?]): Future[Application] =
+  def upsertNewApplication()(using request: Request[?]): Future[Application] =
     val application: Application = applicationFactory
-      .makeNewApplication(sessionId = request.sessionId)
+      .makeNewApplication(sessionId = sessionId)
 
     upsert(application)
       .map { _ =>

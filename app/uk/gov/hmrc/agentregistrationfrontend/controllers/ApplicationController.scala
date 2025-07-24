@@ -16,19 +16,12 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
-import play.api.i18n.I18nSupport
-import play.api.mvc.Action
-import play.api.mvc.AnyContent
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedUtrRequest
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
-import javax.inject.Inject
-import javax.inject.Singleton
-import scala.concurrent.ExecutionContext
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.Future
 
 @Singleton
@@ -40,13 +33,13 @@ class ApplicationController @Inject() (
 )
 extends FrontendController(mcc):
 
-  val initializeApplication: Action[AnyContent] = actions.authorisedUtr.async { implicit request =>
+  val initializeApplication: Action[AnyContent] = actions.authorised.async { implicit request =>
     applicationService
       .upsertNewApplication()
       .map(_ => Redirect(routes.ApplicationController.landing.url))
   }
 
-  val landing: Action[AnyContent] = actions.getApplicationInProgress.async { implicit request =>
+  val landing: Action[AnyContent] = actions.authorised.async { implicit request =>
     Future.successful(Ok(simplePage(
       h1 = "Landing page...",
       bodyText = Some(
@@ -55,11 +48,29 @@ extends FrontendController(mcc):
     )))
   }
 
+  val taskList: Action[AnyContent] = actions.getApplicationInProgress.async { implicit request =>
+    Future.successful(Ok(simplePage(
+      h1 = "Task List page...",
+      bodyText = Some(
+        "Placeholder for the task list page..."
+      )
+    )))
+  }
+
+  val applicationDashboard: Action[AnyContent] = actions.getApplicationInProgress.async { implicit request =>
+    Future.successful(Ok(simplePage(
+      h1 = "Application Dashboard page...",
+      bodyText = Some(
+        "Placeholder for the Application Dashboard page..."
+      )
+    )))
+  }
+
   val applicationSubmitted: Action[AnyContent] = actions.getApplicationSubmitted.async { implicit request =>
     Future.successful(Ok(simplePage(
-      h1 = "Application Submitted",
+      h1 = "Application Submitted...",
       bodyText = Some(
-        "Placeholder for the application submitted page..."
+        "Placeholder for the Application Submitted page..."
       )
     )))
   }

@@ -7,8 +7,11 @@ GET     /sign-out                         uk.gov.hmrc.agentregistrationfrontend.
 GET     /time-out                         uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timeOut
 GET     /timed-out                        uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timedOut
 
-GET     /new-application                   uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.initializeApplication
-GET     /application-submitted             uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.applicationSubmitted
+GET     /new-application                  uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.initializeApplication
+GET     /application-submitted            uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.applicationSubmitted
+
+GET        /application-dashboard         uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.applicationDashboard
+GET        /task-list                     uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.taskList
 
 # Register routes
 GET     /register                                      uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.startRegistration
