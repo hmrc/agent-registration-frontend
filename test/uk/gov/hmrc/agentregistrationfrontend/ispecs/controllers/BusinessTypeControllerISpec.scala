@@ -26,7 +26,7 @@ class BusinessTypeControllerISpec
   extends ISpec :
 
   private val wsClient = app.injector.instanceOf[WSClient]
-  private val baseUrl = "http://localhost:22201/agent-registration"
+  private val baseUrl = s"http://localhost:${port.toString}/agent-registration"
 
   "GET /register should redirect to business type page" in :
     val response: WSResponse =
