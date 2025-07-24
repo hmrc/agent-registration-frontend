@@ -22,10 +22,10 @@ businessType.error.invalid = Tell us how your business is set up
 # About your application / user role
 userRole.title = Are you the owner of the business?
 userRole.true = Yes
-userRole.false = No, but I''m authorised by them to set up this account
+userRole.false = No, but I’m authorised by them to set up this account
 userRole.other.signOut = Finish and sign out
-userRole.error.required = Tell us how your business is set up
-userRole.error.invalid = Tell us how your business is set up
+userRole.error.required = Select ‘yes’ if you are the owner of the business
+userRole.error.invalid = Select ‘yes’ if you are the owner of the business
 
 
 # Timed out

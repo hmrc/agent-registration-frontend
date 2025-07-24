@@ -80,4 +80,4 @@ class UserRoleControllerISpec
     response.status shouldBe 400
     val content = response.body[String]
     content should include("There is a problem")
-    content should include("Tell us how your business is set up")
+    content should include("Select ‘yes’ if you are the owner of the business")

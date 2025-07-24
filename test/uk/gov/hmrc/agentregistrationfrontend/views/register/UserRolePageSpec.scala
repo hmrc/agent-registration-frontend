@@ -38,7 +38,7 @@ class UserRolePageSpec extends ViewSpecSupport {
         legend = heading, 
         options = List(
           "Yes" -> "true",
-          "No, but I'm authorised by them to set up this account" -> "false"
+          "No, but I’m authorised by them to set up this account" -> "false"
         ),
         hint = None
       )
@@ -48,10 +48,10 @@ class UserRolePageSpec extends ViewSpecSupport {
     "render a save and continue button" in {
       doc.select("button[type=submit]").text() shouldBe "Save and continue"
     }
-    
+
     "render a form error when the form contains an error" in {
       val field = "userRole"
-      val errorMessage = "Tell us how your business is set up"
+      val errorMessage = "Select ‘yes’ if you are the owner of the business"
       val formWithError = ConfirmationForm
         .form(field)
         .withError(field, errorMessage)
