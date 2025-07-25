@@ -20,25 +20,38 @@ import play.api.data.validation.*
 
 trait FormFieldHelper {
 
-  protected def mandatoryBoolean(errorMessageKey: String, args: String*): Constraint[Option[Boolean]] = Constraint[Option[Boolean]] { fieldValue =>
+  protected def mandatoryBoolean(
+    errorMessageKey: String,
+    args: String*
+  ): Constraint[Option[Boolean]] = Constraint[Option[Boolean]] { fieldValue =>
     if (fieldValue.isDefined)
       Valid
     else
       Invalid(ValidationError(mandatoryFieldErrorMessage(errorMessageKey), args*))
   }
 
-  protected def mandatoryRadio(errorMessageKey: String, options: Seq[String], args: String*): Constraint[Option[String]] = Constraint[Option[String]] { fieldValue =>
+  protected def mandatoryRadio(
+    errorMessageKey: String,
+    options: Seq[String],
+    args: String*
+  ): Constraint[Option[String]] = Constraint[Option[String]] { fieldValue =>
     if (fieldValue.isDefined && options.contains(fieldValue.get))
       Valid
     else
       Invalid(ValidationError(mandatoryFieldErrorMessage(errorMessageKey), args*))
   }
 
-  protected def invalidMandatoryField(messageKey: String, inputFieldClass: String): Invalid = {
+  protected def invalidMandatoryField(
+    messageKey: String,
+    inputFieldClass: String
+  ): Invalid = {
     Invalid(ValidationError(mandatoryFieldErrorMessage(messageKey), "inputFieldClass" -> inputFieldClass))
   }
 
-  protected def invalidInput(messageKey: String, inputFieldClass: String): Invalid = {
+  protected def invalidInput(
+    messageKey: String,
+    inputFieldClass: String
+  ): Invalid = {
     Invalid(ValidationError(invalidInputErrorMessage(messageKey), "inputFieldClass" -> inputFieldClass))
   }
 

@@ -16,18 +16,24 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action
 
-import play.api.mvc.{ActionRefiner, Request, Result}
+import play.api.mvc.ActionRefiner
+import play.api.mvc.Request
+import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.model.application.AgentRegistrationApplication
-import uk.gov.hmrc.agentregistrationfrontend.model.{GroupId, InternalUserId}
+import uk.gov.hmrc.agentregistrationfrontend.model.GroupId
+import uk.gov.hmrc.agentregistrationfrontend.model.InternalUserId
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.util.{Errors, RequestAwareLogging}
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 class AgentRegistrationApplicationRequest[A](
   val agentRegistrationApplication: AgentRegistrationApplication,
@@ -35,15 +41,20 @@ class AgentRegistrationApplicationRequest[A](
   override val groupId: GroupId,
   override val request: Request[A]
 )
-extends AuthorisedRequest[A](internalUserId, groupId, request):
+extends AuthorisedRequest[A](
+  internalUserId,
+  groupId,
+  request
+):
   Errors.require(
     requirement = agentRegistrationApplication.internalUserId === internalUserId,
-    message = s"Sanity Check: InternalUserId from the request (${internalUserId.value}) must match the Application " +
-      s"retrieved from backend (${agentRegistrationApplication.internalUserId.value}) (this should never happen)"
+    message =
+      s"Sanity Check: InternalUserId from the request (${internalUserId.value}) must match the Application " +
+        s"retrieved from backend (${agentRegistrationApplication.internalUserId.value}) (this should never happen)"
   )(using this)
 
 @Singleton
-class AgentRegistrationApplicationAction @Inject()(
+class AgentRegistrationApplicationAction @Inject() (
   applicationService: ApplicationService,
   enrolmentStoreProxyConnector: EnrolmentStoreProxyConnector,
   appConfig: AppConfig
@@ -56,16 +67,17 @@ with RequestAwareLogging:
 
     applicationService
       .find()
-      .flatMap{ maybeApplication => maybeApplication match
-        case Some(application) => Future.successful(Right(new AgentRegistrationApplicationRequest(
-          agentRegistrationApplication = application,
-          internalUserId = request.internalUserId,
-          groupId = request.groupId,
-          request = request.request
-        )))
-        case None => createNewApplication()
+      .flatMap { maybeApplication =>
+        maybeApplication match
+          case Some(application) =>
+            Future.successful(Right(new AgentRegistrationApplicationRequest(
+              agentRegistrationApplication = application,
+              internalUserId = request.internalUserId,
+              groupId = request.groupId,
+              request = request.request
+            )))
+          case None => createNewApplication()
       }
-
 
   private def createNewApplication[A]()(using request: AuthorisedRequest[A]): Future[Either[Result, AgentRegistrationApplicationRequest[A]]] =
     enrolmentStoreProxyConnector
@@ -79,12 +91,14 @@ with RequestAwareLogging:
         else
           applicationService
             .upsertNewApplication()
-            .map(agentRegistrationApplication => Right(AgentRegistrationApplicationRequest[A](
+            .map(agentRegistrationApplication =>
+              Right(AgentRegistrationApplicationRequest[A](
                 agentRegistrationApplication = agentRegistrationApplication,
                 internalUserId = request.internalUserId,
                 groupId = request.groupId,
                 request = request.request
-            )))
+              ))
+            )
       }
 
   override protected def executionContext: ExecutionContext = ec

@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.model
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.Format
 
-final case class GroupId(  value: String)
+final case class GroupId(value: String)
 
 object GroupId:
   given format: Format[GroupId] = summon[Format[String]].inmap(GroupId(_), _.value)

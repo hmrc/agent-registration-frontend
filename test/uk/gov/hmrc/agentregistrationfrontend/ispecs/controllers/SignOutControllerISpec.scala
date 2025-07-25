@@ -17,22 +17,22 @@
 package uk.gov.hmrc.agentregistrationfrontend.ispecs.controllers
 
 import play.api.libs.ws.DefaultBodyReadables.*
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.WSClient
+import play.api.libs.ws.WSResponse
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistrationfrontend.ispecs.ISpec
 
 class SignOutControllerISpec
-  extends ISpec:
+extends ISpec:
 
   private val wsClient = app.injector.instanceOf[WSClient]
   private val baseUrl = s"http://localhost:${port.toString}/agent-registration"
   private val selfExternalUrl = "http://localhost:22201/agent-registration"
   private val signOutViaBasGatewayUrl = uri"http://localhost:9099/bas-gateway/sign-out-without-state"
 
-  private def signOutWithContinue(continue: String): String =
-    uri"$signOutViaBasGatewayUrl?${Map("continue" -> continue)}".toString
+  private def signOutWithContinue(continue: String): String = uri"$signOutViaBasGatewayUrl?${Map("continue" -> continue)}".toString
 
-  "GET /sign-out" in :
+  "GET /sign-out" in:
     val response: WSResponse =
       wsClient
         .url(s"$baseUrl/sign-out")
@@ -44,7 +44,7 @@ class SignOutControllerISpec
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe signOutWithContinue(selfExternalUrl)
 
-  "GET /time-out" in :
+  "GET /time-out" in:
     val timedOutUrl = uri"$selfExternalUrl/timed-out"
     val response: WSResponse =
       wsClient
@@ -57,7 +57,7 @@ class SignOutControllerISpec
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe signOutWithContinue(timedOutUrl.toString)
 
-  "GET /timed-out" in :
+  "GET /timed-out" in:
     val response: WSResponse =
       wsClient
         .url(s"$baseUrl/timed-out")

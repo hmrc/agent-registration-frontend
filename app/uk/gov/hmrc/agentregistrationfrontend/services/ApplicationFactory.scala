@@ -17,10 +17,13 @@
 package uk.gov.hmrc.agentregistrationfrontend.services
 
 import uk.gov.hmrc.agentregistrationfrontend.model.InternalUserId
-import uk.gov.hmrc.agentregistrationfrontend.model.application.{AgentRegistrationApplication, ApplicationState}
+import uk.gov.hmrc.agentregistrationfrontend.model.application.AgentRegistrationApplication
+import uk.gov.hmrc.agentregistrationfrontend.model.application.ApplicationState
 
-import java.time.{Clock, Instant}
-import javax.inject.{Inject, Singleton}
+import java.time.Clock
+import java.time.Instant
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class ApplicationFactory @Inject() (

@@ -17,15 +17,26 @@
 package uk.gov.hmrc.agentregistrationfrontend.forms
 
 import play.api.data.Form
-import play.api.data.Forms.{optional, single, text}
+import play.api.data.Forms.optional
+import play.api.data.Forms.single
+import play.api.data.Forms.text
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.FormFieldHelper
 
-object SelectFromOptionsForm extends FormFieldHelper {
-  def form(fieldName: String, options: Seq[String], args: String*): Form[String] = {
+object SelectFromOptionsForm
+extends FormFieldHelper {
+  def form(
+    fieldName: String,
+    options: Seq[String],
+    args: String*
+  ): Form[String] = {
     Form[String](
       single(
         fieldName -> optional(text)
-          .verifying(mandatoryRadio(fieldName, options, args*))
+          .verifying(mandatoryRadio(
+            fieldName,
+            options,
+            args*
+          ))
           .transform(_.getOrElse(""), (Some(_)): String => Option[String])
       )
     )

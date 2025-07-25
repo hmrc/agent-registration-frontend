@@ -16,63 +16,64 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
-
 import play.api.http.Status
 import play.api.libs.functional.syntax.*
-import play.api.libs.json.{Json, Reads, __}
+import play.api.libs.json.Json
+import play.api.libs.json.Reads
+import play.api.libs.json.__
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.GroupId
 import uk.gov.hmrc.agentregistrationfrontend.model.application.AgentRegistrationApplication
-import uk.gov.hmrc.agentregistrationfrontend.util.{Errors, RequestAwareLogging}
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
 import uk.gov.hmrc.auth.core.EnrolmentIdentifier
 import uk.gov.hmrc.http.HttpReads.Implicits.given
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HttpResponse, StringContextOps}
+import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.http.StringContextOps
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
-/**
- * Connector to the companion backend microservice
- */
+/** Connector to the companion backend microservice
+  */
 @Singleton
 class AgentRegistrationConnector @Inject() (
-                                               httpClient: HttpClientV2,
-                                               appConfig: AppConfig
-                                             )(using
-                                               ec: ExecutionContext
-                                             )
-  extends RequestAwareLogging:
+  httpClient: HttpClientV2,
+  appConfig: AppConfig
+)(using
+  ec: ExecutionContext
+)
+extends RequestAwareLogging:
 
   def findApplication()(using
-                                       request: AuthorisedRequest[?]
-                                     ): Future[Option[AgentRegistrationApplication]] =
-    httpClient
-      .get(url"$baseUrl/application")
-      .execute[HttpResponse]
-      .map{ response =>
-        response.status match {
-          case Status.OK => Some(response.json.as[AgentRegistrationApplication])
-          case Status.NO_CONTENT => None
-          case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
-        }
+    request: AuthorisedRequest[?]
+  ): Future[Option[AgentRegistrationApplication]] = httpClient
+    .get(url"$baseUrl/application")
+    .execute[HttpResponse]
+    .map { response =>
+      response.status match {
+        case Status.OK => Some(response.json.as[AgentRegistrationApplication])
+        case Status.NO_CONTENT => None
+        case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
       }
+    }
 
   def upsertApplication(application: AgentRegistrationApplication)(using
-                                                                   request: RequestHeader
-                                     ): Future[Unit] =
-    httpClient
-      .post(url"$baseUrl/application")
-      .execute[HttpResponse]
-      .map{ response =>
-        response.status match {
-          case Status.OK => ()
-          case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
-        }
+    request: RequestHeader
+  ): Future[Unit] = httpClient
+    .post(url"$baseUrl/application")
+    .execute[HttpResponse]
+    .map { response =>
+      response.status match {
+        case Status.OK => ()
+        case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
       }
+    }
 
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration"
-

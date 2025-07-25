@@ -35,9 +35,9 @@ extends RequestAwareLogging:
   /** Check if application matches predicate. If it doesn't, it will send the Redirect.
     */
   def ensureApplication(
-                         predicate: AgentRegistrationApplication => Boolean,
-                         redirectF: AgentRegistrationApplication => Call,
-                         hintWhyRedirecting: String
+    predicate: AgentRegistrationApplication => Boolean,
+    redirectF: AgentRegistrationApplication => Call,
+    hintWhyRedirecting: String
   ): ActionFilter[AgentRegistrationApplicationRequest] =
     new ActionFilter[AgentRegistrationApplicationRequest]:
       override def filter[A](request: AgentRegistrationApplicationRequest[A]): Future[Option[Result]] =

@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport
 
 trait Selectors {
+
   // Outside main-content
   val languageSwitcher = ".hmrc-language-select"
   val main = "#main-content"
@@ -70,4 +71,5 @@ trait Selectors {
   val warning = ".govuk-warning-text"
 
   val tabLink = ".govuk-tabs__tab"
+
 }

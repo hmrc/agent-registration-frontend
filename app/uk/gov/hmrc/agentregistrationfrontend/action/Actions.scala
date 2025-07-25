@@ -23,10 +23,10 @@ import javax.inject.Singleton
 
 @Singleton
 class Actions @Inject() (
-                          actionBuilder: DefaultActionBuilder,
-                          authorisedAction: AuthorisedAction,
-                          agentRegistrationApplicationAction: AgentRegistrationApplicationAction,
-                          ensureApplication: EnsureApplication
+  actionBuilder: DefaultActionBuilder,
+  authorisedAction: AuthorisedAction,
+  agentRegistrationApplicationAction: AgentRegistrationApplicationAction,
+  ensureApplication: EnsureApplication
 ):
 
   val default: ActionBuilder[Request, AnyContent] = actionBuilder

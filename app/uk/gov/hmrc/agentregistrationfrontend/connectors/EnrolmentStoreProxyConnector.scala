@@ -18,19 +18,25 @@ package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import play.api.http.Status
 import play.api.libs.functional.syntax.*
-import play.api.libs.json.{Json, Reads, __}
+import play.api.libs.json.Json
+import play.api.libs.json.Reads
+import play.api.libs.json.__
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.GroupId
-import uk.gov.hmrc.agentregistrationfrontend.util.{Errors, RequestAwareLogging}
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
 import uk.gov.hmrc.auth.core.EnrolmentIdentifier
 import uk.gov.hmrc.http.HttpReads.Implicits.given
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.{HttpResponse, StringContextOps}
+import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.http.StringContextOps
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class EnrolmentStoreProxyConnector @Inject() (
@@ -41,37 +47,35 @@ class EnrolmentStoreProxyConnector @Inject() (
 )
 extends RequestAwareLogging:
 
-  /**
-   * ES3: Query Enrolments allocated to a group
-   * https://confluence.tools.tax.service.gov.uk/display/GGWRLS/ES3+-+Query+Enrolments+allocated+to+a+group
-   */
+  /** ES3: Query Enrolments allocated to a group https://confluence.tools.tax.service.gov.uk/display/GGWRLS/ES3+-+Query+Enrolments+allocated+to+a+group
+    */
   def queryEnrolmentsAllocatedToGroup(
     groupId: GroupId
   )(using
     request: RequestHeader
-  ): Future[List[EnrolmentStoreProxyConnector.Enrolment]] =
-    httpClient
-      .get(url"$baseUrl/enrolment-store/groups/${groupId.value}/enrolments")
-      .execute[HttpResponse]
-      .map{ response =>
-        response.status match {
-          case Status.OK => response.json.as[List[EnrolmentStoreProxyConnector.Enrolment]]
-          case Status.NO_CONTENT => List[EnrolmentStoreProxyConnector.Enrolment]()
-          case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
-        }
+  ): Future[List[EnrolmentStoreProxyConnector.Enrolment]] = httpClient
+    .get(url"$baseUrl/enrolment-store/groups/${groupId.value}/enrolments")
+    .execute[HttpResponse]
+    .map { response =>
+      response.status match {
+        case Status.OK => response.json.as[List[EnrolmentStoreProxyConnector.Enrolment]]
+        case Status.NO_CONTENT => List[EnrolmentStoreProxyConnector.Enrolment]()
+        case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
       }
+    }
 
   private val baseUrl: String = appConfig.enrolmentStoreProxyBaseUrl + "/enrolment-store-proxy/enrolment-store"
 
-object EnrolmentStoreProxyConnector:  
+object EnrolmentStoreProxyConnector:
 
   final case class Enrolment(
-    service: String, 
+    service: String,
     state: String
   )
-  
+
   object Enrolment:
-    given Reads[Enrolment] = (
-      (__ \ "service").read[String] and
-        (__ \ "state").read[String]
+    given Reads[Enrolment] =
+      (
+        (__ \ "service").read[String] and
+          (__ \ "state").read[String]
       )(Enrolment.apply)

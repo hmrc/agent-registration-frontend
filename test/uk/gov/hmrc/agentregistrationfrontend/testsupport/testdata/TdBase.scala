@@ -16,10 +16,13 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-import uk.gov.hmrc.agentregistrationfrontend.model.{Nino, Utr}
+import uk.gov.hmrc.agentregistrationfrontend.model.Nino
+import uk.gov.hmrc.agentregistrationfrontend.model.Utr
 
 import java.time.format.DateTimeFormatter
-import java.time.{Instant, LocalDateTime, ZoneOffset}
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 trait TdBase:
 

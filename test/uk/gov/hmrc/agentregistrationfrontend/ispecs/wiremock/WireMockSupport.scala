@@ -19,10 +19,14 @@ package uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
-import org.scalatest.{BeforeAndAfterAll, BeforeAndAfterEach, Suite}
+import org.scalatest.BeforeAndAfterAll
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.Suite
 import play.api.Logger
 
-trait WireMockSupport extends BeforeAndAfterAll, BeforeAndAfterEach:
+trait WireMockSupport
+extends BeforeAndAfterAll,
+  BeforeAndAfterEach:
   self: Suite =>
 
   private val logger = Logger(getClass)
@@ -47,4 +51,3 @@ trait WireMockSupport extends BeforeAndAfterAll, BeforeAndAfterEach:
 
 object WireMockSupport:
   lazy val port: Int = 11111
-

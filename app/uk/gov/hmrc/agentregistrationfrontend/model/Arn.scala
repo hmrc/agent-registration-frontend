@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.model
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.Format
 
-final case class Arn(  value: String)
+final case class Arn(value: String)
 
 object Arn:
   given format: Format[Arn] = summon[Format[String]].inmap(Arn(_), _.value)

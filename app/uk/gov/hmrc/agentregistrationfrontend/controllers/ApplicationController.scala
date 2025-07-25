@@ -16,12 +16,15 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import scala.concurrent.Future
 
 @Singleton
@@ -33,7 +36,7 @@ class ApplicationController @Inject() (
 )
 extends FrontendController(mcc):
 
-  val landing: Action[AnyContent] = actions.authorised.async { implicit request =>
+  val landing: Action[AnyContent] = actions.getApplicationInProgress.async { implicit request =>
     Future.successful(Ok(simplePage(
       h1 = "Landing page...",
       bodyText = Some(

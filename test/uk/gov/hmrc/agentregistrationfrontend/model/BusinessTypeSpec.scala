@@ -19,28 +19,30 @@ package uk.gov.hmrc.agentregistrationfrontend.model
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
 
-class BusinessTypeSpec extends AnyWordSpecLike with Matchers :
+class BusinessTypeSpec
+extends AnyWordSpecLike
+with Matchers:
 
-    BusinessType.values.foreach(value =>
-      s"BusinessType.fromName should read $value" in :
-        BusinessType.fromName(value.toString) shouldBe Some(value)
+  BusinessType.values.foreach(value =>
+    s"BusinessType.fromName should read $value" in:
+      BusinessType.fromName(value.toString) shouldBe Some(value)
+  )
+
+  "BusinessType.fromName should fail to read an unknown value" in:
+    BusinessType.fromName("invalid") shouldBe None
+
+  "BusinessType.names should return all business type names" in:
+    BusinessType.names should contain allOf (
+      BusinessType.SoleTrader.name,
+      BusinessType.LimitedCompany.name,
+      BusinessType.GeneralPartnership.name,
+      BusinessType.LimitedLiabilityPartnership.name
     )
 
-    "BusinessType.fromName should fail to read an unknown value" in :
-      BusinessType.fromName("invalid") shouldBe None
-
-    "BusinessType.names should return all business type names" in :
-      BusinessType.names should contain allOf (
-        BusinessType.SoleTrader.name,
-        BusinessType.LimitedCompany.name,
-        BusinessType.GeneralPartnership.name,
-        BusinessType.LimitedLiabilityPartnership.name
-      )
-
-    "BusinessType.all should return all business types" in :
-      BusinessType.all should contain allOf (
-        BusinessType.SoleTrader,
-        BusinessType.LimitedCompany,
-        BusinessType.GeneralPartnership,
-        BusinessType.LimitedLiabilityPartnership
-      )
+  "BusinessType.all should return all business types" in:
+    BusinessType.all should contain allOf (
+      BusinessType.SoleTrader,
+      BusinessType.LimitedCompany,
+      BusinessType.GeneralPartnership,
+      BusinessType.LimitedLiabilityPartnership
+    )

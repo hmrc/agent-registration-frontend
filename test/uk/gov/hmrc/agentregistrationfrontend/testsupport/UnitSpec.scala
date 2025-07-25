@@ -18,4 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport
 
 import org.scalatest.freespec.AnyFreeSpec
 
-trait UnitSpec extends AnyFreeSpec, RichMatchers
+trait UnitSpec
+extends AnyFreeSpec,
+  RichMatchers

@@ -18,20 +18,22 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import org.scalatest.{BeforeAndAfterEach, OptionValues}
+import org.scalatest.BeforeAndAfterEach
+import org.scalatest.OptionValues
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.Messages
+import play.api.i18n.MessagesApi
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 
-trait ViewSpecSupport 
-  extends AnyWordSpecLike 
-    with Matchers 
-    with OptionValues 
-    with BeforeAndAfterEach 
-    with GuiceOneAppPerSuite 
-    with ViewSpecHelper {
+trait ViewSpecSupport
+extends AnyWordSpecLike
+with Matchers
+with OptionValues
+with BeforeAndAfterEach
+with GuiceOneAppPerSuite
+with ViewSpecHelper {
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   implicit val messages: Messages = app.injector.instanceOf[MessagesApi].preferred(request)

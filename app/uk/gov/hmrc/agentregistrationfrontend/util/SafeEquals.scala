@@ -21,6 +21,7 @@ object SafeEquals:
   /** Simple safe equals so we don't have to import cats
     */
   extension [A](v: A)
+
     @SuppressWarnings(Array("org.wartremover.warts.Equals"))
     def ===(other: A): Boolean = v == other
     @SuppressWarnings(Array("org.wartremover.warts.Equals"))

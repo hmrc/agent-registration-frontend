@@ -19,9 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.model
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.Format
 
-/**
- * Internal User Identifier, which comes from the Retrievals
- */
+/** Internal User Identifier, which comes from the Retrievals
+  */
 final case class InternalUserId(value: String)
 
 object InternalUserId:
