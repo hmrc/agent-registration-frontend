@@ -22,9 +22,13 @@ import play.api.mvc.*
 import play.api.mvc.Results.*
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
+import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
+import uk.gov.hmrc.agentregistrationfrontend.model.application.AgentRegistrationApplication
 import uk.gov.hmrc.agentregistrationfrontend.model.Arn
 import uk.gov.hmrc.agentregistrationfrontend.model.GroupId
+import uk.gov.hmrc.agentregistrationfrontend.model.InternalUserId
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
@@ -40,61 +44,59 @@ import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
+import play.api.mvc.Request
+import play.api.mvc.WrappedRequest
+import uk.gov.hmrc.agentregistrationfrontend.model.GroupId
+import uk.gov.hmrc.agentregistrationfrontend.model.InternalUserId
+import uk.gov.hmrc.agentregistrationfrontend.model.application.AgentRegistrationApplication
+
+class AuthorisedRequest[A](
+  val internalUserId: InternalUserId,
+  val groupId: GroupId,
+  val request: Request[A]
+)
+extends WrappedRequest[A](request)
+
 @Singleton
 class AuthorisedAction @Inject() (
   af: AuthorisedFunctions,
   errorResults: ErrorResults,
   appConfig: AppConfig,
-  enrolmentStoreProxyConnector: EnrolmentStoreProxyConnector,
   cc: MessagesControllerComponents
 )
-extends ActionRefiner[Request, Request]
+extends ActionRefiner[Request, AuthorisedRequest]
 with RequestAwareLogging:
 
-  override protected def refine[A](request: Request[A]): Future[Either[Result, Request[A]]] =
+  override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] =
     given r: Request[A] = request
 
     af.authorised(
       AuthProviders(GovernmentGateway)
         and AffinityGroup.Agent
-//        and credentialRoleAdmin
     ).retrieve(
       Retrievals.allEnrolments
         and Retrievals.groupIdentifier
         and Retrievals.credentialRole
+        and Retrievals.internalId
     ).apply:
-      case allEnrolments ~ maybeGroupIdentifier ~ credentialRole =>
-
-        println(credentialRole)
-
-        val groupId: GroupId = maybeGroupIdentifier
-          .map(GroupId.apply)
-          .getOrElse(Errors.throwServerErrorException("Expected group identifier to be found"))
-
-        val isHmrcAsAgentEnrolmentAssignedToUser: Boolean = allEnrolments
-          .getEnrolment(hmrcAsAgentEnrolment.key)
-          .exists(_.isActivated)
-
-        if isHmrcAsAgentEnrolmentAssignedToUser then
+      case allEnrolments ~ maybeGroupIdentifier ~ credentialRole ~ maybeInternalId =>
+        if isUnsupportedCredentialRole(credentialRole) then
+          logger.info(s"Unauthorised because of 'UnsupportedCredentialRole'")
+          Future.successful(Left(errorResults.unauthorised(message = "UnsupportedCredentialRole")))
+        else if isHmrcAsAgentEnrolmentAssignedToUser(allEnrolments) then
           val redirectUrl: String = appConfig.asaDashboardUrl
-          logger.info(s"Enrolment $hmrcAsAgentEnrolment is assigned to user, redirecting to ASA Dashboard ($redirectUrl)")
+          logger.info(s"Enrolment ${appConfig.hmrcAsAgentEnrolment} is assigned to user, redirecting to ASA Dashboard ($redirectUrl)")
           Future.successful(Left(Redirect(redirectUrl)))
         else
-          for
-            enrolmentsInGroup <- enrolmentStoreProxyConnector
-              .queryEnrolmentsAllocatedToGroup(
-                groupId = groupId
-              )
-            isHmrcAsAgentEnrolmentAllocatedToGroup: Boolean = enrolmentsInGroup.exists(e =>
-              e.service === hmrcAsAgentEnrolment.key && e.state === "Activated"
-            )
-          yield
-            if isHmrcAsAgentEnrolmentAllocatedToGroup then
-              val redirectUrl: String = appConfig.taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment
-              logger.info(s"Enrolment $hmrcAsAgentEnrolment is assigned to user, redirecting to taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment ($redirectUrl)")
-              Left(Redirect(redirectUrl))
-            else
-              Right(request)
+          Future.successful(Right(new AuthorisedRequest(
+            internalUserId = maybeInternalId
+              .map(InternalUserId.apply)
+              .getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing")),
+            groupId = maybeGroupIdentifier
+              .map(GroupId.apply)
+              .getOrElse(Errors.throwServerErrorException("Retrievals for group identifier is missing")),
+            request = request
+          )))
     .recoverWith:
       case _: NoActiveSession =>
         Future.successful(Left(Redirect(
@@ -129,9 +131,19 @@ with RequestAwareLogging:
           )
         ))
 
-  private val hmrcAsAgentEnrolment: Enrolment = Enrolment(key = "HMRC-AS-AGENT")
+  override protected def executionContext: ExecutionContext = cc.executionContext
+
+  private def isHmrcAsAgentEnrolmentAssignedToUser[A](allEnrolments: Enrolments) = allEnrolments
+    .getEnrolment(appConfig.hmrcAsAgentEnrolment.key)
+    .exists(_.isActivated)
+
+  private def isUnsupportedCredentialRole[A](maybeCredentialRole: Option[CredentialRole])(using request: RequestHeader) =
+    @nowarn
+    val supportedCredentialRoles: Set[CredentialRole] = Set(User, Admin)
+    val credentialRole: CredentialRole = maybeCredentialRole.getOrElse(Errors.throwServerErrorException("Retrievals for CredentialRole is missing"))
+    !supportedCredentialRoles.contains(credentialRole)
 
   @nowarn
   private val credentialRoleAdmin: Predicate = User.or(Admin) // Admin and User are equivalent, Admin is deprecated
-  override protected def executionContext: ExecutionContext = cc.executionContext
+
   private given ExecutionContext = cc.executionContext

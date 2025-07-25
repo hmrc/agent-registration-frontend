@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.util
 
 import play.api.i18n.*
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentregistrationfrontend.model.application.SessionId
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
@@ -41,8 +40,6 @@ object RequestSupport:
 
   given hc(using request: RequestHeader): HeaderCarrier = HcProvider.headerCarrier
 
-  def sessionId(using request: RequestHeader): SessionId = hc.sessionId.getOrElse(Errors.throwServerErrorException("Expected sessionId to be in the request"))
-  
   /** Naive way of checking if user is logged in. Use it in views only. For more real check see auth.AuthService
     */
   def isLoggedIn(using request: RequestHeader): Boolean = request.session.get(SessionKeys.authToken).isDefined

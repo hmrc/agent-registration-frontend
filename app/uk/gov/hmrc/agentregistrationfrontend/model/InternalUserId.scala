@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.action
+package uk.gov.hmrc.agentregistrationfrontend.model
 
-import play.api.mvc.Request
-import play.api.mvc.WrappedRequest
-import uk.gov.hmrc.agentregistrationfrontend.model.application.Application
-import uk.gov.hmrc.agentregistrationfrontend.model.application.ApplicationId
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.Format
 
-class ApplicationRequest[A](
-  val application: Application,
-  val request: Request[A]
-)
-extends WrappedRequest[A](request):
+/**
+ * Internal User Identifier, which comes from the Retrievals
+ */
+final case class InternalUserId(value: String)
 
-  val applicationId: ApplicationId = application.applicationId
+object InternalUserId:
+  given format: Format[InternalUserId] = summon[Format[String]].inmap(InternalUserId(_), _.value)

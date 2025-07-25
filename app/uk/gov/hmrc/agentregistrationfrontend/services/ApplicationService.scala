@@ -17,13 +17,12 @@
 package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.mvc.Request
-import uk.gov.hmrc.agentregistrationfrontend.model.application.Application
-import uk.gov.hmrc.agentregistrationfrontend.model.application.ApplicationId
-import uk.gov.hmrc.agentregistrationfrontend.model.application.SessionId
-import uk.gov.hmrc.agentregistrationfrontend.repository.ApplicationRepo
+import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
+import uk.gov.hmrc.agentregistrationfrontend.model.application.AgentRegistrationApplication
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.sessionId
+import uk.gov.hmrc.agentregistrationfrontend.util.SafeEquals.===
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,34 +31,25 @@ import scala.concurrent.Future
 
 @Singleton
 class ApplicationService @Inject() (
-  applicationRepo: ApplicationRepo,
+  agentRegistrationConnector: AgentRegistrationConnector,
   applicationFactory: ApplicationFactory
 )(using ec: ExecutionContext)
 extends RequestAwareLogging:
 
-  def upsertNewApplication()(using request: Request[?]): Future[Application] =
-    val application: Application = applicationFactory
-      .makeNewApplication(sessionId = sessionId)
+  def upsertNewApplication()(using request: AuthorisedRequest[?]): Future[AgentRegistrationApplication] =
+    val application: AgentRegistrationApplication = applicationFactory.makeNewApplication(request.internalUserId)
+    logger.info(s"Upserting new application [${request.internalUserId}]")
+    upsert(application).map(_ => application)
 
-    upsert(application)
-      .map { _ =>
-        logger.info(s"Started new application [applicationId:${application.id.value}]")
-        application
-      }
+  def find()(using request: AuthorisedRequest[?]): Future[Option[AgentRegistrationApplication]] = agentRegistrationConnector
+    .findApplication()
 
-  def get(applicationId: ApplicationId)(using request: Request[?]): Future[Application] = find(applicationId).map { maybeApplication =>
-    maybeApplication
-      .getOrElse(Errors.throwServerErrorException(s"Expected application to be found"))
-  }
+  def get()(using request: AuthorisedRequest[?]): Future[AgentRegistrationApplication] = find()
+    .map { maybeApplication =>
+      maybeApplication.getOrElse(Errors.throwServerErrorException(s"Expected application to be found"))
+    }
 
-  def upsert[J <: Application](application: J)(using request: Request[?]): Future[J] =
-    logger.info(s"Upserting new application...")
-    applicationRepo
-      .upsert(application)
-      .map(_ => application)
-
-  def find(applicationId: ApplicationId): Future[Option[Application]] = applicationRepo
-    .findById(applicationId)
-
-  def find(sessionId: SessionId): Future[Option[Application]] = applicationRepo
-    .findBySessionId(sessionId)
+  def upsert(application: AgentRegistrationApplication)(using request: AuthorisedRequest[?]): Future[Unit] =
+    Errors.require(application.internalUserId === request.internalUserId, "Cannot modify application - you must be the user who created it")
+    agentRegistrationConnector
+      .upsertApplication(application)

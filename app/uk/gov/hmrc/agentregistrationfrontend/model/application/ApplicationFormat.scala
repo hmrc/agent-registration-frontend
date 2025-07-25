@@ -25,16 +25,16 @@ import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 import java.time.Instant
 
 object ApplicationFormat:
-  val format: OFormat[Application] =
+  val format: OFormat[AgentRegistrationApplication] =
 
     given Format[Instant] = MongoJavatimeFormats.instantFormat
 
 //    @SuppressWarnings(Array("org.wartremover.warts.Any"))
-    val defaultFormat: OFormat[Application] = Json.format[Application]
+    val defaultFormat: OFormat[AgentRegistrationApplication] = Json.format[AgentRegistrationApplication]
 
     // we need to write some extra fields on the top of the structure so it's
     // possible to index on them and use them in queries
-    val customWrites = OWrites[Application](j =>
+    val customWrites = OWrites[AgentRegistrationApplication](j =>
       defaultFormat.writes(j) ++ Json.obj(
         "createdAt" -> MongoJavatimeFormats.instantFormat.writes(j.createdAt),
         "lastUpdated" -> MongoJavatimeFormats.instantFormat.writes(j.lastUpdated)

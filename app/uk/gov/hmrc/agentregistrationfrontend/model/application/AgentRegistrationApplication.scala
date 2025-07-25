@@ -18,27 +18,23 @@ package uk.gov.hmrc.agentregistrationfrontend.model.application
 
 import play.api.libs.json.OFormat
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentregistrationfrontend.model.Nino
-import uk.gov.hmrc.agentregistrationfrontend.model.Utr
+import uk.gov.hmrc.agentregistrationfrontend.model.{InternalUserId, Nino, Utr}
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 
 import java.time.Clock
 import java.time.Instant
 
-/** The application data submitted by the user.
-  */
-final case class Application(
-  private val _id: ApplicationId,
-  createdAt: Instant,
-  sessionId: SessionId,
-  applicationState: ApplicationState,
-  nino: Option[Nino],
-  utr: Option[Utr]
+/** Agent Registration Application.
+ * This class holds the application data submitted by the user.
+ */
+final case class AgentRegistrationApplication(
+                                               internalUserId: InternalUserId,
+                                               createdAt: Instant,
+                                               applicationState: ApplicationState,
+                                               utr: Option[Utr]
 ):
 
   /* derived stuff: */
-  val id: ApplicationId = _id
-  val applicationId: ApplicationId = _id
   val lastUpdated: Instant = Instant.now(Clock.systemUTC())
   val hasFinished: Boolean =
     applicationState match
@@ -47,13 +43,10 @@ final case class Application(
 
   val isInProgress: Boolean = !hasFinished
 
-  def getUtr(using request: RequestHeader): Nino = nino.getOrElse(
-    Errors.throwServerErrorException(s"Expected 'utr' to be defined but it was None [${applicationId.toString}] ")
+  def getUtr(using request: RequestHeader): Utr = utr.getOrElse(
+    Errors.throwServerErrorException(s"Expected 'utr' to be defined but it was None [${internalUserId.toString}] ")
   )
 
-  def getNino(using request: RequestHeader): Nino = nino.getOrElse(
-    Errors.throwServerErrorException(s"Expected 'nino' to be defined but it was None [${applicationId.toString}] ")
-  )
 
-object Application:
-  given format: OFormat[Application] = ApplicationFormat.format
+object AgentRegistrationApplication:
+  given format: OFormat[AgentRegistrationApplication] = ApplicationFormat.format

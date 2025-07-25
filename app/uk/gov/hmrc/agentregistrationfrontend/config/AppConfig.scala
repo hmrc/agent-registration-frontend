@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.config
 import play.api.Configuration
 import sttp.model.Uri
 import sttp.model.Uri.UriContext
+import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.Inject
@@ -42,7 +43,10 @@ class AppConfig @Inject()(
   val taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment: String = ConfigHelper.readConfigAsValidUrlString("urls.taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment", configuration)
 
   val enrolmentStoreProxyBaseUrl: String = servicesConfig.baseUrl("enrolment-store-proxy")
-  
+  val agentRegistrationBaseUrl: String = servicesConfig.baseUrl("agent-registration")
+
+  val hmrcAsAgentEnrolment: Enrolment = Enrolment(key = "HMRC-AS-AGENT")
+
   def signInUri(continueUri: Uri): Uri = uri"$basFrontendSignBaseInBaseUrl"
     .addParam("continue_url", continueUri.toString())
     .addParam("origin", "agent-registration-frontend")

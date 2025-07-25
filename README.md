@@ -13,12 +13,22 @@ To start the service, use the following commands:
 After starting the service, open in browser:
 [`http://localhost:22201/agent-registration-frontend](http://localhost:10150/get-an-income-tax-refund/test-only)
 
-Ensure that all dependent applications, including MongoDB and other microservices managed by `TODO`, are also running.
+Ensure that all dependent applications, including MongoDB and other microservices, are also running.
 To start these dependent services, use the Service Manager command:
 
 ```bash
-sm --start TODO
+sm --start \
+AWESOME_STUBS_FRONTEND \
+AWESOME_STUBS \
+INTERNAL_AUTH \
+&& sm -s
 ```
+
+```bash
+sm --stop ALL \
+&& sm -s
+```
+
 
 # Project Setup in IntelliJ
 

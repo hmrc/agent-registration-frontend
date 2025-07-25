@@ -33,12 +33,6 @@ class ApplicationController @Inject() (
 )
 extends FrontendController(mcc):
 
-  val initializeApplication: Action[AnyContent] = actions.authorised.async { implicit request =>
-    applicationService
-      .upsertNewApplication()
-      .map(_ => Redirect(routes.ApplicationController.landing.url))
-  }
-
   val landing: Action[AnyContent] = actions.authorised.async { implicit request =>
     Future.successful(Ok(simplePage(
       h1 = "Landing page...",
