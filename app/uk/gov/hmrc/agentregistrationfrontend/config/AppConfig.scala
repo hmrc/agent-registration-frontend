@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.config
 import play.api.Configuration
 import sttp.model.Uri
 import sttp.model.Uri.UriContext
+import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.Inject
@@ -28,15 +29,23 @@ import scala.concurrent.duration.FiniteDuration
 import scala.util.Try
 
 @Singleton
-class AppConfig @Inject() (
-  servicesConfig: ServicesConfig,
-  configuration: Configuration
-):
+class AppConfig @Inject()(
+                           servicesConfig: ServicesConfig,
+                           configuration: Configuration
+                         ):
 
   val thisFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.this-frontend", configuration)
   val feedbackFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.feedback-frontend", configuration)
   private val basFrontendSignBaseInBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-in", configuration)
   val basFrontendSignOutUrlBase: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-out", configuration)
+
+  val asaDashboardUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.asa-fe-dashboard-url", configuration)
+  val taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment: String = ConfigHelper.readConfigAsValidUrlString("urls.taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment", configuration)
+
+  val enrolmentStoreProxyBaseUrl: String = servicesConfig.baseUrl("enrolment-store-proxy")
+  val agentRegistrationBaseUrl: String = servicesConfig.baseUrl("agent-registration")
+
+  val hmrcAsAgentEnrolment: Enrolment = Enrolment(key = "HMRC-AS-AGENT")
 
   def signInUri(continueUri: Uri): Uri = uri"$basFrontendSignBaseInBaseUrl"
     .addParam("continue_url", continueUri.toString())
@@ -51,13 +60,13 @@ class AppConfig @Inject() (
 object ConfigHelper:
 
   /** The application loads the configuration from the provided `configPath` and checks if it's a valid URL. If it's not a valid URL, an exception is thrown.
-    * This exception is triggered early during the application's startup to highlight a malformed configuration, thus increasing the chances of it being
-    * rectified promptly.
-    */
+   * This exception is triggered early during the application's startup to highlight a malformed configuration, thus increasing the chances of it being
+   * rectified promptly.
+   */
   def readConfigAsValidUrlString(
-    configPath: String,
-    configuration: Configuration
-  ): String =
+                                  configPath: String,
+                                  configuration: Configuration
+                                ): String =
     val url: String = configuration.get[String](configPath)
     Try(new java.net.URI(url).toURL).fold[String](
       e => throw new RuntimeException(s"Invalid URL in config under [$configPath], value was [$url]", e),
@@ -65,9 +74,9 @@ object ConfigHelper:
     )
 
   def readFiniteDuration(
-    configPath: String,
-    servicesConfig: ServicesConfig
-  ): FiniteDuration =
+                          configPath: String,
+                          servicesConfig: ServicesConfig
+                        ): FiniteDuration =
     servicesConfig.getDuration(configPath) match
       case d: FiniteDuration => d
       case _: Infinite => throw new RuntimeException(s"Infinite Duration in config for the key [$configPath]")

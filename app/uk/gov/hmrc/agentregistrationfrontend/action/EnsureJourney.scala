@@ -20,7 +20,7 @@ import play.api.mvc.Results.Redirect
 import play.api.mvc.ActionFilter
 import play.api.mvc.Call
 import play.api.mvc.Result
-import uk.gov.hmrc.agentregistrationfrontend.model.application.Application
+import uk.gov.hmrc.agentregistrationfrontend.model.application.AgentRegistrationApplication
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
@@ -35,19 +35,19 @@ extends RequestAwareLogging:
   /** Check if application matches predicate. If it doesn't, it will send the Redirect.
     */
   def ensureApplication(
-    predicate: Application => Boolean,
-    redirectF: Application => Call,
-    hintWhyRedirecting: String
-  ): ActionFilter[ApplicationRequest] =
-    new ActionFilter[ApplicationRequest]:
-      override def filter[A](request: ApplicationRequest[A]): Future[Option[Result]] =
-        given r: ApplicationRequest[A] = request
-        val application = request.application
+                         predicate: AgentRegistrationApplication => Boolean,
+                         redirectF: AgentRegistrationApplication => Call,
+                         hintWhyRedirecting: String
+  ): ActionFilter[AgentRegistrationApplicationRequest] =
+    new ActionFilter[AgentRegistrationApplicationRequest]:
+      override def filter[A](request: AgentRegistrationApplicationRequest[A]): Future[Option[Result]] =
+        given r: AgentRegistrationApplicationRequest[A] = request
+        val application = request.agentRegistrationApplication
         val result: Option[Result] =
           if predicate(application) then None
           else
             val call = redirectF(application)
-            logger.warn(s"$hintWhyRedirecting (current application state: ${request.application.applicationState.toString}), redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page.")
+            logger.warn(s"$hintWhyRedirecting (current application state: ${request.agentRegistrationApplication.applicationState.toString}), redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page.")
             Some(Redirect(call))
         Future.successful(result)
 

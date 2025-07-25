@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.util
 
-/** Simple safe equals so we don't have to import cats
-  */
 object SafeEquals:
 
-  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
-  implicit class EqualsOps[A](v: A):
-
+  /** Simple safe equals so we don't have to import cats
+    */
+  extension [A](v: A)
+    @SuppressWarnings(Array("org.wartremover.warts.Equals"))
     def ===(other: A): Boolean = v == other
+    @SuppressWarnings(Array("org.wartremover.warts.Equals"))
     def =!=(other: A): Boolean = v != other
