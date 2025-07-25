@@ -16,16 +16,13 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
-import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
-import uk.gov.hmrc.agentregistrationfrontend.action.{Actions, ApplicationRequest, AuthorisedUtrRequest}
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.BusinessTypePage
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessType
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.forms.SelectFromOptionsForm
+import uk.gov.hmrc.agentregistrationfrontend.model.BusinessType
+import uk.gov.hmrc.agentregistrationfrontend.views.html.register.BusinessTypePage
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BusinessTypeController @Inject()(
@@ -44,7 +41,7 @@ extends FrontendController(mcc):
     SelectFromOptionsForm.form("businessType", BusinessType.names).bindFromRequest().fold(
       formWithErrors => BadRequest(view(formWithErrors)),
       businessType => {
-        Redirect("routes.TODO").addingToSession(
+        Redirect(routes.UserRoleController.show.url).addingToSession(
           "businessType" -> businessType
         )
       }

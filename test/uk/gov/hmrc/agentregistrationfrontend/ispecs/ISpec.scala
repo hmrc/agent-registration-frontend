@@ -42,7 +42,7 @@ trait ISpec
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(timeout = scaled(Span(3, Seconds)), interval = scaled(Span(300, Millis)))
   private val testServerPort = ISpec.testServerPort
   private val baseUrl: String = s"http://localhost:${testServerPort.toString}"
-  private val databaseName: String = "p800-refunds-frontend-it"
+  private val databaseName: String = "agent-registration-frontend-it"
   lazy val webdriverUrl: String = s"http://localhost:${port.toString}"
 
   lazy val tdAll: TdAll = TdAll()
