@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.ispecs.controllers
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.DefaultBodyWritables.*
 import play.api.libs.ws.{WSClient, WSResponse}
-import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistrationfrontend.ispecs.ISpec
 
 class BusinessTypeControllerISpec
@@ -64,7 +63,7 @@ class BusinessTypeControllerISpec
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "routes.TODO"
+    response.header("Location").value shouldBe "/agent-registration/register/about-your-application/user-role"
   
   "POST /register/about-your-application/business-type without valid selection should return 400" in :
     val response: WSResponse =

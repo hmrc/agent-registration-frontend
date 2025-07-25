@@ -16,19 +16,13 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
-import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistrationfrontend.action.{Actions, ApplicationRequest, AuthorisedUtrRequest}
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.forms.SelectFromOptionsForm
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessType
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.BusinessTypePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.TimedOutPage
 
 import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SignOutController @Inject()(

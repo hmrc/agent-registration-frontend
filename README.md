@@ -11,7 +11,7 @@ To start the service, use the following commands:
 - `sbt runTestOnly` for testing modes.
 
 After starting the service, open in browser:
-[`http://localhost:22201/agent-registration-frontend](http://localhost:10150/get-an-income-tax-refund/test-only)
+[`http://localhost:22201/agent-registration](http://localhost:22201/agent-registration)
 
 Ensure that all dependent applications, including MongoDB and other microservices managed by `TODO`, are also running.
 To start these dependent services, use the Service Manager command:
