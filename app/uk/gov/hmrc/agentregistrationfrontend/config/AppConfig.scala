@@ -33,10 +33,10 @@ class AppConfig @Inject() (
   configuration: Configuration
 ):
 
-  val thisFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.this-frontend", configuration)
-  val feedbackFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.feedback-frontend", configuration)
-  private val basFrontendSignBaseInBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-in", configuration)
-  val basFrontendSignOutUrlBase: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-out", configuration)
+  val thisFrontendBaseUrl: String = configuration.get[String]("urls.this-frontend")
+  val feedbackFrontendBaseUrl: String = configuration.get[String]("urls.feedback-frontend")
+  private val basFrontendSignBaseInBaseUrl: String = configuration.get[String]("urls.bas-gateway-sign-in")
+  val basFrontendSignOutUrlBase: String = configuration.get[String]("urls.bas-gateway-sign-out")
 
   def signInUri(continueUri: Uri): Uri = uri"$basFrontendSignBaseInBaseUrl"
     .addParam("continue_url", continueUri.toString())
