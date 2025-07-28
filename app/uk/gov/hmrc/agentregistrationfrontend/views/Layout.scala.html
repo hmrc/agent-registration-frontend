@@ -31,7 +31,8 @@
 
 @(
         pageTitle: String,
-        maybeForm: Option[Form[?]] = None
+        maybeForm: Option[Form[?]] = None,
+        suppressBackLink: Boolean = false
 )(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
 @isSignedIn = @{
@@ -60,6 +61,7 @@
 @hmrcStandardPage(
   HmrcStandardPageParams(
     pageTitle = Some(gdsTitle),
+    backLink = if suppressBackLink then None else Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
     isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
   )
 )(contentWithErrorsAndHelp)

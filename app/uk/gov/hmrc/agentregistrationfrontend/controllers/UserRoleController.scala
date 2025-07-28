@@ -18,31 +18,30 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers
 
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.forms.SelectFromOptionsForm
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessType
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.BusinessTypePage
+import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmationForm
+import uk.gov.hmrc.agentregistrationfrontend.views.html.register.UserRolePage
 
 import javax.inject.{Inject, Singleton}
 
 @Singleton
-class BusinessTypeController @Inject()(
+class UserRoleController @Inject()(
   actions: Actions,
   mcc: MessagesControllerComponents,
-  view: BusinessTypePage
+  view: UserRolePage
 )
 extends FrontendController(mcc):
 
   def show: Action[AnyContent] = Action { implicit request =>
-    val form = SelectFromOptionsForm.form("businessType", BusinessType.names)
+    val form = ConfirmationForm.form("userRole")
     Ok(view(form))
   }
 
   def submit: Action[AnyContent] = Action { implicit request =>
-    SelectFromOptionsForm.form("businessType", BusinessType.names).bindFromRequest().fold(
+    ConfirmationForm.form("userRole").bindFromRequest().fold(
       formWithErrors => BadRequest(view(formWithErrors)),
-      businessType => {
-        Redirect(routes.UserRoleController.show.url).addingToSession(
-          "businessType" -> businessType
+      hasOwnership => {
+        Redirect("routes.TODO").addingToSession(
+          "hasOwnership" -> hasOwnership.toString
         )
       }
     )
