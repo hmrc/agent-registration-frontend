@@ -20,6 +20,7 @@ import play.api.libs.json.*
 
 import scala.reflect.ClassTag
 
+
 /** Utility for creating JSON Format instances for Scala 3 enums */
 object EnumFormat:
 
@@ -33,11 +34,9 @@ object EnumFormat:
   def enumFormat[E <: reflect.Enum](using ct: ClassTag[E]): Format[E] =
     // Get the enum's companion object
     val enumClass = ct.runtimeClass
-    val companionObj = enumClass.getField("MODULE$").get(null)
-
     // Call the values() method on the companion object to get all enum values
-    val valuesMethod = enumClass.getMethod("values")
-    val enumValues = valuesMethod.invoke(companionObj).asInstanceOf[Array[E]]
+    val valuesMethod = enumClass.getDeclaredMethod("values")
+    val enumValues: Array[E] = valuesMethod.invoke(null).asInstanceOf[Array[E]]
 
     // Create the Format using the retrieved enum values
     enumFormatWithValues(enumValues)

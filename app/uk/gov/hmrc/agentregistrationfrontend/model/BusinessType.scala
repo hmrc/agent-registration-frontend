@@ -16,6 +16,11 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.model
 
+import play.api.libs.json.Json
+import play.api.libs.json.Format
+import uk.gov.hmrc.agentregistrationfrontend.util.{EnumFormat, HyphenTool}
+
+
 enum BusinessType(val name: String):
 
   case SoleTrader
