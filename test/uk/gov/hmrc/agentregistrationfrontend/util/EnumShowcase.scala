@@ -25,54 +25,51 @@ import uk.gov.hmrc.http.StringContextOps
 
 import java.net.URL
 
-enum BusinessType:
+  
+enum ExampleEnum:
 
   case SoleTrader
-    extends BusinessType
   case LimitedCompany
-    extends BusinessType
   case GeneralPartnership
-    extends BusinessType
   case LimitedLiabilityPartnership
-    extends BusinessType
 
-object BusinessType:
-  given Format[BusinessType] = EnumFormat.enumFormat[BusinessType]
-  given PathBindable[BusinessType] = EnumBinder.pathBindable[BusinessType]
-  given QueryStringBindable[BusinessType] = EnumBinder.queryStringEnumBinder[BusinessType]
-
+object ExampleEnum:
+  given Format[ExampleEnum] = EnumFormat.enumFormat[ExampleEnum]
+  given PathBindable[ExampleEnum] = EnumBinder.pathBindable[ExampleEnum]
+  given QueryStringBindable[ExampleEnum] = EnumBinder.queryStringEnumBinder[ExampleEnum]
 
 class EnumShowcase extends UnitSpec:
 
-
   "PathBindable" in {
-    val pathBindable: PathBindable[BusinessType] = BusinessType.given_PathBindable_BusinessType
-    val st: BusinessType = pathBindable.bind("businessType", "sole-trader").value
-    st shouldBe BusinessType.SoleTrader
-    pathBindable.unbind("businessType", BusinessType.SoleTrader) shouldBe "sole-trader"
+    val pathBindable: PathBindable[ExampleEnum] = ExampleEnum.given_PathBindable_ExampleEnum
+    val st: ExampleEnum = pathBindable.bind("businessType", "sole-trader").value
+    st shouldBe ExampleEnum.SoleTrader
+    pathBindable.unbind("businessType", ExampleEnum.SoleTrader) shouldBe "sole-trader"
   }
 
   "QueryStringBindable" in {
-    val bindable: QueryStringBindable[BusinessType] = EnumBinder.queryStringEnumBinder[BusinessType]
+    val bindable: QueryStringBindable[ExampleEnum] = EnumBinder.queryStringEnumBinder[ExampleEnum]
 
-    val st: BusinessType = bindable.bind(
+    val st: ExampleEnum = bindable.bind(
       "businessType",
       Map("businessType" -> Seq("sole-trader"))
     )
       .value
       .value
 
-    st shouldBe BusinessType.SoleTrader
-    bindable.unbind("businessType", BusinessType.SoleTrader) shouldBe "businessType=sole-trader"
+    st shouldBe ExampleEnum.SoleTrader
+    bindable.unbind("businessType", ExampleEnum.SoleTrader) shouldBe "businessType=sole-trader"
 
   }
 
   "toStringHyphenated" in {
-    BusinessType.SoleTrader.toStringHyphenated shouldBe "sole-trader"
+    ExampleEnum.SoleTrader.toString shouldBe "SoleTrader"
+    
+    ExampleEnum.SoleTrader.toStringHyphenated shouldBe "sole-trader"
 
     //use cases
     //for example, in url param in connector code:
-    val bt = BusinessType.SoleTrader
+    val bt = ExampleEnum.SoleTrader
     val url: URL = url"http://whatever.mdtp/find-by-business-type/${bt.toStringHyphenated}?businessType=${bt.toStringHyphenated}"
     url.toString shouldBe "http://whatever.mdtp/find-by-business-type/sole-trader?businessType=sole-trader"
 
@@ -82,7 +79,6 @@ class EnumShowcase extends UnitSpec:
 
   "JsoFormat" in {
 
-    Json.toJson(BusinessType.SoleTrader) shouldBe Json.parse(""" "SoleTrader" """)
+    Json.toJson(ExampleEnum.SoleTrader) shouldBe Json.parse(""" "SoleTrader" """)
     //alternatively: Json.toJson(BusinessType2.SoleTrader) shouldBe Json.parse(""" "sole-trader" """)
   }
-
