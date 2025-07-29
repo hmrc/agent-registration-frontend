@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.util
+package uk.gov.hmrc.agentregistration.shared.util
 
 import play.api.data.FormError
 import play.api.data.format.Formatter
-import uk.gov.hmrc.agentregistrationfrontend.util.SafeEquals.===
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import scala.reflect.ClassTag
 
@@ -31,18 +31,31 @@ object EnumFormatter:
     val enumClass = classTag.runtimeClass
     // Call the values() method on the companion object to get all enum values
     val valuesMethod = enumClass.getDeclaredMethod("values")
+    @SuppressWarnings(Array(
+      "org.wartremover.warts.AsInstanceOf",
+      "org.wartremover.warts.Null"
+    ))
     val enumValues: Array[E] = valuesMethod.invoke(null).asInstanceOf[Array[E]]
 
-    new Formatter[E]{
-      override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], E] =
-        data
-          .get(key)
-          .toRight(Seq(FormError(key, errorMessageIfMissing, Nil)))
-          .flatMap { (str: String) =>
-            enumValues
-              .find(_.toString === str)
-              .toRight(Seq(FormError(key, errorMessageIfEnumError)))
-          }
+    new Formatter[E] {
+      override def bind(
+        key: String,
+        data: Map[String, String]
+      ): Either[Seq[FormError], E] = data
+        .get(key)
+        .toRight(Seq(FormError(
+          key,
+          errorMessageIfMissing,
+          Nil
+        )))
+        .flatMap { (str: String) =>
+          enumValues
+            .find(_.toString === str)
+            .toRight(Seq(FormError(key, errorMessageIfEnumError)))
+        }
 
-      override def unbind(key: String, value: E): Map[String, String] =  Map(key -> value.toString)
+      override def unbind(
+        key: String,
+        value: E
+      ): Map[String, String] = Map(key -> value.toString)
     }

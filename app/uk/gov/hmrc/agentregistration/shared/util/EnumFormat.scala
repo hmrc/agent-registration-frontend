@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.util
+package uk.gov.hmrc.agentregistration.shared.util
 
 import play.api.libs.json.*
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import scala.reflect.ClassTag
-
 
 /** Utility for creating JSON Format instances for Scala 3 enums */
 object EnumFormat:
@@ -36,6 +36,10 @@ object EnumFormat:
     val enumClass = ct.runtimeClass
     // Call the values() method on the companion object to get all enum values
     val valuesMethod = enumClass.getDeclaredMethod("values")
+    @SuppressWarnings(Array(
+      "org.wartremover.warts.AsInstanceOf",
+      "org.wartremover.warts.Null"
+    ))
     val enumValues: Array[E] = valuesMethod.invoke(null).asInstanceOf[Array[E]]
 
     // Create the Format using the retrieved enum values
@@ -57,7 +61,7 @@ object EnumFormat:
       Reads { json =>
         json.validate[String].flatMap { str =>
           enumValues
-            .find(_.toString == str)
+            .find(_.toString === str)
             .fold[JsResult[E]](JsError(s"Unknown value for enum $enumName: '$str'"))(JsSuccess(_))
         }
       },

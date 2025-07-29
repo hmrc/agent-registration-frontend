@@ -19,7 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.util
 import play.api.libs.json.{Format, JsString, JsValue, Json}
 import play.api.mvc.{PathBindable, QueryStringBindable}
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
-import uk.gov.hmrc.agentregistrationfrontend.util.EnumExtensions.toStringHyphenated
+import uk.gov.hmrc.agentregistration.shared.util.EnumExtensions.toStringHyphenated
+import uk.gov.hmrc.agentregistration.shared.util.{EnumBinder, EnumFormat}
 import uk.gov.hmrc.govukfrontend.views.Aliases.{RadioItem, Text}
 import uk.gov.hmrc.http.StringContextOps
 
@@ -38,6 +39,7 @@ object ExampleEnum:
   given PathBindable[ExampleEnum] = EnumBinder.pathBindable[ExampleEnum]
   given QueryStringBindable[ExampleEnum] = EnumBinder.queryStringEnumBinder[ExampleEnum]
 
+//TODO: move it to backend, make proper unit test
 class EnumShowcase extends UnitSpec:
 
   "PathBindable" in {

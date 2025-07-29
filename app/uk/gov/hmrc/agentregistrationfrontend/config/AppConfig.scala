@@ -57,9 +57,6 @@ class AppConfig @Inject() (
 
   val welshLanguageSupportEnabled: Boolean = configuration.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
 
-  object ApplicationRepo:
-    val applicationRepoTtl: FiniteDuration = ConfigHelper.readFiniteDuration("mongodb.application-repo-ttl", servicesConfig)
-
 object ConfigHelper:
 
   /** The application loads the configuration from the provided `configPath` and checks if it's a valid URL. If it's not a valid URL, an exception is thrown.

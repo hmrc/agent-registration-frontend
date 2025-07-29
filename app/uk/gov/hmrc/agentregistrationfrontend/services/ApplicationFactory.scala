@@ -16,9 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.services
 
-import uk.gov.hmrc.agentregistrationfrontend.model.InternalUserId
-import uk.gov.hmrc.agentregistrationfrontend.model.application.AgentRegistrationApplication
-import uk.gov.hmrc.agentregistrationfrontend.model.application.ApplicationState
+import uk.gov.hmrc.agentregistration.shared._
 
 import java.time.Clock
 import java.time.Instant
@@ -30,7 +28,7 @@ class ApplicationFactory @Inject() (
   clock: Clock
 ):
 
-  def makeNewApplication(internalUserId: InternalUserId): AgentRegistrationApplication = AgentRegistrationApplication(
+  def makeNewAgentApplication(internalUserId: InternalUserId): AgentApplication = AgentApplication(
     internalUserId = internalUserId,
     createdAt = Instant.now(clock),
     applicationState = ApplicationState.InProgress,

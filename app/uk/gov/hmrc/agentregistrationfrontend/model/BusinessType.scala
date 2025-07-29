@@ -16,40 +16,29 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.model
 
-import play.api.libs.json.Json
-import play.api.libs.json.Format
-import uk.gov.hmrc.agentregistrationfrontend.util.{EnumBinder, EnumFormat, EnumFormatter, HyphenTool}
-import play.api.libs.json.{Format, JsString, JsValue, Json}
-import play.api.mvc.{PathBindable, QueryStringBindable}
-import uk.gov.hmrc.agentregistrationfrontend.util.EnumExtensions.toStringHyphenated
-import uk.gov.hmrc.govukfrontend.views.Aliases.{RadioItem, Text}
-import uk.gov.hmrc.http.StringContextOps
-import play.api.data.{FieldMapping, Form, Forms}
-import play.api.data.Forms.mapping
-
 //TODO Simpler Enum proposal:
-enum BusinessType2:
-
-  case SoleTrader
-  case LimitedCompany
-  case GeneralPartnership
-  case LimitedLiabilityPartnership
-
-object BusinessType2:
-  given Format[BusinessType2] = EnumFormat.enumFormat[BusinessType2]
-  given PathBindable[BusinessType2] = EnumBinder.pathBindable[BusinessType2]
-  given QueryStringBindable[BusinessType2] = EnumBinder.queryStringEnumBinder[BusinessType2]
-
-object BusinessType2Form:
-
-  val form: Form[BusinessType] =
-    val fieldMapping: FieldMapping[BusinessType] = Forms.of(EnumFormatter.formatter[BusinessType](
-      errorMessageIfMissing = "businessType.error.required",
-      errorMessageIfEnumError = "businessType.error.invalid"
-    ))
-    Form(
-      mapping = mapping("business-type" -> fieldMapping)(identity)(Some(_))
-    )
+//enum BusinessType2:
+//
+//  case SoleTrader
+//  case LimitedCompany
+//  case GeneralPartnership
+//  case LimitedLiabilityPartnership
+//
+//object BusinessType2:
+//  given Format[BusinessType2] = EnumFormat.enumFormat[BusinessType2]
+//  given PathBindable[BusinessType2] = EnumBinder.pathBindable[BusinessType2]
+//  given QueryStringBindable[BusinessType2] = EnumBinder.queryStringEnumBinder[BusinessType2]
+//
+//object BusinessType2Form:
+//
+//  val form: Form[BusinessType] =
+//    val fieldMapping: FieldMapping[BusinessType] = Forms.of(EnumFormatter.formatter[BusinessType](
+//      errorMessageIfMissing = "businessType.error.required",
+//      errorMessageIfEnumError = "businessType.error.invalid"
+//    ))
+//    Form(
+//      mapping = mapping("business-type" -> fieldMapping)(identity)(Some(_))
+//    )
 
 enum BusinessType(val name: String):
 

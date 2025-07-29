@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.util
+package uk.gov.hmrc.agentregistration.shared.util
 
 import play.api.libs.json.*
 import play.api.mvc.PathBindable
 import play.api.mvc.QueryStringBindable
-import uk.gov.hmrc.agentregistrationfrontend.util.SafeEquals.===
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import scala.reflect.ClassTag
 
@@ -29,6 +29,10 @@ object EnumBinder:
     val enumClass = classTag.runtimeClass
     // Call the values() method on the companion object to get all enum values
     val valuesMethod = enumClass.getDeclaredMethod("values")
+    @SuppressWarnings(Array(
+      "org.wartremover.warts.AsInstanceOf",
+      "org.wartremover.warts.Null"
+    ))
     val enumValues: Array[E] = valuesMethod.invoke(null).asInstanceOf[Array[E]]
 
     new PathBindable[E]:
@@ -55,6 +59,10 @@ object EnumBinder:
     val enumClass = classTag.runtimeClass
     // Call the values() method on the companion object to get all enum values
     val valuesMethod = enumClass.getDeclaredMethod("values")
+    @SuppressWarnings(Array(
+      "org.wartremover.warts.AsInstanceOf",
+      "org.wartremover.warts.Null"
+    ))
     val eenums: Array[E] = valuesMethod.invoke(null).asInstanceOf[Array[E]]
 
     new QueryStringBindable[E]:

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model
+package uk.gov.hmrc.agentregistration.shared
 
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.Format
 
-final case class Arn(value: String)
+final case class GroupId(value: String)
 
-object Arn:
-  given format: Format[Arn] = summon[Format[String]].inmap(Arn(_), _.value)
+object GroupId:
+  given format: Format[GroupId] = summon[Format[String]].inmap(GroupId(_), _.value)

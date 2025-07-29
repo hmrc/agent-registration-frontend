@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.application
+package uk.gov.hmrc.agentregistration.shared.util
 
-import play.api.libs.json.Format
-import uk.gov.hmrc.agentregistrationfrontend.util.EnumFormat
-
-enum ApplicationState:
-
-  case InProgress
-  case Submitted
-
-object ApplicationState:
-  given Format[ApplicationState] = EnumFormat.enumFormat[ApplicationState]
+object EnumExtensions:
+  extension [E <: reflect.Enum](eenum: E)
+    def toStringHyphenated: String = HyphenTool.camelCaseToHyphenated(eenum.toString)

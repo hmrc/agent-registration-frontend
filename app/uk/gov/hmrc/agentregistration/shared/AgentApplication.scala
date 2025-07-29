@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.application
+package uk.gov.hmrc.agentregistration.shared
 
+import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentregistrationfrontend.model.InternalUserId
-import uk.gov.hmrc.agentregistrationfrontend.model.Nino
-import uk.gov.hmrc.agentregistrationfrontend.model.Utr
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 
 import java.time.Clock
 import java.time.Instant
 
-/** Agent Registration Application. This class holds the application data submitted by the user.
+/** Agent (Registration) Application. This case class represents the data entered by a user for registering as an agent.
   */
-final case class AgentRegistrationApplication(
+final case class AgentApplication(
   internalUserId: InternalUserId,
   createdAt: Instant,
   applicationState: ApplicationState,
@@ -45,8 +42,8 @@ final case class AgentRegistrationApplication(
   val isInProgress: Boolean = !hasFinished
 
   def getUtr(using request: RequestHeader): Utr = utr.getOrElse(
-    Errors.throwServerErrorException(s"Expected 'utr' to be defined but it was None [${internalUserId.toString}] ")
+    throw RuntimeException(s"Expected 'utr' to be defined but it was None [${internalUserId.toString}] ")
   )
 
-object AgentRegistrationApplication:
-  given format: OFormat[AgentRegistrationApplication] = ApplicationFormat.format
+object AgentApplication:
+  given format: OFormat[AgentApplication] = Json.format[AgentApplication]

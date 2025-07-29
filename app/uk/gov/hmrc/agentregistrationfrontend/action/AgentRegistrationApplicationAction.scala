@@ -22,21 +22,19 @@ import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
-import uk.gov.hmrc.agentregistrationfrontend.model.application.AgentRegistrationApplication
-import uk.gov.hmrc.agentregistrationfrontend.model.GroupId
-import uk.gov.hmrc.agentregistrationfrontend.model.InternalUserId
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
+import uk.gov.hmrc.agentregistration.shared._
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-class AgentRegistrationApplicationRequest[A](
-  val agentRegistrationApplication: AgentRegistrationApplication,
+class AgentApplicationRequest[A](
+  val agentApplication: AgentApplication,
   override val internalUserId: InternalUserId,
   override val groupId: GroupId,
   override val request: Request[A]
@@ -47,22 +45,22 @@ extends AuthorisedRequest[A](
   request
 ):
   Errors.require(
-    requirement = agentRegistrationApplication.internalUserId === internalUserId,
+    requirement = agentApplication.internalUserId === internalUserId,
     message =
       s"Sanity Check: InternalUserId from the request (${internalUserId.value}) must match the Application " +
-        s"retrieved from backend (${agentRegistrationApplication.internalUserId.value}) (this should never happen)"
+        s"retrieved from backend (${agentApplication.internalUserId.value}) (this should never happen)"
   )(using this)
 
 @Singleton
-class AgentRegistrationApplicationAction @Inject() (
+class AgentApplicationAction @Inject() (
   applicationService: ApplicationService,
   enrolmentStoreProxyConnector: EnrolmentStoreProxyConnector,
   appConfig: AppConfig
 )(using ec: ExecutionContext)
-extends ActionRefiner[AuthorisedRequest, AgentRegistrationApplicationRequest]
+extends ActionRefiner[AuthorisedRequest, AgentApplicationRequest]
 with RequestAwareLogging:
 
-  override protected def refine[A](request: AuthorisedRequest[A]): Future[Either[Result, AgentRegistrationApplicationRequest[A]]] =
+  override protected def refine[A](request: AuthorisedRequest[A]): Future[Either[Result, AgentApplicationRequest[A]]] =
     given r: AuthorisedRequest[A] = request
 
     applicationService
@@ -70,8 +68,8 @@ with RequestAwareLogging:
       .flatMap { maybeApplication =>
         maybeApplication match
           case Some(application) =>
-            Future.successful(Right(new AgentRegistrationApplicationRequest(
-              agentRegistrationApplication = application,
+            Future.successful(Right(new AgentApplicationRequest(
+              agentApplication = application,
               internalUserId = request.internalUserId,
               groupId = request.groupId,
               request = request.request
@@ -79,26 +77,25 @@ with RequestAwareLogging:
           case None => createNewApplication()
       }
 
-  private def createNewApplication[A]()(using request: AuthorisedRequest[A]): Future[Either[Result, AgentRegistrationApplicationRequest[A]]] =
-    enrolmentStoreProxyConnector
-      .queryEnrolmentsAllocatedToGroup(request.groupId)
-      .map(_.exists(e => e.service === appConfig.hmrcAsAgentEnrolment.key && e.state === "Activated"))
-      .flatMap { isHmrcAsAgentEnrolmentAllocatedToGroup =>
-        if isHmrcAsAgentEnrolmentAllocatedToGroup then
-          val redirectUrl: String = appConfig.taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment
-          logger.info(s"Request cannot be served by this microservice as ${appConfig.hmrcAsAgentEnrolment} is assigned to group, therefore redirecting user to taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment ($redirectUrl)")
-          Future.successful(Left(Redirect(redirectUrl)))
-        else
-          applicationService
-            .upsertNewApplication()
-            .map(agentRegistrationApplication =>
-              Right(AgentRegistrationApplicationRequest[A](
-                agentRegistrationApplication = agentRegistrationApplication,
-                internalUserId = request.internalUserId,
-                groupId = request.groupId,
-                request = request.request
-              ))
-            )
-      }
+  private def createNewApplication[A]()(using request: AuthorisedRequest[A]): Future[Either[Result, AgentApplicationRequest[A]]] = enrolmentStoreProxyConnector
+    .queryEnrolmentsAllocatedToGroup(request.groupId)
+    .map(_.exists(e => e.service === appConfig.hmrcAsAgentEnrolment.key && e.state === "Activated"))
+    .flatMap { isHmrcAsAgentEnrolmentAllocatedToGroup =>
+      if isHmrcAsAgentEnrolmentAllocatedToGroup then
+        val redirectUrl: String = appConfig.taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment
+        logger.info(s"Request cannot be served by this microservice as ${appConfig.hmrcAsAgentEnrolment} is assigned to group, therefore redirecting user to taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment ($redirectUrl)")
+        Future.successful(Left(Redirect(redirectUrl)))
+      else
+        applicationService
+          .upsertNewApplication()
+          .map(AgentApplication =>
+            Right(AgentApplicationRequest[A](
+              agentApplication = AgentApplication,
+              internalUserId = request.internalUserId,
+              groupId = request.groupId,
+              request = request.request
+            ))
+          )
+    }
 
   override protected def executionContext: ExecutionContext = ec

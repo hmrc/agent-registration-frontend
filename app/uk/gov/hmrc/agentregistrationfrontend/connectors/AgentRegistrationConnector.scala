@@ -17,28 +17,20 @@
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import play.api.http.Status
-import play.api.libs.functional.syntax.*
 import play.api.libs.json.Json
-import play.api.libs.json.Reads
-import play.api.libs.json.__
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.GroupId
-import uk.gov.hmrc.agentregistrationfrontend.model.application.AgentRegistrationApplication
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
+import uk.gov.hmrc.agentregistration.shared._
+import uk.gov.hmrc.agentregistration.shared.util._
+import uk.gov.hmrc.agentregistrationfrontend.util.{Errors, RequestAwareLogging}
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
-import uk.gov.hmrc.auth.core.EnrolmentIdentifier
 import uk.gov.hmrc.http.HttpReads.Implicits.given
+import uk.gov.hmrc.http.{HttpResponse, StringContextOps}
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.StringContextOps
 
-import javax.inject.Inject
-import javax.inject.Singleton
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.{ExecutionContext, Future}
 
 /** Connector to the companion backend microservice
   */
@@ -53,21 +45,24 @@ extends RequestAwareLogging:
 
   def findApplication()(using
     request: AuthorisedRequest[?]
-  ): Future[Option[AgentRegistrationApplication]] = httpClient
+  ): Future[Option[AgentApplication]] = httpClient
     .get(url"$baseUrl/application")
     .execute[HttpResponse]
     .map { response =>
       response.status match {
-        case Status.OK => Some(response.json.as[AgentRegistrationApplication])
+        case Status.OK => Some(response.json.as[AgentApplication])
         case Status.NO_CONTENT => None
         case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
       }
     }
 
-  def upsertApplication(application: AgentRegistrationApplication)(using
+  import play.api.libs.ws.JsonBodyWritables.given
+
+  def upsertApplication(application: AgentApplication)(using
     request: RequestHeader
   ): Future[Unit] = httpClient
     .post(url"$baseUrl/application")
+    .withBody(Json.toJson(application))
     .execute[HttpResponse]
     .map { response =>
       response.status match {

@@ -19,10 +19,10 @@ package uk.gov.hmrc.agentregistrationfrontend.services
 import play.api.mvc.Request
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
-import uk.gov.hmrc.agentregistrationfrontend.model.application.AgentRegistrationApplication
+import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-import uk.gov.hmrc.agentregistrationfrontend.util.SafeEquals.===
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -36,20 +36,20 @@ class ApplicationService @Inject() (
 )(using ec: ExecutionContext)
 extends RequestAwareLogging:
 
-  def upsertNewApplication()(using request: AuthorisedRequest[?]): Future[AgentRegistrationApplication] =
-    val application: AgentRegistrationApplication = applicationFactory.makeNewApplication(request.internalUserId)
+  def upsertNewApplication()(using request: AuthorisedRequest[?]): Future[AgentApplication] =
+    val application: AgentApplication = applicationFactory.makeNewAgentApplication(request.internalUserId)
     logger.info(s"Upserting new application [${request.internalUserId}]")
     upsert(application).map(_ => application)
 
-  def find()(using request: AuthorisedRequest[?]): Future[Option[AgentRegistrationApplication]] = agentRegistrationConnector
+  def find()(using request: AuthorisedRequest[?]): Future[Option[AgentApplication]] = agentRegistrationConnector
     .findApplication()
 
-  def get()(using request: AuthorisedRequest[?]): Future[AgentRegistrationApplication] = find()
+  def get()(using request: AuthorisedRequest[?]): Future[AgentApplication] = find()
     .map { maybeApplication =>
       maybeApplication.getOrElse(Errors.throwServerErrorException(s"Expected application to be found"))
     }
 
-  def upsert(application: AgentRegistrationApplication)(using request: AuthorisedRequest[?]): Future[Unit] =
-    Errors.require(application.internalUserId === request.internalUserId, "Cannot modify application - you must be the user who created it")
+  def upsert(agentApplication: AgentApplication)(using request: AuthorisedRequest[?]): Future[Unit] =
+    Errors.require(agentApplication.internalUserId === request.internalUserId, "Cannot modify application - you must be the user who created it")
     agentRegistrationConnector
-      .upsertApplication(application)
+      .upsertApplication(agentApplication)

@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model
+package uk.gov.hmrc.agentregistration.shared
 
-import play.api.libs.functional.syntax.*
 import play.api.libs.json.Format
+import uk.gov.hmrc.agentregistration.shared.util.EnumFormat
 
-final case class Nino(value: String)
+enum ApplicationState:
 
-object Nino:
-  given format: Format[Nino] = summon[Format[String]].inmap(Nino(_), _.value)
+  case InProgress
+  case Submitted
+
+object ApplicationState:
+  given Format[ApplicationState] = EnumFormat.enumFormat[ApplicationState]

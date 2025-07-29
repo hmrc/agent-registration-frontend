@@ -23,10 +23,10 @@ import javax.inject.Singleton
 
 @Singleton
 class Actions @Inject() (
-  actionBuilder: DefaultActionBuilder,
-  authorisedAction: AuthorisedAction,
-  agentRegistrationApplicationAction: AgentRegistrationApplicationAction,
-  ensureApplication: EnsureApplication
+                          actionBuilder: DefaultActionBuilder,
+                          authorisedAction: AuthorisedAction,
+                          agentApplicationAction: AgentApplicationAction,
+                          ensureApplication: EnsureApplication
 ):
 
   val default: ActionBuilder[Request, AnyContent] = actionBuilder
@@ -34,18 +34,18 @@ class Actions @Inject() (
   val authorised: ActionBuilder[AuthorisedRequest, AnyContent] = default
     .andThen(authorisedAction)
 
-  val getApplicationInProgress: ActionBuilder[AgentRegistrationApplicationRequest, AnyContent] = authorised
-    .andThen(agentRegistrationApplicationAction)
+  val getApplicationInProgress: ActionBuilder[AgentApplicationRequest, AnyContent] = authorised
+    .andThen(agentApplicationAction)
     .andThen(ensureApplication.ensureApplication(
       predicate = _.isInProgress,
-      redirectF = _ => uk.gov.hmrc.agentregistrationfrontend.controllers.routes.ApplicationController.applicationSubmitted,
+      redirectF = _ => uk.gov.hmrc.agentregistrationfrontend.controllers.routes.AgentApplicationController.applicationSubmitted,
       hintWhyRedirecting = "The application is in the final state"
     ))
 
-  val getApplicationSubmitted: ActionBuilder[AgentRegistrationApplicationRequest, AnyContent] = authorised
-    .andThen(agentRegistrationApplicationAction)
+  val getApplicationSubmitted: ActionBuilder[AgentApplicationRequest, AnyContent] = authorised
+    .andThen(agentApplicationAction)
     .andThen(ensureApplication.ensureApplication(
       predicate = _.hasFinished,
-      redirectF = _ => uk.gov.hmrc.agentregistrationfrontend.controllers.routes.ApplicationController.landing,
+      redirectF = _ => uk.gov.hmrc.agentregistrationfrontend.controllers.routes.AgentApplicationController.landing,
       hintWhyRedirecting = "The application is not in the final state"
     ))

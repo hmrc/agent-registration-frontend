@@ -25,14 +25,9 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
-import uk.gov.hmrc.agentregistrationfrontend.model.application.AgentRegistrationApplication
-import uk.gov.hmrc.agentregistrationfrontend.model.Arn
-import uk.gov.hmrc.agentregistrationfrontend.model.GroupId
-import uk.gov.hmrc.agentregistrationfrontend.model.InternalUserId
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
-import uk.gov.hmrc.agentregistrationfrontend.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.views.ErrorResults
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
@@ -46,9 +41,8 @@ import scala.concurrent.Future
 
 import play.api.mvc.Request
 import play.api.mvc.WrappedRequest
-import uk.gov.hmrc.agentregistrationfrontend.model.GroupId
-import uk.gov.hmrc.agentregistrationfrontend.model.InternalUserId
-import uk.gov.hmrc.agentregistrationfrontend.model.application.AgentRegistrationApplication
+import uk.gov.hmrc.agentregistration.shared.*
+
 
 class AuthorisedRequest[A](
   val internalUserId: InternalUserId,

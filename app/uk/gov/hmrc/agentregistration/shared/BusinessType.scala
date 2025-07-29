@@ -14,14 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model
+package uk.gov.hmrc.agentregistration.shared
 
-import play.api.libs.functional.syntax.*
 import play.api.libs.json.Format
+import uk.gov.hmrc.agentregistration.shared.util.EnumFormat
 
-/** Internal User Identifier, which comes from the Retrievals
-  */
-final case class InternalUserId(value: String)
+enum BusinessType:
 
-object InternalUserId:
-  given format: Format[InternalUserId] = summon[Format[String]].inmap(InternalUserId(_), _.value)
+  case SoleTrader
+  case LimitedCompany
+  case GeneralPartnership
+  case LimitedLiabilityPartnership
+
+object BusinessType:
+  given Format[BusinessType] = EnumFormat.enumFormat[BusinessType]

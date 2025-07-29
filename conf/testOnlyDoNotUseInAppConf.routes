@@ -11,3 +11,6 @@
 
 # Add all the application routes to the prod.routes file
 ->         /                          prod.Routes
+
+#TODO: testonly routes throw randomly compilation errors :/
+GET /agent-registration/test-only/show-agent-application        uk.gov.hmrc.agentregistrationfrontend.controllers.TestOnlyController.showAgentApplication

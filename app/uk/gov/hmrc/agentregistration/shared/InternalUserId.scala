@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model
+package uk.gov.hmrc.agentregistration.shared
 
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.Format
 
-final case class Utr(value: String)
+/** Internal User Identifier, which comes from the Retrievals
+  */
+final case class InternalUserId(value: String)
 
-object Utr:
-  given format: Format[Utr] = summon[Format[String]].inmap(Utr(_), _.value)
+object InternalUserId:
+  given format: Format[InternalUserId] = summon[Format[String]].inmap(InternalUserId(_), _.value)

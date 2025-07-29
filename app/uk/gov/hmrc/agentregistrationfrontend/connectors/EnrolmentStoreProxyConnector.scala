@@ -23,7 +23,8 @@ import play.api.libs.json.Reads
 import play.api.libs.json.__
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.GroupId
+import uk.gov.hmrc.agentregistration.shared._
+import uk.gov.hmrc.agentregistration.shared.util._
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
@@ -53,18 +54,21 @@ extends RequestAwareLogging:
     groupId: GroupId
   )(using
     request: RequestHeader
-  ): Future[List[EnrolmentStoreProxyConnector.Enrolment]] = httpClient
-    .get(url"$baseUrl/enrolment-store/groups/${groupId.value}/enrolments")
-    .execute[HttpResponse]
-    .map { response =>
-      response.status match {
-        case Status.OK => response.json.as[List[EnrolmentStoreProxyConnector.Enrolment]]
-        case Status.NO_CONTENT => List[EnrolmentStoreProxyConnector.Enrolment]()
-        case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
+  ): Future[List[EnrolmentStoreProxyConnector.Enrolment]] = {
+    val url = url"$baseUrl/enrolment-store/groups/${groupId.value}/enrolments"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map { response =>
+        response.status match {
+          case Status.OK => response.json.as[List[EnrolmentStoreProxyConnector.Enrolment]]
+          case Status.NO_CONTENT => List[EnrolmentStoreProxyConnector.Enrolment]()
+          case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other when calling GET '$url'.")
+        }
       }
-    }
+  }
 
-  private val baseUrl: String = appConfig.enrolmentStoreProxyBaseUrl + "/enrolment-store-proxy/enrolment-store"
+  private val baseUrl: String = appConfig.enrolmentStoreProxyBaseUrl + "/enrolment-store-proxy"
 
 object EnrolmentStoreProxyConnector:
 
