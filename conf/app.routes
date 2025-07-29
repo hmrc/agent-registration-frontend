@@ -20,6 +20,3 @@ POST    /register/about-your-application/business-type uk.gov.hmrc.agentregistra
 
 GET     /register/about-your-application/user-role uk.gov.hmrc.agentregistrationfrontend.controllers.UserRoleController.show
 POST    /register/about-your-application/user-role uk.gov.hmrc.agentregistrationfrontend.controllers.UserRoleController.submit
-
-#TODO: testonly routes throw randomly compilation errors :/
-#GET /test-only/show-agent-application        uk.gov.hmrc.agentregistrationfrontend.controllers.TestOnlyController.showAgentApplication
