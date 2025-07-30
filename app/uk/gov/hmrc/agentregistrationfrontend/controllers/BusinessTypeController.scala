@@ -18,34 +18,43 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers
 
 import play.api.data.Form
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.forms.SelectFromOptionsForm
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessType
+import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeForm
+import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.BusinessTypePage
 
 import javax.inject.{Inject, Singleton}
+import scala.concurrent.Future
 
 
 @Singleton
 class BusinessTypeController @Inject()(
-  actions: Actions,
-  mcc: MessagesControllerComponents,
-  view: BusinessTypePage
-)
-extends FrontendController(mcc):
+                                        actions: Actions,
+                                        mcc: MessagesControllerComponents,
+                                        view: BusinessTypePage,
+                                        applicationService: ApplicationService
+                                      )
+  extends FrontendController(mcc):
 
-  def show: Action[AnyContent] = Action { implicit request =>
-    val form: Form[String] = SelectFromOptionsForm.form("businessType", BusinessType.names)
-    Ok(view(form))
+  def show: Action[AnyContent] = actions.getApplicationInProgress.async { implicit request =>
+    val userAnswers = request.agentApplication.aboutYourApplication
+    val form: Form[BusinessType] = if userAnswers.businessType.isDefined
+    then
+      BusinessTypeForm.form.fill(userAnswers.businessType.get)
+    else
+      BusinessTypeForm.form
+    Future.successful(Ok(view(form)))
   }
 
-  def submit: Action[AnyContent] = Action { implicit request =>
-    SelectFromOptionsForm.form("businessType", BusinessType.names).bindFromRequest().fold(
-      formWithErrors => BadRequest(view(formWithErrors)),
-      businessType => {
-        Redirect(routes.UserRoleController.show.url).addingToSession(
-          "businessType" -> businessType
-        )
+  def submit: Action[AnyContent] = actions.getApplicationInProgress.async { implicit request =>
+    BusinessTypeForm.form.bindFromRequest().fold(
+      formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+      businessType => applicationService.upsert(
+        agentApplication = request.agentApplication.copy(
+          aboutYourApplication = request.agentApplication.aboutYourApplication.copy(businessType = Some(businessType))
+        )).map { _ =>
+        Redirect(routes.UserRoleController.show.url)
       }
     )
   }

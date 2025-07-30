@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistrationfrontend.model.BusinessType
+@import uk.gov.hmrc.agentregistration.shared.BusinessType
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
@@ -29,7 +29,7 @@
 )
 
 @(
-        form: Form[String]
+        form: Form[BusinessType]
 )(implicit
         request: RequestHeader,
         messages: Messages
@@ -46,7 +46,7 @@
         @messages(s"$key.other.description")
     </p>
     <p class="govuk-body">
-        <a class="govuk-link" href="routes.TODO">@messages(s"$key.other.signOut")</a>
+        <a class="govuk-link" href="@{routes.SignOutController.signOut.url}">@messages(s"$key.other.signOut")</a>
     </p>
 }
 
@@ -63,10 +63,10 @@
                     classes = "govuk-fieldset__legend--xl"
                 ))
             )),
-            items = BusinessType.names.map(businessType =>
+            items = BusinessType.values.toSeq.map(businessType =>
                 RadioItem(
-                    content = Text(messages(s"$key.$businessType")),
-                    value = Some(businessType)
+                    content = Text(messages(s"$key.${businessType.toString}")),
+                    value = Some(businessType.toString)
                 )
             )
         ).withFormField(form(key)))

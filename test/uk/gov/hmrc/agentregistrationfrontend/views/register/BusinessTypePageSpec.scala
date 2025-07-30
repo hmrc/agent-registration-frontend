@@ -18,9 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.register
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.agentregistrationfrontend.forms.SelectFromOptionsForm
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessType
+import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpecSupport
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.BusinessTypePage
 
@@ -28,7 +26,7 @@ class BusinessTypePageSpec
 extends ViewSpecSupport:
 
   val viewTemplate: BusinessTypePage = app.injector.instanceOf[BusinessTypePage]
-  implicit val doc: Document = Jsoup.parse(viewTemplate(SelectFromOptionsForm.form("businessType", BusinessType.names)).body)
+  implicit val doc: Document = Jsoup.parse(viewTemplate(BusinessTypeForm.form).body)
   private val heading: String = "How is your business set up?"
 
   "BusinessTypePage" should:
@@ -40,10 +38,10 @@ extends ViewSpecSupport:
       val expectedRadioGroup: TestRadioGroup = TestRadioGroup(
         legend = heading,
         options = List(
-          "Sole trader" -> "sole-trader",
-          "Limited company" -> "limited-company",
-          "Partnership" -> "general-partnership",
-          "Limited liability partnership" -> "limited-liability-partnership"
+          "Sole trader" -> "SoleTrader",
+          "Limited company" -> "LimitedCompany",
+          "Partnership" -> "GeneralPartnership",
+          "Limited liability partnership" -> "LimitedLiabilityPartnership"
         ),
         hint = None
       )
@@ -64,8 +62,7 @@ extends ViewSpecSupport:
     "render a form error when the form contains an error" in:
       val field = "businessType"
       val errorMessage = "Tell us how your business is set up"
-      val formWithError = SelectFromOptionsForm
-        .form(field, BusinessType.names)
+      val formWithError = BusinessTypeForm.form
         .withError(field, errorMessage)
       val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
       errorDoc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
