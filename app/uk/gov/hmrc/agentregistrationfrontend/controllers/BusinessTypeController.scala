@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
+import play.api.data.Form
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.forms.SelectFromOptionsForm
@@ -23,6 +24,7 @@ import uk.gov.hmrc.agentregistrationfrontend.model.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.BusinessTypePage
 
 import javax.inject.{Inject, Singleton}
+
 
 @Singleton
 class BusinessTypeController @Inject()(
@@ -33,7 +35,7 @@ class BusinessTypeController @Inject()(
 extends FrontendController(mcc):
 
   def show: Action[AnyContent] = Action { implicit request =>
-    val form = SelectFromOptionsForm.form("businessType", BusinessType.names)
+    val form: Form[String] = SelectFromOptionsForm.form("businessType", BusinessType.names)
     Ok(view(form))
   }
 

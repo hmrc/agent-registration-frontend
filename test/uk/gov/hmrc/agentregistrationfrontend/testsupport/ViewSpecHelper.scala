@@ -22,27 +22,48 @@ import org.jsoup.select.Elements
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 import scala.language.implicitConversions
 
-trait ViewSpecHelper extends Selectors {
+trait ViewSpecHelper
+extends Selectors {
+
   extension (elements: Elements)
+
     def toList: List[Element] = elements.iterator.asScala.toList
     def headOption: Option[Element] = toList.headOption
 
+  case class TestLink(
+    text: String,
+    href: String
+  )
 
-  case class TestLink(text: String, href: String)
+  case class TestRadioGroup(
+    legend: String,
+    options: List[(String, String)],
+    hint: Option[String],
+    optionHints: List[(String, Option[String])] = Nil
+  )
 
-  case class TestRadioGroup(legend: String, options: List[(String, String)], hint: Option[String], optionHints: List[(String, Option[String])] = Nil)
+  case class TestInputField(
+    label: String,
+    hint: Option[String],
+    inputName: String
+  )
 
-  case class TestInputField(label: String, hint: Option[String], inputName: String)
-
-  case class TestSelect(inputName: String, options: Seq[(String, String)])
+  case class TestSelect(
+    inputName: String,
+    options: Seq[(String, String)]
+  )
 
   case class TestSummaryList(rows: List[(String, String, String)])
 
-  case class TestTable(caption: String, rows: List[IndexedSeq[String]])
+  case class TestTable(
+    caption: String,
+    rows: List[IndexedSeq[String]]
+  )
 
   private val elementToLink: Element => TestLink = element => TestLink(element.text(), element.attr("href"))
 
   extension (el: Element)
+
     def hasLanguageSwitch: Boolean = el.select(languageSwitcher).headOption.nonEmpty
     def mainContent: Element = el.select(main).headOption.get
 
@@ -52,11 +73,23 @@ trait ViewSpecHelper extends Selectors {
     //    val para = extractByIndex(para, 1)
     //    para.extractText(visuallyHidden, 1)
     //    para.extractLink(1)
-    def extractByIndex(selector: String, index: Int): Option[Element] = el.select(selector).toList.lift(index - 1)
-    def extractById(selector: String, id: String): Option[Element] = el.select(selector).select(s"#$id").headOption
+    def extractByIndex(
+      selector: String,
+      index: Int
+    ): Option[Element] = el.select(selector).toList.lift(index - 1)
+    def extractById(
+      selector: String,
+      id: String
+    ): Option[Element] = el.select(selector).select(s"#$id").headOption
 
-    def extractText(selector: String, index: Int): Option[String] = extractByIndex(selector, index).map(_.text())
-    def extractText(selector: String, id: String): Option[String] = extractById(selector, id).map(_.text())
+    def extractText(
+      selector: String,
+      index: Int
+    ): Option[String] = extractByIndex(selector, index).map(_.text())
+    def extractText(
+      selector: String,
+      id: String
+    ): Option[String] = extractById(selector, id).map(_.text())
 
     def extractList(index: Int): List[String] = extractByIndex(list, index).map(_.getElementsByTag("li").toList.map(_.text())).getOrElse(Nil)
 
@@ -79,7 +112,9 @@ trait ViewSpecHelper extends Selectors {
         legend = element.select(fieldSetLegend).first().text(),
         options = element.select(".govuk-radios__item").toList.map(el => (el.select("label").text(), el.select("input").attr("value"))),
         hint = element.select(fieldSetHint).toList.headOption.map(_.text),
-        optionHints = element.select(".govuk-radios__item").toList.map(el => (el.select("label").text(), el.select(".govuk-radios__hint").headOption.map(_.text()))),
+        optionHints = element.select(".govuk-radios__item").toList.map(el =>
+          (el.select("label").text(), el.select(".govuk-radios__hint").headOption.map(_.text()))
+        )
       )
     }
 
@@ -109,12 +144,17 @@ trait ViewSpecHelper extends Selectors {
       )
     }
 
-    def extractTable(index: Int, numberOfCols: Int): Option[TestTable] = extractByIndex(table, index).map { elem =>
+    def extractTable(
+      index: Int,
+      numberOfCols: Int
+    ): Option[TestTable] = extractByIndex(table, index).map { elem =>
       TestTable(
         caption = elem.select("caption").text(),
         rows = elem.select("tbody tr").toList.map { row =>
-          for (i <- 0 until numberOfCols) yield row.select("td").get(i).text()
+          for (i <- 0 until numberOfCols)
+            yield row.select("td").get(i).text()
         }
       )
     }
+
 }

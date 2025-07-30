@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.util
 
 import play.api.mvc.Request
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.http.HttpErrorFunctions
+import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.http.UpstreamErrorResponse
 
 import scala.concurrent.Future
@@ -25,7 +27,7 @@ import scala.concurrent.Future
 object Errors
 extends RequestAwareLogging:
 
-  /** Creates a requirement which has to pass in order to continue computation. If it fails it will result in Upstream4xxResponse.
+  /** Creates a requirement which has to pass in order to continue computation.
     */
   def require(
     requirement: Boolean,
@@ -33,7 +35,7 @@ extends RequestAwareLogging:
   )(using request: RequestHeader): Unit =
     if !requirement then
       logger.error(s"Requirement failed: $message")
-      throw UpstreamErrorResponse(message, play.mvc.Http.Status.BAD_REQUEST)
+      throw InternalServerException(message)
     else ()
 
   def requireF(
@@ -42,7 +44,7 @@ extends RequestAwareLogging:
   )(using request: Request[?]): Future[Unit] =
     if !requirement then
       logger.error(s"Requirement failed: $message")
-      Future.failed(UpstreamErrorResponse(message, play.mvc.Http.Status.BAD_REQUEST))
+      Future.failed(InternalServerException(message))
     else Future.successful(())
 
   @inline def throwBadRequestException(message: => String)(using request: RequestHeader): Nothing =
@@ -73,18 +75,9 @@ extends RequestAwareLogging:
       play.mvc.Http.Status.INTERNAL_SERVER_ERROR
     )
 
-  /** Call this to ensure that we don't do stupid things, like make illegal transitions (eg. from Finished to New)
-    */
-  def sanityCheck(
-    requirement: Boolean,
-    message: => String
-  )(using request: RequestHeader): Unit =
-    if !requirement then
-      logger.error(message)
-      throw UpstreamErrorResponse(message, play.mvc.Http.Status.INTERNAL_SERVER_ERROR)
-    else ()
-
   def notImplemented(message: => String = "")(using request: RequestHeader): Nothing =
     val m = s"Unimplemented: $message"
     logger.error(m)
     throw UpstreamErrorResponse(m, play.mvc.Http.Status.NOT_IMPLEMENTED)
+
+  val httpErrorFunctions: HttpErrorFunctions = new HttpErrorFunctions {}

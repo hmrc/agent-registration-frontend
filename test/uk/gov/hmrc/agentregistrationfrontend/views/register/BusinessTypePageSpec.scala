@@ -24,19 +24,21 @@ import uk.gov.hmrc.agentregistrationfrontend.model.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpecSupport
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.BusinessTypePage
 
-class BusinessTypePageSpec extends ViewSpecSupport :
+class BusinessTypePageSpec
+extends ViewSpecSupport:
+
   val viewTemplate: BusinessTypePage = app.injector.instanceOf[BusinessTypePage]
   implicit val doc: Document = Jsoup.parse(viewTemplate(SelectFromOptionsForm.form("businessType", BusinessType.names)).body)
   private val heading: String = "How is your business set up?"
-  
-  "BusinessTypePage" should :
-    
-    "have the correct title" in :
+
+  "BusinessTypePage" should:
+
+    "have the correct title" in:
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
 
-    "render a radio button for each option" in :
+    "render a radio button for each option" in:
       val expectedRadioGroup: TestRadioGroup = TestRadioGroup(
-        legend = heading, 
+        legend = heading,
         options = List(
           "Sole trader" -> "sole-trader",
           "Limited company" -> "limited-company",
@@ -47,18 +49,19 @@ class BusinessTypePageSpec extends ViewSpecSupport :
       )
       doc.mainContent.extractRadios(1).value shouldBe expectedRadioGroup
 
-    "render a details element with content for when the business type is not listed" in :
-      val expectedSummary  = "The business is set up as something else"
-      val expectedDetails = "To get an agent services account your business must be a sole trader, limited company, partnership or limited liability partnership."
+    "render a details element with content for when the business type is not listed" in:
+      val expectedSummary = "The business is set up as something else"
+      val expectedDetails =
+        "To get an agent services account your business must be a sole trader, limited company, partnership or limited liability partnership."
       val expectedLinkText = "Finish and sign out"
       val details = doc.select("details")
       details.size() shouldBe 1
       details.text() shouldBe s"$expectedSummary $expectedDetails $expectedLinkText"
 
-    "render a save and continue button" in :
+    "render a save and continue button" in:
       doc.select("button[type=submit]").text() shouldBe "Save and continue"
 
-    "render a form error when the form contains an error" in :
+    "render a form error when the form contains an error" in:
       val field = "businessType"
       val errorMessage = "Tell us how your business is set up"
       val formWithError = SelectFromOptionsForm

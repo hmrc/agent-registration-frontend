@@ -7,18 +7,29 @@ This is a new service. No overview yet.
 # Running the Service
 
 To start the service, use the following commands:
+- `sbt runTestOnly` - this enables extra test endpoints
 - `sbt run` to launch the service normally.
-- `sbt runTestOnly` for testing modes.
 
 After starting the service, open in browser:
 [`http://localhost:22201/agent-registration](http://localhost:22201/agent-registration)
 
-Ensure that all dependent applications, including MongoDB and other microservices managed by `TODO`, are also running.
-To start these dependent services, use the Service Manager command:
+Ensure that all dependent applications, including MongoDB and other microservices, are also running.
+To start/stop these dependent services, use the Service Manager commands:
 
 ```bash
-sm --start TODO
+sm --start \
+AWESOME_STUBS_FRONTEND \
+AWESOME_STUBS \
+INTERNAL_AUTH \
+AGENT_REGISTRATION \
+&& sm -s
 ```
+
+```bash
+sm --stop ALL \
+&& sm -s
+```
+
 
 # Project Setup in IntelliJ
 

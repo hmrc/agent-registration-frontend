@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model
+package uk.gov.hmrc.agentregistration.shared
 
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.Format
 
-final case class Nino(value: String)
+final case class Utr(value: String)
 
-object Nino:
-  given format: Format[Nino] = summon[Format[String]].inmap(Nino(_), _.value)
+object Utr:
+  given format: Format[Utr] = summon[Format[String]].inmap(Utr(_), _.value)

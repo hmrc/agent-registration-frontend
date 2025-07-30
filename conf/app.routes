@@ -1,17 +1,19 @@
 # microservice specific routes
 
-GET     /                                  uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.landing
+GET     /                                  uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.landing
+
+GET        /task-list                     uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.taskList
+GET        /application-dashboard         uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.applicationDashboard
 
 # Sign out routes
 GET     /sign-out                         uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.signOut
 GET     /time-out                         uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timeOut
 GET     /timed-out                        uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timedOut
 
-GET     /new-application                   uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.initializeApplication
-GET     /application-submitted             uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.applicationSubmitted
+GET     /application-submitted            uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.applicationSubmitted
 
 # Register routes
-GET     /register                                      uk.gov.hmrc.agentregistrationfrontend.controllers.ApplicationController.startRegistration
+GET     /register                                      uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.startRegistration
 ## About your application routes
 GET     /register/about-your-application/business-type uk.gov.hmrc.agentregistrationfrontend.controllers.BusinessTypeController.show
 POST    /register/about-your-application/business-type uk.gov.hmrc.agentregistrationfrontend.controllers.BusinessTypeController.submit

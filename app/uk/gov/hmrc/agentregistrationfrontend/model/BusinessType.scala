@@ -16,21 +16,50 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.model
 
-enum BusinessType(val name: String) :
-  case SoleTrader extends BusinessType("sole-trader")
-  case LimitedCompany extends BusinessType("limited-company")
-  case GeneralPartnership extends BusinessType("general-partnership")
-  case LimitedLiabilityPartnership extends BusinessType("limited-liability-partnership")
+//TODO Simpler Enum proposal:
+//enum BusinessType2:
+//
+//  case SoleTrader
+//  case LimitedCompany
+//  case GeneralPartnership
+//  case LimitedLiabilityPartnership
+//
+//object BusinessType2:
+//  given Format[BusinessType2] = EnumFormat.enumFormat[BusinessType2]
+//  given PathBindable[BusinessType2] = EnumBinder.pathBindable[BusinessType2]
+//  given QueryStringBindable[BusinessType2] = EnumBinder.queryStringEnumBinder[BusinessType2]
+//
+//object BusinessType2Form:
+//
+//  val form: Form[BusinessType] =
+//    val fieldMapping: FieldMapping[BusinessType] = Forms.of(EnumFormatter.formatter[BusinessType](
+//      errorMessageIfMissing = "businessType.error.required",
+//      errorMessageIfEnumError = "businessType.error.invalid"
+//    ))
+//    Form(
+//      mapping = mapping("business-type" -> fieldMapping)(identity)(Some(_))
+//    )
+
+enum BusinessType(val name: String):
+
+  case SoleTrader
+  extends BusinessType("sole-trader")
+  case LimitedCompany
+  extends BusinessType("limited-company")
+  case GeneralPartnership
+  extends BusinessType("general-partnership")
+  case LimitedLiabilityPartnership
+  extends BusinessType("limited-liability-partnership")
 
   override def toString: String = name
 
-object BusinessType :
+object BusinessType:
 
-    def names: Seq[String] = Seq(
-      SoleTrader.name,
-      LimitedCompany.name,
-      GeneralPartnership.name,
-      LimitedLiabilityPartnership.name
-    )
-    def fromName(name: String): Option[BusinessType] = values.find(_.name == name)
-    def all: Seq[BusinessType] = values.toSeq
+  def names: Seq[String] = Seq(
+    SoleTrader.name,
+    LimitedCompany.name,
+    GeneralPartnership.name,
+    LimitedLiabilityPartnership.name
+  )
+  def fromName(name: String): Option[BusinessType] = values.find(_.name == name)
+  def all: Seq[BusinessType] = values.toSeq

@@ -39,12 +39,12 @@ extends FrontendController(mcc):
   }
 
   def signOut: Action[AnyContent] = Action {
-    val continueUrl = uri"${appConfig.thisFrontendBaseUrl + routes.ApplicationController.landing.url}"
+    val continueUrl = uri"${appConfig.thisFrontendBaseUrl + uk.gov.hmrc.agentregistrationfrontend.controllers.routes.AgentApplicationController.landing.url}"
     signOutWithContinue(continueUrl.toString)
   }
 
   def timeOut: Action[AnyContent] = Action {
-    val continueUrl = uri"${appConfig.thisFrontendBaseUrl + routes.SignOutController.timedOut.url}"
+    val continueUrl = uri"${appConfig.thisFrontendBaseUrl + uk.gov.hmrc.agentregistrationfrontend.controllers.routes.SignOutController.timedOut.url}"
     signOutWithContinue(continueUrl.toString)
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.services
+package uk.gov.hmrc.agentregistration.shared
 
-import org.bson.types.ObjectId
-import uk.gov.hmrc.agentregistrationfrontend.model.application.ApplicationId
+import play.api.libs.json.Format
+import uk.gov.hmrc.agentregistration.shared.util.EnumFormat
 
-import javax.inject.Singleton
+enum BusinessType:
 
-@Singleton
-class ApplicationIdGenerator:
-  def nextApplicationId(): ApplicationId = ApplicationId(ObjectId.get().toHexString)
+  case SoleTrader
+  case LimitedCompany
+  case GeneralPartnership
+  case LimitedLiabilityPartnership
+
+object BusinessType:
+  given Format[BusinessType] = EnumFormat.enumFormat[BusinessType]

@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model
+package uk.gov.hmrc.agentregistration.shared.util
 
-import play.api.libs.functional.syntax.*
-import play.api.libs.json.Format
+object HyphenTool:
 
-final case class Utr(  value: String)
-
-object Utr:
-  given format: Format[Utr] = summon[Format[String]].inmap(Utr(_), _.value)
+  /** Converts a CamelCase string to a hyphen-separated string Example: "SoleTrader" -> "sole-trader"
+    */
+  def camelCaseToHyphenated(input: String): String = {
+    input.replaceAll("([A-Z])", "-$1")
+      .toLowerCase
+      .stripPrefix("-")
+  }

@@ -11,3 +11,5 @@
 
 # Add all the application routes to the prod.routes file
 ->         /                          prod.Routes
+
+GET /agent-registration/test-only/show-agent-application        uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.TestOnlyController.showAgentApplication

@@ -17,21 +17,24 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport
 
 import org.scalatest.*
-import org.scalatest.concurrent.{Eventually, IntegrationPatience, ScalaFutures}
+import org.scalatest.concurrent.Eventually
+import org.scalatest.concurrent.IntegrationPatience
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.diagrams.Diagrams
 import org.scalatest.matchers.should.Matchers
 
-object RichMatchers extends RichMatchers
+object RichMatchers
+extends RichMatchers
 
 trait RichMatchers
-  extends Matchers,
-    Diagrams,
-    TryValues,
-    EitherValues,
-    OptionValues,
-    AppendedClues,
-    ScalaFutures,
-    StreamlinedXml,
-    Inside,
-    Eventually,
-    IntegrationPatience
+extends Matchers,
+  Diagrams,
+  TryValues,
+  EitherValues,
+  OptionValues,
+  AppendedClues,
+  ScalaFutures,
+  StreamlinedXml,
+  Inside,
+  Eventually,
+  IntegrationPatience

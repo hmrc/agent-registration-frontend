@@ -14,24 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.ispecs
+package uk.gov.hmrc.agentregistration.shared
 
-import play.api.libs.ws.WSClient
-import play.api.libs.ws.WSResponse
-import play.api.libs.ws.DefaultBodyReadables.*
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.Format
 
-class HealthEndpointISpec
-extends ISpec:
+/** Internal User Identifier, which comes from the Retrievals
+  */
+final case class InternalUserId(value: String)
 
-  private val wsClient = app.injector.instanceOf[WSClient]
-  private val baseUrl = s"http://localhost:${port.toString}"
-
-  "service health endpoint should respond with 200 status" in:
-    val response: WSResponse =
-      wsClient
-        .url(s"$baseUrl/ping/ping")
-        .get()
-        .futureValue
-
-    response.status shouldBe 200
-    response.body[String] shouldBe ""
+object InternalUserId:
+  given format: Format[InternalUserId] = summon[Format[String]].inmap(InternalUserId(_), _.value)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.application
+package uk.gov.hmrc.agentregistration.shared
 
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.Format
 
-final case class ApplicationId(value: String)
+final case class GroupId(value: String)
 
-object ApplicationId:
-  given Format[ApplicationId] = summon[Format[String]].inmap(ApplicationId(_), _.value)
+object GroupId:
+  given format: Format[GroupId] = summon[Format[String]].inmap(GroupId(_), _.value)

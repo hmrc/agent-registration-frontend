@@ -24,18 +24,20 @@ import uk.gov.hmrc.agentregistrationfrontend.model.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpecSupport
 import uk.gov.hmrc.agentregistrationfrontend.views.html.TimedOutPage
 
-class TimedOutPageSpec extends ViewSpecSupport :
+class TimedOutPageSpec
+extends ViewSpecSupport:
+
   val viewTemplate: TimedOutPage = app.injector.instanceOf[TimedOutPage]
   implicit val doc: Document = Jsoup.parse(viewTemplate().body)
 
-  "TimedOutPage" should :
+  "TimedOutPage" should:
 
-    "have the correct title" in :
+    "have the correct title" in:
       doc.title() shouldBe "You have been signed out - Apply for an agent services account - GOV.UK"
 
-    "render explanation for sign out" in :
+    "render explanation for sign out" in:
       doc.extractText("p.govuk-body", 1).get shouldBe
         "You have not done anything for 15 minutes, so we have signed you out to keep your account secure."
 
-    "render a link to sign in again" in :
+    "render a link to sign in again" in:
       doc.extractText("a.govuk-link", 1).get shouldBe "Sign in again"

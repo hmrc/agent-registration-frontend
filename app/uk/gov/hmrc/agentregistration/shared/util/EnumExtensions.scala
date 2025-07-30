@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.action
+package uk.gov.hmrc.agentregistration.shared.util
 
-import play.api.mvc.Request
-import play.api.mvc.WrappedRequest
-import uk.gov.hmrc.agentregistrationfrontend.model.application.Application
-import uk.gov.hmrc.agentregistrationfrontend.model.application.ApplicationId
-
-class ApplicationRequest[A](
-  val application: Application,
-  val request: Request[A]
-)
-extends WrappedRequest[A](request):
-
-  val applicationId: ApplicationId = application.applicationId
+object EnumExtensions:
+  extension [E <: reflect.Enum](eenum: E)
+    def toStringHyphenated: String = HyphenTool.camelCaseToHyphenated(eenum.toString)

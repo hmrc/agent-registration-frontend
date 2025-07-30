@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.util
+package uk.gov.hmrc.agentregistration.shared
 
-/** Simple safe equals so we don't have to import cats
-  */
-object SafeEquals:
+import play.api.libs.json.Format
+import uk.gov.hmrc.agentregistration.shared.util.EnumFormat
 
-  @SuppressWarnings(Array("org.wartremover.warts.Equals"))
-  implicit class EqualsOps[A](v: A):
+enum ApplicationState:
 
-    def ===(other: A): Boolean = v == other
-    def =!=(other: A): Boolean = v != other
+  case InProgress
+  case Submitted
+
+object ApplicationState:
+  given Format[ApplicationState] = EnumFormat.enumFormat[ApplicationState]

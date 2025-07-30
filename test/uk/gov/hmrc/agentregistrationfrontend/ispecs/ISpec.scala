@@ -19,25 +19,33 @@ package uk.gov.hmrc.agentregistrationfrontend.ispecs
 import com.google.inject.AbstractModule
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.freespec.AnyFreeSpecLike
-import org.scalatest.time.{Millis, Seconds, Span}
+import org.scalatest.time.Millis
+import org.scalatest.time.Seconds
+import org.scalatest.time.Span
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
-import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
-import play.api.test.{DefaultTestServerFactory, TestServerFactory}
-import play.api.{Application, Logging, Mode}
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.inject.guice.GuiceableModule
+import play.api.test.DefaultTestServerFactory
+import play.api.test.TestServerFactory
+import play.api.Application
+import play.api.Logging
+import play.api.Mode
 import play.core.server.ServerConfig
 import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.WireMockSupport
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.RichMatchers
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 
-import java.time.{Clock, Instant, ZoneId}
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneId
 
 trait ISpec
-  extends AnyFreeSpecLike
-    with RichMatchers
-    with BeforeAndAfterEach
-    with GuiceOneServerPerSuite
-    with WireMockSupport:
+extends AnyFreeSpecLike
+with RichMatchers
+with BeforeAndAfterEach
+with GuiceOneServerPerSuite
+with WireMockSupport:
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(timeout = scaled(Span(3, Seconds)), interval = scaled(Span(300, Millis)))
   private val testServerPort = ISpec.testServerPort
@@ -49,38 +57,43 @@ trait ISpec
   lazy val frozenInstant: Instant = tdAll.instant
   lazy val clock: Clock = Clock.fixed(frozenInstant, ZoneId.of("UTC"))
 
-  protected def configMap: Map[String, Any] = Map[String, Any](
-    "mongodb.uri" -> s"mongodb://localhost:27017/$databaseName",
-    "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
-    "auditing.consumer.baseUri.port" -> WireMockSupport.port,
-    "auditing.enabled" -> false,
-    "auditing.traceRequests" -> false
-  ) ++ configOverrides
+  protected def configMap: Map[String, Any] =
+    Map[String, Any](
+      "mongodb.uri" -> s"mongodb://localhost:27017/$databaseName",
+      "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
+      "auditing.consumer.baseUri.port" -> WireMockSupport.port,
+      "auditing.enabled" -> false,
+      "auditing.traceRequests" -> false
+    ) ++ configOverrides
 
   protected def configOverrides: Map[String, Any] = Map[String, Any]()
 
+  lazy val overridesModule: AbstractModule =
+    new AbstractModule:
+      override def configure(): Unit = bind(classOf[Clock]).toInstance(clock)
 
-  lazy val overridesModule: AbstractModule = new AbstractModule:
-    override def configure(): Unit =
-      bind(classOf[Clock]).toInstance(clock)
-
-  override def fakeApplication(): Application =
-    GuiceApplicationBuilder()
-      .overrides(GuiceableModule.fromGuiceModules(Seq(overridesModule)))
-      .configure(configMap).build()
+  override def fakeApplication(): Application = GuiceApplicationBuilder()
+    .overrides(GuiceableModule.fromGuiceModules(Seq(overridesModule)))
+    .configure(configMap).build()
 
   override protected def testServerFactory: TestServerFactory = CustomTestServerFactory
 
-  object CustomTestServerFactory extends DefaultTestServerFactory:
+  object CustomTestServerFactory
+  extends DefaultTestServerFactory:
     override protected def serverConfig(app: Application): ServerConfig =
-      val sc = ServerConfig(port = Some(testServerPort), sslPort = None, mode = Mode.Test, rootDir = app.path)
+      val sc = ServerConfig(
+        port = Some(testServerPort),
+        sslPort = None,
+        mode = Mode.Test,
+        rootDir = app.path
+      )
       sc.copy(configuration = sc.configuration.withFallback(overrideServerConfiguration(app)))
 
-  override def beforeEach(): Unit =
-    super.beforeEach()
+  override def beforeEach(): Unit = super.beforeEach()
 
 //  lazy val pages = new Pages(baseUrl)
 
-object ISpec extends Logging:
+object ISpec
+extends Logging:
 
   lazy val testServerPort: Int = 19001

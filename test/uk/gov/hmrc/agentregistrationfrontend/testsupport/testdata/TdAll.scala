@@ -22,11 +22,9 @@ object TdAll:
 
   val tdAll: TdAll = new TdAll {}
 
-/**
- * TestData (Td), All instances
- */
+/** TestData (Td), All instances
+  */
 trait TdAll
-  extends AnyRef
-    with TdBase
-    with TdRequest
-
+extends AnyRef
+with TdBase
+with TdRequest

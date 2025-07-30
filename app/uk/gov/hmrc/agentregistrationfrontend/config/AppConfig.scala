@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.config
 import play.api.Configuration
 import sttp.model.Uri
 import sttp.model.Uri.UriContext
+import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.Inject
@@ -38,15 +39,23 @@ class AppConfig @Inject() (
   private val basFrontendSignBaseInBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-in", configuration)
   val basFrontendSignOutUrlBase: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-out", configuration)
 
+  val asaDashboardUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.asa-fe-dashboard-url", configuration)
+  val taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment: String = ConfigHelper.readConfigAsValidUrlString(
+    "urls.taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment",
+    configuration
+  )
+
+  val enrolmentStoreProxyBaseUrl: String = servicesConfig.baseUrl("enrolment-store-proxy")
+  val agentRegistrationBaseUrl: String = servicesConfig.baseUrl("agent-registration")
+
+  val hmrcAsAgentEnrolment: Enrolment = Enrolment(key = "HMRC-AS-AGENT")
+
   def signInUri(continueUri: Uri): Uri = uri"$basFrontendSignBaseInBaseUrl"
     .addParam("continue_url", continueUri.toString())
     .addParam("origin", "agent-registration-frontend")
     .addParam("accountType", "agent") // specifying this to bypass unnecessary screens intended for Individuals
 
   val welshLanguageSupportEnabled: Boolean = configuration.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
-
-  object ApplicationRepo:
-    val applicationRepoTtl: FiniteDuration = ConfigHelper.readFiniteDuration("mongodb.application-repo-ttl", servicesConfig)
 
 object ConfigHelper:
 

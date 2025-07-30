@@ -16,10 +16,13 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-import uk.gov.hmrc.agentregistrationfrontend.model.{Nino, Utr}
+
+import uk.gov.hmrc.agentregistration.shared.Utr
 
 import java.time.format.DateTimeFormatter
-import java.time.{Instant, LocalDateTime, ZoneOffset}
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 trait TdBase:
 
@@ -31,5 +34,4 @@ trait TdBase:
   lazy val instant: Instant = localDateTime.toInstant(ZoneOffset.UTC)
   lazy val newInstant: Instant = instant.plusSeconds(20) // used when a new application is created from existing one
 
-  lazy val nino: Nino = Nino("LM001014C")
   lazy val utr: Utr = Utr("1234567895")
