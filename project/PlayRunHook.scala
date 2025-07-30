@@ -11,9 +11,8 @@ object PlayRunHook {
   }
 
   private def printLinksForConvenience(httpPort: Int): Unit = {
-    println(s"http://localhost:$httpPort/")
     println(s"http://localhost:$httpPort/agent-registration")
-    println(s"http://localhost:$httpPort/agent-registration/test-only")
+    println(s"http://localhost:$httpPort/agent-registration/test-only/show-agent-application")
     println(s"http://localhost:$httpPort/agent-registration/register")
   }
 }
