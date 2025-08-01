@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-
 import uk.gov.hmrc.agentregistration.shared.Utr
 
 import java.time.format.DateTimeFormatter

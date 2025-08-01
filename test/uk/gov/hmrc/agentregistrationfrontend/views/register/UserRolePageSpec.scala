@@ -22,20 +22,22 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmationForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpecSupport
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.UserRolePage
 
-class UserRolePageSpec extends ViewSpecSupport {
+class UserRolePageSpec
+extends ViewSpecSupport {
+
   val viewTemplate: UserRolePage = app.injector.instanceOf[UserRolePage]
   implicit val doc: Document = Jsoup.parse(viewTemplate(ConfirmationForm.form("userRole")).body)
   private val heading: String = "Are you the owner of the business?"
-  
+
   "UserRolePage" should {
-    
+
     "have the correct title" in {
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
     }
 
     "render a radio button for each option" in {
       val expectedRadioGroup: TestRadioGroup = TestRadioGroup(
-        legend = heading, 
+        legend = heading,
         options = List(
           "Yes" -> "true",
           "No, but I’m authorised by them to set up this account" -> "false"
@@ -63,4 +65,5 @@ class UserRolePageSpec extends ViewSpecSupport {
     }
 
   }
+
 }
