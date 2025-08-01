@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardPage, HmrcReportTechnicalIssueHelper, HmrcTimeoutDialogHelper}
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.HmrcStandardPageParams
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
@@ -60,8 +60,15 @@
 
 @hmrcStandardPage(
   HmrcStandardPageParams(
-    pageTitle = Some(gdsTitle),
-    backLink = if suppressBackLink then None else Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
-    isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
+      pageTitle = Some(gdsTitle),
+      serviceURLs = ServiceURLs(
+          signOutUrl = if (isSignedIn) Some(routes.SignOutController.signOut.url) else None
+      ),
+      templateOverrides = TemplateOverrides(
+          additionalHeadBlock = Some(head)
+      ),
+      backLink = if suppressBackLink then None else Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
+      isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled,
+      serviceName = Some(messages("service.name"))
   )
 )(contentWithErrorsAndHelp)

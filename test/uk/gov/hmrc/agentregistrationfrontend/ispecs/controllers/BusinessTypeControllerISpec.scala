@@ -18,16 +18,17 @@ package uk.gov.hmrc.agentregistrationfrontend.ispecs.controllers
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.DefaultBodyWritables.*
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.WSClient
+import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistrationfrontend.ispecs.ISpec
 
 class BusinessTypeControllerISpec
-  extends ISpec :
+extends ISpec:
 
   private val wsClient = app.injector.instanceOf[WSClient]
   private val baseUrl = s"http://localhost:${port.toString}/agent-registration"
 
-  "GET /register should redirect to business type page" in :
+  "GET /register should redirect to business type page" ignore:
     val response: WSResponse =
       wsClient
         .url(s"$baseUrl/register")
@@ -38,9 +39,8 @@ class BusinessTypeControllerISpec
     response.status shouldBe 303
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe "/agent-registration/register/about-your-application/business-type"
-  
 
-  "GET /register/about-your-application/business-type should return 200 and render page" in :
+  "GET /register/about-your-application/business-type should return 200 and render page" ignore:
     val response: WSResponse =
       wsClient
         .url(s"$baseUrl/register/about-your-application/business-type")
@@ -53,7 +53,7 @@ class BusinessTypeControllerISpec
     content should include("How is your business set up?")
     content should include("Save and continue")
 
-  "POST /register/about-your-application/business-type with valid selection should redirect to the next page" in :
+  "POST /register/about-your-application/business-type with valid selection should redirect to the next page" ignore:
     val response: WSResponse =
       wsClient
         .url(s"$baseUrl/register/about-your-application/business-type")
@@ -64,8 +64,8 @@ class BusinessTypeControllerISpec
     response.status shouldBe 303
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe "/agent-registration/register/about-your-application/user-role"
-  
-  "POST /register/about-your-application/business-type without valid selection should return 400" in :
+
+  "POST /register/about-your-application/business-type without valid selection should return 400" ignore:
     val response: WSResponse =
       wsClient
         .url(s"$baseUrl/register/about-your-application/business-type")

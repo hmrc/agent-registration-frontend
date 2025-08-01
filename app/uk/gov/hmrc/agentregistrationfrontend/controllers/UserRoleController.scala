@@ -16,15 +16,18 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmationForm
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.UserRolePage
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
-class UserRoleController @Inject()(
+class UserRoleController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
   view: UserRolePage

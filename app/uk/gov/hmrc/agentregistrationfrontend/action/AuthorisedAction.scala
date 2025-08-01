@@ -43,7 +43,6 @@ import play.api.mvc.Request
 import play.api.mvc.WrappedRequest
 import uk.gov.hmrc.agentregistration.shared.*
 
-
 class AuthorisedRequest[A](
   val internalUserId: InternalUserId,
   val groupId: GroupId,

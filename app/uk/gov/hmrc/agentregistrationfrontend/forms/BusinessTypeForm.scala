@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,25 +16,20 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.forms
 
+import play.api.data.Forms.mapping
+import play.api.data.FieldMapping
 import play.api.data.Form
-import play.api.data.Forms.boolean
-import play.api.data.Forms.optional
-import play.api.data.Forms.single
-import play.api.data.Forms.text
-import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.FormFieldHelper
+import play.api.data.Forms
+import uk.gov.hmrc.agentregistration.shared.util.EnumFormatter
+import uk.gov.hmrc.agentregistration.shared.BusinessType
 
-object ConfirmationForm
-extends FormFieldHelper {
-  def form(
-    fieldName: String,
-    args: String*
-  ): Form[Boolean] = {
-    Form[Boolean](
-      single(
-        fieldName -> optional(boolean)
-          .verifying(mandatoryBoolean(fieldName, args*))
-          .transform(_.getOrElse(false), Some(_))
-      )
+object BusinessTypeForm:
+
+  val form: Form[BusinessType] =
+    val fieldMapping: FieldMapping[BusinessType] = Forms.of(EnumFormatter.formatter[BusinessType](
+      errorMessageIfMissing = "businessType.error.required",
+      errorMessageIfEnumError = "businessType.error.invalid"
+    ))
+    Form(
+      mapping = mapping("businessType" -> fieldMapping)(identity)(Some(_))
     )
-  }
-}

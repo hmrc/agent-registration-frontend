@@ -28,7 +28,7 @@ import javax.inject.Singleton
 import scala.concurrent.Future
 
 @Singleton
-class AgentApplicationController @Inject()(
+class AgentApplicationController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
   applicationService: ApplicationService,
