@@ -17,7 +17,9 @@
 package uk.gov.hmrc.agentregistrationfrontend.forms
 
 import play.api.data.Forms.mapping
-import play.api.data.{FieldMapping, Form, Forms}
+import play.api.data.FieldMapping
+import play.api.data.Form
+import play.api.data.Forms
 import uk.gov.hmrc.agentregistration.shared.util.EnumFormatter
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 

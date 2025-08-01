@@ -17,23 +17,23 @@
 package uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers
 
 import play.api.libs.json.Json
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class TestOnlyController @Inject() (
-                                        mcc: MessagesControllerComponents,
-                                        actions: Actions,
-                                        applicationService: ApplicationService
-                                      )
-  extends FrontendController(mcc):
+  mcc: MessagesControllerComponents,
+  actions: Actions,
+  applicationService: ApplicationService
+)
+extends FrontendController(mcc):
 
-    val showAgentApplication: Action[AnyContent] = actions.getApplicationInProgress: request =>
-      Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))
-
-  
-  
+  val showAgentApplication: Action[AnyContent] = actions.getApplicationInProgress: request =>
+    Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))

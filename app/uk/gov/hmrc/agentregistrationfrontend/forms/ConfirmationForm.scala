@@ -17,11 +17,18 @@
 package uk.gov.hmrc.agentregistrationfrontend.forms
 
 import play.api.data.Form
-import play.api.data.Forms.{boolean, optional, single, text}
+import play.api.data.Forms.boolean
+import play.api.data.Forms.optional
+import play.api.data.Forms.single
+import play.api.data.Forms.text
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.FormFieldHelper
 
-object ConfirmationForm extends FormFieldHelper {
-  def form(fieldName: String, args: String*): Form[Boolean] = {
+object ConfirmationForm
+extends FormFieldHelper {
+  def form(
+    fieldName: String,
+    args: String*
+  ): Form[Boolean] = {
     Form[Boolean](
       single(
         fieldName -> optional(boolean)
