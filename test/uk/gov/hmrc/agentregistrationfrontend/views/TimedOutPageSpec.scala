@@ -18,9 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.views
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.agentregistrationfrontend.forms.SelectFromOptionsForm
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpecSupport
 import uk.gov.hmrc.agentregistrationfrontend.views.html.TimedOutPage
 

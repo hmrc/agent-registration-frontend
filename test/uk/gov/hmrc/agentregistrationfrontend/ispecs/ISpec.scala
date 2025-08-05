@@ -22,17 +22,18 @@ import org.scalatest.freespec.AnyFreeSpecLike
 import org.scalatest.time.Millis
 import org.scalatest.time.Seconds
 import org.scalatest.time.Span
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
+import play.api.Application
+import play.api.Logging
+import play.api.Mode
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.inject.guice.GuiceableModule
 import play.api.test.DefaultTestServerFactory
 import play.api.test.TestServerFactory
-import play.api.Application
-import play.api.Logging
-import play.api.Mode
 import play.core.server.ServerConfig
 import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.WireMockSupport
+import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs.AgentRegistrationStubs
+import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.RichMatchers
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 
@@ -45,11 +46,11 @@ extends AnyFreeSpecLike
 with RichMatchers
 with BeforeAndAfterEach
 with GuiceOneServerPerSuite
-with WireMockSupport:
+with WireMockSupport
+with WsHelper:
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(timeout = scaled(Span(3, Seconds)), interval = scaled(Span(300, Millis)))
   private val testServerPort = ISpec.testServerPort
-  private val baseUrl: String = s"http://localhost:${testServerPort.toString}"
   private val databaseName: String = "agent-registration-frontend-it"
   lazy val webdriverUrl: String = s"http://localhost:${port.toString}"
 
@@ -59,11 +60,14 @@ with WireMockSupport:
 
   protected def configMap: Map[String, Any] =
     Map[String, Any](
-      "mongodb.uri" -> s"mongodb://localhost:27017/$databaseName",
+      "microservice.services.agent-registration.port" -> WireMockSupport.port,
+      "microservice.services.auth.port" -> WireMockSupport.port,
+      "microservice.services.enrolment-store-proxy.port" -> WireMockSupport.port,
       "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
       "auditing.consumer.baseUri.port" -> WireMockSupport.port,
       "auditing.enabled" -> false,
-      "auditing.traceRequests" -> false
+      "auditing.traceRequests" -> false,
+      "play.filters.csrf.header.bypassHeaders.Csrf-Token" -> "nocheck"
     ) ++ configOverrides
 
   protected def configOverrides: Map[String, Any] = Map[String, Any]()

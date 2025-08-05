@@ -17,61 +17,51 @@
 package uk.gov.hmrc.agentregistrationfrontend.ispecs.controllers
 
 import play.api.libs.ws.DefaultBodyReadables.*
-import play.api.libs.ws.DefaultBodyWritables.*
-import play.api.libs.ws.WSClient
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs.AgentRegistrationStubs
+import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.ispecs.ISpec
+import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 
 class BusinessTypeControllerISpec
 extends ISpec:
 
-  private val wsClient = app.injector.instanceOf[WSClient]
-  private val baseUrl = s"http://localhost:${port.toString}/agent-registration"
+  private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
+  private val businessTypePath = "/agent-registration/register/about-your-application/business-type"
+  private val fakeAgentApplication: AgentApplication = applicationFactory.makeNewAgentApplication(tdAll.internalUserId)
 
-  "GET /register should redirect to business type page" ignore:
-    val response: WSResponse =
-      wsClient
-        .url(s"$baseUrl/register")
-        .withFollowRedirects(false)
-        .get()
-        .futureValue
+  "GET /register should redirect to business type page" in:
+    val response: WSResponse = get("/agent-registration/register")
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/register/about-your-application/business-type"
+    response.header("Location").value shouldBe businessTypePath
 
-  "GET /register/about-your-application/business-type should return 200 and render page" ignore:
-    val response: WSResponse =
-      wsClient
-        .url(s"$baseUrl/register/about-your-application/business-type")
-        .withFollowRedirects(false)
-        .get()
-        .futureValue
+  s"GET $businessTypePath should return 200 and render page" in:
+    AuthStubs.stubAuthoriseAsCleanAgent
+    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    val response: WSResponse = get(businessTypePath)
 
     response.status shouldBe 200
     val content = response.body[String]
     content should include("How is your business set up?")
     content should include("Save and continue")
 
-  "POST /register/about-your-application/business-type with valid selection should redirect to the next page" ignore:
-    val response: WSResponse =
-      wsClient
-        .url(s"$baseUrl/register/about-your-application/business-type")
-        .withFollowRedirects(false)
-        .post(Map("businessType" -> Seq("sole-trader")))
-        .futureValue
+  s"POST $businessTypePath with valid selection should redirect to the next page" in:
+    AuthStubs.stubAuthoriseAsCleanAgent
+    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    AgentRegistrationStubs.stubUpdateAgentApplication
+    val response: WSResponse = post(businessTypePath)(Map("businessType" -> Seq("SoleTrader")))
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe "/agent-registration/register/about-your-application/user-role"
 
-  "POST /register/about-your-application/business-type without valid selection should return 400" ignore:
-    val response: WSResponse =
-      wsClient
-        .url(s"$baseUrl/register/about-your-application/business-type")
-        .withFollowRedirects(false)
-        .post(Map("businessType" -> Seq("")))
-        .futureValue
+  s"POST $businessTypePath without valid selection should return 400" in:
+    AuthStubs.stubAuthoriseAsCleanAgent
+    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    val response: WSResponse = post(businessTypePath)(Map("businessType" -> Seq("")))
 
     response.status shouldBe 400
     val content = response.body[String]

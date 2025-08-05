@@ -7,6 +7,7 @@ PlayKeys.playRunHooks += PlayRunHook(playPort)
 
 ThisBuild / majorVersion := 0
 ThisBuild / scalaVersion := "3.6.1"
+ThisBuild / scalafmtOnCompile := true
 
 lazy val microservice = Project("agent-registration-frontend", file("."))
   .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)

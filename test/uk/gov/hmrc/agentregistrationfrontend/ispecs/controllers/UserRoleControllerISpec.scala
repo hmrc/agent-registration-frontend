@@ -17,40 +17,18 @@
 package uk.gov.hmrc.agentregistrationfrontend.ispecs.controllers
 
 import play.api.libs.ws.DefaultBodyReadables.*
-import play.api.libs.ws.DefaultBodyWritables.*
-import play.api.libs.ws.WSClient
 import play.api.libs.ws.WSResponse
-import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistrationfrontend.ispecs.ISpec
 
 class UserRoleControllerISpec
 extends ISpec:
 
-  private val wsClient = app.injector.instanceOf[WSClient]
-  private val baseUrl = s"http://localhost:${port.toString}/agent-registration"
-
-
-  "GET /business-type should redirect to user role page" ignore :
-    val response: WSResponse =
-      wsClient
-        .url(s"$baseUrl/register/about-your-application/business-type")
-        .withFollowRedirects(false)
-        .get()
-        .futureValue
-
-    response.status shouldBe 303
-    response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/register/about-your-application/user-role"
-
+  private val userRolePath = s"/agent-registration/register/about-your-application/user-role"
 
 
   "GET /register/about-your-application/user-role should return 200 and render page" ignore:
     val response: WSResponse =
-      wsClient
-        .url(s"$baseUrl/register/about-your-application/user-role")
-        .withFollowRedirects(false)
-        .get()
-        .futureValue
+      get(userRolePath)
 
     response.status shouldBe 200
     val content = response.body[String]
@@ -59,11 +37,7 @@ extends ISpec:
 
   "POST /register/about-your-application/user-role with valid selection should redirect to the next page" ignore:
     val response: WSResponse =
-      wsClient
-        .url(s"$baseUrl/register/about-your-application/user-role")
-        .withFollowRedirects(false)
-        .post(Map("userRole" -> Seq("Authorised")))
-        .futureValue
+      post(userRolePath)(Map("userRole" -> Seq("false")))
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
@@ -71,11 +45,7 @@ extends ISpec:
 
   "POST /register/about-your-application/user-role without valid selection should return 400" ignore:
     val response: WSResponse =
-      wsClient
-        .url(s"$baseUrl/register/about-your-application/user-role")
-        .withFollowRedirects(false)
-        .post(Map("userRole" -> Seq("")))
-        .futureValue
+      post(userRolePath)(Map("userRole" -> Seq("")))
 
     response.status shouldBe 400
     val content = response.body[String]
