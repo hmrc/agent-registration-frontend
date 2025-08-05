@@ -16,36 +16,50 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
-import play.api.mvc.Action
-import play.api.mvc.AnyContent
-import play.api.mvc.MessagesControllerComponents
+import com.softwaremill.quicklens.*
+import play.api.data.Form
+import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmationForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.UserRoleForm
+import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.UserRolePage
 
-import javax.inject.Inject
-import javax.inject.Singleton
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.Future
 
 @Singleton
 class UserRoleController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  view: UserRolePage
+  view: UserRolePage,
+  applicationService: ApplicationService
 )
 extends FrontendController(mcc):
 
-  def show: Action[AnyContent] = Action { implicit request =>
-    val form = ConfirmationForm.form("userRole")
-    Ok(view(form))
-  }
+  def show: Action[AnyContent] = actions.getApplicationInProgress:
+    implicit request =>
+      val form: Form[UserRole] =
+        request
+          .agentApplication
+          .aboutYourApplication
+          .userRole
+          .fold(UserRoleForm.form)((businessType: UserRole) =>
+            UserRoleForm.form.fill(businessType)
+          )
+      Ok(view(form))
 
-  def submit: Action[AnyContent] = Action { implicit request =>
-    ConfirmationForm.form("userRole").bindFromRequest().fold(
-      formWithErrors => BadRequest(view(formWithErrors)),
-      hasOwnership => {
-        Redirect("routes.TODO").addingToSession(
-          "hasOwnership" -> hasOwnership.toString
-        )
-      }
-    )
-  }
+  def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
+    implicit request =>
+      UserRoleForm.form.bindFromRequest().fold(
+        formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+        (userRole: UserRole) =>
+          applicationService
+            .upsert(
+              request
+                .agentApplication
+                .modify(_.aboutYourApplication.userRole)
+                .setTo(Some(userRole))
+            )
+            .map(_ => Redirect("routes.TODO.checkYourAnswers"))
+      )
