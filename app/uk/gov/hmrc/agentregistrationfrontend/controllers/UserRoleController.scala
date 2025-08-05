@@ -44,8 +44,8 @@ extends FrontendController(mcc):
           .agentApplication
           .aboutYourApplication
           .userRole
-          .fold(UserRoleForm.form)((businessType: UserRole) =>
-            UserRoleForm.form.fill(businessType)
+          .fold(UserRoleForm.form)((userRole: UserRole) =>
+            UserRoleForm.form.fill(userRole)
           )
       Ok(view(form))
 
@@ -61,5 +61,5 @@ extends FrontendController(mcc):
                 .modify(_.aboutYourApplication.userRole)
                 .setTo(Some(userRole))
             )
-            .map(_ => Redirect("routes.TODO.checkYourAnswers"))
+            .map(_ => Redirect(routes.CheckYourAnswerController.show.url))
       )
