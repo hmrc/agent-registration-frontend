@@ -73,7 +73,6 @@ extends FrontendController(mcc):
   }
 
   def startRegistration: Action[AnyContent] = Action { implicit request =>
-    println(s"${Console.MAGENTA} Wojciech - Uff I am not crazy ${Console.RESET}")
     // if we use an endpoint like this, we can later change the flow without changing the URL
     Redirect(routes.BusinessTypeController.show)
   }
