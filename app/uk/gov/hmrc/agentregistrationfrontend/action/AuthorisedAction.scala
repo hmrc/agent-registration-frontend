@@ -18,13 +18,11 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import play.api.mvc.*
 import play.api.mvc.Results.*
+import play.api.mvc.*
 import sttp.model.Uri.UriContext
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
-import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
@@ -38,10 +36,6 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-
-import play.api.mvc.Request
-import play.api.mvc.WrappedRequest
-import uk.gov.hmrc.agentregistration.shared.*
 
 class AuthorisedRequest[A](
   val internalUserId: InternalUserId,
@@ -92,6 +86,7 @@ with RequestAwareLogging:
           )))
     .recoverWith:
       case _: NoActiveSession =>
+        logger.info(s"Unauthorised because of 'NoActiveSession', redirecting to sign in page")
         Future.successful(Left(Redirect(
           url = appConfig.signInUri(uri"""${appConfig.thisFrontendBaseUrl + request.uri}""").toString()
         )))

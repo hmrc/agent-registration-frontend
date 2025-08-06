@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
+import uk.gov.hmrc.agentregistration.shared.GroupId
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.Utr
 
 import java.time.format.DateTimeFormatter
@@ -34,3 +36,5 @@ trait TdBase:
   lazy val newInstant: Instant = instant.plusSeconds(20) // used when a new application is created from existing one
 
   lazy val utr: Utr = Utr("1234567895")
+  lazy val internalUserId: InternalUserId = InternalUserId("internal-user-id-12345")
+  lazy val groupId: GroupId = GroupId("group-id-12345")

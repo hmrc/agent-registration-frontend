@@ -17,16 +17,17 @@
 package uk.gov.hmrc.agentregistrationfrontend.ispecs.controllers
 
 import play.api.libs.ws.DefaultBodyReadables.*
-import play.api.libs.ws.WSClient
 import play.api.libs.ws.WSResponse
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistrationfrontend.ispecs.ISpec
 
 class SignOutControllerISpec
 extends ISpec:
-
-  private val wsClient = app.injector.instanceOf[WSClient]
+  
   private val baseUrl = s"http://localhost:${port.toString}/agent-registration"
+  private val signOutPath = "/agent-registration/sign-out"
+  private val timeOutPath = "/agent-registration/time-out"
+  private val timedOutPath = "/agent-registration/timed-out"
   private val selfExternalUrl = "http://localhost:22201/agent-registration"
   private val signOutViaBasGatewayUrl = uri"http://localhost:9099/bas-gateway/sign-out-without-state"
 
@@ -34,11 +35,7 @@ extends ISpec:
 
   "GET /sign-out" in:
     val response: WSResponse =
-      wsClient
-        .url(s"$baseUrl/sign-out")
-        .withFollowRedirects(false)
-        .get()
-        .futureValue
+      get(signOutPath)
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
@@ -46,12 +43,8 @@ extends ISpec:
 
   "GET /time-out" in:
     val timedOutUrl = uri"$selfExternalUrl/timed-out"
-    val response: WSResponse =
-      wsClient
-        .url(s"$baseUrl/time-out")
-        .withFollowRedirects(false)
-        .get()
-        .futureValue
+    val response: WSResponse = 
+      get(timeOutPath)
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
@@ -59,10 +52,7 @@ extends ISpec:
 
   "GET /timed-out" in:
     val response: WSResponse =
-      wsClient
-        .url(s"$baseUrl/timed-out")
-        .get()
-        .futureValue
+        get(timedOutPath)
 
     response.status shouldBe 200
     response.body[String] should include("You have been signed out")
