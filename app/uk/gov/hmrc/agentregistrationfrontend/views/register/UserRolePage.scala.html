@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.agentregistration.shared.UserRole
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
@@ -27,7 +28,7 @@
 )
 
 @(
-        form: Form[Boolean]
+        form: Form[UserRole]
 )(implicit
         request: RequestHeader,
         messages: Messages
@@ -53,10 +54,10 @@
                     classes = "govuk-fieldset__legend--xl"
                 ))
             )),
-            items = Seq("true", "false").map(trueOrFalse =>
+            items = UserRole.values.toSeq.map(userRole =>
                 RadioItem(
-                    content = Text(messages(s"$key.$trueOrFalse")),
-                    value = Some(trueOrFalse)
+                    content = Text(messages(s"$key.${userRole.toString}")),
+                    value = Some(userRole.toString)
                 )
             )
         ).withFormField(form(key)))

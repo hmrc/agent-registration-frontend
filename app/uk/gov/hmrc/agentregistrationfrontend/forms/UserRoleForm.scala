@@ -16,25 +16,20 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.forms
 
-import play.api.data.Form
-import play.api.data.Forms.boolean
-import play.api.data.Forms.optional
-import play.api.data.Forms.single
-import play.api.data.Forms.text
-import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.FormFieldHelper
+import play.api.data.Forms.mapping
+import play.api.data.{FieldMapping, Form, Forms}
+import uk.gov.hmrc.agentregistration.shared.UserRole
+import uk.gov.hmrc.agentregistration.shared.util.EnumFormatter
 
-object ConfirmationForm
-extends FormFieldHelper {
-  def form(
-    fieldName: String,
-    args: String*
-  ): Form[Boolean] = {
-    Form[Boolean](
-      single(
-        fieldName -> optional(boolean)
-          .verifying(mandatoryBoolean(fieldName, args*))
-          .transform(_.getOrElse(false), Some(_))
-      )
+
+
+object UserRoleForm:
+
+  val form: Form[UserRole] =
+    val fieldMapping: FieldMapping[UserRole] = Forms.of(EnumFormatter.formatter[UserRole](
+      errorMessageIfMissing = "userRole.error.required",
+      errorMessageIfEnumError = "userRole.error.invalid"
+    ))
+    Form(
+      mapping = mapping("userRole" -> fieldMapping)(identity)(Some(_))
     )
-  }
-}

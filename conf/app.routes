@@ -20,3 +20,6 @@ POST    /register/about-your-application/business-type uk.gov.hmrc.agentregistra
 
 GET     /register/about-your-application/user-role uk.gov.hmrc.agentregistrationfrontend.controllers.UserRoleController.show
 POST    /register/about-your-application/user-role uk.gov.hmrc.agentregistrationfrontend.controllers.UserRoleController.submit
+
+GET     /register/about-your-application/check-answer uk.gov.hmrc.agentregistrationfrontend.controllers.CheckYourAnswerController.show
+POST    /register/about-your-application/check-answer uk.gov.hmrc.agentregistrationfrontend.controllers.CheckYourAnswerController.submit

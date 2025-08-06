@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.register
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmationForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.UserRoleForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpecSupport
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.UserRolePage
 
@@ -26,7 +26,7 @@ class UserRolePageSpec
 extends ViewSpecSupport {
 
   val viewTemplate: UserRolePage = app.injector.instanceOf[UserRolePage]
-  implicit val doc: Document = Jsoup.parse(viewTemplate(ConfirmationForm.form("userRole")).body)
+  implicit val doc: Document = Jsoup.parse(viewTemplate(UserRoleForm.form).body)
   private val heading: String = "Are you the owner of the business?"
 
   "UserRolePage" should {
@@ -39,8 +39,8 @@ extends ViewSpecSupport {
       val expectedRadioGroup: TestRadioGroup = TestRadioGroup(
         legend = heading,
         options = List(
-          "Yes" -> "true",
-          "No, but I’m authorised by them to set up this account" -> "false"
+          "Yes" -> "Owner",
+          "No, but I’m authorised by them to set up this account" -> "Authorised"
         ),
         hint = None
       )
@@ -54,8 +54,7 @@ extends ViewSpecSupport {
     "render a form error when the form contains an error" in {
       val field = "userRole"
       val errorMessage = "Select ‘yes’ if you are the owner of the business"
-      val formWithError = ConfirmationForm
-        .form(field)
+      val formWithError = UserRoleForm.form
         .withError(field, errorMessage)
       val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
       errorDoc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"

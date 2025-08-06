@@ -46,5 +46,9 @@ final case class AgentApplication(
     throw RuntimeException(s"Expected 'utr' to be defined but it was None [${internalUserId.toString}] ")
   )
 
+  def getBusinessType: BusinessType = aboutYourApplication.businessType.getOrElse(throw new RuntimeException("business type not defined"))
+
+  def getUserRole: UserRole = aboutYourApplication.userRole.getOrElse(throw new RuntimeException("user roile not defined"))
+
 object AgentApplication:
   given format: OFormat[AgentApplication] = Json.format[AgentApplication]

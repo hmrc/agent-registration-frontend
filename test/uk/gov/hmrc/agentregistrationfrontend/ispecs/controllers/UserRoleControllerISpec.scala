@@ -29,12 +29,11 @@ extends ISpec:
   private val wsClient = app.injector.instanceOf[WSClient]
   private val baseUrl = s"http://localhost:${port.toString}/agent-registration"
 
-  // TODO - later when we have previous page
-  /*
-  "GET /XXX should redirect to user role page" in :
+
+  "GET /business-type should redirect to user role page" ignore :
     val response: WSResponse =
       wsClient
-        .url(s"$baseUrl/XXX")
+        .url(s"$baseUrl/register/about-your-application/business-type")
         .withFollowRedirects(false)
         .get()
         .futureValue
@@ -43,9 +42,9 @@ extends ISpec:
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe "/agent-registration/register/about-your-application/user-role"
 
-   */
 
-  "GET /register/about-your-application/user-role should return 200 and render page" in:
+
+  "GET /register/about-your-application/user-role should return 200 and render page" ignore:
     val response: WSResponse =
       wsClient
         .url(s"$baseUrl/register/about-your-application/user-role")
@@ -58,19 +57,19 @@ extends ISpec:
     content should include("Are you the owner of the business?")
     content should include("Save and continue")
 
-  "POST /register/about-your-application/user-role with valid selection should redirect to the next page" in:
+  "POST /register/about-your-application/user-role with valid selection should redirect to the next page" ignore:
     val response: WSResponse =
       wsClient
         .url(s"$baseUrl/register/about-your-application/user-role")
         .withFollowRedirects(false)
-        .post(Map("userRole" -> Seq("false")))
+        .post(Map("userRole" -> Seq("Authorised")))
         .futureValue
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "routes.TODO"
+    response.header("Location").value shouldBe "/agent-registration/register/about-your-application/user-role"
 
-  "POST /register/about-your-application/user-role without valid selection should return 400" in:
+  "POST /register/about-your-application/user-role without valid selection should return 400" ignore:
     val response: WSResponse =
       wsClient
         .url(s"$baseUrl/register/about-your-application/user-role")

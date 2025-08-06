@@ -2,6 +2,7 @@ service.name = Apply for an agent services account
 service.text = This is your new service
 
 common.saveAndContinue = Save and continue
+common.confirmAndContinue = Confirm and continue
 common.errorPrefix = Error
 
 # About your application
@@ -21,11 +22,25 @@ businessType.error.invalid = Tell us how your business is set up
 
 # About your application / user role
 userRole.title = Are you the owner of the business?
-userRole.true = Yes
-userRole.false = No, but I’m authorised by them to set up this account
+userRole.Owner = Yes
+userRole.Authorised = No, but I’m authorised by them to set up this account
 userRole.other.signOut = Finish and sign out
 userRole.error.required = Select ‘yes’ if you are the owner of the business
 userRole.error.invalid = Select ‘yes’ if you are the owner of the business
+
+# About your application / check your answers
+checkYourAnswer.title = Check your answers
+checkYourAnswer.businessType.label = Business type
+checkYourAnswer.businessType.SoleTrader = Sole trader
+checkYourAnswer.businessType.LimitedCompany = Limited company
+checkYourAnswer.businessType.GeneralPartnership = Partnership
+checkYourAnswer.businessType.LimitedLiabilityPartnership = Limited liability partnership
+checkYourAnswer.userRole.label = Are you the business owner ?
+checkYourAnswer.userRole.Owner = Yes
+checkYourAnswer.change = Change
+checkYourAnswer.userRole.Authorised = No, but I’m authorised by them to set up this account
+checkYourAnswer.other.signOut = Finish and sign out
+
 
 
 # Timed out
