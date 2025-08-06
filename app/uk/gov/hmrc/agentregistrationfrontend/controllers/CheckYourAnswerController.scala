@@ -22,6 +22,7 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.CheckYourAnswerPage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
@@ -32,7 +33,8 @@ class CheckYourAnswerController @Inject()(
   actions: Actions,
   mcc: MessagesControllerComponents,
   view: CheckYourAnswerPage,
-  applicationService: ApplicationService)
+  applicationService: ApplicationService,
+  simplePage: SimplePage)
  (implicit ec: ExecutionContext) extends FrontendController(mcc) with I18nSupport:
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
@@ -48,6 +50,11 @@ class CheckYourAnswerController @Inject()(
             .modify(_.aboutYourApplication.confirmed)
             .setTo(Some(true))
         )
-        .map(_ => Redirect("routes.todo"))
+        .map(_ => Ok(simplePage(
+          h1 = "Application Submitted...",
+          bodyText = Some(
+            "Placeholder for the Application CheckYourAnswers follow up page..."
+          )
+        )))
       
 

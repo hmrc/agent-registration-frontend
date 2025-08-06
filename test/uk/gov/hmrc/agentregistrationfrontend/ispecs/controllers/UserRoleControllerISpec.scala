@@ -29,7 +29,6 @@ extends ISpec:
   private val wsClient = app.injector.instanceOf[WSClient]
   private val baseUrl = s"http://localhost:${port.toString}/agent-registration"
 
-  // TODO - later when we have previous page
 
   "GET /business-type should redirect to user role page" ignore :
     val response: WSResponse =
