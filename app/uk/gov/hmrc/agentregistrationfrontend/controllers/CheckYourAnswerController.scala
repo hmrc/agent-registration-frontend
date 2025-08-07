@@ -16,10 +16,13 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
-import com.google.inject.{Inject, Singleton}
+import com.google.inject.Inject
+import com.google.inject.Singleton
 import com.softwaremill.quicklens.*
 import play.api.i18n.I18nSupport
-import play.api.mvc.{Action, AnyContent, MessagesControllerComponents}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
@@ -29,13 +32,15 @@ import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class CheckYourAnswerController @Inject()(
+class CheckYourAnswerController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
   view: CheckYourAnswerPage,
   applicationService: ApplicationService,
-  simplePage: SimplePage)
- (implicit ec: ExecutionContext) extends FrontendController(mcc) with I18nSupport:
+  simplePage: SimplePage
+)(implicit ec: ExecutionContext)
+extends FrontendController(mcc)
+with I18nSupport:
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
@@ -50,11 +55,11 @@ class CheckYourAnswerController @Inject()(
             .modify(_.aboutYourApplication.confirmed)
             .setTo(Some(true))
         )
-        .map(_ => Ok(simplePage(
-          h1 = "Application Submitted...",
-          bodyText = Some(
-            "Placeholder for the Application CheckYourAnswers follow up page..."
-          )
-        )))
-      
-
+        .map(_ =>
+          Ok(simplePage(
+            h1 = "Application Submitted...",
+            bodyText = Some(
+              "Placeholder for the Application CheckYourAnswers follow up page..."
+            )
+          ))
+        )
