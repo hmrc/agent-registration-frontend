@@ -63,6 +63,8 @@ extends FrontendController(mcc):
                 .agentApplication
                 .modify(_.aboutYourApplication.businessType)
                 .setTo(Some(businessType))
+                .modify(_.businessDetails)
+                .setToIf(request.agentApplication.businessDetails.exists(_.businessType != businessType))(None)
             )
             .map(_ => Redirect(routes.UserRoleController.show.url))
       )

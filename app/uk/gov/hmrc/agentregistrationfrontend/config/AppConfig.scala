@@ -19,6 +19,12 @@ package uk.gov.hmrc.agentregistrationfrontend.config
 import play.api.Configuration
 import sttp.model.Uri
 import sttp.model.Uri.UriContext
+import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.BusinessType.GeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedCompany
+import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedLiabilityPartnership
+import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
+import uk.gov.hmrc.agentregistration.shared.util.EnumExtensions.toStringHyphenated
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
@@ -56,6 +62,41 @@ class AppConfig @Inject() (
     .addParam("accountType", "agent") // specifying this to bypass unnecessary screens intended for Individuals
 
   val welshLanguageSupportEnabled: Boolean = configuration.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
+  val contactFrontendId: String = configuration.get[String]("contact-frontend.serviceId") // TODO placeholder
+  val accessibilityStatementPath: String = configuration.get[String]("accessibility-statement.service-path")
+
+  /*
+   * GRS CONFIG START
+   */
+  val agentRegime: String = "VATC" // TODO placeholder
+
+  val soleTraderIdBaseUrl: String = servicesConfig.baseUrl("sole-trader-identification-frontend")
+  val incorpIdBaseUrl: String = servicesConfig.baseUrl("incorporated-entity-identification-frontend")
+  val partnershipIdBaseUrl: String = servicesConfig.baseUrl("partnership-identification-frontend")
+
+  def grsJourneyCallbackUrl(businessType: BusinessType) = s"$thisFrontendBaseUrl/agent-registration/register/grs-callback/${businessType.toStringHyphenated}"
+
+  def grsJourneyUrl(businessType: BusinessType): String =
+    businessType match {
+      case SoleTrader => s"$soleTraderIdBaseUrl/sole-trader-identification/api/sole-trader-journey"
+      case LimitedCompany => s"$incorpIdBaseUrl/incorporated-entity-identification/api/limited-company-journey"
+      case GeneralPartnership => s"$partnershipIdBaseUrl/partnership-identification/api/general-partnership-journey"
+      case LimitedLiabilityPartnership => s"$partnershipIdBaseUrl/partnership-identification/api/limited-liability-partnership-journey"
+    }
+
+  def grsRetrieveDetailsUrl(
+    businessType: BusinessType,
+    journeyId: String
+  ): String =
+    businessType match {
+      case SoleTrader => s"$soleTraderIdBaseUrl/sole-trader-identification/api/journey/$journeyId"
+      case LimitedCompany => s"$incorpIdBaseUrl/incorporated-entity-identification/api/journey/$journeyId"
+      case GeneralPartnership | LimitedLiabilityPartnership => s"$partnershipIdBaseUrl/partnership-identification/api/journey/$journeyId"
+    }
+
+/*
+ * GRS CONFIG END
+ */
 
 object ConfigHelper:
 

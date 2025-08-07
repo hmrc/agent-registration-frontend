@@ -33,5 +33,6 @@ class ApplicationFactory @Inject() (
     createdAt = Instant.now(clock),
     applicationState = ApplicationState.InProgress,
     utr = None,
-    aboutYourApplication = AboutYourApplication()
+    aboutYourApplication = AboutYourApplication(),
+    businessDetails = None
   )

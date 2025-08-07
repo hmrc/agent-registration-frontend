@@ -41,7 +41,8 @@ checkYourAnswer.change = Change
 checkYourAnswer.userRole.Authorised = No, but I’m authorised by them to set up this account
 checkYourAnswer.other.signOut = Finish and sign out
 
-
+# GRS overrides
+grs.optFullNamePageLabel = What is the business owner’s full name?
 
 # Timed out
 timed-out.header = You have been signed out
