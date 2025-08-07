@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistrationfrontend.ispecs.ISpec
 
 class SignOutControllerISpec
 extends ISpec:
-  
+
   private val baseUrl = s"http://localhost:${port.toString}/agent-registration"
   private val signOutPath = "/agent-registration/sign-out"
   private val timeOutPath = "/agent-registration/time-out"
@@ -34,8 +34,7 @@ extends ISpec:
   private def signOutWithContinue(continue: String): String = uri"$signOutViaBasGatewayUrl?${Map("continue" -> continue)}".toString
 
   "GET /sign-out" in:
-    val response: WSResponse =
-      get(signOutPath)
+    val response: WSResponse = get(signOutPath)
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
@@ -43,16 +42,14 @@ extends ISpec:
 
   "GET /time-out" in:
     val timedOutUrl = uri"$selfExternalUrl/timed-out"
-    val response: WSResponse = 
-      get(timeOutPath)
+    val response: WSResponse = get(timeOutPath)
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe signOutWithContinue(timedOutUrl.toString)
 
   "GET /timed-out" in:
-    val response: WSResponse =
-        get(timedOutPath)
+    val response: WSResponse = get(timedOutPath)
 
     response.status shouldBe 200
     response.body[String] should include("You have been signed out")
