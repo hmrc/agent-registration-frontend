@@ -31,7 +31,7 @@ class CheckYourAnswerControllerISpec
 extends ISpec:
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
-  private val checkAnswerPath = s"/agent-registration/register/about-your-application/check-answer"
+  private val checkAnswerPath = s"/agent-registration/register/about-your-application/check-your-answers"
   private val fakeAgentApplication: AgentApplication = applicationFactory
     .makeNewAgentApplication(tdAll.internalUserId)
     .modify(_.aboutYourApplication.businessType).setTo(Some(SoleTrader))

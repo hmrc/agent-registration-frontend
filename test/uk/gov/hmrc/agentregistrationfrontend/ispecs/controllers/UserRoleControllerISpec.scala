@@ -50,7 +50,7 @@ extends ISpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/register/about-your-application/check-answer"
+    response.header("Location").value shouldBe "/agent-registration/register/about-your-application/check-your-answers"
 
   "POST /register/about-your-application/user-role without valid selection should return 400" in:
     AuthStubs.stubAuthoriseAsCleanAgent
