@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs
 
+import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.Json
@@ -28,6 +29,14 @@ object AgentRegistrationStubs {
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = urlMatching("/agent-registration/application"),
     responseStatus = 200
+  )
+
+  // when you want to verify what is being stored
+  def stubUpdateAgentApplication(agentApplication: AgentApplication): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = urlMatching("/agent-registration/application"),
+    responseStatus = 200,
+    requestBody = Some(equalToJson(Json.toJson(agentApplication).toString))
   )
 
   def stubApplicationInProgress(fakeAgentApplication: AgentApplication): StubMapping = StubMaker.make(

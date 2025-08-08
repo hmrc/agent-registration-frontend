@@ -32,21 +32,12 @@ import scala.jdk.CollectionConverters.SeqHasAsJava
 
 object StubMaker:
 
-  sealed trait HttpMethod
+  enum HttpMethod:
 
-  object HttpMethod:
-
-    case object GET
-    extends HttpMethod
-
-    case object POST
-    extends HttpMethod
-
-    case object DELETE
-    extends HttpMethod
-
-    case object PUT
-    extends HttpMethod
+    case GET
+    case POST
+    case DELETE
+    case PUT
 
   def make(
     httpMethod: HttpMethod = HttpMethod.GET,
