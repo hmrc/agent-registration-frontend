@@ -36,8 +36,7 @@ class CheckYourAnswerController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
   view: CheckYourAnswerPage,
-  applicationService: ApplicationService,
-  simplePage: SimplePage
+  applicationService: ApplicationService
 )(implicit ec: ExecutionContext)
 extends FrontendController(mcc)
 with I18nSupport:
@@ -55,11 +54,4 @@ with I18nSupport:
             .modify(_.aboutYourApplication.confirmed)
             .setTo(Some(true))
         )
-        .map(_ =>
-          Ok(simplePage(
-            h1 = "Application Submitted...",
-            bodyText = Some(
-              "Placeholder for the Application CheckYourAnswers follow up page..."
-            )
-          ))
-        )
+        .map(_ => Redirect(routes.GrsController.startJourney)) // TODO ultimately this will redirect to the tasklist

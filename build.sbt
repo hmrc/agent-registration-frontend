@@ -1,4 +1,4 @@
-import uk.gov.hmrc.DefaultBuildSettings
+
 
 val strictBuilding: SettingKey[Boolean] = StrictBuilding.strictBuilding //defining here so it can be set before running sbt like `sbt 'set Global / strictBuilding := true' ...`
 StrictBuilding.strictBuildingSetting
@@ -25,8 +25,9 @@ lazy val microservice = Project("agent-registration-frontend", file("."))
     pipelineStages := Seq(gzip),
     Test / parallelExecution := true,
     routesImport ++= Seq(
-          "uk.gov.hmrc.agentregistrationfrontend"
-      )
+      "uk.gov.hmrc.agentregistrationfrontend",
+      "uk.gov.hmrc.agentregistration.shared.BusinessType"
+    )
   )
   .settings(CodeCoverageSettings.settings: _*)
   .settings(CodeCoverageSettings.settings *)

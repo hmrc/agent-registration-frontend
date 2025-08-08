@@ -56,7 +56,5 @@ extends ISpec:
 
     val response: WSResponse = post(checkAnswerPath)(Map.empty)
 
-    // TODO - validate location and status 303
-    response.status shouldBe 200 // 303
-//    response.body[String] shouldBe ""
-//    response.header("Location").value shouldBe "/agent-registration/register/about-your-application/check-answer"
+    response.status shouldBe 303
+    response.header("Location").value shouldBe "/agent-registration/register/start-grs-journey"
