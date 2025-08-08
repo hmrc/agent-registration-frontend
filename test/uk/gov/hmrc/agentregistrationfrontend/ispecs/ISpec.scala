@@ -22,6 +22,7 @@ import org.scalatest.freespec.AnyFreeSpecLike
 import org.scalatest.time.Millis
 import org.scalatest.time.Seconds
 import org.scalatest.time.Span
+import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.Logging
@@ -42,7 +43,7 @@ import java.time.Instant
 import java.time.ZoneId
 
 trait ISpec
-extends AnyFreeSpecLike
+extends AnyWordSpecLike
 with RichMatchers
 with BeforeAndAfterEach
 with GuiceOneServerPerSuite
@@ -63,6 +64,9 @@ with WsHelper:
       "microservice.services.agent-registration.port" -> WireMockSupport.port,
       "microservice.services.auth.port" -> WireMockSupport.port,
       "microservice.services.enrolment-store-proxy.port" -> WireMockSupport.port,
+      "microservice.services.sole-trader-identification-frontend.port" -> WireMockSupport.port,
+      "microservice.services.incorporated-entity-identification-frontend.port" -> WireMockSupport.port,
+      "microservice.services.partnership-identification-frontend.port" -> WireMockSupport.port,
       "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
       "auditing.consumer.baseUri.port" -> WireMockSupport.port,
       "auditing.enabled" -> false,
