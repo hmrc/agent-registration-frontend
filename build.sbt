@@ -29,11 +29,9 @@ lazy val microservice = Project("agent-registration-frontend", file("."))
       "uk.gov.hmrc.agentregistration.shared.BusinessType"
     )
   )
-  .settings(CodeCoverageSettings.settings: _*)
-  .settings(CodeCoverageSettings.settings *)
+  .settings(CodeCoverageSettings.settings)
   .settings(commands ++= SbtCommands.commands)
   .settings(SbtUpdatesSettings.sbtUpdatesSettings *)
-  .settings(CodeCoverageSettings.settings *)
 //  .settings(WartRemoverSettings.wartRemoverSettings)
   .settings(PlayKeys.playDefaultPort := playPort)
   .settings(
