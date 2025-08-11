@@ -66,34 +66,37 @@ with I18nSupport:
     journeyId: String
   ): Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
-      grsService
-        .getGrsResponse(businessType, journeyId)
-        .map {
-          case _ if businessType != request.agentApplication.getBusinessType => Redirect(routes.AgentApplicationController.startRegistration) // User changed answer while on GRS
-          case grsResponse if grsResponse.identifiersMatch && grsResponse.registration.registeredBusinessPartnerId.nonEmpty =>
-            applicationService
-              .upsert(
-                request
-                  .agentApplication
-                  .modify(_.utr)
-                  .setTo(Some(grsResponse.utr))
-                  .modify(_.businessDetails)
-                  .setTo(Some(grsResponse.toBusinessDetails(businessType)))
-              )
-            Ok(Json.prettyPrint(Json.toJson(grsResponse)))
-          case grsResponse if !grsResponse.identifiersMatch && grsResponse.registration.registrationStatus.equals(GrsNotCalled) =>
-            Ok(placeholder(
-              h1 = "Identifiers did not match...",
-              bodyText = Some(
-                "Placeholder for the Identifier match failure page..."
-              )
-            ))
-          case grsResponse if grsResponse.identifiersMatch && grsResponse.registration.registrationStatus.equals(GrsFailed) =>
-            Ok(placeholder(
-              h1 = "Registration call on GRS failed...",
-              bodyText = Some(
-                "Placeholder for the Business registration grs error page..."
-              )
-            ))
-          case _ => throw new Exception(s"[GrsController] Unexpected response from GRS for journey: $journeyId")
-        }
+      if (businessType != request.agentApplication.getBusinessType)
+        Future.successful(Redirect(routes.AgentApplicationController.startRegistration)) // User changed answer while on GRS)
+      else
+        grsService
+          .getGrsResponse(businessType, journeyId)
+          .flatMap {
+            case grsResponse if grsResponse.identifiersMatch && grsResponse.registration.registeredBusinessPartnerId.nonEmpty =>
+              applicationService
+                .upsert(
+                  request
+                    .agentApplication
+                    .modify(_.utr)
+                    .setTo(Some(grsResponse.utr))
+                    .modify(_.businessDetails)
+                    .setTo(Some(grsResponse.toBusinessDetails(businessType)))
+                ).map { _ =>
+                  Ok(Json.prettyPrint(Json.toJson(grsResponse)))
+                }
+            case grsResponse if !grsResponse.identifiersMatch && grsResponse.registration.registrationStatus.equals(GrsNotCalled) =>
+              Future.successful(Ok(placeholder(
+                h1 = "Identifiers did not match...",
+                bodyText = Some(
+                  "Placeholder for the Identifier match failure page..."
+                )
+              )))
+            case grsResponse if grsResponse.identifiersMatch && grsResponse.registration.registrationStatus.equals(GrsFailed) =>
+              Future.successful(Ok(placeholder(
+                h1 = "Registration call on GRS failed...",
+                bodyText = Some(
+                  "Placeholder for the Business registration grs error page..."
+                )
+              )))
+            case _ => throw new Exception(s"[GrsController] Unexpected response from GRS for journey: $journeyId")
+          }

@@ -17,17 +17,13 @@ Ensure that all dependent applications, including MongoDB and other microservice
 To start/stop these dependent services, use the Service Manager commands:
 
 ```bash
-sm --start \
-AWESOME_STUBS_FRONTEND \
-AWESOME_STUBS \
-INTERNAL_AUTH \
-AGENT_REGISTRATION \
-&& sm -s
+sm2 --start AGENT_REGISTRATION_ALL \
+&& sm2 -s
 ```
 
 ```bash
-sm --stop ALL \
-&& sm -s
+sm2 -stop-all \
+&& sm2 -s
 ```
 
 
