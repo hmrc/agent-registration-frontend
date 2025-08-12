@@ -34,5 +34,6 @@ class ApplicationFactory @Inject() (
     applicationState = ApplicationState.InProgress,
     utr = None,
     aboutYourApplication = AboutYourApplication(),
-    businessDetails = None
+    businessDetails = None,
+    amlsDetails = None
   )

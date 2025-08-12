@@ -27,3 +27,7 @@ POST        /register/about-your-application/check-your-answers        uk.gov.hm
 ##GRS routes
 GET         /register/start-grs-journey                                uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.startJourney
 GET         /register/grs-callback/:businessType                       uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.journeyCallback(businessType: BusinessType, journeyId: String)
+
+## Anti Money Laundering routes
+GET         /register/anti-money-laundering/supervisor-name            uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsSupervisorController.show
+POST        /register/anti-money-laundering/supervisor-name            uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsSupervisorController.submit

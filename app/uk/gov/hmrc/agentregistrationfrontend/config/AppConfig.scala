@@ -64,6 +64,7 @@ class AppConfig @Inject() (
   val welshLanguageSupportEnabled: Boolean = configuration.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
   val contactFrontendId: String = configuration.get[String]("contact-frontend.serviceId") // TODO placeholder
   val accessibilityStatementPath: String = configuration.get[String]("accessibility-statement.service-path")
+  val amlsCodesPath: String = "/amls.csv"
 
   /*
    * GRS CONFIG START
