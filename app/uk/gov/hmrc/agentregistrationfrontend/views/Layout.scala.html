@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.{HmrcStandardPage, HmrcReportTechnicalIssueHelper, HmrcTimeoutDialogHelper}
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers._
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.html.components._
@@ -26,7 +26,9 @@
         hmrcStandardPage: HmrcStandardPage,
         hmrcReportTechnicalIssueHelper: HmrcReportTechnicalIssueHelper,
         hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper,
-        govukErrorSummary: GovukErrorSummary
+        govukErrorSummary: GovukErrorSummary,
+        autocompleteCss: HmrcAccessibleAutocompleteCss,
+        autocompleteJavascript: HmrcAccessibleAutocompleteJavascript
 )
 
 @(
@@ -45,6 +47,7 @@
             timeoutUrl = Some(routes.SignOutController.timeOut.url)
         )
     }
+    @autocompleteCss()
 }
 @errorPrefix = @{if(maybeForm.exists(_.hasErrors)) s"${messages("common.errorPrefix")}: " else ""}
 @gdsTitle = @{s"$errorPrefix$pageTitle - ${messages("service.name")} - GOV.UK"}
@@ -65,7 +68,8 @@
           signOutUrl = if (isSignedIn) Some(routes.SignOutController.signOut.url) else None
       ),
       templateOverrides = TemplateOverrides(
-          additionalHeadBlock = Some(head)
+          additionalHeadBlock = Some(head),
+          additionalScriptsBlock = Some(autocompleteJavascript())
       ),
       backLink = if suppressBackLink then None else Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
       isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled,
