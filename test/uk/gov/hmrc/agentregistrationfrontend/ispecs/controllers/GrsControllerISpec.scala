@@ -21,8 +21,6 @@ import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.http.Status.OK
 import play.api.http.Status.SEE_OTHER
 import play.api.libs.json.Json
-import uk.gov.hmrc.agentregistration.shared.AboutYourApplication
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.UserRole.*

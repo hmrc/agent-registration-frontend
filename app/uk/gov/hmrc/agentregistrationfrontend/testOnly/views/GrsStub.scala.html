@@ -1,0 +1,219 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistration.shared.BusinessType
+@import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.routes
+@import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.agentregistrationfrontend.model.GrsResponse
+@import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.*
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import java.util.UUID
+@import uk.gov.hmrc.agentregistration.shared.BusinessType.*
+
+@this(
+        layout: Layout,
+        formWithCSRF: FormWithCSRF,
+        govukRadios: GovukRadios,
+        govukInput: GovukInput,
+        govukButton: GovukButton
+)
+
+@(
+        form: Form[GrsResponse],
+        businessType: BusinessType,
+        journeyId: String
+)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@layout(pageTitle = "GRS Test Data Setup") {
+    <h2 class="govuk-heading-xl">GRS Test Data Setup</h2>
+
+    @formWithCSRF(action = routes.GrsStubController.submitGrsData(businessType, journeyId)) {
+        <h3 class="govuk-heading-l">Registration Details</h3>
+        @govukButton(Button(
+            content = Text(messages("Save Test Data"))
+        ))
+
+        @govukButton(Button(
+            content = Text(messages("Reset Test Data")),
+            href = Some(routes.GrsStubController.showGrsData(businessType, UUID.randomUUID().toString).url)
+        ))
+        @registrationInput
+        @if(businessType == SoleTrader) {
+            @sautrInput
+            @fullNameInput
+            @dateOfBirthInput
+            @ninoInput
+            @trnInput
+        }
+        @if(businessType == LimitedCompany) {
+            @ctutrInput
+            @companyProfileInput
+        }
+        @* Includes Scottish Partnership *@
+        @if(businessType == GeneralPartnership) {
+            @sautrInput
+            @partnershipPostcodeInput
+        }
+        @* Includes Limited and Scottish Limited Partnerships *@
+        @if(businessType == LimitedLiabilityPartnership) {
+            @sautrInput
+            @partnershipPostcodeInput
+            @companyProfileInput
+        }
+
+        @govukButton(Button(
+            content = Text(messages("Save Test Data"))
+        ))
+
+        @govukButton(Button(
+            content = Text(messages("Reset Test Data")),
+            href = Some(routes.GrsStubController.showGrsData(businessType, UUID.randomUUID().toString).url)
+        ))
+    }
+}
+
+@registrationInput = {
+@govukRadios(Radios(
+    fieldset = Some(Fieldset(
+        legend = Some(Legend(
+            content = Text("Registration Status"),
+            isPageHeading = false,
+            classes = "govuk-fieldset__legend--m"
+        ))
+    )),
+    items = GrsRegistrationStatus.values.toSeq.map(status =>
+        RadioItem(
+            content = Text(messages(status.key)),
+            value = Some(status.toString),
+            conditionalHtml =
+                if status == GrsRegistered then Some(govukInput(Input(
+                    label = Label(
+                        content = Text(messages(s"Business Partner Safe Id")),
+                        isPageHeading = false,
+                        classes = "govuk-label--m"
+                    )
+                ).withFormField(form("safeId"))))
+                else None
+        )
+    )
+).withFormField(form("registrationStatus")))
+}
+
+@fullNameInput = {
+@govukInput(Input(
+    label = Label(
+        content = Text(messages(s"First Name")),
+        isPageHeading = false,
+        classes = "govuk-label--m"
+    )
+).withFormField(form("firstName")))
+@govukInput(Input(
+    label = Label(
+        content = Text(messages(s"Last Name")),
+        isPageHeading = false,
+        classes = "govuk-label--m"
+    )
+).withFormField(form("lastName")))
+}
+
+@dateOfBirthInput = {
+@govukInput(Input(
+    label = Label(
+        content = Text(messages(s"Date of Birth")),
+        isPageHeading = false,
+        classes = "govuk-label--m"
+    )
+).withFormField(form("dateOfBirth")))
+}
+
+@ninoInput = {
+@govukInput(Input(
+    label = Label(
+        content = Text(messages(s"NINO")),
+        isPageHeading = false,
+        classes = "govuk-label--m"
+    )
+).withFormField(form("nino")))
+}
+
+@trnInput = {
+@govukInput(Input(
+    label = Label(
+        content = Text(messages(s"TRN (required if NINO is empty)")),
+        isPageHeading = false,
+        classes = "govuk-label--m"
+    )
+).withFormField(form("trn")))
+}
+
+@sautrInput = {
+@govukInput(Input(
+    label = Label(
+        content = Text(messages(s"SAUTR")),
+        isPageHeading = false,
+        classes = "govuk-label--m"
+    )
+).withFormField(form("sautr")))
+}
+
+@companyProfileInput = {
+@govukInput(Input(
+    label = Label(
+        content = Text(messages(s"Company Number")),
+        isPageHeading = false,
+        classes = "govuk-label--m"
+    )
+).withFormField(form("companyNumber")))
+@govukInput(Input(
+    label = Label(
+        content = Text(messages(s"Company Name")),
+        isPageHeading = false,
+        classes = "govuk-label--m"
+    )
+).withFormField(form("companyName")))
+@govukInput(Input(
+    label = Label(
+        content = Text(messages(s"Date of Incorporation (optional)")),
+        isPageHeading = false,
+        classes = "govuk-label--m"
+    )
+).withFormField(form("dateOfIncorporation")))
+}
+
+@partnershipPostcodeInput = {
+@govukInput(Input(
+    label = Label(
+        content = Text(messages(s"Partnership Postcode")),
+        isPageHeading = false,
+        classes = "govuk-label--m"
+    )
+).withFormField(form("postcode")))
+}
+
+@ctutrInput = {
+@govukInput(Input(
+    label = Label(
+        content = Text(messages(s"CTUTR")),
+        isPageHeading = false,
+        classes = "govuk-label--m"
+    )
+).withFormField(form("ctutr")))
+}

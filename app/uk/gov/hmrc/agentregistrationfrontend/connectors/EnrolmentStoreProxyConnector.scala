@@ -18,17 +18,14 @@ package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import play.api.http.Status
 import play.api.libs.functional.syntax.*
-import play.api.libs.json.Json
 import play.api.libs.json.Reads
 import play.api.libs.json.__
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistration.shared._
-import uk.gov.hmrc.agentregistration.shared.util._
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
-import uk.gov.hmrc.auth.core.EnrolmentIdentifier
 import uk.gov.hmrc.http.HttpReads.Implicits.given
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.HttpResponse

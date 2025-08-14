@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.ispecs
 
 import com.google.inject.AbstractModule
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.freespec.AnyFreeSpecLike
 import org.scalatest.time.Millis
 import org.scalatest.time.Seconds
 import org.scalatest.time.Span
@@ -33,8 +32,6 @@ import play.api.test.DefaultTestServerFactory
 import play.api.test.TestServerFactory
 import play.core.server.ServerConfig
 import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.WireMockSupport
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.RichMatchers
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 
@@ -69,7 +66,8 @@ with WsHelper:
       "auditing.consumer.baseUri.port" -> WireMockSupport.port,
       "auditing.enabled" -> false,
       "auditing.traceRequests" -> false,
-      "play.filters.csrf.header.bypassHeaders.Csrf-Token" -> "nocheck"
+      "play.filters.csrf.header.bypassHeaders.Csrf-Token" -> "nocheck",
+      "features.grs-stub" -> false
     ) ++ configOverrides
 
   protected def configOverrides: Map[String, Any] = Map[String, Any]()

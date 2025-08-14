@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.services
 
-import play.api.mvc.Request
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistration.shared.*

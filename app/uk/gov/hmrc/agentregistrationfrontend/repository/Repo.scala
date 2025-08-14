@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.repository
 
 import org.bson.codecs.Codec
-import org.mongodb.scala.SingleObservableFuture
 import org.mongodb.scala.model.Filters
 import org.mongodb.scala.model.IndexModel
 import org.mongodb.scala.model.ReplaceOptions

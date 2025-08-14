@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.i18n.Lang
 import play.api.i18n.MessagesApi
-import play.api.libs.json.JsValue
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
@@ -28,12 +27,10 @@ import uk.gov.hmrc.agentregistrationfrontend.model.GrsJourneyConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsResponse
 import uk.gov.hmrc.agentregistrationfrontend.model.JourneyLabels
 import uk.gov.hmrc.agentregistrationfrontend.model.TranslationLabels
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton

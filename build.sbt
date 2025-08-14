@@ -1,5 +1,3 @@
-
-
 val strictBuilding: SettingKey[Boolean] = StrictBuilding.strictBuilding //defining here so it can be set before running sbt like `sbt 'set Global / strictBuilding := true' ...`
 StrictBuilding.strictBuildingSetting
 val playPort: Int = 22201
@@ -15,12 +13,14 @@ lazy val microservice = Project("agent-registration-frontend", file("."))
   .settings(
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test,
     pipelineStages := Seq(gzip),
-    Compile / doc / scalacOptions := Seq(), //this will allow to have warnings in `doc` task
-    Test / doc / scalacOptions := Seq(), //this will allow to have warnings in `doc` task
-    scalacOptions -= "-Wunused:all",
+    Compile / doc / scalacOptions := Seq(), // this will allow to have warnings in `doc` task
+    Test / doc / scalacOptions := Seq(), // this will allow to have warnings in `doc` task
     scalacOptions ++= ScalaCompilerFlags.scalaCompilerOptions,
     scalacOptions ++= {
-      if (StrictBuilding.strictBuilding.value) ScalaCompilerFlags.strictScalaCompilerOptions else Nil
+      if (StrictBuilding.strictBuilding.value)
+        ScalaCompilerFlags.strictScalaCompilerOptions
+      else
+        Nil
     },
     pipelineStages := Seq(gzip),
     Test / parallelExecution := true,

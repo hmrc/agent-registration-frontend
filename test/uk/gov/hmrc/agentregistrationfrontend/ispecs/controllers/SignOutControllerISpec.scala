@@ -24,7 +24,6 @@ import uk.gov.hmrc.agentregistrationfrontend.ispecs.ISpec
 class SignOutControllerISpec
 extends ISpec:
 
-  private val baseUrl = s"http://localhost:${port.toString}/agent-registration"
   private val signOutPath = "/agent-registration/sign-out"
   private val timeOutPath = "/agent-registration/time-out"
   private val timedOutPath = "/agent-registration/timed-out"

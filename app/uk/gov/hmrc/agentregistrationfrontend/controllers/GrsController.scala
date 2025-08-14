@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
 import com.softwaremill.quicklens.*
-import play.api.i18n.I18nSupport
+import play.api.i18n.MessagesApi
 import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
@@ -27,13 +27,9 @@ import uk.gov.hmrc.agentregistration.shared.UserRole.Owner
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.GrsFailed
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.GrsNotCalled
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.GrsRegistered
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistration
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsResponse
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.GrsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -48,11 +44,12 @@ class GrsController @Inject() (
   applicationService: ApplicationService,
   placeholder: SimplePage
 )(implicit ec: ExecutionContext)
-extends FrontendController(mcc)
-with I18nSupport:
+extends FrontendController(mcc):
 
   def startJourney: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
+      given MessagesApi = messagesApi
+
       (request.agentApplication.aboutYourApplication.businessType, request.agentApplication.aboutYourApplication.userRole) match {
         case (Some(businessType), Some(userRole)) =>
           grsService
