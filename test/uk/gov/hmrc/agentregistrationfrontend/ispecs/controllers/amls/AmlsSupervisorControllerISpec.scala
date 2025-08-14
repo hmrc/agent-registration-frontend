@@ -32,7 +32,7 @@ extends ISpec:
   private val fakeAgentApplication: AgentApplication = applicationFactory.makeNewAgentApplication(tdAll.internalUserId)
 
   s"GET $pathUnderTest should return 200 and render page" in:
-    AuthStubs.stubAuthoriseAsCleanAgent
+    AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     val response: WSResponse = get(pathUnderTest)
 
@@ -42,7 +42,7 @@ extends ISpec:
     content should include("Save and continue")
 
   s"POST $pathUnderTest with valid selection should redirect to the next page" in:
-    AuthStubs.stubAuthoriseAsCleanAgent
+    AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication
     val response: WSResponse = post(pathUnderTest)(Map("amlsSupervisoryBody" -> Seq("HMRC")))
@@ -52,7 +52,7 @@ extends ISpec:
     response.header("Location").value shouldBe "routes.nextPageInTask.TODO"
 
   s"POST $pathUnderTest with save for later and valid selection should redirect to the saved for later page" in:
-    AuthStubs.stubAuthoriseAsCleanAgent
+    AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication
     val response: WSResponse =
@@ -66,7 +66,7 @@ extends ISpec:
     response.header("Location").value shouldBe "routes.saveAndComeBackLater.TODO"
 
   s"POST $pathUnderTest without valid selection should return 400" in:
-    AuthStubs.stubAuthoriseAsCleanAgent
+    AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     val response: WSResponse = post(pathUnderTest)(Map("amlsSupervisoryBody" -> Seq("")))
 

@@ -16,24 +16,70 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
+import com.github.tomakehurst.wiremock.client.WireMock as wm
+import com.github.tomakehurst.wiremock.matching.StringValuePattern
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import play.api.libs.json.Json
+import play.api.http.Status
+import uk.gov.hmrc.agentregistration.shared.{GroupId, InternalUserId}
 import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.StubMaker
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 
 object AuthStubs {
-  def stubAuthoriseAsCleanAgent: StubMapping = StubMaker.make(
+
+  def stubAuthorise(
+    responseBody: String = responseBodyAsCleanAgent()
+  ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
-    urlPattern = urlMatching("/auth/authorise"),
-    responseStatus = 200,
-    responseBody =
-      Json.obj(
-        "internalId" -> TdAll.tdAll.internalUserId.value,
-        "groupIdentifier" -> TdAll.tdAll.groupId.value,
-        "credentialRole" -> "User",
-        "affinityGroup" -> "Agent",
-        "allEnrolments" -> Json.arr()
-      ).toString
+    urlPattern = wm.urlMatching("/auth/authorise"),
+    requestBody = Some(expectedRequestBody),
+    responseStatus = Status.OK,
+    responseBody = responseBody
   )
+
+  def verifyAuthorise(count: Int = 1): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlMatching("/auth/authorise"),
+    count = count
+  )
+
+  def responseBodyAsCleanAgent(
+    internalUserId: InternalUserId = TdAll.tdAll.internalUserId,
+    groupId: GroupId = TdAll.tdAll.groupId
+  ): String =
+    // language=JSON
+    s"""
+       |{
+       |  "authorisedEnrolments": [],
+       |  "allEnrolments": [],
+       |  "credentialRole": "User",
+       |  "groupIdentifier": "${groupId.value}",
+       |  "agentInformation": {},
+       |  "internalId": "${internalUserId.value}"
+       |}
+       |""".stripMargin
+
+  private val expectedRequestBody: StringValuePattern = wm.equalToJson(
+    // language=JSON
+    """
+      |{
+      |  "authorise": [
+      |    {
+      |      "authProviders": [
+      |        "GovernmentGateway"
+      |      ]
+      |    },
+      |    {
+      |      "affinityGroup": "Agent"
+      |    }
+      |  ],
+      |  "retrieve": [
+      |    "allEnrolments",
+      |    "groupIdentifier",
+      |    "credentialRole",
+      |    "internalId"
+      |  ]
+      |}
+      |""".stripMargin
+  )
+
 }

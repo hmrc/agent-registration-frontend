@@ -24,8 +24,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.*
 trait TdRequest:
 
   lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-    .withAuthToken()
-    .withAkamaiReputationHeader()
+    .withAuthTokenInSession()
     .withRequestId()
     .withTrueClientIp()
     .withTrueClientPort()
@@ -34,7 +33,6 @@ trait TdRequest:
   lazy val request: Request[?] = fakeRequest
 
   lazy val requestNotLoggedIn: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-    .withAkamaiReputationHeader()
     .withRequestId()
     .withTrueClientIp()
     .withTrueClientPort()

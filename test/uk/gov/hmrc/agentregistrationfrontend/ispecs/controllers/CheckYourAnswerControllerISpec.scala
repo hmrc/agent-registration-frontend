@@ -38,7 +38,7 @@ extends ISpec:
     .modify(_.aboutYourApplication.userRole).setTo(Some(Owner))
 
   "GET /register/about-your-application/check-answer should return 200 and render page" in:
-    AuthStubs.stubAuthoriseAsCleanAgent
+    AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     val response: WSResponse = get(checkAnswerPath)
 
@@ -50,7 +50,7 @@ extends ISpec:
     content should include("Confirm and continue")
 
   "POST /register/about-your-application/check-answer with confirm and continue selection should redirect to the next page" in:
-    AuthStubs.stubAuthoriseAsCleanAgent
+    AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication
 
