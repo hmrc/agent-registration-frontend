@@ -20,7 +20,8 @@ import com.github.tomakehurst.wiremock.client.WireMock as wm
 import com.github.tomakehurst.wiremock.matching.StringValuePattern
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
-import uk.gov.hmrc.agentregistration.shared.{GroupId, InternalUserId}
+import uk.gov.hmrc.agentregistration.shared.GroupId
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.StubMaker
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 

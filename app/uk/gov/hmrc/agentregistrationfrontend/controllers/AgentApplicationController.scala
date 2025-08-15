@@ -20,7 +20,6 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import javax.inject.Inject
@@ -31,7 +30,6 @@ import scala.concurrent.Future
 class AgentApplicationController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  applicationService: ApplicationService,
   simplePage: SimplePage
 )
 extends FrontendController(mcc):

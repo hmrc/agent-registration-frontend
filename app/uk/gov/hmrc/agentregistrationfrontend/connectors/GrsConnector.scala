@@ -16,26 +16,20 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
+import play.api.http.HeaderNames
 import play.api.http.Status.CREATED
-import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.BusinessType.GeneralPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedCompany
-import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedLiabilityPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsJourneyConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsResponse
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.http.StringContextOps
 
 import javax.inject.Inject
@@ -66,6 +60,13 @@ class GrsConnector @Inject() (
   def getGrsResponse(
     businessType: BusinessType,
     journeyId: String
-  )(using request: AuthorisedRequest[?]): Future[GrsResponse] = httpClient
-    .get(url"${appConfig.grsRetrieveDetailsUrl(businessType, journeyId)}")
-    .execute[GrsResponse]
+  )(using request: AuthorisedRequest[?]): Future[GrsResponse] =
+    // HC override is needed because the GRS stub data is stored in the session cookie
+    // By default the header carrier drops the session cookie
+    given headerCarrier: HeaderCarrier =
+      if appConfig.enableGrsStub then hc.copy(extraHeaders = hc.headers(Seq(HeaderNames.COOKIE)))
+      else hc
+
+    httpClient
+      .get(url"${appConfig.grsRetrieveDetailsUrl(businessType, journeyId)}")
+      .execute[GrsResponse]

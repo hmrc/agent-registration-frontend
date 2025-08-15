@@ -22,7 +22,6 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,8 +29,7 @@ import javax.inject.Singleton
 @Singleton
 class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
-  applicationService: ApplicationService
+  actions: Actions
 )
 extends FrontendController(mcc):
 

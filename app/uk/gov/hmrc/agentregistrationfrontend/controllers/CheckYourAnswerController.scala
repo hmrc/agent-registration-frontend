@@ -19,15 +19,12 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import com.softwaremill.quicklens.*
-import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.CheckYourAnswerPage
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import scala.concurrent.ExecutionContext
 
@@ -38,8 +35,7 @@ class CheckYourAnswerController @Inject() (
   view: CheckYourAnswerPage,
   applicationService: ApplicationService
 )(implicit ec: ExecutionContext)
-extends FrontendController(mcc)
-with I18nSupport:
+extends FrontendController(mcc):
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>

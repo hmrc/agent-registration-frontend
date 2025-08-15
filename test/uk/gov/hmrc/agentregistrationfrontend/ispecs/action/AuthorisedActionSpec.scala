@@ -16,22 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.ispecs.action
 
-import org.scalatest.Assertions.fail
-import org.scalatest.funsuite.AnyFunSuiteLike
 import play.api.http.Status
 import play.api.mvc.Request
 import play.api.mvc.Result
-import play.api.mvc.Results
-import play.api.mvc.Results.Ok
-import play.api.mvc.Results.Redirect
-import play.api.mvc.Results.Unauthorized
+import play.api.mvc.Results.*
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedAction
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.ispecs.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs.AuthStubs
-import uk.gov.hmrc.auth.core.InternalError
-import uk.gov.hmrc.auth.core.MissingBearerToken
-import uk.gov.hmrc.auth.core.UnsupportedCredentialRole
 import play.api.test.Helpers.*
 
 import scala.concurrent.Future

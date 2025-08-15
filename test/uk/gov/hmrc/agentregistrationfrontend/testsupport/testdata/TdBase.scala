@@ -49,5 +49,10 @@ trait TdBase:
   lazy val fullName = FullName(firstName, lastName)
   lazy val companyNumber = "1234567890"
   lazy val companyName = "Test Company Name"
-  lazy val companyProfile = CompanyProfile(companyNumber, companyName)
+  lazy val dateOfIncorporation: LocalDate = LocalDate.now().minusYears(10)
+  lazy val companyProfile = CompanyProfile(
+    companyNumber,
+    companyName,
+    Some(dateOfIncorporation)
+  )
   lazy val postcode = "AA1 1AA"

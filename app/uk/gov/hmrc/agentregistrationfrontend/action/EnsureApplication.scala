@@ -22,7 +22,6 @@ import play.api.mvc.Call
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistrationfrontend.util.*
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.util.*
 
 import javax.inject.Inject
 import javax.inject.Singleton
