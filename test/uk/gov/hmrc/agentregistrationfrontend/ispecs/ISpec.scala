@@ -52,10 +52,8 @@ with WsHelper:
 
   override implicit val patienceConfig: PatienceConfig = PatienceConfig(timeout = scaled(Span(3, Seconds)), interval = scaled(Span(300, Millis)))
   private val testServerPort = ISpec.testServerPort
-  private val databaseName: String = "agent-registration-frontend-it"
-  lazy val webdriverUrl: String = s"http://localhost:${port.toString}"
 
-  lazy val tdAll: TdAll = TdAll()
+  lazy val tdAll: TdAll = TdAll.tdAll
   lazy val frozenInstant: Instant = tdAll.instant
   lazy val clock: Clock = Clock.fixed(frozenInstant, ZoneId.of("UTC"))
 
@@ -98,8 +96,6 @@ with WsHelper:
       sc.copy(configuration = sc.configuration.withFallback(overrideServerConfiguration(app)))
 
   override def beforeEach(): Unit = super.beforeEach()
-
-//  lazy val pages = new Pages(baseUrl)
 
 object ISpec
 extends Logging:

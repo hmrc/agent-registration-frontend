@@ -39,7 +39,7 @@ extends ISpec:
     response.header("Location").value shouldBe businessTypePath
 
   s"GET $businessTypePath should return 200 and render page" in:
-    AuthStubs.stubAuthoriseAsCleanAgent
+    AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     val response: WSResponse = get(businessTypePath)
 
@@ -49,7 +49,7 @@ extends ISpec:
     content should include("Save and continue")
 
   s"POST $businessTypePath with valid selection should redirect to the next page" in:
-    AuthStubs.stubAuthoriseAsCleanAgent
+    AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication
     val response: WSResponse = post(businessTypePath)(Map("businessType" -> Seq("SoleTrader")))
@@ -59,7 +59,7 @@ extends ISpec:
     response.header("Location").value shouldBe "/agent-registration/register/about-your-application/user-role"
 
   s"POST $businessTypePath without valid selection should return 400" in:
-    AuthStubs.stubAuthoriseAsCleanAgent
+    AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     val response: WSResponse = post(businessTypePath)(Map("businessType" -> Seq("")))
 

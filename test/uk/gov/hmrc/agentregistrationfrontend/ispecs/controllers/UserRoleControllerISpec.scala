@@ -32,7 +32,7 @@ extends ISpec:
   private val fakeAgentApplication: AgentApplication = applicationFactory.makeNewAgentApplication(tdAll.internalUserId)
 
   "GET /register/about-your-application/user-role should return 200 and render page" in:
-    AuthStubs.stubAuthoriseAsCleanAgent
+    AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     val response: WSResponse = get(userRolePath)
 
@@ -42,7 +42,7 @@ extends ISpec:
     content should include("Save and continue")
 
   "POST /register/about-your-application/user-role with valid selection should redirect to the next page" in:
-    AuthStubs.stubAuthoriseAsCleanAgent
+    AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication
 
@@ -53,7 +53,7 @@ extends ISpec:
     response.header("Location").value shouldBe "/agent-registration/register/about-your-application/check-your-answers"
 
   "POST /register/about-your-application/user-role without valid selection should return 400" in:
-    AuthStubs.stubAuthoriseAsCleanAgent
+    AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
 
     val response: WSResponse = post(userRolePath)(Map("userRole" -> Seq("")))

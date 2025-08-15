@@ -171,7 +171,7 @@ extends ISpec:
   )
   s"GET $grsStartUrl" should:
     "redirect to grs start for a sole trader owner" in:
-      stubAuthoriseAsCleanAgent
+      stubAuthorise()
       stubApplicationInProgress(soleTraderOwnerApplication)
       stubCreateGrsJourney(SoleTrader)
 
@@ -181,7 +181,7 @@ extends ISpec:
       response.header("Location").value shouldBe grsSoleTraderJourneyUrl
 
     "redirect to grs start for a sole trader transactor" in:
-      stubAuthoriseAsCleanAgent
+      stubAuthorise()
       stubApplicationInProgress(soleTraderTransactorApplication)
       stubCreateGrsJourney(SoleTrader)
 
@@ -191,7 +191,7 @@ extends ISpec:
       response.header("Location").value shouldBe grsSoleTraderJourneyUrl
 
     "redirect to grs start for a limited company" in:
-      stubAuthoriseAsCleanAgent
+      stubAuthorise()
       stubApplicationInProgress(limitedCompanyApplication)
       stubCreateGrsJourney(LimitedCompany)
 
@@ -201,7 +201,7 @@ extends ISpec:
       response.header("Location").value shouldBe grsLimitedCompanyJourneyUrl
 
     "redirect to grs start for a general  partnership" in:
-      stubAuthoriseAsCleanAgent
+      stubAuthorise()
       stubApplicationInProgress(generalPartnershipApplication)
       stubCreateGrsJourney(GeneralPartnership)
 
@@ -211,7 +211,7 @@ extends ISpec:
       response.header("Location").value shouldBe grsGeneralPartnershipJourneyUrl
 
     "redirect to grs start for a limited liability partnership" in:
-      stubAuthoriseAsCleanAgent
+      stubAuthorise()
       stubApplicationInProgress(limitedLiabilityPartnershipApplication)
       stubCreateGrsJourney(LimitedLiabilityPartnership)
 
@@ -221,7 +221,7 @@ extends ISpec:
       response.header("Location").value shouldBe grsLimitedLiabilityPartnershipJourneyUrl
 
     "redirect to journey start if user is missing data" in:
-      stubAuthoriseAsCleanAgent
+      stubAuthorise()
       stubApplicationInProgress(fakeAgentApplication)
 
       val response = get(grsStartUrl)
@@ -231,7 +231,7 @@ extends ISpec:
 
   s"GET $grsCallbackUrl" should:
     "store valid data and redirect to next page for a sole trader" in:
-      stubAuthoriseAsCleanAgent
+      stubAuthorise()
       stubApplicationInProgress(soleTraderOwnerApplication)
       stubGetGrsResponse(
         SoleTrader,
@@ -259,7 +259,7 @@ extends ISpec:
 //      response.header("Location").value shouldBe "tasklist"
 
     "store valid data and redirect to next page for a limited company" in:
-      stubAuthoriseAsCleanAgent
+      stubAuthorise()
       stubApplicationInProgress(limitedCompanyApplication)
       stubGetGrsResponse(
         LimitedCompany,
@@ -284,7 +284,7 @@ extends ISpec:
     //      response.header("Location").value shouldBe "tasklist"
 
     "store valid data and redirect to next page for a general partnership" in:
-      stubAuthoriseAsCleanAgent
+      stubAuthorise()
       stubApplicationInProgress(generalPartnershipApplication)
       stubGetGrsResponse(
         GeneralPartnership,
@@ -310,7 +310,7 @@ extends ISpec:
     //      response.header("Location").value shouldBe "tasklist"
 
     "store valid data and redirect to next page for a limited liability partnership" in:
-      stubAuthoriseAsCleanAgent
+      stubAuthorise()
       stubApplicationInProgress(limitedLiabilityPartnershipApplication)
       stubGetGrsResponse(
         LimitedLiabilityPartnership,
@@ -336,7 +336,7 @@ extends ISpec:
     //      response.header("Location").value shouldBe "tasklist"
 
     "redirect to journey start if callback url does not match application data" in:
-      stubAuthoriseAsCleanAgent
+      stubAuthorise()
       stubApplicationInProgress(soleTraderOwnerApplication)
 
       val response = get(s"$grsCallbackUrl/${LimitedCompany.toStringHyphenated}?journeyId=$testJourneyId")
@@ -345,7 +345,7 @@ extends ISpec:
       response.header("Location").value shouldBe "/agent-registration/register"
 
     "redirect to failed to match identifiers if grs data has identifiersMatch = false" in:
-      stubAuthoriseAsCleanAgent
+      stubAuthorise()
       stubApplicationInProgress(soleTraderOwnerApplication)
       stubGetGrsResponse(
         SoleTrader,
@@ -359,7 +359,7 @@ extends ISpec:
       // response.header("Location").value shouldBe "identifiers not matched"
 
     "redirect to failed to registration failed if grs data has registrationStatus = REGISTRATION_FAILED" in:
-      stubAuthoriseAsCleanAgent
+      stubAuthorise()
       stubApplicationInProgress(soleTraderOwnerApplication)
       stubGetGrsResponse(
         SoleTrader,
@@ -373,7 +373,7 @@ extends ISpec:
       // response.header("Location").value shouldBe "business regisration failed"
 
     "throw runtime error if grs returns an unexpected combination of data" in:
-      stubAuthoriseAsCleanAgent
+      stubAuthorise()
       stubApplicationInProgress(soleTraderOwnerApplication)
       stubGetGrsResponse(
         SoleTrader,

@@ -26,11 +26,7 @@ object TdSupport:
 
   extension [T](r: FakeRequest[T])
 
-    def withAuthToken(authToken: String = "authorization-value-123"): FakeRequest[T] = r.withSession((SessionKeys.authToken, authToken))
-
-    def withAkamaiReputationHeader(
-      akamaiReputationValue: String = "akamai-reputation-value-123"
-    ): FakeRequest[T] = r.withHeaders(HeaderNames.akamaiReputation -> akamaiReputationValue)
+    def withAuthTokenInSession(authToken: String = "authorization-value-123"): FakeRequest[T] = r.withSession((SessionKeys.authToken, authToken))
 
     def withRequestId(requestId: String = "request-id-value-123"): FakeRequest[T] = r.withHeaders(HeaderNames.xRequestId -> requestId)
 
