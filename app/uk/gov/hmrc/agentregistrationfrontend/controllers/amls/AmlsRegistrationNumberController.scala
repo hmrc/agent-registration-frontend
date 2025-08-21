@@ -23,14 +23,13 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
+import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.config.CsvLoader
-import uk.gov.hmrc.agentregistrationfrontend.forms.SelectFromOptionsForm
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
+import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
+import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.AmlsSupervisoryBodyPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.AmlsRegistrationNumberPage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.Inject
@@ -39,41 +38,40 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class AmlsSupervisorController @Inject() (
+class AmlsRegistrationNumberController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  view: AmlsSupervisoryBodyPage,
-  applicationService: ApplicationService,
-  csvLoader: CsvLoader,
-  appConfig: AppConfig
+  view: AmlsRegistrationNumberPage,
+  applicationService: ApplicationService
 )(implicit ec: ExecutionContext)
 extends FrontendController(mcc)
 with I18nSupport:
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
-      val options = csvLoader.load(appConfig.amlsCodesPath)
-      val formWithOptions = SelectFromOptionsForm.form("amlsSupervisoryBody", options.keys.toSeq)
-      val form: Form[String] =
+      val isHmrc = request.agentApplication.getAmlsDetails.isHmrc
+      val emptyForm = AmlsRegistrationNumberForm(isHmrc).form
+      val form: Form[AmlsRegistrationNumber] =
         request
           .agentApplication
-          .amlsDetails
-          .fold(formWithOptions)((amlsDetails: AmlsDetails) =>
-            formWithOptions.fill(amlsDetails.supervisoryBody)
+          .getAmlsDetails
+          .amlsRegistrationNumber
+          .fold(emptyForm)((amlsRegistrationNumber: AmlsRegistrationNumber) =>
+            emptyForm.fill(amlsRegistrationNumber)
           )
-      Ok(view(form, options))
+      Ok(view(form))
 
   def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
-      val options = csvLoader.load(appConfig.amlsCodesPath)
+      val isHmrc = request.agentApplication.getAmlsDetails.isHmrc
       val submitAction: String = request.body.asFormUrlEncoded
         .flatMap(_.get("submit").flatMap(_.headOption))
         .getOrElse(SaveAndContinue.toString)
-      SelectFromOptionsForm.form("amlsSupervisoryBody", options.keys.toSeq)
+      AmlsRegistrationNumberForm(isHmrc).form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, options))),
-          supervisoryBody =>
+          formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+          amlsRegistrationNumber =>
             applicationService
               .upsert(
                 request.agentApplication
@@ -81,20 +79,16 @@ with I18nSupport:
                   .using {
                     case Some(details) =>
                       Some(details
-                        .modify(_.supervisoryBody)
-                        .setTo(supervisoryBody))
-                    case None =>
-                      Some(AmlsDetails(
-                        supervisoryBody = supervisoryBody,
-                        amlsRegistrationNumber = None
-                      ))
+                        .modify(_.amlsRegistrationNumber)
+                        .setTo(Some(amlsRegistrationNumber)))
+                    case _ => throw new IllegalStateException("AMLS details not found in the application")
                   }
               )
               .map(_ =>
                 Redirect(
                   if submitAction == SaveAndComeBackLater.toString
                   then "routes.saveAndComeBackLater.TODO"
-                  else routes.AmlsRegistrationNumberController.show.url
+                  else "routes.nextPageInTask.TODO"
                 )
               )
         )

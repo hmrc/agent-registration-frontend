@@ -31,3 +31,6 @@ GET         /register/grs-callback/:businessType                       uk.gov.hm
 ## Anti Money Laundering routes
 GET         /register/anti-money-laundering/supervisor-name            uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsSupervisorController.show
 POST        /register/anti-money-laundering/supervisor-name            uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsSupervisorController.submit
+GET         /register/anti-money-laundering/registration-number        uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsRegistrationNumberController.show
+POST        /register/anti-money-laundering/registration-number        uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsRegistrationNumberController.submit
+
