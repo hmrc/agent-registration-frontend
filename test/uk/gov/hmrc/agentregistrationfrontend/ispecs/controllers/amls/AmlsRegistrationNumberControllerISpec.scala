@@ -47,7 +47,8 @@ extends ISpec:
       supervisoryBody = "FCA",
       amlsRegistrationNumber = None
     )))
-  case class TestCase(
+  
+  private case class TestCaseForAmlsRegistrationNumber(
     application: AgentApplication,
     amlsType: String,
     validInput: String,
@@ -55,13 +56,13 @@ extends ISpec:
   )
 
   List(
-    TestCase(
+    TestCaseForAmlsRegistrationNumber(
       application = fakeAgentApplicationWithHmrc,
       amlsType = "HMRC",
       validInput = "XAML00000123456",
       invalidInput = "123"
     ),
-    TestCase(
+    TestCaseForAmlsRegistrationNumber(
       application = fakeAgentApplicationNonHmrc,
       amlsType = "non-HMRC",
       validInput = "1234567890",
