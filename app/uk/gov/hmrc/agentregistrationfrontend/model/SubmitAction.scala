@@ -23,7 +23,18 @@ enum SubmitAction:
 
   case SaveAndContinue
   case SaveAndComeBackLater
+  
 
 object SubmitAction:
 
+  def fromSubmissionWithDefault(opt: Option[String]): SubmitAction =
+    opt match {
+      case Some("SaveAndContinue") => SaveAndContinue
+      case Some("SaveAndComeBackLater") => SaveAndComeBackLater
+      case _ => SaveAndContinue // default
+    }
+
+  extension (submitAction: SubmitAction)
+    def isSaveAndComeBackLater: Boolean = submitAction == SubmitAction.SaveAndComeBackLater
+    
   given Format[SubmitAction] = EnumFormat.enumFormat[SubmitAction]

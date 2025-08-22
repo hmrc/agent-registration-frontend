@@ -26,8 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.getSubmitAction
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.AmlsRegistrationNumberPage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -64,9 +63,6 @@ with I18nSupport:
   def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
       val isHmrc = request.agentApplication.getAmlsDetails.isHmrc
-      val submitAction: String = request.body.asFormUrlEncoded
-        .flatMap(_.get("submit").flatMap(_.headOption))
-        .getOrElse(SaveAndContinue.toString)
       AmlsRegistrationNumberForm(isHmrc).form
         .bindFromRequest()
         .fold(
@@ -75,18 +71,13 @@ with I18nSupport:
             applicationService
               .upsert(
                 request.agentApplication
-                  .modify(_.amlsDetails)
-                  .using {
-                    case Some(details) =>
-                      Some(details
-                        .modify(_.amlsRegistrationNumber)
-                        .setTo(Some(amlsRegistrationNumber)))
-                    case _ => throw new IllegalStateException("AMLS details not found in the application")
-                  }
+                  .modify(_.amlsDetails.each.amlsRegistrationNumber)
+                  .setTo(Some(amlsRegistrationNumber))
               )
               .map(_ =>
                 Redirect(
-                  if submitAction == SaveAndComeBackLater.toString
+                  if getSubmitAction(request)
+                    .isSaveAndComeBackLater
                   then "routes.saveAndComeBackLater.TODO"
                   else "routes.nextPageInTask.TODO"
                 )

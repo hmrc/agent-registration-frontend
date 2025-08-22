@@ -27,8 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.config.CsvLoader
 import uk.gov.hmrc.agentregistrationfrontend.forms.SelectFromOptionsForm
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.getSubmitAction
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.AmlsSupervisoryBodyPage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
@@ -66,9 +65,6 @@ with I18nSupport:
   def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
       val options = csvLoader.load(appConfig.amlsCodesPath)
-      val submitAction: String = request.body.asFormUrlEncoded
-        .flatMap(_.get("submit").flatMap(_.headOption))
-        .getOrElse(SaveAndContinue.toString)
       SelectFromOptionsForm.form("amlsSupervisoryBody", options.keys.toSeq)
         .bindFromRequest()
         .fold(
@@ -85,14 +81,14 @@ with I18nSupport:
                         .setTo(supervisoryBody))
                     case None =>
                       Some(AmlsDetails(
-                        supervisoryBody = supervisoryBody,
-                        amlsRegistrationNumber = None
+                        supervisoryBody = supervisoryBody
                       ))
                   }
               )
               .map(_ =>
                 Redirect(
-                  if submitAction == SaveAndComeBackLater.toString
+                  if getSubmitAction(request)
+                    .isSaveAndComeBackLater
                   then "routes.saveAndComeBackLater.TODO"
                   else routes.AmlsRegistrationNumberController.show.url
                 )

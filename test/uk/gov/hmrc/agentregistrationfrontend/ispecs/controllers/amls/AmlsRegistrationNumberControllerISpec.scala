@@ -47,7 +47,7 @@ extends ISpec:
       supervisoryBody = "FCA",
       amlsRegistrationNumber = None
     )))
-  
+
   private case class TestCaseForAmlsRegistrationNumber(
     application: AgentApplication,
     amlsType: String,
