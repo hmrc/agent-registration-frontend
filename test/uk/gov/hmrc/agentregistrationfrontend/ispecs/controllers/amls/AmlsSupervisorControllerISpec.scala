@@ -49,7 +49,7 @@ extends ISpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "routes.nextPageInTask.TODO"
+    response.header("Location").value shouldBe "/agent-registration/register/anti-money-laundering/registration-number"
 
   s"POST $pathUnderTest with save for later and valid selection should redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
@@ -63,7 +63,7 @@ extends ISpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "routes.saveAndComeBackLater.TODO"
+    response.header("Location").value shouldBe "/agent-registration/register/save-and-come-back-later"
 
   s"POST $pathUnderTest without valid selection should return 400" in:
     AuthStubs.stubAuthorise()

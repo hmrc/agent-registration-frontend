@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared
+package uk.gov.hmrc.agentregistrationfrontend.forms.helpers
 
-import play.api.libs.json.Format
-import play.api.libs.json.Json
+import play.api.mvc.AnyContent
+import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction
 
-final case class AmlsDetails(
-  supervisoryBody: String,
-  amlsRegistrationNumber: Option[AmlsRegistrationNumber] = None
-) {
-  val isHmrc: Boolean = supervisoryBody.contains("HMRC")
-}
-
-object AmlsDetails {
-  implicit val format: Format[AmlsDetails] = Json.format[AmlsDetails]
+object SubmissionHelper {
+  def getSubmitAction(request: AgentApplicationRequest[AnyContent]): SubmitAction = SubmitAction.fromSubmissionWithDefault(
+    request.body.asFormUrlEncoded
+      .flatMap(_.get("submit")
+        .flatMap(_.headOption))
+  )
 }

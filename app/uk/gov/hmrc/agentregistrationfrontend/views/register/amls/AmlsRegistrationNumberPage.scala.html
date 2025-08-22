@@ -14,10 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
+@import uk.gov.hmrc.govukfrontend.views.Implicits._
+@import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.amls.routes
-
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.register.partials.ContinueOrSaveForLater
 
@@ -25,19 +24,18 @@
         layout: Layout,
         formWithCSRF: FormWithCSRF,
         govukButton: GovukButton,
-        govukSelect: GovukSelect,
+        govukInput: GovukInput,
         continueOrSaveForLater: ContinueOrSaveForLater
 )
 
 @(
-        form: Form[String],
-        options: Map[String, String]
+        form: Form[AmlsRegistrationNumber]
 )(implicit
         request: RequestHeader,
         messages: Messages
 )
 
-@key = @{"amlsSupervisoryBody"}
+@key = @{"amlsRegistrationNumber"}
 @pageTitle = @{messages(s"$key.title")}
     
 @layout(
@@ -46,36 +44,15 @@
 ) {
 
     <h2 class="govuk-caption-xl">@messages("amlsDetails.title")</h2>
-    @formWithCSRF(action = routes.AmlsSupervisorController.submit) {
-
-        @govukSelect(Select(
-            id = key,
-            name = key,
+    @formWithCSRF(action = routes.AmlsRegistrationNumberController.submit) {
+        @govukInput(Input(
             label = Label(
                 content = Text(pageTitle),
                 isPageHeading = true,
                 classes = "govuk-label--xl"
             ),
-            items = Seq(SelectItem(
-                value = Some(""),
-                text = "")).++(
-                options.flatMap {
-                    case (k, v) => Seq(
-                        SelectItem(
-                            value = Some(k),
-                            text = v,
-                            selected = form.value.getOrElse("").equals(v)
-                        )
-                    )
-                }
-            ),
-            hint = Some(Hint(content = Text(messages(s"$key.hint"))))
-        ).asAccessibleAutocomplete(Some(
-            AccessibleAutocomplete(
-                defaultValue = Some(""),
-                showAllValues = false
-            )
-        )).withFormField(form(key)))
+            classes = "govuk-!-width-one-half"
+        ).withFormField(form(key)))
 
         @continueOrSaveForLater()
     }

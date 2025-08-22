@@ -53,6 +53,11 @@ amlsSupervisoryBody.title = What is the name of your supervisory body?
 amlsSupervisoryBody.hint = Start to enter a name and choose your supervisor from the list
 amlsSupervisoryBody.error.required = Enter a name and choose your supervisor from the list
 
+## AmlsDetails / Registration number
+amlsRegistrationNumber.title = What is your registration number?
+amlsRegistrationNumber.error.required = Enter your registration number
+amlsRegistrationNumber.error.invalid = Enter your registration number in the correct format
+
 # Timed out
 timed-out.header = You have been signed out
 timed-out.p1 = You have not done anything for 15 minutes, so we have signed you out to keep your account secure.
