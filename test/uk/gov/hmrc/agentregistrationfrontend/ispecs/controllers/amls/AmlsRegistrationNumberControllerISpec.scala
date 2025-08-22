@@ -98,7 +98,7 @@ extends ISpec:
 
       response.status shouldBe 303
       response.body[String] shouldBe ""
-      response.header("Location").value shouldBe "routes.nextPageInTask.TODO"
+      response.header("Location").value shouldBe "/agent-registration/register/anti-money-laundering/supervision-runs-out"
 
     s"POST $pathUnderTest with save for later and valid input for ${testCase.amlsType} should redirect to the saved for later page" in:
       AuthStubs.stubAuthorise()
@@ -119,7 +119,7 @@ extends ISpec:
 
       response.status shouldBe 303
       response.body[String] shouldBe ""
-      response.header("Location").value shouldBe "routes.saveAndComeBackLater.TODO"
+      response.header("Location").value shouldBe "/agent-registration/register/save-and-come-back-later"
 
     s"POST $pathUnderTest as blank form for ${testCase.amlsType} should return 400" in:
       AuthStubs.stubAuthorise()

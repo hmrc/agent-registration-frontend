@@ -26,6 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.config.CsvLoader
+import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.SelectFromOptionsForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.getSubmitAction
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
@@ -68,7 +69,14 @@ with I18nSupport:
       SelectFromOptionsForm.form("amlsSupervisoryBody", options.keys.toSeq)
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors, options))),
+          formWithErrors =>
+            Future.successful(
+              if getSubmitAction(request).isSaveAndComeBackLater
+              then
+                Redirect(applicationRoutes.AgentApplicationController.saveAndComeBackLater.url)
+              else
+                BadRequest(view(formWithErrors, options))
+            ),
           supervisoryBody =>
             applicationService
               .upsert(
@@ -88,8 +96,8 @@ with I18nSupport:
               .map(_ =>
                 Redirect(
                   if getSubmitAction(request)
-                    .isSaveAndComeBackLater
-                  then "routes.saveAndComeBackLater.TODO"
+                      .isSaveAndComeBackLater
+                  then applicationRoutes.AgentApplicationController.saveAndComeBackLater.url
                   else routes.AmlsRegistrationNumberController.show.url
                 )
               )

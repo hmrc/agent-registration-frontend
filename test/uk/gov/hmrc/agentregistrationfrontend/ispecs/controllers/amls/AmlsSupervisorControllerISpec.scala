@@ -63,7 +63,7 @@ extends ISpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "routes.saveAndComeBackLater.TODO"
+    response.header("Location").value shouldBe "/agent-registration/register/save-and-come-back-later"
 
   s"POST $pathUnderTest without valid selection should return 400" in:
     AuthStubs.stubAuthorise()

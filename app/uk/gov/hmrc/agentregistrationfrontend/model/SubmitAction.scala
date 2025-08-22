@@ -23,7 +23,6 @@ enum SubmitAction:
 
   case SaveAndContinue
   case SaveAndComeBackLater
-  
 
 object SubmitAction:
 
@@ -36,5 +35,5 @@ object SubmitAction:
 
   extension (submitAction: SubmitAction)
     def isSaveAndComeBackLater: Boolean = submitAction == SubmitAction.SaveAndComeBackLater
-    
+
   given Format[SubmitAction] = EnumFormat.enumFormat[SubmitAction]

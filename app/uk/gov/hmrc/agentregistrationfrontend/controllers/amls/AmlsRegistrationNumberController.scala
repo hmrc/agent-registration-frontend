@@ -25,6 +25,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.getSubmitAction
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
@@ -66,7 +67,13 @@ with I18nSupport:
       AmlsRegistrationNumberForm(isHmrc).form
         .bindFromRequest()
         .fold(
-          formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+          formWithErrors =>
+            Future.successful(
+              if getSubmitAction(request)
+                  .isSaveAndComeBackLater
+              then Redirect(applicationRoutes.AgentApplicationController.saveAndComeBackLater.url)
+              else BadRequest(view(formWithErrors))
+            ),
           amlsRegistrationNumber =>
             applicationService
               .upsert(
@@ -77,9 +84,9 @@ with I18nSupport:
               .map(_ =>
                 Redirect(
                   if getSubmitAction(request)
-                    .isSaveAndComeBackLater
-                  then "routes.saveAndComeBackLater.TODO"
-                  else "routes.nextPageInTask.TODO"
+                      .isSaveAndComeBackLater
+                  then applicationRoutes.AgentApplicationController.saveAndComeBackLater.url
+                  else routes.AmlsExpiryDateController.show.url
                 )
               )
         )

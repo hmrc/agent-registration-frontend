@@ -61,6 +61,15 @@ extends FrontendController(mcc):
     )))
   }
 
+  def saveAndComeBackLater: Action[AnyContent] = actions.getApplicationInProgress:
+    implicit request =>
+      Ok(simplePage(
+        h1 = "Save and come back later...",
+        bodyText = Some(
+          "Placeholder for the Save and come back later page..."
+        )
+      ))
+
   val applicationSubmitted: Action[AnyContent] = actions.getApplicationSubmitted.async { implicit request =>
     Future.successful(Ok(simplePage(
       h1 = "Application Submitted...",
