@@ -135,7 +135,7 @@ extends ISpec:
       content should include("There is a problem")
       content should include("Enter your registration number")
 
-    s"POST $pathUnderTest as blank form and save for later for ${testCase.amlsType} should return 400" in:
+    s"POST $pathUnderTest as blank form and save for later for ${testCase.amlsType} should redirect to save for later page" in:
       AuthStubs.stubAuthorise()
       AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
       val response: WSResponse =
@@ -144,10 +144,9 @@ extends ISpec:
           "submit" -> Seq("SaveAndComeBackLater")
         ))
 
-      response.status shouldBe 400
-      val content = response.body[String]
-      content should include("There is a problem")
-      content should include("Enter your registration number")
+      response.status shouldBe 303
+      response.body[String] shouldBe ""
+      response.header("Location").value shouldBe "/agent-registration/register/save-and-come-back-later"
 
     s"POST $pathUnderTest with an invalid value for ${testCase.amlsType} should return 400" in:
       AuthStubs.stubAuthorise()
@@ -163,7 +162,7 @@ extends ISpec:
       content should include("There is a problem")
       content should include("Enter your registration number in the correct format")
 
-    s"POST $pathUnderTest with an invalid value and save for later for ${testCase.amlsType} should return 400" in:
+    s"POST $pathUnderTest with an invalid value and save for later for ${testCase.amlsType} should not save and redirect to save for later" in:
       AuthStubs.stubAuthorise()
       AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
       val response: WSResponse =
@@ -172,9 +171,8 @@ extends ISpec:
           "submit" -> Seq("SaveAndComeBackLater")
         ))
 
-      response.status shouldBe 400
-      val content = response.body[String]
-      content should include("There is a problem")
-      content should include("Enter your registration number in the correct format")
+      response.status shouldBe 303
+      response.body[String] shouldBe ""
+      response.header("Location").value shouldBe "/agent-registration/register/save-and-come-back-later"
 
   }
