@@ -14,6 +14,10 @@ GET         /application-submitted                                     uk.gov.hm
 
 # Register routes
 GET         /register                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.startRegistration
+
+## save and come back later route
+GET         /register/save-and-come-back-later                         uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.saveAndComeBackLater
+
 ## About your application routes
 GET         /register/about-your-application/business-type             uk.gov.hmrc.agentregistrationfrontend.controllers.BusinessTypeController.show
 POST        /register/about-your-application/business-type             uk.gov.hmrc.agentregistrationfrontend.controllers.BusinessTypeController.submit
@@ -31,3 +35,6 @@ GET         /register/grs-callback/:businessType                       uk.gov.hm
 ## Anti Money Laundering routes
 GET         /register/anti-money-laundering/supervisor-name            uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsSupervisorController.show
 POST        /register/anti-money-laundering/supervisor-name            uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsSupervisorController.submit
+GET         /register/anti-money-laundering/registration-number        uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsRegistrationNumberController.show
+POST        /register/anti-money-laundering/registration-number        uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsRegistrationNumberController.submit
+GET         /register/anti-money-laundering/supervision-runs-out       uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsExpiryDateController.show
