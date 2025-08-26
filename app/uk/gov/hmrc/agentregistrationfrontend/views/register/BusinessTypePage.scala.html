@@ -54,7 +54,7 @@
 
     <h2 class="govuk-caption-xl">@messages("about-application.title")</h2>
 
-    @formWithCSRF(action = routes.BusinessTypeController.submit) {
+    @formWithCSRF(action = uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.routes.BusinessTypeController.submit) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(

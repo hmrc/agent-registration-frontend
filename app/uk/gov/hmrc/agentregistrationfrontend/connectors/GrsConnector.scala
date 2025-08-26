@@ -54,6 +54,7 @@ class GrsConnector @Inject() (
       case response @ HttpResponse(CREATED, _, _) =>
         val journeyStartUrl = (response.json \ "journeyStartUrl").as[String]
         journeyStartUrl
+      // TODO dedicated exteption which accepts context and standardizes error message (including agentApplication id, requestId, etc)
       case response => throw new Exception(s"Unexpected response from GRS create journey for $businessType: Status: ${response.status} Body: ${response.body}")
     }
 

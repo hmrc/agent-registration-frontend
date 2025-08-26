@@ -14,22 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.ispecs
+package uk.gov.hmrc.agentregistration.shared
 
-import play.api.libs.ws.DefaultBodyReadables.*
-import play.api.libs.ws.WSResponse
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.Format
 
-class HealthEndpointISpec
-extends ISpec:
+final case class Nino(value: String)
 
-  private val baseUrl = s"http://localhost:${port.toString}"
-
-  "service health endpoint should respond with 200 status" in:
-    val response: WSResponse =
-      ws
-        .url(s"$baseUrl/ping/ping")
-        .get()
-        .futureValue
-
-    response.status shouldBe 200
-    response.body[String] shouldBe ""
+object Nino:
+  given format: Format[Nino] = summon[Format[String]].inmap(Nino(_), _.value)

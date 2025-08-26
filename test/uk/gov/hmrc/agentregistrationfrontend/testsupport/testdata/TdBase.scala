@@ -20,6 +20,7 @@ import uk.gov.hmrc.agentregistration.shared.CompanyProfile
 import uk.gov.hmrc.agentregistration.shared.FullName
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.Utr
 
 import java.time.format.DateTimeFormatter
@@ -41,7 +42,7 @@ trait TdBase:
   lazy val utr: Utr = Utr("1234567895")
   lazy val internalUserId: InternalUserId = InternalUserId("internal-user-id-12345")
   lazy val groupId: GroupId = GroupId("group-id-12345")
-  lazy val nino = "AB123456C"
+  lazy val nino = Nino("AB123456C")
   lazy val safeId = "X00000123456789"
   lazy val dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
   lazy val firstName = "Test"
@@ -51,8 +52,8 @@ trait TdBase:
   lazy val companyName = "Test Company Name"
   lazy val dateOfIncorporation: LocalDate = LocalDate.now().minusYears(10)
   lazy val companyProfile = CompanyProfile(
-    companyNumber,
-    companyName,
-    Some(dateOfIncorporation)
+    companyNumber = companyNumber,
+    companyName = companyName,
+    dateOfIncorporation = Some(dateOfIncorporation)
   )
   lazy val postcode = "AA1 1AA"

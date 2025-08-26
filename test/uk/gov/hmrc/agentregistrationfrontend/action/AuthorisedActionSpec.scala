@@ -14,17 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.ispecs.action
+package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.http.Status
 import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Results.*
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedAction
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.ISpec
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs.AuthStubs
 import play.api.test.Helpers.*
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 
 import scala.concurrent.Future
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.ispecs
+package uk.gov.hmrc.agentregistrationfrontend.testsupport
 
 import com.google.inject.AbstractModule
 import org.scalatest.BeforeAndAfterEach
@@ -23,17 +23,16 @@ import org.scalatest.time.Seconds
 import org.scalatest.time.Span
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
-import play.api.Application
-import play.api.Logging
-import play.api.Mode
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.inject.guice.GuiceableModule
 import play.api.test.DefaultTestServerFactory
 import play.api.test.TestServerFactory
+import play.api.Application
+import play.api.Logging
+import play.api.Mode
 import play.core.server.ServerConfig
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.WireMockSupport
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.RichMatchers
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.WireMockSupport
 
 import java.time.Clock
 import java.time.Instant

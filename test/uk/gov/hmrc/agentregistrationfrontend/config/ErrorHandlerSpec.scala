@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.ispecs
+package uk.gov.hmrc.agentregistrationfrontend.config
 
-import uk.gov.hmrc.agentregistrationfrontend.config.ErrorHandler
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 
 class ErrorHandlerSpec

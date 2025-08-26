@@ -14,51 +14,56 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.ispecs.controllers
+package uk.gov.hmrc.agentregistrationfrontend.controllers
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.ISpec
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
-class UserRoleControllerISpec
+class BusinessTypeControllerISpec
 extends ISpec:
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
-  private val userRolePath = s"/agent-registration/register/about-your-application/user-role"
+  private val businessTypePath = "/agent-registration/register/about-your-application/business-type"
   private val fakeAgentApplication: AgentApplication = applicationFactory.makeNewAgentApplication(tdAll.internalUserId)
 
-  "GET /register/about-your-application/user-role should return 200 and render page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
-    val response: WSResponse = get(userRolePath)
-
-    response.status shouldBe 200
-    val content = response.body[String]
-    content should include("Are you the owner of the business?")
-    content should include("Save and continue")
-
-  "POST /register/about-your-application/user-role with valid selection should redirect to the next page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
-    AgentRegistrationStubs.stubUpdateAgentApplication
-
-    val response: WSResponse = post(userRolePath)(Map("userRole" -> Seq("Owner")))
+  "GET /register should redirect to business type page" in:
+    val response: WSResponse = get("/agent-registration/register")
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/register/about-your-application/check-your-answers"
+    response.header("Location").value shouldBe businessTypePath
 
-  "POST /register/about-your-application/user-role without valid selection should return 400" in:
+  s"GET $businessTypePath should return 200 and render page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    val response: WSResponse = get(businessTypePath)
 
-    val response: WSResponse = post(userRolePath)(Map("userRole" -> Seq("")))
+    response.status shouldBe 200
+    val content = response.body[String]
+    content should include("How is your business set up?")
+    content should include("Save and continue")
+
+  s"POST $businessTypePath with valid selection should redirect to the next page" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    AgentRegistrationStubs.stubUpdateAgentApplication
+    val response: WSResponse = post(businessTypePath)(Map("businessType" -> Seq("SoleTrader")))
+
+    response.status shouldBe 303
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe "/agent-registration/register/about-your-application/user-role"
+
+  s"POST $businessTypePath without valid selection should return 400" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    val response: WSResponse = post(businessTypePath)(Map("businessType" -> Seq("")))
 
     response.status shouldBe 400
     val content = response.body[String]
     content should include("There is a problem")
-    content should include("Select ‘yes’ if you are the owner of the business")
+    content should include("Tell us how your business is set up")

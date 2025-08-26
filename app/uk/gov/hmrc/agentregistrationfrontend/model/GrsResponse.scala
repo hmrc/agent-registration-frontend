@@ -30,17 +30,18 @@ import java.time.LocalDate
 case class GrsResponse(
   fullName: Option[FullName], // sole trader
   dateOfBirth: Option[LocalDate], // sole trader
-  nino: Option[String], // sole trader (can be replaced by trn)
+  nino: Option[Nino], // sole trader (can be replaced by trn)
   trn: Option[String], // sole trader (if this is present then there will also be an 'address' and 'saPostcode' field)
-  sautr: Option[String], // sole trader / partnership (both can return None but that will not have a safeId)
+  sautr: Option[Utr], // sole trader / partnership (both can return None but that will not have a safeId)
   companyProfile: Option[CompanyProfile], // limited company or any limited partnership
-  ctutr: Option[String], // limited company
+  ctutr: Option[Utr], // limited company
   postcode: Option[String], // any partnership
   identifiersMatch: Boolean,
   registration: GrsRegistration
 ):
 
-  def utr: Utr = sautr.orElse(ctutr).map(Utr(_)).getOrElse(throw new Exception("Business details missing Utr"))
+  // TODO: distinguish between CT and SA Utrs, make dedicated types and analyse when to use correct identifier
+  def getUtr: Utr = sautr.orElse(ctutr).getOrElse(throw new Exception("Business details missing Utr"))
 
   def toBusinessDetails(businessType: BusinessType): BusinessDetails = {
     def missingDataError(key: String): Nothing = throw new RuntimeException(s"Business details missing $key for $businessType type")

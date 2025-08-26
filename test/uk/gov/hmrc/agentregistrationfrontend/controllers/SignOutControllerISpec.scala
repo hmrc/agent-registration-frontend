@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.ispecs.controllers
+package uk.gov.hmrc.agentregistrationfrontend.controllers
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.ISpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 
 class SignOutControllerISpec
 extends ISpec:
