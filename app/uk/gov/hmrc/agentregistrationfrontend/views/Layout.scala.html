@@ -53,8 +53,14 @@
 @gdsTitle = @{s"$errorPrefix$pageTitle - ${messages("service.name")} - GOV.UK"}
 @contentWithErrorsAndHelp = {
     @maybeForm.map { form =>
-        @if(form.hasErrors) {
-            @govukErrorSummary(ErrorSummary().withFormErrorsAsText(form))
+        @form.errors.headOption.map { error =>
+            @govukErrorSummary(ErrorSummary(
+                title = Text(messages("error.summary.title")),
+                errorList = Seq(ErrorLink(
+                    href = if(error.key.endsWith("Date")) Some(s"#${error.key}.day") else Some(s"#${error.key}"),
+                    content = Text(messages(error.message, error.args*))
+                ))
+            ))
         }
     }
     @contentBlock

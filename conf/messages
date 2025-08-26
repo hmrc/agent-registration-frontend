@@ -58,6 +58,20 @@ amlsRegistrationNumber.title = What is your registration number?
 amlsRegistrationNumber.error.required = Enter your registration number
 amlsRegistrationNumber.error.invalid = Enter your registration number in the correct format
 
+## AmlsDetails / Expiry date
+amlsExpiryDate.title = When does your supervision run out?
+amlsExpiryDate.hint = Tells us the last day you will be covered in your current 12-month supervision period. For example, 27 3 2026
+amlsExpiryDate.error.required = Enter the date your supervision runs out
+amlsExpiryDate.error.month-year.required = The date your supervision runs out must include a month and year
+amlsExpiryDate.error.day-month.required = The date your supervision runs out must include a day and month
+amlsExpiryDate.error.day-year.required = The date your supervision runs out must include a day and year
+amlsExpiryDate.error.day.required = The date your supervision runs out must include a day
+amlsExpiryDate.error.month.required = The date your supervision runs out must include a month
+amlsExpiryDate.error.year.required = The date your supervision runs out must include a year
+amlsExpiryDate.error.invalid = The date your supervision runs out must be a real date
+amlsExpiryDate.error.past = The date your supervision runs out must be in the future
+amlsExpiryDate.error.future = The date your supervision runs out must be in the next 13 months
+
 # Timed out
 timed-out.header = You have been signed out
 timed-out.p1 = You have not done anything for 15 minutes, so we have signed you out to keep your account secure.

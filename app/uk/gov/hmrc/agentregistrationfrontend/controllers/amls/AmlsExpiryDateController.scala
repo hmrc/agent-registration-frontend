@@ -16,31 +16,76 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
+import com.softwaremill.quicklens.*
+import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
+import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.getSubmitAction
+import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.AmlsExpiryDatePage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
+import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class AmlsExpiryDateController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  view: SimplePage
-)
+  formProvider: AmlsExpiryDateForm,
+  view: AmlsExpiryDatePage,
+  applicationService: ApplicationService
+)(implicit ec: ExecutionContext)
 extends FrontendController(mcc)
 with I18nSupport:
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
-      Ok(view(
-        h1 = "AMLS expiry date...",
-        bodyText = Some(
-          "Placeholder for the AMLS expiry date page..."
+      val emptyForm = formProvider.form()
+      val form: Form[LocalDate] =
+        request
+          .agentApplication
+          .getAmlsDetails
+          .amlsExpiryDate
+          .fold(emptyForm)((amlsExpiryDate: LocalDate) =>
+            emptyForm.fill(amlsExpiryDate)
+          )
+      Ok(view(form))
+
+  def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
+    implicit request =>
+      formProvider.form()
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(
+              if getSubmitAction(request)
+                  .isSaveAndComeBackLater
+              then Redirect(applicationRoutes.AgentApplicationController.saveAndComeBackLater.url)
+              else BadRequest(view(formWithErrors))
+            ),
+          amlsExpiryDate =>
+            applicationService
+              .upsert(
+                request.agentApplication
+                  .modify(_.amlsDetails.each.amlsExpiryDate)
+                  .setTo(Some(amlsExpiryDate))
+              )
+              .map(_ =>
+                Redirect(
+                  if getSubmitAction(request)
+                      .isSaveAndComeBackLater
+                  then applicationRoutes.AgentApplicationController.saveAndComeBackLater.url
+                  else routes.AmlsSupportingEvidenceController.show.url
+                )
+              )
         )
-      ))

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared
+package uk.gov.hmrc.agentregistrationfrontend.forms.mappings
 
-import play.api.libs.json.Format
-import play.api.libs.json.Json
+import play.api.data.Forms.of
+import play.api.data.Mapping
+import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.LocalDateFormatter
 
 import java.time.LocalDate
 
-final case class AmlsDetails(
-  supervisoryBody: String,
-  amlsRegistrationNumber: Option[AmlsRegistrationNumber] = None,
-  amlsExpiryDate: Option[LocalDate] = None
-) {
-  val isHmrc: Boolean = supervisoryBody.contains("HMRC")
-}
+object Mappings {
 
-object AmlsDetails {
-  implicit val format: Format[AmlsDetails] = Json.format[AmlsDetails]
+  def localDate(formMessageKey: String): Mapping[LocalDate] = {
+    of(new LocalDateFormatter(formMessageKey))
+  }
+
 }
