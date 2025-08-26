@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs
+package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
@@ -24,9 +24,9 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.BusinessType.*
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.StubMaker
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.StubMaker.HttpMethod.GET
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.StubMaker.HttpMethod.POST
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker.HttpMethod.GET
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker.HttpMethod.POST
 
 object GrsStubs:
 

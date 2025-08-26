@@ -34,13 +34,15 @@ import javax.inject.Singleton
 import scala.concurrent.Future
 
 @Singleton
-class GrsService @Inject() (grsConnector: GrsConnector)(implicit appConfig: AppConfig):
+class GrsService @Inject() (
+  grsConnector: GrsConnector,
+  messagesApi: MessagesApi
+)(implicit appConfig: AppConfig):
 
   def createGrsJourney(
     businessType: BusinessType,
     hasOwnership: Boolean
   )(using
-    messagesApi: MessagesApi,
     request: AuthorisedRequest[?]
   ): Future[String] = {
     val journeyConfig = createConfig(businessType, hasOwnership)
@@ -56,7 +58,7 @@ class GrsService @Inject() (grsConnector: GrsConnector)(implicit appConfig: AppC
   private def createConfig(
     businessType: BusinessType,
     hasOwnership: Boolean
-  )(using messagesApi: MessagesApi): GrsJourneyConfig = {
+  ): GrsJourneyConfig = {
     val callbackUrl = appConfig.grsJourneyCallbackUrl(businessType)
 
     val (fullNamePageLabel, welshFullNamePageLabel) =

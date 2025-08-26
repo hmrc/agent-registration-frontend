@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.mvc.*
-
 import javax.inject.Inject
 import javax.inject.Singleton
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers
+package uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
@@ -23,6 +23,8 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.CheckYourAnswerPage
 
@@ -48,6 +50,6 @@ extends FrontendController(mcc):
           request
             .agentApplication
             .modify(_.aboutYourApplication.confirmed)
-            .setTo(Some(true))
+            .setTo(true)
         )
-        .map(_ => Redirect(routes.GrsController.startJourney)) // TODO ultimately this will redirect to the tasklist
+        .map(_ => Redirect(routes.GrsController.startGrsJourney)) // TODO ultimately this will redirect to the tasklist

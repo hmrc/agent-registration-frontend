@@ -14,55 +14,58 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers
+package uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication
 
 import com.softwaremill.quicklens.*
 import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.UserRole
+import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.forms.UserRoleForm
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.UserRolePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.register.BusinessTypePage
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
 
 @Singleton
-class UserRoleController @Inject() (
+class BusinessTypeController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  view: UserRolePage,
+  view: BusinessTypePage,
   applicationService: ApplicationService
 )
 extends FrontendController(mcc):
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
-      val form: Form[UserRole] =
+      val form: Form[BusinessType] =
         request
           .agentApplication
           .aboutYourApplication
-          .userRole
-          .fold(UserRoleForm.form)((userRole: UserRole) =>
-            UserRoleForm.form.fill(userRole)
+          .businessType
+          .fold(BusinessTypeForm.form)((businessType: BusinessType) =>
+            BusinessTypeForm.form.fill(businessType)
           )
       Ok(view(form))
 
   def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
-      UserRoleForm.form.bindFromRequest().fold(
+      BusinessTypeForm.form.bindFromRequest().fold(
         formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-        (userRole: UserRole) =>
+        (businessType: BusinessType) =>
           applicationService
             .upsert(
               request
                 .agentApplication
-                .modify(_.aboutYourApplication.userRole)
-                .setTo(Some(userRole))
+                .modify(_.aboutYourApplication.businessType)
+                .setTo(Some(businessType))
+                .modify(_.businessDetails)
+                .setToIf(request.agentApplication.businessDetails.exists(_.businessType != businessType))(None)
             )
-            .map(_ => Redirect(routes.CheckYourAnswerController.show.url))
+            .map(_ => Redirect(uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.routes.UserRoleController.show.url))
       )

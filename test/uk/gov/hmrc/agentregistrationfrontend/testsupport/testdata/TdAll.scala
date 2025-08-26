@@ -28,3 +28,4 @@ trait TdAll
 extends AnyRef
 with TdBase
 with TdRequest
+with TdAgentApplication

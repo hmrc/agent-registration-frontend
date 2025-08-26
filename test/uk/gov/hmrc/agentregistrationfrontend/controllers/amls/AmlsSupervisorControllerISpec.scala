@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.ispecs.controllers.amls
+package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.ISpec
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 
 class AmlsSupervisorControllerISpec
 extends ISpec:

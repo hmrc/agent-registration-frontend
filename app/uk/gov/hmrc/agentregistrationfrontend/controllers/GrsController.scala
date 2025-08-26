@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
 import com.softwaremill.quicklens.*
-import play.api.i18n.MessagesApi
 import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
@@ -46,15 +45,14 @@ class GrsController @Inject() (
 )(implicit ec: ExecutionContext)
 extends FrontendController(mcc):
 
-  def startJourney: Action[AnyContent] = actions.getApplicationInProgress.async:
+  def startGrsJourney: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
-      given MessagesApi = messagesApi
-
       (request.agentApplication.aboutYourApplication.businessType, request.agentApplication.aboutYourApplication.userRole) match {
         case (Some(businessType), Some(userRole)) =>
           grsService
-            .createGrsJourney(businessType, userRole == Owner)
+            .createGrsJourney(businessType, userRole == Owner) // why ignoring userRole and setting it to the owner?
             .map(Redirect(_))
+        // fail sooner, easier to debug if happens, and log errors ffs!
         case _ => Future.successful(Redirect(routes.AgentApplicationController.startRegistration))
       }
 
@@ -75,7 +73,7 @@ extends FrontendController(mcc):
                   request
                     .agentApplication
                     .modify(_.utr)
-                    .setTo(Some(grsResponse.utr))
+                    .setTo(Some(grsResponse.getUtr))
                     .modify(_.businessDetails)
                     .setTo(Some(grsResponse.toBusinessDetails(businessType)))
                 ).map { _ =>

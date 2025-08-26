@@ -19,17 +19,17 @@ GET         /register                                                  uk.gov.hm
 GET         /register/save-and-come-back-later                         uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.saveAndComeBackLater
 
 ## About your application routes
-GET         /register/about-your-application/business-type             uk.gov.hmrc.agentregistrationfrontend.controllers.BusinessTypeController.show
-POST        /register/about-your-application/business-type             uk.gov.hmrc.agentregistrationfrontend.controllers.BusinessTypeController.submit
+GET         /register/about-your-application/business-type             uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.BusinessTypeController.show
+POST        /register/about-your-application/business-type             uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.BusinessTypeController.submit
 
-GET         /register/about-your-application/user-role                 uk.gov.hmrc.agentregistrationfrontend.controllers.UserRoleController.show
-POST        /register/about-your-application/user-role                 uk.gov.hmrc.agentregistrationfrontend.controllers.UserRoleController.submit
+GET         /register/about-your-application/user-role                 uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.UserRoleController.show
+POST        /register/about-your-application/user-role                 uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.UserRoleController.submit
 
-GET         /register/about-your-application/check-your-answers        uk.gov.hmrc.agentregistrationfrontend.controllers.CheckYourAnswerController.show
-POST        /register/about-your-application/check-your-answers        uk.gov.hmrc.agentregistrationfrontend.controllers.CheckYourAnswerController.submit
+GET         /register/about-your-application/check-your-answers        uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.CheckYourAnswerController.show
+POST        /register/about-your-application/check-your-answers        uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.CheckYourAnswerController.submit
 
 ##GRS routes
-GET         /register/start-grs-journey                                uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.startJourney
+GET         /register/start-grs-journey                                uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.startGrsJourney
 GET         /register/grs-callback/:businessType                       uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.journeyCallback(businessType: BusinessType, journeyId: String)
 
 ## Anti Money Laundering routes

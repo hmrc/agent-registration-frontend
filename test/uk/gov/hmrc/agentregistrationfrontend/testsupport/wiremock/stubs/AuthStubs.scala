@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs
+package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock as wm
 import com.github.tomakehurst.wiremock.matching.StringValuePattern
@@ -22,8 +22,8 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.StubMaker
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AuthStubs {
 

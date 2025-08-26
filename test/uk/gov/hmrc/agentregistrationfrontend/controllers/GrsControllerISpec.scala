@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.ispecs.controllers
+package uk.gov.hmrc.agentregistrationfrontend.controllers
 
 import com.softwaremill.quicklens.*
 import play.api.http.Status.INTERNAL_SERVER_ERROR
@@ -25,16 +25,22 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.UserRole.*
 import uk.gov.hmrc.agentregistration.shared.util.EnumExtensions.toStringHyphenated
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.ISpec
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs.AgentRegistrationStubs.*
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs.AuthStubs.*
-import uk.gov.hmrc.agentregistrationfrontend.ispecs.wiremock.stubs.GrsStubs.*
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistration
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.GrsFailed
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.GrsNotCalled
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.GrsRegistered
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsResponse
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs.stubApplicationInProgress
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs.stubUpdateAgentApplication
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs.stubAuthorise
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.GrsStubs.grsGeneralPartnershipJourneyUrl
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.GrsStubs.grsLimitedCompanyJourneyUrl
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.GrsStubs.grsLimitedLiabilityPartnershipJourneyUrl
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.GrsStubs.grsSoleTraderJourneyUrl
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.GrsStubs.stubCreateGrsJourney
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.GrsStubs.stubGetGrsResponse
 
 import java.util.UUID
 
@@ -52,35 +58,35 @@ extends ISpec:
     .setTo(AboutYourApplication(
       Some(SoleTrader),
       Some(Owner),
-      Some(true)
+      true
     ))
   val soleTraderTransactorApplication: AgentApplication = fakeAgentApplication
     .modify(_.aboutYourApplication)
     .setTo(AboutYourApplication(
       Some(SoleTrader),
       Some(Authorised),
-      Some(true)
+      true
     ))
   val limitedCompanyApplication: AgentApplication = fakeAgentApplication
     .modify(_.aboutYourApplication)
     .setTo(AboutYourApplication(
       Some(LimitedCompany),
       Some(Owner),
-      Some(true)
+      true
     ))
   val generalPartnershipApplication: AgentApplication = fakeAgentApplication
     .modify(_.aboutYourApplication)
     .setTo(AboutYourApplication(
       Some(GeneralPartnership),
       Some(Owner),
-      Some(true)
+      true
     ))
   val limitedLiabilityPartnershipApplication: AgentApplication = fakeAgentApplication
     .modify(_.aboutYourApplication)
     .setTo(AboutYourApplication(
       Some(LimitedLiabilityPartnership),
       Some(Owner),
-      Some(true)
+      true
     ))
 
   val soleTraderGrsResponse = GrsResponse(
@@ -88,12 +94,15 @@ extends ISpec:
     dateOfBirth = Some(tdAll.dateOfBirth),
     nino = Some(tdAll.nino),
     trn = None,
-    sautr = Some(tdAll.utr.value),
+    sautr = Some(tdAll.utr),
     companyProfile = None,
     ctutr = None,
     postcode = None,
     identifiersMatch = true,
-    registration = GrsRegistration(GrsRegistered, Some(tdAll.safeId))
+    registration = GrsRegistration(
+      registrationStatus = GrsRegistered,
+      registeredBusinessPartnerId = Some(tdAll.safeId)
+    )
   )
   val limitedCompanyGrsResponse = GrsResponse(
     fullName = None,
@@ -102,7 +111,7 @@ extends ISpec:
     trn = None,
     sautr = None,
     companyProfile = Some(tdAll.companyProfile),
-    ctutr = Some(tdAll.utr.value),
+    ctutr = Some(tdAll.utr),
     postcode = None,
     identifiersMatch = true,
     registration = GrsRegistration(GrsRegistered, Some(tdAll.safeId))
@@ -112,7 +121,7 @@ extends ISpec:
     dateOfBirth = None,
     nino = None,
     trn = None,
-    sautr = Some(tdAll.utr.value),
+    sautr = Some(tdAll.utr),
     companyProfile = None,
     ctutr = None,
     postcode = Some(tdAll.postcode),
@@ -124,7 +133,7 @@ extends ISpec:
     dateOfBirth = None,
     nino = None,
     trn = None,
-    sautr = Some(tdAll.utr.value),
+    sautr = Some(tdAll.utr),
     companyProfile = Some(tdAll.companyProfile),
     ctutr = None,
     postcode = Some(tdAll.postcode),
@@ -136,7 +145,7 @@ extends ISpec:
     dateOfBirth = Some(tdAll.dateOfBirth),
     nino = Some(tdAll.nino),
     trn = None,
-    sautr = Some(tdAll.utr.value),
+    sautr = Some(tdAll.utr),
     companyProfile = None,
     ctutr = None,
     postcode = None,
@@ -148,7 +157,7 @@ extends ISpec:
     dateOfBirth = Some(tdAll.dateOfBirth),
     nino = Some(tdAll.nino),
     trn = None,
-    sautr = Some(tdAll.utr.value),
+    sautr = Some(tdAll.utr),
     companyProfile = None,
     ctutr = None,
     postcode = None,
@@ -160,7 +169,7 @@ extends ISpec:
     dateOfBirth = Some(tdAll.dateOfBirth),
     nino = Some(tdAll.nino),
     trn = None,
-    sautr = Some(tdAll.utr.value),
+    sautr = Some(tdAll.utr),
     companyProfile = None,
     ctutr = None,
     postcode = None,
@@ -360,9 +369,9 @@ extends ISpec:
       stubAuthorise()
       stubApplicationInProgress(soleTraderOwnerApplication)
       stubGetGrsResponse(
-        SoleTrader,
-        testJourneyId,
-        Json.toJson(failedGrsResponse)
+        businessType = SoleTrader,
+        journeyId = testJourneyId,
+        responseBody = Json.toJson(failedGrsResponse)
       )
 
       val response = get(s"$grsCallbackUrl/${SoleTrader.toStringHyphenated}?journeyId=$testJourneyId")
@@ -374,9 +383,9 @@ extends ISpec:
       stubAuthorise()
       stubApplicationInProgress(soleTraderOwnerApplication)
       stubGetGrsResponse(
-        SoleTrader,
-        testJourneyId,
-        Json.toJson(unexpectedGrsResponse)
+        businessType = SoleTrader,
+        journeyId = testJourneyId,
+        responseBody = Json.toJson(unexpectedGrsResponse)
       )
 
       val response = get(s"$grsCallbackUrl/${SoleTrader.toStringHyphenated}?journeyId=$testJourneyId")

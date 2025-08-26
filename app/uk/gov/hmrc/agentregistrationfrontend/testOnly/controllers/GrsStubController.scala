@@ -28,12 +28,14 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Request
 import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.CompanyProfile
+import uk.gov.hmrc.agentregistration.shared.FullName
+import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.BusinessType.GeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedCompany
 import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedLiabilityPartnership
 import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
-import uk.gov.hmrc.agentregistration.shared.CompanyProfile
-import uk.gov.hmrc.agentregistration.shared.FullName
 import uk.gov.hmrc.agentregistration.shared.util.EnumFormatter
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -109,6 +111,8 @@ extends FrontendController(mcc):
       Created(Json.obj(
         "journeyStartUrl" -> routes.GrsStubController.showGrsData(businessType, UUID.randomUUID().toString).url
       ))
+
+  def randomUtr(): Utr = Utr("%010d".format(Random.nextLong(9999999999L)))
 
   private def form(businessType: BusinessType): Form[GrsResponse] =
     val registrationStatusMapping: FieldMapping[GrsRegistrationStatus] = Forms.of(EnumFormatter.formatter[GrsRegistrationStatus](
@@ -192,9 +196,9 @@ extends FrontendController(mcc):
           ),
           fullName = firstName.map(first => FullName(first, lastName.getOrElse(""))),
           dateOfBirth = dateOfBirth.map(LocalDate.parse),
-          nino = nino,
+          nino = nino.map(Nino.apply),
           trn = trn,
-          sautr = sautr,
+          sautr = sautr.map(Utr.apply),
           // address = ... when/if adding support for SoleTrader address, don't add it to the stub page and just hardcode it here when trn is defined
           companyProfile = companyNumber.map(number =>
             CompanyProfile(
@@ -204,7 +208,7 @@ extends FrontendController(mcc):
               // unsanitisedCHROAddress = ... when/if adding support for companies house address, don't add it to the stub page and just hardcode it here
             )
           ),
-          ctutr = ctutr,
+          ctutr = ctutr.map(Utr.apply),
           postcode = postcode
         )
     )(response =>
@@ -214,13 +218,13 @@ extends FrontendController(mcc):
         response.fullName.map(_.firstName),
         response.fullName.map(_.lastName),
         response.dateOfBirth.map(_.toString),
-        response.nino,
+        response.nino.map(_.value),
         response.trn,
-        response.sautr,
+        response.sautr.map(_.value),
         response.companyProfile.map(_.companyNumber),
         response.companyProfile.map(_.companyName),
         response.companyProfile.flatMap(_.dateOfIncorporation.map(_.toString)),
-        response.ctutr,
+        response.ctutr.map(_.value),
         response.postcode
       ))
     ))
@@ -233,7 +237,7 @@ extends FrontendController(mcc):
     ),
     fullName = if businessType == SoleTrader then Some(FullName("Test", "User")) else None,
     dateOfBirth = if businessType == SoleTrader then Some(LocalDate.now().minusYears(20)) else None,
-    nino = if businessType == SoleTrader then Some("AB123456C") else None,
+    nino = if businessType == SoleTrader then Some(Nino("AB123456C")) else None,
     trn = None,
     sautr =
       if Seq(
@@ -241,7 +245,7 @@ extends FrontendController(mcc):
           GeneralPartnership,
           LimitedLiabilityPartnership /*Scottish, General Limited, Scottish Limited */
         ).contains(businessType)
-      then Some("%010d".format(Random.nextLong(9999999999L)))
+      then Some(randomUtr())
       else None,
     companyProfile =
       if Seq(LimitedCompany, LimitedLiabilityPartnership /*General Limited, Scottish Limited */ ).contains(businessType) then
@@ -251,7 +255,7 @@ extends FrontendController(mcc):
           dateOfIncorporation = Some(LocalDate.now().minusYears(10))
         ))
       else None,
-    ctutr = if businessType == LimitedCompany then Some("%010d".format(Random.nextLong(9999999999L))) else None,
+    ctutr = if businessType == LimitedCompany then Some(randomUtr()) else None,
     postcode =
       if Seq(GeneralPartnership, LimitedLiabilityPartnership /*Scottish, General Limited, Scottish Limited */ ).contains(businessType) then Some("AA1 1AA")
       else None
