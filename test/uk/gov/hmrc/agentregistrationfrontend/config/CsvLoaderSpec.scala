@@ -16,27 +16,18 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.config
 
-import org.mockito.Mockito.when
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpecLike
-import org.scalatestplus.mockito.MockitoSugar
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 
 import scala.collection.immutable.ListMap
 
 class CsvLoaderSpec
-extends AnyWordSpecLike
-with Matchers
-with MockitoSugar:
+extends UnitSpec:
 
-  implicit val mockAppConfig: AppConfig = mock[AppConfig]
-  def csvLoader = new CsvLoader()
-
-  ".load" should:
+  "CsvLoader.load" should:
 
     "return a ListMap of key value pairs when the CSV file is loaded and parsed correctly" in:
-      when(mockAppConfig.amlsCodesPath).thenReturn("/testAmlsCodes.csv")
-      csvLoader.load(
-        location = mockAppConfig.amlsCodesPath
+      CsvLoader.load(
+        resourceName = ("/testAmlsCodes.csv")
       )
         .shouldBe(ListMap(
           "ATT" -> "Association of TaxationTechnicians (ATT)",
@@ -44,10 +35,9 @@ with MockitoSugar:
         ))
 
     "return a ListMap of names as values when the CSV file is loaded with namesAsValues being true" in:
-      when(mockAppConfig.amlsCodesPath).thenReturn("/testAmlsCodes.csv")
-      csvLoader.load(
+      CsvLoader.load(
         namesAsValues = true,
-        location = mockAppConfig.amlsCodesPath
+        resourceName = "/testAmlsCodes.csv"
       )
         .shouldBe(ListMap(
           "Association of TaxationTechnicians (ATT)" -> "Association of TaxationTechnicians (ATT)",
@@ -57,25 +47,22 @@ with MockitoSugar:
     "return an exception" when:
 
       "the CSV file is loaded but no values were parsed" in:
-        when(mockAppConfig.amlsCodesPath).thenReturn("/testNoCodes.csv")
-        intercept[RuntimeException](csvLoader.load(
-          location = mockAppConfig.amlsCodesPath
+        intercept[RuntimeException](CsvLoader.load(
+          resourceName = "/testNoCodes.csv"
         ))
           .getMessage
           .shouldBe("No keys or values found")
 
       "the file path is empty" in:
-        when(mockAppConfig.amlsCodesPath).thenReturn("")
-        intercept[RuntimeException](csvLoader.load(
-          location = mockAppConfig.amlsCodesPath
+        intercept[RuntimeException](CsvLoader.load(
+          resourceName = ""
         ))
           .getMessage
           .shouldBe("requirement failed: The file path should not be empty")
 
       "the target file is not a CSV type" in:
-        when(mockAppConfig.amlsCodesPath).thenReturn("/testInvalidFileType.txt")
-        intercept[RuntimeException](csvLoader.load(
-          location = mockAppConfig.amlsCodesPath
+        intercept[RuntimeException](CsvLoader.load(
+          resourceName = "/testInvalidFileType.txt"
         ))
           .getMessage
           .shouldBe("requirement failed: The file should be a csv file")

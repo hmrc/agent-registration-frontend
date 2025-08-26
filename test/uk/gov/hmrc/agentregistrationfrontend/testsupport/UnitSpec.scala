@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport
 
-import org.scalatest.freespec.AnyFreeSpec
+import org.scalatest.wordspec.AnyWordSpecLike
 
 trait UnitSpec
-extends AnyFreeSpec,
+extends AnyWordSpecLike,
   RichMatchers

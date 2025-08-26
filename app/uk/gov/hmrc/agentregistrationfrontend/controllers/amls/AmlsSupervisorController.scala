@@ -44,7 +44,6 @@ class AmlsSupervisorController @Inject() (
   mcc: MessagesControllerComponents,
   view: AmlsSupervisoryBodyPage,
   applicationService: ApplicationService,
-  csvLoader: CsvLoader,
   appConfig: AppConfig
 )(implicit ec: ExecutionContext)
 extends FrontendController(mcc)
@@ -52,7 +51,7 @@ with I18nSupport:
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
-      val options = csvLoader.load(appConfig.amlsCodesPath)
+      val options = CsvLoader.load(appConfig.amlsCodesPath)
       val formWithOptions = SelectFromOptionsForm.form("amlsSupervisoryBody", options.keys.toSeq)
       val form: Form[String] =
         request
@@ -65,7 +64,7 @@ with I18nSupport:
 
   def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
-      val options = csvLoader.load(appConfig.amlsCodesPath)
+      val options = CsvLoader.load(appConfig.amlsCodesPath)
       SelectFromOptionsForm.form("amlsSupervisoryBody", options.keys.toSeq)
         .bindFromRequest()
         .fold(
