@@ -38,3 +38,5 @@ POST        /register/anti-money-laundering/supervisor-name            uk.gov.hm
 GET         /register/anti-money-laundering/registration-number        uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsRegistrationNumberController.show
 POST        /register/anti-money-laundering/registration-number        uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsRegistrationNumberController.submit
 GET         /register/anti-money-laundering/supervision-runs-out       uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsExpiryDateController.show
+POST        /register/anti-money-laundering/supervision-runs-out       uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsExpiryDateController.submit
+GET         /register/anti-money-laundering/supporting-evidence        uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsSupportingEvidenceController.show
