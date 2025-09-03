@@ -25,11 +25,12 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 
 object BusinessTypeForm:
 
+  val key: String = "businessType"
   val form: Form[BusinessType] =
     val fieldMapping: FieldMapping[BusinessType] = Forms.of(EnumFormatter.formatter[BusinessType](
       errorMessageIfMissing = "businessType.error.required",
       errorMessageIfEnumError = "businessType.error.invalid"
     ))
     Form(
-      mapping = mapping("businessType" -> fieldMapping)(identity)(Some(_))
+      mapping = mapping(key -> fieldMapping)(identity)(Some(_))
     )

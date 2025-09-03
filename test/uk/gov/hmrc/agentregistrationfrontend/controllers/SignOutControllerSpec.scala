@@ -19,10 +19,10 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
-class SignOutControllerISpec
-extends ISpec:
+class SignOutControllerSpec
+extends ControllerSpec:
 
   private val signOutPath = "/agent-registration/sign-out"
   private val timeOutPath = "/agent-registration/time-out"
@@ -35,7 +35,7 @@ extends ISpec:
   "GET /sign-out" in:
     val response: WSResponse = get(signOutPath)
 
-    response.status shouldBe 303
+    response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe signOutWithContinue(selfExternalUrl)
 
@@ -43,13 +43,11 @@ extends ISpec:
     val timedOutUrl = uri"$selfExternalUrl/timed-out"
     val response: WSResponse = get(timeOutPath)
 
-    response.status shouldBe 303
+    response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe signOutWithContinue(timedOutUrl.toString)
 
   "GET /timed-out" in:
     val response: WSResponse = get(timedOutPath)
-
-    response.status shouldBe 200
-    response.body[String] should include("You have been signed out")
-    response.body[String] should include("Sign in again")
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe "You have been signed out - Apply for an agent services account - GOV.UK"

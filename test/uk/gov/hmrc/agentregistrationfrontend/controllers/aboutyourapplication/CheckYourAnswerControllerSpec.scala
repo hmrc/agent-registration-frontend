@@ -14,47 +14,53 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers
+package uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication
 
-import play.api.libs.ws.DefaultBodyReadables.*
+import com.softwaremill.quicklens.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
-import com.softwaremill.quicklens.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
 import uk.gov.hmrc.agentregistration.shared.UserRole.Owner
+import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 
-class CheckYourAnswerControllerISpec
-extends ISpec:
+class CheckYourAnswerControllerSpec
+extends ControllerSpec:
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
-  private val checkAnswerPath = s"/agent-registration/register/about-your-application/check-your-answers"
+  private val path = s"/agent-registration/register/about-your-application/check-your-answers"
   private val fakeAgentApplication: AgentApplication = applicationFactory
     .makeNewAgentApplication(tdAll.internalUserId)
     .modify(_.aboutYourApplication.businessType).setTo(Some(SoleTrader))
     .modify(_.aboutYourApplication.userRole).setTo(Some(Owner))
 
-  "GET /register/about-your-application/check-answer should return 200 and render page" in:
+  "routes should have correct paths and methods" in:
+    routes.CheckYourAnswerController.show shouldBe Call(
+      method = "GET",
+      url = "/agent-registration/register/about-your-application/check-your-answers"
+    )
+    routes.CheckYourAnswerController.submit shouldBe Call(
+      method = "POST",
+      url = "/agent-registration/register/about-your-application/check-your-answers"
+    )
+    routes.CheckYourAnswerController.submit.url shouldBe routes.CheckYourAnswerController.show.url
+
+  s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
-    val response: WSResponse = get(checkAnswerPath)
+    val response: WSResponse = get(path)
 
-    response.status shouldBe 200
-    val content = response.body[String]
-
-    content should include("Business type")
-    content should include("Are you the business owner?")
-    content should include("Confirm and continue")
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
 
   "POST /register/about-your-application/check-answer with confirm and continue selection should redirect to the next page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication
 
-    val response: WSResponse = post(checkAnswerPath)(Map.empty)
+    val response: WSResponse = post(path)(Map.empty)
 
-    response.status shouldBe 303
+    response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe "/agent-registration/register/start-grs-journey"

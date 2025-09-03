@@ -16,27 +16,24 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.config
 
-import javax.inject.Inject
-import javax.inject.Singleton
 import scala.collection.immutable.ListMap
 import scala.io.Source
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
 
-@Singleton
-class CsvLoader @Inject() {
+object CsvLoader {
 
   def load(
-    location: String,
+    resourceName: String,
     namesAsValues: Boolean = false
   ): ListMap[String, String] =
     Try {
-      require(location.nonEmpty, "The file path should not be empty")
-      require(location.endsWith(".csv"), "The file should be a csv file")
+      require(resourceName.nonEmpty, "The file path should not be empty")
+      require(resourceName.endsWith(".csv"), "The file should be a csv file")
 
       Source
-        .fromInputStream(getClass.getResourceAsStream(location), "utf-8")
+        .fromInputStream(getClass.getResourceAsStream(resourceName), "utf-8")
         .getLines
         .drop(1)
         .foldLeft(ListMap.empty[String, String]) { (acc, row) =>

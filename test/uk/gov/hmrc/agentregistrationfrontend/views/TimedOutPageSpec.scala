@@ -18,23 +18,47 @@ package uk.gov.hmrc.agentregistrationfrontend.views
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpecSupport
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.TimedOutPage
 
 class TimedOutPageSpec
-extends ViewSpecSupport:
-
-  val viewTemplate: TimedOutPage = app.injector.instanceOf[TimedOutPage]
-  implicit val doc: Document = Jsoup.parse(viewTemplate().body)
+extends ViewSpec:
 
   "TimedOutPage" should:
+    val viewTemplate: TimedOutPage = app.injector.instanceOf[TimedOutPage]
+    val doc: Document = Jsoup.parse(viewTemplate().body)
+
+    "have expected content" in:
+      doc.mainContent shouldContainContent
+        """
+          |You have been signed out
+          |You have not done anything for 15 minutes, so we have signed you out to keep your account secure.
+          |Sign in again
+          |"""
+          .stripMargin
 
     "have the correct title" in:
       doc.title() shouldBe "You have been signed out - Apply for an agent services account - GOV.UK"
 
+    "have the correct h1" in:
+      doc.h1 shouldBe "You have been signed out"
+
     "render explanation for sign out" in:
-      doc.extractText("p.govuk-body", 1).get shouldBe
-        "You have not done anything for 15 minutes, so we have signed you out to keep your account secure."
+      doc
+        .mainContent
+        .selectOrFail("p.govuk-body")
+        .first()
+        .text() shouldBe "You have not done anything for 15 minutes, so we have signed you out to keep your account secure."
 
     "render a link to sign in again" in:
-      doc.extractText("a.govuk-link", 1).get shouldBe "Sign in again"
+      val signInAgainLink: TestLink =
+        doc
+          .mainContent
+          .selectOrFail("p.govuk-body a")
+          .selectOnlyOneElementOrFail()
+          .toLink
+
+      signInAgainLink shouldBe TestLink(
+        text = "Sign in again",
+        href = "/agent-registration"
+      )

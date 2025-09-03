@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport
+package uk.gov.hmrc.agentregistrationfrontend.testsupport.viewspecsupport
 
-import org.scalatest.wordspec.AnyWordSpecLike
+import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
+import org.jsoup.select.Elements
+import org.jsoup.Jsoup
+import org.scalactic.source.Position
+import play.api.libs.ws.WSResponse
 
-trait UnitSpec
-extends AnyWordSpecLike,
-  RichMatchers
+object JsoupSupport {
+
+  export ContainContentMatcher.*
+  export ElementSupport.*
+  export ElementsSupport.*
+  export ViewSelectors.*
+
+  extension (response: WSResponse)
+    def parseBodyAsJsoupDocument: Document = Jsoup.parse(response.body)
+
+}

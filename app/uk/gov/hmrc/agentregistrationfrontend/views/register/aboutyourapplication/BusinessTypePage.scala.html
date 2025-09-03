@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
+@import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeForm
 
 @this(
         layout: Layout,
@@ -36,7 +37,7 @@
 )
 
 @key = @{
-    "businessType"
+    BusinessTypeForm.key
 }
 @title = @{
     messages(s"$key.title")

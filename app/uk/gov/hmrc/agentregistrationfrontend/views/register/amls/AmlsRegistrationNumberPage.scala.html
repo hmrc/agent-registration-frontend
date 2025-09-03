@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.govukfrontend.views.Implicits._
 @import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
+@import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.amls.routes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.register.partials.ContinueOrSaveForLater
@@ -35,7 +36,10 @@
         messages: Messages
 )
 
-@key = @{"amlsRegistrationNumber"}
+@key = @{
+    AmlsRegistrationNumberForm.key
+}
+
 @pageTitle = @{messages(s"$key.title")}
     
 @layout(

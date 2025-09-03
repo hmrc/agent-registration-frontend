@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.register
+package uk.gov.hmrc.agentregistrationfrontend.views.register.aboutyourapplication
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeForm
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpecSupport
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.BusinessTypePage
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
+import uk.gov.hmrc.agentregistrationfrontend.views.html.register.aboutyourapplication.BusinessTypePage
 
 class BusinessTypePageSpec
-extends ViewSpecSupport:
+extends ViewSpec:
 
   val viewTemplate: BusinessTypePage = app.injector.instanceOf[BusinessTypePage]
   implicit val doc: Document = Jsoup.parse(viewTemplate(BusinessTypeForm.form).body)
@@ -45,14 +45,14 @@ extends ViewSpecSupport:
         ),
         hint = None
       )
-      doc.mainContent.extractRadios(1).value shouldBe expectedRadioGroup
+      doc.mainContent.extractRadioGroup() shouldBe expectedRadioGroup
 
     "render a details element with content for when the business type is not listed" in:
       val expectedSummary = "The business is set up as something else"
       val expectedDetails =
         "To get an agent services account your business must be a sole trader, limited company, partnership or limited liability partnership."
       val expectedLinkText = "Finish and sign out"
-      val details = doc.select("details")
+      val details = doc.selectOrFail("details")
       details.size() shouldBe 1
       details.text() shouldBe s"$expectedSummary $expectedDetails $expectedLinkText"
 
@@ -66,6 +66,6 @@ extends ViewSpecSupport:
         .withError(field, errorMessage)
       val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
       errorDoc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
-      errorDoc.select(".govuk-error-summary__title").text() shouldBe "There is a problem"
-      errorDoc.select(".govuk-error-summary__list > li > a").attr("href") shouldBe s"#$field"
-      errorDoc.select(".govuk-error-message").text() shouldBe s"Error: $errorMessage"
+      errorDoc.selectOrFail(".govuk-error-summary__title").selectOnlyOneElementOrFail().text() shouldBe "There is a problem"
+      errorDoc.selectOrFail(".govuk-error-summary__list > li > a").selectOnlyOneElementOrFail().selectAttrOrFail("href") shouldBe s"#$field"
+      errorDoc.selectOrFail(".govuk-error-message").selectOnlyOneElementOrFail().text() shouldBe s"Error: $errorMessage"

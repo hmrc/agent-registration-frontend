@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.CheckYourAnswerPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.register.aboutyourapplication.CheckYourAnswerPage
 
 import scala.concurrent.ExecutionContext
 
