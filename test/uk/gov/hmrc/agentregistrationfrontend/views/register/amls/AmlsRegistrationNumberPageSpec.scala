@@ -21,46 +21,81 @@ import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpecSupport
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.AmlsRegistrationNumberPage
 
 class AmlsRegistrationNumberPageSpec
-extends ViewSpecSupport {
+extends ViewSpec:
 
   val viewTemplate: AmlsRegistrationNumberPage = app.injector.instanceOf[AmlsRegistrationNumberPage]
 
-  implicit val doc: Document = Jsoup.parse(
+  val doc: Document = Jsoup.parse(
     viewTemplate(
       AmlsRegistrationNumberForm(isHmrc = false).form
     ).body
   )
   private val heading: String = "What is your registration number?"
 
-  "AmlsRegistrationNumberPage view" should {
+  "AmlsRegistrationNumberPage view" should:
+
+    "contain expected content" in:
+      doc.mainContent shouldContainContent
+        """
+          |Anti-money laundering supervision details
+          |What is your registration number?
+          |Save and continue
+          |Save and come back later
+          |""".stripMargin
+
     "have the correct title" in {
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
     }
-    "have a text input element" in {
-      doc.select("input[type='text']").size() shouldBe 1
-    }
-    "render a save and continue button" in {
-      doc.select(s"button[value='${SaveAndContinue.toString}']").text() shouldBe "Save and continue"
-    }
-    "render a save and come back later button" in {
-      doc.select(s"button[value=${SaveAndComeBackLater.toString}]").text() shouldBe "Save and come back later"
-    }
+    "have only one text input element in the form" in:
+//      doc
+//        .mainContent
+//        .selectOrFail("form input[type='text']")
+//        .selectOnlyOneElementOrFail()
+//        .toInputField shouldBe TestInputField("xxx", None, "xxx")
+      // TODO: toInputFiels isn't working, discuss how it should behave
 
-    "render an error message when form has errors" in {
+      doc
+        .mainContent
+        .selectOrFail("form input[type='text']")
+        .selectOnlyOneElementOrFail()
+
+    "render a save and continue button" in:
+      doc
+        .mainContent
+        .selectOrFail(s"form button[value='${SaveAndContinue.toString}']")
+        .selectOnlyOneElementOrFail()
+        .text() shouldBe "Save and continue"
+
+    "render a save and come back later button" in:
+      doc
+        .mainContent
+        .selectOrFail(s"form button[value=${SaveAndComeBackLater.toString}]")
+        .selectOnlyOneElementOrFail()
+        .text() shouldBe "Save and come back later"
+
+    "render an error message when form has errors" in:
       val field = "amlsRegistrationNumber"
       val errorMessage = "Enter your registration number"
       val formWithError = AmlsRegistrationNumberForm(isHmrc = false).form
         .withError(field, errorMessage)
       val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
-      errorDoc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
-      errorDoc.select(".govuk-error-summary__title").text() shouldBe "There is a problem"
-      errorDoc.select(".govuk-error-summary__list > li > a").attr("href") shouldBe s"#$field"
-      errorDoc.select(".govuk-error-message").text() shouldBe s"Error: $errorMessage"
-    }
-  }
+      errorDoc.mainContent shouldContainContent
+        """
+          |There is a problem
+          |Enter your registration number
+          |Anti-money laundering supervision details
+          |What is your registration number?
+          |Error:
+          |Enter your registration number
+          |Save and continue
+          |Save and come back later
+          |""".stripMargin
 
-}
+      errorDoc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
+      errorDoc.selectOrFail(".govuk-error-summary__title").selectOnlyOneElementOrFail().text() shouldBe "There is a problem"
+      errorDoc.selectOrFail(".govuk-error-summary__list > li > a").selectOnlyOneElementOrFail().selectAttrOrFail("href") shouldBe s"#$field"
+      errorDoc.selectOrFail(".govuk-error-message").selectOnlyOneElementOrFail().text() shouldBe s"Error: $errorMessage"

@@ -19,10 +19,11 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import org.jsoup.Jsoup
 
-class SignOutControllerISpec
-extends ISpec:
+class SignOutControllerSpec
+extends ControllerSpec:
 
   private val signOutPath = "/agent-registration/sign-out"
   private val timeOutPath = "/agent-registration/time-out"
@@ -51,5 +52,13 @@ extends ISpec:
     val response: WSResponse = get(timedOutPath)
 
     response.status shouldBe 200
-    response.body[String] should include("You have been signed out")
-    response.body[String] should include("Sign in again")
+
+    Jsoup
+      .parse(response.body)
+      .mainContent shouldContainContent
+      """
+        |You have been signed out
+        |You have not done anything for 15 minutes, so we have signed you out to keep your account secure.
+        |Sign in again
+        |"""
+        .stripMargin

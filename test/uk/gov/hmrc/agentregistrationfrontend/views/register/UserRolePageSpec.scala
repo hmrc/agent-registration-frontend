@@ -19,23 +19,34 @@ package uk.gov.hmrc.agentregistrationfrontend.views.register
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.forms.UserRoleForm
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpecSupport
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.UserRolePage
 
 class UserRolePageSpec
-extends ViewSpecSupport {
+extends ViewSpec:
 
-  val viewTemplate: UserRolePage = app.injector.instanceOf[UserRolePage]
-  implicit val doc: Document = Jsoup.parse(viewTemplate(UserRoleForm.form).body)
-  private val heading: String = "Are you the owner of the business?"
+  "UserRolePage" should:
+    val heading: String = "Are you the owner of the business?"
+    val viewTemplate: UserRolePage = app.injector.instanceOf[UserRolePage]
+    val doc: Document = Jsoup.parse(viewTemplate(UserRoleForm.form).body)
 
-  "UserRolePage" should {
+    "contein expected content" in:
+      doc.mainContent shouldContainContent
+        """
+          |About your application
+          |Are you the owner of the business?
+          |Yes
+          |No, but I’m authorised by them to set up this account
+          |Save and continue
+          |""".stripMargin
 
-    "have the correct title" in {
+    "have the correct title" in:
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
-    }
 
-    "render a radio button for each option" in {
+    "have the correct h1" in:
+      doc.h1 shouldBe "Are you the owner of the business?"
+
+    "render a radio button for each option" in:
       val expectedRadioGroup: TestRadioGroup = TestRadioGroup(
         legend = heading,
         options = List(
@@ -44,25 +55,56 @@ extends ViewSpecSupport {
         ),
         hint = None
       )
-      doc.mainContent.extractRadios(1).value shouldBe expectedRadioGroup
-    }
 
-    "render a save and continue button" in {
-      doc.select("button[type=submit]").text() shouldBe "Save and continue"
-    }
+      doc
+        .mainContent
+        .extractRadioGroup() shouldBe expectedRadioGroup
 
-    "render a form error when the form contains an error" in {
+    "render a save and continue button" in:
+      doc.extractSubmitButtonText shouldBe "Save and continue"
+//      doc.select("button[type=submit]").text() shouldBe "Save and continue"
+
+    "render a form error when the form contains an error" in:
+      // TODO: this tests doesn't test that correct form with errors is passed to the view.
+      //  Also it doesn't verify if error summary list leads to the input field
+
+      val viewTemplate: UserRolePage = app.injector.instanceOf[UserRolePage]
+      val heading: String = "Are you the owner of the business?"
+
       val field = "userRole"
       val errorMessage = "Select ‘yes’ if you are the owner of the business"
       val formWithError = UserRoleForm.form
         .withError(field, errorMessage)
-      val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
-      errorDoc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
-      errorDoc.select(".govuk-error-summary__title").text() shouldBe "There is a problem"
-      errorDoc.select(".govuk-error-summary__list > li > a").attr("href") shouldBe s"#$field"
-      errorDoc.select(".govuk-error-message").text() shouldBe s"Error: $errorMessage"
-    }
+      val doc: Document = Jsoup.parse(viewTemplate(formWithError).body)
 
-  }
+      doc.mainContent shouldContainContent
+        """
+          |There is a problem
+          |Select ‘yes’ if you are the owner of the business
+          |About your application
+          |Are you the owner of the business?
+          |Error:
+          |Select ‘yes’ if you are the owner of the business
+          |Yes
+          |No, but I’m authorised by them to set up this account
+          |Save and continue
+          |""".stripMargin
 
-}
+      doc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
+
+      // TODO discuss what are those and if we could make them available in the ViewSelectors
+      doc
+        .mainContent
+        .selectOrFail(".govuk-error-summary__title")
+        .selectOnlyOneElementOrFail()
+        .text() shouldBe "There is a problem"
+
+      doc
+        .selectOrFail(".govuk-error-summary__list > li > a")
+        .selectOnlyOneElementOrFail()
+        .selectAttrOrFail("href") shouldBe s"#$field"
+
+      doc
+        .selectOrFail(".govuk-error-message")
+        .selectOnlyOneElementOrFail()
+        .text() shouldBe s"Error: $errorMessage"

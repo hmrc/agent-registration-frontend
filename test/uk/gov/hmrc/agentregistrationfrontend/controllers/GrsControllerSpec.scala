@@ -21,31 +21,26 @@ import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.http.Status.OK
 import play.api.http.Status.SEE_OTHER
 import play.api.libs.json.Json
-import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.UserRole.*
 import uk.gov.hmrc.agentregistration.shared.util.EnumExtensions.toStringHyphenated
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistration
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.GrsFailed
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.GrsNotCalled
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.GrsRegistered
+import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistration
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsResponse
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs.stubApplicationInProgress
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs.stubUpdateAgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs.stubAuthorise
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.GrsStubs.grsGeneralPartnershipJourneyUrl
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.GrsStubs.grsLimitedCompanyJourneyUrl
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.GrsStubs.grsLimitedLiabilityPartnershipJourneyUrl
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.GrsStubs.grsSoleTraderJourneyUrl
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.GrsStubs.stubCreateGrsJourney
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.GrsStubs.stubGetGrsResponse
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.GrsStubs.*
 
 import java.util.UUID
 
-class GrsControllerISpec
-extends ISpec:
+class GrsControllerSpec
+extends ControllerSpec:
 
   val grsStartUrl = "/agent-registration/register/start-grs-journey"
   val grsCallbackUrl = "/agent-registration/register/grs-callback"

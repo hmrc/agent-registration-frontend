@@ -16,19 +16,19 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
+import com.softwaremill.quicklens.*
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
-import com.softwaremill.quicklens.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
 import uk.gov.hmrc.agentregistration.shared.UserRole.Owner
+import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 
-class CheckYourAnswerControllerISpec
-extends ISpec:
+class CheckYourAnswerControllerSpec
+extends ControllerSpec:
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
   private val checkAnswerPath = s"/agent-registration/register/about-your-application/check-your-answers"

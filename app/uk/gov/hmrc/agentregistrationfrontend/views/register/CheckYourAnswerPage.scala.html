@@ -40,6 +40,7 @@
     messages(s"$key.title")
 }
 
+
 @businessTypeRow = @{
     SummaryListRow(
         key = Key(
@@ -91,6 +92,8 @@
 
     <h2 class="govuk-caption-xl">@messages("about-application.title")</h2>
     <h1 class="govuk-heading-xl">@messages(s"$key.title")</h1>
+
+
 
     @govukSummaryList(SummaryList(rows))
 

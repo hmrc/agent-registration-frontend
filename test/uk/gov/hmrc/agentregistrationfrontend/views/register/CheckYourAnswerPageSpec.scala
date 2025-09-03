@@ -25,12 +25,12 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
 import uk.gov.hmrc.agentregistration.shared.UserRole.Owner
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpecSupport
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.CheckYourAnswerPage
 
 class CheckYourAnswerPageSpec
-extends ViewSpecSupport {
+extends ViewSpec:
 
   val viewTemplate: CheckYourAnswerPage = app.injector.instanceOf[CheckYourAnswerPage]
 
@@ -49,29 +49,43 @@ extends ViewSpecSupport {
       internalUserId = tdAll.internalUserId,
       groupId = tdAll.groupId
     )
-  implicit val doc: Document = Jsoup.parse(viewTemplate().body)
+
+  val doc: Document = Jsoup.parse(viewTemplate().body)
   private val heading: String = "Check your answers"
 
-  "CheckYourAnswerPage" should {
+  "CheckYourAnswerPage" should:
+    "contain content" in:
+      doc.mainContent shouldContainContent
+        """
+          |About your application
+          |Check your answers
+          |Business type
+          |Sole trader
+          |Change Business type
+          |Are you the business owner?
+          |Yes
+          |Change Are you the business owner?
+          """.stripMargin
 
-    "have the correct title" in {
+    "have the correct title" in:
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
-    }
 
-    "render a radio button for each option" in {
-      val testSummaryList: TestSummaryList = TestSummaryList(
+    "render a radio button for each option" in:
+      val expectedSummaryList: TestSummaryList = TestSummaryList(
         List(
-          ("Business type", "Sole trader", "/agent-registration/register/about-your-application/business-type"),
-          ("Are you the business owner?", "Yes", "/agent-registration/register/about-your-application/user-role")
+          TestSummaryRow(
+            key = "Business type",
+            value = "Sole trader",
+            action = "/agent-registration/register/about-your-application/business-type"
+          ),
+          TestSummaryRow(
+            key = "Are you the business owner?",
+            value = "Yes",
+            action = "/agent-registration/register/about-your-application/user-role"
+          )
         )
       )
-      doc.mainContent.extractSummaryList(1).value shouldBe testSummaryList
-    }
+      doc.mainContent.extractSummaryList() shouldBe expectedSummaryList
 
-    "render a confirm and continue button" in {
-      doc.select("button[type=submit]").text() shouldBe "Confirm and continue"
-    }
-
-  }
-
-}
+    "render a confirm and continue button" in:
+      doc.extractSubmitButtonText shouldBe "Confirm and continue"

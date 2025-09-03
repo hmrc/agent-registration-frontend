@@ -22,13 +22,13 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
-class AmlsRegistrationNumberControllerISpec
-extends ISpec:
+class AmlsRegistrationNumberControllerSpec
+extends ControllerSpec:
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
   private val pathUnderTest = "/agent-registration/register/anti-money-laundering/registration-number"
