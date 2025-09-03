@@ -36,7 +36,7 @@ object ElementsSupport:
       else
         selectedElements
 
-    /** Will find the element by index and return the element as option. Index lookup is 1-indexed, if you want the first element then pass in 1.
+    /** Will find the element by index. Index lookup is 1-indexed, if you want the first element then pass in 1.
       */
     inline def selectOrFail(index: Int)(using pos: Position): Element = elements
       .toList
