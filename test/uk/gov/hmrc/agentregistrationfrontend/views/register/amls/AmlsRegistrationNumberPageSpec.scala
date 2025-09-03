@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.views.register.amls
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
+import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -47,9 +49,12 @@ extends ViewSpec:
           |Save and come back later
           |""".stripMargin
 
-    "have the correct title" in {
+    "have the correct title" in:
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
-    }
+
+    "have the correct h1" in:
+      doc.h1 shouldBe heading
+
     "have only one text input element in the form" in:
 //      doc
 //        .mainContent
@@ -60,7 +65,7 @@ extends ViewSpec:
 
       doc
         .mainContent
-        .selectOrFail("formx input[type='text']")
+        .selectOrFail("form input[type='text']")
         .selectOnlyOneElementOrFail()
 
     "render a save and continue button" in:
@@ -78,10 +83,10 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render an error message when form has errors" in:
-      val field = "amlsRegistrationNumber"
-      val errorMessage = "Enter your registration number"
-      val formWithError = AmlsRegistrationNumberForm(isHmrc = false).form
-        .withError(field, errorMessage)
+      val key: String = AmlsRegistrationNumberForm.key
+      val errorMessage: String = "Enter your registration number"
+      val formWithError: Form[AmlsRegistrationNumber] = AmlsRegistrationNumberForm(isHmrc = false).form
+        .withError(key, errorMessage)
       val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
       errorDoc.mainContent shouldContainContent
         """
@@ -97,5 +102,5 @@ extends ViewSpec:
 
       errorDoc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
       errorDoc.selectOrFail(".govuk-error-summary__title").selectOnlyOneElementOrFail().text() shouldBe "There is a problem"
-      errorDoc.selectOrFail(".govuk-error-summary__list > li > a").selectOnlyOneElementOrFail().selectAttrOrFail("href") shouldBe s"#$field"
+      errorDoc.selectOrFail(".govuk-error-summary__list > li > a").selectOnlyOneElementOrFail().selectAttrOrFail("href") shouldBe s"#$key"
       errorDoc.selectOrFail(".govuk-error-message").selectOnlyOneElementOrFail().text() shouldBe s"Error: $errorMessage"

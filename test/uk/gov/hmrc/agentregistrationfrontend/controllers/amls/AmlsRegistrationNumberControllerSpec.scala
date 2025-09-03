@@ -23,6 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
@@ -31,7 +32,19 @@ class AmlsRegistrationNumberControllerSpec
 extends ControllerSpec:
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
-  private val pathUnderTest = "/agent-registration/register/anti-money-laundering/registration-number"
+  private val path = "/agent-registration/register/anti-money-laundering/registration-number"
+
+  "routes should have correct paths and methods" in:
+    routes.AmlsRegistrationNumberController.show shouldBe Call(
+      method = "GET",
+      url = "/agent-registration/register/anti-money-laundering/registration-number"
+    )
+    routes.AmlsRegistrationNumberController.submit shouldBe Call(
+      method = "POST",
+      url = "/agent-registration/register/anti-money-laundering/registration-number"
+    )
+    routes.AmlsRegistrationNumberController.submit.url shouldBe routes.AmlsRegistrationNumberController.show.url
+
   // when the supervisory body is HMRC, the registration number has a different format to non-HMRC bodies
   private val fakeAgentApplicationWithHmrc: AgentApplication = applicationFactory
     .makeNewAgentApplication(tdAll.internalUserId)
@@ -68,18 +81,18 @@ extends ControllerSpec:
       validInput = "1234567890",
       invalidInput = ";</\\>"
     )
-  ).foreach { testCase =>
-    s"GET $pathUnderTest should return 200 for ${testCase.amlsType} and render page" in:
+  ).foreach: testCase =>
+    s"GET $path should return 200 for ${testCase.amlsType} and render page" in:
       AuthStubs.stubAuthorise()
       AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
-      val response: WSResponse = get(pathUnderTest)
+      val response: WSResponse = get(path)
 
       response.status shouldBe 200
       val content = response.body[String]
       content should include("What is your registration number?")
       content should include("Save and continue")
 
-    s"POST $pathUnderTest with valid input for ${testCase.amlsType} should redirect to the next page" in:
+    s"POST $path with valid input for ${testCase.amlsType} should redirect to the next page" in:
       AuthStubs.stubAuthorise()
       AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
       val updatedApplication = testCase.application
@@ -91,8 +104,8 @@ extends ControllerSpec:
       AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
       AgentRegistrationStubs.stubApplicationInProgress(updatedApplication)
       val response: WSResponse =
-        post(pathUnderTest)(Map(
-          "amlsRegistrationNumber" -> Seq(testCase.validInput),
+        post(path)(Map(
+          AmlsRegistrationNumberForm.key -> Seq(testCase.validInput),
           "submit" -> Seq("SaveAndContinue")
         ))
 
@@ -100,7 +113,7 @@ extends ControllerSpec:
       response.body[String] shouldBe ""
       response.header("Location").value shouldBe "/agent-registration/register/anti-money-laundering/supervision-runs-out"
 
-    s"POST $pathUnderTest with save for later and valid input for ${testCase.amlsType} should redirect to the saved for later page" in:
+    s"POST $path with save for later and valid input for ${testCase.amlsType} should redirect to the saved for later page" in:
       AuthStubs.stubAuthorise()
       AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
       val updatedApplication = testCase.application
@@ -112,8 +125,8 @@ extends ControllerSpec:
       AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
       AgentRegistrationStubs.stubApplicationInProgress(updatedApplication)
       val response: WSResponse =
-        post(pathUnderTest)(Map(
-          "amlsRegistrationNumber" -> Seq(testCase.validInput),
+        post(path)(Map(
+          AmlsRegistrationNumberForm.key -> Seq(testCase.validInput),
           "submit" -> Seq("SaveAndComeBackLater")
         ))
 
@@ -121,12 +134,12 @@ extends ControllerSpec:
       response.body[String] shouldBe ""
       response.header("Location").value shouldBe "/agent-registration/register/save-and-come-back-later"
 
-    s"POST $pathUnderTest as blank form for ${testCase.amlsType} should return 400" in:
+    s"POST $path as blank form for ${testCase.amlsType} should return 400" in:
       AuthStubs.stubAuthorise()
       AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
       val response: WSResponse =
-        post(pathUnderTest)(Map(
-          "amlsRegistrationNumber" -> Seq(""),
+        post(path)(Map(
+          AmlsRegistrationNumberForm.key -> Seq(""),
           "submit" -> Seq("SaveAndContinue")
         ))
 
@@ -135,12 +148,12 @@ extends ControllerSpec:
       content should include("There is a problem")
       content should include("Enter your registration number")
 
-    s"POST $pathUnderTest as blank form and save for later for ${testCase.amlsType} should redirect to save for later page" in:
+    s"POST $path as blank form and save for later for ${testCase.amlsType} should redirect to save for later page" in:
       AuthStubs.stubAuthorise()
       AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
       val response: WSResponse =
-        post(pathUnderTest)(Map(
-          "amlsRegistrationNumber" -> Seq(""),
+        post(path)(Map(
+          AmlsRegistrationNumberForm.key -> Seq(""),
           "submit" -> Seq("SaveAndComeBackLater")
         ))
 
@@ -148,12 +161,12 @@ extends ControllerSpec:
       response.body[String] shouldBe ""
       response.header("Location").value shouldBe "/agent-registration/register/save-and-come-back-later"
 
-    s"POST $pathUnderTest with an invalid value for ${testCase.amlsType} should return 400" in:
+    s"POST $path with an invalid value for ${testCase.amlsType} should return 400" in:
       AuthStubs.stubAuthorise()
       AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
       val response: WSResponse =
-        post(pathUnderTest)(Map(
-          "amlsRegistrationNumber" -> Seq(testCase.invalidInput),
+        post(path)(Map(
+          AmlsRegistrationNumberForm.key -> Seq(testCase.invalidInput),
           "submit" -> Seq("SaveAndContinue")
         ))
 
@@ -162,17 +175,15 @@ extends ControllerSpec:
       content should include("There is a problem")
       content should include("Enter your registration number in the correct format")
 
-    s"POST $pathUnderTest with an invalid value and save for later for ${testCase.amlsType} should not save and redirect to save for later" in:
+    s"POST $path with an invalid value and save for later for ${testCase.amlsType} should not save and redirect to save for later" in:
       AuthStubs.stubAuthorise()
       AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
       val response: WSResponse =
-        post(pathUnderTest)(Map(
-          "amlsRegistrationNumber" -> Seq(testCase.invalidInput),
+        post(path)(Map(
+          AmlsRegistrationNumberForm.key -> Seq(testCase.invalidInput),
           "submit" -> Seq("SaveAndComeBackLater")
         ))
 
       response.status shouldBe 303
       response.body[String] shouldBe ""
       response.header("Location").value shouldBe "/agent-registration/register/save-and-come-back-later"
-
-  }

@@ -25,11 +25,13 @@ import uk.gov.hmrc.agentregistration.shared.util.EnumFormatter
 
 object UserRoleForm:
 
+  val key: String = "userRole"
+
   val form: Form[UserRole] =
     val fieldMapping: FieldMapping[UserRole] = Forms.of(EnumFormatter.formatter[UserRole](
       errorMessageIfMissing = "userRole.error.required",
       errorMessageIfEnumError = "userRole.error.invalid"
     ))
     Form(
-      mapping = mapping("userRole" -> fieldMapping)(identity)(Some(_))
+      mapping = mapping(key -> fieldMapping)(identity)(Some(_))
     )

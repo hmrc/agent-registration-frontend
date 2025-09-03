@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.BusinessTypePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.register.aboutyourapplication.BusinessTypePage
 
 import javax.inject.Inject
 import javax.inject.Singleton

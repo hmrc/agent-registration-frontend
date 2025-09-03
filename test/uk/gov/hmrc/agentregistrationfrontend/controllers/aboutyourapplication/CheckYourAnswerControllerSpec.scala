@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers
+package uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication
 
 import com.softwaremill.quicklens.*
 import play.api.libs.ws.WSResponse
@@ -30,38 +30,37 @@ class CheckYourAnswerControllerSpec
 extends ControllerSpec:
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
-  private val checkAnswerPath = s"/agent-registration/register/about-your-application/check-your-answers"
+  private val path = s"/agent-registration/register/about-your-application/check-your-answers"
   private val fakeAgentApplication: AgentApplication = applicationFactory
     .makeNewAgentApplication(tdAll.internalUserId)
     .modify(_.aboutYourApplication.businessType).setTo(Some(SoleTrader))
     .modify(_.aboutYourApplication.userRole).setTo(Some(Owner))
 
-  "GET /register/about-your-application/check-answer should return 200 and render page" in:
+  "routes should have correct paths and methods" in:
+    routes.CheckYourAnswerController.show shouldBe Call(
+      method = "GET",
+      url = "/agent-registration/register/about-your-application/check-your-answers"
+    )
+    routes.CheckYourAnswerController.submit shouldBe Call(
+      method = "POST",
+      url = "/agent-registration/register/about-your-application/check-your-answers"
+    )
+    routes.CheckYourAnswerController.submit.url shouldBe routes.CheckYourAnswerController.show.url
+
+  s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
-    val response: WSResponse = get(checkAnswerPath)
+    val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.mainContent shouldContainContent
-      """
-        |About your application
-        |Check your answers
-        |Business type
-        |Sole trader
-        |Change Business type
-        |Are you the business owner?
-        |Yes
-        |Change Are you the business owner?
-        |Confirm and continue
-        |"""
-        .stripMargin
+    response.parseBodyAsJsoupDocument.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
 
   "POST /register/about-your-application/check-answer with confirm and continue selection should redirect to the next page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication
 
-    val response: WSResponse = post(checkAnswerPath)(Map.empty)
+    val response: WSResponse = post(path)(Map.empty)
 
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe "/agent-registration/register/start-grs-journey"

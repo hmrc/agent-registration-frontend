@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.register
+package uk.gov.hmrc.agentregistrationfrontend.views.register.aboutyourapplication
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.forms.UserRoleForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.UserRolePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.register.aboutyourapplication.UserRolePage
 
 class UserRolePageSpec
 extends ViewSpec:
@@ -71,7 +71,8 @@ extends ViewSpec:
       val viewTemplate: UserRolePage = app.injector.instanceOf[UserRolePage]
       val heading: String = "Are you the owner of the business?"
 
-      val field = "userRole"
+      val field: String = UserRoleForm.key
+
       val errorMessage = "Select ‘yes’ if you are the owner of the business"
       val formWithError = UserRoleForm.form
         .withError(field, errorMessage)

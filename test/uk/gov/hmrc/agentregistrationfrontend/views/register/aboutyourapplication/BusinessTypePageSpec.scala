@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.register
+package uk.gov.hmrc.agentregistrationfrontend.views.register.aboutyourapplication
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.BusinessTypePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.register.aboutyourapplication.BusinessTypePage
 
 class BusinessTypePageSpec
 extends ViewSpec:

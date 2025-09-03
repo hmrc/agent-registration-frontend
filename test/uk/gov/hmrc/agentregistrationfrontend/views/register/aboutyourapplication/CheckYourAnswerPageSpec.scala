@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.register
+package uk.gov.hmrc.agentregistrationfrontend.views.register.aboutyourapplication
 
 import com.softwaremill.quicklens.*
 import org.jsoup.Jsoup
@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.CheckYourAnswerPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.register.aboutyourapplication.CheckYourAnswerPage
 
 class CheckYourAnswerPageSpec
 extends ViewSpec:

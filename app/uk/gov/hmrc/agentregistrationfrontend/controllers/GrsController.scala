@@ -50,7 +50,7 @@ extends FrontendController(mcc):
       (request.agentApplication.aboutYourApplication.businessType, request.agentApplication.aboutYourApplication.userRole) match {
         case (Some(businessType), Some(userRole)) =>
           grsService
-            .createGrsJourney(businessType, userRole == Owner) 
+            .createGrsJourney(businessType, userRole == Owner)
             .map(Redirect(_))
         // fail sooner, easier to debug if happens, and log errors
         case _ => Future.successful(Redirect(routes.AgentApplicationController.startRegistration))

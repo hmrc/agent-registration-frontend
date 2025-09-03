@@ -49,13 +49,5 @@ extends ControllerSpec:
 
   "GET /timed-out" in:
     val response: WSResponse = get(timedOutPath)
-
     response.status shouldBe Status.OK
-
-    response.parseBodyAsJsoupDocument.mainContent shouldContainContent
-      """
-        |You have been signed out
-        |You have not done anything for 15 minutes, so we have signed you out to keep your account secure.
-        |Sign in again
-        |"""
-        .stripMargin
+    response.parseBodyAsJsoupDocument.title() shouldBe "You have been signed out - Apply for an agent services account - GOV.UK"

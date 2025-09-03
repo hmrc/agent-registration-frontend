@@ -14,74 +14,62 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
+package uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
-class AmlsSupervisorControllerSpec
+class BusinessTypeControllerSpec
 extends ControllerSpec:
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
-  private val path = "/agent-registration/register/anti-money-laundering/supervisor-name"
+  private val path = "/agent-registration/register/about-your-application/business-type"
   private val fakeAgentApplication: AgentApplication = applicationFactory.makeNewAgentApplication(tdAll.internalUserId)
 
   "routes should have correct paths and methods" in:
-    routes.AmlsSupervisorController.show shouldBe Call(
+    routes.BusinessTypeController.show shouldBe Call(
       method = "GET",
-      url = "/agent-registration/register/anti-money-laundering/supervisor-name"
+      url = "/agent-registration/register/about-your-application/business-type"
     )
-    routes.AmlsSupervisorController.submit shouldBe Call(
+    routes.BusinessTypeController.submit shouldBe Call(
       method = "POST",
-      url = "/agent-registration/register/anti-money-laundering/supervisor-name"
+      url = "/agent-registration/register/about-your-application/business-type"
     )
-    routes.AmlsSupervisorController.submit.url shouldBe routes.AmlsSupervisorController.show.url
+    routes.BusinessTypeController.submit.url shouldBe routes.BusinessTypeController.show.url
 
   s"GET $path should return 200 and render page" in:
+
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     val response: WSResponse = get(path)
 
-    response.status shouldBe 200
-    val content = response.body[String]
-    content should include("What is the name of your supervisory body?")
-    content should include("Save and continue")
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe "How is your business set up? - Apply for an agent services account - GOV.UK"
 
   s"POST $path with valid selection should redirect to the next page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication
-    val response: WSResponse = post(path)(Map("amlsSupervisoryBody" -> Seq("HMRC")))
 
-    response.status shouldBe 303
+    val response: WSResponse = post(path)(Map(BusinessTypeForm.key -> Seq("SoleTrader")))
+
+    response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/register/anti-money-laundering/registration-number"
-
-  s"POST $path with save for later and valid selection should redirect to the saved for later page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
-    AgentRegistrationStubs.stubUpdateAgentApplication
-    val response: WSResponse =
-      post(path)(Map(
-        "amlsSupervisoryBody" -> Seq("HMRC"),
-        "submit" -> Seq("SaveAndComeBackLater")
-      ))
-
-    response.status shouldBe 303
-    response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/register/save-and-come-back-later"
+    response.header("Location").value shouldBe "/agent-registration/register/about-your-application/user-role"
 
   s"POST $path without valid selection should return 400" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
-    val response: WSResponse = post(path)(Map("amlsSupervisoryBody" -> Seq("")))
 
-    response.status shouldBe 400
-    val content = response.body[String]
-    content should include("There is a problem")
-    content should include("Enter a name and choose your supervisor from the list")
+    // TODO: finish exploring how to obtain submission form data out of form
+//    val data: Map[String, Seq[String]] = BusinessTypeForm.form.mapping.mappings.map(_.key).map(k => k -> Seq("")).toMap
+    val response: WSResponse = post(path)(Map(BusinessTypeForm.key -> Seq("")))
+
+    response.status shouldBe Status.BAD_REQUEST
+    response.parseBodyAsJsoupDocument.title() shouldBe "Error: How is your business set up? - Apply for an agent services account - GOV.UK"

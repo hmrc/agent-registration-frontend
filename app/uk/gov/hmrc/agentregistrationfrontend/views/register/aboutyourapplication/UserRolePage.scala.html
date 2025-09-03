@@ -14,47 +14,40 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.BusinessType
+@import uk.gov.hmrc.agentregistration.shared.UserRole
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.forms.UserRoleForm
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
 
 @this(
         layout: Layout,
         govukRadios: GovukRadios,
         govukButton: GovukButton,
-        formWithCSRF: FormWithCSRF,
-        govukDetails: GovukDetails
+        formWithCSRF: FormWithCSRF
 )
 
 @(
-        form: Form[BusinessType]
+        form: Form[UserRole]
 )(implicit
         request: RequestHeader,
         messages: Messages
 )
 
 @key = @{
-    "businessType"
+    UserRoleForm.key
 }
+
 @title = @{
     messages(s"$key.title")
-}
-@detailsHtml = {
-    <p class="govuk-body">
-        @messages(s"$key.other.description")
-    </p>
-    <p class="govuk-body">
-        <a class="govuk-link" href="@{routes.SignOutController.signOut.url}">@messages(s"$key.other.signOut")</a>
-    </p>
 }
 
 @layout(pageTitle = title, maybeForm = Some(form)) {
 
     <h2 class="govuk-caption-xl">@messages("about-application.title")</h2>
 
-    @formWithCSRF(action = uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.routes.BusinessTypeController.submit) {
+    @formWithCSRF(action = uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.routes.UserRoleController.submit) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(
@@ -63,18 +56,13 @@
                     classes = "govuk-fieldset__legend--xl"
                 ))
             )),
-            items = BusinessType.values.toSeq.map(businessType =>
+            items = UserRole.values.toSeq.map(userRole =>
                 RadioItem(
-                    content = Text(messages(s"$key.${businessType.toString}")),
-                    value = Some(businessType.toString)
+                    content = Text(messages(s"$key.${userRole.toString}")),
+                    value = Some(userRole.toString)
                 )
             )
         ).withFormField(form(key)))
-
-        @govukDetails(Details(
-            summary = Text(messages(s"$key.other")),
-            content = HtmlContent(detailsHtml)
-        ))
 
         @govukButton(Button(
             content = Text(messages("common.saveAndContinue"))

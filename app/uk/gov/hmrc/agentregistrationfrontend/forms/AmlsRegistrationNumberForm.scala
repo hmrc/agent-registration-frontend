@@ -26,7 +26,12 @@ import play.api.data.validation.ValidationError
 import play.api.i18n.Messages
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 
+object AmlsRegistrationNumberForm:
+  val key: String = "amlsRegistrationNumber"
+
 class AmlsRegistrationNumberForm(isHmrc: Boolean)(implicit messages: Messages) {
+
+  import AmlsRegistrationNumberForm.*
 
   // these methods could end up being needed in other forms, until then this is the only place they are used
   private def stripWhiteSpaces(str: String): String = str.trim.replaceAll("\\s", "")
@@ -40,10 +45,10 @@ class AmlsRegistrationNumberForm(isHmrc: Boolean)(implicit messages: Messages) {
   }
 
   val form: Form[AmlsRegistrationNumber] = Form[AmlsRegistrationNumber](
-    "amlsRegistrationNumber" -> optional(text)
-      .verifying(validateText("amlsRegistrationNumber.error.required"))
+    key -> optional(text)
+      .verifying(validateText(s"$key.error.required"))
       .verifying(
-        "amlsRegistrationNumber.error.invalid",
+        s"$key.error.invalid",
         value =>
           val normalisedValue = stripWhiteSpaces(value.getOrElse(""))
           if (isHmrc)

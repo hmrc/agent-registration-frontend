@@ -20,5 +20,6 @@ class ControllerSpec
 extends ISpec,
   WsHelper:
 
-  export play.api.http.Status
   export viewspecsupport.JsoupSupport.*
+  export play.api.mvc.Call
+  export play.api.http.Status
