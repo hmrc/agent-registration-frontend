@@ -32,8 +32,8 @@ object ViewSelectors:
   extension (element: Element)
 
     def hasLanguageSwitch: Boolean = element.select(languageSwitcher).headOption.nonEmpty
-    def h1: String = element.mainContent.selectOrFail(Selectors.h1).selectOnlyOneElementOrFail().text()
-    def mainContent: Element = element.selectOrFail(main).first()
+    def h1(using pos: Position): String = element.mainContent.selectOrFail(Selectors.h1).selectOnlyOneElementOrFail().text()
+    def mainContent(using pos: Position): Element = element.selectOrFail(main).selectOnlyOneElementOrFail()
 
     inline def toLink(using pos: Position): TestLink = {
       element.tagName() shouldBe "a"

@@ -60,7 +60,7 @@ extends ViewSpec:
 
       doc
         .mainContent
-        .selectOrFail("form input[type='text']")
+        .selectOrFail("formx input[type='text']")
         .selectOnlyOneElementOrFail()
 
     "render a save and continue button" in:
