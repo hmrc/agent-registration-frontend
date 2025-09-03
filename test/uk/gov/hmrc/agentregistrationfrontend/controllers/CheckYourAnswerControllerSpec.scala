@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
 import com.softwaremill.quicklens.*
-import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
@@ -42,12 +41,20 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     val response: WSResponse = get(checkAnswerPath)
 
-    response.status shouldBe 200
-    val content = response.body[String]
-
-    content should include("Business type")
-    content should include("Are you the business owner?")
-    content should include("Confirm and continue")
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.mainContent shouldContainContent
+      """
+        |About your application
+        |Check your answers
+        |Business type
+        |Sole trader
+        |Change Business type
+        |Are you the business owner?
+        |Yes
+        |Change Are you the business owner?
+        |Confirm and continue
+        |"""
+        .stripMargin
 
   "POST /register/about-your-application/check-answer with confirm and continue selection should redirect to the next page" in:
     AuthStubs.stubAuthorise()
@@ -56,5 +63,5 @@ extends ControllerSpec:
 
     val response: WSResponse = post(checkAnswerPath)(Map.empty)
 
-    response.status shouldBe 303
+    response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe "/agent-registration/register/start-grs-journey"

@@ -20,7 +20,6 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import org.jsoup.Jsoup
 
 class SignOutControllerSpec
 extends ControllerSpec:
@@ -36,7 +35,7 @@ extends ControllerSpec:
   "GET /sign-out" in:
     val response: WSResponse = get(signOutPath)
 
-    response.status shouldBe 303
+    response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe signOutWithContinue(selfExternalUrl)
 
@@ -44,18 +43,16 @@ extends ControllerSpec:
     val timedOutUrl = uri"$selfExternalUrl/timed-out"
     val response: WSResponse = get(timeOutPath)
 
-    response.status shouldBe 303
+    response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe signOutWithContinue(timedOutUrl.toString)
 
   "GET /timed-out" in:
     val response: WSResponse = get(timedOutPath)
 
-    response.status shouldBe 200
+    response.status shouldBe Status.OK
 
-    Jsoup
-      .parse(response.body)
-      .mainContent shouldContainContent
+    response.parseBodyAsJsoupDocument.mainContent shouldContainContent
       """
         |You have been signed out
         |You have not done anything for 15 minutes, so we have signed you out to keep your account secure.

@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
@@ -67,13 +65,7 @@ extends ControllerSpec:
     val response: WSResponse = post(userRolePath)(Map("userRole" -> Seq("")))
 
     response.status shouldBe Status.BAD_REQUEST
-    val content = response.body[String]
-    content should include("There is a problem")
-    content should include("Select ‘yes’ if you are the owner of the business")
-
-    val doc: Document = Jsoup.parse(content)
-
-    doc.mainContent shouldContainContent
+    response.parseBodyAsJsoupDocument.mainContent shouldContainContent
       """
         |There is a problem
         |Select ‘yes’ if you are the owner of the business
@@ -84,4 +76,5 @@ extends ControllerSpec:
         |Yes
         |No, but I’m authorised by them to set up this account
         |Save and continue
-        |""".stripMargin
+        |"""
+        .stripMargin

@@ -34,7 +34,7 @@ extends ControllerSpec:
   "GET /register should redirect to business type page" in:
     val response: WSResponse = get("/agent-registration/register")
 
-    response.status shouldBe 303
+    response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe businessTypePath
 
@@ -43,10 +43,20 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     val response: WSResponse = get(businessTypePath)
 
-    response.status shouldBe 200
-    val content = response.body[String]
-    content should include("How is your business set up?")
-    content should include("Save and continue")
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.mainContent shouldContainContent
+      """
+        |About your application
+        |How is your business set up?
+        |Sole trader
+        |Limited company
+        |Partnership
+        |Limited liability partnership
+        |The business is set up as something else
+        |To get an agent services account your business must be a sole trader, limited company, partnership or limited liability partnership.
+        |Finish and sign out
+        |Save and continue
+        |""".stripMargin
 
   s"POST $businessTypePath with valid selection should redirect to the next page" in:
     AuthStubs.stubAuthorise()
@@ -54,7 +64,7 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubUpdateAgentApplication
     val response: WSResponse = post(businessTypePath)(Map("businessType" -> Seq("SoleTrader")))
 
-    response.status shouldBe 303
+    response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe "/agent-registration/register/about-your-application/user-role"
 
@@ -63,7 +73,21 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     val response: WSResponse = post(businessTypePath)(Map("businessType" -> Seq("")))
 
-    response.status shouldBe 400
-    val content = response.body[String]
-    content should include("There is a problem")
-    content should include("Tell us how your business is set up")
+    response.status shouldBe Status.BAD_REQUEST
+    response.parseBodyAsJsoupDocument.mainContent shouldContainContent
+      """
+        |There is a problem
+        |Tell us how your business is set up
+        |About your application
+        |How is your business set up?
+        |Error:
+        |Tell us how your business is set up
+        |Sole trader
+        |Limited company
+        |Partnership
+        |Limited liability partnership
+        |The business is set up as something else
+        |To get an agent services account your business must be a sole trader, limited company, partnership or limited liability partnership.
+        |Finish and sign out
+        |Save and continue
+        |""".stripMargin
