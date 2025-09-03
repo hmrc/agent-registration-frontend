@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.amls.routes
+@import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.register.partials.ContinueOrSaveForLater
@@ -26,12 +27,12 @@
         formWithCSRF: FormWithCSRF,
         govukButton: GovukButton,
         govukSelect: GovukSelect,
-        continueOrSaveForLater: ContinueOrSaveForLater
+        continueOrSaveForLater: ContinueOrSaveForLater,
+        amlsCodes: AmlsCodes
 )
 
 @(
-        form: Form[String],
-        options: Map[String, String]
+        form: Form[String]
 )(implicit
         request: RequestHeader,
         messages: Messages
@@ -59,7 +60,7 @@
             items = Seq(SelectItem(
                 value = Some(""),
                 text = "")).++(
-                options.flatMap {
+                amlsCodes.amlsCodes.flatMap {
                     case (k, v) => Seq(
                         SelectItem(
                             value = Some(k),

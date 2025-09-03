@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.forms.UserRoleForm
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
 
 @this(
@@ -35,7 +36,7 @@
 )
 
 @key = @{
-    "userRole"
+    UserRoleForm.key
 }
 @title = @{
     messages(s"$key.title")

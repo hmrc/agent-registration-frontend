@@ -18,9 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport
 
 import com.google.inject.AbstractModule
 import org.scalatest.BeforeAndAfterEach
-import org.scalatest.time.Millis
-import org.scalatest.time.Seconds
-import org.scalatest.time.Span
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -33,20 +30,21 @@ import play.api.Mode
 import play.core.server.ServerConfig
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.WireMockSupport
+import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
+import uk.gov.hmrc.agentregistrationfrontend.config.CsvLoader
 
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
 
 trait ISpec
-extends AnyWordSpecLike
-with RichMatchers
-with BeforeAndAfterEach
-with GuiceOneServerPerSuite
-with WireMockSupport
-with WsHelper:
+extends AnyWordSpecLike,
+  RichMatchers,
+  BeforeAndAfterEach,
+  GuiceOneServerPerSuite,
+  WireMockSupport:
 
-  override implicit val patienceConfig: PatienceConfig = PatienceConfig(timeout = scaled(Span(3, Seconds)), interval = scaled(Span(300, Millis)))
+//  override implicit val patienceConfig: PatienceConfig = PatienceConfig(timeout = scaled(Span(3, Seconds)), interval = scaled(Span(300, Millis)))
   private val testServerPort = ISpec.testServerPort
 
   lazy val tdAll: TdAll = TdAll.tdAll
@@ -73,7 +71,14 @@ with WsHelper:
 
   lazy val overridesModule: AbstractModule =
     new AbstractModule:
-      override def configure(): Unit = bind(classOf[Clock]).toInstance(clock)
+      override def configure(): Unit =
+        bind(classOf[Clock]).toInstance(clock)
+        bind(classOf[AmlsCodes]).toInstance(
+          new AmlsCodes {
+            import AmlsCodes.*
+            override val amlsCodes: Map[AmlsCode, AmlsName] = CsvLoader.load("/testAmlsCodes.csv")
+          }
+        )
 
   override def fakeApplication(): Application = GuiceApplicationBuilder()
     .overrides(GuiceableModule.fromGuiceModules(Seq(overridesModule)))

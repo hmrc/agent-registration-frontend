@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport
+package uk.gov.hmrc.agentregistrationfrontend.config
 
-import org.scalatest.wordspec.AnyWordSpecLike
+import com.google.inject.Inject
+import com.google.inject.Singleton
+import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes.*
 
-trait UnitSpec
-extends AnyWordSpecLike,
-  RichMatchers
+@Singleton
+class AmlsCodes @Inject() ():
+  val amlsCodes: Map[AmlsCode, AmlsName] = CsvLoader.load("/amls.csv")
+
+object AmlsCodes:
+
+  type AmlsCode = String
+  type AmlsName = String

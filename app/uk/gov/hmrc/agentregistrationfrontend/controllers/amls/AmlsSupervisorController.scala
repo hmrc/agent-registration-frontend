@@ -24,8 +24,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.config.CsvLoader
+import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.SelectFromOptionsForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.getSubmitAction
@@ -44,16 +43,14 @@ class AmlsSupervisorController @Inject() (
   mcc: MessagesControllerComponents,
   view: AmlsSupervisoryBodyPage,
   applicationService: ApplicationService,
-  csvLoader: CsvLoader,
-  appConfig: AppConfig
+  amlsCodes: AmlsCodes
 )(implicit ec: ExecutionContext)
 extends FrontendController(mcc)
 with I18nSupport:
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
-      val options = csvLoader.load(appConfig.amlsCodesPath)
-      val formWithOptions = SelectFromOptionsForm.form("amlsSupervisoryBody", options.keys.toSeq)
+      val formWithOptions = SelectFromOptionsForm.form("amlsSupervisoryBody", amlsCodes.amlsCodes.keys.toSeq)
       val form: Form[String] =
         request
           .agentApplication
@@ -61,12 +58,11 @@ with I18nSupport:
           .fold(formWithOptions)((amlsDetails: AmlsDetails) =>
             formWithOptions.fill(amlsDetails.supervisoryBody)
           )
-      Ok(view(form, options))
+      Ok(view(form))
 
   def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
-      val options = csvLoader.load(appConfig.amlsCodesPath)
-      SelectFromOptionsForm.form("amlsSupervisoryBody", options.keys.toSeq)
+      SelectFromOptionsForm.form("amlsSupervisoryBody", amlsCodes.amlsCodes.keys.toSeq)
         .bindFromRequest()
         .fold(
           formWithErrors =>
@@ -75,7 +71,7 @@ with I18nSupport:
               then
                 Redirect(applicationRoutes.AgentApplicationController.saveAndComeBackLater.url)
               else
-                BadRequest(view(formWithErrors, options))
+                BadRequest(view(formWithErrors))
             ),
           supervisoryBody =>
             applicationService

@@ -28,7 +28,9 @@ import java.time.ZoneOffset
 class Module
 extends AbstractModule:
 
-  override def configure(): Unit = bind(classOf[AppConfig]).asEagerSingleton()
+  override def configure(): Unit =
+    bind(classOf[AppConfig]).asEagerSingleton() // Initialize eagerly to detect any misconfiguration at startup
+    bind(classOf[AmlsCodes]).asEagerSingleton() // Initialize eagerly to detect any AmlsCodes misconfiguration at startup
 
   @Provides
   @Singleton
