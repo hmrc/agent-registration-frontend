@@ -31,15 +31,15 @@ extends Matcher[Element]:
     val cleanExpectedText: String = expectedLines.stripSpaces
     val includeResult = include(cleanExpectedText)(actualText)
 
-    // Hacking do provide '<Click to see difference>' support in intellij when the test fails.
-    // Delegating computing MatchResult to
+    // This hack enables IntelliJ's 'Click to see difference' feature in test failure messages
+    // by delegating the MatchResult computation to the 'be' matcher which has this functionality
     val result: MatchResult = be(cleanExpectedText)(actualText)
 
     result.copy(
       matches = includeResult.matches,
-      // Don't change below code!
-      // It must containt 'was not equal to {1}' or similar strings in the messages
-      // in order to support intellij's <Click to see difference> support
+      // IMPORTANT: Do not modify these messages!
+      // The specific format of these messages (e.g. 'was not equal to {1}') is required
+      // to enable IntelliJ's 'Click to see difference' feature in test failure messages
       rawFailureMessage = s"{0}\n\ndid not contain or was not equal to {1}",
       rawNegatedFailureMessage = s"{0}\n\ndid contain or was equal to {1}",
       rawMidSentenceFailureMessage = s"{0}\n\ndid not contain or was not equal to {1}",
