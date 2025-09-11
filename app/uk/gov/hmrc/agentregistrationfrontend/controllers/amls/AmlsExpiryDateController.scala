@@ -84,7 +84,7 @@ with I18nSupport:
                   if getSubmitAction(request)
                       .isSaveAndComeBackLater
                   then applicationRoutes.AgentApplicationController.saveAndComeBackLater.url
-                  else routes.AmlsSupportingEvidenceController.show.url
+                  else routes.AmlsEvidenceUploadController.show.url
                 )
               )
         )

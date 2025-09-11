@@ -1,5 +1,5 @@
-@*
- * Copyright 2025 HM Revenue & Customs
+/*
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -12,21 +12,21 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this(layout: Layout)
+package uk.gov.hmrc.agentregistrationfrontend.model.upscan
 
-@(
-        h1: String,
-        bodyText: Option[String]
-)(implicit
-        request: RequestHeader,
-        messages: Messages
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+
+case class UpscanInitiateRequest(
+  callbackUrl: String,
+  successRedirect: Option[String] = None,
+  errorRedirect: Option[String] = None,
+  minimumFileSize: Option[Int] = None,
+  maximumFileSize: Option[Int] = Some(5242880) // 5 MB file limit specified in bytes
 )
 
-@layout(pageTitle = h1) {
-    <h1 class="govuk-heading-xl">@h1</h1>
-    @bodyText.map { bodyText =>
-        <p class="govuk-body">@bodyText</p>
-    }
+object UpscanInitiateRequest {
+  implicit val format: OFormat[UpscanInitiateRequest] = Json.format[UpscanInitiateRequest]
 }

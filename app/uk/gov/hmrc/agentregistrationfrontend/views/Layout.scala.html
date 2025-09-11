@@ -34,7 +34,9 @@
 @(
         pageTitle: String,
         maybeForm: Option[Form[?]] = None,
-        suppressBackLink: Boolean = false
+        suppressBackLink: Boolean = false,
+        templateScripts: Option[Html] = None,
+        templateStyles: Option[Html] = None
 )(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
 @isSignedIn = @{
@@ -48,6 +50,11 @@
         )
     }
     @autocompleteCss()
+    @templateStyles.getOrElse(Html(""))
+}
+@additionalScripts = {
+    @autocompleteJavascript()
+    @templateScripts.getOrElse(Html(""))
 }
 @errorPrefix = @{if(maybeForm.exists(_.hasErrors)) s"${messages("common.errorPrefix")}: " else ""}
 @gdsTitle = @{s"$errorPrefix$pageTitle - ${messages("service.name")} - GOV.UK"}
@@ -75,7 +82,7 @@
       ),
       templateOverrides = TemplateOverrides(
           additionalHeadBlock = Some(head),
-          additionalScriptsBlock = Some(autocompleteJavascript())
+          additionalScriptsBlock = Some(additionalScripts)
       ),
       backLink = if suppressBackLink then None else Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
       isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled,

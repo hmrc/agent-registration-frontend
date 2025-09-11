@@ -1,0 +1,232 @@
+@*
+ * Copyright 2024 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import play.twirl.api.Html
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.controllers.amls.routes
+@import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UpscanInitiateResponse
+@import uk.gov.hmrc.agentregistrationfrontend.views.html._
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import views.html.helper.CSPNonce
+@import java.net.URI
+
+@this(
+        layout: Layout,
+        govukFileUpload: GovukFileUpload,
+        govukButton: GovukButton,
+        govukErrorSummary: GovukErrorSummary,
+        govukDetails: GovukDetails,
+        appConfig: AppConfig
+)
+
+@(
+        upscanInitiateResponse: UpscanInitiateResponse,
+        errorMessage: Option[String],
+        supervisoryBodyName: String
+)(implicit request: Request[?], messages: Messages)
+
+@key = @{"amlsEvidenceUpload"}
+@title = @{messages(s"$key.title")}
+@templateScripts = {
+    <script src="@{controllers.routes.Assets.versioned("javascripts/file-upload-enhancements.js")}" @CSPNonce.attr></script>
+}
+@templateStyles = {
+    <link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/file-upload-styles.css")}" @CSPNonce.attr>
+}
+@detailsHtml = {
+    <p class="govuk-body">@messages(s"$key.fileTypes.p1")</p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>@messages(s"$key.fileTypes.bullet1")</li>
+      <li>@messages(s"$key.fileTypes.bullet2")</li>
+      <li>@messages(s"$key.fileTypes.bullet3")</li>
+      <li>@messages(s"$key.fileTypes.bullet4")</li>
+      <li>@messages(s"$key.fileTypes.bullet5")</li>
+    </ul>
+}
+
+@layout(
+    pageTitle = if(errorMessage.isDefined) s"${messages("common.errorPrefix")}: $title" else title,
+    templateScripts = Some(templateScripts),
+    templateStyles = Some(templateStyles)
+) {
+    @if(errorMessage.isDefined) {
+        @govukErrorSummary(ErrorSummary(
+            errorList = Seq(
+                ErrorLink(
+                    href = Some("#fileToUpload"),
+                    content = Text(errorMessage.get)
+                )
+            ),
+            title = Text(messages("error.summary.title")),
+            disableAutoFocus = Some(false),
+            attributes = Map("id" -> "error-summary-display")
+        ))
+    }
+    <h2 class="govuk-caption-l">@messages("amlsDetails.title")</h2>
+    <h1 class="govuk-heading-l">@title</h1>
+    <p class="govuk-body">
+        @messages(s"$key.p1", supervisoryBodyName)
+    </p>
+    <p class="govuk-body">
+        @messages(s"$key.p2")
+    </p>
+    <p class="govuk-body">
+        @messages(s"$key.p3")
+    </p>
+    <p class="govuk-body">
+        @messages(s"$key.p4")
+    </p>
+
+    @govukDetails(Details(
+        summary = Text(messages(s"$key.details.summary")),
+        content = HtmlContent(detailsHtml)
+    ))
+
+    <form id="fileUploadForm" action="@upscanInitiateResponse.postTarget" method="post" enctype="multipart/form-data">
+        @for(field <- upscanInitiateResponse.formFields) {
+            <input type="hidden" name="@field._1" value="@field._2"/>
+        }
+        @govukFileUpload(FileUpload(
+            name = "file",
+            id = "fileToUpload",
+            label = Label(
+                content = Text(messages(s"$key.label")),
+                classes = "govuk-label--m"
+            ),
+            attributes = Map(
+                "accept" -> "application/pdf, image/jpg, image/jpeg, image/png, image/tiff, text/plain, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/msword, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "required" -> "true"
+            ),
+            errorMessage = errorMessage.map(msg => ErrorMessage(content = Text(msg)))
+        ))
+
+        <div id="upload-handling">
+            <span
+            id="file-upload-progress"
+            data-url-to-poll="@{routes.AmlsEvidenceUploadController.pollResultWithJavaScript.url}"
+            data-success="@{appConfig.upscanRedirectBase}@{routes.AmlsEvidenceUploadController.showResult.url}"
+            data-max-polls="@{appConfig.fileUploadMaxPolls}"
+            data-milliseconds-before-poll="@{appConfig.millisecondsBeforePoll}"
+            data-max-file-size="@{appConfig.maxFileSize}"
+            aria-live="assertive"
+            >
+            </span>
+            @govukButton(Button(
+                content = Text(messages("common.saveAndContinue")),
+                attributes = Map(
+                    "id" -> "upload-button",
+                    "type" -> "submit",
+                    "data-prevent-double-click" -> "true"
+                )
+            ))
+        </div>
+    </form>
+
+    <template id="empty-file-error-summary">
+        @govukErrorSummary(ErrorSummary(
+            title = Text(messages("error.summary.title")),
+            errorList = Seq(ErrorLink(
+                href = Some("#fileToUpload"),
+                content = Text(messages(s"$key.error.required"))
+            )),
+            attributes = Map("id" -> "error-summary-display", "tabindex" -> "-1")
+        ))
+    </template>
+
+    <template id="empty-file-error-message">
+        <div class="govuk-error-message" id="fileToUpload-error">
+            <span class="govuk-visually-hidden">@messages("common.errorPrefix"): </span>
+            @messages(s"$key.error.required")
+        </div>
+    </template>
+
+    <template id="generic-error-summary">
+    @govukErrorSummary(ErrorSummary(
+        title = Text(messages("error.summary.title")),
+        errorList = Seq(ErrorLink(
+            href = Some("#fileToUpload"),
+            content = Text(messages(s"$key.error.generic"))
+        )),
+        attributes = Map("id" -> "error-summary-display", "tabindex" -> "-1")
+    ))
+    </template>
+
+    <template id="generic-error-message">
+        <div class="govuk-error-message" id="fileToUpload-error">
+            <span class="govuk-visually-hidden">@messages("common.errorPrefix"): </span>
+            @messages(s"$key.error.generic")
+        </div>
+    </template>
+
+    <template id="virus-error-summary">
+    @govukErrorSummary(ErrorSummary(
+        title = Text(messages("error.summary.title")),
+        errorList = Seq(ErrorLink(
+            href = Some("#fileToUpload"),
+            content = Text(messages(s"$key.error.virus"))
+        )),
+        attributes = Map("id" -> "error-summary-display", "tabindex" -> "-1")
+    ))
+    </template>
+
+    <template id="virus-error-message">
+        <div class="govuk-error-message" id="fileToUpload-error">
+            <span class="govuk-visually-hidden">@messages("common.errorPrefix"): </span>
+            @messages(s"$key.error.virus")
+        </div>
+    </template>
+
+    <template id="file-too-large-error-summary">
+    @govukErrorSummary(ErrorSummary(
+        title = Text(messages("error.summary.title")),
+        errorList = Seq(ErrorLink(
+            href = Some("#fileToUpload"),
+            content = Text(messages(s"$key.error.file-too-large"))
+        )),
+        attributes = Map("id" -> "error-summary-display", "tabindex" -> "-1")
+    ))
+    </template>
+
+    <template id="file-too-large-error-message">
+        <div class="govuk-error-message" id="fileToUpload-error">
+            <span class="govuk-visually-hidden">@messages("common.errorPrefix"): </span>
+            @messages(s"$key.error.file-too-large")
+        </div>
+    </template>
+
+    <template id="wrong-file-type-error-summary">
+    @govukErrorSummary(ErrorSummary(
+        title = Text(messages("error.summary.title")),
+        errorList = Seq(ErrorLink(
+            href = Some("#fileToUpload"),
+            content = Text(messages(s"$key.error.wrong-file-type"))
+        )),
+        attributes = Map("id" -> "error-summary-display", "tabindex" -> "-1")
+    ))
+    </template>
+
+    <template id="wrong-file-type-error-message">
+        <div class="govuk-error-message" id="fileToUpload-error">
+            <span class="govuk-visually-hidden">@messages("common.errorPrefix"): </span>
+            @messages(s"$key.error.wrong-file-type")
+        </div>
+    </template>
+
+    <template id="live-region-content">
+        <span class="spinner"></span>
+        <span class="govuk-body">@messages("fileUploadProgress.message")</span>
+    </template>
+}

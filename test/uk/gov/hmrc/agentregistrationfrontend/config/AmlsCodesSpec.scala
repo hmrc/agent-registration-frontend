@@ -36,4 +36,4 @@ extends ISpec:
       .map: kv =>
         (AmlsCode(kv._1), AmlsName(kv._2))
 
-    amlsCodes.amlsCodes.nonEmpty shouldBe true withClue "sanity check that we actually have some options defiend in the amls.csv "
+    amlsCodes.amlsCodes.nonEmpty shouldBe true withClue "sanity check that we actually have some options defined in the amls.csv "

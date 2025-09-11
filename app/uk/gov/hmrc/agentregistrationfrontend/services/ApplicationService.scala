@@ -45,7 +45,7 @@ extends RequestAwareLogging:
 
   def get()(using request: AuthorisedRequest[?]): Future[AgentApplication] = find()
     .map { maybeApplication =>
-      maybeApplication.getOrElse(Errors.throwServerErrorException(s"Expected application to be found"))
+      maybeApplication.getOrElse(Errors.throwServerErrorException("Expected application to be found"))
     }
 
   def upsert(agentApplication: AgentApplication)(using request: AuthorisedRequest[?]): Future[Unit] =

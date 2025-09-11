@@ -1,9 +1,11 @@
 service.name = Apply for an agent services account
 service.text = This is your new service
 
+common.continue = Continue
 common.saveAndContinue = Save and continue
 common.confirmAndContinue = Confirm and continue
 common.saveAndComeBackLater = Save and come back later
+common.tryAgain = Try again
 common.errorPrefix = Error
 
 # About your application
@@ -72,6 +74,42 @@ amlsExpiryDate.error.year.required = The date your supervision runs out must inc
 amlsExpiryDate.error.invalid = The date your supervision runs out must be a real date
 amlsExpiryDate.error.past = The date your supervision runs out must be in the future
 amlsExpiryDate.error.future = The date your supervision runs out must be in the next 13 months
+
+## AmlsDetails / Evidence upload
+amlsEvidenceUpload.title = Evidence of your anti-money laundering supervision
+amlsEvidenceUpload.p1=Upload evidence to show that {0} is your current anti-money laundering supervisor.
+amlsEvidenceUpload.p2=You can choose what evidence to upload.
+amlsEvidenceUpload.p3=Suitable evidence might be a letter, email or payment receipt from your supervisory body, confirming you’re covered.
+amlsEvidenceUpload.p4=The file must be smaller than 5MB.
+amlsEvidenceUpload.details.summary=Types of file we can accept
+amlsEvidenceUpload.fileTypes.p1=These file types are allowed:
+amlsEvidenceUpload.fileTypes.bullet1=image (.jpg, .jpeg, .png or .tiff)
+amlsEvidenceUpload.fileTypes.bullet2=PDF (.pdf)
+amlsEvidenceUpload.fileTypes.bullet3=email (.txt or .msg)
+amlsEvidenceUpload.fileTypes.bullet4=Microsoft (Word, Excel or PowerPoint)
+amlsEvidenceUpload.fileTypes.bullet5=Open Document Format (ODF)
+amlsEvidenceUpload.label=Choose your file
+amlsEvidenceUpload.scanning.header = Your report is being checked
+amlsEvidenceUpload.scanning.paragraph = Do not close this window, it will refresh automatically.
+amlsEvidenceUpload.error.required = Upload a file as evidence of your anti-money laundering supervision
+amlsEvidenceUpload.error.wrong-file-type = The selected file must be a JPG, JPEG, PNG, TIFF, PDF, TXT, MSG, DOC, DOCX, XLS, XLSX, PPT, PPTX, ODT, ODS or ODP file
+amlsEvidenceUpload.error.file-too-large = The selected file must not be larger than 5MB
+amlsEvidenceUpload.error.virus = The file you uploaded was infected with a virus
+amlsEvidenceUpload.error.generic = The file upload has failed. Try uploading your file again.
+
+fileUploadProgress.title=We are checking your upload
+fileUploadProgress.complete.title=Your upload is complete
+fileUploadProgress.QUARANTINE.title=Your upload has a virus
+fileUploadProgress.TOO_LARGE.title=Your upload is too large
+fileUploadProgress.REJECTED.title=Your upload is the wrong type of file
+fileUploadProgress.failed.title=Your upload has failed
+fileUploadProgress.message=Checking file
+fileUploadProgress.inProgress=Wait a few seconds and then select ‘Continue’.
+fileUploadProgress.complete=Your file {0} has been uploaded successfully.
+fileUploadProgress.QUARANTINE=Your file upload has failed. Try uploading another file.
+fileUploadProgress.REJECTED=The selected file must be a JPG, JPEG, PNG, TIFF, PDF, TXT, MSG, DOC, DOCX, XLS, XLSX, PPT, PPTX, ODT, ODS or ODP file.
+fileUploadProgress.TOO_LARGE=The selected file must not be larger than 5MB.
+fileUploadProgress.failed=Your file upload has failed. Try uploading your file again.
 
 # Timed out
 timed-out.header = You have been signed out

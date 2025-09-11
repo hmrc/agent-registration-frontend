@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,21 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this(layout: Layout)
+package uk.gov.hmrc.agentregistration.shared.upscan
 
-@(
-        h1: String,
-        bodyText: Option[String]
-)(implicit
-        request: RequestHeader,
-        messages: Messages
-)
+import play.api.libs.json.JsString
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
-@layout(pageTitle = h1) {
-    <h1 class="govuk-heading-xl">@h1</h1>
-    @bodyText.map { bodyText =>
-        <p class="govuk-body">@bodyText</p>
-    }
+final case class Reference(value: String)
+extends AnyVal
+
+object Reference {
+
+  implicit val referenceReader: Reads[Reference] = Reads.StringReads.map(Reference(_))
+  implicit val referenceWrites: Writes[Reference] = Writes[Reference](x => JsString(x.value))
+
 }
