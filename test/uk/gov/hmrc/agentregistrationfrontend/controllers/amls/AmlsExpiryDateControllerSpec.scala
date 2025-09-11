@@ -22,6 +22,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
+import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -60,9 +61,7 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
 
     response.status shouldBe 200
-    val content = response.body[String]
-    content should include("When does your supervision run out?")
-    content should include("Save and continue")
+    response.parseBodyAsJsoupDocument.title shouldBe "When does your supervision run out? - Apply for an agent services account - GOV.UK"
 
   s"POST $path with valid inputs should redirect to the next page" in:
     AuthStubs.stubAuthorise()
@@ -78,15 +77,15 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubApplicationInProgress(updatedApplication)
     val response: WSResponse =
       post(path)(Map(
-        AmlsExpiryDateForm().dayKey -> Seq(tdAll.validAmlsExpiryDate.getDayOfMonth.toString),
-        AmlsExpiryDateForm().monthKey -> Seq(tdAll.validAmlsExpiryDate.getMonthValue.toString),
-        AmlsExpiryDateForm().yearKey -> Seq(tdAll.validAmlsExpiryDate.getYear.toString),
+        AmlsExpiryDateForm.dayKey -> Seq(tdAll.validAmlsExpiryDate.getDayOfMonth.toString),
+        AmlsExpiryDateForm.monthKey -> Seq(tdAll.validAmlsExpiryDate.getMonthValue.toString),
+        AmlsExpiryDateForm.yearKey -> Seq(tdAll.validAmlsExpiryDate.getYear.toString),
         "submit" -> Seq("SaveAndContinue")
       ))
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/register/anti-money-laundering/supporting-evidence"
+    response.header("Location").value shouldBe routes.AmlsSupportingEvidenceController.show.url
 
   s"POST $path with save for later and valid input should redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
@@ -102,74 +101,70 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubApplicationInProgress(updatedApplication)
     val response: WSResponse =
       post(path)(Map(
-        AmlsExpiryDateForm().dayKey -> Seq(tdAll.validAmlsExpiryDate.getDayOfMonth.toString),
-        AmlsExpiryDateForm().monthKey -> Seq(tdAll.validAmlsExpiryDate.getMonthValue.toString),
-        AmlsExpiryDateForm().yearKey -> Seq(tdAll.validAmlsExpiryDate.getYear.toString),
+        AmlsExpiryDateForm.dayKey -> Seq(tdAll.validAmlsExpiryDate.getDayOfMonth.toString),
+        AmlsExpiryDateForm.monthKey -> Seq(tdAll.validAmlsExpiryDate.getMonthValue.toString),
+        AmlsExpiryDateForm.yearKey -> Seq(tdAll.validAmlsExpiryDate.getYear.toString),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/register/save-and-come-back-later"
+    response.header("Location").value shouldBe applicationRoutes.AgentApplicationController.saveAndComeBackLater.url
 
   s"POST $path as blank form should return 400" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     val response: WSResponse =
       post(path)(Map(
-        AmlsExpiryDateForm().dayKey -> Seq(""),
-        AmlsExpiryDateForm().monthKey -> Seq(""),
-        AmlsExpiryDateForm().yearKey -> Seq(""),
+        AmlsExpiryDateForm.dayKey -> Seq(""),
+        AmlsExpiryDateForm.monthKey -> Seq(""),
+        AmlsExpiryDateForm.yearKey -> Seq(""),
         "submit" -> Seq("SaveAndContinue")
       ))
 
     response.status shouldBe 400
-    val content = response.body[String]
-    content should include("There is a problem")
-    content should include("Enter the date your supervision runs out")
+    response.parseBodyAsJsoupDocument.title shouldBe "Error: When does your supervision run out? - Apply for an agent services account - GOV.UK"
 
   s"POST $path as blank form and save for later should redirect to save for later page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     val response: WSResponse =
       post(path)(Map(
-        AmlsExpiryDateForm().dayKey -> Seq(""),
-        AmlsExpiryDateForm().monthKey -> Seq(""),
-        AmlsExpiryDateForm().yearKey -> Seq(""),
+        AmlsExpiryDateForm.dayKey -> Seq(""),
+        AmlsExpiryDateForm.monthKey -> Seq(""),
+        AmlsExpiryDateForm.yearKey -> Seq(""),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/register/save-and-come-back-later"
+    response.header("Location").value shouldBe applicationRoutes.AgentApplicationController.saveAndComeBackLater.url
 
   s"POST $path with an invalid value should return 400" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     val response: WSResponse =
       post(path)(Map(
-        AmlsExpiryDateForm().dayKey -> Seq(tdAll.invalidAmlsExpiryDate.getDayOfMonth.toString),
-        AmlsExpiryDateForm().monthKey -> Seq(tdAll.invalidAmlsExpiryDate.getMonthValue.toString),
-        AmlsExpiryDateForm().yearKey -> Seq(tdAll.invalidAmlsExpiryDate.getYear.toString),
+        AmlsExpiryDateForm.dayKey -> Seq(tdAll.invalidAmlsExpiryDate.getDayOfMonth.toString),
+        AmlsExpiryDateForm.monthKey -> Seq(tdAll.invalidAmlsExpiryDate.getMonthValue.toString),
+        AmlsExpiryDateForm.yearKey -> Seq(tdAll.invalidAmlsExpiryDate.getYear.toString),
         "submit" -> Seq("SaveAndContinue")
       ))
 
     response.status shouldBe 400
-    val content = response.body[String]
-    content should include("There is a problem")
-    content should include("The date your supervision runs out must be in the next 13 months")
+    response.parseBodyAsJsoupDocument.title shouldBe "Error: When does your supervision run out? - Apply for an agent services account - GOV.UK"
 
   s"POST $path with an invalid value and save for later should redirect to save for later" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     val response: WSResponse =
       post(path)(Map(
-        AmlsExpiryDateForm().dayKey -> Seq(tdAll.invalidAmlsExpiryDate.getDayOfMonth.toString),
-        AmlsExpiryDateForm().monthKey -> Seq(tdAll.invalidAmlsExpiryDate.getMonthValue.toString),
-        AmlsExpiryDateForm().yearKey -> Seq(tdAll.invalidAmlsExpiryDate.getYear.toString),
+        AmlsExpiryDateForm.dayKey -> Seq(tdAll.invalidAmlsExpiryDate.getDayOfMonth.toString),
+        AmlsExpiryDateForm.monthKey -> Seq(tdAll.invalidAmlsExpiryDate.getMonthValue.toString),
+        AmlsExpiryDateForm.yearKey -> Seq(tdAll.invalidAmlsExpiryDate.getYear.toString),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/register/save-and-come-back-later"
+    response.header("Location").value shouldBe applicationRoutes.AgentApplicationController.saveAndComeBackLater.url

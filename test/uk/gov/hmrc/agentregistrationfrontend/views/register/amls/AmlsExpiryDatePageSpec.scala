@@ -65,25 +65,25 @@ extends ViewSpec:
     "render a form that posts to the correct action" in:
       val form = doc.mainContent.selectOrFail("form")
       form.attr("action").shouldBe(routes.AmlsExpiryDateController.submit.url)
-      form.attr("method").shouldBe("POST")
+      form.attr("method").shouldBe(routes.AmlsExpiryDateController.submit.method)
 
     "contain inputs for a date field within the form" in:
       val form = doc.mainContent.selectOrFail("form")
       val dayInputName = form
-        .selectOrFail(s"input[id='${AmlsExpiryDateForm().dayKey}']")
+        .selectOrFail(s"input[id='${AmlsExpiryDateForm.dayKey}']")
         .selectOnlyOneElementOrFail()
         .attr("name")
-      dayInputName shouldBe AmlsExpiryDateForm().dayKey
+      dayInputName.shouldBe(AmlsExpiryDateForm.dayKey)
       val monthInputName = form
-        .selectOrFail(s"input[id='${AmlsExpiryDateForm().monthKey}']")
+        .selectOrFail(s"input[id='${AmlsExpiryDateForm.monthKey}']")
         .selectOnlyOneElementOrFail()
         .attr("name")
-      monthInputName shouldBe AmlsExpiryDateForm().monthKey
+      monthInputName.shouldBe(AmlsExpiryDateForm.monthKey)
       val yearInputName = form
-        .selectOrFail(s"input[id='${AmlsExpiryDateForm().yearKey}']")
+        .selectOrFail(s"input[id='${AmlsExpiryDateForm.yearKey}']")
         .selectOnlyOneElementOrFail()
         .attr("name")
-      yearInputName shouldBe AmlsExpiryDateForm().yearKey
+      yearInputName.shouldBe(AmlsExpiryDateForm.yearKey)
 
     "render a save and continue button" in:
       doc
@@ -100,7 +100,7 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render an error message when form has errors" in:
-      val key: String = AmlsExpiryDateForm().key
+      val key: String = AmlsExpiryDateForm.key
       val errorMessage: String = "Enter the date your supervision runs out"
       val formWithError: Form[LocalDate] = AmlsExpiryDateForm().form()
         .withError(key, errorMessage)
