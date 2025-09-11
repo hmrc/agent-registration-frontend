@@ -21,6 +21,7 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
+import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
@@ -50,7 +51,7 @@ extends ControllerSpec:
     .makeNewAgentApplication(tdAll.internalUserId)
     .modify(_.amlsDetails)
     .setTo(Some(AmlsDetails(
-      supervisoryBody = "FCA",
+      supervisoryBody = AmlsCode("FCA"),
       amlsRegistrationNumber = Some(AmlsRegistrationNumber("XAML00000123456")),
       amlsExpiryDate = None
     )))
