@@ -52,6 +52,7 @@ amlsDetails.title = Anti-money laundering supervision details
 amlsSupervisoryBody.title = What is the name of your supervisory body?
 amlsSupervisoryBody.hint = Start to enter a name and choose your supervisor from the list
 amlsSupervisoryBody.error.required = Enter a name and choose your supervisor from the list
+amlsSupervisoryBody.error.invalid = Enter a name and choose your supervisor from the list
 
 ## AmlsDetails / Registration number
 amlsRegistrationNumber.title = What is your registration number?

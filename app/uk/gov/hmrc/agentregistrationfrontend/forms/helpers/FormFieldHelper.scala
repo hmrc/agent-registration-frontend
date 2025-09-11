@@ -18,9 +18,20 @@ package uk.gov.hmrc.agentregistrationfrontend.forms.helpers
 
 import play.api.data.validation.*
 
-trait FormFieldHelper {
+object FormFieldHelper {
 
-  protected def mandatoryBoolean(
+  def constraint[T](
+    constraint: (T => Boolean),
+    error: => String,
+    args: String*
+  ): Constraint[T] = Constraint((t: T) =>
+    if (constraint(t))
+      Valid
+    else
+      Invalid(Seq(ValidationError(error, args)))
+  )
+
+  def mandatoryBoolean(
     errorMessageKey: String,
     args: String*
   ): Constraint[Option[Boolean]] = Constraint[Option[Boolean]] { fieldValue =>
@@ -30,7 +41,7 @@ trait FormFieldHelper {
       Invalid(ValidationError(mandatoryFieldErrorMessage(errorMessageKey), args*))
   }
 
-  protected def mandatoryRadio(
+  def mandatoryRadio(
     errorMessageKey: String,
     options: Seq[String],
     args: String*
@@ -41,22 +52,22 @@ trait FormFieldHelper {
       Invalid(ValidationError(mandatoryFieldErrorMessage(errorMessageKey), args*))
   }
 
-  protected def invalidMandatoryField(
+  def invalidMandatoryField(
     messageKey: String,
     inputFieldClass: String
   ): Invalid = {
     Invalid(ValidationError(mandatoryFieldErrorMessage(messageKey), "inputFieldClass" -> inputFieldClass))
   }
 
-  protected def invalidInput(
+  def invalidInput(
     messageKey: String,
     inputFieldClass: String
   ): Invalid = {
     Invalid(ValidationError(invalidInputErrorMessage(messageKey), "inputFieldClass" -> inputFieldClass))
   }
 
-  protected def mandatoryFieldErrorMessage(messageKey: String): String = s"$messageKey.error.required"
+  def mandatoryFieldErrorMessage(messageKey: String): String = s"$messageKey.error.required"
 
-  protected def invalidInputErrorMessage(messageKey: String): String = s"$messageKey.error.invalid"
+  def invalidInputErrorMessage(messageKey: String): String = s"$messageKey.error.invalid"
 
 }

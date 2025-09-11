@@ -21,7 +21,7 @@ import play.api.data.FieldMapping
 import play.api.data.Form
 import play.api.data.Forms
 import uk.gov.hmrc.agentregistration.shared.UserRole
-import uk.gov.hmrc.agentregistration.shared.util.EnumFormatter
+import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.EnumFormatter
 
 object UserRoleForm:
 

@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.forms
 
 import play.api.data.Form
+import play.api.data.Mapping
 import play.api.data.Forms.optional
 import play.api.data.Forms.text
 import play.api.data.validation.Constraint
@@ -44,8 +45,8 @@ class AmlsRegistrationNumberForm(isHmrc: Boolean)(implicit messages: Messages) {
     }
   }
 
-  val form: Form[AmlsRegistrationNumber] = Form[AmlsRegistrationNumber](
-    key -> optional(text)
+  val form: Form[AmlsRegistrationNumber] =
+    val mappings: Mapping[AmlsRegistrationNumber] = optional(text)
       .verifying(validateText(s"$key.error.required"))
       .verifying(
         s"$key.error.invalid",
@@ -60,6 +61,9 @@ class AmlsRegistrationNumberForm(isHmrc: Boolean)(implicit messages: Messages) {
         userInput => AmlsRegistrationNumber(userInput.getOrElse("").trim),
         amlsRegistrationNumber => Some(amlsRegistrationNumber.value)
       )
-  )
+
+    Form[AmlsRegistrationNumber](
+      key -> mappings
+    )
 
 }

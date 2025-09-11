@@ -36,13 +36,13 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType.GeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedCompany
 import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedLiabilityPartnership
 import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
-import uk.gov.hmrc.agentregistration.shared.util.EnumFormatter
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
+import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.EnumFormatter
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsJourneyConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistration
 import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus

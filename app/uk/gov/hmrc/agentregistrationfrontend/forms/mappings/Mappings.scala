@@ -19,13 +19,26 @@ package uk.gov.hmrc.agentregistrationfrontend.forms.mappings
 import play.api.data.Forms.of
 import play.api.data.Mapping
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.LocalDateFormatter
+import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.TextFormatter
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.FormFieldHelper
 
 import java.time.LocalDate
 
-object Mappings {
+object Mappings:
 
-  def localDate(formMessageKey: String): Mapping[LocalDate] = {
-    of(new LocalDateFormatter(formMessageKey))
-  }
+  def text(formMessageKey: String): Mapping[String] = of(TextFormatter(
+    errorMessageIfMissing = FormFieldHelper.mandatoryFieldErrorMessage(formMessageKey)
+  ))
 
-}
+  def localDate(formMessageKey: String): Mapping[LocalDate] = of(LocalDateFormatter(formMessageKey))
+
+  def textFromOptions(
+    formMessageKey: String,
+    options: Seq[String]
+  ): Mapping[String] = text(formMessageKey = formMessageKey)
+    .verifying(
+      FormFieldHelper.constraint(
+        constraint = options.contains,
+        error = FormFieldHelper.invalidInputErrorMessage(formMessageKey)
+      )
+    )
