@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.forms
 
-import com.google.inject.Inject
 import play.api.data.Form
 import play.api.i18n.Messages
 import uk.gov.hmrc.agentregistrationfrontend.forms.mappings.Mappings
@@ -30,9 +29,6 @@ object AmlsExpiryDateForm:
   val monthKey: String = s"$key.month"
   val yearKey: String = s"$key.year"
 
-class AmlsExpiryDateForm @Inject():
-
-  import AmlsExpiryDateForm.*
   def form()(implicit messages: Messages): Form[LocalDate] = Form(
     key -> Mappings.localDate(key)
       .verifying(s"$key.error.past", date => date.isAfter(LocalDate.now()))

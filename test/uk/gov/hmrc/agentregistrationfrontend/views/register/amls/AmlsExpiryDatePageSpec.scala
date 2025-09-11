@@ -35,7 +35,7 @@ extends ViewSpec:
 
   val doc: Document = Jsoup.parse(
     viewTemplate(
-      AmlsExpiryDateForm().form()
+      AmlsExpiryDateForm.form()
     ).body
   )
   private val heading: String = "When does your supervision run out?"
@@ -102,7 +102,7 @@ extends ViewSpec:
     "render an error message when form has errors" in:
       val key: String = AmlsExpiryDateForm.key
       val errorMessage: String = "Enter the date your supervision runs out"
-      val formWithError: Form[LocalDate] = AmlsExpiryDateForm().form()
+      val formWithError: Form[LocalDate] = AmlsExpiryDateForm.form()
         .withError(key, errorMessage)
       val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
       errorDoc.mainContent shouldContainContent
