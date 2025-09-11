@@ -20,6 +20,7 @@ import play.api.data.Forms.of
 import play.api.data.Mapping
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.LocalDateFormatter
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.TextFormatter
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.FormFieldHelper
 
 import java.time.LocalDate
@@ -27,7 +28,7 @@ import java.time.LocalDate
 object Mappings:
 
   def text(formMessageKey: String): Mapping[String] = of(TextFormatter(
-    errorMessageIfMissing = FormFieldHelper.mandatoryFieldErrorMessage(formMessageKey)
+    errorMessageIfMissing = ErrorKeys.requiredFieldErrorMessage(formMessageKey)
   ))
 
   def localDate(formMessageKey: String): Mapping[LocalDate] = of(LocalDateFormatter(formMessageKey))
@@ -39,6 +40,6 @@ object Mappings:
     .verifying(
       FormFieldHelper.constraint(
         constraint = options.contains,
-        error = FormFieldHelper.invalidInputErrorMessage(formMessageKey)
+        error = ErrorKeys.invalidInputErrorMessage(formMessageKey)
       )
     )

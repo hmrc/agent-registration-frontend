@@ -38,7 +38,7 @@ object FormFieldHelper {
     if (fieldValue.isDefined)
       Valid
     else
-      Invalid(ValidationError(mandatoryFieldErrorMessage(errorMessageKey), args*))
+      Invalid(ValidationError(ErrorKeys.requiredFieldErrorMessage(errorMessageKey), args*))
   }
 
   def mandatoryRadio(
@@ -49,25 +49,21 @@ object FormFieldHelper {
     if (fieldValue.isDefined && options.contains(fieldValue.get))
       Valid
     else
-      Invalid(ValidationError(mandatoryFieldErrorMessage(errorMessageKey), args*))
+      Invalid(ValidationError(ErrorKeys.requiredFieldErrorMessage(errorMessageKey), args*))
   }
 
   def invalidMandatoryField(
     messageKey: String,
     inputFieldClass: String
   ): Invalid = {
-    Invalid(ValidationError(mandatoryFieldErrorMessage(messageKey), "inputFieldClass" -> inputFieldClass))
+    Invalid(ValidationError(ErrorKeys.requiredFieldErrorMessage(messageKey), "inputFieldClass" -> inputFieldClass))
   }
 
   def invalidInput(
     messageKey: String,
     inputFieldClass: String
   ): Invalid = {
-    Invalid(ValidationError(invalidInputErrorMessage(messageKey), "inputFieldClass" -> inputFieldClass))
+    Invalid(ValidationError(ErrorKeys.invalidInputErrorMessage(messageKey), "inputFieldClass" -> inputFieldClass))
   }
-
-  def mandatoryFieldErrorMessage(messageKey: String): String = s"$messageKey.error.required"
-
-  def invalidInputErrorMessage(messageKey: String): String = s"$messageKey.error.invalid"
 
 }

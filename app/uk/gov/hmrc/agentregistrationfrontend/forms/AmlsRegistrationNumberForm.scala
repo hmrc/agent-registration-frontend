@@ -26,6 +26,7 @@ import play.api.data.validation.Valid
 import play.api.data.validation.ValidationError
 import play.api.i18n.Messages
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
 object AmlsRegistrationNumberForm:
   val key: String = "amlsRegistrationNumber"
@@ -47,7 +48,7 @@ class AmlsRegistrationNumberForm(isHmrc: Boolean)(implicit messages: Messages) {
 
   val form: Form[AmlsRegistrationNumber] =
     val mappings: Mapping[AmlsRegistrationNumber] = optional(text)
-      .verifying(validateText(s"$key.error.required"))
+      .verifying(validateText(ErrorKeys.requiredFieldErrorMessage(key)))
       .verifying(
         s"$key.error.invalid",
         value =>
