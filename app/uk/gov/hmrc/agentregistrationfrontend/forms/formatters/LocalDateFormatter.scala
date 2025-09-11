@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.forms.formatters
 
 import play.api.data.FormError
 import play.api.data.format.Formatter
-import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
 import java.time.LocalDate
 import scala.util.Failure
