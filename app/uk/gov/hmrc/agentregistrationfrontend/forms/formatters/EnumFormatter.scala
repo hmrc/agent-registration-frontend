@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.util
+package uk.gov.hmrc.agentregistrationfrontend.forms.formatters
 
 import play.api.data.FormError
 import play.api.data.format.Formatter

@@ -22,11 +22,11 @@ import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
-import uk.gov.hmrc.agentregistrationfrontend.forms.SelectFromOptionsForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.getSubmitAction
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.AmlsSupervisoryBodyPage
@@ -43,26 +43,28 @@ class AmlsSupervisorController @Inject() (
   mcc: MessagesControllerComponents,
   view: AmlsSupervisoryBodyPage,
   applicationService: ApplicationService,
-  amlsCodes: AmlsCodes
+  amlsSupervisoryBodyForm: AmlsCodeForm
 )(implicit ec: ExecutionContext)
 extends FrontendController(mcc)
 with I18nSupport:
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
-      val formWithOptions = SelectFromOptionsForm.form("amlsSupervisoryBody", amlsCodes.amlsCodes.keys.toSeq)
-      val form: Form[String] =
+      val formTemplate: Form[AmlsCode] = amlsSupervisoryBodyForm.form
+
+      val form: Form[AmlsCode] =
         request
           .agentApplication
           .amlsDetails
-          .fold(formWithOptions)((amlsDetails: AmlsDetails) =>
-            formWithOptions.fill(amlsDetails.supervisoryBody)
+          .fold(formTemplate)((amlsDetails: AmlsDetails) =>
+            formTemplate.fill(amlsDetails.supervisoryBody)
           )
       Ok(view(form))
 
   def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
-      SelectFromOptionsForm.form("amlsSupervisoryBody", amlsCodes.amlsCodes.keys.toSeq)
+      amlsSupervisoryBodyForm
+        .form
         .bindFromRequest()
         .fold(
           formWithErrors =>

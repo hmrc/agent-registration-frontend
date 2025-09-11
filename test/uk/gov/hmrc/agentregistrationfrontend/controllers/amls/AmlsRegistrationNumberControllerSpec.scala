@@ -22,6 +22,8 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
+import uk.gov.hmrc.agentregistration.shared.AmlsCode
+import uk.gov.hmrc.agentregistrationfrontend.controllers
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
@@ -50,14 +52,14 @@ extends ControllerSpec:
     .makeNewAgentApplication(tdAll.internalUserId)
     .modify(_.amlsDetails)
     .setTo(Some(AmlsDetails(
-      supervisoryBody = "HMRC",
+      supervisoryBody = AmlsCode("HMRC"),
       amlsRegistrationNumber = None
     )))
   private val fakeAgentApplicationNonHmrc: AgentApplication = applicationFactory
     .makeNewAgentApplication(tdAll.internalUserId)
     .modify(_.amlsDetails)
     .setTo(Some(AmlsDetails(
-      supervisoryBody = "FCA",
+      supervisoryBody = AmlsCode("FCA"),
       amlsRegistrationNumber = None
     )))
 
@@ -88,9 +90,8 @@ extends ControllerSpec:
       val response: WSResponse = get(path)
 
       response.status shouldBe 200
-      val content = response.body[String]
-      content should include("What is your registration number?")
-      content should include("Save and continue")
+      val doc = response.parseBodyAsJsoupDocument
+      doc.title() shouldBe "What is your registration number? - Apply for an agent services account - GOV.UK"
 
     s"POST $path with valid input for ${testCase.amlsType} should redirect to the next page" in:
       AuthStubs.stubAuthorise()
@@ -111,7 +112,7 @@ extends ControllerSpec:
 
       response.status shouldBe 303
       response.body[String] shouldBe ""
-      response.header("Location").value shouldBe "/agent-registration/register/anti-money-laundering/supervision-runs-out"
+      response.header("Location").value shouldBe routes.AmlsExpiryDateController.show.url
 
     s"POST $path with save for later and valid input for ${testCase.amlsType} should redirect to the saved for later page" in:
       AuthStubs.stubAuthorise()
@@ -132,7 +133,7 @@ extends ControllerSpec:
 
       response.status shouldBe 303
       response.body[String] shouldBe ""
-      response.header("Location").value shouldBe "/agent-registration/register/save-and-come-back-later"
+      response.header("Location").value shouldBe controllers.routes.AgentApplicationController.saveAndComeBackLater.url
 
     s"POST $path as blank form for ${testCase.amlsType} should return 400" in:
       AuthStubs.stubAuthorise()
@@ -159,7 +160,7 @@ extends ControllerSpec:
 
       response.status shouldBe 303
       response.body[String] shouldBe ""
-      response.header("Location").value shouldBe "/agent-registration/register/save-and-come-back-later"
+      response.header("Location").value shouldBe controllers.routes.AgentApplicationController.saveAndComeBackLater.url
 
     s"POST $path with an invalid value for ${testCase.amlsType} should return 400" in:
       AuthStubs.stubAuthorise()
@@ -186,4 +187,4 @@ extends ControllerSpec:
 
       response.status shouldBe 303
       response.body[String] shouldBe ""
-      response.header("Location").value shouldBe "/agent-registration/register/save-and-come-back-later"
+      response.header("Location").value shouldBe controllers.routes.AgentApplicationController.saveAndComeBackLater.url

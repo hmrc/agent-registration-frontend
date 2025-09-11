@@ -17,6 +17,8 @@
 package uk.gov.hmrc.agentregistrationfrontend.config
 
 import com.google.inject.AbstractModule
+import uk.gov.hmrc.agentregistration.shared.AmlsCode
+import uk.gov.hmrc.agentregistration.shared.AmlsName
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 
 class AmlsCodesSpec
@@ -29,5 +31,9 @@ extends ISpec:
 
   "AmlsCodes should load prodcution AMLS codes which are defined in /amls.csv resource" in:
     val amlsCodes: AmlsCodes = app.injector.instanceOf[AmlsCodes]
-    amlsCodes.amlsCodes shouldBe CsvLoader.load("/amls.csv")
+    amlsCodes.amlsCodes shouldBe CsvLoader
+      .load("/amls.csv")
+      .map: kv =>
+        (AmlsCode(kv._1), AmlsName(kv._2))
+
     amlsCodes.amlsCodes.nonEmpty shouldBe true withClue "sanity check that we actually have some options defiend in the amls.csv "

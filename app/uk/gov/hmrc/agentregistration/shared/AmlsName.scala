@@ -14,14 +14,6 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.config
+package uk.gov.hmrc.agentregistration.shared
 
-import com.google.inject.Inject
-import com.google.inject.Singleton
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsName
-
-@Singleton
-class AmlsCodes @Inject() ():
-  val amlsCodes: Map[AmlsCode, AmlsName] = CsvLoader.load("/amls.csv").map: kv =>
-    (AmlsCode(kv._1), AmlsName(kv._2))
+final case class AmlsName(value: String)

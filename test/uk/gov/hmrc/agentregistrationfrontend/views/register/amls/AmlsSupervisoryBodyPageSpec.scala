@@ -18,7 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.views.register.amls
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistrationfrontend.forms.SelectFromOptionsForm
+import play.api.data.Form
+import uk.gov.hmrc.agentregistration.shared.AmlsCode
+import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -29,19 +31,15 @@ extends ViewSpec:
 
   val viewTemplate: AmlsSupervisoryBodyPage = app.injector.instanceOf[AmlsSupervisoryBodyPage]
 
+  val form: Form[AmlsCode] = app.injector.instanceOf[AmlsCodeForm].form
+
   def testOptions: Map[String, String] = Map(
     "ATT" -> "Association of TaxationTechnicians (ATT)",
     "HMRC" -> "HM Revenue and Customs (HMRC)"
   )
 
   val doc: Document = Jsoup.parse(
-    viewTemplate(
-      // TODO: it won't confirm that the same for is used in controller when making a view from it. Also in controller that code seems to be duplicated
-      SelectFromOptionsForm.form(
-        fieldName = "amlsSupervisoryBody",
-        options = testOptions.keys.toSeq
-      )
-    ).body
+    viewTemplate(form).body
   )
 
   private val heading: String = "What is the name of your supervisory body?"
@@ -95,8 +93,7 @@ extends ViewSpec:
       val field = "amlsSupervisoryBody"
       val errorMessage = "Enter a name and choose your supervisor from the list"
       // TODO: form is duplicated, not really testing that such form with this particular error will be used in controller
-      val formWithError = SelectFromOptionsForm.form("amlsSupervisoryBody", testOptions.keys.toSeq)
-        .withError(field, errorMessage)
+      val formWithError = form.withError(field, errorMessage)
       val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
 
       errorDoc.mainContent shouldContainContent

@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.config
+package uk.gov.hmrc.agentregistrationfrontend.forms.helpers
 
-import com.google.inject.Inject
-import com.google.inject.Singleton
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsName
+object ErrorKeys {
 
-@Singleton
-class AmlsCodes @Inject() ():
-  val amlsCodes: Map[AmlsCode, AmlsName] = CsvLoader.load("/amls.csv").map: kv =>
-    (AmlsCode(kv._1), AmlsName(kv._2))
+  def requiredFieldErrorMessage(messageKey: String): String = s"$messageKey.error.required"
+  def invalidInputErrorMessage(messageKey: String): String = s"$messageKey.error.invalid"
+
+}

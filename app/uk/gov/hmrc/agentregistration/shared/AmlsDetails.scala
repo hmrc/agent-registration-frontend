@@ -22,13 +22,11 @@ import play.api.libs.json.Json
 import java.time.LocalDate
 
 final case class AmlsDetails(
-  supervisoryBody: String,
+  supervisoryBody: AmlsCode,
   amlsRegistrationNumber: Option[AmlsRegistrationNumber] = None,
   amlsExpiryDate: Option[LocalDate] = None
-) {
-  val isHmrc: Boolean = supervisoryBody.contains("HMRC")
-}
+):
+  val isHmrc: Boolean = supervisoryBody.value.contains("HMRC")
 
-object AmlsDetails {
+object AmlsDetails:
   implicit val format: Format[AmlsDetails] = Json.format[AmlsDetails]
-}

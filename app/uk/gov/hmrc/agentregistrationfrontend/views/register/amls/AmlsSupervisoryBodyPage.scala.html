@@ -18,6 +18,9 @@
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.amls.routes
 @import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
+@import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
+@import uk.gov.hmrc.agentregistration.shared.AmlsCode
+@import uk.gov.hmrc.agentregistration.shared.AmlsName
 
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.register.partials.ContinueOrSaveForLater
@@ -32,13 +35,13 @@
 )
 
 @(
-        form: Form[String]
+        form: Form[AmlsCode],
 )(implicit
         request: RequestHeader,
         messages: Messages
 )
 
-@key = @{"amlsSupervisoryBody"}
+@key = @{AmlsCodeForm.key}
 @pageTitle = @{messages(s"$key.title")}
     
 @layout(
@@ -61,11 +64,11 @@
                 value = Some(""),
                 text = "")).++(
                 amlsCodes.amlsCodes.flatMap {
-                    case (k, v) => Seq(
+                    case (amlsCode: AmlsCode, amlsName: AmlsName) => Seq(
                         SelectItem(
-                            value = Some(k),
-                            text = v,
-                            selected = form.value.getOrElse("").equals(v)
+                            value = Some(amlsCode.value),
+                            text = amlsName.value,
+                            selected = form.value.contains(amlsCode)
                         )
                     )
                 }

@@ -16,15 +16,13 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.forms.formatters
 
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.FormError
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 
 import java.time.LocalDate
 
 class LocalDateFormatterSpec
-extends AnyWordSpec
-with Matchers {
+extends UnitSpec:
 
   val msgPrefix = "page.service"
 
@@ -260,5 +258,3 @@ with Matchers {
       )
     }
   }
-
-}

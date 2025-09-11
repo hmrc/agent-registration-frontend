@@ -28,6 +28,8 @@ import play.api.Application
 import play.api.Logging
 import play.api.Mode
 import play.core.server.ServerConfig
+import uk.gov.hmrc.agentregistration.shared.AmlsCode
+import uk.gov.hmrc.agentregistration.shared.AmlsName
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.WireMockSupport
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
@@ -75,8 +77,8 @@ extends AnyWordSpecLike,
         bind(classOf[Clock]).toInstance(clock)
         bind(classOf[AmlsCodes]).toInstance(
           new AmlsCodes {
-            import AmlsCodes.*
-            override val amlsCodes: Map[AmlsCode, AmlsName] = CsvLoader.load("/testAmlsCodes.csv")
+            override val amlsCodes: Map[AmlsCode, AmlsName] = CsvLoader.load("/testAmlsCodes.csv").map: kv =>
+              (AmlsCode(kv._1), AmlsName(kv._2))
           }
         )
 

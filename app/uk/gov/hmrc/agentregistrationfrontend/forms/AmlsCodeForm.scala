@@ -16,22 +16,24 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.forms
 
-import play.api.data.Forms.mapping
-import play.api.data.FieldMapping
 import play.api.data.Form
 import play.api.data.Forms
-import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.EnumFormatter
-import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
+import play.api.data.Mapping
+import uk.gov.hmrc.agentregistration.shared.AmlsCode
+import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
+import uk.gov.hmrc.agentregistrationfrontend.forms.mappings.Mappings
 
-object BusinessTypeForm:
+import javax.inject.Inject
+import javax.inject.Singleton
 
-  val key: String = "businessType"
-  val form: Form[BusinessType] =
-    val fieldMapping: FieldMapping[BusinessType] = Forms.of(EnumFormatter.formatter[BusinessType](
-      errorMessageIfMissing = ErrorKeys.requiredFieldErrorMessage(key),
-      errorMessageIfEnumError = ErrorKeys.invalidInputErrorMessage(key)
-    ))
-    Form(
-      mapping = mapping(key -> fieldMapping)(identity)(Some(_))
-    )
+@Singleton
+class AmlsCodeForm @Inject() (amlsCodes: AmlsCodes):
+  val form: Form[AmlsCode] =
+    val mapping: Mapping[AmlsCode] = Mappings.textFromOptions(
+      formMessageKey = AmlsCodeForm.key,
+      options = amlsCodes.amlsCodes.keys.map(_.value).toSeq
+    ).transform[AmlsCode](AmlsCode.apply, _.value)
+    Form(Forms.single(AmlsCodeForm.key -> mapping))
+
+object AmlsCodeForm:
+  val key = "amlsSupervisoryBody"

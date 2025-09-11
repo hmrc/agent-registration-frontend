@@ -16,13 +16,11 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.forms.formatters
 
-import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import play.api.data.FormError
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 
 class MonthFormatterSpec
-extends AnyWordSpec
-with Matchers {
+extends UnitSpec:
 
   val invalidKey = "dateFieldName.error.invalid"
   val missingKey = "dateFieldName.error.required"
@@ -44,47 +42,42 @@ with Matchers {
     12 -> "December"
   )
 
-  val formatter =
+  val formatter: MonthFormatter =
     new MonthFormatter(
       invalidKey = invalidKey,
       missingKey = missingKey
     )
 
-  ".bind" should {
-
-    monthNames.foreach { case (monthNumber, monthFullName) =>
+  ".bind" should:
+    monthNames.foreach: t =>
+      val (monthNumber, monthFullName) = t
       val monthShortName = monthFullName.take(3)
-      s"return an Int when binding was successful from a valid month number with leading zero: 0$monthNumber" in {
+      s"return an Int when binding was successful from a valid month number with leading zero: 0$monthNumber" in:
         formatter.bind(
           key = monthKey,
           data = Map(monthKey -> s"0$monthNumber")
         ) shouldBe
           Right(monthNumber)
-      }
-      s"return an Int when binding was successful from a valid month number without leading zero: $monthNumber" in {
+      s"return an Int when binding was successful from a valid month number without leading zero: $monthNumber" in:
         formatter.bind(
           key = monthKey,
           data = Map(monthKey -> s"$monthNumber")
         ) shouldBe
           Right(monthNumber)
-      }
-      s"return an Int when binding was successful from a valid month short name: $monthShortName" in {
+      s"return an Int when binding was successful from a valid month short name: $monthShortName" in:
         formatter.bind(
           key = monthKey,
           data = Map(monthKey -> monthShortName)
         ) shouldBe
           Right(monthNumber)
-      }
-      s"return an Int when binding was successful from a valid month full name: $monthFullName" in {
+      s"return an Int when binding was successful from a valid month full name: $monthFullName" in:
         formatter.bind(
           key = monthKey,
           data = Map(monthKey -> monthFullName)
         ) shouldBe
           Right(monthNumber)
-      }
-    }
 
-    "return the form errors when binding was unsuccessful due to missing value" in {
+    "return the form errors when binding was unsuccessful due to missing value" in:
       formatter.bind(
         key = monthKey,
         data = Map(monthKey -> "")
@@ -93,9 +86,8 @@ with Matchers {
           key = "date.month",
           message = missingKey
         )))
-    }
 
-    "return the form errors when binding was unsuccessful due to invalid input" in {
+    "return the form errors when binding was unsuccessful due to invalid input" in:
       formatter.bind(
         key = monthKey,
         data = Map(monthKey -> "invalid")
@@ -104,19 +96,12 @@ with Matchers {
           key = "date.month",
           message = invalidKey
         )))
-    }
-  }
 
-  ".unbind" should {
-
-    "return form data from a valid month Int" in {
+  ".unbind" should:
+    "return form data from a valid month Int" in:
       formatter.unbind(
         key = monthKey,
         value = 11
       ) shouldBe Map(
         "date.month" -> "11"
       )
-    }
-  }
-
-}
