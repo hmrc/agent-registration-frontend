@@ -57,3 +57,5 @@ trait TdBase:
     dateOfIncorporation = Some(dateOfIncorporation)
   )
   lazy val postcode = "AA1 1AA"
+  lazy val validAmlsExpiryDate: LocalDate = LocalDate.now().plusMonths(6)
+  lazy val invalidAmlsExpiryDate: LocalDate = LocalDate.now().plusMonths(13)

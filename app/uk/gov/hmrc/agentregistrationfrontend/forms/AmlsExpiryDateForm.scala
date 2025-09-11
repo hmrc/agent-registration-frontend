@@ -16,19 +16,21 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.forms
 
-import com.google.inject.Inject
 import play.api.data.Form
 import play.api.i18n.Messages
 import uk.gov.hmrc.agentregistrationfrontend.forms.mappings.Mappings
 
 import java.time.LocalDate
 
-class AmlsExpiryDateForm @Inject() {
+object AmlsExpiryDateForm:
+
+  val key: String = "amlsExpiryDate"
+  val dayKey: String = s"$key.day"
+  val monthKey: String = s"$key.month"
+  val yearKey: String = s"$key.year"
 
   def form()(implicit messages: Messages): Form[LocalDate] = Form(
-    "amlsExpiryDate" -> Mappings.localDate("amlsExpiryDate")
-      .verifying("amlsExpiryDate.error.past", date => date.isAfter(LocalDate.now()))
-      .verifying("amlsExpiryDate.error.future", date => date.isBefore(LocalDate.now().plusMonths(13)))
+    key -> Mappings.localDate(key)
+      .verifying(s"$key.error.past", date => date.isAfter(LocalDate.now()))
+      .verifying(s"$key.error.future", date => date.isBefore(LocalDate.now().plusMonths(13)))
   )
-
-}

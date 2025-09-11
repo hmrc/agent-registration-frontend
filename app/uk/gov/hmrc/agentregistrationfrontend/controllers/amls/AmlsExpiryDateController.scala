@@ -41,7 +41,6 @@ import scala.concurrent.Future
 class AmlsExpiryDateController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  formProvider: AmlsExpiryDateForm,
   view: AmlsExpiryDatePage,
   applicationService: ApplicationService
 )(implicit ec: ExecutionContext)
@@ -50,7 +49,7 @@ with I18nSupport:
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
-      val emptyForm = formProvider.form()
+      val emptyForm = AmlsExpiryDateForm.form()
       val form: Form[LocalDate] =
         request
           .agentApplication
@@ -63,7 +62,7 @@ with I18nSupport:
 
   def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
-      formProvider.form()
+      AmlsExpiryDateForm.form()
         .bindFromRequest()
         .fold(
           formWithErrors =>
