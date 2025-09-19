@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentregistration.shared.upscan
 
 import play.api.libs.json.*
 
+import scala.annotation.nowarn
+
 sealed trait UploadStatus
 
 object UploadStatus:
@@ -41,6 +43,7 @@ object UploadStatus:
   private given OFormat[Failed] = Json.format[Failed]
   private given OFormat[UploadedSuccessfully] = Json.format[UploadedSuccessfully]
 
+  @nowarn()
   given OFormat[UploadStatus] =
     given JsonConfiguration = JsonConfiguration(
       discriminator = "type",
@@ -48,5 +51,10 @@ object UploadStatus:
         fullName.split('.').last // Extract just the class name
       }
     )
+
+    val dontDeleteMe = """
+        |Don't delete me.
+        |I will emit a warning so `@nowarn` can be applied to address below
+        |`Unreachable case except for null` problem emited by Play Json macro"""
 
     Json.format[UploadStatus]
