@@ -6,7 +6,7 @@ object ScalaCompilerFlags {
     "-language:reflectiveCalls",
     "-Wconf:msg=While parsing annotations in:silent",
     "-Yno-flexible-types",
-    "-Wconf:msg=Unreachable case:silent", // Suppress unreachable case warnings
+//    "-Wconf:msg=Unreachable case:silent", // Suppress unreachable case warnings
     //    "-rewrite",             // Enable rewriting
 //    "-new-syntax",          // Enable significant indentation syntax
 //    "-indent",              // Enable significant indentation syntax
