@@ -36,7 +36,6 @@ extends ViewSpec:
         postTarget = "https://bucketName.s3.eu-west-2.amazonaws.com/upload",
         formFields = Map("hiddenKey" -> "hiddenValue")
       ),
-      errorMessage = None,
       supervisoryBodyName = AmlsName("Gambling Commission")
     ).body
   )
@@ -100,53 +99,3 @@ extends ViewSpec:
         .selectOrFail(s"form button[id='upload-button']")
         .selectOnlyOneElementOrFail()
         .text() shouldBe "Save and continue"
-
-    "render an error message when error passed in" in:
-      val errorMessage: String = "The file you uploaded was infected with a virus"
-      val errorDoc: Document = Jsoup.parse(
-        viewTemplate(
-          upscanInitiateResponse = UpscanInitiateResponse(
-            fileReference = Reference("reference"),
-            postTarget = "https://bucketName.s3.eu-west-2.amazonaws.com/upload",
-            formFields = Map("hiddenKey" -> "hiddenValue")
-          ),
-          errorMessage = Some(errorMessage),
-          supervisoryBodyName = AmlsName("Test Supervisory Body")
-        ).body
-      )
-      errorDoc.mainContent shouldContainContent
-        """
-          |There is a problem
-          |The file you uploaded was infected with a virus
-          |Anti-money laundering supervision details
-          |Evidence of your anti-money laundering supervision
-          |Upload evidence to show that Test Supervisory Body is your current anti-money laundering supervisor.
-          |You can choose what evidence to upload.
-          |Suitable evidence might be a letter, email or payment receipt from your supervisory body, confirming you’re covered.
-          |The file must be smaller than 5MB.
-          |Types of file we can accept
-          |These file types are allowed:
-          |image (.jpg, .jpeg, .png or .tiff)
-          |PDF (.pdf)
-          |email (.txt or .msg)
-          |Microsoft (Word, Excel or PowerPoint)
-          |Open Document Format (ODF)
-          |Choose your file
-          |Error:
-          |The file you uploaded was infected with a virus
-          |Save and continue
-          |""".stripMargin
-
-      errorDoc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
-      errorDoc
-        .selectOrFail("main > div > div > .govuk-error-summary .govuk-error-summary__title")
-        .selectOnlyOneElementOrFail()
-        .text() shouldBe "There is a problem"
-      errorDoc
-        .selectOrFail("main > div > div > .govuk-error-summary .govuk-error-summary__list > li > a")
-        .selectOnlyOneElementOrFail()
-        .selectAttrOrFail("href") shouldBe "#fileToUpload"
-      errorDoc
-        .selectOrFail("form .govuk-error-message")
-        .selectOnlyOneElementOrFail()
-        .text() shouldBe s"Error: $errorMessage"

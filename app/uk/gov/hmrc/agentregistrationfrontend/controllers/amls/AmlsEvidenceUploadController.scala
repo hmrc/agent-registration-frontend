@@ -56,7 +56,6 @@ with I18nSupport:
 
   def show: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
-      val errorMessage: Option[String] = request.flash.get("errorMessage")
       val amlsCode: AmlsCode = request.agentApplication.getAmlsDetails.supervisoryBody
       val amlsName: AmlsName = amlsCodes.getSupervisoryName(amlsCode)
 
@@ -79,7 +78,6 @@ with I18nSupport:
           )
       yield Ok(view(
         upscanInitiateResponse = upscanInitiateResponse,
-        errorMessage = errorMessage,
         supervisoryBodyName = amlsName
       ))
 

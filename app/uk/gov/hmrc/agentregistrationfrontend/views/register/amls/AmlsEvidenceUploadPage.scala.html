@@ -35,7 +35,6 @@
 
 @(
         upscanInitiateResponse: UpscanInitiateResponse,
-        errorMessage: Option[String],
         supervisoryBodyName: AmlsName
 )(implicit request: Request[?], messages: Messages)
 
@@ -59,23 +58,10 @@
 }
 
 @layout(
-    pageTitle = if(errorMessage.isDefined) s"${messages("common.errorPrefix")}: $title" else title,
+    pageTitle = title,
     templateScripts = Some(templateScripts),
     templateStyles = Some(templateStyles)
 ) {
-    @if(errorMessage.isDefined) {
-        @govukErrorSummary(ErrorSummary(
-            errorList = Seq(
-                ErrorLink(
-                    href = Some("#fileToUpload"),
-                    content = Text(errorMessage.get)
-                )
-            ),
-            title = Text(messages("error.summary.title")),
-            disableAutoFocus = Some(false),
-            attributes = Map("id" -> "error-summary-display")
-        ))
-    }
     <h2 class="govuk-caption-l">@messages("amlsDetails.title")</h2>
     <h1 class="govuk-heading-l">@title</h1>
     <p class="govuk-body">
@@ -110,8 +96,7 @@
             attributes = Map(
                 "accept" -> "application/pdf, image/jpg, image/jpeg, image/png, image/tiff, text/plain, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/msword, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                 "required" -> "true"
-            ),
-            errorMessage = errorMessage.map(msg => ErrorMessage(content = Text(msg)))
+            )
         ))
 
         <div id="upload-handling">
