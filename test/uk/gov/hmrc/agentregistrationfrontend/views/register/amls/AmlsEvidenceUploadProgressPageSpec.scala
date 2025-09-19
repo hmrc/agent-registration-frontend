@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.views.register.amls
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import sttp.model.Uri.UriContext
+import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.AmlsEvidenceUploadProgressPage
@@ -38,7 +40,7 @@ extends ViewSpec:
       status = UploadStatus.UploadedSuccessfully(
         name = "file.pdf",
         mimeType = "application/pdf",
-        downloadUrl = new java.net.URL("http://localhost:1234/download/file.pdf"),
+        downloadUrl = ObjectStoreUrl(uri"http://localhost:1234/download/file.pdf"),
         size = Some(12345),
         checksum = "checksum"
       )

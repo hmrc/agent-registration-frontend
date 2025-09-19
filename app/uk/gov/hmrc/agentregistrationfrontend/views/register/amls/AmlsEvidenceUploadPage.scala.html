@@ -15,6 +15,7 @@
  *@
 
 @import play.twirl.api.Html
+@import uk.gov.hmrc.agentregistration.shared.AmlsName
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.amls.routes
 @import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UpscanInitiateResponse
@@ -35,7 +36,7 @@
 @(
         upscanInitiateResponse: UpscanInitiateResponse,
         errorMessage: Option[String],
-        supervisoryBodyName: String
+        supervisoryBodyName: AmlsName
 )(implicit request: Request[?], messages: Messages)
 
 @key = @{"amlsEvidenceUpload"}
@@ -78,7 +79,7 @@
     <h2 class="govuk-caption-l">@messages("amlsDetails.title")</h2>
     <h1 class="govuk-heading-l">@title</h1>
     <p class="govuk-body">
-        @messages(s"$key.p1", supervisoryBodyName)
+        @messages(s"$key.p1", supervisoryBodyName.value)
     </p>
     <p class="govuk-body">
         @messages(s"$key.p2")

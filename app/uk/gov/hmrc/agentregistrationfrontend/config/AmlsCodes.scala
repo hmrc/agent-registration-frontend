@@ -23,5 +23,13 @@ import uk.gov.hmrc.agentregistration.shared.AmlsName
 
 @Singleton
 class AmlsCodes @Inject() ():
+
   val amlsCodes: Map[AmlsCode, AmlsName] = CsvLoader.load("/amls.csv").map: kv =>
     (AmlsCode(kv._1), AmlsName(kv._2))
+
+  def getSupervisoryName(amlsCode: AmlsCode): AmlsName = amlsCodes.getOrElse(
+    amlsCode,
+    throw new RuntimeException(
+      s"""No supervisory body found for $amlsCode\nAvailable options:\n${amlsCodes.map(kv => s"${kv._1} ${kv._2}").mkString("\n")}"""
+    )
+  )

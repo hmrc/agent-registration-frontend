@@ -20,7 +20,6 @@ import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import play.mvc.Http.HeaderNames
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistration.shared.upscan.Reference
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.PreparedUpload
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UpscanInitiateRequest
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UpscanInitiateResponse
@@ -29,6 +28,7 @@ import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
 
+import java.net.URL
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -40,7 +40,7 @@ class UpscanConnector @Inject() (
 
   private val upscanInitiateHost: String = appConfig.upscanInitiateHost
   private[connectors] val upscanInitiatePath: String = "/upscan/v2/initiate"
-  private val upscanInitiateUrl: String = upscanInitiateHost + upscanInitiatePath
+  private val upscanInitiateUrl: URL = url"${upscanInitiateHost + upscanInitiatePath}"
   private val headers = Map(
     HeaderNames.CONTENT_TYPE -> "application/json"
   )
@@ -57,17 +57,17 @@ class UpscanConnector @Inject() (
     )
 
     for
-      response <- httpClientV2.post(url"$upscanInitiateUrl")
+      response <- httpClientV2.post(upscanInitiateUrl)
         .withBody(Json.toJson(request))
         .setHeader(headers.toSeq*)
         .execute[PreparedUpload]
-      fileReference = Reference(response.reference.value)
+      fileReference = response.reference
       postTarget = response.uploadRequest.href
       formFields = response.uploadRequest.fields
     yield UpscanInitiateResponse(
-      fileReference,
-      postTarget,
-      formFields
+      fileReference = fileReference,
+      postTarget = postTarget,
+      formFields = formFields
     )
 
 }
