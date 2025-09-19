@@ -38,6 +38,12 @@ object UploadStatus:
   extends UploadStatus
 
   given OFormat[UploadStatus] =
+    given JsonConfiguration = JsonConfiguration(
+      discriminator = "type",
+      typeNaming = JsonNaming { fullName =>
+        fullName.split('.').last // Extract just the class name
+      }
+    )
     given OFormat[InProgress.type] = Json.format[InProgress.type]
     given OFormat[Failed] = Json.format[Failed]
     given OFormat[UploadedSuccessfully] = Json.format[UploadedSuccessfully]
