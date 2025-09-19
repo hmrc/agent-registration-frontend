@@ -115,10 +115,12 @@ extends FrontendController(mcc):
   def randomUtr(): Utr = Utr("%010d".format(Random.nextLong(9999999999L)))
 
   private def form(businessType: BusinessType): Form[GrsResponse] =
-    val registrationStatusMapping: FieldMapping[GrsRegistrationStatus] = Forms.of(EnumFormatter.formatter[GrsRegistrationStatus](
-      errorMessageIfMissing = "Registration status required",
-      errorMessageIfEnumError = "Registration status invalid"
-    ))
+    val registrationStatusMapping: FieldMapping[GrsRegistrationStatus] = Forms.of(using
+      EnumFormatter.formatter[GrsRegistrationStatus](
+        errorMessageIfMissing = "Registration status required",
+        errorMessageIfEnumError = "Registration status invalid"
+      )
+    )
 
     Form(mapping(
       "registrationStatus" -> registrationStatusMapping,

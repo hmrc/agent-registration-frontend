@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistration.shared
 
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
-import play.api.mvc.RequestHeader
 
 import java.time.Clock
 import java.time.Instant
@@ -44,7 +43,7 @@ final case class AgentApplication(
 
   val isInProgress: Boolean = !hasFinished
 
-  def getUtr(using request: RequestHeader): Utr = utr.getOrElse(
+  def getUtr(): Utr = utr.getOrElse(
     throw RuntimeException(s"Expected 'utr' to be defined but it was None [${internalUserId.toString}] ")
   )
 

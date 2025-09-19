@@ -11,7 +11,7 @@ addSbtPlugin("org.scoverage"      % "sbt-scoverage"      % "2.3.1")
 addSbtPlugin("com.github.sbt"     % "sbt-gzip"           % "2.0.0")
 addSbtPlugin("uk.gov.hmrc"        % "sbt-sass-compiler"  % "0.12.0")
 addSbtPlugin("org.scalastyle"     %% "scalastyle-sbt-plugin" % "1.0.0")
-addSbtPlugin("org.wartremover"    %  "sbt-wartremover"       % "3.3.0")
+addSbtPlugin("org.wartremover"    %  "sbt-wartremover"       % "3.4.1")
 addSbtPlugin("com.timushev.sbt"   %  "sbt-updates"           % "0.6.3")
 addSbtPlugin("org.scalameta"      % "sbt-scalafmt"            % "2.5.4")
 

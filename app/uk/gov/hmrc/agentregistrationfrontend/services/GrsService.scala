@@ -64,8 +64,8 @@ class GrsService @Inject() (
     val (fullNamePageLabel, welshFullNamePageLabel) =
       if (!hasOwnership && businessType == SoleTrader) {
         (
-          messagesApi.translate("grs.optFullNamePageLabel", Nil)(Lang("en")),
-          messagesApi.translate("grs.optFullNamePageLabel", Nil)(Lang("cy"))
+          messagesApi.translate("grs.optFullNamePageLabel", Nil)(using Lang("en")),
+          messagesApi.translate("grs.optFullNamePageLabel", Nil)(using Lang("cy"))
         )
       }
       else {
@@ -81,11 +81,11 @@ class GrsService @Inject() (
       businessVerificationCheck = false,
       labels = Some(JourneyLabels(
         en = TranslationLabels(
-          optServiceName = messagesApi.translate("service.name", Nil)(Lang("en")),
+          optServiceName = messagesApi.translate("service.name", Nil)(using Lang("en")),
           optFullNamePageLabel = fullNamePageLabel
         ),
         cy = TranslationLabels(
-          optServiceName = messagesApi.translate("service.name", Nil)(Lang("cy")),
+          optServiceName = messagesApi.translate("service.name", Nil)(using Lang("cy")),
           optFullNamePageLabel = welshFullNamePageLabel
         )
       ))
