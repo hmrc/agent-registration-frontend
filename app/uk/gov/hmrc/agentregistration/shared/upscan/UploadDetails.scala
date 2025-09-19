@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,21 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this(layout: Layout)
+package uk.gov.hmrc.agentregistration.shared.upscan
 
-@(
-        h1: String,
-        bodyText: Option[String]
-)(implicit
-        request: RequestHeader,
-        messages: Messages
+import play.api.libs.json.Format
+import play.api.libs.json.Json
+
+final case class UploadDetails(
+  reference: Reference,
+  status: UploadStatus
 )
 
-@layout(pageTitle = h1) {
-    <h1 class="govuk-heading-xl">@h1</h1>
-    @bodyText.map { bodyText =>
-        <p class="govuk-body">@bodyText</p>
-    }
-}
+object UploadDetails:
+
+  given format: Format[UploadDetails] = Json.format[UploadDetails]

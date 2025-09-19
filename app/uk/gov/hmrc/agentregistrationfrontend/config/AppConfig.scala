@@ -98,9 +98,16 @@ class AppConfig @Inject() (
       case GeneralPartnership | LimitedLiabilityPartnership => s"$partnershipIdBaseUrl/partnership-identification/api/journey/$journeyId"
     }
 
-/*
- * GRS CONFIG END
- */
+  /*
+   * UPSCAN CONFIG START
+   */
+  val upscanInitiateHost: String = servicesConfig.baseUrl("upscan")
+  val upscanRedirectBase: String = configuration.get[String]("microservice.services.upscan.redirect-base")
+  val fileUploadMaxPolls: Int = configuration.get[Int]("uploads.maximum-js-polls")
+  val millisecondsBeforePoll: Int = configuration.get[Int]("uploads.milliseconds-before-poll")
+  val upscanCallbackEndpoint: String = s"$agentRegistrationBaseUrl/agent-registration/upscan-callback"
+  val maxFileSize: Int = configuration.get[Int]("uploads.max-file-size-in-bytes")
+  val allowedCorsOrigin: String = configuration.get[String]("microservice.services.upscan.redirect-base")
 
 object ConfigHelper:
 

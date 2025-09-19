@@ -16,31 +16,26 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
-import play.api.i18n.I18nSupport
+import com.google.inject.Inject
+import com.google.inject.Singleton
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
-
-import javax.inject.Inject
-import javax.inject.Singleton
 
 @Singleton
-class AmlsSupportingEvidenceController @Inject() (
+class CheckYourAnswersController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  view: SimplePage
+  view: SimplePage // TODO placeholder page
 )
-extends FrontendController(mcc)
-with I18nSupport:
+extends FrontendController(mcc):
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       Ok(view(
-        h1 = "AMLS supporting evidence...",
-        bodyText = Some(
-          "Placeholder for the AMLS supporting evidence page..."
-        )
+        h1 = "Check your answers placeholder",
+        bodyText = Some("This is a placeholder page for the Check Your Answers page")
       ))

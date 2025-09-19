@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,21 +12,20 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@this(layout: Layout)
+package uk.gov.hmrc.agentregistration.shared.upscan
 
-@(
-        h1: String,
-        bodyText: Option[String]
-)(implicit
-        request: RequestHeader,
-        messages: Messages
-)
+import play.api.libs.json.*
+import play.api.libs.functional.syntax.*
 
-@layout(pageTitle = h1) {
-    <h1 class="govuk-heading-xl">@h1</h1>
-    @bodyText.map { bodyText =>
-        <p class="govuk-body">@bodyText</p>
-    }
-}
+final case class ObjectStoreUrl(private val value: String)
+
+object ObjectStoreUrl:
+
+  def apply(uri: sttp.model.Uri): ObjectStoreUrl =
+    val isFullyQualified: Boolean = uri.scheme.isDefined && uri.host.isDefined
+    require(isFullyQualified, "ObjectStoreUrl must be fully qualified")
+    ObjectStoreUrl(uri.toString)
+
+  given format: Format[ObjectStoreUrl] = summon[Format[String]].inmap(ObjectStoreUrl(_), _.value)

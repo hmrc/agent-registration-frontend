@@ -67,7 +67,8 @@ extends ControllerSpec:
     application: AgentApplication,
     amlsType: String,
     validInput: String,
-    invalidInput: String
+    invalidInput: String,
+    nextPage: String
   )
 
   List(
@@ -75,13 +76,15 @@ extends ControllerSpec:
       application = fakeAgentApplicationWithHmrc,
       amlsType = "HMRC",
       validInput = "XAML00000123456",
-      invalidInput = "123"
+      invalidInput = "123",
+      nextPage = routes.CheckYourAnswersController.show.url
     ),
     TestCaseForAmlsRegistrationNumber(
       application = fakeAgentApplicationNonHmrc,
       amlsType = "non-HMRC",
       validInput = "1234567890",
-      invalidInput = ";</\\>"
+      invalidInput = ";</\\>",
+      nextPage = routes.AmlsExpiryDateController.show.url
     )
   ).foreach: testCase =>
     s"GET $path should return 200 for ${testCase.amlsType} and render page" in:
@@ -112,7 +115,7 @@ extends ControllerSpec:
 
       response.status shouldBe 303
       response.body[String] shouldBe ""
-      response.header("Location").value shouldBe routes.AmlsExpiryDateController.show.url
+      response.header("Location").value shouldBe testCase.nextPage
 
     s"POST $path with save for later and valid input for ${testCase.amlsType} should redirect to the saved for later page" in:
       AuthStubs.stubAuthorise()

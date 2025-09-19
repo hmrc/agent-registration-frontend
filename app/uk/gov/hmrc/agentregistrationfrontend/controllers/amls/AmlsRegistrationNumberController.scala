@@ -86,6 +86,7 @@ with I18nSupport:
                   if getSubmitAction(request)
                       .isSaveAndComeBackLater
                   then applicationRoutes.AgentApplicationController.saveAndComeBackLater.url
+                  else if isHmrc then routes.CheckYourAnswersController.show.url
                   else routes.AmlsExpiryDateController.show.url
                 )
               )

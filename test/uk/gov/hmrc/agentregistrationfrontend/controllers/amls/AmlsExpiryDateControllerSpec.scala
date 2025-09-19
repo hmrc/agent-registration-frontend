@@ -86,7 +86,7 @@ extends ControllerSpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.AmlsSupportingEvidenceController.show.url
+    response.header("Location").value shouldBe routes.AmlsEvidenceUploadController.show.url
 
   s"POST $path with save for later and valid input should redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()

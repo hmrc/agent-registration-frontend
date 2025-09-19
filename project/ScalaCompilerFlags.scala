@@ -5,6 +5,7 @@ object ScalaCompilerFlags {
     "-language:implicitConversions",
     "-language:reflectiveCalls",
     "-Wconf:msg=While parsing annotations in:silent",
+    "-Yno-flexible-types",
 //    "-rewrite",             // Enable rewriting
 //    "-new-syntax",          // Enable significant indentation syntax
 //    "-indent",              // Enable significant indentation syntax

@@ -1,0 +1,71 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.agentregistrationfrontend.controllers.amls.routes
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
+
+@this(
+    layout: Layout,
+    govukButton: GovukButton
+)
+@(status: UploadStatus)(implicit messages: Messages, request: RequestHeader)
+
+
+@pageTitle =  @{status match {
+    case UploadStatus.InProgress               => messages("fileUploadProgress.title")
+    case s : UploadStatus.UploadedSuccessfully => messages("fileUploadProgress.complete.title")
+    case UploadStatus.Failed(f)  => messages(s"fileUploadProgress.$f.title")
+}}
+
+@layout(
+    pageTitle = pageTitle
+) {
+    <h2 class="govuk-caption-l">@messages("amlsDetails.title")</h2>
+    <h1 class="govuk-heading-l">@pageTitle</h1>
+
+    <p class="govuk-body">
+        @status match {
+            case UploadStatus.InProgress               => { @messages("fileUploadProgress.inProgress") }
+            case s : UploadStatus.UploadedSuccessfully => { @messages("fileUploadProgress.complete", s.name) }
+            case UploadStatus.Failed(f)     => { @messages(s"fileUploadProgress.$f") }
+        }
+    </p>
+
+    <p class="govuk-body">
+        @status match {
+            case s : UploadStatus.UploadedSuccessfully => {
+                @govukButton(Button(
+                  href = Some(routes.CheckYourAnswersController.show.url),
+                  content = Text(messages("common.continue"))
+                ))
+            }
+            case UploadStatus.InProgress => {
+                @govukButton(Button(
+                    href = Some(routes.AmlsEvidenceUploadController.showResult.url),
+                    content = Text(messages("common.continue"))
+                ))
+            }
+          case _ => {
+              @govukButton(Button(
+                  href = Some(routes.AmlsEvidenceUploadController.show.url),
+                  content = Text(messages("common.tryAgain"))
+              ))
+          }
+        }
+    </p>
+}
