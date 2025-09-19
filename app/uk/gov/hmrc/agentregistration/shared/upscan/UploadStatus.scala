@@ -37,6 +37,10 @@ object UploadStatus:
   )
   extends UploadStatus
 
+  private given OFormat[InProgress.type] = Json.format[InProgress.type]
+  private given OFormat[Failed] = Json.format[Failed]
+  private given OFormat[UploadedSuccessfully] = Json.format[UploadedSuccessfully]
+
   given OFormat[UploadStatus] =
     given JsonConfiguration = JsonConfiguration(
       discriminator = "type",
@@ -44,8 +48,5 @@ object UploadStatus:
         fullName.split('.').last // Extract just the class name
       }
     )
-    given OFormat[InProgress.type] = Json.format[InProgress.type]
-    given OFormat[Failed] = Json.format[Failed]
-    given OFormat[UploadedSuccessfully] = Json.format[UploadedSuccessfully]
 
     Json.format[UploadStatus]
