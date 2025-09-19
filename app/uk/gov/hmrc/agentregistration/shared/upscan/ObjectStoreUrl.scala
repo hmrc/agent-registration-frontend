@@ -14,8 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.upscan
+package uk.gov.hmrc.agentregistration.shared.upscan
 
-case class UpscanFileReference(
-  reference: String
-)
+import play.api.libs.json.*
+import play.api.libs.functional.syntax.*
+
+final case class ObjectStoreUrl(private val value: String)
+
+object ObjectStoreUrl:
+
+  def apply(uri: sttp.model.Uri): ObjectStoreUrl =
+    val isFullyQualified: Boolean = uri.scheme.isDefined && uri.host.isDefined
+    require(isFullyQualified, "ObjectStoreUrl must be fully qualified")
+    ObjectStoreUrl(uri.toString)
+
+  given format: Format[ObjectStoreUrl] = summon[Format[String]].inmap(ObjectStoreUrl(_), _.value)

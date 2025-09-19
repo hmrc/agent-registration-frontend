@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
 import com.google.inject.AbstractModule
 import com.softwaremill.quicklens.*
+import sttp.model.Uri.UriContext
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
@@ -26,13 +27,13 @@ import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistration.shared.upscan.Reference
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
+import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.UpscanStubs
-import uk.gov.hmrc.http.StringContextOps
 
 class AmlsEvidenceUploadControllerSpec
 extends ControllerSpec:
@@ -68,7 +69,7 @@ extends ControllerSpec:
       UploadDetails(
         reference = Reference("test-file-reference"),
         status = UploadStatus.UploadedSuccessfully(
-          downloadUrl = url"https://bucketName.s3.eu-west-2.amazonaws.com/xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+          downloadUrl = ObjectStoreUrl(uri"https://bucketName.s3.eu-west-2.amazonaws.com/xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"),
           name = "evidence.pdf",
           mimeType = "application/pdf",
           size = Some(12345L),

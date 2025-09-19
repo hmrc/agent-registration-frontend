@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.register.amls
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import uk.gov.hmrc.agentregistration.shared.AmlsName
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.AmlsEvidenceUploadPage
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UpscanInitiateResponse
@@ -36,7 +37,7 @@ extends ViewSpec:
         formFields = Map("hiddenKey" -> "hiddenValue")
       ),
       errorMessage = None,
-      supervisoryBodyName = "Gambling Commission"
+      supervisoryBodyName = AmlsName("Gambling Commission")
     ).body
   )
 
@@ -110,7 +111,7 @@ extends ViewSpec:
             formFields = Map("hiddenKey" -> "hiddenValue")
           ),
           errorMessage = Some(errorMessage),
-          supervisoryBodyName = "Test Supervisory Body"
+          supervisoryBodyName = AmlsName("Test Supervisory Body")
         ).body
       )
       errorDoc.mainContent shouldContainContent

@@ -29,11 +29,19 @@ extends ISpec:
       // Leaving configure empty to avoid binding AmlsCodes instance in test context
       override def configure(): Unit = ()
 
+  val amlsCodes: AmlsCodes = app.injector.instanceOf[AmlsCodes]
+
   "AmlsCodes should load prodcution AMLS codes which are defined in /amls.csv resource" in:
-    val amlsCodes: AmlsCodes = app.injector.instanceOf[AmlsCodes]
     amlsCodes.amlsCodes shouldBe CsvLoader
       .load("/amls.csv")
       .map: kv =>
         (AmlsCode(kv._1), AmlsName(kv._2))
 
     amlsCodes.amlsCodes.nonEmpty shouldBe true withClue "sanity check that we actually have some options defined in the amls.csv "
+
+  "getSupervisoryName should return corresponding amls name or throw exception" in:
+    amlsCodes.getSupervisoryName(AmlsCode("ACCA")) shouldBe AmlsName("Association of Chartered Certified Accountants (ACCA)")
+
+    intercept[RuntimeException](amlsCodes.getSupervisoryName(AmlsCode("sialala")))
+      .getMessage should
+      startWith("No supervisory body found for AmlsCode(sialala)")

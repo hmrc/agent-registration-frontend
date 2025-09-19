@@ -22,7 +22,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.upscan.Reference
+import uk.gov.hmrc.agentregistration.shared.AmlsName
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
@@ -58,10 +58,8 @@ with I18nSupport:
     implicit request =>
       val errorMessage: Option[String] = request.flash.get("errorMessage")
       val amlsCode: AmlsCode = request.agentApplication.getAmlsDetails.supervisoryBody
-      val supervisorName: String = amlsCodes.amlsCodes
-        .get(amlsCode)
-        .map(_.value)
-        .getOrElse(throw new RuntimeException("No supervisory body found for code " + amlsCode.value))
+      val amlsName: AmlsName = amlsCodes.getSupervisoryName(amlsCode)
+
       for
         upscanInitiateResponse <- upscanInitiateConnector.initiate(
           redirectOnSuccess = Some(appConfig.upscanRedirectBase + routes.AmlsEvidenceUploadController.showResult.url),
@@ -76,17 +74,20 @@ with I18nSupport:
               .modify(_.amlsDetails.each.amlsEvidence)
               .setTo(Some(UploadDetails(
                 status = UploadStatus.InProgress,
-                reference = Reference(upscanInitiateResponse.fileReference.value)
+                reference = upscanInitiateResponse.fileReference
               )))
-          ).map(_ => ())
+          )
       yield Ok(view(
         upscanInitiateResponse = upscanInitiateResponse,
         errorMessage = errorMessage,
-        supervisoryBodyName = supervisorName
+        supervisoryBodyName = amlsName
       ))
 
-  // only used when the file transfer to upscan fails
-  // upscan will append query parameters to the redirectOnError url
+  /** Handles file upload errors from Upscan.
+    *
+    * This endpoint is called when a file transfer to Upscan service fails. Upscan will redirect to this endpoint and append error information as query
+    * parameters to the redirect URL.
+    */
   def showError(
     errorCode: String,
     errorMessage: String,
