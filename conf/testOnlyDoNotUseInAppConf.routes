@@ -13,6 +13,7 @@
 ->          /                                                                 prod.Routes
 
 GET         /agent-registration/test-only/show-agent-application              uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.TestOnlyController.showAgentApplication
+GET         /agent-registration/test-only/set-upload-to-complete              uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.TestOnlyController.setUploadToComplete()
 
 GET         /agent-registration/test-only/grs-stub/:businessType              uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.GrsStubController.showGrsData(businessType: BusinessType, journeyId: String)
 POST        /agent-registration/test-only/grs-stub/:businessType              uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.GrsStubController.submitGrsData(businessType: BusinessType, journeyId: String)

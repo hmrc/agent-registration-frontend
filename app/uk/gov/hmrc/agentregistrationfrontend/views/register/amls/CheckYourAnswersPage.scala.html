@@ -1,0 +1,153 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.agentregistrationfrontend.controllers.amls.routes
+@import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
+@import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
+@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+
+@this(
+        layout: Layout,
+        govukButton: GovukButton,
+        govukSummaryList: GovukSummaryList,
+        amlsCodes: AmlsCodes
+)
+
+
+@(implicit
+        request: AgentApplicationRequest[AnyContent],
+        messages: Messages
+)
+
+@key = @{
+    "amlsCheckYourAnswers"
+}
+@title = @{
+    messages(s"$key.title")
+}
+@amlsDetails = @{
+    request.agentApplication.getAmlsDetails
+}
+
+@supervisorRow = @{
+    SummaryListRow(
+        key = Key(
+            content = Text(messages(s"$key.supervisoryBody.label"))
+        ),
+        value = Value(
+            content = Text(
+                amlsCodes.getSupervisoryName(
+                    amlsDetails
+                    .supervisoryBody
+                ).value
+            )
+        ),
+        actions = Some(Actions(
+            items = Seq(
+                ActionItem(
+                    href = s"${routes.AmlsSupervisorController.show}",
+                    content = Text(messages(s"$key.change")),
+                    visuallyHiddenText = Some(messages(s"$key.supervisoryBody.label"))
+                )
+            )
+        ))
+    )
+}
+
+@registrationNumberRow = @{
+    SummaryListRow(
+        key = Key(
+            content = Text(messages(s"$key.registrationNumber.label"))
+        ),
+        value = Value(
+            content = Text(
+                amlsDetails
+                .getRegistrationNumber
+                .value
+            )
+        ),
+        actions = Some(Actions(
+            items = Seq(
+                ActionItem(
+                    href = s"${routes.AmlsRegistrationNumberController.show}",
+                    content = Text(messages(s"$key.change")),
+                    visuallyHiddenText = Some(messages(s"$key.registrationNumber.label"))
+                )
+            )
+        ))
+    )
+}
+
+@expiryDateRow = @{
+    SummaryListRow(
+        key = Key(
+            content = Text(messages(s"$key.expiryDate.label"))
+        ),
+        value = Value(
+            content = Text(if amlsDetails.isHmrc then messages(s"$key.notApplicable") else displayDateForLang(Some(amlsDetails.getAmlsExpiryDate)))
+        ),
+        actions = Some(Actions(
+            items = Seq(
+                ActionItem(
+                    href = s"${routes.AmlsExpiryDateController.show}",
+                    content = Text(messages(s"$key.change")),
+                    visuallyHiddenText = Some(messages(s"$key.expiryDate.label"))
+                )
+            )
+        ))
+    )
+}
+
+@evidenceRow = @{
+    SummaryListRow(
+        key = Key(
+            content = Text(messages(s"$key.evidence.label"))
+        ),
+        value = Value(
+            content = Text(if amlsDetails.isHmrc then messages(s"$key.notApplicable") else amlsDetails.getAmlsEvidenceName)
+        ),
+        actions = Some(Actions(
+            items = Seq(
+                ActionItem(
+                    href = s"${routes.AmlsEvidenceUploadController.show}",
+                    content = Text(messages(s"$key.change")),
+                    visuallyHiddenText = Some(messages(s"$key.evidence.label"))
+                )
+            )
+        ))
+    )
+}
+@commonRows = @{Seq(supervisorRow, registrationNumberRow)}
+@nonHmrcRows = @{Seq(expiryDateRow, evidenceRow)}
+@rows = @{if amlsDetails.isHmrc then commonRows else commonRows ++ nonHmrcRows}
+
+@layout(pageTitle = title) {
+    <h2 class="govuk-caption-l">@messages("amlsDetails.title")</h2>
+    <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
+    @govukSummaryList(SummaryList(rows))
+    <p class="govuk-body">
+      @govukButton(Button(
+          href = Some(applicationRoutes.AgentApplicationController.taskList.url),
+          content = Text(messages("common.confirmAndContinue"))
+      ))
+    </p>
+
+
+}

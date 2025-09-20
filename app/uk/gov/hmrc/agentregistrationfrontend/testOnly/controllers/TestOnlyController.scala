@@ -22,6 +22,10 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import com.softwaremill.quicklens.*
+import sttp.model.Uri.UriContext
+import uk.gov.hmrc.agentregistration.shared.upscan.*
+import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -29,9 +33,29 @@ import javax.inject.Singleton
 @Singleton
 class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions
+  actions: Actions,
+  applicationService: ApplicationService
 )
 extends FrontendController(mcc):
 
   val showAgentApplication: Action[AnyContent] = actions.getApplicationInProgress: request =>
     Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))
+
+  def setUploadToComplete(): Action[AnyContent] = actions.getApplicationInProgress.async:
+    implicit request =>
+      applicationService
+        .upsert(
+          request.agentApplication
+            .modify(_.amlsDetails.each.amlsEvidence)
+            .setTo(Some(UploadDetails(
+              reference = request.agentApplication.getAmlsDetails.getAmlsEvidence.reference,
+              status = UploadStatus.UploadedSuccessfully(
+                name = "test.pdf",
+                mimeType = "application/pdf",
+                downloadUrl = ObjectStoreUrl(uri"http://example.com/download"),
+                size = Some(12345),
+                checksum = "checksum"
+              )
+            )))
+        )
+        .map(_ => Ok("upload set to complete"))
