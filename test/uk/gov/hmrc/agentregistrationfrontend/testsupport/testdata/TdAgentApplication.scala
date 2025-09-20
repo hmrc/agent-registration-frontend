@@ -22,7 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.ApplicationState
 
 trait TdAgentApplication { dependencies: TdBase =>
 
-  def agentApplicationAfterCreated = AgentApplication(
+  def agentApplicationAfterCreated: AgentApplication = AgentApplication(
     internalUserId = dependencies.internalUserId,
     createdAt = dependencies.instant,
     applicationState = ApplicationState.InProgress,
