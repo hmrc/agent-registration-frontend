@@ -16,12 +16,17 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
+import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.CompanyProfile
 import uk.gov.hmrc.agentregistration.shared.FullName
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.Utr
+import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
+import uk.gov.hmrc.agentregistration.shared.upscan.Reference
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 
 import java.time.format.DateTimeFormatter
 import java.time.Instant
@@ -59,3 +64,13 @@ trait TdBase:
   lazy val postcode = "AA1 1AA"
   lazy val validAmlsExpiryDate: LocalDate = LocalDate.now().plusMonths(6)
   lazy val invalidAmlsExpiryDate: LocalDate = LocalDate.now().plusMonths(13)
+  lazy val amlsUploadDetailsSuccess: UploadDetails = UploadDetails(
+    reference = Reference("test-file-reference"),
+    status = UploadStatus.UploadedSuccessfully(
+      name = "test.pdf",
+      mimeType = "application/pdf",
+      downloadUrl = ObjectStoreUrl(uri"http://example.com/download"),
+      size = Some(12345),
+      checksum = "checksum"
+    )
+  )

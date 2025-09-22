@@ -23,19 +23,19 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.CheckYourAnswersPage
 
 @Singleton
 class CheckYourAnswersController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  view: SimplePage // TODO placeholder page
+  view: CheckYourAnswersPage
 )
 extends FrontendController(mcc):
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
-      Ok(view(
-        h1 = "Check your answers placeholder",
-        bodyText = Some("This is a placeholder page for the Check Your Answers page")
-      ))
+      val amlsDetails = request.agentApplication.amlsDetails
+      if amlsDetails.isDefined && amlsDetails.get.isComplete
+      then Ok(view())
+      else Redirect(routes.AmlsSupervisorController.show) // TODO: redirect to first incomplete page instead

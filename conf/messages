@@ -111,6 +111,15 @@ fileUploadProgress.REJECTED=The selected file must be a JPG, JPEG, PNG, TIFF, PD
 fileUploadProgress.TOO_LARGE=The selected file must not be larger than 5MB.
 fileUploadProgress.failed=Your file upload has failed. Try uploading your file again.
 
+## AmlsDetails / Check your answers
+amlsCheckYourAnswers.title = Check your answers
+amlsCheckYourAnswers.supervisoryBody.label = Supervisory body
+amlsCheckYourAnswers.registrationNumber.label = Registration number
+amlsCheckYourAnswers.expiryDate.label = Supervision expiry date
+amlsCheckYourAnswers.notApplicable = n/a
+amlsCheckYourAnswers.evidence.label = Evidence of anti-money laundering supervision
+amlsCheckYourAnswers.change = Change
+
 # Timed out
 timed-out.header = You have been signed out
 timed-out.p1 = You have not done anything for 15 minutes, so we have signed you out to keep your account secure.
