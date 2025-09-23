@@ -54,7 +54,7 @@ class AppConfig @Inject() (
 
   val enrolmentStoreProxyBaseUrl: String = servicesConfig.baseUrl("enrolment-store-proxy")
   val agentRegistrationBaseUrl: String = servicesConfig.baseUrl("agent-registration")
-
+  val selfBaseUrl: String = servicesConfig.baseUrl("agent-registration-frontend")
   val hmrcAsAgentEnrolment: Enrolment = Enrolment(key = "HMRC-AS-AGENT")
 
   def signInUri(continueUri: Uri): Uri = uri"$basFrontendSignBaseInBaseUrl"
@@ -80,7 +80,7 @@ class AppConfig @Inject() (
 
   def grsJourneyUrl(businessType: BusinessType): String =
     businessType match {
-      case _ if enableGrsStub => s"$thisFrontendBaseUrl${testRoutes.GrsStubController.setupGrsJourney(businessType).url}"
+      case _ if enableGrsStub => s"$selfBaseUrl${testRoutes.GrsStubController.setupGrsJourney(businessType).url}"
       case SoleTrader => s"$soleTraderIdBaseUrl/sole-trader-identification/api/sole-trader-journey"
       case LimitedCompany => s"$incorpIdBaseUrl/incorporated-entity-identification/api/limited-company-journey"
       case GeneralPartnership => s"$partnershipIdBaseUrl/partnership-identification/api/general-partnership-journey"
