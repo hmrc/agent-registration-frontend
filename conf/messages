@@ -120,6 +120,23 @@ amlsCheckYourAnswers.notApplicable = n/a
 amlsCheckYourAnswers.evidence.label = Evidence of anti-money laundering supervision
 amlsCheckYourAnswers.change = Change
 
+taskList.status.Incomplete = Incomplete
+taskList.status.Completed = Completed
+taskList.status.CannotStartYet = Cannot start yet
+
+taskList.title = Application for {0}
+taskList.businessDetails.heading = Tell us about your business
+taskList.businessDetails.linkText = About your business
+taskList.contact.heading = How to contact you
+taskList.contact.linkText = Applicant contact details
+taskList.accountDetails.heading = How you want your account set up
+taskList.accountDetails.linkText = Agent services account details
+taskList.hmrcStandards.heading = Meet the HMRC standard for agents
+taskList.hmrcStandards.amls.linkText = Anti-money laundering supervision details
+taskList.hmrcStandards.agreement.linkText = HMRC standard for agents
+taskList.declaration.heading = Finish this stage of the process
+taskList.declaration.linkText = Declaration
+
 # Timed out
 timed-out.header = You have been signed out
 timed-out.p1 = You have not done anything for 15 minutes, so we have signed you out to keep your account secure.

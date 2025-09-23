@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
 import com.softwaremill.quicklens.*
-import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
@@ -77,7 +76,7 @@ extends FrontendController(mcc):
                     .modify(_.businessDetails)
                     .setTo(Some(grsResponse.toBusinessDetails(businessType)))
                 ).map { _ =>
-                  Ok(Json.prettyPrint(Json.toJson(grsResponse)))
+                  Redirect(routes.AgentApplicationController.taskList.url)
                 }
             case grsResponse if !grsResponse.identifiersMatch && grsResponse.registration.registrationStatus.equals(GrsNotCalled) =>
               Future.successful(Ok(placeholder(

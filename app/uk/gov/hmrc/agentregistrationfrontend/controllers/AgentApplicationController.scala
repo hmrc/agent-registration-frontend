@@ -21,6 +21,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.register.TaskListPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,26 +31,20 @@ import scala.concurrent.Future
 class AgentApplicationController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  simplePage: SimplePage
+  simplePage: SimplePage,
+  taskListPage: TaskListPage
 )
 extends FrontendController(mcc):
 
-  val landing: Action[AnyContent] = actions.getApplicationInProgress.async { implicit request =>
-    Future.successful(Ok(simplePage(
-      h1 = "Landing page...",
-      bodyText = Some(
-        "Placeholder for the landing page..."
-      )
-    )))
+  val landing: Action[AnyContent] = actions.getApplicationInProgress { implicit request =>
+    Redirect(routes.AgentApplicationController.startRegistration)
   }
 
-  val taskList: Action[AnyContent] = actions.getApplicationInProgress.async { implicit request =>
-    Future.successful(Ok(simplePage(
-      h1 = "Task List page...",
-      bodyText = Some(
-        "Placeholder for the task list page..."
-      )
-    )))
+  val taskList: Action[AnyContent] = actions.getApplicationInProgress { implicit request =>
+    if (request.agentApplication.utr.isDefined)
+      Ok(taskListPage())
+    else
+      Redirect(routes.AgentApplicationController.startRegistration)
   }
 
   val applicationDashboard: Action[AnyContent] = actions.getApplicationInProgress.async { implicit request =>
