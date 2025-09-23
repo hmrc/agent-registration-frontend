@@ -92,7 +92,7 @@ class AppConfig @Inject() (
     journeyId: String
   ): String =
     businessType match {
-      case _ if enableGrsStub => s"$thisFrontendBaseUrl${testRoutes.GrsStubController.retrieveGrsData(journeyId).url}"
+      case _ if enableGrsStub => s"$selfBaseUrl${testRoutes.GrsStubController.retrieveGrsData(journeyId).url}"
       case SoleTrader => s"$soleTraderIdBaseUrl/sole-trader-identification/api/journey/$journeyId"
       case LimitedCompany => s"$incorpIdBaseUrl/incorporated-entity-identification/api/journey/$journeyId"
       case GeneralPartnership | LimitedLiabilityPartnership => s"$partnershipIdBaseUrl/partnership-identification/api/journey/$journeyId"
