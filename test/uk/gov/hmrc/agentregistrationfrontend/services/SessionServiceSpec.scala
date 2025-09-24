@@ -20,15 +20,17 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import SessionService.*
+import play.api.mvc.AnyContentAsEmpty
 import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Session
 import play.api.mvc.Results.Ok
+import play.api.test.FakeRequest
 
 class SessionServiceSpec
 extends UnitSpec:
 
-  val request = TdAll.tdAll.baseRequest
+  implicit val request: FakeRequest[AnyContentAsEmpty.type] = TdAll.tdAll.baseRequest
   val result: Result = Ok("").withSession("some-preexisting-key" -> "some-value")
 
   BusinessType.values.foreach: bt =>

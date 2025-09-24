@@ -17,8 +17,16 @@ GET         /register                                                  uk.gov.hm
 
 ## save and come back later route
 GET         /register/save-and-come-back-later                         uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.saveAndComeBackLater
+GET         /register/exit                                             uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.genericExitPage
 
-## About your application routes
+## About your business routes
+GET         /register/about-your-business/agent-type                   uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.AgentTypeController.show
+POST        /register/about-your-business/agent-type                   uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.AgentTypeController.submit
+
+GET         /register/about-your-business/business-type                uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.BusinessTypeController.show
+POST        /register/about-your-business/business-type                uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.BusinessTypeController.submit
+
+## About your application routes - DEPRECATED
 GET         /register/about-your-application/business-type             uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.BusinessTypeController.show
 POST        /register/about-your-application/business-type             uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.BusinessTypeController.submit
 

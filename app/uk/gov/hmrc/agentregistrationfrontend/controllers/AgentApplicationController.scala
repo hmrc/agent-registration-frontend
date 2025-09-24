@@ -78,3 +78,12 @@ extends FrontendController(mcc):
     // if we use an endpoint like this, we can later change the flow without changing the URL
     Redirect(aboutyourapplication.routes.BusinessTypeController.show)
   }
+
+  def genericExitPage: Action[AnyContent] = Action { implicit request =>
+    Ok(simplePage(
+      h1 = "You cannot use this service...",
+      bodyText = Some(
+        "Placeholder for the generic exit page..."
+      )
+    ))
+  }

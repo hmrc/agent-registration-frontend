@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.mvc.Request
 import play.api.mvc.Result
+import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
@@ -25,11 +26,21 @@ object SessionService:
 
   private val microserviceName = "agent-registration-frontend"
   private val businessTypeKey: String = s"$microserviceName.businessType"
+  private val agentTypeKey: String = s"$microserviceName.agentType"
 
   extension (r: Result)
-    def addBusinessTypeToSession(bt: BusinessType): Result = r.addingToSession(businessTypeKey -> bt.toString)(request = null)
+
+    def addAgentTypeToSession(at: AgentType)(implicit request: Request[?]): Result = r.addingToSession(agentTypeKey -> at.toString)
+    def addBusinessTypeToSession(bt: BusinessType)(implicit request: Request[?]): Result = r.addingToSession(businessTypeKey -> bt.toString)
 
   extension (r: Request[?])
+
+    def readAgentType: Option[AgentType] = r.session.get(agentTypeKey).map: value =>
+      AgentType
+        .values
+        .find(_.toString === value)
+        .getOrElse(throw new RuntimeException(s"Invalid AgentType type in session: '$value'"))
+
     def readBusinessType: Option[BusinessType] = r.session.get(businessTypeKey).map: value =>
       BusinessType
         .values
