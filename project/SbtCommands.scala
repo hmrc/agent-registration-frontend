@@ -22,7 +22,7 @@ object SbtCommands {
         state
     }
 
-  val strictBuilding: Command = Command.command("strictBuilding") { state =>
+  val strictBuilding: Command = Command.command("strict") { state =>
     state.globalLogging.full.info("Turning on strict building")
     s"""set Global / strictBuilding := true""" ::
       state

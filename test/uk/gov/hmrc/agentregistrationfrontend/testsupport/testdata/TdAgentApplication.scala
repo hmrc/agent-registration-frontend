@@ -19,10 +19,13 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 import uk.gov.hmrc.agentregistration.shared.AboutYourApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.UserRole
+import com.softwaremill.quicklens.*
 
 trait TdAgentApplication { dependencies: TdBase =>
 
-  def agentApplicationAfterCreated: AgentApplication = AgentApplication(
+  val agentApplicationAfterCreated: AgentApplication = AgentApplication(
     internalUserId = dependencies.internalUserId,
     createdAt = dependencies.instant,
     applicationState = ApplicationState.InProgress,
@@ -35,5 +38,21 @@ trait TdAgentApplication { dependencies: TdBase =>
     businessDetails = None,
     amlsDetails = None
   )
+
+  object SoleTrader {
+
+    val agentApplicationAfterBusinessType = agentApplicationAfterCreated
+      .modify(_.aboutYourApplication.businessType)
+      .setTo(Some(BusinessType.SoleTrader))
+
+    val agentApplicationAfterUserRoleOwner = agentApplicationAfterBusinessType
+      .modify(_.aboutYourApplication.userRole)
+      .setTo(Some(UserRole.Owner))
+
+    val agentApplicationAfterUserRoleAuthorised = agentApplicationAfterBusinessType
+      .modify(_.aboutYourApplication.userRole)
+      .setTo(Some(UserRole.Authorised))
+
+  }
 
 }
