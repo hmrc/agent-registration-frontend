@@ -41,7 +41,6 @@ extends ISpec:
 
   "Credential role must be User or Admin or else the action returns Unahtorised View" in:
     val authorisedAction: AuthorisedAction = app.injector.instanceOf[AuthorisedAction]
-    val notLoggedInRequest: Request[?] = tdAll.request
     val credentialRoleNotUserNorAdmin = "Assistant"
     AuthStubs.stubAuthorise(
       responseBody =
@@ -58,14 +57,13 @@ extends ISpec:
            |""".stripMargin
     )
 
-    val resultF = authorisedAction.invokeBlock(notLoggedInRequest, _ => fakeResultF)
+    val resultF = authorisedAction.invokeBlock(tdAll.requestLoggedIn, _ => fakeResultF)
     contentAsString(resultF) should include("unauthorised.heading")
     status(resultF) shouldBe Status.UNAUTHORIZED
     AuthStubs.verifyAuthorise()
 
   "active HMRC-AS-AGENT enrolment MUST NOT be assigned to user or else the action redirects to ASA Dashboard" in:
     val authorisedAction: AuthorisedAction = app.injector.instanceOf[AuthorisedAction]
-    val notLoggedInRequest: Request[?] = tdAll.request
     AuthStubs.stubAuthorise(
       responseBody =
         // language=JSON
@@ -92,18 +90,17 @@ extends ISpec:
            |""".stripMargin
     )
 
-    val result = authorisedAction.invokeBlock(notLoggedInRequest, _ => fakeResultF).futureValue
+    val result = authorisedAction.invokeBlock(tdAll.requestLoggedIn, _ => fakeResultF).futureValue
     result shouldBe Redirect("http://localhost:9437/agent-services-account/home")
     AuthStubs.verifyAuthorise()
 
   "successfully authorise when user is logged in, credentialRole is User/Admin, and no active HMRC-AS-AGENT enrolment" in:
     val authorisedAction: AuthorisedAction = app.injector.instanceOf[AuthorisedAction]
-    val notLoggedInRequest: Request[?] = tdAll.request
     AuthStubs.stubAuthorise()
     val result: Result = Ok("AllGood")
     authorisedAction
       .invokeBlock(
-        notLoggedInRequest,
+        tdAll.requestLoggedIn,
         (r: AuthorisedRequest[?]) =>
           Future.successful {
             r.internalUserId shouldBe tdAll.internalUserId

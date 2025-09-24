@@ -30,5 +30,5 @@ extends ISpec:
         "title",
         "heading",
         "message"
-      )(using TdAll.tdAll.fakeRequest).futureValue
+      )(using TdAll.tdAll.requestLoggedIn).futureValue
     html.contentType shouldBe "text/html"

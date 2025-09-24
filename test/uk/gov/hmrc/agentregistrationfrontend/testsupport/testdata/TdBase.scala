@@ -36,35 +36,35 @@ import java.time.ZoneOffset
 
 trait TdBase:
 
-  lazy val dateString: String = "2059-11-25"
-  lazy val timeString: String = s"${dateString}T16:33:51.880"
-  lazy val localDateTime: LocalDateTime =
+  def dateString: String = "2059-11-25"
+  def timeString: String = s"${dateString}T16:33:51.880"
+  def localDateTime: LocalDateTime =
     // the frozen time has to be in future otherwise the applications will disappear from mongodb because of expiry index
     LocalDateTime.parse(timeString, DateTimeFormatter.ISO_DATE_TIME)
-  lazy val instant: Instant = localDateTime.toInstant(ZoneOffset.UTC)
-  lazy val newInstant: Instant = instant.plusSeconds(20) // used when a new application is created from existing one
+  def instant: Instant = localDateTime.toInstant(ZoneOffset.UTC)
+  def newInstant: Instant = instant.plusSeconds(20) // used when a new application is created from existing one
 
-  lazy val utr: Utr = Utr("1234567895")
-  lazy val internalUserId: InternalUserId = InternalUserId("internal-user-id-12345")
-  lazy val groupId: GroupId = GroupId("group-id-12345")
-  lazy val nino = Nino("AB123456C")
-  lazy val safeId = "X00000123456789"
-  lazy val dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
-  lazy val firstName = "Test"
-  lazy val lastName = "Name"
-  lazy val fullName = FullName(firstName, lastName)
-  lazy val companyNumber = "1234567890"
-  lazy val companyName = "Test Company Name"
-  lazy val dateOfIncorporation: LocalDate = LocalDate.now().minusYears(10)
-  lazy val companyProfile = CompanyProfile(
+  def utr: Utr = Utr("1234567895")
+  def internalUserId: InternalUserId = InternalUserId("internal-user-id-12345")
+  def groupId: GroupId = GroupId("group-id-12345")
+  def nino = Nino("AB123456C")
+  def safeId = "X00000123456789"
+  def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
+  def firstName = "Test"
+  def lastName = "Name"
+  def fullName = FullName(firstName, lastName)
+  def companyNumber = "1234567890"
+  def companyName = "Test Company Name"
+  def dateOfIncorporation: LocalDate = LocalDate.now().minusYears(10)
+  def companyProfile = CompanyProfile(
     companyNumber = companyNumber,
     companyName = companyName,
     dateOfIncorporation = Some(dateOfIncorporation)
   )
-  lazy val postcode = "AA1 1AA"
-  lazy val validAmlsExpiryDate: LocalDate = LocalDate.now().plusMonths(6)
-  lazy val invalidAmlsExpiryDate: LocalDate = LocalDate.now().plusMonths(13)
-  lazy val amlsUploadDetailsSuccess: UploadDetails = UploadDetails(
+  def postcode = "AA1 1AA"
+  def validAmlsExpiryDate: LocalDate = LocalDate.now().plusMonths(6)
+  def invalidAmlsExpiryDate: LocalDate = LocalDate.now().plusMonths(13)
+  def amlsUploadDetailsSuccess: UploadDetails = UploadDetails(
     reference = Reference("test-file-reference"),
     status = UploadStatus.UploadedSuccessfully(
       name = "test.pdf",

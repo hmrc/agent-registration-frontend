@@ -23,24 +23,18 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.*
 
 trait TdRequest:
 
-  lazy val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-    .withAuthTokenInSession()
+  def authToken: String = "authorization-value-123"
+  def akamaiReputationValue: String = "akamai-reputation-value-123"
+  def requestId: String = "request-id-value-123"
+  def trueClientIp: String = "client-ip-123"
+  def trueClientPort: String = "client-port-123"
+  def deviceIdInRequest: String = "device-id-123"
+
+  def baseRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
     .withRequestId()
     .withTrueClientIp()
     .withTrueClientPort()
     .withDeviceId()
 
-  lazy val request: Request[?] = fakeRequest
-
-  lazy val requestNotLoggedIn: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
-    .withRequestId()
-    .withTrueClientIp()
-    .withTrueClientPort()
-    .withDeviceId()
-
-  lazy val authToken: String = "authorization-value-123"
-  lazy val akamaiReputationValue: String = "akamai-reputation-value-123"
-  lazy val requestId: String = "request-id-value-123"
-  lazy val trueClientIp: String = "client-ip-123"
-  lazy val trueClientPort: String = "client-port-123"
-  lazy val deviceIdInRequest: String = "device-id-123"
+  def requestNotLoggedIn: Request[AnyContentAsEmpty.type] = baseRequest
+  def requestLoggedIn: Request[AnyContentAsEmpty.type] = baseRequest.withAuthTokenInSession()
