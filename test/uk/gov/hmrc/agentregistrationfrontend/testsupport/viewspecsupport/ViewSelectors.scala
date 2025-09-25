@@ -33,6 +33,7 @@ object ViewSelectors:
 
     def hasLanguageSwitch: Boolean = element.select(languageSwitcher).headOption.nonEmpty
     def h1(using pos: Position): String = element.mainContent.selectOrFail(Selectors.h1).selectOnlyOneElementOrFail().text()
+    def h2(using pos: Position): String = element.mainContent.selectOrFail(Selectors.h2).selectOnlyOneElementOrFail().text()
     def mainContent(using pos: Position): Element = element.selectOrFail(main).selectOnlyOneElementOrFail()
 
     inline def toLink(using pos: Position): TestLink = {
@@ -86,6 +87,14 @@ object ViewSelectors:
           legend = element.selectOrFail(fieldSetLegend).first().text(),
           options = element.selectOrFail(".govuk-radios__item").toList.map(el => (el.selectOrFail("label").text(), el.selectOrFail("input").attr("value"))),
           hint = element.select(fieldSetHint).toList.headOption.map(_.text)
+        )
+
+    inline def extractNumberedList(index: Int = 1): TestNumberedList = element
+      .selectOrFail(numberedList)
+      .selectOrFail(index)
+      .pipe: element =>
+        TestNumberedList(
+          items = element.selectOrFail(li).toList.map(_.text())
         )
 
     inline def extractRadioGroupWithHints(index: Int = 1): TestRadioGroup = element
@@ -195,6 +204,8 @@ object ViewSelectors:
 
   final case class TestSummaryList(rows: List[TestSummaryRow])
 
+  final case class TestNumberedList(items: List[String])
+
   object Selectors:
 
     // Outside main-content
@@ -210,6 +221,7 @@ object ViewSelectors:
     val visuallyHidden = ".govuk-visually-hidden"
     val link = ".govuk-link"
     val list = ".govuk-list"
+    val numberedList = ".govuk-list--number"
     val inset = ".govuk-inset-text"
     val captionM = ".govuk-caption-m"
     val captionL = ".govuk-caption-l"

@@ -258,7 +258,7 @@ extends ControllerSpec:
       val response = get(s"$grsCallbackUrl/${SoleTrader.toStringHyphenated}?journeyId=$testJourneyId")
 
       response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe routes.AgentApplicationController.taskList.url
+      response.header("Location").value shouldBe routes.TaskListController.show.url
 
     "store valid data and redirect to next page for a limited company" in:
       stubAuthorise()
@@ -283,7 +283,7 @@ extends ControllerSpec:
       val response = get(s"$grsCallbackUrl/${LimitedCompany.toStringHyphenated}?journeyId=$testJourneyId")
 
       response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe routes.AgentApplicationController.taskList.url
+      response.header("Location").value shouldBe routes.TaskListController.show.url
 
     "store valid data and redirect to next page for a general partnership" in:
       stubAuthorise()
@@ -309,7 +309,7 @@ extends ControllerSpec:
       val response = get(s"$grsCallbackUrl/${GeneralPartnership.toStringHyphenated}?journeyId=$testJourneyId")
 
       response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe routes.AgentApplicationController.taskList.url
+      response.header("Location").value shouldBe routes.TaskListController.show.url
 
     "store valid data and redirect to next page for a limited liability partnership" in:
       stubAuthorise()
@@ -335,7 +335,7 @@ extends ControllerSpec:
       val response = get(s"$grsCallbackUrl/${LimitedLiabilityPartnership.toStringHyphenated}?journeyId=$testJourneyId")
 
       response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe routes.AgentApplicationController.taskList.url
+      response.header("Location").value shouldBe routes.TaskListController.show.url
 
     "redirect to journey start if callback url does not match application data" in:
       stubAuthorise()

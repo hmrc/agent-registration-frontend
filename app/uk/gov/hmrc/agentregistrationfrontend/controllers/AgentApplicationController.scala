@@ -21,7 +21,6 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.TaskListPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,20 +30,14 @@ import scala.concurrent.Future
 class AgentApplicationController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  simplePage: SimplePage,
-  taskListPage: TaskListPage
+  simplePage: SimplePage
 )
 extends FrontendController(mcc):
 
   val landing: Action[AnyContent] = actions.getApplicationInProgress { implicit request =>
-    Redirect(routes.AgentApplicationController.startRegistration)
-  }
-
-  val taskList: Action[AnyContent] = actions.getApplicationInProgress { implicit request =>
-    if (request.agentApplication.utr.isDefined)
-      Ok(taskListPage())
-    else
-      Redirect(routes.AgentApplicationController.startRegistration)
+    // until we have more than the registration journey just go to the task list
+    // which will redirect to the start of registration if needed
+    Redirect(routes.TaskListController.show)
   }
 
   val applicationDashboard: Action[AnyContent] = actions.getApplicationInProgress.async { implicit request =>
@@ -55,15 +48,6 @@ extends FrontendController(mcc):
       )
     )))
   }
-
-  def saveAndComeBackLater: Action[AnyContent] = actions.getApplicationInProgress:
-    implicit request =>
-      Ok(simplePage(
-        h1 = "Save and come back later...",
-        bodyText = Some(
-          "Placeholder for the Save and come back later page..."
-        )
-      ))
 
   val applicationSubmitted: Action[AnyContent] = actions.getApplicationSubmitted.async { implicit request =>
     Future.successful(Ok(simplePage(

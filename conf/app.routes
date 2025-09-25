@@ -2,7 +2,6 @@
 
 GET         /                                                          uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.landing
 
-GET         /task-list                                                 uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.taskList
 GET         /application-dashboard                                     uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.applicationDashboard
 
 # Sign out routes
@@ -12,11 +11,10 @@ GET         /timed-out                                                 uk.gov.hm
 
 GET         /application-submitted                                     uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.applicationSubmitted
 
-# Apply to register routes
+# Register routes
 GET         /apply                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.startRegistration
-
-## save and come back later route
-GET         /apply/save-and-come-back-later                         uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.saveAndComeBackLater
+GET         /apply/task-list                                        uk.gov.hmrc.agentregistrationfrontend.controllers.TaskListController.show
+GET         /apply/save-and-come-back-later                         uk.gov.hmrc.agentregistrationfrontend.controllers.SaveForLaterController.show
 GET         /apply/exit                                             uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.genericExitPage
 
 ## About your business routes
