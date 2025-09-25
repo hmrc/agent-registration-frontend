@@ -58,7 +58,7 @@ extends UnitSpec:
           .withSession("agent-registration-frontend.businessType" -> "garbage")
           .readBusinessType
 
-      throwable.getMessage shouldBe "Invalid BusinessType type in session: 'garbage'"
+      throwable.getMessage shouldBe "Invalid BusinessTypeSessionValue type in session: 'garbage'"
 
     "readBusinessType should return None when business type is not present in session" in:
       request.readBusinessType shouldBe None

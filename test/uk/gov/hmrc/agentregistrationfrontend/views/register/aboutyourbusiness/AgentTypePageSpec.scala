@@ -45,8 +45,8 @@ extends ViewSpec:
       )
       doc.mainContent.extractRadioGroup() shouldBe expectedRadioGroup
 
-    "render a save and continue button" in:
-      doc.select("button[type=submit]").text() shouldBe "Save and continue"
+    "render a continue button" in:
+      doc.select("button[type=submit]").text() shouldBe "Continue"
 
     "render a form error when the form contains an error" in:
       val field = "agentType"

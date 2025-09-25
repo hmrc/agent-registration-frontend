@@ -202,7 +202,7 @@ extends ControllerSpec:
       response.status shouldBe SEE_OTHER
       response.header("Location").value shouldBe grsLimitedCompanyJourneyUrl
 
-    "redirect to grs start for a general  partnership" in:
+    "redirect to grs start for a general partnership" in:
       stubAuthorise()
       stubApplicationInProgress(generalPartnershipApplication)
       stubCreateGrsJourney(GeneralPartnership)
@@ -229,7 +229,7 @@ extends ControllerSpec:
       val response = get(grsStartUrl)
 
       response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe "/agent-registration/register"
+      response.header("Location").value shouldBe "/agent-registration/apply"
 
   s"GET $grsCallbackUrl" should:
     "store valid data and redirect to next page for a sole trader" in:
@@ -344,7 +344,7 @@ extends ControllerSpec:
       val response = get(s"$grsCallbackUrl/${LimitedCompany.toStringHyphenated}?journeyId=$testJourneyId")
 
       response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe "/agent-registration/register"
+      response.header("Location").value shouldBe "/agent-registration/apply"
 
     "redirect to failed to match identifiers if grs data has identifiersMatch = false" in:
       stubAuthorise()

@@ -25,33 +25,55 @@ class BusinessTypeSessionControllerSpec
 extends ControllerSpec:
 
   private val path = "/agent-registration/apply/about-your-business/business-type"
+  private val stubAddAgentUrl = "/agent-registration/test-only/add-agent-type/uk-tax-agent"
 
   "routes should have correct paths and methods" in:
     routes.BusinessTypeSessionController.show shouldBe Call(
       method = "GET",
-      url = "/agent-registration/apply/about-your-business/business-type"
+      url = path
     )
     routes.BusinessTypeSessionController.submit shouldBe Call(
       method = "POST",
-      url = "/agent-registration/apply/about-your-business/business-type"
+      url = path
     )
     routes.BusinessTypeSessionController.submit.url shouldBe routes.BusinessTypeSessionController.show.url
 
-  s"GET $path should return 200 and render page" in:
+  s"GET $path without AgentType in session should return 303 and redirect to agent type page" in:
     val response: WSResponse = get(path)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe "/agent-registration/apply/about-your-business/agent-type"
+
+  s"GET $path with AgentType in session should return 200 and render page" in:
+    val stubSession = get(stubAddAgentUrl)
+    val response: WSResponse = get(
+      uri = path,
+      cookies = extractCookies(stubSession)
+    )
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "How is your business set up? - Apply for an agent services account - GOV.UK"
 
-  s"POST $path with selection of type of partnership should redirect to the type of partnership page" in:
-    val response: WSResponse = post(path)(Map(BusinessTypeSessionForm.key -> Seq("PartnershipType")))
+  s"POST $path selecting partnership should redirect to the type of partnership page" in:
+    val stubSession = get(stubAddAgentUrl)
+    val response: WSResponse =
+      post(
+        uri = path,
+        cookies = extractCookies(stubSession)
+      )(Map(BusinessTypeSessionForm.key -> Seq("PartnershipType")))
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe "/agent-registration/apply/about-your-business/partnership-type"
 
   s"POST $path without valid selection should return 400" in:
-    val response: WSResponse = post(path)(Map(BusinessTypeSessionForm.key -> Seq("")))
+    val stubSession = get(stubAddAgentUrl)
+    val response: WSResponse =
+      post(
+        uri = path,
+        cookies = extractCookies(stubSession)
+      )(Map(BusinessTypeSessionForm.key -> Seq("")))
 
     response.status shouldBe Status.BAD_REQUEST
     response.parseBodyAsJsoupDocument.title() shouldBe "Error: How is your business set up? - Apply for an agent services account - GOV.UK"

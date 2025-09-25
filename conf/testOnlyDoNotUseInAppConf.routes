@@ -20,3 +20,6 @@ POST        /agent-registration/test-only/grs-stub/:businessType              uk
 GET         /agent-registration/test-only/grs-stub-retrieve                   uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.GrsStubController.retrieveGrsData(journeyId: String)
 + nocsrf
 POST        /agent-registration/test-only/grs-stub-setup/:businessType        uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.GrsStubController.setupGrsJourney(businessType: BusinessType)
+
+GET         /agent-registration/test-only/add-agent-type/:agentType           uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.TestOnlyController.addAgentTypeToSession(agentType: AgentType)
+GET         /agent-registration/test-only/add-business-type/:businessType     uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.TestOnlyController.addBusinessTypeToSession(businessType: BusinessTypeSessionValue)

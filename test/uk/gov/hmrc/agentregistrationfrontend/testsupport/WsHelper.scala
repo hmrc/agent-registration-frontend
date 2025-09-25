@@ -42,24 +42,43 @@ trait WsHelper {
   implicit val executionContext: ExecutionContext = app.injector.instanceOf[ExecutionContext]
   val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
-  def get[T](uri: String): WSResponse = await(buildClient(uri).withHttpHeaders("Authorization" -> "Bearer 123").get())
+  def get[T](
+    uri: String,
+    cookies: Seq[WSCookie] = Seq.empty
+  ): WSResponse = await(buildClient(uri, cookies).withHttpHeaders("Authorization" -> "Bearer 123").get())
 
-  def post(uri: String)(body: Map[String, Seq[String]]): WSResponse = await(
-    buildClient(uri)
+  def post(
+    uri: String,
+    cookies: Seq[WSCookie] = Seq.empty
+  )(body: Map[String, Seq[String]]): WSResponse = await(
+    buildClient(uri, cookies)
       .withHttpHeaders("Authorization" -> "Bearer 123", "Csrf-Token" -> "nocheck")
       .post(body)
   )
 
-  def delete[T](uri: String): WSResponse = await(buildClient(uri).withHttpHeaders("Authorization" -> "Bearer 123").delete())
+  def delete[T](
+    uri: String,
+    cookies: Seq[WSCookie] = Seq.empty
+  ): WSResponse = await(buildClient(uri, cookies).withHttpHeaders("Authorization" -> "Bearer 123").delete())
 
   val baseUrl: String = "/agent-registration"
 
-  private def buildClient(path: String): WSRequest = ws.url(s"http://localhost:$port$baseUrl${path.replace(baseUrl, "")}")
-    .withFollowRedirects(false)
-    .withCookies(
-      DefaultWSCookie("PLAY_LANG", "en"),
-      mockSessionCookie
-    )
+  private def buildClient(
+    path: String,
+    cookies: Seq[WSCookie] = Seq.empty
+  ): WSRequest = {
+    val allCookies =
+      if (cookies.nonEmpty)
+        cookies
+      else
+        Seq(
+          DefaultWSCookie("PLAY_LANG", "en"),
+          mockSessionCookie
+        )
+    ws.url(s"http://localhost:$port$baseUrl${path.replace(baseUrl, "")}")
+      .withFollowRedirects(false)
+      .withCookies(allCookies*)
+  }
 
   val sessionHeaders: Map[String, String] = Map(
     SessionKeys.lastRequestTimestamp -> System.currentTimeMillis().toString,
@@ -87,5 +106,9 @@ trait WsHelper {
       override def httpOnly: Boolean = cookie.httpOnly
     }
   }
+
+  /** Extract all cookies from a WSResponse for use in subsequent requests. Usage: val cookies = extractCookies(response)
+    */
+  def extractCookies(response: WSResponse): scala.collection.immutable.Seq[WSCookie] = response.cookies.toList
 
 }
