@@ -76,7 +76,7 @@ class AppConfig @Inject() (
   val incorpIdBaseUrl: String = servicesConfig.baseUrl("incorporated-entity-identification-frontend")
   val partnershipIdBaseUrl: String = servicesConfig.baseUrl("partnership-identification-frontend")
 
-  def grsJourneyCallbackUrl(businessType: BusinessType) = s"$thisFrontendBaseUrl/agent-registration/register/grs-callback/${businessType.toStringHyphenated}"
+  def grsJourneyCallbackUrl(businessType: BusinessType) = s"$thisFrontendBaseUrl/agent-registration/apply/grs-callback/${businessType.toStringHyphenated}"
 
   def grsJourneyUrl(businessType: BusinessType): String =
     businessType match {

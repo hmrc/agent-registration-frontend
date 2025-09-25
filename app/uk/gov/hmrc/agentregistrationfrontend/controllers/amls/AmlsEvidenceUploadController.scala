@@ -63,7 +63,7 @@ with I18nSupport:
         upscanInitiateResponse <- upscanInitiateConnector.initiate(
           redirectOnSuccess = Some(appConfig.upscanRedirectBase + routes.AmlsEvidenceUploadController.showResult.url),
           // cannot use controller.routes for the error url because upscan will respond with query parameters
-          redirectOnError = Some(appConfig.upscanRedirectBase + "/agent-registration/register/anti-money-laundering/evidence/error"),
+          redirectOnError = Some(appConfig.upscanRedirectBase + "/agent-registration/apply/anti-money-laundering/evidence/error"),
           maxFileSize = appConfig.maxFileSize
         )
         // store the upscan fileReference in the application

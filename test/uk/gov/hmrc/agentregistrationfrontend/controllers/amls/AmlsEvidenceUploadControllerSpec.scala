@@ -43,9 +43,9 @@ extends ControllerSpec:
       override def configure(): Unit = bind(classOf[AmlsCodes]).asEagerSingleton()
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
-  private val path = "/agent-registration/register/anti-money-laundering/evidence"
-  private val resultPath = "/agent-registration/register/anti-money-laundering/evidence/upload-result"
-  private val uploadErrorPath = "/agent-registration/register/anti-money-laundering/evidence/upload-error"
+  private val path = "/agent-registration/apply/anti-money-laundering/evidence"
+  private val resultPath = "/agent-registration/apply/anti-money-laundering/evidence/upload-result"
+  private val uploadErrorPath = "/agent-registration/apply/anti-money-laundering/evidence/upload-error"
   private val fakeAgentApplication: AgentApplication = applicationFactory
     .makeNewAgentApplication(tdAll.internalUserId)
     .modify(_.amlsDetails)

@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.services
 
 import uk.gov.hmrc.agentregistration.shared.AgentType
-import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import SessionService.*
@@ -35,7 +35,7 @@ extends UnitSpec:
   val result: Result = Ok("").withSession("some-preexisting-key" -> "some-value")
 
   "BusinessType" should:
-    BusinessType.values.foreach: bt =>
+    BusinessTypeSessionValue.values.foreach: bt =>
       s"$bt can be added to the Result and read back from the Request" in:
         val newResult = result
           .addBusinessTypeToSession(bt)

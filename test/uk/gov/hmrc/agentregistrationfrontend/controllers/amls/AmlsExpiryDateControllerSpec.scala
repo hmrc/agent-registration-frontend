@@ -34,7 +34,7 @@ class AmlsExpiryDateControllerSpec
 extends ControllerSpec:
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
-  private val path = "/agent-registration/register/anti-money-laundering/supervision-runs-out"
+  private val path = "/agent-registration/apply/anti-money-laundering/supervision-runs-out"
 
   "routes should have correct paths and methods" in:
     routes.AmlsExpiryDateController.show shouldBe Call(

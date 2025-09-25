@@ -42,8 +42,8 @@ import java.util.UUID
 class GrsControllerSpec
 extends ControllerSpec:
 
-  val grsStartUrl = "/agent-registration/register/start-grs-journey"
-  val grsCallbackUrl = "/agent-registration/register/grs-callback"
+  val grsStartUrl = "/agent-registration/apply/start-grs-journey"
+  val grsCallbackUrl = "/agent-registration/apply/grs-callback"
 
   val applicationFactory: ApplicationFactory = app.injector.instanceOf[ApplicationFactory]
   val testJourneyId: String = UUID.randomUUID().toString

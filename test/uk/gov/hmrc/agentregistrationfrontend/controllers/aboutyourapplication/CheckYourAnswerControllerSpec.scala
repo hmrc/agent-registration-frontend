@@ -30,7 +30,7 @@ class CheckYourAnswerControllerSpec
 extends ControllerSpec:
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
-  private val path = s"/agent-registration/register/about-your-application/check-your-answers"
+  private val path = s"/agent-registration/apply/about-your-application/check-your-answers"
   private val fakeAgentApplication: AgentApplication = applicationFactory
     .makeNewAgentApplication(tdAll.internalUserId)
     .modify(_.aboutYourApplication.businessType).setTo(Some(SoleTrader))
@@ -39,11 +39,11 @@ extends ControllerSpec:
   "routes should have correct paths and methods" in:
     routes.CheckYourAnswerController.show shouldBe Call(
       method = "GET",
-      url = "/agent-registration/register/about-your-application/check-your-answers"
+      url = "/agent-registration/apply/about-your-application/check-your-answers"
     )
     routes.CheckYourAnswerController.submit shouldBe Call(
       method = "POST",
-      url = "/agent-registration/register/about-your-application/check-your-answers"
+      url = "/agent-registration/apply/about-your-application/check-your-answers"
     )
     routes.CheckYourAnswerController.submit.url shouldBe routes.CheckYourAnswerController.show.url
 
@@ -55,7 +55,7 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
 
-  "POST /register/about-your-application/check-answer with confirm and continue selection should redirect to the next page" in:
+  "POST /apply/about-your-application/check-answer with confirm and continue selection should redirect to the next page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication
@@ -63,4 +63,4 @@ extends ControllerSpec:
     val response: WSResponse = post(path)(Map.empty)
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe "/agent-registration/register/start-grs-journey"
+    response.header("Location").value shouldBe "/agent-registration/apply/start-grs-journey"

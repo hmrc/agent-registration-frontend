@@ -100,12 +100,12 @@ extends ViewSpec:
           TestSummaryRow(
             key = "Supervisory body",
             value = "HM Revenue and Customs (HMRC)",
-            action = "/agent-registration/register/anti-money-laundering/supervisor-name"
+            action = "/agent-registration/apply/anti-money-laundering/supervisor-name"
           ),
           TestSummaryRow(
             key = "Registration number",
             value = "XAML00000123456",
-            action = "/agent-registration/register/anti-money-laundering/registration-number"
+            action = "/agent-registration/apply/anti-money-laundering/registration-number"
           )
         )
       )
@@ -152,22 +152,22 @@ extends ViewSpec:
           TestSummaryRow(
             key = "Supervisory body",
             value = "Financial Conduct Authority (FCA)",
-            action = "/agent-registration/register/anti-money-laundering/supervisor-name"
+            action = "/agent-registration/apply/anti-money-laundering/supervisor-name"
           ),
           TestSummaryRow(
             key = "Registration number",
             value = "1234567890",
-            action = "/agent-registration/register/anti-money-laundering/registration-number"
+            action = "/agent-registration/apply/anti-money-laundering/registration-number"
           ),
           TestSummaryRow(
             key = "Supervision expiry date",
             value = "2 September 2026",
-            action = "/agent-registration/register/anti-money-laundering/supervision-runs-out"
+            action = "/agent-registration/apply/anti-money-laundering/supervision-runs-out"
           ),
           TestSummaryRow(
             key = "Evidence of anti-money laundering supervision",
             value = "test.pdf",
-            action = "/agent-registration/register/anti-money-laundering/evidence"
+            action = "/agent-registration/apply/anti-money-laundering/evidence"
           )
         )
       )

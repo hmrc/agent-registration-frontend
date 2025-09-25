@@ -29,17 +29,17 @@ class UserRoleControllerSpec
 extends ControllerSpec:
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
-  private val path = "/agent-registration/register/about-your-application/user-role"
+  private val path = "/agent-registration/apply/about-your-application/user-role"
   private val fakeAgentApplication: AgentApplication = applicationFactory.makeNewAgentApplication(tdAll.internalUserId)
 
   "routes should have correct paths and methods" in:
     routes.UserRoleController.show shouldBe Call(
       method = "GET",
-      url = "/agent-registration/register/about-your-application/user-role"
+      url = "/agent-registration/apply/about-your-application/user-role"
     )
     routes.UserRoleController.submit shouldBe Call(
       method = "POST",
-      url = "/agent-registration/register/about-your-application/user-role"
+      url = "/agent-registration/apply/about-your-application/user-role"
     )
     routes.UserRoleController.submit.url shouldBe routes.UserRoleController.show.url
 
@@ -61,7 +61,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/register/about-your-application/check-your-answers"
+    response.header("Location").value shouldBe "/agent-registration/apply/about-your-application/check-your-answers"
 
   s"POST $path without valid selection should return 400" in:
     AuthStubs.stubAuthorise()

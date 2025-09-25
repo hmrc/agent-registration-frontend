@@ -31,7 +31,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BusinessTypeController @Inject() (
+class BusinessTypeSessionController @Inject() (
   mcc: MessagesControllerComponents,
   businessTypeSessionPage: BusinessTypeSessionPage
 )
