@@ -11,6 +11,18 @@ common.errorPrefix = Error
 # About your application
 about-application.title = About your application
 
+# About your business
+about-your-business.title = About your business
+
+## About your business / Agent type
+agentType.title = Is your agent business based in the UK?
+agentType.UkTaxAgent = Yes
+agentType.NonUkTaxAgent = No, it’s based outside the UK
+agentType.error.required = Select yes if your agent business is based in the UK
+agentType.error.invalid = Select yes if your agent business is based in the UK
+
+## About your business / business type
+
 # About your application / business type
 businessType.title = How is your business set up?
 businessType.SoleTrader = Sole trader

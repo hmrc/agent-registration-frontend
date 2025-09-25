@@ -251,7 +251,7 @@ extends FrontendController(mcc):
       if Seq(LimitedCompany, LimitedLiabilityPartnership /*General Limited, Scottish Limited */ ).contains(businessType) then
         Some(CompanyProfile(
           companyNumber = "12345678",
-          companyName = "Test Company",
+          companyName = if businessType == LimitedCompany then "Test Company Ltd" else "Test Partnership LLP",
           dateOfIncorporation = Some(LocalDate.now().minusYears(10))
         ))
       else None,
