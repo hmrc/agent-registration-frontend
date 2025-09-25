@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.model
 
 import play.api.libs.json.Format
 import play.api.mvc.PathBindable
-import play.api.mvc.QueryStringBindable
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.util.EnumBinder
 import uk.gov.hmrc.agentregistration.shared.util.EnumFormat
@@ -45,4 +44,3 @@ object BusinessTypeSessionValue:
 
   given Format[BusinessTypeSessionValue] = EnumFormat.enumFormat[BusinessTypeSessionValue]
   given PathBindable[BusinessTypeSessionValue] = EnumBinder.pathBindable[BusinessTypeSessionValue]
-  given QueryStringBindable[BusinessTypeSessionValue] = EnumBinder.queryStringEnumBinder[BusinessTypeSessionValue]

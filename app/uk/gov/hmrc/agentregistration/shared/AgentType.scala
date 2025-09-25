@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistration.shared
 
 import play.api.libs.json.Format
 import play.api.mvc.PathBindable
-import play.api.mvc.QueryStringBindable
 import uk.gov.hmrc.agentregistration.shared.util.EnumBinder
 import uk.gov.hmrc.agentregistration.shared.util.EnumFormat
 
@@ -31,4 +30,3 @@ object AgentType:
 
   given Format[AgentType] = EnumFormat.enumFormat[AgentType]
   given PathBindable[AgentType] = EnumBinder.pathBindable[AgentType]
-  given QueryStringBindable[AgentType] = EnumBinder.queryStringEnumBinder[AgentType]
