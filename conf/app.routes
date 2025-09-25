@@ -24,7 +24,6 @@ GET         /register/about-your-business/agent-type                   uk.gov.hm
 POST        /register/about-your-business/agent-type                   uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.AgentTypeController.submit
 
 GET         /register/about-your-business/business-type                uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.BusinessTypeController.show
-POST        /register/about-your-business/business-type                uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.BusinessTypeController.submit
 
 ## About your application routes - DEPRECATED
 GET         /register/about-your-application/business-type             uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.BusinessTypeController.show

@@ -16,15 +16,11 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness
 
-import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeForm
-import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.aboutyourbusiness.BusinessTypePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,23 +28,13 @@ import javax.inject.Singleton
 @Singleton
 class BusinessTypeController @Inject() (
   mcc: MessagesControllerComponents,
-  view: BusinessTypePage
+  view: SimplePage
 )
 extends FrontendController(mcc):
 
   def show: Action[AnyContent] = Action:
     implicit request =>
-      val form: Form[BusinessType] =
-        request.readBusinessType match
-          case Some(value: BusinessType) => BusinessTypeForm.form.fill(value)
-          case _ => BusinessTypeForm.form
-      Ok(view(form))
-
-  def submit: Action[AnyContent] = Action:
-    implicit request =>
-      BusinessTypeForm.form.bindFromRequest().fold(
-        formWithErrors => BadRequest(view(formWithErrors)),
-        (businessType: BusinessType) =>
-          Redirect("routes.UserRoleController.show.url")
-            .addBusinessTypeToSession(businessType)
-      )
+      Ok(view(
+        h1 = "Placeholder for Business Type page...",
+        bodyText = Some("Business Type page content goes here...")
+      ))
