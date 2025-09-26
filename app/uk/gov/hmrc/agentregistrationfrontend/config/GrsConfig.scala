@@ -56,8 +56,8 @@ class GrsConfig @Inject() (appConfig: AppConfig):
       businessType match
         case BusinessType.SoleTrader => s"${appConfig.soleTraderIdBaseUrl}/sole-trader-identification/api/journey/$journeyId"
         case BusinessType.LimitedCompany => s"${appConfig.incorpIdBaseUrl}/incorporated-entity-identification/api/journey/$journeyId"
-        case _: Partnership =>
-          s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/journey/$journeyId": @nowarn( /*scala3 bug?*/ "msg=Unreachable case")
+        case _: Partnership => s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/journey/$journeyId"
+      : @nowarn( /*scala3 bug?*/ "msg=Unreachable case")
 
     val stubUrl: String = s"${appConfig.selfBaseUrl}${testRoutes.GrsStubController.retrieveGrsData(journeyId).url}"
     if enableGrsStub then stubUrl else grsUrl

@@ -22,28 +22,22 @@ import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.config.GrsConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyStartUrl
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpReads.Implicits.*
-import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.StringContextOps
+import uk.gov.hmrc.http.client.HttpClientV2
 
-import java.net.URL
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.util.chaining.scalaUtilChainingOps
-import sttp.model.Uri
-import sttp.model.UriInterpolator
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.routes as testRoutes
 
 /** A connector that integrates with multiple Grs microservices sharing similar endpoints and data structures in their request and response bodies.
   *

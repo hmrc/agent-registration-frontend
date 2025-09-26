@@ -19,15 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.config
 import play.api.Configuration
 import sttp.model.Uri
 import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.BusinessType.GeneralPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedCompany
-import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedLiabilityPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
-import uk.gov.hmrc.agentregistration.shared.util.EnumExtensions.toStringHyphenated
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.routes as testRoutes
 
 import javax.inject.Inject
 import javax.inject.Singleton
