@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.model.grs
 import play.api.libs.json.Format
 import play.api.mvc.QueryStringBindable
 import uk.gov.hmrc.agentregistrationfrontend.util.ValueClassBinder
-import play.api.libs.functional.syntax.*
+import uk.gov.hmrc.agentregistration.shared.util.ValueClassFormats
 
 /** Grs' identifier of a Journey.
   */
@@ -27,7 +27,7 @@ final case class JourneyId(value: String)
 
 object JourneyId:
 
-  given Format[JourneyId] = summon[Format[String]].inmap(JourneyId(_), _.value)
+  given Format[JourneyId] = ValueClassFormats.makeFormat
 
   /** Allows JourneyId case class to be used as a query parameter in routes and controllers
     */
