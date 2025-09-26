@@ -20,7 +20,6 @@ import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeSessionForm
@@ -58,14 +57,16 @@ extends FrontendController(mcc):
       else
         BusinessTypeSessionForm.form.bindFromRequest().fold(
           formWithErrors => BadRequest(businessTypeSessionPage(formWithErrors)),
-          (businessType: BusinessTypeSessionValue) =>
-            if businessType === BusinessTypeSessionValue.PartnershipType then
+          {
+            case businessType @ (BusinessTypeSessionValue.SoleTrader | BusinessTypeSessionValue.LimitedCompany) =>
+              // TODO SoleTrader or LimitedCompany journeys not yet built
+              Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
+                .addBusinessTypeToSession(businessType)
+            case businessType @ BusinessTypeSessionValue.PartnershipType =>
               Redirect(routes.PartnershipTypeController.show.url)
                 .addBusinessTypeToSession(businessType)
-            else if businessType === BusinessTypeSessionValue.NotSupported then
+            case businessType @ BusinessTypeSessionValue.NotSupported =>
               Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
                 .addBusinessTypeToSession(businessType)
-            else
-              Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
-                .addBusinessTypeToSession(businessType) // TODO SoleTrader or LimitedCompany journeys not yet built
+          }
         )
