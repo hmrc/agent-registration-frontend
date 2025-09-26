@@ -59,3 +59,30 @@ object EnumFormatter:
         value: E
       ): Map[String, String] = Map(key -> value.toString)
     }
+
+  def formatter[E](
+    isAllowed: E => Boolean,
+    errorMessageIfMissing: String,
+    errorMessageIfEnumError: String
+  )(using classTag: ClassTag[E]): Formatter[E] =
+    val enumClass = classTag.runtimeClass
+    val valuesMethod = enumClass.getDeclaredMethod("values")
+    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Null"))
+    val enumValues: Array[E] = valuesMethod.invoke(null).asInstanceOf[Array[E]]
+
+    new Formatter[E] {
+      override def bind(
+        key: String,
+        data: Map[String, String]
+      ): Either[Seq[FormError], E] = data.get(key)
+        .toRight(Seq(FormError(key, errorMessageIfMissing)))
+        .flatMap { str =>
+          enumValues.find(e => e.toString === str && isAllowed(e))
+            .toRight(Seq(FormError(key, errorMessageIfEnumError)))
+        }
+
+      override def unbind(
+        key: String,
+        value: E
+      ): Map[String, String] = Map(key -> value.toString)
+    }

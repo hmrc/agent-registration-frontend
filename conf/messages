@@ -30,13 +30,21 @@ businessType.SoleTrader = Sole trader
 businessType.LimitedCompany = Limited company
 businessType.PartnershipType = A type of partnership
 businessType.NotSupported = Something else
-businessType.GeneralPartnership = Partnership
-businessType.LimitedLiabilityPartnership = Limited liability partnership
+
+# About your business / partnership type
+partnershipType.title = What type of partnership?
+partnershipType.GeneralPartnership = General partnership
+partnershipType.ScottishPartnership = Scottish partnership
+partnershipType.LimitedLiabilityPartnership = Limited liability partnership
+partnershipType.LimitedPartnership = Limited partnership
+partnershipType.ScottishLimitedPartnership = Scottish limited partnership
 businessType.other = The business is set up as something else
 businessType.other.description = To get an agent services account your business must be a sole trader, limited company, partnership or limited liability partnership.
 businessType.other.signOut = Finish and sign out
 businessType.error.required = Tell us how your business is set up
 businessType.error.invalid = Tell us how your business is set up
+partnershipType.error.required = Tell us what type of partnership
+partnershipType.error.invalid = Tell us what type of partnership
 
 # About your application / user role
 userRole.title = Are you the owner of the business?

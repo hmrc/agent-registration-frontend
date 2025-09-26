@@ -27,12 +27,42 @@ import play.api.mvc.Result
 import play.api.mvc.Session
 import play.api.mvc.Results.Ok
 import play.api.test.FakeRequest
+import uk.gov.hmrc.agentregistration.shared.BusinessType
 
 class SessionServiceSpec
 extends UnitSpec:
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = TdAll.tdAll.baseRequest
   val result: Result = Ok("").withSession("some-preexisting-key" -> "some-value")
+
+  "PartnershipType" should:
+    BusinessType.partnershipTypes.foreach: pt =>
+      s"$pt can be added to the Result and read back from the Request" in:
+        val newResult = result
+          .addPartnershipTypeToSession(pt)
+
+        newResult
+          .asRequest
+          .readPartnershipType shouldBe Some(pt)
+
+        newResult.newSession.value.get(
+          "agent-registration-frontend.partnershipType"
+        ).value shouldBe pt.toString withClue "data should be stored under 'agent-registration-frontend.partnershipType' session key"
+
+        newResult.newSession.value.get(
+          "some-preexisting-key"
+        ).value shouldBe "some-value" withClue "preexisting session data should not be affected"
+
+    "readPartnershipType should throw exception if the stored data can't be deserialised to enum value " in:
+      val throwable: RuntimeException = intercept[RuntimeException]:
+        request
+          .withSession("agent-registration-frontend.partnershipType" -> "garbage")
+          .readPartnershipType
+
+      throwable.getMessage shouldBe "Invalid Partnership type in session: 'garbage'"
+
+    "readPartnershipType should return None when partnership type is not present in session" in:
+      request.readPartnershipType shouldBe None
 
   "BusinessType" should:
     BusinessTypeSessionValue.values.foreach: bt =>

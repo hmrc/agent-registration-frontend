@@ -231,6 +231,9 @@ object ViewSelectors:
 
     val errorSummary = ".govuk-error-summary"
     val errorSummaryList = ".govuk-error-summary__list"
+    val errorSummaryTitle = ".govuk-error-summary__title"
+    val errorSummaryLink = ".govuk-error-summary__list > li > a"
+    val inlineErrorMessage = ".govuk-error-message"
     val fieldSet = ".govuk-fieldset"
     val fieldSetLegend = ".govuk-fieldset__legend"
     val fieldSetHint = ".govuk-fieldset > .govuk-hint"

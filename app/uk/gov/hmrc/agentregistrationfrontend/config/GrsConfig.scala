@@ -44,7 +44,11 @@ class GrsConfig @Inject() (appConfig: AppConfig):
         case BusinessType.GeneralPartnership => s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/general-partnership-journey"
         case BusinessType.LimitedLiabilityPartnership =>
           s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/limited-liability-partnership-journey"
+        case BusinessType.ScottishPartnership => s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/scottish-partnership-journey"
+        case BusinessType.ScottishLimitedPartnership => s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/scottish-limited-partnership-journey"
+        case BusinessType.LimitedPartnership =>
       }
+      s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/limited-partnership-journey"
     val stubUrl: String = s"${appConfig.selfBaseUrl}${testRoutes.GrsStubController.setupGrsJourney(businessType).url}"
     if enableGrsStub then stubUrl else grsUrl
 
