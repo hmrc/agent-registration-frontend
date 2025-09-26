@@ -19,14 +19,15 @@ package uk.gov.hmrc.agentregistrationfrontend.services
 import play.api.i18n.Lang
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.config.GrsConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.GrsConnector
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsJourneyConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsResponse
-import uk.gov.hmrc.agentregistrationfrontend.model.JourneyLabels
-import uk.gov.hmrc.agentregistrationfrontend.model.TranslationLabels
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyLabels
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyStartUrl
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.TranslationLabels
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
 
 import javax.inject.Inject
@@ -36,48 +37,40 @@ import scala.concurrent.Future
 @Singleton
 class GrsService @Inject() (
   grsConnector: GrsConnector,
-  messagesApi: MessagesApi
-)(implicit appConfig: AppConfig):
+  messagesApi: MessagesApi,
+  grsConfig: GrsConfig
+):
 
   def createGrsJourney(
     businessType: BusinessType,
-    hasOwnership: Boolean
+    includeNamePageLabel: Boolean
   )(using
     request: AuthorisedRequest[?]
-  ): Future[String] = {
-    val journeyConfig = createConfig(businessType, hasOwnership)
-
-    grsConnector.createGrsJourney(journeyConfig, businessType)
-  }
+  ): Future[JourneyStartUrl] = grsConnector.createJourney(
+    journeyConfig = createJourneyConfig(businessType, includeNamePageLabel),
+    businessType = businessType
+  )
 
   def getGrsResponse(
     businessType: BusinessType,
-    journeyId: String
-  )(using request: AuthorisedRequest[?]): Future[GrsResponse] = grsConnector.getGrsResponse(businessType, journeyId)
+    journeyId: JourneyId
+  )(using request: AuthorisedRequest[?]): Future[JourneyData] = grsConnector.getJourneyData(businessType, journeyId)
 
-  private def createConfig(
+  private def createJourneyConfig(
     businessType: BusinessType,
-    hasOwnership: Boolean
-  ): GrsJourneyConfig = {
-    val callbackUrl = appConfig.grsJourneyCallbackUrl(businessType)
+    includeNamePageLabel: Boolean
+  ): JourneyConfig = {
 
-    val (fullNamePageLabel, welshFullNamePageLabel) =
-      if (!hasOwnership && businessType == SoleTrader) {
-        (
-          messagesApi.translate("grs.optFullNamePageLabel", Nil)(Lang("en")),
-          messagesApi.translate("grs.optFullNamePageLabel", Nil)(Lang("cy"))
-        )
-      }
-      else {
-        (None, None)
-      }
+    val continueUrl: String = grsConfig.grsJourneyCallbackUrl(businessType)
+    val fullNamePageLabel: Option[String] = if includeNamePageLabel then messagesApi.translate("grs.optFullNamePageLabel", Nil)(Lang("en")) else None
+    val welshFullNamePageLabel: Option[String] = if includeNamePageLabel then messagesApi.translate("grs.optFullNamePageLabel", Nil)(Lang("cy")) else None
 
-    GrsJourneyConfig(
-      continueUrl = callbackUrl,
-      deskProServiceId = appConfig.contactFrontendId,
+    JourneyConfig(
+      continueUrl = continueUrl,
+      deskProServiceId = grsConfig.deskProServiceId,
       signOutUrl = routes.SignOutController.signOut.url,
-      accessibilityUrl = appConfig.accessibilityStatementPath,
-      regime = appConfig.agentRegime,
+      accessibilityUrl = grsConfig.accessibilityUrl,
+      regime = grsConfig.regime,
       businessVerificationCheck = false,
       labels = Some(JourneyLabels(
         en = TranslationLabels(

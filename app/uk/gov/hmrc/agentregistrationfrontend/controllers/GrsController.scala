@@ -22,9 +22,11 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.UserRole.Owner
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.GrsFailed
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.GrsNotCalled
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsFailed
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsNotCalled
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.GrsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
@@ -44,20 +46,22 @@ class GrsController @Inject() (
 )(implicit ec: ExecutionContext)
 extends FrontendController(mcc):
 
+  // TODO: This is an old endpoint for SoleTrader journey and needs to be adapter to the new design
   def startGrsJourney: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
-      (request.agentApplication.aboutYourApplication.businessType, request.agentApplication.aboutYourApplication.userRole) match {
+      (request.agentApplication.aboutYourApplication.businessType, request.agentApplication.aboutYourApplication.userRole) match
         case (Some(businessType), Some(userRole)) =>
-          grsService
-            .createGrsJourney(businessType, userRole == Owner)
-            .map(Redirect(_))
+          val includeNamePageLabel = userRole =!= Owner && businessType === BusinessType.SoleTrader
+          grsService.createGrsJourney(
+            businessType = businessType,
+            includeNamePageLabel
+          ).map(journeyStartUrl => Redirect(journeyStartUrl.value))
         // fail sooner, easier to debug if happens, and log errors
         case _ => Future.successful(Redirect(routes.AgentApplicationController.startRegistration))
-      }
 
   def journeyCallback(
     businessType: BusinessType,
-    journeyId: String
+    journeyId: JourneyId
   ): Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
       if (businessType != request.agentApplication.getBusinessType)

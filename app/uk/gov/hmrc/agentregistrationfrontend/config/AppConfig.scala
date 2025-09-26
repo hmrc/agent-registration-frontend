@@ -19,15 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.config
 import play.api.Configuration
 import sttp.model.Uri
 import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.BusinessType.GeneralPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedCompany
-import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedLiabilityPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
-import uk.gov.hmrc.agentregistration.shared.util.EnumExtensions.toStringHyphenated
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.routes as testRoutes
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -70,33 +63,10 @@ class AppConfig @Inject() (
    * GRS CONFIG START
    */
   val enableGrsStub: Boolean = configuration.getOptional[Boolean]("features.grs-stub").getOrElse(false)
-  val agentRegime: String = "VATC" // TODO placeholder
 
   val soleTraderIdBaseUrl: String = servicesConfig.baseUrl("sole-trader-identification-frontend")
   val incorpIdBaseUrl: String = servicesConfig.baseUrl("incorporated-entity-identification-frontend")
   val partnershipIdBaseUrl: String = servicesConfig.baseUrl("partnership-identification-frontend")
-
-  def grsJourneyCallbackUrl(businessType: BusinessType) = s"$thisFrontendBaseUrl/agent-registration/apply/grs-callback/${businessType.toStringHyphenated}"
-
-  def grsJourneyUrl(businessType: BusinessType): String =
-    businessType match {
-      case _ if enableGrsStub => s"$selfBaseUrl${testRoutes.GrsStubController.setupGrsJourney(businessType).url}"
-      case SoleTrader => s"$soleTraderIdBaseUrl/sole-trader-identification/api/sole-trader-journey"
-      case LimitedCompany => s"$incorpIdBaseUrl/incorporated-entity-identification/api/limited-company-journey"
-      case GeneralPartnership => s"$partnershipIdBaseUrl/partnership-identification/api/general-partnership-journey"
-      case LimitedLiabilityPartnership => s"$partnershipIdBaseUrl/partnership-identification/api/limited-liability-partnership-journey"
-    }
-
-  def grsRetrieveDetailsUrl(
-    businessType: BusinessType,
-    journeyId: String
-  ): String =
-    businessType match {
-      case _ if enableGrsStub => s"$selfBaseUrl${testRoutes.GrsStubController.retrieveGrsData(journeyId).url}"
-      case SoleTrader => s"$soleTraderIdBaseUrl/sole-trader-identification/api/journey/$journeyId"
-      case LimitedCompany => s"$incorpIdBaseUrl/incorporated-entity-identification/api/journey/$journeyId"
-      case GeneralPartnership | LimitedLiabilityPartnership => s"$partnershipIdBaseUrl/partnership-identification/api/journey/$journeyId"
-    }
 
   /*
    * UPSCAN CONFIG START
