@@ -27,7 +27,6 @@ class BusinessTypeSessionControllerSpec
 extends ControllerSpec:
 
   private val path = "/agent-registration/apply/about-your-business/business-type"
-  private val stubAddAgentUrl = "/agent-registration/test-only/add-agent-type/uk-tax-agent"
 
   "routes should have correct paths and methods" in:
     routes.BusinessTypeSessionController.show shouldBe Call(
