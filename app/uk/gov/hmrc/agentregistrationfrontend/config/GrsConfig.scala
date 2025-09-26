@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.config
 
 import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.Partnership
 import uk.gov.hmrc.agentregistration.shared.util.EnumExtensions.*
 import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.routes as testRoutes
 
@@ -56,7 +55,7 @@ class GrsConfig @Inject() (appConfig: AppConfig):
       businessType match
         case BusinessType.SoleTrader => s"${appConfig.soleTraderIdBaseUrl}/sole-trader-identification/api/journey/$journeyId"
         case BusinessType.LimitedCompany => s"${appConfig.incorpIdBaseUrl}/incorporated-entity-identification/api/journey/$journeyId"
-        case _: Partnership => s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/journey/$journeyId"
+        case _: BusinessType.Partnership => s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/journey/$journeyId"
       : @nowarn( /*scala3 bug?*/ "msg=Unreachable case")
 
     val stubUrl: String = s"${appConfig.selfBaseUrl}${testRoutes.GrsStubController.retrieveGrsData(journeyId).url}"
