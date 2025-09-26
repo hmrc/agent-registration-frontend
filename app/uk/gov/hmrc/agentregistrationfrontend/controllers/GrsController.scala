@@ -59,6 +59,8 @@ extends FrontendController(mcc):
         // fail sooner, easier to debug if happens, and log errors
         case _ => Future.successful(Redirect(routes.AgentApplicationController.startRegistration))
 
+  /** This endpoint is called by Grs when a User is navigated back from Grs to this Frontend Service
+    */
   def journeyCallback(
     businessType: BusinessType,
     journeyId: JourneyId
@@ -68,7 +70,7 @@ extends FrontendController(mcc):
         Future.successful(Redirect(routes.AgentApplicationController.startRegistration)) // User changed answer while on GRS)
       else
         grsService
-          .getGrsResponse(businessType, journeyId)
+          .getJourneyData(businessType, journeyId)
           .flatMap {
             case grsResponse if grsResponse.identifiersMatch && grsResponse.registration.registeredBusinessPartnerId.nonEmpty =>
               applicationService

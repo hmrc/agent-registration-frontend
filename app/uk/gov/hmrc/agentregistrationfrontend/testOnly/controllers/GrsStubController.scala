@@ -32,6 +32,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.CompanyProfile
 import uk.gov.hmrc.agentregistration.shared.FullName
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.SafeId
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.BusinessType.GeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedCompany
@@ -195,7 +196,7 @@ extends FrontendController(mcc):
           identifiersMatch = if status == GrsNotCalled then false else true,
           registration = Registration(
             registrationStatus = status,
-            registeredBusinessPartnerId = safeId
+            registeredBusinessPartnerId = safeId.map(SafeId.apply)
           ),
           fullName = firstName.map(first => FullName(first, lastName.getOrElse(""))),
           dateOfBirth = dateOfBirth.map(LocalDate.parse),
@@ -217,7 +218,7 @@ extends FrontendController(mcc):
     )(response =>
       Some((
         response.registration.registrationStatus,
-        response.registration.registeredBusinessPartnerId,
+        response.registration.registeredBusinessPartnerId.map(_.value),
         response.fullName.map(_.firstName),
         response.fullName.map(_.lastName),
         response.dateOfBirth.map(_.toString),
@@ -236,7 +237,7 @@ extends FrontendController(mcc):
     identifiersMatch = true,
     registration = Registration(
       registrationStatus = GrsRegistered,
-      registeredBusinessPartnerId = Some("X00000123456789")
+      registeredBusinessPartnerId = Some(SafeId("X00000123456789"))
     ),
     fullName = if businessType == SoleTrader then Some(FullName("Test", "User")) else None,
     dateOfBirth = if businessType == SoleTrader then Some(LocalDate.now().minusYears(20)) else None,
