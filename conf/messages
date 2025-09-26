@@ -7,6 +7,7 @@ common.confirmAndContinue = Confirm and continue
 common.saveAndComeBackLater = Save and come back later
 common.tryAgain = Try again
 common.errorPrefix = Error
+common.or = or
 
 # About your application
 about-application.title = About your application
@@ -27,6 +28,8 @@ agentType.error.invalid = Select yes if your agent business is based in the UK
 businessType.title = How is your business set up?
 businessType.SoleTrader = Sole trader
 businessType.LimitedCompany = Limited company
+businessType.PartnershipType = A type of partnership
+businessType.NotSupported = Something else
 businessType.GeneralPartnership = Partnership
 businessType.LimitedLiabilityPartnership = Limited liability partnership
 businessType.other = The business is set up as something else

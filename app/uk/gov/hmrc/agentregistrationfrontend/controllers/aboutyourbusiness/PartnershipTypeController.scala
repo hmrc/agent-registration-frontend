@@ -26,7 +26,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class BusinessTypeController @Inject() (
+class PartnershipTypeController @Inject() (
   mcc: MessagesControllerComponents,
   view: SimplePage
 )
@@ -35,6 +35,6 @@ extends FrontendController(mcc):
   def show: Action[AnyContent] = Action:
     implicit request =>
       Ok(view(
-        h1 = "Placeholder for Business Type page...",
-        bodyText = Some("Business Type page content goes here...")
+        h1 = "Placeholder for partnership type",
+        bodyText = Some("This is a placeholder for the Partnership Type page.")
       ))

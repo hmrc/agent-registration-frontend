@@ -24,8 +24,11 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import com.softwaremill.quicklens.*
 import sttp.model.Uri.UriContext
+import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.upscan.*
+import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -59,3 +62,17 @@ extends FrontendController(mcc):
             )))
         )
         .map(_ => Ok("upload set to complete"))
+
+  def addAgentTypeToSession(
+    agentType: AgentType
+  ): Action[AnyContent] = Action:
+    implicit request =>
+      Ok("agent type added to session")
+        .addAgentTypeToSession(agentType)
+
+  def addBusinessTypeToSession(
+    businessType: BusinessTypeSessionValue
+  ): Action[AnyContent] = Action:
+    implicit request =>
+      Ok("business type added to session")
+        .addBusinessTypeToSession(businessType)

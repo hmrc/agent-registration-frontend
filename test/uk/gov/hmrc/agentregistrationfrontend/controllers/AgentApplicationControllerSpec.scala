@@ -24,12 +24,12 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 class AgentApplicationControllerSpec
 extends ControllerSpec:
 
-  private val path: String = "/agent-registration/register"
+  private val path: String = "/agent-registration/apply"
 
   "routes should have correct paths and methods" in:
     routes.AgentApplicationController.startRegistration shouldBe Call(
       method = "GET",
-      url = "/agent-registration/register"
+      url = "/agent-registration/apply"
     )
 
   s"GET $path should redirect to business type page" in:
