@@ -20,6 +20,7 @@ import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeSessionForm
@@ -58,10 +59,10 @@ extends FrontendController(mcc):
         BusinessTypeSessionForm.form.bindFromRequest().fold(
           formWithErrors => BadRequest(businessTypeSessionPage(formWithErrors)),
           (businessType: BusinessTypeSessionValue) =>
-            if businessType == BusinessTypeSessionValue.PartnershipType then
+            if businessType === BusinessTypeSessionValue.PartnershipType then
               Redirect(routes.PartnershipTypeController.show.url)
                 .addBusinessTypeToSession(businessType)
-            else if businessType == BusinessTypeSessionValue.NotSupported then
+            else if businessType === BusinessTypeSessionValue.NotSupported then
               Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
                 .addBusinessTypeToSession(businessType)
             else
