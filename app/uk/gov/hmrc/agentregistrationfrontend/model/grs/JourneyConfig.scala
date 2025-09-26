@@ -14,13 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model
+package uk.gov.hmrc.agentregistrationfrontend.model.grs
 
 import play.api.libs.json.Format
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 
-case class GrsJourneyConfig(
+/** Configuration for initiating a Grs journey. This configuration is sent as the request body when creating a Grs journey.
+  * @note
+  *   The name JourneyConfig matches the terminology used in Grs services otherwise it would be named CreatingGrsJourneyRequest
+  */
+final case class JourneyConfig(
   continueUrl: String,
   deskProServiceId: String,
   signOutUrl: String,
@@ -30,24 +34,5 @@ case class GrsJourneyConfig(
   labels: Option[JourneyLabels] = None
 )
 
-object GrsJourneyConfig:
-  given format: Format[GrsJourneyConfig] = Json.format[GrsJourneyConfig]
-
-case class JourneyLabels(
-  en: TranslationLabels,
-  cy: TranslationLabels
-)
-
-object JourneyLabels {
-  implicit val format: OFormat[JourneyLabels] = Json.format[JourneyLabels]
-}
-
-// optFullNamePageLabel label is only supported by sole-trader-identification-frontend
-case class TranslationLabels(
-  optFullNamePageLabel: Option[String] = None,
-  optServiceName: Option[String]
-)
-
-object TranslationLabels {
-  implicit val format: OFormat[TranslationLabels] = Json.format[TranslationLabels]
-}
+object JourneyConfig:
+  given Format[JourneyConfig] = Json.format[JourneyConfig]

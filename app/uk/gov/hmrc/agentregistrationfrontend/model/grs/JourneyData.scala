@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model
+package uk.gov.hmrc.agentregistrationfrontend.model.grs
 
 import play.api.libs.json.*
 import uk.gov.hmrc.agentregistration.shared.*
@@ -22,12 +22,17 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType.GeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedCompany
 import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedLiabilityPartnership
 import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistration.given
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.Registration.given
 
 import java.time.LocalDate
 
 // TODO sole trader responses can also contain an overseas address and an overseas taxIdentifier, do we do anything about this?
-case class GrsResponse(
+
+/** This represents uber class to hold all cases of journey data for various business types. In reality many fields are set only for specific business types,
+  * others are left none. TODO: consider creating dedicated classes for each endpoint with specified fields, e.g. SoleTraderJourneyData, PartnershipJourneyData,
+  * etc.
+  */
+final case class JourneyData(
   fullName: Option[FullName], // sole trader
   dateOfBirth: Option[LocalDate], // sole trader
   nino: Option[Nino], // sole trader (can be replaced by trn)
@@ -37,7 +42,7 @@ case class GrsResponse(
   ctutr: Option[Utr], // limited company
   postcode: Option[String], // any partnership
   identifiersMatch: Boolean,
-  registration: GrsRegistration
+  registration: Registration
 ):
 
   // TODO: distinguish between CT and SA Utrs, make dedicated types and analyse when to use correct identifier
@@ -72,31 +77,5 @@ case class GrsResponse(
     }
   }
 
-object GrsResponse:
-  given Format[GrsResponse] = Json.format[GrsResponse]
-
-enum GrsRegistrationStatus(val key: String):
-
-  case GrsRegistered
-  extends GrsRegistrationStatus("REGISTERED")
-  case GrsFailed
-  extends GrsRegistrationStatus("REGISTRATION_FAILED")
-  case GrsNotCalled
-  extends GrsRegistrationStatus("REGISTRATION_NOT_CALLED")
-
-object GrsRegistrationStatus:
-  given Format[GrsRegistrationStatus] = Format(
-    _.validate[String].flatMap { string =>
-      GrsRegistrationStatus.values.find(_.key == string).map(JsSuccess(_))
-        .getOrElse(JsError(s"Unknown value for GrsRegistrationStatus: '$string'"))
-    },
-    status => JsString(status.key)
-  )
-
-case class GrsRegistration(
-  registrationStatus: GrsRegistrationStatus,
-  registeredBusinessPartnerId: Option[String]
-)
-
-object GrsRegistration:
-  given Format[GrsRegistration] = Json.format[GrsRegistration]
+object JourneyData:
+  given Format[JourneyData] = Json.format[JourneyData]

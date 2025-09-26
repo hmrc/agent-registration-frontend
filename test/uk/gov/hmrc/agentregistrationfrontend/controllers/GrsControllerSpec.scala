@@ -25,11 +25,11 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.UserRole.*
 import uk.gov.hmrc.agentregistration.shared.util.EnumExtensions.toStringHyphenated
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.GrsFailed
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.GrsNotCalled
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.GrsRegistered
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistration
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsResponse
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsFailed
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsNotCalled
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsRegistered
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.Registration
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs.stubApplicationInProgress
@@ -84,7 +84,7 @@ extends ControllerSpec:
       true
     ))
 
-  val soleTraderGrsResponse = GrsResponse(
+  val soleTraderGrsResponse = JourneyData(
     fullName = Some(tdAll.fullName),
     dateOfBirth = Some(tdAll.dateOfBirth),
     nino = Some(tdAll.nino),
@@ -94,12 +94,12 @@ extends ControllerSpec:
     ctutr = None,
     postcode = None,
     identifiersMatch = true,
-    registration = GrsRegistration(
+    registration = Registration(
       registrationStatus = GrsRegistered,
       registeredBusinessPartnerId = Some(tdAll.safeId)
     )
   )
-  val limitedCompanyGrsResponse = GrsResponse(
+  val limitedCompanyGrsResponse = JourneyData(
     fullName = None,
     dateOfBirth = None,
     nino = None,
@@ -109,9 +109,9 @@ extends ControllerSpec:
     ctutr = Some(tdAll.utr),
     postcode = None,
     identifiersMatch = true,
-    registration = GrsRegistration(GrsRegistered, Some(tdAll.safeId))
+    registration = Registration(GrsRegistered, Some(tdAll.safeId))
   )
-  val generalPartnershipGrsResponse = GrsResponse(
+  val generalPartnershipGrsResponse = JourneyData(
     fullName = None,
     dateOfBirth = None,
     nino = None,
@@ -121,9 +121,9 @@ extends ControllerSpec:
     ctutr = None,
     postcode = Some(tdAll.postcode),
     identifiersMatch = true,
-    registration = GrsRegistration(GrsRegistered, Some(tdAll.safeId))
+    registration = Registration(GrsRegistered, Some(tdAll.safeId))
   )
-  val limitedLiabiliyPartnershipGrsResponse = GrsResponse(
+  val limitedLiabiliyPartnershipGrsResponse = JourneyData(
     fullName = None,
     dateOfBirth = None,
     nino = None,
@@ -133,9 +133,9 @@ extends ControllerSpec:
     ctutr = None,
     postcode = Some(tdAll.postcode),
     identifiersMatch = true,
-    registration = GrsRegistration(GrsRegistered, Some(tdAll.safeId))
+    registration = Registration(GrsRegistered, Some(tdAll.safeId))
   )
-  val unmatchedGrsResponse = GrsResponse(
+  val unmatchedGrsResponse = JourneyData(
     fullName = Some(tdAll.fullName),
     dateOfBirth = Some(tdAll.dateOfBirth),
     nino = Some(tdAll.nino),
@@ -145,9 +145,9 @@ extends ControllerSpec:
     ctutr = None,
     postcode = None,
     identifiersMatch = false,
-    registration = GrsRegistration(GrsNotCalled, None)
+    registration = Registration(GrsNotCalled, None)
   )
-  val failedGrsResponse = GrsResponse(
+  val failedGrsResponse = JourneyData(
     fullName = Some(tdAll.fullName),
     dateOfBirth = Some(tdAll.dateOfBirth),
     nino = Some(tdAll.nino),
@@ -157,9 +157,9 @@ extends ControllerSpec:
     ctutr = None,
     postcode = None,
     identifiersMatch = true,
-    registration = GrsRegistration(GrsFailed, None)
+    registration = Registration(GrsFailed, None)
   )
-  val unexpectedGrsResponse = GrsResponse(
+  val unexpectedGrsResponse = JourneyData(
     fullName = Some(tdAll.fullName),
     dateOfBirth = Some(tdAll.dateOfBirth),
     nino = Some(tdAll.nino),
@@ -169,7 +169,7 @@ extends ControllerSpec:
     ctutr = None,
     postcode = None,
     identifiersMatch = false,
-    registration = GrsRegistration(GrsRegistered, Some(tdAll.safeId))
+    registration = Registration(GrsRegistered, Some(tdAll.safeId))
   )
   s"GET $grsStartUrl" should:
     "redirect to grs start for a sole trader owner" in:

@@ -21,12 +21,22 @@ import play.api.mvc.PathBindable
 import uk.gov.hmrc.agentregistration.shared.util.EnumBinder
 import uk.gov.hmrc.agentregistration.shared.util.EnumFormat
 
+/** Marking trait for business types that are partnerships.
+  */
+sealed trait Partnership
+
 enum BusinessType:
 
   case SoleTrader
   case LimitedCompany
+
   case GeneralPartnership
+  extends BusinessType
+  with Partnership
+
   case LimitedLiabilityPartnership
+  extends BusinessType
+  with Partnership
 
 object BusinessType:
 

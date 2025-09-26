@@ -17,11 +17,11 @@
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistration.shared.BusinessType
 @import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.routes
-@import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
-@import uk.gov.hmrc.agentregistrationfrontend.model.GrsResponse
-@import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.*
+@import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
+@import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 @import java.util.UUID
 @import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 
@@ -34,7 +34,7 @@
 )
 
 @(
-        form: Form[GrsResponse],
+        form: Form[JourneyData],
         businessType: BusinessType,
         journeyId: String
 )(implicit
@@ -56,24 +56,24 @@
             href = Some(routes.GrsStubController.showGrsData(businessType, UUID.randomUUID().toString).url)
         ))
         @registrationInput
-        @if(businessType == SoleTrader) {
+        @if(businessType === SoleTrader) {
             @sautrInput
             @fullNameInput
             @dateOfBirthInput
             @ninoInput
             @trnInput
         }
-        @if(businessType == LimitedCompany) {
+        @if(businessType === LimitedCompany) {
             @ctutrInput
             @companyProfileInput
         }
         @* Includes Scottish Partnership *@
-        @if(businessType == GeneralPartnership) {
+        @if(businessType === GeneralPartnership) {
             @sautrInput
             @partnershipPostcodeInput
         }
         @* Includes Limited and Scottish Limited Partnerships *@
-        @if(businessType == LimitedLiabilityPartnership) {
+        @if(businessType === LimitedLiabilityPartnership) {
             @sautrInput
             @partnershipPostcodeInput
             @companyProfileInput
@@ -99,12 +99,12 @@
             classes = "govuk-fieldset__legend--m"
         ))
     )),
-    items = GrsRegistrationStatus.values.toSeq.map(status =>
+    items = RegistrationStatus.values.toSeq.map(status =>
         RadioItem(
             content = Text(messages(status.key)),
             value = Some(status.toString),
             conditionalHtml =
-                if status == GrsRegistered then Some(govukInput(Input(
+                if status === RegistrationStatus.GrsRegistered then Some(govukInput(Input(
                     label = Label(
                         content = Text(messages(s"Business Partner Safe Id")),
                         isPageHeading = false,

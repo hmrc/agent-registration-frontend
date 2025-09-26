@@ -43,12 +43,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.EnumFormatter
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsJourneyConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistration
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.GrsNotCalled
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsRegistrationStatus.GrsRegistered
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsResponse
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.Registration
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsNotCalled
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsRegistered
 import uk.gov.hmrc.agentregistrationfrontend.testOnly.views.html.GrsStub
 import uk.gov.voa.play.form.ConditionalMappings.isEqual
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
@@ -72,7 +72,7 @@ extends FrontendController(mcc):
   ): Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       val prefilledForm =
-        request.session.get(journeyId).map(data => Json.parse(data).as[GrsResponse]) match {
+        request.session.get(journeyId).map(data => Json.parse(data).as[JourneyData]) match {
           case Some(data) => form(businessType).fill(data)
           case _ => formWithDefaults(businessType)
         }
@@ -106,16 +106,16 @@ extends FrontendController(mcc):
       case None => NotFound
     }
 
-  def setupGrsJourney(businessType: BusinessType): Action[GrsJourneyConfig] =
-    Action(parse.json[GrsJourneyConfig]): (_: Request[GrsJourneyConfig]) =>
+  def setupGrsJourney(businessType: BusinessType): Action[JourneyConfig] =
+    Action(parse.json[JourneyConfig]): (_: Request[JourneyConfig]) =>
       Created(Json.obj(
         "journeyStartUrl" -> routes.GrsStubController.showGrsData(businessType, UUID.randomUUID().toString).url
       ))
 
   def randomUtr(): Utr = Utr("%010d".format(Random.nextLong(9999999999L)))
 
-  private def form(businessType: BusinessType): Form[GrsResponse] =
-    val registrationStatusMapping: FieldMapping[GrsRegistrationStatus] = Forms.of(EnumFormatter.formatter[GrsRegistrationStatus](
+  private def form(businessType: BusinessType): Form[JourneyData] =
+    val registrationStatusMapping: FieldMapping[RegistrationStatus] = Forms.of(EnumFormatter.formatter[RegistrationStatus](
       errorMessageIfMissing = "Registration status required",
       errorMessageIfEnumError = "Registration status invalid"
     ))
@@ -188,9 +188,9 @@ extends FrontendController(mcc):
         ctutr,
         postcode
       ) =>
-        GrsResponse(
+        JourneyData(
           identifiersMatch = if status == GrsNotCalled then false else true,
-          registration = GrsRegistration(
+          registration = Registration(
             registrationStatus = status,
             registeredBusinessPartnerId = safeId
           ),
@@ -229,9 +229,9 @@ extends FrontendController(mcc):
       ))
     ))
 
-  private def formWithDefaults(businessType: BusinessType): Form[GrsResponse] = form(businessType).fill(GrsResponse(
+  private def formWithDefaults(businessType: BusinessType): Form[JourneyData] = form(businessType).fill(JourneyData(
     identifiersMatch = true,
-    registration = GrsRegistration(
+    registration = Registration(
       registrationStatus = GrsRegistered,
       registeredBusinessPartnerId = Some("X00000123456789")
     ),

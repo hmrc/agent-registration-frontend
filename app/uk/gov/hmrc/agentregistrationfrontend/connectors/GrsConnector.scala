@@ -23,8 +23,10 @@ import play.api.libs.ws.JsonBodyWritables.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsJourneyConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.GrsResponse
+import uk.gov.hmrc.agentregistrationfrontend.config.GrsConfig
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyStartUrl
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.HttpReads.Implicits.*
@@ -32,42 +34,55 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.StringContextOps
 
+import java.net.URL
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+import scala.util.chaining.scalaUtilChainingOps
+import sttp.model.Uri
+import sttp.model.UriInterpolator
+import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.routes as testRoutes
 
+/** A connector that integrates with multiple Grs microservices sharing similar endpoints and data structures in their request and response bodies.
+  *
+  * The Grs microservices family include:
+  *   - sole-trader-identification-frontend
+  *   - incorporated-entity-identification-frontend
+  *   - partnership-identification-frontend
+  *   - minor-entity-identification-frontend
+  */
 @Singleton
 class GrsConnector @Inject() (
   httpClient: HttpClientV2,
-  appConfig: AppConfig
-)(implicit ec: ExecutionContext):
+  grsConfig: GrsConfig
+)(using ExecutionContext):
 
-  def createGrsJourney(
-    journeyConfig: GrsJourneyConfig,
+  def createJourney(
+    journeyConfig: JourneyConfig,
     businessType: BusinessType
-  )(using request: AuthorisedRequest[?]): Future[String] = httpClient
-    .post(url"${appConfig.grsJourneyUrl(businessType)}")
+  )(using request: AuthorisedRequest[?]): Future[JourneyStartUrl] = httpClient
+    .post(url"${grsConfig.createJourneyUrl(businessType)}")
     .withBody(Json.toJson(journeyConfig))
     .execute[HttpResponse]
     .map {
       case response @ HttpResponse(CREATED, _, _) =>
-        val journeyStartUrl = (response.json \ "journeyStartUrl").as[String]
+        val journeyStartUrl: JourneyStartUrl = (response.json \ "journeyStartUrl").as[String].pipe(JourneyStartUrl.apply)
         journeyStartUrl
-      // TODO dedicated exteption which accepts context and standardizes error message (including agentApplication id, requestId, etc)
+      // TODO dedicated exception which accepts context and standardizes error message (including agentApplication id, requestId, etc)
       case response => throw new Exception(s"Unexpected response from GRS create journey for $businessType: Status: ${response.status} Body: ${response.body}")
     }
 
-  def getGrsResponse(
+  def getJourneyData(
     businessType: BusinessType,
     journeyId: String
-  )(using request: AuthorisedRequest[?]): Future[GrsResponse] =
+  )(using request: AuthorisedRequest[?]): Future[JourneyData] =
     // HC override is needed because the GRS stub data is stored in the session cookie
     // By default the header carrier drops the session cookie
     given headerCarrier: HeaderCarrier =
-      if appConfig.enableGrsStub then hc.copy(extraHeaders = hc.headers(Seq(HeaderNames.COOKIE)))
+      if grsConfig.enableGrsStub then hc.copy(extraHeaders = hc.headers(Seq(HeaderNames.COOKIE)))
       else hc
-
     httpClient
-      .get(url"${appConfig.grsRetrieveDetailsUrl(businessType, journeyId)}")
-      .execute[GrsResponse]
+      .get(url"${grsConfig.retrieveJourneyDataUrl(businessType, journeyId)}")
+      .execute[JourneyData]
