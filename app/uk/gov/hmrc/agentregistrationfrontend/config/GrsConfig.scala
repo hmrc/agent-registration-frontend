@@ -29,7 +29,7 @@ import scala.annotation.nowarn
 class GrsConfig @Inject() (appConfig: AppConfig):
 
   def grsJourneyCallbackUrl(businessType: BusinessType) =
-    s"${appConfig.thisFrontendBaseUrl}/agent-registration/register/grs-callback/${businessType.toStringHyphenated}"
+    s"${appConfig.thisFrontendBaseUrl}/agent-registration/apply/grs-callback/${businessType.toStringHyphenated}"
 
   val enableGrsStub: Boolean = appConfig.enableGrsStub
   val deskProServiceId: String = appConfig.contactFrontendId

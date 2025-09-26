@@ -32,7 +32,7 @@ extends ISpec:
       businessType.toString in:
 
         val thisFrontendBaseUrl: String = "http://localhost:22201"
-        val expectedPath: String = s"/agent-registration/register/grs-callback/${businessType.toStringHyphenated}"
+        val expectedPath: String = s"/agent-registration/apply/grs-callback/${businessType.toStringHyphenated}"
         val withJourneyIdQuery: String = "?journeyId=journey-id-added-by-grs"
 
         grsConfig.grsJourneyCallbackUrl(businessType) shouldBe s"$thisFrontendBaseUrl$expectedPath"
