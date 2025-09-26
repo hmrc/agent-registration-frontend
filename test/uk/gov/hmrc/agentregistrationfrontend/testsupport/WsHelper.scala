@@ -107,8 +107,10 @@ trait WsHelper {
     }
   }
 
-  /** Extract all cookies from a WSResponse for use in subsequent requests. Usage: val cookies = extractCookies(response)
-    */
-  def extractCookies(response: WSResponse): scala.collection.immutable.Seq[WSCookie] = response.cookies.toList
+  extension (response: WSResponse)
+
+    /** Extract all cookies from a WSResponse for use in subsequent requests.
+      */
+    def extractCookies: scala.collection.immutable.Seq[WSCookie] = response.cookies.toList
 
 }

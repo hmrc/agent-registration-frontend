@@ -16,6 +16,11 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport
 
+import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.agentregistration.shared.AgentType
+import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.util.EnumExtensions.*
+
 class ControllerSpec
 extends ISpec,
   WsHelper:
@@ -23,3 +28,9 @@ extends ISpec,
   export viewspecsupport.JsoupSupport.*
   export play.api.mvc.Call
   export play.api.http.Status
+
+  def addAgentTypeToSession(agentType: AgentType): WSResponse = get(s"/agent-registration/test-only/add-agent-type/${agentType.toStringHyphenated}")
+
+  def addBusinessTypeToSession(businessType: BusinessType): WSResponse = get(
+    s"/agent-registration/test-only/add-business-type/${businessType.toStringHyphenated}"
+  )
