@@ -26,6 +26,7 @@ object ValueClassFormats:
 
   /** Compile-time checked derivation of play json Format for case classes of the form: case class X(value: String)
     */
+  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
   inline def makeFormat[A](using
     m: Mirror.ProductOf[A],
     strFmt: Format[String]
