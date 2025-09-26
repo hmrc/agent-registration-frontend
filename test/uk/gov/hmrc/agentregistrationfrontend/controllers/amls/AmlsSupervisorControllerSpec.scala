@@ -75,7 +75,7 @@ extends ControllerSpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe appRoutes.AgentApplicationController.saveAndComeBackLater.url
+    response.header("Location").value shouldBe appRoutes.SaveForLaterController.show.url
 
   s"POST $path without valid selection should return 400" in:
     AuthStubs.stubAuthorise()
