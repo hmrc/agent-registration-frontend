@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.grs
+package uk.gov.hmrc.agentregistration.shared
 
-import play.api.libs.json.*
-import uk.gov.hmrc.agentregistration.shared.SafeId
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.Format
 
-final case class Registration(
-  registrationStatus: RegistrationStatus,
-  registeredBusinessPartnerId: Option[SafeId]
-)
+/** SafeId (aka BusinessPartnerId in Etmp systems), is an unique identifier retrieved from the Grs that identifies the business entity being currently
+  * registered.
+  */
+final case class SafeId(value: String)
 
-object Registration:
-  given Format[Registration] = Json.format[Registration]
+object SafeId:
+  given format: Format[SafeId] = summon[Format[String]].inmap(SafeId(_), _.value)

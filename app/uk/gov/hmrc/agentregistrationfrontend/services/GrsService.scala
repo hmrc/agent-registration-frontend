@@ -51,7 +51,7 @@ class GrsService @Inject() (
     businessType = businessType
   )
 
-  def getGrsResponse(
+  def getJourneyData(
     businessType: BusinessType,
     journeyId: JourneyId
   )(using request: AuthorisedRequest[?]): Future[JourneyData] = grsConnector.getJourneyData(businessType, journeyId)
