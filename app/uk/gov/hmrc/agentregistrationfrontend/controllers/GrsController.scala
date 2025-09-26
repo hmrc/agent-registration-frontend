@@ -24,6 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.UserRole.Owner
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsFailed
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsNotCalled
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
@@ -60,7 +61,7 @@ extends FrontendController(mcc):
 
   def journeyCallback(
     businessType: BusinessType,
-    journeyId: String
+    journeyId: JourneyId
   ): Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
       if (businessType != request.agentApplication.getBusinessType)

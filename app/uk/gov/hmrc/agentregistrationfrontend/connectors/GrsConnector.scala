@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.GrsConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyStartUrl
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
 import uk.gov.hmrc.http.HttpReads.Implicits.*
@@ -70,7 +71,7 @@ class GrsConnector @Inject() (
 
   def getJourneyData(
     businessType: BusinessType,
-    journeyId: String
+    journeyId: JourneyId
   )(using request: AuthorisedRequest[?]): Future[JourneyData] =
     // HC override is needed because the GRS stub data is stored in the session cookie
     // By default the header carrier drops the session cookie

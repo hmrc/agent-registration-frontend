@@ -20,6 +20,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
 import uk.gov.hmrc.agentregistration.shared.util.EnumExtensions.toStringHyphenated
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 
 class GrsConfigSpec
 extends ISpec:
@@ -35,4 +36,4 @@ extends ISpec:
         val withJourneyIdQuery: String = "?journeyId=journey-id-added-by-grs"
 
         grsConfig.grsJourneyCallbackUrl(businessType) shouldBe s"$thisFrontendBaseUrl$expectedPath"
-        appRoutes.GrsController.journeyCallback(businessType, "journey-id-added-by-grs").url shouldBe s"$expectedPath$withJourneyIdQuery"
+        appRoutes.GrsController.journeyCallback(businessType, JourneyId("journey-id-added-by-grs")).url shouldBe s"$expectedPath$withJourneyIdQuery"

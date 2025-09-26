@@ -22,12 +22,13 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.GrsConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.GrsConnector
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyLabels
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyStartUrl
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.TranslationLabels
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyStartUrl
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -52,7 +53,7 @@ class GrsService @Inject() (
 
   def getGrsResponse(
     businessType: BusinessType,
-    journeyId: String
+    journeyId: JourneyId
   )(using request: AuthorisedRequest[?]): Future[JourneyData] = grsConnector.getJourneyData(businessType, journeyId)
 
   private def createJourneyConfig(

@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.agentregistration.shared.BusinessType
 @import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.routes
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
+@import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 @import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 @import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
@@ -36,7 +37,7 @@
 @(
         form: Form[JourneyData],
         businessType: BusinessType,
-        journeyId: String
+        journeyId: JourneyId
 )(implicit
         request: RequestHeader,
         messages: Messages
@@ -53,7 +54,7 @@
 
         @govukButton(Button(
             content = Text(messages("Reset Test Data")),
-            href = Some(routes.GrsStubController.showGrsData(businessType, UUID.randomUUID().toString).url)
+            href = Some(routes.GrsStubController.showGrsData(businessType, JourneyId(UUID.randomUUID().toString)).url)
         ))
         @registrationInput
         @if(businessType === SoleTrader) {
@@ -85,7 +86,7 @@
 
         @govukButton(Button(
             content = Text(messages("Reset Test Data")),
-            href = Some(routes.GrsStubController.showGrsData(businessType, UUID.randomUUID().toString).url)
+            href = Some(routes.GrsStubController.showGrsData(businessType, JourneyId(UUID.randomUUID().toString)).url)
         ))
     }
 }
