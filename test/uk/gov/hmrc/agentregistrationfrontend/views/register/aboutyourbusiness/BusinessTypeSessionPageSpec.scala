@@ -18,18 +18,18 @@ package uk.gov.hmrc.agentregistrationfrontend.views.register.aboutyourbusiness
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTypeForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeSessionForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.aboutyourbusiness.AgentTypePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.register.aboutyourbusiness.BusinessTypeSessionPage
 
-class AgentTypePageSpec
+class BusinessTypeSessionPageSpec
 extends ViewSpec:
 
-  val viewTemplate: AgentTypePage = app.injector.instanceOf[AgentTypePage]
-  implicit val doc: Document = Jsoup.parse(viewTemplate(AgentTypeForm.form).body)
-  private val heading: String = "Is your agent business based in the UK?"
+  val viewTemplate: BusinessTypeSessionPage = app.injector.instanceOf[BusinessTypeSessionPage]
+  implicit val doc: Document = Jsoup.parse(viewTemplate(BusinessTypeSessionForm.form).body)
+  private val heading: String = "How is your business set up?"
 
-  "BusinessTypePage" should:
+  "BusinessTypeSessionPage" should:
 
     "have the correct title" in:
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
@@ -38,8 +38,10 @@ extends ViewSpec:
       val expectedRadioGroup: TestRadioGroup = TestRadioGroup(
         legend = heading,
         options = List(
-          "Yes" -> "UkTaxAgent",
-          "No, it’s based outside the UK" -> "NonUkTaxAgent"
+          "Sole trader" -> "SoleTrader",
+          "Limited company" -> "LimitedCompany",
+          "A type of partnership" -> "PartnershipType",
+          "Something else" -> "NotSupported"
         ),
         hint = None
       )
@@ -49,13 +51,12 @@ extends ViewSpec:
       doc.select("button[type=submit]").text() shouldBe "Continue"
 
     "render a form error when the form contains an error" in:
-      val field = "agentType"
-      val errorMessage = "Select yes if your agent business is based in the UK"
-      val formWithError = AgentTypeForm.form
+      val field = "businessType"
+      val errorMessage = "Tell us how your business is set up"
+      val formWithError = BusinessTypeSessionForm.form
         .withError(field, errorMessage)
       val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
       errorDoc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
       errorDoc.selectOrFail(".govuk-error-summary__title").selectOnlyOneElementOrFail().text() shouldBe "There is a problem"
-      errorDoc.selectOrFail(".govuk-error-summary__list > li > a").selectOnlyOneElementOrFail().text() shouldBe errorMessage
       errorDoc.selectOrFail(".govuk-error-summary__list > li > a").selectOnlyOneElementOrFail().selectAttrOrFail("href") shouldBe s"#$field"
       errorDoc.selectOrFail(".govuk-error-message").selectOnlyOneElementOrFail().text() shouldBe s"Error: $errorMessage"

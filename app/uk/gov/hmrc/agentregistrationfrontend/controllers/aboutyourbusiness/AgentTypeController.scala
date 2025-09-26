@@ -53,7 +53,7 @@ extends FrontendController(mcc):
         (agentType: AgentType) =>
           if agentType == AgentType.UkTaxAgent
           then
-            Redirect(routes.BusinessTypeController.show.url)
+            Redirect(routes.BusinessTypeSessionController.show.url)
               .addAgentTypeToSession(agentType)
           else Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
       )

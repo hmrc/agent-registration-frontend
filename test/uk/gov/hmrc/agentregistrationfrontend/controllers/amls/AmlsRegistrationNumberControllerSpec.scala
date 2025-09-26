@@ -34,16 +34,16 @@ class AmlsRegistrationNumberControllerSpec
 extends ControllerSpec:
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
-  private val path = "/agent-registration/register/anti-money-laundering/registration-number"
+  private val path = "/agent-registration/apply/anti-money-laundering/registration-number"
 
   "routes should have correct paths and methods" in:
     routes.AmlsRegistrationNumberController.show shouldBe Call(
       method = "GET",
-      url = "/agent-registration/register/anti-money-laundering/registration-number"
+      url = "/agent-registration/apply/anti-money-laundering/registration-number"
     )
     routes.AmlsRegistrationNumberController.submit shouldBe Call(
       method = "POST",
-      url = "/agent-registration/register/anti-money-laundering/registration-number"
+      url = "/agent-registration/apply/anti-money-laundering/registration-number"
     )
     routes.AmlsRegistrationNumberController.submit.url shouldBe routes.AmlsRegistrationNumberController.show.url
 

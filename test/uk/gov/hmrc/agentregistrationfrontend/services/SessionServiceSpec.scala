@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.services
 
-import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.AgentType
+import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import SessionService.*
@@ -33,33 +34,63 @@ extends UnitSpec:
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = TdAll.tdAll.baseRequest
   val result: Result = Ok("").withSession("some-preexisting-key" -> "some-value")
 
-  BusinessType.values.foreach: bt =>
-    s"$bt can be added to the Result and read back from the Request" in:
-      val newResult = result
-        .addBusinessTypeToSession(bt)
+  "BusinessType" should:
+    BusinessTypeSessionValue.values.foreach: bt =>
+      s"$bt can be added to the Result and read back from the Request" in:
+        val newResult = result
+          .addBusinessTypeToSession(bt)
 
-      newResult
-        .asRequest
-        .readBusinessType shouldBe Some(bt)
+        newResult
+          .asRequest
+          .readBusinessType shouldBe Some(bt)
 
-      newResult.newSession.value.get(
-        "agent-registration-frontend.businessType"
-      ).value shouldBe bt.toString withClue "data should be stored under 'agent-registration-frontend.businessType' session key"
+        newResult.newSession.value.get(
+          "agent-registration-frontend.businessType"
+        ).value shouldBe bt.toString withClue "data should be stored under 'agent-registration-frontend.businessType' session key"
 
-      newResult.newSession.value.get(
-        "some-preexisting-key"
-      ).value shouldBe "some-value" withClue "preexisting session data should not be affected"
+        newResult.newSession.value.get(
+          "some-preexisting-key"
+        ).value shouldBe "some-value" withClue "preexisting session data should not be affected"
 
-  "readBusinessType should throw exception if the stored data can't be deserialised to enum value " in:
-    val throwable: RuntimeException = intercept[RuntimeException]:
-      request
-        .withSession("agent-registration-frontend.businessType" -> "garbage")
-        .readBusinessType
+    "readBusinessType should throw exception if the stored data can't be deserialised to enum value " in:
+      val throwable: RuntimeException = intercept[RuntimeException]:
+        request
+          .withSession("agent-registration-frontend.businessType" -> "garbage")
+          .readBusinessType
 
-    throwable.getMessage shouldBe "Invalid BusinessType type in session: 'garbage'"
+      throwable.getMessage shouldBe "Invalid BusinessTypeSessionValue type in session: 'garbage'"
 
-  "readBusinessType should return None when business type is not present in session" in:
-    request.readBusinessType shouldBe None
+    "readBusinessType should return None when business type is not present in session" in:
+      request.readBusinessType shouldBe None
+
+  "AgentType" should:
+    AgentType.values.foreach: bt =>
+      s"$bt can be added to the Result and read back from the Request" in:
+        val newResult = result
+          .addAgentTypeToSession(bt)
+
+        newResult
+          .asRequest
+          .readAgentType shouldBe Some(bt)
+
+        newResult.newSession.value.get(
+          "agent-registration-frontend.agentType"
+        ).value shouldBe bt.toString withClue "data should be stored under 'agent-registration-frontend.agentType' session key"
+
+        newResult.newSession.value.get(
+          "some-preexisting-key"
+        ).value shouldBe "some-value" withClue "preexisting session data should not be affected"
+
+    "readAgentType should throw exception if the stored data can't be deserialised to enum value " in:
+      val throwable: RuntimeException = intercept[RuntimeException]:
+        request
+          .withSession("agent-registration-frontend.agentType" -> "garbage")
+          .readAgentType
+
+      throwable.getMessage shouldBe "Invalid AgentType type in session: 'garbage'"
+
+    "readAgentType should return None when business type is not present in session" in:
+      request.readAgentType shouldBe None
 
   extension (result: Result)
     def asRequest: Request[?] = request.withSession(result.newSession.getOrElse(Session()).data.toSeq*)

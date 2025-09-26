@@ -28,17 +28,17 @@ class AmlsSupervisorControllerSpec
 extends ControllerSpec:
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
-  private val path = "/agent-registration/register/anti-money-laundering/supervisor-name"
+  private val path = "/agent-registration/apply/anti-money-laundering/supervisor-name"
   private val fakeAgentApplication: AgentApplication = applicationFactory.makeNewAgentApplication(tdAll.internalUserId)
 
   "routes should have correct paths and methods" in:
     routes.AmlsSupervisorController.show shouldBe Call(
       method = "GET",
-      url = "/agent-registration/register/anti-money-laundering/supervisor-name"
+      url = "/agent-registration/apply/anti-money-laundering/supervisor-name"
     )
     routes.AmlsSupervisorController.submit shouldBe Call(
       method = "POST",
-      url = "/agent-registration/register/anti-money-laundering/supervisor-name"
+      url = "/agent-registration/apply/anti-money-laundering/supervisor-name"
     )
     routes.AmlsSupervisorController.submit.url shouldBe routes.AmlsSupervisorController.show.url
 
@@ -60,7 +60,7 @@ extends ControllerSpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/register/anti-money-laundering/registration-number"
+    response.header("Location").value shouldBe "/agent-registration/apply/anti-money-laundering/registration-number"
 
   s"POST $path with save for later and valid selection should redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
@@ -74,7 +74,7 @@ extends ControllerSpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/register/save-and-come-back-later"
+    response.header("Location").value shouldBe "/agent-registration/apply/save-and-come-back-later"
 
   s"POST $path without valid selection should return 400" in:
     AuthStubs.stubAuthorise()

@@ -38,7 +38,7 @@ extends ControllerSpec:
       override def configure(): Unit = bind(classOf[AmlsCodes]).asEagerSingleton()
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
-  private val path = "/agent-registration/register/anti-money-laundering/check-your-answers"
+  private val path = "/agent-registration/apply/anti-money-laundering/check-your-answers"
 
   "route should have correct path and method" in:
     routes.CheckYourAnswersController.show shouldBe Call(

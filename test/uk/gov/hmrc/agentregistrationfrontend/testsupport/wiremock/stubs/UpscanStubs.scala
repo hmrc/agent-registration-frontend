@@ -29,8 +29,8 @@ object UpscanStubs {
     s"""
    {
        "callbackUrl": "http://localhost:${WireMockSupport.port}/agent-registration/upscan-callback",
-       "successRedirect": "http://localhost:22201/agent-registration/register/anti-money-laundering/evidence/upload-result",
-       "errorRedirect": "http://localhost:22201/agent-registration/register/anti-money-laundering/evidence/error",
+       "successRedirect": "http://localhost:22201/agent-registration/apply/anti-money-laundering/evidence/upload-result",
+       "errorRedirect": "http://localhost:22201/agent-registration/apply/anti-money-laundering/evidence/error",
        "maximumFileSize": 5242880
    }
    """

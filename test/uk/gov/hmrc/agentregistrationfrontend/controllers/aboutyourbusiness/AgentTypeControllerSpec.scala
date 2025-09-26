@@ -18,13 +18,14 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
 class AgentTypeControllerSpec
 extends ControllerSpec:
 
-  private val path = "/agent-registration/register/about-your-business/agent-type"
+  private val path = "/agent-registration/apply/about-your-business/agent-type"
 
   "routes should have correct paths and methods" in:
     routes.AgentTypeController.show shouldBe Call(
@@ -48,14 +49,14 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/register/about-your-business/business-type"
+    response.header("Location").value shouldBe routes.BusinessTypeSessionController.show.url
 
   s"POST $path with No should redirect to an exit page" in:
     val response: WSResponse = post(path)(Map(AgentTypeForm.key -> Seq("NonUkTaxAgent")))
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/register/exit"
+    response.header("Location").value shouldBe applicationRoutes.AgentApplicationController.genericExitPage.url
 
   s"POST $path without valid selection should return 400" in:
     val response: WSResponse = post(path)(Map(AgentTypeForm.key -> Seq("")))

@@ -76,12 +76,12 @@ extends ViewSpec:
           TestSummaryRow(
             key = "Business type",
             value = "Sole trader",
-            action = "/agent-registration/register/about-your-application/business-type"
+            action = "/agent-registration/apply/about-your-application/business-type"
           ),
           TestSummaryRow(
             key = "Are you the business owner?",
             value = "Yes",
-            action = "/agent-registration/register/about-your-application/user-role"
+            action = "/agent-registration/apply/about-your-application/user-role"
           )
         )
       )

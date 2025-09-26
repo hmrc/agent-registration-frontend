@@ -29,17 +29,17 @@ class BusinessTypeControllerSpec
 extends ControllerSpec:
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
-  private val path = "/agent-registration/register/about-your-application/business-type"
+  private val path = "/agent-registration/apply/about-your-application/business-type"
   private val fakeAgentApplication: AgentApplication = applicationFactory.makeNewAgentApplication(tdAll.internalUserId)
 
   "routes should have correct paths and methods" in:
     routes.BusinessTypeController.show shouldBe Call(
       method = "GET",
-      url = "/agent-registration/register/about-your-application/business-type"
+      url = "/agent-registration/apply/about-your-application/business-type"
     )
     routes.BusinessTypeController.submit shouldBe Call(
       method = "POST",
-      url = "/agent-registration/register/about-your-application/business-type"
+      url = "/agent-registration/apply/about-your-application/business-type"
     )
     routes.BusinessTypeController.submit.url shouldBe routes.BusinessTypeController.show.url
 
@@ -61,7 +61,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/register/about-your-application/user-role"
+    response.header("Location").value shouldBe "/agent-registration/apply/about-your-application/user-role"
 
   s"POST $path without valid selection should return 400" in:
     AuthStubs.stubAuthorise()
