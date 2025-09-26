@@ -43,7 +43,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/apply/about-your-business/agent-type"
+    response.header("Location").value shouldBe routes.AgentTypeController.show.url
 
   s"GET $path with AgentType in session should return 200 and render page" in:
     val stubSession = get(stubAddAgentUrl)
@@ -65,7 +65,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/apply/about-your-business/partnership-type"
+    response.header("Location").value shouldBe routes.PartnershipTypeController.show.url
 
   s"POST $path without valid selection should return 400" in:
     val stubSession = get(stubAddAgentUrl)
