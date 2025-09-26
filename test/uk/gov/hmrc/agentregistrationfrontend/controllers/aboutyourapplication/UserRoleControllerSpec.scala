@@ -61,7 +61,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/apply/about-your-application/check-your-answers"
+    response.header("Location").value shouldBe routes.CheckYourAnswerController.show.url
 
   s"POST $path without valid selection should return 400" in:
     AuthStubs.stubAuthorise()

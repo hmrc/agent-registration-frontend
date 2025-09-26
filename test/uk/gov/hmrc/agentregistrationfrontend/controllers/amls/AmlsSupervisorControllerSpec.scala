@@ -20,6 +20,7 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
+import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -60,7 +61,7 @@ extends ControllerSpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/apply/anti-money-laundering/registration-number"
+    response.header("Location").value shouldBe routes.AmlsRegistrationNumberController.show.url
 
   s"POST $path with save for later and valid selection should redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
@@ -74,7 +75,7 @@ extends ControllerSpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "/agent-registration/apply/save-and-come-back-later"
+    response.header("Location").value shouldBe appRoutes.AgentApplicationController.saveAndComeBackLater.url
 
   s"POST $path without valid selection should return 400" in:
     AuthStubs.stubAuthorise()

@@ -50,10 +50,7 @@ extends FrontendController(mcc):
     implicit request: Request[?] =>
       AgentTypeForm.form.bindFromRequest().fold(
         formWithErrors => BadRequest(view(formWithErrors)),
-        (agentType: AgentType) =>
-          if agentType == AgentType.UkTaxAgent
-          then
-            Redirect(routes.BusinessTypeSessionController.show.url)
-              .addAgentTypeToSession(agentType)
-          else Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
+        _ match
+          case AgentType.UkTaxAgent => Redirect(routes.BusinessTypeSessionController.show.url)
+          case AgentType.NonUkTaxAgent => Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
       )

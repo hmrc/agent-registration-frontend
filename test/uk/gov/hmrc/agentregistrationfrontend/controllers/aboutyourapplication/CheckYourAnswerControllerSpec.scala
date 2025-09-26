@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
+import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
 
 class CheckYourAnswerControllerSpec
 extends ControllerSpec:
@@ -55,7 +56,7 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
 
-  "POST /apply/about-your-application/check-answer with confirm and continue selection should redirect to the next page" in:
+  s"POST $path with confirm and continue selection should redirect to start Grs journey Url" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication
@@ -63,4 +64,4 @@ extends ControllerSpec:
     val response: WSResponse = post(path)(Map.empty)
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe "/agent-registration/apply/start-grs-journey"
+    response.header("Location").value shouldBe appRoutes.GrsController.startGrsJourney.url
