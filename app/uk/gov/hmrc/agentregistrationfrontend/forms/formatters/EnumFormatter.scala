@@ -59,3 +59,25 @@ object EnumFormatter:
         value: E
       ): Map[String, String] = Map(key -> value.toString)
     }
+
+  def formatter[E](
+    allowedValues: Seq[E],
+    errorMessageIfMissing: String,
+    errorMessageIfEnumError: String
+  )(using classTag: ClassTag[E]): Formatter[E] =
+    new Formatter[E] {
+      override def bind(
+        key: String,
+        data: Map[String, String]
+      ): Either[Seq[FormError], E] = data.get(key)
+        .toRight(Seq(FormError(key, errorMessageIfMissing)))
+        .flatMap { str =>
+          allowedValues.find(_.toString === str)
+            .toRight(Seq(FormError(key, errorMessageIfEnumError)))
+        }
+
+      override def unbind(
+        key: String,
+        value: E
+      ): Map[String, String] = Map(key -> value.toString)
+    }

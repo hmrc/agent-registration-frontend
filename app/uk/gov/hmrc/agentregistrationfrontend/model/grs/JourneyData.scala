@@ -21,6 +21,9 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.GeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedCompany
 import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedLiabilityPartnership
+import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedPartnership
+import uk.gov.hmrc.agentregistration.shared.BusinessType.ScottishLimitedPartnership
+import uk.gov.hmrc.agentregistration.shared.BusinessType.ScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.Registration.given
 
@@ -67,7 +70,7 @@ final case class JourneyData(
           nino = nino,
           trn = trn
         )
-      case GeneralPartnership | LimitedLiabilityPartnership =>
+      case GeneralPartnership | LimitedLiabilityPartnership | LimitedPartnership | ScottishLimitedPartnership | ScottishPartnership =>
         PartnershipDetails(
           safeId = registration.registeredBusinessPartnerId.getOrElse(missingDataError("safeId")),
           businessType = businessType,
