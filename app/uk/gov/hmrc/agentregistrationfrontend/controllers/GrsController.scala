@@ -80,7 +80,7 @@ extends FrontendController(mcc):
                     .modify(_.businessDetails)
                     .setTo(Some(grsResponse.toBusinessDetails(businessType)))
                 ).map { _ =>
-                  Redirect(routes.AgentApplicationController.taskList.url)
+                  Redirect(routes.TaskListController.show.url)
                 }
             case grsResponse if !grsResponse.identifiersMatch && grsResponse.registration.registrationStatus.equals(GrsNotCalled) =>
               Future.successful(Ok(placeholder(

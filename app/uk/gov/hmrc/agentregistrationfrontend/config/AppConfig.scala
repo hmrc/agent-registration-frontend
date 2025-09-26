@@ -34,6 +34,7 @@ class AppConfig @Inject() (
   configuration: Configuration
 ):
 
+  val govukStartPageUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.govuk-start-page", configuration)
   val thisFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.this-frontend", configuration)
   val feedbackFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.feedback-frontend", configuration)
   private val basFrontendSignBaseInBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-in", configuration)

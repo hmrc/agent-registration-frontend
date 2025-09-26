@@ -144,7 +144,7 @@
     @govukSummaryList(SummaryList(rows))
     <p class="govuk-body">
       @govukButton(Button(
-          href = Some(applicationRoutes.AgentApplicationController.taskList.url),
+          href = Some(applicationRoutes.TaskListController.show.url),
           content = Text(messages("common.confirmAndContinue"))
       ))
     </p>

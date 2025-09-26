@@ -71,7 +71,7 @@ with I18nSupport:
             Future.successful(
               if getSubmitAction(request).isSaveAndComeBackLater
               then
-                Redirect(applicationRoutes.AgentApplicationController.saveAndComeBackLater.url)
+                Redirect(applicationRoutes.SaveForLaterController.show.url)
               else
                 BadRequest(view(formWithErrors))
             ),
@@ -95,7 +95,7 @@ with I18nSupport:
                 Redirect(
                   if getSubmitAction(request)
                       .isSaveAndComeBackLater
-                  then applicationRoutes.AgentApplicationController.saveAndComeBackLater.url
+                  then applicationRoutes.SaveForLaterController.show.url
                   else routes.AmlsRegistrationNumberController.show.url
                 )
               )

@@ -152,6 +152,17 @@ taskList.hmrcStandards.agreement.linkText = HMRC standard for agents
 taskList.declaration.heading = Finish this stage of the process
 taskList.declaration.linkText = Declaration
 
+# Save for later
+saveForLater.title = Your progress has been saved for 30 days
+saveForLater.h2 = What you need to do next
+saveForLater.p1 = You need to come back and complete this application within 30 days.
+saveForLater.p2 = To come back to this application:
+saveForLater.li1 = Go to the <a class="govuk-link" href="{0}">Apply for an agent services account</a> page.
+saveForLater.li2 = Click on the link under the start button to check the progress of your application.
+saveForLater.li3 = Sign in again using the same credentials you are currently signed in with.
+saveForLater.continueLink = Continue where you left off
+saveForLater.finishLink = Finish and sign out
+
 # Timed out
 timed-out.header = You have been signed out
 timed-out.p1 = You have not done anything for 15 minutes, so we have signed you out to keep your account secure.
