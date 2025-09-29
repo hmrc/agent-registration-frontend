@@ -16,11 +16,16 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness
 
+import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.forms.PartnershipTypeForm
+import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
+import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
+import uk.gov.hmrc.agentregistrationfrontend.views.html.register.aboutyourbusiness.PartnershipTypePage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,13 +33,31 @@ import javax.inject.Singleton
 @Singleton
 class PartnershipTypeController @Inject() (
   mcc: MessagesControllerComponents,
-  view: SimplePage
+  view: PartnershipTypePage
 )
 extends FrontendController(mcc):
 
   def show: Action[AnyContent] = Action:
     implicit request =>
-      Ok(view(
-        h1 = "Placeholder for partnership type",
-        bodyText = Some("This is a placeholder for the Partnership Type page.")
-      ))
+      // ensure that business type has been selected and is partnership type
+      // before allowing partnership type to be selected
+      request.readBusinessType match
+        case Some(BusinessTypeSessionValue.PartnershipType) =>
+          val form: Form[BusinessType] =
+            request.readPartnershipType match
+              case Some(data) => PartnershipTypeForm.form.fill(data)
+              case None => PartnershipTypeForm.form
+          Ok(view(form))
+        case _ => Redirect(routes.BusinessTypeSessionController.show)
+
+  def submit: Action[AnyContent] = Action:
+    implicit request =>
+      request.readBusinessType match
+        case Some(BusinessTypeSessionValue.PartnershipType) =>
+          PartnershipTypeForm.form.bindFromRequest().fold(
+            formWithErrors => BadRequest(view(formWithErrors)),
+            partnershipType =>
+              Redirect(routes.SignInFilterController.show)
+                .addPartnershipTypeToSession(partnershipType)
+          )
+        case _ => Redirect(routes.BusinessTypeSessionController.show)

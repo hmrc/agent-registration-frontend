@@ -34,6 +34,9 @@ object GrsStubs:
   val grsLimitedCompanyJourneyUrl = "/grs/start/limited-company"
   val grsGeneralPartnershipJourneyUrl = "/grs/start/general-partnership"
   val grsLimitedLiabilityPartnershipJourneyUrl = "/grs/start/limited-liability-partnership"
+  val grsLimitedPartnershipJourneyUrl = "/grs/start/limited-partnership"
+  val grsScottishPartnershipJourneyUrl = "/grs/start/scottish-partnership"
+  val grsScottishLimitedPartnershipJourneyUrl = "/grs/start/scottish-limited-partnership"
 
   def stubCreateGrsJourney(businessType: BusinessType): StubMapping = {
     val url =
@@ -42,6 +45,9 @@ object GrsStubs:
         case LimitedCompany => s"/incorporated-entity-identification/api/limited-company-journey"
         case GeneralPartnership => s"/partnership-identification/api/general-partnership-journey"
         case LimitedLiabilityPartnership => s"/partnership-identification/api/limited-liability-partnership-journey"
+        case LimitedPartnership => s"/partnership-identification/api/limited-partnership-journey"
+        case ScottishPartnership => s"/partnership-identification/api/scottish-partnership-journey"
+        case ScottishLimitedPartnership => s"/partnership-identification/api/scottish-limited-partnership-journey"
       }
     StubMaker.make(
       httpMethod = POST,
@@ -54,6 +60,9 @@ object GrsStubs:
             case LimitedCompany => grsLimitedCompanyJourneyUrl
             case GeneralPartnership => grsGeneralPartnershipJourneyUrl
             case LimitedLiabilityPartnership => grsLimitedLiabilityPartnershipJourneyUrl
+            case LimitedPartnership => grsLimitedPartnershipJourneyUrl
+            case ScottishPartnership => grsScottishPartnershipJourneyUrl
+            case ScottishLimitedPartnership => grsScottishLimitedPartnershipJourneyUrl
           })
         ).toString
     )
@@ -68,7 +77,8 @@ object GrsStubs:
       businessType match {
         case SoleTrader => s"/sole-trader-identification/api/journey/$journeyId"
         case LimitedCompany => s"/incorporated-entity-identification/api/journey/$journeyId"
-        case GeneralPartnership | LimitedLiabilityPartnership => s"/partnership-identification/api/journey/$journeyId"
+        case GeneralPartnership | LimitedLiabilityPartnership | LimitedPartnership | ScottishLimitedPartnership | ScottishPartnership =>
+          s"/partnership-identification/api/journey/$journeyId"
       }
     StubMaker.make(
       httpMethod = GET,

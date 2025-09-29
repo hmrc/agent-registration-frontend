@@ -16,6 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers
 
+/*
+ * whilst we are going to be implementing these journeys
+ * they won't be using application models like these
+
 import com.softwaremill.quicklens.*
 import play.api.http.Status.INTERNAL_SERVER_ERROR
 import play.api.http.Status.OK
@@ -38,351 +42,358 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStub
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.GrsStubs.*
 
 import java.util.UUID
-
+ */
 class GrsControllerSpec
+/*
 extends ControllerSpec:
 
-  val grsStartUrl = "/agent-registration/apply/start-grs-journey"
-  val grsCallbackUrl = "/agent-registration/apply/grs-callback"
 
-  val applicationFactory: ApplicationFactory = app.injector.instanceOf[ApplicationFactory]
-  val testJourneyId: String = UUID.randomUUID().toString
-  val fakeAgentApplication: AgentApplication = applicationFactory.makeNewAgentApplication(tdAll.internalUserId)
-  val soleTraderOwnerApplication: AgentApplication = fakeAgentApplication
-    .modify(_.aboutYourApplication)
-    .setTo(AboutYourApplication(
-      Some(SoleTrader),
-      Some(Owner),
-      true
-    ))
-  val soleTraderTransactorApplication: AgentApplication = fakeAgentApplication
-    .modify(_.aboutYourApplication)
-    .setTo(AboutYourApplication(
-      Some(SoleTrader),
-      Some(Authorised),
-      true
-    ))
-  val limitedCompanyApplication: AgentApplication = fakeAgentApplication
-    .modify(_.aboutYourApplication)
-    .setTo(AboutYourApplication(
-      Some(LimitedCompany),
-      Some(Owner),
-      true
-    ))
-  val generalPartnershipApplication: AgentApplication = fakeAgentApplication
-    .modify(_.aboutYourApplication)
-    .setTo(AboutYourApplication(
-      Some(GeneralPartnership),
-      Some(Owner),
-      true
-    ))
-  val limitedLiabilityPartnershipApplication: AgentApplication = fakeAgentApplication
-    .modify(_.aboutYourApplication)
-    .setTo(AboutYourApplication(
-      Some(LimitedLiabilityPartnership),
-      Some(Owner),
-      true
-    ))
+val grsStartUrl = "/agent-registration/apply/start-grs-journey"
+val grsCallbackUrl = "/agent-registration/apply/grs-callback"
 
-  val soleTraderGrsResponse = JourneyData(
-    fullName = Some(tdAll.fullName),
-    dateOfBirth = Some(tdAll.dateOfBirth),
-    nino = Some(tdAll.nino),
-    trn = None,
-    sautr = Some(tdAll.utr),
-    companyProfile = None,
-    ctutr = None,
-    postcode = None,
-    identifiersMatch = true,
-    registration = Registration(
-      registrationStatus = GrsRegistered,
-      registeredBusinessPartnerId = Some(tdAll.safeId)
-    )
-  )
-  val limitedCompanyGrsResponse = JourneyData(
-    fullName = None,
-    dateOfBirth = None,
-    nino = None,
-    trn = None,
-    sautr = None,
-    companyProfile = Some(tdAll.companyProfile),
-    ctutr = Some(tdAll.utr),
-    postcode = None,
-    identifiersMatch = true,
-    registration = Registration(GrsRegistered, Some(tdAll.safeId))
-  )
-  val generalPartnershipGrsResponse = JourneyData(
-    fullName = None,
-    dateOfBirth = None,
-    nino = None,
-    trn = None,
-    sautr = Some(tdAll.utr),
-    companyProfile = None,
-    ctutr = None,
-    postcode = Some(tdAll.postcode),
-    identifiersMatch = true,
-    registration = Registration(GrsRegistered, Some(tdAll.safeId))
-  )
-  val limitedLiabiliyPartnershipGrsResponse = JourneyData(
-    fullName = None,
-    dateOfBirth = None,
-    nino = None,
-    trn = None,
-    sautr = Some(tdAll.utr),
-    companyProfile = Some(tdAll.companyProfile),
-    ctutr = None,
-    postcode = Some(tdAll.postcode),
-    identifiersMatch = true,
-    registration = Registration(GrsRegistered, Some(tdAll.safeId))
-  )
-  val unmatchedGrsResponse = JourneyData(
-    fullName = Some(tdAll.fullName),
-    dateOfBirth = Some(tdAll.dateOfBirth),
-    nino = Some(tdAll.nino),
-    trn = None,
-    sautr = Some(tdAll.utr),
-    companyProfile = None,
-    ctutr = None,
-    postcode = None,
-    identifiersMatch = false,
-    registration = Registration(GrsNotCalled, None)
-  )
-  val failedGrsResponse = JourneyData(
-    fullName = Some(tdAll.fullName),
-    dateOfBirth = Some(tdAll.dateOfBirth),
-    nino = Some(tdAll.nino),
-    trn = None,
-    sautr = Some(tdAll.utr),
-    companyProfile = None,
-    ctutr = None,
-    postcode = None,
-    identifiersMatch = true,
-    registration = Registration(GrsFailed, None)
-  )
-  val unexpectedGrsResponse = JourneyData(
-    fullName = Some(tdAll.fullName),
-    dateOfBirth = Some(tdAll.dateOfBirth),
-    nino = Some(tdAll.nino),
-    trn = None,
-    sautr = Some(tdAll.utr),
-    companyProfile = None,
-    ctutr = None,
-    postcode = None,
-    identifiersMatch = false,
-    registration = Registration(GrsRegistered, Some(tdAll.safeId))
-  )
-  s"GET $grsStartUrl" should:
-    "redirect to grs start for a sole trader owner" in:
-      stubAuthorise()
-      stubApplicationInProgress(soleTraderOwnerApplication)
-      stubCreateGrsJourney(SoleTrader)
+val applicationFactory: ApplicationFactory = app.injector.instanceOf[ApplicationFactory]
+val testJourneyId: String = UUID.randomUUID().toString
+val fakeAgentApplication: AgentApplication = applicationFactory.makeNewAgentApplication(tdAll.internalUserId)
+val soleTraderOwnerApplication: AgentApplication = fakeAgentApplication
+ .modify(_.aboutYourApplication)
+ .setTo(AboutYourApplication(
+   Some(SoleTrader),
+   Some(Owner),
+   true
+ ))
+val soleTraderTransactorApplication: AgentApplication = fakeAgentApplication
+ .modify(_.aboutYourApplication)
+ .setTo(AboutYourApplication(
+   Some(SoleTrader),
+   Some(Authorised),
+   true
+ ))
+val limitedCompanyApplication: AgentApplication = fakeAgentApplication
+ .modify(_.aboutYourApplication)
+ .setTo(AboutYourApplication(
+   Some(LimitedCompany),
+   Some(Owner),
+   true
+ ))
+val generalPartnershipApplication: AgentApplication = fakeAgentApplication
+ .modify(_.aboutYourApplication)
+ .setTo(AboutYourApplication(
+   Some(GeneralPartnership),
+   Some(Owner),
+   true
+ ))
+val limitedLiabilityPartnershipApplication: AgentApplication = fakeAgentApplication
+ .modify(_.aboutYourApplication)
+ .setTo(AboutYourApplication(
+   Some(LimitedLiabilityPartnership),
+   Some(Owner),
+   true
+ ))
 
-      val response = get(grsStartUrl)
+val soleTraderGrsResponse = JourneyData(
+ fullName = Some(tdAll.fullName),
+ dateOfBirth = Some(tdAll.dateOfBirth),
+ nino = Some(tdAll.nino),
+ trn = None,
+ sautr = Some(tdAll.utr),
+ companyProfile = None,
+ ctutr = None,
+ postcode = None,
+ identifiersMatch = true,
+ registration = Registration(
+   registrationStatus = GrsRegistered,
+   registeredBusinessPartnerId = Some(tdAll.safeId)
+ )
+)
+val limitedCompanyGrsResponse = JourneyData(
+ fullName = None,
+ dateOfBirth = None,
+ nino = None,
+ trn = None,
+ sautr = None,
+ companyProfile = Some(tdAll.companyProfile),
+ ctutr = Some(tdAll.utr),
+ postcode = None,
+ identifiersMatch = true,
+ registration = Registration(GrsRegistered, Some(tdAll.safeId))
+)
+val generalPartnershipGrsResponse = JourneyData(
+ fullName = None,
+ dateOfBirth = None,
+ nino = None,
+ trn = None,
+ sautr = Some(tdAll.utr),
+ companyProfile = None,
+ ctutr = None,
+ postcode = Some(tdAll.postcode),
+ identifiersMatch = true,
+ registration = Registration(GrsRegistered, Some(tdAll.safeId))
+)
+val limitedLiabiliyPartnershipGrsResponse = JourneyData(
+ fullName = None,
+ dateOfBirth = None,
+ nino = None,
+ trn = None,
+ sautr = Some(tdAll.utr),
+ companyProfile = Some(tdAll.companyProfile),
+ ctutr = None,
+ postcode = Some(tdAll.postcode),
+ identifiersMatch = true,
+ registration = Registration(GrsRegistered, Some(tdAll.safeId))
+)
+val unmatchedGrsResponse = JourneyData(
+ fullName = Some(tdAll.fullName),
+ dateOfBirth = Some(tdAll.dateOfBirth),
+ nino = Some(tdAll.nino),
+ trn = None,
+ sautr = Some(tdAll.utr),
+ companyProfile = None,
+ ctutr = None,
+ postcode = None,
+ identifiersMatch = false,
+ registration = Registration(GrsNotCalled, None)
+)
+val failedGrsResponse = JourneyData(
+ fullName = Some(tdAll.fullName),
+ dateOfBirth = Some(tdAll.dateOfBirth),
+ nino = Some(tdAll.nino),
+ trn = None,
+ sautr = Some(tdAll.utr),
+ companyProfile = None,
+ ctutr = None,
+ postcode = None,
+ identifiersMatch = true,
+ registration = Registration(GrsFailed, None)
+)
+val unexpectedGrsResponse = JourneyData(
+ fullName = Some(tdAll.fullName),
+ dateOfBirth = Some(tdAll.dateOfBirth),
+ nino = Some(tdAll.nino),
+ trn = None,
+ sautr = Some(tdAll.utr),
+ companyProfile = None,
+ ctutr = None,
+ postcode = None,
+ identifiersMatch = false,
+ registration = Registration(GrsRegistered, Some(tdAll.safeId))
+)
 
-      response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe grsSoleTraderJourneyUrl
+s"GET $grsStartUrl" should:
 
-    "redirect to grs start for a sole trader transactor" in:
-      stubAuthorise()
-      stubApplicationInProgress(soleTraderTransactorApplication)
-      stubCreateGrsJourney(SoleTrader)
+ "redirect to grs start for a sole trader owner" in:
+   stubAuthorise()
+   stubApplicationInProgress(soleTraderOwnerApplication)
+   stubCreateGrsJourney(SoleTrader)
 
-      val response = get(grsStartUrl)
+   val response = get(grsStartUrl)
 
-      response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe grsSoleTraderJourneyUrl
+   response.status shouldBe SEE_OTHER
+   response.header("Location").value shouldBe grsSoleTraderJourneyUrl
 
-    "redirect to grs start for a limited company" in:
-      stubAuthorise()
-      stubApplicationInProgress(limitedCompanyApplication)
-      stubCreateGrsJourney(LimitedCompany)
+ "redirect to grs start for a sole trader transactor" in:
+   stubAuthorise()
+   stubApplicationInProgress(soleTraderTransactorApplication)
+   stubCreateGrsJourney(SoleTrader)
 
-      val response = get(grsStartUrl)
+   val response = get(grsStartUrl)
 
-      response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe grsLimitedCompanyJourneyUrl
+   response.status shouldBe SEE_OTHER
+   response.header("Location").value shouldBe grsSoleTraderJourneyUrl
 
-    "redirect to grs start for a general partnership" in:
-      stubAuthorise()
-      stubApplicationInProgress(generalPartnershipApplication)
-      stubCreateGrsJourney(GeneralPartnership)
+ "redirect to grs start for a limited company" in:
+   stubAuthorise()
+   stubApplicationInProgress(limitedCompanyApplication)
+   stubCreateGrsJourney(LimitedCompany)
 
-      val response = get(grsStartUrl)
+   val response = get(grsStartUrl)
 
-      response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe grsGeneralPartnershipJourneyUrl
+   response.status shouldBe SEE_OTHER
+   response.header("Location").value shouldBe grsLimitedCompanyJourneyUrl
 
-    "redirect to grs start for a limited liability partnership" in:
-      stubAuthorise()
-      stubApplicationInProgress(limitedLiabilityPartnershipApplication)
-      stubCreateGrsJourney(LimitedLiabilityPartnership)
+ "redirect to grs start for a general partnership" in:
+   stubAuthorise()
+   stubApplicationInProgress(generalPartnershipApplication)
+   stubCreateGrsJourney(GeneralPartnership)
 
-      val response = get(grsStartUrl)
+   val response = get(grsStartUrl)
 
-      response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe grsLimitedLiabilityPartnershipJourneyUrl
+   response.status shouldBe SEE_OTHER
+   response.header("Location").value shouldBe grsGeneralPartnershipJourneyUrl
 
-    "redirect to journey start if user is missing data" in:
-      stubAuthorise()
-      stubApplicationInProgress(fakeAgentApplication)
+ "redirect to grs start for a limited liability partnership" in:
+   stubAuthorise()
+   stubApplicationInProgress(limitedLiabilityPartnershipApplication)
+   stubCreateGrsJourney(LimitedLiabilityPartnership)
 
-      val response = get(grsStartUrl)
+   val response = get(grsStartUrl)
 
-      response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe "/agent-registration/apply"
+   response.status shouldBe SEE_OTHER
+   response.header("Location").value shouldBe grsLimitedLiabilityPartnershipJourneyUrl
 
-  s"GET $grsCallbackUrl" should:
-    "store valid data and redirect to next page for a sole trader" in:
-      stubAuthorise()
-      stubApplicationInProgress(soleTraderOwnerApplication)
-      stubGetGrsResponse(
-        SoleTrader,
-        testJourneyId,
-        Json.toJson(soleTraderGrsResponse)
-      )
-      stubUpdateAgentApplication(
-        soleTraderOwnerApplication
-          .modify(_.utr)
-          .setTo(Some(tdAll.utr))
-          .modify(_.businessDetails)
-          .setTo(Some(SoleTraderDetails(
-            safeId = tdAll.safeId,
-            businessType = SoleTrader,
-            fullName = tdAll.fullName,
-            dateOfBirth = tdAll.dateOfBirth,
-            nino = Some(tdAll.nino),
-            trn = None
-          )))
-      )
+ "redirect to journey start if user is missing data" in:
+   stubAuthorise()
+   stubApplicationInProgress(fakeAgentApplication)
 
-      val response = get(s"$grsCallbackUrl/${SoleTrader.toStringHyphenated}?journeyId=$testJourneyId")
+   val response = get(grsStartUrl)
 
-      response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe routes.TaskListController.show.url
+   response.status shouldBe SEE_OTHER
+   response.header("Location").value shouldBe "/agent-registration/apply"
 
-    "store valid data and redirect to next page for a limited company" in:
-      stubAuthorise()
-      stubApplicationInProgress(limitedCompanyApplication)
-      stubGetGrsResponse(
-        LimitedCompany,
-        testJourneyId,
-        Json.toJson(limitedCompanyGrsResponse)
-      )
-      stubUpdateAgentApplication(
-        limitedCompanyApplication
-          .modify(_.utr)
-          .setTo(Some(tdAll.utr))
-          .modify(_.businessDetails)
-          .setTo(Some(LimitedCompanyDetails(
-            safeId = tdAll.safeId,
-            businessType = LimitedCompany,
-            companyProfile = tdAll.companyProfile
-          )))
-      )
+s"GET $grsCallbackUrl" should:
+ "store valid data and redirect to next page for a sole trader" in:
+   stubAuthorise()
+   stubApplicationInProgress(soleTraderOwnerApplication)
+   stubGetGrsResponse(
+     SoleTrader,
+     testJourneyId,
+     Json.toJson(soleTraderGrsResponse)
+   )
+   stubUpdateAgentApplication(
+     soleTraderOwnerApplication
+       .modify(_.utr)
+       .setTo(Some(tdAll.utr))
+       .modify(_.businessDetails)
+       .setTo(Some(SoleTraderDetails(
+         safeId = tdAll.safeId,
+         businessType = SoleTrader,
+         fullName = tdAll.fullName,
+         dateOfBirth = tdAll.dateOfBirth,
+         nino = Some(tdAll.nino),
+         trn = None
+       )))
+   )
 
-      val response = get(s"$grsCallbackUrl/${LimitedCompany.toStringHyphenated}?journeyId=$testJourneyId")
+   val response = get(s"$grsCallbackUrl/${SoleTrader.toStringHyphenated}?journeyId=$testJourneyId")
 
-      response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe routes.TaskListController.show.url
+   response.status shouldBe SEE_OTHER
+   response.header("Location").value shouldBe routes.TaskListController.show.url
 
-    "store valid data and redirect to next page for a general partnership" in:
-      stubAuthorise()
-      stubApplicationInProgress(generalPartnershipApplication)
-      stubGetGrsResponse(
-        GeneralPartnership,
-        testJourneyId,
-        Json.toJson(generalPartnershipGrsResponse)
-      )
-      stubUpdateAgentApplication(
-        generalPartnershipApplication
-          .modify(_.utr)
-          .setTo(Some(tdAll.utr))
-          .modify(_.businessDetails)
-          .setTo(Some(PartnershipDetails(
-            safeId = tdAll.safeId,
-            businessType = GeneralPartnership,
-            companyProfile = None,
-            postcode = tdAll.postcode
-          )))
-      )
+ "store valid data and redirect to next page for a limited company" in:
+   stubAuthorise()
+   stubApplicationInProgress(limitedCompanyApplication)
+   stubGetGrsResponse(
+     LimitedCompany,
+     testJourneyId,
+     Json.toJson(limitedCompanyGrsResponse)
+   )
+   stubUpdateAgentApplication(
+     limitedCompanyApplication
+       .modify(_.utr)
+       .setTo(Some(tdAll.utr))
+       .modify(_.businessDetails)
+       .setTo(Some(LimitedCompanyDetails(
+         safeId = tdAll.safeId,
+         businessType = LimitedCompany,
+         companyProfile = tdAll.companyProfile
+       )))
+   )
 
-      val response = get(s"$grsCallbackUrl/${GeneralPartnership.toStringHyphenated}?journeyId=$testJourneyId")
+   val response = get(s"$grsCallbackUrl/${LimitedCompany.toStringHyphenated}?journeyId=$testJourneyId")
 
-      response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe routes.TaskListController.show.url
+   response.status shouldBe SEE_OTHER
+   response.header("Location").value shouldBe routes.TaskListController.show.url
 
-    "store valid data and redirect to next page for a limited liability partnership" in:
-      stubAuthorise()
-      stubApplicationInProgress(limitedLiabilityPartnershipApplication)
-      stubGetGrsResponse(
-        LimitedLiabilityPartnership,
-        testJourneyId,
-        Json.toJson(limitedLiabiliyPartnershipGrsResponse)
-      )
-      stubUpdateAgentApplication(
-        limitedLiabilityPartnershipApplication
-          .modify(_.utr)
-          .setTo(Some(tdAll.utr))
-          .modify(_.businessDetails)
-          .setTo(Some(PartnershipDetails(
-            safeId = tdAll.safeId,
-            businessType = LimitedLiabilityPartnership,
-            companyProfile = Some(tdAll.companyProfile),
-            postcode = tdAll.postcode
-          )))
-      )
+ "store valid data and redirect to next page for a general partnership" in:
+   stubAuthorise()
+   stubApplicationInProgress(generalPartnershipApplication)
+   stubGetGrsResponse(
+     GeneralPartnership,
+     testJourneyId,
+     Json.toJson(generalPartnershipGrsResponse)
+   )
+   stubUpdateAgentApplication(
+     generalPartnershipApplication
+       .modify(_.utr)
+       .setTo(Some(tdAll.utr))
+       .modify(_.businessDetails)
+       .setTo(Some(PartnershipDetails(
+         safeId = tdAll.safeId,
+         businessType = GeneralPartnership,
+         companyProfile = None,
+         postcode = tdAll.postcode
+       )))
+   )
 
-      val response = get(s"$grsCallbackUrl/${LimitedLiabilityPartnership.toStringHyphenated}?journeyId=$testJourneyId")
+   val response = get(s"$grsCallbackUrl/${GeneralPartnership.toStringHyphenated}?journeyId=$testJourneyId")
 
-      response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe routes.TaskListController.show.url
+   response.status shouldBe SEE_OTHER
+   response.header("Location").value shouldBe routes.TaskListController.show.url
 
-    "redirect to journey start if callback url does not match application data" in:
-      stubAuthorise()
-      stubApplicationInProgress(soleTraderOwnerApplication)
+ "store valid data and redirect to next page for a limited liability partnership" in:
+   stubAuthorise()
+   stubApplicationInProgress(limitedLiabilityPartnershipApplication)
+   stubGetGrsResponse(
+     LimitedLiabilityPartnership,
+     testJourneyId,
+     Json.toJson(limitedLiabiliyPartnershipGrsResponse)
+   )
+   stubUpdateAgentApplication(
+     limitedLiabilityPartnershipApplication
+       .modify(_.utr)
+       .setTo(Some(tdAll.utr))
+       .modify(_.businessDetails)
+       .setTo(Some(PartnershipDetails(
+         safeId = tdAll.safeId,
+         businessType = LimitedLiabilityPartnership,
+         companyProfile = Some(tdAll.companyProfile),
+         postcode = tdAll.postcode
+       )))
+   )
 
-      val response = get(s"$grsCallbackUrl/${LimitedCompany.toStringHyphenated}?journeyId=$testJourneyId")
+   val response = get(s"$grsCallbackUrl/${LimitedLiabilityPartnership.toStringHyphenated}?journeyId=$testJourneyId")
 
-      response.status shouldBe SEE_OTHER
-      response.header("Location").value shouldBe "/agent-registration/apply"
+   response.status shouldBe SEE_OTHER
+   response.header("Location").value shouldBe routes.TaskListController.show.url
 
-    "redirect to failed to match identifiers if grs data has identifiersMatch = false" in:
-      stubAuthorise()
-      stubApplicationInProgress(soleTraderOwnerApplication)
-      stubGetGrsResponse(
-        SoleTrader,
-        testJourneyId,
-        Json.toJson(unmatchedGrsResponse)
-      )
+ "redirect to journey start if callback url does not match application data" in:
+   stubAuthorise()
+   stubApplicationInProgress(soleTraderOwnerApplication)
 
-      val response = get(s"$grsCallbackUrl/${SoleTrader.toStringHyphenated}?journeyId=$testJourneyId")
+   val response = get(s"$grsCallbackUrl/${LimitedCompany.toStringHyphenated}?journeyId=$testJourneyId")
 
-      response.status shouldBe OK // SEE_OTHER
-    // response.header("Location").value shouldBe "identifiers not matched"
+   response.status shouldBe SEE_OTHER
+   response.header("Location").value shouldBe "/agent-registration/apply"
 
-    "redirect to failed to registration failed if grs data has registrationStatus = REGISTRATION_FAILED" in:
-      stubAuthorise()
-      stubApplicationInProgress(soleTraderOwnerApplication)
-      stubGetGrsResponse(
-        businessType = SoleTrader,
-        journeyId = testJourneyId,
-        responseBody = Json.toJson(failedGrsResponse)
-      )
+ "redirect to failed to match identifiers if grs data has identifiersMatch = false" in:
+   stubAuthorise()
+   stubApplicationInProgress(soleTraderOwnerApplication)
+   stubGetGrsResponse(
+     SoleTrader,
+     testJourneyId,
+     Json.toJson(unmatchedGrsResponse)
+   )
 
-      val response = get(s"$grsCallbackUrl/${SoleTrader.toStringHyphenated}?journeyId=$testJourneyId")
+   val response = get(s"$grsCallbackUrl/${SoleTrader.toStringHyphenated}?journeyId=$testJourneyId")
 
-      response.status shouldBe OK // SEE_OTHER
-    // response.header("Location").value shouldBe "business regisration failed"
+   response.status shouldBe OK // SEE_OTHER
+ // response.header("Location").value shouldBe "identifiers not matched"
 
-    "throw runtime error if grs returns an unexpected combination of data" in:
-      stubAuthorise()
-      stubApplicationInProgress(soleTraderOwnerApplication)
-      stubGetGrsResponse(
-        businessType = SoleTrader,
-        journeyId = testJourneyId,
-        responseBody = Json.toJson(unexpectedGrsResponse)
-      )
+ "redirect to failed to registration failed if grs data has registrationStatus = REGISTRATION_FAILED" in:
+   stubAuthorise()
+   stubApplicationInProgress(soleTraderOwnerApplication)
+   stubGetGrsResponse(
+     businessType = SoleTrader,
+     journeyId = testJourneyId,
+     responseBody = Json.toJson(failedGrsResponse)
+   )
 
-      val response = get(s"$grsCallbackUrl/${SoleTrader.toStringHyphenated}?journeyId=$testJourneyId")
+   val response = get(s"$grsCallbackUrl/${SoleTrader.toStringHyphenated}?journeyId=$testJourneyId")
 
-      response.status shouldBe INTERNAL_SERVER_ERROR
+   response.status shouldBe OK // SEE_OTHER
+ // response.header("Location").value shouldBe "business regisration failed"
+
+ "throw runtime error if grs returns an unexpected combination of data" in:
+   stubAuthorise()
+   stubApplicationInProgress(soleTraderOwnerApplication)
+   stubGetGrsResponse(
+     businessType = SoleTrader,
+     journeyId = testJourneyId,
+     responseBody = Json.toJson(unexpectedGrsResponse)
+   )
+
+   val response = get(s"$grsCallbackUrl/${SoleTrader.toStringHyphenated}?journeyId=$testJourneyId")
+
+   response.status shouldBe INTERNAL_SERVER_ERROR
+
+
+ */

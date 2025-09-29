@@ -19,19 +19,22 @@ package uk.gov.hmrc.agentregistrationfrontend.services
 import play.api.mvc.Request
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.AgentType
+import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
 
 object SessionService:
 
   private val microserviceName = "agent-registration-frontend"
-  private val businessTypeKey: String = s"$microserviceName.businessType"
   private val agentTypeKey: String = s"$microserviceName.agentType"
+  private val businessTypeKey: String = s"$microserviceName.businessType"
+  private val partnershipTypeKey: String = s"$microserviceName.partnershipType"
 
   extension (r: Result)
 
     def addAgentTypeToSession(at: AgentType)(implicit request: Request[?]): Result = r.addingToSession(agentTypeKey -> at.toString)
     def addBusinessTypeToSession(bt: BusinessTypeSessionValue)(implicit request: Request[?]): Result = r.addingToSession(businessTypeKey -> bt.toString)
+    def addPartnershipTypeToSession(pt: BusinessType)(implicit request: Request[?]): Result = r.addingToSession(partnershipTypeKey -> pt.toString)
 
   extension (r: Request[?])
 
@@ -46,3 +49,8 @@ object SessionService:
         .values
         .find(_.toString === value)
         .getOrElse(throw new RuntimeException(s"Invalid BusinessTypeSessionValue type in session: '$value'"))
+
+    def readPartnershipType: Option[BusinessType] = r.session.get(partnershipTypeKey).map: value =>
+      BusinessType.partnershipTypes
+        .find(_.toString === value)
+        .getOrElse(throw new RuntimeException(s"Invalid Partnership type in session: '$value'"))

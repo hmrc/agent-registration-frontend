@@ -27,30 +27,30 @@ object EnumFormatter:
   def formatter[E <: reflect.Enum](
     errorMessageIfMissing: String = "error.required",
     errorMessageIfEnumError: String = "invalid input"
+  )(using classTag: ClassTag[E]): Formatter[E] = formatter[E](
+    _ => true,
+    errorMessageIfMissing,
+    errorMessageIfEnumError
+  )
+
+  def formatter[E](
+    isAllowed: E => Boolean,
+    errorMessageIfMissing: String,
+    errorMessageIfEnumError: String
   )(using classTag: ClassTag[E]): Formatter[E] =
     val enumClass = classTag.runtimeClass
-    // Call the values() method on the companion object to get all enum values
     val valuesMethod = enumClass.getDeclaredMethod("values")
-    @SuppressWarnings(Array(
-      "org.wartremover.warts.AsInstanceOf",
-      "org.wartremover.warts.Null"
-    ))
-    val enumValues: Array[E] = valuesMethod.invoke(null).asInstanceOf[Array[E]]
+    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Null"))
+    val enumValues: Array[E] = valuesMethod.invoke(null).asInstanceOf[Array[E]].filter(isAllowed)
 
     new Formatter[E] {
       override def bind(
         key: String,
         data: Map[String, String]
-      ): Either[Seq[FormError], E] = data
-        .get(key)
-        .toRight(Seq(FormError(
-          key,
-          errorMessageIfMissing,
-          Nil
-        )))
-        .flatMap { (str: String) =>
-          enumValues
-            .find(_.toString === str)
+      ): Either[Seq[FormError], E] = data.get(key)
+        .toRight(Seq(FormError(key, errorMessageIfMissing)))
+        .flatMap { str =>
+          enumValues.find(e => e.toString === str)
             .toRight(Seq(FormError(key, errorMessageIfEnumError)))
         }
 
