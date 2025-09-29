@@ -19,17 +19,20 @@ package uk.gov.hmrc.agentregistrationfrontend.model
 import play.api.libs.json.Format
 import play.api.mvc.PathBindable
 import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.util.EnumBinder
-import uk.gov.hmrc.agentregistration.shared.util.EnumFormat
+import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
+import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 
 enum BusinessTypeSessionValue:
 
   case SoleTrader
   extends BusinessTypeSessionValue
+
   case LimitedCompany
   extends BusinessTypeSessionValue
+
   case PartnershipType
   extends BusinessTypeSessionValue
+
   case NotSupported
   extends BusinessTypeSessionValue
 
@@ -42,5 +45,5 @@ enum BusinessTypeSessionValue:
 
 object BusinessTypeSessionValue:
 
-  given Format[BusinessTypeSessionValue] = EnumFormat.enumFormat[BusinessTypeSessionValue]
-  given PathBindable[BusinessTypeSessionValue] = EnumBinder.pathBindable[BusinessTypeSessionValue]
+  given Format[BusinessTypeSessionValue] = JsonFormatsFactory.makeEnumFormat[BusinessTypeSessionValue]
+  given PathBindable[BusinessTypeSessionValue] = PathBindableFactory.pathBindable[BusinessTypeSessionValue]

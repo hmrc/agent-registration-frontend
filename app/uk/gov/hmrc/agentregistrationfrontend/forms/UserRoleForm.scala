@@ -21,7 +21,7 @@ import play.api.data.FieldMapping
 import play.api.data.Form
 import play.api.data.Forms
 import uk.gov.hmrc.agentregistration.shared.UserRole
-import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.EnumFormatter
+import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
 object UserRoleForm:
@@ -29,7 +29,7 @@ object UserRoleForm:
   val key: String = "userRole"
 
   val form: Form[UserRole] =
-    val fieldMapping: FieldMapping[UserRole] = Forms.of(EnumFormatter.formatter[UserRole](
+    val fieldMapping: FieldMapping[UserRole] = Forms.of(FormatterFactory.makeEnumFormatter[UserRole](
       errorMessageIfMissing = ErrorKeys.requiredFieldErrorMessage(key),
       errorMessageIfEnumError = ErrorKeys.invalidInputErrorMessage(key)
     ))

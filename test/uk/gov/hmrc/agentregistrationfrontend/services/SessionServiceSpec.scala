@@ -36,7 +36,7 @@ extends UnitSpec:
   val result: Result = Ok("").withSession("some-preexisting-key" -> "some-value")
 
   "PartnershipType" should:
-    BusinessType.partnershipTypes.foreach: pt =>
+    BusinessType.Partnership.values.foreach: pt =>
       s"$pt can be added to the Result and read back from the Request" in:
         val newResult = result
           .addPartnershipTypeToSession(pt)

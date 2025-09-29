@@ -43,7 +43,7 @@ extends FrontendController(mcc):
       // before allowing partnership type to be selected
       request.readBusinessType match
         case Some(BusinessTypeSessionValue.PartnershipType) =>
-          val form: Form[BusinessType] =
+          val form: Form[BusinessType.Partnership] =
             request.readPartnershipType match
               case Some(data) => PartnershipTypeForm.form.fill(data)
               case None => PartnershipTypeForm.form

@@ -21,15 +21,14 @@ import play.api.data.Form
 import play.api.data.Forms
 import play.api.data.Forms.mapping
 import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.EnumFormatter
+import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
 object PartnershipTypeForm:
 
   val key: String = "partnershipType"
-  val form: Form[BusinessType] =
-    val fieldMapping: FieldMapping[BusinessType] = Forms.of(EnumFormatter.formatter[BusinessType](
-      _.isInstanceOf[BusinessType.Partnership],
+  val form: Form[BusinessType.Partnership] =
+    val fieldMapping: FieldMapping[BusinessType.Partnership] = Forms.of(FormatterFactory.makeSealedObjectsFormatter[BusinessType.Partnership](
       errorMessageIfMissing = ErrorKeys.requiredFieldErrorMessage(key),
       errorMessageIfEnumError = ErrorKeys.invalidInputErrorMessage(key)
     ))

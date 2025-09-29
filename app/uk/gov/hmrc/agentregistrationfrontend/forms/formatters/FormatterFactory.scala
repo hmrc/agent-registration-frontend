@@ -19,30 +19,36 @@ package uk.gov.hmrc.agentregistrationfrontend.forms.formatters
 import play.api.data.FormError
 import play.api.data.format.Formatter
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistration.shared.util.EnumValues
+import uk.gov.hmrc.agentregistration.shared.util.SealedObjects
 
 import scala.reflect.ClassTag
 
-object EnumFormatter:
+object FormatterFactory:
 
-  def formatter[E <: reflect.Enum](
+  inline def makeEnumFormatter[E <: reflect.Enum](
     errorMessageIfMissing: String = "error.required",
     errorMessageIfEnumError: String = "invalid input"
-  )(using classTag: ClassTag[E]): Formatter[E] = formatter[E](
-    _ => true,
+  )(using classTag: ClassTag[E]): Formatter[E] = makeFormatter[E](
     errorMessageIfMissing,
-    errorMessageIfEnumError
+    errorMessageIfEnumError,
+    EnumValues.all[E]
   )
 
-  def formatter[E](
-    isAllowed: E => Boolean,
-    errorMessageIfMissing: String,
-    errorMessageIfEnumError: String
-  )(using classTag: ClassTag[E]): Formatter[E] =
-    val enumClass = classTag.runtimeClass
-    val valuesMethod = enumClass.getDeclaredMethod("values")
-    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Null"))
-    val enumValues: Array[E] = valuesMethod.invoke(null).asInstanceOf[Array[E]].filter(isAllowed)
+  inline def makeSealedObjectsFormatter[E](
+    errorMessageIfMissing: String = "error.required",
+    errorMessageIfEnumError: String = "invalid input"
+  )(using classTag: ClassTag[E]): Formatter[E] = makeFormatter[E](
+    errorMessageIfMissing,
+    errorMessageIfEnumError,
+    SealedObjects.all[E]
+  )
 
+  private[formatters] def makeFormatter[E](
+    errorMessageIfMissing: String,
+    errorMessageIfEnumError: String,
+    values: Seq[E]
+  ): Formatter[E] =
     new Formatter[E] {
       override def bind(
         key: String,
@@ -50,7 +56,7 @@ object EnumFormatter:
       ): Either[Seq[FormError], E] = data.get(key)
         .toRight(Seq(FormError(key, errorMessageIfMissing)))
         .flatMap { str =>
-          enumValues.find(e => e.toString === str)
+          values.find(e => e.toString === str)
             .toRight(Seq(FormError(key, errorMessageIfEnumError)))
         }
 

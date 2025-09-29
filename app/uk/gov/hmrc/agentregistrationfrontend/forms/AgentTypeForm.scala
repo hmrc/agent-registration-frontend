@@ -21,14 +21,14 @@ import play.api.data.Form
 import play.api.data.Forms
 import play.api.data.Forms.mapping
 import uk.gov.hmrc.agentregistration.shared.AgentType
-import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.EnumFormatter
+import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
 object AgentTypeForm:
 
   val key: String = "agentType"
   val form: Form[AgentType] =
-    val fieldMapping: FieldMapping[AgentType] = Forms.of(EnumFormatter.formatter[AgentType](
+    val fieldMapping: FieldMapping[AgentType] = Forms.of(FormatterFactory.makeEnumFormatter[AgentType](
       errorMessageIfMissing = ErrorKeys.requiredFieldErrorMessage(key),
       errorMessageIfEnumError = ErrorKeys.invalidInputErrorMessage(key)
     ))

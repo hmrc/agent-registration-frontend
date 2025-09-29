@@ -27,7 +27,7 @@
         govukButton: GovukButton
 )
 
-@(form: Form[BusinessType])(implicit request: Request[?], messages: Messages)
+@(form: Form[BusinessType.Partnership])(implicit request: Request[?], messages: Messages)
 
 @key = @{
     PartnershipTypeForm.key
@@ -47,8 +47,18 @@
                     classes = "govuk-fieldset__legend--l"
                 ))
             )),
-            items =
-              BusinessType.partnershipTypes.map { (partnershipType: BusinessType) =>
+            items = BusinessType
+              .Partnership
+              .values
+              //sorting, because we need to render them in a particular order
+              .sortBy { _ match
+                case BusinessType.Partnership.GeneralPartnership => 1
+                case BusinessType.Partnership.LimitedLiabilityPartnership => 2
+                case BusinessType.Partnership.LimitedPartnership => 3
+                case BusinessType.Partnership.ScottishLimitedPartnership => 4
+                case BusinessType.Partnership.ScottishPartnership => 5
+              }
+              .map { (partnershipType: BusinessType.Partnership) =>
                   RadioItem(
                       content = Text(messages(s"$key.${partnershipType.toString}")),
                       value = Some(partnershipType.toString)
