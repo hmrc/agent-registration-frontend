@@ -64,6 +64,22 @@ extends UnitSpec:
     "readPartnershipType should return None when partnership type is not present in session" in:
       request.readPartnershipType shouldBe None
 
+    "removePartnershipType should remove partnership type from session" in:
+      val newResult = result
+        .addPartnershipTypeToSession(BusinessType.Partnership.LimitedLiabilityPartnership)
+
+      newResult
+        .asRequest
+        .readPartnershipType shouldBe Some(BusinessType.Partnership.LimitedLiabilityPartnership)
+
+      val resultAfterRemoval =
+        newResult
+          .removePartnershipTypeFromSession
+
+      resultAfterRemoval
+        .asRequest
+        .readPartnershipType shouldBe None withClue "partnership type should be removed from session"
+
   "BusinessType" should:
     BusinessTypeSessionValue.values.foreach: bt =>
       s"$bt can be added to the Result and read back from the Request" in:

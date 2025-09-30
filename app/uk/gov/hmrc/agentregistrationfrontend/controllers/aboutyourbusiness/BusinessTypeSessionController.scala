@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRo
 import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeSessionForm
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.aboutyourbusiness.BusinessTypeSessionPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.BusinessTypeSessionPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -62,6 +62,7 @@ extends FrontendController(mcc):
               // TODO SoleTrader or LimitedCompany journeys not yet built
               Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
                 .addBusinessTypeToSession(businessType)
+                .removePartnershipTypeFromSession
             case businessType @ BusinessTypeSessionValue.PartnershipType =>
               Redirect(routes.PartnershipTypeController.show.url)
                 .addBusinessTypeToSession(businessType)

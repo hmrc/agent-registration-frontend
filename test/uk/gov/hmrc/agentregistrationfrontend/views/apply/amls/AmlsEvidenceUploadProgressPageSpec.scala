@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.register.amls
+package uk.gov.hmrc.agentregistrationfrontend.views.apply.amls
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -22,7 +22,7 @@ import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.AmlsEvidenceUploadProgressPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadProgressPage
 
 class AmlsEvidenceUploadProgressPageSpec
 extends ViewSpec:

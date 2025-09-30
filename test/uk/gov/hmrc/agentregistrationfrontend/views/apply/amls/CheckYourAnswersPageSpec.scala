@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.register.amls
+package uk.gov.hmrc.agentregistrationfrontend.views.apply.amls
 
 import com.google.inject.AbstractModule
 import com.softwaremill.quicklens.*
@@ -30,7 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.CheckYourAnswersPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.CheckYourAnswersPage
 
 import java.time.LocalDate
 

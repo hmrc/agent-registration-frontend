@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.register.aboutyourbusiness
+package uk.gov.hmrc.agentregistrationfrontend.views.apply.aboutyourbusiness
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.forms.PartnershipTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.viewspecsupport.ViewSelectors.Selectors.errorSummaryLink
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.viewspecsupport.ViewSelectors.Selectors.inlineErrorMessage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.aboutyourbusiness.PartnershipTypePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.PartnershipTypePage
 
 class PartnershipTypePageSpec
 extends ViewSpec:
@@ -68,16 +66,13 @@ extends ViewSpec:
       doc.select("button[type=submit]").text() shouldBe "Continue"
 
     "render a form error when the form contains an error" in:
-      val field = "partnershipType"
+      val field = PartnershipTypeForm.key
       val errorMessage = "Tell us what type of partnership"
       val formWithError = PartnershipTypeForm.form
         .withError(field, errorMessage)
-      val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
-      val summaryLink = errorDoc.selectOrFail(errorSummaryLink).selectOnlyOneElementOrFail()
-      val inlineError = errorDoc.selectOrFail(inlineErrorMessage).selectOnlyOneElementOrFail()
-
-      errorDoc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
-      errorDoc.selectOrFail(".govuk-error-summary__title").selectOnlyOneElementOrFail().text() shouldBe "There is a problem"
-      summaryLink.text() shouldBe errorMessage
-      summaryLink.selectAttrOrFail("href") shouldBe s"#$field"
-      inlineError.text() shouldBe s"Error: $errorMessage"
+      behavesLikePageWithErrorHandling(
+        field = field,
+        errorMessage = errorMessage,
+        errorDoc = Jsoup.parse(viewTemplate(formWithError).body),
+        heading = heading
+      )

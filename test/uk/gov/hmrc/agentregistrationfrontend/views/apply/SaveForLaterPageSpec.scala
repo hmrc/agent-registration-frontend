@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.register
+package uk.gov.hmrc.agentregistrationfrontend.views.apply
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.SaveForLaterPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.SaveForLaterPage
 
 class SaveForLaterPageSpec
 extends ViewSpec:

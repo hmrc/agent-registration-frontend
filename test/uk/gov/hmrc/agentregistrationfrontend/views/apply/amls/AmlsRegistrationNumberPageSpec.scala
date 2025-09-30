@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.register.amls
+package uk.gov.hmrc.agentregistrationfrontend.views.apply.amls
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.AmlsRegistrationNumberPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsRegistrationNumberPage
 
 class AmlsRegistrationNumberPageSpec
 extends ViewSpec:
@@ -83,10 +83,10 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render an error message when form has errors" in:
-      val key: String = AmlsRegistrationNumberForm.key
+      val field: String = AmlsRegistrationNumberForm.key
       val errorMessage: String = "Enter your registration number"
       val formWithError: Form[AmlsRegistrationNumber] = AmlsRegistrationNumberForm(isHmrc = false).form
-        .withError(key, errorMessage)
+        .withError(field, errorMessage)
       val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
       errorDoc.mainContent shouldContainContent
         """
@@ -100,7 +100,9 @@ extends ViewSpec:
           |Save and come back later
           |""".stripMargin
 
-      errorDoc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
-      errorDoc.selectOrFail(".govuk-error-summary__title").selectOnlyOneElementOrFail().text() shouldBe "There is a problem"
-      errorDoc.selectOrFail(".govuk-error-summary__list > li > a").selectOnlyOneElementOrFail().selectAttrOrFail("href") shouldBe s"#$key"
-      errorDoc.selectOrFail(".govuk-error-message").selectOnlyOneElementOrFail().text() shouldBe s"Error: $errorMessage"
+      behavesLikePageWithErrorHandling(
+        field = field,
+        errorMessage = errorMessage,
+        errorDoc = errorDoc,
+        heading = heading
+      )

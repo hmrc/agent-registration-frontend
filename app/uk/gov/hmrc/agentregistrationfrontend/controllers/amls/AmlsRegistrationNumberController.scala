@@ -29,7 +29,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRo
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.getSubmitAction
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.AmlsRegistrationNumberPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsRegistrationNumberPage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.Inject

@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport
 
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentType
+import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.util.EnumExtensions.*
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
 
@@ -35,4 +36,8 @@ extends ISpec,
 
   def addBusinessTypeToSession(businessType: BusinessTypeSessionValue): WSResponse = get(
     s"/agent-registration/test-only/add-business-type/${businessType.toStringHyphenated}"
+  )
+
+  def addPartnershipTypeToSession(partnershipType: BusinessType.Partnership): WSResponse = get(
+    s"/agent-registration/test-only/add-partnership-type/${partnershipType.toString}"
   )

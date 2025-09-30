@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport
 
+import org.jsoup.nodes.Document
+import org.scalatest.Assertion
 import play.api.i18n.Messages
 import play.api.i18n.MessagesApi
 import play.api.mvc.AnyContentAsEmpty
@@ -29,3 +31,23 @@ extends ISpec:
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   implicit val messages: Messages = app.injector.instanceOf[MessagesApi].preferred(request)
+
+  /* Ensures that a page with form errors renders accessibly, with the expected
+   * error prefix appended, summary list and links rendered correctly and in inline error message
+   * rendered correctly.
+   */
+  def behavesLikePageWithErrorHandling(
+    field: String,
+    errorMessage: String,
+    errorDoc: Document,
+    heading: String,
+    isWholeDateError: Boolean = false
+  ): Assertion =
+    val summaryLink = errorDoc.selectOrFail(errorSummaryLink).selectOnlyOneElementOrFail()
+    val inlineError = errorDoc.selectOrFail(inlineErrorMessage).selectOnlyOneElementOrFail()
+    val expectedSummaryLinkHref = if isWholeDateError then s"#$field.day" else s"#$field"
+    errorDoc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
+    errorDoc.selectOrFail(".govuk-error-summary__title").selectOnlyOneElementOrFail().text() shouldBe "There is a problem"
+    summaryLink.text() shouldBe errorMessage
+    summaryLink.selectAttrOrFail("href") shouldBe s"$expectedSummaryLinkHref"
+    inlineError.text() shouldBe s"Error: $errorMessage"

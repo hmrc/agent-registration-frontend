@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRo
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.getSubmitAction
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.AmlsExpiryDatePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsExpiryDatePage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import java.time.LocalDate

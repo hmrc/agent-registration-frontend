@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.register.amls
+package uk.gov.hmrc.agentregistrationfrontend.views.apply.amls
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.AmlsSupervisoryBodyPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsSupervisoryBodyPage
 
 class AmlsSupervisoryBodyPageSpec
 extends ViewSpec:
@@ -95,7 +95,6 @@ extends ViewSpec:
       // TODO: form is duplicated, not really testing that such form with this particular error will be used in controller
       val formWithError = form.withError(field, errorMessage)
       val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
-
       errorDoc.mainContent shouldContainContent
         """
           |There is a problem
@@ -111,7 +110,9 @@ extends ViewSpec:
           |Save and come back later
           |""".stripMargin
 
-      errorDoc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
-      errorDoc.selectOrFail(".govuk-error-summary__title").selectOnlyOneElementOrFail().text() shouldBe "There is a problem"
-      errorDoc.selectOrFail(".govuk-error-summary__list > li > a").selectOnlyOneElementOrFail().selectAttrOrFail("href") shouldBe s"#$field"
-      errorDoc.selectOrFail(".govuk-error-message").selectOnlyOneElementOrFail().text() shouldBe s"Error: $errorMessage"
+      behavesLikePageWithErrorHandling(
+        field = field,
+        errorMessage = errorMessage,
+        errorDoc = errorDoc,
+        heading = heading
+      )

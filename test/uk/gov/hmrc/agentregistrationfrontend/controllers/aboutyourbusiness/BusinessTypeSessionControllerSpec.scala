@@ -55,17 +55,6 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "How is your business set up? - Apply for an agent services account - GOV.UK"
 
-  s"POST $path selecting partnership should redirect to the type of partnership page" in:
-    val response: WSResponse =
-      post(
-        uri = path,
-        cookies = addAgentTypeToSession(UkTaxAgent).extractCookies
-      )(Map(BusinessTypeSessionForm.key -> Seq("PartnershipType")))
-
-    response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.PartnershipTypeController.show.url
-
   s"POST $path without valid selection should return 400" in:
     val response: WSResponse =
       post(

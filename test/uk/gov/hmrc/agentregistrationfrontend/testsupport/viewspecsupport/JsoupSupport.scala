@@ -29,6 +29,7 @@ object JsoupSupport {
   export ElementSupport.*
   export ElementsSupport.*
   export ViewSelectors.*
+  export ViewSelectors.Selectors.*
 
   extension (response: WSResponse)
     def parseBodyAsJsoupDocument: Document = Jsoup.parse(response.body)

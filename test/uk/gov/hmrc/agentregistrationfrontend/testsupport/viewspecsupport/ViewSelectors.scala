@@ -224,7 +224,7 @@ object ViewSelectors:
     val numberedList = ".govuk-list--number"
     val inset = ".govuk-inset-text"
     val captionM = ".govuk-caption-m"
-    val captionL = ".govuk-caption-l"
+    val captionL = "h2.govuk-caption-l"
     val captionXL = ".govuk-caption-xl"
     val button = ".govuk-button"
     val li = "li"
