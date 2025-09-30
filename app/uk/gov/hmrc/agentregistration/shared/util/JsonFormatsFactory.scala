@@ -35,7 +35,8 @@ object JsonFormatsFactory:
     */
   inline def makeSealedObjectFormat[E](using ct: ClassTag[E]): Format[E] = makeFormat(SealedObjects.all[E])
 
-  /** Creates a Format for Scala 3 enums with explicitly provided enum values.
+  /** Internal utility to create a Format for the type `E`. The formatter uses toString() for serialization and expects all objects in the provided sequence to
+    * have unique string representations.
     */
   private def makeFormat[E](values: Iterable[E])(using ct: ClassTag[E]): Format[E] =
     val enumName = ct.runtimeClass.getSimpleName

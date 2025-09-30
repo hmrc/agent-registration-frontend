@@ -21,7 +21,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 class EnumValuesSpec
 extends UnitSpec:
 
-  "EnumObjects.all[A] all A enums values" in:
+  "EnumObjects.all[A] returns all A enums values" in:
     sealed trait M
 
     enum A:
