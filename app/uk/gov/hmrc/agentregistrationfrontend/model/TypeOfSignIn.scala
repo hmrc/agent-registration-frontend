@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
+package uk.gov.hmrc.agentregistrationfrontend.model
 
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import play.api.libs.json.Format
+import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 
-trait TdAgentApplication { dependencies: TdBase =>
+enum TypeOfSignIn:
 
-  val agentApplicationAfterCreated: AgentApplication = AgentApplication(
-    internalUserId = dependencies.internalUserId,
-    createdAt = dependencies.instant,
-    applicationState = ApplicationState.InProgress,
-    utr = Some(dependencies.utr),
-    businessDetails = None,
-    amlsDetails = None
-  )
+  case HmrcOnlineServices
+  case CreateSignInDetails
 
-}
+object TypeOfSignIn:
+  given Format[TypeOfSignIn] = JsonFormatsFactory.makeEnumFormat[TypeOfSignIn]

@@ -57,7 +57,7 @@ extends FrontendController(mcc):
           PartnershipTypeForm.form.bindFromRequest().fold(
             formWithErrors => BadRequest(view(formWithErrors)),
             partnershipType =>
-              Redirect(routes.SignInFilterController.show)
+              Redirect(routes.TypeOfSignInController.show)
                 .addPartnershipTypeToSession(partnershipType)
           )
         case _ => Redirect(routes.BusinessTypeSessionController.show)

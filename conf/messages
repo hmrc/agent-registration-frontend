@@ -46,6 +46,27 @@ businessType.error.invalid = Tell us how your business is set up
 partnershipType.error.required = Tell us what type of partnership
 partnershipType.error.invalid = Tell us what type of partnership
 
+## About your business / Type of sign in page
+typeOfSignIn.title = Do you have an HMRC online services for agents account?
+typeOfSignIn.hint = You’ll have this account if you already manage taxes on behalf of clients.
+typeOfSignIn.HmrcOnlineServices = Yes
+typeOfSignIn.CreateSignInDetails = No, I do not manage any taxes for clients
+typeOfSignIn.error.required = Select yes if you have an HMRC online services for agents account
+typeOfSignIn.error.invalid = Select yes if you have an HMRC online services for agents account
+
+createSignInDetails.title=Create your agent account sign in details
+createSignInDetails.p1=You do not have agent sign in details yet.
+createSignInDetails.p2=You’ll need to create some before you can get an agent services account.
+createSignInDetails.p3=Select ‘Continue’ to start.
+
+signInWithAgentDetails.title=Sign in with your agent account details
+signInWithAgentDetails.p1=Sign in using the details for your existing agent account.
+signInWithAgentDetails.p2=Your new agent services account will then be linked to those sign in details.
+signInWithAgentDetails.h2=If you have more than one set of sign in details
+signInWithAgentDetails.p3=Choose the one you want to be linked to your new agent services account.
+
+
+
 # About your application / user role
 userRole.title = Are you the owner of the business?
 userRole.Owner = Yes

@@ -70,7 +70,7 @@ extends FrontendController(mcc):
   def showGrsData(
     businessType: BusinessType,
     journeyId: JourneyId
-  ): Action[AnyContent] = actions.getApplicationInProgress:
+  ): Action[AnyContent] = actions.authorised:
     implicit request =>
       val prefilledForm =
         request.session.get(journeyId.value).map(data => Json.parse(data).as[JourneyData]) match {
@@ -86,7 +86,7 @@ extends FrontendController(mcc):
   def submitGrsData(
     businessType: BusinessType,
     journeyId: JourneyId
-  ): Action[AnyContent] = actions.getApplicationInProgress:
+  ): Action[AnyContent] = actions.authorised:
     implicit request =>
       form(businessType).bindFromRequest().fold(
         formWithErrors =>

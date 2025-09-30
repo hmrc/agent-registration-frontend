@@ -32,8 +32,8 @@ extends ControllerSpec:
       url = "/agent-registration/apply"
     )
 
-  s"GET $path should redirect to business type page" in:
+  s"GET $path should redirect to agent type page" in:
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe aboutyourapplication.routes.BusinessTypeController.show.url
+    response.header("Location").value shouldBe aboutyourbusiness.routes.AgentTypeController.show.url

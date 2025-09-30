@@ -14,12 +14,11 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.UserRole
-@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.forms.UserRoleForm
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
+@import uk.gov.hmrc.agentregistrationfrontend.forms.TypeOfSignInForm
+@import uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.routes
 
 @this(
         layout: Layout,
@@ -29,24 +28,26 @@
 )
 
 @(
-        form: Form[UserRole]
+        form: Form[TypeOfSignIn]
 )(implicit
         request: RequestHeader,
         messages: Messages
 )
 
 @key = @{
-    UserRoleForm.key
+    TypeOfSignInForm.key
 }
 @title = @{
     messages(s"$key.title")
 }
 
-@layout(pageTitle = title, maybeForm = Some(form)) {
+@layout(
+    pageTitle = title,
+    maybeForm = Some(form)
+) {
 
-    <h2 class="govuk-caption-xl">@messages("about-application.title")</h2>
-
-    @formWithCSRF(action = uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.routes.UserRoleController.submit) {
+    <h2 class="govuk-caption-l">@messages("about-your-business.title")</h2>
+    @formWithCSRF(action = routes.TypeOfSignInController.submit) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(
@@ -55,16 +56,16 @@
                     classes = "govuk-fieldset__legend--xl"
                 ))
             )),
-            items = UserRole.values.toSeq.map(userRole =>
+            items = TypeOfSignIn.values.toSeq.map(typeOfSignIn =>
                 RadioItem(
-                    content = Text(messages(s"$key.${userRole.toString}")),
-                    value = Some(userRole.toString)
+                    content = Text(messages(s"$key.${typeOfSignIn.toString}")),
+                    value = Some(typeOfSignIn.toString)
                 )
             )
         ).withFormField(form(key)))
 
         @govukButton(Button(
-            content = Text(messages("common.saveAndContinue"))
+            content = Text(messages("common.continue"))
         ))
     }
 }

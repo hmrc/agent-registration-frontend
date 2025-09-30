@@ -26,20 +26,12 @@ POST        /apply/about-your-business/business-type                uk.gov.hmrc.
 GET         /apply/about-your-business/partnership-type             uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.PartnershipTypeController.show
 POST        /apply/about-your-business/partnership-type             uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.PartnershipTypeController.submit
 
-GET         /apply/about-your-business/agent-online-services-account uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.SignInFilterController.show
-
-## About your application routes - DEPRECATED
-GET         /apply/about-your-application/business-type             uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.BusinessTypeController.show
-POST        /apply/about-your-application/business-type             uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.BusinessTypeController.submit
-
-GET         /apply/about-your-application/user-role                 uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.UserRoleController.show
-POST        /apply/about-your-application/user-role                 uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.UserRoleController.submit
-
-GET         /apply/about-your-application/check-your-answers        uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.CheckYourAnswerController.show
-POST        /apply/about-your-application/check-your-answers        uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.CheckYourAnswerController.submit
+GET         /apply/about-your-business/agent-online-services-account uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.TypeOfSignInController.show
+POST        /apply/about-your-business/agent-online-services-account uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.TypeOfSignInController.submit
+GET         /apply/about-your-business/sign-in                       uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.TypeOfSignInController.redirectToChosenSignIn(signInLink: String)
 
 ##GRS routes
-GET         /apply/start-grs-journey                                uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.startGrsJourney
+GET         /apply/about-your-business/agent-type/:agentType/entity-type/:businessType uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.setUpGrsFromSignIn(agentType: AgentType, businessType: BusinessType)
 GET         /apply/grs-callback/:businessType                       uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.journeyCallback(businessType: BusinessType, journeyId: JourneyId)
 
 ## Anti Money Laundering routes

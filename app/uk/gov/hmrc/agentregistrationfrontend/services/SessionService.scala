@@ -22,6 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
+import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
 
 object SessionService:
 
@@ -29,12 +30,14 @@ object SessionService:
   private val agentTypeKey: String = s"$microserviceName.agentType"
   private val businessTypeKey: String = s"$microserviceName.businessType"
   private val partnershipTypeKey: String = s"$microserviceName.partnershipType"
+  private val typeOfSignInKey: String = s"$microserviceName.typeOfSignIn"
 
   extension (r: Result)
 
     def addAgentTypeToSession(at: AgentType)(implicit request: Request[?]): Result = r.addingToSession(agentTypeKey -> at.toString)
     def addBusinessTypeToSession(bt: BusinessTypeSessionValue)(implicit request: Request[?]): Result = r.addingToSession(businessTypeKey -> bt.toString)
     def addPartnershipTypeToSession(pt: BusinessType.Partnership)(implicit request: Request[?]): Result = r.addingToSession(partnershipTypeKey -> pt.toString)
+    def addTypeOfSignInToSession(tos: TypeOfSignIn)(implicit request: Request[?]): Result = r.addingToSession(typeOfSignInKey -> tos.toString)
 
   extension (r: Request[?])
 
@@ -56,3 +59,20 @@ object SessionService:
         .values
         .find(_.toString === value)
         .getOrElse(throw new RuntimeException(s"Invalid Partnership type in session: '$value'"))
+
+    def readTypeOfSignIn: Option[TypeOfSignIn] = r.session.get(typeOfSignInKey).map: value =>
+      TypeOfSignIn
+        .values
+        .find(_.toString === value)
+        .getOrElse(throw new RuntimeException(s"Invalid TypeOfSignIn type in session: '$value'"))
+
+    def requireAgentTypeAndBusinessType: (AgentType, BusinessType) =
+      val at = readAgentType.getOrElse(throw new RuntimeException("No AgentType in session"))
+      val bt = readPartnershipType
+        .getOrElse(
+          readBusinessType
+            .getOrElse(throw new RuntimeException("No BusinessType in session"))
+            .toBusinessType
+            .getOrElse(throw new RuntimeException("No BusinessType in session"))
+        )
+      (at, bt)
