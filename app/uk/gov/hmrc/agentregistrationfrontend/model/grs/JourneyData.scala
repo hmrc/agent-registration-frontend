@@ -18,13 +18,14 @@ package uk.gov.hmrc.agentregistrationfrontend.model.grs
 
 import play.api.libs.json.*
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.BusinessType.GeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.GeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedCompany
-import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedLiabilityPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.ScottishLimitedPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.ScottishPartnership
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedLiabilityPartnership
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedPartnership
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.ScottishLimitedPartnership
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.ScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
+
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.Registration.given
 
 import java.time.LocalDate

@@ -34,17 +34,15 @@ import uk.gov.hmrc.agentregistration.shared.FullName
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.SafeId
 import uk.gov.hmrc.agentregistration.shared.Utr
-import uk.gov.hmrc.agentregistration.shared.BusinessType.GeneralPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedCompany
-import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedLiabilityPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
+import uk.gov.hmrc.agentregistration.shared.BusinessType.*
+import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
-import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.EnumFormatter
+import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
@@ -119,7 +117,7 @@ extends FrontendController(mcc):
   def randomJourneyId(): JourneyId = JourneyId(UUID.randomUUID().toString)
 
   private def form(businessType: BusinessType): Form[JourneyData] =
-    val registrationStatusMapping: FieldMapping[RegistrationStatus] = Forms.of(EnumFormatter.formatter[RegistrationStatus](
+    val registrationStatusMapping: FieldMapping[RegistrationStatus] = Forms.of(FormatterFactory.makeEnumFormatter[RegistrationStatus](
       errorMessageIfMissing = "Registration status required",
       errorMessageIfEnumError = "Registration status invalid"
     ))

@@ -65,7 +65,7 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "What type of partnership? - Apply for an agent services account - GOV.UK"
 
-  BusinessType.partnershipTypes.foreach: partnershipType =>
+  BusinessType.Partnership.values.foreach: partnershipType =>
     s"POST $path selecting a ${partnershipType.toString} should redirect to the sign in filter page" in:
       val response: WSResponse =
         post(

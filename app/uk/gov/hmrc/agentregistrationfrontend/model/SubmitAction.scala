@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.model
 
 import play.api.libs.json.Format
-import uk.gov.hmrc.agentregistration.shared.util.EnumFormat
+import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 
 enum SubmitAction:
@@ -37,4 +37,4 @@ object SubmitAction:
   extension (submitAction: SubmitAction)
     def isSaveAndComeBackLater: Boolean = submitAction === SubmitAction.SaveAndComeBackLater
 
-  given Format[SubmitAction] = EnumFormat.enumFormat[SubmitAction]
+  given Format[SubmitAction] = JsonFormatsFactory.makeEnumFormat[SubmitAction]

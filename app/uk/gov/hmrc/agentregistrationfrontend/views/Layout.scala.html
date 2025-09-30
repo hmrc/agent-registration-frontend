@@ -20,6 +20,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
+@import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.isSignedIn
 
 @this(
         appConfig: AppConfig,
@@ -39,9 +40,6 @@
         templateStyles: Option[Html] = None
 )(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
-@isSignedIn = @{
-    try { request.session.get("authToken").isDefined } catch { case _: Throwable => false }
-}
 @head = {
     @if(isSignedIn) {
         @hmrcTimeoutDialogHelper(

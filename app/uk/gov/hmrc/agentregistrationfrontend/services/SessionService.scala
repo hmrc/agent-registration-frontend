@@ -34,7 +34,7 @@ object SessionService:
 
     def addAgentTypeToSession(at: AgentType)(implicit request: Request[?]): Result = r.addingToSession(agentTypeKey -> at.toString)
     def addBusinessTypeToSession(bt: BusinessTypeSessionValue)(implicit request: Request[?]): Result = r.addingToSession(businessTypeKey -> bt.toString)
-    def addPartnershipTypeToSession(pt: BusinessType)(implicit request: Request[?]): Result = r.addingToSession(partnershipTypeKey -> pt.toString)
+    def addPartnershipTypeToSession(pt: BusinessType.Partnership)(implicit request: Request[?]): Result = r.addingToSession(partnershipTypeKey -> pt.toString)
 
   extension (r: Request[?])
 
@@ -50,7 +50,9 @@ object SessionService:
         .find(_.toString === value)
         .getOrElse(throw new RuntimeException(s"Invalid BusinessTypeSessionValue type in session: '$value'"))
 
-    def readPartnershipType: Option[BusinessType] = r.session.get(partnershipTypeKey).map: value =>
-      BusinessType.partnershipTypes
+    def readPartnershipType: Option[BusinessType.Partnership] = r.session.get(partnershipTypeKey).map: value =>
+      BusinessType
+        .Partnership
+        .values
         .find(_.toString === value)
         .getOrElse(throw new RuntimeException(s"Invalid Partnership type in session: '$value'"))
