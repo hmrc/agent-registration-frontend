@@ -15,7 +15,6 @@
  *@
 
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourapplication.routes as businessDetailsRoutes
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.amls.routes as amlsDetailsRoutes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 
@@ -60,7 +59,7 @@
                 status = TaskListItemStatus(
                     content = Text(messages(s"$key.status.Completed"))
                 ),
-                href = Some(businessDetailsRoutes.CheckYourAnswerController.show.url)
+                href = Some("#") // TODO we don't have a CYA view yet...
             )
         ),
         idPrefix = "businessDetails"
