@@ -57,10 +57,10 @@ extends FrontendController(mcc):
         case Some(pt @ BusinessTypeSessionValue.PartnershipType) =>
           request.readPartnershipType match
             case None => Redirect(routes.PartnershipTypeController.show)
-            case Some(_) => hasValidSessionForSigningIn(request)
-        case Some(_) => hasValidSessionForSigningIn(request)
+            case Some(_) => showTypeOfSignInForm(request)
+        case Some(_) => showTypeOfSignInForm(request)
 
-  private def hasValidSessionForSigningIn(implicit request: Request[?]) =
+  private def showTypeOfSignInForm(implicit request: Request[?]) =
     val form: Form[TypeOfSignIn] =
       request.readTypeOfSignIn match
         case Some(data) => TypeOfSignInForm.form.fill(data)
@@ -74,10 +74,10 @@ extends FrontendController(mcc):
         case Some(pt @ BusinessTypeSessionValue.PartnershipType) =>
           request.readPartnershipType match
             case None => Redirect(routes.PartnershipTypeController.show)
-            case Some(_) => hasValidSessionForPostingSignInChoice(request)
-        case Some(_) => hasValidSessionForPostingSignInChoice(request)
+            case Some(_) => redirectToChosenSignIn(request)
+        case Some(_) => redirectToChosenSignIn(request)
 
-  private def hasValidSessionForPostingSignInChoice(implicit request: Request[?]) = TypeOfSignInForm.form.bindFromRequest().fold(
+  private def redirectToChosenSignIn(implicit request: Request[?]) = TypeOfSignInForm.form.bindFromRequest().fold(
     formWithErrors =>
       BadRequest(view(formWithErrors)),
     typeOfSignIn =>
