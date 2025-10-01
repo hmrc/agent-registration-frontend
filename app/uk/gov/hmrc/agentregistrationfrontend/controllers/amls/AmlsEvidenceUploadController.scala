@@ -31,8 +31,8 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanConnector
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.ErrorTemplate
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.AmlsEvidenceUploadPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.amls.AmlsEvidenceUploadProgressPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadProgressPage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.Inject

@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.mvc.Request
+import play.api.mvc.RequestHeader
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
@@ -38,6 +39,7 @@ object SessionService:
     def addBusinessTypeToSession(bt: BusinessTypeSessionValue)(implicit request: Request[?]): Result = r.addingToSession(businessTypeKey -> bt.toString)
     def addPartnershipTypeToSession(pt: BusinessType.Partnership)(implicit request: Request[?]): Result = r.addingToSession(partnershipTypeKey -> pt.toString)
     def addTypeOfSignInToSession(tos: TypeOfSignIn)(implicit request: Request[?]): Result = r.addingToSession(typeOfSignInKey -> tos.toString)
+    def removePartnershipTypeFromSession(implicit request: RequestHeader): Result = r.removingFromSession(partnershipTypeKey)
 
   extension (r: Request[?])
 

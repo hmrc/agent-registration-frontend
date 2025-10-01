@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.register.aboutyourbusiness
+package uk.gov.hmrc.agentregistrationfrontend.views.apply.aboutyourbusiness
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.aboutyourbusiness.AgentTypePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.AgentTypePage
 
 class AgentTypePageSpec
 extends ViewSpec:
@@ -53,9 +53,9 @@ extends ViewSpec:
       val errorMessage = "Select yes if your agent business is based in the UK"
       val formWithError = AgentTypeForm.form
         .withError(field, errorMessage)
-      val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
-      errorDoc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
-      errorDoc.selectOrFail(".govuk-error-summary__title").selectOnlyOneElementOrFail().text() shouldBe "There is a problem"
-      errorDoc.selectOrFail(".govuk-error-summary__list > li > a").selectOnlyOneElementOrFail().text() shouldBe errorMessage
-      errorDoc.selectOrFail(".govuk-error-summary__list > li > a").selectOnlyOneElementOrFail().selectAttrOrFail("href") shouldBe s"#$field"
-      errorDoc.selectOrFail(".govuk-error-message").selectOnlyOneElementOrFail().text() shouldBe s"Error: $errorMessage"
+      behavesLikePageWithErrorHandling(
+        field = field,
+        errorMessage = errorMessage,
+        errorDoc = Jsoup.parse(viewTemplate(formWithError).body),
+        heading = heading
+      )

@@ -20,6 +20,7 @@ import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Request
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -30,11 +31,11 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn.*
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.aboutyourbusiness.TypeOfSignInPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.aboutyourbusiness.SignInWithAgentDetailsPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.register.aboutyourbusiness.CreateSignInDetailsPage
-
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.TypeOfSignInPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.SignInWithAgentDetailsPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.CreateSignInDetailsPage
 import sttp.model.Uri
+import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -53,33 +54,44 @@ extends FrontendController(mcc):
     implicit request =>
       request.readBusinessType match
         case None => Redirect(routes.BusinessTypeSessionController.show)
-        case Some(_) =>
-          val form: Form[TypeOfSignIn] =
-            request.readTypeOfSignIn match
-              case Some(data) => TypeOfSignInForm.form.fill(data)
-              case None => TypeOfSignInForm.form
-          Ok(view(form))
+        case Some(pt @ BusinessTypeSessionValue.PartnershipType) =>
+          request.readPartnershipType match
+            case None => Redirect(routes.PartnershipTypeController.show)
+            case Some(_) => hasValidSessionForSigningIn(request)
+        case Some(_) => hasValidSessionForSigningIn(request)
+
+  private def hasValidSessionForSigningIn(implicit request: Request[?]) =
+    val form: Form[TypeOfSignIn] =
+      request.readTypeOfSignIn match
+        case Some(data) => TypeOfSignInForm.form.fill(data)
+        case None => TypeOfSignInForm.form
+    Ok(view(form))
 
   def submit: Action[AnyContent] = Action:
     implicit request =>
       request.readBusinessType match
         case None => Redirect(routes.BusinessTypeSessionController.show)
-        case Some(_) =>
-          TypeOfSignInForm.form.bindFromRequest().fold(
-            formWithErrors =>
-              BadRequest(view(formWithErrors)),
-            typeOfSignIn =>
-              val (agentType: AgentType, businessType: BusinessType) = request.requireAgentTypeAndBusinessType
-              val signInLink = appConfig.signInUri(
-                continueUri =
-                  uri"${appConfig.thisFrontendBaseUrl + applicationRoutes.GrsController.setUpGrsFromSignIn(
-                      agentType = agentType,
-                      businessType = businessType
-                    ).url}"
-              )
-              Redirect(routes.TypeOfSignInController.redirectToChosenSignIn(signInLink.toString))
-                .addTypeOfSignInToSession(typeOfSignIn)
-          )
+        case Some(pt @ BusinessTypeSessionValue.PartnershipType) =>
+          request.readPartnershipType match
+            case None => Redirect(routes.PartnershipTypeController.show)
+            case Some(_) => hasValidSessionForPostingSignInChoice(request)
+        case Some(_) => hasValidSessionForPostingSignInChoice(request)
+
+  private def hasValidSessionForPostingSignInChoice(implicit request: Request[?]) = TypeOfSignInForm.form.bindFromRequest().fold(
+    formWithErrors =>
+      BadRequest(view(formWithErrors)),
+    typeOfSignIn =>
+      val (agentType: AgentType, businessType: BusinessType) = request.requireAgentTypeAndBusinessType
+      val signInLink = appConfig.signInUri(
+        continueUri =
+          uri"${appConfig.thisFrontendBaseUrl + applicationRoutes.GrsController.setUpGrsFromSignIn(
+              agentType = agentType,
+              businessType = businessType
+            ).url}"
+      )
+      Redirect(routes.TypeOfSignInController.redirectToChosenSignIn(signInLink.toString))
+        .addTypeOfSignInToSession(typeOfSignIn)
+  )
 
   def redirectToChosenSignIn(signInLink: String): Action[AnyContent] = Action:
     implicit request =>
