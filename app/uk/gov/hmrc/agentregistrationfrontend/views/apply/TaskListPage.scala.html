@@ -15,6 +15,7 @@
  *@
 
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+@import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes as applicantRoutes
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.amls.routes as amlsDetailsRoutes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 
@@ -78,7 +79,7 @@
                         classes = "govuk-tag--blue"
                     ))
                 ),
-                href = Some("#") // TODO Add link when available
+                href = Some(applicantRoutes.LlpRoleController.show.url) // TODO Switch to CYA link when available
             )
         ),
         idPrefix = "contact"

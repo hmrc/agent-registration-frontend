@@ -27,7 +27,12 @@ trait TdAgentApplication { dependencies: TdBase =>
     applicationState = ApplicationState.InProgress,
     utr = Some(dependencies.utr),
     businessDetails = None,
+    applicantContactDetails = None,
     amlsDetails = None
+  )
+
+  val llpAgentApplication: AgentApplication = agentApplicationAfterCreated.copy(
+    businessDetails = Some(dependencies.llpBusinessDetails)
   )
 
 }

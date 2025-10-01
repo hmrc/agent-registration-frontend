@@ -11,7 +11,7 @@ GET         /timed-out                                                 uk.gov.hm
 
 GET         /application-submitted                                     uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.applicationSubmitted
 
-# Register routes
+# Apply routes
 GET         /apply                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.startRegistration
 GET         /apply/task-list                                        uk.gov.hmrc.agentregistrationfrontend.controllers.TaskListController.show
 GET         /apply/save-and-come-back-later                         uk.gov.hmrc.agentregistrationfrontend.controllers.SaveForLaterController.show
@@ -33,6 +33,12 @@ GET         /apply/about-your-business/sign-in                       uk.gov.hmrc
 ##GRS routes
 GET         /apply/about-your-business/agent-type/:agentType/entity-type/:businessType uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.setUpGrsFromSignIn(agentType: AgentType, businessType: BusinessType)
 GET         /apply/grs-callback/:businessType                       uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.journeyCallback(businessType: BusinessType, journeyId: JourneyId)
+
+## Applicant contact details routes
+GET         /apply/about-applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.LlpRoleController.show
+POST        /apply/about-applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.LlpRoleController.submit
+GET         /apply/about-applicant/applicant-name                        uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.ApplicantNameController.show
+GET         /apply/about-applicant/member-name                           uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.MemberNameController.show
 
 ## Anti Money Laundering routes
 GET         /apply/anti-money-laundering/supervisor-name            uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsSupervisorController.show
