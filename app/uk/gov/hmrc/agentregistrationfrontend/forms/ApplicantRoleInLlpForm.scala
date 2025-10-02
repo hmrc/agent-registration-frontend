@@ -20,7 +20,7 @@ import play.api.data.FieldMapping
 import play.api.data.Form
 import play.api.data.Forms
 import play.api.data.Forms.mapping
-import uk.gov.hmrc.agentregistration.shared.AppicantRoleInLlp
+import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
@@ -28,8 +28,8 @@ object ApplicantRoleInLlpForm:
 
   val key: String = "applicantRoleInLlp"
 
-  val form: Form[AppicantRoleInLlp] =
-    val fieldMapping: FieldMapping[AppicantRoleInLlp] = Forms.of(FormatterFactory.makeEnumFormatter[AppicantRoleInLlp](
+  val form: Form[ApplicantRoleInLlp] =
+    val fieldMapping: FieldMapping[ApplicantRoleInLlp] = Forms.of(FormatterFactory.makeEnumFormatter[ApplicantRoleInLlp](
       errorMessageIfMissing = ErrorKeys.requiredFieldErrorMessage(key),
       errorMessageIfEnumError = ErrorKeys.invalidInputErrorMessage(key)
     ))

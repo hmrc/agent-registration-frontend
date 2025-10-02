@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.AppicantRoleInLlp
+@import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 @import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes
@@ -30,7 +30,7 @@
         continueOrSaveForLater: ContinueOrSaveForLater
 )
 
-@(form: Form[AppicantRoleInLlp])(implicit request: AgentApplicationRequest[AnyContent], messages: Messages)
+@(form: Form[ApplicantRoleInLlp])(implicit request: AgentApplicationRequest[AnyContent], messages: Messages)
 
 @key = @{
     ApplicantRoleInLlpForm.key
@@ -53,7 +53,7 @@
             hint = Some(Hint(
                 content = HtmlContent(messages(s"$key.hint", request.agentApplication.getApplicantName))
             )),
-            items = AppicantRoleInLlp.values.toSeq.map(applicantRoleInLlp =>
+            items = ApplicantRoleInLlp.values.toSeq.map(applicantRoleInLlp =>
                 RadioItem(
                     content = Text(messages(s"$key.${applicantRoleInLlp.toString}")),
                     value = Some(applicantRoleInLlp.toString)

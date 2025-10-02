@@ -21,8 +21,8 @@ import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.AppicantRoleInLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicantContactDetails
+import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
@@ -44,7 +44,7 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
-      val form: Form[AppicantRoleInLlp] = ApplicantRoleInLlpForm.form.fill:
+      val form: Form[ApplicantRoleInLlp] = ApplicantRoleInLlpForm.form.fill:
         request
           .agentApplication
           .applicantContactDetails.map(_.applicantRoleInLlp)
@@ -56,7 +56,7 @@ extends FrontendController(mcc, actions):
       .ensureValidFormAndRedirectIfSaveForLater(ApplicantRoleInLlpForm.form, implicit r => view(_))
       .async:
         implicit request =>
-          val applicantRoleInLlp: AppicantRoleInLlp = request.formValue
+          val applicantRoleInLlp: ApplicantRoleInLlp = request.formValue
           applicationService
             .upsert(
               request.agentApplication
@@ -72,11 +72,11 @@ extends FrontendController(mcc, actions):
                     ))
                 }
             )
-            .map(_ =>
+            .map((_: Unit) =>
               Redirect(
                 applicantRoleInLlp match
-                  case AppicantRoleInLlp.Member => routes.MemberNameController.show.url
-                  case AppicantRoleInLlp.Authorised => routes.ApplicantNameController.show.url
+                  case ApplicantRoleInLlp.Member => routes.MemberNameController.show.url
+                  case ApplicantRoleInLlp.Authorised => routes.ApplicantNameController.show.url
               )
             )
       .redirectIfSaveForLater
