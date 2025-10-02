@@ -16,8 +16,12 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails
 
+import com.softwaremill.quicklens.*
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.agentregistration.shared.ApplicantContactDetails
+import uk.gov.hmrc.agentregistration.shared.LlpRole
+import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.LlpRoleForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -74,3 +78,34 @@ extends ControllerSpec:
 
     response.status shouldBe Status.BAD_REQUEST
     response.parseBodyAsJsoupDocument.title() shouldBe "Error: Are you a member of the limited liability partnership? - Apply for an agent services account - GOV.UK"
+
+  s"POST $path with save for later and valid selection should redirect to the saved for later page" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubApplicationInProgress(tdAll.llpAgentApplication)
+    AgentRegistrationStubs.stubUpdateAgentApplication(
+      tdAll.llpAgentApplication
+        .modify(_.applicantContactDetails)
+        .setTo(Some(ApplicantContactDetails(llpRole = LlpRole.Member)))
+    )
+    val response: WSResponse =
+      post(path)(Map(
+        LlpRoleForm.key -> Seq("Member"),
+        "submit" -> Seq("SaveAndComeBackLater")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe applicationRoutes.SaveForLaterController.show.url
+
+  s"POST $path with save for later and invalid selection should not return errors and redirect to save for later page" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubApplicationInProgress(tdAll.llpAgentApplication)
+    val response: WSResponse =
+      post(path)(Map(
+        LlpRoleForm.key -> Seq(""),
+        "submit" -> Seq("SaveAndComeBackLater")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe applicationRoutes.SaveForLaterController.show.url
