@@ -27,11 +27,11 @@ import javax.inject.Singleton
 
 @Singleton
 class TaskListController @Inject() (
-  actions: Actions,
   mcc: MessagesControllerComponents,
+  actions: Actions,
   taskListPage: TaskListPage
 )
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
   /* Show the task list if we have a UTR from GRS, otherwise redirect to start of registration */
   val show: Action[AnyContent] = actions.getApplicationInProgress { implicit request =>

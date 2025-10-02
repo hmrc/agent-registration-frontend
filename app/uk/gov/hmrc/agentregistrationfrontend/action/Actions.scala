@@ -17,6 +17,9 @@
 package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.mvc.*
+import play.api.mvc.Results.Redirect
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
+
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -25,26 +28,45 @@ class Actions @Inject() (
   actionBuilder: DefaultActionBuilder,
   authorisedAction: AuthorisedAction,
   agentApplicationAction: AgentApplicationAction,
-  ensureApplication: EnsureApplication
-):
+  requestEnsurer: RequestEnsurer
+)
+extends RequestAwareLogging:
 
-  val default: ActionBuilder[Request, AnyContent] = actionBuilder
+  export requestEnsurer.*
 
-  val authorised: ActionBuilder[AuthorisedRequest, AnyContent] = default
+  val action: ActionBuilder[Request, AnyContent] = actionBuilder
+
+  val authorised: ActionBuilder[AuthorisedRequest, AnyContent] = action
     .andThen(authorisedAction)
 
   val getApplicationInProgress: ActionBuilder[AgentApplicationRequest, AnyContent] = authorised
     .andThen(agentApplicationAction)
-    .andThen(ensureApplication.ensureApplication(
-      predicate = _.isInProgress,
-      redirectF = _ => uk.gov.hmrc.agentregistrationfrontend.controllers.routes.AgentApplicationController.applicationSubmitted,
-      hintWhyRedirecting = "The application is in the final state"
-    ))
+    .ensure(
+      condition = _.agentApplication.isInProgress,
+      resultWhenConditionNotMet =
+        request =>
+          // TODO: this is a temporary solution and should be revisited once we have full journey implemented
+          val call = uk.gov.hmrc.agentregistrationfrontend.controllers.routes.AgentApplicationController.applicationSubmitted
+          logger.warn(
+            s"The application is not in the final state" +
+              s" (current application state: ${request.agentApplication.applicationState.toString}), " +
+              s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
+          )(using request)
+          Redirect(call.url)
+    )
 
   val getApplicationSubmitted: ActionBuilder[AgentApplicationRequest, AnyContent] = authorised
     .andThen(agentApplicationAction)
-    .andThen(ensureApplication.ensureApplication(
-      predicate = _.hasFinished,
-      redirectF = _ => uk.gov.hmrc.agentregistrationfrontend.controllers.routes.AgentApplicationController.landing,
-      hintWhyRedirecting = "The application is not in the final state"
-    ))
+    .ensure(
+      condition = (r: AgentApplicationRequest[?]) => r.agentApplication.hasFinished,
+      resultWhenConditionNotMet =
+        request =>
+          // TODO: this is a temporary solution and should be revisited once we have full journey implemented
+          val call = uk.gov.hmrc.agentregistrationfrontend.controllers.routes.AgentApplicationController.landing // or task list
+          logger.warn(
+            s"The application is not in the final state" +
+              s" (current application state: ${request.agentApplication.applicationState.toString}), " +
+              s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
+          )(using request)
+          Redirect(call.url)
+    )

@@ -21,7 +21,9 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Request
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentregistration.shared.AgentType
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTypeForm
@@ -34,24 +36,28 @@ import javax.inject.Singleton
 @Singleton
 class AgentTypeController @Inject() (
   mcc: MessagesControllerComponents,
+  actions: Actions,
   view: AgentTypePage
 )
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = Action:
+  def show: Action[AnyContent] = action:
     implicit request: Request[?] =>
       val form: Form[AgentType] =
         request.readAgentType match
           case Some(value: AgentType) => AgentTypeForm.form.fill(value)
           case _ => AgentTypeForm.form
-      Ok(view(form))
+      val appendable: HtmlFormat.Appendable = view(form)
+      Ok.apply(content = appendable)
 
-  def submit: Action[AnyContent] = Action:
-    implicit request: Request[?] =>
-      AgentTypeForm.form.bindFromRequest().fold(
-        formWithErrors => BadRequest(view(formWithErrors)),
-        agentType =>
-          agentType match
-            case AgentType.UkTaxAgent => Redirect(routes.BusinessTypeSessionController.show.url).addAgentTypeToSession(agentType)
-            case AgentType.NonUkTaxAgent => Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url).addAgentTypeToSession(agentType)
-      )
+  def submit: Action[AnyContent] =
+    Action
+      .ensureValidForm[AgentType](AgentTypeForm.form, implicit request => view(_)):
+        implicit request: Request[?] =>
+          AgentTypeForm.form.bindFromRequest().fold(
+            formWithErrors => BadRequest(view(formWithErrors)),
+            agentType =>
+              agentType match
+                case AgentType.UkTaxAgent => Redirect(routes.BusinessTypeSessionController.show.url).addAgentTypeToSession(agentType)
+                case AgentType.NonUkTaxAgent => Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url).addAgentTypeToSession(agentType)
+          )

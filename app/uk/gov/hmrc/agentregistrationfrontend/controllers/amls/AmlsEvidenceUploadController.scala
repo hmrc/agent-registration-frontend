@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
 import com.softwaremill.quicklens.*
-import play.api.i18n.I18nSupport
+
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
@@ -33,16 +33,15 @@ import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.ErrorTemplate
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadProgressPage
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.ExecutionContext
 
 @Singleton
 class AmlsEvidenceUploadController @Inject() (
-  actions: Actions,
   mcc: MessagesControllerComponents,
+  actions: Actions,
   view: AmlsEvidenceUploadPage,
   progressView: AmlsEvidenceUploadProgressPage,
   errorView: ErrorTemplate,
@@ -50,9 +49,8 @@ class AmlsEvidenceUploadController @Inject() (
   upscanInitiateConnector: UpscanConnector,
   applicationService: ApplicationService,
   amlsCodes: AmlsCodes
-)(implicit ec: ExecutionContext)
-extends FrontendController(mcc)
-with I18nSupport:
+)
+extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>

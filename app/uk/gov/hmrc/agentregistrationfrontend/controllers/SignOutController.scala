@@ -20,6 +20,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import sttp.model.Uri.UriContext
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.views.html.TimedOutPage
 
@@ -29,10 +30,11 @@ import javax.inject.Singleton
 @Singleton
 class SignOutController @Inject() (
   mcc: MessagesControllerComponents,
+  actions: Actions,
   timedOutPage: TimedOutPage,
   appConfig: AppConfig
 )
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
   private def signOutWithContinue(continue: String) = {
     val signOutAndRedirectUrl: String = uri"""${appConfig.basFrontendSignOutUrlBase}?${Map("continue" -> continue)}""".toString

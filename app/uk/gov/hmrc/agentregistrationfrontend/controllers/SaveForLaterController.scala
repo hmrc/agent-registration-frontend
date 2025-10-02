@@ -27,11 +27,11 @@ import javax.inject.Singleton
 
 @Singleton
 class SaveForLaterController @Inject() (
-  actions: Actions,
   mcc: MessagesControllerComponents,
+  actions: Actions,
   saveForLaterPage: SaveForLaterPage
 )
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
   val show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>

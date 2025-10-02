@@ -21,6 +21,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.PartnershipTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
@@ -33,9 +34,10 @@ import javax.inject.Singleton
 @Singleton
 class PartnershipTypeController @Inject() (
   mcc: MessagesControllerComponents,
+  actions: Actions,
   view: PartnershipTypePage
 )
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = Action:
     implicit request =>

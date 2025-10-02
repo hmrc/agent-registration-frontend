@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
@@ -28,11 +29,12 @@ import javax.inject.Singleton
 @Singleton
 class BusinessTypeController @Inject() (
   mcc: MessagesControllerComponents,
+  actions: Actions,
   view: SimplePage
 )
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = Action:
+  def show: Action[AnyContent] = action:
     implicit request =>
       Ok(view(
         h1 = "Placeholder for Business Type page...",
