@@ -17,11 +17,14 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import sttp.model.Uri.UriContext
+import uk.gov.hmrc.agentregistration.shared.BusinessDetails
+import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.CompanyProfile
 import uk.gov.hmrc.agentregistration.shared.FullName
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.PartnershipDetails
 import uk.gov.hmrc.agentregistration.shared.SafeId
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
@@ -74,4 +77,10 @@ trait TdBase:
       size = Some(12345),
       checksum = "checksum"
     )
+  )
+  def llpBusinessDetails: BusinessDetails = PartnershipDetails(
+    businessType = BusinessType.Partnership.LimitedLiabilityPartnership,
+    safeId = safeId,
+    companyProfile = Some(companyProfile),
+    postcode = postcode
   )

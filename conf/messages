@@ -31,7 +31,7 @@ businessType.LimitedCompany = Limited company
 businessType.PartnershipType = A type of partnership
 businessType.NotSupported = Something else
 
-# About your business / partnership type
+## About your business / partnership type
 partnershipType.title = What type of partnership?
 partnershipType.GeneralPartnership = General partnership
 partnershipType.ScottishPartnership = Scottish partnership
@@ -65,7 +65,17 @@ signInWithAgentDetails.p2=Your new agent services account will then be linked to
 signInWithAgentDetails.h2=If you have more than one set of sign in details
 signInWithAgentDetails.p3=Choose the one you want to be linked to your new agent services account.
 
+# Applicant contact details
 
+applicant-contact-details.title = Applicant contact details
+
+## Applicant contact details / Llp role
+applicantRoleInLlp.title = Are you a member of the limited liability partnership?
+applicantRoleInLlp.hint = Being a member means you are listed in Companies House as a current officer of {0}.
+applicantRoleInLlp.Member = Yes
+applicantRoleInLlp.Authorised = No, but I’m authorised by them to set up this account
+applicantRoleInLlp.error.required = Select ‘yes’ if you are a member of the limited liability partnership
+applicantRoleInLlp.error.invalid = Select ‘yes’ if you are a member of the limited liability partnership
 
 # About your application / user role
 userRole.title = Are you the owner of the business?
