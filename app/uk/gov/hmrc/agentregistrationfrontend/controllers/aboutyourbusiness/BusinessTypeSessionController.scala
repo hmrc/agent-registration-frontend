@@ -39,36 +39,22 @@ class BusinessTypeSessionController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = Action
-//      .refineWith(implicit request =>
-//        request.headers.get("X-User-Id").toRight(Unauthorized)
-//      )
-//      .refineWith(implicit request =>
-//        request.headers.get("X-User-Id").toRight(Unauthorized)
-//      )
-  :
-    implicit request =>
-//          val x: String = request.collected
+  def show: Action[AnyContent] =
+    action
+      .ensure(_.readAgentType.isDefined, _ => Redirect(routes.AgentTypeController.show)):
+        implicit request =>
+          val form: Form[BusinessTypeSessionValue] =
+            request.readBusinessType match
+              case Some(bt: BusinessTypeSessionValue) => BusinessTypeSessionForm.form.fill(bt)
+              case None => BusinessTypeSessionForm.form
+          Ok(businessTypeSessionPage(form))
 
-      // ensure that agent type has been selected before allowing business type to be selected
-      if request.readAgentType.isEmpty then
-        Redirect(routes.AgentTypeController.show)
-      else
-        val form: Form[BusinessTypeSessionValue] =
-          request.readBusinessType match
-            case Some(bt: BusinessTypeSessionValue) => BusinessTypeSessionForm.form.fill(bt)
-            case None => BusinessTypeSessionForm.form
-        Ok(businessTypeSessionPage(form))
-
-  def submit: Action[AnyContent] = Action:
-    implicit request =>
-      // ensure that agent type has been selected before allowing business type to be posted
-      if request.readAgentType.isEmpty then
-        Redirect(routes.AgentTypeController.show)
-      else
-        BusinessTypeSessionForm.form.bindFromRequest().fold(
-          formWithErrors => BadRequest(businessTypeSessionPage(formWithErrors)),
-          {
+  def submit: Action[AnyContent] =
+    action
+      .ensure(_.readAgentType.isDefined, _ => Redirect(routes.AgentTypeController.show)) // ensure that agent type has been selected before allowing business type to be posted
+      .ensureValidForm(BusinessTypeSessionForm.form, implicit r => businessTypeSessionPage(_)):
+        implicit request =>
+          request.formValue match
             case businessType @ (BusinessTypeSessionValue.SoleTrader | BusinessTypeSessionValue.LimitedCompany) =>
               // TODO SoleTrader or LimitedCompany journeys not yet built
               Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
@@ -80,5 +66,3 @@ extends FrontendController(mcc, actions):
             case businessType @ BusinessTypeSessionValue.NotSupported =>
               Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
                 .addBusinessTypeToSession(businessType)
-          }
-        )

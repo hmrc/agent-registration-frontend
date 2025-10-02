@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action
 
+import play.api.mvc.MessagesRequest
 import play.api.mvc.Request
 import play.api.mvc.WrappedRequest
 
@@ -34,20 +35,30 @@ trait FormValue[T]:
   * @tparam R
   *   the type to merge the form value into
   */
-trait MergeFormValue[T, R]:
+trait MergeFormValue[R, T]:
   def mergeFormValue(
-    formValue: T,
-    r: R
+    r: R,
+    formValue: T
   ): R & FormValue[T]
 
 object MergeFormValue:
-  // lowes priority given for generic Request
 
-  given [T, A]: MergeFormValue[T, Request[A]] =
+  // lowes priority given for generic requests
+
+  given [T, A]: MergeFormValue[Request[A], T] =
     (
-      formValue: T,
-      r: Request[A]
+      r: Request[A],
+      t: T
     ) =>
       new WrappedRequest[A](r)
         with FormValue[T]:
-        val formValue: T = formValue
+        override val formValue: T = t
+
+  given [B, T]: MergeFormValue[MessagesRequest[B], T] =
+    (
+      r: MessagesRequest[B],
+      t: T
+    ) =>
+      new MessagesRequest[B](r, r.messagesApi)
+        with FormValue[T]:
+        override val formValue = t

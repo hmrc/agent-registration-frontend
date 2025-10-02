@@ -17,14 +17,9 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness
 
 import play.api.data.Form
-import play.api.mvc.Action
-import play.api.mvc.AnyContent
-import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.Request
-import play.twirl.api.HtmlFormat
+import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTypeForm
@@ -50,13 +45,13 @@ extends FrontendController(mcc, actions):
           case _ => AgentTypeForm.form
       Ok(view(form))
 
-//  type RequestWithForm[T] <: Request[AnyContent] & FormValue[T]
-
-  def submit: Action[AnyContent] = action
-    .ensureValidForm(implicit r => AgentTypeForm.form.bindFromRequest(), implicit request => view(_))
-    .apply:
-      implicit request: Request[AnyContent] & FormValue[AgentType] =>
-        val agentType: AgentType = request.formValue
-        agentType match
-          case AgentType.UkTaxAgent => Redirect(routes.BusinessTypeSessionController.show.url).addAgentTypeToSession(agentType)
-          case AgentType.NonUkTaxAgent => Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url).addAgentTypeToSession(agentType)
+  def submit: Action[AnyContent] =
+    action
+      .ensureValidForm(AgentTypeForm.form, implicit request => view(_)):
+        implicit request =>
+          val agentType: AgentType = request.formValue
+          val call: Call =
+            agentType match
+              case AgentType.UkTaxAgent => routes.BusinessTypeSessionController.show
+              case AgentType.NonUkTaxAgent => applicationRoutes.AgentApplicationController.genericExitPage
+          Redirect(call.url).addAgentTypeToSession(agentType)

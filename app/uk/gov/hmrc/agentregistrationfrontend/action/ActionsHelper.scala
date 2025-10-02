@@ -34,6 +34,11 @@ object ActionsHelper:
 
     def ensure(
       condition: R[B] => Boolean,
+      resultWhenConditionNotMet: => Result
+    ): ActionBuilder[R, B] = ensure(condition, _ => resultWhenConditionNotMet)
+
+    def ensure(
+      condition: R[B] => Boolean,
       resultWhenConditionNotMet: R[B] => Result
     ): ActionBuilder[R, B] = ab.andThen(new ActionFilter[R]:
       protected def executionContext: ExecutionContext = ec
@@ -56,25 +61,32 @@ object ActionsHelper:
           result <- if ok then Future.successful(None) else resultWhenConditionNotMet(rB).map(Some(_))
         yield result)
 
-    def ensureValidForm[
-      T,
-      RWithFormValue <: [X] =>> R[X] & FormValue[T]
-    ](
-      form: R[B] => Form[T],
+    def ensureValidForm[T](
+      form: Form[T],
       viewToServeWhenFormHasErrors: R[B] => Form[T] => HtmlFormat.Appendable
     )(using
       fb: FormBinding,
-      merger: MergeFormValue[T, R[B]]
-    ): ActionBuilder[R, B] =
-//      type RWithFormValue <: [X] =>> R[X] & FormValue[T]
-      ab.andThen(new ActionRefiner[R, RWithFormValue]:
-        override protected def executionContext: ExecutionContext = ec
-        override protected def refine[A](rA: R[A]): Future[Either[Result, RWithFormValue[A]]] = Future.successful:
-          val rB: R[B] = rA.asInstanceOf[R[B]]
-          form(rB).bindFromRequest()(using rB, fb).fold(
-            formWithErrors => Left(BadRequest(viewToServeWhenFormHasErrors(rB)(formWithErrors))),
-            formValue => Right(merger.mergeFormValue(formValue, rB).asInstanceOf[RWithFormValue[A]])
-          ))
+      merge: MergeFormValue[R[B], T]
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ab.andThen(new ActionRefiner[R, [X] =>> R[X] & FormValue[T]] {
+
+      override protected def refine[A](rA: R[A]): Future[Either[Result, R[A] & FormValue[T]]] = Future.successful {
+        val rB: R[B] = rA.asInstanceOf[R[B]]
+        summon[R[B] <:< Request[B]]
+
+        //        val requestB: Request[B] = ev.apply(rB)
+
+        form.bindFromRequest()(using rB, fb).fold(
+          hasErrors = formWithErrors => Left(BadRequest(viewToServeWhenFormHasErrors(rB)(formWithErrors))),
+          success =
+            (formValue: T) =>
+              val x: R[A] & FormValue[T] = merge.mergeFormValue(rB, formValue).asInstanceOf[R[A] & FormValue[T]]
+              Right(x)
+        )
+
+      }
+
+      override protected def executionContext: ExecutionContext = ec
+    })
 
 //    def ensureValidForm2[T](
 //      form: Form[T],

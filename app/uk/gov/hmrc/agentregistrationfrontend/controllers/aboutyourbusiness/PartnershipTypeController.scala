@@ -39,27 +39,38 @@ class PartnershipTypeController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = Action:
-    implicit request =>
-      // ensure that business type has been selected and is partnership type
-      // before allowing partnership type to be selected
-      request.readBusinessType match
-        case Some(BusinessTypeSessionValue.PartnershipType) =>
+  def show: Action[AnyContent] =
+    action
+      .ensure(
+        _.readBusinessType match {
+          case Some(BusinessTypeSessionValue.PartnershipType) => true
+          case _ => false
+        },
+        implicit r =>
+          logger.info(s"Redirecting to business type page due to missing or invalid business type selection: ${r.readBusinessType}")
+          Redirect(routes.BusinessTypeSessionController.show)
+      ):
+        implicit request =>
           val form: Form[BusinessType.Partnership] =
             request.readPartnershipType match
               case Some(data) => PartnershipTypeForm.form.fill(data)
               case None => PartnershipTypeForm.form
           Ok(view(form))
-        case _ => Redirect(routes.BusinessTypeSessionController.show)
 
-  def submit: Action[AnyContent] = Action:
-    implicit request =>
-      request.readBusinessType match
-        case Some(BusinessTypeSessionValue.PartnershipType) =>
-          PartnershipTypeForm.form.bindFromRequest().fold(
-            formWithErrors => BadRequest(view(formWithErrors)),
-            partnershipType =>
-              Redirect(routes.TypeOfSignInController.show)
-                .addPartnershipTypeToSession(partnershipType)
-          )
-        case _ => Redirect(routes.BusinessTypeSessionController.show)
+  def submit: Action[AnyContent] =
+    action
+      .ensure(
+        _.readBusinessType match {
+          case Some(BusinessTypeSessionValue.PartnershipType) => true
+          case _ => false
+        },
+        implicit r =>
+          logger.info(s"Redirecting to business type page due to missing or invalid business type selection: ${r.readBusinessType}")
+          Redirect(routes.BusinessTypeSessionController.show)
+      )
+      .ensureValidForm(PartnershipTypeForm.form, implicit r => view(_)):
+        implicit request =>
+          val partnershipType = request.formValue
+          Redirect(
+            routes.TypeOfSignInController.show
+          ).addPartnershipTypeToSession(partnershipType)
