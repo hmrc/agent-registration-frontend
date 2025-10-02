@@ -16,23 +16,28 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.forms
 
-import play.api.data.FieldMapping
 import play.api.data.Form
-import play.api.data.Forms
 import play.api.data.Forms.mapping
-import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
-import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
+import play.api.data.Forms.text
+import uk.gov.hmrc.agentregistration.shared.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
-object ApplicantRoleInLlpForm:
+object CompaniesHouseNameQueryForm:
 
-  val key: String = "applicantRoleInLlp"
+  val firstNameKey: String = "firstName"
+  val lastNameKey: String = "lastName"
 
-  val form: Form[ApplicantRoleInLlp] =
-    val fieldMapping: FieldMapping[ApplicantRoleInLlp] = Forms.of(FormatterFactory.makeEnumFormatter[ApplicantRoleInLlp](
-      errorMessageIfMissing = ErrorKeys.requiredFieldErrorMessage(key),
-      errorMessageIfEnumError = ErrorKeys.invalidInputErrorMessage(key)
-    ))
-    Form(
-      mapping = mapping(key -> fieldMapping)(identity)(Some(_))
-    )
+  val form: Form[CompaniesHouseNameQuery] = Form[CompaniesHouseNameQuery](
+    mapping(
+      firstNameKey -> text
+        .verifying(
+          ErrorKeys.requiredFieldErrorMessage(firstNameKey),
+          _.nonEmpty
+        ),
+      lastNameKey -> text
+        .verifying(
+          ErrorKeys.requiredFieldErrorMessage(lastNameKey),
+          _.nonEmpty
+        )
+    )(CompaniesHouseNameQuery.apply)(CompaniesHouseNameQuery.unapply)
+  )

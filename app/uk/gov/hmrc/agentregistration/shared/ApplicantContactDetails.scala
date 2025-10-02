@@ -20,9 +20,10 @@ import play.api.libs.json.Format
 import play.api.libs.json.Json
 
 final case class ApplicantContactDetails(
-  applicantRoleInLlp: AppicantRoleInLlp
+  applicantRoleInLlp: ApplicantRoleInLlp
 )
 
 object ApplicantContactDetails:
 
   implicit val format: Format[ApplicantContactDetails] = Json.format[ApplicantContactDetails]
+

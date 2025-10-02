@@ -74,4 +74,17 @@ extends RequestAwareLogging:
       }
     }
 
+  // TODO: url and result handling to be confirmed
+  def searchCompaniesHouseOfficers(query: CompaniesHouseNameQuery)(using
+    request: RequestHeader
+  ): Future[Seq[CompaniesHouseOfficer]] = httpClient
+    .post(url"$baseUrl/companies-house/name-query")
+    .withBody(Json.toJson(query))
+    .execute[Seq[CompaniesHouseOfficer]]
+    .recover {
+      case e =>
+        logger.error(s"Error calling companiesHouseNameQuery: ${e.getMessage}", e)
+        Seq.empty
+    }
+
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration"

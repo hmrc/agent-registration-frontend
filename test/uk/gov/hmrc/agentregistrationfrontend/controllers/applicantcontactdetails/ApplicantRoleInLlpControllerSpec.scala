@@ -20,17 +20,17 @@ import com.softwaremill.quicklens.*
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.AppicantRoleInLlp
+import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
-class AppicantRoleInLlpControllerSpec
+class ApplicantRoleInLlpControllerSpec
 extends ControllerSpec:
 
-  private val path = "/agent-registration/apply/about-applicant/llp-member"
+  private val path = "/agent-registration/apply/applicant/llp-member"
 
   "routes should have correct paths and methods" in:
     routes.ApplicantRoleInLlpController.show shouldBe Call(
@@ -57,7 +57,7 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubUpdateAgentApplication(
       tdAll.llpAgentApplication
         .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(applicantRoleInLlp = AppicantRoleInLlp.Member)))
+        .setTo(Some(ApplicantContactDetails(applicantRoleInLlp = ApplicantRoleInLlp.Member)))
     )
     val response: WSResponse = post(path)(Map(ApplicantRoleInLlpForm.key -> Seq("Member")))
 
@@ -71,7 +71,7 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubUpdateAgentApplication(
       tdAll.llpAgentApplication
         .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(applicantRoleInLlp = AppicantRoleInLlp.Authorised)))
+        .setTo(Some(ApplicantContactDetails(applicantRoleInLlp = ApplicantRoleInLlp.Authorised)))
     )
     val response: WSResponse = post(path)(Map(ApplicantRoleInLlpForm.key -> Seq("Authorised")))
 
@@ -93,7 +93,7 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubUpdateAgentApplication(
       tdAll.llpAgentApplication
         .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(applicantRoleInLlp = AppicantRoleInLlp.Member)))
+        .setTo(Some(ApplicantContactDetails(applicantRoleInLlp = ApplicantRoleInLlp.Member)))
     )
     val response: WSResponse =
       post(path)(Map(

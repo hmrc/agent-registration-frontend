@@ -22,7 +22,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.AppicantRoleInLlp
+import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
@@ -48,7 +48,7 @@ extends FrontendController(mcc, actions):
   val show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       val emptyForm = ApplicantRoleInLlpForm.form
-      val form: Form[AppicantRoleInLlp] =
+      val form: Form[ApplicantRoleInLlp] =
         request
           .agentApplication
           .applicantContactDetails
@@ -92,8 +92,8 @@ extends FrontendController(mcc, actions):
                   then applicationRoutes.SaveForLaterController.show.url
                   else
                     applicantRoleInLlp match
-                      case AppicantRoleInLlp.Member => routes.MemberNameController.show.url
-                      case AppicantRoleInLlp.Authorised => routes.ApplicantNameController.show.url
+                      case ApplicantRoleInLlp.Member => routes.MemberNameController.show.url
+                      case ApplicantRoleInLlp.Authorised => routes.ApplicantNameController.show.url
                 )
               )
         )
