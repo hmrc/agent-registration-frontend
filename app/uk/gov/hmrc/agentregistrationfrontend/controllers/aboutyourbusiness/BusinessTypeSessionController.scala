@@ -39,26 +39,26 @@ class BusinessTypeSessionController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] =
-    Action
-      .refineWith(implicit request =>
-        request.headers.get("X-User-Id").toRight(Unauthorized)
-      )
-      .refineWith(implicit request =>
-        request.headers.get("X-User-Id").toRight(Unauthorized)
-      ):
-        implicit request =>
-          val x: String = request.collected
+  def show: Action[AnyContent] = Action
+//      .refineWith(implicit request =>
+//        request.headers.get("X-User-Id").toRight(Unauthorized)
+//      )
+//      .refineWith(implicit request =>
+//        request.headers.get("X-User-Id").toRight(Unauthorized)
+//      )
+  :
+    implicit request =>
+//          val x: String = request.collected
 
-          // ensure that agent type has been selected before allowing business type to be selected
-          if request.readAgentType.isEmpty then
-            Redirect(routes.AgentTypeController.show)
-          else
-            val form: Form[BusinessTypeSessionValue] =
-              request.readBusinessType match
-                case Some(bt: BusinessTypeSessionValue) => BusinessTypeSessionForm.form.fill(bt)
-                case None => BusinessTypeSessionForm.form
-            Ok(businessTypeSessionPage(form))
+      // ensure that agent type has been selected before allowing business type to be selected
+      if request.readAgentType.isEmpty then
+        Redirect(routes.AgentTypeController.show)
+      else
+        val form: Form[BusinessTypeSessionValue] =
+          request.readBusinessType match
+            case Some(bt: BusinessTypeSessionValue) => BusinessTypeSessionForm.form.fill(bt)
+            case None => BusinessTypeSessionForm.form
+        Ok(businessTypeSessionPage(form))
 
   def submit: Action[AnyContent] = Action:
     implicit request =>

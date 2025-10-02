@@ -28,11 +28,11 @@ import javax.inject.Singleton
 
 @Singleton
 class MemberNameController @Inject() (
-  actions: Actions,
   mcc: MessagesControllerComponents,
+  actions: Actions,
   view: SimplePage
 )
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>

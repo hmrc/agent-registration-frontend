@@ -19,20 +19,21 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
+import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class Actions @Inject() (
   actionBuilder: DefaultActionBuilder,
   authorisedAction: AuthorisedAction,
-  agentApplicationAction: AgentApplicationAction,
-  requestEnsurer: RequestEnsurer
-)
+  agentApplicationAction: AgentApplicationAction
+)(using ExecutionContext)
 extends RequestAwareLogging:
 
-  export requestEnsurer.*
+  export ActionsHelper.*
 
   val action: ActionBuilder[Request, AnyContent] = actionBuilder
 
@@ -44,14 +45,14 @@ extends RequestAwareLogging:
     .ensure(
       condition = _.agentApplication.isInProgress,
       resultWhenConditionNotMet =
-        request =>
+        implicit request =>
           // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-          val call = uk.gov.hmrc.agentregistrationfrontend.controllers.routes.AgentApplicationController.applicationSubmitted
+          val call = appRoutes.AgentApplicationController.applicationSubmitted
           logger.warn(
             s"The application is not in the final state" +
               s" (current application state: ${request.agentApplication.applicationState.toString}), " +
               s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
-          )(using request)
+          )
           Redirect(call.url)
     )
 
@@ -60,13 +61,13 @@ extends RequestAwareLogging:
     .ensure(
       condition = (r: AgentApplicationRequest[?]) => r.agentApplication.hasFinished,
       resultWhenConditionNotMet =
-        request =>
+        implicit request =>
           // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-          val call = uk.gov.hmrc.agentregistrationfrontend.controllers.routes.AgentApplicationController.landing // or task list
+          val call = appRoutes.AgentApplicationController.landing // or task list
           logger.warn(
             s"The application is not in the final state" +
               s" (current application state: ${request.agentApplication.applicationState.toString}), " +
               s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
-          )(using request)
+          )
           Redirect(call.url)
     )

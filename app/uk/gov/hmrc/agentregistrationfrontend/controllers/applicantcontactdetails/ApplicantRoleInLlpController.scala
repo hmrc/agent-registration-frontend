@@ -38,12 +38,12 @@ import scala.concurrent.Future
 
 @Singleton
 class ApplicantRoleInLlpController @Inject() (
-  actions: Actions,
   mcc: MessagesControllerComponents,
+  actions: Actions,
   view: ApplicantRoleInLlpPage,
   applicationService: ApplicationService
 )(implicit ec: ExecutionContext)
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>

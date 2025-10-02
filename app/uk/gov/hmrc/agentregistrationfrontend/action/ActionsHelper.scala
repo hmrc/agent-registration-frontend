@@ -21,98 +21,112 @@ import play.api.data.FormBinding
 import play.api.mvc.*
 import play.api.mvc.Results.BadRequest
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.agentregistrationfrontend.util.*
-import uk.gov.hmrc.play.bootstrap.data.UrlEncodedOnlyFormBinding
 
-import javax.inject.Inject
-import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-final class CollectedRequest[C, A](
-  val underlying: Request[A],
-  val collected: C
-)
-extends WrappedRequest[A](underlying)
+object ActionsHelper:
 
-@Singleton
-class RequestEnsurer @Inject() ()(using ec: ExecutionContext)
-extends RequestAwareLogging:
-  self =>
+  extension [
+    R <: [X] =>> Request[X],
+    B // Represents Play Framework's Content Type parameter, commonly denoted as B
+  ](ab: ActionBuilder[R, B])(using ec: ExecutionContext)
 
-  type Collected[C] = [X] =>> CollectedRequest[C, X]
-
-//  type WithForm[
-//    T,
-//    R <: Request[T]
-//  ] = [X] =>> FormRequest[X, R[X], T]
-
-  extension [R[_], B](ab: ActionBuilder[R, B])
-
-    //    @targetName("filterWithAsync")
-    def filterWithAsync(
-      predicate: R[B] => Future[Boolean],
-      onReject: R[B] => Future[Result]
-    )(using
-      ev: R[B] <:< Request[B]
-    ): ActionBuilder[R, B] = ab.andThen(new ActionFilter[R]:
-      protected def executionContext: ExecutionContext = ec
-      def filter[A](request: R[A]): Future[Option[Result]] = predicate(request.asInstanceOf[R[B]]).flatMap { ok =>
-        if ok then Future.successful(None)
-        else onReject(request.asInstanceOf[R[B]]).map(Some(_))
-      })
-
-    def ensureValidForm2[T](
-      form: Form[T],
-      viewToServeWhenFormHasErrors: R[B] => Form[T] => HtmlFormat.Appendable
-    )(using
-      ev: R[B] <:< Request[B]
+    def ensure(
+      condition: R[B] => Boolean,
+      resultWhenConditionNotMet: R[B] => Result
     ): ActionBuilder[R, B] = ab.andThen(new ActionFilter[R]:
       protected def executionContext: ExecutionContext = ec
 
-      def filter[A](request: R[A]): Future[Option[Result]] =
-        val r1: R[B] = request.asInstanceOf[R[B]]
-        given r: Request[B] = ev.apply(request.asInstanceOf[R[B]])
-        given FormBinding = formBinding
-        form.bindFromRequest().fold[Future[Option[Result]]](
-          hasErrors = formWithErrors => Future.successful(Some(BadRequest(viewToServeWhenFormHasErrors(r1)(formWithErrors)))),
-          success = _ => Future.successful(None)
-        ))
+      def filter[A](rA: R[A]): Future[Option[Result]] = Future.successful:
+        given rB: R[B] = rA.asInstanceOf[R[B]]
+        if condition(rB) then None
+        else Some(resultWhenConditionNotMet(rB)))
 
-    def refineWith[C](f: R[B] => Either[Result, C])(using
-      ev: R[B] <:< Request[B]
-    ) = ab.andThen(new ActionRefiner[R, Collected[C]] {
+    //    @targetName("ensureAsync")
+    def ensureAsync(
+      condition: R[B] => Future[Boolean],
+      resultWhenConditionNotMet: R[B] => Future[Result]
+    ): ActionBuilder[R, B] = ab.andThen(new ActionFilter[R]:
       protected def executionContext: ExecutionContext = ec
-      def refine[A](request: R[A]): Future[Either[Result, CollectedRequest[C, A]]] = Future.successful {
-        f(request.asInstanceOf[R[B]]) match
-          case Left(res) => Left(res)
-          case Right(c) =>
-            val base = request.asInstanceOf[Request[A]]
-            Right(CollectedRequest[C, A](base, c))
-      }
-    })
+      def filter[A](rA: R[A]): Future[Option[Result]] =
+        val rB: R[B] = rA.asInstanceOf[R[B]]
+        for
+          ok <- condition(rB)
+          result <- if ok then Future.successful(None) else resultWhenConditionNotMet(rB).map(Some(_))
+        yield result)
 
-    def ensureValidForm[T](
-      form: Form[T],
+    def ensureValidForm[
+      T,
+      RWithFormValue <: [X] =>> R[X] & FormValue[T]
+    ](
+      form: R[B] => Form[T],
       viewToServeWhenFormHasErrors: R[B] => Form[T] => HtmlFormat.Appendable
     )(using
       fb: FormBinding,
-      ev: R[B] <:< Request[B]
-    ): ActionBuilder[[X] =>> FormRequest[X, R[X], T], B] = ab.andThen(new ActionRefiner[R, [X] =>> FormRequest[X, R[X], T]] {
-      protected def executionContext: ExecutionContext = ec
+      merger: MergeFormValue[T, R[B]]
+    ): ActionBuilder[R, B] =
+//      type RWithFormValue <: [X] =>> R[X] & FormValue[T]
+      ab.andThen(new ActionRefiner[R, RWithFormValue]:
+        override protected def executionContext: ExecutionContext = ec
+        override protected def refine[A](rA: R[A]): Future[Either[Result, RWithFormValue[A]]] = Future.successful:
+          val rB: R[B] = rA.asInstanceOf[R[B]]
+          form(rB).bindFromRequest()(using rB, fb).fold(
+            formWithErrors => Left(BadRequest(viewToServeWhenFormHasErrors(rB)(formWithErrors))),
+            formValue => Right(merger.mergeFormValue(formValue, rB).asInstanceOf[RWithFormValue[A]])
+          ))
 
-      def refine[A](request: R[A]): Future[Either[Result, FormRequest[A, R[A], T]]] =
-        val rB: R[B] = request.asInstanceOf[R[B]]
-        val baseB: Request[B] = ev(rB)
-        form.bindFromRequest()(using baseB, fb).fold(
-          hasErrors =
-            fe =>
-              Future.successful(Left(BadRequest(viewToServeWhenFormHasErrors(rB)(fe)))),
-          success =
-            value =>
-              Future.successful(Right(new FormRequest[A, R[A], T](value, request)))
-        )
-    })
+//    def ensureValidForm2[T](
+//      form: Form[T],
+//      viewToServeWhenFormHasErrors: R[B] => Form[T] => HtmlFormat.Appendable
+//    )(using
+//      ev: R[B] <:< Request[B]
+//    ): ActionBuilder[R, B] = ab.andThen(new ActionFilter[R]:
+//      protected def executionContext: ExecutionContext = ec
+//
+//      def filter[A](request: R[A]): Future[Option[Result]] =
+//        val r1: R[B] = request.asInstanceOf[R[B]]
+//        given r: Request[B] = ev.apply(request.asInstanceOf[R[B]])
+//        given FormBinding = formBinding
+//        form.bindFromRequest().fold[Future[Option[Result]]](
+//          hasErrors = formWithErrors => Future.successful(Some(BadRequest(viewToServeWhenFormHasErrors(r1)(formWithErrors)))),
+//          success = _ => Future.successful(None)
+//        ))
+//
+//    def refineWith[C](f: R[B] => Either[Result, C])(using
+//      ev: R[B] <:< Request[B]
+//    ) = ab.andThen(new ActionRefiner[R, Collected[C]] {
+//      protected def executionContext: ExecutionContext = ec
+//      def refine[A](request: R[A]): Future[Either[Result, CollectedRequest[C, A]]] = Future.successful {
+//        f(request.asInstanceOf[R[B]]) match
+//          case Left(res) => Left(res)
+//          case Right(c) =>
+//            val base = request.asInstanceOf[Request[A]]
+//            Right(CollectedRequest[C, A](base, c))
+//      }
+//    })
+//
+//    def ensureValidForm[T](
+//      form: Form[T],
+//      viewToServeWhenFormHasErrors: R[B] => Form[T] => HtmlFormat.Appendable
+//    )(using
+//      fb: FormBinding,
+//      ev: R[B] <:< Request[B]
+//    ): ActionBuilder[[X] =>> FormRequest[X, R[X], T], B] = ab.andThen(new ActionRefiner[R, [X] =>> FormRequest[X, R[X], T]] {
+//      protected def executionContext: ExecutionContext = ec
+//
+//      def refine[A](request: R[A]): Future[Either[Result, FormRequest[A, R[A], T]]] =
+//        val rB: R[B] = request.asInstanceOf[R[B]]
+//        val baseB: Request[B] = ev(rB)
+//        form.bindFromRequest()(using baseB, fb).fold(
+//          hasErrors =
+//            fe =>
+//              Future.successful(Left(BadRequest(viewToServeWhenFormHasErrors(rB)(fe)))),
+//          success =
+//            value =>
+//              Future.successful(Right(new FormRequest[A, R[A], T](value, request)))
+//        )
+//    })
 
 //    def ensureValidForm[T](
 //      form: Form[T],
@@ -168,20 +182,6 @@ extends RequestAwareLogging:
 //          hasErrors = formWithErrors => Future.successful(Some(BadRequest(viewToServeWhenFormHasErrors(r1)(formWithErrors)))),
 //          success = _ => Future.successful(None)
 //        ))
-
-    def ensure(
-      condition: R[B] => Boolean,
-      resultWhenConditionNotMet: R[B] => Result
-    )(using
-      ev: R[B] <:< Request[B]
-    ): ActionBuilder[R, B] = ab.andThen(new ActionFilter[R]:
-      protected def executionContext: ExecutionContext = ec
-
-      def filter[A](request: R[A]): Future[Option[Result]] =
-        given r: R[B] = request.asInstanceOf[R[B]]
-        if condition(r) then
-          Future.successful(None)
-        else Future.successful(Some(resultWhenConditionNotMet(r))))
 
 //  extension [
 //    ContentType,
@@ -254,5 +254,3 @@ extends RequestAwareLogging:
 //    condition = r => Future.successful(condition(r)),
 //    resultWhenConditionNotMet = r => Future.successful(resultWhenConditionNotMet(r))
 //  )
-
-  private val formBinding: FormBinding = new UrlEncodedOnlyFormBinding
