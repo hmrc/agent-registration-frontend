@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails
 
-import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,8 +32,7 @@ class ApplicantNameController @Inject() (
   mcc: MessagesControllerComponents,
   view: SimplePage
 )
-extends FrontendController(mcc)
-with I18nSupport:
+extends FrontendController(mcc):
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>

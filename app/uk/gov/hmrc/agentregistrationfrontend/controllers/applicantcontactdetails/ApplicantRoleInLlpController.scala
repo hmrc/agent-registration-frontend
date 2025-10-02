@@ -18,19 +18,18 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetail
 
 import com.softwaremill.quicklens.*
 import play.api.data.Form
-import play.api.i18n.I18nSupport
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.AppicantRoleInLlp
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.getSubmitAction
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.ApplicantRoleInLlpPage
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -44,8 +43,7 @@ class ApplicantRoleInLlpController @Inject() (
   view: ApplicantRoleInLlpPage,
   applicationService: ApplicationService
 )(implicit ec: ExecutionContext)
-extends FrontendController(mcc)
-with I18nSupport:
+extends FrontendController(mcc):
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
