@@ -54,7 +54,11 @@ extends ControllerSpec:
   s"POST $path with Yes should redirect to the member name page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(tdAll.llpAgentApplication)
-    AgentRegistrationStubs.stubUpdateAgentApplication
+    AgentRegistrationStubs.stubUpdateAgentApplication(
+      tdAll.llpAgentApplication
+        .modify(_.applicantContactDetails)
+        .setTo(Some(ApplicantContactDetails(llpRole = LlpRole.Member)))
+    )
     val response: WSResponse = post(path)(Map(LlpRoleForm.key -> Seq("Member")))
 
     response.status shouldBe Status.SEE_OTHER
@@ -64,7 +68,11 @@ extends ControllerSpec:
   s"POST $path with No should redirect to applicant name page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(tdAll.llpAgentApplication)
-    AgentRegistrationStubs.stubUpdateAgentApplication
+    AgentRegistrationStubs.stubUpdateAgentApplication(
+      tdAll.llpAgentApplication
+        .modify(_.applicantContactDetails)
+        .setTo(Some(ApplicantContactDetails(llpRole = LlpRole.Authorised)))
+    )
     val response: WSResponse = post(path)(Map(LlpRoleForm.key -> Seq("Authorised")))
 
     response.status shouldBe Status.SEE_OTHER
