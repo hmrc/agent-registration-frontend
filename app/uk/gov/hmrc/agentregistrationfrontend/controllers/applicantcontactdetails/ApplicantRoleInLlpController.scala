@@ -23,13 +23,13 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.LlpRole
+import uk.gov.hmrc.agentregistration.shared.AppicantRoleInLlp
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
-import uk.gov.hmrc.agentregistrationfrontend.forms.LlpRoleForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.getSubmitAction
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.LlpRolePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.ApplicantRoleInLlpPage
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.Inject
@@ -38,10 +38,10 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class LlpRoleController @Inject() (
+class ApplicantRoleInLlpController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  view: LlpRolePage,
+  view: ApplicantRoleInLlpPage,
   applicationService: ApplicationService
 )(implicit ec: ExecutionContext)
 extends FrontendController(mcc)
@@ -49,19 +49,19 @@ with I18nSupport:
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
-      val emptyForm = LlpRoleForm.form
-      val form: Form[LlpRole] =
+      val emptyForm = ApplicantRoleInLlpForm.form
+      val form: Form[AppicantRoleInLlp] =
         request
           .agentApplication
           .applicantContactDetails
           .fold(emptyForm)((applicant: ApplicantContactDetails) =>
-            emptyForm.fill(applicant.llpRole)
+            emptyForm.fill(applicant.applicantRoleInLlp)
           )
       Ok(view(form))
 
   def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
-      LlpRoleForm.form
+      ApplicantRoleInLlpForm.form
         .bindFromRequest()
         .fold(
           formWithErrors =>
@@ -71,7 +71,7 @@ with I18nSupport:
               then Redirect(applicationRoutes.SaveForLaterController.show.url)
               else BadRequest(view(formWithErrors))
             ),
-          llpRole =>
+          applicantRoleInLlp =>
             applicationService
               .upsert(
                 request.agentApplication
@@ -79,11 +79,11 @@ with I18nSupport:
                   .using {
                     case Some(acd) =>
                       Some(acd
-                        .modify(_.llpRole)
-                        .setTo(llpRole))
+                        .modify(_.applicantRoleInLlp)
+                        .setTo(applicantRoleInLlp))
                     case None =>
                       Some(ApplicantContactDetails(
-                        llpRole = llpRole
+                        applicantRoleInLlp = applicantRoleInLlp
                       ))
                   }
               )
@@ -93,9 +93,9 @@ with I18nSupport:
                       .isSaveAndComeBackLater
                   then applicationRoutes.SaveForLaterController.show.url
                   else
-                    llpRole match
-                      case LlpRole.Member => routes.MemberNameController.show.url
-                      case LlpRole.Authorised => routes.ApplicantNameController.show.url
+                    applicantRoleInLlp match
+                      case AppicantRoleInLlp.Member => routes.MemberNameController.show.url
+                      case AppicantRoleInLlp.Authorised => routes.ApplicantNameController.show.url
                 )
               )
         )

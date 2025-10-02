@@ -35,8 +35,8 @@ GET         /apply/about-your-business/agent-type/:agentType/entity-type/:busine
 GET         /apply/grs-callback/:businessType                       uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.journeyCallback(businessType: BusinessType, journeyId: JourneyId)
 
 ## Applicant contact details routes
-GET         /apply/about-applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.LlpRoleController.show
-POST        /apply/about-applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.LlpRoleController.submit
+GET         /apply/about-applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.ApplicantRoleInLlpController.show
+POST        /apply/about-applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.ApplicantRoleInLlpController.submit
 GET         /apply/about-applicant/applicant-name                        uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.ApplicantNameController.show
 GET         /apply/about-applicant/member-name                           uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.MemberNameController.show
 

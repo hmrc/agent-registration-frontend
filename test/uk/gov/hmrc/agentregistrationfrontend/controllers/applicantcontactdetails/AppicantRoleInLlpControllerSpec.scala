@@ -20,28 +20,28 @@ import com.softwaremill.quicklens.*
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.LlpRole
+import uk.gov.hmrc.agentregistration.shared.AppicantRoleInLlp
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
-import uk.gov.hmrc.agentregistrationfrontend.forms.LlpRoleForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
-class LlpRoleControllerSpec
+class AppicantRoleInLlpControllerSpec
 extends ControllerSpec:
 
   private val path = "/agent-registration/apply/about-applicant/llp-member"
 
   "routes should have correct paths and methods" in:
-    routes.LlpRoleController.show shouldBe Call(
+    routes.ApplicantRoleInLlpController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.LlpRoleController.submit shouldBe Call(
+    routes.ApplicantRoleInLlpController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.LlpRoleController.submit.url shouldBe routes.LlpRoleController.show.url
+    routes.ApplicantRoleInLlpController.submit.url shouldBe routes.ApplicantRoleInLlpController.show.url
 
   s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthorise()
@@ -57,9 +57,9 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubUpdateAgentApplication(
       tdAll.llpAgentApplication
         .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(llpRole = LlpRole.Member)))
+        .setTo(Some(ApplicantContactDetails(applicantRoleInLlp = AppicantRoleInLlp.Member)))
     )
-    val response: WSResponse = post(path)(Map(LlpRoleForm.key -> Seq("Member")))
+    val response: WSResponse = post(path)(Map(ApplicantRoleInLlpForm.key -> Seq("Member")))
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
@@ -71,9 +71,9 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubUpdateAgentApplication(
       tdAll.llpAgentApplication
         .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(llpRole = LlpRole.Authorised)))
+        .setTo(Some(ApplicantContactDetails(applicantRoleInLlp = AppicantRoleInLlp.Authorised)))
     )
-    val response: WSResponse = post(path)(Map(LlpRoleForm.key -> Seq("Authorised")))
+    val response: WSResponse = post(path)(Map(ApplicantRoleInLlpForm.key -> Seq("Authorised")))
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
@@ -82,7 +82,7 @@ extends ControllerSpec:
   s"POST $path without valid selection should return 400" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(tdAll.llpAgentApplication)
-    val response: WSResponse = post(path)(Map(LlpRoleForm.key -> Seq("")))
+    val response: WSResponse = post(path)(Map(ApplicantRoleInLlpForm.key -> Seq("")))
 
     response.status shouldBe Status.BAD_REQUEST
     response.parseBodyAsJsoupDocument.title() shouldBe "Error: Are you a member of the limited liability partnership? - Apply for an agent services account - GOV.UK"
@@ -93,11 +93,11 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubUpdateAgentApplication(
       tdAll.llpAgentApplication
         .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(llpRole = LlpRole.Member)))
+        .setTo(Some(ApplicantContactDetails(applicantRoleInLlp = AppicantRoleInLlp.Member)))
     )
     val response: WSResponse =
       post(path)(Map(
-        LlpRoleForm.key -> Seq("Member"),
+        ApplicantRoleInLlpForm.key -> Seq("Member"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
@@ -110,7 +110,7 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubApplicationInProgress(tdAll.llpAgentApplication)
     val response: WSResponse =
       post(path)(Map(
-        LlpRoleForm.key -> Seq(""),
+        ApplicantRoleInLlpForm.key -> Seq(""),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 

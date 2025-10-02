@@ -70,12 +70,12 @@ signInWithAgentDetails.p3=Choose the one you want to be linked to your new agent
 applicant-contact-details.title = Applicant contact details
 
 ## Applicant contact details / Llp role
-llpRole.title = Are you a member of the limited liability partnership?
-llpRole.hint = Being a member means you are listed in Companies House as a current officer of {0}.
-llpRole.Member = Yes
-llpRole.Authorised = No, but I’m authorised by them to set up this account
-llpRole.error.required = Select ‘yes’ if you are a member of the limited liability partnership
-llpRole.error.invalid = Select ‘yes’ if you are a member of the limited liability partnership
+applicantRoleInLlp.title = Are you a member of the limited liability partnership?
+applicantRoleInLlp.hint = Being a member means you are listed in Companies House as a current officer of {0}.
+applicantRoleInLlp.Member = Yes
+applicantRoleInLlp.Authorised = No, but I’m authorised by them to set up this account
+applicantRoleInLlp.error.required = Select ‘yes’ if you are a member of the limited liability partnership
+applicantRoleInLlp.error.invalid = Select ‘yes’ if you are a member of the limited liability partnership
 
 # About your application / user role
 userRole.title = Are you the owner of the business?

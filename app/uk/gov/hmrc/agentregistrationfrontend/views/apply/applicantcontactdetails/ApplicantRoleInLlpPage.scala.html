@@ -14,9 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.LlpRole
+@import uk.gov.hmrc.agentregistration.shared.AppicantRoleInLlp
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-@import uk.gov.hmrc.agentregistrationfrontend.forms.LlpRoleForm
+@import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
@@ -30,10 +30,10 @@
         continueOrSaveForLater: ContinueOrSaveForLater
 )
 
-@(form: Form[LlpRole])(implicit request: AgentApplicationRequest[AnyContent], messages: Messages)
+@(form: Form[AppicantRoleInLlp])(implicit request: AgentApplicationRequest[AnyContent], messages: Messages)
 
 @key = @{
-    LlpRoleForm.key
+    ApplicantRoleInLlpForm.key
 }
 @title = @{messages(s"$key.title")}
 @layout(
@@ -41,7 +41,7 @@
     maybeForm = Some(form)
 ) {
     <h2 class="govuk-caption-l">@messages("applicant-contact-details.title")</h2>
-    @formWithCSRF(action = routes.LlpRoleController.submit) {
+    @formWithCSRF(action = routes.ApplicantRoleInLlpController.submit) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(
@@ -53,10 +53,10 @@
             hint = Some(Hint(
                 content = HtmlContent(messages(s"$key.hint", request.agentApplication.getApplicantName))
             )),
-            items = LlpRole.values.toSeq.map(llpRole =>
+            items = AppicantRoleInLlp.values.toSeq.map(applicantRoleInLlp =>
                 RadioItem(
-                    content = Text(messages(s"$key.${llpRole.toString}")),
-                    value = Some(llpRole.toString)
+                    content = Text(messages(s"$key.${applicantRoleInLlp.toString}")),
+                    value = Some(applicantRoleInLlp.toString)
                 )
             )
         ).withFormField(form(key)))

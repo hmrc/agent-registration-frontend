@@ -21,16 +21,16 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.forms.LlpRoleForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.LlpRolePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.ApplicantRoleInLlpPage
 
-class LlpRolePageSpec
+class AppicantRoleInLlpPageSpec
 extends ViewSpec:
 
-  val viewTemplate: LlpRolePage = app.injector.instanceOf[LlpRolePage]
+  val viewTemplate: ApplicantRoleInLlpPage = app.injector.instanceOf[ApplicantRoleInLlpPage]
   implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] =
     new AgentApplicationRequest(
       request = request.withSession("agentType" -> "UkTaxAgent", "businessType" -> "LimitedLiabilityPartnership"),
@@ -40,10 +40,10 @@ extends ViewSpec:
       internalUserId = tdAll.internalUserId,
       groupId = tdAll.groupId
     )
-  val doc: Document = Jsoup.parse(viewTemplate(LlpRoleForm.form).body)
+  val doc: Document = Jsoup.parse(viewTemplate(ApplicantRoleInLlpForm.form).body)
   private val heading: String = "Are you a member of the limited liability partnership?"
 
-  "LlpRolePage" should:
+  "ApplicantRoleInLlpPage" should:
 
     "have the correct title" in:
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
@@ -74,9 +74,9 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render a form error when the form contains an error" in:
-      val field = LlpRoleForm.key
+      val field = ApplicantRoleInLlpForm.key
       val errorMessage = "Select ‘yes’ if you are the owner of the business"
-      val formWithError = LlpRoleForm.form
+      val formWithError = ApplicantRoleInLlpForm.form
         .withError(field, errorMessage)
       behavesLikePageWithErrorHandling(
         field = field,
