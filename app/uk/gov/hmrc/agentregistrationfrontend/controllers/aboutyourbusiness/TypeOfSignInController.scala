@@ -60,7 +60,7 @@ extends FrontendController(mcc, actions):
           request.readPartnershipType match
             case None => Redirect(routes.PartnershipTypeController.show)
             case Some(_) => showTypeOfSignInForm(request)
-        case Some(_) => showTypeOfSignInForm(request) //bug?
+        case Some(_) => showTypeOfSignInForm(request) // bug?
 
   private def showTypeOfSignInForm(implicit request: Request[?]) =
     val form: Form[TypeOfSignIn] =

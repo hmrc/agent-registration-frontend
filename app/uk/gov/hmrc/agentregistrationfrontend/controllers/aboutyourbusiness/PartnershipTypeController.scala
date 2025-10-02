@@ -18,8 +18,10 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness
 
 import play.api.data.Form
 import play.api.mvc.Action
+import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Request
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -39,38 +41,29 @@ class PartnershipTypeController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] =
-    action
-      .ensure(
-        _.readBusinessType match {
-          case Some(BusinessTypeSessionValue.PartnershipType) => true
-          case _ => false
-        },
-        implicit r =>
-          logger.info(s"Redirecting to business type page due to missing or invalid business type selection: ${r.readBusinessType}")
-          Redirect(routes.BusinessTypeSessionController.show)
-      ):
-        implicit request =>
-          val form: Form[BusinessType.Partnership] =
-            request.readPartnershipType match
-              case Some(data) => PartnershipTypeForm.form.fill(data)
-              case None => PartnershipTypeForm.form
-          Ok(view(form))
+  private val baseAction: ActionBuilder[Request, AnyContent] = action
+    .ensure(
+      _.readBusinessType match {
+        case Some(BusinessTypeSessionValue.PartnershipType) => true
+        case _ => false
+      },
+      implicit r =>
+        logger.info(s"Redirecting to business type page due to missing or invalid business type selection: ${r.readBusinessType}")
+        Redirect(routes.BusinessTypeSessionController.show)
+    )
 
-  def submit: Action[AnyContent] =
-    action
-      .ensure(
-        _.readBusinessType match {
-          case Some(BusinessTypeSessionValue.PartnershipType) => true
-          case _ => false
-        },
-        implicit r =>
-          logger.info(s"Redirecting to business type page due to missing or invalid business type selection: ${r.readBusinessType}")
-          Redirect(routes.BusinessTypeSessionController.show)
-      )
-      .ensureValidForm(PartnershipTypeForm.form, implicit r => view(_)):
-        implicit request =>
-          val partnershipType = request.formValue
-          Redirect(
-            routes.TypeOfSignInController.show
-          ).addPartnershipTypeToSession(partnershipType)
+  val show: Action[AnyContent] = baseAction:
+    implicit request =>
+      val form: Form[BusinessType.Partnership] =
+        request.readPartnershipType match
+          case Some(data) => PartnershipTypeForm.form.fill(data)
+          case None => PartnershipTypeForm.form
+      Ok(view(form))
+
+  val submit: Action[AnyContent] =
+    baseAction.ensureValidForm(PartnershipTypeForm.form, implicit r => view(_)):
+      implicit request =>
+        val partnershipType = request.formValue
+        Redirect(
+          routes.TypeOfSignInController.show
+        ).addPartnershipTypeToSession(partnershipType)
