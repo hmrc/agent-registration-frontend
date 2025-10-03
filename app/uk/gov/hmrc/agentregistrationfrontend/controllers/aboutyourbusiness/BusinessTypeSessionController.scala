@@ -20,6 +20,7 @@ import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeSessionForm
@@ -33,31 +34,32 @@ import javax.inject.Singleton
 @Singleton
 class BusinessTypeSessionController @Inject() (
   mcc: MessagesControllerComponents,
+  actions: Actions,
   businessTypeSessionPage: BusinessTypeSessionPage
 )
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = Action:
-    implicit request =>
-      // ensure that agent type has been selected before allowing business type to be selected
-      if request.readAgentType.isEmpty then
+  private val baseAction = action
+    .ensure(
+      _.readAgentType.isDefined,
+      implicit request =>
+        logger.warn("Agent type not selected - redirecting to agent type selection page")
         Redirect(routes.AgentTypeController.show)
-      else
-        val form: Form[BusinessTypeSessionValue] =
-          request.readBusinessType match
-            case Some(bt: BusinessTypeSessionValue) => BusinessTypeSessionForm.form.fill(bt)
-            case None => BusinessTypeSessionForm.form
-        Ok(businessTypeSessionPage(form))
+    )
 
-  def submit: Action[AnyContent] = Action:
+  val show: Action[AnyContent] = baseAction:
     implicit request =>
-      // ensure that agent type has been selected before allowing business type to be posted
-      if request.readAgentType.isEmpty then
-        Redirect(routes.AgentTypeController.show)
-      else
-        BusinessTypeSessionForm.form.bindFromRequest().fold(
-          formWithErrors => BadRequest(businessTypeSessionPage(formWithErrors)),
-          {
+      val form: Form[BusinessTypeSessionValue] =
+        request.readBusinessType match
+          case Some(bt: BusinessTypeSessionValue) => BusinessTypeSessionForm.form.fill(bt)
+          case None => BusinessTypeSessionForm.form
+      Ok(businessTypeSessionPage(form))
+
+  def submit: Action[AnyContent] =
+    baseAction
+      .ensureValidForm(BusinessTypeSessionForm.form, implicit r => businessTypeSessionPage(_)):
+        implicit request =>
+          request.formValue match
             case businessType @ (BusinessTypeSessionValue.SoleTrader | BusinessTypeSessionValue.LimitedCompany) =>
               // TODO SoleTrader or LimitedCompany journeys not yet built
               Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
@@ -69,5 +71,3 @@ extends FrontendController(mcc):
             case businessType @ BusinessTypeSessionValue.NotSupported =>
               Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
                 .addBusinessTypeToSession(businessType)
-          }
-        )

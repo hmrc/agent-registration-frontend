@@ -32,18 +32,17 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
 class GrsController @Inject() (
-  actions: Actions,
   mcc: MessagesControllerComponents,
+  actions: Actions,
   grsService: GrsService,
   applicationService: ApplicationService,
   placeholder: SimplePage
-)(implicit ec: ExecutionContext)
-extends FrontendController(mcc):
+)
+extends FrontendController(mcc, actions):
 
   def setUpGrsFromSignIn(
     agentType: AgentType,

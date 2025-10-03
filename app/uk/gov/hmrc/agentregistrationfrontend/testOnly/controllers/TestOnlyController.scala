@@ -40,7 +40,7 @@ class TestOnlyController @Inject() (
   actions: Actions,
   applicationService: ApplicationService
 )
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
   val showAgentApplication: Action[AnyContent] = actions.getApplicationInProgress: request =>
     Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))

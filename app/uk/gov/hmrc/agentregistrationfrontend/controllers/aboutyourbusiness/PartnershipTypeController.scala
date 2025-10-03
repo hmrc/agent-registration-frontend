@@ -18,9 +18,12 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness
 
 import play.api.data.Form
 import play.api.mvc.Action
+import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Request
 import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.PartnershipTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
@@ -33,31 +36,34 @@ import javax.inject.Singleton
 @Singleton
 class PartnershipTypeController @Inject() (
   mcc: MessagesControllerComponents,
+  actions: Actions,
   view: PartnershipTypePage
 )
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = Action:
-    implicit request =>
-      // ensure that business type has been selected and is partnership type
-      // before allowing partnership type to be selected
-      request.readBusinessType match
-        case Some(BusinessTypeSessionValue.PartnershipType) =>
-          val form: Form[BusinessType.Partnership] =
-            request.readPartnershipType match
-              case Some(data) => PartnershipTypeForm.form.fill(data)
-              case None => PartnershipTypeForm.form
-          Ok(view(form))
-        case _ => Redirect(routes.BusinessTypeSessionController.show)
+  private val baseAction: ActionBuilder[Request, AnyContent] = action
+    .ensure(
+      _.readBusinessType match {
+        case Some(BusinessTypeSessionValue.PartnershipType) => true
+        case _ => false
+      },
+      implicit request =>
+        logger.info(s"Redirecting to business type page due to missing or invalid business type selection: ${request.readBusinessType}")
+        Redirect(routes.BusinessTypeSessionController.show)
+    )
 
-  def submit: Action[AnyContent] = Action:
+  val show: Action[AnyContent] = baseAction:
     implicit request =>
-      request.readBusinessType match
-        case Some(BusinessTypeSessionValue.PartnershipType) =>
-          PartnershipTypeForm.form.bindFromRequest().fold(
-            formWithErrors => BadRequest(view(formWithErrors)),
-            partnershipType =>
-              Redirect(routes.TypeOfSignInController.show)
-                .addPartnershipTypeToSession(partnershipType)
-          )
-        case _ => Redirect(routes.BusinessTypeSessionController.show)
+      val form: Form[BusinessType.Partnership] =
+        request.readPartnershipType match
+          case Some(data) => PartnershipTypeForm.form.fill(data)
+          case None => PartnershipTypeForm.form
+      Ok(view(form))
+
+  val submit: Action[AnyContent] =
+    baseAction.ensureValidForm(PartnershipTypeForm.form, implicit r => view(_)):
+      implicit request =>
+        val partnershipType = request.formValue
+        Redirect(
+          routes.TypeOfSignInController.show
+        ).addPartnershipTypeToSession(partnershipType)

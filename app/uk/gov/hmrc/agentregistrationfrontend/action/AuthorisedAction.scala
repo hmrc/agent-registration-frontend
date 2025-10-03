@@ -44,6 +44,20 @@ class AuthorisedRequest[A](
 )
 extends WrappedRequest[A](request)
 
+object AuthorisedRequest:
+
+  given [T, A]: MergeFormValue[AuthorisedRequest[A], T] =
+    (
+      r: AuthorisedRequest[A],
+      t: T
+    ) =>
+      new AuthorisedRequest[A](
+        r.internalUserId,
+        r.groupId,
+        r.request
+      ) with FormValue[T]:
+        val formValue: T = t
+
 @Singleton
 class AuthorisedAction @Inject() (
   af: AuthorisedFunctions,

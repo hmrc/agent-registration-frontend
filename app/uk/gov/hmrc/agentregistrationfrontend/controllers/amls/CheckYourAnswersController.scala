@@ -27,13 +27,13 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.CheckYourAnsw
 
 @Singleton
 class CheckYourAnswersController @Inject() (
-  actions: Actions,
   mcc: MessagesControllerComponents,
+  actions: Actions,
   view: CheckYourAnswersPage
 )
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getApplicationInProgress:
+  val show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       val amlsDetails = request.agentApplication.amlsDetails
       if amlsDetails.isDefined && amlsDetails.get.isComplete

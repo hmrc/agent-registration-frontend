@@ -35,6 +35,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.SignInWithAgentDetailsPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.CreateSignInDetailsPage
 import sttp.model.Uri
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
 
 import javax.inject.Inject
@@ -43,14 +44,15 @@ import javax.inject.Singleton
 @Singleton
 class TypeOfSignInController @Inject() (
   mcc: MessagesControllerComponents,
+  actions: Actions,
   view: TypeOfSignInPage,
   signInWithAgentDetailsPage: SignInWithAgentDetailsPage,
   createSignInDetailsPage: CreateSignInDetailsPage,
   appConfig: AppConfig
 )
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = Action:
+  val show: Action[AnyContent] = action:
     implicit request =>
       request.readBusinessType match
         case None => Redirect(routes.BusinessTypeSessionController.show)
@@ -67,7 +69,7 @@ extends FrontendController(mcc):
         case None => TypeOfSignInForm.form
     Ok(view(form))
 
-  def submit: Action[AnyContent] = Action:
+  val submit: Action[AnyContent] = action:
     implicit request =>
       request.readBusinessType match
         case None => Redirect(routes.BusinessTypeSessionController.show)
@@ -93,7 +95,7 @@ extends FrontendController(mcc):
         .addTypeOfSignInToSession(typeOfSignIn)
   )
 
-  def redirectToChosenSignIn(signInLink: String): Action[AnyContent] = Action:
+  def redirectToChosenSignIn(signInLink: String): Action[AnyContent] = action:
     implicit request =>
       request.readTypeOfSignIn match
         case Some(HmrcOnlineServices) => Ok(signInWithAgentDetailsPage(uri"$signInLink"))

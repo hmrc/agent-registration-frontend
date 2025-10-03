@@ -20,6 +20,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import javax.inject.Inject
@@ -32,13 +33,13 @@ class AgentApplicationController @Inject() (
   mcc: MessagesControllerComponents,
   simplePage: SimplePage
 )
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
-  val landing: Action[AnyContent] = actions.getApplicationInProgress { implicit request =>
-    // until we have more than the registration journey just go to the task list
-    // which will redirect to the start of registration if needed
-    Redirect(routes.TaskListController.show)
-  }
+  val landing: Action[AnyContent] = actions.getApplicationInProgress:
+    implicit request =>
+      // until we have more than the registration journey just go to the task list
+      // which will redirect to the start of registration if needed
+      Redirect(routes.TaskListController.show)
 
   val applicationDashboard: Action[AnyContent] = actions.getApplicationInProgress.async { implicit request =>
     Future.successful(Ok(simplePage(
@@ -58,12 +59,30 @@ extends FrontendController(mcc):
     )))
   }
 
-  def startRegistration: Action[AnyContent] = Action { implicit request =>
+  val applicationSubmitted2: Action[AnyContent] = actions
+    .getApplicationSubmitted
+    .ensure(
+      condition = (r: AgentApplicationRequest[?]) => r.agentApplication.hasFinished,
+      resultWhenConditionNotMet =
+        r =>
+          logger.warn("Application submitted but has not finished")(using r)
+          Redirect("")
+    )
+    .async { implicit request =>
+      Future.successful(Ok(simplePage(
+        h1 = "Application Submitted...",
+        bodyText = Some(
+          "Placeholder for the Application Submitted page..."
+        )
+      )))
+    }
+
+  val startRegistration: Action[AnyContent] = action { implicit request =>
     // if we use an endpoint like this, we can later change the flow without changing the URL
     Redirect(aboutyourbusiness.routes.AgentTypeController.show)
   }
 
-  def genericExitPage: Action[AnyContent] = Action { implicit request =>
+  val genericExitPage: Action[AnyContent] = action { implicit request =>
     Ok(simplePage(
       h1 = "You cannot use this service...",
       bodyText = Some(

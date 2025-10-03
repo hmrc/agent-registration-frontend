@@ -68,6 +68,7 @@ object SessionService:
         .find(_.toString === value)
         .getOrElse(throw new RuntimeException(s"Invalid TypeOfSignIn type in session: '$value'"))
 
+    //
     def requireAgentTypeAndBusinessType: (AgentType, BusinessType) =
       val at = readAgentType.getOrElse(throw new RuntimeException("No AgentType in session"))
       val bt = readPartnershipType

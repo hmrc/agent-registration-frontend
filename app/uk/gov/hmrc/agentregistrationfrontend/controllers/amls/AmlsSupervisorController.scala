@@ -18,37 +18,35 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
 import com.softwaremill.quicklens.*
 import play.api.data.Form
-import play.api.i18n.I18nSupport
+
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.getSubmitAction
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsSupervisoryBodyPage
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
 class AmlsSupervisorController @Inject() (
-  actions: Actions,
   mcc: MessagesControllerComponents,
+  actions: Actions,
   view: AmlsSupervisoryBodyPage,
   applicationService: ApplicationService,
   amlsSupervisoryBodyForm: AmlsCodeForm
-)(implicit ec: ExecutionContext)
-extends FrontendController(mcc)
-with I18nSupport:
+)
+extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getApplicationInProgress:
+  val show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       val formTemplate: Form[AmlsCode] = amlsSupervisoryBodyForm.form
 
@@ -61,7 +59,7 @@ with I18nSupport:
           )
       Ok(view(form))
 
-  def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
+  val submit: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
       amlsSupervisoryBodyForm
         .form

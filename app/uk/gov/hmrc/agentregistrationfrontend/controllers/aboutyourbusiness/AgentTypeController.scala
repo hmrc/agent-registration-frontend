@@ -17,11 +17,9 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness
 
 import play.api.data.Form
-import play.api.mvc.Action
-import play.api.mvc.AnyContent
-import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.Request
+import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentType
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTypeForm
@@ -34,11 +32,12 @@ import javax.inject.Singleton
 @Singleton
 class AgentTypeController @Inject() (
   mcc: MessagesControllerComponents,
+  actions: Actions,
   view: AgentTypePage
 )
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = Action:
+  val show: Action[?] = action:
     implicit request: Request[?] =>
       val form: Form[AgentType] =
         request.readAgentType match
@@ -46,12 +45,13 @@ extends FrontendController(mcc):
           case _ => AgentTypeForm.form
       Ok(view(form))
 
-  def submit: Action[AnyContent] = Action:
-    implicit request: Request[?] =>
-      AgentTypeForm.form.bindFromRequest().fold(
-        formWithErrors => BadRequest(view(formWithErrors)),
-        agentType =>
-          agentType match
-            case AgentType.UkTaxAgent => Redirect(routes.BusinessTypeSessionController.show.url).addAgentTypeToSession(agentType)
-            case AgentType.NonUkTaxAgent => Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url).addAgentTypeToSession(agentType)
-      )
+  val submit: Action[AnyContent] =
+    action
+      .ensureValidForm(AgentTypeForm.form, implicit request => view(_)):
+        implicit request =>
+          val agentType: AgentType = request.formValue
+          val call: Call =
+            agentType match
+              case AgentType.UkTaxAgent => routes.BusinessTypeSessionController.show
+              case AgentType.NonUkTaxAgent => applicationRoutes.AgentApplicationController.genericExitPage
+          Redirect(call.url).addAgentTypeToSession(agentType)

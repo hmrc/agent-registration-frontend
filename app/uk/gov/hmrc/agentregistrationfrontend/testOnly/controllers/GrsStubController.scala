@@ -65,7 +65,7 @@ class GrsStubController @Inject() (
   actions: Actions,
   view: GrsStub
 )
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
   def showGrsData(
     businessType: BusinessType,

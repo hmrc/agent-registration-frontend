@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
 import com.softwaremill.quicklens.*
 import play.api.data.Form
-import play.api.i18n.I18nSupport
+
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
@@ -29,25 +29,23 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.getSubmitAction
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsExpiryDatePage
-import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
 class AmlsExpiryDateController @Inject() (
-  actions: Actions,
   mcc: MessagesControllerComponents,
+  actions: Actions,
   view: AmlsExpiryDatePage,
   applicationService: ApplicationService
-)(implicit ec: ExecutionContext)
-extends FrontendController(mcc)
-with I18nSupport:
+)
+extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getApplicationInProgress:
+  val show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       val emptyForm = AmlsExpiryDateForm.form()
       val form: Form[LocalDate] =
@@ -60,7 +58,7 @@ with I18nSupport:
           )
       Ok(view(form))
 
-  def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
+  val submit: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
       AmlsExpiryDateForm.form()
         .bindFromRequest()

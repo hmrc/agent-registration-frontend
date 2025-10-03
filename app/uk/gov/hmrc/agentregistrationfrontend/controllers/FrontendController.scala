@@ -19,12 +19,18 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers
 import play.api.i18n.I18nSupport
 import play.api.i18n.MessagesApi
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 abstract class FrontendController(
-  mcc: MessagesControllerComponents
+  mcc: MessagesControllerComponents,
+  actions: Actions
 )
-extends uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController(mcc)
-with I18nSupport:
+extends uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController(mcc),
+  I18nSupport,
+  RequestAwareLogging:
+
+  export actions.*
 
   override def messagesApi: MessagesApi = mcc.messagesApi
-  implicit val ec: scala.concurrent.ExecutionContext = mcc.executionContext
+  given scala.concurrent.ExecutionContext = mcc.executionContext

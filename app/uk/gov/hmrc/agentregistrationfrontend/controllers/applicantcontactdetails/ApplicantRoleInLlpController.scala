@@ -38,14 +38,14 @@ import scala.concurrent.Future
 
 @Singleton
 class ApplicantRoleInLlpController @Inject() (
-  actions: Actions,
   mcc: MessagesControllerComponents,
+  actions: Actions,
   view: ApplicantRoleInLlpPage,
   applicationService: ApplicationService
 )(implicit ec: ExecutionContext)
-extends FrontendController(mcc):
+extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getApplicationInProgress:
+  val show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       val emptyForm = ApplicantRoleInLlpForm.form
       val form: Form[AppicantRoleInLlp] =
@@ -57,7 +57,7 @@ extends FrontendController(mcc):
           )
       Ok(view(form))
 
-  def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
+  val submit: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
       ApplicantRoleInLlpForm.form
         .bindFromRequest()
