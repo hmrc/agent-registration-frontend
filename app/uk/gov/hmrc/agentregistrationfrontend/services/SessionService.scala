@@ -22,7 +22,7 @@ import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
+import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
 
 object SessionService:
@@ -36,7 +36,7 @@ object SessionService:
   extension (r: Result)
 
     def addAgentTypeToSession(at: AgentType)(implicit request: Request[?]): Result = r.addingToSession(agentTypeKey -> at.toString)
-    def addBusinessTypeToSession(bt: BusinessTypeSessionValue)(implicit request: Request[?]): Result = r.addingToSession(businessTypeKey -> bt.toString)
+    def addBusinessTypeAnswerToSession(bt: BusinessTypeAnswer)(implicit request: Request[?]): Result = r.addingToSession(businessTypeKey -> bt.toString)
     def addPartnershipTypeToSession(pt: BusinessType.Partnership)(implicit request: Request[?]): Result = r.addingToSession(partnershipTypeKey -> pt.toString)
     def addTypeOfSignInToSession(tos: TypeOfSignIn)(implicit request: Request[?]): Result = r.addingToSession(typeOfSignInKey -> tos.toString)
     def removePartnershipTypeFromSession(implicit request: RequestHeader): Result = r.removingFromSession(partnershipTypeKey)
@@ -49,8 +49,8 @@ object SessionService:
         .find(_.toString === value)
         .getOrElse(throw new RuntimeException(s"Invalid AgentType type in session: '$value'"))
 
-    def readBusinessType: Option[BusinessTypeSessionValue] = r.session.get(businessTypeKey).map: value =>
-      BusinessTypeSessionValue
+    def readBusinessType: Option[BusinessTypeAnswer] = r.session.get(businessTypeKey).map: value =>
+      BusinessTypeAnswer
         .values
         .find(_.toString === value)
         .getOrElse(throw new RuntimeException(s"Invalid BusinessTypeSessionValue type in session: '$value'"))

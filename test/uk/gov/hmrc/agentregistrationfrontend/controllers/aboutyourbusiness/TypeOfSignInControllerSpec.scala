@@ -22,7 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.TypeOfSignInForm
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
+import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import sttp.model.Uri.UriContext
@@ -53,7 +53,7 @@ extends ControllerSpec:
   s"GET $path with BusinessType of PartnershipType but no partnership type selected should return 303 and redirect to partnership type page" in:
     val response: WSResponse = get(
       uri = path,
-      cookies = addBusinessTypeToSession(BusinessTypeSessionValue.PartnershipType).extractCookies
+      cookies = addBusinessTypeToSession(BusinessTypeAnswer.PartnershipType).extractCookies
     )
 
     response.status shouldBe Status.SEE_OTHER
@@ -63,7 +63,7 @@ extends ControllerSpec:
   s"GET $path with a valid business type in session should return 200 and render the page" in:
     val response: WSResponse = get(
       uri = path,
-      cookies = addBusinessTypeToSession(BusinessTypeSessionValue.LimitedCompany).extractCookies
+      cookies = addBusinessTypeToSession(BusinessTypeAnswer.LimitedCompany).extractCookies
     )
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Do you have an HMRC online services for agents account? - Apply for an agent services account - GOV.UK"
@@ -72,7 +72,7 @@ extends ControllerSpec:
     val response: WSResponse =
       post(
         uri = path,
-        cookies = addBusinessTypeToSession(BusinessTypeSessionValue.LimitedCompany).extractCookies
+        cookies = addBusinessTypeToSession(BusinessTypeAnswer.LimitedCompany).extractCookies
       )(Map(TypeOfSignInForm.key -> Seq(TypeOfSignIn.HmrcOnlineServices.toString)))
 
     val signInLink = appConfig.signInUri(
@@ -89,7 +89,7 @@ extends ControllerSpec:
     val response: WSResponse =
       post(
         uri = path,
-        cookies = addBusinessTypeToSession(BusinessTypeSessionValue.LimitedCompany).extractCookies
+        cookies = addBusinessTypeToSession(BusinessTypeAnswer.LimitedCompany).extractCookies
       )(Map(TypeOfSignInForm.key -> Seq("")))
 
     response.status shouldBe Status.BAD_REQUEST

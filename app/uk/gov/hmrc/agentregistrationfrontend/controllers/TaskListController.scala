@@ -34,7 +34,7 @@ class TaskListController @Inject() (
 extends FrontendController(mcc, actions):
 
   /* Show the task list if we have a UTR from GRS, otherwise redirect to start of registration */
-  val show: Action[AnyContent] = actions.getApplicationInProgress { implicit request =>
+  def show: Action[AnyContent] = actions.getApplicationInProgress { implicit request =>
     if (request.agentApplication.utr.isDefined)
       Ok(taskListPage())
     else

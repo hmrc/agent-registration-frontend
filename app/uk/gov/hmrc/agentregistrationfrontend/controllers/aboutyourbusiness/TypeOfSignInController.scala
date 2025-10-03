@@ -36,7 +36,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.CreateSignInDetailsPage
 import sttp.model.Uri
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
+import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -52,11 +52,11 @@ class TypeOfSignInController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  val show: Action[AnyContent] = action:
+  def show: Action[AnyContent] = action:
     implicit request =>
       request.readBusinessType match
         case None => Redirect(routes.BusinessTypeSessionController.show)
-        case Some(pt @ BusinessTypeSessionValue.PartnershipType) =>
+        case Some(pt @ BusinessTypeAnswer.PartnershipType) =>
           request.readPartnershipType match
             case None => Redirect(routes.PartnershipTypeController.show)
             case Some(_) => showTypeOfSignInForm(request)
@@ -69,11 +69,11 @@ extends FrontendController(mcc, actions):
         case None => TypeOfSignInForm.form
     Ok(view(form))
 
-  val submit: Action[AnyContent] = action:
+  def submit: Action[AnyContent] = action:
     implicit request =>
       request.readBusinessType match
         case None => Redirect(routes.BusinessTypeSessionController.show)
-        case Some(pt @ BusinessTypeSessionValue.PartnershipType) =>
+        case Some(pt @ BusinessTypeAnswer.PartnershipType) =>
           request.readPartnershipType match
             case None => Redirect(routes.PartnershipTypeController.show)
             case Some(_) => redirectToChosenSignIn(request)

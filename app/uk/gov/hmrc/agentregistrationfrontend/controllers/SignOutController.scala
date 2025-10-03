@@ -41,16 +41,16 @@ extends FrontendController(mcc, actions):
     Redirect(signOutAndRedirectUrl)
   }
 
-  val signOut: Action[AnyContent] = action {
+  def signOut: Action[AnyContent] = action {
     val continueUrl = uri"${appConfig.thisFrontendBaseUrl + routes.AgentApplicationController.landing.url}"
     signOutWithContinue(continueUrl.toString)
   }
 
-  val timeOut: Action[AnyContent] = action {
+  def timeOut: Action[AnyContent] = action {
     val continueUrl = uri"${appConfig.thisFrontendBaseUrl + routes.SignOutController.timedOut.url}"
     signOutWithContinue(continueUrl.toString)
   }
 
-  val timedOut: Action[AnyContent] = action { implicit request =>
+  def timedOut: Action[AnyContent] = action { implicit request =>
     Ok(timedOutPage())
   }

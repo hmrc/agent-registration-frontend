@@ -35,13 +35,13 @@ class AgentApplicationController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  val landing: Action[AnyContent] = actions.getApplicationInProgress:
+  def landing: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       // until we have more than the registration journey just go to the task list
       // which will redirect to the start of registration if needed
       Redirect(routes.TaskListController.show)
 
-  val applicationDashboard: Action[AnyContent] = actions.getApplicationInProgress.async { implicit request =>
+  def applicationDashboard: Action[AnyContent] = actions.getApplicationInProgress.async { implicit request =>
     Future.successful(Ok(simplePage(
       h1 = "Application Dashboard page...",
       bodyText = Some(
@@ -50,7 +50,7 @@ extends FrontendController(mcc, actions):
     )))
   }
 
-  val applicationSubmitted: Action[AnyContent] = actions.getApplicationSubmitted.async { implicit request =>
+  def applicationSubmitted: Action[AnyContent] = actions.getApplicationSubmitted.async { implicit request =>
     Future.successful(Ok(simplePage(
       h1 = "Application Submitted...",
       bodyText = Some(
@@ -59,7 +59,7 @@ extends FrontendController(mcc, actions):
     )))
   }
 
-  val applicationSubmitted2: Action[AnyContent] = actions
+  def applicationSubmitted2: Action[AnyContent] = actions
     .getApplicationSubmitted
     .ensure(
       condition = (r: AgentApplicationRequest[?]) => r.agentApplication.hasFinished,
@@ -77,12 +77,12 @@ extends FrontendController(mcc, actions):
       )))
     }
 
-  val startRegistration: Action[AnyContent] = action { implicit request =>
+  def startRegistration: Action[AnyContent] = action { implicit request =>
     // if we use an endpoint like this, we can later change the flow without changing the URL
     Redirect(aboutyourbusiness.routes.AgentTypeController.show)
   }
 
-  val genericExitPage: Action[AnyContent] = action { implicit request =>
+  def genericExitPage: Action[AnyContent] = action { implicit request =>
     Ok(simplePage(
       h1 = "You cannot use this service...",
       bodyText = Some(

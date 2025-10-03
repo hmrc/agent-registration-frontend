@@ -20,5 +20,5 @@ object RoutesExports:
 
   export uk.gov.hmrc.agentregistration.shared.BusinessType
   export uk.gov.hmrc.agentregistration.shared.AgentType
-  export uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
+  export uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
   export uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId

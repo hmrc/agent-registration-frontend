@@ -45,7 +45,7 @@ class AmlsExpiryDateController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  val show: Action[AnyContent] = actions.getApplicationInProgress:
+  def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       val emptyForm = AmlsExpiryDateForm.form()
       val form: Form[LocalDate] =
@@ -58,7 +58,7 @@ extends FrontendController(mcc, actions):
           )
       Ok(view(form))
 
-  val submit: Action[AnyContent] = actions.getApplicationInProgress.async:
+  def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
       AmlsExpiryDateForm.form()
         .bindFromRequest()

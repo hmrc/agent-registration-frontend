@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeSessionForm
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
+import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.BusinessTypeSessionPage
 
@@ -47,11 +47,11 @@ extends FrontendController(mcc, actions):
         Redirect(routes.AgentTypeController.show)
     )
 
-  val show: Action[AnyContent] = baseAction:
+  def show: Action[AnyContent] = baseAction:
     implicit request =>
-      val form: Form[BusinessTypeSessionValue] =
+      val form: Form[BusinessTypeAnswer] =
         request.readBusinessType match
-          case Some(bt: BusinessTypeSessionValue) => BusinessTypeSessionForm.form.fill(bt)
+          case Some(bt: BusinessTypeAnswer) => BusinessTypeSessionForm.form.fill(bt)
           case None => BusinessTypeSessionForm.form
       Ok(businessTypeSessionPage(form))
 
@@ -60,14 +60,14 @@ extends FrontendController(mcc, actions):
       .ensureValidForm(BusinessTypeSessionForm.form, implicit r => businessTypeSessionPage(_)):
         implicit request =>
           request.formValue match
-            case businessType @ (BusinessTypeSessionValue.SoleTrader | BusinessTypeSessionValue.LimitedCompany) =>
+            case businessType @ (BusinessTypeAnswer.SoleTrader | BusinessTypeAnswer.LimitedCompany) =>
               // TODO SoleTrader or LimitedCompany journeys not yet built
               Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
-                .addBusinessTypeToSession(businessType)
+                .addBusinessTypeAnswerToSession(businessType)
                 .removePartnershipTypeFromSession
-            case businessType @ BusinessTypeSessionValue.PartnershipType =>
+            case businessType @ BusinessTypeAnswer.PartnershipType =>
               Redirect(routes.PartnershipTypeController.show.url)
-                .addBusinessTypeToSession(businessType)
-            case businessType @ BusinessTypeSessionValue.NotSupported =>
+                .addBusinessTypeAnswerToSession(businessType)
+            case businessType @ BusinessTypeAnswer.Other =>
               Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
-                .addBusinessTypeToSession(businessType)
+                .addBusinessTypeAnswerToSession(businessType)

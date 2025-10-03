@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.services
 
 import uk.gov.hmrc.agentregistration.shared.AgentType
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
+import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import SessionService.*
@@ -81,10 +81,10 @@ extends UnitSpec:
         .readPartnershipType shouldBe None withClue "partnership type should be removed from session"
 
   "BusinessType" should:
-    BusinessTypeSessionValue.values.foreach: bt =>
+    BusinessTypeAnswer.values.foreach: bt =>
       s"$bt can be added to the Result and read back from the Request" in:
         val newResult = result
-          .addBusinessTypeToSession(bt)
+          .addBusinessTypeAnswerToSession(bt)
 
         newResult
           .asRequest
