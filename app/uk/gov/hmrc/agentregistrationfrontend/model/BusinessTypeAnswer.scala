@@ -18,32 +18,17 @@ package uk.gov.hmrc.agentregistrationfrontend.model
 
 import play.api.libs.json.Format
 import play.api.mvc.PathBindable
-import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
 
-enum BusinessTypeSessionValue:
+enum BusinessTypeAnswer:
 
   case SoleTrader
-  extends BusinessTypeSessionValue
-
   case LimitedCompany
-  extends BusinessTypeSessionValue
-
   case PartnershipType
-  extends BusinessTypeSessionValue
+  case Other
 
-  case NotSupported
-  extends BusinessTypeSessionValue
+object BusinessTypeAnswer:
 
-  def toBusinessType: Option[BusinessType] =
-    this match
-      case SoleTrader => Some(BusinessType.SoleTrader)
-      case LimitedCompany => Some(BusinessType.LimitedCompany)
-      case PartnershipType => None
-      case NotSupported => None
-
-object BusinessTypeSessionValue:
-
-  given Format[BusinessTypeSessionValue] = JsonFormatsFactory.makeEnumFormat[BusinessTypeSessionValue]
-  given PathBindable[BusinessTypeSessionValue] = PathBindableFactory.pathBindable[BusinessTypeSessionValue]
+  given Format[BusinessTypeAnswer] = JsonFormatsFactory.makeEnumFormat[BusinessTypeAnswer]
+  given PathBindable[BusinessTypeAnswer] = PathBindableFactory.pathBindable[BusinessTypeAnswer]

@@ -46,7 +46,7 @@ class AmlsSupervisorController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  val show: Action[AnyContent] = actions.getApplicationInProgress:
+  def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       val formTemplate: Form[AmlsCode] = amlsSupervisoryBodyForm.form
 
@@ -59,7 +59,7 @@ extends FrontendController(mcc, actions):
           )
       Ok(view(form))
 
-  val submit: Action[AnyContent] = actions.getApplicationInProgress.async:
+  def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
       amlsSupervisoryBodyForm
         .form

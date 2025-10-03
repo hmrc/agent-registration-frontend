@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
+@import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 @import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeSessionForm
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.routes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
@@ -27,7 +27,7 @@
         govukButton: GovukButton
 )
 
-@(form: Form[BusinessTypeSessionValue])(implicit request: Request[?], messages: Messages)
+@(form: Form[BusinessTypeAnswer])(implicit request: Request[?], messages: Messages)
 
 @key = @{
     BusinessTypeSessionForm.key
@@ -49,23 +49,23 @@
             )),
             items = Seq(
                 RadioItem(
-                    content = Text(messages(s"$key.${BusinessTypeSessionValue.SoleTrader.toString}")),
-                    value = Some(BusinessTypeSessionValue.SoleTrader.toString)
+                    content = Text(messages(s"$key.${BusinessTypeAnswer.SoleTrader.toString}")),
+                    value = Some(BusinessTypeAnswer.SoleTrader.toString)
                 ),
                 RadioItem(
-                    content = Text(messages(s"$key.${BusinessTypeSessionValue.LimitedCompany.toString}")),
-                    value = Some(BusinessTypeSessionValue.LimitedCompany.toString)
+                    content = Text(messages(s"$key.${BusinessTypeAnswer.LimitedCompany.toString}")),
+                    value = Some(BusinessTypeAnswer.LimitedCompany.toString)
                 ),
                 RadioItem(
-                    content = Text(messages(s"$key.${BusinessTypeSessionValue.PartnershipType.toString}")),
-                    value = Some(BusinessTypeSessionValue.PartnershipType.toString)
+                    content = Text(messages(s"$key.${BusinessTypeAnswer.PartnershipType.toString}")),
+                    value = Some(BusinessTypeAnswer.PartnershipType.toString)
                 ),
                 RadioItem(
                     divider = Some(messages("common.or"))
                 ),
                 RadioItem(
-                    content = Text(messages(s"$key.${BusinessTypeSessionValue.NotSupported.toString}")),
-                    value = Some(BusinessTypeSessionValue.NotSupported.toString)
+                    content = Text(messages(s"$key.${BusinessTypeAnswer.Other.toString}")),
+                    value = Some(BusinessTypeAnswer.Other.toString)
                 )
             )
         ).withFormField(form(key)))

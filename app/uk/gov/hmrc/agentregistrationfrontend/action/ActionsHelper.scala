@@ -21,11 +21,13 @@ import play.api.data.FormBinding
 import play.api.mvc.*
 import play.api.mvc.Results.BadRequest
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-object ActionsHelper:
+object ActionsHelper
+extends RequestAwareLogging:
 
   extension [
     R <: [X] =>> Request[X],
@@ -46,7 +48,10 @@ object ActionsHelper:
       def filter[A](rA: R[A]): Future[Option[Result]] = Future.successful:
         given rB: R[B] = rA.asInstanceOf[R[B]]
         if condition(rB) then None
-        else Some(resultWhenConditionNotMet(rB)))
+        else
+          val result: Result = resultWhenConditionNotMet(rB)
+          logger.warn(s"Condition not met for the request, responding with ${result.header.status}")
+          Some(result))
 
     def ensureAsync(
       condition: R[B] => Future[Boolean],

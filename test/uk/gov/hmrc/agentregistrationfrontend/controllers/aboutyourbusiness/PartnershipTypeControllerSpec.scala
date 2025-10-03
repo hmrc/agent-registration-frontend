@@ -20,7 +20,7 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.forms.PartnershipTypeForm
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
+import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
 class PartnershipTypeControllerSpec
@@ -49,7 +49,7 @@ extends ControllerSpec:
   s"GET $path with something other than PartnershipType in session should return 303 and redirect to business type page" in:
     val response: WSResponse = get(
       uri = path,
-      cookies = addBusinessTypeToSession(BusinessTypeSessionValue.SoleTrader).extractCookies
+      cookies = addBusinessTypeToSession(BusinessTypeAnswer.SoleTrader).extractCookies
     )
 
     response.status shouldBe Status.SEE_OTHER
@@ -59,7 +59,7 @@ extends ControllerSpec:
   s"GET $path with BusinessType as PartnershipType in session should return 200 and render page" in:
     val response: WSResponse = get(
       uri = path,
-      cookies = addBusinessTypeToSession(BusinessTypeSessionValue.PartnershipType).extractCookies
+      cookies = addBusinessTypeToSession(BusinessTypeAnswer.PartnershipType).extractCookies
     )
 
     response.status shouldBe Status.OK
@@ -70,7 +70,7 @@ extends ControllerSpec:
       val response: WSResponse =
         post(
           uri = path,
-          cookies = addBusinessTypeToSession(BusinessTypeSessionValue.PartnershipType).extractCookies
+          cookies = addBusinessTypeToSession(BusinessTypeAnswer.PartnershipType).extractCookies
         )(Map(PartnershipTypeForm.key -> Seq(partnershipType.toString)))
 
       response.status shouldBe Status.SEE_OTHER
@@ -81,7 +81,7 @@ extends ControllerSpec:
     val response: WSResponse =
       post(
         uri = path,
-        cookies = addBusinessTypeToSession(BusinessTypeSessionValue.PartnershipType).extractCookies
+        cookies = addBusinessTypeToSession(BusinessTypeAnswer.PartnershipType).extractCookies
       )(Map(PartnershipTypeForm.key -> Seq("")))
 
     response.status shouldBe Status.BAD_REQUEST

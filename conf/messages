@@ -29,7 +29,7 @@ businessType.title = How is your business set up?
 businessType.SoleTrader = Sole trader
 businessType.LimitedCompany = Limited company
 businessType.PartnershipType = A type of partnership
-businessType.NotSupported = Something else
+businessType.Other = Something else
 
 ## About your business / partnership type
 partnershipType.title = What type of partnership?

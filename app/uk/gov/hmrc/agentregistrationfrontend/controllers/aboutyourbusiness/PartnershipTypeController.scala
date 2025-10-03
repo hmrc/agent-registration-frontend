@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.PartnershipTypeForm
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
+import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.PartnershipTypePage
 
@@ -43,16 +43,16 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[Request, AnyContent] = action
     .ensure(
-      _.readBusinessType match {
-        case Some(BusinessTypeSessionValue.PartnershipType) => true
+      _.readBusinessTypeAnswer match {
+        case Some(BusinessTypeAnswer.PartnershipType) => true
         case _ => false
       },
       implicit request =>
-        logger.info(s"Redirecting to business type page due to missing or invalid business type selection: ${request.readBusinessType}")
+        logger.info(s"Redirecting to business type page due to missing or invalid business type selection: ${request.readBusinessTypeAnswer}")
         Redirect(routes.BusinessTypeSessionController.show)
     )
 
-  val show: Action[AnyContent] = baseAction:
+  def show: Action[AnyContent] = baseAction:
     implicit request =>
       val form: Form[BusinessType.Partnership] =
         request.readPartnershipType match
@@ -60,10 +60,10 @@ extends FrontendController(mcc, actions):
           case None => PartnershipTypeForm.form
       Ok(view(form))
 
-  val submit: Action[AnyContent] =
+  def submit: Action[AnyContent] =
     baseAction.ensureValidForm(PartnershipTypeForm.form, implicit r => view(_)):
       implicit request =>
-        val partnershipType = request.formValue
+        val partnershipType: BusinessType.Partnership = request.formValue
         Redirect(
           routes.TypeOfSignInController.show
-        ).addPartnershipTypeToSession(partnershipType)
+        ).addSession(partnershipType)

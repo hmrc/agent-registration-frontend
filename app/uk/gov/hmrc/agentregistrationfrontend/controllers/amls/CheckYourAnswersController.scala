@@ -33,7 +33,7 @@ class CheckYourAnswersController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  val show: Action[AnyContent] = actions.getApplicationInProgress:
+  def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       val amlsDetails = request.agentApplication.amlsDetails
       if amlsDetails.isDefined && amlsDetails.get.isComplete
