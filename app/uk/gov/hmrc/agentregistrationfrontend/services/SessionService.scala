@@ -24,8 +24,11 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 
 object SessionService:
+
+  import Errors.*
 
   private val microserviceName = "agent-registration-frontend"
   private val agentTypeKey: String = s"$microserviceName.agentType"
@@ -35,11 +38,11 @@ object SessionService:
 
   extension (r: Result)
 
-    def addAgentTypeToSession(at: AgentType)(implicit request: Request[?]): Result = r.addingToSession(agentTypeKey -> at.toString)
-    def addBusinessTypeAnswerToSession(bt: BusinessTypeAnswer)(implicit request: Request[?]): Result = r.addingToSession(businessTypeKey -> bt.toString)
-    def addPartnershipTypeToSession(pt: BusinessType.Partnership)(implicit request: Request[?]): Result = r.addingToSession(partnershipTypeKey -> pt.toString)
-    def addTypeOfSignInToSession(tos: TypeOfSignIn)(implicit request: Request[?]): Result = r.addingToSession(typeOfSignInKey -> tos.toString)
-    def removePartnershipTypeFromSession(implicit request: RequestHeader): Result = r.removingFromSession(partnershipTypeKey)
+    def addToSession(at: AgentType)(using request: RequestHeader): Result = r.addingToSession(agentTypeKey -> at.toString)
+    def addToSession(bt: BusinessTypeAnswer)(using request: RequestHeader): Result = r.addingToSession(businessTypeKey -> bt.toString)
+    def addSession(pt: BusinessType.Partnership)(using request: RequestHeader): Result = r.addingToSession(partnershipTypeKey -> pt.toString)
+    def addToSession(tos: TypeOfSignIn)(using request: RequestHeader): Result = r.addingToSession(typeOfSignInKey -> tos.toString)
+    def removePartnershipTypeFromSession(using request: RequestHeader): Result = r.removingFromSession(partnershipTypeKey)
 
   extension (r: Request[?])
 
@@ -49,11 +52,14 @@ object SessionService:
         .find(_.toString === value)
         .getOrElse(throw new RuntimeException(s"Invalid AgentType type in session: '$value'"))
 
-    def readBusinessType: Option[BusinessTypeAnswer] = r.session.get(businessTypeKey).map: value =>
+    def getAgentType: AgentType = readAgentType.getOrThrowExpectedDataMissing("AgentType")
+
+    def readBusinessTypeAnswer: Option[BusinessTypeAnswer] = r.session.get(businessTypeKey).map: value =>
       BusinessTypeAnswer
         .values
         .find(_.toString === value)
         .getOrElse(throw new RuntimeException(s"Invalid BusinessTypeSessionValue type in session: '$value'"))
+    def getBusinessTypeAnswer: BusinessTypeAnswer = readBusinessTypeAnswer.getOrThrowExpectedDataMissing("BusinessTypeAnswer")
 
     def readPartnershipType: Option[BusinessType.Partnership] = r.session.get(partnershipTypeKey).map: value =>
       BusinessType
@@ -62,20 +68,20 @@ object SessionService:
         .find(_.toString === value)
         .getOrElse(throw new RuntimeException(s"Invalid Partnership type in session: '$value'"))
 
+    def getPartnershipType: BusinessType.Partnership = readPartnershipType.getOrThrowExpectedDataMissing("PartnershipType")
+
     def readTypeOfSignIn: Option[TypeOfSignIn] = r.session.get(typeOfSignInKey).map: value =>
       TypeOfSignIn
         .values
         .find(_.toString === value)
         .getOrElse(throw new RuntimeException(s"Invalid TypeOfSignIn type in session: '$value'"))
 
-    //
-    def requireAgentTypeAndBusinessType: (AgentType, BusinessType) =
-      val at = readAgentType.getOrElse(throw new RuntimeException("No AgentType in session"))
-      val bt = readPartnershipType
-        .getOrElse(
-          readBusinessType
-            .getOrElse(throw new RuntimeException("No BusinessType in session"))
-            .toBusinessType
-            .getOrElse(throw new RuntimeException("No BusinessType in session"))
-        )
-      (at, bt)
+    def getTypeOfSignIn: TypeOfSignIn = readTypeOfSignIn.getOrThrowExpectedDataMissing("TypeOfSignIn")
+
+    def readBusinessType: Option[BusinessType] = readBusinessTypeAnswer.flatMap:
+      case BusinessTypeAnswer.SoleTrader => Some(BusinessType.SoleTrader)
+      case BusinessTypeAnswer.LimitedCompany => Some(BusinessType.LimitedCompany)
+      case BusinessTypeAnswer.Other => throw new NotImplementedError(s"readBusinessType: ${BusinessTypeAnswer.Other}")
+      case BusinessTypeAnswer.PartnershipType => readPartnershipType
+
+    def getBusinessType: BusinessType = readBusinessType.getOrThrowExpectedDataMissing("BusinessType")

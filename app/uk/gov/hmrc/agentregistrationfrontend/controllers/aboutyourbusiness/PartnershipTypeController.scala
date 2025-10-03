@@ -43,12 +43,12 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[Request, AnyContent] = action
     .ensure(
-      _.readBusinessType match {
+      _.readBusinessTypeAnswer match {
         case Some(BusinessTypeAnswer.PartnershipType) => true
         case _ => false
       },
       implicit request =>
-        logger.info(s"Redirecting to business type page due to missing or invalid business type selection: ${request.readBusinessType}")
+        logger.info(s"Redirecting to business type page due to missing or invalid business type selection: ${request.readBusinessTypeAnswer}")
         Redirect(routes.BusinessTypeSessionController.show)
     )
 
@@ -66,4 +66,4 @@ extends FrontendController(mcc, actions):
         val partnershipType: BusinessType.Partnership = request.formValue
         Redirect(
           routes.TypeOfSignInController.show
-        ).addPartnershipTypeToSession(partnershipType)
+        ).addSession(partnershipType)

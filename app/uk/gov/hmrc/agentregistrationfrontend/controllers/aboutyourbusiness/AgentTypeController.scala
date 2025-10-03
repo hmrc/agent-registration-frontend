@@ -54,4 +54,4 @@ extends FrontendController(mcc, actions):
             agentType match
               case AgentType.UkTaxAgent => routes.BusinessTypeSessionController.show
               case AgentType.NonUkTaxAgent => applicationRoutes.AgentApplicationController.genericExitPage
-          Redirect(call.url).addAgentTypeToSession(agentType)
+          Redirect(call.url).addToSession(agentType)

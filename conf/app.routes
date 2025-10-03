@@ -28,7 +28,7 @@ POST        /apply/about-your-business/partnership-type             uk.gov.hmrc.
 
 GET         /apply/about-your-business/agent-online-services-account uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.TypeOfSignInController.show
 POST        /apply/about-your-business/agent-online-services-account uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.TypeOfSignInController.submit
-GET         /apply/about-your-business/sign-in                       uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.TypeOfSignInController.redirectToChosenSignIn(signInLink: String)
+GET         /apply/about-your-business/sign-in                       uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.TypeOfSignInController.showSignInPage
 
 ##GRS routes
 GET         /apply/about-your-business/agent-type/:agentType/entity-type/:businessType uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.setUpGrsFromSignIn(agentType: AgentType, businessType: BusinessType)

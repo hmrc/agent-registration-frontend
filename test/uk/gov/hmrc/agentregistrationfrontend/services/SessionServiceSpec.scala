@@ -39,7 +39,7 @@ extends UnitSpec:
     BusinessType.Partnership.values.foreach: pt =>
       s"$pt can be added to the Result and read back from the Request" in:
         val newResult = result
-          .addPartnershipTypeToSession(pt)
+          .addSession(pt)
 
         newResult
           .asRequest
@@ -66,7 +66,7 @@ extends UnitSpec:
 
     "removePartnershipType should remove partnership type from session" in:
       val newResult = result
-        .addPartnershipTypeToSession(BusinessType.Partnership.LimitedLiabilityPartnership)
+        .addSession(BusinessType.Partnership.LimitedLiabilityPartnership)
 
       newResult
         .asRequest
@@ -84,11 +84,11 @@ extends UnitSpec:
     BusinessTypeAnswer.values.foreach: bt =>
       s"$bt can be added to the Result and read back from the Request" in:
         val newResult = result
-          .addBusinessTypeAnswerToSession(bt)
+          .addToSession(bt)
 
         newResult
           .asRequest
-          .readBusinessType shouldBe Some(bt)
+          .readBusinessTypeAnswer shouldBe Some(bt)
 
         newResult.newSession.value.get(
           "agent-registration-frontend.businessType"
@@ -102,18 +102,18 @@ extends UnitSpec:
       val throwable: RuntimeException = intercept[RuntimeException]:
         request
           .withSession("agent-registration-frontend.businessType" -> "garbage")
-          .readBusinessType
+          .readBusinessTypeAnswer
 
       throwable.getMessage shouldBe "Invalid BusinessTypeSessionValue type in session: 'garbage'"
 
     "readBusinessType should return None when business type is not present in session" in:
-      request.readBusinessType shouldBe None
+      request.readBusinessTypeAnswer shouldBe None
 
   "AgentType" should:
     AgentType.values.foreach: bt =>
       s"$bt can be added to the Result and read back from the Request" in:
         val newResult = result
-          .addAgentTypeToSession(bt)
+          .addToSession(bt)
 
         newResult
           .asRequest

@@ -18,9 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.model
 
 import play.api.libs.json.Format
 import play.api.mvc.PathBindable
-import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
 
 enum BusinessTypeAnswer:
 
@@ -28,13 +27,6 @@ enum BusinessTypeAnswer:
   case LimitedCompany
   case PartnershipType
   case Other
-
-  def toBusinessType: Option[BusinessType] =
-    this match
-      case SoleTrader => Some(BusinessType.SoleTrader)
-      case LimitedCompany => Some(BusinessType.LimitedCompany)
-      case PartnershipType => None
-      case Other => None
 
 object BusinessTypeAnswer:
 

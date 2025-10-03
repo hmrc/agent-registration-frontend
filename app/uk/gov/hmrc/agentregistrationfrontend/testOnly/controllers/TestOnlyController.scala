@@ -69,21 +69,21 @@ extends FrontendController(mcc, actions):
   ): Action[AnyContent] = Action:
     implicit request =>
       Ok("agent type added to session")
-        .addAgentTypeToSession(agentType)
+        .addToSession(agentType)
 
   def addBusinessTypeToSession(
     businessType: BusinessTypeAnswer
   ): Action[AnyContent] = Action:
     implicit request =>
       Ok("business type added to session")
-        .addAgentTypeToSession(AgentType.UkTaxAgent)
-        .addBusinessTypeAnswerToSession(businessType)
+        .addToSession(AgentType.UkTaxAgent)
+        .addToSession(businessType)
 
   def addPartnershipTypeToSession(
     partnershipType: BusinessType.Partnership
   ): Action[AnyContent] = Action:
     implicit request =>
       Ok("partnership type added to session")
-        .addAgentTypeToSession(AgentType.UkTaxAgent)
-        .addBusinessTypeAnswerToSession(BusinessTypeAnswer.PartnershipType)
-        .addPartnershipTypeToSession(partnershipType)
+        .addToSession(AgentType.UkTaxAgent)
+        .addToSession(BusinessTypeAnswer.PartnershipType)
+        .addSession(partnershipType)

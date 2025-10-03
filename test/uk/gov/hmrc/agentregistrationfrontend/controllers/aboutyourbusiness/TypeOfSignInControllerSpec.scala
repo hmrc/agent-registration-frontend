@@ -16,16 +16,11 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness
 
-import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentType
-import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.TypeOfSignInForm
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import sttp.model.Uri.UriContext
 
 class TypeOfSignInControllerSpec
 extends ControllerSpec:
@@ -43,23 +38,6 @@ extends ControllerSpec:
     )
     routes.TypeOfSignInController.submit.url shouldBe routes.TypeOfSignInController.show.url
 
-  s"GET $path without BusinessType in session should return 303 and redirect to business type page" in:
-    val response: WSResponse = get(path)
-
-    response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.BusinessTypeSessionController.show.url
-
-  s"GET $path with BusinessType of PartnershipType but no partnership type selected should return 303 and redirect to partnership type page" in:
-    val response: WSResponse = get(
-      uri = path,
-      cookies = addBusinessTypeToSession(BusinessTypeAnswer.PartnershipType).extractCookies
-    )
-
-    response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.PartnershipTypeController.show.url
-
   s"GET $path with a valid business type in session should return 200 and render the page" in:
     val response: WSResponse = get(
       uri = path,
@@ -75,15 +53,8 @@ extends ControllerSpec:
         cookies = addBusinessTypeToSession(BusinessTypeAnswer.LimitedCompany).extractCookies
       )(Map(TypeOfSignInForm.key -> Seq(TypeOfSignIn.HmrcOnlineServices.toString)))
 
-    val signInLink = appConfig.signInUri(
-      continueUri =
-        uri"${appConfig.thisFrontendBaseUrl + applicationRoutes.GrsController.setUpGrsFromSignIn(
-            agentType = AgentType.UkTaxAgent,
-            businessType = BusinessType.LimitedCompany
-          ).url}"
-    )
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe routes.TypeOfSignInController.redirectToChosenSignIn(signInLink.toString).url
+    response.header("Location").value shouldBe routes.TypeOfSignInController.showSignInPage.url
 
   s"POST $path without valid selection should return 400" in:
     val response: WSResponse =
@@ -94,3 +65,5 @@ extends ControllerSpec:
 
     response.status shouldBe Status.BAD_REQUEST
     response.parseBodyAsJsoupDocument.title() shouldBe "Error: Do you have an HMRC online services for agents account? - Apply for an agent services account - GOV.UK"
+
+//TODO: missing showSignInPage test

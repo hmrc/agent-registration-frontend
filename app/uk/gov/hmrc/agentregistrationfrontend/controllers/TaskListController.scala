@@ -33,10 +33,14 @@ class TaskListController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  /* Show the task list if we have a UTR from GRS, otherwise redirect to start of registration */
-  def show: Action[AnyContent] = actions.getApplicationInProgress { implicit request =>
-    if (request.agentApplication.utr.isDefined)
-      Ok(taskListPage())
-    else
-      Redirect(routes.AgentApplicationController.startRegistration)
-  }
+  def show: Action[AnyContent] =
+    actions
+      .getApplicationInProgress
+      .ensure(
+        _.agentApplication.utr.isDefined,
+        implicit request =>
+          logger.warn("Missing data from GRS, redirecting to start GRS registration")
+          Redirect(routes.AgentApplicationController.startRegistration)
+      ):
+        implicit request =>
+          Ok(taskListPage())

@@ -50,7 +50,7 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] = baseAction:
     implicit request =>
       val form: Form[BusinessTypeAnswer] =
-        request.readBusinessType match
+        request.readBusinessTypeAnswer match
           case Some(bt: BusinessTypeAnswer) => BusinessTypeSessionForm.form.fill(bt)
           case None => BusinessTypeSessionForm.form
       Ok(businessTypeSessionPage(form))
@@ -63,11 +63,11 @@ extends FrontendController(mcc, actions):
             case businessType @ (BusinessTypeAnswer.SoleTrader | BusinessTypeAnswer.LimitedCompany) =>
               // TODO SoleTrader or LimitedCompany journeys not yet built
               Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
-                .addBusinessTypeAnswerToSession(businessType)
+                .addToSession(businessType)
                 .removePartnershipTypeFromSession
             case businessType @ BusinessTypeAnswer.PartnershipType =>
               Redirect(routes.PartnershipTypeController.show.url)
-                .addBusinessTypeAnswerToSession(businessType)
+                .addToSession(businessType)
             case businessType @ BusinessTypeAnswer.Other =>
               Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
-                .addBusinessTypeAnswerToSession(businessType)
+                .addToSession(businessType)

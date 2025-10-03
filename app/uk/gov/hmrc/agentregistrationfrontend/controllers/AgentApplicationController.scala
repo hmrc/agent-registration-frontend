@@ -68,25 +68,25 @@ extends FrontendController(mcc, actions):
           logger.warn("Application submitted but has not finished")(using r)
           Redirect("")
     )
-    .async { implicit request =>
-      Future.successful(Ok(simplePage(
-        h1 = "Application Submitted...",
+    .async:
+      implicit request =>
+        Future.successful(Ok(simplePage(
+          h1 = "Application Submitted...",
+          bodyText = Some(
+            "Placeholder for the Application Submitted page..."
+          )
+        )))
+
+  def startRegistration: Action[AnyContent] = action:
+    implicit request =>
+      // if we use an endpoint like this, we can later change the flow without changing the URL
+      Redirect(aboutyourbusiness.routes.AgentTypeController.show)
+
+  def genericExitPage: Action[AnyContent] = action:
+    implicit request =>
+      Ok(simplePage(
+        h1 = "You cannot use this service...",
         bodyText = Some(
-          "Placeholder for the Application Submitted page..."
+          "Placeholder for the generic exit page..."
         )
-      )))
-    }
-
-  def startRegistration: Action[AnyContent] = action { implicit request =>
-    // if we use an endpoint like this, we can later change the flow without changing the URL
-    Redirect(aboutyourbusiness.routes.AgentTypeController.show)
-  }
-
-  def genericExitPage: Action[AnyContent] = action { implicit request =>
-    Ok(simplePage(
-      h1 = "You cannot use this service...",
-      bodyText = Some(
-        "Placeholder for the generic exit page..."
-      )
-    ))
-  }
+      ))
