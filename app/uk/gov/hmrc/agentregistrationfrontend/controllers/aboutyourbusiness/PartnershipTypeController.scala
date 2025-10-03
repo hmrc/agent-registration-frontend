@@ -47,8 +47,8 @@ extends FrontendController(mcc, actions):
         case Some(BusinessTypeSessionValue.PartnershipType) => true
         case _ => false
       },
-      implicit r =>
-        logger.info(s"Redirecting to business type page due to missing or invalid business type selection: ${r.readBusinessType}")
+      implicit request =>
+        logger.info(s"Redirecting to business type page due to missing or invalid business type selection: ${request.readBusinessType}")
         Redirect(routes.BusinessTypeSessionController.show)
     )
 

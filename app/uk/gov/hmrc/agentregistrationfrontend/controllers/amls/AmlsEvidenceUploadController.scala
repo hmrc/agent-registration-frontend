@@ -52,7 +52,7 @@ class AmlsEvidenceUploadController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getApplicationInProgress.async:
+  val show: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
       val amlsCode: AmlsCode = request.agentApplication.getAmlsDetails.supervisoryBody
       val amlsName: AmlsName = amlsCodes.getSupervisoryName(amlsCode)
@@ -97,7 +97,7 @@ extends FrontendController(mcc, actions):
         message = s"$errorMessage, Code: $errorCode, RequestId: $errorRequestId, FileReference: $key"
       ))
 
-  def showResult: Action[AnyContent] = actions.getApplicationInProgress:
+  val showResult: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       Ok(progressView(request
         .agentApplication
@@ -112,7 +112,7 @@ extends FrontendController(mcc, actions):
   )
 
   // this method returns a status code only for AJAX polling
-  def pollResultWithJavaScript: Action[AnyContent] = actions.getApplicationInProgress:
+  val pollResultWithJavaScript: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       request
         .agentApplication

@@ -52,7 +52,7 @@ class TypeOfSignInController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = Action:
+  val show: Action[AnyContent] = action:
     implicit request =>
       request.readBusinessType match
         case None => Redirect(routes.BusinessTypeSessionController.show)
@@ -60,7 +60,7 @@ extends FrontendController(mcc, actions):
           request.readPartnershipType match
             case None => Redirect(routes.PartnershipTypeController.show)
             case Some(_) => showTypeOfSignInForm(request)
-        case Some(_) => showTypeOfSignInForm(request) // bug?
+        case Some(_) => showTypeOfSignInForm(request)
 
   private def showTypeOfSignInForm(implicit request: Request[?]) =
     val form: Form[TypeOfSignIn] =
@@ -69,7 +69,7 @@ extends FrontendController(mcc, actions):
         case None => TypeOfSignInForm.form
     Ok(view(form))
 
-  def submit: Action[AnyContent] = Action:
+  val submit: Action[AnyContent] = action:
     implicit request =>
       request.readBusinessType match
         case None => Redirect(routes.BusinessTypeSessionController.show)
@@ -95,7 +95,7 @@ extends FrontendController(mcc, actions):
         .addTypeOfSignInToSession(typeOfSignIn)
   )
 
-  def redirectToChosenSignIn(signInLink: String): Action[AnyContent] = Action:
+  def redirectToChosenSignIn(signInLink: String): Action[AnyContent] = action:
     implicit request =>
       request.readTypeOfSignIn match
         case Some(HmrcOnlineServices) => Ok(signInWithAgentDetailsPage(uri"$signInLink"))

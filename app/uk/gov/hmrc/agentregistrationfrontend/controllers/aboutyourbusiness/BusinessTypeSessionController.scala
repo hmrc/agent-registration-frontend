@@ -39,19 +39,24 @@ class BusinessTypeSessionController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] =
-    action
-      .ensure(_.readAgentType.isDefined, _ => Redirect(routes.AgentTypeController.show)):
-        implicit request =>
-          val form: Form[BusinessTypeSessionValue] =
-            request.readBusinessType match
-              case Some(bt: BusinessTypeSessionValue) => BusinessTypeSessionForm.form.fill(bt)
-              case None => BusinessTypeSessionForm.form
-          Ok(businessTypeSessionPage(form))
+  private val baseAction = action
+    .ensure(
+      _.readAgentType.isDefined,
+      implicit request =>
+        logger.warn("Agent type not selected - redirecting to agent type selection page")
+        Redirect(routes.AgentTypeController.show)
+    )
+
+  val show: Action[AnyContent] = baseAction:
+    implicit request =>
+      val form: Form[BusinessTypeSessionValue] =
+        request.readBusinessType match
+          case Some(bt: BusinessTypeSessionValue) => BusinessTypeSessionForm.form.fill(bt)
+          case None => BusinessTypeSessionForm.form
+      Ok(businessTypeSessionPage(form))
 
   def submit: Action[AnyContent] =
-    action
-      .ensure(_.readAgentType.isDefined, _ => Redirect(routes.AgentTypeController.show)) // ensure that agent type has been selected before allowing business type to be posted
+    baseAction
       .ensureValidForm(BusinessTypeSessionForm.form, implicit r => businessTypeSessionPage(_)):
         implicit request =>
           request.formValue match

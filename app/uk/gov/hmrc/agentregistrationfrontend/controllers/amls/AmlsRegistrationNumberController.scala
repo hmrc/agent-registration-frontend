@@ -45,7 +45,7 @@ class AmlsRegistrationNumberController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getApplicationInProgress:
+  val show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       val isHmrc = request.agentApplication.getAmlsDetails.isHmrc
       val emptyForm = AmlsRegistrationNumberForm(isHmrc).form
@@ -59,7 +59,7 @@ extends FrontendController(mcc, actions):
           )
       Ok(view(form))
 
-  def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
+  val submit: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
       val isHmrc = request.agentApplication.getAmlsDetails.isHmrc
       AmlsRegistrationNumberForm(isHmrc).form

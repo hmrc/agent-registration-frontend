@@ -34,7 +34,7 @@ class SignInFilterController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = action { implicit request =>
+  val show: Action[AnyContent] = action { implicit request =>
     Ok(simplePage(
       h1 = "Sign in filter page...",
       bodyText = Some(

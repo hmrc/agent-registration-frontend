@@ -77,12 +77,12 @@ extends FrontendController(mcc, actions):
       )))
     }
 
-  def startRegistration: Action[AnyContent] = Action { implicit request =>
+  val startRegistration: Action[AnyContent] = action { implicit request =>
     // if we use an endpoint like this, we can later change the flow without changing the URL
     Redirect(aboutyourbusiness.routes.AgentTypeController.show)
   }
 
-  def genericExitPage: Action[AnyContent] = Action { implicit request =>
+  val genericExitPage: Action[AnyContent] = action { implicit request =>
     Ok(simplePage(
       h1 = "You cannot use this service...",
       bodyText = Some(

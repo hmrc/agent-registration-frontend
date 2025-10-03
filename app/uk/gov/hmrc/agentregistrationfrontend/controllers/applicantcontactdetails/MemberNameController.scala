@@ -34,7 +34,7 @@ class MemberNameController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getApplicationInProgress:
+  val show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       Ok(view(
         h1 = "Member name placeholder...",

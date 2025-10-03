@@ -34,7 +34,7 @@ class BusinessTypeController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = action:
+  val show: Action[AnyContent] = action:
     implicit request =>
       Ok(view(
         h1 = "Placeholder for Business Type page...",
