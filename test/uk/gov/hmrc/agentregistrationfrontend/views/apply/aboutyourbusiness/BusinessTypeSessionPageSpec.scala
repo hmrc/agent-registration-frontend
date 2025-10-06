@@ -41,7 +41,7 @@ extends ViewSpec:
           "Sole trader" -> "SoleTrader",
           "Limited company" -> "LimitedCompany",
           "A type of partnership" -> "PartnershipType",
-          "Something else" -> "NotSupported"
+          "Something else" -> "Other"
         ),
         hint = None
       )

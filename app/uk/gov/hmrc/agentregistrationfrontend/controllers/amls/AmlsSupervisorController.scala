@@ -26,15 +26,12 @@ import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
-import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.getSubmitAction
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsSupervisoryBodyPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.Future
 
 @Singleton
 class AmlsSupervisorController @Inject() (
@@ -42,59 +39,41 @@ class AmlsSupervisorController @Inject() (
   actions: Actions,
   view: AmlsSupervisoryBodyPage,
   applicationService: ApplicationService,
-  amlsSupervisoryBodyForm: AmlsCodeForm
+  amlsCodeForm: AmlsCodeForm
 )
 extends FrontendController(mcc, actions):
 
-  val show: Action[AnyContent] = actions.getApplicationInProgress:
-    implicit request =>
-      val formTemplate: Form[AmlsCode] = amlsSupervisoryBodyForm.form
-
-      val form: Form[AmlsCode] =
-        request
+  def show: Action[AnyContent] = actions
+    .getApplicationInProgress:
+      implicit request =>
+        val form: Form[AmlsCode] = amlsCodeForm.form.fill(request
           .agentApplication
           .amlsDetails
-          .fold(formTemplate)((amlsDetails: AmlsDetails) =>
-            formTemplate.fill(amlsDetails.supervisoryBody)
-          )
-      Ok(view(form))
+          .map(_.supervisoryBody))
+        Ok(view(form))
 
-  val submit: Action[AnyContent] = actions.getApplicationInProgress.async:
-    implicit request =>
-      amlsSupervisoryBodyForm
-        .form
-        .bindFromRequest()
-        .fold(
-          formWithErrors =>
-            Future.successful(
-              if getSubmitAction(request).isSaveAndComeBackLater
-              then
-                Redirect(applicationRoutes.SaveForLaterController.show.url)
-              else
-                BadRequest(view(formWithErrors))
-            ),
-          supervisoryBody =>
-            applicationService
-              .upsert(
-                request.agentApplication
-                  .modify(_.amlsDetails)
-                  .using {
-                    case Some(details) =>
-                      Some(details
-                        .modify(_.supervisoryBody)
-                        .setTo(supervisoryBody))
-                    case None =>
-                      Some(AmlsDetails(
-                        supervisoryBody = supervisoryBody
-                      ))
-                  }
-              )
-              .map(_ =>
-                Redirect(
-                  if getSubmitAction(request)
-                      .isSaveAndComeBackLater
-                  then applicationRoutes.SaveForLaterController.show.url
-                  else routes.AmlsRegistrationNumberController.show.url
-                )
-              )
-        )
+  def submit: Action[AnyContent] =
+    actions
+      .getApplicationInProgress
+      .ensureValidFormAndRedirectIfSaveForLater(amlsCodeForm.form, implicit r => view(_))
+      .async:
+        implicit request =>
+          val supervisoryBody = request.formValue
+
+          applicationService
+            .upsert(
+              request.agentApplication
+                .modify(_.amlsDetails)
+                .using {
+                  case Some(details) =>
+                    Some(details
+                      .modify(_.supervisoryBody)
+                      .setTo(supervisoryBody))
+                  case None =>
+                    Some(AmlsDetails(
+                      supervisoryBody = supervisoryBody
+                    ))
+                }
+            )
+            .map(_ => Redirect(routes.AmlsRegistrationNumberController.show.url))
+      .redirectIfSaveForLater

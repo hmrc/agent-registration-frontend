@@ -27,7 +27,7 @@ import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.upscan.*
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeSessionValue
+import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 
@@ -69,21 +69,21 @@ extends FrontendController(mcc, actions):
   ): Action[AnyContent] = Action:
     implicit request =>
       Ok("agent type added to session")
-        .addAgentTypeToSession(agentType)
+        .addToSession(agentType)
 
   def addBusinessTypeToSession(
-    businessType: BusinessTypeSessionValue
+    businessType: BusinessTypeAnswer
   ): Action[AnyContent] = Action:
     implicit request =>
       Ok("business type added to session")
-        .addAgentTypeToSession(AgentType.UkTaxAgent)
-        .addBusinessTypeToSession(businessType)
+        .addToSession(AgentType.UkTaxAgent)
+        .addToSession(businessType)
 
   def addPartnershipTypeToSession(
     partnershipType: BusinessType.Partnership
   ): Action[AnyContent] = Action:
     implicit request =>
       Ok("partnership type added to session")
-        .addAgentTypeToSession(AgentType.UkTaxAgent)
-        .addBusinessTypeToSession(BusinessTypeSessionValue.PartnershipType)
-        .addPartnershipTypeToSession(partnershipType)
+        .addToSession(AgentType.UkTaxAgent)
+        .addToSession(BusinessTypeAnswer.PartnershipType)
+        .addSession(partnershipType)

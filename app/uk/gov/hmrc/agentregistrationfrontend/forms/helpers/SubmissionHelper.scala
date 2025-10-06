@@ -17,13 +17,24 @@
 package uk.gov.hmrc.agentregistrationfrontend.forms.helpers
 
 import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import play.api.mvc.Request
+import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
+import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction
 
-object SubmissionHelper {
-  def getSubmitAction(request: AgentApplicationRequest[AnyContent]): SubmitAction = SubmitAction.fromSubmissionWithDefault(
+object SubmissionHelper:
+
+  def getSubmitAction(request: Request[AnyContent]): SubmitAction = SubmitAction.fromSubmissionWithDefault(
     request.body.asFormUrlEncoded
       .flatMap(_.get("submit")
         .flatMap(_.headOption))
   )
-}
+
+  def redirectIfSaveForLater(
+    request: Request[AnyContent],
+    originalResult: Result
+  ): Result =
+    if getSubmitAction(request).isSaveAndComeBackLater
+    then Redirect(appRoutes.SaveForLaterController.show)
+    else originalResult

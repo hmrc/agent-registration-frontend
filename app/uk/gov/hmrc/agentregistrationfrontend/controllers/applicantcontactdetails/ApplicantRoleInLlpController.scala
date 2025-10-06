@@ -21,20 +21,17 @@ import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.AppicantRoleInLlp
+import uk.gov.hmrc.agentregistration.shared.ApplicantContactDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
-import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.getSubmitAction
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.ApplicantRoleInLlpPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
 @Singleton
 class ApplicantRoleInLlpController @Inject() (
@@ -42,58 +39,44 @@ class ApplicantRoleInLlpController @Inject() (
   actions: Actions,
   view: ApplicantRoleInLlpPage,
   applicationService: ApplicationService
-)(implicit ec: ExecutionContext)
+)(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
-  val show: Action[AnyContent] = actions.getApplicationInProgress:
+  def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
-      val emptyForm = ApplicantRoleInLlpForm.form
-      val form: Form[AppicantRoleInLlp] =
+      val form: Form[AppicantRoleInLlp] = ApplicantRoleInLlpForm.form.fill:
         request
           .agentApplication
-          .applicantContactDetails
-          .fold(emptyForm)((applicant: ApplicantContactDetails) =>
-            emptyForm.fill(applicant.applicantRoleInLlp)
-          )
+          .applicantContactDetails.map(_.applicantRoleInLlp)
       Ok(view(form))
 
-  val submit: Action[AnyContent] = actions.getApplicationInProgress.async:
-    implicit request =>
-      ApplicantRoleInLlpForm.form
-        .bindFromRequest()
-        .fold(
-          formWithErrors =>
-            Future.successful(
-              if getSubmitAction(request)
-                  .isSaveAndComeBackLater
-              then Redirect(applicationRoutes.SaveForLaterController.show.url)
-              else BadRequest(view(formWithErrors))
-            ),
-          applicantRoleInLlp =>
-            applicationService
-              .upsert(
-                request.agentApplication
-                  .modify(_.applicantContactDetails)
-                  .using {
-                    case Some(acd) =>
-                      Some(acd
-                        .modify(_.applicantRoleInLlp)
-                        .setTo(applicantRoleInLlp))
-                    case None =>
-                      Some(ApplicantContactDetails(
-                        applicantRoleInLlp = applicantRoleInLlp
-                      ))
-                  }
+  def submit: Action[AnyContent] =
+    actions
+      .getApplicationInProgress
+      .ensureValidFormAndRedirectIfSaveForLater(ApplicantRoleInLlpForm.form, implicit r => view(_))
+      .async:
+        implicit request =>
+          val applicantRoleInLlp: AppicantRoleInLlp = request.formValue
+          applicationService
+            .upsert(
+              request.agentApplication
+                .modify(_.applicantContactDetails)
+                .using {
+                  case Some(acd) =>
+                    Some(acd
+                      .modify(_.applicantRoleInLlp)
+                      .setTo(applicantRoleInLlp))
+                  case None =>
+                    Some(ApplicantContactDetails(
+                      applicantRoleInLlp = applicantRoleInLlp
+                    ))
+                }
+            )
+            .map(_ =>
+              Redirect(
+                applicantRoleInLlp match
+                  case AppicantRoleInLlp.Member => routes.MemberNameController.show.url
+                  case AppicantRoleInLlp.Authorised => routes.ApplicantNameController.show.url
               )
-              .map(_ =>
-                Redirect(
-                  if getSubmitAction(request)
-                      .isSaveAndComeBackLater
-                  then applicationRoutes.SaveForLaterController.show.url
-                  else
-                    applicantRoleInLlp match
-                      case AppicantRoleInLlp.Member => routes.MemberNameController.show.url
-                      case AppicantRoleInLlp.Authorised => routes.ApplicantNameController.show.url
-                )
-              )
-        )
+            )
+      .redirectIfSaveForLater

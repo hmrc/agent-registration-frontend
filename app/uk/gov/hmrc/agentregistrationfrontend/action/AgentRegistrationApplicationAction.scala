@@ -51,6 +51,21 @@ extends AuthorisedRequest[A](
         s"retrieved from backend (${agentApplication.internalUserId.value}) (this should never happen)"
   )(using this)
 
+object AgentApplicationRequest:
+
+  given [B, T]: MergeFormValue[AgentApplicationRequest[B], T] =
+    (
+      r: AgentApplicationRequest[B],
+      t: T
+    ) =>
+      new AgentApplicationRequest[B](
+        agentApplication = r.agentApplication,
+        internalUserId = r.internalUserId,
+        groupId = r.groupId,
+        request = r
+      ) with FormValue[T]:
+        override val formValue: T = t
+
 @Singleton
 class AgentApplicationAction @Inject() (
   applicationService: ApplicationService,
