@@ -60,7 +60,7 @@ extends RequestAwareLogging:
     )
 
     def ensureValidFormGeneric[T](
-      form: Form[T],
+      form: R[B] => Form[T],
       resultToServeWhenFormHasErrors: R[B] => Form[T] => Result
     )(using
       fb: FormBinding,
@@ -69,7 +69,7 @@ extends RequestAwareLogging:
 
       override protected def refine[A](rA: R[A]): Future[Either[Result, R[A] & FormValue[T]]] = Future.successful {
         val rB: R[B] = rA.asInstanceOf[R[B]]
-        form.bindFromRequest()(using rB, fb).fold(
+        form(rB).bindFromRequest()(using rB, fb).fold(
           hasErrors = formWithErrors => Left(resultToServeWhenFormHasErrors(rB)(formWithErrors)),
           success =
             (formValue: T) =>
@@ -87,7 +87,7 @@ extends RequestAwareLogging:
       fb: FormBinding,
       merge: MergeFormValue[R[B], T]
     ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ab
-      .ensureValidFormGeneric[T](form, (r: R[B]) => (f: Form[T]) => viewToServeWhenFormHasErrors(r)(f).pipe(BadRequest.apply)) //
+      .ensureValidFormGeneric[T](_ => form, (r: R[B]) => (f: Form[T]) => viewToServeWhenFormHasErrors(r)(f).pipe(BadRequest.apply)) //
 
     def genericFilter(
       condition: R[B] => Boolean,

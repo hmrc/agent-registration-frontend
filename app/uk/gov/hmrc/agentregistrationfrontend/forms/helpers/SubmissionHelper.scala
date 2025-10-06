@@ -31,8 +31,10 @@ object SubmissionHelper:
         .flatMap(_.headOption))
   )
 
-  extension (result: Result)
-    def redirectIfToSaveForLater(request: Request[AnyContent]): Result =
-      if getSubmitAction(request).isSaveAndComeBackLater
-      then Redirect(appRoutes.SaveForLaterController.show)
-      else result
+  def redirectIfSaveForLater(
+    request: Request[AnyContent],
+    originalResult: Result
+  ): Result =
+    if getSubmitAction(request).isSaveAndComeBackLater
+    then Redirect(appRoutes.SaveForLaterController.show)
+    else originalResult

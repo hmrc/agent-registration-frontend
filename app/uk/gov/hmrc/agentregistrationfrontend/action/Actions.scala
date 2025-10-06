@@ -25,7 +25,6 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
-import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.redirectIfToSaveForLater
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -82,7 +81,7 @@ extends RequestAwareLogging:
   extension (ab: ActionBuilder[AgentApplicationRequest, AnyContent])(using ec: ExecutionContext)
 
     def ensureValidFormAndRedirectIfSaveForLater[T](
-      form: Form[T],
+      form: AgentApplicationRequest[AnyContent] => Form[T],
       viewToServeWhenFormHasErrors: AgentApplicationRequest[AnyContent] => Form[T] => HtmlFormat.Appendable
     )(using
       fb: FormBinding,
@@ -92,8 +91,21 @@ extends RequestAwareLogging:
         form,
         (r: AgentApplicationRequest[AnyContent]) =>
           (f: Form[T]) =>
-            viewToServeWhenFormHasErrors(r)(f).pipe(BadRequest.apply).redirectIfToSaveForLater(r)
+            viewToServeWhenFormHasErrors(r)(f)
+              .pipe(BadRequest.apply)
+              .pipe(SubmissionHelper.redirectIfSaveForLater(r, _))
       )
+
+    def ensureValidFormAndRedirectIfSaveForLater[T](
+      form: Form[T],
+      viewToServeWhenFormHasErrors: AgentApplicationRequest[AnyContent] => Form[T] => HtmlFormat.Appendable
+    )(using
+      fb: FormBinding,
+      merge: MergeFormValue[AgentApplicationRequest[AnyContent], T]
+    ): ActionBuilder[[X] =>> AgentApplicationRequest[X] & FormValue[T], AnyContent] = ab.ensureValidFormAndRedirectIfSaveForLater(
+      _ => form,
+      viewToServeWhenFormHasErrors
+    )
 
   extension (a: Action[AnyContent])
     /** Modifies the action result to handle "Save and Come Back Later" functionality. If the form submission contains a "Save and Come Back Later" action,

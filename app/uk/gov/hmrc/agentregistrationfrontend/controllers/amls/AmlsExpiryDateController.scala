@@ -18,23 +18,20 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
 import com.softwaremill.quicklens.*
 import play.api.data.Form
-
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
+import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
-import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.getSubmitAction
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsExpiryDatePage
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.Future
 
 @Singleton
 class AmlsExpiryDateController @Inject() (
@@ -47,42 +44,24 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
-      val emptyForm = AmlsExpiryDateForm.form()
-      val form: Form[LocalDate] =
-        request
-          .agentApplication
-          .getAmlsDetails
-          .amlsExpiryDate
-          .fold(emptyForm)((amlsExpiryDate: LocalDate) =>
-            emptyForm.fill(amlsExpiryDate)
-          )
+      val form: Form[LocalDate] = AmlsExpiryDateForm.form().fill(request
+        .agentApplication
+        .getAmlsDetails
+        .amlsExpiryDate)
       Ok(view(form))
 
-  def submit: Action[AnyContent] = actions.getApplicationInProgress.async:
-    implicit request =>
-      AmlsExpiryDateForm.form()
-        .bindFromRequest()
-        .fold(
-          formWithErrors =>
-            Future.successful(
-              if getSubmitAction(request)
-                  .isSaveAndComeBackLater
-              then Redirect(applicationRoutes.SaveForLaterController.show.url)
-              else BadRequest(view(formWithErrors))
-            ),
-          amlsExpiryDate =>
-            applicationService
-              .upsert(
-                request.agentApplication
-                  .modify(_.amlsDetails.each.amlsExpiryDate)
-                  .setTo(Some(amlsExpiryDate))
-              )
-              .map(_ =>
-                Redirect(
-                  if getSubmitAction(request)
-                      .isSaveAndComeBackLater
-                  then applicationRoutes.SaveForLaterController.show.url
-                  else routes.AmlsEvidenceUploadController.show.url
-                )
-              )
-        )
+  def submit: Action[AnyContent] =
+    actions
+      .getApplicationInProgress
+      .ensureValidFormAndRedirectIfSaveForLater[LocalDate](AmlsExpiryDateForm.form(), implicit request => view(_))
+      .async:
+        implicit request =>
+          val amlsExpiryDate = request.formValue
+          applicationService
+            .upsert(
+              request.agentApplication
+                .modify(_.amlsDetails.each.amlsExpiryDate)
+                .setTo(Some(amlsExpiryDate))
+            )
+            .map(_ => Redirect(routes.AmlsEvidenceUploadController.show.url))
+      .redirectIfSaveForLater
