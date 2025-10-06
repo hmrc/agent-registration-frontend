@@ -33,9 +33,14 @@ class CheckYourAnswersController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getApplicationInProgress:
-    implicit request =>
-      val amlsDetails = request.agentApplication.amlsDetails
-      if amlsDetails.isDefined && amlsDetails.get.isComplete
-      then Ok(view())
-      else Redirect(routes.AmlsSupervisorController.show) // TODO: redirect to first incomplete page instead
+  def show: Action[AnyContent] =
+    actions
+      .getApplicationInProgress
+      .ensure(
+        r => r.agentApplication.amlsDetails.exists(_.isComplete),
+        implicit r =>
+          logger.warn(s"Cannot display Check Your Answers page - incomplete AMLS details.")
+          // TODO: improve routing, redirect to first incomplete page instead
+          Redirect(routes.AmlsSupervisorController.show)
+      ):
+        implicit request => Ok(view())
