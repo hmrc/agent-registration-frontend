@@ -25,7 +25,7 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
-import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.handleRedirectToSaveForLater
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.redirectIfToSaveForLater
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -81,7 +81,7 @@ extends RequestAwareLogging:
 
   extension (ab: ActionBuilder[AgentApplicationRequest, AnyContent])(using ec: ExecutionContext)
 
-    def ensureValidFormAndHandleSaveForLater[T](
+    def ensureValidFormAndRedirectIfSaveForLater[T](
       form: Form[T],
       viewToServeWhenFormHasErrors: AgentApplicationRequest[AnyContent] => Form[T] => HtmlFormat.Appendable
     )(using
@@ -92,14 +92,14 @@ extends RequestAwareLogging:
         form,
         (r: AgentApplicationRequest[AnyContent]) =>
           (f: Form[T]) =>
-            viewToServeWhenFormHasErrors(r)(f).pipe(BadRequest.apply).handleRedirectToSaveForLater(r)
+            viewToServeWhenFormHasErrors(r)(f).pipe(BadRequest.apply).redirectIfToSaveForLater(r)
       )
 
   extension (a: Action[AnyContent])
     /** Modifies the action result to handle "Save and Come Back Later" functionality. If the form submission contains a "Save and Come Back Later" action,
       * redirects to the Save and Come Back Later page. Otherwise, returns the original result unchanged.
       */
-    def handleSaveAndComeBackLater: Action[AnyContent] = a.mapResult(request =>
+    def redirectIfSaveForLater: Action[AnyContent] = a.mapResult(request =>
       originalResult =>
         if SubmissionHelper.getSubmitAction(request).isSaveAndComeBackLater then Redirect(appRoutes.SaveForLaterController.show) else originalResult
     )

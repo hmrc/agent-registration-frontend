@@ -53,7 +53,7 @@ extends FrontendController(mcc, actions):
   def submit: Action[AnyContent] =
     actions
       .getApplicationInProgress
-      .ensureValidFormAndHandleSaveForLater(ApplicantRoleInLlpForm.form, implicit r => view(_))
+      .ensureValidFormAndRedirectIfSaveForLater(ApplicantRoleInLlpForm.form, implicit r => view(_))
       .async:
         implicit request =>
           val applicantRoleInLlp: AppicantRoleInLlp = request.formValue
@@ -79,4 +79,4 @@ extends FrontendController(mcc, actions):
                   case AppicantRoleInLlp.Authorised => routes.ApplicantNameController.show.url
               )
             )
-      .handleSaveAndComeBackLater
+      .redirectIfSaveForLater

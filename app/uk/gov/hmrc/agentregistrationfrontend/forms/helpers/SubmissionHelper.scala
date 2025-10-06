@@ -32,7 +32,7 @@ object SubmissionHelper:
   )
 
   extension (result: Result)
-    def handleRedirectToSaveForLater(request: Request[AnyContent]): Result =
+    def redirectIfToSaveForLater(request: Request[AnyContent]): Result =
       if getSubmitAction(request).isSaveAndComeBackLater
       then Redirect(appRoutes.SaveForLaterController.show)
       else result
