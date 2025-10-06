@@ -20,7 +20,6 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import javax.inject.Inject
@@ -58,24 +57,6 @@ extends FrontendController(mcc, actions):
       )
     )))
   }
-
-  def applicationSubmitted2: Action[AnyContent] = actions
-    .getApplicationSubmitted
-    .ensure(
-      condition = (r: AgentApplicationRequest[?]) => r.agentApplication.hasFinished,
-      resultWhenConditionNotMet =
-        r =>
-          logger.warn("Application submitted but has not finished")(using r)
-          Redirect("")
-    )
-    .async:
-      implicit request =>
-        Future.successful(Ok(simplePage(
-          h1 = "Application Submitted...",
-          bodyText = Some(
-            "Placeholder for the Application Submitted page..."
-          )
-        )))
 
   def startRegistration: Action[AnyContent] = action:
     implicit request =>

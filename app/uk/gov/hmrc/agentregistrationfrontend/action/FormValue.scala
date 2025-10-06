@@ -61,4 +61,4 @@ object MergeFormValue:
     ) =>
       new MessagesRequest[B](r, r.messagesApi)
         with FormValue[T]:
-        override val formValue = t
+        override val formValue: T = t

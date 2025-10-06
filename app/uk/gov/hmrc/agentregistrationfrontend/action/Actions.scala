@@ -16,14 +16,21 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action
 
+import play.api.data.Form
+import play.api.data.FormBinding
 import play.api.mvc.*
+import play.api.mvc.Results.BadRequest
 import play.api.mvc.Results.Redirect
+import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper.handleRedirectToSaveForLater
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
+import scala.util.chaining.scalaUtilChainingOps
 
 @Singleton
 class Actions @Inject() (
@@ -70,4 +77,29 @@ extends RequestAwareLogging:
               s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
           )
           Redirect(call.url)
+    )
+
+  extension (ab: ActionBuilder[AgentApplicationRequest, AnyContent])(using ec: ExecutionContext)
+
+    def ensureValidFormAndHandleSaveForLater[T](
+      form: Form[T],
+      viewToServeWhenFormHasErrors: AgentApplicationRequest[AnyContent] => Form[T] => HtmlFormat.Appendable
+    )(using
+      fb: FormBinding,
+      merge: MergeFormValue[AgentApplicationRequest[AnyContent], T]
+    ): ActionBuilder[[X] =>> AgentApplicationRequest[X] & FormValue[T], AnyContent] = ab
+      .ensureValidFormGeneric[T](
+        form,
+        (r: AgentApplicationRequest[AnyContent]) =>
+          (f: Form[T]) =>
+            viewToServeWhenFormHasErrors(r)(f).pipe(BadRequest.apply).handleRedirectToSaveForLater(r)
+      )
+
+  extension (a: Action[AnyContent])
+    /** Modifies the action result to handle "Save and Come Back Later" functionality. If the form submission contains a "Save and Come Back Later" action,
+      * redirects to the Save and Come Back Later page. Otherwise, returns the original result unchanged.
+      */
+    def handleSaveAndComeBackLater: Action[AnyContent] = a.mapResult(request =>
+      originalResult =>
+        if SubmissionHelper.getSubmitAction(request).isSaveAndComeBackLater then Redirect(appRoutes.SaveForLaterController.show) else originalResult
     )
