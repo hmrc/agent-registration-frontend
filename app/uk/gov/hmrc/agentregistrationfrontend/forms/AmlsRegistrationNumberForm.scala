@@ -24,14 +24,13 @@ import play.api.data.validation.Constraint
 import play.api.data.validation.Invalid
 import play.api.data.validation.Valid
 import play.api.data.validation.ValidationError
-import play.api.i18n.Messages
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
 object AmlsRegistrationNumberForm:
   val key: String = "amlsRegistrationNumber"
 
-class AmlsRegistrationNumberForm(isHmrc: Boolean)(implicit messages: Messages) {
+class AmlsRegistrationNumberForm(isHmrc: Boolean) {
 
   import AmlsRegistrationNumberForm.*
 
@@ -41,7 +40,7 @@ class AmlsRegistrationNumberForm(isHmrc: Boolean)(implicit messages: Messages) {
     Constraint[Option[String]] { (userInput: Option[String]) =>
       userInput match {
         case Some(value) if stripWhiteSpaces(value).nonEmpty => Valid
-        case _ => Invalid(ValidationError(messages(messageKey)))
+        case _ => Invalid(ValidationError(messageKey))
       }
     }
   }
