@@ -22,6 +22,8 @@ import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
+import uk.gov.hmrc.agentregistration.shared.CompaniesHouseNameQuery
+import uk.gov.hmrc.agentregistration.shared.NameOfMember
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
@@ -42,8 +44,9 @@ extends ViewSpec:
         .setTo(Some(tdAll.llpBusinessDetails))
         .modify(_.applicantContactDetails)
         .setTo(Some(ApplicantContactDetails(
-          applicantRoleInLlp = ApplicantRoleInLlp.Member,
-          memberNameQuery = None
+          applicantName = NameOfMember(
+            role = ApplicantRoleInLlp.Member
+          )
         ))),
       internalUserId = tdAll.internalUserId,
       groupId = tdAll.groupId
