@@ -58,15 +58,21 @@
 @gdsTitle = @{s"$errorPrefix$pageTitle - ${messages("service.name")} - GOV.UK"}
 @contentWithErrorsAndHelp = {
     @maybeForm.map { form =>
-        @form.errors.headOption.map { error =>
-            @govukErrorSummary(ErrorSummary(
-                title = Text(messages("error.summary.title")),
-                errorList = Seq(ErrorLink(
-                    href = if(error.key.endsWith("Date")) Some(s"#${error.key}.day") else Some(s"#${error.key}"),
-                    content = Text(messages(error.message, error.args*))
-                ))
-            ))
-        }
+      @if(form.hasErrors) {
+          @govukErrorSummary(ErrorSummary(
+              title = Text(messages("error.summary.title")),
+              errorList = form.errors
+                  .groupBy(_.key.split("\\.").head) // handle date keys like "someDate.day"
+                  .values
+                  .flatMap(_.headOption)
+                  .map { error =>
+                      ErrorLink(
+                          href = if(error.key.endsWith("Date")) Some(s"#${error.key}.day") else Some(s"#${error.key}"),
+                          content = Text(messages(error.message, error.args *))
+                      )
+                  }.toSeq.reverse
+          ))
+      }
     }
     @contentBlock
     @hmrcReportTechnicalIssueHelper()
@@ -76,6 +82,7 @@
   HmrcStandardPageParams(
       pageTitle = Some(gdsTitle),
       serviceURLs = ServiceURLs(
+          serviceUrl = Some(routes.AgentApplicationController.landing.url),
           signOutUrl = if (isSignedIn) Some(routes.SignOutController.signOut.url) else None
       ),
       templateOverrides = TemplateOverrides(

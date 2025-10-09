@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.ApplicantRoleInLlpPage
 
-class AppicantRoleInLlpPageSpec
+class ApplicantRoleInLlpPageSpec
 extends ViewSpec:
 
   val viewTemplate: ApplicantRoleInLlpPage = app.injector.instanceOf[ApplicantRoleInLlpPage]
