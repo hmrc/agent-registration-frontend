@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared
+package uk.gov.hmrc.agentregistration.shared.contactdetails
 
 import play.api.libs.json.*
-
-final case class CompaniesHouseDateOfBirth(
-  day: Option[Int],
-  month: Int,
-  year: Int
-)
 
 final case class CompaniesHouseOfficer(
   name: String,
   dateOfBirth: Option[CompaniesHouseDateOfBirth]
 )
 
-object CompaniesHouseDateOfBirth:
-  implicit val format: Format[CompaniesHouseDateOfBirth] = Json.format[CompaniesHouseDateOfBirth]
-
 object CompaniesHouseOfficer:
-  implicit val format: Format[CompaniesHouseOfficer] = Json.format[CompaniesHouseOfficer]
+  given format: Format[CompaniesHouseOfficer] = Json.format[CompaniesHouseOfficer]
