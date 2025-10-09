@@ -21,8 +21,11 @@ import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
+import uk.gov.hmrc.agentregistration.shared.NameOfAuthorised
+import uk.gov.hmrc.agentregistration.shared.NameOfMember
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
@@ -32,6 +35,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactde
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class ApplicantRoleInLlpController @Inject() (
@@ -47,7 +51,7 @@ extends FrontendController(mcc, actions):
       val form: Form[ApplicantRoleInLlp] = ApplicantRoleInLlpForm.form.fill:
         request
           .agentApplication
-          .applicantContactDetails.map(_.applicantRoleInLlp)
+          .applicantContactDetails.map(_.getApplicantRole)
       Ok(view(form))
 
   def submit: Action[AnyContent] =
@@ -57,22 +61,47 @@ extends FrontendController(mcc, actions):
       .async:
         implicit request =>
           val applicantRoleInLlp: ApplicantRoleInLlp = request.formValue
-          applicationService
-            .upsert(
-              request.agentApplication
-                .modify(_.applicantContactDetails)
-                .using {
-                  case Some(acd) =>
-                    Some(acd
-                      .modify(_.applicantRoleInLlp)
-                      .setTo(applicantRoleInLlp))
-                  case None =>
-                    Some(ApplicantContactDetails(
-                      applicantRoleInLlp = applicantRoleInLlp
+          val currentRoleInLlp: Option[ApplicantRoleInLlp] = request
+            .agentApplication
+            .applicantContactDetails
+            .map(_.getApplicantRole)
+          if (!currentRoleInLlp.contains(applicantRoleInLlp)) {
+            val updatedApplication: AgentApplication = request.agentApplication
+              .modify(_.applicantContactDetails)
+              .using {
+                case Some(acd) =>
+                  Some(acd
+                    .modify(_.applicantName)
+                    .setTo(
+                      applicantRoleInLlp match
+                        case ApplicantRoleInLlp.Member => NameOfMember()
+                        case ApplicantRoleInLlp.Authorised => NameOfAuthorised()
                     ))
-                }
-            )
-            .map((_: Unit) =>
+                case None =>
+                  applicantRoleInLlp match {
+                    case ApplicantRoleInLlp.Member =>
+                      Some(ApplicantContactDetails(
+                        applicantName = NameOfMember()
+                      ))
+                    case ApplicantRoleInLlp.Authorised =>
+                      Some(ApplicantContactDetails(
+                        applicantName = NameOfAuthorised()
+                      ))
+                  }
+              }
+            println(s"Updated application after changing applicantRoleInLlp: $updatedApplication")
+            applicationService
+              .upsert(updatedApplication)
+              .map((_: Unit) =>
+                Redirect(
+                  applicantRoleInLlp match
+                    case ApplicantRoleInLlp.Member => routes.MemberNameController.show.url
+                    case ApplicantRoleInLlp.Authorised => routes.ApplicantNameController.show.url
+                )
+              )
+          }
+          else
+            Future.successful(
               Redirect(
                 applicantRoleInLlp match
                   case ApplicantRoleInLlp.Member => routes.MemberNameController.show.url

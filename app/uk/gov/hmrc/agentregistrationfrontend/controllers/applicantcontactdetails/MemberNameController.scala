@@ -21,9 +21,9 @@ import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
+import uk.gov.hmrc.agentregistration.shared.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.CompaniesHouseNameQuery
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistration.shared.NameOfMember
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -48,7 +48,7 @@ extends FrontendController(mcc, actions):
   private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
     .ensure(
       _.agentApplication.applicantContactDetails match {
-        case Some(details) => details.applicantRoleInLlp === ApplicantRoleInLlp.Member
+        case Some(ApplicantContactDetails(NameOfMember(_, _, _))) => true
         case _ => false
       },
       implicit request =>
@@ -63,7 +63,7 @@ extends FrontendController(mcc, actions):
           request
             .agentApplication
             .applicantContactDetails
-            .flatMap(_.memberNameQuery)
+            .flatMap(_.readMemberNameQuery)
       ))
 
   def submit: Action[AnyContent] =
@@ -74,8 +74,10 @@ extends FrontendController(mcc, actions):
           val validFormData: CompaniesHouseNameQuery = request.formValue
           applicationService.upsert(
             request.agentApplication
-              .modify(_.applicantContactDetails.each.memberNameQuery)
-              .setTo(Some(validFormData))
+              .modify(_.applicantContactDetails.each.applicantName)
+              .setTo(NameOfMember(
+                memberNameQuery = Some(validFormData)
+              )) // this will overwrite any existing match
           ).map((_: Unit) =>
             Redirect(
               routes.MemberNameController.showMemberNameMatches.url
@@ -86,7 +88,7 @@ extends FrontendController(mcc, actions):
   def showMemberNameMatches: Action[AnyContent] =
     baseAction
       .ensure(
-        _.agentApplication.applicantContactDetails.flatMap(_.memberNameQuery).isDefined,
+        _.agentApplication.applicantContactDetails.flatMap(_.readMemberNameQuery).isDefined,
         implicit request =>
           logger.info("Redirecting to member name page due to missing memberNameQuery value")
           Redirect(routes.MemberNameController.show)
