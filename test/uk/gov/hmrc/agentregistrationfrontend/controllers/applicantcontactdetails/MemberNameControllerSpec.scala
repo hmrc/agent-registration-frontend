@@ -19,10 +19,9 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetail
 import com.softwaremill.quicklens.*
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
-import uk.gov.hmrc.agentregistration.shared.CompaniesHouseNameQuery
-import uk.gov.hmrc.agentregistration.shared.NameOfMember
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
+import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -36,10 +35,9 @@ extends ControllerSpec:
   private val validApplication = tdAll.llpAgentApplication
     .modify(_.applicantContactDetails)
     .setTo(Some(ApplicantContactDetails(
-      applicantName = NameOfMember(
+      applicantName = ApplicantName.NameOfMember(
         memberNameQuery = None,
-        companiesHouseOfficer = None,
-        role = ApplicantRoleInLlp.Member
+        companiesHouseOfficer = None
       )
     )))
 
@@ -69,13 +67,12 @@ extends ControllerSpec:
       validApplication
         .modify(_.applicantContactDetails)
         .setTo(Some(ApplicantContactDetails(
-          applicantName = NameOfMember(
+          applicantName = ApplicantName.NameOfMember(
             memberNameQuery = Some(CompaniesHouseNameQuery(
               firstName = "First",
               lastName = "Last"
             )),
-            companiesHouseOfficer = None,
-            role = ApplicantRoleInLlp.Member
+            companiesHouseOfficer = None
           )
         )))
     )
@@ -126,13 +123,12 @@ extends ControllerSpec:
       validApplication
         .modify(_.applicantContactDetails)
         .setTo(Some(ApplicantContactDetails(
-          applicantName = NameOfMember(
+          applicantName = ApplicantName.NameOfMember(
             memberNameQuery = Some(CompaniesHouseNameQuery(
               firstName = "First",
               lastName = "Last"
             )),
-            companiesHouseOfficer = None,
-            role = ApplicantRoleInLlp.Member
+            companiesHouseOfficer = None
           )
         )))
     )

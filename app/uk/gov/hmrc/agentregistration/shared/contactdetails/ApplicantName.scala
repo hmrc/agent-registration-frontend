@@ -54,8 +54,7 @@ object ApplicantName:
     given JsonConfiguration = JsonConfig.jsonConfiguration
     given OFormat[NameOfMember] = Json.format[NameOfMember]
     given OFormat[NameOfAuthorised] = Json.format[NameOfAuthorised]
-    val dontDeleteMe =
-      """
+    val dontDeleteMe = """
         |Don't delete me.
         |I will emit a warning so `@nowarn` can be applied to address below
         |`Unreachable case except for null` problem emitted by Play Json macro"""
