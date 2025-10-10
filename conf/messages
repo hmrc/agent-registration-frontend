@@ -87,6 +87,12 @@ firstName.error.invalid = Your first name must only include letters a to z, hyph
 lastName.error.required = Enter your last name
 lastName.error.invalid = Your last name must only include letters a to z, hyphens, apostrophes and spaces
 
+## Applicant contact details / Authorised name
+authorisedName.title = What is your full name?
+authorisedName.error.required = Enter your full name
+authorisedName.error.invalid = Your full name must only include letters a to z, hyphens, apostrophes and spaces
+authorisedName.error.tooLong = Your full name must be 100 characters or fewer
+
 # About your application / user role
 userRole.title = Are you the owner of the business?
 userRole.Owner = Yes

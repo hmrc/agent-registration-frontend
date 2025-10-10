@@ -89,6 +89,6 @@ extends FrontendController(mcc, actions):
               Redirect(
                 applicantRoleFromForm match
                   case ApplicantRoleInLlp.Member => routes.MemberNameController.show.url
-                  case ApplicantRoleInLlp.Authorised => routes.ApplicantNameController.show.url
+                  case ApplicantRoleInLlp.Authorised => routes.AuthorisedNameController.show.url
               )
       .redirectIfSaveForLater

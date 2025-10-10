@@ -30,7 +30,7 @@
 )
 
 @key = @{"taskList"}
-@title = @{messages(s"$key.title", request.agentApplication.getApplicantName)}
+@title = @{messages(s"$key.title", request.agentApplication.getApplicantBusinessName)}
 @amlsStatus = @{
     if(request.agentApplication.amlsDetails.exists(_.isComplete)) {
         TaskListItemStatus(content = Text(messages(s"$key.status.Completed")))
