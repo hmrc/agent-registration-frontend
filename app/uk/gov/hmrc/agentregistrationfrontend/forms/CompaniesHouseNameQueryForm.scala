@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.forms
 import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.text
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
@@ -36,7 +37,7 @@ object CompaniesHouseNameQueryForm:
         )
         .verifying(
           ErrorKeys.invalidInputErrorMessage(firstNameKey),
-          value => CompaniesHouseNameQuery.isValidName(value)
+          value => ApplicantName.isValidName(value)
         ),
       lastNameKey -> text
         .verifying(
@@ -45,7 +46,7 @@ object CompaniesHouseNameQueryForm:
         )
         .verifying(
           ErrorKeys.invalidInputErrorMessage(lastNameKey),
-          value => CompaniesHouseNameQuery.isValidName(value)
+          value => ApplicantName.isValidName(value)
         )
     )(CompaniesHouseNameQuery.apply)(CompaniesHouseNameQuery.unapply)
   )
