@@ -19,8 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetail
 import com.softwaremill.quicklens.*
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -57,7 +57,12 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubUpdateAgentApplication(
       tdAll.llpAgentApplication
         .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(applicantRoleInLlp = ApplicantRoleInLlp.Member)))
+        .setTo(Some(ApplicantContactDetails(
+          applicantName = ApplicantName.NameOfMember(
+            memberNameQuery = None,
+            companiesHouseOfficer = None
+          )
+        )))
     )
     val response: WSResponse = post(path)(Map(ApplicantRoleInLlpForm.key -> Seq("Member")))
 
@@ -71,7 +76,11 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubUpdateAgentApplication(
       tdAll.llpAgentApplication
         .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(applicantRoleInLlp = ApplicantRoleInLlp.Authorised)))
+        .setTo(Some(ApplicantContactDetails(
+          applicantName = ApplicantName.NameOfAuthorised(
+            name = None
+          )
+        )))
     )
     val response: WSResponse = post(path)(Map(ApplicantRoleInLlpForm.key -> Seq("Authorised")))
 
@@ -93,7 +102,12 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubUpdateAgentApplication(
       tdAll.llpAgentApplication
         .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(applicantRoleInLlp = ApplicantRoleInLlp.Member)))
+        .setTo(Some(ApplicantContactDetails(
+          applicantName = ApplicantName.NameOfMember(
+            memberNameQuery = None,
+            companiesHouseOfficer = None
+          )
+        )))
     )
     val response: WSResponse =
       post(path)(Map(

@@ -21,9 +21,13 @@ import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.ApplicantContactDetails
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
@@ -32,6 +36,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactde
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
+import scala.util.chaining.scalaUtilChainingOps
 
 @Singleton
 class ApplicantRoleInLlpController @Inject() (
@@ -47,7 +52,7 @@ extends FrontendController(mcc, actions):
       val form: Form[ApplicantRoleInLlp] = ApplicantRoleInLlpForm.form.fill:
         request
           .agentApplication
-          .applicantContactDetails.map(_.applicantRoleInLlp)
+          .applicantContactDetails.map(_.applicantName.role)
       Ok(view(form))
 
   def submit: Action[AnyContent] =
@@ -55,28 +60,35 @@ extends FrontendController(mcc, actions):
       .getApplicationInProgress
       .ensureValidFormAndRedirectIfSaveForLater(ApplicantRoleInLlpForm.form, implicit r => view(_))
       .async:
-        implicit request =>
-          val applicantRoleInLlp: ApplicantRoleInLlp = request.formValue
+        // Hint: Explicit type annotation helps IDE provide better code completion
+        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[ApplicantRoleInLlp]) =>
+          val applicantRoleFromForm: ApplicantRoleInLlp = request.formValue
+
+          val updatedApplication: AgentApplication = request
+            .agentApplication
+            .modify(_.applicantContactDetails).using:
+              case None => // applicant selects role for the first time
+                applicantRoleFromForm match
+                  case ApplicantRoleInLlp.Member => ApplicantName.NameOfMember().pipe(ApplicantContactDetails.apply).pipe(Some(_))
+                  case ApplicantRoleInLlp.Authorised => ApplicantName.NameOfAuthorised().pipe(ApplicantContactDetails.apply).pipe(Some(_))
+              case Some(applicantContactDetails) => // applicant selects updates selected role (probably came back from previous pages)
+                applicantContactDetails.modify(_.applicantName).using:
+                  case n: ApplicantName.NameOfMember =>
+                    applicantRoleFromForm match
+                      case ApplicantRoleInLlp.Member => n // don't change anything, same selection as previously
+                      case ApplicantRoleInLlp.Authorised => ApplicantName.NameOfAuthorised()
+                  case n: ApplicantName.NameOfAuthorised =>
+                    applicantRoleFromForm match
+                      case ApplicantRoleInLlp.Member => ApplicantName.NameOfMember()
+                      case ApplicantRoleInLlp.Authorised => n // don't change anything, same selection as previously
+                .pipe(Some(_))
+
           applicationService
-            .upsert(
-              request.agentApplication
-                .modify(_.applicantContactDetails)
-                .using {
-                  case Some(acd) =>
-                    Some(acd
-                      .modify(_.applicantRoleInLlp)
-                      .setTo(applicantRoleInLlp))
-                  case None =>
-                    Some(ApplicantContactDetails(
-                      applicantRoleInLlp = applicantRoleInLlp
-                    ))
-                }
-            )
-            .map((_: Unit) =>
+            .upsert(updatedApplication)
+            .map: _ =>
               Redirect(
-                applicantRoleInLlp match
+                applicantRoleFromForm match
                   case ApplicantRoleInLlp.Member => routes.MemberNameController.show.url
                   case ApplicantRoleInLlp.Authorised => routes.ApplicantNameController.show.url
               )
-            )
       .redirectIfSaveForLater

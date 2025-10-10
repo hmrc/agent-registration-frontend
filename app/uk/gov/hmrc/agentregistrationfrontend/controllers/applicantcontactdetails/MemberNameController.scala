@@ -21,9 +21,11 @@ import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
-import uk.gov.hmrc.agentregistration.shared.CompaniesHouseNameQuery
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -47,23 +49,18 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
     .ensure(
-      _.agentApplication.applicantContactDetails match {
-        case Some(details) => details.applicantRoleInLlp === ApplicantRoleInLlp.Member
-        case _ => false
-      },
+      _.agentApplication.applicantContactDetails.map(_.applicantName.role).contains(ApplicantRoleInLlp.Member),
       implicit request =>
-        logger.info("Redirecting to applicant role page due to missing or invalid applicantRoleInLlp value")
+        logger.warn("Member name page requires Member role. Redirecting to applicant role selection page")
         Redirect(routes.ApplicantRoleInLlpController.show)
     )
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
       Ok(view(
-        CompaniesHouseNameQueryForm.form.fill:
-          request
-            .agentApplication
-            .applicantContactDetails
-            .flatMap(_.memberNameQuery)
+        CompaniesHouseNameQueryForm.form
+          .fill:
+            request.agentApplication.memberNameQuery
       ))
 
   def submit: Action[AnyContent] =
@@ -74,8 +71,10 @@ extends FrontendController(mcc, actions):
           val validFormData: CompaniesHouseNameQuery = request.formValue
           applicationService.upsert(
             request.agentApplication
-              .modify(_.applicantContactDetails.each.memberNameQuery)
-              .setTo(Some(validFormData))
+              .modify(_.applicantContactDetails.each.applicantName)
+              .setTo(ApplicantName.NameOfMember(
+                memberNameQuery = Some(validFormData)
+              )) // this will overwrite any existing match
           ).map((_: Unit) =>
             Redirect(
               routes.MemberNameController.showMemberNameMatches.url
@@ -86,7 +85,7 @@ extends FrontendController(mcc, actions):
   def showMemberNameMatches: Action[AnyContent] =
     baseAction
       .ensure(
-        _.agentApplication.applicantContactDetails.flatMap(_.memberNameQuery).isDefined,
+        _.agentApplication.memberNameQuery.isDefined,
         implicit request =>
           logger.info("Redirecting to member name page due to missing memberNameQuery value")
           Redirect(routes.MemberNameController.show)
@@ -96,3 +95,11 @@ extends FrontendController(mcc, actions):
             h1 = "Member name matches",
             bodyText = Some("placeholder for matches")
           ))
+
+  extension (agentApplication: AgentApplication)
+    def memberNameQuery: Option[CompaniesHouseNameQuery] =
+      for
+        acd <- agentApplication.applicantContactDetails
+        nameOfMember <- acd.applicantName.as[ApplicantName.NameOfMember]
+        memberNameQuery <- nameOfMember.memberNameQuery
+      yield memberNameQuery

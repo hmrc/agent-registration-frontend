@@ -19,9 +19,9 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetail
 import com.softwaremill.quicklens.*
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
-import uk.gov.hmrc.agentregistration.shared.CompaniesHouseNameQuery
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
+import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -34,7 +34,12 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/applicant/member-name"
   private val validApplication = tdAll.llpAgentApplication
     .modify(_.applicantContactDetails)
-    .setTo(Some(ApplicantContactDetails(applicantRoleInLlp = ApplicantRoleInLlp.Member)))
+    .setTo(Some(ApplicantContactDetails(
+      applicantName = ApplicantName.NameOfMember(
+        memberNameQuery = None,
+        companiesHouseOfficer = None
+      )
+    )))
 
   "routes should have correct paths and methods" in:
     routes.MemberNameController.show shouldBe Call(
@@ -62,8 +67,13 @@ extends ControllerSpec:
       validApplication
         .modify(_.applicantContactDetails)
         .setTo(Some(ApplicantContactDetails(
-          applicantRoleInLlp = ApplicantRoleInLlp.Member,
-          memberNameQuery = Some(CompaniesHouseNameQuery("First", "Last"))
+          applicantName = ApplicantName.NameOfMember(
+            memberNameQuery = Some(CompaniesHouseNameQuery(
+              firstName = "First",
+              lastName = "Last"
+            )),
+            companiesHouseOfficer = None
+          )
         )))
     )
     val response: WSResponse =
@@ -113,8 +123,13 @@ extends ControllerSpec:
       validApplication
         .modify(_.applicantContactDetails)
         .setTo(Some(ApplicantContactDetails(
-          applicantRoleInLlp = ApplicantRoleInLlp.Member,
-          memberNameQuery = Some(CompaniesHouseNameQuery("First", "Last"))
+          applicantName = ApplicantName.NameOfMember(
+            memberNameQuery = Some(CompaniesHouseNameQuery(
+              firstName = "First",
+              lastName = "Last"
+            )),
+            companiesHouseOfficer = None
+          )
         )))
     )
     val response: WSResponse =

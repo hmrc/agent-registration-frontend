@@ -20,8 +20,8 @@ import com.softwaremill.quicklens.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistration.shared.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
@@ -42,8 +42,7 @@ extends ViewSpec:
         .setTo(Some(tdAll.llpBusinessDetails))
         .modify(_.applicantContactDetails)
         .setTo(Some(ApplicantContactDetails(
-          applicantRoleInLlp = ApplicantRoleInLlp.Member,
-          memberNameQuery = None
+          applicantName = ApplicantName.NameOfMember()
         ))),
       internalUserId = tdAll.internalUserId,
       groupId = tdAll.groupId
