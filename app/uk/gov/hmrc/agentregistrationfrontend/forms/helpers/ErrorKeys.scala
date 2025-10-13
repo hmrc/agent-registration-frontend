@@ -20,5 +20,6 @@ object ErrorKeys {
 
   def requiredFieldErrorMessage(messageKey: String): String = s"$messageKey.error.required"
   def invalidInputErrorMessage(messageKey: String): String = s"$messageKey.error.invalid"
+  def inputTooLongErrorMessage(messageKey: String): String = s"$messageKey.error.tooLong"
 
 }

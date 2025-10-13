@@ -20,33 +20,28 @@ import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.text
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
-import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
-object CompaniesHouseNameQueryForm:
+object AuthorisedNameForm:
 
-  val firstNameKey: String = "firstName"
-  val lastNameKey: String = "lastName"
+  val key: String = "authorisedName"
 
-  val form: Form[CompaniesHouseNameQuery] = Form[CompaniesHouseNameQuery](
+  private def canonicalise(name: String): String = name.trim.replaceAll("\\s+", " ")
+
+  val form: Form[String] = Form[String](
     mapping(
-      firstNameKey -> text
+      key -> text.transform[String](canonicalise, identity)
         .verifying(
-          ErrorKeys.requiredFieldErrorMessage(firstNameKey),
+          ErrorKeys.requiredFieldErrorMessage(key),
           _.nonEmpty
         )
         .verifying(
-          ErrorKeys.invalidInputErrorMessage(firstNameKey),
-          value => ApplicantName.isValidName(value)
-        ),
-      lastNameKey -> text
-        .verifying(
-          ErrorKeys.requiredFieldErrorMessage(lastNameKey),
-          _.nonEmpty
+          ErrorKeys.inputTooLongErrorMessage(key),
+          _.length <= 100
         )
         .verifying(
-          ErrorKeys.invalidInputErrorMessage(lastNameKey),
+          ErrorKeys.invalidInputErrorMessage(key),
           value => ApplicantName.isValidName(value)
         )
-    )(CompaniesHouseNameQuery.apply)(CompaniesHouseNameQuery.unapply)
+    )(identity)(Some(_))
   )

@@ -37,10 +37,12 @@ GET         /apply/grs-callback/:businessType                       uk.gov.hmrc.
 ## Applicant contact details routes
 GET         /apply/applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.ApplicantRoleInLlpController.show
 POST        /apply/applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.ApplicantRoleInLlpController.submit
-GET         /apply/applicant/applicant-name                        uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.ApplicantNameController.show
+GET         /apply/applicant/applicant-name                        uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.AuthorisedNameController.show
+POST        /apply/applicant/applicant-name                        uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.AuthorisedNameController.submit
 GET         /apply/applicant/member-name                           uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.MemberNameController.show
 POST        /apply/applicant/member-name                           uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.MemberNameController.submit
 GET         /apply/applicant/member-name-match                     uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.MemberNameController.showMemberNameMatches
+GET         /apply/applicant/telephone-number                      uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.TelephoneNumberController.show
 
 ## Anti Money Laundering routes
 GET         /apply/anti-money-laundering/supervisor-name            uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsSupervisorController.show

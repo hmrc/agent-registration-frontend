@@ -27,7 +27,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ApplicantNameController @Inject() (
+class TelephoneNumberController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: SimplePage
@@ -37,6 +37,6 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       Ok(view(
-        h1 = "Applicant name placeholder...",
-        bodyText = Some("Placeholder text for applicant name page")
+        h1 = "Telephone number placeholder...",
+        bodyText = Some("Placeholder text for telephone number page")
       ))
