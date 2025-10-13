@@ -41,7 +41,8 @@ GET         /apply/applicant/applicant-name                        uk.gov.hmrc.a
 POST        /apply/applicant/applicant-name                        uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.AuthorisedNameController.submit
 GET         /apply/applicant/member-name                           uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.MemberNameController.show
 POST        /apply/applicant/member-name                           uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.MemberNameController.submit
-GET         /apply/applicant/member-name-match                     uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.MemberNameController.showMemberNameMatches
+GET         /apply/applicant/member-name-match                     uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.CompaniesHouseMatchingController.show
+POST        /apply/applicant/member-name-match                     uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.CompaniesHouseMatchingController.submit
 GET         /apply/applicant/telephone-number                      uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.TelephoneNumberController.show
 
 ## Anti Money Laundering routes

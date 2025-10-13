@@ -57,6 +57,7 @@ extends AnyWordSpecLike,
     Map[String, Any](
       "microservice.services.agent-registration.port" -> WireMockSupport.port,
       "microservice.services.auth.port" -> WireMockSupport.port,
+      "microservice.services.companies-house-api-proxy.port" -> WireMockSupport.port,
       "microservice.services.enrolment-store-proxy.port" -> WireMockSupport.port,
       "microservice.services.sole-trader-identification-frontend.port" -> WireMockSupport.port,
       "microservice.services.incorporated-entity-identification-frontend.port" -> WireMockSupport.port,

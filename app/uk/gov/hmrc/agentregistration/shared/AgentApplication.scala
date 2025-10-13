@@ -65,5 +65,16 @@ final case class AgentApplication(
       // until we have a requirement to make it mandatory and throw an exception
       case pd: PartnershipDetails => pd.companyProfile.fold("")(_.companyName)
 
+  def getCompanyRegistrationNumber: Crn =
+    getBusinessDetails match
+      case lcd: LimitedCompanyDetails => Crn(lcd.companyProfile.companyNumber)
+      case pd: PartnershipDetails =>
+        Crn(
+          pd.companyProfile
+            .map(_.companyNumber)
+            .getOrElse(throw new RuntimeException("company registration number not defined"))
+        )
+      case _: SoleTraderDetails => throw new RuntimeException("company registration number not applicable for sole traders")
+
 object AgentApplication:
   given format: OFormat[AgentApplication] = Json.format[AgentApplication]

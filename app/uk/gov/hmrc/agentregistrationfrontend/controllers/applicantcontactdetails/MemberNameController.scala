@@ -23,15 +23,13 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
-import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
+import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MemberNamePage
 
 import javax.inject.Inject
@@ -42,8 +40,7 @@ class MemberNameController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: MemberNamePage,
-  applicationService: ApplicationService,
-  memberNameMatchesView: SimplePage
+  applicationService: ApplicationService
 )
 extends FrontendController(mcc, actions):
 
@@ -77,29 +74,15 @@ extends FrontendController(mcc, actions):
               )) // this will overwrite any existing match
           ).map((_: Unit) =>
             Redirect(
-              routes.MemberNameController.showMemberNameMatches.url
+              routes.CompaniesHouseMatchingController.show.url
             )
           )
       .redirectIfSaveForLater
-
-  def showMemberNameMatches: Action[AnyContent] =
-    baseAction
-      .ensure(
-        _.agentApplication.memberNameQuery.isDefined,
-        implicit request =>
-          logger.info("Redirecting to member name page due to missing memberNameQuery value")
-          Redirect(routes.MemberNameController.show)
-      ):
-        implicit request =>
-          Ok(memberNameMatchesView(
-            h1 = "Member name matches",
-            bodyText = Some("placeholder for matches")
-          ))
 
   extension (agentApplication: AgentApplication)
     def memberNameQuery: Option[CompaniesHouseNameQuery] =
       for
         acd <- agentApplication.applicantContactDetails
         nameOfMember <- acd.applicantName.as[ApplicantName.NameOfMember]
-        memberNameQuery <- nameOfMember.memberNameQuery
-      yield memberNameQuery
+        query <- nameOfMember.memberNameQuery
+      yield query

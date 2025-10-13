@@ -21,104 +21,94 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
+import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
+import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
-import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseOfficerForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CompaniesHouseStubs
 
-class MemberNameControllerSpec
+class CompaniesHouseMatchingControllerSpec
 extends ControllerSpec:
 
-  private val path = "/agent-registration/apply/applicant/member-name"
+  private val path = "/agent-registration/apply/applicant/member-name-match"
+  private val lastName = "Last"
   private val validApplication = tdAll.llpAgentApplication
     .modify(_.applicantContactDetails)
     .setTo(Some(ApplicantContactDetails(
       applicantName = ApplicantName.NameOfMember(
-        memberNameQuery = None,
+        memberNameQuery = Some(CompaniesHouseNameQuery(
+          firstName = "First",
+          lastName = lastName
+        )),
         companiesHouseOfficer = None
       )
     )))
 
   "routes should have correct paths and methods" in:
-    routes.MemberNameController.show shouldBe Call(
+    routes.CompaniesHouseMatchingController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.MemberNameController.submit shouldBe Call(
+    routes.CompaniesHouseMatchingController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.MemberNameController.submit.url shouldBe routes.MemberNameController.show.url
+    routes.CompaniesHouseMatchingController.submit.url shouldBe routes.CompaniesHouseMatchingController.show.url
 
-  s"GET $path should return 200 and render page" in:
+  s"GET $path should return 200 and render page when there is a single match" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe "What is your name? - Apply for an agent services account - GOV.UK"
+    response.parseBodyAsJsoupDocument.title() shouldBe "Are these your details? - Apply for an agent services account - GOV.UK"
 
-  s"POST $path with first and last names should save data and redirect to the show name matches page" in:
+  s"GET $path should return 200 and render page when there are multiple matches" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(validApplication)
-    AgentRegistrationStubs.stubUpdateAgentApplication(
-      validApplication
-        .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(
-          applicantName = ApplicantName.NameOfMember(
-            memberNameQuery = Some(CompaniesHouseNameQuery(
-              firstName = "First",
-              lastName = "Last"
-            )),
-            companiesHouseOfficer = None
-          )
-        )))
-    )
-    val response: WSResponse =
-      post(path)(Map(
-        CompaniesHouseNameQueryForm.firstNameKey -> Seq("First"),
-        CompaniesHouseNameQueryForm.lastNameKey -> Seq("Last")
-      ))
+    CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
+    val response: WSResponse = get(path)
 
-    response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CompaniesHouseMatchingController.show.url
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe "2 records match this name - Apply for an agent services account - GOV.UK"
 
-  s"POST $path with blank inputs should return 400" in:
+  s"POST $path for single match with blank inputs should return 400" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse =
       post(path)(Map(
-        CompaniesHouseNameQueryForm.firstNameKey -> Seq(""),
-        CompaniesHouseNameQueryForm.lastNameKey -> Seq("")
+        CompaniesHouseOfficerForm.key -> Seq("")
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: What is your name? - Apply for an agent services account - GOV.UK"
-    doc.mainContent.select("#firstName-error").text() shouldBe "Error: Enter your first name"
-    doc.mainContent.select("#lastName-error").text() shouldBe "Error: Enter your last name"
+    doc.title() shouldBe "Error: Are these your details? - Apply for an agent services account - GOV.UK"
+    doc.mainContent.select("#companiesHouseOfficer-error").text() shouldBe "Error: Select yes if these are your details"
 
-  s"POST $path with invalid inputs should return 400" in:
+  s"POST $path for multiple matches with blank inputs should return 400" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
     val response: WSResponse =
       post(path)(Map(
-        CompaniesHouseNameQueryForm.firstNameKey -> Seq("()))"),
-        CompaniesHouseNameQueryForm.lastNameKey -> Seq(";[[[")
+        CompaniesHouseOfficerForm.key -> Seq("")
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: What is your name? - Apply for an agent services account - GOV.UK"
-    doc.mainContent.select("#firstName-error").text() shouldBe "Error: Your first name must only include letters a to z, hyphens, apostrophes and spaces"
-    doc.mainContent.select("#lastName-error").text() shouldBe "Error: Your last name must only include letters a to z, hyphens, apostrophes and spaces"
+    doc.title() shouldBe "Error: 2 records match this name - Apply for an agent services account - GOV.UK"
+    doc.mainContent.select("#companiesHouseOfficer-error").text() shouldBe "Error: Select the name and date of birth that matches your details"
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     AgentRegistrationStubs.stubUpdateAgentApplication(
       validApplication
         .modify(_.applicantContactDetails)
@@ -128,14 +118,16 @@ extends ControllerSpec:
               firstName = "First",
               lastName = "Last"
             )),
-            companiesHouseOfficer = None
+            companiesHouseOfficer = Some(CompaniesHouseOfficer(
+              name = "First Last",
+              dateOfBirth = Some(CompaniesHouseDateOfBirth(None, 1, 1990))
+            ))
           )
         )))
     )
     val response: WSResponse =
       post(path)(Map(
-        CompaniesHouseNameQueryForm.firstNameKey -> Seq("First"),
-        CompaniesHouseNameQueryForm.lastNameKey -> Seq("Last"),
+        CompaniesHouseOfficerForm.key -> Seq("First Last|1990-01"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
@@ -146,10 +138,10 @@ extends ControllerSpec:
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse =
       post(path)(Map(
-        CompaniesHouseNameQueryForm.firstNameKey -> Seq(""),
-        CompaniesHouseNameQueryForm.lastNameKey -> Seq(""),
+        CompaniesHouseOfficerForm.key -> Seq(""),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 

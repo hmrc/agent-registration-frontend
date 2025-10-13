@@ -8,6 +8,20 @@ common.saveAndComeBackLater = Save and come back later
 common.tryAgain = Try again
 common.errorPrefix = Error
 common.or = or
+common.dobPrefix = Date of birth
+
+months.1 = January
+months.2 = February
+months.3 = March
+months.4 = April
+months.5 = May
+months.6 = June
+months.7 = July
+months.8 = August
+months.9 = September
+months.10 = October
+months.11 = November
+months.12 = December
 
 # About your application
 about-application.title = About your application
@@ -86,6 +100,17 @@ firstName.error.required = Enter your first name
 firstName.error.invalid = Your first name must only include letters a to z, hyphens, apostrophes and spaces
 lastName.error.required = Enter your last name
 lastName.error.invalid = Your last name must only include letters a to z, hyphens, apostrophes and spaces
+
+## Applicant contact details / Companies House match
+companiesHouseOfficer.single.title=Are these your details?
+companiesHouseOfficer.single.yes=Yes
+companiesHouseOfficer.single.no=No
+companiesHouseOfficer.single.error.required=Select yes if these are your details
+companiesHouseOfficer.single.error.invalid=Select yes if these are your details
+companiesHouseOfficer.multiple.title={0} records match this name
+companiesHouseOfficer.multiple.hint=Select your details
+companiesHouseOfficer.error.required=Select the name and date of birth that matches your details
+companiesHouseOfficer.error.invalid=Select the name and date of birth that matches your details
 
 ## Applicant contact details / Authorised name
 authorisedName.title = What is your full name?
