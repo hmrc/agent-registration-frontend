@@ -34,7 +34,7 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.CompaniesHouseService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MembersMatchedPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MatchedMembersPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -47,7 +47,7 @@ class CompaniesHouseMatchingController @Inject() (
   actions: Actions,
   applicationService: ApplicationService,
   companiesHouseService: CompaniesHouseService,
-  memberNameMatchesView: MembersMatchedPage,
+  matchedMembersView: MatchedMembersPage,
   noMemberNameMatchesView: SimplePage
 )
 extends FrontendController(mcc, actions):
@@ -76,7 +76,7 @@ extends FrontendController(mcc, actions):
             ))
           else
             logger.info(s"Found ${officers.size} Companies House officers matching member name query")
-            Ok(memberNameMatchesView(
+            Ok(matchedMembersView(
               form = CompaniesHouseOfficerForm.form(officers).fill:
                 request.agentApplication.getCompanyOfficer
               ,
@@ -129,7 +129,7 @@ extends FrontendController(mcc, actions):
             val formWithErrors = CompaniesHouseOfficerForm.form(officers)
               .withError(CompaniesHouseOfficerForm.key, s"${CompaniesHouseOfficerForm.key}.single.error.required")
             Future.successful(
-              BadRequest(memberNameMatchesView(
+              BadRequest(matchedMembersView(
                 form = formWithErrors,
                 officers = officers
               )).pipe(SubmissionHelper.redirectIfSaveForLater(request, _))
@@ -142,7 +142,7 @@ extends FrontendController(mcc, actions):
             .fold(
               formWithErrors =>
                 Future.successful(
-                  BadRequest(memberNameMatchesView(
+                  BadRequest(matchedMembersView(
                     form = formWithErrors,
                     officers = officers
                   ))
