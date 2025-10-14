@@ -16,8 +16,12 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
+import play.api.libs.json.Reads
+import play.api.libs.functional.syntax.*
+import play.api.libs.json.__
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.Crn
+import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
@@ -52,6 +56,13 @@ extends RequestAwareLogging:
   )(implicit
     rh: RequestHeader
   ): Future[Seq[CompaniesHouseOfficer]] =
+
+    implicit val companiesHouseOfficerReads: Reads[CompaniesHouseOfficer] =
+      (
+        (__ \ "name").read[String] and
+          (__ \ "date_of_birth").readNullable[CompaniesHouseDateOfBirth]
+      )(CompaniesHouseOfficer.apply)
+
     val registerType: String = if isLlp then "llp_members" else "directors"
     val params = Map(
       "surname" -> surname,

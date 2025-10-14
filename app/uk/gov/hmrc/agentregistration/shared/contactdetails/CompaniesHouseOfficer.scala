@@ -17,24 +17,19 @@
 package uk.gov.hmrc.agentregistration.shared.contactdetails
 
 import play.api.libs.json.*
-import play.api.libs.functional.syntax.*
 
 final case class CompaniesHouseOfficer(
   name: String,
   dateOfBirth: Option[CompaniesHouseDateOfBirth]
 ):
+  // we need a string representation of the values in this case class for use in form values
   override def toString: String = s"${name}|${dateOfBirth.map(dob => s"${dob.day.getOrElse("")}/${dob.month}/${dob.year}").getOrElse("")}"
 
 object CompaniesHouseOfficer:
 
-  implicit val reads: Reads[CompaniesHouseOfficer] =
-    (
-      (__ \ "name").read[String] and
-        (__ \ "date_of_birth").readNullable[CompaniesHouseDateOfBirth]
-    )(CompaniesHouseOfficer.apply)
-  implicit val writes: Writes[CompaniesHouseOfficer] = Json.writes[CompaniesHouseOfficer]
-  implicit val format: Format[CompaniesHouseOfficer] = Format(reads, writes)
+  implicit val format: Format[CompaniesHouseOfficer] = Json.format[CompaniesHouseOfficer]
 
+  // reconstruct a CompaniesHouseOfficer from its string representation as used in form values
   def fromString(s: String): CompaniesHouseOfficer = {
     val parts = s.split('|')
     val name = parts(0)
