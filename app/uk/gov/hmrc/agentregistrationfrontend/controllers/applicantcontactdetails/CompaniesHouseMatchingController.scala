@@ -163,7 +163,8 @@ extends FrontendController(mcc, actions):
         }
       }
 
-  extension (agentApplication: AgentApplication)
+  extension (agentApplication: AgentApplication) {
+
     def memberNameQuery: Option[CompaniesHouseNameQuery] =
       for
         acd <- agentApplication.applicantContactDetails
@@ -171,15 +172,15 @@ extends FrontendController(mcc, actions):
         query <- nameOfMember.memberNameQuery
       yield query
 
-  extension (agentApplication: AgentApplication)
     def getLastNameFromQuery: String =
       agentApplication.memberNameQuery.getOrThrowExpectedDataMissing("memberNameQuery is not defined")
         .lastName
 
-  extension (agentApplication: AgentApplication)
     def getCompanyOfficer: Option[CompaniesHouseOfficer] =
       for
         acd <- agentApplication.applicantContactDetails
         nameOfMember <- acd.applicantName.as[ApplicantName.NameOfMember]
         companyOfficer <- nameOfMember.companiesHouseOfficer
       yield companyOfficer
+
+  }
