@@ -20,6 +20,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors.getOrThrowExpectedDataMissing
 
 import java.time.Clock
 import java.time.Instant
@@ -45,17 +46,17 @@ final case class AgentApplication(
 
   val isInProgress: Boolean = !hasFinished
 
-  def getUtr(using request: RequestHeader): Utr = utr.getOrElse(
-    throw RuntimeException(s"Expected 'utr' to be defined but it was None [${internalUserId.toString}] ")
-  )
+  def getUtr(using request: RequestHeader): Utr = utr
+    .getOrThrowExpectedDataMissing(s"Expected 'utr' to be defined but it was None [${internalUserId.toString}] ")
 
-  def getBusinessDetails: BusinessDetails = businessDetails.getOrElse(throw new RuntimeException("business details not defined"))
 
-  def getApplicantContactDetails: ApplicantContactDetails = applicantContactDetails.getOrElse(
-    throw new RuntimeException("applicant contact details not defined")
-  )
+  def getBusinessDetails: BusinessDetails = businessDetails
+    .getOrThrowExpectedDataMissing("business details not defined")
 
-  def getAmlsDetails: AmlsDetails = amlsDetails.getOrElse(throw new RuntimeException("AMLS details not defined"))
+  def getApplicantContactDetails: ApplicantContactDetails = applicantContactDetails
+    .getOrThrowExpectedDataMissing("applicant contact details not defined")
+
+  def getAmlsDetails: AmlsDetails = amlsDetails.getOrThrowExpectedDataMissing("AMLS details not defined")
 
   def getApplicantBusinessName: String =
     getBusinessDetails match
@@ -72,7 +73,7 @@ final case class AgentApplication(
         Crn(
           pd.companyProfile
             .map(_.companyNumber)
-            .getOrElse(throw new RuntimeException("company registration number not defined"))
+            .getOrThrowExpectedDataMissing("company registration number not defined")
         )
       case _: SoleTraderDetails => throw new RuntimeException("company registration number not applicable for sole traders")
 
