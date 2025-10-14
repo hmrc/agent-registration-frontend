@@ -32,7 +32,7 @@ GET         /apply/about-your-business/sign-in                       uk.gov.hmrc
 
 ##GRS routes
 GET         /apply/about-your-business/agent-type/:agentType/entity-type/:businessType uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.setUpGrsFromSignIn(agentType: AgentType, businessType: BusinessType)
-GET         /apply/grs-callback/:businessType                       uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.journeyCallback(businessType: BusinessType, journeyId: JourneyId)
+GET         /apply/grs-callback                                      uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.journeyCallback(journeyId: JourneyId)
 
 ## Applicant contact details routes
 GET         /apply/applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.ApplicantRoleInLlpController.show

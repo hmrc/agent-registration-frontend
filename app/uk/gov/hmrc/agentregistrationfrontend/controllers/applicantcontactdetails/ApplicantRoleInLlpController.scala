@@ -30,7 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.ApplicantRoleInLlpPage
 
 import javax.inject.Inject
@@ -43,7 +43,7 @@ class ApplicantRoleInLlpController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: ApplicantRoleInLlpPage,
-  applicationService: ApplicationService
+  applicationService: AgentRegistrationService
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
@@ -52,6 +52,7 @@ extends FrontendController(mcc, actions):
       val form: Form[ApplicantRoleInLlp] = ApplicantRoleInLlpForm.form.fill:
         request
           .agentApplication
+          .asLlpApplication
           .applicantContactDetails.map(_.applicantName.role)
       Ok(view(form))
 
@@ -66,6 +67,7 @@ extends FrontendController(mcc, actions):
 
           val updatedApplication: AgentApplication = request
             .agentApplication
+            .asLlpApplication
             .modify(_.applicantContactDetails).using:
               case None => // applicant selects role for the first time
                 applicantRoleFromForm match

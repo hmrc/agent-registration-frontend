@@ -28,11 +28,14 @@ class ApplicationFactory @Inject() (
   clock: Clock
 ):
 
-  def makeNewAgentApplication(internalUserId: InternalUserId): AgentApplication = AgentApplication(
+  def makeNewAgentApplication(
+    internalUserId: InternalUserId,
+    groupId: GroupId
+  ): AgentApplication = ApplicationLlp(
     internalUserId = internalUserId,
+    groupId = groupId,
     createdAt = Instant.now(clock),
-    applicationState = ApplicationState.InProgress,
-    utr = None,
+    applicationState = ApplicationState.Started,
     businessDetails = None,
     applicantContactDetails = None,
     amlsDetails = None

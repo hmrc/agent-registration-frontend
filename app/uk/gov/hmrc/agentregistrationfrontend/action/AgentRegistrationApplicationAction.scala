@@ -22,7 +22,7 @@ import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistration.shared._
@@ -68,7 +68,7 @@ object AgentApplicationRequest:
 
 @Singleton
 class AgentApplicationAction @Inject() (
-  applicationService: ApplicationService,
+  applicationService: AgentRegistrationService,
   enrolmentStoreProxyConnector: EnrolmentStoreProxyConnector,
   appConfig: AppConfig
 )(using ec: ExecutionContext)

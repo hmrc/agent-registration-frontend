@@ -41,16 +41,16 @@ final case class JourneyData(
   dateOfBirth: Option[LocalDate], // sole trader
   nino: Option[Nino], // sole trader (can be replaced by trn)
   trn: Option[String], // sole trader (if this is present then there will also be an 'address' and 'saPostcode' field)
-  sautr: Option[Utr], // sole trader / partnership (both can return None but that will not have a safeId)
+  sautr: Option[SaUtr], // sole trader / partnership (both can return None but that will not have a safeId)
   companyProfile: Option[CompanyProfile], // limited company or any limited partnership
-  ctutr: Option[Utr], // limited company
+  ctutr: Option[CtUtr], // limited company
   postcode: Option[String], // any partnership
   identifiersMatch: Boolean,
   registration: Registration
 ):
 
   // TODO: distinguish between CT and SA Utrs, make dedicated types and analyse when to use correct identifier
-  def getUtr: Utr = sautr.orElse(ctutr).getOrElse(throw new Exception("Business details missing Utr"))
+//  def getUtr: Utr = sautr.orElse(ctutr).getOrElse(throw new Exception("Business details missing Utr"))
 
   def toBusinessDetails(businessType: BusinessType): BusinessDetails = {
     def missingDataError(key: String): Nothing = throw new RuntimeException(s"Business details missing $key for $businessType type")

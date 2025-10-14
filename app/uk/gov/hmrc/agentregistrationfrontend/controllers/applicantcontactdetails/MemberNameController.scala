@@ -38,12 +38,12 @@ import javax.inject.Singleton
 
 @Singleton
 class MemberNameController @Inject() (
-  mcc: MessagesControllerComponents,
-  actions: Actions,
-  view: MemberNamePage,
-  applicationService: ApplicationService
-)
-extends FrontendController(mcc, actions):
+                                       mcc: MessagesControllerComponents,
+                                       actions: Actions,
+                                       view: MemberNamePage,
+                                       applicationService: ApplicationService
+                                     )
+  extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
     .ensure(

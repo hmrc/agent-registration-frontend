@@ -29,14 +29,14 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class ApplicationService @Inject() (
+class AgentRegistrationService @Inject() (
   agentRegistrationConnector: AgentRegistrationConnector,
   applicationFactory: ApplicationFactory
 )(using ec: ExecutionContext)
 extends RequestAwareLogging:
 
   def upsertNewApplication()(using request: AuthorisedRequest[?]): Future[AgentApplication] =
-    val application: AgentApplication = applicationFactory.makeNewAgentApplication(request.internalUserId)
+    val application: AgentApplication = applicationFactory.makeNewAgentApplication(request.internalUserId, request.groupId)
     logger.info(s"Upserting new application [${request.internalUserId}]")
     upsert(application).map(_ => application)
 

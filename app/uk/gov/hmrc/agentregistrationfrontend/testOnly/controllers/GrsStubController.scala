@@ -33,7 +33,8 @@ import uk.gov.hmrc.agentregistration.shared.CompanyProfile
 import uk.gov.hmrc.agentregistration.shared.FullName
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.SafeId
-import uk.gov.hmrc.agentregistration.shared.Utr
+import uk.gov.hmrc.agentregistration.shared.CtUtr
+import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
@@ -97,7 +98,7 @@ extends FrontendController(mcc, actions):
           )),
         grsResponse =>
           val json: JsValue = Json.toJson(grsResponse)
-          Redirect(appRoutes.GrsController.journeyCallback(businessType, journeyId))
+          Redirect(appRoutes.GrsController.journeyCallback(journeyId))
             .addingToSession(journeyId.value -> json.toString)
       )
 
@@ -113,7 +114,8 @@ extends FrontendController(mcc, actions):
         "journeyStartUrl" -> routes.GrsStubController.showGrsData(businessType, randomJourneyId()).url
       ))
 
-  def randomUtr(): Utr = Utr("%010d".format(Random.nextLong(9999999999L)))
+  def randomSaUtr(): SaUtr = SaUtr("%010d".format(Random.nextLong(9999999999L)))
+  def randomCtUtr(): CtUtr = CtUtr("%010d".format(Random.nextLong(9999999999L)))
   def randomJourneyId(): JourneyId = JourneyId(UUID.randomUUID().toString)
 
   private def form(businessType: BusinessType): Form[JourneyData] =
@@ -200,7 +202,7 @@ extends FrontendController(mcc, actions):
           dateOfBirth = dateOfBirth.map(LocalDate.parse),
           nino = nino.map(Nino.apply),
           trn = trn,
-          sautr = sautr.map(Utr.apply),
+          sautr = sautr.map(SaUtr.apply),
           // address = ... when/if adding support for SoleTrader address, don't add it to the stub page and just hardcode it here when trn is defined
           companyProfile = companyNumber.map(number =>
             CompanyProfile(
@@ -210,7 +212,7 @@ extends FrontendController(mcc, actions):
               // unsanitisedCHROAddress = ... when/if adding support for companies house address, don't add it to the stub page and just hardcode it here
             )
           ),
-          ctutr = ctutr.map(Utr.apply),
+          ctutr = ctutr.map(CtUtr.apply),
           postcode = postcode
         )
     )(response =>
@@ -247,7 +249,7 @@ extends FrontendController(mcc, actions):
           GeneralPartnership,
           LimitedLiabilityPartnership /*Scottish, General Limited, Scottish Limited */
         ).contains(businessType)
-      then Some(randomUtr())
+      then Some(randomSaUtr())
       else None,
     companyProfile =
       if Seq(LimitedCompany, LimitedLiabilityPartnership /*General Limited, Scottish Limited */ ).contains(businessType) then
@@ -257,7 +259,7 @@ extends FrontendController(mcc, actions):
           dateOfIncorporation = Some(LocalDate.now().minusYears(10))
         ))
       else None,
-    ctutr = if businessType == LimitedCompany then Some(randomUtr()) else None,
+    ctutr = if businessType == LimitedCompany then Some(randomCtUtr()) else None,
     postcode =
       if Seq(GeneralPartnership, LimitedLiabilityPartnership /*Scottish, General Limited, Scottish Limited */ ).contains(businessType) then Some("AA1 1AA")
       else None

@@ -37,7 +37,7 @@ extends FrontendController(mcc, actions):
     actions
       .getApplicationInProgress
       .ensure(
-        _.agentApplication.utr.isDefined,
+        _.agentApplication.isGrsDataReceived,
         implicit request =>
           logger.warn("Missing data from GRS, redirecting to start GRS registration")
           Redirect(routes.AgentApplicationController.startRegistration)
