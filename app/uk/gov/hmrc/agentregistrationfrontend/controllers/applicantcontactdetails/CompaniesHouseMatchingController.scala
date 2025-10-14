@@ -55,7 +55,7 @@ extends FrontendController(mcc, actions):
     .ensure(
       _.agentApplication.memberNameQuery.isDefined,
       implicit request =>
-        logger.warn("Redirecting to member name page due to missing memberNameQuery value")
+        logger.info("Redirecting to member name page due to missing memberNameQuery value")
         Redirect(routes.MemberNameController.show)
     )
 
@@ -75,7 +75,6 @@ extends FrontendController(mcc, actions):
             ))
           else
             logger.info(s"Found ${officers.size} Companies House officers matching member name query")
-            logger.info(s"First name ${officers.head.name}")
             Ok(memberNameMatchesView(
               form = CompaniesHouseOfficerForm.form(officers).fill:
                 request.agentApplication.getCompanyOfficer
