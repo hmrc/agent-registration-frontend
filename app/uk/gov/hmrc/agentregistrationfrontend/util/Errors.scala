@@ -27,9 +27,6 @@ import scala.concurrent.Future
 object Errors
 extends RequestAwareLogging:
 
-  extension [T](t: Option[T])
-    inline def getOrThrowExpectedDataMissing(message: => String): T = t.getOrElse(throw new RuntimeException(s"Expected data was missing: $message"))
-
   /** Creates a requirement which has to pass in order to continue computation.
     */
   def require(

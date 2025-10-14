@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseOfficer
+import uk.gov.hmrc.agentregistration.shared.util.RequiredDataExtensions.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -172,7 +173,7 @@ extends FrontendController(mcc, actions):
 
   extension (agentApplication: AgentApplication)
     def getLastNameFromQuery: String =
-      agentApplication.memberNameQuery.getOrElse(throw new IllegalStateException("memberNameQuery is not defined"))
+      agentApplication.memberNameQuery.getOrThrowExpectedDataMissing("memberNameQuery is not defined")
         .lastName
 
   extension (agentApplication: AgentApplication)

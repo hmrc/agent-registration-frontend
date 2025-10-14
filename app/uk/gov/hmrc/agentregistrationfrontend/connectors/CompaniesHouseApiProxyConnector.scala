@@ -16,14 +16,12 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
-import play.api.http.Status.*
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.Crn
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
-import uk.gov.hmrc.http.BadRequestException
 import uk.gov.hmrc.http.HttpErrorFunctions.*
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.HttpResponse

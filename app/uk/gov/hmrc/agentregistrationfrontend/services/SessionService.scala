@@ -21,14 +21,12 @@ import play.api.mvc.RequestHeader
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.util.RequiredDataExtensions.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 
 object SessionService:
-
-  import Errors.*
 
   private val microserviceName = "agent-registration-frontend"
   private val agentTypeKey: String = s"$microserviceName.agentType"
