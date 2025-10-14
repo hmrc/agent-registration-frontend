@@ -49,7 +49,6 @@ final case class AgentApplication(
   def getUtr(using request: RequestHeader): Utr = utr
     .getOrThrowExpectedDataMissing(s"Expected 'utr' to be defined but it was None [${internalUserId.toString}] ")
 
-
   def getBusinessDetails: BusinessDetails = businessDetails
     .getOrThrowExpectedDataMissing("business details not defined")
 

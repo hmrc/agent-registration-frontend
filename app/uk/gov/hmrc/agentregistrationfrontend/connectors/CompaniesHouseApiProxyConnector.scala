@@ -66,7 +66,6 @@ extends RequestAwareLogging:
       .map { response =>
         response.status match {
           case s if is2xx(s) => (response.json \ "items").as[Seq[CompaniesHouseOfficer]]
-          case BAD_REQUEST => throw new BadRequestException(s"BAD_REQUEST")
           case s => throw UpstreamErrorResponse(s"Upstream error response from Companies House API Proxy: $s", s)
         }
       }
