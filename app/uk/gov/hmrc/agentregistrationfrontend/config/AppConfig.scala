@@ -46,6 +46,7 @@ class AppConfig @Inject() (
     configuration
   )
 
+  val companiesHouseApiProxyBaseUrl: String = servicesConfig.baseUrl("companies-house-api-proxy")
   val enrolmentStoreProxyBaseUrl: String = servicesConfig.baseUrl("enrolment-store-proxy")
   val agentRegistrationBaseUrl: String = servicesConfig.baseUrl("agent-registration")
   val selfBaseUrl: String = servicesConfig.baseUrl("agent-registration-frontend")
