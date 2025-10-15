@@ -118,6 +118,13 @@ authorisedName.error.required = Enter your full name
 authorisedName.error.invalid = Your full name must only include letters a to z, hyphens, apostrophes and spaces
 authorisedName.error.tooLong = Your full name must be 100 characters or fewer
 
+## Applicant contact details / Telephone number
+telephoneNumber.title = If we need to speak to you about this application, what number do we call?
+telephoneNumber.hint = We will not send a code to confirm this number.
+telephoneNumber.error.required = Enter the number we should call to speak to you about this application
+telephoneNumber.error.invalid = Enter a phone number, like 01632 960 001 or 07700 900 982
+telephoneNumber.error.tooLong = The phone number must be 25 characters or fewer
+
 # About your application / user role
 userRole.title = Are you the owner of the business?
 userRole.Owner = Yes

@@ -69,8 +69,8 @@ extends FrontendController(mcc, actions):
             .modify(_.applicantContactDetails).using:
               case None => // applicant selects role for the first time
                 applicantRoleFromForm match
-                  case ApplicantRoleInLlp.Member => ApplicantName.NameOfMember().pipe(ApplicantContactDetails.apply).pipe(Some(_))
-                  case ApplicantRoleInLlp.Authorised => ApplicantName.NameOfAuthorised().pipe(ApplicantContactDetails.apply).pipe(Some(_))
+                  case ApplicantRoleInLlp.Member => ApplicantContactDetails(ApplicantName.NameOfMember(), None).pipe(Some(_))
+                  case ApplicantRoleInLlp.Authorised => ApplicantContactDetails(ApplicantName.NameOfAuthorised(), None).pipe(Some(_))
               case Some(applicantContactDetails) => // applicant selects updates selected role (probably came back from previous pages)
                 applicantContactDetails.modify(_.applicantName).using:
                   case n: ApplicantName.NameOfMember =>
