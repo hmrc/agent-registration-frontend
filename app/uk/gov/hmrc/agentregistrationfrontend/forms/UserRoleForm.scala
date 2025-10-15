@@ -34,5 +34,5 @@ object UserRoleForm:
       errorMessageIfEnumError = ErrorKeys.invalidInputErrorMessage(key)
     ))
     Form(
-      mapping = mapping(key -> fieldMapping)(identity)(Some(_))
+      mapping = Forms.mapping(key -> fieldMapping)(identity)(Some(_))
     )

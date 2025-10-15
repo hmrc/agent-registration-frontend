@@ -29,7 +29,7 @@
         continueOrSaveForLater: ContinueOrSaveForLater
 )
 
-@(form: Form[String])(implicit request: AgentApplicationRequest[AnyContent], messages: Messages)
+@(form: Form[String])(implicit request: AgentApplicationRequest[?], messages: Messages)
 
 @key = @{
     AuthorisedNameForm.key

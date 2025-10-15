@@ -21,6 +21,7 @@ import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
@@ -29,17 +30,22 @@ import uk.gov.hmrc.agentregistration.shared.util.RequiredDataExtensions.getOrThr
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseOfficerForm
-import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
+import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionFormType
+import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
+import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
+import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms.toOfficerSelection
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.CompaniesHouseService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MatchedMemberPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MatchedMembersPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
-import scala.util.chaining.scalaUtilChainingOps
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
+import CompaniesHouseMatchingController.*
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 @Singleton
 class CompaniesHouseMatchingController @Inject() (
@@ -47,6 +53,7 @@ class CompaniesHouseMatchingController @Inject() (
   actions: Actions,
   applicationService: ApplicationService,
   companiesHouseService: CompaniesHouseService,
+  matchedMemberView: MatchedMemberPage,
   matchedMembersView: MatchedMembersPage,
   noMemberNameMatchesView: SimplePage
 )
@@ -63,107 +70,114 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] = baseAction
     .async:
       implicit request =>
-        companiesHouseService.getCompaniesHouseOfficers(
+        // TODO: case when user clicks back and lands on this page.
+        // Instead of calling CH we just render the page with prepopulated data.
+        // On submission decide whether to call CH again
+
+        companiesHouseService.getLlpOfficers(
           companyRegistrationNumber = request.agentApplication.getCompanyRegistrationNumber,
-          lastName = request.agentApplication.getLastNameFromQuery, // safe due to ensuring memberNameQuery is defined first
-          isLlp = true // LLP members only
-        ).map: officers =>
-          if officers.isEmpty then
-            logger.info("No Companies House officers found matching member name query")
+          lastName = request.agentApplication.getLastNameFromQuery // safe due to ensuring memberNameQuery is defined first
+        ).map:
+          case Nil =>
+            logger.info("No Companies House officers found matching member name query, rendering noMemberNameMatchesView")
             Ok(noMemberNameMatchesView(
               h1 = "No member name matches",
               bodyText = Some("placeholder for no matches")
             ))
-          else
-            logger.info(s"Found ${officers.size} Companies House officers matching member name query")
+
+          case officer :: Nil =>
+            logger.info(s"Found one Companies House officer matching member name query, rendering matchedMemberView")
+            Ok(matchedMemberView(ChOfficerSelectionForms.yesNoForm, officer))
+
+          case officers: Seq[CompaniesHouseOfficer] =>
+            logger.info(s"Found ${officers.size} Companies House officers matching member name query, rendering matchedMembersView")
             Ok(matchedMembersView(
-              form = CompaniesHouseOfficerForm.form(officers).fill:
-                request.agentApplication.getCompanyOfficer
-              ,
+              form = ChOfficerSelectionForms
+                .officerSelectionForm(officers)
+                .fill(request.agentApplication.companyOfficer.map(_.toOfficerSelection)),
               officers = officers
             ))
 
-  def submit: Action[AnyContent] = baseAction.async:
-    implicit request =>
-      companiesHouseService.getCompaniesHouseOfficers(
-        companyRegistrationNumber = request.agentApplication.getCompanyRegistrationNumber,
-        lastName = request.agentApplication.getLastNameFromQuery,
-        isLlp = true // LLP members only
-      ).flatMap { officers =>
-        if (officers.isEmpty) {
-          Future.successful(
-            Ok(noMemberNameMatchesView(
-              h1 = "No member name matches",
-              bodyText = Some("placeholder for no matches")
-            ))
-          ).map(SubmissionHelper.redirectIfSaveForLater(request, _))
-        }
-        else if (officers.size == 1) {
-          val formValue: Option[Seq[String]] = request
-            .body
-            .asFormUrlEncoded
-            .getOrElse(Map.empty)
-            .get(CompaniesHouseOfficerForm.key)
-          if (formValue.exists(_.contains(officers.head.toString))) {
-            // user has confirmed the single match is correct
-            val updatedApplication = request.agentApplication
-              .modify(_.applicantContactDetails.each.applicantName)
-              .setTo(ApplicantName.NameOfMember(
-                memberNameQuery = request.agentApplication.memberNameQuery,
-                companiesHouseOfficer = Some(officers.head)
-              ))
-            applicationService.upsert(updatedApplication)
-              .map(_ =>
-                Redirect(routes.TelephoneNumberController.show.url)
-              ).map(SubmissionHelper.redirectIfSaveForLater(request, _))
+  def submit: Action[AnyContent] =
+    baseAction
+      .ensureValidFormAndRedirectIfSaveForLater[ChOfficerSelectionFormType](
+        _ => ChOfficerSelectionForms.formType,
+        implicit request => formWithErrors => Errors.throwBadRequestException(s"Unexpected errors in the FormType: $formWithErrors")
+      )
+      .async:
+        implicit request =>
+          request.formValue match {
+            case ChOfficerSelectionFormType.YesNoForm => handleYesNoForm
+            case ChOfficerSelectionFormType.OfficerSelectionForm => handleOfficerSelectionForm
           }
-          else if (formValue.contains(Seq("No"))) {
-            // user has indicated the single match is not correct, so redirect to where user can
-            // say they are not a member to provide a different name
+      .redirectIfSaveForLater
+
+  private def handleYesNoForm(using request: AgentApplicationRequest[?]): Future[Result] = companiesHouseService.getLlpOfficers(
+    companyRegistrationNumber = request.agentApplication.getCompanyRegistrationNumber,
+    lastName = request.agentApplication.getLastNameFromQuery
+  )
+    .flatMap: officers =>
+      val officer: CompaniesHouseOfficer = officers
+        .headOption
+        .getOrThrowExpectedDataMissing(
+          s"Unexpected response from companies house, expected one officer but got: ${officers.size}"
+        )
+      ChOfficerSelectionForms.yesNoForm.bindFromRequest().fold(
+        hasErrors = formWithErrors => Future.successful(BadRequest(matchedMemberView(formWithErrors, officer))),
+        success =
+          case YesNo.Yes => updateApplicationAndRedirectToPhoneNumberPage(officer)
+          case YesNo.No =>
+            // TODO: do we need to reset data here?
             Future.successful(
               Redirect(routes.ApplicantRoleInLlpController.show.url)
-            ).map(SubmissionHelper.redirectIfSaveForLater(request, _))
-          }
-          else {
-            // user has not supplied any answer
-            val formWithErrors = CompaniesHouseOfficerForm.form(officers)
-              .withError(CompaniesHouseOfficerForm.key, s"${CompaniesHouseOfficerForm.key}.single.error.required")
-            Future.successful(
-              BadRequest(matchedMembersView(
-                form = formWithErrors,
-                officers = officers
-              )).pipe(SubmissionHelper.redirectIfSaveForLater(request, _))
             )
-          }
-        }
-        else {
-          CompaniesHouseOfficerForm.form(officers)
-            .bindFromRequest()
-            .fold(
-              formWithErrors =>
-                Future.successful(
-                  BadRequest(matchedMembersView(
-                    form = formWithErrors,
-                    officers = officers
-                  ))
-                ).map(SubmissionHelper.redirectIfSaveForLater(request, _)),
-              validFormData => {
-                val updatedApplication = request.agentApplication
-                  .modify(_.applicantContactDetails.each.applicantName)
-                  .setTo(ApplicantName.NameOfMember(
-                    memberNameQuery = request.agentApplication.memberNameQuery,
-                    companiesHouseOfficer = Some(validFormData)
-                  ))
-                applicationService.upsert(updatedApplication)
-                  .map(_ =>
-                    Redirect(routes.TelephoneNumberController.show.url)
-                  ).map(SubmissionHelper.redirectIfSaveForLater(request, _))
-              }
-            )
-        }
-      }
+      )
 
-  extension (agentApplication: AgentApplication) {
+  def handleOfficerSelectionForm(using request: AgentApplicationRequest[?]): Future[Result] = companiesHouseService.getLlpOfficers(
+    companyRegistrationNumber = request.agentApplication.getCompanyRegistrationNumber,
+    lastName = request.agentApplication.getLastNameFromQuery
+  )
+    .flatMap: officers =>
+      Errors.require(officers.size > 1, s"Unexpected response from companies house, expected more then 1 officer but got: ${officers.size}")
+
+      ChOfficerSelectionForms
+        .officerSelectionForm(officers)
+        .bindFromRequest()
+        .fold(
+          hasErrors = formWithErrors => Future.successful(BadRequest(matchedMembersView(formWithErrors, officers))),
+          success =
+            officerSelection =>
+              val officer: CompaniesHouseOfficer = officers
+                .find(_.toOfficerSelection === officerSelection)
+                .getOrThrowExpectedDataMissing("Unexpected response from companies house, could not find selected officer")
+              updateApplicationAndRedirectToPhoneNumberPage(officer)
+        )
+
+  private def updateApplicationAndRedirectToPhoneNumberPage(officer: CompaniesHouseOfficer)(using request: AgentApplicationRequest[?]) =
+    val updatedApplication: AgentApplication = request.agentApplication
+      .modify(_.applicantContactDetails.each.applicantName)
+      .setTo(ApplicantName.NameOfMember(
+        memberNameQuery = request.agentApplication.memberNameQuery,
+        companiesHouseOfficer = Some(officer)
+      ))
+    applicationService
+      .upsert(updatedApplication)
+      .map(_ => Redirect(routes.TelephoneNumberController.show.url))
+
+object CompaniesHouseMatchingController:
+
+  extension (agentApplication: AgentApplication)
+
+    def getLastNameFromQuery: String =
+      agentApplication.memberNameQuery.getOrThrowExpectedDataMissing("memberNameQuery is not defined")
+        .lastName
+
+    def companyOfficer: Option[CompaniesHouseOfficer] =
+      for
+        acd <- agentApplication.applicantContactDetails
+        nameOfMember <- acd.applicantName.as[ApplicantName.NameOfMember]
+        companyOfficer <- nameOfMember.companiesHouseOfficer
+      yield companyOfficer
 
     def memberNameQuery: Option[CompaniesHouseNameQuery] =
       for
@@ -171,16 +185,3 @@ extends FrontendController(mcc, actions):
         nameOfMember <- acd.applicantName.as[ApplicantName.NameOfMember]
         query <- nameOfMember.memberNameQuery
       yield query
-
-    def getLastNameFromQuery: String =
-      agentApplication.memberNameQuery.getOrThrowExpectedDataMissing("memberNameQuery is not defined")
-        .lastName
-
-    def getCompanyOfficer: Option[CompaniesHouseOfficer] =
-      for
-        acd <- agentApplication.applicantContactDetails
-        nameOfMember <- acd.applicantName.as[ApplicantName.NameOfMember]
-        companyOfficer <- nameOfMember.companiesHouseOfficer
-      yield companyOfficer
-
-  }

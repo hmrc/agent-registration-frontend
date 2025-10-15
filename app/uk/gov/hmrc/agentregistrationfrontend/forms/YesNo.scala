@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.contactdetails
+package uk.gov.hmrc.agentregistrationfrontend.forms
 
-import play.api.libs.json.*
+enum YesNo:
 
-final case class CompaniesHouseOfficer(
-  name: String,
-  dateOfBirth: Option[CompaniesHouseDateOfBirth]
-)
-
-object CompaniesHouseOfficer:
-
-  implicit val format: Format[CompaniesHouseOfficer] = Json.format[CompaniesHouseOfficer]
+  case Yes
+  case No

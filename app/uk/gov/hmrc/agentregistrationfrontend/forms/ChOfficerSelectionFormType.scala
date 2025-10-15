@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.contactdetails
+package uk.gov.hmrc.agentregistrationfrontend.forms
 
-import play.api.libs.json.*
+/** Companies House (Ch) Officer Selection Form Type.
+  *
+  * This enum serves as a discriminator to determine which form should be extracted from the HTTP request.
+  */
+enum ChOfficerSelectionFormType:
 
-final case class CompaniesHouseOfficer(
-  name: String,
-  dateOfBirth: Option[CompaniesHouseDateOfBirth]
-)
+  case YesNoForm
+  case OfficerSelectionForm
 
-object CompaniesHouseOfficer:
-
-  implicit val format: Format[CompaniesHouseOfficer] = Json.format[CompaniesHouseOfficer]
+object ChOfficerSelectionFormType:
+  val key: String = "ChOfficerSelectionFormType"

@@ -42,3 +42,12 @@ extends RequestAwareLogging:
       surname = lastName,
       isLlp = isLlp
     )
+
+  def getLlpOfficers(
+    companyRegistrationNumber: Crn,
+    lastName: String
+  )(using request: AuthorisedRequest[?]): Future[Seq[CompaniesHouseOfficer]] = getCompaniesHouseOfficers(
+    companyRegistrationNumber,
+    lastName,
+    isLlp = true
+  )

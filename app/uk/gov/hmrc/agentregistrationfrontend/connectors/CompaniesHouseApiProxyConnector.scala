@@ -64,7 +64,7 @@ extends RequestAwareLogging:
       )(CompaniesHouseOfficer.apply)
 
     val registerType: String = if isLlp then "llp_members" else "directors"
-    val params = Map(
+    val params: Map[String, Any] = Map(
       "surname" -> surname,
       "register_view" -> true,
       "register_type" -> registerType

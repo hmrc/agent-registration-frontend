@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQue
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes
-import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseOfficerForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -89,7 +89,7 @@ extends ViewSpec:
   )
 
   "MatchedMembersPage with a single match" should:
-    val doc: Document = Jsoup.parse(viewTemplate(CompaniesHouseOfficerForm.form(singleOfficer), singleOfficer).body)
+    val doc: Document = Jsoup.parse(viewTemplate(ChOfficerSelectionForms.officerSelectionForm(singleOfficer), singleOfficer).body)
     "have the correct title for a single match" in:
       doc.title() shouldBe s"$singleHeading - Apply for an agent services account - GOV.UK"
 
@@ -102,14 +102,14 @@ extends ViewSpec:
         .selectOnlyOneElementOrFail()
         .text() shouldBe "Yes"
       form
-        .selectOrFail(s"input[name=${CompaniesHouseOfficerForm.key}][type=radio][value='${singleOfficer.head.toString}']")
+        .selectOrFail(s"input[name=${ChOfficerSelectionForms.key}][type=radio][value='${singleOfficer.head.toString}']")
         .selectOnlyOneElementOrFail()
       form
-        .selectOrFail(s"label[for=${CompaniesHouseOfficerForm.key}-2]")
+        .selectOrFail(s"label[for=${ChOfficerSelectionForms.key}-2]")
         .selectOnlyOneElementOrFail()
         .text() shouldBe "No"
       form
-        .selectOrFail(s"input[name=${CompaniesHouseOfficerForm.key}][type=radio][value='No']")
+        .selectOrFail(s"input[name=${ChOfficerSelectionForms.key}][type=radio][value='No']")
         .selectOnlyOneElementOrFail()
 
     "render a save and continue button" in:
@@ -127,9 +127,9 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render a form error when passed in" in:
-      val field = CompaniesHouseOfficerForm.key
+      val field = ChOfficerSelectionForms.key
       val errorMessage = "Select yes if these are your details"
-      val formWithError = CompaniesHouseOfficerForm.form(singleOfficer)
+      val formWithError = ChOfficerSelectionForms.officerSelectionForm(singleOfficer)
         .withError(field, errorMessage)
       behavesLikePageWithErrorHandling(
         field = field,
@@ -139,7 +139,7 @@ extends ViewSpec:
       )
 
   "MatchedMembersPage with multiple matches" should:
-    val doc: Document = Jsoup.parse(viewTemplate(CompaniesHouseOfficerForm.form(multipleOfficers), multipleOfficers).body)
+    val doc: Document = Jsoup.parse(viewTemplate(ChOfficerSelectionForms.officerSelectionForm(multipleOfficers), multipleOfficers).body)
     "have the correct title for multiple matches" in:
       doc.title() shouldBe s"$multipleHeading - Apply for an agent services account - GOV.UK"
 
@@ -152,14 +152,14 @@ extends ViewSpec:
         .selectOnlyOneElementOrFail()
         .text() shouldBe "First Last Date of birth: January 1990"
       form
-        .selectOrFail(s"input[name=${CompaniesHouseOfficerForm.key}][type=radio][value='${multipleOfficers.head.toString}']")
+        .selectOrFail(s"input[name=${ChOfficerSelectionForms.key}][type=radio][value='${multipleOfficers.head.toString}']")
         .selectOnlyOneElementOrFail()
       form
-        .selectOrFail(s"label[for=${CompaniesHouseOfficerForm.key}-2]")
+        .selectOrFail(s"label[for=${ChOfficerSelectionForms.key}-2]")
         .selectOnlyOneElementOrFail()
         .text() shouldBe "First Alt Last Date of birth: April 1980"
       form
-        .selectOrFail(s"input[name=${CompaniesHouseOfficerForm.key}][type=radio][value='${multipleOfficers.last.toString}']")
+        .selectOrFail(s"input[name=${ChOfficerSelectionForms.key}][type=radio][value='${multipleOfficers.last.toString}']")
         .selectOnlyOneElementOrFail()
 
     "render a save and continue button" in:
@@ -177,9 +177,9 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render a form error when passed in" in:
-      val field = CompaniesHouseOfficerForm.key
+      val field = ChOfficerSelectionForms.key
       val errorMessage = "Select yes if these are your details"
-      val formWithError = CompaniesHouseOfficerForm.form(singleOfficer)
+      val formWithError = ChOfficerSelectionForms.officerSelectionForm(singleOfficer)
         .withError(field, errorMessage)
       behavesLikePageWithErrorHandling(
         field = field,
