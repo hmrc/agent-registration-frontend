@@ -21,7 +21,7 @@
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
-@import uk.gov.hmrc.agentregistrationfrontend.forms.OfficerSelection
+@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 @import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionFormType
 @import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 @import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms.toOfficerSelection
@@ -36,11 +36,12 @@
 )
 
 @(
-        form: Form[OfficerSelection],
-        officers: Seq[CompaniesHouseOfficer]
+        form: Form[YesNo],
+        officer: CompaniesHouseOfficer
 )(implicit request: AgentApplicationRequest[?], messages: Messages)
 
 @key: String = @{ChOfficerSelectionForms.key}
+
 @makeDateOfBirth(dob: Option[CompaniesHouseDateOfBirth]) = {
   @if(dob.isDefined) {
      <div class="govuk-caption-m">
@@ -48,44 +49,46 @@
      </div>
   }
 }
-@makeLabel(officer: CompaniesHouseOfficer) = {
-      @{
-          officer.name
-      }
-      @{
-          makeDateOfBirth(officer.dateOfBirth)
-      }
-}
-@title = @{messages(s"$key.multiple.title", officers.size)}
+
+@title = @{messages(s"$key.single.title")}
 
 @layout(
     pageTitle = title,
     maybeForm = Some(form)
 ) {
     <h2 class="govuk-caption-l">@messages("applicant-contact-details.title")</h2>
-    @formWithCSRF(action = routes.CompaniesHouseMatchingController.submit) {
-        <input
-            type="hidden"
-            name="@ChOfficerSelectionFormType.key"
-            value="@ChOfficerSelectionFormType.OfficerSelectionForm"
-        />
 
-        @govukRadios(Radios(
+    <h1 class="govuk-heading-l">@title</h1>
+    @govukInsetText(InsetText(
+        content = HtmlContent(
+            s"${officer.name}${makeDateOfBirth(officer.dateOfBirth)}"
+        )
+    ))
+    @formWithCSRF(action = routes.CompaniesHouseMatchingController.submit) {
+      <input
+          type="hidden"
+          name="@ChOfficerSelectionFormType.key"
+          value="@ChOfficerSelectionFormType.YesNoForm"
+      />
+      @govukRadios(Radios(
           fieldset = Some(Fieldset(
               legend = Some(Legend(
                   content = Text(title),
-                  isPageHeading = true,
-                  classes = "govuk-fieldset__legend--l"
+                  isPageHeading = false,
+                  classes = "govuk-visually-hidden"
               ))
           )),
-          hint = Some(Hint(content = HtmlContent(messages(s"$key.multiple.hint")))),
-          items = officers.map(officer =>
-              RadioItem(
-                  content = HtmlContent(makeLabel(officer)),
-                  value = Some(officer.toOfficerSelection.value)
-              )
-          )
-        ).withFormField(form(key)))
-        @continueOrSaveForLater()
+          hint = None,
+          items = YesNo.values.toSeq.map:
+            case YesNo.Yes => RadioItem(
+                content = HtmlContent(messages(s"$key.single.yes")),
+                value = Some(YesNo.Yes.toString)
+            )
+            case YesNo.No => RadioItem(
+                content = HtmlContent(messages(s"$key.single.no")),
+                value = Some(YesNo.No.toString)
+            )
+      ).withFormField(form(key)))
+      @continueOrSaveForLater()
     }
 }

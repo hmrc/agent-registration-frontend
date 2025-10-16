@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.contactdetails
+package uk.gov.hmrc.agentregistrationfrontend.forms
 
-import play.api.libs.json.Format
-import play.api.libs.json.Json
+enum YesNo:
 
-final case class CompaniesHouseNameQuery(
-  firstName: String,
-  lastName: String
-)
-
-object CompaniesHouseNameQuery:
-
-  given Format[CompaniesHouseNameQuery] = Json.format[CompaniesHouseNameQuery]
-  def unapply(q: CompaniesHouseNameQuery): Option[(String, String)] = Some((q.firstName, q.lastName))
+  case Yes
+  case No

@@ -30,7 +30,7 @@
         continueOrSaveForLater: ContinueOrSaveForLater
 )
 
-@(form: Form[CompaniesHouseNameQuery])(implicit request: AgentApplicationRequest[AnyContent], messages: Messages)
+@(form: Form[CompaniesHouseNameQuery])(implicit request: AgentApplicationRequest[?], messages: Messages)
 
 @key = @{
     "llpMemberName"

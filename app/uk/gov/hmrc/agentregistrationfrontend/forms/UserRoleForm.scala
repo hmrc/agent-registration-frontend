@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.forms
 
-import play.api.data.Forms.mapping
 import play.api.data.FieldMapping
 import play.api.data.Form
 import play.api.data.Forms
@@ -34,5 +33,5 @@ object UserRoleForm:
       errorMessageIfEnumError = ErrorKeys.invalidInputErrorMessage(key)
     ))
     Form(
-      mapping = mapping(key -> fieldMapping)(identity)(Some(_))
+      mapping = Forms.mapping(key -> fieldMapping)(identity)(Some(_))
     )

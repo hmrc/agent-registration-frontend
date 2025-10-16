@@ -29,7 +29,7 @@ extends RequestAwareLogging:
 
   /** Creates a requirement which has to pass in order to continue computation.
     */
-  def require(
+  inline def require(
     requirement: Boolean,
     message: => String
   )(using request: RequestHeader): Unit =

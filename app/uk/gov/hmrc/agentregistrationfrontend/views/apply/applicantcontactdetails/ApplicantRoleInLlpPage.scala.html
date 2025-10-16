@@ -30,7 +30,7 @@
         continueOrSaveForLater: ContinueOrSaveForLater
 )
 
-@(form: Form[ApplicantRoleInLlp])(implicit request: AgentApplicationRequest[AnyContent], messages: Messages)
+@(form: Form[ApplicantRoleInLlp])(implicit request: AgentApplicationRequest[?], messages: Messages)
 
 @key = @{
     ApplicantRoleInLlpForm.key

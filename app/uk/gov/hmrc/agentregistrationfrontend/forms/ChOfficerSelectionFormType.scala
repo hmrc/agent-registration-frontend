@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.contactdetails
+package uk.gov.hmrc.agentregistrationfrontend.forms
 
-import play.api.libs.json.Format
-import play.api.libs.json.Json
+/** Companies House (Ch) Officer Selection Form Type.
+  *
+  * This enum serves as a discriminator to determine which form should be extracted from the HTTP request.
+  */
+enum ChOfficerSelectionFormType:
 
-final case class CompaniesHouseNameQuery(
-  firstName: String,
-  lastName: String
-)
+  case YesNoForm
+  case OfficerSelectionForm
 
-object CompaniesHouseNameQuery:
-
-  given Format[CompaniesHouseNameQuery] = Json.format[CompaniesHouseNameQuery]
-  def unapply(q: CompaniesHouseNameQuery): Option[(String, String)] = Some((q.firstName, q.lastName))
+object ChOfficerSelectionFormType:
+  val key: String = "ChOfficerSelectionFormType"

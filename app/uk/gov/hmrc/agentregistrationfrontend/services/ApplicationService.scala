@@ -49,6 +49,7 @@ extends RequestAwareLogging:
     }
 
   def upsert(agentApplication: AgentApplication)(using request: AuthorisedRequest[?]): Future[Unit] =
+    logger.debug(s"Upserting application [${request.internalUserId}]")
     Errors.require(agentApplication.internalUserId === request.internalUserId, "Cannot modify application - you must be the user who created it")
     agentRegistrationConnector
       .upsertApplication(agentApplication)
