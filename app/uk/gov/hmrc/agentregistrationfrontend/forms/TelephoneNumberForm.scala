@@ -40,10 +40,10 @@ object TelephoneNumberForm:
           ErrorKeys.inputTooLongErrorMessage(key),
           _.length <= 25
         )
+        .transform[TelephoneNumber](TelephoneNumber(_), _.value)
         .verifying(
           ErrorKeys.invalidInputErrorMessage(key),
-          TelephoneNumber.isValid(_)
+          _.isValid
         )
-        .transform[TelephoneNumber](TelephoneNumber(_), _.value)
     )(identity)(Some(_))
   )
