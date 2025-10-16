@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
@@ -64,19 +65,26 @@ extends FrontendController(mcc, actions):
     baseAction
       .ensureValidFormAndRedirectIfSaveForLater(CompaniesHouseNameQueryForm.form, implicit r => view(_))
       .async:
-        implicit request =>
-          val validFormData: CompaniesHouseNameQuery = request.formValue
-          applicationService.upsert(
-            request.agentApplication
-              .modify(_.applicantContactDetails.each.applicantName)
-              .setTo(ApplicantName.NameOfMember(
-                memberNameQuery = Some(validFormData)
-              )) // this will overwrite any existing match
-          ).map((_: Unit) =>
-            Redirect(
-              routes.CompaniesHouseMatchingController.show.url
-            )
-          )
+        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[CompaniesHouseNameQuery]) =>
+          val submittedNameQuery: CompaniesHouseNameQuery = request.formValue
+          val hasChanged = request.agentApplication.memberNameQuery != Some(submittedNameQuery)
+
+          val updatedApplication =
+            if hasChanged
+            then
+              request.agentApplication
+                .modify(_.applicantContactDetails.each.applicantName)
+                .setTo(ApplicantName.NameOfMember(
+                  memberNameQuery = Some(submittedNameQuery)
+                ))
+            else request.agentApplication
+
+          applicationService
+            .upsert(updatedApplication)
+            .map: _ =>
+              Redirect(
+                routes.CompaniesHouseMatchingController.show.url
+              )
       .redirectIfSaveForLater
 
   extension (agentApplication: AgentApplication)
