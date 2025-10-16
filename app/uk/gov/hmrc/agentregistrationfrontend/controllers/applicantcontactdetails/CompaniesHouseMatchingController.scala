@@ -45,6 +45,7 @@ import javax.inject.Singleton
 import scala.concurrent.Future
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import CompaniesHouseMatchingController.*
+import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 @Singleton
@@ -87,7 +88,8 @@ extends FrontendController(mcc, actions):
 
           case officer :: Nil =>
             logger.info(s"Found one Companies House officer matching member name query, rendering matchedMemberView")
-            Ok(matchedMemberView(ChOfficerSelectionForms.yesNoForm, officer))
+            val form: Form[YesNo] = ChOfficerSelectionForms.yesNoForm.fill(request.agentApplication.companyOfficer.filter(_ === officer).map(_ => YesNo.Yes))
+            Ok(matchedMemberView(form, officer))
 
           case officers: Seq[CompaniesHouseOfficer] =>
             logger.info(s"Found ${officers.size} Companies House officers matching member name query, rendering matchedMembersView")

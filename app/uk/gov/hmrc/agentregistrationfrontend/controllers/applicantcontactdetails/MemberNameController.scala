@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
@@ -34,6 +35,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactde
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.util.chaining.scalaUtilChainingOps
 
 @Singleton
 class MemberNameController @Inject() (
@@ -64,13 +66,19 @@ extends FrontendController(mcc, actions):
     baseAction
       .ensureValidFormAndRedirectIfSaveForLater(CompaniesHouseNameQueryForm.form, implicit r => view(_))
       .async:
-        implicit request =>
-          val validFormData: CompaniesHouseNameQuery = request.formValue
+        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[CompaniesHouseNameQuery]) =>
+          val submittedNameQuery: CompaniesHouseNameQuery = request.formValue
+          def requiresUpdate(existingApplicantName: ApplicantName): Boolean =
+            !existingApplicantName
+              .as[ApplicantName.NameOfMember]
+              .flatMap(_.memberNameQuery)
+              .contains(submittedNameQuery)
+
           applicationService.upsert(
             request.agentApplication
-              .modify(_.applicantContactDetails.each.applicantName)
+              .modify(_.applicantContactDetails.eachWhere(_.applicantName.pipe(requiresUpdate)).applicantName)
               .setTo(ApplicantName.NameOfMember(
-                memberNameQuery = Some(validFormData)
+                memberNameQuery = Some(submittedNameQuery)
               )) // this will overwrite any existing match
           ).map((_: Unit) =>
             Redirect(

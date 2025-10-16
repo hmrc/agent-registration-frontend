@@ -25,4 +25,4 @@ final case class CompaniesHouseOfficer(
 
 object CompaniesHouseOfficer:
 
-  implicit val format: Format[CompaniesHouseOfficer] = Json.format[CompaniesHouseOfficer]
+  given Format[CompaniesHouseOfficer] = Json.format[CompaniesHouseOfficer]
