@@ -1,0 +1,82 @@
+{
+    "journeyName": "Save for Later Confirmation",
+    "controller": "SaveForLaterController",
+    "package": "uk.gov.hmrc.agentregistrationfrontend.controllers",
+    "description": "Provides confirmation page when users choose to save their application progress and return later",
+    "businessContext": {
+        "purpose": "Allow users to safely exit the application process while preserving their progress and receive guidance on how to return",
+        "requirements": [
+            "Confirm application has been saved",
+            "Provide clear instructions for returning",
+            "Display session expiry information",
+            "Offer navigation options back to task list",
+            "Ensure user understands data retention"
+        ],
+        "complianceAspects": [
+            "Data retention policies clearly communicated",
+            "Session security explained to users",
+            "Privacy implications of saved data"
+        ]
+    },
+    "journeySteps": [
+        {
+            "step": 1,
+            "name": "Display Save Confirmation",
+            "action": "show",
+            "method": "GET",
+            "route": "/apply/save-and-come-back-later",
+            "purpose": "Show confirmation that application progress has been saved",
+            "userActions": [
+                "View save confirmation",
+                "Read return instructions"
+            ],
+            "systemActions": [
+                "Validate application exists in session",
+                "Display confirmation page",
+                "Show session expiry information",
+                "Provide navigation options"
+            ],
+            "validations": [
+                "Valid application must exist in session"
+            ],
+            "outcomes": [
+                "Confirmation page displayed with return guidance"
+            ]
+        }
+    ],
+    "errorHandling": [
+        {
+            "scenario": "No Application in Session",
+            "trigger": "User accesses save page without valid application",
+            "handling": "Actions framework redirects to start registration",
+            "userExperience": "Automatic redirect to begin new application"
+        }
+    ],
+    "integrations": [
+        {
+            "service": "Actions Framework",
+            "purpose": "Session validation and application retrieval",
+            "endpoint": "getApplicationInProgress action",
+            "authentication": "Session-based",
+            "dataExchange": "AgentApplication validation"
+        }
+    ],
+    "stateTransitions": [
+        {
+            "from": "Active application session",
+            "to": "Save confirmation displayed",
+            "trigger": "User navigates to save page",
+            "data": "No state changes, read-only operation"
+        }
+    ],
+    "securityConsiderations": [
+        "Session validation ensures only valid users can access save page",
+        "No sensitive data exposed in confirmation page",
+        "Clear communication of data retention and session security"
+    ],
+    "performanceCharacteristics": {
+        "responseTime": "Very fast - simple template rendering with minimal processing",
+        "caching": "Static template can be cached effectively",
+        "scalability": "Highly scalable due to minimal server-side processing"
+    }
+}
