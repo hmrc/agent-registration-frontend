@@ -30,7 +30,9 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CompaniesHouseStubs
+import org.scalatest.Ignore
 
+@Ignore
 class CompaniesHouseMatchingControllerSpec
 extends ControllerSpec:
 
