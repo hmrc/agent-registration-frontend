@@ -35,7 +35,6 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactde
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.util.chaining.scalaUtilChainingOps
 
 @Singleton
 class MemberNameController @Inject() (
@@ -68,23 +67,24 @@ extends FrontendController(mcc, actions):
       .async:
         implicit request: (AgentApplicationRequest[AnyContent] & FormValue[CompaniesHouseNameQuery]) =>
           val submittedNameQuery: CompaniesHouseNameQuery = request.formValue
-          def requiresUpdate(existingApplicantName: ApplicantName): Boolean =
-            !existingApplicantName
-              .as[ApplicantName.NameOfMember]
-              .flatMap(_.memberNameQuery)
-              .contains(submittedNameQuery)
+          val hasChanged = request.agentApplication.memberNameQuery != Some(submittedNameQuery)
 
-          applicationService.upsert(
-            request.agentApplication
-              .modify(_.applicantContactDetails.eachWhere(_.applicantName.pipe(requiresUpdate)).applicantName)
-              .setTo(ApplicantName.NameOfMember(
-                memberNameQuery = Some(submittedNameQuery)
-              )) // this will overwrite any existing match
-          ).map((_: Unit) =>
-            Redirect(
-              routes.CompaniesHouseMatchingController.show.url
-            )
-          )
+          val updatedApplication =
+            if hasChanged
+            then
+              request.agentApplication
+                .modify(_.applicantContactDetails.each.applicantName)
+                .setTo(ApplicantName.NameOfMember(
+                  memberNameQuery = Some(submittedNameQuery)
+                ))
+            else request.agentApplication
+
+          applicationService
+            .upsert(updatedApplication)
+            .map: _ =>
+              Redirect(
+                routes.CompaniesHouseMatchingController.show.url
+              )
       .redirectIfSaveForLater
 
   extension (agentApplication: AgentApplication)
