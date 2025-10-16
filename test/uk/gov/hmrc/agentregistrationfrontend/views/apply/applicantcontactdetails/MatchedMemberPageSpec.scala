@@ -31,14 +31,12 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MatchedMembersPage
-import org.scalatest.Ignore
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MatchedMemberPage
 
-@Ignore
-class MatchedMembersPageSpec
+class MatchedMemberPageSpec
 extends ViewSpec:
 
-  val viewTemplate: MatchedMembersPage = app.injector.instanceOf[MatchedMembersPage]
+  val viewTemplate: MatchedMemberPage = app.injector.instanceOf[MatchedMemberPage]
   implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] =
     new AgentApplicationRequest(
       request = request,
@@ -55,10 +53,9 @@ extends ViewSpec:
       internalUserId = tdAll.internalUserId,
       groupId = tdAll.groupId
     )
+  private val heading: String = "Are these your details?"
 
-  private val heading: String = "2 records match this name"
-
-  private val multipleOfficers = Seq(
+  private val singleOfficer = Seq(
     CompaniesHouseOfficer(
       name = "First Last",
       dateOfBirth = Some(CompaniesHouseDateOfBirth(
@@ -66,39 +63,31 @@ extends ViewSpec:
         month = 1,
         year = 1990
       ))
-    ),
-    CompaniesHouseOfficer(
-      name = "First Alt Last",
-      dateOfBirth = Some(CompaniesHouseDateOfBirth(
-        day = None,
-        month = 4,
-        year = 1980
-      ))
     )
   )
 
-  "MatchedMembersPage with multiple matches" should:
-    val doc: Document = Jsoup.parse(viewTemplate(ChOfficerSelectionForms.officerSelectionForm(multipleOfficers), multipleOfficers).body)
-    "have the correct title for multiple matches" in:
+  "MatchedMembersPage with a single match" should:
+    val doc: Document = Jsoup.parse(viewTemplate(ChOfficerSelectionForms.yesNoForm, singleOfficer.head).body)
+    "have the correct title for a single match" in:
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
 
-    "render a form with radios for each of the multiple matches" in:
+    "render a form with yes/no radios for a single match" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
       form.attr("action") shouldBe routes.CompaniesHouseMatchingController.submit.url
       form
-        .selectOrFail("label[for=companiesHouseOfficer]")
+        .selectOrFail(s"label[for=${ChOfficerSelectionForms.key}]")
         .selectOnlyOneElementOrFail()
-        .text() shouldBe "First Last Date of birth: January 1990"
+        .text() shouldBe "Yes"
       form
-        .selectOrFail(s"input[name=${ChOfficerSelectionForms.key}][type=radio][value='First Last|/1/1990']")
+        .selectOrFail(s"input[name=${ChOfficerSelectionForms.key}][type=radio][value='Yes']")
         .selectOnlyOneElementOrFail()
       form
         .selectOrFail(s"label[for=${ChOfficerSelectionForms.key}-2]")
         .selectOnlyOneElementOrFail()
-        .text() shouldBe "First Alt Last Date of birth: April 1980"
+        .text() shouldBe "No"
       form
-        .selectOrFail(s"input[name=${ChOfficerSelectionForms.key}][type=radio][value='First Alt Last|/4/1980']")
+        .selectOrFail(s"input[name=${ChOfficerSelectionForms.key}][type=radio][value='No']")
         .selectOnlyOneElementOrFail()
 
     "render a save and continue button" in:
@@ -117,12 +106,12 @@ extends ViewSpec:
 
     "render a form error when passed in" in:
       val field = ChOfficerSelectionForms.key
-      val errorMessage = "Select the name and date of birth that matches your details"
-      val formWithError = ChOfficerSelectionForms.officerSelectionForm(multipleOfficers)
+      val errorMessage = "Select yes if these are your details"
+      val formWithError = ChOfficerSelectionForms.yesNoForm
         .withError(field, errorMessage)
       behavesLikePageWithErrorHandling(
         field = field,
         errorMessage = errorMessage,
-        errorDoc = Jsoup.parse(viewTemplate(formWithError, multipleOfficers).body),
+        errorDoc = Jsoup.parse(viewTemplate(formWithError, singleOfficer.head).body),
         heading = heading
       )
