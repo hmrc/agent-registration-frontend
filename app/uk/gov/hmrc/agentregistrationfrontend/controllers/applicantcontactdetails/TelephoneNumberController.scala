@@ -48,7 +48,8 @@ extends FrontendController(mcc, actions):
   private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
     .ensure(
       _.agentApplication.applicantContactDetails.map(_.applicantName) match {
-        case Some(ApplicantName.NameOfMember(Some(_), Some(_))) | Some(ApplicantName.NameOfAuthorised(Some(_))) => true
+        case Some(ApplicantName.NameOfMember(_, Some(_))) => true
+        case Some(ApplicantName.NameOfAuthorised(Some(_))) => true
         case _ => false
       },
       implicit request =>
