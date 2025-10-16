@@ -31,7 +31,7 @@ object CompaniesHouseStubs {
       Json.obj(
         "items" -> Json.arr(
           Json.obj(
-            "name" -> s"$lastName, First",
+            "name" -> s"First $lastName",
             "date_of_birth" -> Json.obj(
               "month" -> 1,
               "year" -> 1990
@@ -49,11 +49,11 @@ object CompaniesHouseStubs {
       Json.obj(
         "items" -> Json.arr(
           Json.obj(
-            "name" -> s"$lastName, First",
+            "name" -> s"First $lastName",
             "date_of_birth" -> Json.obj("month" -> 1, "year" -> 1990)
           ),
           Json.obj(
-            "name" -> s"$lastName, First Alt",
+            "name" -> s"First Alt $lastName",
             "date_of_birth" -> Json.obj("month" -> 2, "year" -> 1980)
           )
         )

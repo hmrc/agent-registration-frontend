@@ -40,7 +40,7 @@
         officers: Seq[CompaniesHouseOfficer]
 )(implicit request: AgentApplicationRequest[?], messages: Messages)
 
-@key: String = @{ChOfficerSelectionForms.key}
+@key = @{ChOfficerSelectionForms.key}
 @makeDateOfBirth(dob: Option[CompaniesHouseDateOfBirth]) = {
   @if(dob.isDefined) {
      <div class="govuk-caption-m">

@@ -79,13 +79,13 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "2 records match this name - Apply for an agent services account - GOV.UK"
 
-  s"POST $path for single match with blank inputs should return 400" in:
+  s"POST $path for single match without a valid selection should return 400" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(validApplication)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse =
       post(path)(Map(
-        ChOfficerSelectionForms.key -> Seq("")
+        "ChOfficerSelectionFormType" -> Seq("YesNoForm")
       ))
 
     response.status shouldBe Status.BAD_REQUEST
@@ -93,21 +93,7 @@ extends ControllerSpec:
     doc.title() shouldBe "Error: Are these your details? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#companiesHouseOfficer-error").text() shouldBe "Error: Select yes if these are your details"
 
-  s"POST $path for multiple matches with blank inputs should return 400" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
-    CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
-    val response: WSResponse =
-      post(path)(Map(
-        ChOfficerSelectionForms.key -> Seq("")
-      ))
-
-    response.status shouldBe Status.BAD_REQUEST
-    val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: 2 records match this name - Apply for an agent services account - GOV.UK"
-    doc.mainContent.select("#companiesHouseOfficer-error").text() shouldBe "Error: Select the name and date of birth that matches your details"
-
-  s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
+  s"POST $path for single match with valid inputs should save officer and redirect to telephone page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(validApplication)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
@@ -129,7 +115,82 @@ extends ControllerSpec:
     )
     val response: WSResponse =
       post(path)(Map(
-        ChOfficerSelectionForms.key -> Seq("First Last|1990-01"),
+        "ChOfficerSelectionFormType" -> Seq("YesNoForm"),
+        "companiesHouseOfficer" -> Seq("Yes")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe routes.TelephoneNumberController.show.url
+
+  s"POST $path for multiple matches without a valid selection should return 400" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
+    val response: WSResponse =
+      post(path)(Map(
+        "ChOfficerSelectionFormType" -> Seq("OfficerSelectionForm")
+      ))
+
+    response.status shouldBe Status.BAD_REQUEST
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "Error: 2 records match this name - Apply for an agent services account - GOV.UK"
+    doc.mainContent.select("#companiesHouseOfficer-error").text() shouldBe "Error: Select the name and date of birth that matches your details"
+
+  s"POST $path for multiple matches with valid inputs should save officer and redirect to telephone page" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
+    AgentRegistrationStubs.stubUpdateAgentApplication(
+      validApplication
+        .modify(_.applicantContactDetails)
+        .setTo(Some(ApplicantContactDetails(
+          applicantName = ApplicantName.NameOfMember(
+            memberNameQuery = Some(CompaniesHouseNameQuery(
+              firstName = "First",
+              lastName = "Last"
+            )),
+            companiesHouseOfficer = Some(CompaniesHouseOfficer(
+              name = "First Last",
+              dateOfBirth = Some(CompaniesHouseDateOfBirth(None, 1, 1990))
+            ))
+          )
+        )))
+    )
+    val response: WSResponse =
+      post(path)(Map(
+        "ChOfficerSelectionFormType" -> Seq("OfficerSelectionForm"),
+        ChOfficerSelectionForms.key -> Seq("First Last|/1/1990")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe routes.TelephoneNumberController.show.url
+
+  s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
+    AgentRegistrationStubs.stubUpdateAgentApplication(
+      validApplication
+        .modify(_.applicantContactDetails)
+        .setTo(Some(ApplicantContactDetails(
+          applicantName = ApplicantName.NameOfMember(
+            memberNameQuery = Some(CompaniesHouseNameQuery(
+              firstName = "First",
+              lastName = "Last"
+            )),
+            companiesHouseOfficer = Some(CompaniesHouseOfficer(
+              name = "First Last",
+              dateOfBirth = Some(CompaniesHouseDateOfBirth(None, 1, 1990))
+            ))
+          )
+        )))
+    )
+    val response: WSResponse =
+      post(path)(Map(
+        "ChOfficerSelectionFormType" -> Seq("OfficerSelectionForm"),
+        ChOfficerSelectionForms.key -> Seq("First Last|/1/1990"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
@@ -137,13 +198,13 @@ extends ControllerSpec:
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe applicationRoutes.SaveForLaterController.show.url
 
-  s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
+  s"POST $path with save for later and without a valid selection should not return errors and redirect to save for later page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(validApplication)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse =
       post(path)(Map(
-        ChOfficerSelectionForms.key -> Seq(""),
+        "ChOfficerSelectionFormType" -> Seq("YesNoForm"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
