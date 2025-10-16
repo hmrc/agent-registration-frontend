@@ -20,7 +20,6 @@ import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.BusinessDetails
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.CompanyProfile
-import uk.gov.hmrc.agentregistration.shared.FullName
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.Nino
@@ -56,7 +55,7 @@ trait TdBase:
   def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
   def firstName = "Test"
   def lastName = "Name"
-  def fullName = FullName(firstName, lastName)
+  def telephoneNumber = "041 427 1125"
   def companyNumber = "1234567890"
   def companyName = "Test Company Name"
   def dateOfIncorporation: LocalDate = LocalDate.now().minusYears(10)
