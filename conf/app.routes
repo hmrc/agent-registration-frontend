@@ -46,6 +46,9 @@ POST        /apply/applicant/member-name-match                     uk.gov.hmrc.a
 GET         /apply/applicant/telephone-number                      uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.TelephoneNumberController.show
 POST        /apply/applicant/telephone-number                      uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.TelephoneNumberController.submit
 GET         /apply/applicant/email-address                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.EmailAddressController.show
+POST        /apply/applicant/email-address                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.EmailAddressController.submit
+GET         /apply/applicant/verify-email-address                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.EmailAddressController.verify
+GET         /apply/applicant/check-your-answers                    uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.CheckYourAnswersController.show
 
 ## Anti Money Laundering routes
 GET         /apply/anti-money-laundering/supervisor-name            uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsSupervisorController.show
