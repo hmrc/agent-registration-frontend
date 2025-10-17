@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.model.grs
 import play.api.libs.json.*
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.GeneralPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedCompany
 import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedLiabilityPartnership
 import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedPartnership
 import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.ScottishLimitedPartnership
@@ -56,7 +55,7 @@ final case class JourneyData(
     def missingDataError(key: String): Nothing = throw new RuntimeException(s"Business details missing $key for $businessType type")
 
     businessType match {
-      case LimitedCompany =>
+      case BusinessType.LimitedCompany =>
         LimitedCompanyDetails(
           safeId = registration.registeredBusinessPartnerId.getOrElse(missingDataError("safeId")),
           businessType = businessType,

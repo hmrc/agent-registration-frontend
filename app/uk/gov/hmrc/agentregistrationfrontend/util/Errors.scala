@@ -16,9 +16,12 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.util
 
+import play.api.http.Status
 import play.api.mvc.Request
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.http.HttpErrorFunctions
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.http.UpstreamErrorResponse
 
@@ -47,37 +50,58 @@ extends RequestAwareLogging:
       Future.failed(InternalServerException(message))
     else Future.successful(())
 
-  @inline def throwBadRequestException(message: => String)(using request: RequestHeader): Nothing =
+  inline def throwBadRequestException(message: => String)(using request: RequestHeader): Nothing =
     logger.error(message)
     throw UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.BAD_REQUEST
     )
 
-  @inline def throwBadRequestExceptionF(message: => String)(using request: RequestHeader): Future[Nothing] =
+  inline def throwBadRequestExceptionF(message: => String)(using request: RequestHeader): Future[Nothing] =
     logger.error(message)
     Future.failed(UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.BAD_REQUEST
     ))
 
-  @inline def throwNotFoundException(message: => String)(using request: RequestHeader): Nothing =
+  inline def throwNotFoundException(message: => String)(using request: RequestHeader): Nothing =
     logger.error(message)
     throw UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.NOT_FOUND
     )
 
-  @inline def throwServerErrorException(message: => String)(using request: RequestHeader): Nothing =
+  inline def throwServerErrorException(message: => String)(using request: RequestHeader): Nothing =
     logger.error(message)
     throw UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.INTERNAL_SERVER_ERROR
     )
 
-  def notImplemented(message: => String = "")(using request: RequestHeader): Nothing =
+  inline def notImplemented(message: => String = "")(using request: RequestHeader): Nothing =
     val m = s"Unimplemented: $message"
     logger.error(m)
     throw UpstreamErrorResponse(m, play.mvc.Http.Status.NOT_IMPLEMENTED)
+
+  def throwUpstreamErrorResponse(
+    httpMethod: String,
+    url: String,
+    status: Int,
+    response: => HttpResponse
+  ) =
+    throw UpstreamErrorResponse(
+      message = httpErrorFunctions.upstreamResponseMessage(
+        httpMethod,
+        url,
+        status,
+        response.body
+      ),
+      statusCode = status,
+      reportAs =
+        if status === Status.BAD_GATEWAY
+        then Status.BAD_GATEWAY
+        else Status.INTERNAL_SERVER_ERROR,
+      headers = response.headers
+    )
 
   val httpErrorFunctions: HttpErrorFunctions = new HttpErrorFunctions {}

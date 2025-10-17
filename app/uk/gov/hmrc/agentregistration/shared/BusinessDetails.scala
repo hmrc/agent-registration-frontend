@@ -30,6 +30,7 @@ sealed trait BusinessDetails:
   val businessType: BusinessType // Duplicated from AgentApplication to simplify json reads
 
 object BusinessDetails:
+
   given Format[BusinessDetails] = Format(
     { json =>
       (json \ "businessType").as[BusinessType] match {
@@ -128,7 +129,7 @@ object FullName:
   given Format[FullName] = Json.format[FullName]
 
 final case class CompanyProfile(
-  companyNumber: String,
+  companyNumber: Crn,
   companyName: String,
   dateOfIncorporation: Option[LocalDate] // for some reason an optional field on companies house
   // unsanitisedCHROAddress: Option[Address]

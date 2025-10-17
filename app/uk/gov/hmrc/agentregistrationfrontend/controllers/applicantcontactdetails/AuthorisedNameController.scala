@@ -24,7 +24,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
-import uk.gov.hmrc.agentregistration.shared.ApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
@@ -77,7 +77,7 @@ extends FrontendController(mcc, actions):
             Redirect(routes.TelephoneNumberController.show.url)
       .redirectIfSaveForLater
 
-  extension (agentApplication: ApplicationLlp)
+  extension (agentApplication: AgentApplicationLlp)
     private def authorisedName: Option[String] =
       for
         acd <- agentApplication.applicantContactDetails

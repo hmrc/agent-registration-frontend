@@ -23,16 +23,15 @@ import play.api.libs.json.OFormat
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors.getOrThrowExpectedDataMissing
+import uk.gov.hmrc.agentregistration.shared.util.RequiredDataExtensions.getOrThrowExpectedDataMissing
 
 import java.time.Clock
 import java.time.Instant
 import scala.annotation.nowarn
 
 /** Agent (Registration) Application. This case class represents the data entered by a user for registering as an agent.
- */
+  */
 sealed trait AgentApplication:
 
   def internalUserId: InternalUserId
@@ -77,49 +76,50 @@ sealed trait AgentApplication:
     s"The application is not of the expected type. Expected: ${ct.runtimeClass.getSimpleName}, Got: ${this.getClass.getSimpleName}"
   )
 
-  def asLlpApplication: ApplicationLlp = asExpected[ApplicationLlp]
+  def asLlpApplication: AgentApplicationLlp = asExpected[AgentApplicationLlp]
 
 /** Sole Trader Application. This case class represents the data entered by a user for registering as a sole trader.
- */
+  */
 final case class AgentApplicationSoleTrader(
-                                             override val internalUserId: InternalUserId,
-                                             override val groupId: GroupId,
-                                             override val createdAt: Instant,
-                                             override val applicationState: ApplicationState,
-                                             userRole: Option[UserRole] = None,
-                                             businessDetails: Option[BusinessDetailsSoleTrader],
-                                             override val amlsDetails: Option[AmlsDetails]
-                                           )
-  extends AgentApplication:
+  override val internalUserId: InternalUserId,
+  override val groupId: GroupId,
+  override val createdAt: Instant,
+  override val applicationState: ApplicationState,
+  userRole: Option[UserRole] = None,
+  businessDetails: Option[BusinessDetailsSoleTrader],
+  override val amlsDetails: Option[AmlsDetails]
+)
+extends AgentApplication:
 
   override val businessType: BusinessType.SoleTrader.type = BusinessType.SoleTrader
   def getUserRole: UserRole = userRole.getOrElse(expectedDataNotDefinedError("userRole"))
   def getBusinessDetails: BusinessDetailsSoleTrader = businessDetails.getOrElse(expectedDataNotDefinedError("businessDetails"))
 
 /** Application Applicatoin for Limited Liability Partnership (Llp). This case class represents the data entered by a user for registering as an Llp.
- */
-final case class ApplicationLlp(
-                                 override val internalUserId: InternalUserId,
-                                 override val groupId: GroupId,
-                                 override val createdAt: Instant,
-                                 override val applicationState: ApplicationState,
-                                 businessDetails: Option[BusinessDetailsLlp],
-                                 applicantContactDetails: Option[ApplicantContactDetails],
-                                 override val amlsDetails: Option[AmlsDetails]
-                               )
-  extends AgentApplication:
+  */
+final case class AgentApplicationLlp(
+  override val internalUserId: InternalUserId,
+  override val groupId: GroupId,
+  override val createdAt: Instant,
+  override val applicationState: ApplicationState,
+  businessDetails: Option[BusinessDetailsLlp],
+  applicantContactDetails: Option[ApplicantContactDetails],
+  override val amlsDetails: Option[AmlsDetails]
+)
+extends AgentApplication:
 
   override val businessType: BusinessType.Partnership.LimitedLiabilityPartnership.type = BusinessType.Partnership.LimitedLiabilityPartnership
 
   def getApplicantContactDetails: ApplicantContactDetails = applicantContactDetails.getOrThrowExpectedDataMissing("ApplicantContactDetails")
   def getBusinessDetails: BusinessDetailsLlp = businessDetails.getOrThrowExpectedDataMissing("businessDetails")
+  def getCrn: Crn = getBusinessDetails.companyProfile.companyNumber
 
 object AgentApplication:
 
   @nowarn()
   given OFormat[AgentApplication] =
     given OFormat[AgentApplicationSoleTrader] = Json.format[AgentApplicationSoleTrader]
-    given OFormat[ApplicationLlp] = Json.format[ApplicationLlp]
+    given OFormat[AgentApplicationLlp] = Json.format[AgentApplicationLlp]
     given JsonConfiguration = JsonConfig.jsonConfiguration
 
     val dontDeleteMe = """

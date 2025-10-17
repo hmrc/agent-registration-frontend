@@ -30,11 +30,12 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Request
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.CompanyProfile
+import uk.gov.hmrc.agentregistration.shared.Crn
+import uk.gov.hmrc.agentregistration.shared.CtUtr
 import uk.gov.hmrc.agentregistration.shared.FullName
 import uk.gov.hmrc.agentregistration.shared.Nino
-import uk.gov.hmrc.agentregistration.shared.SafeId
-import uk.gov.hmrc.agentregistration.shared.CtUtr
 import uk.gov.hmrc.agentregistration.shared.SaUtr
+import uk.gov.hmrc.agentregistration.shared.SafeId
 import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
@@ -206,7 +207,7 @@ extends FrontendController(mcc, actions):
           // address = ... when/if adding support for SoleTrader address, don't add it to the stub page and just hardcode it here when trn is defined
           companyProfile = companyNumber.map(number =>
             CompanyProfile(
-              companyNumber = number,
+              companyNumber = Crn(number),
               companyName = companyName.getOrElse(""),
               dateOfIncorporation = dateOfIncorporation.map(LocalDate.parse)
               // unsanitisedCHROAddress = ... when/if adding support for companies house address, don't add it to the stub page and just hardcode it here
@@ -225,7 +226,7 @@ extends FrontendController(mcc, actions):
         response.nino.map(_.value),
         response.trn,
         response.sautr.map(_.value),
-        response.companyProfile.map(_.companyNumber),
+        response.companyProfile.map(_.companyNumber.value),
         response.companyProfile.map(_.companyName),
         response.companyProfile.flatMap(_.dateOfIncorporation.map(_.toString)),
         response.ctutr.map(_.value),
@@ -254,7 +255,7 @@ extends FrontendController(mcc, actions):
     companyProfile =
       if Seq(LimitedCompany, LimitedLiabilityPartnership /*General Limited, Scottish Limited */ ).contains(businessType) then
         Some(CompanyProfile(
-          companyNumber = "12345678",
+          companyNumber = Crn("12345678"),
           companyName = if businessType == LimitedCompany then "Test Company Ltd" else "Test Partnership LLP",
           dateOfIncorporation = Some(LocalDate.now().minusYears(10))
         ))

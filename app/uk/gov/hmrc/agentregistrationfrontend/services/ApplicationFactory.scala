@@ -31,7 +31,7 @@ class ApplicationFactory @Inject() (
   def makeNewAgentApplication(
     internalUserId: InternalUserId,
     groupId: GroupId
-  ): AgentApplication = ApplicationLlp(
+  ): AgentApplication = AgentApplicationLlp(
     internalUserId = internalUserId,
     groupId = groupId,
     createdAt = Instant.now(clock),
