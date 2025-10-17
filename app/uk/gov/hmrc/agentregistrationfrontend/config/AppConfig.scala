@@ -49,6 +49,8 @@ class AppConfig @Inject() (
   val companiesHouseApiProxyBaseUrl: String = servicesConfig.baseUrl("companies-house-api-proxy")
   val enrolmentStoreProxyBaseUrl: String = servicesConfig.baseUrl("enrolment-store-proxy")
   val agentRegistrationBaseUrl: String = servicesConfig.baseUrl("agent-registration")
+  val emailVerificationBaseUrl: String = servicesConfig.baseUrl("email-verification")
+  val emailVerificationFrontendBaseUrl: String = servicesConfig.getString("microservice.services.email-verification-frontend.external-url")
   val selfBaseUrl: String = servicesConfig.baseUrl("agent-registration-frontend")
   val hmrcAsAgentEnrolment: Enrolment = Enrolment(key = "HMRC-AS-AGENT")
 

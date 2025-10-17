@@ -74,7 +74,8 @@ extends ViewSpec:
         request = request,
         agentApplication = completeHmrcApplication,
         internalUserId = tdAll.internalUserId,
-        groupId = tdAll.groupId
+        groupId = tdAll.groupId,
+        credentials = tdAll.credentials
       )
 
     val doc: Document = Jsoup.parse(viewTemplate().body)
@@ -120,7 +121,8 @@ extends ViewSpec:
         request = request,
         agentApplication = completeNonHmrcApplication,
         internalUserId = tdAll.internalUserId,
-        groupId = tdAll.groupId
+        groupId = tdAll.groupId,
+        credentials = tdAll.credentials
       )
 
     val doc: Document = Jsoup.parse(viewTemplate().body)

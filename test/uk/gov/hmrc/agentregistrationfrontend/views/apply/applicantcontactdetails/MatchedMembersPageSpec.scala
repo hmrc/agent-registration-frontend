@@ -53,7 +53,8 @@ extends ViewSpec:
           )
         ))),
       internalUserId = tdAll.internalUserId,
-      groupId = tdAll.groupId
+      groupId = tdAll.groupId,
+      credentials = tdAll.credentials
     )
 
   private val heading: String = "2 records match this name"

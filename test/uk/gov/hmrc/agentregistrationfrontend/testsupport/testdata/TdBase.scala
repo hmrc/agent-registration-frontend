@@ -30,6 +30,7 @@ import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
 import uk.gov.hmrc.agentregistration.shared.upscan.Reference
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import java.time.Instant
 import java.time.LocalDate
@@ -50,12 +51,14 @@ trait TdBase:
   def utr: Utr = Utr("1234567895")
   def internalUserId: InternalUserId = InternalUserId("internal-user-id-12345")
   def groupId: GroupId = GroupId("group-id-12345")
+  def credentials: Credentials = Credentials("cred-id-12345", "GovernmentGateway")
   def nino = Nino("AB123456C")
   def safeId: SafeId = SafeId("X00000123456789")
   def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
   def firstName = "Test"
   def lastName = "Name"
   def telephoneNumber = "041 427 1125"
+  def applicantEmailAddress = "user@test.com"
   def companyNumber = "1234567890"
   def companyName = "Test Company Name"
   def dateOfIncorporation: LocalDate = LocalDate.now().minusYears(10)
