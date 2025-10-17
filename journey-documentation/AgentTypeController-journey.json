@@ -1,0 +1,101 @@
+{
+    "frontendService": "agent-registration-frontend",
+    "controller": "AgentTypeController",
+    "journeyContext": "Agent business type selection within registration flow - determines if agent is UK-based or non-UK based",
+    "routes": [
+        {
+            "method": "GET",
+            "path": "/apply/about-your-business/agent-type",
+            "userAction": "Navigate to agent type selection page",
+            "pageType": "form-display",
+            "formHandling": {
+                "formType": "AgentTypeForm",
+                "preFillSource": "session",
+                "validationRules": [
+                    "required field validation",
+                    "valid enum value (UkTaxAgent or NonUkTaxAgent)"
+                ]
+            },
+            "interactions": [
+                {
+                    "step": 1,
+                    "type": "Session Read",
+                    "description": "Check for existing agent type in session using SessionService",
+                    "sessionKey": "agentType",
+                    "method": "request.readAgentType"
+                },
+                {
+                    "step": 2,
+                    "type": "Form Pre-fill",
+                    "description": "Pre-populate AgentTypeForm if session data exists",
+                    "formType": "AgentTypeForm"
+                },
+                {
+                    "step": 3,
+                    "type": "View Render",
+                    "description": "Render agent type selection page with form",
+                    "template": "AgentTypePage.scala.html"
+                }
+            ],
+            "navigationFlow": {
+                "onSuccess": "Form displayed with pre-filled data if available",
+                "onError": "Error page or fallback handling"
+            }
+        },
+        {
+            "method": "POST",
+            "path": "/apply/about-your-business/agent-type",
+            "userAction": "Submit agent type selection",
+            "pageType": "form-submission",
+            "formHandling": {
+                "formType": "AgentTypeForm",
+                "validationRules": [
+                    "required field validation",
+                    "valid enum value validation using FormatterFactory.makeEnumFormatter"
+                ],
+                "errorHandling": "re-render form with validation errors"
+            },
+            "interactions": [
+                {
+                    "step": 1,
+                    "type": "Action Composition",
+                    "description": "Apply custom action builders for request enhancement",
+                    "actionBuilders": [
+                        "action",
+                        "ensureValidForm"
+                    ]
+                },
+                {
+                    "step": 2,
+                    "type": "Form Validation",
+                    "description": "Validate submitted agent type using AgentTypeForm",
+                    "formType": "AgentTypeForm",
+                    "errorKeys": {
+                        "required": "Select yes if your agent business is based in the UK",
+                        "invalid": "Select yes if your agent business is based in the UK"
+                    }
+                },
+                {
+                    "step": 3,
+                    "type": "Session Write",
+                    "description": "Store validated agent type in session",
+                    "sessionKey": "agentType",
+                    "method": "addToSession(agentType)"
+                },
+                {
+                    "step": 4,
+                    "type": "Conditional Redirect",
+                    "description": "Route user based on agent type selection",
+                    "conditions": {
+                        "UkTaxAgent": "/apply/about-your-business/business-type",
+                        "NonUkTaxAgent": "/apply/exit"
+                    }
+                }
+            ],
+            "navigationFlow": {
+                "onSuccess": "Redirect to next step based on UK/Non-UK selection",
+                "onValidationError": "Re-render form with error messages"
+            }
+        }
+    ]
+}

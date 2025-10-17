@@ -1,0 +1,125 @@
+{
+    "frontendService": "agent-registration-frontend",
+    "controller": "GrsController",
+    "journeyContext": "Government Registration Service (GRS) integration for business verification - handles external journey to verify business identity and registration details",
+    "routes": [
+        {
+            "method": "GET",
+            "path": "/apply/about-your-business/agent-type/:agentType/entity-type/:businessType",
+            "userAction": "Initiate GRS journey for business verification",
+            "pageType": "external-service-redirect",
+            "formHandling": {
+                "formType": "none",
+                "preFillSource": "url-parameters",
+                "validationRules": [
+                    "valid AgentType parameter",
+                    "valid BusinessType parameter"
+                ]
+            },
+            "interactions": [
+                {
+                    "step": 1,
+                    "type": "Action Composition",
+                    "description": "Apply authorised action for authenticated users only",
+                    "actionBuilders": [
+                        "actions.authorised"
+                    ]
+                },
+                {
+                    "step": 2,
+                    "type": "Backend Service Call",
+                    "description": "Create GRS journey configuration and initiate external journey",
+                    "service": "GrsService",
+                    "method": "createGrsJourney",
+                    "parameters": {
+                        "businessType": "from URL parameter",
+                        "includeNamePageLabel": false
+                    }
+                },
+                {
+                    "step": 3,
+                    "type": "External Redirect",
+                    "description": "Redirect user to Government Registration Service for business verification",
+                    "target": "GRS external service",
+                    "returnUrl": "/apply/grs-callback/:businessType"
+                }
+            ],
+            "navigationFlow": {
+                "onSuccess": "User redirected to external GRS service",
+                "onError": "Service error handling"
+            }
+        },
+        {
+            "method": "GET",
+            "path": "/apply/grs-callback/:businessType",
+            "userAction": "Return from GRS with verification results",
+            "pageType": "callback-processing",
+            "formHandling": {
+                "formType": "none",
+                "preFillSource": "grs-response",
+                "validationRules": [
+                    "valid journeyId parameter",
+                    "valid businessType parameter"
+                ]
+            },
+            "interactions": [
+                {
+                    "step": 1,
+                    "type": "Action Composition",
+                    "description": "Load user's application state for update",
+                    "actionBuilders": [
+                        "actions.getApplicationInProgress"
+                    ]
+                },
+                {
+                    "step": 2,
+                    "type": "Backend Service Call",
+                    "description": "Retrieve GRS journey results and verification data",
+                    "service": "GrsService",
+                    "method": "getJourneyData",
+                    "parameters": {
+                        "businessType": "from URL parameter",
+                        "journeyId": "from query parameter"
+                    }
+                },
+                {
+                    "step": 3,
+                    "type": "Complex Response Processing",
+                    "description": "Handle multiple GRS response scenarios with different business outcomes",
+                    "scenarios": {
+                        "success_with_match": "identifiersMatch=true AND registeredBusinessPartnerId exists",
+                        "identifiers_no_match": "identifiersMatch=false AND registrationStatus=GrsNotCalled",
+                        "registration_failed": "identifiersMatch=true AND registrationStatus=GrsFailed",
+                        "unexpected_response": "Any other combination throws exception"
+                    }
+                },
+                {
+                    "step": 4,
+                    "type": "Application State Update",
+                    "description": "Update AgentApplication with verified business details",
+                    "updatePattern": "application.modify(_.utr).setTo(grsResponse.getUtr).modify(_.businessDetails).setTo(grsResponse.toBusinessDetails)",
+                    "service": "ApplicationService",
+                    "method": "upsert",
+                    "condition": "Only on successful verification"
+                },
+                {
+                    "step": 5,
+                    "type": "Conditional Navigation",
+                    "description": "Route user based on GRS verification outcome",
+                    "conditions": {
+                        "verification_success": "Redirect to TaskListController",
+                        "identifiers_mismatch": "Display placeholder error page",
+                        "registration_failure": "Display placeholder error page",
+                        "unexpected_error": "Throw exception for investigation"
+                    }
+                }
+            ],
+            "navigationFlow": {
+                "onVerificationSuccess": "Redirect to task list to continue registration",
+                "onIdentifierMismatch": "Display error page with identifier mismatch message",
+                "onRegistrationFailure": "Display error page with registration failure message",
+                "onUnexpectedResponse": "System exception for debugging"
+            }
+        }
+    ]
+}
