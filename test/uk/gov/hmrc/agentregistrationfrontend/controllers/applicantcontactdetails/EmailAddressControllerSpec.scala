@@ -77,7 +77,7 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe "What is your email address? - Apply for an agent services account - GOV.UK"
+    response.parseBodyAsJsoupDocument.title() shouldBe "If we need to email you about this application, what’s the email address? - Apply for an agent services account - GOV.UK"
 
   s"POST $path with well formed email address should save data and redirect to the verify endpoint" in:
     AuthStubs.stubAuthorise()
@@ -109,7 +109,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: What is your email address? - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe "Error: If we need to email you about this application, what’s the email address? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#emailAddress-error").text() shouldBe "Error: Enter your email address"
 
   s"POST $path with invalid characters should return 400" in:
@@ -122,7 +122,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: What is your email address? - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe "Error: If we need to email you about this application, what’s the email address? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
       "#emailAddress-error"
     ).text() shouldBe "Error: Enter your email address with a name, @ symbol and a domain name, like yourname@example.com"

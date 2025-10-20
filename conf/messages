@@ -126,7 +126,7 @@ telephoneNumber.error.invalid = Enter a phone number, like 01632 960 001 or 0770
 telephoneNumber.error.tooLong = The phone number must be 25 characters or fewer
 
 ## Applicant contact details / Email address
-emailAddress.title = What is your email address?
+emailAddress.title = If we need to email you about this application, what’s the email address?
 emailAddress.hint = We will send a code to this email address to confirm it.
 emailAddress.error.required = Enter your email address
 emailAddress.error.invalid = Enter your email address with a name, @ symbol and a domain name, like yourname@example.com

@@ -50,7 +50,7 @@ extends ViewSpec:
       credentials = tdAll.credentials
     )
   val doc: Document = Jsoup.parse(viewTemplate(EmailAddressForm.form).body)
-  private val heading: String = "What is your email address?"
+  private val heading: String = "If we need to email you about this application, what’s the email address?"
 
   "EmailAddressPage" should:
 
