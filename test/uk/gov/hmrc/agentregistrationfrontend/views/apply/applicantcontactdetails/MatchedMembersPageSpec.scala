@@ -32,9 +32,7 @@ import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackL
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MatchedMembersPage
-import org.scalatest.Ignore
 
-@Ignore
 class MatchedMembersPageSpec
 extends ViewSpec:
 
