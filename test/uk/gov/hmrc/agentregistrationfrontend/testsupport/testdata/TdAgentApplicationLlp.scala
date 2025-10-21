@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
 import uk.gov.hmrc.agentregistration.shared.contactdetails.*
 import com.softwaremill.quicklens.*
 
-trait TdAgentApplicationLlp { dependencies: TdBase =>
+trait TdAgentApplicationLlp { dependencies: (TdBase & TdAmls) =>
 
   object agentApplicationLlp:
 
@@ -50,7 +50,8 @@ trait TdAgentApplicationLlp { dependencies: TdBase =>
       applicationState = GrsDataReceived
     )
 
-    object whenApplicantIsAMember:
+    object whenApplicantIsAMember
+    extends AgentApplicationLlpWithAmlsDetails:
 
       private object applicantName:
 
@@ -99,7 +100,10 @@ trait TdAgentApplicationLlp { dependencies: TdBase =>
         .modify(_.applicantContactDetails.each.telephoneNumber)
         .setTo(Some(dependencies.telephoneNumber))
 
-    object whenApplicantIsAuthorised:
+      override final val agentApplicationBaseToAddAmlsDetails: AgentApplicationLlp = afterTelephoneNumberProvided
+
+    object whenApplicantIsAuthorised
+    extends AgentApplicationLlpWithAmlsDetails:
 
       private object applicantName:
 
@@ -122,9 +126,10 @@ trait TdAgentApplicationLlp { dependencies: TdBase =>
         .modify(_.applicantContactDetails.each.applicantName)
         .setTo(applicantName.afterNameDeclared)
 
-      val afterTelephoneNumber: AgentApplicationLlp = afterRoleSelected
+      val afterTelephoneNumberProvided: AgentApplicationLlp = afterRoleSelected
         .modify(_.applicantContactDetails.each.telephoneNumber)
         .setTo(Some(dependencies.telephoneNumber))
 
+      override final val agentApplicationBaseToAddAmlsDetails: AgentApplicationLlp = afterTelephoneNumberProvided
 
 }

@@ -17,7 +17,10 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistration.shared.{AgentApplicationLlp, AmlsCode, AmlsDetails, AmlsRegistrationNumber}
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AmlsCode
+import uk.gov.hmrc.agentregistration.shared.AmlsDetails
+import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
 import uk.gov.hmrc.agentregistration.shared.upscan.Reference
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
@@ -68,12 +71,20 @@ trait TdAmls { dependencies: TdBase =>
       amlsEvidence = Some(amlsUploadDetails)
     )
 
-  extension (a: AgentApplicationLlp)
-    def afterSupervisoryBodySelected: AgentApplicationLlp = a.copy(amlsDetails = Some(amlsDetails.afterSupervisoryBodySelected))
-    def afterRegistrationNumberProvided: AgentApplicationLlp = a.copy(amlsDetails = Some(amlsDetails.afterRegistrationNumberProvided))
-    def afterUploadedEvidence: AgentApplicationLlp = a.copy(amlsDetails = Some(amlsDetails.afterUploadedEvidence))
-    def afterUploadFailed: AgentApplicationLlp = a.copy(amlsDetails = Some(amlsDetails.afterUploadFailed))
-    def afterUploadSucceded: AgentApplicationLlp = a.copy(amlsDetails = Some(amlsDetails.afterUploadSucceded))
-    def afterAmlsExpiryDateProvided: AgentApplicationLlp = a.copy(amlsDetails = Some(amlsDetails.afterAmlsExpiryDateProvided))
+  trait AgentApplicationLlpWithAmlsDetails:
+
+    protected def agentApplicationBaseToAddAmlsDetails: AgentApplicationLlp
+    def afterSupervisoryBodySelected: AgentApplicationLlp = agentApplicationBaseToAddAmlsDetails.copy(amlsDetails =
+      Some(amlsDetails.afterSupervisoryBodySelected)
+    )
+    def afterRegistrationNumberProvided: AgentApplicationLlp = agentApplicationBaseToAddAmlsDetails.copy(amlsDetails =
+      Some(amlsDetails.afterRegistrationNumberProvided)
+    )
+    def afterUploadedEvidence: AgentApplicationLlp = agentApplicationBaseToAddAmlsDetails.copy(amlsDetails = Some(amlsDetails.afterUploadedEvidence))
+    def afterUploadFailed: AgentApplicationLlp = agentApplicationBaseToAddAmlsDetails.copy(amlsDetails = Some(amlsDetails.afterUploadFailed))
+    def afterUploadSucceded: AgentApplicationLlp = agentApplicationBaseToAddAmlsDetails.copy(amlsDetails = Some(amlsDetails.afterUploadSucceded))
+    def afterAmlsExpiryDateProvided: AgentApplicationLlp = agentApplicationBaseToAddAmlsDetails.copy(amlsDetails =
+      Some(amlsDetails.afterAmlsExpiryDateProvided)
+    )
 
 }

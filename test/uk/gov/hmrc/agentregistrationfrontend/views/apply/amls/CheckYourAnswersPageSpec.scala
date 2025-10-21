@@ -45,7 +45,7 @@ extends ViewSpec:
 
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
   private val fixedExpiryDate: LocalDate = LocalDate.of(2026, 9, 2)
-  
+
   private val completeHmrcApplication: AgentApplication = applicationFactory
     .makeNewAgentApplication(tdAll.internalUserId)
     .modify(_.amlsDetails)

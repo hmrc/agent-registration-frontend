@@ -22,13 +22,24 @@ object TdAll:
 
   val tdAll: TdAll = new TdAll {}
 
-/** TestData (Td), All instances
+/** Test Data (Td) composition trait that combines All available test data instances.
+  *
+  * Implemented as composable traits to allow flexible customization of test data. For example:
+  *
+  * {{{
+  * val td = new TdAll {
+  *   override val saUtr: SaUtr = SaUtr("666667777")
+  * }
+  *
+  * td.
+  * }}}
+  *
+  * This allows reusing default test data while overriding specific values as needed.
   */
 trait TdAll
-extends AnyRef
-with TdBase
-with TdRequest
-with TdGrs
-with TdAgentApplicationFactories
-with TdAgentApplicationLlp
-with TdAgentApplicationSoleTrader
+extends TdBase,
+  TdRequest,
+  TdGrs,
+  TdAmls,
+  TdAgentApplicationLlp,
+  TdAgentApplicationSoleTrader
