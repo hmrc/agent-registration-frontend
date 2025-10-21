@@ -60,12 +60,12 @@ extends RequestAwareLogging:
       )
     } yield verifyEmailResponse.redirectUri
 
-  def checkStatus(
+  def checkEmailVerificationStatus(
     credId: String,
     email: String
   )(using rh: RequestHeader): Future[EmailVerificationStatus] = {
     val emailLowerCase = email.toLowerCase
-    emailVerificationConnector.checkEmail(credId).map {
+    emailVerificationConnector.checkEmailVerificationStatus(credId).map {
       case vsr if vsr.emails.filter(_.emailAddress == emailLowerCase).exists(_.verified) => EmailVerificationStatus.Verified
       case vsr if vsr.emails.filter(_.emailAddress == emailLowerCase).exists(_.locked) => EmailVerificationStatus.Locked
       case _ => EmailVerificationStatus.Unverified

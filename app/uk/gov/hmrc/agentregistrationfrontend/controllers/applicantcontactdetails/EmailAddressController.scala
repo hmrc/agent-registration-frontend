@@ -126,7 +126,7 @@ extends FrontendController(mcc, actions):
       implicit request =>
         val emailToVerify = request.agentApplication.getApplicantEmailAddress.emailAddress.value
         val credId = request.credentials.providerId
-        emailVerificationService.checkStatus(
+        emailVerificationService.checkEmailVerificationStatus(
           credId = credId,
           email = emailToVerify
         ).flatMap {

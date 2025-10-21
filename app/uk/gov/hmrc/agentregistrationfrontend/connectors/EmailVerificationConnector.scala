@@ -48,7 +48,7 @@ extends RequestAwareLogging:
     .withBody(Json.toJson(request))
     .execute[VerifyEmailResponse]
 
-  def checkEmail(credId: String)(using
+  def checkEmailVerificationStatus(credId: String)(using
     rh: RequestHeader
   ): Future[VerificationStatusResponse] = http
     .get(url"${appConfig.emailVerificationBaseUrl}/email-verification/verification-status/$credId")
