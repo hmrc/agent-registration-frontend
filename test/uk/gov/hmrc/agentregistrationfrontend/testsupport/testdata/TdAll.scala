@@ -29,5 +29,6 @@ extends AnyRef
 with TdBase
 with TdRequest
 with TdGrs
+with TdAgentApplicationFactories
 with TdAgentApplicationLlp
 with TdAgentApplicationSoleTrader

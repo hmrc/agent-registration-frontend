@@ -31,9 +31,9 @@ trait TdAgentApplicationLlp { dependencies: TdBase =>
 
     val afterStarted: AgentApplicationLlp = AgentApplicationLlp(
       internalUserId = dependencies.internalUserId,
+      groupId = dependencies.groupId,
       createdAt = dependencies.instant,
       applicationState = ApplicationState.Started,
-      saUtr = Some(dependencies.saUtr),
       businessDetails = None,
       applicantContactDetails = None,
       amlsDetails = None
@@ -42,7 +42,7 @@ trait TdAgentApplicationLlp { dependencies: TdBase =>
     private val businessDetailsLlp: BusinessDetailsLlp = BusinessDetailsLlp(
       safeId = dependencies.safeId,
       saUtr = dependencies.saUtr,
-      companyProfile = Some(dependencies.companyProfile)
+      companyProfile = dependencies.companyProfile
     )
 
     val afterGrsDataReceived: AgentApplicationLlp = afterStarted.copy(
@@ -52,7 +52,7 @@ trait TdAgentApplicationLlp { dependencies: TdBase =>
 
     object whenApplicantIsAMember:
 
-      object name:
+      private object applicantName:
 
         val afterRoleSelected: ApplicantName.NameOfMember = ApplicantName.NameOfMember(
           memberNameQuery = None,
@@ -83,17 +83,17 @@ trait TdAgentApplicationLlp { dependencies: TdBase =>
       val afterRoleSelected: AgentApplicationLlp = afterGrsDataReceived
         .modify(_.applicantContactDetails)
         .setTo(Some(ApplicantContactDetails(
-          applicantName = name.afterRoleSelected,
+          applicantName = applicantName.afterRoleSelected,
           telephoneNumber = None
         )))
 
       val afterNameQueryProvided: AgentApplicationLlp = afterRoleSelected
         .modify(_.applicantContactDetails.each.applicantName)
-        .setTo(name.afterQuery)
+        .setTo(applicantName.afterQuery)
 
       val afterOfficerChosen: AgentApplicationLlp = afterRoleSelected
         .modify(_.applicantContactDetails.each.applicantName)
-        .setTo(name.afterChosenOfficer)
+        .setTo(applicantName.afterChosenOfficer)
 
       val afterTelephoneNumberProvided: AgentApplicationLlp = afterOfficerChosen
         .modify(_.applicantContactDetails.each.telephoneNumber)
@@ -101,7 +101,7 @@ trait TdAgentApplicationLlp { dependencies: TdBase =>
 
     object whenApplicantIsAuthorised:
 
-      object name:
+      private object applicantName:
 
         val afterRoleSelected: ApplicantName.NameOfAuthorised = ApplicantName.NameOfAuthorised(
           name = None
@@ -114,16 +114,17 @@ trait TdAgentApplicationLlp { dependencies: TdBase =>
       val afterRoleSelected: AgentApplicationLlp = afterGrsDataReceived
         .modify(_.applicantContactDetails)
         .setTo(Some(ApplicantContactDetails(
-          applicantName = name.afterRoleSelected,
+          applicantName = applicantName.afterRoleSelected,
           telephoneNumber = None
         )))
 
       val afterNameDeclared: AgentApplicationLlp = afterRoleSelected
         .modify(_.applicantContactDetails.each.applicantName)
-        .setTo(name.afterNameDeclared)
+        .setTo(applicantName.afterNameDeclared)
 
       val afterTelephoneNumber: AgentApplicationLlp = afterRoleSelected
         .modify(_.applicantContactDetails.each.telephoneNumber)
-        .setTo(dependencies.telephoneNumber)
+        .setTo(Some(dependencies.telephoneNumber))
+
 
 }
