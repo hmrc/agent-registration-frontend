@@ -51,7 +51,8 @@ extends ViewSpec:
           )
         ))),
       internalUserId = tdAll.internalUserId,
-      groupId = tdAll.groupId
+      groupId = tdAll.groupId,
+      credentials = tdAll.credentials
     )
   private val heading: String = "Are these your details?"
 

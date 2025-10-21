@@ -45,7 +45,8 @@ extends ViewSpec:
           applicantName = ApplicantName.NameOfAuthorised()
         ))),
       internalUserId = tdAll.internalUserId,
-      groupId = tdAll.groupId
+      groupId = tdAll.groupId,
+      credentials = tdAll.credentials
     )
   val doc: Document = Jsoup.parse(viewTemplate(AuthorisedNameForm.form).body)
   private val heading: String = "What is your full name?"

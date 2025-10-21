@@ -32,9 +32,7 @@ import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackL
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MatchedMembersPage
-import org.scalatest.Ignore
 
-@Ignore
 class MatchedMembersPageSpec
 extends ViewSpec:
 
@@ -53,7 +51,8 @@ extends ViewSpec:
           )
         ))),
       internalUserId = tdAll.internalUserId,
-      groupId = tdAll.groupId
+      groupId = tdAll.groupId,
+      credentials = tdAll.credentials
     )
 
   private val heading: String = "2 records match this name"

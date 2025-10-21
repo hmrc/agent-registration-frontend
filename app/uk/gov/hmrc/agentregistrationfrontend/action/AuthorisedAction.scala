@@ -40,7 +40,8 @@ import scala.concurrent.Future
 class AuthorisedRequest[A](
   val internalUserId: InternalUserId,
   val groupId: GroupId,
-  val request: Request[A]
+  val request: Request[A],
+  val credentials: Credentials
 )
 extends WrappedRequest[A](request)
 
@@ -54,7 +55,8 @@ object AuthorisedRequest:
       new AuthorisedRequest[A](
         r.internalUserId,
         r.groupId,
-        r.request
+        r.request,
+        r.credentials
       ) with FormValue[T]:
         val formValue: T = t
 
@@ -79,8 +81,9 @@ with RequestAwareLogging:
         and Retrievals.groupIdentifier
         and Retrievals.credentialRole
         and Retrievals.internalId
+        and Retrievals.credentials
     ).apply:
-      case allEnrolments ~ maybeGroupIdentifier ~ credentialRole ~ maybeInternalId =>
+      case allEnrolments ~ maybeGroupIdentifier ~ credentialRole ~ maybeInternalId ~ credentials =>
         if isUnsupportedCredentialRole(credentialRole) then
           logger.info(s"Unauthorised because of 'UnsupportedCredentialRole'")
           Future.successful(Left(errorResults.unauthorised(message = "UnsupportedCredentialRole")))
@@ -96,7 +99,8 @@ with RequestAwareLogging:
             groupId = maybeGroupIdentifier
               .map(GroupId.apply)
               .getOrElse(Errors.throwServerErrorException("Retrievals for group identifier is missing")),
-            request = request
+            request = request,
+            credentials = credentials.getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing"))
           )))
     .recoverWith:
       case _: NoActiveSession =>

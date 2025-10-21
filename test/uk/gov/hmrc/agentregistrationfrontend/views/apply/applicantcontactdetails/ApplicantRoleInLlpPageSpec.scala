@@ -38,7 +38,8 @@ extends ViewSpec:
         .modify(_.businessDetails)
         .setTo(Some(tdAll.llpBusinessDetails)),
       internalUserId = tdAll.internalUserId,
-      groupId = tdAll.groupId
+      groupId = tdAll.groupId,
+      credentials = tdAll.credentials
     )
   val doc: Document = Jsoup.parse(viewTemplate(ApplicantRoleInLlpForm.form).body)
   private val heading: String = "Are you a member of the limited liability partnership?"
