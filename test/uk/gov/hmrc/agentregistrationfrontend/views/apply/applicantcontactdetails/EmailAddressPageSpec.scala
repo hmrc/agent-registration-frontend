@@ -43,7 +43,7 @@ extends ViewSpec:
         .setTo(Some(ApplicantContactDetails(
           applicantName = ApplicantName.NameOfAuthorised(name = Some("First Last")),
           telephoneNumber = Some(TelephoneNumber(tdAll.telephoneNumber)),
-          emailAddress = None
+          applicantEmailAddress = None
         ))),
       internalUserId = tdAll.internalUserId,
       groupId = tdAll.groupId,

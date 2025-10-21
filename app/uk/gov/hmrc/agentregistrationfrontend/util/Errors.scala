@@ -16,9 +16,12 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.util
 
+import play.api.http.Status
 import play.api.mvc.Request
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.http.HttpErrorFunctions
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.http.UpstreamErrorResponse
 
@@ -79,5 +82,26 @@ extends RequestAwareLogging:
     val m = s"Unimplemented: $message"
     logger.error(m)
     throw UpstreamErrorResponse(m, play.mvc.Http.Status.NOT_IMPLEMENTED)
+
+  def throwUpstreamErrorResponse(
+    httpMethod: String,
+    url: String,
+    status: Int,
+    response: => HttpResponse
+  ) =
+    throw UpstreamErrorResponse(
+      message = httpErrorFunctions.upstreamResponseMessage(
+        httpMethod,
+        url,
+        status,
+        response.body
+      ),
+      statusCode = status,
+      reportAs =
+        if status === Status.BAD_GATEWAY
+        then Status.BAD_GATEWAY
+        else Status.INTERNAL_SERVER_ERROR,
+      headers = response.headers
+    )
 
   val httpErrorFunctions: HttpErrorFunctions = new HttpErrorFunctions {}

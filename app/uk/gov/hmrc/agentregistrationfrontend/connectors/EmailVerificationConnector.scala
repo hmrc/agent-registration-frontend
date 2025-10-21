@@ -23,6 +23,7 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.VerificationStatusResponse
 import uk.gov.hmrc.agentregistrationfrontend.model.VerifyEmailRequest
 import uk.gov.hmrc.agentregistrationfrontend.model.VerifyEmailResponse
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
 import uk.gov.hmrc.http.HttpReads.Implicits.*
@@ -44,30 +45,27 @@ extends RequestAwareLogging:
 
   def verifyEmail(request: VerifyEmailRequest)(using
     rh: RequestHeader
-  ): Future[Option[VerifyEmailResponse]] = http
+  ): Future[VerifyEmailResponse] = http
     .post(url"${appConfig.emailVerificationBaseUrl}/email-verification/verify-email")
     .withBody(Json.toJson(request))
-    .execute[HttpResponse]
-    .map { response =>
-      response.status match {
-        case 201 => Some(response.json.as[VerifyEmailResponse])
-        case status =>
-          logger.error(s"verifyEmail error; HTTP status: $status, message: $response")
-          None
-      }
-    }
+    .execute[VerifyEmailResponse]
 
   def checkEmail(credId: String)(using
     rh: RequestHeader
-  ): Future[Option[VerificationStatusResponse]] = http
+  ): Future[VerificationStatusResponse] = http
     .get(url"${appConfig.emailVerificationBaseUrl}/email-verification/verification-status/$credId")
     .execute[HttpResponse]
     .map { response =>
       response.status match {
-        case 200 => Some(response.json.as[VerificationStatusResponse])
-        case 404 => Some(VerificationStatusResponse(List.empty))
+        case 200 => response.json.as[VerificationStatusResponse]
+        case 404 => VerificationStatusResponse(List.empty)
         case status =>
           logger.error(s"email verification status error for $credId; HTTP status: $status, message: $response")
-          None
+          Errors.throwUpstreamErrorResponse(
+            httpMethod = "GET",
+            url = s"${appConfig.emailVerificationBaseUrl}/email-verification/verification-status/$credId",
+            status = status,
+            response = response
+          )
       }
     }

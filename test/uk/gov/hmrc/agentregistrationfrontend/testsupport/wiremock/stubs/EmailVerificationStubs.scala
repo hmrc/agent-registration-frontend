@@ -30,7 +30,8 @@ object EmailVerificationStubs {
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = urlMatching(s"/email-verification/verification-status/$credId"),
-    responseStatus = 404
+    responseStatus = 404,
+    responseBody = Json.obj("emails" -> Json.arr()).toString
   )
 
   def stubEmailStatusVerified(

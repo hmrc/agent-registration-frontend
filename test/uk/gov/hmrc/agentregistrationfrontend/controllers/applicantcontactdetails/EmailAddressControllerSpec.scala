@@ -43,7 +43,7 @@ extends ControllerSpec:
     .setTo(Some(ApplicantContactDetails(
       applicantName = ApplicantName.NameOfAuthorised(name = Some("First Last")),
       telephoneNumber = Some(TelephoneNumber("01234567890")),
-      emailAddress = None
+      applicantEmailAddress = None
     )))
   private val applicantEmailVerificationRequest: VerifyEmailRequest = VerifyEmailRequest(
     credId = tdAll.credentials.providerId,
@@ -52,7 +52,7 @@ extends ControllerSpec:
     deskproServiceName = None,
     accessibilityStatementUrl = "/agent-services-account",
     email = Some(Email(
-      address = "user@test.com",
+      address = tdAll.applicantEmailAddress,
       enterUrl = "http://localhost:22201/agent-registration/apply/applicant/email-address"
     )),
     lang = Some("en"),
@@ -84,10 +84,9 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubApplicationInProgress(validApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication(
       validApplication
-        .modify(_.applicantContactDetails.each.emailAddress)
+        .modify(_.applicantContactDetails.each.applicantEmailAddress)
         .setTo(Some(ApplicantEmailAddress(
-          emailToVerify = EmailAddress(tdAll.applicantEmailAddress),
-          verifiedEmail = None
+          emailAddress = EmailAddress(tdAll.applicantEmailAddress)
         )))
     )
     val response: WSResponse =
@@ -132,10 +131,9 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubApplicationInProgress(validApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication(
       validApplication
-        .modify(_.applicantContactDetails.each.emailAddress)
+        .modify(_.applicantContactDetails.each.applicantEmailAddress)
         .setTo(Some(ApplicantEmailAddress(
-          emailToVerify = EmailAddress(tdAll.applicantEmailAddress),
-          verifiedEmail = None
+          emailAddress = EmailAddress(tdAll.applicantEmailAddress)
         )))
     )
     val response: WSResponse =
@@ -165,10 +163,10 @@ extends ControllerSpec:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(
       validApplication
-        .modify(_.applicantContactDetails.each.emailAddress)
+        .modify(_.applicantContactDetails.each.applicantEmailAddress)
         .setTo(Some(ApplicantEmailAddress(
-          emailToVerify = EmailAddress(tdAll.applicantEmailAddress),
-          verifiedEmail = None
+          emailAddress = EmailAddress(tdAll.applicantEmailAddress),
+          isVerified = false
         )))
     )
     EmailVerificationStubs.stubEmailStatusUnverified(tdAll.credentials.providerId)
@@ -183,10 +181,9 @@ extends ControllerSpec:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(
       validApplication
-        .modify(_.applicantContactDetails.each.emailAddress)
+        .modify(_.applicantContactDetails.each.applicantEmailAddress)
         .setTo(Some(ApplicantEmailAddress(
-          emailToVerify = EmailAddress(tdAll.applicantEmailAddress),
-          verifiedEmail = None
+          emailAddress = EmailAddress(tdAll.applicantEmailAddress)
         )))
     )
     EmailVerificationStubs.stubEmailStatusVerified(
@@ -195,10 +192,10 @@ extends ControllerSpec:
     )
     AgentRegistrationStubs.stubUpdateAgentApplication(
       validApplication
-        .modify(_.applicantContactDetails.each.emailAddress)
+        .modify(_.applicantContactDetails.each.applicantEmailAddress)
         .setTo(Some(ApplicantEmailAddress(
-          emailToVerify = EmailAddress(tdAll.applicantEmailAddress),
-          verifiedEmail = Some(EmailAddress(tdAll.applicantEmailAddress))
+          emailAddress = EmailAddress(tdAll.applicantEmailAddress),
+          isVerified = true
         )))
     )
     val response: WSResponse = get(verifyPath)
@@ -211,11 +208,15 @@ extends ControllerSpec:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubApplicationInProgress(
       validApplication
-        .modify(_.applicantContactDetails.each.emailAddress)
+        .modify(_.applicantContactDetails.each.applicantEmailAddress)
         .setTo(Some(ApplicantEmailAddress(
-          emailToVerify = EmailAddress(tdAll.applicantEmailAddress),
-          verifiedEmail = Some(EmailAddress(tdAll.applicantEmailAddress))
+          emailAddress = EmailAddress(tdAll.applicantEmailAddress),
+          isVerified = true
         )))
+    )
+    EmailVerificationStubs.stubEmailStatusVerified(
+      credId = tdAll.credentials.providerId,
+      email = tdAll.applicantEmailAddress
     )
     val response: WSResponse = get(verifyPath)
 

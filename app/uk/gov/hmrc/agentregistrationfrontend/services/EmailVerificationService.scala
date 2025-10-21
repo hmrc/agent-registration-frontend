@@ -41,9 +41,9 @@ extends RequestAwareLogging:
     maybeBackUrl: Option[String],
     accessibilityStatementUrl: String,
     lang: String
-  )(using rh: RequestHeader): Future[Option[String]] =
+  )(using rh: RequestHeader): Future[String] =
     for {
-      maybeVerifyEmailResponse <- emailVerificationConnector.verifyEmail(
+      verifyEmailResponse <- emailVerificationConnector.verifyEmail(
         VerifyEmailRequest(
           credId = credId,
           continueUrl = continueUrl,
@@ -60,7 +60,7 @@ extends RequestAwareLogging:
           pageTitle = None
         )
       )
-    } yield maybeVerifyEmailResponse.map(_.redirectUri)
+    } yield verifyEmailResponse.redirectUri
 
   def checkStatus(
     credId: String,
@@ -68,9 +68,8 @@ extends RequestAwareLogging:
   )(using rh: RequestHeader): Future[EmailVerificationStatus] = {
     val emailLowerCase = email.toLowerCase
     emailVerificationConnector.checkEmail(credId).map {
-      case Some(vsr) if vsr.emails.filter(_.emailAddress == emailLowerCase).exists(_.verified) => EmailVerificationStatus.Verified
-      case Some(vsr) if vsr.emails.filter(_.emailAddress == emailLowerCase).exists(_.locked) => EmailVerificationStatus.Locked
-      case Some(_) => EmailVerificationStatus.Unverified
-      case None => EmailVerificationStatus.Error
+      case vsr if vsr.emails.filter(_.emailAddress == emailLowerCase).exists(_.verified) => EmailVerificationStatus.Verified
+      case vsr if vsr.emails.filter(_.emailAddress == emailLowerCase).exists(_.locked) => EmailVerificationStatus.Locked
+      case _ => EmailVerificationStatus.Unverified
     }
   }
