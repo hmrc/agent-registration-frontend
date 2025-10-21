@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EmailVerificationConnector
 import uk.gov.hmrc.agentregistrationfrontend.model.emailVerification.*
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
@@ -63,11 +64,13 @@ extends RequestAwareLogging:
   def checkEmailVerificationStatus(
     credId: String,
     email: String
-  )(using rh: RequestHeader): Future[EmailVerificationStatus] = {
-    val emailLowerCase = email.toLowerCase
-    emailVerificationConnector.checkEmailVerificationStatus(credId).map {
-      case vsr if vsr.emails.filter(_.emailAddress == emailLowerCase).exists(_.verified) => EmailVerificationStatus.Verified
-      case vsr if vsr.emails.filter(_.emailAddress == emailLowerCase).exists(_.locked) => EmailVerificationStatus.Locked
-      case _ => EmailVerificationStatus.Unverified
-    }
-  }
+  )(using rh: RequestHeader): Future[EmailVerificationStatus] = emailVerificationConnector
+    .checkEmailVerificationStatus(credId)
+    .map(
+      _.emails.find(_.emailAddress === email.toLowerCase)
+        .fold[EmailVerificationStatus](EmailVerificationStatus.Unverified)(completedEmail =>
+          if completedEmail.verified then EmailVerificationStatus.Verified
+          else if completedEmail.locked then EmailVerificationStatus.Locked
+          else EmailVerificationStatus.Unverified
+        )
+    )
