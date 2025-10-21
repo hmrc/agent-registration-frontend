@@ -128,10 +128,18 @@ extends FrontendController(mcc, actions):
           credId = credId,
           email = emailToVerify
         ).flatMap {
-          case EmailVerificationStatus.Verified => onEmailVerified()
-          case EmailVerificationStatus.Unverified => onEmailUnverified(credId, emailToVerify)
-          case EmailVerificationStatus.Locked => onEmailLocked()
-          case EmailVerificationStatus.Error => onEmailError()
+          case EmailVerificationStatus.Verified =>
+            logger.info(s"[checkEmailVerificationStatus] Verified status received for applicantEmail using credId $credId and email $emailToVerify")
+            onEmailVerified()
+          case EmailVerificationStatus.Unverified =>
+            logger.info(s"[checkEmailVerificationStatus] Unverified status received for applicantEmail using credId $credId and email $emailToVerify")
+            onEmailUnverified(credId, emailToVerify)
+          case EmailVerificationStatus.Locked =>
+            logger.info(s"[checkEmailVerificationStatus] Locked status received for applicantEmail using credId $credId and email $emailToVerify")
+            onEmailLocked()
+          case EmailVerificationStatus.Error =>
+            logger.info(s"[checkEmailVerificationStatus] Error received for applicantEmail using credId $credId and email $emailToVerify")
+            onEmailError()
         }
 
   private def onEmailVerified()(implicit request: AgentApplicationRequest[AnyContent]): Future[Result] =
