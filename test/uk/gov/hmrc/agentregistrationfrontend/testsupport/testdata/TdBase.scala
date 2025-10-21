@@ -24,7 +24,9 @@ import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.PartnershipDetails
+import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistration.shared.SafeId
+import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
 import uk.gov.hmrc.agentregistration.shared.upscan.Reference
@@ -47,7 +49,7 @@ trait TdBase:
   def instant: Instant = localDateTime.toInstant(ZoneOffset.UTC)
   def newInstant: Instant = instant.plusSeconds(20) // used when a new application is created from existing one
 
-  def utr: Utr = Utr("1234567895")
+  def saUtr: SaUtr = SaUtr("1234567895")
   def internalUserId: InternalUserId = InternalUserId("internal-user-id-12345")
   def groupId: GroupId = GroupId("group-id-12345")
   def nino = Nino("AB123456C")
@@ -55,7 +57,7 @@ trait TdBase:
   def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
   def firstName = "Test"
   def lastName = "Name"
-  def telephoneNumber = "041 427 1125"
+  def telephoneNumber = TelephoneNumber("(+44) 10794554342")
   def companyNumber = "1234567890"
   def companyName = "Test Company Name"
   def dateOfIncorporation: LocalDate = LocalDate.now().minusYears(10)
@@ -76,10 +78,4 @@ trait TdBase:
       size = Some(12345),
       checksum = "checksum"
     )
-  )
-  def llpBusinessDetails: BusinessDetails = PartnershipDetails(
-    businessType = BusinessType.Partnership.LimitedLiabilityPartnership,
-    safeId = safeId,
-    companyProfile = Some(companyProfile),
-    postcode = postcode
   )

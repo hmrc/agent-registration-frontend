@@ -19,20 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 
-trait TdAgentApplication { dependencies: TdBase =>
-
-  val agentApplicationAfterCreated: AgentApplication = AgentApplication(
-    internalUserId = dependencies.internalUserId,
-    createdAt = dependencies.instant,
-    applicationState = ApplicationState.InProgress,
-    utr = Some(dependencies.utr),
-    businessDetails = None,
-    applicantContactDetails = None,
-    amlsDetails = None
-  )
-
-  val llpAgentApplication: AgentApplication = agentApplicationAfterCreated.copy(
-    businessDetails = Some(dependencies.llpBusinessDetails)
-  )
+trait TdAgentApplicationSoleTrader { dependencies: TdBase =>
 
 }

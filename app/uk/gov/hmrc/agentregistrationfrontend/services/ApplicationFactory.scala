@@ -31,12 +31,15 @@ class ApplicationFactory @Inject() (
   def makeNewAgentApplication(
     internalUserId: InternalUserId,
     groupId: GroupId
-  ): AgentApplication = AgentApplicationLlp(
-    internalUserId = internalUserId,
-    groupId = groupId,
-    createdAt = Instant.now(clock),
-    applicationState = ApplicationState.Started,
-    businessDetails = None,
-    applicantContactDetails = None,
-    amlsDetails = None
-  )
+  ): AgentApplication = {
+    // TODO: we need to distinguish between llp and other types of applications. For now only Llp is supported.
+    AgentApplicationLlp(
+      internalUserId = internalUserId,
+      groupId = groupId,
+      createdAt = Instant.now(clock),
+      applicationState = ApplicationState.Started,
+      businessDetails = None,
+      applicantContactDetails = None,
+      amlsDetails = None
+    )
+  }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-object TdAll:
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.ApplicationState
 
-  def apply(): TdAll = new TdAll {}
+trait TdGrs {
+  dependencies: TdBase =>
 
-  val tdAll: TdAll = new TdAll {}
-
-/** TestData (Td), All instances
-  */
-trait TdAll
-extends AnyRef
-with TdBase
-with TdRequest
-with TdGrs
-with TdAgentApplicationLlp
-with TdAgentApplicationSoleTrader
+}

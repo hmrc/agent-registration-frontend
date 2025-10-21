@@ -37,22 +37,13 @@ class MatchedMemberPageSpec
 extends ViewSpec:
 
   val viewTemplate: MatchedMemberPage = app.injector.instanceOf[MatchedMemberPage]
-  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] =
-    new AgentApplicationRequest(
-      request = request,
-      agentApplication = tdAll.llpAgentApplication
-        .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(
-          applicantName = ApplicantName.NameOfMember(
-            memberNameQuery = Some(CompaniesHouseNameQuery(
-              firstName = "First",
-              lastName = "Last"
-            ))
-          )
-        ))),
-      internalUserId = tdAll.internalUserId,
-      groupId = tdAll.groupId
-    )
+  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(
+    agentApplication =
+      tdAll
+        .agentApplicationLlp
+        .whenApplicantIsAMember
+        .afterNameQueryProvided
+  )
   private val heading: String = "Are these your details?"
 
   private val singleOfficer = Seq(

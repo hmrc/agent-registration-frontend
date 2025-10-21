@@ -34,19 +34,13 @@ class AuthorisedNamePageSpec
 extends ViewSpec:
 
   val viewTemplate: AuthorisedNamePage = app.injector.instanceOf[AuthorisedNamePage]
-  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] =
-    new AgentApplicationRequest(
-      request = request,
-      agentApplication = tdAll.agentApplicationAfterCreated
-        .modify(_.businessDetails)
-        .setTo(Some(tdAll.llpBusinessDetails))
-        .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(
-          applicantName = ApplicantName.NameOfAuthorised()
-        ))),
-      internalUserId = tdAll.internalUserId,
-      groupId = tdAll.groupId
-    )
+  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(
+    agentApplication =
+      tdAll
+        .agentApplicationLlp
+        .whenApplicantIsAuthorised
+        .afterRoleSelected
+  )
   val doc: Document = Jsoup.parse(viewTemplate(AuthorisedNameForm.form).body)
   private val heading: String = "What is your full name?"
 

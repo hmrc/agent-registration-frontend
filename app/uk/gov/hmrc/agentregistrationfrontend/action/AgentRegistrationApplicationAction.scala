@@ -103,9 +103,9 @@ with RequestAwareLogging:
       else
         applicationService
           .upsertNewApplication()
-          .map(AgentApplication =>
+          .map(agentApplication =>
             Right(AgentApplicationRequest[A](
-              agentApplication = AgentApplication,
+              agentApplication = agentApplication,
               internalUserId = request.internalUserId,
               groupId = request.groupId,
               request = request.request

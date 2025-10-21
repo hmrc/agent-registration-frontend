@@ -34,18 +34,13 @@ class MemberNamePageSpec
 extends ViewSpec:
 
   val viewTemplate: MemberNamePage = app.injector.instanceOf[MemberNamePage]
-  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] =
-    new AgentApplicationRequest(
-      request = request,
-      agentApplication = tdAll.agentApplicationAfterCreated
-        .modify(_.businessDetails)
-        .setTo(Some(tdAll.llpBusinessDetails))
-        .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(
-          applicantName = ApplicantName.NameOfMember()
-        ))),
-      internalUserId = tdAll.internalUserId,
-      groupId = tdAll.groupId
+  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] = tdAll
+    .makeAgentApplicationRequest(
+      agentApplication =
+        tdAll
+          .agentApplicationLlp
+          .whenApplicantIsAMember
+          .afterRoleSelected
     )
   val doc: Document = Jsoup.parse(viewTemplate(CompaniesHouseNameQueryForm.form).body)
   private val heading: String = "What is your name?"
