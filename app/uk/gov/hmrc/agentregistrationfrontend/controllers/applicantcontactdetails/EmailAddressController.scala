@@ -93,8 +93,6 @@ extends FrontendController(mcc, actions):
                       ))
                   }
 
-                println(s"Updated application email address, application now reads: $updatedApplication")
-
                 applicationService
                   .upsert(updatedApplication)
                   .map(_ =>
