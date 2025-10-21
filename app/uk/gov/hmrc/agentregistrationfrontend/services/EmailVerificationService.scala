@@ -18,9 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EmailVerificationConnector
-import uk.gov.hmrc.agentregistrationfrontend.model.Email
-import uk.gov.hmrc.agentregistrationfrontend.model.EmailVerificationStatus
-import uk.gov.hmrc.agentregistrationfrontend.model.VerifyEmailRequest
+import uk.gov.hmrc.agentregistrationfrontend.model.emailVerification.*
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject

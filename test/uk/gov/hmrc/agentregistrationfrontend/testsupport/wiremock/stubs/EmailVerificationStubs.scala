@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock as wm
 import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.Json
-import uk.gov.hmrc.agentregistrationfrontend.model.VerifyEmailRequest
+import uk.gov.hmrc.agentregistrationfrontend.model.emailVerification.VerifyEmailRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object EmailVerificationStubs {
