@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
+package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.soletrader
 
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
 trait TdAgentApplicationSoleTrader { dependencies: TdBase =>
 

@@ -39,6 +39,7 @@ extends ViewSpec:
       agentApplication =
         tdAll
           .agentApplicationLlp
+          .sectionContactDetails
           .whenApplicantIsAMember
           .afterRoleSelected
     )

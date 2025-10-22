@@ -40,6 +40,8 @@ trait TdAll
 extends TdBase,
   TdRequest,
   TdGrs,
-  TdAmls,
-  TdAgentApplicationLlp,
-  TdAgentApplicationSoleTrader
+  agentapplication.TdAgentApplicationRequest,
+  agentapplication.llp.TdSectionAmls,
+  agentapplication.llp.TdAgentApplicationLlp,
+  agentapplication.llp.TdSectionContactDetails,
+  agentapplication.soletrader.TdAgentApplicationSoleTrader

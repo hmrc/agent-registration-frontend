@@ -20,6 +20,7 @@ import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.BusinessDetails
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.CompanyProfile
+import uk.gov.hmrc.agentregistration.shared.Crn
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.Nino
@@ -55,18 +56,18 @@ trait TdBase:
   def nino = Nino("AB123456C")
   def safeId: SafeId = SafeId("X00000123456789")
   def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
-  def firstName = "Test"
-  def lastName = "Name"
-  def telephoneNumber = TelephoneNumber("(+44) 10794554342")
-  def companyNumber = "1234567890"
+//  def firstName: String = "Test"
+//  def lastName: String = "Name"
+  def telephoneNumber: TelephoneNumber = TelephoneNumber("(+44) 10794554342")
+  def crn: Crn = Crn("1234567890")
   def companyName = "Test Company Name"
   def dateOfIncorporation: LocalDate = LocalDate.now().minusYears(10)
-  def companyProfile = CompanyProfile(
-    companyNumber = companyNumber,
+  def companyProfile: CompanyProfile = CompanyProfile(
+    companyNumber = crn,
     companyName = companyName,
     dateOfIncorporation = Some(dateOfIncorporation)
   )
-  def postcode = "AA1 1AA"
+  def postcode: String = "AA1 1AA"
   def validAmlsExpiryDate: LocalDate = LocalDate.now().plusMonths(6)
   def invalidAmlsExpiryDate: LocalDate = LocalDate.now().plusMonths(13)
   def amlsUploadDetailsSuccess: UploadDetails = UploadDetails(

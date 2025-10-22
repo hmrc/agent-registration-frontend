@@ -89,7 +89,7 @@ extends ControllerSpec:
   ).foreach: testCase =>
     s"GET $path should return 200 for ${testCase.amlsType} and render page" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
       val response: WSResponse = get(path)
 
       response.status shouldBe 200
@@ -98,7 +98,7 @@ extends ControllerSpec:
 
     s"POST $path with valid input for ${testCase.amlsType} should redirect to the next page" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
       val updatedApplication = testCase.application
         .modify(_.amlsDetails.each)
         .setTo(AmlsDetails(
@@ -106,7 +106,7 @@ extends ControllerSpec:
           amlsRegistrationNumber = Some(AmlsRegistrationNumber(testCase.validInput))
         ))
       AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
-      AgentRegistrationStubs.stubApplicationInProgress(updatedApplication)
+      AgentRegistrationStubs.stubGetAgentApplication(updatedApplication)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(testCase.validInput),
@@ -119,7 +119,7 @@ extends ControllerSpec:
 
     s"POST $path with save for later and valid input for ${testCase.amlsType} should redirect to the saved for later page" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
       val updatedApplication = testCase.application
         .modify(_.amlsDetails.each)
         .setTo(AmlsDetails(
@@ -127,7 +127,7 @@ extends ControllerSpec:
           amlsRegistrationNumber = Some(AmlsRegistrationNumber(testCase.validInput))
         ))
       AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
-      AgentRegistrationStubs.stubApplicationInProgress(updatedApplication)
+      AgentRegistrationStubs.stubGetAgentApplication(updatedApplication)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(testCase.validInput),
@@ -140,7 +140,7 @@ extends ControllerSpec:
 
     s"POST $path as blank form for ${testCase.amlsType} should return 400" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(""),
@@ -154,7 +154,7 @@ extends ControllerSpec:
 
     s"POST $path as blank form and save for later for ${testCase.amlsType} should redirect to save for later page" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(""),
@@ -167,7 +167,7 @@ extends ControllerSpec:
 
     s"POST $path with an invalid value for ${testCase.amlsType} should return 400" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(testCase.invalidInput),
@@ -181,7 +181,7 @@ extends ControllerSpec:
 
     s"POST $path with an invalid value and save for later for ${testCase.amlsType} should not save and redirect to save for later" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(testCase.invalidInput),

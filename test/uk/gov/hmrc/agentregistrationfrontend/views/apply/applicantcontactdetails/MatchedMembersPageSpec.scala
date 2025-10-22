@@ -43,6 +43,7 @@ extends ViewSpec:
     agentApplication =
       tdAll
         .agentApplicationLlp
+        .sectionContactDetails
         .whenApplicantIsAMember
         .afterOfficerChosen
   )

@@ -114,7 +114,7 @@ extends ControllerSpec:
     if testCase.isComplete then
       s"GET $path with complete amls details should return 200 and render page for ${testCase.amlsType}" in:
         AuthStubs.stubAuthorise()
-        AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
+        AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
         val response: WSResponse = get(path)
 
         response.status shouldBe 200
@@ -123,7 +123,7 @@ extends ControllerSpec:
     else
       s"GET $path with incomplete amls details should redirect to the start of the amls journey for ${testCase.amlsType}" in:
         AuthStubs.stubAuthorise()
-        AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
+        AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
         val response: WSResponse = get(path)
 
         response.status shouldBe 303

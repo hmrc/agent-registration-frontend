@@ -45,7 +45,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
     val response: WSResponse = get(path)
 
     response.status shouldBe 200
@@ -55,7 +55,7 @@ extends ControllerSpec:
 
   s"POST $path with valid selection should redirect to the next page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication
     val response: WSResponse = post(path)(Map("amlsSupervisoryBody" -> Seq("HMRC")))
 
@@ -65,7 +65,7 @@ extends ControllerSpec:
 
   s"POST $path with save for later and valid selection should redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication
     val response: WSResponse =
       post(path)(Map(
@@ -79,7 +79,7 @@ extends ControllerSpec:
 
   s"POST $path without valid selection should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
     val response: WSResponse = post(path)(Map("amlsSupervisoryBody" -> Seq("")))
 
     response.status shouldBe 400

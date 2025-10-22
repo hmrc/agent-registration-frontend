@@ -23,8 +23,6 @@ import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsDetails
-import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
@@ -46,35 +44,23 @@ extends ViewSpec:
   private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
   private val fixedExpiryDate: LocalDate = LocalDate.of(2026, 9, 2)
 
-  private val completeHmrcApplication: AgentApplication = applicationFactory
-    .makeNewAgentApplication(tdAll.internalUserId)
-    .modify(_.amlsDetails)
-    .setTo(Some(AmlsDetails(
-      supervisoryBody = AmlsCode("HMRC"),
-      amlsRegistrationNumber = Some(AmlsRegistrationNumber("XAML00000123456")),
-      amlsExpiryDate = None,
-      amlsEvidence = None
-    )))
-  private val completeNonHmrcApplication: AgentApplication = applicationFactory
-    .makeNewAgentApplication(tdAll.internalUserId)
-    .modify(_.amlsDetails)
-    .setTo(Some(AmlsDetails(
-      supervisoryBody = AmlsCode("FCA"),
-      amlsRegistrationNumber = Some(AmlsRegistrationNumber("1234567890")),
-      amlsExpiryDate = Some(fixedExpiryDate),
-      amlsEvidence = Some(tdAll.amlsUploadDetailsSuccess)
-    )))
+  private val completeHmrcApplication: AgentApplication =
+    tdAll
+      .agentApplicationLlp
+      .sectionAmls
+      .afterRegistrationNumberProvided
+
+  private val completeNonHmrcApplication: AgentApplication =
+    new TdAll {
+      override def amlsCode: AmlsCode = AmlsCode("ATT")
+    }.agentApplicationLlp
+      .sectionAmls
+      .afterRegistrationNumberProvided
 
   private val heading: String = "Check your answers"
 
   "CheckYourAnswersPage for complete Hmrc Amls Details" should:
-    implicit val agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] =
-      new AgentApplicationRequest(
-        request = request,
-        agentApplication = completeHmrcApplication,
-        internalUserId = tdAll.internalUserId,
-        groupId = tdAll.groupId
-      )
+    implicit val agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(completeHmrcApplication)
 
     val doc: Document = Jsoup.parse(viewTemplate().body)
     "contain content" in:

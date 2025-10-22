@@ -31,11 +31,12 @@ class AuthorisedNameControllerSpec
 extends ControllerSpec:
 
   private val path = "/agent-registration/apply/applicant/applicant-name"
-  private val validApplication = tdAll.llpAgentApplication
-    .modify(_.applicantContactDetails)
-    .setTo(Some(ApplicantContactDetails(
-      applicantName = ApplicantName.NameOfAuthorised(name = None)
-    )))
+  private val validApplication =
+    tdAll
+      .agentApplicationLlp
+      .sectionContactDetails
+      .whenApplicantIsAuthorised
+      .afterRoleSelected
 
   "routes should have correct paths and methods" in:
     routes.AuthorisedNameController.show shouldBe Call(
@@ -50,7 +51,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(validApplication)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -58,7 +59,7 @@ extends ControllerSpec:
 
   s"POST $path with valid name should save data and redirect to the telephone number page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(validApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication(
       validApplication
         .modify(_.applicantContactDetails)
@@ -79,7 +80,7 @@ extends ControllerSpec:
 
   s"POST $path with blank inputs should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(validApplication)
     val response: WSResponse =
       post(path)(Map(
         AuthorisedNameForm.key -> Seq("")
@@ -92,7 +93,7 @@ extends ControllerSpec:
 
   s"POST $path with invalid characters should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(validApplication)
     val response: WSResponse =
       post(path)(Map(
         AuthorisedNameForm.key -> Seq("[[)(*%")
@@ -105,7 +106,7 @@ extends ControllerSpec:
 
   s"POST $path with more than 100 characters should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(validApplication)
     val response: WSResponse =
       post(path)(Map(
         AuthorisedNameForm.key -> Seq("A".repeat(101))
@@ -118,7 +119,7 @@ extends ControllerSpec:
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(validApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication(
       validApplication
         .modify(_.applicantContactDetails)
@@ -140,7 +141,7 @@ extends ControllerSpec:
 
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(validApplication)
     val response: WSResponse =
       post(path)(Map(
         AuthorisedNameForm.key -> Seq("[[)(*%"),

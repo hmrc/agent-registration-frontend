@@ -58,7 +58,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 render page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
     val response: WSResponse = get(path)
 
     response.status shouldBe 200
@@ -66,7 +66,7 @@ extends ControllerSpec:
 
   s"POST $path with valid inputs should redirect to the next page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
     val updatedApplication = fakeAgentApplication
       .modify(_.amlsDetails.each)
       .setTo(AmlsDetails(
@@ -75,7 +75,7 @@ extends ControllerSpec:
         amlsExpiryDate = Some(tdAll.validAmlsExpiryDate)
       ))
     AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
-    AgentRegistrationStubs.stubApplicationInProgress(updatedApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(updatedApplication)
     val response: WSResponse =
       post(path)(Map(
         AmlsExpiryDateForm.dayKey -> Seq(tdAll.validAmlsExpiryDate.getDayOfMonth.toString),
@@ -90,7 +90,7 @@ extends ControllerSpec:
 
   s"POST $path with save for later and valid input should redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
     val updatedApplication = fakeAgentApplication
       .modify(_.amlsDetails.each)
       .setTo(AmlsDetails(
@@ -99,7 +99,7 @@ extends ControllerSpec:
         amlsExpiryDate = Some(tdAll.validAmlsExpiryDate)
       ))
     AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
-    AgentRegistrationStubs.stubApplicationInProgress(updatedApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(updatedApplication)
     val response: WSResponse =
       post(path)(Map(
         AmlsExpiryDateForm.dayKey -> Seq(tdAll.validAmlsExpiryDate.getDayOfMonth.toString),
@@ -114,7 +114,7 @@ extends ControllerSpec:
 
   s"POST $path as blank form should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
     val response: WSResponse =
       post(path)(Map(
         AmlsExpiryDateForm.dayKey -> Seq(""),
@@ -128,7 +128,7 @@ extends ControllerSpec:
 
   s"POST $path as blank form and save for later should redirect to save for later page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
     val response: WSResponse =
       post(path)(Map(
         AmlsExpiryDateForm.dayKey -> Seq(""),
@@ -143,7 +143,7 @@ extends ControllerSpec:
 
   s"POST $path with an invalid value should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
     val response: WSResponse =
       post(path)(Map(
         AmlsExpiryDateForm.dayKey -> Seq(tdAll.invalidAmlsExpiryDate.getDayOfMonth.toString),
@@ -157,7 +157,7 @@ extends ControllerSpec:
 
   s"POST $path with an invalid value and save for later should redirect to save for later" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
     val response: WSResponse =
       post(path)(Map(
         AmlsExpiryDateForm.dayKey -> Seq(tdAll.invalidAmlsExpiryDate.getDayOfMonth.toString),

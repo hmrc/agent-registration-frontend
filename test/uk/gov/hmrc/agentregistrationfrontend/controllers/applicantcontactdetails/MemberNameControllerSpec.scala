@@ -32,14 +32,21 @@ class MemberNameControllerSpec
 extends ControllerSpec:
 
   private val path = "/agent-registration/apply/applicant/member-name"
-  private val validApplication = tdAll.llpAgentApplication
-    .modify(_.applicantContactDetails)
-    .setTo(Some(ApplicantContactDetails(
-      applicantName = ApplicantName.NameOfMember(
-        memberNameQuery = None,
-        companiesHouseOfficer = None
-      )
-    )))
+  private object agentApplication:
+
+    val whenApplicantIsAMember =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAMember
+
+    val beforeNameQueryProvided =
+      whenApplicantIsAMember
+        .afterRoleSelected
+
+    val afterNameQueryProvided =
+      whenApplicantIsAMember
+        .afterNameQueryProvided
 
   "routes should have correct paths and methods" in:
     routes.MemberNameController.show shouldBe Call(
@@ -54,7 +61,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeNameQueryProvided)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -62,24 +69,12 @@ extends ControllerSpec:
 
   s"POST $path with first and last names should save data and redirect to the show name matches page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
-    AgentRegistrationStubs.stubUpdateAgentApplication(
-      validApplication
-        .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(
-          applicantName = ApplicantName.NameOfMember(
-            memberNameQuery = Some(CompaniesHouseNameQuery(
-              firstName = "First",
-              lastName = "Last"
-            )),
-            companiesHouseOfficer = None
-          )
-        )))
-    )
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeNameQueryProvided)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterNameQueryProvided)
     val response: WSResponse =
       post(path)(Map(
-        CompaniesHouseNameQueryForm.firstNameKey -> Seq("First"),
-        CompaniesHouseNameQueryForm.lastNameKey -> Seq("Last")
+        CompaniesHouseNameQueryForm.firstNameKey -> Seq(agentApplication.whenApplicantIsAMember.firstNameQuery),
+        CompaniesHouseNameQueryForm.lastNameKey -> Seq(agentApplication.whenApplicantIsAMember.lastNameQuery)
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -88,7 +83,7 @@ extends ControllerSpec:
 
   s"POST $path with blank inputs should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeNameQueryProvided)
     val response: WSResponse =
       post(path)(Map(
         CompaniesHouseNameQueryForm.firstNameKey -> Seq(""),
@@ -103,7 +98,7 @@ extends ControllerSpec:
 
   s"POST $path with invalid inputs should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeNameQueryProvided)
     val response: WSResponse =
       post(path)(Map(
         CompaniesHouseNameQueryForm.firstNameKey -> Seq("()))"),
@@ -118,20 +113,8 @@ extends ControllerSpec:
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
-    AgentRegistrationStubs.stubUpdateAgentApplication(
-      validApplication
-        .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(
-          applicantName = ApplicantName.NameOfMember(
-            memberNameQuery = Some(CompaniesHouseNameQuery(
-              firstName = "First",
-              lastName = "Last"
-            )),
-            companiesHouseOfficer = None
-          )
-        )))
-    )
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeNameQueryProvided)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterNameQueryProvided)
     val response: WSResponse =
       post(path)(Map(
         CompaniesHouseNameQueryForm.firstNameKey -> Seq("First"),
@@ -145,7 +128,7 @@ extends ControllerSpec:
 
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeNameQueryProvided)
     val response: WSResponse =
       post(path)(Map(
         CompaniesHouseNameQueryForm.firstNameKey -> Seq(""),

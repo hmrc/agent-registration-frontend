@@ -56,13 +56,6 @@ extends ViewSpec:
       doc.h1 shouldBe heading
 
     "have only one text input element in the form" in:
-//      doc
-//        .mainContent
-//        .selectOrFail("form input[type='text']")
-//        .selectOnlyOneElementOrFail()
-//        .toInputField shouldBe TestInputField("xxx", None, "xxx")
-      // TODO: toInputFiels isn't working, discuss how it should behave
-
       doc
         .mainContent
         .selectOrFail("form input[type='text']")

@@ -39,11 +39,11 @@ object AgentRegistrationStubs {
     requestBody = Some(equalToJson(Json.toJson(agentApplication).toString))
   )
 
-  def stubApplicationInProgress(fakeAgentApplication: AgentApplication): StubMapping = StubMaker.make(
+  def stubGetAgentApplication(agentApplication: AgentApplication): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = urlMatching("/agent-registration/application"),
     responseStatus = 200,
-    responseBody = Json.toJson(fakeAgentApplication).toString
+    responseBody = Json.toJson(agentApplication).toString
   )
 
 }
