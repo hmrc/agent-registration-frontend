@@ -1,0 +1,146 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes
+@import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+@import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
+
+@this(
+        layout: Layout,
+        govukButton: GovukButton,
+        govukSummaryList: GovukSummaryList
+)
+
+@(implicit
+        request: AgentApplicationRequest[?],
+        messages: Messages
+)
+
+@key = @{
+    "contactCheckYourAnswers"
+}
+@title = @{
+    messages(s"$key.title")
+}
+@contactDetails = @{
+    request.agentApplication.getApplicantContactDetails
+}
+
+@llpMemberRow = @{
+    SummaryListRow(
+        key = Key(
+            content = Text(messages(s"$key.llpMember.label"))
+        ),
+        value = Value(
+            content = Text(
+                messages(s"$key.llpMember.${contactDetails.applicantName.role.toString}")
+            )
+        ),
+        actions = Some(Actions(
+            items = Seq(
+                ActionItem(
+                    href = s"${routes.ApplicantRoleInLlpController.show}",
+                    content = Text(messages(s"$key.change")),
+                    visuallyHiddenText = Some(messages(s"$key.llpMember.label"))
+                )
+            )
+        ))
+    )
+}
+@nameChangeRoute = @{
+    contactDetails.applicantName.role match {
+        case ApplicantRoleInLlp.Member => routes.MemberNameController.show
+        case ApplicantRoleInLlp.Authorised => routes.AuthorisedNameController.show
+    }}
+@nameRow = @{
+    SummaryListRow(
+        key = Key(
+            content = Text(messages(s"$key.name.label"))
+        ),
+        value = Value(
+            content = Text(
+                contactDetails.getApplicantName
+            )
+        ),
+        actions = Some(Actions(
+            items = Seq(
+                ActionItem(
+                    href = nameChangeRoute.url,
+                    content = Text(messages(s"$key.change")),
+                    visuallyHiddenText = Some(messages(s"$key.name.label"))
+                )
+            )
+        ))
+    )
+}
+
+@telephoneRow = @{
+    SummaryListRow(
+        key = Key(
+            content = Text(messages(s"$key.telephone.label"))
+        ),
+        value = Value(
+            content = Text(contactDetails.getTelephoneNumber.value)
+        ),
+        actions = Some(Actions(
+            items = Seq(
+                ActionItem(
+                    href = s"${routes.TelephoneNumberController.show}",
+                    content = Text(messages(s"$key.change")),
+                    visuallyHiddenText = Some(messages(s"$key.telephone.label"))
+                )
+            )
+        ))
+    )
+}
+
+@emailRow = @{
+    SummaryListRow(
+        key = Key(
+            content = Text(messages(s"$key.email.label"))
+        ),
+        value = Value(
+            content = Text(contactDetails.getVerifiedEmail.value)
+        ),
+        actions = Some(Actions(
+            items = Seq(
+                ActionItem(
+                    href = s"${routes.EmailAddressController.show}",
+                    content = Text(messages(s"$key.change")),
+                    visuallyHiddenText = Some(messages(s"$key.email.label"))
+                )
+            )
+        ))
+    )
+}
+
+@rows = @{Seq(llpMemberRow, nameRow, telephoneRow, emailRow)}
+
+@layout(pageTitle = title) {
+    <h2 class="govuk-caption-l">@messages("applicant-contact-details.title")</h2>
+    <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
+    @govukSummaryList(SummaryList(rows))
+    <p class="govuk-body">
+      @govukButton(Button(
+          href = Some(applicationRoutes.TaskListController.show.url),
+          content = Text(messages("common.confirmAndContinue"))
+      ))
+    </p>
+
+}

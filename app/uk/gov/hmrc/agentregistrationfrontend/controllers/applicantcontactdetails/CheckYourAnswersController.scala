@@ -25,13 +25,13 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.CheckYourAnswersPage
 
 @Singleton
 class CheckYourAnswersController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  view: SimplePage
+  view: CheckYourAnswersPage
 )
 extends FrontendController(mcc, actions):
 
@@ -44,4 +44,4 @@ extends FrontendController(mcc, actions):
     )
 
   def show: Action[AnyContent] = baseAction:
-    implicit request => Ok(view(h1 = "Check your answers", bodyText = Some("placeholder for CYA...")))
+    implicit request => Ok(view())

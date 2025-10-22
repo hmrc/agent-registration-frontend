@@ -90,7 +90,7 @@ extends ControllerSpec:
     doc.title() shouldBe "Error: Are these your details? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#companiesHouseOfficer-error").text() shouldBe "Error: Select yes if these are your details"
 
-  s"POST $path for single match with valid inputs should save officer and redirect to telephone page" in:
+  s"POST $path for single match with valid inputs should save officer and redirect to check your answers" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
@@ -103,7 +103,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.TelephoneNumberController.show.url
+    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
 
   s"POST $path for multiple matches without a valid selection should return 400" in:
     AuthStubs.stubAuthorise()
@@ -119,7 +119,7 @@ extends ControllerSpec:
     doc.title() shouldBe "Error: 2 records match this name - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#companiesHouseOfficer-error").text() shouldBe "Error: Select the name and date of birth that matches your details"
 
-  s"POST $path for multiple matches with valid inputs should save officer and redirect to telephone page" in:
+  s"POST $path for multiple matches with valid inputs should save officer and redirect to check your answers" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
@@ -132,7 +132,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.TelephoneNumberController.show.url
+    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()

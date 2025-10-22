@@ -58,8 +58,7 @@ extends FrontendController(mcc, actions):
         .agentApplication
         .asLlpApplication
         .applicantContactDetails
-        .map(_.telephoneNumber)
-        .isDefined,
+        .exists(_.telephoneNumber.isDefined),
       implicit request =>
         logger.warn("Because we don't have a telephone number we are redirecting to the telephone number page")
         Redirect(routes.TelephoneNumberController.show)
