@@ -17,20 +17,14 @@
 package uk.gov.hmrc.agentregistrationfrontend.views.apply.amls
 
 import com.google.inject.AbstractModule
-import com.softwaremill.quicklens.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.CheckYourAnswersPage
-
-import java.time.LocalDate
 
 class CheckYourAnswersPageSpec
 extends ViewSpec:
@@ -41,26 +35,26 @@ extends ViewSpec:
 
   val viewTemplate: CheckYourAnswersPage = app.injector.instanceOf[CheckYourAnswersPage]
 
-  private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
-  private val fixedExpiryDate: LocalDate = LocalDate.of(2026, 9, 2)
+  private object agentApplication:
 
-  private val completeHmrcApplication: AgentApplication =
-    tdAll
-      .agentApplicationLlp
-      .sectionAmls
-      .afterRegistrationNumberProvided
+    val completeHmrcApplication: AgentApplication =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsHmrc
+        .complete
 
-  private val completeNonHmrcApplication: AgentApplication =
-    new TdAll {
-      override def amlsCode: AmlsCode = AmlsCode("ATT")
-    }.agentApplicationLlp
-      .sectionAmls
-      .afterRegistrationNumberProvided
+    val completeNonHmrcApplication: AgentApplication =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsNonHmrc
+        .complete
 
   private val heading: String = "Check your answers"
 
   "CheckYourAnswersPage for complete Hmrc Amls Details" should:
-    implicit val agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(completeHmrcApplication)
+    implicit val agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(agentApplication.completeHmrcApplication)
 
     val doc: Document = Jsoup.parse(viewTemplate().body)
     "contain content" in:
@@ -100,13 +94,9 @@ extends ViewSpec:
       doc.extractLinkButton(1).text shouldBe "Confirm and continue"
 
   "CheckYourAnswersPage for complete non-Hmrc Amls Details" should:
-    implicit val agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] =
-      new AgentApplicationRequest(
-        request = request,
-        agentApplication = completeNonHmrcApplication,
-        internalUserId = tdAll.internalUserId,
-        groupId = tdAll.groupId
-      )
+    implicit val agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(
+      agentApplication.completeNonHmrcApplication
+    )
 
     val doc: Document = Jsoup.parse(viewTemplate().body)
     "contain content" in:

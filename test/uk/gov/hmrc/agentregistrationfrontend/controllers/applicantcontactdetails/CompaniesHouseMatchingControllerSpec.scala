@@ -17,20 +17,16 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails
 
 import com.softwaremill.quicklens.*
+import org.scalatest.Ignore
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
-import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseDateOfBirth
-import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
-import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseOfficer
+import uk.gov.hmrc.agentregistration.shared.contactdetails.*
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CompaniesHouseStubs
-import org.scalatest.Ignore
 
 @Ignore
 class CompaniesHouseMatchingControllerSpec

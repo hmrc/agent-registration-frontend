@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.forms.mappings
 
+import play.api.data.Forms.single
 import play.api.data.Form
 import play.api.data.FormError
 import play.api.data.Mapping
-import play.api.data.Forms.single
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 
 import java.time.LocalDate

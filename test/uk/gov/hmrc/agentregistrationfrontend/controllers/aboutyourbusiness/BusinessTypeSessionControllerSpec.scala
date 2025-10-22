@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentType.UkTaxAgent
-import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeSessionForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 

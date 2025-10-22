@@ -19,18 +19,18 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
 class AmlsSupervisorControllerSpec
 extends ControllerSpec:
 
-  private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
   private val path = "/agent-registration/apply/anti-money-laundering/supervisor-name"
-  private val fakeAgentApplication: AgentApplication = applicationFactory.makeNewAgentApplication(tdAll.internalUserId)
+
+  private object agentApplication:
+    val baseForSectionAmls: AgentApplication = tdAll.agentApplicationLlp.baseForSectionAmls
 
   "routes should have correct paths and methods" in:
     routes.AmlsSupervisorController.show shouldBe Call(
@@ -45,7 +45,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.baseForSectionAmls)
     val response: WSResponse = get(path)
 
     response.status shouldBe 200
@@ -55,7 +55,7 @@ extends ControllerSpec:
 
   s"POST $path with valid selection should redirect to the next page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.baseForSectionAmls)
     AgentRegistrationStubs.stubUpdateAgentApplication
     val response: WSResponse = post(path)(Map("amlsSupervisoryBody" -> Seq("HMRC")))
 
@@ -65,7 +65,7 @@ extends ControllerSpec:
 
   s"POST $path with save for later and valid selection should redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.baseForSectionAmls)
     AgentRegistrationStubs.stubUpdateAgentApplication
     val response: WSResponse =
       post(path)(Map(
@@ -79,7 +79,7 @@ extends ControllerSpec:
 
   s"POST $path without valid selection should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.baseForSectionAmls)
     val response: WSResponse = post(path)(Map("amlsSupervisoryBody" -> Seq("")))
 
     response.status shouldBe 400

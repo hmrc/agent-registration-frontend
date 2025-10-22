@@ -17,19 +17,9 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
 import com.google.inject.AbstractModule
-import com.softwaremill.quicklens.*
-import sttp.model.Uri.UriContext
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsDetails
-import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
-import uk.gov.hmrc.agentregistration.shared.upscan.Reference
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
-import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
@@ -42,7 +32,6 @@ extends ControllerSpec:
     new AbstractModule:
       override def configure(): Unit = bind(classOf[AmlsCodes]).asEagerSingleton()
 
-  private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
   private val path = "/agent-registration/apply/anti-money-laundering/evidence"
   private val resultPath = "/agent-registration/apply/anti-money-laundering/evidence/upload-result"
   private val uploadErrorPath = "/agent-registration/apply/anti-money-laundering/evidence/upload-error"
@@ -53,24 +42,28 @@ extends ControllerSpec:
       tdAll
         .agentApplicationLlp
         .sectionAmls
+        .whenSupervisorBodyIsNonHmrc
         .afterAmlsExpiryDateProvided
 
     val afterUploadedEvidence: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
+        .whenSupervisorBodyIsNonHmrc
         .afterUploadedEvidence
 
     val afterUploadSucceded: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
+        .whenSupervisorBodyIsNonHmrc
         .afterUploadSucceded
 
     val afterUploadFailed: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
+        .whenSupervisorBodyIsNonHmrc
         .afterUploadFailed
 
   "routes should have correct paths and methods" in:

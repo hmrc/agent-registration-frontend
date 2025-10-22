@@ -20,10 +20,10 @@ import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import org.scalactic.source.Position
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.RichMatchers.*
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.viewspecsupport.JsoupHelper.*
 
 import scala.jdk.CollectionConverters.IteratorHasAsScala
 import scala.language.implicitConversions
-import JsoupHelper.*
 
 object ElementsSupport:
 

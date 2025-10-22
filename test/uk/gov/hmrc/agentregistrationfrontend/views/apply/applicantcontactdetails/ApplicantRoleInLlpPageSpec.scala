@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.views.apply.applicantcontactdetails
 
-import com.softwaremill.quicklens.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent

@@ -16,12 +16,9 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.views.apply.applicantcontactdetails
 
-import com.softwaremill.quicklens.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm

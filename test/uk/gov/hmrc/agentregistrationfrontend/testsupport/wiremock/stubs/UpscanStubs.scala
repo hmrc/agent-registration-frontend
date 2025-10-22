@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.client.WireMock as wm
+import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.WireMockSupport

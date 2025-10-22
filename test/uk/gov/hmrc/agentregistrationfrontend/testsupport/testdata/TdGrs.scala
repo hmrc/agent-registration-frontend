@@ -16,9 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.ApplicationState
-
 trait TdGrs {
   dependencies: TdBase =>
 

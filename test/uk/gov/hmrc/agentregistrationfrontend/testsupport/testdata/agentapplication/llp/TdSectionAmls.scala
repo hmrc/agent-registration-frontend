@@ -17,23 +17,29 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.llp
 
 import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
-import uk.gov.hmrc.agentregistration.shared.upscan.Reference
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
+import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
+import uk.gov.hmrc.agentregistration.shared.upscan.Reference
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.RichMatchers.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
 import java.time.LocalDate
+import scala.util.chaining.scalaUtilChainingOps
 
 trait TdSectionAmls {
   dependencies: TdBase =>
 
-  def amlsCode: AmlsCode = AmlsCode("HMRC")
-  def amlsRegistrationNumber = AmlsRegistrationNumber("XAML00000123456")
+  final def amlsCodeHmrc: AmlsCode = AmlsCode("HMRC")
+  def amlsCodeNonHmrc: AmlsCode = AmlsCode("ATT") /// Association of TaxationTechnicians
+
+  def amlsRegistrationNumberHmrc = AmlsRegistrationNumber("XAML00000123456")
+  def amlsRegistrationNumberNonHmrc = AmlsRegistrationNumber("NONHMRC_REF_AMLS_NUMBER_00001")
+
   def amlsExpiryDate: LocalDate = LocalDate.parse("2028-01-01")
 
   def amlsUploadDetailsAfterUploadInProgress: UploadDetails = UploadDetails(
@@ -59,40 +65,82 @@ trait TdSectionAmls {
 
   class AgentApplicationLlpWithSectionAmls(baseForSectionAmls: AgentApplicationLlp):
 
+    /** when the supervisory body is HMRC, the registration number has a different format to non-HMRC bodies and no evidence or expiry date is required to be
+      * considered complete
+      */
     object sectionAmls:
 
-      def afterSupervisoryBodySelected: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(AmlsDetailsHelper.afterSupervisoryBodySelected))
-      def afterRegistrationNumberProvided: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(AmlsDetailsHelper.afterRegistrationNumberProvided))
-      def afterAmlsExpiryDateProvided: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(AmlsDetailsHelper.afterAmlsExpiryDateProvided))
-      def afterUploadedEvidence: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(AmlsDetailsHelper.afterUploadedEvidence))
-      def afterUploadFailed: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(AmlsDetailsHelper.afterUploadFailed))
-      def afterUploadSucceded: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(AmlsDetailsHelper.afterUploadSucceded))
+      object whenSupervisorBodyIsHmrc:
 
-  private object AmlsDetailsHelper:
+        def amlsCode: AmlsCode = amlsCodeHmrc
+        def amlsRegistrationNumber: AmlsRegistrationNumber = amlsRegistrationNumberHmrc
 
-    val afterSupervisoryBodySelected: AmlsDetails = AmlsDetails(
-      supervisoryBody = amlsCode,
-      amlsRegistrationNumber = None,
-      amlsExpiryDate = None,
-      amlsEvidence = None
-    )
+        private object amlsDetailsHelper:
 
-    val afterRegistrationNumberProvided = afterSupervisoryBodySelected.copy(
-      amlsRegistrationNumber = Some(amlsRegistrationNumber)
-    )
+          def afterSupervisoryBodySelected: AmlsDetails = AmlsDetails(
+            supervisoryBody = amlsCode,
+            amlsRegistrationNumber = None,
+            amlsExpiryDate = None,
+            amlsEvidence = None
+          )
 
-    val afterAmlsExpiryDateProvided = afterRegistrationNumberProvided.copy(
-      amlsExpiryDate = Some(amlsExpiryDate)
-    )
+          def afterRegistrationNumberProvided: AmlsDetails = afterSupervisoryBodySelected.copy(
+            amlsRegistrationNumber = Some(amlsRegistrationNumber)
+          ).tap(_.isComplete shouldBe true withClue "when HMRC - no evidence or expiry date is required to be considered complete")
 
-    val afterUploadedEvidence = afterAmlsExpiryDateProvided.copy(
-      amlsEvidence = Some(amlsUploadDetailsAfterUploadInProgress)
-    )
-    val afterUploadFailed = afterAmlsExpiryDateProvided.copy(
-      amlsEvidence = Some(amlsUploadDetailsAfterUploadFailed)
-    )
-    val afterUploadSucceded = afterAmlsExpiryDateProvided.copy(
-      amlsEvidence = Some(amlsUploadDetailsAfterUploadSucceeded)
-    )
+        def afterSupervisoryBodySelected: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterSupervisoryBodySelected))
+
+        def afterRegistrationNumberProvided: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails =
+          Some(amlsDetailsHelper.afterRegistrationNumberProvided)
+        )
+
+        def complete: AgentApplicationLlp = afterRegistrationNumberProvided.tap(_.amlsDetails.value.isComplete shouldBe true withClue "sanity check")
+
+      object whenSupervisorBodyIsNonHmrc:
+
+        def amlsCode: AmlsCode = amlsCodeHmrc
+        def amlsRegistrationNumber: AmlsRegistrationNumber = amlsRegistrationNumberHmrc
+
+        private object amlsDetailsHelper:
+
+          def afterSupervisoryBodySelected: AmlsDetails = AmlsDetails(
+            supervisoryBody = amlsCode,
+            amlsRegistrationNumber = None,
+            amlsExpiryDate = None,
+            amlsEvidence = None
+          )
+
+          def afterRegistrationNumberProvided = afterSupervisoryBodySelected.copy(
+            amlsRegistrationNumber = Some(amlsRegistrationNumber)
+          )
+
+          def afterAmlsExpiryDateProvided = afterRegistrationNumberProvided.copy(
+            amlsExpiryDate = Some(amlsExpiryDate)
+          )
+          def afterUploadedEvidence = afterAmlsExpiryDateProvided.copy(
+            amlsEvidence = Some(amlsUploadDetailsAfterUploadInProgress)
+          )
+          def afterUploadFailed = afterAmlsExpiryDateProvided.copy(
+            amlsEvidence = Some(amlsUploadDetailsAfterUploadFailed)
+          )
+          def afterUploadSucceded = afterAmlsExpiryDateProvided.copy(
+            amlsEvidence = Some(amlsUploadDetailsAfterUploadSucceeded)
+          )
+
+        def afterSupervisoryBodySelected: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterSupervisoryBodySelected))
+
+        def afterRegistrationNumberProvided: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails =
+          Some(amlsDetailsHelper.afterRegistrationNumberProvided)
+        )
+
+        def afterAmlsExpiryDateProvided: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterAmlsExpiryDateProvided))
+
+        def afterUploadedEvidence: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadedEvidence))
+
+        def afterUploadFailed: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadFailed))
+
+        def afterUploadSucceded: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadSucceded))
+
+        def complete: AgentApplicationLlp = afterUploadSucceded.tap(_.amlsDetails.value.isComplete shouldBe true withClue "sanity check")
 
 }

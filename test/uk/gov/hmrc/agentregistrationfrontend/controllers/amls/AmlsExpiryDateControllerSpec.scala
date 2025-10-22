@@ -16,16 +16,12 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
-import com.softwaremill.quicklens.*
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AmlsDetails
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
@@ -33,7 +29,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStub
 class AmlsExpiryDateControllerSpec
 extends ControllerSpec:
 
-  private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
   private val path = "/agent-registration/apply/anti-money-laundering/supervision-runs-out"
 
   "routes should have correct paths and methods" in:
@@ -47,18 +42,25 @@ extends ControllerSpec:
     )
     routes.AmlsExpiryDateController.submit.url shouldBe routes.AmlsExpiryDateController.show.url
 
-  private val fakeAgentApplication: AgentApplication = applicationFactory
-    .makeNewAgentApplication(tdAll.internalUserId)
-    .modify(_.amlsDetails)
-    .setTo(Some(AmlsDetails(
-      supervisoryBody = AmlsCode("FCA"),
-      amlsRegistrationNumber = Some(AmlsRegistrationNumber("XAML00000123456")),
-      amlsExpiryDate = None
-    )))
+  private object agentApplication:
+
+    val afterRegistrationNumberProvided: AgentApplication =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsNonHmrc
+        .afterRegistrationNumberProvided
+
+    val afterAmlsExpiryDateProvided =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsNonHmrc
+        .afterAmlsExpiryDateProvided
 
   s"GET $path should return 200 render page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRegistrationNumberProvided)
     val response: WSResponse = get(path)
 
     response.status shouldBe 200
@@ -66,14 +68,9 @@ extends ControllerSpec:
 
   s"POST $path with valid inputs should redirect to the next page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
-    val updatedApplication = fakeAgentApplication
-      .modify(_.amlsDetails.each)
-      .setTo(AmlsDetails(
-        supervisoryBody = fakeAgentApplication.getAmlsDetails.supervisoryBody,
-        amlsRegistrationNumber = Some(fakeAgentApplication.getAmlsDetails.amlsRegistrationNumber.get),
-        amlsExpiryDate = Some(tdAll.validAmlsExpiryDate)
-      ))
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRegistrationNumberProvided)
+    val updatedApplication: AgentApplicationLlp = agentApplication.afterAmlsExpiryDateProvided
+
     AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
     AgentRegistrationStubs.stubGetAgentApplication(updatedApplication)
     val response: WSResponse =
@@ -90,14 +87,8 @@ extends ControllerSpec:
 
   s"POST $path with save for later and valid input should redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
-    val updatedApplication = fakeAgentApplication
-      .modify(_.amlsDetails.each)
-      .setTo(AmlsDetails(
-        supervisoryBody = fakeAgentApplication.getAmlsDetails.supervisoryBody,
-        amlsRegistrationNumber = Some(fakeAgentApplication.getAmlsDetails.amlsRegistrationNumber.get),
-        amlsExpiryDate = Some(tdAll.validAmlsExpiryDate)
-      ))
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRegistrationNumberProvided)
+    val updatedApplication = agentApplication.afterAmlsExpiryDateProvided
     AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
     AgentRegistrationStubs.stubGetAgentApplication(updatedApplication)
     val response: WSResponse =
@@ -114,7 +105,7 @@ extends ControllerSpec:
 
   s"POST $path as blank form should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRegistrationNumberProvided)
     val response: WSResponse =
       post(path)(Map(
         AmlsExpiryDateForm.dayKey -> Seq(""),
@@ -128,7 +119,7 @@ extends ControllerSpec:
 
   s"POST $path as blank form and save for later should redirect to save for later page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRegistrationNumberProvided)
     val response: WSResponse =
       post(path)(Map(
         AmlsExpiryDateForm.dayKey -> Seq(""),
@@ -143,7 +134,7 @@ extends ControllerSpec:
 
   s"POST $path with an invalid value should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRegistrationNumberProvided)
     val response: WSResponse =
       post(path)(Map(
         AmlsExpiryDateForm.dayKey -> Seq(tdAll.invalidAmlsExpiryDate.getDayOfMonth.toString),
@@ -157,7 +148,7 @@ extends ControllerSpec:
 
   s"POST $path with an invalid value and save for later should redirect to save for later" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(fakeAgentApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRegistrationNumberProvided)
     val response: WSResponse =
       post(path)(Map(
         AmlsExpiryDateForm.dayKey -> Seq(tdAll.invalidAmlsExpiryDate.getDayOfMonth.toString),

@@ -17,18 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistration.shared.BusinessDetails
-import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.CompanyProfile
-import uk.gov.hmrc.agentregistration.shared.Crn
-import uk.gov.hmrc.agentregistration.shared.GroupId
-import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistration.shared.Nino
-import uk.gov.hmrc.agentregistration.shared.PartnershipDetails
-import uk.gov.hmrc.agentregistration.shared.SaUtr
-import uk.gov.hmrc.agentregistration.shared.SafeId
-import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
-import uk.gov.hmrc.agentregistration.shared.Utr
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
 import uk.gov.hmrc.agentregistration.shared.upscan.Reference
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
@@ -70,6 +59,7 @@ trait TdBase:
   def postcode: String = "AA1 1AA"
   def validAmlsExpiryDate: LocalDate = LocalDate.now().plusMonths(6)
   def invalidAmlsExpiryDate: LocalDate = LocalDate.now().plusMonths(13)
+  // todo remove this
   def amlsUploadDetailsSuccess: UploadDetails = UploadDetails(
     reference = Reference("test-file-reference"),
     status = UploadStatus.UploadedSuccessfully(
