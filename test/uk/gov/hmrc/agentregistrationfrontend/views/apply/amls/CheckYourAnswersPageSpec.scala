@@ -105,16 +105,16 @@ extends ViewSpec:
           |Anti-money laundering supervision details
           |Check your answers
           |Supervisory body
-          |Financial Conduct Authority (FCA)
+          |Association of TaxationTechnicians (ATT)
           |Change Supervisory body
           |Registration number
-          |1234567890
+          |NONHMRC_REF_AMLS_NUMBER_00001
           |Change Registration number
           |Supervision expiry date
-          |2 September 2026
+          |25 May 2060
           |Change Supervision expiry date
           |Evidence of anti-money laundering supervision
-          |test.pdf
+          |evidence.pdf
           |Change Evidence of anti-money laundering supervision
           """.stripMargin
 
@@ -126,22 +126,22 @@ extends ViewSpec:
         List(
           TestSummaryRow(
             key = "Supervisory body",
-            value = "Financial Conduct Authority (FCA)",
+            value = "Association of TaxationTechnicians (ATT)",
             action = "/agent-registration/apply/anti-money-laundering/supervisor-name"
           ),
           TestSummaryRow(
             key = "Registration number",
-            value = "1234567890",
+            value = "NONHMRC_REF_AMLS_NUMBER_00001",
             action = "/agent-registration/apply/anti-money-laundering/registration-number"
           ),
           TestSummaryRow(
             key = "Supervision expiry date",
-            value = "2 September 2026",
+            value = "25 May 2060",
             action = "/agent-registration/apply/anti-money-laundering/supervision-runs-out"
           ),
           TestSummaryRow(
             key = "Evidence of anti-money laundering supervision",
-            value = "test.pdf",
+            value = "evidence.pdf",
             action = "/agent-registration/apply/anti-money-laundering/evidence"
           )
         )

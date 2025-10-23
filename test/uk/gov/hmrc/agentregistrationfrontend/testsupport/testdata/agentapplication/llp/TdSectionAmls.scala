@@ -100,7 +100,7 @@ trait TdSectionAmls {
       object whenSupervisorBodyIsNonHmrc:
 
         def amlsCode: AmlsCode = amlsCodeNonHmrc
-        def amlsRegistrationNumber: AmlsRegistrationNumber = amlsRegistrationNumberHmrc
+        def amlsRegistrationNumber: AmlsRegistrationNumber = amlsRegistrationNumberNonHmrc
 
         private object amlsDetailsHelper:
 
