@@ -27,8 +27,7 @@ import javax.inject.Singleton
 @Singleton
 class GrsConfig @Inject() (appConfig: AppConfig):
 
-  def grsJourneyCallbackUrl(businessType: BusinessType) =
-    s"${appConfig.thisFrontendBaseUrl}/agent-registration/apply/grs-callback/${businessType.toStringHyphenated}"
+  def grsJourneyCallbackUrl(businessType: BusinessType) = s"${appConfig.thisFrontendBaseUrl}/agent-registration/apply/grs-callback"
 
   val enableGrsStub: Boolean = appConfig.enableGrsStub
   val deskProServiceId: String = appConfig.contactFrontendId
