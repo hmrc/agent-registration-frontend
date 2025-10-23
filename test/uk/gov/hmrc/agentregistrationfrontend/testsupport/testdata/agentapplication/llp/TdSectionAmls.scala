@@ -59,7 +59,7 @@ trait TdSectionAmls {
 
   def amlsUploadDetailsAfterUploadFailed: UploadDetails = amlsUploadDetailsAfterUploadInProgress.copy(
     status = UploadStatus.Failed(
-      failureReason = "Invalid file type"
+      failureReason = "QUARANTINE"
     )
   )
 
