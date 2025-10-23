@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.services
 
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistration.shared.*
@@ -53,3 +54,6 @@ extends RequestAwareLogging:
     Errors.require(agentApplication.internalUserId === request.internalUserId, "Cannot modify application - you must be the user who created it")
     agentRegistrationConnector
       .upsertApplication(agentApplication)
+
+  def findApplicationByLinkId(linkId: LinkId)(using request: RequestHeader): Future[Option[AgentApplication]] =
+    agentRegistrationConnector.findApplicationByLinkId(linkId)

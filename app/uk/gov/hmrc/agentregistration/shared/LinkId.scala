@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend
+package uk.gov.hmrc.agentregistration.shared
 
-object RoutesExports:
+import play.api.libs.json.Format
+import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 
-  export uk.gov.hmrc.agentregistration.shared.BusinessType
-  export uk.gov.hmrc.agentregistration.shared.AgentType
-  export uk.gov.hmrc.agentregistration.shared.LinkId
-  export uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
-  export uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
+/** LinkId is a unique identifier used by the frontend to build shareable web links for distribution to the signatories of the application
+  */
+final case class LinkId(value: String)
+
+object LinkId:
+  given format: Format[LinkId] = JsonFormatsFactory.makeValueClassFormat

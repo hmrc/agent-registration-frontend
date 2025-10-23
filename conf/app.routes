@@ -62,3 +62,7 @@ GET         /apply/anti-money-laundering/evidence/status            uk.gov.hmrc.
 GET         /apply/anti-money-laundering/evidence/upload-result     uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsEvidenceUploadController.showResult
 GET         /apply/anti-money-laundering/evidence/upload-error      uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsEvidenceUploadController.showError(errorCode: String, errorMessage: String, errorRequestId: String, key: String)
 GET         /apply/anti-money-laundering/check-your-answers         uk.gov.hmrc.agentregistrationfrontend.controllers.amls.CheckYourAnswersController.show
+
+
+# Signatory journey routes
+GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.signatories.StartController.start(linkId: String)

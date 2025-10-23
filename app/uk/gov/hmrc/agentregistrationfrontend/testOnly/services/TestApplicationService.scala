@@ -14,28 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.services
+package uk.gov.hmrc.agentregistrationfrontend.testOnly.services
 
-import uk.gov.hmrc.agentregistration.shared.*
+import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistrationfrontend.testOnly.connectors.TestAgentRegistrationConnector
+import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.TestOnlyLink
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
-import java.time.Clock
-import java.time.Instant
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.Future
 
 @Singleton
-class ApplicationFactory @Inject() (
-  clock: Clock
-):
+class TestApplicationService @Inject() (
+  testAgentRegistrationConnector: TestAgentRegistrationConnector
+)
+extends RequestAwareLogging:
 
-  def makeNewAgentApplication(internalUserId: InternalUserId): AgentApplication = AgentApplication(
-    linkId = LinkId(value = UUID.randomUUID().toString),
-    internalUserId = internalUserId,
-    createdAt = Instant.now(clock),
-    applicationState = ApplicationState.InProgress,
-    utr = None,
-    businessDetails = None,
-    applicantContactDetails = None,
-    amlsDetails = None
-  )
+  def makeTestApplication()(using request: RequestHeader): Future[TestOnlyLink] = testAgentRegistrationConnector
+    .makeTestApplication()
