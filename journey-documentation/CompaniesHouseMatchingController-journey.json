@@ -1,0 +1,139 @@
+{
+    "frontendService": "agent-registration-frontend",
+    "controller": "CompaniesHouseMatchingController",
+    "journeyContext": "LLP member name matching against Companies House officer records - validates that applicant is a legitimate member of the limited liability partnership",
+    "routes": [
+        {
+            "method": "GET",
+            "path": "/apply/applicant/member-name-match",
+            "userAction": "View Companies House member matching results",
+            "pageType": "dynamic-results-display",
+            "formHandling": {
+                "formType": "CompaniesHouseOfficerForm",
+                "preFillSource": "application-state",
+                "validationRules": [
+                    "required selection from matched officers",
+                    "valid officer selection"
+                ]
+            },
+            "interactions": [
+                {
+                    "step": 1,
+                    "type": "Action Composition",
+                    "description": "Apply custom action builders with business logic validation",
+                    "actionBuilders": [
+                        "getApplicationInProgress",
+                        "ensure(memberNameQuery.isDefined)"
+                    ],
+                    "businessRules": "Redirect to MemberNameController if memberNameQuery missing"
+                },
+                {
+                    "step": 2,
+                    "type": "Backend Service Call",
+                    "description": "Fetch matching officers from Companies House API",
+                    "service": "CompaniesHouseService",
+                    "method": "getCompaniesHouseOfficers",
+                    "parameters": {
+                        "companyRegistrationNumber": "from application state",
+                        "lastName": "from memberNameQuery",
+                        "isLlp": true
+                    }
+                },
+                {
+                    "step": 3,
+                    "type": "Application State Read",
+                    "description": "Extract company registration number and member name query from AgentApplication",
+                    "dataExtracted": [
+                        "companyRegistrationNumber",
+                        "memberNameQuery.lastName"
+                    ]
+                },
+                {
+                    "step": 4,
+                    "type": "Conditional View Render",
+                    "description": "Render different views based on Companies House API results",
+                    "conditions": {
+                        "no_matches": "SimplePage with 'No member name matches'",
+                        "has_matches": "MatchedMembersPage with officer selection form"
+                    }
+                },
+                {
+                    "step": 5,
+                    "type": "Form Pre-fill",
+                    "description": "Pre-populate form with existing company officer selection if available",
+                    "formType": "CompaniesHouseOfficerForm",
+                    "prePopulationSource": "request.agentApplication.getCompanyOfficer"
+                }
+            ],
+            "navigationFlow": {
+                "onNoMatches": "Display no matches message page",
+                "onMatches": "Display officer selection form with radio buttons",
+                "onMissingPrerequisites": "Redirect to MemberNameController"
+            }
+        },
+        {
+            "method": "POST",
+            "path": "/apply/applicant/member-name-match",
+            "userAction": "Submit selected Companies House officer match",
+            "pageType": "complex-form-submission",
+            "formHandling": {
+                "formType": "CompaniesHouseOfficerForm",
+                "validationRules": [
+                    "required officer selection",
+                    "valid officer from available options",
+                    "special handling for single match confirmation"
+                ],
+                "errorHandling": "re-render with errors and fresh Companies House data"
+            },
+            "interactions": [
+                {
+                    "step": 1,
+                    "type": "Backend Service Call",
+                    "description": "Re-fetch Companies House officers to ensure data consistency",
+                    "service": "CompaniesHouseService",
+                    "method": "getCompaniesHouseOfficers"
+                },
+                {
+                    "step": 2,
+                    "type": "Complex Form Processing",
+                    "description": "Handle multiple submission scenarios based on number of matches",
+                    "scenarios": {
+                        "no_matches": "Display no matches page",
+                        "single_match": "Handle confirmation/rejection of single officer",
+                        "multiple_matches": "Process standard form selection"
+                    }
+                },
+                {
+                    "step": 3,
+                    "type": "Application State Update",
+                    "description": "Update AgentApplication with selected Companies House officer",
+                    "updatePattern": "application.modify(_.applicantContactDetails.each.applicantName).setTo(ApplicantName.NameOfMember)",
+                    "service": "ApplicationService",
+                    "method": "upsert"
+                },
+                {
+                    "step": 4,
+                    "type": "Conditional Navigation",
+                    "description": "Route based on user selection and validation outcome",
+                    "conditions": {
+                        "officer_confirmed": "Redirect to TelephoneNumberController",
+                        "officer_rejected": "Redirect to ApplicantRoleInLlpController",
+                        "validation_error": "Re-render form with errors"
+                    }
+                },
+                {
+                    "step": 5,
+                    "type": "Save For Later Handling",
+                    "description": "Apply save-for-later redirect logic consistently across all paths",
+                    "helper": "SubmissionHelper.redirectIfSaveForLater"
+                }
+            ],
+            "navigationFlow": {
+                "onValidSelection": "Redirect to telephone number collection",
+                "onRejectedMatch": "Redirect back to role selection to provide different name",
+                "onValidationError": "Re-render with error messages and fresh data",
+                "onSaveForLater": "Redirect to save-for-later page"
+            }
+        }
+    ]
+}
