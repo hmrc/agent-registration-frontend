@@ -72,63 +72,6 @@ graph LR
     style B fill:#c8e6c9
 ```
 
-## Security & Validation Flow
-
-```mermaid
-graph TD
-    A[Every Request] --> B{Session Valid?}
-    B -->|No| C[Redirect to Auth]
-    B -->|Yes| D{Application Exists?}
-    D -->|No| E[Start New Application]
-    D -->|Yes| F{Controller-Specific Checks}
-    
-    F --> G{TaskList: UTR Required}
-    F --> H{Upload: AML Details Required}
-    F --> I{GRS: Business Type Required}
-    
-    G -->|Pass| J[Show Task List]
-    G -->|Fail| K[Redirect to GRS]
-    
-    H -->|Pass| L[Show Upload Form]
-    H -->|Fail| M[Redirect to AML Setup]
-    
-    I -->|Pass| N[Process GRS]
-    I -->|Fail| O[Show Error]
-    
-    style C fill:#ffcdd2
-    style E fill:#fff3e0
-    style J fill:#c8e6c9
-    style L fill:#c8e6c9
-    style N fill:#c8e6c9
-```
-
-## Data Flow Between Controllers
-
-```mermaid
-sequenceDiagram
-    participant U as User
-    participant AT as AgentType
-    participant GRS as GrsController
-    participant TL as TaskList
-    participant UP as Upload
-    participant S as Session
-
-    U->>AT: Select agent type
-    AT->>S: Store agentType
-    
-    U->>GRS: Business verification
-    GRS->>S: Store UTR + business details
-    
-    U->>TL: View progress
-    TL->>S: Read all application data
-    TL-->>U: Show completion status
-    
-    U->>UP: Upload evidence
-    UP->>S: Store upload details
-    
-    Note over S: Complete application ready for submission
-```
-
 ## Session Data Evolution by Screen
 
 This section shows the deterministic progression of session data throughout the user journey, with deltas highlighting what changes at each step.
@@ -384,6 +327,36 @@ stateDiagram-v2
 ```
 
 This visual overview provides a comprehensive view of how session data evolves across the entire agent registration journey, making it easy to understand data flow and state management patterns.
+
+## Security & Validation Flow
+
+```mermaid
+graph TD
+    A[Every Request] --> B{Session Valid?}
+    B -->|No| C[Redirect to Auth]
+    B -->|Yes| D{Application Exists?}
+    D -->|No| E[Start New Application]
+    D -->|Yes| F{Controller-Specific Checks}
+    
+    F --> G{TaskList: UTR Required}
+    F --> H{Upload: AML Details Required}
+    F --> I{GRS: Business Type Required}
+    
+    G -->|Pass| J[Show Task List]
+    G -->|Fail| K[Redirect to GRS]
+    
+    H -->|Pass| L[Show Upload Form]
+    H -->|Fail| M[Redirect to AML Setup]
+    
+    I -->|Pass| N[Process GRS]
+    I -->|Fail| O[Show Error]
+    
+    style C fill:#ffcdd2
+    style E fill:#fff3e0
+    style J fill:#c8e6c9
+    style L fill:#c8e6c9
+    style N fill:#c8e6c9
+```
 
 ## Performance Metrics
 
