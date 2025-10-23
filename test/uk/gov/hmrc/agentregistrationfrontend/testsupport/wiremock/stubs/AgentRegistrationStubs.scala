@@ -25,6 +25,15 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AgentRegistrationStubs {
 
+  def stubGetAgentApplication(agentApplication: AgentApplication): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching("/agent-registration/application"),
+    responseStatus = 200,
+    responseBody = Json.toJson(agentApplication).toString
+  )
+
+  // TODO remove this one and use more specific, so we ensure what is actually sent to the backend on updates
+  @deprecated("Use stubUpdateAgentApplication(agentApplication: AgentApplication) instead", "1.0.0")
   def stubUpdateAgentApplication: StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = urlMatching("/agent-registration/application"),
@@ -37,13 +46,6 @@ object AgentRegistrationStubs {
     urlPattern = urlMatching("/agent-registration/application"),
     responseStatus = 200,
     requestBody = Some(equalToJson(Json.toJson(agentApplication).toString))
-  )
-
-  def stubGetAgentApplication(agentApplication: AgentApplication): StubMapping = StubMaker.make(
-    httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching("/agent-registration/application"),
-    responseStatus = 200,
-    responseBody = Json.toJson(agentApplication).toString
   )
 
 }

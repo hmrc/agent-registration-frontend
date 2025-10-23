@@ -26,8 +26,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
-import java.time.LocalDate
-
 class AmlsExpiryDateControllerSpec
 extends ControllerSpec:
 

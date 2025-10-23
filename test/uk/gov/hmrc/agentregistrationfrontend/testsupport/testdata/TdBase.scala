@@ -16,12 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
-import uk.gov.hmrc.agentregistration.shared.upscan.Reference
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import java.time.Clock
@@ -62,7 +57,7 @@ trait TdBase:
   def nino = Nino("AB123456C")
   def safeId: SafeId = SafeId("X00000123456789")
   def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
-  def applicantEmailAddress: String = "user@test.com"
+  def applicantEmailAddress: EmailAddress = EmailAddress("user@test.com")
 
   def telephoneNumber: TelephoneNumber = TelephoneNumber("(+44) 10794554342")
   def crn: Crn = Crn("1234567890")

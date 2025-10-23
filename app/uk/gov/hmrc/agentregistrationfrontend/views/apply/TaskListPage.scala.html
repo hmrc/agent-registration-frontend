@@ -30,7 +30,7 @@
 )
 
 @key = @{"taskList"}
-@title = @{messages(s"$key.title", request.agentApplication.asLlpApplication.getApplicantBusinessName)}
+@title = @{messages(s"$key.title", request.agentApplication.asLlpApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName)}
 @incompleteStatus = @{
     TaskListItemStatus(
         tag = Some(Tag(
@@ -39,7 +39,7 @@
         ))
     )
 }
-@contactIsComplete = @{request.agentApplication.applicantContactDetails.exists(_.isComplete)}
+@contactIsComplete = @{request.agentApplication.asLlpApplication.applicantContactDetails.exists(_.isComplete)}
 @contactStatus = @{
     if(contactIsComplete) {
         TaskListItemStatus(content = Text(messages(s"$key.status.Completed")))

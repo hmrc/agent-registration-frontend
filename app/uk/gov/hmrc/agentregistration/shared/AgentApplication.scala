@@ -31,7 +31,7 @@ import java.time.Instant
 import scala.annotation.nowarn
 
 /** Agent (Registration) Application. This case class represents the data entered by a user for registering as an agent.
- */
+  */
 sealed trait AgentApplication:
 
   def internalUserId: InternalUserId
@@ -79,34 +79,34 @@ sealed trait AgentApplication:
   def asLlpApplication: AgentApplicationLlp = asExpected[AgentApplicationLlp]
 
 /** Sole Trader Application. This case class represents the data entered by a user for registering as a sole trader.
- */
+  */
 final case class AgentApplicationSoleTrader(
-                                             override val internalUserId: InternalUserId,
-                                             override val groupId: GroupId,
-                                             override val createdAt: Instant,
-                                             override val applicationState: ApplicationState,
-                                             userRole: Option[UserRole] = None,
-                                             businessDetails: Option[BusinessDetailsSoleTrader],
-                                             override val amlsDetails: Option[AmlsDetails]
-                                           )
-  extends AgentApplication:
+  override val internalUserId: InternalUserId,
+  override val groupId: GroupId,
+  override val createdAt: Instant,
+  override val applicationState: ApplicationState,
+  userRole: Option[UserRole] = None,
+  businessDetails: Option[BusinessDetailsSoleTrader],
+  override val amlsDetails: Option[AmlsDetails]
+)
+extends AgentApplication:
 
   override val businessType: BusinessType.SoleTrader.type = BusinessType.SoleTrader
   def getUserRole: UserRole = userRole.getOrElse(expectedDataNotDefinedError("userRole"))
   def getBusinessDetails: BusinessDetailsSoleTrader = businessDetails.getOrElse(expectedDataNotDefinedError("businessDetails"))
 
 /** Application Applicatoin for Limited Liability Partnership (Llp). This case class represents the data entered by a user for registering as an Llp.
- */
+  */
 final case class AgentApplicationLlp(
-                                      override val internalUserId: InternalUserId,
-                                      override val groupId: GroupId,
-                                      override val createdAt: Instant,
-                                      override val applicationState: ApplicationState,
-                                      businessDetails: Option[BusinessDetailsLlp],
-                                      applicantContactDetails: Option[ApplicantContactDetails],
-                                      override val amlsDetails: Option[AmlsDetails]
-                                    )
-  extends AgentApplication:
+  override val internalUserId: InternalUserId,
+  override val groupId: GroupId,
+  override val createdAt: Instant,
+  override val applicationState: ApplicationState,
+  businessDetails: Option[BusinessDetailsLlp],
+  applicantContactDetails: Option[ApplicantContactDetails],
+  override val amlsDetails: Option[AmlsDetails]
+)
+extends AgentApplication:
 
   override val businessType: BusinessType.Partnership.LimitedLiabilityPartnership.type = BusinessType.Partnership.LimitedLiabilityPartnership
 

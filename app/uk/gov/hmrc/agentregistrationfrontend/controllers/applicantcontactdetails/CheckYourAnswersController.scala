@@ -37,7 +37,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
     .ensure(
-      _.agentApplication.applicantContactDetails.exists(_.isComplete),
+      _.agentApplication.asLlpApplication.applicantContactDetails.exists(_.isComplete),
       implicit request =>
         logger.warn("Because we don't have complete applicant contact details we are redirecting to the email page")
         Redirect(routes.EmailAddressController.show)

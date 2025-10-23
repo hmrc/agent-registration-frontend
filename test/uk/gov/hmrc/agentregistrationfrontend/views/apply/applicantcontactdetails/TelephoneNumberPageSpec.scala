@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.TelephoneNumberPage
 
 class TelephoneNumberPageSpec
-  extends ViewSpec:
+extends ViewSpec:
 
   val viewTemplate: TelephoneNumberPage = app.injector.instanceOf[TelephoneNumberPage]
   implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] = tdAll

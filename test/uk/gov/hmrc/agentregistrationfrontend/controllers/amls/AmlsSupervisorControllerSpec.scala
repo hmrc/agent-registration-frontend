@@ -24,6 +24,8 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
+import scala.annotation.nowarn
+
 class AmlsSupervisorControllerSpec
 extends ControllerSpec:
 
@@ -56,7 +58,7 @@ extends ControllerSpec:
   s"POST $path with valid selection should redirect to the next page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.baseForSectionAmls)
-    AgentRegistrationStubs.stubUpdateAgentApplication
+    AgentRegistrationStubs.stubUpdateAgentApplication: @nowarn("cat=deprecation")
     val response: WSResponse = post(path)(Map("amlsSupervisoryBody" -> Seq("HMRC")))
 
     response.status shouldBe 303
@@ -66,7 +68,8 @@ extends ControllerSpec:
   s"POST $path with save for later and valid selection should redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.baseForSectionAmls)
-    AgentRegistrationStubs.stubUpdateAgentApplication
+
+    AgentRegistrationStubs.stubUpdateAgentApplication: @nowarn("cat=deprecation")
     val response: WSResponse =
       post(path)(Map(
         "amlsSupervisoryBody" -> Seq("HMRC"),

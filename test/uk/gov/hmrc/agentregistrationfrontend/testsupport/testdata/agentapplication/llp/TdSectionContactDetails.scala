@@ -81,6 +81,14 @@ trait TdSectionContactDetails {
           .modify(_.applicantContactDetails.each.telephoneNumber)
           .setTo(Some(dependencies.telephoneNumber))
 
+        val afterEmailAddressProvided: AgentApplicationLlp = afterTelephoneNumberProvided
+          .modify(_.applicantContactDetails.each.applicantEmailAddress)
+          .setTo(Some(ApplicantEmailAddressHelper.afterEmailAddressProvided))
+
+        val afterEmailAddressVerified: AgentApplicationLlp = afterEmailAddressProvided
+          .modify(_.applicantContactDetails.each.applicantEmailAddress)
+          .setTo(Some(ApplicantEmailAddressHelper.afterEmailAddressVerified))
+
       object whenApplicantIsAuthorised:
 
         private object ApplicantNameHelper:
@@ -102,5 +110,21 @@ trait TdSectionContactDetails {
         val afterTelephoneNumberProvided: AgentApplicationLlp = afterNameDeclared
           .modify(_.applicantContactDetails.each.telephoneNumber)
           .setTo(Some(dependencies.telephoneNumber))
+
+        val afterEmailAddressProvided: AgentApplicationLlp = afterTelephoneNumberProvided
+          .modify(_.applicantContactDetails.each.applicantEmailAddress)
+          .setTo(Some(ApplicantEmailAddressHelper.afterEmailAddressProvided))
+
+        val afterEmailAddressVerified: AgentApplicationLlp = afterEmailAddressProvided
+          .modify(_.applicantContactDetails.each.applicantEmailAddress)
+          .setTo(Some(ApplicantEmailAddressHelper.afterEmailAddressVerified))
+
+  private object ApplicantEmailAddressHelper:
+
+    val afterEmailAddressProvided: ApplicantEmailAddress = ApplicantEmailAddress(
+      emailAddress = dependencies.applicantEmailAddress,
+      isVerified = false
+    )
+    val afterEmailAddressVerified: ApplicantEmailAddress = afterEmailAddressProvided.copy(isVerified = true)
 
 }

@@ -20,6 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock as wm
 import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.Json
+import uk.gov.hmrc.agentregistration.shared.EmailAddress
 import uk.gov.hmrc.agentregistrationfrontend.model.emailVerification.VerifyEmailRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
@@ -36,7 +37,7 @@ object EmailVerificationStubs {
 
   def stubEmailStatusVerified(
     credId: String,
-    email: String
+    emailAddress: EmailAddress
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = urlMatching(s"/email-verification/verification-status/$credId"),
@@ -45,7 +46,7 @@ object EmailVerificationStubs {
       Json.obj(
         "emails" -> Json.arr(
           Json.obj(
-            "emailAddress" -> s"$email",
+            "emailAddress" -> s"${emailAddress.value}",
             "verified" -> true,
             "locked" -> false
           )

@@ -16,11 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails
 
-import com.softwaremill.quicklens.*
-import org.scalatest.Ignore
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.contactdetails.*
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -32,13 +29,23 @@ class CompaniesHouseMatchingControllerSpec
 extends ControllerSpec:
 
   private val path = "/agent-registration/apply/applicant/member-name-match"
-  private val lastName = "Last"
-  private val validApplication =
-    tdAll
-      .agentApplicationLlp
-      .sectionContactDetails
-      .whenApplicantIsAMember
-      .afterNameQueryProvided
+  private object agentApplication:
+
+    val afterNameQueryProvided =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAMember
+        .afterNameQueryProvided
+
+    val afterOfficerChosen =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAMember
+        .afterOfficerChosen
+
+  private val lastName = tdAll.agentApplicationLlp.sectionContactDetails.whenApplicantIsAMember.lastNameQuery
 
   "routes should have correct paths and methods" in:
     routes.CompaniesHouseMatchingController.show shouldBe Call(
@@ -53,7 +60,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page when there is a single match" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse = get(path)
 
@@ -62,7 +69,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page when there are multiple matches" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
     val response: WSResponse = get(path)
 
@@ -71,7 +78,7 @@ extends ControllerSpec:
 
   s"POST $path for single match without a valid selection should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse =
       post(path)(Map(
@@ -85,24 +92,9 @@ extends ControllerSpec:
 
   s"POST $path for single match with valid inputs should save officer and redirect to telephone page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
-    AgentRegistrationStubs.stubUpdateAgentApplication(
-      validApplication
-        .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(
-          applicantName = ApplicantName.NameOfMember(
-            memberNameQuery = Some(CompaniesHouseNameQuery(
-              firstName = "First",
-              lastName = "Last"
-            )),
-            companiesHouseOfficer = Some(CompaniesHouseOfficer(
-              name = "First Last",
-              dateOfBirth = Some(CompaniesHouseDateOfBirth(None, 1, 1990))
-            ))
-          )
-        )))
-    )
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterOfficerChosen)
     val response: WSResponse =
       post(path)(Map(
         "ChOfficerSelectionFormType" -> Seq("YesNoForm"),
@@ -115,7 +107,7 @@ extends ControllerSpec:
 
   s"POST $path for multiple matches without a valid selection should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
     val response: WSResponse =
       post(path)(Map(
@@ -129,28 +121,13 @@ extends ControllerSpec:
 
   s"POST $path for multiple matches with valid inputs should save officer and redirect to telephone page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
-    AgentRegistrationStubs.stubUpdateAgentApplication(
-      validApplication
-        .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(
-          applicantName = ApplicantName.NameOfMember(
-            memberNameQuery = Some(CompaniesHouseNameQuery(
-              firstName = "First",
-              lastName = "Last"
-            )),
-            companiesHouseOfficer = Some(CompaniesHouseOfficer(
-              name = "First Last",
-              dateOfBirth = Some(CompaniesHouseDateOfBirth(None, 1, 1990))
-            ))
-          )
-        )))
-    )
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterOfficerChosen)
     val response: WSResponse =
       post(path)(Map(
         "ChOfficerSelectionFormType" -> Seq("OfficerSelectionForm"),
-        ChOfficerSelectionForms.key -> Seq("First Last|/1/1990")
+        ChOfficerSelectionForms.key -> Seq("Taylor Reed|12/11/1990")
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -159,23 +136,10 @@ extends ControllerSpec:
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
     AgentRegistrationStubs.stubUpdateAgentApplication(
-      validApplication
-        .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(
-          applicantName = ApplicantName.NameOfMember(
-            memberNameQuery = Some(CompaniesHouseNameQuery(
-              firstName = "First",
-              lastName = "Last"
-            )),
-            companiesHouseOfficer = Some(CompaniesHouseOfficer(
-              name = "First Last",
-              dateOfBirth = Some(CompaniesHouseDateOfBirth(None, 1, 1990))
-            ))
-          )
-        )))
+      agentApplication.afterOfficerChosen
     )
     val response: WSResponse =
       post(path)(Map(
@@ -190,7 +154,7 @@ extends ControllerSpec:
 
   s"POST $path with save for later and without a valid selection should not return errors and redirect to save for later page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse =
       post(path)(Map(

@@ -37,7 +37,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.WireMockSuppor
 
 import java.time.Clock
 import java.time.Instant
-import java.time.ZoneId
 
 trait ISpec
 extends AnyWordSpecLike,

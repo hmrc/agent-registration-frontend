@@ -30,7 +30,8 @@ trait TdAgentApplicationRequest {
       request = dependencies.requestLoggedIn,
       agentApplication = agentApplication,
       internalUserId = dependencies.internalUserId,
-      groupId = dependencies.groupId
+      groupId = dependencies.groupId,
+      credentials = dependencies.credentials
     )
 
 }
