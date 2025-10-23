@@ -30,19 +30,38 @@
 )
 
 @key = @{"taskList"}
-@title = @{messages(s"$key.title", request.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName)}
+@title = @{messages(s"$key.title", request.agentApplication.asLlpApplication.getApplicantBusinessName)}
+@incompleteStatus = @{
+    TaskListItemStatus(
+        tag = Some(Tag(
+            content = Text(messages(s"$key.status.Incomplete")),
+            classes = "govuk-tag--blue"
+        ))
+    )
+}
+@contactIsComplete = @{request.agentApplication.applicantContactDetails.exists(_.isComplete)}
+@contactStatus = @{
+    if(contactIsComplete) {
+        TaskListItemStatus(content = Text(messages(s"$key.status.Completed")))
+    } else {
+        incompleteStatus
+    }
+}
+@agencyDetailsStatus = @{
+    if(contactIsComplete) {
+        incompleteStatus
+    } else {
+        TaskListItemStatus(content = Text(messages(s"$key.status.CannotStartYet")))
+    }
+}
 @amlsStatus = @{
     if(request.agentApplication.amlsDetails.exists(_.isComplete)) {
         TaskListItemStatus(content = Text(messages(s"$key.status.Completed")))
     } else {
-        TaskListItemStatus(
-            tag = Some(Tag(
-                content = Text(messages(s"$key.status.Incomplete")),
-                classes = "govuk-tag--blue"
-            ))
-        )
+        incompleteStatus
     }
 }
+
 @layout(
     pageTitle = title,
     suppressBackLink = true
@@ -73,13 +92,8 @@
                 title = TaskListItemTitle(
                     content = Text(messages(s"$key.contact.linkText"))
                 ),
-                status = TaskListItemStatus(
-                    tag = Some(Tag(
-                        content = Text(messages(s"$key.status.Incomplete")),
-                        classes = "govuk-tag--blue"
-                    ))
-                ),
-                href = Some(applicantRoutes.ApplicantRoleInLlpController.show.url) // TODO Switch to CYA link when available
+                status = contactStatus,
+                href = Some(applicantRoutes.CheckYourAnswersController.show.url)
             )
         ),
         idPrefix = "contact"
@@ -92,10 +106,8 @@
                 title = TaskListItemTitle(
                     content = Text(messages(s"$key.accountDetails.linkText"))
                 ),
-                status = TaskListItemStatus(
-                    content = Text(messages(s"$key.status.CannotStartYet"))
-                ),
-                href = None
+                status = agencyDetailsStatus,
+                href = if contactIsComplete then Some("#") else None
             )
         ),
         idPrefix = "accountDetails"
@@ -115,12 +127,7 @@
                 title = TaskListItemTitle(
                     content = Text(messages(s"$key.hmrcStandards.agreement.linkText"))
                 ),
-                status = TaskListItemStatus(
-                    tag = Some(Tag(
-                        content = Text(messages(s"$key.status.Incomplete")),
-                        classes = "govuk-tag--blue"
-                    ))
-                ),
+                status = incompleteStatus,
                 href = Some("#") // TODO Add link when available
             )
         ),

@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.CheckYourAnswersPage
 
 class CheckYourAnswersPageSpec
-extends ViewSpec:
+  extends ViewSpec:
 
   override lazy val overridesModule: AbstractModule =
     new AbstractModule:

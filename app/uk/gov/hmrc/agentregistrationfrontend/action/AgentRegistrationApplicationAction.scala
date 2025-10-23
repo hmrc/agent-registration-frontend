@@ -25,8 +25,9 @@ import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConne
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
-import uk.gov.hmrc.agentregistration.shared._
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,12 +38,14 @@ class AgentApplicationRequest[A](
   val agentApplication: AgentApplication,
   override val internalUserId: InternalUserId,
   override val groupId: GroupId,
-  override val request: Request[A]
+  override val request: Request[A],
+  override val credentials: Credentials
 )
 extends AuthorisedRequest[A](
   internalUserId,
   groupId,
-  request
+  request,
+  credentials
 ):
   Errors.require(
     requirement = agentApplication.internalUserId === internalUserId,
@@ -62,7 +65,8 @@ object AgentApplicationRequest:
         agentApplication = r.agentApplication,
         internalUserId = r.internalUserId,
         groupId = r.groupId,
-        request = r
+        request = r,
+        credentials = r.credentials
       ) with FormValue[T]:
         override val formValue: T = t
 
@@ -87,7 +91,8 @@ with RequestAwareLogging:
               agentApplication = application,
               internalUserId = request.internalUserId,
               groupId = request.groupId,
-              request = request.request
+              request = request.request,
+              credentials = request.credentials
             )))
           case None => createNewApplication()
       }
@@ -108,7 +113,8 @@ with RequestAwareLogging:
               agentApplication = agentApplication,
               internalUserId = request.internalUserId,
               groupId = request.groupId,
-              request = request.request
+              request = request.request,
+              credentials = request.credentials
             ))
           )
     }

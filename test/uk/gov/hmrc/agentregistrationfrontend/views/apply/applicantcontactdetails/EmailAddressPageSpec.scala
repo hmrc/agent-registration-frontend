@@ -16,48 +16,57 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.views.apply.applicantcontactdetails
 
+import com.softwaremill.quicklens.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
+import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes
-import uk.gov.hmrc.agentregistrationfrontend.forms.TelephoneNumberForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.TelephoneNumberPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.EmailAddressPage
 
-class TelephoneNumberPageSpec
-  extends ViewSpec:
+class EmailAddressPageSpec
+extends ViewSpec:
 
-  val viewTemplate: TelephoneNumberPage = app.injector.instanceOf[TelephoneNumberPage]
-  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] = tdAll
-    .makeAgentApplicationRequest(
-      agentApplication =
-        tdAll
-          .agentApplicationLlp
-          .sectionContactDetails
-          .whenApplicantIsAuthorised
-          .afterNameDeclared
+  val viewTemplate: EmailAddressPage = app.injector.instanceOf[EmailAddressPage]
+  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] =
+    new AgentApplicationRequest(
+      request = request,
+      agentApplication = tdAll.llpAgentApplication
+        .modify(_.applicantContactDetails)
+        .setTo(Some(ApplicantContactDetails(
+          applicantName = ApplicantName.NameOfAuthorised(name = Some("First Last")),
+          telephoneNumber = Some(TelephoneNumber(tdAll.telephoneNumber)),
+          applicantEmailAddress = None
+        ))),
+      internalUserId = tdAll.internalUserId,
+      groupId = tdAll.groupId,
+      credentials = tdAll.credentials
     )
-  val doc: Document = Jsoup.parse(viewTemplate(TelephoneNumberForm.form).body)
-  private val heading: String = "If we need to speak to you about this application, what number do we call?"
+  val doc: Document = Jsoup.parse(viewTemplate(EmailAddressForm.form).body)
+  private val heading: String = "If we need to email you about this application, what’s the email address?"
 
-  "TelephoneNumberPage" should:
+  "EmailAddressPage" should:
 
     "have the correct title" in:
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
 
-    "render a form with an input of type tel for telephone number" in:
+    "render a form with an input of type email for email address" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe routes.TelephoneNumberController.submit.url
+      form.attr("action") shouldBe routes.EmailAddressController.submit.url
       form
-        .selectOrFail("label[for=telephoneNumber]")
+        .selectOrFail("label[for=emailAddress]")
         .selectOnlyOneElementOrFail()
         .text() shouldBe heading
       form
-        .selectOrFail("input[name=telephoneNumber][type=tel]")
+        .selectOrFail("input[name=emailAddress][type=email]")
         .selectOnlyOneElementOrFail()
 
     "render a save and continue button" in:
@@ -75,9 +84,9 @@ class TelephoneNumberPageSpec
         .text() shouldBe "Save and come back later"
 
     "render the form error correctly when the form contains an error" in:
-      val field = TelephoneNumberForm.key
-      val errorMessage = "Enter the number we should call to speak to you about this application"
-      val formWithError = TelephoneNumberForm.form
+      val field = EmailAddressForm.key
+      val errorMessage = "Enter your email address"
+      val formWithError = EmailAddressForm.form
         .withError(field, errorMessage)
       behavesLikePageWithErrorHandling(
         field = field,

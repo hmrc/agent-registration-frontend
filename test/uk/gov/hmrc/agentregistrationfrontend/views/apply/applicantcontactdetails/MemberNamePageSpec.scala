@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MemberNamePage
 
 class MemberNamePageSpec
-extends ViewSpec:
+  extends ViewSpec:
 
   val viewTemplate: MemberNamePage = app.injector.instanceOf[MemberNamePage]
   implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] = tdAll

@@ -28,7 +28,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentReg
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CompaniesHouseStubs
 
-@Ignore
 class CompaniesHouseMatchingControllerSpec
 extends ControllerSpec:
 

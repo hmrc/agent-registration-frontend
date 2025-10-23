@@ -55,7 +55,8 @@ object AuthStubs {
        |  "credentialRole": "User",
        |  "groupIdentifier": "${groupId.value}",
        |  "agentInformation": {},
-       |  "internalId": "${internalUserId.value}"
+       |  "internalId": "${internalUserId.value}",
+       |  "optionalCredentials": {"providerId":"cred-id-12345","providerType":"GovernmentGateway"}
        |}
        |""".stripMargin
 
@@ -77,7 +78,8 @@ object AuthStubs {
       |    "allEnrolments",
       |    "groupIdentifier",
       |    "credentialRole",
-      |    "internalId"
+      |    "internalId",
+      |    "optionalCredentials"
       |  ]
       |}
       |""".stripMargin

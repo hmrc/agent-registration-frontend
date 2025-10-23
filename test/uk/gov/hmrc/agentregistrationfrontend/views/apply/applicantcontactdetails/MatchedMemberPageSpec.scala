@@ -30,7 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MatchedMemberPage
 
 class MatchedMemberPageSpec
-extends ViewSpec:
+  extends ViewSpec:
 
   val viewTemplate: MatchedMemberPage = app.injector.instanceOf[MatchedMemberPage]
   implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(
