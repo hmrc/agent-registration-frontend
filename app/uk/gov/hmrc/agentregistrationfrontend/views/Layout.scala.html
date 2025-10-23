@@ -29,7 +29,8 @@
         hmrcTimeoutDialogHelper: HmrcTimeoutDialogHelper,
         govukErrorSummary: GovukErrorSummary,
         autocompleteCss: HmrcAccessibleAutocompleteCss,
-        autocompleteJavascript: HmrcAccessibleAutocompleteJavascript
+        autocompleteJavascript: HmrcAccessibleAutocompleteJavascript,
+        govukServiceNavigation: GovukServiceNavigation
 )
 
 @(
@@ -81,16 +82,19 @@
 @hmrcStandardPage(
   HmrcStandardPageParams(
       pageTitle = Some(gdsTitle),
+      serviceName = Some(""), // None will display a default, not blank as required
       serviceURLs = ServiceURLs(
-          serviceUrl = Some(routes.AgentApplicationController.landing.url),
           signOutUrl = if (isSignedIn) Some(routes.SignOutController.signOut.url) else None
       ),
+      serviceNavigation = Some(ServiceNavigation(
+          serviceName = Some(messages("service.name")),
+          serviceUrl = Some(appConfig.govukStartPageUrl)
+      )),
       templateOverrides = TemplateOverrides(
           additionalHeadBlock = Some(head),
           additionalScriptsBlock = Some(additionalScripts)
       ),
       backLink = if suppressBackLink then None else Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
-      isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled,
-      serviceName = Some(messages("service.name"))
+      isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
   )
 )(contentWithErrorsAndHelp)

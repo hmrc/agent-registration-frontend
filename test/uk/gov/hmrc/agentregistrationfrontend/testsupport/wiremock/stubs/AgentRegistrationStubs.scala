@@ -32,20 +32,22 @@ object AgentRegistrationStubs {
     responseBody = Json.toJson(agentApplication).toString
   )
 
-  // TODO remove this one and use more specific, so we ensure what is actually sent to the backend on updates
-  @deprecated("Use stubUpdateAgentApplication(agentApplication: AgentApplication) instead", "1.0.0")
-  def stubUpdateAgentApplication: StubMapping = StubMaker.make(
-    httpMethod = StubMaker.HttpMethod.POST,
-    urlPattern = urlMatching("/agent-registration/application"),
-    responseStatus = 200
-  )
-
   // when you want to verify what is being stored
   def stubUpdateAgentApplication(agentApplication: AgentApplication): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = urlMatching("/agent-registration/application"),
     responseStatus = 200,
     requestBody = Some(equalToJson(Json.toJson(agentApplication).toString))
+  )
+
+  def stubFindApplicationByLinkId(
+    linkId: String,
+    agentApplication: AgentApplication
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"/agent-registration/application/$linkId"),
+    responseStatus = 200,
+    responseBody = Json.toJson(agentApplication).toString
   )
 
 }

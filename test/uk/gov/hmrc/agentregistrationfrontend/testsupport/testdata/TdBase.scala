@@ -49,6 +49,7 @@ trait TdBase:
 
   def saUtr: SaUtr = SaUtr("1234567895")
   def internalUserId: InternalUserId = InternalUserId("internal-user-id-12345")
+  def linkId: LinkId = LinkId("link-id-12345")
   def groupId: GroupId = GroupId("group-id-12345")
   def credentials: Credentials = Credentials(
     providerId = "cred-id-12345",

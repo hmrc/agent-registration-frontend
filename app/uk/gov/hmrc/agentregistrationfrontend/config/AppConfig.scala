@@ -59,6 +59,8 @@ class AppConfig @Inject() (
     .addParam("origin", "agent-registration-frontend")
     .addParam("accountType", "agent") // specifying this to bypass unnecessary screens intended for Individuals
 
+  def applicationLink(linkId: String): Uri = uri"$thisFrontendBaseUrl/agent-registration/provide-details/start/$linkId"
+
   val welshLanguageSupportEnabled: Boolean = configuration.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
   val contactFrontendId: String = configuration.get[String]("contact-frontend.serviceId") // TODO placeholder
   val accessibilityStatementPath: String = configuration.get[String]("accessibility-statement.service-path")
