@@ -45,7 +45,7 @@ extends ControllerSpec:
     routes.AmlsRegistrationNumberController.submit.url shouldBe routes.AmlsRegistrationNumberController.show.url
 
   private case class TestCaseForAmlsRegistrationNumber(
-    application: AgentApplication,
+    agentApplicationAfterSupervisoryBodySelected: AgentApplication,
     amlsType: String,
     validInput: String,
     invalidInput: String,
@@ -54,7 +54,7 @@ extends ControllerSpec:
 
   List(
     TestCaseForAmlsRegistrationNumber(
-      application =
+      agentApplicationAfterSupervisoryBodySelected =
         tdAll
           .agentApplicationLlp
           .sectionAmls
@@ -66,7 +66,7 @@ extends ControllerSpec:
       nextPage = routes.CheckYourAnswersController.show.url
     ),
     TestCaseForAmlsRegistrationNumber(
-      application =
+      agentApplicationAfterSupervisoryBodySelected =
         tdAll
           .agentApplicationLlp
           .sectionAmls
@@ -80,7 +80,7 @@ extends ControllerSpec:
   ).foreach: testCase =>
     s"GET $path should return 200 for ${testCase.amlsType} and render page" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.agentApplicationAfterSupervisoryBodySelected)
       val response: WSResponse = get(path)
 
       response.status shouldBe 200
@@ -89,11 +89,11 @@ extends ControllerSpec:
 
     s"POST $path with valid input for ${testCase.amlsType} should redirect to the next page" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
-      val updatedApplication = testCase.application
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.agentApplicationAfterSupervisoryBodySelected)
+      val updatedApplication = testCase.agentApplicationAfterSupervisoryBodySelected
         .modify(_.amlsDetails.each)
         .setTo(AmlsDetails(
-          supervisoryBody = testCase.application.getAmlsDetails.supervisoryBody,
+          supervisoryBody = testCase.agentApplicationAfterSupervisoryBodySelected.getAmlsDetails.supervisoryBody,
           amlsRegistrationNumber = Some(AmlsRegistrationNumber(testCase.validInput))
         ))
       AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
@@ -110,11 +110,11 @@ extends ControllerSpec:
 
     s"POST $path with save for later and valid input for ${testCase.amlsType} should redirect to the saved for later page" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
-      val updatedApplication = testCase.application
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.agentApplicationAfterSupervisoryBodySelected)
+      val updatedApplication = testCase.agentApplicationAfterSupervisoryBodySelected
         .modify(_.amlsDetails.each)
         .setTo(AmlsDetails(
-          supervisoryBody = testCase.application.getAmlsDetails.supervisoryBody,
+          supervisoryBody = testCase.agentApplicationAfterSupervisoryBodySelected.getAmlsDetails.supervisoryBody,
           amlsRegistrationNumber = Some(AmlsRegistrationNumber(testCase.validInput))
         ))
       AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
@@ -131,7 +131,7 @@ extends ControllerSpec:
 
     s"POST $path as blank form for ${testCase.amlsType} should return 400" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.agentApplicationAfterSupervisoryBodySelected)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(""),
@@ -145,7 +145,7 @@ extends ControllerSpec:
 
     s"POST $path as blank form and save for later for ${testCase.amlsType} should redirect to save for later page" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.agentApplicationAfterSupervisoryBodySelected)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(""),
@@ -158,7 +158,7 @@ extends ControllerSpec:
 
     s"POST $path with an invalid value for ${testCase.amlsType} should return 400" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.agentApplicationAfterSupervisoryBodySelected)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(testCase.invalidInput),
@@ -172,7 +172,7 @@ extends ControllerSpec:
 
     s"POST $path with an invalid value and save for later for ${testCase.amlsType} should not save and redirect to save for later" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.agentApplicationAfterSupervisoryBodySelected)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(testCase.invalidInput),
