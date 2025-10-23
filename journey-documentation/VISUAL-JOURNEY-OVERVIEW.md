@@ -27,14 +27,6 @@ graph TD
 
 ## Session Data Model Across Controllers
 
-    style A fill:#e3f2fd
-    style E fill:#fff3e0
-    style H fill:#c8e6c9
-
-```
-
-## Session Data Model Across Controllers
-
 ```mermaid
 graph TD
     A[AgentApplication Session] --> B[Basic Info]
