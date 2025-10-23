@@ -99,7 +99,7 @@ trait TdSectionContactDetails {
           .modify(_.applicantContactDetails.each.applicantName)
           .setTo(ApplicantNameHelper.afterNameDeclared)
 
-        val afterTelephoneNumberProvided: AgentApplicationLlp = afterRoleSelected
+        val afterTelephoneNumberProvided: AgentApplicationLlp = afterNameDeclared
           .modify(_.applicantContactDetails.each.telephoneNumber)
           .setTo(Some(dependencies.telephoneNumber))
 
