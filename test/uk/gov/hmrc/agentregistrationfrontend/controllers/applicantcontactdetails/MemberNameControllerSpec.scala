@@ -113,8 +113,8 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterNameQueryProvided)
     val response: WSResponse =
       post(path)(Map(
-        CompaniesHouseNameQueryForm.firstNameKey -> Seq("First"),
-        CompaniesHouseNameQueryForm.lastNameKey -> Seq("Last"),
+        CompaniesHouseNameQueryForm.firstNameKey -> Seq(agentApplication.whenApplicantIsAMember.firstNameQuery),
+        CompaniesHouseNameQueryForm.lastNameKey -> Seq(agentApplication.whenApplicantIsAMember.lastNameQuery),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
