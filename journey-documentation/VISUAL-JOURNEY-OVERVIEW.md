@@ -25,38 +25,6 @@ graph TD
         H --> I[Submit Application]
 ```
 
-## Session Data Model Across Controllers
-
-```mermaid
-graph TD
-    A[AgentApplication Session] --> B[Basic Info]
-    A --> C[Business Details]
-    A --> D[Applicant Info]
-    A --> E[AML Details]
-    
-    B --> B1[Agent Type: Individual/Company]
-    B --> B2[Business Type: SoleTrader/LimitedCompany/Partnership/LLP]
-    B --> B3[UTR: String - from GRS]
-    
-    C --> C1[Business Name: String]
-    C --> C2[Registration Date: LocalDate]
-    C --> C3[Company Number: Option String]
-    
-    D --> D1[Applicant Name: String]
-    D --> D2[LLP Role: Option String]
-    D --> D3[Contact Details: Phone/Email]
-    
-    E --> E1[Supervisor: AML Body]
-    E --> E2[Registration Number: String]
-    E --> E3[Evidence Upload: UploadDetails]
-    
-    style A fill:#e3f2fd
-    style B fill:#fff3e0
-    style C fill:#e8f5e8
-    style D fill:#f3e5f5
-    style E fill:#fce4ec
-```
-
 ## Controller-Specific Session Changes
 
 ### AgentTypeController
@@ -160,61 +128,6 @@ sequenceDiagram
     
     Note over S: Complete application ready for submission
 ```
-
-## UI State Indicators
-
-### Task List Progress Visualization
-
-```mermaid
-graph LR
-    A[About Business] --> A1{Complete?}
-    B[Applicant Details] --> B1{Complete?}
-    C[AML Details] --> C1{Complete?}
-    
-    A1 -->|Yes| A2[Completed]
-    A1 -->|Partial| A3[In Progress]
-    A1 -->|No| A4[Not Started]
-    
-    B1 -->|Yes| B2[Completed]
-    B1 -->|Partial| B3[In Progress]
-    B1 -->|No| B4[Not Started]
-    
-    C1 -->|Yes| C2[Completed]
-    C1 -->|Partial| C3[In Progress]
-    C1 -->|No| C4[Not Started]
-    
-    style A2 fill:#c8e6c9
-    style B2 fill:#c8e6c9
-    style C2 fill:#c8e6c9
-    style A3 fill:#fff3e0
-    style B3 fill:#fff3e0
-    style C3 fill:#fff3e0
-    style A4 fill:#ffebee
-    style B4 fill:#ffebee
-    style C4 fill:#ffebee
-```
-
-## Responsive Design Patterns
-
-### Mobile Journey Adaptation
-
-```mermaid
-graph TD
-    A[Mobile User] --> B[Simplified Navigation]
-    B --> C[One Section at a Time]
-    C --> D[Progress Indicator]
-    D --> E[Save for Later Prominent]
-    
-    F[Desktop User] --> G[Full Task List View]
-    G --> H[Multiple Sections Visible]
-    H --> I[Side Navigation]
-    I --> J[Breadcrumb Trail]
-    
-    style A fill:#e3f2fd
-    style F fill:#e3f2fd
-```
-
-## Debug & Monitoring Views
 
 ## Session Data Evolution by Screen
 
@@ -449,29 +362,6 @@ AgentApplication:
 # DELTA: None - Ready for submission
 ```
 
-## Session Data Size Progression
-
-| Step | Screen | Fields Added | Total Fields | Data Size (approx) |
-|------|--------|--------------|--------------|-------------------|
-| 1 | Agent Type | 4 | 4 | 150 bytes |
-| 2 | Business Type | 1 | 5 | 170 bytes |
-| 3 | GRS Callback | 4 | 9 | 280 bytes |
-| 4 | Task List | 0 | 9 | 280 bytes |
-| 5 | Applicant Details | 4 | 13 | 380 bytes |
-| 6 | AML Supervisor | 1 | 14 | 400 bytes |
-| 7 | AML Registration | 1 | 15 | 420 bytes |
-| 8 | Evidence Upload | 4 | 19 | 520 bytes |
-
-## Performance Metrics Dashboard
-
-| Controller | Avg Response | Session Operations | External Calls |
-|------------|-------------|-------------------|-----------------|
-| AgentType | 45ms | 1 write | 0 |
-| GrsController | 3.2s | 2 writes | 2 (GRS API) |
-| TaskList | 35ms | 1 read | 0 |
-| Upload | 85ms | 2 writes | 1 (Upscan) |
-| CompaniesHouse | 1.8s | 1 write | 1 (CH API) |
-
 ## State Transition Map
 
 ```mermaid
@@ -494,3 +384,13 @@ stateDiagram-v2
 ```
 
 This visual overview provides a comprehensive view of how session data evolves across the entire agent registration journey, making it easy to understand data flow and state management patterns.
+
+## Performance Metrics
+
+| Controller | Avg Response | Session Operations | External Calls |
+|------------|-------------|-------------------|-----------------|
+| AgentType | 45ms | 1 write | 0 |
+| GrsController | 3.2s | 2 writes | 2 (GRS API) |
+| TaskList | 35ms | 1 read | 0 |
+| Upload | 85ms | 2 writes | 1 (Upscan) |
+| CompaniesHouse | 1.8s | 1 write | 1 (CH API) |
