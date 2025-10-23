@@ -50,8 +50,8 @@ extends AnyWordSpecLike,
   private val testServerPort = ISpec.testServerPort
 
   lazy val tdAll: TdAll = TdAll.tdAll
-  lazy val frozenInstant: Instant = tdAll.instant
-  lazy val clock: Clock = Clock.fixed(frozenInstant, ZoneId.of("UTC"))
+  lazy val frozenInstant: Instant = tdAll.nowAsInstant
+  lazy given clock: Clock = tdAll.clock
 
   protected def configMap: Map[String, Any] =
     Map[String, Any](

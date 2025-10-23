@@ -40,7 +40,8 @@ trait TdSectionAmls {
   def amlsRegistrationNumberHmrc = AmlsRegistrationNumber("XAML00000123456")
   def amlsRegistrationNumberNonHmrc = AmlsRegistrationNumber("NONHMRC_REF_AMLS_NUMBER_00001")
 
-  def amlsExpiryDate: LocalDate = LocalDate.parse("2028-01-01")
+  def amlsExpiryDateValid: LocalDate = dependencies.nowPlus6mAsLocalDateTime.toLocalDate
+  def amlsExpiryDateInvalid: LocalDate = dependencies.nowPlus13mAsLocalDateTime.toLocalDate
 
   def amlsUploadDetailsAfterUploadInProgress: UploadDetails = UploadDetails(
     reference = Reference("test-file-reference"),
@@ -115,7 +116,7 @@ trait TdSectionAmls {
           )
 
           def afterAmlsExpiryDateProvided = afterRegistrationNumberProvided.copy(
-            amlsExpiryDate = Some(amlsExpiryDate)
+            amlsExpiryDate = Some(amlsExpiryDateValid)
           )
           def afterUploadedEvidence = afterAmlsExpiryDateProvided.copy(
             amlsEvidence = Some(amlsUploadDetailsAfterUploadInProgress)

@@ -29,7 +29,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
     val afterStarted: AgentApplicationLlp = AgentApplicationLlp(
       internalUserId = dependencies.internalUserId,
       groupId = dependencies.groupId,
-      createdAt = dependencies.instant,
+      createdAt = dependencies.nowAsInstant,
       applicationState = ApplicationState.Started,
       businessDetails = None,
       applicantContactDetails = None,

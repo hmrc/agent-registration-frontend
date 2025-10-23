@@ -23,21 +23,33 @@ import uk.gov.hmrc.agentregistration.shared.upscan.Reference
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 
+import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 trait TdBase:
 
+  final val zoneOffset: ZoneOffset = ZoneOffset.UTC
+  final val zoneId: ZoneId = ZoneId.of("UTC")
+
   def dateString: String = "2059-11-25"
   def timeString: String = s"${dateString}T16:33:51.880"
-  def localDateTime: LocalDateTime =
+
+  def nowAsLocalDateTime: LocalDateTime =
     // the frozen time has to be in future otherwise the applications will disappear from mongodb because of expiry index
     LocalDateTime.parse(timeString, DateTimeFormatter.ISO_DATE_TIME)
-  def instant: Instant = localDateTime.toInstant(ZoneOffset.UTC)
-  def newInstant: Instant = instant.plusSeconds(20) // used when a new application is created from existing one
+
+  def nowPlus6mAsLocalDateTime: LocalDateTime = nowAsLocalDateTime.plus(java.time.Period.ofMonths(6))
+  def nowPlus13mAsLocalDateTime: LocalDateTime = nowAsLocalDateTime.plus(java.time.Period.ofMonths(13))
+  def newPlus20sAsLocalDateTime: LocalDateTime = nowAsLocalDateTime.plusSeconds(20)
+
+  def nowAsInstant: Instant = nowAsLocalDateTime.toInstant(ZoneOffset.UTC)
+
+  final val clock: Clock = Clock.fixed(nowAsInstant, zoneId)
 
   def saUtr: SaUtr = SaUtr("1234567895")
   def internalUserId: InternalUserId = InternalUserId("internal-user-id-12345")
@@ -45,8 +57,7 @@ trait TdBase:
   def nino = Nino("AB123456C")
   def safeId: SafeId = SafeId("X00000123456789")
   def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
-//  def firstName: String = "Test"
-//  def lastName: String = "Name"
+
   def telephoneNumber: TelephoneNumber = TelephoneNumber("(+44) 10794554342")
   def crn: Crn = Crn("1234567890")
   def companyName = "Test Company Name"
@@ -57,16 +68,3 @@ trait TdBase:
     dateOfIncorporation = Some(dateOfIncorporation)
   )
   def postcode: String = "AA1 1AA"
-  def validAmlsExpiryDate: LocalDate = LocalDate.now().plusMonths(6)
-  def invalidAmlsExpiryDate: LocalDate = LocalDate.now().plusMonths(13)
-  // todo remove this
-  def amlsUploadDetailsSuccess: UploadDetails = UploadDetails(
-    reference = Reference("test-file-reference"),
-    status = UploadStatus.UploadedSuccessfully(
-      name = "test.pdf",
-      mimeType = "application/pdf",
-      downloadUrl = ObjectStoreUrl(uri"http://example.com/download"),
-      size = Some(12345),
-      checksum = "checksum"
-    )
-  )

@@ -26,6 +26,8 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
+import java.time.LocalDate
+
 class AmlsExpiryDateControllerSpec
 extends ControllerSpec:
 
@@ -75,9 +77,9 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubGetAgentApplication(updatedApplication)
     val response: WSResponse =
       post(path)(Map(
-        AmlsExpiryDateForm.dayKey -> Seq(tdAll.validAmlsExpiryDate.getDayOfMonth.toString),
-        AmlsExpiryDateForm.monthKey -> Seq(tdAll.validAmlsExpiryDate.getMonthValue.toString),
-        AmlsExpiryDateForm.yearKey -> Seq(tdAll.validAmlsExpiryDate.getYear.toString),
+        AmlsExpiryDateForm.dayKey -> Seq(tdAll.amlsExpiryDateValid.getDayOfMonth.toString),
+        AmlsExpiryDateForm.monthKey -> Seq(tdAll.amlsExpiryDateValid.getMonthValue.toString),
+        AmlsExpiryDateForm.yearKey -> Seq(tdAll.amlsExpiryDateValid.getYear.toString),
         "submit" -> Seq("SaveAndContinue")
       ))
 
@@ -93,9 +95,9 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubGetAgentApplication(updatedApplication)
     val response: WSResponse =
       post(path)(Map(
-        AmlsExpiryDateForm.dayKey -> Seq(tdAll.validAmlsExpiryDate.getDayOfMonth.toString),
-        AmlsExpiryDateForm.monthKey -> Seq(tdAll.validAmlsExpiryDate.getMonthValue.toString),
-        AmlsExpiryDateForm.yearKey -> Seq(tdAll.validAmlsExpiryDate.getYear.toString),
+        AmlsExpiryDateForm.dayKey -> Seq(tdAll.amlsExpiryDateValid.getDayOfMonth.toString),
+        AmlsExpiryDateForm.monthKey -> Seq(tdAll.amlsExpiryDateValid.getMonthValue.toString),
+        AmlsExpiryDateForm.yearKey -> Seq(tdAll.amlsExpiryDateValid.getYear.toString),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
@@ -137,9 +139,9 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRegistrationNumberProvided)
     val response: WSResponse =
       post(path)(Map(
-        AmlsExpiryDateForm.dayKey -> Seq(tdAll.invalidAmlsExpiryDate.getDayOfMonth.toString),
-        AmlsExpiryDateForm.monthKey -> Seq(tdAll.invalidAmlsExpiryDate.getMonthValue.toString),
-        AmlsExpiryDateForm.yearKey -> Seq(tdAll.invalidAmlsExpiryDate.getYear.toString),
+        AmlsExpiryDateForm.dayKey -> Seq(tdAll.amlsExpiryDateInvalid.getDayOfMonth.toString),
+        AmlsExpiryDateForm.monthKey -> Seq(tdAll.amlsExpiryDateInvalid.getMonthValue.toString),
+        AmlsExpiryDateForm.yearKey -> Seq(tdAll.amlsExpiryDateInvalid.getYear.toString),
         "submit" -> Seq("SaveAndContinue")
       ))
 
@@ -151,9 +153,9 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRegistrationNumberProvided)
     val response: WSResponse =
       post(path)(Map(
-        AmlsExpiryDateForm.dayKey -> Seq(tdAll.invalidAmlsExpiryDate.getDayOfMonth.toString),
-        AmlsExpiryDateForm.monthKey -> Seq(tdAll.invalidAmlsExpiryDate.getMonthValue.toString),
-        AmlsExpiryDateForm.yearKey -> Seq(tdAll.invalidAmlsExpiryDate.getYear.toString),
+        AmlsExpiryDateForm.dayKey -> Seq(tdAll.amlsExpiryDateInvalid.getDayOfMonth.toString),
+        AmlsExpiryDateForm.monthKey -> Seq(tdAll.amlsExpiryDateInvalid.getMonthValue.toString),
+        AmlsExpiryDateForm.yearKey -> Seq(tdAll.amlsExpiryDateInvalid.getYear.toString),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
