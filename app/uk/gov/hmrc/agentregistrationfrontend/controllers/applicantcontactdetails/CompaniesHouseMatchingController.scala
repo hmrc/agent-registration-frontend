@@ -130,7 +130,7 @@ extends FrontendController(mcc, actions):
       ChOfficerSelectionForms.yesNoForm.bindFromRequest().fold(
         hasErrors = formWithErrors => Future.successful(BadRequest(matchedMemberView(formWithErrors, officer))),
         success =
-          case YesNo.Yes => updateApplicationAndRedirectToPhoneNumberPage(officer)
+          case YesNo.Yes => updateApplicationAndRedirectToCya(officer)
           case YesNo.No =>
             // TODO: do we need to reset data here?
             Future.successful(
@@ -155,10 +155,10 @@ extends FrontendController(mcc, actions):
               val officer: CompaniesHouseOfficer = officers
                 .find(_.toOfficerSelection === officerSelection)
                 .getOrThrowExpectedDataMissing("Unexpected response from companies house, could not find selected officer")
-              updateApplicationAndRedirectToPhoneNumberPage(officer)
+              updateApplicationAndRedirectToCya(officer)
         )
 
-  private def updateApplicationAndRedirectToPhoneNumberPage(officer: CompaniesHouseOfficer)(using request: AgentApplicationRequest[?]) =
+  private def updateApplicationAndRedirectToCya(officer: CompaniesHouseOfficer)(using request: AgentApplicationRequest[?]) =
     val updatedApplication: AgentApplication = request.agentApplication.asLlpApplication
       .modify(_.applicantContactDetails.each.applicantName)
       .setTo(ApplicantName.NameOfMember(
@@ -167,7 +167,7 @@ extends FrontendController(mcc, actions):
       ))
     agentRegistrationService
       .upsert(updatedApplication)
-      .map(_ => Redirect(routes.TelephoneNumberController.show.url))
+      .map(_ => Redirect(routes.CheckYourAnswersController.show.url))
 
 object CompaniesHouseMatchingController:
 

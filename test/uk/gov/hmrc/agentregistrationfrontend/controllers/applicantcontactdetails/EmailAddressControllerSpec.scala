@@ -35,6 +35,13 @@ extends ControllerSpec:
 
   private object agentApplication:
 
+    val beforeTelephoneProvided: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAuthorised
+        .afterNameDeclared
+
     val beforeEmailAddressProvided: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
@@ -89,6 +96,15 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "If we need to email you about this application, what’s the email address? - Apply for an agent services account - GOV.UK"
+
+  s"GET $path should redirect to telephone number page when telephone number is missing" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeTelephoneProvided)
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe routes.TelephoneNumberController.show.url
 
   s"POST $path with well formed email address should save data and redirect to the verify endpoint" in:
     AuthStubs.stubAuthorise()

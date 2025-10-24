@@ -74,7 +74,7 @@ extends FrontendController(mcc, actions):
               name = Some(validFormData)
             ))
           applicationService.upsert(updatedApplication).map: _ =>
-            Redirect(routes.TelephoneNumberController.show.url)
+            Redirect(routes.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater
 
   extension (agentApplication: AgentApplicationLlp)

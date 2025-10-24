@@ -57,7 +57,7 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "What is your full name? - Apply for an agent services account - GOV.UK"
 
-  s"POST $path with valid name should save data and redirect to the telephone number page" in:
+  s"POST $path with valid name should save data and redirect to check your answers" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(validApplication)
     AgentRegistrationStubs.stubUpdateAgentApplication(
@@ -76,7 +76,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.TelephoneNumberController.show.url
+    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
 
   s"POST $path with blank inputs should return 400" in:
     AuthStubs.stubAuthorise()

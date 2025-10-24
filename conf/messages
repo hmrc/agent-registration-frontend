@@ -131,6 +131,16 @@ emailAddress.hint = We will send a code to this email address to confirm it.
 emailAddress.error.required = Enter your email address
 emailAddress.error.invalid = Enter your email address with a name, @ symbol and a domain name, like yourname@example.com
 
+## Applicant contact details / Check your answers
+contactCheckYourAnswers.title = Check your answers
+contactCheckYourAnswers.llpMember.label = Member of the limited liability partnership
+contactCheckYourAnswers.llpMember.Member = Yes
+contactCheckYourAnswers.llpMember.Authorised = No, but I’m authorised by them to set up this account
+contactCheckYourAnswers.name.label = Name
+contactCheckYourAnswers.telephone.label = Telephone number
+contactCheckYourAnswers.email.label = Email address
+contactCheckYourAnswers.change = Change
+
 # About your application / user role
 userRole.title = Are you the owner of the business?
 userRole.Owner = Yes
