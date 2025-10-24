@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessDetailsLlp
 import uk.gov.hmrc.agentregistration.shared.BusinessDetailsPartnership
 import uk.gov.hmrc.agentregistration.shared.BusinessDetailsSoleTrader
 import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.util.RequiredDataExtensions.getOrThrowExpectedDataMissing
+import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
