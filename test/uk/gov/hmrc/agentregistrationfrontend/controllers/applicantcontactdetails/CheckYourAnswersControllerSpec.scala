@@ -16,21 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails
 
-import com.google.inject.AbstractModule
-import com.softwaremill.quicklens.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
 class CheckYourAnswersControllerSpec
 extends ControllerSpec:
-
-  override lazy val overridesModule: AbstractModule =
-    new AbstractModule:
-      override def configure(): Unit = bind(classOf[AmlsCodes]).asEagerSingleton()
 
   private val path = "/agent-registration/apply/applicant/check-your-answers"
 
@@ -40,25 +33,26 @@ extends ControllerSpec:
       url = path
     )
 
-  private val completeApplication: AgentApplicationLlp =
-    tdAll
-      .agentApplicationLlp
-      .sectionContactDetails
-      .whenApplicantIsAuthorised
-      .afterEmailAddressVerified
+  object agentApplication:
 
-  private val incompleteEmailApplication: AgentApplicationLlp =
-    tdAll
-      .agentApplicationLlp
-      .sectionContactDetails
-      .whenApplicantIsAuthorised
-      .afterEmailAddressProvided
+    val complete: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAuthorised
+        .afterEmailAddressVerified
 
-  // an application to show that regardless of which parts of the contact details are missing
-  // that we will redirect to the Email entry page which triggers a recursive chain of checks for previous vals
-  private val incompleteContactDetailsApplication: AgentApplicationLlp = completeApplication
-    .modify(_.applicantContactDetails)
-    .setTo(None)
+    val incomplete: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAuthorised
+        .afterEmailAddressProvided
+
+    val noContactDetails: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .afterGrsDataReceived
 
   private case class TestCaseForCya(
     application: AgentApplicationLlp,
@@ -68,16 +62,16 @@ extends ControllerSpec:
 
   List(
     TestCaseForCya(
-      application = completeApplication,
+      application = agentApplication.complete,
       name = "complete contact details"
     ),
     TestCaseForCya(
-      application = incompleteEmailApplication,
+      application = agentApplication.incomplete,
       name = "missing email address",
       expectedRedirect = Some(routes.EmailAddressController.show.url)
     ),
     TestCaseForCya(
-      application = incompleteContactDetailsApplication,
+      application = agentApplication.noContactDetails,
       name = "missing all contact details",
       expectedRedirect = Some(routes.EmailAddressController.show.url)
     )

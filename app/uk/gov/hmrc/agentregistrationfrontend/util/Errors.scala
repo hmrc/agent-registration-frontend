@@ -88,7 +88,7 @@ extends RequestAwareLogging:
     url: String,
     status: Int,
     response: => HttpResponse
-  ) =
+  ): Nothing =
     throw UpstreamErrorResponse(
       message = httpErrorFunctions.upstreamResponseMessage(
         httpMethod,
