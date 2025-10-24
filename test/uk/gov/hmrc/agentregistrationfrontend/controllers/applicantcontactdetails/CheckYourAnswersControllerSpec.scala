@@ -73,7 +73,7 @@ extends ControllerSpec:
     TestCaseForCya(
       application = agentApplication.noContactDetails,
       name = "missing all contact details",
-      expectedRedirect = Some(routes.EmailAddressController.show.url)
+      expectedRedirect = Some(routes.ApplicantRoleInLlpController.show.url)
     )
   ).foreach: testCase =>
     if testCase.expectedRedirect.isEmpty then
@@ -93,4 +93,4 @@ extends ControllerSpec:
         val response: WSResponse = get(path)
 
         response.status shouldBe 303
-        response.header("Location").value shouldBe routes.EmailAddressController.show.url
+        response.header("Location").value shouldBe testCase.expectedRedirect.get
