@@ -42,12 +42,47 @@ extends ControllerSpec:
         .whenApplicantIsAuthorised
         .afterEmailAddressVerified
 
-    val incomplete: AgentApplicationLlp =
+    val missingVerifiedEmail: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
         .whenApplicantIsAuthorised
         .afterEmailAddressProvided
+
+    val missingEmail: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAuthorised
+        .afterTelephoneNumberProvided
+
+    val missingTelephone: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAuthorised
+        .afterNameDeclared
+
+    val missingCompaniesHouseOfficerSelection: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAMember
+        .afterNameQueryProvided
+
+    val missingMemberNameQuery: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAMember
+        .afterRoleSelected
+
+    val missingAuthorisedName: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAuthorised
+        .afterRoleSelected
 
     val noContactDetails: AgentApplicationLlp =
       tdAll
@@ -66,9 +101,34 @@ extends ControllerSpec:
       name = "complete contact details"
     ),
     TestCaseForCya(
-      application = agentApplication.incomplete,
+      application = agentApplication.missingVerifiedEmail,
+      name = "missing verified email address",
+      expectedRedirect = Some(routes.EmailAddressController.show.url)
+    ),
+    TestCaseForCya(
+      application = agentApplication.missingEmail,
       name = "missing email address",
       expectedRedirect = Some(routes.EmailAddressController.show.url)
+    ),
+    TestCaseForCya(
+      application = agentApplication.missingTelephone,
+      name = "missing telephone number",
+      expectedRedirect = Some(routes.TelephoneNumberController.show.url)
+    ),
+    TestCaseForCya(
+      application = agentApplication.missingCompaniesHouseOfficerSelection,
+      name = "missing companies house office selection",
+      expectedRedirect = Some(routes.CompaniesHouseMatchingController.show.url)
+    ),
+    TestCaseForCya(
+      application = agentApplication.missingMemberNameQuery,
+      name = "missing name to query companies house with",
+      expectedRedirect = Some(routes.MemberNameController.show.url)
+    ),
+    TestCaseForCya(
+      application = agentApplication.missingAuthorisedName,
+      name = "missing authorised applicant name",
+      expectedRedirect = Some(routes.AuthorisedNameController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.noContactDetails,
