@@ -39,7 +39,7 @@
     messages(s"$key.title")
 }
 @contactDetails = @{
-    request.agentApplication.getApplicantContactDetails
+    request.agentApplication.asLlpApplication.getApplicantContactDetails
 }
 
 @llpMemberRow = @{

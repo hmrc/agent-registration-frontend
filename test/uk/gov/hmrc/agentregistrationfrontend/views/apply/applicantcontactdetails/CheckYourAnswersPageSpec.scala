@@ -17,16 +17,10 @@
 package uk.gov.hmrc.agentregistrationfrontend.views.apply.applicantcontactdetails
 
 import com.google.inject.AbstractModule
-import com.softwaremill.quicklens.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.EmailAddress
-import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -44,18 +38,12 @@ extends ViewSpec:
 
   private val tdAll: TdAll = TdAll()
 
-  private val completeApplication: AgentApplication = tdAll.llpAgentApplication
-    .modify(_.applicantContactDetails)
-    .setTo(Some(
-      ApplicantContactDetails(
-        applicantName = ApplicantName.NameOfAuthorised(name = Some("First Last")),
-        telephoneNumber = Some(TelephoneNumber(tdAll.telephoneNumber)),
-        applicantEmailAddress = Some(ApplicantEmailAddress(
-          emailAddress = EmailAddress(tdAll.applicantEmailAddress),
-          isVerified = true
-        ))
-      )
-    ))
+  private val completeApplication: AgentApplicationLlp =
+    tdAll
+      .agentApplicationLlp
+      .sectionContactDetails
+      .whenApplicantIsAuthorised
+      .afterEmailAddressVerified
 
   private val heading: String = "Check your answers"
 
@@ -79,10 +67,10 @@ extends ViewSpec:
           |No, but I’m authorised by them to set up this account
           |Change Member of the limited liability partnership
           |Name
-          |First Last
+          |Miss Alexa Fantastic
           |Change Name
           |Telephone number
-          |041 427 1125
+          |(+44) 10794554342
           |Change Telephone number
           |Email address
           |user@test.com
@@ -101,12 +89,12 @@ extends ViewSpec:
           ),
           TestSummaryRow(
             key = "Name",
-            value = "First Last",
+            value = "Miss Alexa Fantastic",
             action = "/agent-registration/apply/applicant/applicant-name"
           ),
           TestSummaryRow(
             key = "Telephone number",
-            value = "041 427 1125",
+            value = "(+44) 10794554342",
             action = "/agent-registration/apply/applicant/telephone-number"
           ),
           TestSummaryRow(

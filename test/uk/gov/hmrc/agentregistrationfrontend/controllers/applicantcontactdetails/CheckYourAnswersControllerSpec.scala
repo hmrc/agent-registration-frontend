@@ -19,12 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetail
 import com.google.inject.AbstractModule
 import com.softwaremill.quicklens.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.EmailAddress
-import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -45,31 +40,28 @@ extends ControllerSpec:
       url = path
     )
 
-  private val completeApplication: AgentApplication = tdAll.llpAgentApplication
-    .modify(_.applicantContactDetails)
-    .setTo(Some(
-      ApplicantContactDetails(
-        applicantName = ApplicantName.NameOfAuthorised(name = Some("First Last")),
-        telephoneNumber = Some(TelephoneNumber(tdAll.telephoneNumber)),
-        applicantEmailAddress = Some(ApplicantEmailAddress(
-          emailAddress = EmailAddress(tdAll.applicantEmailAddress),
-          isVerified = true
-        ))
-      )
-    ))
+  private val completeApplication: AgentApplicationLlp =
+    tdAll
+      .agentApplicationLlp
+      .sectionContactDetails
+      .whenApplicantIsAuthorised
+      .afterEmailAddressVerified
 
-  private val incompleteEmailApplication: AgentApplication = completeApplication
-    .modify(_.applicantContactDetails.each.applicantEmailAddress)
-    .setTo(None)
+  private val incompleteEmailApplication: AgentApplicationLlp =
+    tdAll
+      .agentApplicationLlp
+      .sectionContactDetails
+      .whenApplicantIsAuthorised
+      .afterEmailAddressProvided
 
   // an application to show that regardless of which parts of the contact details are missing
   // that we will redirect to the Email entry page which triggers a recursive chain of checks for previous vals
-  private val incompleteContactDetailsApplication: AgentApplication = completeApplication
+  private val incompleteContactDetailsApplication: AgentApplicationLlp = completeApplication
     .modify(_.applicantContactDetails)
     .setTo(None)
 
   private case class TestCaseForCya(
-    application: AgentApplication,
+    application: AgentApplicationLlp,
     name: String,
     expectedRedirect: Option[String] = None
   )
@@ -93,7 +85,7 @@ extends ControllerSpec:
     if testCase.expectedRedirect.isEmpty then
       s"GET $path with complete contact details should return 200 and render page" in:
         AuthStubs.stubAuthorise()
-        AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
+        AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
         val response: WSResponse = get(path)
 
         response.status shouldBe 200
@@ -103,7 +95,7 @@ extends ControllerSpec:
     else
       s"GET $path with ${testCase.name} should redirect to the email entry page" in:
         AuthStubs.stubAuthorise()
-        AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
+        AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
         val response: WSResponse = get(path)
 
         response.status shouldBe 303
