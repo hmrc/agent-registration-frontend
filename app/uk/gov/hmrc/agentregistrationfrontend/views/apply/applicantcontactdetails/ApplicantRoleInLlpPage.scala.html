@@ -51,7 +51,10 @@
                 ))
             )),
             hint = Some(Hint(
-                content = HtmlContent(messages(s"$key.hint", request.agentApplication.getApplicantBusinessName))
+                content = HtmlContent(messages(
+                    s"$key.hint",
+                    request.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
+                ))
             )),
             items = ApplicantRoleInLlp.values.toSeq.map(applicantRoleInLlp =>
                 RadioItem(

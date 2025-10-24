@@ -16,12 +16,9 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.views.apply.applicantcontactdetails
 
-import com.softwaremill.quicklens.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes
 import uk.gov.hmrc.agentregistrationfrontend.forms.TelephoneNumberForm
@@ -34,18 +31,14 @@ class TelephoneNumberPageSpec
 extends ViewSpec:
 
   val viewTemplate: TelephoneNumberPage = app.injector.instanceOf[TelephoneNumberPage]
-  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] =
-    new AgentApplicationRequest(
-      request = request,
-      agentApplication = tdAll.llpAgentApplication
-        .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(
-          applicantName = ApplicantName.NameOfAuthorised(name = Some("First Last")),
-          telephoneNumber = None
-        ))),
-      internalUserId = tdAll.internalUserId,
-      groupId = tdAll.groupId,
-      credentials = tdAll.credentials
+  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] = tdAll
+    .makeAgentApplicationRequest(
+      agentApplication =
+        tdAll
+          .agentApplicationLlp
+          .sectionContactDetails
+          .whenApplicantIsAuthorised
+          .afterNameDeclared
     )
   val doc: Document = Jsoup.parse(viewTemplate(TelephoneNumberForm.form).body)
   private val heading: String = "If we need to speak to you about this application, what number do we call?"

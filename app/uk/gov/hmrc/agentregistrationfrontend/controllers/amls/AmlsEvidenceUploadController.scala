@@ -29,7 +29,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanConnector
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.ErrorTemplate
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadProgressPage
@@ -47,7 +47,7 @@ class AmlsEvidenceUploadController @Inject() (
   errorView: ErrorTemplate,
   appConfig: AppConfig,
   upscanInitiateConnector: UpscanConnector,
-  applicationService: ApplicationService,
+  applicationService: AgentRegistrationService,
   amlsCodes: AmlsCodes
 )
 extends FrontendController(mcc, actions):

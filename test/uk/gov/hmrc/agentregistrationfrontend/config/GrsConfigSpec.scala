@@ -17,10 +17,9 @@
 package uk.gov.hmrc.agentregistrationfrontend.config
 
 import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.util.SealedObjectsExtensions.toStringHyphenated
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 
 class GrsConfigSpec
 extends ISpec:
@@ -32,8 +31,8 @@ extends ISpec:
       businessType.toString in:
 
         val thisFrontendBaseUrl: String = "http://localhost:22201"
-        val expectedPath: String = s"/agent-registration/apply/grs-callback/${businessType.toStringHyphenated}"
+        val expectedPath: String = s"/agent-registration/apply/grs-callback"
         val withJourneyIdQuery: String = "?journeyId=journey-id-added-by-grs"
 
         grsConfig.grsJourneyCallbackUrl(businessType) shouldBe s"$thisFrontendBaseUrl$expectedPath"
-        appRoutes.GrsController.journeyCallback(businessType, JourneyId("journey-id-added-by-grs")).url shouldBe s"$expectedPath$withJourneyIdQuery"
+        appRoutes.GrsController.journeyCallback(JourneyId("journey-id-added-by-grs")).url shouldBe s"$expectedPath$withJourneyIdQuery"

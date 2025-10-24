@@ -17,15 +17,9 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
 import com.google.inject.AbstractModule
-import com.softwaremill.quicklens.*
-import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsDetails
-import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
@@ -37,7 +31,6 @@ extends ControllerSpec:
     new AbstractModule:
       override def configure(): Unit = bind(classOf[AmlsCodes]).asEagerSingleton()
 
-  private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
   private val path = "/agent-registration/apply/anti-money-laundering/check-your-answers"
 
   "route should have correct path and method" in:
@@ -46,67 +39,44 @@ extends ControllerSpec:
       url = path
     )
 
-  // when the supervisory body is HMRC, the registration number has a different format to non-HMRC bodies
-  // and no evidence or expiry date is required to be considered complete
-  private val completeHmrcApplication: AgentApplication = applicationFactory
-    .makeNewAgentApplication(tdAll.internalUserId)
-    .modify(_.amlsDetails)
-    .setTo(Some(AmlsDetails(
-      supervisoryBody = AmlsCode("HMRC"),
-      amlsRegistrationNumber = Some(AmlsRegistrationNumber("XAML00000123456")),
-      amlsExpiryDate = None,
-      amlsEvidence = None
-    )))
-  private val completeNonHmrcApplication: AgentApplication = applicationFactory
-    .makeNewAgentApplication(tdAll.internalUserId)
-    .modify(_.amlsDetails)
-    .setTo(Some(AmlsDetails(
-      supervisoryBody = AmlsCode("FCA"),
-      amlsRegistrationNumber = Some(AmlsRegistrationNumber("1234567890")),
-      amlsExpiryDate = Some(tdAll.validAmlsExpiryDate),
-      amlsEvidence = Some(tdAll.amlsUploadDetailsSuccess)
-    )))
-  private val incompleteHmrcApplication: AgentApplication = applicationFactory
-    .makeNewAgentApplication(tdAll.internalUserId)
-    .modify(_.amlsDetails)
-    .setTo(Some(AmlsDetails(
-      supervisoryBody = AmlsCode("HMRC"),
-      amlsRegistrationNumber = None
-    )))
-  private val incompleteNonHmrcApplication: AgentApplication = applicationFactory
-    .makeNewAgentApplication(tdAll.internalUserId)
-    .modify(_.amlsDetails)
-    .setTo(Some(AmlsDetails(
-      supervisoryBody = AmlsCode("FCA"),
-      amlsRegistrationNumber = Some(AmlsRegistrationNumber("1234567890")),
-      amlsExpiryDate = Some(tdAll.validAmlsExpiryDate),
-      amlsEvidence = None
-    )))
-
   private case class TestCaseForCya(
     application: AgentApplication,
     amlsType: String,
     isComplete: Boolean
   )
 
+  val sectionAmls = tdAll.agentApplicationLlp.sectionAmls
+
   List(
     TestCaseForCya(
-      application = completeHmrcApplication,
+      application =
+        sectionAmls
+          .whenSupervisorBodyIsHmrc
+          .afterRegistrationNumberProvided,
       amlsType = "HMRC",
       isComplete = true
     ),
     TestCaseForCya(
-      application = completeNonHmrcApplication,
+      application =
+        sectionAmls
+          .whenSupervisorBodyIsNonHmrc
+          .afterUploadSucceded,
       amlsType = "non-HMRC",
       isComplete = true
     ),
     TestCaseForCya(
-      application = incompleteHmrcApplication,
+      application =
+        sectionAmls
+          .whenSupervisorBodyIsHmrc
+          .afterSupervisoryBodySelected,
       amlsType = "HMRC",
       isComplete = false
     ),
     TestCaseForCya(
-      application = incompleteNonHmrcApplication,
+      application =
+        sectionAmls
+          .whenSupervisorBodyIsNonHmrc
+          .afterAmlsExpiryDateProvided,
       amlsType = "non-HMRC",
       isComplete = false
     )
@@ -114,7 +84,7 @@ extends ControllerSpec:
     if testCase.isComplete then
       s"GET $path with complete amls details should return 200 and render page for ${testCase.amlsType}" in:
         AuthStubs.stubAuthorise()
-        AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
+        AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
         val response: WSResponse = get(path)
 
         response.status shouldBe 200
@@ -123,7 +93,7 @@ extends ControllerSpec:
     else
       s"GET $path with incomplete amls details should redirect to the start of the amls journey for ${testCase.amlsType}" in:
         AuthStubs.stubAuthorise()
-        AgentRegistrationStubs.stubApplicationInProgress(testCase.application)
+        AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
         val response: WSResponse = get(path)
 
         response.status shouldBe 303

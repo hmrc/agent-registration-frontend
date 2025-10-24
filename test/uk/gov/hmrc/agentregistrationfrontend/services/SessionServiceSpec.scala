@@ -16,18 +16,18 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.services
 
-import uk.gov.hmrc.agentregistration.shared.AgentType
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
-import SessionService.*
+import play.api.mvc.Results.Ok
 import play.api.mvc.AnyContentAsEmpty
 import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Session
-import play.api.mvc.Results.Ok
 import play.api.test.FakeRequest
+import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
+import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 
 class SessionServiceSpec
 extends UnitSpec:

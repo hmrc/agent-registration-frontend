@@ -17,22 +17,14 @@
 package uk.gov.hmrc.agentregistrationfrontend.views.apply.amls
 
 import com.google.inject.AbstractModule
-import com.softwaremill.quicklens.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsDetails
-import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.CheckYourAnswersPage
-
-import java.time.LocalDate
 
 class CheckYourAnswersPageSpec
 extends ViewSpec:
@@ -43,40 +35,26 @@ extends ViewSpec:
 
   val viewTemplate: CheckYourAnswersPage = app.injector.instanceOf[CheckYourAnswersPage]
 
-  private val tdAll: TdAll = TdAll()
-  private val applicationFactory = app.injector.instanceOf[ApplicationFactory]
-  private val fixedExpiryDate: LocalDate = LocalDate.of(2026, 9, 2)
+  private object agentApplication:
 
-  private val completeHmrcApplication: AgentApplication = applicationFactory
-    .makeNewAgentApplication(tdAll.internalUserId)
-    .modify(_.amlsDetails)
-    .setTo(Some(AmlsDetails(
-      supervisoryBody = AmlsCode("HMRC"),
-      amlsRegistrationNumber = Some(AmlsRegistrationNumber("XAML00000123456")),
-      amlsExpiryDate = None,
-      amlsEvidence = None
-    )))
-  private val completeNonHmrcApplication: AgentApplication = applicationFactory
-    .makeNewAgentApplication(tdAll.internalUserId)
-    .modify(_.amlsDetails)
-    .setTo(Some(AmlsDetails(
-      supervisoryBody = AmlsCode("FCA"),
-      amlsRegistrationNumber = Some(AmlsRegistrationNumber("1234567890")),
-      amlsExpiryDate = Some(fixedExpiryDate),
-      amlsEvidence = Some(tdAll.amlsUploadDetailsSuccess)
-    )))
+    val completeHmrcApplication: AgentApplication =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsHmrc
+        .complete
+
+    val completeNonHmrcApplication: AgentApplication =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsNonHmrc
+        .complete
 
   private val heading: String = "Check your answers"
 
   "CheckYourAnswersPage for complete Hmrc Amls Details" should:
-    implicit val agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] =
-      new AgentApplicationRequest(
-        request = request,
-        agentApplication = completeHmrcApplication,
-        internalUserId = tdAll.internalUserId,
-        groupId = tdAll.groupId,
-        credentials = tdAll.credentials
-      )
+    implicit val agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(agentApplication.completeHmrcApplication)
 
     val doc: Document = Jsoup.parse(viewTemplate().body)
     "contain content" in:
@@ -116,14 +94,9 @@ extends ViewSpec:
       doc.extractLinkButton(1).text shouldBe "Confirm and continue"
 
   "CheckYourAnswersPage for complete non-Hmrc Amls Details" should:
-    implicit val agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] =
-      new AgentApplicationRequest(
-        request = request,
-        agentApplication = completeNonHmrcApplication,
-        internalUserId = tdAll.internalUserId,
-        groupId = tdAll.groupId,
-        credentials = tdAll.credentials
-      )
+    implicit val agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(
+      agentApplication.completeNonHmrcApplication
+    )
 
     val doc: Document = Jsoup.parse(viewTemplate().body)
     "contain content" in:
@@ -132,16 +105,16 @@ extends ViewSpec:
           |Anti-money laundering supervision details
           |Check your answers
           |Supervisory body
-          |Financial Conduct Authority (FCA)
+          |Association of TaxationTechnicians (ATT)
           |Change Supervisory body
           |Registration number
-          |1234567890
+          |NONHMRC_REF_AMLS_NUMBER_00001
           |Change Registration number
           |Supervision expiry date
-          |2 September 2026
+          |25 May 2060
           |Change Supervision expiry date
           |Evidence of anti-money laundering supervision
-          |test.pdf
+          |evidence.pdf
           |Change Evidence of anti-money laundering supervision
           """.stripMargin
 
@@ -153,22 +126,22 @@ extends ViewSpec:
         List(
           TestSummaryRow(
             key = "Supervisory body",
-            value = "Financial Conduct Authority (FCA)",
+            value = "Association of TaxationTechnicians (ATT)",
             action = "/agent-registration/apply/anti-money-laundering/supervisor-name"
           ),
           TestSummaryRow(
             key = "Registration number",
-            value = "1234567890",
+            value = "NONHMRC_REF_AMLS_NUMBER_00001",
             action = "/agent-registration/apply/anti-money-laundering/registration-number"
           ),
           TestSummaryRow(
             key = "Supervision expiry date",
-            value = "2 September 2026",
+            value = "25 May 2060",
             action = "/agent-registration/apply/anti-money-laundering/supervision-runs-out"
           ),
           TestSummaryRow(
             key = "Evidence of anti-money laundering supervision",
-            value = "test.pdf",
+            value = "evidence.pdf",
             action = "/agent-registration/apply/anti-money-laundering/evidence"
           )
         )

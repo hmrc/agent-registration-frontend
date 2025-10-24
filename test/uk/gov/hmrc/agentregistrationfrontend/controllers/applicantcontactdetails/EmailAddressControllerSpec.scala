@@ -16,14 +16,9 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails
 
-import com.softwaremill.quicklens.*
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.EmailAddress
-import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.emailVerification.*
@@ -37,13 +32,30 @@ extends ControllerSpec:
 
   private val path = "/agent-registration/apply/applicant/email-address"
   private val verifyPath = "/agent-registration/apply/applicant/verify-email-address"
-  private val validApplication = tdAll.llpAgentApplication
-    .modify(_.applicantContactDetails)
-    .setTo(Some(ApplicantContactDetails(
-      applicantName = ApplicantName.NameOfAuthorised(name = Some("First Last")),
-      telephoneNumber = Some(TelephoneNumber("01234567890")),
-      applicantEmailAddress = None
-    )))
+
+  private object agentApplication:
+
+    val beforeEmailAddressProvided: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAuthorised
+        .afterTelephoneNumberProvided
+
+    val afterEmailAddressProvided: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAuthorised
+        .afterEmailAddressProvided
+
+    val afterEmailAddressVerified: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAuthorised
+        .afterEmailAddressVerified
+
   private val applicantEmailVerificationRequest: VerifyEmailRequest = VerifyEmailRequest(
     credId = tdAll.credentials.providerId,
     continueUrl = "http://localhost:22201/agent-registration/apply/applicant/verify-email-address",
@@ -51,7 +63,7 @@ extends ControllerSpec:
     deskproServiceName = None,
     accessibilityStatementUrl = "/agent-services-account",
     email = Some(Email(
-      address = tdAll.applicantEmailAddress,
+      address = tdAll.applicantEmailAddress.value,
       enterUrl = "http://localhost:22201/agent-registration/apply/applicant/email-address"
     )),
     lang = Some("en"),
@@ -72,7 +84,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeEmailAddressProvided)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -80,14 +92,8 @@ extends ControllerSpec:
 
   s"POST $path with well formed email address should save data and redirect to the verify endpoint" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
-    AgentRegistrationStubs.stubUpdateAgentApplication(
-      validApplication
-        .modify(_.applicantContactDetails.each.applicantEmailAddress)
-        .setTo(Some(ApplicantEmailAddress(
-          emailAddress = EmailAddress(tdAll.applicantEmailAddress)
-        )))
-    )
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterEmailAddressProvided)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterEmailAddressProvided)
     val response: WSResponse =
       post(path)(Map(
         EmailAddressForm.key -> Seq("user@test.com")
@@ -99,7 +105,7 @@ extends ControllerSpec:
 
   s"POST $path with blank inputs should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeEmailAddressProvided)
     val response: WSResponse =
       post(path)(Map(
         EmailAddressForm.key -> Seq("")
@@ -112,7 +118,7 @@ extends ControllerSpec:
 
   s"POST $path with invalid characters should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeEmailAddressProvided)
     val response: WSResponse =
       post(path)(Map(
         EmailAddressForm.key -> Seq("[[)(*%")
@@ -127,14 +133,8 @@ extends ControllerSpec:
 
   s"POST $path with save for later and valid email address should save data and redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
-    AgentRegistrationStubs.stubUpdateAgentApplication(
-      validApplication
-        .modify(_.applicantContactDetails.each.applicantEmailAddress)
-        .setTo(Some(ApplicantEmailAddress(
-          emailAddress = EmailAddress(tdAll.applicantEmailAddress)
-        )))
-    )
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeEmailAddressProvided)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterEmailAddressProvided)
     val response: WSResponse =
       post(path)(Map(
         EmailAddressForm.key -> Seq("user@test.com"),
@@ -147,7 +147,7 @@ extends ControllerSpec:
 
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeEmailAddressProvided)
     val response: WSResponse =
       post(path)(Map(
         EmailAddressForm.key -> Seq("[[)(*%"),
@@ -160,14 +160,7 @@ extends ControllerSpec:
 
   s"GET $verifyPath with an email to verify in the application should redirect to the email verification frontend" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(
-      validApplication
-        .modify(_.applicantContactDetails.each.applicantEmailAddress)
-        .setTo(Some(ApplicantEmailAddress(
-          emailAddress = EmailAddress(tdAll.applicantEmailAddress),
-          isVerified = false
-        )))
-    )
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterEmailAddressProvided)
     EmailVerificationStubs.stubEmailStatusUnverified(tdAll.credentials.providerId)
     EmailVerificationStubs.stubVerificationRequest(applicantEmailVerificationRequest)
     val response: WSResponse = get(verifyPath)
@@ -178,25 +171,12 @@ extends ControllerSpec:
 
   s"GET $verifyPath with an already verified email not yet stored in the application should redirect to check your answers" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(
-      validApplication
-        .modify(_.applicantContactDetails.each.applicantEmailAddress)
-        .setTo(Some(ApplicantEmailAddress(
-          emailAddress = EmailAddress(tdAll.applicantEmailAddress)
-        )))
-    )
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterEmailAddressProvided)
     EmailVerificationStubs.stubEmailStatusVerified(
       credId = tdAll.credentials.providerId,
-      email = tdAll.applicantEmailAddress
+      emailAddress = tdAll.applicantEmailAddress
     )
-    AgentRegistrationStubs.stubUpdateAgentApplication(
-      validApplication
-        .modify(_.applicantContactDetails.each.applicantEmailAddress)
-        .setTo(Some(ApplicantEmailAddress(
-          emailAddress = EmailAddress(tdAll.applicantEmailAddress),
-          isVerified = true
-        )))
-    )
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterEmailAddressVerified)
     val response: WSResponse = get(verifyPath)
 
     response.status shouldBe Status.SEE_OTHER
@@ -205,17 +185,10 @@ extends ControllerSpec:
 
   s"GET $verifyPath with an already verified email stored in the application should redirect to check your answers" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(
-      validApplication
-        .modify(_.applicantContactDetails.each.applicantEmailAddress)
-        .setTo(Some(ApplicantEmailAddress(
-          emailAddress = EmailAddress(tdAll.applicantEmailAddress),
-          isVerified = true
-        )))
-    )
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterEmailAddressVerified)
     EmailVerificationStubs.stubEmailStatusVerified(
       credId = tdAll.credentials.providerId,
-      email = tdAll.applicantEmailAddress
+      emailAddress = tdAll.applicantEmailAddress
     )
     val response: WSResponse = get(verifyPath)
 

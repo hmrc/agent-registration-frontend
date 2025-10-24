@@ -31,7 +31,7 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.emailVerification.*
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.services.EmailVerificationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.EmailAddressPage
@@ -46,7 +46,7 @@ class EmailAddressController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: EmailAddressPage,
-  applicationService: ApplicationService,
+  agentRegistrationService: AgentRegistrationService,
   emailVerificationService: EmailVerificationService,
   placeholder: SimplePage
 )
@@ -54,7 +54,12 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
     .ensure(
-      _.agentApplication.applicantContactDetails.map(_.telephoneNumber).isDefined,
+      _
+        .agentApplication
+        .asLlpApplication
+        .applicantContactDetails
+        .map(_.telephoneNumber)
+        .isDefined,
       implicit request =>
         logger.warn("Because we don't have a telephone number we are redirecting to the telephone number page")
         Redirect(routes.TelephoneNumberController.show)
@@ -63,7 +68,9 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] = baseAction:
     implicit request =>
       Ok(view(EmailAddressForm.form.fill(
-        request.agentApplication
+        request
+          .agentApplication
+          .asLlpApplication
           .getApplicantContactDetails
           .applicantEmailAddress
           .map(_.emailAddress)
@@ -78,7 +85,9 @@ extends FrontendController(mcc, actions):
             .fold(
               formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
               emailAddress =>
-                val updatedApplication = request.agentApplication
+                val updatedApplication = request
+                  .agentApplication
+                  .asLlpApplication
                   .modify(_.applicantContactDetails.each.applicantEmailAddress)
                   .using {
                     case Some(details) =>
@@ -93,7 +102,7 @@ extends FrontendController(mcc, actions):
                       ))
                   }
 
-                applicationService
+                agentRegistrationService
                   .upsert(updatedApplication)
                   .map(_ =>
                     Redirect(
@@ -106,6 +115,7 @@ extends FrontendController(mcc, actions):
   def verify: Action[AnyContent] = actions.getApplicationInProgress
     .ensure(
       _.agentApplication
+        .asLlpApplication
         .applicantContactDetails
         .map(_.applicantEmailAddress).isDefined,
       implicit request =>
@@ -114,6 +124,8 @@ extends FrontendController(mcc, actions):
     )
     .ensure(
       _.agentApplication
+        .asLlpApplication
+        .getApplicantContactDetails
         .getApplicantEmailAddress
         .isVerified === false,
       implicit request =>
@@ -122,7 +134,14 @@ extends FrontendController(mcc, actions):
     )
     .async:
       implicit request =>
-        val emailToVerify = request.agentApplication.getApplicantEmailAddress.emailAddress.value
+        val emailToVerify =
+          request
+            .agentApplication
+            .asLlpApplication
+            .getApplicantContactDetails
+            .getApplicantEmailAddress
+            .emailAddress
+            .value
         val credId = request.credentials.providerId
         emailVerificationService.checkEmailVerificationStatus(
           credId = credId,
@@ -143,14 +162,16 @@ extends FrontendController(mcc, actions):
         }
 
   private def onEmailVerified()(implicit request: AgentApplicationRequest[AnyContent]): Future[Result] =
-    val updatedApplication = request.agentApplication
+    val updatedApplication = request
+      .agentApplication
+      .asLlpApplication
       .modify(
         _.applicantContactDetails
           .each.applicantEmailAddress
           .each.isVerified
       )
       .setTo(true)
-    applicationService.upsert(updatedApplication).map { _ =>
+    agentRegistrationService.upsert(updatedApplication).map { _ =>
       logger.info("Applicant email status reported as verified, redirecting to check your answers page")
       Redirect(routes.CheckYourAnswersController.show)
     }

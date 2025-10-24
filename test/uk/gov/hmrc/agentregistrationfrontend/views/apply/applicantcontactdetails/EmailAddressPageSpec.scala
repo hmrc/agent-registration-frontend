@@ -16,13 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.views.apply.applicantcontactdetails
 
-import com.softwaremill.quicklens.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes
 import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
@@ -34,21 +31,19 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactde
 class EmailAddressPageSpec
 extends ViewSpec:
 
-  val viewTemplate: EmailAddressPage = app.injector.instanceOf[EmailAddressPage]
-  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] =
-    new AgentApplicationRequest(
-      request = request,
-      agentApplication = tdAll.llpAgentApplication
-        .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(
-          applicantName = ApplicantName.NameOfAuthorised(name = Some("First Last")),
-          telephoneNumber = Some(TelephoneNumber(tdAll.telephoneNumber)),
-          applicantEmailAddress = None
-        ))),
-      internalUserId = tdAll.internalUserId,
-      groupId = tdAll.groupId,
-      credentials = tdAll.credentials
-    )
+  private val viewTemplate: EmailAddressPage = app.injector.instanceOf[EmailAddressPage]
+
+  private object agentApplication:
+
+    val beforeEmailAddressProvided: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAuthorised
+        .afterTelephoneNumberProvided
+
+  given agentApplicationRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(agentApplication.beforeEmailAddressProvided)
+
   val doc: Document = Jsoup.parse(viewTemplate(EmailAddressForm.form).body)
   private val heading: String = "If we need to email you about this application, what’s the email address?"
 

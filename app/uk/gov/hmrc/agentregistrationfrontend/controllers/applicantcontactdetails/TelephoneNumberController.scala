@@ -30,7 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.TelephoneNumberForm
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.TelephoneNumberPage
 
 import javax.inject.Inject
@@ -41,20 +41,20 @@ class TelephoneNumberController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: TelephoneNumberPage,
-  applicationService: ApplicationService
+  agentRegistrationService: AgentRegistrationService
 )
 extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
     .ensure(
-      _.agentApplication.applicantContactDetails.map(_.applicantName) match {
+      _.agentApplication.asLlpApplication.applicantContactDetails.map(_.applicantName) match {
         case Some(ApplicantName.NameOfMember(_, Some(_))) => true
         case Some(ApplicantName.NameOfAuthorised(Some(_))) => true
         case _ => false
       },
       implicit request =>
         logger.warn("Because we don't have name details we are computing which name type to redirect to and redirecting to that page")
-        request.agentApplication.applicantContactDetails.map(_.applicantName) match {
+        request.agentApplication.asLlpApplication.applicantContactDetails.map(_.applicantName) match {
           case Some(ApplicantName.NameOfMember(_, _)) => Redirect(routes.CompaniesHouseMatchingController.show)
           case Some(ApplicantName.NameOfAuthorised(_)) => Redirect(routes.AuthorisedNameController.show)
           case _ => Redirect(routes.ApplicantRoleInLlpController.show)
@@ -66,7 +66,9 @@ extends FrontendController(mcc, actions):
       Ok(view(
         TelephoneNumberForm.form
           .fill:
-            request.agentApplication
+            request
+              .agentApplication
+              .asLlpApplication
               .getApplicantContactDetails
               .telephoneNumber
       ))
@@ -77,9 +79,9 @@ extends FrontendController(mcc, actions):
       .async:
         implicit request: (AgentApplicationRequest[AnyContent] & FormValue[TelephoneNumber]) =>
           val validFormData: TelephoneNumber = request.formValue
-          val updatedApplication: AgentApplication = request.agentApplication
+          val updatedApplication: AgentApplication = request.agentApplication.asLlpApplication
             .modify(_.applicantContactDetails.each.telephoneNumber)
             .setTo(Some(validFormData))
-          applicationService.upsert(updatedApplication).map: _ =>
+          agentRegistrationService.upsert(updatedApplication).map: _ =>
             Redirect(routes.EmailAddressController.show.url)
       .redirectIfSaveForLater

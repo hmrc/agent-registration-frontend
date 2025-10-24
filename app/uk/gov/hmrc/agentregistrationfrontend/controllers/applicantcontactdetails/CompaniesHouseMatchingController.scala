@@ -23,6 +23,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseOfficer
@@ -34,7 +35,7 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionFormType
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms.toOfficerSelection
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.services.CompaniesHouseService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MatchedMemberPage
@@ -52,7 +53,7 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 class CompaniesHouseMatchingController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  applicationService: ApplicationService,
+  agentRegistrationService: AgentRegistrationService,
   companiesHouseService: CompaniesHouseService,
   matchedMemberView: MatchedMemberPage,
   matchedMembersView: MatchedMembersPage,
@@ -62,7 +63,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
     .ensure(
-      _.agentApplication.memberNameQuery.isDefined,
+      _.agentApplication.asLlpApplication.memberNameQuery.isDefined,
       implicit request =>
         logger.info("Redirecting to member name page due to missing memberNameQuery value")
         Redirect(routes.MemberNameController.show)
@@ -76,8 +77,8 @@ extends FrontendController(mcc, actions):
         // On submission decide whether to call CH again
 
         companiesHouseService.getLlpOfficers(
-          companyRegistrationNumber = request.agentApplication.getCompanyRegistrationNumber,
-          lastName = request.agentApplication.getLastNameFromQuery // safe due to ensuring memberNameQuery is defined first
+          companyRegistrationNumber = request.agentApplication.asLlpApplication.getCrn,
+          lastName = request.agentApplication.asLlpApplication.getLastNameFromQuery // safe due to ensuring memberNameQuery is defined first
         ).map:
           case Nil =>
             logger.info("No Companies House officers found matching member name query, rendering noMemberNameMatchesView")
@@ -88,7 +89,9 @@ extends FrontendController(mcc, actions):
 
           case officer :: Nil =>
             logger.info(s"Found one Companies House officer matching member name query, rendering matchedMemberView")
-            val form: Form[YesNo] = ChOfficerSelectionForms.yesNoForm.fill(request.agentApplication.companyOfficer.filter(_ === officer).map(_ => YesNo.Yes))
+            val form: Form[YesNo] = ChOfficerSelectionForms.yesNoForm.fill(request.agentApplication.asLlpApplication.companyOfficer.filter(_ === officer).map(
+              _ => YesNo.Yes
+            ))
             Ok(matchedMemberView(form, officer))
 
           case officers: Seq[CompaniesHouseOfficer] =>
@@ -96,7 +99,7 @@ extends FrontendController(mcc, actions):
             Ok(matchedMembersView(
               form = ChOfficerSelectionForms
                 .officerSelectionForm(officers)
-                .fill(request.agentApplication.companyOfficer.map(_.toOfficerSelection)),
+                .fill(request.agentApplication.asLlpApplication.companyOfficer.map(_.toOfficerSelection)),
               officers = officers
             ))
 
@@ -115,8 +118,8 @@ extends FrontendController(mcc, actions):
       .redirectIfSaveForLater
 
   private def handleYesNoForm(using request: AgentApplicationRequest[?]): Future[Result] = companiesHouseService.getLlpOfficers(
-    companyRegistrationNumber = request.agentApplication.getCompanyRegistrationNumber,
-    lastName = request.agentApplication.getLastNameFromQuery
+    companyRegistrationNumber = request.agentApplication.asLlpApplication.getCrn,
+    lastName = request.agentApplication.asLlpApplication.getLastNameFromQuery
   )
     .flatMap: officers =>
       val officer: CompaniesHouseOfficer = officers
@@ -136,8 +139,8 @@ extends FrontendController(mcc, actions):
       )
 
   def handleOfficerSelectionForm(using request: AgentApplicationRequest[?]): Future[Result] = companiesHouseService.getLlpOfficers(
-    companyRegistrationNumber = request.agentApplication.getCompanyRegistrationNumber,
-    lastName = request.agentApplication.getLastNameFromQuery
+    companyRegistrationNumber = request.agentApplication.asLlpApplication.getCrn,
+    lastName = request.agentApplication.asLlpApplication.getLastNameFromQuery
   )
     .flatMap: officers =>
       Errors.require(officers.size > 1, s"Unexpected response from companies house, expected more then 1 officer but got: ${officers.size}")
@@ -156,19 +159,19 @@ extends FrontendController(mcc, actions):
         )
 
   private def updateApplicationAndRedirectToPhoneNumberPage(officer: CompaniesHouseOfficer)(using request: AgentApplicationRequest[?]) =
-    val updatedApplication: AgentApplication = request.agentApplication
+    val updatedApplication: AgentApplication = request.agentApplication.asLlpApplication
       .modify(_.applicantContactDetails.each.applicantName)
       .setTo(ApplicantName.NameOfMember(
-        memberNameQuery = request.agentApplication.memberNameQuery,
+        memberNameQuery = request.agentApplication.asLlpApplication.memberNameQuery,
         companiesHouseOfficer = Some(officer)
       ))
-    applicationService
+    agentRegistrationService
       .upsert(updatedApplication)
       .map(_ => Redirect(routes.TelephoneNumberController.show.url))
 
 object CompaniesHouseMatchingController:
 
-  extension (agentApplication: AgentApplication)
+  extension (agentApplication: AgentApplicationLlp)
 
     def getLastNameFromQuery: String =
       agentApplication.memberNameQuery.getOrThrowExpectedDataMissing("memberNameQuery is not defined")

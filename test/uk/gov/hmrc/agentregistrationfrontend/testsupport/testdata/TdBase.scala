@@ -16,73 +16,56 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistration.shared.BusinessDetails
-import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.CompanyProfile
-import uk.gov.hmrc.agentregistration.shared.GroupId
-import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistration.shared.Nino
-import uk.gov.hmrc.agentregistration.shared.PartnershipDetails
-import uk.gov.hmrc.agentregistration.shared.SafeId
-import uk.gov.hmrc.agentregistration.shared.Utr
-import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
-import uk.gov.hmrc.agentregistration.shared.upscan.Reference
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
+import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 trait TdBase:
 
+  final val zoneOffset: ZoneOffset = ZoneOffset.UTC
+  final val zoneId: ZoneId = ZoneId.of("UTC")
+
   def dateString: String = "2059-11-25"
   def timeString: String = s"${dateString}T16:33:51.880"
-  def localDateTime: LocalDateTime =
+
+  def nowAsLocalDateTime: LocalDateTime =
     // the frozen time has to be in future otherwise the applications will disappear from mongodb because of expiry index
     LocalDateTime.parse(timeString, DateTimeFormatter.ISO_DATE_TIME)
-  def instant: Instant = localDateTime.toInstant(ZoneOffset.UTC)
-  def newInstant: Instant = instant.plusSeconds(20) // used when a new application is created from existing one
 
-  def utr: Utr = Utr("1234567895")
+  def nowPlus6mAsLocalDateTime: LocalDateTime = nowAsLocalDateTime.plus(java.time.Period.ofMonths(6))
+  def nowPlus13mAsLocalDateTime: LocalDateTime = nowAsLocalDateTime.plus(java.time.Period.ofMonths(13))
+  def newPlus20sAsLocalDateTime: LocalDateTime = nowAsLocalDateTime.plusSeconds(20)
+
+  def nowAsInstant: Instant = nowAsLocalDateTime.toInstant(ZoneOffset.UTC)
+
+  final val clock: Clock = Clock.fixed(nowAsInstant, zoneId)
+
+  def saUtr: SaUtr = SaUtr("1234567895")
   def internalUserId: InternalUserId = InternalUserId("internal-user-id-12345")
   def groupId: GroupId = GroupId("group-id-12345")
-  def credentials: Credentials = Credentials("cred-id-12345", "GovernmentGateway")
+  def credentials: Credentials = Credentials(
+    providerId = "cred-id-12345",
+    providerType = "GovernmentGateway"
+  )
   def nino = Nino("AB123456C")
   def safeId: SafeId = SafeId("X00000123456789")
   def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
-  def firstName = "Test"
-  def lastName = "Name"
-  def telephoneNumber = "041 427 1125"
-  def applicantEmailAddress = "user@test.com"
-  def companyNumber = "1234567890"
+  def applicantEmailAddress: EmailAddress = EmailAddress("user@test.com")
+
+  def telephoneNumber: TelephoneNumber = TelephoneNumber("(+44) 10794554342")
+  def crn: Crn = Crn("1234567890")
   def companyName = "Test Company Name"
   def dateOfIncorporation: LocalDate = LocalDate.now().minusYears(10)
-  def companyProfile = CompanyProfile(
-    companyNumber = companyNumber,
+  def companyProfile: CompanyProfile = CompanyProfile(
+    companyNumber = crn,
     companyName = companyName,
     dateOfIncorporation = Some(dateOfIncorporation)
   )
-  def postcode = "AA1 1AA"
-  def validAmlsExpiryDate: LocalDate = LocalDate.now().plusMonths(6)
-  def invalidAmlsExpiryDate: LocalDate = LocalDate.now().plusMonths(13)
-  def amlsUploadDetailsSuccess: UploadDetails = UploadDetails(
-    reference = Reference("test-file-reference"),
-    status = UploadStatus.UploadedSuccessfully(
-      name = "test.pdf",
-      mimeType = "application/pdf",
-      downloadUrl = ObjectStoreUrl(uri"http://example.com/download"),
-      size = Some(12345),
-      checksum = "checksum"
-    )
-  )
-  def llpBusinessDetails: BusinessDetails = PartnershipDetails(
-    businessType = BusinessType.Partnership.LimitedLiabilityPartnership,
-    safeId = safeId,
-    companyProfile = Some(companyProfile),
-    postcode = postcode
-  )
+  def postcode: String = "AA1 1AA"

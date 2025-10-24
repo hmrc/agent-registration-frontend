@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import play.api.mvc.Call
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
 class AgentApplicationControllerSpec

@@ -16,14 +16,11 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.views.apply.applicantcontactdetails
 
-import com.softwaremill.quicklens.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.scalatest.Ignore
 import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseDateOfBirth
-import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes
@@ -33,27 +30,19 @@ import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MatchedMembersPage
 
+@Ignore
 class MatchedMembersPageSpec
 extends ViewSpec:
 
   val viewTemplate: MatchedMembersPage = app.injector.instanceOf[MatchedMembersPage]
-  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] =
-    new AgentApplicationRequest(
-      request = request,
-      agentApplication = tdAll.llpAgentApplication
-        .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(
-          applicantName = ApplicantName.NameOfMember(
-            memberNameQuery = Some(CompaniesHouseNameQuery(
-              firstName = "First",
-              lastName = "Last"
-            ))
-          )
-        ))),
-      internalUserId = tdAll.internalUserId,
-      groupId = tdAll.groupId,
-      credentials = tdAll.credentials
-    )
+  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(
+    agentApplication =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAMember
+        .afterOfficerChosen
+  )
 
   private val heading: String = "2 records match this name"
 

@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.forms
 import play.api.data.Form
 import uk.gov.hmrc.agentregistrationfrontend.forms.mappings.Mappings
 
+import java.time.Clock
 import java.time.LocalDate
 
 object AmlsExpiryDateForm:
@@ -28,8 +29,8 @@ object AmlsExpiryDateForm:
   val monthKey: String = s"$key.month"
   val yearKey: String = s"$key.year"
 
-  def form(): Form[LocalDate] = Form(
+  def form()(using clock: Clock): Form[LocalDate] = Form(
     key -> Mappings.localDate(key)
-      .verifying(s"$key.error.past", date => date.isAfter(LocalDate.now()))
-      .verifying(s"$key.error.future", date => date.isBefore(LocalDate.now().plusMonths(13)))
+      .verifying(s"$key.error.past", date => date.isAfter(LocalDate.now(clock)))
+      .verifying(s"$key.error.future", date => date.isBefore(LocalDate.now(clock).plusMonths(13)))
   )

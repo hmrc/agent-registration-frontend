@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared
+package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.soletrader
 
-import play.api.libs.functional.syntax.*
-import play.api.libs.json.Format
-import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
-/** SafeId (aka BusinessPartnerId in Etmp systems), is an unique identifier retrieved from the Grs that identifies the business entity being currently
-  * registered.
-  */
-final case class SafeId(value: String)
+trait TdAgentApplicationSoleTrader { dependencies: TdBase =>
 
-object SafeId:
-  given format: Format[SafeId] = JsonFormatsFactory.makeValueClassFormat
+}

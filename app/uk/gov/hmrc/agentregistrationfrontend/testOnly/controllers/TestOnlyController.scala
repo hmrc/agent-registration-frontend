@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.upscan.*
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 
 import javax.inject.Inject
@@ -38,7 +38,7 @@ import javax.inject.Singleton
 class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  applicationService: ApplicationService
+  applicationService: AgentRegistrationService
 )
 extends FrontendController(mcc, actions):
 

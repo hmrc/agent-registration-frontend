@@ -26,9 +26,10 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsExpiryDatePage
 
+import java.time.Clock
 import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,8 +39,8 @@ class AmlsExpiryDateController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: AmlsExpiryDatePage,
-  applicationService: ApplicationService
-)
+  applicationService: AgentRegistrationService
+)(using clock: Clock)
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions.getApplicationInProgress:

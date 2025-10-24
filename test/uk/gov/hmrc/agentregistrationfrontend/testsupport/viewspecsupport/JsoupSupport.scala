@@ -16,11 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.viewspecsupport
 
-import org.jsoup.nodes.Document
-import org.jsoup.nodes.Element
-import org.jsoup.select.Elements
 import org.jsoup.Jsoup
-import org.scalactic.source.Position
+import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
 
 object JsoupSupport {

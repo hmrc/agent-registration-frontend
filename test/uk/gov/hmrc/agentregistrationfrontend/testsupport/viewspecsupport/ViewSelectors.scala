@@ -20,8 +20,8 @@ import org.jsoup.nodes.Element
 import org.scalactic.source.Position
 import sttp.model.Uri
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.RichMatchers.*
-import ElementSupport.*
-import ElementsSupport.*
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.viewspecsupport.ElementSupport.*
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.viewspecsupport.ElementsSupport.*
 
 import scala.util.chaining.scalaUtilChainingOps
 

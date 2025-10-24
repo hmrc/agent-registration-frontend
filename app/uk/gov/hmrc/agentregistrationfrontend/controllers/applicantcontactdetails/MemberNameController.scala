@@ -21,7 +21,7 @@ import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
@@ -30,7 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MemberNamePage
 
 import javax.inject.Inject
@@ -41,13 +41,13 @@ class MemberNameController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: MemberNamePage,
-  applicationService: ApplicationService
+  agentRegistrationService: AgentRegistrationService
 )
 extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
     .ensure(
-      _.agentApplication.applicantContactDetails.map(_.applicantName.role).contains(ApplicantRoleInLlp.Member),
+      _.agentApplication.asLlpApplication.applicantContactDetails.map(_.applicantName.role).contains(ApplicantRoleInLlp.Member),
       implicit request =>
         logger.warn("Member name page requires Member role. Redirecting to applicant role selection page")
         Redirect(routes.ApplicantRoleInLlpController.show)
@@ -58,7 +58,7 @@ extends FrontendController(mcc, actions):
       Ok(view(
         CompaniesHouseNameQueryForm.form
           .fill:
-            request.agentApplication.memberNameQuery
+            request.agentApplication.asLlpApplication.memberNameQuery
       ))
 
   def submit: Action[AnyContent] =
@@ -67,19 +67,21 @@ extends FrontendController(mcc, actions):
       .async:
         implicit request: (AgentApplicationRequest[AnyContent] & FormValue[CompaniesHouseNameQuery]) =>
           val submittedNameQuery: CompaniesHouseNameQuery = request.formValue
-          val hasChanged = request.agentApplication.memberNameQuery != Some(submittedNameQuery)
+          val hasChanged = request.agentApplication.asLlpApplication.memberNameQuery != Some(submittedNameQuery)
 
           val updatedApplication =
             if hasChanged
             then
-              request.agentApplication
+              request
+                .agentApplication
+                .asLlpApplication
                 .modify(_.applicantContactDetails.each.applicantName)
                 .setTo(ApplicantName.NameOfMember(
                   memberNameQuery = Some(submittedNameQuery)
                 ))
             else request.agentApplication
 
-          applicationService
+          agentRegistrationService
             .upsert(updatedApplication)
             .map: _ =>
               Redirect(
@@ -87,7 +89,7 @@ extends FrontendController(mcc, actions):
               )
       .redirectIfSaveForLater
 
-  extension (agentApplication: AgentApplication)
+  extension (agentApplication: AgentApplicationLlp)
     def memberNameQuery: Option[CompaniesHouseNameQuery] =
       for
         acd <- agentApplication.applicantContactDetails

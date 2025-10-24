@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsSupervisoryBodyPage
 
 import javax.inject.Inject
@@ -38,7 +38,7 @@ class AmlsSupervisorController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: AmlsSupervisoryBodyPage,
-  applicationService: ApplicationService,
+  applicationService: AgentRegistrationService,
   amlsCodeForm: AmlsCodeForm
 )
 extends FrontendController(mcc, actions):

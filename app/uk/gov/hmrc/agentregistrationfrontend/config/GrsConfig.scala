@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.config
 
 import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.util.SealedObjectsExtensions.toStringHyphenated
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.routes as testRoutes
 
@@ -27,8 +26,7 @@ import javax.inject.Singleton
 @Singleton
 class GrsConfig @Inject() (appConfig: AppConfig):
 
-  def grsJourneyCallbackUrl(businessType: BusinessType) =
-    s"${appConfig.thisFrontendBaseUrl}/agent-registration/apply/grs-callback/${businessType.toStringHyphenated}"
+  def grsJourneyCallbackUrl(businessType: BusinessType) = s"${appConfig.thisFrontendBaseUrl}/agent-registration/apply/grs-callback"
 
   val enableGrsStub: Boolean = appConfig.enableGrsStub
   val deskProServiceId: String = appConfig.contactFrontendId

@@ -24,13 +24,14 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AuthorisedNameForm
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.AuthorisedNamePage
 
 import javax.inject.Inject
@@ -41,13 +42,13 @@ class AuthorisedNameController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: AuthorisedNamePage,
-  applicationService: ApplicationService
+  applicationService: AgentRegistrationService
 )
 extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
     .ensure(
-      _.agentApplication.applicantContactDetails.map(_.applicantName.role).contains(ApplicantRoleInLlp.Authorised),
+      _.agentApplication.asLlpApplication.applicantContactDetails.map(_.applicantName.role).contains(ApplicantRoleInLlp.Authorised),
       implicit request =>
         logger.warn("Authorised name page requires Authorised role. Redirecting to applicant role selection page")
         Redirect(routes.ApplicantRoleInLlpController.show)
@@ -58,7 +59,7 @@ extends FrontendController(mcc, actions):
       Ok(view(
         AuthorisedNameForm.form
           .fill:
-            request.agentApplication.authorisedName
+            request.agentApplication.asLlpApplication.authorisedName
       ))
 
   def submit: Action[AnyContent] =
@@ -67,7 +68,7 @@ extends FrontendController(mcc, actions):
       .async:
         implicit request: (AgentApplicationRequest[AnyContent] & FormValue[String]) =>
           val validFormData: String = request.formValue
-          val updatedApplication: AgentApplication = request.agentApplication
+          val updatedApplication: AgentApplication = request.agentApplication.asLlpApplication
             .modify(_.applicantContactDetails.each.applicantName)
             .setTo(ApplicantName.NameOfAuthorised(
               name = Some(validFormData)
@@ -76,7 +77,7 @@ extends FrontendController(mcc, actions):
             Redirect(routes.TelephoneNumberController.show.url)
       .redirectIfSaveForLater
 
-  extension (agentApplication: AgentApplication)
+  extension (agentApplication: AgentApplicationLlp)
     private def authorisedName: Option[String] =
       for
         acd <- agentApplication.applicantContactDetails

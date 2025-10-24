@@ -16,12 +16,9 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails
 
-import com.softwaremill.quicklens.*
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.TelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -32,12 +29,22 @@ class TelephoneNumberControllerSpec
 extends ControllerSpec:
 
   private val path = "/agent-registration/apply/applicant/telephone-number"
-  private val validApplication = tdAll.llpAgentApplication
-    .modify(_.applicantContactDetails)
-    .setTo(Some(ApplicantContactDetails(
-      applicantName = ApplicantName.NameOfAuthorised(name = Some("First Last")),
-      telephoneNumber = None
-    )))
+
+  private object agentApplication:
+
+    val beforeTelephoneUpdate: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAuthorised
+        .afterNameDeclared
+
+    val afterTelephoneNumberProvided: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAuthorised
+        .afterTelephoneNumberProvided
 
   "routes should have correct paths and methods" in:
     routes.TelephoneNumberController.show shouldBe Call(
@@ -52,7 +59,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeTelephoneUpdate)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -60,15 +67,12 @@ extends ControllerSpec:
 
   s"POST $path with valid name should save data and redirect to the telephone number page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
-    AgentRegistrationStubs.stubUpdateAgentApplication(
-      validApplication
-        .modify(_.applicantContactDetails.each.telephoneNumber)
-        .setTo(Some(TelephoneNumber(tdAll.telephoneNumber)))
-    )
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeTelephoneUpdate)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterTelephoneNumberProvided)
+
     val response: WSResponse =
       post(path)(Map(
-        TelephoneNumberForm.key -> Seq(tdAll.telephoneNumber)
+        TelephoneNumberForm.key -> Seq(tdAll.telephoneNumber.value)
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -77,7 +81,7 @@ extends ControllerSpec:
 
   s"POST $path with blank inputs should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeTelephoneUpdate)
     val response: WSResponse =
       post(path)(Map(
         TelephoneNumberForm.key -> Seq("")
@@ -90,7 +94,7 @@ extends ControllerSpec:
 
   s"POST $path with invalid characters should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeTelephoneUpdate)
     val response: WSResponse =
       post(path)(Map(
         TelephoneNumberForm.key -> Seq("[[)(*%")
@@ -103,7 +107,7 @@ extends ControllerSpec:
 
   s"POST $path with more than 25 characters should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeTelephoneUpdate)
     val response: WSResponse =
       post(path)(Map(
         TelephoneNumberForm.key -> Seq("2".repeat(26))
@@ -116,15 +120,11 @@ extends ControllerSpec:
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
-    AgentRegistrationStubs.stubUpdateAgentApplication(
-      validApplication
-        .modify(_.applicantContactDetails.each.telephoneNumber)
-        .setTo(Some(TelephoneNumber(tdAll.telephoneNumber)))
-    )
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeTelephoneUpdate)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterTelephoneNumberProvided)
     val response: WSResponse =
       post(path)(Map(
-        TelephoneNumberForm.key -> Seq(tdAll.telephoneNumber),
+        TelephoneNumberForm.key -> Seq(tdAll.telephoneNumber.value),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
@@ -134,7 +134,7 @@ extends ControllerSpec:
 
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubApplicationInProgress(validApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeTelephoneUpdate)
     val response: WSResponse =
       post(path)(Map(
         TelephoneNumberForm.key -> Seq("[[*%"),

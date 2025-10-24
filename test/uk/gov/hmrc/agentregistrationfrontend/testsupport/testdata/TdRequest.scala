@@ -19,9 +19,14 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 import play.api.mvc.AnyContentAsEmpty
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.*
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withAuthTokenInSession
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withDeviceId
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withRequestId
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withTrueClientIp
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withTrueClientPort
 
-trait TdRequest:
+trait TdRequest {
+  dependencies: TdBase =>
 
   def authToken: String = "authorization-value-123"
   def akamaiReputationValue: String = "akamai-reputation-value-123"
@@ -38,3 +43,5 @@ trait TdRequest:
 
   def requestNotLoggedIn: Request[AnyContentAsEmpty.type] = baseRequest
   def requestLoggedIn: Request[AnyContentAsEmpty.type] = baseRequest.withAuthTokenInSession()
+
+}

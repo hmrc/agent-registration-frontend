@@ -16,12 +16,9 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.views.apply.applicantcontactdetails
 
-import com.softwaremill.quicklens.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AuthorisedNameForm
@@ -34,20 +31,14 @@ class AuthorisedNamePageSpec
 extends ViewSpec:
 
   val viewTemplate: AuthorisedNamePage = app.injector.instanceOf[AuthorisedNamePage]
-  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] =
-    new AgentApplicationRequest(
-      request = request,
-      agentApplication = tdAll.agentApplicationAfterCreated
-        .modify(_.businessDetails)
-        .setTo(Some(tdAll.llpBusinessDetails))
-        .modify(_.applicantContactDetails)
-        .setTo(Some(ApplicantContactDetails(
-          applicantName = ApplicantName.NameOfAuthorised()
-        ))),
-      internalUserId = tdAll.internalUserId,
-      groupId = tdAll.groupId,
-      credentials = tdAll.credentials
-    )
+  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(
+    agentApplication =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAuthorised
+        .afterRoleSelected
+  )
   val doc: Document = Jsoup.parse(viewTemplate(AuthorisedNameForm.form).body)
   private val heading: String = "What is your full name?"
 

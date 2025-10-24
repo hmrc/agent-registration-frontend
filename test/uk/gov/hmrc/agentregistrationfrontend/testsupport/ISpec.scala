@@ -20,24 +20,23 @@ import com.google.inject.AbstractModule
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
+import play.api.Application
+import play.api.Logging
+import play.api.Mode
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.inject.guice.GuiceableModule
 import play.api.test.DefaultTestServerFactory
 import play.api.test.TestServerFactory
-import play.api.Application
-import play.api.Logging
-import play.api.Mode
 import play.core.server.ServerConfig
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsName
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.WireMockSupport
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.CsvLoader
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.WireMockSupport
 
 import java.time.Clock
 import java.time.Instant
-import java.time.ZoneId
 
 trait ISpec
 extends AnyWordSpecLike,
@@ -50,8 +49,8 @@ extends AnyWordSpecLike,
   private val testServerPort = ISpec.testServerPort
 
   lazy val tdAll: TdAll = TdAll.tdAll
-  lazy val frozenInstant: Instant = tdAll.instant
-  lazy val clock: Clock = Clock.fixed(frozenInstant, ZoneId.of("UTC"))
+  lazy val frozenInstant: Instant = tdAll.nowAsInstant
+  lazy given clock: Clock = tdAll.clock
 
   protected def configMap: Map[String, Any] =
     Map[String, Any](

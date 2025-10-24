@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.views.apply.applicantcontactdetails
 
-import com.softwaremill.quicklens.*
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
@@ -31,16 +30,12 @@ class ApplicantRoleInLlpPageSpec
 extends ViewSpec:
 
   val viewTemplate: ApplicantRoleInLlpPage = app.injector.instanceOf[ApplicantRoleInLlpPage]
-  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] =
-    new AgentApplicationRequest(
-      request = request.withSession("agentType" -> "UkTaxAgent", "businessType" -> "LimitedLiabilityPartnership"),
-      agentApplication = tdAll.agentApplicationAfterCreated
-        .modify(_.businessDetails)
-        .setTo(Some(tdAll.llpBusinessDetails)),
-      internalUserId = tdAll.internalUserId,
-      groupId = tdAll.groupId,
-      credentials = tdAll.credentials
-    )
+  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(
+    agentApplication =
+      tdAll
+        .agentApplicationLlp
+        .afterGrsDataReceived
+  )
   val doc: Document = Jsoup.parse(viewTemplate(ApplicantRoleInLlpForm.form).body)
   private val heading: String = "Are you a member of the limited liability partnership?"
 
