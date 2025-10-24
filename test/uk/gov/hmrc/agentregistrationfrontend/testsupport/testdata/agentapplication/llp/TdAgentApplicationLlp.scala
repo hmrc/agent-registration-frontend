@@ -54,6 +54,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
     val baseForSectionContactDetails: AgentApplicationLlp = afterGrsDataReceived
     protected val tdAgentApplicationLlpWithSectionContactDetails =
       new TdAgentApplicationLlpWithSectionContactDetails(baseForSectionContactDetails = baseForSectionContactDetails)
+
     export tdAgentApplicationLlpWithSectionContactDetails.sectionContactDetails
 
 }

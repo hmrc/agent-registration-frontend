@@ -38,24 +38,18 @@ extends ViewSpec:
 
   private val tdAll: TdAll = TdAll()
 
-  private val completeApplication: AgentApplicationLlp =
-    tdAll
-      .agentApplicationLlp
-      .sectionContactDetails
-      .whenApplicantIsAuthorised
-      .afterEmailAddressVerified
+  object agentApplication:
+    val complete: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAuthorised
+        .afterEmailAddressVerified
 
   private val heading: String = "Check your answers"
 
   "CheckYourAnswersPage for complete Applicant Contact Details" should:
-    implicit val agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] =
-      new AgentApplicationRequest(
-        request = request,
-        agentApplication = completeApplication,
-        internalUserId = tdAll.internalUserId,
-        groupId = tdAll.groupId,
-        credentials = tdAll.credentials
-      )
+    given agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(agentApplication.complete)
 
     val doc: Document = Jsoup.parse(viewTemplate().body)
     "contain content" in:
