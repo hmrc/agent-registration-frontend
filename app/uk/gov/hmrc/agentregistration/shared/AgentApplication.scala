@@ -117,7 +117,7 @@ extends AgentApplication:
 object AgentApplication:
 
   @nowarn()
-  given OFormat[AgentApplication] =
+  given format: OFormat[AgentApplication] =
     given OFormat[AgentApplicationSoleTrader] = Json.format[AgentApplicationSoleTrader]
     given OFormat[AgentApplicationLlp] = Json.format[AgentApplicationLlp]
     given JsonConfiguration = JsonConfig.jsonConfiguration
