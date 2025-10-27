@@ -92,7 +92,9 @@ extends FrontendController(mcc, actions):
                     case Some(details) =>
                       Some(ApplicantEmailAddress(
                         emailAddress = emailAddress,
-                        isVerified = appConfig.ignoreEmailVerification | (emailAddress === details.emailAddress && details.isVerified)
+                        // avoid unsetting verified status of any unchanged email if we are not ignoring verification
+                        isVerified = appConfig.ignoreEmailVerification ||
+                          (emailAddress === details.emailAddress && details.isVerified)
                       ))
                     case None =>
                       Some(ApplicantEmailAddress(
