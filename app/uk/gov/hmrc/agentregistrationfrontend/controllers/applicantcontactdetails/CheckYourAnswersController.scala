@@ -22,6 +22,8 @@ import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -39,8 +41,30 @@ extends FrontendController(mcc, actions):
     .ensure(
       _.agentApplication.asLlpApplication.applicantContactDetails.exists(_.isComplete),
       implicit request =>
-        logger.warn("Because we don't have complete applicant contact details we are redirecting to the email page")
-        Redirect(routes.EmailAddressController.show)
+        logger.warn("Because we don't have complete applicant contact details we are redirecting to where data is missing")
+        request.agentApplication.asLlpApplication.applicantContactDetails match {
+          case None => Redirect(routes.ApplicantRoleInLlpController.show)
+          case Some(ApplicantContactDetails(
+                ApplicantName.NameOfAuthorised(None),
+                _,
+                _
+              )) =>
+            Redirect(routes.AuthorisedNameController.show)
+          case Some(ApplicantContactDetails(
+                ApplicantName.NameOfMember(None, None),
+                _,
+                _
+              )) =>
+            Redirect(routes.MemberNameController.show)
+          case Some(ApplicantContactDetails(
+                ApplicantName.NameOfMember(Some(_), None),
+                _,
+                _
+              )) =>
+            Redirect(routes.CompaniesHouseMatchingController.show)
+          case Some(ApplicantContactDetails(_, None, _)) => Redirect(routes.TelephoneNumberController.show)
+          case Some(ApplicantContactDetails(_, Some(_), _)) => Redirect(routes.EmailAddressController.show)
+        }
     )
 
   def show: Action[AnyContent] = baseAction:
