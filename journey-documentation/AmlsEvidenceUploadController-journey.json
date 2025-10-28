@@ -1,0 +1,217 @@
+{
+    "journeyName": "AML Evidence Upload Journey",
+    "controller": "AmlsEvidenceUploadController",
+    "package": "uk.gov.hmrc.agentregistrationfrontend.controllers.amls",
+    "description": "Handles secure file upload for Anti-Money Laundering (AML) evidence documents using Upscan service with AJAX polling for upload status",
+    "businessContext": {
+        "purpose": "Enable agents to upload required AML supervision evidence documents as part of their registration application",
+        "requirements": [
+            "Upload PDF, JPG, or PNG files up to 5MB",
+            "Secure file handling via Government's Upscan service",
+            "Real-time upload progress tracking",
+            "Virus scanning and quarantine handling",
+            "Error handling for failed uploads"
+        ],
+        "complianceAspects": [
+            "AML supervision evidence is mandatory for agent registration",
+            "Files must be virus-free and within size limits",
+            "Secure transmission and storage of sensitive documents"
+        ]
+    },
+    "journeySteps": [
+        {
+            "step": 1,
+            "name": "Initiate Upload",
+            "action": "show",
+            "method": "GET",
+            "route": "/apply/anti-money-laundering/evidence",
+            "purpose": "Display upload page and initialize Upscan service",
+            "userActions": [
+                "View upload form",
+                "Select file to upload"
+            ],
+            "systemActions": [
+                "Retrieve AML supervisor name from application",
+                "Initialize Upscan upload session",
+                "Generate secure upload URLs",
+                "Store file reference in application state"
+            ],
+            "validations": [
+                "Application must have AML supervisor details"
+            ],
+            "outcomes": [
+                "Upload form displayed with secure upload endpoint"
+            ]
+        },
+        {
+            "step": 2,
+            "name": "File Upload",
+            "action": "browser_upload",
+            "method": "POST",
+            "route": "External Upscan endpoint",
+            "purpose": "User uploads file directly to secure Upscan service",
+            "userActions": [
+                "Select file",
+                "Submit upload"
+            ],
+            "systemActions": [
+                "Validate file size and type",
+                "Perform virus scanning",
+                "Store file securely",
+                "Process upload result"
+            ],
+            "validations": [
+                "File size <= 5MB",
+                "File type: PDF, JPG, PNG",
+                "File passes virus scan"
+            ],
+            "outcomes": [
+                "Success: Redirect to result page",
+                "Error: Redirect to error page with details"
+            ]
+        },
+        {
+            "step": 3,
+            "name": "Upload Error Handling",
+            "action": "showError",
+            "method": "GET",
+            "route": "/apply/anti-money-laundering/evidence/upload-error",
+            "purpose": "Display detailed error information for failed uploads",
+            "userActions": [
+                "View error details",
+                "Navigate back to retry"
+            ],
+            "systemActions": [
+                "Display error message with technical details"
+            ],
+            "validations": [],
+            "outcomes": [
+                "Error information displayed with retry option"
+            ]
+        },
+        {
+            "step": 4,
+            "name": "Upload Result Page",
+            "action": "showResult",
+            "method": "GET",
+            "route": "/apply/anti-money-laundering/evidence/upload-result",
+            "purpose": "Display upload progress page with JavaScript polling",
+            "userActions": [
+                "Wait for upload completion"
+            ],
+            "systemActions": [
+                "Show progress indicator",
+                "Start JavaScript polling for status",
+                "Display final result when complete"
+            ],
+            "validations": [],
+            "outcomes": [
+                "Upload in progress: Show progress indicator",
+                "Upload complete: Show success message",
+                "Upload failed: Show error message"
+            ]
+        },
+        {
+            "step": 5,
+            "name": "Status Polling",
+            "action": "pollResultWithJavaScript",
+            "method": "GET",
+            "route": "/apply/anti-money-laundering/evidence/status",
+            "purpose": "AJAX endpoint for polling upload status with CORS headers",
+            "userActions": [],
+            "systemActions": [
+                "Check current upload status",
+                "Return appropriate HTTP status code",
+                "Include CORS headers for browser security"
+            ],
+            "validations": [],
+            "outcomes": [
+                "204 No Content: Upload still in progress",
+                "202 Accepted: Upload completed successfully",
+                "409 Conflict: File quarantined (virus detected)",
+                "400 Bad Request: Upload failed"
+            ]
+        }
+    ],
+    "errorHandling": [
+        {
+            "scenario": "File too large",
+            "trigger": "File exceeds 5MB limit",
+            "handling": "Upscan rejects upload and redirects to error page",
+            "userExperience": "Clear error message with file size guidance"
+        },
+        {
+            "scenario": "Invalid file type",
+            "trigger": "File not PDF, JPG, or PNG",
+            "handling": "Upscan rejects upload and redirects to error page",
+            "userExperience": "Error message listing acceptable file types"
+        },
+        {
+            "scenario": "Virus detected",
+            "trigger": "File fails virus scan",
+            "handling": "Upload status shows QUARANTINE, 409 Conflict returned",
+            "userExperience": "Security message advising file cannot be accepted"
+        },
+        {
+            "scenario": "Network failure",
+            "trigger": "Upload interrupted or timeout",
+            "handling": "Upscan handles retry and eventual failure",
+            "userExperience": "Generic upload failure message with retry option"
+        },
+        {
+            "scenario": "Polling failure",
+            "trigger": "AJAX status check fails",
+            "handling": "JavaScript handles error and may retry",
+            "userExperience": "Progress indicator continues, may show timeout message"
+        }
+    ],
+    "integrations": [
+        {
+            "service": "Upscan",
+            "purpose": "Secure file upload and virus scanning",
+            "endpoint": "/upscan/v2/initiate",
+            "authentication": "Service-to-service",
+            "dataExchange": "Multipart form upload"
+        },
+        {
+            "service": "ApplicationService",
+            "purpose": "Store upload details in application state",
+            "endpoint": "Internal service",
+            "authentication": "None (internal)",
+            "dataExchange": "UploadDetails domain object"
+        }
+    ],
+    "stateTransitions": [
+        {
+            "from": "No upload details",
+            "to": "UploadStatus.InProgress",
+            "trigger": "Upscan initiation",
+            "data": "File reference stored"
+        },
+        {
+            "from": "UploadStatus.InProgress",
+            "to": "UploadStatus.UploadedSuccessfully",
+            "trigger": "Successful upload callback",
+            "data": "File URL and metadata"
+        },
+        {
+            "from": "UploadStatus.InProgress",
+            "to": "UploadStatus.Failed",
+            "trigger": "Upload failure or virus detection",
+            "data": "Error details and failure reason"
+        }
+    ],
+    "securityConsiderations": [
+        "Files uploaded directly to secure Upscan service, not through application",
+        "CORS headers configured for secure AJAX polling",
+        "File virus scanning before acceptance",
+        "Secure file URLs with limited access",
+        "No sensitive data in client-side JavaScript"
+    ],
+    "performanceCharacteristics": {
+        "uploadTime": "Depends on file size and network speed",
+        "pollingInterval": "Configurable via JavaScript (typically 1-2 seconds)",
+        "virusScanTime": "Usually completes within 10-30 seconds",
+        "fileRetention": "Files stored securely for application processing period"
+    }
+}

@@ -1,0 +1,101 @@
+{
+    "journeyName": "Task List Navigation Hub",
+    "controller": "TaskListController",
+    "package": "uk.gov.hmrc.agentregistrationfrontend.controllers",
+    "description": "Central navigation hub that displays application progress and provides access to different sections of the agent registration journey",
+    "businessContext": {
+        "purpose": "Provide users with a clear overview of their application progress and structured navigation between different registration sections",
+        "requirements": [
+            "Display completion status for each application section",
+            "Enable navigation to incomplete sections",
+            "Show overall application progress",
+            "Prevent access without valid GRS verification",
+            "Provide clear next steps guidance"
+        ],
+        "complianceAspects": [
+            "Ensures mandatory sections are completed before submission",
+            "Validates business verification via GRS before allowing progress",
+            "Maintains audit trail of section completion"
+        ]
+    },
+    "journeySteps": [
+        {
+            "step": 1,
+            "name": "Access Task List",
+            "action": "show",
+            "method": "GET",
+            "route": "/apply/task-list",
+            "purpose": "Display the main task list with application progress",
+            "userActions": [
+                "Navigate to task list",
+                "View section statuses"
+            ],
+            "systemActions": [
+                "Validate GRS completion (UTR exists)",
+                "Calculate section completion statuses",
+                "Render task list with navigation links",
+                "Display progress indicators"
+            ],
+            "validations": [
+                "UTR must exist from GRS verification"
+            ],
+            "outcomes": [
+                "Success: Task list displayed with navigation options",
+                "Missing UTR: Redirect to start registration"
+            ]
+        }
+    ],
+    "errorHandling": [
+        {
+            "scenario": "Missing GRS Verification",
+            "trigger": "User accesses task list without completing GRS verification",
+            "handling": "Redirect to start registration with warning log",
+            "userExperience": "Automatically redirected to begin GRS process"
+        },
+        {
+            "scenario": "Application Not Found",
+            "trigger": "No valid application in session",
+            "handling": "Actions framework handles with redirect to start",
+            "userExperience": "Redirected to application start page"
+        }
+    ],
+    "integrations": [
+        {
+            "service": "Actions Framework",
+            "purpose": "Session management and application validation",
+            "endpoint": "getApplicationInProgress action",
+            "authentication": "Session-based",
+            "dataExchange": "AgentApplication domain object"
+        }
+    ],
+    "stateTransitions": [
+        {
+            "from": "No application",
+            "to": "Redirect to start",
+            "trigger": "Actions framework validation",
+            "data": "Session state checked"
+        },
+        {
+            "from": "Application without UTR",
+            "to": "Redirect to GRS",
+            "trigger": "UTR validation failure",
+            "data": "Missing GRS verification"
+        },
+        {
+            "from": "Valid application with UTR",
+            "to": "Task list displayed",
+            "trigger": "All validations pass",
+            "data": "Progress calculations performed"
+        }
+    ],
+    "securityConsiderations": [
+        "UTR verification prevents unauthorized access to application sections",
+        "Session-based authentication ensures user owns the application",
+        "Warning logs for security-relevant access attempts"
+    ],
+    "performanceCharacteristics": {
+        "responseTime": "Fast rendering as primarily static template with dynamic progress data",
+        "caching": "No caching due to dynamic progress calculations",
+        "scalability": "Lightweight controller with minimal processing overhead"
+    }
+}
