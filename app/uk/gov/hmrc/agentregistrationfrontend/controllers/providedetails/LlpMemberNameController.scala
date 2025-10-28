@@ -19,10 +19,10 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
+import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.LlpMemberNamePage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,13 +31,19 @@ import javax.inject.Singleton
 class LlpMemberNameController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  placeholder: SimplePage
+  llpMemberNamePage: LlpMemberNamePage
 )
 extends FrontendController(mcc, actions):
 
+  // TODO: this is a dumb controller to enable dev of the template and form
   def show: Action[AnyContent] = Action:
-    implicit request: RequestHeader =>
-      Ok(placeholder(
-        h1 = "What is your name?",
-        bodyText = Some("This is a placeholder page for the LLP member name page.")
-      ))
+    implicit request =>
+      Ok(llpMemberNamePage(CompaniesHouseNameQueryForm.form))
+
+  def submit: Action[AnyContent] = Action:
+    implicit request =>
+      val form = CompaniesHouseNameQueryForm.form.bindFromRequest()
+      form.fold(
+        formWithErrors => BadRequest(llpMemberNamePage(formWithErrors)),
+        validFormData => Ok(s"Form submitted successfully with data: $validFormData")
+      )

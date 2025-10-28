@@ -68,3 +68,4 @@ GET         /apply/anti-money-laundering/check-your-answers         uk.gov.hmrc.
 GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.start(linkId: LinkId)
 GET         /provide-details/resolve/:linkId                        uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.resolve(linkId: LinkId)
 GET         /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.LlpMemberNameController.show
+POST        /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.LlpMemberNameController.submit
