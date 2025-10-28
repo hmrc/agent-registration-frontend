@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import play.api.http.Status
 import play.api.libs.json.Json
+import play.api.libs.ws.JsonBodyWritables.given
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
@@ -59,8 +60,6 @@ extends RequestAwareLogging:
       }
     }
 
-  import play.api.libs.ws.JsonBodyWritables.given
-
   def upsertApplication(application: AgentApplication)(using
     request: RequestHeader
   ): Future[Unit] = httpClient
@@ -70,6 +69,19 @@ extends RequestAwareLogging:
     .map { response =>
       response.status match {
         case Status.OK => ()
+        case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
+      }
+    }
+
+  def findApplicationByLinkId(linkId: LinkId)(using
+    request: RequestHeader
+  ): Future[Option[AgentApplication]] = httpClient
+    .get(url"$baseUrl/application/linkId/${linkId.value}")
+    .execute[HttpResponse]
+    .map { response =>
+      response.status match {
+        case Status.OK => Some(response.json.as[AgentApplication])
+        case Status.NO_CONTENT => None
         case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
       }
     }

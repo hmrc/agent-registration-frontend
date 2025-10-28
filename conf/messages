@@ -1,6 +1,7 @@
 service.name = Apply for an agent services account
 service.text = This is your new service
 
+common.start = Start
 common.continue = Continue
 common.saveAndContinue = Save and continue
 common.confirmAndContinue = Confirm and continue
@@ -270,3 +271,16 @@ saveForLater.finishLink = Finish and sign out
 timed-out.header = You have been signed out
 timed-out.p1 = You have not done anything for 15 minutes, so we have signed you out to keep your account secure.
 timed-out.link = Sign in again
+
+
+# Signatory journeys
+llpProvideDetailsStart.title = Sign in and confirm your details
+llpProvideDetailsStart.p1 = {0} has started an application for an agent services account on behalf of {1}.
+llpProvideDetailsStart.p2 = You are listed in Companies House as a current member of this limited liability partnership. That means we need some information from you before we can process the application.
+llpProvideDetailsStart.info.h2 = Why we need this information
+llpProvideDetailsStart.info.p1 = We ask you to sign in so we can:
+llpProvideDetailsStart.info.li1 = confirm who you are
+llpProvideDetailsStart.info.li2 = carry out some checks on your tax and financial background
+llpProvideDetailsStart.signIn.h2 = Use the right sign in details
+llpProvideDetailsStart.signIn.p1 = We need you to sign in using sign in details you created for your personal taxes, not your business taxes.
+llpProvideDetailsStart.signIn.p2 = If you do not have personal sign in details, you can create some.

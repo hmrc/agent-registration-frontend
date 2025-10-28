@@ -16,20 +16,23 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers
 
+import com.softwaremill.quicklens.*
 import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import com.softwaremill.quicklens.*
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.upscan.*
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
+import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.TestOnlyLink
+import uk.gov.hmrc.agentregistrationfrontend.testOnly.services.TestApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.testOnly.views.html.TestLinkPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,7 +41,9 @@ import javax.inject.Singleton
 class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  applicationService: AgentRegistrationService
+  applicationService: AgentRegistrationService,
+  testApplicationService: TestApplicationService,
+  testLinkPage: TestLinkPage
 )
 extends FrontendController(mcc, actions):
 
@@ -87,3 +92,14 @@ extends FrontendController(mcc, actions):
         .addToSession(AgentType.UkTaxAgent)
         .addToSession(BusinessTypeAnswer.PartnershipType)
         .addSession(partnershipType)
+
+  // as we add more types of entity support we may want to specify which business type to create
+  // possibly as part of the url, for now we only create an LLP application
+  def makeTestSubmittedApplication(): Action[AnyContent] = Action
+    .async:
+      implicit request =>
+        testApplicationService
+          .makeTestApplication()
+          .map((linkId: TestOnlyLink) =>
+            Ok(testLinkPage(linkId))
+          )

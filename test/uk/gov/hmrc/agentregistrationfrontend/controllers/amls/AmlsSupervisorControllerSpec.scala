@@ -16,15 +16,16 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
+import com.softwaremill.quicklens.modify
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AmlsCode
+import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
-
-import scala.annotation.nowarn
 
 class AmlsSupervisorControllerSpec
 extends ControllerSpec:
@@ -58,7 +59,14 @@ extends ControllerSpec:
   s"POST $path with valid selection should redirect to the next page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.baseForSectionAmls)
-    AgentRegistrationStubs.stubUpdateAgentApplication: @nowarn("cat=deprecation")
+    AgentRegistrationStubs.stubUpdateAgentApplication(
+      agentApplication = agentApplication
+        .baseForSectionAmls
+        .modify(_.amlsDetails)
+        .setTo(Some(AmlsDetails(
+          supervisoryBody = AmlsCode("HMRC")
+        )))
+    )
     val response: WSResponse = post(path)(Map("amlsSupervisoryBody" -> Seq("HMRC")))
 
     response.status shouldBe 303
@@ -69,7 +77,14 @@ extends ControllerSpec:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.baseForSectionAmls)
 
-    AgentRegistrationStubs.stubUpdateAgentApplication: @nowarn("cat=deprecation")
+    AgentRegistrationStubs.stubUpdateAgentApplication(
+      agentApplication = agentApplication
+        .baseForSectionAmls
+        .modify(_.amlsDetails)
+        .setTo(Some(AmlsDetails(
+          supervisoryBody = AmlsCode("HMRC")
+        )))
+    )
     val response: WSResponse =
       post(path)(Map(
         "amlsSupervisoryBody" -> Seq("HMRC"),

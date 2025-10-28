@@ -11,7 +11,7 @@ GET         /timed-out                                                 uk.gov.hm
 
 GET         /application-submitted                                     uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.applicationSubmitted
 
-# Apply routes
+# Agent apply routes
 GET         /apply                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.startRegistration
 GET         /apply/task-list                                        uk.gov.hmrc.agentregistrationfrontend.controllers.TaskListController.show
 GET         /apply/save-and-come-back-later                         uk.gov.hmrc.agentregistrationfrontend.controllers.SaveForLaterController.show
@@ -62,3 +62,9 @@ GET         /apply/anti-money-laundering/evidence/status            uk.gov.hmrc.
 GET         /apply/anti-money-laundering/evidence/upload-result     uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsEvidenceUploadController.showResult
 GET         /apply/anti-money-laundering/evidence/upload-error      uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsEvidenceUploadController.showError(errorCode: String, errorMessage: String, errorRequestId: String, key: String)
 GET         /apply/anti-money-laundering/check-your-answers         uk.gov.hmrc.agentregistrationfrontend.controllers.amls.CheckYourAnswersController.show
+
+
+# Individuals (directors/partners/members/owners) providing details
+GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.start(linkId: LinkId)
+GET         /provide-details/resolve/:linkId                        uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.resolve(linkId: LinkId)
+GET         /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.LlpMemberNameController.show

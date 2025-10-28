@@ -1,0 +1,46 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.TestOnlyLink
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+
+@this(
+    appConfig: AppConfig,
+    layout: Layout
+)
+
+@(
+        testOnlyLink: TestOnlyLink
+)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@link = @{appConfig.applicationLink(testOnlyLink.linkId).toString}
+
+@layout(
+    pageTitle = "Test link",
+    suppressBackLink = true
+) {
+    <h1 class="govuk-heading-xl">Test link</h1>
+    <p class="govuk-body">
+        The link to share for accessing the newly created test application:
+    </p>
+    <p class="govuk-body">
+        <a class="govuk-link" href="@link">@link</a>
+    </p>
+}
