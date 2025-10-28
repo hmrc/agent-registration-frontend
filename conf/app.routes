@@ -65,5 +65,6 @@ GET         /apply/anti-money-laundering/check-your-answers         uk.gov.hmrc.
 
 
 # Individuals (directors/partners/members/owners) providing details
-GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.start(linkId: String)
-GET         /provide-details/name                uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.LlpMemberNameController.show
+GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.start(linkId: LinkId)
+GET         /provide-details/resolve/:linkId                        uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.resolve(linkId: LinkId)
+GET         /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.LlpMemberNameController.show

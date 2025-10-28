@@ -20,12 +20,16 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.RequestHeader
+import play.api.mvc.Result
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.StartPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.LlpStartPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,15 +38,36 @@ import javax.inject.Singleton
 class StartController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  startPage: StartPage,
+  llpStartPage: LlpStartPage,
+  placeholderStartPage: SimplePage,
   applicationService: AgentRegistrationService
 )
 extends FrontendController(mcc, actions):
 
-  def start(linkId: String): Action[AnyContent] = Action
+  def start(linkId: LinkId): Action[AnyContent] = Action
     .async:
       implicit request: RequestHeader =>
-        applicationService.findApplicationByLinkId(LinkId(linkId)).map {
-          case Some(app) if app.hasFinished => Ok(startPage(app))
-          case _ => Redirect(routes.AgentApplicationController.genericExitPage.url)
+        applicationService.findApplicationByLinkId(linkId).map {
+          case Some(app) if app.hasFinished => startPageForApplicationType(app)
+          case _ => Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
         }
+
+  // TODO: this method requires an auth action to ensure user is signed in correctly and has
+  //  the application from the linkId provided within the request going forward
+  def resolve(linkId: LinkId): Action[AnyContent] = Action
+    .async:
+      implicit request: RequestHeader =>
+        applicationService.findApplicationByLinkId(linkId).map {
+          case Some(app) if app.hasFinished => Redirect(routes.LlpMemberNameController.show)
+          case _ => Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
+        }
+
+  // for now this returns only the llp start page template until we build the rest
+  private def startPageForApplicationType(agentApplication: AgentApplication)(implicit request: RequestHeader): Result =
+    agentApplication.businessType match
+      case BusinessType.Partnership.LimitedLiabilityPartnership => Ok(llpStartPage(agentApplication.asLlpApplication))
+      case _ =>
+        Ok(placeholderStartPage(
+          h1 = "Start page for unsupported application type",
+          bodyText = Some("Placeholder for unbuilt start pages")
+        ))

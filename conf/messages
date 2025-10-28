@@ -274,13 +274,13 @@ timed-out.link = Sign in again
 
 
 # Signatory journeys
-provideDetailsStart.title = Sign in and confirm your details
-provideDetailsStart.p1 = {0} has started an application for an agent services account on behalf of {1}.
-provideDetailsStart.p2 = You are listed in Companies House as a current member of this limited liability partnership. That means we need some information from you before we can process the application.
-provideDetailsStart.info.h2 = Why we need this information
-provideDetailsStart.info.p1 = We ask you to sign in so we can:
-provideDetailsStart.info.li1 = confirm who you are
-provideDetailsStart.info.li2 = carry out some checks on your tax and financial background
-provideDetailsStart.signIn.h2 = Use the right sign in details
-provideDetailsStart.signIn.p1 = We need you to sign in using sign in details you created for your personal taxes, not your business taxes.
-provideDetailsStart.signIn.p2 = If you do not have personal sign in details, you can create some.
+llpProvideDetailsStart.title = Sign in and confirm your details
+llpProvideDetailsStart.p1 = {0} has started an application for an agent services account on behalf of {1}.
+llpProvideDetailsStart.p2 = You are listed in Companies House as a current member of this limited liability partnership. That means we need some information from you before we can process the application.
+llpProvideDetailsStart.info.h2 = Why we need this information
+llpProvideDetailsStart.info.p1 = We ask you to sign in so we can:
+llpProvideDetailsStart.info.li1 = confirm who you are
+llpProvideDetailsStart.info.li2 = carry out some checks on your tax and financial background
+llpProvideDetailsStart.signIn.h2 = Use the right sign in details
+llpProvideDetailsStart.signIn.p1 = We need you to sign in using sign in details you created for your personal taxes, not your business taxes.
+llpProvideDetailsStart.signIn.p2 = If you do not have personal sign in details, you can create some.

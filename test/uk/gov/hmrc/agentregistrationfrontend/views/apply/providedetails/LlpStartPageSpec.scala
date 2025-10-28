@@ -22,12 +22,12 @@ import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.StartPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.LlpStartPage
 
-class StartPageSpec
+class LlpStartPageSpec
 extends ViewSpec:
 
-  val viewTemplate: StartPage = app.injector.instanceOf[StartPage]
+  val viewTemplate: LlpStartPage = app.injector.instanceOf[LlpStartPage]
 
   val submittedAgentApplication: AgentApplicationLlp = tdAll
     .agentApplicationLlp
@@ -76,5 +76,5 @@ extends ViewSpec:
 
       startLink shouldBe TestLink(
         text = "Start",
-        href = "/agent-registration/provide-details/name"
+        href = s"/agent-registration/provide-details/resolve/${submittedAgentApplication.linkId.value}"
       )

@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import play.api.http.Status
 import play.api.libs.json.Json
+import play.api.libs.ws.JsonBodyWritables.given
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
@@ -59,8 +60,6 @@ extends RequestAwareLogging:
       }
     }
 
-  import play.api.libs.ws.JsonBodyWritables.given
-
   def upsertApplication(application: AgentApplication)(using
     request: RequestHeader
   ): Future[Unit] = httpClient
@@ -77,7 +76,7 @@ extends RequestAwareLogging:
   def findApplicationByLinkId(linkId: LinkId)(using
     request: RequestHeader
   ): Future[Option[AgentApplication]] = httpClient
-    .get(url"$baseUrl/application/${linkId.value}")
+    .get(url"$baseUrl/application/linkId/${linkId.value}")
     .execute[HttpResponse]
     .map { response =>
       response.status match {
