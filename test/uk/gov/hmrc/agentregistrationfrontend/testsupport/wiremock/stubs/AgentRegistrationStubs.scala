@@ -21,6 +21,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AgentRegistrationStubs {
@@ -41,11 +42,11 @@ object AgentRegistrationStubs {
   )
 
   def stubFindApplicationByLinkId(
-    linkId: String,
+    linkId: LinkId,
     agentApplication: AgentApplication
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/agent-registration/application/linkId/$linkId"),
+    urlPattern = urlMatching(s"/agent-registration/application/linkId/${linkId.value}"),
     responseStatus = 200,
     responseBody = Json.toJson(agentApplication).toString
   )

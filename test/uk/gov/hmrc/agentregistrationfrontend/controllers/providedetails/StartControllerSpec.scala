@@ -21,15 +21,16 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 
 class StartControllerSpec
 extends ControllerSpec:
 
-  private val linkId = "test-link-id"
+  private val linkId = LinkId("test-link-id")
 
-  private val path: String = s"/agent-registration/provide-details/start/$linkId"
+  private val path: String = s"/agent-registration/provide-details/start/${linkId.value}"
 
   object agentApplication:
 
