@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 import com.softwaremill.quicklens.*
 import play.api.data.Form
 import play.api.mvc.Action
+import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
@@ -43,7 +44,22 @@ class AmlsExpiryDateController @Inject() (
 )(using clock: Clock)
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getApplicationInProgress:
+  val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+    .getApplicationInProgress
+    .ensure(
+      _.agentApplication.amlsDetails.exists(_.amlsRegistrationNumber.isDefined),
+      implicit r =>
+        logger.warn("Missing AmlsRegistrationNumber, redirecting to registration number page")
+        Redirect(routes.AmlsRegistrationNumberController.show.url)
+    )
+    .ensure(
+      !_.agentApplication.getAmlsDetails.isHmrc, // safe to getAmlsDetails as ensured above
+      implicit r =>
+        logger.warn("Expiry date is not required as supervisor is HMRC, redirecting to Check Your Answers")
+        Redirect(routes.CheckYourAnswersController.show.url)
+    )
+
+  def show: Action[AnyContent] = baseAction:
     implicit request =>
       val form: Form[LocalDate] = AmlsExpiryDateForm.form().fill(request
         .agentApplication
@@ -52,8 +68,7 @@ extends FrontendController(mcc, actions):
       Ok(view(form))
 
   def submit: Action[AnyContent] =
-    actions
-      .getApplicationInProgress
+    baseAction
       .ensureValidFormAndRedirectIfSaveForLater[LocalDate](AmlsExpiryDateForm.form(), implicit request => view(_))
       .async:
         implicit request =>
@@ -64,5 +79,5 @@ extends FrontendController(mcc, actions):
                 .modify(_.amlsDetails.each.amlsExpiryDate)
                 .setTo(Some(amlsExpiryDate))
             )
-            .map(_ => Redirect(routes.AmlsEvidenceUploadController.show.url))
+            .map(_ => Redirect(routes.CheckYourAnswersController.show.url))
       .redirectIfSaveForLater

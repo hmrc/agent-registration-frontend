@@ -38,7 +38,7 @@ trait TdSectionAmls {
   def amlsCodeNonHmrc: AmlsCode = AmlsCode("ATT") /// Association of TaxationTechnicians
 
   def amlsRegistrationNumberHmrc = AmlsRegistrationNumber("XAML00000123456")
-  def amlsRegistrationNumberNonHmrc = AmlsRegistrationNumber("NONHMRC_REF_AMLS_NUMBER_00001")
+  def amlsRegistrationNumberNonHmrc = AmlsRegistrationNumber("NONHMRC-REF-AMLS-NUMBER-00001")
 
   def amlsExpiryDateValid: LocalDate = dependencies.nowPlus6mAsLocalDateTime.toLocalDate
   def amlsExpiryDateInvalid: LocalDate = dependencies.nowPlus13mAsLocalDateTime.toLocalDate
@@ -118,7 +118,7 @@ trait TdSectionAmls {
           def afterAmlsExpiryDateProvided = afterRegistrationNumberProvided.copy(
             amlsExpiryDate = Some(amlsExpiryDateValid)
           )
-          def afterUploadedEvidence = afterAmlsExpiryDateProvided.copy(
+          def afterUploadInitiated = afterAmlsExpiryDateProvided.copy(
             amlsEvidence = Some(amlsUploadDetailsAfterUploadInProgress)
           )
           def afterUploadFailed = afterAmlsExpiryDateProvided.copy(
@@ -136,7 +136,7 @@ trait TdSectionAmls {
 
         def afterAmlsExpiryDateProvided: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterAmlsExpiryDateProvided))
 
-        def afterUploadedEvidence: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadedEvidence))
+        def afterUploadInitiated: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadInitiated))
 
         def afterUploadFailed: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadFailed))
 

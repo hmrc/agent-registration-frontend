@@ -17,8 +17,8 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
 import com.softwaremill.quicklens.*
-
 import play.api.mvc.Action
+import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
@@ -26,6 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.AmlsName
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanConnector
@@ -52,7 +53,22 @@ class AmlsEvidenceUploadController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getApplicationInProgress.async:
+  val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+    .getApplicationInProgress
+    .ensure(
+      _.agentApplication.amlsDetails.exists(!_.isHmrc),
+      implicit r =>
+        logger.warn("Uploaded evidence is not required as supervisor is HMRC, redirecting to Check Your Answers")
+        Redirect(routes.CheckYourAnswersController.show.url)
+    )
+    .ensure(
+      _.agentApplication.getAmlsDetails.amlsExpiryDate.isDefined, // safe to getAmlsDetails as ensured above
+      implicit r =>
+        logger.warn("Missing AmlsExpiryDate, redirecting to AmlsExpiryDate page")
+        Redirect(routes.AmlsExpiryDateController.show.url)
+    )
+
+  def show: Action[AnyContent] = baseAction.async:
     implicit request =>
       val amlsCode: AmlsCode = request.agentApplication.getAmlsDetails.supervisoryBody
       val amlsName: AmlsName = amlsCodes.getSupervisoryName(amlsCode)

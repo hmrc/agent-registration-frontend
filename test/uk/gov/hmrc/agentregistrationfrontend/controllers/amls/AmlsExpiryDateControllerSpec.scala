@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
@@ -44,14 +43,28 @@ extends ControllerSpec:
 
   private object agentApplication:
 
-    val afterRegistrationNumberProvided: AgentApplication =
+    val hmrcAmls: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsHmrc
+        .afterRegistrationNumberProvided
+
+    val beforeRegistrationNumberProvided: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsHmrc
+        .afterSupervisoryBodySelected
+
+    val afterRegistrationNumberProvided: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
         .afterRegistrationNumberProvided
 
-    val afterAmlsExpiryDateProvided =
+    val afterAmlsExpiryDateProvided: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
         .sectionAmls
@@ -63,8 +76,50 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRegistrationNumberProvided)
     val response: WSResponse = get(path)
 
-    response.status shouldBe 200
+    response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title shouldBe "When does your supervision run out? - Apply for an agent services account - GOV.UK"
+
+  s"GET $path when expiry date already stored should return 200 and render page with previous answer filled in" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterAmlsExpiryDateProvided)
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.OK
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title shouldBe "When does your supervision run out? - Apply for an agent services account - GOV.UK"
+    doc.select(s"input[name='${AmlsExpiryDateForm.dayKey}']")
+      .attr("value") shouldBe agentApplication.afterAmlsExpiryDateProvided
+      .getAmlsDetails
+      .getAmlsExpiryDate
+      .getDayOfMonth.toString
+    doc.select(s"input[name='${AmlsExpiryDateForm.monthKey}']")
+      .attr("value") shouldBe agentApplication.afterAmlsExpiryDateProvided
+      .getAmlsDetails
+      .getAmlsExpiryDate
+      .getMonthValue.toString
+    doc.select(s"input[name='${AmlsExpiryDateForm.yearKey}']")
+      .attr("value") shouldBe agentApplication.afterAmlsExpiryDateProvided
+      .getAmlsDetails
+      .getAmlsExpiryDate
+      .getYear.toString
+
+  s"GET $path when registration number is missing should redirect to registration number page" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeRegistrationNumberProvided)
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe routes.AmlsRegistrationNumberController.show.url
+
+  s"GET $path when supervisor is HMRC should redirect to check your answers" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.hmrcAmls)
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
 
   s"POST $path with valid inputs should redirect to the next page" in:
     AuthStubs.stubAuthorise()
@@ -83,7 +138,7 @@ extends ControllerSpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.AmlsEvidenceUploadController.show.url
+    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
 
   s"POST $path with save for later and valid input should redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()

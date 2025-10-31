@@ -18,13 +18,14 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
 import com.softwaremill.quicklens.*
 import play.api.data.Form
-
 import play.api.mvc.Action
+import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
@@ -42,7 +43,16 @@ class AmlsRegistrationNumberController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getApplicationInProgress:
+  val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+    .getApplicationInProgress
+    .ensure(
+      _.agentApplication.amlsDetails.isDefined,
+      implicit r =>
+        logger.warn("Missing AmlsDetails, redirecting to AmlsSupervisor page")
+        Redirect(routes.AmlsSupervisorController.show.url)
+    )
+
+  def show: Action[AnyContent] = baseAction:
     implicit request =>
       val isHmrc = request.agentApplication.getAmlsDetails.isHmrc
       val form: Form[AmlsRegistrationNumber] = AmlsRegistrationNumberForm(isHmrc).form.fill(request
@@ -52,14 +62,7 @@ extends FrontendController(mcc, actions):
       Ok(view(form))
 
   def submit: Action[AnyContent] =
-    actions
-      .getApplicationInProgress
-      .ensure(
-        _.agentApplication.amlsDetails.isDefined,
-        implicit r =>
-          logger.warn("Missing AmlsDetails, redirecting to AmlsSupervisor page")
-          Redirect(routes.AmlsSupervisorController.show.url)
-      )
+    baseAction
       .ensureValidFormAndRedirectIfSaveForLater(
         r => AmlsRegistrationNumberForm(r.agentApplication.getAmlsDetails.isHmrc).form,
         implicit r => view(_)
@@ -75,9 +78,6 @@ extends FrontendController(mcc, actions):
                 .setTo(Some(amlsRegistrationNumber))
             )
             .map(_ =>
-              Redirect(
-                if request.agentApplication.getAmlsDetails.isHmrc then routes.CheckYourAnswersController.show.url
-                else routes.AmlsExpiryDateController.show.url
-              )
+              Redirect(routes.CheckYourAnswersController.show.url)
             )
       .redirectIfSaveForLater

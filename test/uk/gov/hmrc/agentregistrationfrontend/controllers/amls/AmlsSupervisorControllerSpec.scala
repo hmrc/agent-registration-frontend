@@ -16,13 +16,12 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
-import com.softwaremill.quicklens.modify
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsDetails
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
+import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
@@ -33,7 +32,29 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/anti-money-laundering/supervisor-name"
 
   private object agentApplication:
+
     val baseForSectionAmls: AgentApplication = tdAll.agentApplicationLlp.baseForSectionAmls
+
+    val afterSupervisoryBodySelected: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsNonHmrc
+        .afterSupervisoryBodySelected
+
+    val afterHmrcSelected: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsHmrc
+        .afterSupervisoryBodySelected
+
+    val afterHmrcRegistrationNumberStored: AgentApplication =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsHmrc
+        .afterRegistrationNumberProvided
 
   "routes should have correct paths and methods" in:
     routes.AmlsSupervisorController.show shouldBe Call(
@@ -51,56 +72,61 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.baseForSectionAmls)
     val response: WSResponse = get(path)
 
-    response.status shouldBe 200
-    val content = response.body[String]
-    content should include("What is the name of your supervisory body?")
-    content should include("Save and continue")
+    response.status shouldBe Status.OK
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "What is the name of your supervisory body? - Apply for an agent services account - GOV.UK"
+
+  s"GET $path when supervisory body already stored should return 200 and render page with previous answer selected" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterSupervisoryBodySelected)
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.OK
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "What is the name of your supervisory body? - Apply for an agent services account - GOV.UK"
+    doc.select("select[name=amlsSupervisoryBody] option[selected]")
+      .attr("value") shouldBe "ATT"
 
   s"POST $path with valid selection should redirect to the next page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.baseForSectionAmls)
-    AgentRegistrationStubs.stubUpdateAgentApplication(
-      agentApplication = agentApplication
-        .baseForSectionAmls
-        .modify(_.amlsDetails)
-        .setTo(Some(AmlsDetails(
-          supervisoryBody = AmlsCode("HMRC")
-        )))
-    )
-    val response: WSResponse = post(path)(Map("amlsSupervisoryBody" -> Seq("HMRC")))
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterHmrcSelected)
+    val response: WSResponse = post(path)(Map(AmlsCodeForm.key -> Seq("HMRC")))
 
-    response.status shouldBe 303
+    response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.AmlsRegistrationNumberController.show.url
+    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+
+  s"POST $path when changing value should unset registration number and redirect to the next page" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterHmrcRegistrationNumberStored)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterSupervisoryBodySelected)
+    val response: WSResponse = post(path)(Map(AmlsCodeForm.key -> Seq("ATT")))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
 
   s"POST $path with save for later and valid selection should redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.baseForSectionAmls)
-
-    AgentRegistrationStubs.stubUpdateAgentApplication(
-      agentApplication = agentApplication
-        .baseForSectionAmls
-        .modify(_.amlsDetails)
-        .setTo(Some(AmlsDetails(
-          supervisoryBody = AmlsCode("HMRC")
-        )))
-    )
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterHmrcSelected)
     val response: WSResponse =
       post(path)(Map(
-        "amlsSupervisoryBody" -> Seq("HMRC"),
+        AmlsCodeForm.key -> Seq("HMRC"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
-    response.status shouldBe 303
+    response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe appRoutes.SaveForLaterController.show.url
 
   s"POST $path without valid selection should return 400" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.baseForSectionAmls)
-    val response: WSResponse = post(path)(Map("amlsSupervisoryBody" -> Seq("")))
+    val response: WSResponse = post(path)(Map(AmlsCodeForm.key -> Seq("")))
 
-    response.status shouldBe 400
+    response.status shouldBe Status.BAD_REQUEST
     val content = response.body[String]
     content should include("There is a problem")
     content should include("Enter a name and choose your supervisor from the list")

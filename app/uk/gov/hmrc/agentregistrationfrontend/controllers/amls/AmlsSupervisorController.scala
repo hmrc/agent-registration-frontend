@@ -68,12 +68,15 @@ extends FrontendController(mcc, actions):
                   case Some(details) =>
                     Some(details
                       .modify(_.supervisoryBody)
-                      .setTo(supervisoryBody))
+                      .setTo(supervisoryBody)
+                      .modify(_.amlsRegistrationNumber)
+                      .setTo(None) // Clear AMLS registration number when supervisory body changes as the format is dependent on the body
+                    )
                   case None =>
                     Some(AmlsDetails(
                       supervisoryBody = supervisoryBody
                     ))
                 }
             )
-            .map(_ => Redirect(routes.AmlsRegistrationNumberController.show.url))
+            .map(_ => Redirect(routes.CheckYourAnswersController.show.url))
       .redirectIfSaveForLater
