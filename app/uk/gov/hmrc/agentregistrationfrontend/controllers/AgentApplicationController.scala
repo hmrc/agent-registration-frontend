@@ -38,7 +38,7 @@ extends FrontendController(mcc, actions):
     implicit request =>
       // until we have more than the registration journey just go to the task list
       // which will redirect to the start of registration if needed
-      Redirect(routes.TaskListController.show)
+      Redirect(arf.routes.TaskListController.show)
 
   def applicationDashboard: Action[AnyContent] = actions.getApplicationInProgress.async { implicit request =>
     Future.successful(Ok(simplePage(
@@ -61,7 +61,7 @@ extends FrontendController(mcc, actions):
   def startRegistration: Action[AnyContent] = action:
     implicit request =>
       // if we use an endpoint like this, we can later change the flow without changing the URL
-      Redirect(aboutyourbusiness.routes.AgentTypeController.show)
+      Redirect(arf.aboutyourbusiness.routes.AgentTypeController.show)
 
   def genericExitPage: Action[AnyContent] = action:
     implicit request =>

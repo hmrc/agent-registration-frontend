@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetail
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.emailVerification.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -79,15 +78,15 @@ extends ControllerSpec:
   )
 
   "routes should have correct paths and methods" in:
-    routes.EmailAddressController.show shouldBe Call(
+    arf.applicantcontactdetails.routes.EmailAddressController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.EmailAddressController.submit shouldBe Call(
+    arf.applicantcontactdetails.routes.EmailAddressController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.EmailAddressController.submit.url shouldBe routes.EmailAddressController.show.url
+    arf.applicantcontactdetails.routes.EmailAddressController.submit.url shouldBe arf.applicantcontactdetails.routes.EmailAddressController.show.url
 
   s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthorise()
@@ -104,7 +103,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.TelephoneNumberController.show.url
+    response.header("Location").value shouldBe arf.applicantcontactdetails.routes.TelephoneNumberController.show.url
 
   s"POST $path with well formed email address should save data and redirect to the verify endpoint" in:
     AuthStubs.stubAuthorise()
@@ -117,7 +116,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.EmailAddressController.verify.url
+    response.header("Location").value shouldBe arf.applicantcontactdetails.routes.EmailAddressController.verify.url
 
   s"POST $path with blank inputs should return 400" in:
     AuthStubs.stubAuthorise()
@@ -159,7 +158,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe applicationRoutes.SaveForLaterController.show.url
+    response.header("Location").value shouldBe arf.routes.SaveForLaterController.show.url
 
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
     AuthStubs.stubAuthorise()
@@ -172,7 +171,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe applicationRoutes.SaveForLaterController.show.url
+    response.header("Location").value shouldBe arf.routes.SaveForLaterController.show.url
 
   s"GET $verifyPath with an email to verify in the application should redirect to the email verification frontend" in:
     AuthStubs.stubAuthorise()
@@ -197,7 +196,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe arf.applicantcontactdetails.routes.CheckYourAnswersController.show.url
 
   s"GET $verifyPath with an already verified email stored in the application should redirect to check your answers" in:
     AuthStubs.stubAuthorise()
@@ -210,4 +209,4 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe arf.applicantcontactdetails.routes.CheckYourAnswersController.show.url

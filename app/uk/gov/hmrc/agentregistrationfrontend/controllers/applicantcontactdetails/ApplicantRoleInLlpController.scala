@@ -90,7 +90,7 @@ extends FrontendController(mcc, actions):
             .map: _ =>
               Redirect(
                 applicantRoleFromForm match
-                  case ApplicantRoleInLlp.Member => routes.MemberNameController.show.url
-                  case ApplicantRoleInLlp.Authorised => routes.AuthorisedNameController.show.url
+                  case ApplicantRoleInLlp.Member => arf.applicantcontactdetails.routes.MemberNameController.show.url
+                  case ApplicantRoleInLlp.Authorised => arf.applicantcontactdetails.routes.AuthorisedNameController.show.url
               )
       .redirectIfSaveForLater

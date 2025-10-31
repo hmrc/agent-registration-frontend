@@ -28,15 +28,15 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/about-your-business/agent-online-services-account"
 
   "routes should have correct paths and methods" in:
-    routes.TypeOfSignInController.show shouldBe Call(
+    arf.aboutyourbusiness.routes.TypeOfSignInController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.TypeOfSignInController.submit shouldBe Call(
+    arf.aboutyourbusiness.routes.TypeOfSignInController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.TypeOfSignInController.submit.url shouldBe routes.TypeOfSignInController.show.url
+    arf.aboutyourbusiness.routes.TypeOfSignInController.submit.url shouldBe arf.aboutyourbusiness.routes.TypeOfSignInController.show.url
 
   s"GET $path with a valid business type in session should return 200 and render the page" in:
     val response: WSResponse = get(
@@ -54,7 +54,7 @@ extends ControllerSpec:
       )(Map(TypeOfSignInForm.key -> Seq(TypeOfSignIn.HmrcOnlineServices.toString)))
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe routes.TypeOfSignInController.showSignInPage.url
+    response.header("Location").value shouldBe arf.aboutyourbusiness.routes.TypeOfSignInController.showSignInPage.url
 
   s"POST $path without valid selection should return 400" in:
     val response: WSResponse =

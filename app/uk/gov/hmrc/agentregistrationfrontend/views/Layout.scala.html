@@ -19,7 +19,7 @@
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage._
 @import uk.gov.hmrc.hmrcfrontend.views.Implicits.RichErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.html.components._
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
+@import arf.routes
 @import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.isSignedIn
 
 @this(
@@ -42,59 +42,59 @@
 )(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
 
 @head = {
-    @if(isSignedIn) {
-        @hmrcTimeoutDialogHelper(
-            signOutUrl = routes.SignOutController.signOut.url,
-            timeoutUrl = Some(routes.SignOutController.timeOut.url)
-        )
-    }
-    @autocompleteCss()
-    @templateStyles.getOrElse(Html(""))
+@if(isSignedIn) {
+    @hmrcTimeoutDialogHelper(
+        signOutUrl = routes.SignOutController.signOut.url,
+        timeoutUrl = Some(routes.SignOutController.timeOut.url)
+    )
+}
+@autocompleteCss()
+@templateStyles.getOrElse(Html(""))
 }
 @additionalScripts = {
-    @autocompleteJavascript()
-    @templateScripts.getOrElse(Html(""))
+@autocompleteJavascript()
+@templateScripts.getOrElse(Html(""))
 }
 @errorPrefix = @{if(maybeForm.exists(_.hasErrors)) s"${messages("common.errorPrefix")}: " else ""}
 @gdsTitle = @{s"$errorPrefix$pageTitle - ${messages("service.name")} - GOV.UK"}
 @contentWithErrorsAndHelp = {
-    @maybeForm.map { form =>
-      @if(form.hasErrors) {
-          @govukErrorSummary(ErrorSummary(
-              title = Text(messages("error.summary.title")),
-              errorList = form.errors
-                  .groupBy(_.key.split("\\.").head) // handle date keys like "someDate.day"
-                  .values
-                  .flatMap(_.headOption)
-                  .map { error =>
-                      ErrorLink(
-                          href = if(error.key.endsWith("Date")) Some(s"#${error.key}.day") else Some(s"#${error.key}"),
-                          content = Text(messages(error.message, error.args *))
-                      )
-                  }.toSeq.reverse
-          ))
-      }
+@maybeForm.map { form =>
+    @if(form.hasErrors) {
+        @govukErrorSummary(ErrorSummary(
+            title = Text(messages("error.summary.title")),
+            errorList = form.errors
+            .groupBy(_.key.split("\\.").head) // handle date keys like "someDate.day"
+            .values
+            .flatMap(_.headOption)
+            .map { error =>
+                ErrorLink(
+                    href = if(error.key.endsWith("Date")) Some(s"#${error.key}.day") else Some(s"#${error.key}"),
+                    content = Text(messages(error.message, error.args *))
+                )
+            }.toSeq.reverse
+        ))
     }
-    @contentBlock
-    @hmrcReportTechnicalIssueHelper()
+}
+@contentBlock
+@hmrcReportTechnicalIssueHelper()
 }
 
 @hmrcStandardPage(
-  HmrcStandardPageParams(
-      pageTitle = Some(gdsTitle),
-      serviceName = Some(""), // None will display a default, not blank as required
-      serviceURLs = ServiceURLs(
-          signOutUrl = if (isSignedIn) Some(routes.SignOutController.signOut.url) else None
-      ),
-      serviceNavigation = Some(ServiceNavigation(
-          serviceName = Some(messages("service.name")),
-          serviceUrl = Some(appConfig.govukStartPageUrl)
-      )),
-      templateOverrides = TemplateOverrides(
-          additionalHeadBlock = Some(head),
-          additionalScriptsBlock = Some(additionalScripts)
-      ),
-      backLink = if suppressBackLink then None else Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
-      isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
-  )
+    HmrcStandardPageParams(
+        pageTitle = Some(gdsTitle),
+        serviceName = Some(""), // None will display a default, not blank as required
+        serviceURLs = ServiceURLs(
+            signOutUrl = if (isSignedIn) Some(routes.SignOutController.signOut.url) else None
+        ),
+        serviceNavigation = Some(ServiceNavigation(
+            serviceName = Some(messages("service.name")),
+            serviceUrl = Some(appConfig.govukStartPageUrl)
+        )),
+        templateOverrides = TemplateOverrides(
+            additionalHeadBlock = Some(head),
+            additionalScriptsBlock = Some(additionalScripts)
+        ),
+        backLink = if suppressBackLink then None else Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
+        isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled
+    )
 )(contentWithErrorsAndHelp)

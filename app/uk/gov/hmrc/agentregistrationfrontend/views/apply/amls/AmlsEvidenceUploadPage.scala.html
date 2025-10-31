@@ -17,7 +17,7 @@
 @import play.twirl.api.Html
 @import uk.gov.hmrc.agentregistration.shared.AmlsName
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.amls.routes
+@import arf.amls.routes
 @import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UpscanInitiateResponse
 @import uk.gov.hmrc.agentregistrationfrontend.views.html._
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
@@ -41,10 +41,10 @@
 @key = @{"amlsEvidenceUpload"}
 @title = @{messages(s"$key.title")}
 @templateScripts = {
-    <script src="@{controllers.routes.Assets.versioned("javascripts/file-upload-enhancements.js")}" @CSPNonce.attr></script>
+    <script src="@{_root_.controllers.routes.Assets.versioned("javascripts/file-upload-enhancements.js")}" @CSPNonce.attr></script>
 }
 @templateStyles = {
-    <link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/file-upload-styles.css")}" @CSPNonce.attr>
+    <link rel="stylesheet" href="@{_root_.controllers.routes.Assets.versioned("stylesheets/file-upload-styles.css")}" @CSPNonce.attr>
 }
 @detailsHtml = {
     <p class="govuk-body">@messages(s"$key.fileTypes.p1")</p>

@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetail
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
+import arf.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -30,15 +30,15 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/applicant/llp-member"
 
   "routes should have correct paths and methods" in:
-    routes.ApplicantRoleInLlpController.show shouldBe Call(
+    arf.applicantcontactdetails.routes.ApplicantRoleInLlpController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.ApplicantRoleInLlpController.submit shouldBe Call(
+    arf.applicantcontactdetails.routes.ApplicantRoleInLlpController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.ApplicantRoleInLlpController.submit.url shouldBe routes.ApplicantRoleInLlpController.show.url
+    arf.applicantcontactdetails.routes.ApplicantRoleInLlpController.submit.url shouldBe arf.applicantcontactdetails.routes.ApplicantRoleInLlpController.show.url
 
   s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthorise()
@@ -60,7 +60,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.MemberNameController.show.url
+    response.header("Location").value shouldBe arf.applicantcontactdetails.routes.MemberNameController.show.url
 
   s"POST $path with No should redirect to applicant name page" in:
     AuthStubs.stubAuthorise()
@@ -76,7 +76,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.AuthorisedNameController.show.url
+    response.header("Location").value shouldBe arf.applicantcontactdetails.routes.AuthorisedNameController.show.url
 
   s"POST $path without valid selection should return 400" in:
     AuthStubs.stubAuthorise()

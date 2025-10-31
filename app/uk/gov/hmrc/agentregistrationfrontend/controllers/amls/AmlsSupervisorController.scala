@@ -75,5 +75,5 @@ extends FrontendController(mcc, actions):
                     ))
                 }
             )
-            .map(_ => Redirect(routes.AmlsRegistrationNumberController.show.url))
+            .map(_ => Redirect(arf.amls.routes.AmlsRegistrationNumberController.show.url))
       .redirectIfSaveForLater

@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetail
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
+import arf.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -48,15 +48,15 @@ extends ControllerSpec:
   private val lastName = tdAll.agentApplicationLlp.sectionContactDetails.whenApplicantIsAMember.lastNameQuery
 
   "routes should have correct paths and methods" in:
-    routes.CompaniesHouseMatchingController.show shouldBe Call(
+    arf.applicantcontactdetails.routes.CompaniesHouseMatchingController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.CompaniesHouseMatchingController.submit shouldBe Call(
+    arf.applicantcontactdetails.routes.CompaniesHouseMatchingController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.CompaniesHouseMatchingController.submit.url shouldBe routes.CompaniesHouseMatchingController.show.url
+    arf.applicantcontactdetails.routes.CompaniesHouseMatchingController.submit.url shouldBe arf.applicantcontactdetails.routes.CompaniesHouseMatchingController.show.url
 
   s"GET $path should return 200 and render page when there is a single match" in:
     AuthStubs.stubAuthorise()
@@ -103,7 +103,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe arf.applicantcontactdetails.routes.CheckYourAnswersController.show.url
 
   s"POST $path for multiple matches without a valid selection should return 400" in:
     AuthStubs.stubAuthorise()
@@ -132,7 +132,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe arf.applicantcontactdetails.routes.CheckYourAnswersController.show.url
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()

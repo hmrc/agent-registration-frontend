@@ -23,7 +23,7 @@ import play.api.mvc.Results.BadRequest
 import play.api.mvc.Results.Redirect
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
+import arf.routes as appRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 
 import javax.inject.Inject
@@ -69,7 +69,7 @@ extends RequestAwareLogging:
       resultWhenConditionNotMet =
         implicit request =>
           // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-          val call = appRoutes.AgentApplicationController.landing // or task list
+          val call = arf.routes.AgentApplicationController.landing // or task list
           logger.warn(
             s"The application is not in the final state" +
               s" (current application state: ${request.agentApplication.applicationState.toString}), " +

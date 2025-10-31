@@ -58,7 +58,7 @@ extends FrontendController(mcc, actions):
         _.agentApplication.amlsDetails.isDefined,
         implicit r =>
           logger.warn("Missing AmlsDetails, redirecting to AmlsSupervisor page")
-          Redirect(routes.AmlsSupervisorController.show.url)
+          Redirect(arf.amls.routes.AmlsSupervisorController.show.url)
       )
       .ensureValidFormAndRedirectIfSaveForLater(
         r => AmlsRegistrationNumberForm(r.agentApplication.getAmlsDetails.isHmrc).form,
@@ -76,8 +76,8 @@ extends FrontendController(mcc, actions):
             )
             .map(_ =>
               Redirect(
-                if request.agentApplication.getAmlsDetails.isHmrc then routes.CheckYourAnswersController.show.url
-                else routes.AmlsExpiryDateController.show.url
+                if request.agentApplication.getAmlsDetails.isHmrc then arf.amls.routes.CheckYourAnswersController.show.url
+                else arf.amls.routes.AmlsExpiryDateController.show.url
               )
             )
       .redirectIfSaveForLater

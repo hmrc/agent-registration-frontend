@@ -22,7 +22,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
+import arf.routes as appRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
@@ -36,15 +36,15 @@ extends ControllerSpec:
     val baseForSectionAmls: AgentApplication = tdAll.agentApplicationLlp.baseForSectionAmls
 
   "routes should have correct paths and methods" in:
-    routes.AmlsSupervisorController.show shouldBe Call(
+    arf.amls.routes.AmlsSupervisorController.show shouldBe Call(
       method = "GET",
       url = "/agent-registration/apply/anti-money-laundering/supervisor-name"
     )
-    routes.AmlsSupervisorController.submit shouldBe Call(
+    arf.amls.routes.AmlsSupervisorController.submit shouldBe Call(
       method = "POST",
       url = "/agent-registration/apply/anti-money-laundering/supervisor-name"
     )
-    routes.AmlsSupervisorController.submit.url shouldBe routes.AmlsSupervisorController.show.url
+    arf.amls.routes.AmlsSupervisorController.submit.url shouldBe arf.amls.routes.AmlsSupervisorController.show.url
 
   s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthorise()
@@ -71,7 +71,7 @@ extends ControllerSpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.AmlsRegistrationNumberController.show.url
+    response.header("Location").value shouldBe arf.amls.routes.AmlsRegistrationNumberController.show.url
 
   s"POST $path with save for later and valid selection should redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()

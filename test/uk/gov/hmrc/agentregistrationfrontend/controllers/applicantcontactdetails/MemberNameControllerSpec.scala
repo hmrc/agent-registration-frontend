@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetail
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
+import arf.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -45,15 +45,15 @@ extends ControllerSpec:
         .afterNameQueryProvided
 
   "routes should have correct paths and methods" in:
-    routes.MemberNameController.show shouldBe Call(
+    arf.applicantcontactdetails.routes.MemberNameController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.MemberNameController.submit shouldBe Call(
+    arf.applicantcontactdetails.routes.MemberNameController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.MemberNameController.submit.url shouldBe routes.MemberNameController.show.url
+    arf.applicantcontactdetails.routes.MemberNameController.submit.url shouldBe arf.applicantcontactdetails.routes.MemberNameController.show.url
 
   s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthorise()
@@ -75,7 +75,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CompaniesHouseMatchingController.show.url
+    response.header("Location").value shouldBe arf.applicantcontactdetails.routes.CompaniesHouseMatchingController.show.url
 
   s"POST $path with blank inputs should return 400" in:
     AuthStubs.stubAuthorise()

@@ -1,70 +1,70 @@
 # microservice specific routes
 
-GET         /                                                          uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.landing
+GET         /                                                                                 arf.AgentApplicationController.landing
 
-GET         /application-dashboard                                     uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.applicationDashboard
+GET         /application-dashboard                                                            arf.AgentApplicationController.applicationDashboard
 
 # Sign out routes
-GET         /sign-out                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.signOut
-GET         /time-out                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timeOut
-GET         /timed-out                                                 uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timedOut
+GET         /sign-out                                                                         arf.SignOutController.signOut
+GET         /time-out                                                                         arf.SignOutController.timeOut
+GET         /timed-out                                                                        arf.SignOutController.timedOut
 
-GET         /application-submitted                                     uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.applicationSubmitted
+GET         /application-submitted                                                            arf.AgentApplicationController.applicationSubmitted
 
 # Agent apply routes
-GET         /apply                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.startRegistration
-GET         /apply/task-list                                        uk.gov.hmrc.agentregistrationfrontend.controllers.TaskListController.show
-GET         /apply/save-and-come-back-later                         uk.gov.hmrc.agentregistrationfrontend.controllers.SaveForLaterController.show
-GET         /apply/exit                                             uk.gov.hmrc.agentregistrationfrontend.controllers.AgentApplicationController.genericExitPage
+GET         /apply                                                                            arf.AgentApplicationController.startRegistration
+GET         /apply/task-list                                                                  arf.TaskListController.show
+GET         /apply/save-and-come-back-later                                                   arf.SaveForLaterController.show
+GET         /apply/exit                                                                       arf.AgentApplicationController.genericExitPage
 
 ## About your business routes
-GET         /apply/about-your-business/agent-type                   uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.AgentTypeController.show
-POST        /apply/about-your-business/agent-type                   uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.AgentTypeController.submit
+GET         /apply/about-your-business/agent-type                                             arf.aboutyourbusiness.AgentTypeController.show
+POST        /apply/about-your-business/agent-type                                             arf.aboutyourbusiness.AgentTypeController.submit
 
-GET         /apply/about-your-business/business-type                uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.BusinessTypeSessionController.show
-POST        /apply/about-your-business/business-type                uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.BusinessTypeSessionController.submit
-GET         /apply/about-your-business/partnership-type             uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.PartnershipTypeController.show
-POST        /apply/about-your-business/partnership-type             uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.PartnershipTypeController.submit
+GET         /apply/about-your-business/business-type                                          arf.aboutyourbusiness.BusinessTypeSessionController.show
+POST        /apply/about-your-business/business-type                                          arf.aboutyourbusiness.BusinessTypeSessionController.submit
+GET         /apply/about-your-business/partnership-type                                       arf.aboutyourbusiness.PartnershipTypeController.show
+POST        /apply/about-your-business/partnership-type                                       arf.aboutyourbusiness.PartnershipTypeController.submit
 
-GET         /apply/about-your-business/agent-online-services-account uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.TypeOfSignInController.show
-POST        /apply/about-your-business/agent-online-services-account uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.TypeOfSignInController.submit
-GET         /apply/about-your-business/sign-in                       uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.TypeOfSignInController.showSignInPage
+GET         /apply/about-your-business/agent-online-services-account                          arf.aboutyourbusiness.TypeOfSignInController.show
+POST        /apply/about-your-business/agent-online-services-account                          arf.aboutyourbusiness.TypeOfSignInController.submit
+GET         /apply/about-your-business/sign-in                                                arf.aboutyourbusiness.TypeOfSignInController.showSignInPage
 
 ##GRS routes
-GET         /apply/about-your-business/agent-type/:agentType/entity-type/:businessType uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.setUpGrsFromSignIn(agentType: AgentType, businessType: BusinessType)
-GET         /apply/grs-callback                                      uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.journeyCallback(journeyId: JourneyId)
+GET         /apply/about-your-business/agent-type/:agentType/entity-type/:businessType        arf.GrsController.setUpGrsFromSignIn(agentType: AgentType, businessType: BusinessType)
+GET         /apply/grs-callback                                                               arf.GrsController.journeyCallback(journeyId: JourneyId)
 
 ## Applicant contact details routes
-GET         /apply/applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.ApplicantRoleInLlpController.show
-POST        /apply/applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.ApplicantRoleInLlpController.submit
-GET         /apply/applicant/applicant-name                        uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.AuthorisedNameController.show
-POST        /apply/applicant/applicant-name                        uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.AuthorisedNameController.submit
-GET         /apply/applicant/member-name                           uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.MemberNameController.show
-POST        /apply/applicant/member-name                           uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.MemberNameController.submit
-GET         /apply/applicant/member-name-match                     uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.CompaniesHouseMatchingController.show
-POST        /apply/applicant/member-name-match                     uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.CompaniesHouseMatchingController.submit
-GET         /apply/applicant/telephone-number                      uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.TelephoneNumberController.show
-POST        /apply/applicant/telephone-number                      uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.TelephoneNumberController.submit
-GET         /apply/applicant/email-address                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.EmailAddressController.show
-POST        /apply/applicant/email-address                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.EmailAddressController.submit
-GET         /apply/applicant/verify-email-address                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.EmailAddressController.verify
-GET         /apply/applicant/check-your-answers                    uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.CheckYourAnswersController.show
+GET         /apply/applicant/llp-member                                                       arf.applicantcontactdetails.ApplicantRoleInLlpController.show
+POST        /apply/applicant/llp-member                                                       arf.applicantcontactdetails.ApplicantRoleInLlpController.submit
+GET         /apply/applicant/applicant-name                                                   arf.applicantcontactdetails.AuthorisedNameController.show
+POST        /apply/applicant/applicant-name                                                   arf.applicantcontactdetails.AuthorisedNameController.submit
+GET         /apply/applicant/member-name                                                      arf.applicantcontactdetails.MemberNameController.show
+POST        /apply/applicant/member-name                                                      arf.applicantcontactdetails.MemberNameController.submit
+GET         /apply/applicant/member-name-match                                                arf.applicantcontactdetails.CompaniesHouseMatchingController.show
+POST        /apply/applicant/member-name-match                                                arf.applicantcontactdetails.CompaniesHouseMatchingController.submit
+GET         /apply/applicant/telephone-number                                                 arf.applicantcontactdetails.TelephoneNumberController.show
+POST        /apply/applicant/telephone-number                                                 arf.applicantcontactdetails.TelephoneNumberController.submit
+GET         /apply/applicant/email-address                                                    arf.applicantcontactdetails.EmailAddressController.show
+POST        /apply/applicant/email-address                                                    arf.applicantcontactdetails.EmailAddressController.submit
+GET         /apply/applicant/verify-email-address                                             arf.applicantcontactdetails.EmailAddressController.verify
+GET         /apply/applicant/check-your-answers                                               arf.applicantcontactdetails.CheckYourAnswersController.show
 
 ## Anti Money Laundering routes
-GET         /apply/anti-money-laundering/supervisor-name            uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsSupervisorController.show
-POST        /apply/anti-money-laundering/supervisor-name            uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsSupervisorController.submit
-GET         /apply/anti-money-laundering/registration-number        uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsRegistrationNumberController.show
-POST        /apply/anti-money-laundering/registration-number        uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsRegistrationNumberController.submit
-GET         /apply/anti-money-laundering/supervision-runs-out       uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsExpiryDateController.show
-POST        /apply/anti-money-laundering/supervision-runs-out       uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsExpiryDateController.submit
-GET         /apply/anti-money-laundering/evidence                   uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsEvidenceUploadController.show
-GET         /apply/anti-money-laundering/evidence/status            uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsEvidenceUploadController.pollResultWithJavaScript
-GET         /apply/anti-money-laundering/evidence/upload-result     uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsEvidenceUploadController.showResult
-GET         /apply/anti-money-laundering/evidence/upload-error      uk.gov.hmrc.agentregistrationfrontend.controllers.amls.AmlsEvidenceUploadController.showError(errorCode: String, errorMessage: String, errorRequestId: String, key: String)
-GET         /apply/anti-money-laundering/check-your-answers         uk.gov.hmrc.agentregistrationfrontend.controllers.amls.CheckYourAnswersController.show
+GET         /apply/anti-money-laundering/supervisor-name                                      arf.amls.AmlsSupervisorController.show
+POST        /apply/anti-money-laundering/supervisor-name                                      arf.amls.AmlsSupervisorController.submit
+GET         /apply/anti-money-laundering/registration-number                                  arf.amls.AmlsRegistrationNumberController.show
+POST        /apply/anti-money-laundering/registration-number                                  arf.amls.AmlsRegistrationNumberController.submit
+GET         /apply/anti-money-laundering/supervision-runs-out                                 arf.amls.AmlsExpiryDateController.show
+POST        /apply/anti-money-laundering/supervision-runs-out                                 arf.amls.AmlsExpiryDateController.submit
+GET         /apply/anti-money-laundering/evidence                                             arf.amls.AmlsEvidenceUploadController.show
+GET         /apply/anti-money-laundering/evidence/status                                      arf.amls.AmlsEvidenceUploadController.pollResultWithJavaScript
+GET         /apply/anti-money-laundering/evidence/upload-result                               arf.amls.AmlsEvidenceUploadController.showResult
+GET         /apply/anti-money-laundering/evidence/upload-error                                arf.amls.AmlsEvidenceUploadController.showError(errorCode: String, errorMessage: String, errorRequestId: String, key: String)
+GET         /apply/anti-money-laundering/check-your-answers                                   arf.amls.CheckYourAnswersController.show
 
 
 # Individuals (directors/partners/members/owners) providing details
-GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.start(linkId: LinkId)
-GET         /provide-details/resolve/:linkId                        uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.resolve(linkId: LinkId)
-GET         /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.LlpMemberNameController.show
+GET         /provide-details/start/:linkId                                                    arf.providedetails.StartController.start(linkId: LinkId)
+GET         /provide-details/resolve/:linkId                                                  arf.providedetails.StartController.resolve(linkId: LinkId)
+GET         /provide-details/name                                                             arf.providedetails.LlpMemberNameController.show
