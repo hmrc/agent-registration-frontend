@@ -21,6 +21,8 @@ import com.google.inject.Singleton
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AmlsCode
+import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.CheckYourAnswersPage
@@ -38,9 +40,25 @@ extends FrontendController(mcc, actions):
       .getApplicationInProgress
       .ensure(
         r => r.agentApplication.amlsDetails.exists(_.isComplete),
-        implicit r =>
+        implicit request =>
           logger.warn(s"Cannot display Check Your Answers page - incomplete AMLS details.")
-          // TODO: improve routing, redirect to first incomplete page instead
-          Redirect(routes.AmlsSupervisorController.show)
+          request.agentApplication.amlsDetails match {
+            case Some(AmlsDetails(_, None, _, _)) => Redirect(routes.AmlsRegistrationNumberController.show)
+            case Some(AmlsDetails(
+                  AmlsCode(amlsCode),
+                  Some(_),
+                  None,
+                  _
+                )) if !amlsCode.contains("HMRC") =>
+              Redirect(routes.AmlsExpiryDateController.show)
+            case Some(AmlsDetails(
+                  AmlsCode(amlsCode),
+                  Some(_),
+                  Some(_),
+                  None
+                )) if !amlsCode.contains("HMRC") =>
+              Redirect(routes.AmlsEvidenceUploadController.show)
+            case _ => Redirect(routes.AmlsSupervisorController.show)
+          }
       ):
         implicit request => Ok(view())

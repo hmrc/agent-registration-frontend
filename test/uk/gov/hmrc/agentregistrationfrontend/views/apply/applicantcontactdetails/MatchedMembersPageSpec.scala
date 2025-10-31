@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.views.apply.applicantcontactdetail
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.scalatest.Ignore
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseOfficer
@@ -30,7 +29,6 @@ import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MatchedMembersPage
 
-@Ignore
 class MatchedMembersPageSpec
 extends ViewSpec:
 

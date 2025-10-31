@@ -108,7 +108,7 @@ extends ViewSpec:
           |Association of TaxationTechnicians (ATT)
           |Change Supervisory body
           |Registration number
-          |NONHMRC_REF_AMLS_NUMBER_00001
+          |NONHMRC-REF-AMLS-NUMBER-00001
           |Change Registration number
           |Supervision expiry date
           |25 May 2060
@@ -131,7 +131,7 @@ extends ViewSpec:
           ),
           TestSummaryRow(
             key = "Registration number",
-            value = "NONHMRC_REF_AMLS_NUMBER_00001",
+            value = "NONHMRC-REF-AMLS-NUMBER-00001",
             action = "/agent-registration/apply/anti-money-laundering/registration-number"
           ),
           TestSummaryRow(

@@ -16,12 +16,9 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.amls
 
-import com.softwaremill.quicklens.*
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AmlsDetails
-import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.controllers
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -44,8 +41,39 @@ extends ControllerSpec:
     )
     routes.AmlsRegistrationNumberController.submit.url shouldBe routes.AmlsRegistrationNumberController.show.url
 
+  object agentApplication:
+
+    val hmrcAfterSupervisoryBodySelected: AgentApplication =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsHmrc
+        .afterSupervisoryBodySelected
+
+    val hmrcAfterRegistrationNumberProvided: AgentApplication =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsHmrc
+        .afterRegistrationNumberProvided
+
+    val nonHmrcAfterSupervisoryBodySelected: AgentApplication =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsNonHmrc
+        .afterSupervisoryBodySelected
+
+    val nonHmrcAfterRegistrationNumberProvided: AgentApplication =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsNonHmrc
+        .afterRegistrationNumberProvided
+
   private case class TestCaseForAmlsRegistrationNumber(
-    agentApplicationAfterSupervisoryBodySelected: AgentApplication,
+    application: AgentApplication,
+    updatedApplication: AgentApplication,
     amlsType: String,
     validInput: String,
     invalidInput: String,
@@ -54,131 +82,141 @@ extends ControllerSpec:
 
   List(
     TestCaseForAmlsRegistrationNumber(
-      agentApplicationAfterSupervisoryBodySelected =
-        tdAll
-          .agentApplicationLlp
-          .sectionAmls
-          .whenSupervisorBodyIsHmrc
-          .afterSupervisoryBodySelected,
+      application = agentApplication.hmrcAfterSupervisoryBodySelected,
+      updatedApplication = agentApplication.hmrcAfterRegistrationNumberProvided,
       amlsType = "HMRC",
       validInput = "XAML00000123456", // when the supervisory body is HMRC, the registration number has a different format to non-HMRC bodies
       invalidInput = "123",
       nextPage = routes.CheckYourAnswersController.show.url
     ),
     TestCaseForAmlsRegistrationNumber(
-      agentApplicationAfterSupervisoryBodySelected =
-        tdAll
-          .agentApplicationLlp
-          .sectionAmls
-          .whenSupervisorBodyIsNonHmrc
-          .afterSupervisoryBodySelected,
+      application = agentApplication.nonHmrcAfterSupervisoryBodySelected,
+      updatedApplication = agentApplication.nonHmrcAfterRegistrationNumberProvided,
       amlsType = "non-HMRC",
-      validInput = "1234567890",
+      validInput = "NONHMRC-REF-AMLS-NUMBER-00001",
       invalidInput = ";</\\>",
-      nextPage = routes.AmlsExpiryDateController.show.url
+      nextPage = routes.CheckYourAnswersController.show.url
     )
   ).foreach: testCase =>
     s"GET $path should return 200 for ${testCase.amlsType} and render page" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.agentApplicationAfterSupervisoryBodySelected)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
       val response: WSResponse = get(path)
 
-      response.status shouldBe 200
+      response.status shouldBe Status.OK
       val doc = response.parseBodyAsJsoupDocument
       doc.title() shouldBe "What is your registration number? - Apply for an agent services account - GOV.UK"
 
     s"POST $path with valid input for ${testCase.amlsType} should redirect to the next page" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.agentApplicationAfterSupervisoryBodySelected)
-      val updatedApplication = testCase.agentApplicationAfterSupervisoryBodySelected
-        .modify(_.amlsDetails.each)
-        .setTo(AmlsDetails(
-          supervisoryBody = testCase.agentApplicationAfterSupervisoryBodySelected.getAmlsDetails.supervisoryBody,
-          amlsRegistrationNumber = Some(AmlsRegistrationNumber(testCase.validInput))
-        ))
-      AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
-      AgentRegistrationStubs.stubGetAgentApplication(updatedApplication)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
+      AgentRegistrationStubs.stubUpdateAgentApplication(testCase.updatedApplication)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(testCase.validInput),
           "submit" -> Seq("SaveAndContinue")
         ))
 
-      response.status shouldBe 303
+      response.status shouldBe Status.SEE_OTHER
       response.body[String] shouldBe ""
       response.header("Location").value shouldBe testCase.nextPage
 
     s"POST $path with save for later and valid input for ${testCase.amlsType} should redirect to the saved for later page" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.agentApplicationAfterSupervisoryBodySelected)
-      val updatedApplication = testCase.agentApplicationAfterSupervisoryBodySelected
-        .modify(_.amlsDetails.each)
-        .setTo(AmlsDetails(
-          supervisoryBody = testCase.agentApplicationAfterSupervisoryBodySelected.getAmlsDetails.supervisoryBody,
-          amlsRegistrationNumber = Some(AmlsRegistrationNumber(testCase.validInput))
-        ))
-      AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
-      AgentRegistrationStubs.stubGetAgentApplication(updatedApplication)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
+      AgentRegistrationStubs.stubUpdateAgentApplication(testCase.updatedApplication)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(testCase.validInput),
           "submit" -> Seq("SaveAndComeBackLater")
         ))
 
-      response.status shouldBe 303
+      response.status shouldBe Status.SEE_OTHER
       response.body[String] shouldBe ""
       response.header("Location").value shouldBe controllers.routes.SaveForLaterController.show.url
 
     s"POST $path as blank form for ${testCase.amlsType} should return 400" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.agentApplicationAfterSupervisoryBodySelected)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(""),
           "submit" -> Seq("SaveAndContinue")
         ))
 
-      response.status shouldBe 400
+      response.status shouldBe Status.BAD_REQUEST
       val content = response.body[String]
       content should include("There is a problem")
       content should include("Enter your registration number")
 
     s"POST $path as blank form and save for later for ${testCase.amlsType} should redirect to save for later page" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.agentApplicationAfterSupervisoryBodySelected)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(""),
           "submit" -> Seq("SaveAndComeBackLater")
         ))
 
-      response.status shouldBe 303
+      response.status shouldBe Status.SEE_OTHER
       response.body[String] shouldBe ""
       response.header("Location").value shouldBe controllers.routes.SaveForLaterController.show.url
 
     s"POST $path with an invalid value for ${testCase.amlsType} should return 400" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.agentApplicationAfterSupervisoryBodySelected)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(testCase.invalidInput),
           "submit" -> Seq("SaveAndContinue")
         ))
 
-      response.status shouldBe 400
+      response.status shouldBe Status.BAD_REQUEST
       val content = response.body[String]
       content should include("There is a problem")
       content should include("Enter your registration number in the correct format")
 
     s"POST $path with an invalid value and save for later for ${testCase.amlsType} should not save and redirect to save for later" in:
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.agentApplicationAfterSupervisoryBodySelected)
+      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(testCase.invalidInput),
           "submit" -> Seq("SaveAndComeBackLater")
         ))
 
-      response.status shouldBe 303
+      response.status shouldBe Status.SEE_OTHER
       response.body[String] shouldBe ""
       response.header("Location").value shouldBe controllers.routes.SaveForLaterController.show.url
+
+  s"GET $path when registration number already stored should return 200 and render page with previous answer filled in" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.nonHmrcAfterRegistrationNumberProvided)
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.OK
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "What is your registration number? - Apply for an agent services account - GOV.UK"
+    doc.select(s"input[name='${AmlsRegistrationNumberForm.key}']")
+      .attr("value") shouldBe "NONHMRC-REF-AMLS-NUMBER-00001"
+
+  s"GET $path when amls details are missing should redirect to supervisory body page" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterGrsDataReceived)
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe routes.AmlsSupervisorController.show.url
+
+  s"POST $path when amls details are missing should redirect to supervisory body page" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterGrsDataReceived)
+    val response: WSResponse =
+      post(path)(Map(
+        AmlsRegistrationNumberForm.key -> Seq("1234567890")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe routes.AmlsSupervisorController.show.url

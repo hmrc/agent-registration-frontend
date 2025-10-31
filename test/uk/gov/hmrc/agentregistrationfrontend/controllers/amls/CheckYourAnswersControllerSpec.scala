@@ -42,19 +42,27 @@ extends ControllerSpec:
   private case class TestCaseForCya(
     application: AgentApplication,
     amlsType: String,
-    isComplete: Boolean
+    expectedRedirect: Option[String] = None
   )
 
-  val sectionAmls = tdAll.agentApplicationLlp.sectionAmls
+  private val sectionAmls = tdAll.agentApplicationLlp.sectionAmls
 
   List(
     TestCaseForCya(
       application =
         sectionAmls
           .whenSupervisorBodyIsHmrc
+          .afterSupervisoryBodySelected,
+      amlsType = "HMRC",
+      expectedRedirect = Some(routes.AmlsRegistrationNumberController.show.url)
+    ),
+    TestCaseForCya(
+      application =
+        sectionAmls
+          .whenSupervisorBodyIsHmrc
           .afterRegistrationNumberProvided,
       amlsType = "HMRC",
-      isComplete = true
+      expectedRedirect = None
     ),
     TestCaseForCya(
       application =
@@ -62,15 +70,23 @@ extends ControllerSpec:
           .whenSupervisorBodyIsNonHmrc
           .afterUploadSucceded,
       amlsType = "non-HMRC",
-      isComplete = true
+      expectedRedirect = None
     ),
     TestCaseForCya(
       application =
         sectionAmls
-          .whenSupervisorBodyIsHmrc
+          .whenSupervisorBodyIsNonHmrc
           .afterSupervisoryBodySelected,
-      amlsType = "HMRC",
-      isComplete = false
+      amlsType = "non-HMRC",
+      expectedRedirect = Some(routes.AmlsRegistrationNumberController.show.url)
+    ),
+    TestCaseForCya(
+      application =
+        sectionAmls
+          .whenSupervisorBodyIsNonHmrc
+          .afterRegistrationNumberProvided,
+      amlsType = "non-HMRC",
+      expectedRedirect = Some(routes.AmlsExpiryDateController.show.url)
     ),
     TestCaseForCya(
       application =
@@ -78,10 +94,10 @@ extends ControllerSpec:
           .whenSupervisorBodyIsNonHmrc
           .afterAmlsExpiryDateProvided,
       amlsType = "non-HMRC",
-      isComplete = false
+      expectedRedirect = Some(routes.AmlsEvidenceUploadController.show.url)
     )
   ).foreach: testCase =>
-    if testCase.isComplete then
+    if testCase.expectedRedirect.isEmpty then
       s"GET $path with complete amls details should return 200 and render page for ${testCase.amlsType}" in:
         AuthStubs.stubAuthorise()
         AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
@@ -91,10 +107,10 @@ extends ControllerSpec:
         val doc = response.parseBodyAsJsoupDocument
         doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
     else
-      s"GET $path with incomplete amls details should redirect to the start of the amls journey for ${testCase.amlsType}" in:
+      s"GET $path with incomplete amls details should redirect to ${testCase.expectedRedirect.value} for ${testCase.amlsType}" in:
         AuthStubs.stubAuthorise()
         AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
         val response: WSResponse = get(path)
 
         response.status shouldBe 303
-        response.header("Location").value shouldBe routes.AmlsSupervisorController.show.url
+        response.header("Location").value shouldBe testCase.expectedRedirect.value
