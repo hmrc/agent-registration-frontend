@@ -45,7 +45,7 @@ extends ControllerSpec:
       .setTo(ApplicationState.Submitted)
 
   "routes should have correct paths and methods" in:
-    routes.StartController.start(linkId) shouldBe Call(
+    arf.providedetails.routes.StartController.start(linkId) shouldBe Call(
       method = "GET",
       url = path
     )

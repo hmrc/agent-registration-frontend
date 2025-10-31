@@ -59,7 +59,7 @@ extends FrontendController(mcc, actions):
 
       for
         upscanInitiateResponse <- upscanInitiateConnector.initiate(
-          redirectOnSuccess = Some(appConfig.upscanRedirectBase + routes.AmlsEvidenceUploadController.showResult.url),
+          redirectOnSuccess = Some(appConfig.upscanRedirectBase + arf.amls.routes.AmlsEvidenceUploadController.showResult.url),
           // cannot use controller.routes for the error url because upscan will respond with query parameters
           redirectOnError = Some(appConfig.upscanRedirectBase + "/agent-registration/apply/anti-money-laundering/evidence/error"),
           maxFileSize = appConfig.maxFileSize

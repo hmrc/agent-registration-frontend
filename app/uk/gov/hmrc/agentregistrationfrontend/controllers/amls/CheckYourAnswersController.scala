@@ -41,6 +41,6 @@ extends FrontendController(mcc, actions):
         implicit r =>
           logger.warn(s"Cannot display Check Your Answers page - incomplete AMLS details.")
           // TODO: improve routing, redirect to first incomplete page instead
-          Redirect(routes.AmlsSupervisorController.show)
+          Redirect(arf.amls.routes.AmlsSupervisorController.show)
       ):
         implicit request => Ok(view())

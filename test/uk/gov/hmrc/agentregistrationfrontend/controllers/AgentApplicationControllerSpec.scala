@@ -26,7 +26,7 @@ extends ControllerSpec:
   private val path: String = "/agent-registration/apply"
 
   "routes should have correct paths and methods" in:
-    routes.AgentApplicationController.startRegistration shouldBe Call(
+    arf.routes.AgentApplicationController.startRegistration shouldBe Call(
       method = "GET",
       url = "/agent-registration/apply"
     )
@@ -35,4 +35,4 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe aboutyourbusiness.routes.AgentTypeController.show.url
+    response.header("Location").value shouldBe arf.aboutyourbusiness.routes.AgentTypeController.show.url

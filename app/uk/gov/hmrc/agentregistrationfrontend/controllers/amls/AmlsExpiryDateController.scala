@@ -64,5 +64,5 @@ extends FrontendController(mcc, actions):
                 .modify(_.amlsDetails.each.amlsExpiryDate)
                 .setTo(Some(amlsExpiryDate))
             )
-            .map(_ => Redirect(routes.AmlsEvidenceUploadController.show.url))
+            .map(_ => Redirect(arf.amls.routes.AmlsEvidenceUploadController.show.url))
       .redirectIfSaveForLater

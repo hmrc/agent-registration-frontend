@@ -20,7 +20,7 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
+import arf.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -32,15 +32,15 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/anti-money-laundering/supervision-runs-out"
 
   "routes should have correct paths and methods" in:
-    routes.AmlsExpiryDateController.show shouldBe Call(
+    arf.amls.routes.AmlsExpiryDateController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.AmlsExpiryDateController.submit shouldBe Call(
+    arf.amls.routes.AmlsExpiryDateController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.AmlsExpiryDateController.submit.url shouldBe routes.AmlsExpiryDateController.show.url
+    arf.amls.routes.AmlsExpiryDateController.submit.url shouldBe arf.amls.routes.AmlsExpiryDateController.show.url
 
   private object agentApplication:
 
@@ -83,7 +83,7 @@ extends ControllerSpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.AmlsEvidenceUploadController.show.url
+    response.header("Location").value shouldBe arf.amls.routes.AmlsEvidenceUploadController.show.url
 
   s"POST $path with save for later and valid input should redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()

@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
+import arf.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.LlpStartPage
@@ -58,7 +58,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request: RequestHeader =>
         applicationService.findApplicationByLinkId(linkId).map {
-          case Some(app) if app.hasFinished => Redirect(routes.LlpMemberNameController.show)
+          case Some(app) if app.hasFinished => Redirect(arf.providedetails.routes.LlpMemberNameController.show)
           case _ => Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
         }
 

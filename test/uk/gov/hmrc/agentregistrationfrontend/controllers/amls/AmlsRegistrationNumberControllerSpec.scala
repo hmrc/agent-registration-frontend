@@ -34,15 +34,15 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/anti-money-laundering/registration-number"
 
   "routes should have correct paths and methods" in:
-    routes.AmlsRegistrationNumberController.show shouldBe Call(
+    arf.amls.routes.AmlsRegistrationNumberController.show shouldBe Call(
       method = "GET",
       url = "/agent-registration/apply/anti-money-laundering/registration-number"
     )
-    routes.AmlsRegistrationNumberController.submit shouldBe Call(
+    arf.amls.routes.AmlsRegistrationNumberController.submit shouldBe Call(
       method = "POST",
       url = "/agent-registration/apply/anti-money-laundering/registration-number"
     )
-    routes.AmlsRegistrationNumberController.submit.url shouldBe routes.AmlsRegistrationNumberController.show.url
+    arf.amls.routes.AmlsRegistrationNumberController.submit.url shouldBe arf.amls.routes.AmlsRegistrationNumberController.show.url
 
   private case class TestCaseForAmlsRegistrationNumber(
     agentApplicationAfterSupervisoryBodySelected: AgentApplication,
@@ -63,7 +63,7 @@ extends ControllerSpec:
       amlsType = "HMRC",
       validInput = "XAML00000123456", // when the supervisory body is HMRC, the registration number has a different format to non-HMRC bodies
       invalidInput = "123",
-      nextPage = routes.CheckYourAnswersController.show.url
+      nextPage = arf.amls.routes.CheckYourAnswersController.show.url
     ),
     TestCaseForAmlsRegistrationNumber(
       agentApplicationAfterSupervisoryBodySelected =
@@ -75,7 +75,7 @@ extends ControllerSpec:
       amlsType = "non-HMRC",
       validInput = "1234567890",
       invalidInput = ";</\\>",
-      nextPage = routes.AmlsExpiryDateController.show.url
+      nextPage = arf.amls.routes.AmlsExpiryDateController.show.url
     )
   ).foreach: testCase =>
     s"GET $path should return 200 for ${testCase.amlsType} and render page" in:
@@ -127,7 +127,7 @@ extends ControllerSpec:
 
       response.status shouldBe 303
       response.body[String] shouldBe ""
-      response.header("Location").value shouldBe controllers.routes.SaveForLaterController.show.url
+      response.header("Location").value shouldBe arf.routes.SaveForLaterController.show.url
 
     s"POST $path as blank form for ${testCase.amlsType} should return 400" in:
       AuthStubs.stubAuthorise()
@@ -154,7 +154,7 @@ extends ControllerSpec:
 
       response.status shouldBe 303
       response.body[String] shouldBe ""
-      response.header("Location").value shouldBe controllers.routes.SaveForLaterController.show.url
+      response.header("Location").value shouldBe arf.routes.SaveForLaterController.show.url
 
     s"POST $path with an invalid value for ${testCase.amlsType} should return 400" in:
       AuthStubs.stubAuthorise()
@@ -181,4 +181,4 @@ extends ControllerSpec:
 
       response.status shouldBe 303
       response.body[String] shouldBe ""
-      response.header("Location").value shouldBe controllers.routes.SaveForLaterController.show.url
+      response.header("Location").value shouldBe arf.routes.SaveForLaterController.show.url

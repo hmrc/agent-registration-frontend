@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
+import arf.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.TypeOfSignInForm
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn.*
@@ -58,14 +58,14 @@ extends FrontendController(mcc, actions):
       .ensureValidForm(TypeOfSignInForm.form, implicit request => view(_)):
         implicit request =>
           val typeOfSignIn: TypeOfSignIn = request.formValue
-          Redirect(routes.TypeOfSignInController.showSignInPage)
+          Redirect(arf.aboutyourbusiness.routes.TypeOfSignInController.showSignInPage)
             .addToSession(typeOfSignIn)
 
   def showSignInPage: Action[AnyContent] =
     action
-      .ensure(_.readAgentType.isDefined, Redirect(routes.AgentTypeController.show.url))
-      .ensure(_.readBusinessType.isDefined, Redirect(routes.BusinessTypeSessionController.show.url))
-      .ensure(_.readTypeOfSignIn.isDefined, Redirect(routes.TypeOfSignInController.show.url)):
+      .ensure(_.readAgentType.isDefined, Redirect(arf.aboutyourbusiness.routes.AgentTypeController.show.url))
+      .ensure(_.readBusinessType.isDefined, Redirect(arf.aboutyourbusiness.routes.BusinessTypeSessionController.show.url))
+      .ensure(_.readTypeOfSignIn.isDefined, Redirect(arf.aboutyourbusiness.routes.TypeOfSignInController.show.url)):
         implicit request =>
           val agentType: AgentType = request.getAgentType
           val businessType: BusinessType = request.getBusinessType

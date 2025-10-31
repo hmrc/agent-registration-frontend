@@ -34,7 +34,7 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/anti-money-laundering/check-your-answers"
 
   "route should have correct path and method" in:
-    routes.CheckYourAnswersController.show shouldBe Call(
+    arf.amls.routes.CheckYourAnswersController.show shouldBe Call(
       method = "GET",
       url = path
     )
@@ -97,4 +97,4 @@ extends ControllerSpec:
         val response: WSResponse = get(path)
 
         response.status shouldBe 303
-        response.header("Location").value shouldBe routes.AmlsSupervisorController.show.url
+        response.header("Location").value shouldBe arf.amls.routes.AmlsSupervisorController.show.url

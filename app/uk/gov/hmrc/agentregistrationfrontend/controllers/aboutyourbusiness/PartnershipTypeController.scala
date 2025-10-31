@@ -49,7 +49,7 @@ extends FrontendController(mcc, actions):
       },
       implicit request =>
         logger.info(s"Redirecting to business type page due to missing or invalid business type selection: ${request.readBusinessTypeAnswer}")
-        Redirect(routes.BusinessTypeSessionController.show)
+        Redirect(arf.aboutyourbusiness.routes.BusinessTypeSessionController.show)
     )
 
   def show: Action[AnyContent] = baseAction:
@@ -65,5 +65,5 @@ extends FrontendController(mcc, actions):
       implicit request =>
         val partnershipType: BusinessType.Partnership = request.formValue
         Redirect(
-          routes.TypeOfSignInController.show
+          arf.aboutyourbusiness.routes.TypeOfSignInController.show
         ).addSession(partnershipType)

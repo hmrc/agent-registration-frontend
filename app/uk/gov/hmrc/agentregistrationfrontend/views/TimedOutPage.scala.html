@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
+@import arf.routes
 
 @this(layout: Layout)
 
@@ -30,7 +30,7 @@
     <h1 class="govuk-heading-xl">@title</h1>
     <p class="govuk-body">@messages("timed-out.p1")</p>
     <p class="govuk-body">
-        <a href="@{uk.gov.hmrc.agentregistrationfrontend.controllers.routes.AgentApplicationController.landing.url}" class="govuk-link">@messages("timed-out.link")</a>
+        <a href="@{arf.routes.AgentApplicationController.landing.url}" class="govuk-link">@messages("timed-out.link")</a>
     </p>
 
 }

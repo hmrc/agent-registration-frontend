@@ -21,7 +21,7 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
+import arf.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AuthorisedNameForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -39,15 +39,15 @@ extends ControllerSpec:
       .afterRoleSelected
 
   "routes should have correct paths and methods" in:
-    routes.AuthorisedNameController.show shouldBe Call(
+    arf.applicantcontactdetails.routes.AuthorisedNameController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.AuthorisedNameController.submit shouldBe Call(
+    arf.applicantcontactdetails.routes.AuthorisedNameController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.AuthorisedNameController.submit.url shouldBe routes.AuthorisedNameController.show.url
+    arf.applicantcontactdetails.routes.AuthorisedNameController.submit.url shouldBe arf.applicantcontactdetails.routes.AuthorisedNameController.show.url
 
   s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthorise()
@@ -76,7 +76,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe arf.applicantcontactdetails.routes.CheckYourAnswersController.show.url
 
   s"POST $path with blank inputs should return 400" in:
     AuthStubs.stubAuthorise()

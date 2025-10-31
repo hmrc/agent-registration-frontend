@@ -132,7 +132,7 @@ extends FrontendController(mcc, actions):
     agentRegistrationService
       .upsert(updatedApplication)
       .map: _ =>
-        Redirect(routes.TaskListController.show.url)
+        Redirect(arf.routes.TaskListController.show.url)
 
 object GrsController:
 

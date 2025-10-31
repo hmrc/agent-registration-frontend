@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
+import arf.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
@@ -28,15 +28,15 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/about-your-business/agent-type"
 
   "routes should have correct paths and methods" in:
-    routes.AgentTypeController.show shouldBe Call(
+    arf.aboutyourbusiness.routes.AgentTypeController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.AgentTypeController.submit shouldBe Call(
+    arf.aboutyourbusiness.routes.AgentTypeController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.AgentTypeController.submit.url shouldBe routes.AgentTypeController.show.url
+    arf.aboutyourbusiness.routes.AgentTypeController.submit.url shouldBe arf.aboutyourbusiness.routes.AgentTypeController.show.url
 
   s"GET $path should return 200 and render page" in:
     val response: WSResponse = get(path)
@@ -49,7 +49,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.BusinessTypeSessionController.show.url
+    response.header("Location").value shouldBe arf.aboutyourbusiness.routes.BusinessTypeSessionController.show.url
 
   s"POST $path with No should redirect to an exit page" in:
     val response: WSResponse = post(path)(Map(AgentTypeForm.key -> Seq("NonUkTaxAgent")))

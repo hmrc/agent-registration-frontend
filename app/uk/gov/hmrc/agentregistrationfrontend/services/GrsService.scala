@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyLabels
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyStartUrl
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.TranslationLabels
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
+import arf.routes
 
 import javax.inject.Inject
 import javax.inject.Singleton

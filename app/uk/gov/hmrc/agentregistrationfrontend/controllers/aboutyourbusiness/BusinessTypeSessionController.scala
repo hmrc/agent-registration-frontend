@@ -22,7 +22,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
+import arf.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeSessionForm
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
@@ -44,7 +44,7 @@ extends FrontendController(mcc, actions):
       _.readAgentType.isDefined,
       implicit request =>
         logger.warn("Agent type not selected - redirecting to agent type selection page")
-        Redirect(routes.AgentTypeController.show)
+        Redirect(arf.aboutyourbusiness.routes.AgentTypeController.show)
     )
 
   def show: Action[AnyContent] = baseAction:
@@ -66,7 +66,7 @@ extends FrontendController(mcc, actions):
                 .addToSession(businessType)
                 .removePartnershipTypeFromSession
             case businessType @ BusinessTypeAnswer.PartnershipType =>
-              Redirect(routes.PartnershipTypeController.show.url)
+              Redirect(arf.aboutyourbusiness.routes.PartnershipTypeController.show.url)
                 .addToSession(businessType)
             case businessType @ BusinessTypeAnswer.Other =>
               Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
