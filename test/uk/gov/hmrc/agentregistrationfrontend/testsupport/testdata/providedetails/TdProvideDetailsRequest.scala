@@ -19,7 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.providedetail
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.ProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.ProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.{TdBase, TdRequest}
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdRequest
 
 trait TdProvideDetailsRequest {
   dependencies: (TdBase & TdRequest) =>

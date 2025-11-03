@@ -17,17 +17,23 @@
 package uk.gov.hmrc.agentregistrationfrontend.action.providedetails
 
 import play.api.mvc.Results.Redirect
-import play.api.mvc.{ActionRefiner, Request, Result}
+import play.api.mvc.ActionRefiner
+import play.api.mvc.Request
+import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
-import uk.gov.hmrc.agentregistrationfrontend.action.{FormValue, MergeFormValue}
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
+import uk.gov.hmrc.agentregistrationfrontend.action.MergeFormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.providedetails.ProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.util.{Errors, RequestAwareLogging}
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 class ProvideDetailsRequest[A](
   val providedDetails: ProvidedDetails,
@@ -63,7 +69,7 @@ object ProvideDetailsRequest:
         override val formValue: T = t
 
 @Singleton
-class ProvideDetailsAction @Inject()(
+class ProvideDetailsAction @Inject() (
   provideDetailsService: ProvideDetailsService
 )(using ec: ExecutionContext)
 extends RequestAwareLogging:
@@ -74,7 +80,7 @@ extends RequestAwareLogging:
 
       override protected def refine[A](request: IndividualAuthorisedRequest[A]): Future[Either[Result, ProvideDetailsRequest[A]]] =
         given r: IndividualAuthorisedRequest[A] = request
-        
+
         provideDetailsService
           .find(linkId)
           .flatMap {
@@ -98,4 +104,3 @@ extends RequestAwareLogging:
       )
 
   protected def executionContext: ExecutionContext = ec
-

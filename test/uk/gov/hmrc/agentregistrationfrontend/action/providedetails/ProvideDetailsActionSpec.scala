@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.provided
 import scala.concurrent.Future
 
 class ProvideDetailsActionSpec
-  extends ISpec:
+extends ISpec:
 
   "when individual User is not logged in (request comes without authorisation in the session) action redirects to login url" in:
     val individualAuthorisedAction: IndividualAuthorisedAction = app.injector.instanceOf[IndividualAuthorisedAction]
@@ -45,7 +45,7 @@ class ProvideDetailsActionSpec
     val affinityGroup = "Agent"
     IndividualAuthStubs.stubAuthorise(
       responseBody =
-      // language=JSON
+        // language=JSON
         s"""
            |{
            |  "authorisedEnrolments": [],
@@ -58,11 +58,10 @@ class ProvideDetailsActionSpec
            |""".stripMargin
     )
 
-    val resultF =  individualAuthorisedAction(tdAll.linkId).invokeBlock(tdAll.requestLoggedIn, _ => fakeResultF)
+    val resultF = individualAuthorisedAction(tdAll.linkId).invokeBlock(tdAll.requestLoggedIn, _ => fakeResultF)
     contentAsString(resultF) should include("unauthorised.heading")
     status(resultF) shouldBe Status.UNAUTHORIZED
     IndividualAuthStubs.verifyAuthorise()
-
 
   "successfully authorise when user is logged in, credentialRole is User/Admin, and no active HMRC-AS-AGENT enrolment" in:
     val individualAuthorisedAction: IndividualAuthorisedAction = app.injector.instanceOf[IndividualAuthorisedAction]

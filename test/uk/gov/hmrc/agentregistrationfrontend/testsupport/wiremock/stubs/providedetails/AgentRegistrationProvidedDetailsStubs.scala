@@ -16,11 +16,13 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails
 
-import com.github.tomakehurst.wiremock.client.WireMock.{equalToJson, urlMatching}
+import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
+import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.Json
-import uk.gov.hmrc.agentregistration.shared.{LinkId, ProvidedDetails}
+import uk.gov.hmrc.agentregistration.shared.LinkId
+import uk.gov.hmrc.agentregistration.shared.ProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AgentRegistrationProvidedDetailsStubs {
