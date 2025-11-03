@@ -20,13 +20,16 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.providedetails.ProvideDetailsConnector
-import uk.gov.hmrc.agentregistrationfrontend.util.{Errors, RequestAwareLogging}
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
-import javax.inject.{Inject, Singleton}
-import scala.concurrent.{ExecutionContext, Future}
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
-class ProvideDetailsService @Inject()(
+class ProvideDetailsService @Inject() (
   provideDetailsConnector: ProvideDetailsConnector,
   provideDetailsFactory: ProvideDetailsFactory
 )(using ec: ExecutionContext)
@@ -35,7 +38,6 @@ extends RequestAwareLogging:
   def createNewProvidedDetails(linkId: LinkId)(using request: IndividualAuthorisedRequest[?]): Future[ProvidedDetails] =
     logger.info(s"creating new provided details for user:[${request.internalUserId}] and linkId:[${linkId}] ")
     Future.successful(provideDetailsFactory.makeNewProvidedDetails(request.internalUserId, linkId))
-
 
   def upsertNewProvidedDetails(linkId: LinkId)(using request: IndividualAuthorisedRequest[?]): Future[ProvidedDetails] =
     val providedDetails: ProvidedDetails = provideDetailsFactory.makeNewProvidedDetails(request.internalUserId, linkId)

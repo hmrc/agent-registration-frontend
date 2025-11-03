@@ -16,28 +16,32 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action.providedetails
 
-import com.google.inject.{Inject, Singleton}
+import com.google.inject.Inject
+import com.google.inject.Singleton
 import play.api.mvc.*
 import play.api.mvc.Results.*
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistrationfrontend.action.{FormValue, MergeFormValue}
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
+import uk.gov.hmrc.agentregistrationfrontend.action.MergeFormValue
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
-import uk.gov.hmrc.agentregistrationfrontend.util.{Errors, RequestAwareLogging}
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.views.ErrorResults
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 class IndividualAuthorisedRequest[A](
-                            val internalUserId: InternalUserId,
-                            val request: Request[A],
-                            val credentials: Credentials
-                          )
-  extends WrappedRequest[A](request)
+  val internalUserId: InternalUserId,
+  val request: Request[A],
+  val credentials: Credentials
+)
+extends WrappedRequest[A](request)
 
 object IndividualAuthorisedRequest:
 
@@ -53,9 +57,8 @@ object IndividualAuthorisedRequest:
       ) with FormValue[T]:
         val formValue: T = t
 
-
 @Singleton
-class IndividualAuthorisedAction @Inject()(
+class IndividualAuthorisedAction @Inject() (
   af: AuthorisedFunctions,
   errorResults: ErrorResults,
   appConfig: AppConfig,
@@ -70,7 +73,7 @@ extends RequestAwareLogging:
 
       override protected def refine[A](request: Request[A]): Future[Either[Result, IndividualAuthorisedRequest[A]]] =
         given r: Request[A] = request
-        
+
         af.authorised(
           AuthProviders(GovernmentGateway)
             and AffinityGroup.Individual
@@ -80,7 +83,7 @@ extends RequestAwareLogging:
             and Retrievals.internalId
             and Retrievals.credentials
         ).apply:
-          case allEnrolments ~ maybeAffinityGroup ~ maybeInternalId  ~ credentials =>
+          case allEnrolments ~ maybeAffinityGroup ~ maybeInternalId ~ credentials =>
             if isUnsupportedAffinityGroup(maybeAffinityGroup) then
               logger.info(s"Unauthorised because of 'UnsupportedAffinityGroup'")
               Future.successful(Left(errorResults.unauthorised(message = "UnsupportedAffinityGroup")))
