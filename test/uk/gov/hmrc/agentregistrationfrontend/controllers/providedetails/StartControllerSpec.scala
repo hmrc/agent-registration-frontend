@@ -17,6 +17,8 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import com.softwaremill.quicklens.modify
+import uk.gov.hmrc.agentregistration.shared.MemberProvidedDetailsLlp
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.AgentRegistrationProvidedDetailsStubs
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
@@ -44,6 +46,12 @@ extends ControllerSpec:
       .modify(_.applicationState)
       .setTo(ApplicationState.Submitted)
 
+  object providedDetails:
+    val newProvidedDetails: MemberProvidedDetailsLlp =
+      tdAll
+        .providedDetailsLlp
+        .afterStarted
+
   "routes should have correct paths and methods" in:
     routes.StartController.start(linkId) shouldBe Call(
       method = "GET",
@@ -52,6 +60,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render the start page" in:
     AgentRegistrationStubs.stubFindApplicationByLinkId(linkId = linkId, agentApplication = agentApplication.complete)
+    AgentRegistrationProvidedDetailsStubs.stubGetProvidedDetailsNoContent()
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Sign in and confirm your details - Apply for an agent services account - GOV.UK"
