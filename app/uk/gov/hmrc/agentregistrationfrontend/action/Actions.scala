@@ -22,6 +22,11 @@ import play.api.mvc.*
 import play.api.mvc.Results.BadRequest
 import play.api.mvc.Results.Redirect
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.agentregistration.shared.LinkId
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedAction
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.ProvideDetailsAction
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.ProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
@@ -35,7 +40,9 @@ import scala.util.chaining.scalaUtilChainingOps
 class Actions @Inject() (
   actionBuilder: DefaultActionBuilder,
   authorisedAction: AuthorisedAction,
-  agentApplicationAction: AgentApplicationAction
+  agentApplicationAction: AgentApplicationAction,
+  individualAuthorisedAction: IndividualAuthorisedAction,
+  provideDetailsAction: ProvideDetailsAction
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
@@ -115,3 +122,9 @@ extends RequestAwareLogging:
       originalResult =>
         if SubmissionHelper.getSubmitAction(request).isSaveAndComeBackLater then Redirect(appRoutes.SaveForLaterController.show) else originalResult
     )
+
+  def authorisedIndividual(linkId: LinkId): ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
+    .andThen(individualAuthorisedAction(linkId))
+
+  def getProvideDetailsRequest(linkId: LinkId): ActionBuilder[ProvideDetailsRequest, AnyContent] = authorisedIndividual(linkId)
+    .andThen(provideDetailsAction(linkId))
