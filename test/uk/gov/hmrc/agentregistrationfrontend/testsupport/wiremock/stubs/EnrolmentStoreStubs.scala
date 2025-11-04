@@ -22,7 +22,6 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object EnrolmentStoreStubs {
@@ -41,7 +40,7 @@ object EnrolmentStoreStubs {
   )
 
   def stubQueryEnrolmentsAllocatedToGroupNoContent(
-    groupId: GroupId = TdAll.tdAll.groupId
+    groupId: GroupId
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlMatching(s"/enrolment-store-proxy/enrolment-store/groups/${groupId.value}/enrolments"),
@@ -50,7 +49,7 @@ object EnrolmentStoreStubs {
   )
 
   def verifyQueryEnrolmentsAllocatedToGroup(
-    groupId: GroupId = TdAll.tdAll.groupId
+    groupId: GroupId
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlMatching(s"/enrolment-store-proxy/enrolment-store/groups/${groupId.value}/enrolments")

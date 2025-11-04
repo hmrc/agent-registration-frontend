@@ -16,8 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
-import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
+import com.github.tomakehurst.wiremock.client.WireMock as wm
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.Json
@@ -29,34 +28,34 @@ object AgentRegistrationStubs {
 
   def stubGetAgentApplication(agentApplication: AgentApplication): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching("/agent-registration/application"),
+    urlPattern = wm.urlPathEqualTo("/agent-registration/application"),
     responseStatus = 200,
     responseBody = Json.toJson(agentApplication).toString
   )
 
   def stubGetAgentApplicationNoContent(): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching("/agent-registration/application"),
+    urlPattern = wm.urlPathEqualTo("/agent-registration/application"),
     responseStatus = Status.NO_CONTENT,
     responseBody = ""
   )
 
   def verifyGetAgentApplication(count: Int = 1): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching("/agent-registration/application"),
+    urlPattern = wm.urlPathEqualTo("/agent-registration/application"),
     count = count
   )
 
   def stubUpdateAgentApplication(agentApplication: AgentApplication): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
-    urlPattern = urlMatching("/agent-registration/application"),
+    urlPattern = wm.urlPathEqualTo("/agent-registration/application"),
     responseStatus = 200,
-    requestBody = Some(equalToJson(Json.toJson(agentApplication).toString))
+    requestBody = Some(wm.equalToJson(Json.toJson(agentApplication).toString))
   )
 
   def verifyUpdateAgentApplication(): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.POST,
-    urlPattern = urlMatching("/agent-registration/application")
+    urlPattern = wm.urlPathEqualTo("/agent-registration/application")
   )
 
   def stubFindApplicationByLinkId(
@@ -64,7 +63,7 @@ object AgentRegistrationStubs {
     agentApplication: AgentApplication
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/agent-registration/application/linkId/${linkId.value}"),
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/linkId/${linkId.value}"),
     responseStatus = 200,
     responseBody = Json.toJson(agentApplication).toString
   )

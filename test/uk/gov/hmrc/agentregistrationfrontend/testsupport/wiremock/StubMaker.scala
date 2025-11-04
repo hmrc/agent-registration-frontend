@@ -73,7 +73,7 @@ object StubMaker:
 
     wm.stubFor(withResponse)
 
-  def verify(
+  inline def verify(
     httpMethod: HttpMethod = HttpMethod.GET,
     urlPattern: UrlPattern = wm.urlPathEqualTo("/example/path"),
     queryParams: Map[String, StringValuePattern] = Map.empty,

@@ -59,10 +59,7 @@ extends ControllerSpec:
       AuthStubs.stubAuthorise()
       AgentRegistrationStubs.stubGetAgentApplicationNoContent()
       AgentRegistrationStubs.stubUpdateAgentApplication(tdAll.agentApplicationLlp.afterStarted)
-      EnrolmentStoreStubs.stubQueryEnrolmentsAllocatedToGroup(
-        tdAll.groupId,
-        EnrolmentStoreProxyConnector.Enrolment(service = "HMRC-AS-AGENT", state = "Activated")
-      )
+      EnrolmentStoreStubs.stubQueryEnrolmentsAllocatedToGroupNoContent(tdAll.groupId)
 
       val response: WSResponse = get(initiateAgentApplicationUrl)
       response.status shouldBe Status.SEE_OTHER
@@ -70,4 +67,19 @@ extends ControllerSpec:
       AuthStubs.verifyAuthorise()
       AgentRegistrationStubs.verifyGetAgentApplication()
       AgentRegistrationStubs.verifyUpdateAgentApplication()
+      EnrolmentStoreStubs.verifyQueryEnrolmentsAllocatedToGroup(tdAll.groupId)
+
+    s"GET $initiateAgentApplicationUrl should redirect to taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment when HmrcAsAgentEnrolment is Allocated to the group" in:
+      AuthStubs.stubAuthorise()
+
+      EnrolmentStoreStubs.stubQueryEnrolmentsAllocatedToGroup(
+        tdAll.groupId,
+        EnrolmentStoreProxyConnector.Enrolment(service = "HMRC-AS-AGENT", state = "Activated")
+      )
+
+      val response: WSResponse = get(initiateAgentApplicationUrl)
+      response.status shouldBe Status.SEE_OTHER
+      // TODO: actual url isn't known yet
+      response.header("Location").value shouldBe "http://localhost:22201/taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment"
+      AuthStubs.verifyAuthorise()
       EnrolmentStoreStubs.verifyQueryEnrolmentsAllocatedToGroup(tdAll.groupId)

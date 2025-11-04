@@ -59,7 +59,7 @@ extends FrontendController(mcc, actions):
         implicit request =>
           val isHmrcAsAgentEnrolmentAllocatedToGroup: Future[Boolean] = enrolmentStoreProxyConnector
             .queryEnrolmentsAllocatedToGroup(request.groupId)
-            .map(_.exists(e => e.service === appConfig.hmrcAsAgentEnrolment.key && e.state === "Activated"))
+            .map(!_.exists(e => e.service === appConfig.hmrcAsAgentEnrolment.key && e.state === "Activated"))
           isHmrcAsAgentEnrolmentAllocatedToGroup
       ,
       resultWhenConditionNotMet =
