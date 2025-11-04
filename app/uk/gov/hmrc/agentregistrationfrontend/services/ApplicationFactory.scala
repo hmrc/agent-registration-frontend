@@ -20,13 +20,13 @@ import uk.gov.hmrc.agentregistration.shared.*
 
 import java.time.Clock
 import java.time.Instant
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ApplicationFactory @Inject() (
-  clock: Clock
+  clock: Clock,
+  linkIdGenerator: LinkIdGenerator
 ):
 
   def makeNewAgentApplicationLlp(
@@ -34,7 +34,7 @@ class ApplicationFactory @Inject() (
     groupId: GroupId
   ): AgentApplicationLlp = AgentApplicationLlp(
     internalUserId = internalUserId,
-    linkId = LinkId(UUID.randomUUID().toString),
+    linkId = linkIdGenerator.nextLinkId(),
     groupId = groupId,
     createdAt = Instant.now(clock),
     applicationState = ApplicationState.Started,

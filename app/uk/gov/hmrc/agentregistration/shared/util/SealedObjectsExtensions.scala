@@ -20,7 +20,7 @@ object SealedObjectsExtensions:
 
   extension [E](e: E)
 
-    inline def toStringHyphenatedForSealedObjects: String = {
+    inline def toStringHyphenated: String = {
       val _ = SealedObjects.all[E] // macro enforces E to be SealedObject type at call site
       HyphenTool.camelCaseToHyphenated(e.toString)
     }

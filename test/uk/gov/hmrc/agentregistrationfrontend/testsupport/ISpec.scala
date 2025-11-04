@@ -30,6 +30,8 @@ import play.api.test.TestServerFactory
 import play.core.server.ServerConfig
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsName
+import uk.gov.hmrc.agentregistration.shared.LinkId
+import uk.gov.hmrc.agentregistration.shared.LinkIdGenerator
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.CsvLoader
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
@@ -83,6 +85,9 @@ extends AnyWordSpecLike,
               (AmlsCode(kv._1), AmlsName(kv._2))
           }
         )
+        bind(classOf[LinkIdGenerator]).toInstance(new LinkIdGenerator {
+          override def nextLinkId(): LinkId = tdAll.linkId
+        })
 
   override def fakeApplication(): Application = GuiceApplicationBuilder()
     .overrides(GuiceableModule.fromGuiceModules(Seq(overridesModule)))

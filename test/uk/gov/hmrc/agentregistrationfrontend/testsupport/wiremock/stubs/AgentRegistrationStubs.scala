@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import play.api.http.Status
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.LinkId
@@ -31,6 +32,13 @@ object AgentRegistrationStubs {
     urlPattern = urlMatching("/agent-registration/application"),
     responseStatus = 200,
     responseBody = Json.toJson(agentApplication).toString
+  )
+
+  def stubGetAgentApplicationNoContent(): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching("/agent-registration/application"),
+    responseStatus = Status.NO_CONTENT,
+    responseBody = ""
   )
 
   def verifyGetAgentApplication(count: Int = 1): Unit = StubMaker.verify(
