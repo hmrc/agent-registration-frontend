@@ -28,7 +28,7 @@
 )
 
 @key = @{"taskList"}
-@title = @{messages(s"$key.title", request.agentApplication.asLlpApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName)}
+@title = @{messages(s"$key.title", request.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName)}
 @incompleteStatus = @{
     TaskListItemStatus(
         tag = Some(Tag(
@@ -45,7 +45,7 @@
         incompleteStatus
     }
 }
-@agencyDetailsStatus = @{
+@agentDetailsStatus = @{
     if(contactIsComplete) {
         incompleteStatus
     } else {
@@ -104,8 +104,8 @@
                 title = TaskListItemTitle(
                     content = Text(messages(s"$key.accountDetails.linkText"))
                 ),
-                status = agencyDetailsStatus,
-                href = if contactIsComplete then Some("#") else None
+                status = agentDetailsStatus,
+                href = if contactIsComplete then Some(agentDetailsRoutes.CheckYourAnswersController.show.url) else None
             )
         ),
         idPrefix = "accountDetails"

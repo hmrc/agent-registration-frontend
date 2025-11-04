@@ -40,5 +40,6 @@ class ApplicationFactory @Inject() (
     applicationState = ApplicationState.Started,
     businessDetails = None,
     applicantContactDetails = None,
-    amlsDetails = None
+    amlsDetails = None,
+    agentDetails = None
   )

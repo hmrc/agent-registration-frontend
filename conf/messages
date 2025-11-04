@@ -10,6 +10,7 @@ common.tryAgain = Try again
 common.errorPrefix = Error
 common.or = or
 common.dobPrefix = Date of birth
+common.change = Change
 
 months.1 = January
 months.2 = February
@@ -141,6 +142,22 @@ contactCheckYourAnswers.name.label = Name
 contactCheckYourAnswers.telephone.label = Telephone number
 contactCheckYourAnswers.email.label = Email address
 contactCheckYourAnswers.change = Change
+
+## Agent details - agent services account setup
+agentDetails.title = Agent services account details
+
+# Agent details / business name
+agentBusinessName.title = What business name will you use for clients?
+agentBusinessName.hint = Choose a name your clients know. We’ll use it when clients respond to authorisation requests or manage their agent relationships.
+agentBusinessName.other = Something else
+agentBusinessName.error.required = Enter the business name you want to use on your agent services account
+otherAgentBusinessName.label = Enter the name you want to use
+otherAgentBusinessName.error.required = Enter the business name you want to use on your agent services account
+otherAgentBusinessName.error.tooLong = Name shown to clients must be 40 characters or less
+otherAgentBusinessName.error.invalid = Name shown to clients must only include letters a to z, numbers, commas, full stops, apostrophes, hyphens, forward slashes and spaces
+
+agentDetailsCheckYourAnswers.title = Check your answers
+agentDetailsCheckYourAnswers.businessName.label = Business name for clients
 
 # About your application / user role
 userRole.title = Are you the owner of the business?

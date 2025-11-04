@@ -14,16 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared
+package uk.gov.hmrc.agentregistrationfrontend.testOnly.model
 
 import play.api.libs.json.Format
-import play.api.mvc.PathBindable
-import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
-import uk.gov.hmrc.agentregistration.shared.util.ValueClassBinder
+import play.api.libs.json.Json
 
-final case class Utr(value: String)
+final case class AddressDetails(
+  addressLine1: String,
+  addressLine2: String,
+  addressLine3: Option[String] = None,
+  addressLine4: Option[String] = None,
+  postalCode: Option[String] = None,
+  countryCode: String
+)
 
-object Utr:
-
-  given format: Format[Utr] = JsonFormatsFactory.makeValueClassFormat
-  given pathBindable: PathBindable[Utr] = ValueClassBinder.valueClassBinder[Utr](_.value)
+object AddressDetails:
+  given format: Format[AddressDetails] = Json.format[AddressDetails]
