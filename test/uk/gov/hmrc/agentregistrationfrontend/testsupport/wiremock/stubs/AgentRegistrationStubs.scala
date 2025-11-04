@@ -33,12 +33,22 @@ object AgentRegistrationStubs {
     responseBody = Json.toJson(agentApplication).toString
   )
 
-  // when you want to verify what is being stored
+  def verifyGetAgentApplication(count: Int = 1): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching("/agent-registration/application"),
+    count = count
+  )
+
   def stubUpdateAgentApplication(agentApplication: AgentApplication): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = urlMatching("/agent-registration/application"),
     responseStatus = 200,
     requestBody = Some(equalToJson(Json.toJson(agentApplication).toString))
+  )
+
+  def verifyUpdateAgentApplication(): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = urlMatching("/agent-registration/application")
   )
 
   def stubFindApplicationByLinkId(

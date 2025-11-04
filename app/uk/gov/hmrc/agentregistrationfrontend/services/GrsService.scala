@@ -20,6 +20,7 @@ import play.api.i18n.Lang
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.controllers.internal.routes as internalRoutes
 import uk.gov.hmrc.agentregistrationfrontend.config.GrsConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.GrsConnector
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
@@ -47,7 +48,7 @@ class GrsService @Inject() (
   )(using
     request: AuthorisedRequest[?]
   ): Future[JourneyStartUrl] = grsConnector.createJourney(
-    journeyConfig = createJourneyConfig(businessType, includeNamePageLabel),
+    journeyConfig = createJourneyConfig(includeNamePageLabel),
     businessType = businessType
   )
 
@@ -57,16 +58,14 @@ class GrsService @Inject() (
   )(using request: AuthorisedRequest[?]): Future[JourneyData] = grsConnector.getJourneyData(businessType, journeyId)
 
   private def createJourneyConfig(
-    businessType: BusinessType,
     includeNamePageLabel: Boolean
   ): JourneyConfig = {
 
-    val continueUrl: String = grsConfig.grsJourneyCallbackUrl(businessType)
     val fullNamePageLabel: Option[String] = if includeNamePageLabel then messagesApi.translate("grs.optFullNamePageLabel", Nil)(Lang("en")) else None
     val welshFullNamePageLabel: Option[String] = if includeNamePageLabel then messagesApi.translate("grs.optFullNamePageLabel", Nil)(Lang("cy")) else None
 
     JourneyConfig(
-      continueUrl = continueUrl,
+      continueUrl = internalRoutes.GrsController.journeyCallback(None).url,
       deskProServiceId = grsConfig.deskProServiceId,
       signOutUrl = routes.SignOutController.signOut.url,
       accessibilityUrl = grsConfig.accessibilityUrl,

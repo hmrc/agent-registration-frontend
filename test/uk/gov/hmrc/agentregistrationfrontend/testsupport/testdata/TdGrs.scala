@@ -16,7 +16,110 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
+import uk.gov.hmrc.agentregistration.shared.BusinessDetailsLlp
+import uk.gov.hmrc.agentregistration.shared.BusinessDetailsSoleTrader
+import uk.gov.hmrc.agentregistration.shared.FullName
+import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.*
+
+import java.time.LocalDate
+
 trait TdGrs {
   dependencies: TdBase =>
+
+  object grs:
+
+    val journeyId: JourneyId = JourneyId("1234567890-8888")
+
+    object llp:
+
+      val journeyData: JourneyData = JourneyData(
+        fullName = None,
+        dateOfBirth = None,
+        nino = None,
+        trn = None,
+        sautr = Some(dependencies.saUtr),
+        companyProfile = Some(dependencies.companyProfile),
+        ctutr = None,
+        postcode = Some(dependencies.postcode),
+        identifiersMatch = true,
+        registration = Registration(
+          registrationStatus = RegistrationStatus.GrsRegistered,
+          registeredBusinessPartnerId = Some(dependencies.safeId)
+        )
+      )
+
+      val businessDetails = BusinessDetailsLlp(
+        safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+        saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
+        companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
+      )
+
+    object soleTrader:
+
+      val fullName: FullName = FullName(firstName = "ST Name", lastName = "ST Lastname")
+      val dateOfBirth: LocalDate = LocalDate.of(1990, 1, 2)
+      val journeyData: JourneyData = JourneyData(
+        fullName = Some(fullName),
+        dateOfBirth = Some(dateOfBirth),
+        nino = Some(dependencies.nino),
+        trn = None,
+        sautr = Some(dependencies.saUtr),
+        companyProfile = None,
+        ctutr = None,
+        postcode = None,
+        identifiersMatch = true,
+        registration = Registration(
+          registrationStatus = RegistrationStatus.GrsRegistered,
+          registeredBusinessPartnerId = Some(dependencies.safeId)
+        )
+      )
+
+      val businessDetails = BusinessDetailsSoleTrader(
+        safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+        saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
+        fullName = journeyData.fullName.getOrThrowExpectedDataMissing("fullName"),
+        dateOfBirth = journeyData.dateOfBirth.getOrThrowExpectedDataMissing("dateOfBirth"),
+        nino = journeyData.nino,
+        trn = journeyData.trn
+      )
+
+    object ltd:
+      val journeyData: JourneyData = JourneyData(
+        fullName = None,
+        dateOfBirth = None,
+        nino = None,
+        trn = None,
+        sautr = None,
+        companyProfile = Some(dependencies.companyProfile),
+        ctutr = Some(dependencies.ctUtr),
+        postcode = None,
+        identifiersMatch = true,
+        registration = Registration(
+          registrationStatus = RegistrationStatus.GrsRegistered,
+          registeredBusinessPartnerId = Some(dependencies.safeId)
+        )
+      )
+
+//      val businessDetails: BusinessDetailsLlp = to be defined
+
+    object generalPartnership:
+      val journeyData: JourneyData = JourneyData(
+        fullName = None,
+        dateOfBirth = None,
+        nino = None,
+        trn = None,
+        sautr = Some(dependencies.saUtr),
+        companyProfile = None,
+        ctutr = None,
+        postcode = Some(dependencies.postcode),
+        identifiersMatch = true,
+        registration = Registration(
+          registrationStatus = RegistrationStatus.GrsRegistered,
+          registeredBusinessPartnerId = Some(dependencies.safeId)
+        )
+      )
+
+//      val businessDetails: BusinessDetailsGeneralPartnership = to be defined
 
 }
