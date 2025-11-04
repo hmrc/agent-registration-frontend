@@ -60,8 +60,7 @@ extends FrontendController(mcc, actions):
           Redirect(routes.TaskListController.show)
     )
 
-  def startJourney(
-  ): Action[AnyContent] = baseAction
+  def startJourney(): Action[AnyContent] = baseAction
     .async:
       implicit request =>
         grsService
