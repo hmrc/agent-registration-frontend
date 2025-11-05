@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.internal
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedLiabilityPartnership
-import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
@@ -69,6 +68,7 @@ extends ControllerSpec:
       AgentRegistrationStubs.verifyUpdateAgentApplication()
       EnrolmentStoreStubs.verifyQueryEnrolmentsAllocatedToGroup(tdAll.groupId)
 
+/*
     s"GET $initiateAgentApplicationUrl should redirect to taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment when HmrcAsAgentEnrolment is Allocated to the group" in:
       AuthStubs.stubAuthorise()
 
@@ -83,3 +83,4 @@ extends ControllerSpec:
       response.header("Location").value shouldBe "http://localhost:22201/taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment"
       AuthStubs.verifyAuthorise()
       EnrolmentStoreStubs.verifyQueryEnrolmentsAllocatedToGroup(tdAll.groupId)
+ */

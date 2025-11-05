@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.services.providedetails.llp
 
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.util.llp.MemberProvidedDetailsIdGenerator
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsIdGenerator
 
 import java.time.Clock
 import java.time.Instant

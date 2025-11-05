@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.services
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationIdGenerator
 
 import java.time.Clock
 import java.time.Instant
@@ -26,13 +27,15 @@ import javax.inject.Singleton
 @Singleton
 class ApplicationFactory @Inject() (
   clock: Clock,
-  linkIdGenerator: LinkIdGenerator
+  linkIdGenerator: LinkIdGenerator,
+  agentApplicationIdGenerator: AgentApplicationIdGenerator
 ):
 
   def makeNewAgentApplicationLlp(
     internalUserId: InternalUserId,
     groupId: GroupId
   ): AgentApplicationLlp = AgentApplicationLlp(
+    _id = agentApplicationIdGenerator.nextApplicationId(),
     internalUserId = internalUserId,
     linkId = linkIdGenerator.nextLinkId(),
     groupId = groupId,
