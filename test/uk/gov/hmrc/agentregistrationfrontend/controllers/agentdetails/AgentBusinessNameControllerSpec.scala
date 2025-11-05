@@ -20,7 +20,7 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.DesBusinessAddress
-import uk.gov.hmrc.agentregistration.shared.DesRegistrationResponse
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentBusinessNameForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -53,7 +53,7 @@ extends ControllerSpec:
         .whenProvidingNewBusinessName
         .afterBusinessNameProvided
 
-  val bprResponse: DesRegistrationResponse = DesRegistrationResponse(
+  val bprResponse: BusinessPartnerRecordResponse = BusinessPartnerRecordResponse(
     organisationName = Some("Test Company Name"),
     address = DesBusinessAddress(
       addressLine1 = "Line 1",

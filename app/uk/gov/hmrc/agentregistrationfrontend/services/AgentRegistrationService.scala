@@ -52,5 +52,5 @@ extends RequestAwareLogging:
   def findApplicationByLinkId(linkId: LinkId)(using request: RequestHeader): Future[Option[AgentApplication]] =
     agentRegistrationConnector.findApplicationByLinkId(linkId)
 
-  def getBusinessPartnerRecord(utr: Utr)(using request: AuthorisedRequest[?]): Future[Option[DesRegistrationResponse]] =
+  def getBusinessPartnerRecord(utr: Utr)(using request: AuthorisedRequest[?]): Future[Option[BusinessPartnerRecordResponse]] =
     agentRegistrationConnector.getBusinessPartnerRecord(utr)

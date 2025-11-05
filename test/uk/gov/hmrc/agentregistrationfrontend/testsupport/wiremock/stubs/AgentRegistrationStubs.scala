@@ -21,7 +21,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.DesRegistrationResponse
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
@@ -71,7 +71,7 @@ object AgentRegistrationStubs {
 
   def stubGetBusinessPartnerRecord(
     utr: String,
-    responseBody: DesRegistrationResponse
+    responseBody: BusinessPartnerRecordResponse
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlMatching(s"/agent-registration/business-partner-record/utr/$utr"),
