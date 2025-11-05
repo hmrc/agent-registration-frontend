@@ -24,4 +24,3 @@ import javax.inject.Singleton
 @Singleton
 class MemberProvidedDetailsIdGenerator:
   def nextMemberProvidedDetailsId(): MemberProvidedDetailsId = MemberProvidedDetailsId(ObjectId.get().toHexString)
-
