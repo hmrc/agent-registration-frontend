@@ -45,4 +45,4 @@ extends TdBase,
   agentapplication.llp.TdSectionContactDetails,
   agentapplication.llp.TdSectionAmls,
   agentapplication.soletrader.TdAgentApplicationSoleTrader,
-  providedetails.member.TdProvidedDetailsLlp
+  providedetails.member.TdMemberProvidedDetails

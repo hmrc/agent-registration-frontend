@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.providedetails.member
+package uk.gov.hmrc.agentregistration.shared
 
-import uk.gov.hmrc.agentregistration.shared.MemberProvidedDetailsLlp
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
+import play.api.libs.json.Format
+import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 
-trait TdProvidedDetailsLlp { dependencies: (TdBase) =>
+/** Agent application Identifier, which is unique for an application
+  */
+final case class AgentApplicationId(value: String)
 
-  object providedDetailsLlp:
-
-    val afterStarted: MemberProvidedDetailsLlp = MemberProvidedDetailsLlp(
-      internalUserId = dependencies.internalUserId,
-      linkId = dependencies.linkId,
-      createdAt = dependencies.nowAsInstant,
-      nino = None
-    )
-
-}
+object AgentApplicationId:
+  given format: Format[AgentApplicationId] = JsonFormatsFactory.makeValueClassFormat

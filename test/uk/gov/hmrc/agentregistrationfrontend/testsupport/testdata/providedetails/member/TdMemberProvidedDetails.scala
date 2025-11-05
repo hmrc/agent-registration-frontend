@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.providedetails
+package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.providedetails.member
 
-import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdRequest
 
-trait TdProvideDetailsRequest {
-  dependencies: (TdBase & TdRequest) =>
+trait TdMemberProvidedDetails { dependencies: (TdBase) =>
 
-  def makeProvideDetailsRequest(memberProvidedDetails: MemberProvidedDetails): MemberProvideDetailsRequest[AnyContent] =
-    new MemberProvideDetailsRequest(
-      request = dependencies.requestLoggedIn,
-      memberProvidedDetails = memberProvidedDetails,
+  object providedDetailsLlp:
+
+    val afterStarted: MemberProvidedDetails = MemberProvidedDetails(
+      _id = dependencies.memberProvidedDetailsId,
       internalUserId = dependencies.internalUserId,
-      credentials = dependencies.credentials
+      createdAt = dependencies.nowAsInstant,
+      applicationId = dependencies.agentApplicationId
     )
 
 }

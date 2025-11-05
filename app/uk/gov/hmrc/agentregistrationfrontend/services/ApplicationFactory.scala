@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.services
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.util.AgentApplicationIdGenerator
 
 import java.time.Clock
 import java.time.Instant
@@ -26,6 +27,7 @@ import javax.inject.Singleton
 
 @Singleton
 class ApplicationFactory @Inject() (
+  agentApplicationIdGenerator: AgentApplicationIdGenerator,
   clock: Clock
 ):
 
@@ -35,6 +37,7 @@ class ApplicationFactory @Inject() (
   ): AgentApplication = {
     // TODO: we need to distinguish between llp and other types of applications. For now only Llp is supported.
     AgentApplicationLlp(
+      _id = agentApplicationIdGenerator.nextApplicationId(),
       internalUserId = internalUserId,
       linkId = LinkId(UUID.randomUUID().toString),
       groupId = groupId,
