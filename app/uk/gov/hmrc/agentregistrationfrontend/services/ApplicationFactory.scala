@@ -20,28 +20,25 @@ import uk.gov.hmrc.agentregistration.shared.*
 
 import java.time.Clock
 import java.time.Instant
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class ApplicationFactory @Inject() (
-  clock: Clock
+  clock: Clock,
+  linkIdGenerator: LinkIdGenerator
 ):
 
-  def makeNewAgentApplication(
+  def makeNewAgentApplicationLlp(
     internalUserId: InternalUserId,
     groupId: GroupId
-  ): AgentApplication = {
-    // TODO: we need to distinguish between llp and other types of applications. For now only Llp is supported.
-    AgentApplicationLlp(
-      internalUserId = internalUserId,
-      linkId = LinkId(UUID.randomUUID().toString),
-      groupId = groupId,
-      createdAt = Instant.now(clock),
-      applicationState = ApplicationState.Started,
-      businessDetails = None,
-      applicantContactDetails = None,
-      amlsDetails = None
-    )
-  }
+  ): AgentApplicationLlp = AgentApplicationLlp(
+    internalUserId = internalUserId,
+    linkId = linkIdGenerator.nextLinkId(),
+    groupId = groupId,
+    createdAt = Instant.now(clock),
+    applicationState = ApplicationState.Started,
+    businessDetails = None,
+    applicantContactDetails = None,
+    amlsDetails = None
+  )

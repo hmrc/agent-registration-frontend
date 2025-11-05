@@ -30,9 +30,11 @@ GET         /apply/about-your-business/agent-online-services-account uk.gov.hmrc
 POST        /apply/about-your-business/agent-online-services-account uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.TypeOfSignInController.submit
 GET         /apply/about-your-business/sign-in                       uk.gov.hmrc.agentregistrationfrontend.controllers.aboutyourbusiness.TypeOfSignInController.showSignInPage
 
-##GRS routes
-GET         /apply/about-your-business/agent-type/:agentType/entity-type/:businessType uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.setUpGrsFromSignIn(agentType: AgentType, businessType: BusinessType)
-GET         /apply/grs-callback                                      uk.gov.hmrc.agentregistrationfrontend.controllers.GrsController.journeyCallback(journeyId: JourneyId)
+## Internal Routes for apply
+#  These routes are for internal navigation and should not be accessed directly through the browser URL and meant to be accessed via redirects from other routes.
+GET        /apply/internal/initiate-agent-application/:agentType/:businessType        uk.gov.hmrc.agentregistrationfrontend.controllers.internal.InitiateAgentApplicationController.initiateAgentApplication(agentType: AgentType, businessType: BusinessType)
+GET        /apply/internal/grs/start-journey                                          uk.gov.hmrc.agentregistrationfrontend.controllers.internal.GrsController.startJourney()
+GET        /apply/internal/grs/journey-callback                                       uk.gov.hmrc.agentregistrationfrontend.controllers.internal.GrsController.journeyCallback(journeyId: Option[JourneyId])
 
 ## Applicant contact details routes
 GET         /apply/applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.ApplicantRoleInLlpController.show

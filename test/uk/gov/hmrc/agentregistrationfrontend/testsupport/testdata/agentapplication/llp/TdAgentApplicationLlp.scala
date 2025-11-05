@@ -21,8 +21,9 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.BusinessDetailsLlp
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
 
-trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionContactDetails) =>
+trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionContactDetails & TdGrs) =>
 
   object agentApplicationLlp:
 
@@ -39,11 +40,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
 
     val afterGrsDataReceived: AgentApplicationLlp = afterStarted.copy(
       businessDetails = Some(
-        BusinessDetailsLlp(
-          safeId = dependencies.safeId,
-          saUtr = dependencies.saUtr,
-          companyProfile = dependencies.companyProfile
-        )
+        dependencies.grs.llp.businessDetails
       ),
       applicationState = GrsDataReceived
     )

@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.internal.routes as internalRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.TypeOfSignInForm
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn.*
@@ -37,6 +37,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.util.chaining.scalaUtilChainingOps
 
 @Singleton
 class TypeOfSignInController @Inject() (
@@ -71,14 +72,15 @@ extends FrontendController(mcc, actions):
           val businessType: BusinessType = request.getBusinessType
           val typeOfSignIn: TypeOfSignIn = request.getTypeOfSignIn
 
-          val signInLink: Uri = appConfig.signInUri(
-            continueUri =
-              uri"${appConfig.thisFrontendBaseUrl + applicationRoutes.GrsController.setUpGrsFromSignIn(
-                  agentType = agentType,
-                  businessType = businessType
-                ).url}"
-          )
+          val signInLink: Uri = internalRoutes
+            .InitiateAgentApplicationController
+            .initiateAgentApplication(
+              agentType = agentType,
+              businessType = businessType
+            )
+            .url
+            .pipe(initiateUrl => uri"${appConfig.thisFrontendBaseUrl + initiateUrl}")
 
           typeOfSignIn match
-            case HmrcOnlineServices => Ok(signInWithAgentDetailsPage(uri"$signInLink"))
-            case CreateSignInDetails => Ok(createSignInDetailsPage(uri"$signInLink"))
+            case HmrcOnlineServices => Ok(signInWithAgentDetailsPage(signInLink))
+            case CreateSignInDetails => Ok(createSignInDetailsPage(signInLink))

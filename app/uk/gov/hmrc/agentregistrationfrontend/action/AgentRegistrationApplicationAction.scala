@@ -20,8 +20,6 @@ import play.api.mvc.ActionRefiner
 import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
@@ -72,51 +70,27 @@ object AgentApplicationRequest:
 
 @Singleton
 class AgentApplicationAction @Inject() (
-  applicationService: AgentRegistrationService,
-  enrolmentStoreProxyConnector: EnrolmentStoreProxyConnector,
-  appConfig: AppConfig
+  agentRegistrationService: AgentRegistrationService
 )(using ec: ExecutionContext)
 extends ActionRefiner[AuthorisedRequest, AgentApplicationRequest]
 with RequestAwareLogging:
 
   override protected def refine[A](request: AuthorisedRequest[A]): Future[Either[Result, AgentApplicationRequest[A]]] =
     given r: AuthorisedRequest[A] = request
-
-    applicationService
+    agentRegistrationService
       .find()
-      .flatMap { maybeApplication =>
-        maybeApplication match
-          case Some(application) =>
-            Future.successful(Right(new AgentApplicationRequest(
-              agentApplication = application,
-              internalUserId = request.internalUserId,
-              groupId = request.groupId,
-              request = request.request,
-              credentials = request.credentials
-            )))
-          case None => createNewApplication()
-      }
-
-  private def createNewApplication[A]()(using request: AuthorisedRequest[A]): Future[Either[Result, AgentApplicationRequest[A]]] = enrolmentStoreProxyConnector
-    .queryEnrolmentsAllocatedToGroup(request.groupId)
-    .map(_.exists(e => e.service === appConfig.hmrcAsAgentEnrolment.key && e.state === "Activated"))
-    .flatMap { isHmrcAsAgentEnrolmentAllocatedToGroup =>
-      if isHmrcAsAgentEnrolmentAllocatedToGroup then
-        val redirectUrl: String = appConfig.taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment
-        logger.info(s"Request cannot be served by this microservice as ${appConfig.hmrcAsAgentEnrolment} is assigned to group, therefore redirecting user to taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment ($redirectUrl)")
-        Future.successful(Left(Redirect(redirectUrl)))
-      else
-        applicationService
-          .upsertNewApplication()
-          .map(agentApplication =>
-            Right(AgentApplicationRequest[A](
-              agentApplication = agentApplication,
-              internalUserId = request.internalUserId,
-              groupId = request.groupId,
-              request = request.request,
-              credentials = request.credentials
-            ))
-          )
-    }
+      .flatMap:
+        case Some(application) =>
+          Future.successful(Right(new AgentApplicationRequest(
+            agentApplication = application,
+            internalUserId = request.internalUserId,
+            groupId = request.groupId,
+            request = request.request,
+            credentials = request.credentials
+          )))
+        case None =>
+          val redirect = uk.gov.hmrc.agentregistrationfrontend.controllers.routes.AgentApplicationController.startRegistration
+          logger.error(s"[Unexpected State] No agent application found for authenticated user ${request.internalUserId.value}. Redirecting to startRegistration page ($redirect)")
+          Future.successful(Left(Redirect(redirect)))
 
   override protected def executionContext: ExecutionContext = ec

@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers
+package uk.gov.hmrc.agentregistrationfrontend.controllers.internal
 
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
-import uk.gov.hmrc.agentregistration.shared.AgentType
-import uk.gov.hmrc.agentregistration.shared.ApplicationState
-import uk.gov.hmrc.agentregistration.shared.BusinessDetailsLlp
-import uk.gov.hmrc.agentregistration.shared.BusinessDetailsPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessDetailsSoleTrader
-import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.controllers.internal.GrsController.*
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus
@@ -42,8 +39,6 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
-import GrsController.*
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 @Singleton
 class GrsController @Inject() (
@@ -55,27 +50,42 @@ class GrsController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def setUpGrsFromSignIn(
-    agentType: AgentType,
-    businessType: BusinessType
-  ): Action[AnyContent] = actions.authorised.async:
-    implicit request =>
-      grsService.createGrsJourney(
-        businessType = businessType,
-        false
-      ).map(journeyStartUrl => Redirect(journeyStartUrl.value))
+  val baseAction = actions
+    .getApplicationInProgress
+    .ensure(
+      condition = !_.agentApplication.isGrsDataReceived,
+      resultWhenConditionNotMet =
+        implicit request =>
+          logger.warn("Data from GRS already exists. Redirecting to task list page.")
+          Redirect(routes.TaskListController.show)
+    )
+
+  def startJourney(): Action[AnyContent] = baseAction
+    .async:
+      implicit request =>
+        grsService
+          .createGrsJourney(
+            businessType = request.agentApplication.businessType,
+            includeNamePageLabel = false
+          )
+          .map(journeyStartUrl => Redirect(journeyStartUrl.value))
 
   /** This endpoint is called by GRS when a user is navigated back from GRS to this Frontend Service. This is where we get [[GrsJourneyData]], extract
     * [[BusinessDetails]] from it and store within [[AgentApplication]]
     */
   def journeyCallback(
-    journeyId: JourneyId
-  ): Action[AnyContent] = actions
-    .getApplicationInProgress
+    journeyId: Option[JourneyId]
+  ): Action[AnyContent] = baseAction
+    .ensure(
+      _ => journeyId.isDefined,
+      implicit r =>
+        logger.error("Missing JourneyId in the request.")
+        Errors.throwBadRequestException("Missing JourneyId in the request.")
+    )
     .async:
       implicit request: AgentApplicationRequest[AnyContent] =>
         for
-          journeyData <- grsService.getJourneyData(request.agentApplication.businessType, journeyId)
+          journeyData <- grsService.getJourneyData(request.agentApplication.businessType, journeyId.getOrThrowExpectedDataMissing("grsJourneyId"))
           result <-
             journeyData.registration.registrationStatus match
               case RegistrationStatus.GrsRegistered =>
@@ -151,11 +161,4 @@ object GrsController:
       safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
       saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
       companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
-    )
-
-    def asBusinessDetailsPartnership: BusinessDetailsPartnership = BusinessDetailsPartnership(
-      safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("safeId"),
-      saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
-      companyProfile = journeyData.companyProfile,
-      postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode")
     )

@@ -26,8 +26,6 @@ import javax.inject.Singleton
 @Singleton
 class GrsConfig @Inject() (appConfig: AppConfig):
 
-  def grsJourneyCallbackUrl(businessType: BusinessType) = s"${appConfig.thisFrontendBaseUrl}/agent-registration/apply/grs-callback"
-
   val enableGrsStub: Boolean = appConfig.enableGrsStub
   val deskProServiceId: String = appConfig.contactFrontendId
   val accessibilityUrl: String = appConfig.accessibilityStatementPath
@@ -35,7 +33,7 @@ class GrsConfig @Inject() (appConfig: AppConfig):
 
   def createJourneyUrl(businessType: BusinessType): String =
     val grsUrl: String =
-      businessType match {
+      businessType match
         case BusinessType.SoleTrader => s"${appConfig.soleTraderIdBaseUrl}/sole-trader-identification/api/sole-trader-journey"
         case BusinessType.LimitedCompany => s"${appConfig.incorpIdBaseUrl}/incorporated-entity-identification/api/limited-company-journey"
         case BusinessType.Partnership.GeneralPartnership => s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/general-partnership-journey"
@@ -44,9 +42,8 @@ class GrsConfig @Inject() (appConfig: AppConfig):
         case BusinessType.Partnership.ScottishPartnership => s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/scottish-partnership-journey"
         case BusinessType.Partnership.ScottishLimitedPartnership =>
           s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/scottish-limited-partnership-journey"
-        case BusinessType.Partnership.LimitedPartnership =>
-      }
-      s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/limited-partnership-journey"
+        case BusinessType.Partnership.LimitedPartnership => s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/limited-partnership-journey"
+
     val stubUrl: String = s"${appConfig.selfBaseUrl}${testRoutes.GrsStubController.setupGrsJourney(businessType).url}"
     if enableGrsStub then stubUrl else grsUrl
 

@@ -16,75 +16,100 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs
 
-import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
+import com.github.tomakehurst.wiremock.client.WireMock as wm
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status.CREATED
 import play.api.http.Status.OK
-import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.*
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker.HttpMethod.GET
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker.HttpMethod.POST
 
 object GrsStubs:
 
-  val grsSoleTraderJourneyUrl = "/grs/start/sole-trader"
-  val grsLimitedCompanyJourneyUrl = "/grs/start/limited-company"
-  val grsGeneralPartnershipJourneyUrl = "/grs/start/general-partnership"
-  val grsLimitedLiabilityPartnershipJourneyUrl = "/grs/start/limited-liability-partnership"
-  val grsLimitedPartnershipJourneyUrl = "/grs/start/limited-partnership"
-  val grsScottishPartnershipJourneyUrl = "/grs/start/scottish-partnership"
-  val grsScottishLimitedPartnershipJourneyUrl = "/grs/start/scottish-limited-partnership"
+  /** The URL which is returned to the browser upon successful creation of a GRS journey in the GRS Service
+    */
+  def journeyStartRedirectUrl(businessType: BusinessType): String =
+    businessType match
+      case SoleTrader => "/grs/start/sole-trader"
+      case LimitedCompany => "/grs/start/limited-company"
+      case GeneralPartnership => "/grs/start/general-partnership"
+      case LimitedLiabilityPartnership => "/grs/start/limited-liability-partnership"
+      case LimitedPartnership => "/grs/start/limited-partnership"
+      case ScottishPartnership => "/grs/start/scottish-partnership"
+      case ScottishLimitedPartnership => "/grs/start/scottish-limited-partnership"
 
-  def stubCreateGrsJourney(businessType: BusinessType): StubMapping = {
-    val url =
-      businessType match {
-        case SoleTrader => s"/sole-trader-identification/api/sole-trader-journey"
-        case LimitedCompany => s"/incorporated-entity-identification/api/limited-company-journey"
-        case GeneralPartnership => s"/partnership-identification/api/general-partnership-journey"
-        case LimitedLiabilityPartnership => s"/partnership-identification/api/limited-liability-partnership-journey"
-        case LimitedPartnership => s"/partnership-identification/api/limited-partnership-journey"
-        case ScottishPartnership => s"/partnership-identification/api/scottish-partnership-journey"
-        case ScottishLimitedPartnership => s"/partnership-identification/api/scottish-limited-partnership-journey"
-      }
-    StubMaker.make(
-      httpMethod = POST,
-      urlPattern = urlMatching(url),
-      responseStatus = CREATED,
-      responseBody =
-        Json.obj(
-          "journeyStartUrl" -> (businessType match {
-            case SoleTrader => grsSoleTraderJourneyUrl
-            case LimitedCompany => grsLimitedCompanyJourneyUrl
-            case GeneralPartnership => grsGeneralPartnershipJourneyUrl
-            case LimitedLiabilityPartnership => grsLimitedLiabilityPartnershipJourneyUrl
-            case LimitedPartnership => grsLimitedPartnershipJourneyUrl
-            case ScottishPartnership => grsScottishPartnershipJourneyUrl
-            case ScottishLimitedPartnership => grsScottishLimitedPartnershipJourneyUrl
-          })
-        ).toString
-    )
-  }
+  def stubCreateJourney(businessType: BusinessType): StubMapping = StubMaker.make(
+    httpMethod = POST,
+    urlPattern = wm.urlPathEqualTo(startGrsJourneyUrl(businessType)),
+    responseStatus = CREATED,
+    responseBody = Json.obj("journeyStartUrl" -> journeyStartRedirectUrl(businessType)).toString
+  )
 
-  def stubGetGrsResponse(
+  def verifyCreateJourney(
+    businessType: BusinessType
+  ): Unit = StubMaker.verify(
+    httpMethod = POST,
+    urlPattern = wm.urlPathEqualTo(startGrsJourneyUrl(businessType))
+  )
+
+  def stubGetJourneyData(
     businessType: BusinessType,
-    journeyId: String,
-    responseBody: JsValue
-  ): StubMapping = {
-    val url =
-      businessType match {
-        case SoleTrader => s"/sole-trader-identification/api/journey/$journeyId"
-        case LimitedCompany => s"/incorporated-entity-identification/api/journey/$journeyId"
-        case GeneralPartnership | LimitedLiabilityPartnership | LimitedPartnership | ScottishLimitedPartnership | ScottishPartnership =>
-          s"/partnership-identification/api/journey/$journeyId"
-      }
+    journeyId: JourneyId,
+    tdAll: TdAll = TdAll.tdAll
+  ): StubMapping =
+
+    val journeyData: JourneyData =
+      businessType match
+        case bt @ BusinessType.Partnership.GeneralPartnership => throw NotImplementedError(s"$bt not implemented yet")
+        case BusinessType.Partnership.LimitedLiabilityPartnership => tdAll.grs.llp.journeyData
+        case bt @ BusinessType.Partnership.LimitedPartnership => throw NotImplementedError(s"$bt not implemented yet")
+        case bt @ BusinessType.Partnership.ScottishLimitedPartnership => throw NotImplementedError(s"$bt not implemented yet")
+        case bt @ BusinessType.Partnership.ScottishPartnership => throw NotImplementedError(s"$bt not implemented yet")
+        case bt @ BusinessType.SoleTrader => throw NotImplementedError(s"$bt not implemented yet")
+        case bt @ BusinessType.LimitedCompany => throw NotImplementedError(s"$bt not implemented yet")
+
     StubMaker.make(
       httpMethod = GET,
-      urlPattern = urlMatching(url),
+      urlPattern = wm.urlPathEqualTo(getJourneyDataUrl(businessType, journeyId)),
       responseStatus = OK,
-      responseBody = responseBody.toString
+      responseBody = Json.prettyPrint(Json.toJson(journeyData))
     )
-  }
+
+  def verifyGetJourneyData(
+    businessType: BusinessType,
+    journeyId: JourneyId
+  ): Unit = StubMaker.verify(
+    httpMethod = GET,
+    urlPattern = wm.urlPathEqualTo(getJourneyDataUrl(businessType, journeyId))
+  )
+
+  /** The url of the GrsService to retrieve Grs Journey Data
+    */
+  private def getJourneyDataUrl(
+    businessType: BusinessType,
+    journeyId: JourneyId
+  ): String =
+    businessType match
+      case SoleTrader => s"/sole-trader-identification/api/journey/${journeyId.value}"
+      case LimitedCompany => s"/incorporated-entity-identification/api/journey/${journeyId.value}"
+      case GeneralPartnership | LimitedLiabilityPartnership | LimitedPartnership | ScottishLimitedPartnership | ScottishPartnership =>
+        s"/partnership-identification/api/journey/${journeyId.value}"
+
+  /** The url of the GrsService to start Grs Journey
+    */
+  private def startGrsJourneyUrl(businessType: BusinessType): String =
+    businessType match
+      case BusinessType.SoleTrader => s"/sole-trader-identification/api/sole-trader-journey"
+      case BusinessType.LimitedCompany => s"/incorporated-entity-identification/api/limited-company-journey"
+      case BusinessType.Partnership.GeneralPartnership => s"/partnership-identification/api/general-partnership-journey"
+      case BusinessType.Partnership.LimitedLiabilityPartnership => s"/partnership-identification/api/limited-liability-partnership-journey"
+      case BusinessType.Partnership.LimitedPartnership => s"/partnership-identification/api/limited-partnership-journey"
+      case BusinessType.Partnership.ScottishPartnership => s"/partnership-identification/api/scottish-partnership-journey"
+      case BusinessType.Partnership.ScottishLimitedPartnership => s"/partnership-identification/api/scottish-limited-partnership-journey"

@@ -117,6 +117,14 @@ extends RequestAwareLogging:
       ): Future[Result] = block(f.asInstanceOf[R[A] => P[A]](request))
     })
 
+    def genericActionRefiner[P[_]](f: R[B] => Either[Result, P[B]]): ActionBuilder[P, B] = ab.andThen(new ActionRefiner[R, P] {
+      protected def executionContext: ExecutionContext = ec
+
+      protected def refine[A](request: R[A]): Future[Either[Result, P[A]]] = Future.successful(
+        f.asInstanceOf[R[A] => Either[Result, P[A]]](request)
+      )
+    })
+
   extension [
     B // B Represents Play Framework's Content Type parameter, commonly denoted as B
   ](a: Action[B])(using ec: ExecutionContext)
