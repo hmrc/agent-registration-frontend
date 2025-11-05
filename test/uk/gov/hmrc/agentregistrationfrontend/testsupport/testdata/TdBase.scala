@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import java.time.Clock
@@ -50,6 +51,7 @@ trait TdBase:
   def saUtr: SaUtr = SaUtr("1234567895")
   def ctUtr: CtUtr = CtUtr("2202108031")
   def internalUserId: InternalUserId = InternalUserId("internal-user-id-12345")
+  def memberProvidedDetailsId: MemberProvidedDetailsId = MemberProvidedDetailsId("member-provided-details-id-12345")
   def linkId: LinkId = LinkId("link-id-12345")
   def groupId: GroupId = GroupId("group-id-12345")
   def credentials: Credentials = Credentials(
@@ -60,6 +62,7 @@ trait TdBase:
   def safeId: SafeId = SafeId("X00000123456789")
   def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
   def applicantEmailAddress: EmailAddress = EmailAddress("user@test.com")
+  def agentApplicationId: AgentApplicationId = AgentApplicationId("agent-application-id-12345")
 
   def telephoneNumber: TelephoneNumber = TelephoneNumber("(+44) 10794554342")
   def crn: Crn = Crn("1234567890")

@@ -25,8 +25,8 @@ import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedAction
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.ProvideDetailsAction
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.ProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.ProvideDetailsAction
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
@@ -126,5 +126,5 @@ extends RequestAwareLogging:
   def authorisedIndividual(linkId: LinkId): ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
     .andThen(individualAuthorisedAction(linkId))
 
-  def getProvideDetailsRequest(linkId: LinkId): ActionBuilder[ProvideDetailsRequest, AnyContent] = authorisedIndividual(linkId)
+  def getProvideDetailsRequest(linkId: LinkId): ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorisedIndividual(linkId)
     .andThen(provideDetailsAction(linkId))

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.connectors.providedetails
+package uk.gov.hmrc.agentregistrationfrontend.connectors.providedetails.llp
 
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.given
-import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
@@ -39,7 +39,7 @@ import scala.concurrent.Future
 /** Connector to the companion backend microservice
   */
 @Singleton
-class ProvideDetailsConnector @Inject() (
+class MemberProvidedDetailsConnector @Inject() (
   httpClient: HttpClientV2,
   appConfig: AppConfig
 )(using
@@ -47,24 +47,24 @@ class ProvideDetailsConnector @Inject() (
 )
 extends RequestAwareLogging:
 
-  def findProvidedDetails(linkId: LinkId)(using
+  def findMemberProvidedDetails()(using
     request: IndividualAuthorisedRequest[?]
-  ): Future[Option[ProvidedDetails]] = httpClient
-    .get(url"$baseUrl/provideddetails/linkId/$linkId")
+  ): Future[Option[MemberProvidedDetails]] = httpClient
+    .get(url"$baseUrl/member-provided-details")
     .execute[HttpResponse]
     .map { response =>
       response.status match {
-        case Status.OK => Some(response.json.as[ProvidedDetails])
+        case Status.OK => Some(response.json.as[MemberProvidedDetails])
         case Status.NO_CONTENT => None
         case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
       }
     }
 
-  def upsertProvidedDetails(providedDetails: ProvidedDetails)(using
-    request: RequestHeader
+  def upsertMemberProvidedDetails(memberProvidedDetails: MemberProvidedDetails)(using
+    request: IndividualAuthorisedRequest[?]
   ): Future[Unit] = httpClient
-    .post(url"$baseUrl/provideddetails")
-    .withBody(Json.toJson(providedDetails))
+    .post(url"$baseUrl/member-provided-details")
+    .withBody(Json.toJson(memberProvidedDetails))
     .execute[HttpResponse]
     .map { response =>
       response.status match {
@@ -73,15 +73,15 @@ extends RequestAwareLogging:
       }
     }
 
-  def findProvidedDetailsByLinkId(linkId: LinkId)(using
-    request: RequestHeader
-  ): Future[List[ProvidedDetails]] = httpClient
-    .get(url"$baseUrl/provideddetails/linkId/${linkId.value}")
+  def findMemberProvidedDetailsByApplicationId(agentApplicationId: AgentApplicationId)(using
+    request: IndividualAuthorisedRequest[?]
+  ): Future[List[MemberProvidedDetails]] = httpClient
+    .get(url"$baseUrl/member-provided-details/agent-applicationId/${agentApplicationId.value}")
     .execute[HttpResponse]
     .map { response =>
       response.status match {
-        case Status.OK => response.json.as[List[ProvidedDetails]]
-        case Status.NO_CONTENT => List.empty[ProvidedDetails]
+        case Status.OK => response.json.as[List[MemberProvidedDetails]]
+        case Status.NO_CONTENT => List.empty[MemberProvidedDetails]
         case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
       }
     }

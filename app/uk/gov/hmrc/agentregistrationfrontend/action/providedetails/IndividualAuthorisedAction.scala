@@ -79,22 +79,17 @@ extends RequestAwareLogging:
             and AffinityGroup.Individual
         ).retrieve(
           Retrievals.allEnrolments
-            and Retrievals.affinityGroup
             and Retrievals.internalId
             and Retrievals.credentials
         ).apply:
-          case allEnrolments ~ maybeAffinityGroup ~ maybeInternalId ~ credentials =>
-            if isUnsupportedAffinityGroup(maybeAffinityGroup) then
-              logger.info(s"Unauthorised because of 'UnsupportedAffinityGroup'")
-              Future.successful(Left(errorResults.unauthorised(message = "UnsupportedAffinityGroup")))
-            else
-              Future.successful(Right(new IndividualAuthorisedRequest(
-                internalUserId = maybeInternalId
-                  .map(InternalUserId.apply)
-                  .getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing")),
-                request = request,
-                credentials = credentials.getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing"))
-              )))
+          case allEnrolments ~ maybeInternalId ~ credentials =>
+            Future.successful(Right(new IndividualAuthorisedRequest(
+              internalUserId = maybeInternalId
+                .map(InternalUserId.apply)
+                .getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing")),
+              request = request,
+              credentials = credentials.getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing"))
+            )))
         .recoverWith:
           case _: NoActiveSession =>
             logger.info(s"Unauthorised because of 'NoActiveSession', redirecting to sign in page")
@@ -122,10 +117,5 @@ extends RequestAwareLogging:
                 message = e.toString
               )
             ))
-
-  private def isUnsupportedAffinityGroup[A](maybeAffinityGroup: Option[AffinityGroup])(using request: RequestHeader) =
-    val supportedAffinityGroups: Set[AffinityGroup] = Set(AffinityGroup.Individual)
-    val affinityGroup: AffinityGroup = maybeAffinityGroup.getOrElse(Errors.throwServerErrorException("Retrievals for AffinityGroup is missing"))
-    !supportedAffinityGroups.contains(affinityGroup)
 
   private given ExecutionContext = cc.executionContext

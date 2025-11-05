@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.services.providedetails
+package uk.gov.hmrc.agentregistration.shared.util
 
-import uk.gov.hmrc.agentregistration.shared.*
 
-import java.time.Clock
-import java.time.Instant
-import javax.inject.Inject
+import org.bson.types.ObjectId
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
+
 import javax.inject.Singleton
 
 @Singleton
-class ProvideDetailsFactory @Inject() (
-  clock: Clock
-):
+class AgentApplicationIdGenerator:
+  def nextApplicationId(): AgentApplicationId = AgentApplicationId(ObjectId.get().toHexString)
 
-  def makeNewProvidedDetails(
-    internalUserId: InternalUserId,
-    linkId: LinkId
-  ): ProvidedDetails = MemberProvidedDetailsLlp(
-    internalUserId = internalUserId,
-    linkId = linkId,
-    createdAt = Instant.now(clock),
-    nino = None
-  )

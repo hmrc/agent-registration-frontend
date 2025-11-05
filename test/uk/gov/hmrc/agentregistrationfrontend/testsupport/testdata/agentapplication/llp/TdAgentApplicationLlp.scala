@@ -28,6 +28,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
   object agentApplicationLlp:
 
     val afterStarted: AgentApplicationLlp = AgentApplicationLlp(
+      _id = dependencies.agentApplicationId,
       internalUserId = dependencies.internalUserId,
       linkId = dependencies.linkId,
       groupId = dependencies.groupId,

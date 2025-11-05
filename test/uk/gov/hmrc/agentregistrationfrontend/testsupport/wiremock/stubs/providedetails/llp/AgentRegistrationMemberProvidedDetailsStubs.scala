@@ -14,46 +14,46 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails
+package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp
 
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.Json
-import uk.gov.hmrc.agentregistration.shared.LinkId
-import uk.gov.hmrc.agentregistration.shared.ProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
-object AgentRegistrationProvidedDetailsStubs {
+object AgentRegistrationMemberProvidedDetailsStubs {
 
-  def stubGetProvidedDetails(providedDetails: ProvidedDetails): StubMapping = StubMaker.make(
+  def stubGetMemberProvidedDetails(memberProvidedDetails: MemberProvidedDetails): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching("/agent-registration/provideddetails"),
+    urlPattern = urlMatching("/agent-registration/member-provided-details"),
     responseStatus = 200,
-    responseBody = Json.toJson(providedDetails).toString
+    responseBody = Json.toJson(memberProvidedDetails).toString
   )
 
-  def stubGetProvidedDetailsNoContent(): StubMapping = StubMaker.make(
+  def stubGetMemberProvidedDetailsNoContent(): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching("/agent-registration/provideddetails"),
+    urlPattern = urlMatching("/agent-registration/member-provided-details"),
     responseStatus = Status.NO_CONTENT
   )
 
   // when you want to verify what is being stored
-  def stubUpdateAgentApplication(providedDetails: ProvidedDetails): StubMapping = StubMaker.make(
+  def stubUpsertMemberProvidedDetails(memberProvidedDetails: MemberProvidedDetails): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
-    urlPattern = urlMatching("/agent-registration/provideddetails"),
+    urlPattern = urlMatching("/agent-registration/member-provided-details"),
     responseStatus = 200,
-    requestBody = Some(equalToJson(Json.toJson(providedDetails).toString))
+    requestBody = Some(equalToJson(Json.toJson(memberProvidedDetails).toString))
   )
 
-  def stubFindApplicationByLinkId(
-    linkId: LinkId,
-    providedDetailsList: List[ProvidedDetails]
+  def stubFindMemberProvidedDetailsByApplicationId(
+    agentApplicationId: AgentApplicationId,
+    providedDetailsList: List[MemberProvidedDetails]
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/agent-registration/provideddetails/linkId/${linkId.value}"),
+    urlPattern = urlMatching(s"/agent-registration/member-provided-details/application-id/${agentApplicationId.value}"),
     responseStatus = 200,
     responseBody = Json.toJson(providedDetailsList).toString
   )

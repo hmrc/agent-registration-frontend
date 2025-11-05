@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.ProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
@@ -46,7 +46,7 @@ class StartController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private def baseAction(linkId: LinkId): ActionBuilder[ProvideDetailsRequest, AnyContent] = actions
+  private def baseAction(linkId: LinkId): ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions
     .getProvideDetailsRequest(linkId)
 
   def start(linkId: LinkId): Action[AnyContent] = Action

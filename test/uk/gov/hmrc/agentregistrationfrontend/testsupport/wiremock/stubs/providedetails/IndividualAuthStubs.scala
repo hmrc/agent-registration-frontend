@@ -24,7 +24,6 @@ import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
-import uk.gov.hmrc.auth.core.AffinityGroup
 
 object IndividualAuthStubs {
 
@@ -55,7 +54,6 @@ object IndividualAuthStubs {
        |  "allEnrolments": [],
        |  "agentInformation": {},
        |  "internalId": "${internalUserId.value}",
-       |  "affinityGroup": "${AffinityGroup.Individual}",
        |  "optionalCredentials": {"providerId":"cred-id-12345","providerType":"GovernmentGateway"}
        |}
        |""".stripMargin
@@ -76,7 +74,6 @@ object IndividualAuthStubs {
       |  ],
       |  "retrieve": [
       |    "allEnrolments",
-      |    "affinityGroup",
       |    "internalId",
       |    "optionalCredentials"
       |  ]
