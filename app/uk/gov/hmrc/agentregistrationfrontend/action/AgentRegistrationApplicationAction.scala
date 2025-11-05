@@ -83,7 +83,7 @@ with RequestAwareLogging:
     given r: AuthorisedRequest[A] = request
 
     applicationService
-      .findByInternalUserId()
+      .find()
       .flatMap { maybeApplication =>
         maybeApplication match
           case Some(application) =>
