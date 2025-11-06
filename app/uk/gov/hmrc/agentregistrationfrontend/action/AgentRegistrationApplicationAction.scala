@@ -26,6 +26,7 @@ import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.auth.core.retrieve.Credentials
+import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -89,7 +90,7 @@ with RequestAwareLogging:
             credentials = request.credentials
           )))
         case None =>
-          val redirect = uk.gov.hmrc.agentregistrationfrontend.controllers.routes.AgentApplicationController.startRegistration
+          val redirect = AppRoutes.apply.AgentApplicationController.startRegistration
           logger.error(s"[Unexpected State] No agent application found for authenticated user ${request.internalUserId.value}. Redirecting to startRegistration page ($redirect)")
           Future.successful(Left(Redirect(redirect)))
 

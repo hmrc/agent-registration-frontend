@@ -22,7 +22,6 @@ import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -62,7 +61,7 @@ extends ViewSpec:
     "render a form with yes/no radios for a single match" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe routes.CompaniesHouseMatchingController.submit.url
+      form.attr("action") shouldBe AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.submit.url
       form
         .selectOrFail(s"label[for=${ChOfficerSelectionForms.key}]")
         .selectOnlyOneElementOrFail()

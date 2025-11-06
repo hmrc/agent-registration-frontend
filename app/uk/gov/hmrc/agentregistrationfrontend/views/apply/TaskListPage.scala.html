@@ -15,8 +15,6 @@
  *@
 
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes as applicantRoutes
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.amls.routes as amlsDetailsRoutes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 
 @this(
@@ -93,7 +91,7 @@
                     content = Text(messages(s"$key.contact.linkText"))
                 ),
                 status = contactStatus,
-                href = Some(applicantRoutes.CheckYourAnswersController.show.url)
+                href = Some(AppRoutes.apply.amls.CheckYourAnswersController.show.url)
             )
         ),
         idPrefix = "contact"
@@ -121,7 +119,7 @@
                     content = Text(messages(s"$key.hmrcStandards.amls.linkText"))
                 ),
                 status = amlsStatus,
-                href = Some(amlsDetailsRoutes.CheckYourAnswersController.show.url)
+                href = Some(AppRoutes.apply.amls.CheckYourAnswersController.show.url)
             ),
             TaskListItem(
                 title = TaskListItemTitle(

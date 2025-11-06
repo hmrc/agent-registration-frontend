@@ -17,7 +17,6 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits._
 @import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 @import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.amls.routes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
 
@@ -48,7 +47,7 @@
 ) {
 
     <h2 class="govuk-caption-l">@messages("amlsDetails.title")</h2>
-    @formWithCSRF(action = routes.AmlsRegistrationNumberController.submit) {
+    @formWithCSRF(action = AppRoutes.apply.amls.AmlsRegistrationNumberController.submit) {
         @govukInput(Input(
             label = Label(
                 content = Text(pageTitle),
