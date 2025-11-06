@@ -86,4 +86,17 @@ extends RequestAwareLogging:
       }
     }
 
+  def getBusinessPartnerRecord(utr: Utr)(using
+    request: RequestHeader
+  ): Future[Option[BusinessPartnerRecordResponse]] = httpClient
+    .get(url"$baseUrl/business-partner-record/utr/${utr.value}")
+    .execute[HttpResponse]
+    .map { response =>
+      response.status match {
+        case Status.OK => Some(response.json.as[BusinessPartnerRecordResponse])
+        case Status.NO_CONTENT => None
+        case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
+      }
+    }
+
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration"

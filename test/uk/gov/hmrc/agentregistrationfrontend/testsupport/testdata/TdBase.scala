@@ -57,7 +57,7 @@ trait TdBase:
     providerType = "GovernmentGateway"
   )
   def nino = Nino("AB123456C")
-  def safeId: SafeId = SafeId("X00000123456789")
+  def safeId: SafeId = SafeId("XA0001234512345")
   def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
   def applicantEmailAddress: EmailAddress = EmailAddress("user@test.com")
 
@@ -71,3 +71,4 @@ trait TdBase:
     dateOfIncorporation = Some(dateOfIncorporation)
   )
   def postcode: String = "AA1 1AA"
+  def authorisedPersonName: String = "Alice Smith"

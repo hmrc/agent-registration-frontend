@@ -16,14 +16,17 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.llp
 
-import uk.gov.hmrc.agentregistration.shared.ApplicationState.GrsDataReceived
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.ApplicationState.GrsDataReceived
 import uk.gov.hmrc.agentregistration.shared.BusinessDetailsLlp
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName.NameOfAuthorised
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
 
-trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionContactDetails & TdGrs) =>
+trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionContactDetails & TdGrs & TdSectionAgentDetails) =>
 
   object agentApplicationLlp:
 
@@ -35,7 +38,8 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       applicationState = ApplicationState.Started,
       businessDetails = None,
       applicantContactDetails = None,
-      amlsDetails = None
+      amlsDetails = None,
+      agentDetails = None
     )
 
     val afterGrsDataReceived: AgentApplicationLlp = afterStarted.copy(
@@ -43,6 +47,20 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
         dependencies.grs.llp.businessDetails
       ),
       applicationState = GrsDataReceived
+    )
+
+    val afterContactDetailsComplete: AgentApplicationLlp = afterGrsDataReceived.copy(
+      applicantContactDetails = Some(
+        ApplicantContactDetails(
+          applicantName = NameOfAuthorised(name = Some(dependencies.authorisedPersonName)),
+          telephoneNumber = Some(dependencies.telephoneNumber),
+          applicantEmailAddress = Some(ApplicantEmailAddress(
+            emailAddress = dependencies.applicantEmailAddress,
+            isVerified = true
+          ))
+        )
+      ),
+      agentDetails = None
     )
 
     val baseForSectionAmls: AgentApplicationLlp = afterGrsDataReceived
@@ -54,5 +72,10 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       new TdAgentApplicationLlpWithSectionContactDetails(baseForSectionContactDetails = baseForSectionContactDetails)
 
     export tdAgentApplicationLlpWithSectionContactDetails.sectionContactDetails
+
+    protected val tdAgentApplicationLlpWithSectionAgentDetails =
+      new TdAgentApplicationLlpWithSectionAgentDetails(baseForSectionAgentDetails = afterContactDetailsComplete)
+
+    export tdAgentApplicationLlpWithSectionAgentDetails.sectionAgentDetails
 
 }
