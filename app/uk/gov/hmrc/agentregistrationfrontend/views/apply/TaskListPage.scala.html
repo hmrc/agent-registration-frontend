@@ -105,7 +105,7 @@
                     content = Text(messages(s"$key.accountDetails.linkText"))
                 ),
                 status = agentDetailsStatus,
-                href = if contactIsComplete then Some(agentDetailsRoutes.CheckYourAnswersController.show.url) else None
+                href = if contactIsComplete then Some(AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url) else None
             )
         ),
         idPrefix = "accountDetails"

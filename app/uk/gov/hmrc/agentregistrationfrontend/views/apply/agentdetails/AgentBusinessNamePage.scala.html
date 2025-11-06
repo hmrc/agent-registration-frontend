@@ -17,7 +17,6 @@
 @import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentBusinessName
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 @import uk.gov.hmrc.agentregistrationfrontend.forms.AgentBusinessNameForm
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.agentdetails.routes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
@@ -68,7 +67,7 @@
     maybeForm = Some(form)
 ) {
     <h2 class="govuk-caption-l">@messages("agentDetails.title")</h2>
-    @formWithCSRF(action = routes.AgentBusinessNameController.submit) {
+    @formWithCSRF(action = AppRoutes.apply.agentdetails.AgentBusinessNameController.submit) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(

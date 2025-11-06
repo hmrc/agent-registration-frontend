@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers.agentdetails
+package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 
 import com.softwaremill.quicklens.*
 import play.api.mvc.Action
@@ -50,16 +50,16 @@ extends FrontendController(mcc, actions):
       agentRegistrationService
         .getBusinessPartnerRecord(
           Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
-        ).map:
-          bprOpt =>
-            Ok(view(
-              form = AgentBusinessNameForm.form.fill:
-                request
-                  .agentApplication
-                  .asLlpApplication
-                  .agentDetails.map(_.businessName),
-              bprBusinessName = bprOpt.flatMap(_.organisationName)
-            ))
+        ).map: bprOpt =>
+          Ok(view(
+            form = AgentBusinessNameForm.form.fill:
+              request
+                .agentApplication
+                .asLlpApplication
+                .agentDetails.map(_.businessName)
+            ,
+            bprBusinessName = bprOpt.flatMap(_.organisationName)
+          ))
 
   def submit: Action[AnyContent] =
     actions
@@ -73,14 +73,13 @@ extends FrontendController(mcc, actions):
                 agentRegistrationService
                   .getBusinessPartnerRecord(
                     Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
-                  ).map:
-                    bprOpt =>
-                      BadRequest(
-                        view(
-                          form = formWithErrors,
-                          bprBusinessName = bprOpt.flatMap(_.organisationName)
-                        )
-                      ).pipe(SubmissionHelper.redirectIfSaveForLater(request, _)),
+                  ).map: bprOpt =>
+                    BadRequest(
+                      view(
+                        form = formWithErrors,
+                        bprBusinessName = bprOpt.flatMap(_.organisationName)
+                      )
+                    ).pipe(SubmissionHelper.redirectIfSaveForLater(request, _)),
               businessNameFromForm =>
                 val updatedApplication: AgentApplication = request
                   .agentApplication

@@ -53,10 +53,10 @@ GET         /apply/applicant/verify-email-address                  uk.gov.hmrc.a
 GET         /apply/applicant/check-your-answers                    uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.CheckYourAnswersController.show
 
 ## Agent details routes
-GET         /apply/agent-details/business-name                     uk.gov.hmrc.agentregistrationfrontend.controllers.agentdetails.AgentBusinessNameController.show
-POST        /apply/agent-details/business-name                     uk.gov.hmrc.agentregistrationfrontend.controllers.agentdetails.AgentBusinessNameController.submit
+GET         /apply/agent-details/business-name                     uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentBusinessNameController.show
+POST        /apply/agent-details/business-name                     uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentBusinessNameController.submit
 
-GET         /apply/agent-details/check-your-answers                uk.gov.hmrc.agentregistrationfrontend.controllers.agentdetails.CheckYourAnswersController.show
+GET         /apply/agent-details/check-your-answers                uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.CheckYourAnswersController.show
 
 ## Anti Money Laundering routes
 GET         /apply/anti-money-laundering/supervisor-name            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsSupervisorController.show

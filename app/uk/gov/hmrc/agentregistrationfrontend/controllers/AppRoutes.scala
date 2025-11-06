@@ -20,6 +20,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRo
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.routes as aboutyourbusinessRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.routes as amlsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.routes as applicantcontactdetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.routes as agentdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes as internalRoutes
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.routes as providedetailsRoutes
@@ -60,6 +61,11 @@ object AppRoutes:
       val EmailAddressController = applicantcontactdetailsRoutes.EmailAddressController
       val TelephoneNumberController = applicantcontactdetailsRoutes.TelephoneNumberController
       val ApplicantRoleInLlpController = applicantcontactdetailsRoutes.ApplicantRoleInLlpController
+
+    object agentdetails:
+
+      val AgentBusinessNameController = agentdetailsRoutes.AgentBusinessNameController
+      val CheckYourAnswersController = agentdetailsRoutes.CheckYourAnswersController
 
     object internal:
 
