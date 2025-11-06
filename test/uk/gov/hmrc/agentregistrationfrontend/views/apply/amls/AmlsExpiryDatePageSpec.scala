@@ -63,8 +63,8 @@ extends ViewSpec:
 
     "render a form that posts to the correct action" in:
       val form = doc.mainContent.selectOrFail("form")
-      form.attr("action").shouldBe(CentralisedRoutes.apply.amls.AmlsExpiryDateController.submit.url)
-      form.attr("method").shouldBe(CentralisedRoutes.apply.amls.AmlsExpiryDateController.submit.method)
+      form.attr("action").shouldBe(AppRoutes.apply.amls.AmlsExpiryDateController.submit.url)
+      form.attr("method").shouldBe(AppRoutes.apply.amls.AmlsExpiryDateController.submit.method)
 
     "contain inputs for a date field within the form" in:
       val form = doc.mainContent.selectOrFail("form")

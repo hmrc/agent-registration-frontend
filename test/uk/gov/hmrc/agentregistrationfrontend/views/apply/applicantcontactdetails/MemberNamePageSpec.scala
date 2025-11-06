@@ -57,7 +57,7 @@ extends ViewSpec:
     "render a form with inputs for first and last name" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe CentralisedRoutes.apply.applicantcontactdetails.MemberNameController.submit.url
+      form.attr("action") shouldBe AppRoutes.apply.applicantcontactdetails.MemberNameController.submit.url
       form
         .selectOrFail("label[for=firstName]")
         .selectOnlyOneElementOrFail()

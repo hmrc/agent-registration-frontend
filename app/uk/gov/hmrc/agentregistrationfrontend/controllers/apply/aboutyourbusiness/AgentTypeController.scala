@@ -53,5 +53,5 @@ extends FrontendController(mcc, actions):
           val call: Call =
             agentType match
               case AgentType.UkTaxAgent => routes.BusinessTypeSessionController.show
-              case AgentType.NonUkTaxAgent => CentralisedRoutes.apply.AgentApplicationController.genericExitPage
+              case AgentType.NonUkTaxAgent => AppRoutes.apply.AgentApplicationController.genericExitPage
           Redirect(call.url).addToSession(agentType)

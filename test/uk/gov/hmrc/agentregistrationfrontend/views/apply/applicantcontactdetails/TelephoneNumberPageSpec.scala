@@ -50,7 +50,7 @@ extends ViewSpec:
     "render a form with an input of type tel for telephone number" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe CentralisedRoutes.apply.applicantcontactdetails.TelephoneNumberController.submit.url
+      form.attr("action") shouldBe AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.submit.url
       form
         .selectOrFail("label[for=telephoneNumber]")
         .selectOnlyOneElementOrFail()

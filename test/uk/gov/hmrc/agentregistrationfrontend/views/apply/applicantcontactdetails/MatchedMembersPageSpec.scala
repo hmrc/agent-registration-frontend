@@ -70,7 +70,7 @@ extends ViewSpec:
     "render a form with radios for each of the multiple matches" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe CentralisedRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.submit.url
+      form.attr("action") shouldBe AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.submit.url
       form
         .selectOrFail("label[for=companiesHouseOfficer]")
         .selectOnlyOneElementOrFail()

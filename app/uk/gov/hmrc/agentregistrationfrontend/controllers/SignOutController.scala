@@ -42,7 +42,7 @@ extends FrontendController(mcc, actions):
     Redirect(signOutAndRedirectUrl)
 
   def signOut: Action[AnyContent] = action:
-    val continueUrl = uri"${appConfig.thisFrontendBaseUrl + CentralisedRoutes.apply.AgentApplicationController.landing.url}"
+    val continueUrl = uri"${appConfig.thisFrontendBaseUrl + AppRoutes.apply.AgentApplicationController.landing.url}"
     signOutWithContinue(continueUrl.toString)
 
   def timeOut: Action[AnyContent] = action:

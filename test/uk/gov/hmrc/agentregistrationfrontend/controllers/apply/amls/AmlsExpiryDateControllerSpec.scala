@@ -156,7 +156,7 @@ extends ControllerSpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe CentralisedRoutes.apply.SaveForLaterController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
 
   s"POST $path as blank form should return 400" in:
     AuthStubs.stubAuthorise()
@@ -185,7 +185,7 @@ extends ControllerSpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe CentralisedRoutes.apply.SaveForLaterController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
 
   s"POST $path with an invalid value should return 400" in:
     AuthStubs.stubAuthorise()
@@ -214,4 +214,4 @@ extends ControllerSpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe CentralisedRoutes.apply.SaveForLaterController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url

@@ -49,7 +49,7 @@ extends FrontendController(mcc, actions):
       implicit request: RequestHeader =>
         applicationService.findApplicationByLinkId(linkId).map {
           case Some(app) if app.hasFinished => startPageForApplicationType(app)
-          case _ => Redirect(CentralisedRoutes.apply.AgentApplicationController.genericExitPage.url)
+          case _ => Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
         }
 
   // TODO: this method requires an auth action to ensure user is signed in correctly and has
@@ -59,7 +59,7 @@ extends FrontendController(mcc, actions):
       implicit request: RequestHeader =>
         applicationService.findApplicationByLinkId(linkId).map {
           case Some(app) if app.hasFinished => Redirect(routes.LlpMemberNameController.show)
-          case _ => Redirect(CentralisedRoutes.apply.AgentApplicationController.genericExitPage.url)
+          case _ => Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
         }
 
   // for now this returns only the llp start page template until we build the rest

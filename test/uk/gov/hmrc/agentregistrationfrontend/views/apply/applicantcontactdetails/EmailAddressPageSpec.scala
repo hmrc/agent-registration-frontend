@@ -54,7 +54,7 @@ extends ViewSpec:
     "render a form with an input of type email for email address" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe CentralisedRoutes.apply.applicantcontactdetails.EmailAddressController.submit.url
+      form.attr("action") shouldBe AppRoutes.apply.applicantcontactdetails.EmailAddressController.submit.url
       form
         .selectOrFail("label[for=emailAddress]")
         .selectOnlyOneElementOrFail()

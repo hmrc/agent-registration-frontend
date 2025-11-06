@@ -49,7 +49,7 @@ extends ViewSpec:
     "render a form with an input for full name" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe CentralisedRoutes.apply.applicantcontactdetails.AuthorisedNameController.submit.url
+      form.attr("action") shouldBe AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.submit.url
       form
         .selectOrFail("label[for=authorisedName]")
         .selectOnlyOneElementOrFail()

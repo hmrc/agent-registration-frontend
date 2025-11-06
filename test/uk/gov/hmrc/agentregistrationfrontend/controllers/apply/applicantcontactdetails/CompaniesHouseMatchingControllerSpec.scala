@@ -150,7 +150,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe CentralisedRoutes.apply.SaveForLaterController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
 
   s"POST $path with save for later and without a valid selection should not return errors and redirect to save for later page" in:
     AuthStubs.stubAuthorise()
@@ -164,4 +164,4 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe CentralisedRoutes.apply.SaveForLaterController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url

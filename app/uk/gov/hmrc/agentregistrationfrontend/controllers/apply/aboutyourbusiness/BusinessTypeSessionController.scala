@@ -62,12 +62,12 @@ extends FrontendController(mcc, actions):
           request.formValue match
             case businessType @ (BusinessTypeAnswer.SoleTrader | BusinessTypeAnswer.LimitedCompany) =>
               // TODO SoleTrader or LimitedCompany journeys not yet built
-              Redirect(CentralisedRoutes.apply.AgentApplicationController.genericExitPage.url)
+              Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
                 .addToSession(businessType)
                 .removePartnershipTypeFromSession
             case businessType @ BusinessTypeAnswer.PartnershipType =>
               Redirect(routes.PartnershipTypeController.show.url)
                 .addToSession(businessType)
             case businessType @ BusinessTypeAnswer.Other =>
-              Redirect(CentralisedRoutes.apply.AgentApplicationController.genericExitPage.url)
+              Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
                 .addToSession(businessType)

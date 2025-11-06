@@ -56,7 +56,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe CentralisedRoutes.apply.AgentApplicationController.genericExitPage.url
+    response.header("Location").value shouldBe AppRoutes.apply.AgentApplicationController.genericExitPage.url
 
   s"POST $path without valid selection should return 400" in:
     val response: WSResponse = post(path)(Map(AgentTypeForm.key -> Seq("")))

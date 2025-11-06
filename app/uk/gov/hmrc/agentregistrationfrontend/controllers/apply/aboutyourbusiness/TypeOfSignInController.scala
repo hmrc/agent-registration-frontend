@@ -71,7 +71,7 @@ extends FrontendController(mcc, actions):
           val businessType: BusinessType = request.getBusinessType
           val typeOfSignIn: TypeOfSignIn = request.getTypeOfSignIn
 
-          val signInLink: Uri = CentralisedRoutes
+          val signInLink: Uri = AppRoutes
             .apply
             .internal
             .InitiateAgentApplicationController

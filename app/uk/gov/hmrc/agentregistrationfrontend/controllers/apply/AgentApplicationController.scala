@@ -63,7 +63,7 @@ extends FrontendController(mcc, actions):
   def startRegistration: Action[AnyContent] = action:
     implicit request =>
       // if we use an endpoint like this, we can later change the flow without changing the URL
-      Redirect(CentralisedRoutes.apply.aboutyourbusiness.AgentTypeController.show)
+      Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show)
 
   def genericExitPage: Action[AnyContent] = action:
     implicit request =>

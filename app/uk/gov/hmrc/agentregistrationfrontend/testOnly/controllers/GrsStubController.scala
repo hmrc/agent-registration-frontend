@@ -98,7 +98,7 @@ extends FrontendController(mcc, actions):
           )),
         grsResponse =>
           val json: JsValue = Json.toJson(grsResponse)
-          Redirect(CentralisedRoutes.apply.internal.GrsController.journeyCallback(Some(journeyId)))
+          Redirect(AppRoutes.apply.internal.GrsController.journeyCallback(Some(journeyId)))
             .addingToSession(journeyId.value -> json.toString)
       )
 

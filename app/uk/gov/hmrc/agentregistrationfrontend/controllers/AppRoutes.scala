@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes a
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.routes as providedetailsRoutes
 
-/** All application routes centralised in one place for convenience and clarity. It helps avoid naming conflicts and makes route management easier.
+/** All application routes centralized in one place for convenience and clarity. It helps avoid naming conflicts and makes route management easier.
   *
   * Please add new controllers here.
   */

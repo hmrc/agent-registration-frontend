@@ -57,7 +57,7 @@ extends FrontendController(mcc, actions):
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Data from GRS already exists. Redirecting to task list page.")
-          Redirect(CentralisedRoutes.apply.TaskListController.show)
+          Redirect(AppRoutes.apply.TaskListController.show)
     )
 
   def startJourney(): Action[AnyContent] = baseAction
@@ -142,7 +142,7 @@ extends FrontendController(mcc, actions):
     agentRegistrationService
       .upsert(updatedApplication)
       .map: _ =>
-        Redirect(CentralisedRoutes.apply.TaskListController.show.url)
+        Redirect(AppRoutes.apply.TaskListController.show.url)
 
 object GrsController:
 
