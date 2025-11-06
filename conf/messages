@@ -153,11 +153,26 @@ agentBusinessName.other = Something else
 agentBusinessName.error.required = Enter the business name you want to use on your agent services account
 otherAgentBusinessName.label = Enter the name you want to use
 otherAgentBusinessName.error.required = Enter the business name you want to use on your agent services account
-otherAgentBusinessName.error.tooLong = Name shown to clients must be 40 characters or less
+otherAgentBusinessName.error.tooLong = Name shown to clients must be 24 characters or less
 otherAgentBusinessName.error.invalid = Name shown to clients must only include letters a to z, numbers, commas, full stops, apostrophes, hyphens, forward slashes and spaces
+
+# Agent details / telephone number
+agentTelephoneNumber.title = What telephone number should we use for your agent services account?
+agentTelephoneNumber.contact.hint = This is the number you have given us.
+agentTelephoneNumber.bpr.hint = This is the number HMRC has in your business record.
+agentTelephoneNumber.other = Something else
+agentTelephoneNumber.error.required = Enter the telephone number for your agent services account
+otherAgentTelephoneNumber.label = Enter the number you want to use
+otherAgentTelephoneNumber.hint = We will not send a code to confirm this number.
+otherAgentTelephoneNumber.error.required = Enter the telephone number for your agent services account
+otherAgentTelephoneNumber.error.invalid = Telephone number must only include numbers, plus sign, hash sign, hyphens, brackets and spaces
+otherAgentTelephoneNumber.error.tooLong = The phone number must be 24 characters or fewer
+
+# Agent details / check your answers
 
 agentDetailsCheckYourAnswers.title = Check your answers
 agentDetailsCheckYourAnswers.businessName.label = Business name for clients
+agentDetailsCheckYourAnswers.telephone.label = Telephone number
 
 # About your application / user role
 userRole.title = Are you the owner of the business?

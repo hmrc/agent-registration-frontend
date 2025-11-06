@@ -212,7 +212,7 @@ extends ControllerSpec:
     ).text() shouldBe "Error: Name shown to clients must only include letters a to z, numbers, commas, full stops, apostrophes, hyphens, forward slashes and spaces"
     AgentRegistrationStubs.verifyGetBusinessPartnerRecord(Utr(tdAll.saUtr.value))
 
-  s"POST $path with selection of other and more than 40 characters should return 400" in:
+  s"POST $path with selection of other and more than 24 characters should return 400" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeBusinessNameProvided)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
@@ -228,7 +228,7 @@ extends ControllerSpec:
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: What business name will you use for clients? - Apply for an agent services account - GOV.UK"
-    doc.mainContent.select(s"#${AgentBusinessNameForm.otherKey}-error").text() shouldBe "Error: Name shown to clients must be 40 characters or less"
+    doc.mainContent.select(s"#${AgentBusinessNameForm.otherKey}-error").text() shouldBe "Error: Name shown to clients must be 24 characters or less"
     AgentRegistrationStubs.verifyGetBusinessPartnerRecord(Utr(tdAll.saUtr.value))
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
