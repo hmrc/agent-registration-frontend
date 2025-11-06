@@ -64,7 +64,7 @@
     <p class="govuk-body">
         @govukButton(Button(
             content = Text(messages("common.start")),
-            href=Some(CentralisedRoutes.providedetails.StartController.resolve(agentApplication.linkId).url),
+            href=Some(AppRoutes.providedetails.StartController.resolve(agentApplication.linkId).url),
             isStartButton = true
         ))
     </p>

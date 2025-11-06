@@ -40,7 +40,7 @@
     maybeForm = Some(form)
 ) {
     <h2 class="govuk-caption-l">@messages("applicant-contact-details.title")</h2>
-    @formWithCSRF(action = CentralisedRoutes.apply.applicantcontactdetails.TelephoneNumberController.submit) {
+    @formWithCSRF(action = AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.submit) {
         @govukInput(Input(
             label = Label(
               content = Text(title),

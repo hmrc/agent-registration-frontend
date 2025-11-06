@@ -46,7 +46,7 @@
 ) {
 
     <h2 class="govuk-caption-l">@messages("about-your-business.title")</h2>
-    @formWithCSRF(action = CentralisedRoutes.apply.aboutyourbusiness.TypeOfSignInController.submit) {
+    @formWithCSRF(action = AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.submit) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(

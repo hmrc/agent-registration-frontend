@@ -91,7 +91,7 @@
                     content = Text(messages(s"$key.contact.linkText"))
                 ),
                 status = contactStatus,
-                href = Some(CentralisedRoutes.apply.amls.CheckYourAnswersController.show.url)
+                href = Some(AppRoutes.apply.amls.CheckYourAnswersController.show.url)
             )
         ),
         idPrefix = "contact"
@@ -119,7 +119,7 @@
                     content = Text(messages(s"$key.hmrcStandards.amls.linkText"))
                 ),
                 status = amlsStatus,
-                href = Some(CentralisedRoutes.apply.amls.CheckYourAnswersController.show.url)
+                href = Some(AppRoutes.apply.amls.CheckYourAnswersController.show.url)
             ),
             TaskListItem(
                 title = TaskListItemTitle(

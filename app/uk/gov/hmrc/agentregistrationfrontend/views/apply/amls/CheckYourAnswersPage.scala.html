@@ -60,7 +60,7 @@
         actions = Some(Actions(
             items = Seq(
                 ActionItem(
-                    href = s"${CentralisedRoutes.apply.amls.AmlsSupervisorController.show}",
+                    href = s"${AppRoutes.apply.amls.AmlsSupervisorController.show}",
                     content = Text(messages(s"$key.change")),
                     visuallyHiddenText = Some(messages(s"$key.supervisoryBody.label"))
                 )
@@ -84,7 +84,7 @@
         actions = Some(Actions(
             items = Seq(
                 ActionItem(
-                    href = s"${CentralisedRoutes.apply.amls.AmlsRegistrationNumberController.show}",
+                    href = s"${AppRoutes.apply.amls.AmlsRegistrationNumberController.show}",
                     content = Text(messages(s"$key.change")),
                     visuallyHiddenText = Some(messages(s"$key.registrationNumber.label"))
                 )
@@ -104,7 +104,7 @@
         actions = Some(Actions(
             items = Seq(
                 ActionItem(
-                    href = s"${CentralisedRoutes.apply.amls.AmlsExpiryDateController.show}",
+                    href = s"${AppRoutes.apply.amls.AmlsExpiryDateController.show}",
                     content = Text(messages(s"$key.change")),
                     visuallyHiddenText = Some(messages(s"$key.expiryDate.label"))
                 )
@@ -124,7 +124,7 @@
         actions = Some(Actions(
             items = Seq(
                 ActionItem(
-                    href = s"${CentralisedRoutes.apply.amls.AmlsEvidenceUploadController.show}",
+                    href = s"${AppRoutes.apply.amls.AmlsEvidenceUploadController.show}",
                     content = Text(messages(s"$key.change")),
                     visuallyHiddenText = Some(messages(s"$key.evidence.label"))
                 )
@@ -142,7 +142,7 @@
     @govukSummaryList(SummaryList(rows))
     <p class="govuk-body">
       @govukButton(Button(
-          href = Some(CentralisedRoutes.apply.TaskListController.show.url),
+          href = Some(AppRoutes.apply.TaskListController.show.url),
           content = Text(messages("common.confirmAndContinue"))
       ))
     </p>

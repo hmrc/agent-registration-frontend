@@ -46,7 +46,7 @@
         s"$key.p1",
         request.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
     )</p>
-    @formWithCSRF(action = CentralisedRoutes.apply.applicantcontactdetails.MemberNameController.submit) {
+    @formWithCSRF(action = AppRoutes.apply.applicantcontactdetails.MemberNameController.submit) {
         @govukInput(Input(
             label = Label(
               content = Text(messages(s"$key.firstName.label")),

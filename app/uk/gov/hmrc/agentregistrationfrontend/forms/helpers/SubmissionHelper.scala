@@ -20,7 +20,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
-import uk.gov.hmrc.agentregistrationfrontend.controllers.CentralisedRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction
 
 object SubmissionHelper:
@@ -36,5 +36,5 @@ object SubmissionHelper:
     originalResult: Result
   ): Result =
     if getSubmitAction(request).isSaveAndComeBackLater
-    then Redirect(CentralisedRoutes.apply.SaveForLaterController.show)
+    then Redirect(AppRoutes.apply.SaveForLaterController.show)
     else originalResult

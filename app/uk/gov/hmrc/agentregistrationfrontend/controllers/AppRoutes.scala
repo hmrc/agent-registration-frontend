@@ -24,11 +24,11 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes a
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.routes as providedetailsRoutes
 
-/** Centralised routing for convenience. It helps avoid naming conflicts and makes route management easier.
+/** All application routes centralised in one place for convenience and clarity. It helps avoid naming conflicts and makes route management easier.
   *
   * Please add new controllers here.
   */
-object CentralisedRoutes:
+object AppRoutes:
 
   object apply:
 

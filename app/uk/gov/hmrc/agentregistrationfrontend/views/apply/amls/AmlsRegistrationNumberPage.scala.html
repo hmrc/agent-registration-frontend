@@ -47,7 +47,7 @@
 ) {
 
     <h2 class="govuk-caption-l">@messages("amlsDetails.title")</h2>
-    @formWithCSRF(action = CentralisedRoutes.apply.amls.AmlsRegistrationNumberController.submit) {
+    @formWithCSRF(action = AppRoutes.apply.amls.AmlsRegistrationNumberController.submit) {
         @govukInput(Input(
             label = Label(
                 content = Text(pageTitle),

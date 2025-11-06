@@ -40,7 +40,7 @@
     maybeForm = Some(form)
 ) {
     <h2 class="govuk-caption-l">@messages("applicant-contact-details.title")</h2>
-    @formWithCSRF(action = CentralisedRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.submit) {
+    @formWithCSRF(action = AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.submit) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(

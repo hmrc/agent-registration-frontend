@@ -54,7 +54,7 @@ extends AnyWordSpecLike,
   lazy val frozenInstant: Instant = tdAll.nowAsInstant
   lazy given clock: Clock = tdAll.clock
 
-  val CentralisedRoutes = uk.gov.hmrc.agentregistrationfrontend.controllers.CentralisedRoutes
+  val CentralisedRoutes = uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 
   protected def configMap: Map[String, Any] =
     Map[String, Any](

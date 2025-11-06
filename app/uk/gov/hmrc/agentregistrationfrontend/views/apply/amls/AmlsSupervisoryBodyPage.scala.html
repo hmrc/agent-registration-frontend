@@ -49,7 +49,7 @@
 ) {
 
     <h2 class="govuk-caption-l">@messages("amlsDetails.title")</h2>
-    @formWithCSRF(action = CentralisedRoutes.apply.amls.AmlsSupervisorController.submit) {
+    @formWithCSRF(action = AppRoutes.apply.amls.AmlsSupervisorController.submit) {
 
         @govukSelect(Select(
             id = key,

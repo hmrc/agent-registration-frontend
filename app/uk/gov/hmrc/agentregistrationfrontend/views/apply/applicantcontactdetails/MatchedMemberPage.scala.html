@@ -63,7 +63,7 @@
             s"${officer.name}${makeDateOfBirth(officer.dateOfBirth)}"
         )
     ))
-    @formWithCSRF(action = CentralisedRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.submit) {
+    @formWithCSRF(action = AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.submit) {
       <input
           type="hidden"
           name="@ChOfficerSelectionFormType.key"

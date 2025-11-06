@@ -101,8 +101,8 @@
         <div id="upload-handling">
             <span
             id="file-upload-progress"
-            data-url-to-poll="@{CentralisedRoutes.apply.amls.AmlsEvidenceUploadController.pollResultWithJavaScript.url}"
-            data-success="@{appConfig.upscanRedirectBase}@{CentralisedRoutes.apply.amls.AmlsEvidenceUploadController.showResult.url}"
+            data-url-to-poll="@{AppRoutes.apply.amls.AmlsEvidenceUploadController.pollResultWithJavaScript.url}"
+            data-success="@{appConfig.upscanRedirectBase}@{AppRoutes.apply.amls.AmlsEvidenceUploadController.showResult.url}"
             data-max-polls="@{appConfig.fileUploadMaxPolls}"
             data-milliseconds-before-poll="@{appConfig.millisecondsBeforePoll}"
             data-max-file-size="@{appConfig.maxFileSize}"

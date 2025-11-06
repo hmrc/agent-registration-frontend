@@ -47,7 +47,7 @@
 ) {
 
     <h2 class="govuk-caption-l">@messages("amlsDetails.title")</h2>
-    @formWithCSRF(action = CentralisedRoutes.apply.amls.AmlsExpiryDateController.submit) {
+    @formWithCSRF(action = AppRoutes.apply.amls.AmlsExpiryDateController.submit) {
         @govukDateInput(DateInput(
             id = key,
             hint = Some(Hint(content = Text(messages(s"$key.hint")))),
