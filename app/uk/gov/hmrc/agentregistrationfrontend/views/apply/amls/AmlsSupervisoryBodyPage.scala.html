@@ -16,7 +16,6 @@
 
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichSelect
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.routes
 @import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 @import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
 @import uk.gov.hmrc.agentregistration.shared.AmlsCode
@@ -50,7 +49,7 @@
 ) {
 
     <h2 class="govuk-caption-l">@messages("amlsDetails.title")</h2>
-    @formWithCSRF(action = routes.AmlsSupervisorController.submit) {
+    @formWithCSRF(action = CentralisedRoutes.apply.amls.AmlsSupervisorController.submit) {
 
         @govukSelect(Select(
             id = key,

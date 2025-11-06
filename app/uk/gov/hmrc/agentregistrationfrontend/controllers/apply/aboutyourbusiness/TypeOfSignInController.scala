@@ -26,7 +26,6 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes as internalRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.TypeOfSignInForm
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn.*
@@ -72,7 +71,9 @@ extends FrontendController(mcc, actions):
           val businessType: BusinessType = request.getBusinessType
           val typeOfSignIn: TypeOfSignIn = request.getTypeOfSignIn
 
-          val signInLink: Uri = internalRoutes
+          val signInLink: Uri = CentralisedRoutes
+            .apply
+            .internal
             .InitiateAgentApplicationController
             .initiateAgentApplication(
               agentType = agentType,

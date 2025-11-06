@@ -21,7 +21,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.routes as aboutyourbusinessRoutes
+
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import javax.inject.Inject
@@ -63,7 +63,7 @@ extends FrontendController(mcc, actions):
   def startRegistration: Action[AnyContent] = action:
     implicit request =>
       // if we use an endpoint like this, we can later change the flow without changing the URL
-      Redirect(aboutyourbusinessRoutes.AgentTypeController.show)
+      Redirect(CentralisedRoutes.apply.aboutyourbusiness.AgentTypeController.show)
 
   def genericExitPage: Action[AnyContent] = action:
     implicit request =>

@@ -17,7 +17,6 @@
 @import play.twirl.api.Html
 @import uk.gov.hmrc.agentregistration.shared.AmlsName
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.routes
 @import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UpscanInitiateResponse
 @import uk.gov.hmrc.agentregistrationfrontend.views.html._
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
@@ -102,8 +101,8 @@
         <div id="upload-handling">
             <span
             id="file-upload-progress"
-            data-url-to-poll="@{routes.AmlsEvidenceUploadController.pollResultWithJavaScript.url}"
-            data-success="@{appConfig.upscanRedirectBase}@{routes.AmlsEvidenceUploadController.showResult.url}"
+            data-url-to-poll="@{CentralisedRoutes.apply.amls.AmlsEvidenceUploadController.pollResultWithJavaScript.url}"
+            data-success="@{appConfig.upscanRedirectBase}@{CentralisedRoutes.apply.amls.AmlsEvidenceUploadController.showResult.url}"
             data-max-polls="@{appConfig.fileUploadMaxPolls}"
             data-milliseconds-before-poll="@{appConfig.millisecondsBeforePoll}"
             data-max-file-size="@{appConfig.maxFileSize}"

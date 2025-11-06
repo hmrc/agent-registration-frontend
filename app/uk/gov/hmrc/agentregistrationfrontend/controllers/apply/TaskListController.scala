@@ -41,7 +41,7 @@ extends FrontendController(mcc, actions):
         _.agentApplication.isGrsDataReceived,
         implicit request =>
           logger.warn("Missing data from GRS, redirecting to start GRS registration")
-          Redirect(routes.AgentApplicationController.startRegistration)
+          Redirect(CentralisedRoutes.apply.AgentApplicationController.startRegistration)
       ):
         implicit request =>
           Ok(taskListPage())

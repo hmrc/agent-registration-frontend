@@ -21,7 +21,7 @@ import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.AgentTypePage
@@ -53,5 +53,5 @@ extends FrontendController(mcc, actions):
           val call: Call =
             agentType match
               case AgentType.UkTaxAgent => routes.BusinessTypeSessionController.show
-              case AgentType.NonUkTaxAgent => applyRoutes.AgentApplicationController.genericExitPage
+              case AgentType.NonUkTaxAgent => CentralisedRoutes.apply.AgentApplicationController.genericExitPage
           Redirect(call.url).addToSession(agentType)

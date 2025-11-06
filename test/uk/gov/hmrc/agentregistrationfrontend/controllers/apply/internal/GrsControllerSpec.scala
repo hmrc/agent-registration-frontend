@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal
 
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
+
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -84,7 +84,7 @@ extends ControllerSpec:
 
       val response: WSResponse = get(journeyCallbackPath)
       response.status shouldBe Status.SEE_OTHER
-      response.header("Location").value shouldBe applyRoutes.TaskListController.show.url
+      response.header("Location").value shouldBe CentralisedRoutes.apply.TaskListController.show.url
       AuthStubs.verifyAuthorise()
       AgentRegistrationStubs.verifyGetAgentApplication()
       GrsStubs.verifyGetJourneyData(t.businessType, journeyId)
@@ -96,7 +96,7 @@ extends ControllerSpec:
 
     val response: WSResponse = get(startJourneyPath)
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe applyRoutes.TaskListController.show.url
+    response.header("Location").value shouldBe CentralisedRoutes.apply.TaskListController.show.url
 
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
@@ -107,7 +107,7 @@ extends ControllerSpec:
 
     val response: WSResponse = get(startJourneyPath)
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe applyRoutes.TaskListController.show.url
+    response.header("Location").value shouldBe CentralisedRoutes.apply.TaskListController.show.url
 
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()

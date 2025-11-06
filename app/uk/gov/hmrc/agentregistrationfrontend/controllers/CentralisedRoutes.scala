@@ -63,7 +63,7 @@ object CentralisedRoutes:
 
     object internal:
 
-      val InitiateAgentApplicationControllerx = internalRoutes.InitiateAgentApplicationController
+      val InitiateAgentApplicationController = internalRoutes.InitiateAgentApplicationController
       val GrsController = internalRoutes.GrsController
 
   object providedetails:

@@ -35,6 +35,8 @@ extends uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController(mcc),
   export actions.*
   export Errors.*
 
+  val CentralisedRoutes = uk.gov.hmrc.agentregistrationfrontend.controllers.CentralisedRoutes
+
   extension [T](form: Form[T])
     def fill(data: Option[T]): Form[T] = data.fold(form)(form.fill)
 

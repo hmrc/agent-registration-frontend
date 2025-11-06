@@ -36,6 +36,8 @@ lazy val microservice = Project("agent-registration-frontend", file("."))
   .settings(PlayKeys.playDefaultPort := playPort)
   .settings(
     TwirlKeys.templateImports ++= Seq(
+      "uk.gov.hmrc.agentregistrationfrontend.controllers.CentralisedRoutes",
+      "uk.gov.hmrc.govukfrontend.views.html.components._",
       "uk.gov.hmrc.govukfrontend.views.html.components._",
       "uk.gov.hmrc.hmrcfrontend.views.html.components._"
     )

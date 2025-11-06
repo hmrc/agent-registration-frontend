@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.GrsController.*
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
+
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
@@ -57,7 +57,7 @@ extends FrontendController(mcc, actions):
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Data from GRS already exists. Redirecting to task list page.")
-          Redirect(applyRoutes.TaskListController.show)
+          Redirect(CentralisedRoutes.apply.TaskListController.show)
     )
 
   def startJourney(): Action[AnyContent] = baseAction
@@ -142,7 +142,7 @@ extends FrontendController(mcc, actions):
     agentRegistrationService
       .upsert(updatedApplication)
       .map: _ =>
-        Redirect(applyRoutes.TaskListController.show.url)
+        Redirect(CentralisedRoutes.apply.TaskListController.show.url)
 
 object GrsController:
 

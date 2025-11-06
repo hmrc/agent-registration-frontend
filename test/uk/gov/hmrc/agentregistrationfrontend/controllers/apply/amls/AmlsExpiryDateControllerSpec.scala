@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -156,7 +156,7 @@ extends ControllerSpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe applyRoutes.SaveForLaterController.show.url
+    response.header("Location").value shouldBe CentralisedRoutes.apply.SaveForLaterController.show.url
 
   s"POST $path as blank form should return 400" in:
     AuthStubs.stubAuthorise()
@@ -185,7 +185,7 @@ extends ControllerSpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe applyRoutes.SaveForLaterController.show.url
+    response.header("Location").value shouldBe CentralisedRoutes.apply.SaveForLaterController.show.url
 
   s"POST $path with an invalid value should return 400" in:
     AuthStubs.stubAuthorise()
@@ -214,4 +214,4 @@ extends ControllerSpec:
 
     response.status shouldBe 303
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe applyRoutes.SaveForLaterController.show.url
+    response.header("Location").value shouldBe CentralisedRoutes.apply.SaveForLaterController.show.url

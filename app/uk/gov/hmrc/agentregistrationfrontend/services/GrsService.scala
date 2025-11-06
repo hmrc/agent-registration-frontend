@@ -20,7 +20,6 @@ import play.api.i18n.Lang
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes as internalRoutes
 import uk.gov.hmrc.agentregistrationfrontend.config.GrsConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.GrsConnector
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
@@ -29,6 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyLabels
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyStartUrl
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.TranslationLabels
+import uk.gov.hmrc.agentregistrationfrontend.controllers.CentralisedRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
 
 import javax.inject.Inject
@@ -65,7 +65,7 @@ class GrsService @Inject() (
     val welshFullNamePageLabel: Option[String] = if includeNamePageLabel then messagesApi.translate("grs.optFullNamePageLabel", Nil)(Lang("cy")) else None
 
     JourneyConfig(
-      continueUrl = internalRoutes.GrsController.journeyCallback(None).url,
+      continueUrl = CentralisedRoutes.apply.internal.GrsController.journeyCallback(None).url,
       deskProServiceId = grsConfig.deskProServiceId,
       signOutUrl = routes.SignOutController.signOut.url,
       accessibilityUrl = grsConfig.accessibilityUrl,

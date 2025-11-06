@@ -24,7 +24,6 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
 
 class AmlsRegistrationNumberControllerSpec
 extends ControllerSpec:
@@ -134,7 +133,7 @@ extends ControllerSpec:
 
       response.status shouldBe Status.SEE_OTHER
       response.body[String] shouldBe ""
-      response.header("Location").value shouldBe applyRoutes.SaveForLaterController.show.url
+      response.header("Location").value shouldBe CentralisedRoutes.apply.SaveForLaterController.show.url
 
     s"POST $path as blank form for ${testCase.amlsType} should return 400" in:
       AuthStubs.stubAuthorise()
@@ -161,7 +160,7 @@ extends ControllerSpec:
 
       response.status shouldBe Status.SEE_OTHER
       response.body[String] shouldBe ""
-      response.header("Location").value shouldBe applyRoutes.SaveForLaterController.show.url
+      response.header("Location").value shouldBe CentralisedRoutes.apply.SaveForLaterController.show.url
 
     s"POST $path with an invalid value for ${testCase.amlsType} should return 400" in:
       AuthStubs.stubAuthorise()
@@ -188,7 +187,7 @@ extends ControllerSpec:
 
       response.status shouldBe Status.SEE_OTHER
       response.body[String] shouldBe ""
-      response.header("Location").value shouldBe applyRoutes.SaveForLaterController.show.url
+      response.header("Location").value shouldBe CentralisedRoutes.apply.SaveForLaterController.show.url
 
   s"GET $path when registration number already stored should return 200 and render page with previous answer filled in" in:
     AuthStubs.stubAuthorise()

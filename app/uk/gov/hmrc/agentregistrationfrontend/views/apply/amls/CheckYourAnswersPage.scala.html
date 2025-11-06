@@ -16,8 +16,6 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.routes
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
 @import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
@@ -62,7 +60,7 @@
         actions = Some(Actions(
             items = Seq(
                 ActionItem(
-                    href = s"${routes.AmlsSupervisorController.show}",
+                    href = s"${CentralisedRoutes.apply.amls.AmlsSupervisorController.show}",
                     content = Text(messages(s"$key.change")),
                     visuallyHiddenText = Some(messages(s"$key.supervisoryBody.label"))
                 )
@@ -86,7 +84,7 @@
         actions = Some(Actions(
             items = Seq(
                 ActionItem(
-                    href = s"${routes.AmlsRegistrationNumberController.show}",
+                    href = s"${CentralisedRoutes.apply.amls.AmlsRegistrationNumberController.show}",
                     content = Text(messages(s"$key.change")),
                     visuallyHiddenText = Some(messages(s"$key.registrationNumber.label"))
                 )
@@ -106,7 +104,7 @@
         actions = Some(Actions(
             items = Seq(
                 ActionItem(
-                    href = s"${routes.AmlsExpiryDateController.show}",
+                    href = s"${CentralisedRoutes.apply.amls.AmlsExpiryDateController.show}",
                     content = Text(messages(s"$key.change")),
                     visuallyHiddenText = Some(messages(s"$key.expiryDate.label"))
                 )
@@ -126,7 +124,7 @@
         actions = Some(Actions(
             items = Seq(
                 ActionItem(
-                    href = s"${routes.AmlsEvidenceUploadController.show}",
+                    href = s"${CentralisedRoutes.apply.amls.AmlsEvidenceUploadController.show}",
                     content = Text(messages(s"$key.change")),
                     visuallyHiddenText = Some(messages(s"$key.evidence.label"))
                 )
@@ -144,7 +142,7 @@
     @govukSummaryList(SummaryList(rows))
     <p class="govuk-body">
       @govukButton(Button(
-          href = Some(applyRoutes.TaskListController.show.url),
+          href = Some(CentralisedRoutes.apply.TaskListController.show.url),
           content = Text(messages("common.confirmAndContinue"))
       ))
     </p>

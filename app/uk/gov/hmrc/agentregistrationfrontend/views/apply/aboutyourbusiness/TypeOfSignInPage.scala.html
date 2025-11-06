@@ -18,7 +18,6 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.forms.TypeOfSignInForm
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.routes
 
 @this(
         layout: Layout,
@@ -47,7 +46,7 @@
 ) {
 
     <h2 class="govuk-caption-l">@messages("about-your-business.title")</h2>
-    @formWithCSRF(action = routes.TypeOfSignInController.submit) {
+    @formWithCSRF(action = CentralisedRoutes.apply.aboutyourbusiness.TypeOfSignInController.submit) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(

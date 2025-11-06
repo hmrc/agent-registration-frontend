@@ -15,8 +15,6 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.routes
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 @import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
@@ -55,7 +53,7 @@
         actions = Some(Actions(
             items = Seq(
                 ActionItem(
-                    href = s"${routes.ApplicantRoleInLlpController.show}",
+                    href = s"${CentralisedRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show}",
                     content = Text(messages(s"$key.change")),
                     visuallyHiddenText = Some(messages(s"$key.llpMember.label"))
                 )
@@ -65,8 +63,8 @@
 }
 @nameChangeRoute = @{
     contactDetails.applicantName.role match {
-        case ApplicantRoleInLlp.Member => routes.MemberNameController.show
-        case ApplicantRoleInLlp.Authorised => routes.AuthorisedNameController.show
+        case ApplicantRoleInLlp.Member => CentralisedRoutes.apply.applicantcontactdetails.MemberNameController.show
+        case ApplicantRoleInLlp.Authorised => CentralisedRoutes.apply.applicantcontactdetails.AuthorisedNameController.show
     }}
 @nameRow = @{
     SummaryListRow(
@@ -101,7 +99,7 @@
         actions = Some(Actions(
             items = Seq(
                 ActionItem(
-                    href = s"${routes.TelephoneNumberController.show}",
+                    href = s"${CentralisedRoutes.apply.applicantcontactdetails.TelephoneNumberController.show}",
                     content = Text(messages(s"$key.change")),
                     visuallyHiddenText = Some(messages(s"$key.telephone.label"))
                 )
@@ -121,7 +119,7 @@
         actions = Some(Actions(
             items = Seq(
                 ActionItem(
-                    href = s"${routes.EmailAddressController.show}",
+                    href = s"${CentralisedRoutes.apply.applicantcontactdetails.EmailAddressController.show}",
                     content = Text(messages(s"$key.change")),
                     visuallyHiddenText = Some(messages(s"$key.email.label"))
                 )
@@ -138,7 +136,7 @@
     @govukSummaryList(SummaryList(rows))
     <p class="govuk-body">
       @govukButton(Button(
-          href = Some(applyRoutes.TaskListController.show.url),
+          href = Some(CentralisedRoutes.apply.TaskListController.show.url),
           content = Text(messages("common.confirmAndContinue"))
       ))
     </p>

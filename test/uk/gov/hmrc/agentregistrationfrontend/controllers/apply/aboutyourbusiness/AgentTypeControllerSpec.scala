@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusines
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
@@ -56,7 +56,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe applyRoutes.AgentApplicationController.genericExitPage.url
+    response.header("Location").value shouldBe CentralisedRoutes.apply.AgentApplicationController.genericExitPage.url
 
   s"POST $path without valid selection should return 400" in:
     val response: WSResponse = post(path)(Map(AgentTypeForm.key -> Seq("")))

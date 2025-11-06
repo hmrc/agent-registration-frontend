@@ -15,7 +15,6 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.routes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 
@@ -50,19 +49,19 @@
         @status match {
             case s : UploadStatus.UploadedSuccessfully => {
                 @govukButton(Button(
-                  href = Some(routes.CheckYourAnswersController.show.url),
+                  href = Some(CentralisedRoutes.apply.amls.CheckYourAnswersController.show.url),
                   content = Text(messages("common.continue"))
                 ))
             }
             case UploadStatus.InProgress => {
                 @govukButton(Button(
-                    href = Some(routes.AmlsEvidenceUploadController.showResult.url),
+                    href = Some(CentralisedRoutes.apply.amls.AmlsEvidenceUploadController.showResult.url),
                     content = Text(messages("common.continue"))
                 ))
             }
           case _ => {
               @govukButton(Button(
-                  href = Some(routes.AmlsEvidenceUploadController.show.url),
+                  href = Some(CentralisedRoutes.apply.amls.AmlsEvidenceUploadController.show.url),
                   content = Text(messages("common.tryAgain"))
               ))
           }

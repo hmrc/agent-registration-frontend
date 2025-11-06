@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontact
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -104,7 +104,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe applyRoutes.SaveForLaterController.show.url
+    response.header("Location").value shouldBe CentralisedRoutes.apply.SaveForLaterController.show.url
 
   s"POST $path with save for later and invalid selection should not return errors and redirect to save for later page" in:
     AuthStubs.stubAuthorise()
@@ -117,4 +117,4 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe applyRoutes.SaveForLaterController.show.url
+    response.header("Location").value shouldBe CentralisedRoutes.apply.SaveForLaterController.show.url
