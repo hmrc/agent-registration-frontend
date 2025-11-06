@@ -20,6 +20,7 @@ import play.api.libs.json.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Finished
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import java.time.Instant
 
@@ -34,7 +35,7 @@ final case class MemberProvidedDetails(
 ):
 
   val memberProvidedDetailsId: MemberProvidedDetailsId = _id
-  val hasFinished: Boolean = if providedDetailsState == Finished then true else false
+  val hasFinished: Boolean = if providedDetailsState === Finished then true else false
   val isInProgress: Boolean = !hasFinished
 
 object MemberProvidedDetails:
