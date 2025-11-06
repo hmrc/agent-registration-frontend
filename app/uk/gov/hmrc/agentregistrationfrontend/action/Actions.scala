@@ -59,7 +59,7 @@ extends RequestAwareLogging:
       resultWhenConditionNotMet =
         implicit request =>
           // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-          val call = appRoutes.AgentApplicationController.applicationSubmitted
+          val call = AppRoutes.apply.AgentApplicationController.applicationSubmitted
           logger.warn(
             s"The application is not in the final state" +
               s" (current application state: ${request.agentApplication.applicationState.toString}), " +
@@ -75,7 +75,7 @@ extends RequestAwareLogging:
       resultWhenConditionNotMet =
         implicit request =>
           // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-          val call = appRoutes.AgentApplicationController.landing // or task list
+          val call = AppRoutes.apply.AgentApplicationController.landing // or task list
           logger.warn(
             s"The application is not in the final state" +
               s" (current application state: ${request.agentApplication.applicationState.toString}), " +
@@ -119,7 +119,7 @@ extends RequestAwareLogging:
       */
     def redirectIfSaveForLater: Action[AnyContent] = a.mapResult(request =>
       originalResult =>
-        if SubmissionHelper.getSubmitAction(request).isSaveAndComeBackLater then Redirect(appRoutes.SaveForLaterController.show) else originalResult
+        if SubmissionHelper.getSubmitAction(request).isSaveAndComeBackLater then Redirect(AppRoutes.apply.SaveForLaterController.show) else originalResult
     )
 
   val authorisedIndividual: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
@@ -132,7 +132,7 @@ extends RequestAwareLogging:
       resultWhenConditionNotMet =
         implicit request =>
           // TODO: TBC - where to redirect
-          val call = appRoutes.AgentApplicationController.genericExitPage
+          val call = AppRoutes.apply.AgentApplicationController.genericExitPage
           logger.warn(
             s"The provided details are in the final state" +
               s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +
@@ -148,7 +148,7 @@ extends RequestAwareLogging:
       resultWhenConditionNotMet =
         implicit request =>
           // TODO: TBC - where to redirect
-          val call = appRoutes.AgentApplicationController.genericExitPage
+          val call = AppRoutes.apply.AgentApplicationController.genericExitPage
           logger.warn(
             s"The provided details are in the final state" +
               s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +

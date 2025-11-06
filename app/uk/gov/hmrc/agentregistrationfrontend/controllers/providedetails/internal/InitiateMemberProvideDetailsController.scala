@@ -23,7 +23,6 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.routes
 import uk.gov.hmrc.agentregistrationfrontend.services.providedetails.llp.MemberProvideDetailsFactory
 import uk.gov.hmrc.agentregistrationfrontend.services.providedetails.llp.MemberProvideDetailsService
@@ -70,6 +69,6 @@ extends FrontendController(mcc, actions):
                 case None =>
                   logger.info(s"Application does not exist for provided linkId: $linkId")
                   // TODO - TBC - confirm next page
-                  Future.successful(Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url))
+                  Future.successful(Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url))
 
           }
