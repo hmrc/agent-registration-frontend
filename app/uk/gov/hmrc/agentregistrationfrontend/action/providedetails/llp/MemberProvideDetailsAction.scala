@@ -27,7 +27,6 @@ import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.MergeFormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.services.providedetails.llp.MemberProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
@@ -73,42 +72,30 @@ object MemberProvideDetailsRequest:
 
 @Singleton
 class ProvideDetailsAction @Inject() (
-  provideDetailsService: MemberProvideDetailsService,
-  agentRegistrationService: AgentRegistrationService
+  memberProvideDetailsService: MemberProvideDetailsService
 )(using ec: ExecutionContext)
-extends RequestAwareLogging:
+extends ActionRefiner[IndividualAuthorisedRequest, MemberProvideDetailsRequest]
+with RequestAwareLogging:
 
-  def apply(linkId: LinkId): ActionRefiner[IndividualAuthorisedRequest, MemberProvideDetailsRequest] =
-    new ActionRefiner[IndividualAuthorisedRequest, MemberProvideDetailsRequest]:
-      override protected def executionContext: ExecutionContext = ec
+  override protected def executionContext: ExecutionContext = ec
 
-      override protected def refine[A](request: IndividualAuthorisedRequest[A]): Future[Either[Result, MemberProvideDetailsRequest[A]]] =
-        given r: IndividualAuthorisedRequest[A] = request
+  override protected def refine[A](request: IndividualAuthorisedRequest[A]): Future[Either[Result, MemberProvideDetailsRequest[A]]] =
+    given r: IndividualAuthorisedRequest[A] = request
 
-        agentRegistrationService.findApplicationByLinkId(linkId).flatMap {
-          case Some(app) if app.hasFinished =>
-            provideDetailsService
-              .find()
-              .flatMap {
-                case Some(providedDetails) =>
-                  logger.info(s"Request cannot be served by this microservice as details for member ${providedDetails.internalUserId} and application id ${providedDetails.applicationId} are already provided")
-                  Future.successful(Left(Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)))
-                case None => createNewProvideDetails(app.agentApplicationId)
-              }
-          case _ => Future.successful(Left(Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)))
-        }
+    memberProvideDetailsService
+      .find()
+      .flatMap {
+        case Some(memberProvidedDetails) =>
+          Future.successful(Right(new MemberProvideDetailsRequest(
+            memberProvidedDetails = memberProvidedDetails,
+            internalUserId = request.internalUserId,
+            request = request.request,
+            credentials = request.credentials
+          )))
+        case None =>
+          // TODO WG - were if we do not know linkId ?? only error page
+          val redirect = applicationRoutes.AgentApplicationController.genericExitPage
+          logger.error(s"[Unexpected State] No member provide details found for authenticated user ${request.internalUserId.value}. Redirecting to startRegistration page ($redirect)")
+          Future.successful(Left(Redirect(redirect)))
 
-  private def createNewProvideDetails[A](agentApplicationId: AgentApplicationId)(using
-    request: IndividualAuthorisedRequest[A]
-  ): Future[Either[Result, MemberProvideDetailsRequest[A]]] = provideDetailsService
-    .createNewMemberProvidedDetails(agentApplicationId)
-    .map(memberProvidedDetails =>
-      Right(MemberProvideDetailsRequest[A](
-        memberProvidedDetails = memberProvidedDetails,
-        internalUserId = request.internalUserId,
-        request = request.request,
-        credentials = request.credentials
-      ))
-    )
-
-  protected def executionContext: ExecutionContext = ec
+      }

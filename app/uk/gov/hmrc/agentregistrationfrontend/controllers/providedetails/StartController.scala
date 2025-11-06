@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.RequestHeader
@@ -26,12 +25,12 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.LlpStartPage
+import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.routes as internalRoutes
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -46,9 +45,6 @@ class StartController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private def baseAction(linkId: LinkId): ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions
-    .getProvideDetailsRequest(linkId)
-
   def start(linkId: LinkId): Action[AnyContent] = Action
     .async:
       implicit request: RequestHeader =>
@@ -59,13 +55,15 @@ extends FrontendController(mcc, actions):
 
   // TODO: this method requires an auth action to ensure user is signed in correctly and has
   //  the application from the linkId provided within the request going forward
-  def resolve(linkId: LinkId): Action[AnyContent] = baseAction(linkId)
+  def resolve(linkId: LinkId): Action[AnyContent] = actions.authorisedIndividual
     .async:
       implicit request =>
-        applicationService.findApplicationByLinkId(linkId).map {
-          case Some(app) if app.hasFinished => Redirect(routes.LlpMemberNameController.show)
-          case _ => Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
-        }
+        applicationService.findApplicationByLinkId(linkId)
+          .map:
+            case Some(app) if app.hasFinished =>
+              Redirect(internalRoutes
+                .InitiateMemberProvideDetailsController.initiateMemberProvideDetails(linkId = linkId))
+            case _ => Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
 
   // for now this returns only the llp start page template until we build the rest
   private def startPageForApplicationType(agentApplication: AgentApplication)(implicit request: RequestHeader): Result =

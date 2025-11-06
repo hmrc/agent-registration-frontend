@@ -20,6 +20,7 @@ import com.google.inject.Inject
 import com.google.inject.Singleton
 import play.api.mvc.*
 import play.api.mvc.Results.*
+import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.MergeFormValue
@@ -64,58 +65,56 @@ class IndividualAuthorisedAction @Inject() (
   appConfig: AppConfig,
   cc: MessagesControllerComponents
 )
-extends RequestAwareLogging:
+extends ActionRefiner[Request, IndividualAuthorisedRequest]
+with RequestAwareLogging:
 
-  def apply(linkId: LinkId): ActionRefiner[Request, IndividualAuthorisedRequest] =
-    new ActionRefiner[Request, IndividualAuthorisedRequest]:
+  override protected def executionContext: ExecutionContext = cc.executionContext
 
-      override protected def executionContext: ExecutionContext = cc.executionContext
+  override protected def refine[A](request: Request[A]): Future[Either[Result, IndividualAuthorisedRequest[A]]] =
+    given r: Request[A] = request
 
-      override protected def refine[A](request: Request[A]): Future[Either[Result, IndividualAuthorisedRequest[A]]] =
-        given r: Request[A] = request
-
-        af.authorised(
-          AuthProviders(GovernmentGateway)
-            and AffinityGroup.Individual
-        ).retrieve(
-          Retrievals.allEnrolments
-            and Retrievals.internalId
-            and Retrievals.credentials
-        ).apply:
-          case allEnrolments ~ maybeInternalId ~ credentials =>
-            Future.successful(Right(new IndividualAuthorisedRequest(
-              internalUserId = maybeInternalId
-                .map(InternalUserId.apply)
-                .getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing")),
-              request = request,
-              credentials = credentials.getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing"))
-            )))
-        .recoverWith:
-          case _: NoActiveSession =>
-            logger.info(s"Unauthorised because of 'NoActiveSession', redirecting to sign in page")
-            Future.successful(Left(Redirect(
-              url = appConfig.applicationLink(linkId.value).toString
-            )))
-          case e: UnsupportedAuthProvider =>
-            logger.info(s"Unauthorised because of '${e.reason}', ${e.toString}")
-            Future.successful(Left(
-              errorResults.unauthorised(
-                message = e.reason
-              )
-            ))
-          case e: UnsupportedAffinityGroup =>
-            logger.info(s"Unauthorised because of '${e.reason}', ${e.toString}")
-            Future.successful(Left(
-              errorResults.unauthorised(
-                message = e.reason
-              )
-            ))
-          case e: AuthorisationException =>
-            logger.info(s"Unauthorised because of '${e.reason}', ${e.toString}")
-            Future.successful(Left(
-              errorResults.unauthorised(
-                message = e.toString
-              )
-            ))
+    af.authorised(
+      AuthProviders(GovernmentGateway)
+        and AffinityGroup.Individual
+    ).retrieve(
+      Retrievals.allEnrolments
+        and Retrievals.internalId
+        and Retrievals.credentials
+    ).apply:
+      case allEnrolments ~ maybeInternalId ~ credentials =>
+        Future.successful(Right(new IndividualAuthorisedRequest(
+          internalUserId = maybeInternalId
+            .map(InternalUserId.apply)
+            .getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing")),
+          request = request,
+          credentials = credentials.getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing"))
+        )))
+    .recoverWith:
+      case _: NoActiveSession =>
+        logger.info(s"Unauthorised because of 'NoActiveSession', redirecting to sign in page")
+        Future.successful(Left(Redirect(
+          url = appConfig.signInUri(uri"""${appConfig.thisFrontendBaseUrl + request.uri}""").toString()
+        )))
+      case e: UnsupportedAuthProvider =>
+        logger.info(s"Unauthorised because of '${e.reason}', ${e.toString}")
+        Future.successful(Left(
+          errorResults.unauthorised(
+            message = e.reason
+          )
+        ))
+      case e: UnsupportedAffinityGroup =>
+        logger.info(s"Unauthorised because of '${e.reason}', ${e.toString}")
+        Future.successful(Left(
+          errorResults.unauthorised(
+            message = e.reason
+          )
+        ))
+      case e: AuthorisationException =>
+        logger.info(s"Unauthorised because of '${e.reason}', ${e.toString}")
+        Future.successful(Left(
+          errorResults.unauthorised(
+            message = e.toString
+          )
+        ))
 
   private given ExecutionContext = cc.executionContext

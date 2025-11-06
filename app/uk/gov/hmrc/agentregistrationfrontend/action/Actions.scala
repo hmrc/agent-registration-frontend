@@ -22,7 +22,6 @@ import play.api.mvc.*
 import play.api.mvc.Results.BadRequest
 import play.api.mvc.Results.Redirect
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedAction
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.ProvideDetailsAction
@@ -123,8 +122,8 @@ extends RequestAwareLogging:
         if SubmissionHelper.getSubmitAction(request).isSaveAndComeBackLater then Redirect(appRoutes.SaveForLaterController.show) else originalResult
     )
 
-  def authorisedIndividual(linkId: LinkId): ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
-    .andThen(individualAuthorisedAction(linkId))
+  val authorisedIndividual: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
+    .andThen(individualAuthorisedAction)
 
-  def getProvideDetailsRequest(linkId: LinkId): ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorisedIndividual(linkId)
-    .andThen(provideDetailsAction(linkId))
+  val getProvideDetailsRequest: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorisedIndividual
+    .andThen(provideDetailsAction)
