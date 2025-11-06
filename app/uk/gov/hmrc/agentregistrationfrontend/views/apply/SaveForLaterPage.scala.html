@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
+@import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
 
 
 @this(
@@ -51,7 +52,7 @@
     </ol>
     <p class="govuk-body">
         <a class="govuk-link" href="@{
-            routes.TaskListController.show.url
+            applyRoutes.TaskListController.show.url
         }">@messages(s"$key.continueLink")</a>
     </p>
     <p class="govuk-body">

@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.apply.amls
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.data.Form
-import uk.gov.hmrc.agentregistrationfrontend.controllers.amls.routes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.routes as amlsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -64,8 +64,8 @@ extends ViewSpec:
 
     "render a form that posts to the correct action" in:
       val form = doc.mainContent.selectOrFail("form")
-      form.attr("action").shouldBe(routes.AmlsExpiryDateController.submit.url)
-      form.attr("method").shouldBe(routes.AmlsExpiryDateController.submit.method)
+      form.attr("action").shouldBe(amlsRoutes.AmlsExpiryDateController.submit.url)
+      form.attr("method").shouldBe(amlsRoutes.AmlsExpiryDateController.submit.method)
 
     "contain inputs for a date field within the form" in:
       val form = doc.mainContent.selectOrFail("form")

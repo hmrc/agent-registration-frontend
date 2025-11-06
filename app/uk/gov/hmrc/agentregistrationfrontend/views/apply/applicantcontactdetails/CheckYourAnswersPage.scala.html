@@ -15,8 +15,8 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
+@import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.routes
+@import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 @import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
@@ -138,7 +138,7 @@
     @govukSummaryList(SummaryList(rows))
     <p class="govuk-body">
       @govukButton(Button(
-          href = Some(applicationRoutes.TaskListController.show.url),
+          href = Some(applyRoutes.TaskListController.show.url),
           content = Text(messages("common.confirmAndContinue"))
       ))
     </p>

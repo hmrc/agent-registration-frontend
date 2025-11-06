@@ -24,6 +24,7 @@ import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.views.html.TimedOutPage
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -42,7 +43,7 @@ extends FrontendController(mcc, actions):
     Redirect(signOutAndRedirectUrl)
 
   def signOut: Action[AnyContent] = action:
-    val continueUrl = uri"${appConfig.thisFrontendBaseUrl + routes.AgentApplicationController.landing.url}"
+    val continueUrl = uri"${appConfig.thisFrontendBaseUrl + applyRoutes.AgentApplicationController.landing.url}"
     signOutWithContinue(continueUrl.toString)
 
   def timeOut: Action[AnyContent] = action:

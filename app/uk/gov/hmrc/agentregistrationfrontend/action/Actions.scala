@@ -23,7 +23,7 @@ import play.api.mvc.Results.BadRequest
 import play.api.mvc.Results.Redirect
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as appRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 
 import javax.inject.Inject
@@ -53,7 +53,7 @@ extends RequestAwareLogging:
       resultWhenConditionNotMet =
         implicit request =>
           // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-          val call = appRoutes.AgentApplicationController.applicationSubmitted
+          val call = applyRoutes.AgentApplicationController.applicationSubmitted
           logger.warn(
             s"The application is not in the final state" +
               s" (current application state: ${request.agentApplication.applicationState.toString}), " +
@@ -69,7 +69,7 @@ extends RequestAwareLogging:
       resultWhenConditionNotMet =
         implicit request =>
           // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-          val call = appRoutes.AgentApplicationController.landing // or task list
+          val call = applyRoutes.AgentApplicationController.landing // or task list
           logger.warn(
             s"The application is not in the final state" +
               s" (current application state: ${request.agentApplication.applicationState.toString}), " +
@@ -113,5 +113,5 @@ extends RequestAwareLogging:
       */
     def redirectIfSaveForLater: Action[AnyContent] = a.mapResult(request =>
       originalResult =>
-        if SubmissionHelper.getSubmitAction(request).isSaveAndComeBackLater then Redirect(appRoutes.SaveForLaterController.show) else originalResult
+        if SubmissionHelper.getSubmitAction(request).isSaveAndComeBackLater then Redirect(applyRoutes.SaveForLaterController.show) else originalResult
     )

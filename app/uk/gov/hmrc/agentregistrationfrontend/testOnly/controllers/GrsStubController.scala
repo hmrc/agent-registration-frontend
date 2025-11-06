@@ -43,7 +43,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import uk.gov.hmrc.agentregistrationfrontend.controllers.internal.routes as internalRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes as internalRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData

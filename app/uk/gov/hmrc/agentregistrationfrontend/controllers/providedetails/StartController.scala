@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.LlpStartPage
@@ -49,7 +49,7 @@ extends FrontendController(mcc, actions):
       implicit request: RequestHeader =>
         applicationService.findApplicationByLinkId(linkId).map {
           case Some(app) if app.hasFinished => startPageForApplicationType(app)
-          case _ => Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
+          case _ => Redirect(applyRoutes.AgentApplicationController.genericExitPage.url)
         }
 
   // TODO: this method requires an auth action to ensure user is signed in correctly and has
@@ -59,7 +59,7 @@ extends FrontendController(mcc, actions):
       implicit request: RequestHeader =>
         applicationService.findApplicationByLinkId(linkId).map {
           case Some(app) if app.hasFinished => Redirect(routes.LlpMemberNameController.show)
-          case _ => Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url)
+          case _ => Redirect(applyRoutes.AgentApplicationController.genericExitPage.url)
         }
 
   // for now this returns only the llp start page template until we build the rest

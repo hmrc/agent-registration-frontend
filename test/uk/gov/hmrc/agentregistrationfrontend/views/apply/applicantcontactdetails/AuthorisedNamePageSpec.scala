@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.routes as applicantcontactdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AuthorisedNameForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -50,7 +50,7 @@ extends ViewSpec:
     "render a form with an input for full name" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe routes.AuthorisedNameController.submit.url
+      form.attr("action") shouldBe applicantcontactdetailsRoutes.AuthorisedNameController.submit.url
       form
         .selectOrFail("label[for=authorisedName]")
         .selectOnlyOneElementOrFail()

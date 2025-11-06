@@ -20,7 +20,7 @@ import play.api.i18n.Lang
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.internal.routes as internalRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes as internalRoutes
 import uk.gov.hmrc.agentregistrationfrontend.config.GrsConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.GrsConnector
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
