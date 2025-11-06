@@ -21,6 +21,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.DesBusinessAddress
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
+import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentBusinessNameForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -82,19 +83,20 @@ extends ControllerSpec:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeBusinessNameProvided)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
-      utr = tdAll.saUtr.value,
+      utr = Utr(tdAll.saUtr.value),
       responseBody = bprResponse
     )
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "What business name will you use for clients? - Apply for an agent services account - GOV.UK"
+    AgentRegistrationStubs.verifyGetBusinessPartnerRecord(Utr(tdAll.saUtr.value))
 
   s"GET $path when existing name already chosen should return 200 and render page with previous answer filled in" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterBusinessNameReused)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
-      utr = tdAll.saUtr.value,
+      utr = Utr(tdAll.saUtr.value),
       responseBody = bprResponse
     )
     val response: WSResponse = get(path)
@@ -105,12 +107,13 @@ extends ControllerSpec:
     val radioForExistingBusinessName = doc.mainContent.select(s"input#${AgentBusinessNameForm.key}")
     radioForExistingBusinessName.attr("value") shouldBe "Test Company Name"
     radioForExistingBusinessName.attr("checked") shouldBe "" // checked attribute is present when selected and has no value
+    AgentRegistrationStubs.verifyGetBusinessPartnerRecord(Utr(tdAll.saUtr.value))
 
   s"GET $path when new name already provided should return 200 and render page with previous answer filled in" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNewBusinessNameProvided)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
-      utr = tdAll.saUtr.value,
+      utr = Utr(tdAll.saUtr.value),
       responseBody = bprResponse
     )
     val response: WSResponse = get(path)
@@ -120,14 +123,11 @@ extends ControllerSpec:
     doc.title() shouldBe "What business name will you use for clients? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(s"input#${AgentBusinessNameForm.otherKey}")
       .attr("value") shouldBe "New Agent Business Llp"
+    AgentRegistrationStubs.verifyGetBusinessPartnerRecord(Utr(tdAll.saUtr.value))
 
   s"POST $path with selection of existing company name should save data and redirect to CYA page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeBusinessNameProvided)
-    AgentRegistrationStubs.stubGetBusinessPartnerRecord(
-      utr = tdAll.saUtr.value,
-      responseBody = bprResponse
-    )
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterBusinessNameReused)
     val response: WSResponse =
       post(path)(Map(
@@ -141,10 +141,6 @@ extends ControllerSpec:
   s"POST $path with selection of other and valid input for other name should save data and redirect to CYA page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeBusinessNameProvided)
-    AgentRegistrationStubs.stubGetBusinessPartnerRecord(
-      utr = tdAll.saUtr.value,
-      responseBody = bprResponse
-    )
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterNewBusinessNameProvided)
     val response: WSResponse =
       post(path)(Map(
@@ -160,7 +156,7 @@ extends ControllerSpec:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeBusinessNameProvided)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
-      utr = tdAll.saUtr.value,
+      utr = Utr(tdAll.saUtr.value),
       responseBody = bprResponse
     )
     val response: WSResponse =
@@ -179,7 +175,7 @@ extends ControllerSpec:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeBusinessNameProvided)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
-      utr = tdAll.saUtr.value,
+      utr = Utr(tdAll.saUtr.value),
       responseBody = bprResponse
     )
     val response: WSResponse =
@@ -194,12 +190,13 @@ extends ControllerSpec:
     doc.mainContent.select(
       s"#${AgentBusinessNameForm.otherKey}-error"
     ).text() shouldBe "Error: Enter the business name you want to use on your agent services account"
+    AgentRegistrationStubs.verifyGetBusinessPartnerRecord(Utr(tdAll.saUtr.value))
 
   s"POST $path with selection of other and invalid characters should return 400" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeBusinessNameProvided)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
-      utr = tdAll.saUtr.value,
+      utr = Utr(tdAll.saUtr.value),
       responseBody = bprResponse
     )
     val response: WSResponse =
@@ -214,12 +211,13 @@ extends ControllerSpec:
     doc.mainContent.select(
       s"#${AgentBusinessNameForm.otherKey}-error"
     ).text() shouldBe "Error: Name shown to clients must only include letters a to z, numbers, commas, full stops, apostrophes, hyphens, forward slashes and spaces"
+    AgentRegistrationStubs.verifyGetBusinessPartnerRecord(Utr(tdAll.saUtr.value))
 
   s"POST $path with selection of other and more than 40 characters should return 400" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeBusinessNameProvided)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
-      utr = tdAll.saUtr.value,
+      utr = Utr(tdAll.saUtr.value),
       responseBody = bprResponse
     )
     val response: WSResponse =
@@ -232,14 +230,11 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: What business name will you use for clients? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(s"#${AgentBusinessNameForm.otherKey}-error").text() shouldBe "Error: Name shown to clients must be 40 characters or less"
+    AgentRegistrationStubs.verifyGetBusinessPartnerRecord(Utr(tdAll.saUtr.value))
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeBusinessNameProvided)
-    AgentRegistrationStubs.stubGetBusinessPartnerRecord(
-      utr = tdAll.saUtr.value,
-      responseBody = bprResponse
-    )
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterBusinessNameReused)
     val response: WSResponse =
       post(path)(Map(
@@ -255,7 +250,7 @@ extends ControllerSpec:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeBusinessNameProvided)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
-      utr = tdAll.saUtr.value,
+      utr = Utr(tdAll.saUtr.value),
       responseBody = bprResponse
     )
     val response: WSResponse =
@@ -268,3 +263,4 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe applicationRoutes.SaveForLaterController.show.url
+    AgentRegistrationStubs.verifyGetBusinessPartnerRecord(Utr(tdAll.saUtr.value))

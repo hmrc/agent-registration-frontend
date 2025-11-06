@@ -23,6 +23,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
+import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AgentRegistrationStubs {
@@ -70,13 +71,22 @@ object AgentRegistrationStubs {
   )
 
   def stubGetBusinessPartnerRecord(
-    utr: String,
+    utr: Utr,
     responseBody: BusinessPartnerRecordResponse
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = wm.urlMatching(s"/agent-registration/business-partner-record/utr/$utr"),
+    urlPattern = wm.urlMatching(s"/agent-registration/business-partner-record/utr/${utr.value}"),
     responseStatus = Status.OK,
     responseBody = Json.toJson(responseBody).toString()
+  )
+
+  def verifyGetBusinessPartnerRecord(
+    utr: Utr,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/business-partner-record/utr/${utr.value}"),
+    count = count
   )
 
 }

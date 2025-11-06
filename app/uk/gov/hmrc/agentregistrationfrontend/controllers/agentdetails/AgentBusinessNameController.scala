@@ -29,13 +29,14 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentBusinessNameForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.AgentBusinessNamePage
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
+import scala.util.chaining.scalaUtilChainingOps
 
 @Singleton
 class AgentBusinessNameController @Inject() (
@@ -69,36 +70,37 @@ extends FrontendController(mcc, actions):
       .getApplicationInProgress
       .async:
         implicit request: AgentApplicationRequest[AnyContent] =>
-          agentRegistrationService
-            .getBusinessPartnerRecord(
-              Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
-            ).flatMap { bprOpt =>
-              AgentBusinessNameForm.form
-                .bindFromRequest()
-                .fold(
-                  formWithErrors =>
-                    Future.successful(BadRequest(view(
+          AgentBusinessNameForm.form
+            .bindFromRequest()
+            .fold(
+              formWithErrors =>
+                agentRegistrationService
+                  .getBusinessPartnerRecord(
+                    Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
+                  ).map { bprOpt =>
+                    BadRequest(view(
                       form = formWithErrors,
                       bprBusinessName = bprOpt.flatMap(_.organisationName)
-                    ))),
-                  businessNameFromForm =>
-                    val updatedApplication: AgentApplication = request
-                      .agentApplication
-                      .asLlpApplication
-                      .modify(_.agentDetails)
-                      .using:
-                        case None => // applicant enters agent details for first time
-                          Some(AgentDetails(
-                            businessName = businessNameFromForm
-                          ))
-                        case Some(details) => // applicant updates agent business name
-                          Some(details
-                            .modify(_.businessName)
-                            .setTo(businessNameFromForm))
-                    agentRegistrationService
-                      .upsert(updatedApplication)
-                      .map: _ =>
-                        Redirect(routes.CheckYourAnswersController.show.url)
-                )
-            }
+                    ))
+                      .pipe(SubmissionHelper.redirectIfSaveForLater(request, _))
+                  },
+              businessNameFromForm =>
+                val updatedApplication: AgentApplication = request
+                  .agentApplication
+                  .asLlpApplication
+                  .modify(_.agentDetails)
+                  .using:
+                    case None => // applicant enters agent details for first time
+                      Some(AgentDetails(
+                        businessName = businessNameFromForm
+                      ))
+                    case Some(details) => // applicant updates agent business name
+                      Some(details
+                        .modify(_.businessName)
+                        .setTo(businessNameFromForm))
+                agentRegistrationService
+                  .upsert(updatedApplication)
+                  .map: _ =>
+                    Redirect(routes.CheckYourAnswersController.show.url)
+            )
       .redirectIfSaveForLater
