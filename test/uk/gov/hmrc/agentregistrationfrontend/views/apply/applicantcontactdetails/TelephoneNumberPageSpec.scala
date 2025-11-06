@@ -20,7 +20,6 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.applicantcontactdetails.routes
 import uk.gov.hmrc.agentregistrationfrontend.forms.TelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -51,7 +50,7 @@ extends ViewSpec:
     "render a form with an input of type tel for telephone number" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe routes.TelephoneNumberController.submit.url
+      form.attr("action") shouldBe AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.submit.url
       form
         .selectOrFail("label[for=telephoneNumber]")
         .selectOnlyOneElementOrFail()

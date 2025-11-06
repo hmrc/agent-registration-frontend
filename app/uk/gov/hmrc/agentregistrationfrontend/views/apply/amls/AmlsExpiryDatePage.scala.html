@@ -15,7 +15,6 @@
  *@
 
 @import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.amls.routes
 @import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
@@ -48,7 +47,7 @@
 ) {
 
     <h2 class="govuk-caption-l">@messages("amlsDetails.title")</h2>
-    @formWithCSRF(action = routes.AmlsExpiryDateController.submit) {
+    @formWithCSRF(action = AppRoutes.apply.amls.AmlsExpiryDateController.submit) {
         @govukDateInput(DateInput(
             id = key,
             hint = Some(Hint(content = Text(messages(s"$key.hint")))),
