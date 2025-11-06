@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.services
+package uk.gov.hmrc.agentregistrationfrontend.services.llp
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsIdGenerator
+import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Started
 
 import java.time.Clock
 import java.time.Instant
@@ -24,23 +27,18 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ApplicationFactory @Inject() (
+class MemberProvideDetailsFactory @Inject() (
   clock: Clock,
-  linkIdGenerator: LinkIdGenerator,
-  agentApplicationIdGenerator: AgentApplicationIdGenerator
+  memberProvidedDetailsIdGenerator: MemberProvidedDetailsIdGenerator
 ):
 
-  def makeNewAgentApplicationLlp(
+  def makeNewMemberProvidedDetails(
     internalUserId: InternalUserId,
-    groupId: GroupId
-  ): AgentApplicationLlp = AgentApplicationLlp(
-    _id = agentApplicationIdGenerator.nextApplicationId(),
+    agentApplicationId: AgentApplicationId
+  ): MemberProvidedDetails = MemberProvidedDetails(
+    _id = memberProvidedDetailsIdGenerator.nextMemberProvidedDetailsId(),
     internalUserId = internalUserId,
-    linkId = linkIdGenerator.nextLinkId(),
-    groupId = groupId,
+    applicationId = agentApplicationId,
     createdAt = Instant.now(clock),
-    applicationState = ApplicationState.Started,
-    businessDetails = None,
-    applicantContactDetails = None,
-    amlsDetails = None
+    providedDetailsState = Started
   )

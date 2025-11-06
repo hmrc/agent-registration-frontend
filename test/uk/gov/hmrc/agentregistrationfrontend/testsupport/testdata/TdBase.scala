@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import java.time.Clock
@@ -71,3 +72,6 @@ trait TdBase:
     dateOfIncorporation = Some(dateOfIncorporation)
   )
   def postcode: String = "AA1 1AA"
+  def agentApplicationId: AgentApplicationId = AgentApplicationId("agent-application-id-12345")
+
+  def memberProvidedDetailsId: MemberProvidedDetailsId = MemberProvidedDetailsId("member-provided-details-id-12345")
