@@ -22,6 +22,10 @@ import play.api.mvc.*
 import play.api.mvc.Results.BadRequest
 import play.api.mvc.Results.Redirect
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedAction
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.ProvideDetailsAction
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
@@ -35,7 +39,9 @@ import scala.util.chaining.scalaUtilChainingOps
 class Actions @Inject() (
   actionBuilder: DefaultActionBuilder,
   authorisedAction: AuthorisedAction,
-  agentApplicationAction: AgentApplicationAction
+  agentApplicationAction: AgentApplicationAction,
+  individualAuthorisedAction: IndividualAuthorisedAction,
+  provideDetailsAction: ProvideDetailsAction
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
@@ -115,4 +121,39 @@ extends RequestAwareLogging:
       originalResult =>
         if SubmissionHelper.getSubmitAction(request).isSaveAndComeBackLater then Redirect(AppRoutes.apply.SaveForLaterController.show)
         else originalResult
+    )
+
+  val authorisedIndividual: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
+    .andThen(individualAuthorisedAction)
+
+  val getProvideDetailsInProgress: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorisedIndividual
+    .andThen(provideDetailsAction)
+    .ensure(
+      condition = _.memberProvidedDetails.isInProgress,
+      resultWhenConditionNotMet =
+        implicit request =>
+          // TODO: TBC - where to redirect
+          val call = AppRoutes.apply.AgentApplicationController.genericExitPage
+          logger.warn(
+            s"The provided details are in the final state" +
+              s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +
+              s"redirecting to [${call.url}]."
+          )
+          Redirect(call.url)
+    )
+
+  val getSubmitedDetailsInProgress: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorisedIndividual
+    .andThen(provideDetailsAction)
+    .ensure(
+      condition = _.memberProvidedDetails.hasFinished,
+      resultWhenConditionNotMet =
+        implicit request =>
+          // TODO: TBC - where to redirect
+          val call = AppRoutes.apply.AgentApplicationController.genericExitPage
+          logger.warn(
+            s"The provided details are in the final state" +
+              s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +
+              s"redirecting to [${call.url}]."
+          )
+          Redirect(call.url)
     )
