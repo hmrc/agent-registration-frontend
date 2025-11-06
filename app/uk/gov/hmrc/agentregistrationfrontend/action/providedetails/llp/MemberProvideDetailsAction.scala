@@ -19,14 +19,12 @@ package uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp
 import play.api.mvc.ActionRefiner
 import play.api.mvc.Request
 import play.api.mvc.Result
-import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.MergeFormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as applicationRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.providedetails.llp.MemberProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
@@ -93,9 +91,9 @@ with RequestAwareLogging:
             credentials = request.credentials
           )))
         case None =>
-          // TODO WG - were if we do not know linkId ?? only error page
-          val redirect = applicationRoutes.AgentApplicationController.genericExitPage
-          logger.error(s"[Unexpected State] No member provide details found for authenticated user ${request.internalUserId.value}. Redirecting to startRegistration page ($redirect)")
-          Future.successful(Left(Redirect(redirect)))
-
+          // TODO - confirm with BA behavior for this scenario
+          logger.error(s"No member provide details found for authenticated user ${request.internalUserId.value}. No linkId found. Redirecting to error page")
+          Errors.throwServerErrorException(
+            "No member provide details found for authenticated user ${request.internalUserId.value}. No linkId found. Redirecting to error page"
+          )
       }

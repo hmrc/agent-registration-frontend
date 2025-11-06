@@ -125,5 +125,34 @@ extends RequestAwareLogging:
   val authorisedIndividual: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
     .andThen(individualAuthorisedAction)
 
-  val getProvideDetailsRequest: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorisedIndividual
+  val getProvideDetailsInProgress: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorisedIndividual
     .andThen(provideDetailsAction)
+    .ensure(
+      condition = _.memberProvidedDetails.isInProgress,
+      resultWhenConditionNotMet =
+        implicit request =>
+          // TODO: TBC - where to redirect
+          val call = appRoutes.AgentApplicationController.genericExitPage
+          logger.warn(
+            s"The provided details are in the final state" +
+              s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +
+              s"redirecting to [${call.url}]."
+          )
+          Redirect(call.url)
+    )
+
+  val getSubmitedDetailsInProgress: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorisedIndividual
+    .andThen(provideDetailsAction)
+    .ensure(
+      condition = _.memberProvidedDetails.hasFinished,
+      resultWhenConditionNotMet =
+        implicit request =>
+          // TODO: TBC - where to redirect
+          val call = appRoutes.AgentApplicationController.genericExitPage
+          logger.warn(
+            s"The provided details are in the final state" +
+              s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +
+              s"redirecting to [${call.url}]."
+          )
+          Redirect(call.url)
+    )

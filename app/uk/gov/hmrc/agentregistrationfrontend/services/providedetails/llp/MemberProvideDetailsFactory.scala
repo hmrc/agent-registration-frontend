@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.services.providedetails.llp
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsIdGenerator
+import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Started
 
 import java.time.Clock
 import java.time.Instant
@@ -38,5 +39,6 @@ class MemberProvideDetailsFactory @Inject() (
     _id = memberProvidedDetailsIdGenerator.nextMemberProvidedDetailsId(),
     internalUserId = internalUserId,
     applicationId = agentApplicationId,
-    createdAt = Instant.now(clock)
+    createdAt = Instant.now(clock),
+    providedDetailsState = Started
   )

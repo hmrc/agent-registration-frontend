@@ -48,7 +48,6 @@ extends FrontendController(mcc, actions):
   def initiateMemberProvideDetails(
     linkId: LinkId
   ): Action[AnyContent] = actions.authorisedIndividual
-    // TODO WG - we should check provided details state too, so user do not complete many times
     .async:
       implicit request =>
 
@@ -70,6 +69,7 @@ extends FrontendController(mcc, actions):
 
                 case None =>
                   logger.info(s"Application does not exist for provided linkId: $linkId")
+                  // TODO - TBC - confirm next page
                   Future.successful(Redirect(applicationRoutes.AgentApplicationController.genericExitPage.url))
 
           }

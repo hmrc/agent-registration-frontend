@@ -35,7 +35,7 @@ class LlpMemberNameController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getProvideDetailsRequest:
+  def show: Action[AnyContent] = actions.getProvideDetailsInProgress:
     implicit request: RequestHeader =>
       Ok(placeholder(
         h1 = "What is your name?",

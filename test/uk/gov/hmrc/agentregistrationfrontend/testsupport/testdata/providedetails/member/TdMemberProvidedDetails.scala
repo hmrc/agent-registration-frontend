@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.providedetails.member
 
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Started
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
 trait TdMemberProvidedDetails { dependencies: (TdBase) =>
@@ -27,7 +28,8 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
       _id = dependencies.memberProvidedDetailsId,
       internalUserId = dependencies.internalUserId,
       createdAt = dependencies.nowAsInstant,
-      applicationId = dependencies.agentApplicationId
+      applicationId = dependencies.agentApplicationId,
+      providedDetailsState = Started
     )
 
 }
