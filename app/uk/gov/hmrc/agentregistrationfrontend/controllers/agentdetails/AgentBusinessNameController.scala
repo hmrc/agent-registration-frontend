@@ -17,13 +17,11 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.agentdetails
 
 import com.softwaremill.quicklens.*
-import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.Utr
-import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentBusinessName
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
@@ -52,18 +50,16 @@ extends FrontendController(mcc, actions):
       agentRegistrationService
         .getBusinessPartnerRecord(
           Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
-        ).map { bprOpt =>
-          val form: Form[AgentBusinessName] = AgentBusinessNameForm.form.fill:
-            request
-              .agentApplication
-              .asLlpApplication
-              .agentDetails.map(_.businessName)
-
-          Ok(view(
-            form = form,
-            bprBusinessName = bprOpt.flatMap(_.organisationName)
-          ))
-        }
+        ).map:
+          bprOpt =>
+            Ok(view(
+              form = AgentBusinessNameForm.form.fill:
+                request
+                  .agentApplication
+                  .asLlpApplication
+                  .agentDetails.map(_.businessName),
+              bprBusinessName = bprOpt.flatMap(_.organisationName)
+            ))
 
   def submit: Action[AnyContent] =
     actions
@@ -77,13 +73,14 @@ extends FrontendController(mcc, actions):
                 agentRegistrationService
                   .getBusinessPartnerRecord(
                     Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
-                  ).map { bprOpt =>
-                    BadRequest(view(
-                      form = formWithErrors,
-                      bprBusinessName = bprOpt.flatMap(_.organisationName)
-                    ))
-                      .pipe(SubmissionHelper.redirectIfSaveForLater(request, _))
-                  },
+                  ).map:
+                    bprOpt =>
+                      BadRequest(
+                        view(
+                          form = formWithErrors,
+                          bprBusinessName = bprOpt.flatMap(_.organisationName)
+                        )
+                      ).pipe(SubmissionHelper.redirectIfSaveForLater(request, _)),
               businessNameFromForm =>
                 val updatedApplication: AgentApplication = request
                   .agentApplication
