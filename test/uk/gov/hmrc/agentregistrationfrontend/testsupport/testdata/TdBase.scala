@@ -76,3 +76,5 @@ trait TdBase:
   def agentApplicationId: AgentApplicationId = AgentApplicationId("agent-application-id-12345")
 
   def memberProvidedDetailsId: MemberProvidedDetailsId = MemberProvidedDetailsId("member-provided-details-id-12345")
+  def bprPrimaryTelephoneNumber: String = "(+44) 78714743399"
+  def newTelephoneNumber: String = "+44 (0) 7000000000"
