@@ -153,7 +153,7 @@ agentBusinessName.other = Something else
 agentBusinessName.error.required = Enter the business name you want to use on your agent services account
 otherAgentBusinessName.label = Enter the name you want to use
 otherAgentBusinessName.error.required = Enter the business name you want to use on your agent services account
-otherAgentBusinessName.error.tooLong = Name shown to clients must be 24 characters or less
+otherAgentBusinessName.error.tooLong = Name shown to clients must be 40 characters or less
 otherAgentBusinessName.error.invalid = Name shown to clients must only include letters a to z, numbers, commas, full stops, apostrophes, hyphens, forward slashes and spaces
 
 # Agent details / telephone number
