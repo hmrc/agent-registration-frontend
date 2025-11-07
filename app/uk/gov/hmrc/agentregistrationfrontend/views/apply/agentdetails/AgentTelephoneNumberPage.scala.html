@@ -14,13 +14,13 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentBusinessName
+@import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentTelephoneNumber
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-@import uk.gov.hmrc.agentregistrationfrontend.forms.AgentBusinessNameForm
+@import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTelephoneNumberForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
 
 @this(
         layout: Layout,
@@ -32,42 +32,78 @@
 )
 
 @(
-        form: Form[AgentBusinessName],
-        bprBusinessName: Option[String]
+        form: Form[AgentTelephoneNumber],
+        bprTelephoneNumber: Option[String]
 )(implicit request: AgentApplicationRequest[?], messages: Messages)
 
 @key = @{
-    AgentBusinessNameForm.key
+    AgentTelephoneNumberForm.key
 }
 @otherKey = @{
-    AgentBusinessNameForm.otherKey
+    AgentTelephoneNumberForm.otherKey
 }
-@title = @{messages(s"$key.title")}
-@existingBusinessName = @{
-    bprBusinessName
-    .getOrElse(
-        request
-        .agentApplication
-        .asLlpApplication
-        .getBusinessDetails
-        .companyProfile
-        .companyName
+@contactTelephone = @{
+    request
+    .agentApplication
+    .asLlpApplication
+    .getApplicantContactDetails
+    .getTelephoneNumber
+}
+@bprRadio = @{
+  if(bprTelephoneNumber.isDefined)
+    Seq(
+        RadioItem(
+            content = Text(bprTelephoneNumber.get),
+            value = Some(bprTelephoneNumber.get),
+            hint = Some(Hint(
+                content = Text(messages(s"$key.bpr.hint"))
+            ))
+        )
     )
+  else Seq.empty
+}
+@contactRadio = @{
+  Seq(
+      RadioItem(
+          content = Text(contactTelephone.value),
+          value = Some(contactTelephone.value),
+          hint = Some(Hint(
+              content = Text(messages(s"$key.contact.hint"))
+          ))
+      )
+  )
 }
 @otherInput = {
     @govukInput(Input(
         label = Label(
             content = Text(messages(s"$otherKey.label"))
         ),
+        hint = Some(Hint(
+            content = Text(messages(s"$otherKey.hint"))
+        )),
         spellcheck = Some(false)
     ).withFormField(form(otherKey)))
 }
+@otherRadios = @{
+  Seq(
+    RadioItem(
+        divider = Some(messages("common.or"))
+    ),
+    RadioItem(
+        content = Text(messages(s"$key.other")),
+        value = Some("other"),
+        conditionalHtml = Some(otherInput)
+    )
+  )
+}
+@title = @{messages(s"$key.title")}
+@allRadios = @{contactRadio ++ bprRadio ++ otherRadios}
 @layout(
     pageTitle = title,
     maybeForm = Some(form)
 ) {
     <h2 class="govuk-caption-l">@messages("agentDetails.title")</h2>
-    @formWithCSRF(action = AppRoutes.apply.agentdetails.AgentBusinessNameController.submit) {
+    @formWithCSRF(action = AppRoutes.apply.agentdetails.AgentTelephoneNumberController.submit) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(
@@ -76,20 +112,7 @@
                     classes = "govuk-fieldset__legend--l"
                 ))
             )),
-            hint = Some(Hint(
-                content = HtmlContent(messages(s"$key.hint")
-            ))),
-            items = Seq(
-                RadioItem(
-                    content = Text(existingBusinessName),
-                    value = Some(existingBusinessName)
-                ),
-                RadioItem(
-                    content = Text(messages(s"$key.other")),
-                    value = Some("other"),
-                    conditionalHtml = Some(otherInput)
-                )
-            )
+            items = allRadios
         ).withFormField(form(key)))
 
         @continueOrSaveForLater()

@@ -72,3 +72,5 @@ trait TdBase:
   )
   def postcode: String = "AA1 1AA"
   def authorisedPersonName: String = "Alice Smith"
+  def bprPrimaryTelephoneNumber: String = "(+44) 78714743399"
+  def newTelephoneNumber: String = "+44 (0) 7000000000"

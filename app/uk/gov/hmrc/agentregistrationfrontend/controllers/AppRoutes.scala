@@ -65,6 +65,7 @@ object AppRoutes:
     object agentdetails:
 
       val AgentBusinessNameController = agentdetailsRoutes.AgentBusinessNameController
+      val AgentTelephoneNumberController = agentdetailsRoutes.AgentTelephoneNumberController
       val CheckYourAnswersController = agentdetailsRoutes.CheckYourAnswersController
 
     object internal:
