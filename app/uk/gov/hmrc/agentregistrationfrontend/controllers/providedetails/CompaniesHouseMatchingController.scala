@@ -17,10 +17,11 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import play.api.mvc.Action
+import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
@@ -28,16 +29,24 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class LlpMemberNameController @Inject() (
-  actions: Actions,
+class CompaniesHouseMatchingController @Inject() (
   mcc: MessagesControllerComponents,
-  placeholder: SimplePage
+  actions: Actions,
+  view: SimplePage
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getProvideDetailsInProgress:
-    implicit request: RequestHeader =>
-      Ok(placeholder(
-        h1 = "What is your name?",
-        bodyText = Some("This is a placeholder page for the LLP member name page.")
+  private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions.getProvideDetailsInProgress
+    .ensure(
+      _.memberProvidedDetails.companiesHouseMatch.isDefined,
+      implicit request =>
+        logger.info("Redirecting to member name page due to missing memberNameQuery value")
+        Redirect(routes.CompaniesHouseNameQueryController.show)
+    )
+
+  def show: Action[AnyContent] = baseAction:
+    implicit request =>
+      Ok(view(
+        h1 = "Companies house lookup results",
+        bodyText = Some("placeholder for companies house matching results")
       ))

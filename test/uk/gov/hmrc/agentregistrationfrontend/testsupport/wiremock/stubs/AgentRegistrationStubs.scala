@@ -21,6 +21,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.Utr
@@ -66,6 +67,16 @@ object AgentRegistrationStubs {
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/linkId/${linkId.value}"),
+    responseStatus = 200,
+    responseBody = Json.toJson(agentApplication).toString
+  )
+
+  def stubFindApplicationByAgentApplicationId(
+    agentApplicationId: AgentApplicationId,
+    agentApplication: AgentApplication
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/agentApplicationId/${agentApplicationId.value}"),
     responseStatus = 200,
     responseBody = Json.toJson(agentApplication).toString
   )

@@ -86,6 +86,20 @@ extends RequestAwareLogging:
       }
     }
 
+  def findApplicationByAgentApplicationId(agentApplicationId: AgentApplicationId)(using
+    request: RequestHeader
+  ): Future[Option[AgentApplication]] = httpClient
+    .get(url"$baseUrl/application/agentApplicationId/${agentApplicationId.value}")
+    .execute[HttpResponse]
+    .map { response =>
+      response.status match {
+        case Status.OK => Some(response.json.as[AgentApplication])
+        case Status.NO_CONTENT => None
+        case other =>
+          Errors.throwServerErrorException(s"Unexpected status when searching by AgentApplicationId $agentApplicationId in the http response: $other.")
+      }
+    }
+
   def getBusinessPartnerRecord(utr: Utr)(using
     request: RequestHeader
   ): Future[Option[BusinessPartnerRecordResponse]] = httpClient

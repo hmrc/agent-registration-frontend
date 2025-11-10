@@ -50,7 +50,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
 
-        val nextEndpoint: Call = routes.LlpMemberNameController.show
+        val nextEndpoint: Call = routes.CompaniesHouseNameQueryController.show
 
         memberProvideDetailsService
           .find()

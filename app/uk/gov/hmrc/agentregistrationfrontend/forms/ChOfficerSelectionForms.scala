@@ -21,7 +21,7 @@ import play.api.data.Form
 import play.api.data.Forms
 import play.api.data.Mapping
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseOfficer
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 import uk.gov.hmrc.agentregistrationfrontend.forms.mappings.Mappings
