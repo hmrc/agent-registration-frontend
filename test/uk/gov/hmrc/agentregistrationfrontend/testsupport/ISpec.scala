@@ -28,6 +28,10 @@ import play.api.inject.guice.GuiceableModule
 import play.api.test.DefaultTestServerFactory
 import play.api.test.TestServerFactory
 import play.core.server.ServerConfig
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsIdGenerator
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationIdGenerator
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsName
 import uk.gov.hmrc.agentregistration.shared.LinkId
@@ -52,7 +56,7 @@ extends AnyWordSpecLike,
 
   lazy val tdAll: TdAll = TdAll.tdAll
   lazy val frozenInstant: Instant = tdAll.nowAsInstant
-  lazy given clock: Clock = tdAll.clock
+  given clock: Clock = tdAll.clock
 
   protected final val AppRoutes = uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes // alias so no need to import it everywhere in ISpecs
 
@@ -89,6 +93,12 @@ extends AnyWordSpecLike,
         )
         bind(classOf[LinkIdGenerator]).toInstance(new LinkIdGenerator {
           override def nextLinkId(): LinkId = tdAll.linkId
+        })
+        bind(classOf[AgentApplicationIdGenerator]).toInstance(new AgentApplicationIdGenerator {
+          override def nextApplicationId(): AgentApplicationId = tdAll.agentApplicationId
+        })
+        bind(classOf[MemberProvidedDetailsIdGenerator]).toInstance(new MemberProvidedDetailsIdGenerator {
+          override def nextMemberProvidedDetailsId(): MemberProvidedDetailsId = tdAll.memberProvidedDetailsId
         })
 
   override def fakeApplication(): Application = GuiceApplicationBuilder()
