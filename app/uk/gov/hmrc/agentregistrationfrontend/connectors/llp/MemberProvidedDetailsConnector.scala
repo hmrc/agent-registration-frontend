@@ -47,19 +47,6 @@ class MemberProvidedDetailsConnector @Inject() (
 )
 extends RequestAwareLogging:
 
-  def findMemberProvidedDetails()(using
-    request: IndividualAuthorisedRequest[?]
-  ): Future[Option[MemberProvidedDetails]] = httpClient
-    .get(url"$baseUrl/member-provided-details")
-    .execute[HttpResponse]
-    .map { response =>
-      response.status match {
-        case Status.OK => Some(response.json.as[MemberProvidedDetails])
-        case Status.NO_CONTENT => None
-        case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
-      }
-    }
-
   def upsertMemberProvidedDetails(memberProvidedDetails: MemberProvidedDetails)(using
     request: IndividualAuthorisedRequest[?]
   ): Future[Unit] = httpClient
@@ -75,13 +62,13 @@ extends RequestAwareLogging:
 
   def findMemberProvidedDetailsByApplicationId(agentApplicationId: AgentApplicationId)(using
     request: IndividualAuthorisedRequest[?]
-  ): Future[List[MemberProvidedDetails]] = httpClient
+  ): Future[Option[MemberProvidedDetails]] = httpClient
     .get(url"$baseUrl/member-provided-details/agent-applicationId/${agentApplicationId.value}")
     .execute[HttpResponse]
     .map { response =>
       response.status match {
-        case Status.OK => response.json.as[List[MemberProvidedDetails]]
-        case Status.NO_CONTENT => List.empty[MemberProvidedDetails]
+        case Status.OK => Some(response.json.as[MemberProvidedDetails])
+        case Status.NO_CONTENT => None
         case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
       }
     }

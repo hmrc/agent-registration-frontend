@@ -24,5 +24,6 @@ POST        /agent-registration/test-only/grs-stub-setup/:businessType        uk
 GET         /agent-registration/test-only/add-agent-type/:agentType           uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.TestOnlyController.addAgentTypeToSession(agentType: AgentType)
 GET         /agent-registration/test-only/add-business-type/:businessTypeAnswer     uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.TestOnlyController.addBusinessTypeToSession(businessTypeAnswer: BusinessTypeAnswer)
 GET         /agent-registration/test-only/add-partnership-type/:partnershipType   uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.TestOnlyController.addPartnershipTypeToSession(partnershipType: BusinessType.Partnership)
+GET         /agent-registration/test-only/add-agent-applicationId/:agentApplicationId  uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.TestOnlyController.addAgentApplicationIdToSession(agentApplicationId: AgentApplicationId)
 
 GET         /agent-registration/test-only/get-link-id                uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.TestOnlyController.makeTestSubmittedApplication()

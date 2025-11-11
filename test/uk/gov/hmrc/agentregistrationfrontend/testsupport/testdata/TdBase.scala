@@ -17,7 +17,9 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import java.time.Clock
@@ -74,7 +76,16 @@ trait TdBase:
   def postcode: String = "AA1 1AA"
   def authorisedPersonName: String = "Alice Smith"
   def agentApplicationId: AgentApplicationId = AgentApplicationId("agent-application-id-12345")
+  def agentApplicationId2: AgentApplicationId = AgentApplicationId("agent-application-id-6789")
 
   def memberProvidedDetailsId: MemberProvidedDetailsId = MemberProvidedDetailsId("member-provided-details-id-12345")
   def bprPrimaryTelephoneNumber: String = "(+44) 78714743399"
   def newTelephoneNumber: String = "+44 (0) 7000000000"
+
+  val memberProvidedDetails: MemberProvidedDetails = MemberProvidedDetails(
+    _id = memberProvidedDetailsId,
+    internalUserId = internalUserId,
+    createdAt = nowAsInstant,
+    agentApplicationId = agentApplicationId,
+    providedDetailsState = ProvidedDetailsState.Started
+  )

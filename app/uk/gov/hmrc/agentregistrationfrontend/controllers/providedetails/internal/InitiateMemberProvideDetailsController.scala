@@ -25,8 +25,8 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.routes
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
-import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsFactory
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,7 +37,6 @@ class InitiateMemberProvideDetailsController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   memberProvideDetailsService: MemberProvideDetailsService,
-  memberProvideDetailsFactory: MemberProvideDetailsFactory,
   agentRegistrationService: AgentRegistrationService
 )
 extends FrontendController(mcc, actions):
@@ -52,23 +51,24 @@ extends FrontendController(mcc, actions):
 
         val nextEndpoint: Call = routes.LlpMemberNameController.show
 
-        memberProvideDetailsService
-          .find()
-          .flatMap {
-            case Some(providedDetails) =>
-              logger.info("Member provided details already exists, redirecting to member name page")
-              Future.successful(Redirect(nextEndpoint))
-            case None =>
-              agentRegistrationService.findApplicationByLinkId(linkId).flatMap:
-                case Some(agentApplication) =>
-                  memberProvideDetailsService
-                    .upsert(memberProvideDetailsFactory
-                      .makeNewMemberProvidedDetails(request.internalUserId, agentApplication.agentApplicationId))
-                    .map(_ => Redirect(nextEndpoint))
-
+        agentRegistrationService.findApplicationByLinkId(linkId).flatMap:
+          case Some(agentApplication) =>
+            memberProvideDetailsService
+              .findByApplicationId(agentApplication.agentApplicationId)
+              .flatMap {
                 case None =>
-                  logger.info(s"Application does not exist for provided linkId: $linkId")
-                  // TODO - TBC - confirm next page
-                  Future.successful(Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url))
+                  memberProvideDetailsService
+                    .upsert(memberProvideDetailsService
+                      .createNewMemberProvidedDetails(agentApplication.agentApplicationId))
+                    .map(_ => Redirect(nextEndpoint).addToSession(agentApplication.agentApplicationId))
 
-          }
+                case Some(memberProvideDetails) =>
+                  // TODO WG - fix the routing to the correct page depending on the status of the provided details
+                  logger.info("Member provided details already exists, redirecting to member name page")
+                  Future.successful(Redirect(nextEndpoint).addToSession(memberProvideDetails.agentApplicationId))
+              }
+
+          case None =>
+            logger.info(s"Application does not exist for provided linkId: $linkId")
+            // TODO - TBC - confirm next page when no application exists for provided linkId
+            Future.successful(Redirect(AppRoutes.providedetails.StartController.startNoLink))

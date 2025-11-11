@@ -33,6 +33,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.Future
 
 @Singleton
 class StartController @Inject() (
@@ -63,6 +64,15 @@ extends FrontendController(mcc, actions):
               Redirect(internalRoutes
                 .InitiateMemberProvideDetailsController.initiateMemberProvideDetails(linkId = linkId))
             case _ => Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
+
+  def startNoLink: Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(Ok(placeholderStartPage(
+      h1 = "Start page for no linkId",
+      bodyText = Some(
+        "Placeholder for the member provide details start page when no linkId is provided"
+      )
+    )))
+  }
 
   // for now this returns only the llp start page template until we build the rest
   private def startPageForApplicationType(agentApplication: AgentApplication)(implicit request: RequestHeader): Result =

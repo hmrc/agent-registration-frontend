@@ -19,16 +19,19 @@ package uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp
 import play.api.mvc.ActionRefiner
 import play.api.mvc.Request
 import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.MergeFormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.retrieve.Credentials
+import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -80,8 +83,9 @@ with RequestAwareLogging:
   override protected def refine[A](request: IndividualAuthorisedRequest[A]): Future[Either[Result, MemberProvideDetailsRequest[A]]] =
     given r: IndividualAuthorisedRequest[A] = request
 
+    val agentApplicationId: AgentApplicationId = request.getAgentApplicationId
     memberProvideDetailsService
-      .find()
+      .findByApplicationId(agentApplicationId)
       .flatMap {
         case Some(memberProvidedDetails) =>
           Future.successful(Right(new MemberProvideDetailsRequest(
@@ -91,9 +95,7 @@ with RequestAwareLogging:
             credentials = request.credentials
           )))
         case None =>
-          // TODO - confirm with BA behavior for this scenario
-          logger.error(s"No member provide details found for authenticated user ${request.internalUserId.value}. No linkId found. Redirecting to error page")
-          Errors.throwServerErrorException(
-            "No member provide details found for authenticated user ${request.internalUserId.value}. No linkId found. Redirecting to error page"
-          )
+          val redirect = AppRoutes.providedetails.StartController.startNoLink
+          logger.info(s"[Unexpected State] No member provided details found for authenticated user ${request.internalUserId.value}. Redirecting to ($redirect)")
+          Future.successful(Left(Redirect(redirect)))
       }
