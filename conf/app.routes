@@ -85,4 +85,4 @@ GET        /provide-details/internal/initiate-member-provide-details/:linkId/  u
 
 GET         /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.LlpMemberNameController.show
 
-GET         /provide-details/start-no-linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.startNoLink
+GET         /provide-details/start-no-linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.SessionManagementController.sessionExpired

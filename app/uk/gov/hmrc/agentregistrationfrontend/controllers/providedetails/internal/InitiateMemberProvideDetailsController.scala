@@ -23,7 +23,6 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.routes
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
@@ -49,25 +48,26 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
 
-        val nextEndpoint: Call = routes.LlpMemberNameController.show
+        val nextEndpoint: Call = AppRoutes.providedetails.LlpMemberNameController.show
+        val redirect = AppRoutes.providedetails.SessionManagementController.sessionExpired
 
-        agentRegistrationService.findApplicationByLinkId(linkId).flatMap:
-          case Some(agentApplication) =>
-            memberProvideDetailsService
-              .findByApplicationId(agentApplication.agentApplicationId)
-              .flatMap {
-                case None =>
-                  memberProvideDetailsService
-                    .upsert(memberProvideDetailsService
-                      .createNewMemberProvidedDetails(agentApplication.agentApplicationId))
-                    .map(_ => Redirect(nextEndpoint).addToSession(agentApplication.agentApplicationId))
+        agentRegistrationService.findApplicationByLinkId(linkId)
+          .flatMap:
+            case Some(agentApplication) =>
+              memberProvideDetailsService
+                .findByApplicationId(agentApplication.agentApplicationId)
+                .flatMap:
+                  case None =>
+                    memberProvideDetailsService
+                      .upsert(memberProvideDetailsService
+                        .createNewMemberProvidedDetails(agentApplication.agentApplicationId))
+                      .map(_ => Redirect(nextEndpoint).addToSession(agentApplication.agentApplicationId))
 
-                case Some(memberProvideDetails) =>
-                  // TODO WG - fix the routing to the correct page depending on the status of the provided details
-                  logger.info("Member provided details already exists, redirecting to member name page")
-                  Future.successful(Redirect(nextEndpoint).addToSession(memberProvideDetails.agentApplicationId))
-              }
+                  case Some(memberProvideDetails) =>
+                    // TODO WG - fix the routing to the correct page depending on the status of the provided details
+                    logger.info("Member provided details already exists, redirecting to member name page")
+                    Future.successful(Redirect(nextEndpoint).addToSession(memberProvideDetails.agentApplicationId))
 
-          case None =>
-            logger.info(s"Application does not exist for provided linkId: $linkId")
-            Future.successful(Redirect(AppRoutes.providedetails.StartController.startNoLink))
+            case None =>
+              logger.info(s"Application does not exist for provided linkId: $linkId")
+              Future.successful(Redirect(redirect))

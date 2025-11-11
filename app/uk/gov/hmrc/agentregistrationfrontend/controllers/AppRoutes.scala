@@ -24,6 +24,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.rout
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes as internalRoutes
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.routes as providedetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.routes as internalProviDedetailsRoutes
 
 /** All application routes centralized in one place for convenience and clarity. It helps avoid naming conflicts and makes route management easier.
   *
@@ -77,3 +78,7 @@ object AppRoutes:
 
     val StartController = providedetailsRoutes.StartController
     val LlpMemberNameController = providedetailsRoutes.LlpMemberNameController
+    val SessionManagementController = providedetailsRoutes.SessionManagementController
+
+    object internal:
+      val InitiateMemberProvideDetailsController = internalProviDedetailsRoutes.InitiateMemberProvideDetailsController

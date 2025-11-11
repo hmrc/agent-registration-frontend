@@ -29,7 +29,6 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.LlpStartPage
-import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.routes as internalRoutes
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -61,8 +60,7 @@ extends FrontendController(mcc, actions):
         applicationService.findApplicationByLinkId(linkId)
           .map:
             case Some(app) if app.hasFinished =>
-              Redirect(internalRoutes
-                .InitiateMemberProvideDetailsController.initiateMemberProvideDetails(linkId = linkId))
+              Redirect(AppRoutes.providedetails.internal.InitiateMemberProvideDetailsController.initiateMemberProvideDetails(linkId = linkId))
             case _ => Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
 
   def startNoLink: Action[AnyContent] = Action.async { implicit request =>

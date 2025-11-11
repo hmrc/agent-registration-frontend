@@ -83,13 +83,13 @@ extends ISpec:
 
     val provideDetailsAction = app.injector.instanceOf[ProvideDetailsAction]
 
-    assertThrows[IllegalStateException] {
-      provideDetailsAction
-        .invokeBlock(
-          tdAll.individualAuthorisedRequestLoggedInWithOutAgentApplicationId,
-          (_: MemberProvideDetailsRequest[?]) => fakeResultF
-        ).futureValue
-    }
+    provideDetailsAction
+      .invokeBlock(
+        tdAll.individualAuthorisedRequestLoggedInWithOutAgentApplicationId,
+        (_: MemberProvideDetailsRequest[?]) => fakeResultF
+      ).futureValue shouldBe Redirect(
+      """/agent-registration/provide-details/start-no-linkId"""
+    )
 
     IndividualAuthStubs.verifyAuthorise()
     AgentRegistrationMemberProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplicationId, 0)

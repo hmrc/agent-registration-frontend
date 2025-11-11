@@ -83,19 +83,26 @@ with RequestAwareLogging:
   override protected def refine[A](request: IndividualAuthorisedRequest[A]): Future[Either[Result, MemberProvideDetailsRequest[A]]] =
     given r: IndividualAuthorisedRequest[A] = request
 
-    val agentApplicationId: AgentApplicationId = request.getAgentApplicationId
-    memberProvideDetailsService
-      .findByApplicationId(agentApplicationId)
-      .flatMap {
-        case Some(memberProvidedDetails) =>
-          Future.successful(Right(new MemberProvideDetailsRequest(
-            memberProvidedDetails = memberProvidedDetails,
-            internalUserId = request.internalUserId,
-            request = request.request,
-            credentials = request.credentials
-          )))
-        case None =>
-          val redirect = AppRoutes.providedetails.StartController.startNoLink
-          logger.info(s"[Unexpected State] No member provided details found for authenticated user ${request.internalUserId.value}. Redirecting to ($redirect)")
+    val redirect = AppRoutes.providedetails.SessionManagementController.sessionExpired
+
+    Future(request.getAgentApplicationId)
+      .flatMap: agentApplicationId =>
+        memberProvideDetailsService
+          .findByApplicationId(agentApplicationId)
+          .flatMap:
+            case Some(memberProvidedDetails) =>
+              Future.successful(Right(new MemberProvideDetailsRequest(
+                memberProvidedDetails = memberProvidedDetails,
+                internalUserId = request.internalUserId,
+                request = request.request,
+                credentials = request.credentials
+              )))
+            case None =>
+              logger.info(s"[Unexpected State] No member provided details found for authenticated user ${request.internalUserId.value}. Redirecting to ($redirect)")
+              Future.successful(Left(Redirect(redirect)))
+      .recoverWith:
+        case e: IllegalStateException =>
+          logger.info(
+            s"[Missing data] AgentApplicationId not found in request for user ${request.internalUserId.value}. Redirecting to ($redirect)"
+          )
           Future.successful(Left(Redirect(redirect)))
-      }

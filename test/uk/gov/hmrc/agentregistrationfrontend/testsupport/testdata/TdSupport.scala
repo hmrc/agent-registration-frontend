@@ -35,7 +35,7 @@ object TdSupport:
     def withTrueClientPort(port: String = "client-port-123"): FakeRequest[T] = r.withHeaders(HeaderNames.trueClientPort -> port)
 
     def withDeviceId(deviceId: String = "device-id-123"): FakeRequest[T] = r.withHeaders(HeaderNames.deviceID -> deviceId)
-    
+
     def withAgentApplicationId(agentApplicationId: String): FakeRequest[T] = r.withSession((
       "agent-registration-frontend.agentApplicationId",
       agentApplicationId
