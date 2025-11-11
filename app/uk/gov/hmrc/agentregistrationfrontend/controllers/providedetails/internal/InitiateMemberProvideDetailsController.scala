@@ -70,5 +70,4 @@ extends FrontendController(mcc, actions):
 
           case None =>
             logger.info(s"Application does not exist for provided linkId: $linkId")
-            // TODO - TBC - confirm next page when no application exists for provided linkId
             Future.successful(Redirect(AppRoutes.providedetails.StartController.startNoLink))

@@ -22,6 +22,7 @@ import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Session
 import play.api.test.FakeRequest
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
@@ -137,6 +138,27 @@ extends UnitSpec:
 
     "readAgentType should return None when business type is not present in session" in:
       request.readAgentType shouldBe None
+
+  "AgentApplicationId" should:
+    s"Agent applicationId can be added to the Result and read back from the Request" in:
+      val agentApplicationId = AgentApplicationId("1234567890")
+      val newResult = result
+        .addToSession(agentApplicationId)
+
+      newResult
+        .asRequest
+        .readAgentApplicationId shouldBe Some(agentApplicationId)
+
+      newResult.newSession.value.get(
+        "agent-registration-frontend.agentApplicationId"
+      ).value shouldBe agentApplicationId.value withClue "data should be stored under 'agent-registration-frontend.agentApplicationId' session key"
+
+      newResult.newSession.value.get(
+        "some-preexisting-key"
+      ).value shouldBe "some-value" withClue "preexisting session data should not be affected"
+
+    "readAgentApplicationId should return None when business type is not present in session" in:
+      request.readAgentApplicationId shouldBe None
 
   extension (result: Result)
     def asRequest: Request[?] = request.withSession(result.newSession.getOrElse(Session()).data.toSeq*)
