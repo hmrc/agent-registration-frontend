@@ -73,7 +73,7 @@ extends RequestAwareLogging:
       }
     }
 
-  def findApplicationByLinkId(linkId: LinkId)(using
+  def findApplication(linkId: LinkId)(using
     request: RequestHeader
   ): Future[Option[AgentApplication]] = httpClient
     .get(url"$baseUrl/application/linkId/${linkId.value}")
@@ -86,7 +86,7 @@ extends RequestAwareLogging:
       }
     }
 
-  def findApplicationByAgentApplicationId(agentApplicationId: AgentApplicationId)(using
+  def findApplication(agentApplicationId: AgentApplicationId)(using
     request: RequestHeader
   ): Future[Option[AgentApplication]] = httpClient
     .get(url"$baseUrl/application/agentApplicationId/${agentApplicationId.value}")

@@ -29,6 +29,7 @@ import javax.inject.Singleton
 final case class AgentApplicationId(value: String)
 
 object AgentApplicationId:
+
   given format: Format[AgentApplicationId] = JsonFormatsFactory.makeValueClassFormat
   given pathBindable: PathBindable[AgentApplicationId] = ValueClassBinder.valueClassBinder[AgentApplicationId](_.value)
 

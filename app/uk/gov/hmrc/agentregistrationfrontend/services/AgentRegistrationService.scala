@@ -49,11 +49,10 @@ extends RequestAwareLogging:
     agentRegistrationConnector
       .upsertApplication(agentApplication)
 
-  def findApplicationByLinkId(linkId: LinkId)(using request: RequestHeader): Future[Option[AgentApplication]] =
-    agentRegistrationConnector.findApplicationByLinkId(linkId)
+  def findApplication(linkId: LinkId)(using request: RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector.findApplication(linkId)
 
-  def findApplicationByAgentApplicationId(agentApplicationId: AgentApplicationId)(using request: RequestHeader): Future[Option[AgentApplication]] =
-    agentRegistrationConnector.findApplicationByAgentApplicationId(agentApplicationId)
+  def findApplication(agentApplicationId: AgentApplicationId)(using request: RequestHeader): Future[Option[AgentApplication]] =
+    agentRegistrationConnector.findApplication(agentApplicationId)
 
   def getBusinessPartnerRecord(utr: Utr)(using request: AuthorisedRequest[?]): Future[Option[BusinessPartnerRecordResponse]] =
     agentRegistrationConnector.getBusinessPartnerRecord(utr)

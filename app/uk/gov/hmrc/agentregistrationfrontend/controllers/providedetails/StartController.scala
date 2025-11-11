@@ -47,7 +47,7 @@ extends FrontendController(mcc, actions):
   def start(linkId: LinkId): Action[AnyContent] = Action
     .async:
       implicit request: RequestHeader =>
-        applicationService.findApplicationByLinkId(linkId).map {
+        applicationService.findApplication(linkId).map {
           case Some(app) if app.hasFinished => startPageForApplicationType(app)
           case _ => Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
         }
@@ -57,7 +57,7 @@ extends FrontendController(mcc, actions):
   def resolve(linkId: LinkId): Action[AnyContent] = actions.authorisedIndividual
     .async:
       implicit request =>
-        applicationService.findApplicationByLinkId(linkId)
+        applicationService.findApplication(linkId)
           .map:
             case Some(app) if app.hasFinished =>
               Redirect(internalRoutes

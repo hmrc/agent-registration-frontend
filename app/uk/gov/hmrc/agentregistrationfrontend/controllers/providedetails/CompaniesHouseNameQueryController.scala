@@ -45,7 +45,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         agentRegistrationService
-          .findApplicationByAgentApplicationId(request.memberProvidedDetails.applicationId)
+          .findApplication(request.memberProvidedDetails.applicationId)
           .map:
             case Some(app) if app.hasFinished =>
               Ok(view(
@@ -73,7 +73,7 @@ extends FrontendController(mcc, actions):
           .fold(
             formWithErrors =>
               agentRegistrationService
-                .findApplicationByAgentApplicationId(request.memberProvidedDetails.applicationId)
+                .findApplication(request.memberProvidedDetails.applicationId)
                 .map:
                   case Some(app) if app.hasFinished =>
                     BadRequest(view(

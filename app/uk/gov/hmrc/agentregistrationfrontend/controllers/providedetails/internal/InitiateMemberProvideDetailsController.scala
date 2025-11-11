@@ -59,7 +59,7 @@ extends FrontendController(mcc, actions):
               logger.info("Member provided details already exists, redirecting to member name page")
               Future.successful(Redirect(nextEndpoint))
             case None =>
-              agentRegistrationService.findApplicationByLinkId(linkId).flatMap:
+              agentRegistrationService.findApplication(linkId).flatMap:
                 case Some(agentApplication) =>
                   memberProvideDetailsService
                     .upsert(memberProvideDetailsFactory
