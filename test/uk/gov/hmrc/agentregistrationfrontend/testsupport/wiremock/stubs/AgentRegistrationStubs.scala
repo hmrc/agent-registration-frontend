@@ -76,7 +76,7 @@ object AgentRegistrationStubs {
     agentApplication: AgentApplication
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/agentApplicationId/${agentApplicationId.value}"),
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/by-agent-application-id/${agentApplicationId.value}"),
     responseStatus = 200,
     responseBody = Json.toJson(agentApplication).toString
   )

@@ -102,7 +102,7 @@ extends RequestAwareLogging:
   def findApplication(agentApplicationId: AgentApplicationId)(using
     request: RequestHeader
   ): Future[Option[AgentApplication]] = httpClient
-    .get(url"$baseUrl/application/agentApplicationId/${agentApplicationId.value}")
+    .get(url"$baseUrl/application/by-agent-application-id/${agentApplicationId.value}")
     .execute[HttpResponse]
     .map { response =>
       response.status match {
