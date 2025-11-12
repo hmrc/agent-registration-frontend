@@ -17,6 +17,9 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfBirth
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState
@@ -81,6 +84,18 @@ trait TdBase:
   def memberProvidedDetailsId: MemberProvidedDetailsId = MemberProvidedDetailsId("member-provided-details-id-12345")
   def bprPrimaryTelephoneNumber: String = "(+44) 78714743399"
   def newTelephoneNumber: String = "+44 (0) 7000000000"
+  def llpNameQuery = CompaniesHouseNameQuery(
+    firstName = "Jane",
+    lastName = "Leadenhall-Lane"
+  )
+  def companiesHouseOfficer = CompaniesHouseOfficer(
+    name = "Taylor Leadenhall-Lane",
+    dateOfBirth = Some(CompaniesHouseDateOfBirth(
+      day = Some(12),
+      month = 11,
+      year = 1990
+    ))
+  )
 
   val memberProvidedDetails: MemberProvidedDetails = MemberProvidedDetails(
     _id = memberProvidedDetailsId,

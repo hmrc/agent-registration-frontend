@@ -47,7 +47,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request: RequestHeader =>
         val genericExitPageUrl: String = AppRoutes.apply.AgentApplicationController.genericExitPage.url
-        applicationService.findApplicationByLinkId(linkId).map {
+        applicationService.findApplication(linkId).map {
           case Some(app) if app.hasFinished => startPageForApplicationType(app)
           case Some(app) =>
             logger.warn(s"Application ${app.agentApplicationId} has not finished, redirecting to $genericExitPageUrl.")

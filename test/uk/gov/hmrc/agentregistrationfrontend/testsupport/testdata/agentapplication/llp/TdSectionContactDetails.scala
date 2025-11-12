@@ -18,6 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplicat
 
 import com.softwaremill.quicklens.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfBirth
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistration.shared.contactdetails.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 

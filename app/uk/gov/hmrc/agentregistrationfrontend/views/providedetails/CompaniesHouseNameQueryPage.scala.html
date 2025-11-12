@@ -14,39 +14,38 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+@import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 @import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
+@import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.routes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
-@import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 
 @this(
         layout: Layout,
         govukInput: GovukInput,
         formWithCSRF: FormWithCSRF,
-        govukButton: GovukButton,
-        continueOrSaveForLater: ContinueOrSaveForLater
+        govukButton: GovukButton
 )
 
-@(form: Form[CompaniesHouseNameQuery])(implicit request: AgentApplicationRequest[?], messages: Messages)
+@(form: Form[CompaniesHouseNameQuery], companyName: String)(implicit request: Request[?], messages: Messages)
 
 @key = @{
-    "llpMemberName"
+    "companiesHouseNameQuery"
 }
 @title = @{messages(s"$key.title")}
 @layout(
     pageTitle = title,
     maybeForm = Some(form)
 ) {
-    <h2 class="govuk-caption-l">@messages("applicant-contact-details.title")</h2>
+    <h2 class="govuk-caption-l">@messages("provide-details.llp.title")</h2>
     <h1 class="govuk-heading-l">@title</h1>
 
     <p class="govuk-body">@messages(
         s"$key.p1",
-        request.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
+        companyName
     )</p>
-    @formWithCSRF(action = AppRoutes.apply.applicantcontactdetails.MemberNameController.submit) {
+    @formWithCSRF(action = routes.CompaniesHouseNameQueryController.submit) {
         @govukInput(Input(
             label = Label(
               content = Text(messages(s"$key.firstName.label")),
@@ -67,6 +66,8 @@
             classes = "govuk-!-width-two-thirds"
         ).withFormField(form(CompaniesHouseNameQueryForm.lastNameKey)))
 
-        @continueOrSaveForLater()
+        @govukButton(Button(
+            content = Text(messages("common.saveAndContinue"))
+        ))
     }
 }

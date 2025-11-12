@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.providedetails.member
 
+import com.softwaremill.quicklens.modify
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseMatch
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Started
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
@@ -31,5 +33,23 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
       agentApplicationId = dependencies.agentApplicationId,
       providedDetailsState = Started
     )
+
+    val afterNameQueryProvided: MemberProvidedDetails = afterStarted
+      .modify(_.companiesHouseMatch)
+      .setTo(
+        Some(CompaniesHouseMatch(
+          memberNameQuery = dependencies.llpNameQuery,
+          companiesHouseOfficer = None
+        ))
+      )
+
+    val afterOfficerChosen: MemberProvidedDetails = afterStarted
+      .modify(_.companiesHouseMatch)
+      .setTo(
+        Some(CompaniesHouseMatch(
+          memberNameQuery = dependencies.llpNameQuery,
+          companiesHouseOfficer = Some(dependencies.companiesHouseOfficer)
+        ))
+      )
 
 }

@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.services
 
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseOfficer
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CompaniesHouseApiProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
@@ -36,7 +36,7 @@ extends RequestAwareLogging:
     companyRegistrationNumber: Crn,
     lastName: String,
     isLlp: Boolean = false
-  )(using request: AuthorisedRequest[?]): Future[Seq[CompaniesHouseOfficer]] = companiesHouseApiProxyConnector
+  )(using request: RequestHeader): Future[Seq[CompaniesHouseOfficer]] = companiesHouseApiProxyConnector
     .getCompaniesHouseOfficers(
       crn = companyRegistrationNumber,
       surname = lastName,
@@ -46,7 +46,7 @@ extends RequestAwareLogging:
   def getLlpOfficers(
     companyRegistrationNumber: Crn,
     lastName: String
-  )(using request: AuthorisedRequest[?]): Future[Seq[CompaniesHouseOfficer]] = getCompaniesHouseOfficers(
+  )(using request: RequestHeader): Future[Seq[CompaniesHouseOfficer]] = getCompaniesHouseOfficers(
     companyRegistrationNumber,
     lastName,
     isLlp = true
