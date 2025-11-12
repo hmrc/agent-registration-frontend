@@ -63,7 +63,7 @@ extends RequestAwareLogging:
   def findMemberProvidedDetailsByApplicationId(agentApplicationId: AgentApplicationId)(using
     request: IndividualAuthorisedRequest[?]
   ): Future[Option[MemberProvidedDetails]] = httpClient
-    .get(url"$baseUrl/member-provided-details/agent-applicationId/${agentApplicationId.value}")
+    .get(url"$baseUrl/member-provided-details/by-agent-applicationId/${agentApplicationId.value}")
     .execute[HttpResponse]
     .map { response =>
       response.status match {

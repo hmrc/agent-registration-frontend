@@ -34,14 +34,14 @@ object AgentRegistrationMemberProvidedDetailsStubs {
     providedDetails: MemberProvidedDetails
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"$base/agent-applicationId/${providedDetails.agentApplicationId.value}"),
+    urlPattern = urlMatching(s"$base/by-agent-applicationId/${providedDetails.agentApplicationId.value}"),
     responseStatus = Status.OK,
     responseBody = Json.toJson(providedDetails).toString
   )
 
   def stubGetMemberProvidedDetailsNoContent(agentApplicationId: AgentApplicationId): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"$base/agent-applicationId/${agentApplicationId.value}"),
+    urlPattern = urlMatching(s"$base/by-agent-applicationId/${agentApplicationId.value}"),
     responseStatus = Status.NO_CONTENT
   )
 
@@ -63,7 +63,7 @@ object AgentRegistrationMemberProvidedDetailsStubs {
     count: Int = 1
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlPathEqualTo(s"$base/agent-applicationId/${agentApplicationId.value}"),
+    urlPattern = urlPathEqualTo(s"$base/by-agent-applicationId/${agentApplicationId.value}"),
     count = count
   )
 
