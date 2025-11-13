@@ -78,7 +78,7 @@ object AppRoutes:
 
     val StartController = providedetailsRoutes.StartController
     val LlpMemberNameController = providedetailsRoutes.LlpMemberNameController
-    val SessionManagementController = providedetailsRoutes.SessionManagementController
+    val ExitController = providedetailsRoutes.ExitController
 
     object internal:
       val InitiateMemberProvideDetailsController = internalProviDedetailsRoutes.InitiateMemberProvideDetailsController

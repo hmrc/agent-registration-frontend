@@ -61,7 +61,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render the start page" in:
     AgentRegistrationStubs.stubFindApplicationByLinkId(linkId = linkId, agentApplication = agentApplication.complete)
-    AgentRegistrationMemberProvidedDetailsStubs.stubGetMemberProvidedDetailsNoContent(agentApplicationId)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindMemberProvidedDetailsNoContent(agentApplicationId)
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Sign in and confirm your details - Apply for an agent services account - GOV.UK"

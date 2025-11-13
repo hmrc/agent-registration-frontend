@@ -30,7 +30,7 @@ object AgentRegistrationMemberProvidedDetailsStubs {
 
   private val base = "/agent-registration/member-provided-details"
 
-  def stubFindMemberProvidedDetailsByApplicationId(
+  def stubFindMemberProvidedDetails(
     providedDetails: MemberProvidedDetails
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
@@ -39,9 +39,24 @@ object AgentRegistrationMemberProvidedDetailsStubs {
     responseBody = Json.toJson(providedDetails).toString
   )
 
-  def stubGetMemberProvidedDetailsNoContent(agentApplicationId: AgentApplicationId): StubMapping = StubMaker.make(
+  def stubFindMemberProvidedDetailsNoContent(agentApplicationId: AgentApplicationId): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = urlMatching(s"$base/by-agent-applicationId/${agentApplicationId.value}"),
+    responseStatus = Status.NO_CONTENT
+  )
+
+  def stubFindAllMemberProvidedDetails(
+    providedDetailsList: List[MemberProvidedDetails]
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"$base"),
+    responseStatus = Status.OK,
+    responseBody = Json.toJson(providedDetailsList).toString
+  )
+
+  def stubFindAllMemberProvidedDetailsNoContent(): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"$base"),
     responseStatus = Status.NO_CONTENT
   )
 

@@ -41,7 +41,10 @@ extends RequestAwareLogging:
 
   def findByApplicationId(applicationId: AgentApplicationId)(using request: IndividualAuthorisedRequest[?]): Future[Option[MemberProvidedDetails]] =
     memberProvideDetailsConnector
-      .findMemberProvidedDetailsByApplicationId(applicationId)
+      .find(applicationId)
+
+  def findAll()(using request: IndividualAuthorisedRequest[?]): Future[List[MemberProvidedDetails]] = memberProvideDetailsConnector
+    .findAll()
 
   def upsert(memberProvidedDetails: MemberProvidedDetails)(using request: IndividualAuthorisedRequest[?]): Future[Unit] =
     logger.debug(s"Upserting providedDetails for user:[${memberProvidedDetails.internalUserId}] and applicationId:[${memberProvidedDetails.agentApplicationId}]")

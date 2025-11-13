@@ -35,9 +35,10 @@ class LlpMemberNameController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getProvideDetailsInProgress:
-    implicit request: RequestHeader =>
-      Ok(placeholder(
-        h1 = "What is your name?",
-        bodyText = Some("This is a placeholder page for the LLP member name page.")
-      ))
+  def show: Action[AnyContent] = actions
+    .getProvideDetailsInProgress:
+      implicit request: RequestHeader =>
+        Ok(placeholder(
+          h1 = "What is your name?",
+          bodyText = Some("This is a placeholder page for the LLP member name page.")
+        ))

@@ -60,7 +60,7 @@ extends RequestAwareLogging:
       }
     }
 
-  def findMemberProvidedDetailsByApplicationId(agentApplicationId: AgentApplicationId)(using
+  def find(agentApplicationId: AgentApplicationId)(using
     request: IndividualAuthorisedRequest[?]
   ): Future[Option[MemberProvidedDetails]] = httpClient
     .get(url"$baseUrl/member-provided-details/by-agent-applicationId/${agentApplicationId.value}")
@@ -69,6 +69,19 @@ extends RequestAwareLogging:
       response.status match {
         case Status.OK => Some(response.json.as[MemberProvidedDetails])
         case Status.NO_CONTENT => None
+        case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
+      }
+    }
+
+  def findAll()(using
+    request: IndividualAuthorisedRequest[?]
+  ): Future[List[MemberProvidedDetails]] = httpClient
+    .get(url"$baseUrl/member-provided-details")
+    .execute[HttpResponse]
+    .map { response =>
+      response.status match {
+        case Status.OK => response.json.as[List[MemberProvidedDetails]]
+        case Status.NO_CONTENT => List.empty[MemberProvidedDetails]
         case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
       }
     }

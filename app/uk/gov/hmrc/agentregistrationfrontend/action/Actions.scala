@@ -132,14 +132,14 @@ extends RequestAwareLogging:
       condition = _.memberProvidedDetails.isInProgress,
       resultWhenConditionNotMet =
         implicit request =>
-          // TODO: TBC - where to redirect
-          val call = AppRoutes.apply.AgentApplicationController.genericExitPage
+          // TODO WG - confirm what is the correct behaviour for this case
+          val mpdGenericExitPage = AppRoutes.providedetails.ExitController.genericExitPage
           logger.warn(
-            s"The provided details are in the final state" +
+            s"The provided details are not in the final state" +
               s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +
-              s"redirecting to [${call.url}]."
+              s"redirecting to [${mpdGenericExitPage.url}]."
           )
-          Redirect(call.url)
+          Redirect(mpdGenericExitPage.url)
     )
 
   val getSubmitedDetailsInProgress: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorisedIndividual
@@ -148,12 +148,12 @@ extends RequestAwareLogging:
       condition = _.memberProvidedDetails.hasFinished,
       resultWhenConditionNotMet =
         implicit request =>
-          // TODO: TBC - where to redirect
-          val call = AppRoutes.apply.AgentApplicationController.genericExitPage
+          // TODO WG - confirm what is the correct behaviour for this case
+          val mpdGenericExitPage = AppRoutes.providedetails.ExitController.genericExitPage
           logger.warn(
             s"The provided details are in the final state" +
               s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +
-              s"redirecting to [${call.url}]."
+              s"redirecting to [${mpdGenericExitPage.url}]."
           )
-          Redirect(call.url)
+          Redirect(mpdGenericExitPage.url)
     )

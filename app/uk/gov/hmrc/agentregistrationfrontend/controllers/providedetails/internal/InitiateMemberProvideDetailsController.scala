@@ -44,12 +44,13 @@ extends FrontendController(mcc, actions):
     */
   def initiateMemberProvideDetails(
     linkId: LinkId
-  ): Action[AnyContent] = actions.authorisedIndividual
+  ): Action[AnyContent] = actions
+    .authorisedIndividual
     .async:
       implicit request =>
 
         val nextEndpoint: Call = AppRoutes.providedetails.LlpMemberNameController.show
-        val redirect = AppRoutes.providedetails.SessionManagementController.sessionExpired
+        val applicationGenericExitPageUrl: String = AppRoutes.apply.AgentApplicationController.genericExitPage.url
 
         agentRegistrationService.findApplicationByLinkId(linkId)
           .flatMap:
@@ -64,10 +65,9 @@ extends FrontendController(mcc, actions):
                       .map(_ => Redirect(nextEndpoint).addToSession(agentApplication.agentApplicationId))
 
                   case Some(memberProvideDetails) =>
-                    // TODO WG - fix the routing to the correct page depending on the status of the provided details
                     logger.info("Member provided details already exists, redirecting to member name page")
                     Future.successful(Redirect(nextEndpoint).addToSession(memberProvideDetails.agentApplicationId))
 
             case None =>
-              logger.info(s"Application does not exist for provided linkId: $linkId")
-              Future.successful(Redirect(redirect))
+              logger.info(s"Application for linkId $linkId not found, redirecting to $applicationGenericExitPageUrl")
+              Future.successful(Redirect(applicationGenericExitPageUrl))

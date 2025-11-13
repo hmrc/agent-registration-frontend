@@ -89,5 +89,3 @@ object SessionService:
 
     def readAgentApplicationId: Option[AgentApplicationId] = r.session.get(agentApplicationId)
       .map(value => AgentApplicationId(value))
-
-    def getAgentApplicationId: AgentApplicationId = readAgentApplicationId.getOrThrowExpectedDataMissing("AgentApplicationId")

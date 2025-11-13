@@ -16,30 +16,37 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
-import play.api.mvc.Action
-import play.api.mvc.AnyContent
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.Future
 
 @Singleton
-class SessionManagementController @Inject() (
+class ExitController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  placeholderStartPage: SimplePage
+  placeholderExitPage: SimplePage,
+  multipleMemberProvidedDetailsPage: SimplePage
 )
 extends FrontendController(mcc, actions):
 
-  def sessionExpired: Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok(placeholderStartPage(
-      h1 = "Start page for no linkId",
-      bodyText = Some(
-        "Placeholder for the member provide details start page when no linkId is provided"
-      )
-    )))
-  }
+  def genericExitPage: Action[AnyContent] = action:
+    implicit request =>
+      Ok(placeholderExitPage(
+        h1 = "You cannot use this service...",
+        bodyText = Some(
+          "Placeholder for member provided detailsgeneric exit page..."
+        )
+      ))
+
+  def multipleProvidedDetailsPage: Action[AnyContent] = action:
+    implicit request =>
+      Ok(multipleMemberProvidedDetailsPage(
+        h1 = "You cannot use this service...",
+        bodyText = Some(
+          "Placeholder for multiple member provided details generic page..."
+        )
+      ))
