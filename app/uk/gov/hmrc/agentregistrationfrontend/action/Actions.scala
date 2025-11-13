@@ -132,7 +132,6 @@ extends RequestAwareLogging:
       condition = _.memberProvidedDetails.isInProgress,
       resultWhenConditionNotMet =
         implicit request =>
-          // TODO WG - confirm what is the correct behaviour for this case
           val mpdGenericExitPage = AppRoutes.providedetails.ExitController.genericExitPage
           logger.warn(
             s"The provided details are not in the final state" +
@@ -148,7 +147,6 @@ extends RequestAwareLogging:
       condition = _.memberProvidedDetails.hasFinished,
       resultWhenConditionNotMet =
         implicit request =>
-          // TODO WG - confirm what is the correct behaviour for this case
           val mpdGenericExitPage = AppRoutes.providedetails.ExitController.genericExitPage
           logger.warn(
             s"The provided details are in the final state" +
