@@ -29,7 +29,7 @@ import uk.gov.hmrc.agentregistration.shared.upscan.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.TestOnlyLink
 import uk.gov.hmrc.agentregistrationfrontend.testOnly.services.TestApplicationService
@@ -42,7 +42,7 @@ import javax.inject.Singleton
 class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  applicationService: AgentRegistrationService,
+  applicationService: AgentApplicationService,
   testApplicationService: TestApplicationService,
   testLinkPage: TestLinkPage
 )

@@ -20,7 +20,9 @@ import com.softwaremill.quicklens.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentBusinessName
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
+import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentEmailAddress
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentTelephoneNumber
+import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentVerifiedEmailAddress
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
 trait TdSectionAgentDetails {
@@ -49,6 +51,18 @@ trait TdSectionAgentDetails {
         val afterOtherTelephoneNumberProvided: AgentApplicationLlp = afterBusinessNameProvided
           .modify(_.agentDetails.each.telephoneNumber)
           .setTo(Some(AgentTelephoneNumberHelper.afterOtherTelephoneNumberProvided))
+        val afterContactEmailAddressSelected: AgentApplicationLlp = afterContactTelephoneSelected
+          .modify(_.agentDetails.each.agentEmailAddress)
+          .setTo(Some(AgentEmailAddressHelper.afterContactEmailAddressSelected))
+        val afterBprEmailAddressSelected: AgentApplicationLlp = afterContactTelephoneSelected
+          .modify(_.agentDetails.each.agentEmailAddress)
+          .setTo(Some(AgentEmailAddressHelper.afterBprEmailAddressSelected))
+        val afterOtherEmailAddressSelected: AgentApplicationLlp = afterContactTelephoneSelected
+          .modify(_.agentDetails.each.agentEmailAddress)
+          .setTo(Some(AgentEmailAddressHelper.afterOtherEmailAddressSelected))
+        val afterVerifiedEmailAddressSelected: AgentApplicationLlp = afterContactTelephoneSelected
+          .modify(_.agentDetails.each.agentEmailAddress)
+          .setTo(Some(AgentEmailAddressHelper.afterVerifiedEmailAddressSelected))
 
       object whenProvidingNewBusinessName:
 
@@ -86,6 +100,40 @@ trait TdSectionAgentDetails {
       val afterOtherTelephoneNumberProvided: AgentTelephoneNumber = AgentTelephoneNumber(
         agentTelephoneNumber = "other",
         otherAgentTelephoneNumber = Some(dependencies.newTelephoneNumber)
+      )
+
+    private object AgentEmailAddressHelper:
+
+      val afterContactEmailAddressSelected: AgentVerifiedEmailAddress = AgentVerifiedEmailAddress(
+        emailAddress = AgentEmailAddress(
+          agentEmailAddress = dependencies.applicantEmailAddress.value,
+          otherAgentEmailAddress = None
+        ),
+        isVerified = true
+      )
+
+      val afterBprEmailAddressSelected: AgentVerifiedEmailAddress = AgentVerifiedEmailAddress(
+        emailAddress = AgentEmailAddress(
+          agentEmailAddress = dependencies.bprEmailAddress,
+          otherAgentEmailAddress = None
+        ),
+        isVerified = true
+      )
+
+      val afterOtherEmailAddressSelected: AgentVerifiedEmailAddress = AgentVerifiedEmailAddress(
+        emailAddress = AgentEmailAddress(
+          agentEmailAddress = "other",
+          otherAgentEmailAddress = Some(dependencies.newEmailAddress)
+        ),
+        isVerified = false
+      )
+
+      val afterVerifiedEmailAddressSelected: AgentVerifiedEmailAddress = AgentVerifiedEmailAddress(
+        emailAddress = AgentEmailAddress(
+          agentEmailAddress = "other",
+          otherAgentEmailAddress = Some(dependencies.newEmailAddress)
+        ),
+        isVerified = true
       )
 
 }

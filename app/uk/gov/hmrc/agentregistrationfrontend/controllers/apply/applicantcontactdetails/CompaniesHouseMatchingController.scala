@@ -33,7 +33,7 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionFormType
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms.toOfficerSelection
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.CompaniesHouseService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MatchedMemberPage
@@ -53,7 +53,7 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 class CompaniesHouseMatchingController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  agentRegistrationService: AgentRegistrationService,
+  agentApplicationService: AgentApplicationService,
   companiesHouseService: CompaniesHouseService,
   matchedMemberView: MatchedMemberPage,
   matchedMembersView: MatchedMembersPage,
@@ -165,7 +165,7 @@ extends FrontendController(mcc, actions):
         memberNameQuery = request.agentApplication.asLlpApplication.memberNameQuery,
         companiesHouseOfficer = Some(officer)
       ))
-    agentRegistrationService
+    agentApplicationService
       .upsert(updatedApplication)
       .map(_ => Redirect(routes.CheckYourAnswersController.show.url))
 

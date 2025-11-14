@@ -30,7 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MemberNamePage
 
 import javax.inject.Inject
@@ -41,7 +41,7 @@ class MemberNameController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: MemberNamePage,
-  agentRegistrationService: AgentRegistrationService
+  agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
@@ -81,7 +81,7 @@ extends FrontendController(mcc, actions):
                 ))
             else request.agentApplication
 
-          agentRegistrationService
+          agentApplicationService
             .upsert(updatedApplication)
             .map: _ =>
               Redirect(

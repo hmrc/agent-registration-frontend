@@ -34,7 +34,7 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionFormType
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms.toOfficerSelection
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.CompaniesHouseService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
@@ -50,7 +50,7 @@ import scala.concurrent.Future
 class CompaniesHouseMatchingController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  agentRegistrationService: AgentRegistrationService,
+  agentApplicationService: AgentApplicationService,
   companiesHouseService: CompaniesHouseService,
   memberProvideDetailsService: MemberProvideDetailsService,
   matchedMemberView: MatchedMemberPage,
@@ -146,8 +146,8 @@ extends FrontendController(mcc, actions):
 
   private def fetchOfficers(using request: MemberProvideDetailsRequest[?]): Future[Seq[CompaniesHouseOfficer]] =
     for {
-      agentApplication <- agentRegistrationService
-        .findApplication(request.memberProvidedDetails.agentApplicationId) // starting to think it may be better to have the application in the request
+      agentApplication <- agentApplicationService
+        .find(request.memberProvidedDetails.agentApplicationId) // starting to think it may be better to have the application in the request
       officers <- companiesHouseService.getLlpOfficers(
         companyRegistrationNumber =
           agentApplication

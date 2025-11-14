@@ -17,10 +17,10 @@
 package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
-import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
+import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
@@ -30,13 +30,19 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class AgentRegistrationService @Inject() (
+class AgentApplicationService @Inject() (
   agentRegistrationConnector: AgentRegistrationConnector
 )(using ec: ExecutionContext)
 extends RequestAwareLogging:
 
   def find()(using request: AuthorisedRequest[?]): Future[Option[AgentApplication]] = agentRegistrationConnector
     .findApplication()
+
+  def find(linkId: LinkId)(using request: RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector.findApplication(linkId)
+
+  def find(
+    agentApplicationId: AgentApplicationId
+  )(using request: RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector.findApplication(agentApplicationId)
 
   def get()(using request: AuthorisedRequest[?]): Future[AgentApplication] = find()
     .map { maybeApplication =>
@@ -48,15 +54,3 @@ extends RequestAwareLogging:
     Errors.require(agentApplication.internalUserId === request.internalUserId, "Cannot modify application - you must be the user who created it")
     agentRegistrationConnector
       .upsertApplication(agentApplication)
-
-  def findApplication(linkId: LinkId)(using request: RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector.findApplication(linkId)
-
-  def findApplication(agentApplicationId: AgentApplicationId)(using request: RequestHeader): Future[Option[AgentApplication]] =
-    agentRegistrationConnector.findApplication(agentApplicationId)
-
-  def find(
-    agentApplicationId: AgentApplicationId
-  )(using request: RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector.find(agentApplicationId)
-
-  def getBusinessPartnerRecord(utr: Utr)(using request: AuthorisedRequest[?]): Future[Option[BusinessPartnerRecordResponse]] =
-    agentRegistrationConnector.getBusinessPartnerRecord(utr)

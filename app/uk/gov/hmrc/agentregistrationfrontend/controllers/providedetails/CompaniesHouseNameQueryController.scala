@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseMatch
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.CompaniesHouseNameQueryPage
 
@@ -38,15 +38,15 @@ class CompaniesHouseNameQueryController @Inject() (
   mcc: MessagesControllerComponents,
   view: CompaniesHouseNameQueryPage,
   memberProvideDetailsService: MemberProvideDetailsService,
-  agentRegistrationService: AgentRegistrationService
+  agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions.getProvideDetailsInProgress
     .async:
       implicit request =>
-        agentRegistrationService
-          .findApplication(request.memberProvidedDetails.agentApplicationId)
+        agentApplicationService
+          .find(request.memberProvidedDetails.agentApplicationId)
           .map:
             case Some(app) if app.hasFinished =>
               Ok(view(
@@ -73,8 +73,8 @@ extends FrontendController(mcc, actions):
           .bindFromRequest()
           .fold(
             formWithErrors =>
-              agentRegistrationService
-                .findApplication(request.memberProvidedDetails.agentApplicationId)
+              agentApplicationService
+                .find(request.memberProvidedDetails.agentApplicationId)
                 .map:
                   case Some(app) =>
                     BadRequest(view(

@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.LlpStartPage
 
@@ -39,7 +39,7 @@ class StartController @Inject() (
   mcc: MessagesControllerComponents,
   llpStartPage: LlpStartPage,
   placeholderStartPage: SimplePage,
-  applicationService: AgentRegistrationService
+  applicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
@@ -47,7 +47,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request: RequestHeader =>
         val genericExitPageUrl: String = AppRoutes.apply.AgentApplicationController.genericExitPage.url
-        applicationService.findApplication(linkId).map {
+        applicationService.find(linkId).map {
           case Some(app) if app.hasFinished => startPageForApplicationType(app)
           case Some(app) =>
             logger.warn(s"Application ${app.agentApplicationId} has not finished, redirecting to $genericExitPageUrl.")

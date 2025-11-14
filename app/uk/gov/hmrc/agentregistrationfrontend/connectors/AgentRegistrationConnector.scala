@@ -86,19 +86,6 @@ extends RequestAwareLogging:
       }
     }
 
-  def find(agentApplicationId: AgentApplicationId)(using
-    request: RequestHeader
-  ): Future[Option[AgentApplication]] = httpClient
-    .get(url"$baseUrl/application/by-agent-application-id/${agentApplicationId.value}")
-    .execute[HttpResponse]
-    .map { response =>
-      response.status match {
-        case Status.OK => Some(response.json.as[AgentApplication])
-        case Status.NO_CONTENT => None
-        case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
-      }
-    }
-
   def findApplication(agentApplicationId: AgentApplicationId)(using
     request: RequestHeader
   ): Future[Option[AgentApplication]] = httpClient

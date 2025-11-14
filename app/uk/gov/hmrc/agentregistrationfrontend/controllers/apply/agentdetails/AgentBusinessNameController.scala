@@ -28,7 +28,8 @@ import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentBusinessNameForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.AgentBusinessNamePage
 
 import javax.inject.Inject
@@ -41,13 +42,14 @@ class AgentBusinessNameController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: AgentBusinessNamePage,
-  agentRegistrationService: AgentRegistrationService
+  agentApplicationService: AgentApplicationService,
+  businessPartnerRecordService: BusinessPartnerRecordService
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions.getApplicationInProgress.async:
     implicit request =>
-      agentRegistrationService
+      businessPartnerRecordService
         .getBusinessPartnerRecord(
           Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
         ).map: bprOpt =>
@@ -70,7 +72,7 @@ extends FrontendController(mcc, actions):
             .bindFromRequest()
             .fold(
               formWithErrors =>
-                agentRegistrationService
+                businessPartnerRecordService
                   .getBusinessPartnerRecord(
                     Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
                   ).map: bprOpt =>
@@ -94,7 +96,7 @@ extends FrontendController(mcc, actions):
                       Some(details
                         .modify(_.businessName)
                         .setTo(businessNameFromForm))
-                agentRegistrationService
+                agentApplicationService
                   .upsert(updatedApplication)
                   .map: _ =>
                     Redirect(routes.CheckYourAnswersController.show.url)

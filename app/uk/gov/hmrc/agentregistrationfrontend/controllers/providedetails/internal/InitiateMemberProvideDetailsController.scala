@@ -23,7 +23,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 
@@ -36,7 +36,7 @@ class InitiateMemberProvideDetailsController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   memberProvideDetailsService: MemberProvideDetailsService,
-  agentRegistrationService: AgentRegistrationService
+  agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
@@ -52,7 +52,7 @@ extends FrontendController(mcc, actions):
         val nextEndpoint: Call = AppRoutes.providedetails.CompaniesHouseNameQueryController.show
         val applicationGenericExitPageUrl: String = AppRoutes.apply.AgentApplicationController.genericExitPage.url
 
-        agentRegistrationService.findApplication(linkId)
+        agentApplicationService.find(linkId)
           .flatMap:
             case Some(agentApplication) =>
               memberProvideDetailsService

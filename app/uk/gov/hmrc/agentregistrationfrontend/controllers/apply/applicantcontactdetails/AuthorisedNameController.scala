@@ -31,7 +31,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AuthorisedNameForm
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.AuthorisedNamePage
 
 import javax.inject.Inject
@@ -42,7 +42,7 @@ class AuthorisedNameController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: AuthorisedNamePage,
-  applicationService: AgentRegistrationService
+  applicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
