@@ -82,4 +82,10 @@ object AgentRegistrationMemberProvidedDetailsStubs {
     count = count
   )
 
+  def verifyUpsert(count: Int = 1): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = urlPathEqualTo(base),
+    count = count
+  )
+
 }

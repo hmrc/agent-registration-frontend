@@ -79,7 +79,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page when there is a single match" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubGetMemberProvidedDetails(memberProvidedDetails.afterNameQueryProvided)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse = get(path)
@@ -89,7 +89,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page when there are multiple matches" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubGetMemberProvidedDetails(memberProvidedDetails.afterNameQueryProvided)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
     val response: WSResponse = get(path)
@@ -99,17 +99,18 @@ extends ControllerSpec:
 
   s"GET $path should redirect to name query page when name query is missing" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubGetMemberProvidedDetails(memberProvidedDetails.afterStarted)
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.inComplete)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterStarted))
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe routes.CompaniesHouseNameQueryController.show.url
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
 
   s"POST $path for single match without a valid selection should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubGetMemberProvidedDetails(memberProvidedDetails.afterNameQueryProvided)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse =
@@ -121,10 +122,14 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: Are these your details? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#companiesHouseOfficer-error").text() shouldBe "Error: Select yes if these are your details"
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
+    CompaniesHouseStubs.verifySingleMatchCalls(lastName = lastName)
 
   s"POST $path for single match with valid inputs should save officer and redirect to telephone page" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubGetMemberProvidedDetails(memberProvidedDetails.afterNameQueryProvided)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvidedDetails.afterOfficerChosen)
@@ -137,10 +142,14 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe routes.TelephoneNumberController.show.url
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
+    CompaniesHouseStubs.verifySingleMatchCalls(lastName = lastName)
 
   s"POST $path for multiple matches without a valid selection should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubGetMemberProvidedDetails(memberProvidedDetails.afterNameQueryProvided)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
     val response: WSResponse =
@@ -152,10 +161,14 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: 2 records match this name - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#companiesHouseOfficer-error").text() shouldBe "Error: Select the name and date of birth that matches your details"
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
+    CompaniesHouseStubs.verifyMultipleMatchCalls(lastName = lastName)
 
   s"POST $path for multiple matches with valid inputs should save officer and redirect to telephone page" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubGetMemberProvidedDetails(memberProvidedDetails.afterNameQueryProvided)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
     AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvidedDetails.afterOfficerChosen)
@@ -168,3 +181,8 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe routes.TelephoneNumberController.show.url
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
+    CompaniesHouseStubs.verifyMultipleMatchCalls(lastName = lastName)
+    AgentRegistrationMemberProvidedDetailsStubs.verifyUpsert()

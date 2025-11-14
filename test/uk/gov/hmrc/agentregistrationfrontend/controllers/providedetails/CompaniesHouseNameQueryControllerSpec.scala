@@ -71,7 +71,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page using company name from agent application" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubGetMemberProvidedDetails(memberProvidedDetails.afterStarted)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterStarted))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
     val response: WSResponse = get(path)
 
@@ -83,10 +83,13 @@ extends ControllerSpec:
       .selectOrFail("p.govuk-body")
       .selectOnlyOneElementOrFail()
       .text() shouldBe "We’ll check this against the business records for Test Company Name on Companies House."
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
 
   s"GET $path when query already stored should return 200 and render page with previous answers filled in" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubGetMemberProvidedDetails(memberProvidedDetails.afterNameQueryProvided)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
     val response: WSResponse = get(path)
 
@@ -103,21 +106,26 @@ extends ControllerSpec:
       .selectOrFail("input#lastName")
       .selectOnlyOneElementOrFail()
       .attr("value") shouldBe "Leadenhall-Lane"
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
 
   s"GET $path when application is not complete should redirect to an exit page" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubGetMemberProvidedDetails(memberProvidedDetails.afterStarted)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterStarted))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.inComplete)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.apply.AgentApplicationController.genericExitPage.url
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
 
   s"POST $path with first and last names should save data and redirect to the show name matches page" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubGetMemberProvidedDetails(memberProvidedDetails.afterStarted)
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterStarted))
     AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvidedDetails.afterNameQueryProvided)
     val response: WSResponse =
       post(path)(Map(
@@ -128,10 +136,13 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe routes.CompaniesHouseMatchingController.show.url
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationMemberProvidedDetailsStubs.verifyUpsert()
 
   s"POST $path with blank inputs should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubGetMemberProvidedDetails(memberProvidedDetails.afterStarted)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterStarted))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
     val response: WSResponse =
       post(path)(Map(
@@ -144,10 +155,13 @@ extends ControllerSpec:
     doc.title() shouldBe "Error: What is your name? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#firstName-error").text() shouldBe "Error: Enter your first name"
     doc.mainContent.select("#lastName-error").text() shouldBe "Error: Enter your last name"
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
 
   s"POST $path with invalid inputs should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubGetMemberProvidedDetails(memberProvidedDetails.afterStarted)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterStarted))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
     val response: WSResponse =
       post(path)(Map(
@@ -160,3 +174,6 @@ extends ControllerSpec:
     doc.title() shouldBe "Error: What is your name? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#firstName-error").text() shouldBe "Error: Your first name must only include letters a to z, hyphens, apostrophes and spaces"
     doc.mainContent.select("#lastName-error").text() shouldBe "Error: Your last name must only include letters a to z, hyphens, apostrophes and spaces"
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
