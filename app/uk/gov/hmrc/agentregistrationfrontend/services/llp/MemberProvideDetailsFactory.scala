@@ -38,7 +38,7 @@ class MemberProvideDetailsFactory @Inject() (
   ): MemberProvidedDetails = MemberProvidedDetails(
     _id = memberProvidedDetailsIdGenerator.nextMemberProvidedDetailsId(),
     internalUserId = internalUserId,
-    applicationId = agentApplicationId,
+    agentApplicationId = agentApplicationId,
     createdAt = Instant.now(clock),
     providedDetailsState = Started
   )

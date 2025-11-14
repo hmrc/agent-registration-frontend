@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.config
 import play.api.Configuration
 import sttp.model.Uri
 import sttp.model.Uri.UriContext
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
@@ -55,10 +56,13 @@ class AppConfig @Inject() (
   val selfBaseUrl: String = servicesConfig.baseUrl("agent-registration-frontend")
   val hmrcAsAgentEnrolment: Enrolment = Enrolment(key = "HMRC-AS-AGENT")
 
-  def signInUri(continueUri: Uri): Uri = uri"$basFrontendSignBaseInBaseUrl"
+  def signInUri(
+    continueUri: Uri,
+    affinityGroup: AffinityGroup
+  ): Uri = uri"$basFrontendSignBaseInBaseUrl"
     .addParam("continue_url", continueUri.toString())
     .addParam("origin", "agent-registration-frontend")
-    .addParam("accountType", "agent") // specifying this to bypass unnecessary screens intended for Individuals
+    .addParam("affinityGroup", affinityGroup.toString.toLowerCase)
 
   def applicationLink(linkId: String): Uri = uri"$thisFrontendBaseUrl/agent-registration/provide-details/start/$linkId"
 

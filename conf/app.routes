@@ -76,11 +76,12 @@ GET         /apply/anti-money-laundering/check-your-answers         uk.gov.hmrc.
 
 # Individuals (directors/partners/members/owners) providing details
 GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.start(linkId: LinkId)
-GET         /provide-details/resolve/:linkId                        uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.resolve(linkId: LinkId)
 
 ## Internal Routes for provide-details
 #  These routes are for internal navigation and should not be accessed directly through the browser URL and meant to be accessed via redirects from other routes.
-GET        /provide-details/internal/initiate-member-provide-details/:linkId/  uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.InitiateMemberProvideDetailsController.initiateMemberProvideDetails(linkId: LinkId)
-
+GET        /provide-details/internal/initiate-member-provide-details/:linkId  uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.InitiateMemberProvideDetailsController.initiateMemberProvideDetails(linkId: LinkId)
 
 GET         /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.LlpMemberNameController.show
+
+GET         /provide-details/exit                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.genericExitPage
+GET         /provide-details/multiple-provided-details              uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.multipleProvidedDetailsPage

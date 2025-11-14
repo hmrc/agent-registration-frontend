@@ -16,10 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
-import play.api.mvc.Action
-import play.api.mvc.AnyContent
-import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.RequestHeader
+import play.api.mvc.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
@@ -28,17 +25,28 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class LlpMemberNameController @Inject() (
+class ExitController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  placeholder: SimplePage
+  placeholderExitPage: SimplePage,
+  multipleMemberProvidedDetailsPage: SimplePage
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions
-    .getProvideDetailsInProgress:
-      implicit request: RequestHeader =>
-        Ok(placeholder(
-          h1 = "What is your name?",
-          bodyText = Some("This is a placeholder page for the LLP member name page.")
-        ))
+  def genericExitPage: Action[AnyContent] = action:
+    implicit request =>
+      Ok(placeholderExitPage(
+        h1 = "You cannot use this service...",
+        bodyText = Some(
+          "Placeholder for member provided detailsgeneric exit page..."
+        )
+      ))
+
+  def multipleProvidedDetailsPage: Action[AnyContent] = action:
+    implicit request =>
+      Ok(multipleMemberProvidedDetailsPage(
+        h1 = "You cannot use this service...",
+        bodyText = Some(
+          "Placeholder for multiple member provided details generic page..."
+        )
+      ))

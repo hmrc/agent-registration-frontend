@@ -106,7 +106,7 @@ with RequestAwareLogging:
       case _: NoActiveSession =>
         logger.info(s"Unauthorised because of 'NoActiveSession', redirecting to sign in page")
         Future.successful(Left(Redirect(
-          url = appConfig.signInUri(uri"""${appConfig.thisFrontendBaseUrl + request.uri}""").toString()
+          url = appConfig.signInUri(uri"""${appConfig.thisFrontendBaseUrl + request.uri}""", AffinityGroup.Agent).toString()
         )))
       case e: UnsupportedAuthProvider =>
         logger.info(s"Unauthorised because of '${e.reason}', ${e.toString}")

@@ -19,11 +19,13 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 import play.api.mvc.AnyContentAsEmpty
 import play.api.mvc.Request
 import play.api.test.FakeRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withAuthTokenInSession
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withDeviceId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withRequestId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withTrueClientIp
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withTrueClientPort
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withAgentApplicationId
 
 trait TdRequest {
   dependencies: TdBase =>
@@ -43,5 +45,22 @@ trait TdRequest {
 
   def requestNotLoggedIn: Request[AnyContentAsEmpty.type] = baseRequest
   def requestLoggedIn: Request[AnyContentAsEmpty.type] = baseRequest.withAuthTokenInSession()
+
+  def requestLoggedInWithAgentApplicationId: Request[AnyContentAsEmpty.type] = baseRequest
+    .withAuthTokenInSession()
+    .withAgentApplicationId(agentApplicationId.value)
+
+  def individualAuthorisedRequestLoggedInWithAgentApplicationId: IndividualAuthorisedRequest[AnyContentAsEmpty.type] =
+    new IndividualAuthorisedRequest(
+      internalUserId = internalUserId,
+      request = requestLoggedInWithAgentApplicationId,
+      credentials = credentials
+    )
+  def individualAuthorisedRequestLoggedInWithOutAgentApplicationId: IndividualAuthorisedRequest[AnyContentAsEmpty.type] =
+    new IndividualAuthorisedRequest(
+      internalUserId = internalUserId,
+      request = requestNotLoggedIn,
+      credentials = credentials
+    )
 
 }

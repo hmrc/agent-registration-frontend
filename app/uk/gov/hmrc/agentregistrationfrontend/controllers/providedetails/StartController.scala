@@ -29,7 +29,6 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.LlpStartPage
-import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.routes as internalRoutes
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -47,22 +46,16 @@ extends FrontendController(mcc, actions):
   def start(linkId: LinkId): Action[AnyContent] = Action
     .async:
       implicit request: RequestHeader =>
+        val genericExitPageUrl: String = AppRoutes.apply.AgentApplicationController.genericExitPage.url
         applicationService.findApplicationByLinkId(linkId).map {
           case Some(app) if app.hasFinished => startPageForApplicationType(app)
-          case _ => Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
+          case Some(app) =>
+            logger.warn(s"Application ${app.agentApplicationId} has not finished, redirecting to $genericExitPageUrl.")
+            Redirect(genericExitPageUrl)
+          case None =>
+            logger.info(s"Application for linkId $linkId not found, redirecting to $genericExitPageUrl")
+            Redirect(genericExitPageUrl)
         }
-
-  // TODO: this method requires an auth action to ensure user is signed in correctly and has
-  //  the application from the linkId provided within the request going forward
-  def resolve(linkId: LinkId): Action[AnyContent] = actions.authorisedIndividual
-    .async:
-      implicit request =>
-        applicationService.findApplicationByLinkId(linkId)
-          .map:
-            case Some(app) if app.hasFinished =>
-              Redirect(internalRoutes
-                .InitiateMemberProvideDetailsController.initiateMemberProvideDetails(linkId = linkId))
-            case _ => Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
 
   // for now this returns only the llp start page template until we build the rest
   private def startPageForApplicationType(agentApplication: AgentApplication)(implicit request: RequestHeader): Result =

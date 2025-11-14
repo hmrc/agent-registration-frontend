@@ -28,7 +28,7 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
       _id = dependencies.memberProvidedDetailsId,
       internalUserId = dependencies.internalUserId,
       createdAt = dependencies.nowAsInstant,
-      applicationId = dependencies.agentApplicationId,
+      agentApplicationId = dependencies.agentApplicationId,
       providedDetailsState = Started
     )
 

@@ -17,18 +17,23 @@
 package uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp
 
 import play.api.mvc.ActionRefiner
+import play.api.mvc.Call
 import play.api.mvc.Request
 import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.MergeFormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.retrieve.Credentials
+import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -70,7 +75,8 @@ object MemberProvideDetailsRequest:
 
 @Singleton
 class ProvideDetailsAction @Inject() (
-  memberProvideDetailsService: MemberProvideDetailsService
+  memberProvideDetailsService: MemberProvideDetailsService,
+  applicationService: AgentRegistrationService
 )(using ec: ExecutionContext)
 extends ActionRefiner[IndividualAuthorisedRequest, MemberProvideDetailsRequest]
 with RequestAwareLogging:
@@ -80,20 +86,56 @@ with RequestAwareLogging:
   override protected def refine[A](request: IndividualAuthorisedRequest[A]): Future[Either[Result, MemberProvideDetailsRequest[A]]] =
     given r: IndividualAuthorisedRequest[A] = request
 
-    memberProvideDetailsService
-      .find()
-      .flatMap {
-        case Some(memberProvidedDetails) =>
-          Future.successful(Right(new MemberProvideDetailsRequest(
-            memberProvidedDetails = memberProvidedDetails,
-            internalUserId = request.internalUserId,
-            request = request.request,
-            credentials = request.credentials
-          )))
-        case None =>
-          // TODO - confirm with BA behavior for this scenario
-          logger.error(s"No member provide details found for authenticated user ${request.internalUserId.value}. No linkId found. Redirecting to error page")
-          Errors.throwServerErrorException(
-            "No member provide details found for authenticated user ${request.internalUserId.value}. No linkId found. Redirecting to error page"
-          )
-      }
+    val mpdGenericExitPage: Call = AppRoutes.providedetails.ExitController.genericExitPage
+    val appGenericExitPageUrl: Call = AppRoutes.apply.AgentApplicationController.genericExitPage
+    val multipleMpd: Call = AppRoutes.providedetails.ExitController.multipleProvidedDetailsPage
+    def initiateMpd(linkId: LinkId): Call = AppRoutes.providedetails.internal.InitiateMemberProvideDetailsController.initiateMemberProvideDetails(linkId =
+      linkId
+    )
+
+    request.readAgentApplicationId match
+      case None =>
+        memberProvideDetailsService
+          .findAll()
+          .map:
+            case Nil =>
+              logger.info(s"Missing agentApplicationIn in session. Recovering failed. Member provided details not found, redirecting to ${mpdGenericExitPage.url}")
+              Left(Redirect(mpdGenericExitPage))
+            case memberProvidedDetails :: Nil =>
+              logger.info(s"Missing agentApplicationIn in session. Recovering success. One member provided details found, redirecting to next page")
+              Right(new MemberProvideDetailsRequest(
+                memberProvidedDetails = memberProvidedDetails,
+                internalUserId = request.internalUserId,
+                request = request.request,
+                credentials = request.credentials
+              ))
+            case _ =>
+              logger.info(s"Missing agentApplicationIn in session. Recovering failed. Multiple member provided details found, redirecting to ${multipleMpd.url}")
+              Left(Redirect(multipleMpd))
+
+      case Some(agentApplicationId) =>
+        memberProvideDetailsService
+          .findByApplicationId(agentApplicationId)
+          .flatMap:
+            case Some(memberProvidedDetails) =>
+              Future.successful(Right(new MemberProvideDetailsRequest(
+                memberProvidedDetails = memberProvidedDetails,
+                internalUserId = request.internalUserId,
+                request = request.request,
+                credentials = request.credentials
+              )))
+            case None =>
+              applicationService
+                .find(agentApplicationId)
+                .map:
+                  // TODO WG - do not like repeating this logic here. same as on start page. Risk of drifting
+                  case Some(app) if app.hasFinished =>
+                    val initiateMpdUrl: Call = initiateMpd(app.linkId)
+                    logger.info(s"Missing member provided details in DB. Recovering success. Recovered  LinkId: ${app.linkId} for user:${app.internalUserId} and redirecting to initiate journey ${initiateMpdUrl.url}.")
+                    Left(Redirect(initiateMpdUrl))
+                  case Some(app) =>
+                    logger.warn(s"Missing member provided details in DB. Recovering failed. Application ${app.agentApplicationId} has not finished, redirecting to ${appGenericExitPageUrl.url}")
+                    Left(Redirect(appGenericExitPageUrl))
+                  case None =>
+                    logger.info(s"Missing member provided details in DB. Recovering failed. Agent application not found, redirecting to ${appGenericExitPageUrl.url}")
+                    Left(Redirect(appGenericExitPageUrl))

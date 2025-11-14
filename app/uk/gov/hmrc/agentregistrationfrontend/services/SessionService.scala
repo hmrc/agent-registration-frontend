@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.services
 import play.api.mvc.Request
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
@@ -33,6 +34,7 @@ object SessionService:
   private val businessTypeKey: String = s"$microserviceName.businessType"
   private val partnershipTypeKey: String = s"$microserviceName.partnershipType"
   private val typeOfSignInKey: String = s"$microserviceName.typeOfSignIn"
+  private val agentApplicationId: String = s"$microserviceName.agentApplicationId"
 
   extension (r: Result)
 
@@ -40,6 +42,7 @@ object SessionService:
     def addToSession(bt: BusinessTypeAnswer)(using request: RequestHeader): Result = r.addingToSession(businessTypeKey -> bt.toString)
     def addSession(pt: BusinessType.Partnership)(using request: RequestHeader): Result = r.addingToSession(partnershipTypeKey -> pt.toString)
     def addToSession(tos: TypeOfSignIn)(using request: RequestHeader): Result = r.addingToSession(typeOfSignInKey -> tos.toString)
+    def addToSession(aid: AgentApplicationId)(using request: RequestHeader): Result = r.addingToSession(agentApplicationId -> aid.value)
     def removePartnershipTypeFromSession(using request: RequestHeader): Result = r.removingFromSession(partnershipTypeKey)
 
   extension (r: Request[?])
@@ -83,3 +86,6 @@ object SessionService:
       case BusinessTypeAnswer.PartnershipType => readPartnershipType
 
     def getBusinessType: BusinessType = readBusinessType.getOrThrowExpectedDataMissing("BusinessType")
+
+    def readAgentApplicationId: Option[AgentApplicationId] = r.session.get(agentApplicationId)
+      .map(value => AgentApplicationId(value))

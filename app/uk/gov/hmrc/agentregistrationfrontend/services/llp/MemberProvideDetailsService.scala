@@ -35,19 +35,19 @@ class MemberProvideDetailsService @Inject() (
 )
 extends RequestAwareLogging:
 
-  def createNewMemberProvidedDetails(applicationId: AgentApplicationId)(using request: IndividualAuthorisedRequest[?]): Future[MemberProvidedDetails] =
+  def createNewMemberProvidedDetails(applicationId: AgentApplicationId)(using request: IndividualAuthorisedRequest[?]): MemberProvidedDetails =
     logger.info(s"creating new provided details for user:[${request.internalUserId}] and applicationId:[${applicationId}] ")
-    Future.successful(provideDetailsFactory.makeNewMemberProvidedDetails(request.internalUserId, applicationId))
+    provideDetailsFactory.makeNewMemberProvidedDetails(request.internalUserId, applicationId)
 
-  def find()(using request: IndividualAuthorisedRequest[?]): Future[Option[MemberProvidedDetails]] = memberProvideDetailsConnector
-    .findMemberProvidedDetails()
-
-  def findByApplicationId(applicationId: AgentApplicationId)(using request: IndividualAuthorisedRequest[?]): Future[List[MemberProvidedDetails]] =
+  def findByApplicationId(applicationId: AgentApplicationId)(using request: IndividualAuthorisedRequest[?]): Future[Option[MemberProvidedDetails]] =
     memberProvideDetailsConnector
-      .findMemberProvidedDetailsByApplicationId(applicationId)
+      .find(applicationId)
+
+  def findAll()(using request: IndividualAuthorisedRequest[?]): Future[List[MemberProvidedDetails]] = memberProvideDetailsConnector
+    .findAll()
 
   def upsert(memberProvidedDetails: MemberProvidedDetails)(using request: IndividualAuthorisedRequest[?]): Future[Unit] =
-    logger.debug(s"Upserting providedDetails for user:[${memberProvidedDetails.internalUserId}] and applicationId:[${memberProvidedDetails.applicationId}]")
+    logger.debug(s"Upserting providedDetails for user:[${memberProvidedDetails.internalUserId}] and applicationId:[${memberProvidedDetails.agentApplicationId}]")
     Errors.require(memberProvidedDetails.internalUserId === request.internalUserId, "Cannot modify provided details - you must be the user who created it")
     memberProvideDetailsConnector
       .upsertMemberProvidedDetails(memberProvidedDetails)

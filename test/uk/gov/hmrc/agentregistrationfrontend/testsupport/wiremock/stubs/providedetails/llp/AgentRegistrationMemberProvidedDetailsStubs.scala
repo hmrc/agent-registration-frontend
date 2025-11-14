@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.provide
 
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
+import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.Json
@@ -27,35 +28,58 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AgentRegistrationMemberProvidedDetailsStubs {
 
-  def stubGetMemberProvidedDetails(memberProvidedDetails: MemberProvidedDetails): StubMapping = StubMaker.make(
+  private val base = "/agent-registration/member-provided-details"
+
+  def stubFindMemberProvidedDetails(
+    providedDetails: MemberProvidedDetails
+  ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching("/agent-registration/member-provided-details"),
-    responseStatus = 200,
-    responseBody = Json.toJson(memberProvidedDetails).toString
+    urlPattern = urlMatching(s"$base/by-agent-applicationId/${providedDetails.agentApplicationId.value}"),
+    responseStatus = Status.OK,
+    responseBody = Json.toJson(providedDetails).toString
   )
 
-  def stubGetMemberProvidedDetailsNoContent(): StubMapping = StubMaker.make(
+  def stubFindMemberProvidedDetailsNoContent(agentApplicationId: AgentApplicationId): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching("/agent-registration/member-provided-details"),
+    urlPattern = urlMatching(s"$base/by-agent-applicationId/${agentApplicationId.value}"),
     responseStatus = Status.NO_CONTENT
   )
 
-  // when you want to verify what is being stored
-  def stubUpsertMemberProvidedDetails(memberProvidedDetails: MemberProvidedDetails): StubMapping = StubMaker.make(
-    httpMethod = StubMaker.HttpMethod.POST,
-    urlPattern = urlMatching("/agent-registration/member-provided-details"),
-    responseStatus = 200,
-    requestBody = Some(equalToJson(Json.toJson(memberProvidedDetails).toString))
-  )
-
-  def stubFindMemberProvidedDetailsByApplicationId(
-    agentApplicationId: AgentApplicationId,
+  def stubFindAllMemberProvidedDetails(
     providedDetailsList: List[MemberProvidedDetails]
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/agent-registration/member-provided-details/application-id/${agentApplicationId.value}"),
-    responseStatus = 200,
+    urlPattern = urlMatching(s"$base"),
+    responseStatus = Status.OK,
     responseBody = Json.toJson(providedDetailsList).toString
+  )
+
+  def stubFindAllMemberProvidedDetailsNoContent(): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"$base"),
+    responseStatus = Status.NO_CONTENT
+  )
+
+  def stubUpsertMemberProvidedDetails(memberProvidedDetails: MemberProvidedDetails): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = urlMatching(base),
+    responseStatus = Status.OK,
+    requestBody = Some(equalToJson(Json.toJson(memberProvidedDetails).toString))
+  )
+
+  def verifyFind(count: Int = 1): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlPathEqualTo(base),
+    count = count
+  )
+
+  def verifyFindByAgentApplicationID(
+    agentApplicationId: AgentApplicationId,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlPathEqualTo(s"$base/by-agent-applicationId/${agentApplicationId.value}"),
+    count = count
   )
 
 }

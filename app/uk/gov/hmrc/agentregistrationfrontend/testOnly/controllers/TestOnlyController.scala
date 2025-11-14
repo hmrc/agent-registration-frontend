@@ -22,6 +22,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import sttp.model.Uri.UriContext
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.upscan.*
@@ -92,6 +93,13 @@ extends FrontendController(mcc, actions):
         .addToSession(AgentType.UkTaxAgent)
         .addToSession(BusinessTypeAnswer.PartnershipType)
         .addSession(partnershipType)
+
+  def addAgentApplicationIdToSession(
+    agentApplicationId: AgentApplicationId
+  ): Action[AnyContent] = Action:
+    implicit request =>
+      Ok("agent applicationId added to session")
+        .addToSession(agentApplicationId)
 
   // as we add more types of entity support we may want to specify which business type to create
   // possibly as part of the url, for now we only create an LLP application
