@@ -28,7 +28,8 @@ case class VerifyEmailRequest(
   email: Option[Email],
   lang: Option[String],
   backUrl: Option[String],
-  pageTitle: Option[String]
+  pageTitle: Option[String],
+  useNewGovUkServiceNavigation: Option[Boolean] = Some(true) // default to match our setting
 )
 
 object VerifyEmailRequest:
