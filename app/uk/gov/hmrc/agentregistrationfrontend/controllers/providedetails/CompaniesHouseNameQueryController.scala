@@ -76,7 +76,7 @@ extends FrontendController(mcc, actions):
               agentRegistrationService
                 .findApplication(request.memberProvidedDetails.agentApplicationId)
                 .map:
-                  case Some(app) if app.hasFinished =>
+                  case Some(app) =>
                     BadRequest(view(
                       formWithErrors,
                       app.asLlpApplication.getBusinessDetails.companyProfile.companyName
