@@ -71,6 +71,16 @@ object AgentRegistrationStubs {
     responseBody = Json.toJson(agentApplication).toString
   )
 
+  def stubFindApplication(
+    agentApplicationId: AgentApplicationId,
+    agentApplication: AgentApplication
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/by-agent-application-id/${agentApplicationId.value}"),
+    responseStatus = 200,
+    responseBody = Json.toJson(agentApplication).toString
+  )
+
   def stubGetBusinessPartnerRecord(
     utr: Utr,
     responseBody: BusinessPartnerRecordResponse

@@ -20,6 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock as wm
 import com.github.tomakehurst.wiremock.matching.StringValuePattern
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
+import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
@@ -32,7 +33,7 @@ object AuthStubs {
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlMatching("/auth/authorise"),
-    requestBody = Some(expectedRequestBody),
+    requestBody = Some(expectedRequestBodyAgent),
     responseStatus = Status.OK,
     responseBody = responseBody
   )
@@ -41,6 +42,16 @@ object AuthStubs {
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlMatching("/auth/authorise"),
     count = count
+  )
+
+  def stubAuthoriseIndividual(
+    responseBody: String = responseBodyAsIndividual()
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlMatching("/auth/authorise"),
+    requestBody = Some(expectedRequestBodyIndividual),
+    responseStatus = Status.OK,
+    responseBody = responseBody
   )
 
   def responseBodyAsCleanAgent(
@@ -60,7 +71,45 @@ object AuthStubs {
        |}
        |""".stripMargin
 
-  private val expectedRequestBody: StringValuePattern = wm.equalToJson(
+  private def responseBodyAsIndividual(
+    internalUserId: InternalUserId = TdAll.tdAll.internalUserId
+  ): String =
+    Json.obj(
+      "internalId" -> internalUserId.value,
+      "affinityGroup" -> "Individual",
+      "confidenceLevel" -> 250,
+      "optionalCredentials" -> Json.obj(
+        "providerId" -> "cred-id-12345",
+        "providerType" -> "GovernmentGateway"
+      ),
+      "allEnrolments" -> Json.arr(Json.obj(
+        "key" -> "MTD-IT",
+        "identifiers" -> Json.arr(Json.obj(
+          "key" -> "AnyIdentifier",
+          "value" -> "AnyValue"
+        ))
+      ))
+    ).toString
+
+  private val expectedRequestBodyIndividual: StringValuePattern = wm.equalToJson(
+    Json.obj(
+      "authorise" -> Json.arr(
+        Json.obj(
+          "authProviders" -> Json.arr("GovernmentGateway")
+        ),
+        Json.obj(
+          "affinityGroup" -> "Individual"
+        )
+      ),
+      "retrieve" -> Json.arr(
+        "allEnrolments",
+        "internalId",
+        "optionalCredentials"
+      )
+    ).toString
+  )
+
+  private val expectedRequestBodyAgent: StringValuePattern = wm.equalToJson(
     // language=JSON
     """
       |{

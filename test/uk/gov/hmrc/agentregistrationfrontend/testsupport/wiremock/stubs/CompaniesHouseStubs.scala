@@ -65,4 +65,22 @@ object CompaniesHouseStubs {
       ).toString
   )
 
+  def verifySingleMatchCalls(
+    lastName: String,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=$lastName&register_view=true&register_type=llp_members"),
+    count = count
+  )
+
+  def verifyMultipleMatchCalls(
+    lastName: String,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=$lastName&register_view=true&register_type=llp_members"),
+    count = count
+  )
+
 }

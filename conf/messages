@@ -304,8 +304,11 @@ timed-out.header = You have been signed out
 timed-out.p1 = You have not done anything for 15 minutes, so we have signed you out to keep your account secure.
 timed-out.link = Sign in again
 
+# Llp member journeys
+provide-details.llp.title=LLP member confirmation
 
-# Signatory journeys
+## Llp start page
+
 llpProvideDetailsStart.title = Sign in and confirm your details
 llpProvideDetailsStart.p1 = {0} has started an application for an agent services account on behalf of {1}.
 llpProvideDetailsStart.p2 = You are listed in Companies House as a current member of this limited liability partnership. That means we need some information from you before we can process the application.
@@ -316,3 +319,12 @@ llpProvideDetailsStart.info.li2 = carry out some checks on your tax and financia
 llpProvideDetailsStart.signIn.h2 = Use the right sign in details
 llpProvideDetailsStart.signIn.p1 = We need you to sign in using sign in details you created for your personal taxes, not your business taxes.
 llpProvideDetailsStart.signIn.p2 = If you do not have personal sign in details, you can create some.
+
+companiesHouseNameQuery.title = What is your name?
+companiesHouseNameQuery.p1 = We’ll check this against the business records for {0} on Companies House.
+companiesHouseNameQuery.firstName.label = First names
+companiesHouseNameQuery.lastName.label = Last name
+firstName.error.required = Enter your first name
+firstName.error.invalid = Your first name must only include letters a to z, hyphens, apostrophes and spaces
+lastName.error.required = Enter your last name
+lastName.error.invalid = Your last name must only include letters a to z, hyphens, apostrophes and spaces

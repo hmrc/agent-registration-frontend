@@ -14,9 +14,8 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+@import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
 @import uk.gov.hmrc.agentregistrationfrontend.forms.OfficerSelection
 @import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionFormType
@@ -30,14 +29,13 @@
         govukRadios: GovukRadios,
         formWithCSRF: FormWithCSRF,
         govukButton: GovukButton,
-        govukInsetText: GovukInsetText,
-        continueOrSaveForLater: ContinueOrSaveForLater
+        govukInsetText: GovukInsetText
 )
 
 @(
         form: Form[OfficerSelection],
         officers: Seq[CompaniesHouseOfficer]
-)(implicit request: AgentApplicationRequest[?], messages: Messages)
+)(implicit request: Request[?], messages: Messages)
 
 @key = @{ChOfficerSelectionForms.key}
 @makeDateOfBirth(dob: Option[CompaniesHouseDateOfBirth]) = {
@@ -61,8 +59,8 @@
     pageTitle = title,
     maybeForm = Some(form)
 ) {
-    <h2 class="govuk-caption-l">@messages("applicant-contact-details.title")</h2>
-    @formWithCSRF(action = AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.submit) {
+    <h2 class="govuk-caption-l">@messages("provide-details.llp.title")</h2>
+    @formWithCSRF(action = AppRoutes.providedetails.CompaniesHouseMatchingController.submit) {
         <input
             type="hidden"
             name="@ChOfficerSelectionFormType.key"
@@ -85,6 +83,9 @@
               )
           )
         ).withFormField(form(key)))
-        @continueOrSaveForLater()
+
+        @govukButton(Button(
+            content = Text(messages("common.saveAndContinue"))
+        ))
     }
 }

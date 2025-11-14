@@ -49,10 +49,10 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
 
-        val nextEndpoint: Call = AppRoutes.providedetails.LlpMemberNameController.show
+        val nextEndpoint: Call = AppRoutes.providedetails.CompaniesHouseNameQueryController.show
         val applicationGenericExitPageUrl: String = AppRoutes.apply.AgentApplicationController.genericExitPage.url
 
-        agentRegistrationService.findApplicationByLinkId(linkId)
+        agentRegistrationService.findApplication(linkId)
           .flatMap:
             case Some(agentApplication) =>
               memberProvideDetailsService

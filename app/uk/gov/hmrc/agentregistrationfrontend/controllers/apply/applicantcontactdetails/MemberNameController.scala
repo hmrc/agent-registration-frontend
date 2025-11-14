@@ -23,8 +23,8 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
-import uk.gov.hmrc.agentregistration.shared.contactdetails.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue

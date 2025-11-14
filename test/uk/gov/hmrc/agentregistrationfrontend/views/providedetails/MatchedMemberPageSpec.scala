@@ -14,32 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.apply.applicantcontactdetails
+package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.MatchedMemberPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.MatchedMemberPage
 
 class MatchedMemberPageSpec
 extends ViewSpec:
 
   val viewTemplate: MatchedMemberPage = app.injector.instanceOf[MatchedMemberPage]
-  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(
-    agentApplication =
-      tdAll
-        .agentApplicationLlp
-        .sectionContactDetails
-        .whenApplicantIsAMember
-        .afterNameQueryProvided
-  )
+
   private val heading: String = "Are these your details?"
 
   private val singleOfficer = Seq(
@@ -61,7 +50,7 @@ extends ViewSpec:
     "render a form with yes/no radios for a single match" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.submit.url
+      form.attr("action") shouldBe AppRoutes.providedetails.CompaniesHouseMatchingController.submit.url
       form
         .selectOrFail(s"label[for=${ChOfficerSelectionForms.key}]")
         .selectOnlyOneElementOrFail()
@@ -80,16 +69,9 @@ extends ViewSpec:
     "render a save and continue button" in:
       doc
         .mainContent
-        .selectOrFail(s"form button[value='${SaveAndContinue.toString}']")
+        .selectOrFail(s"form button")
         .selectOnlyOneElementOrFail()
         .text() shouldBe "Save and continue"
-
-    "render a save and come back later button" in:
-      doc
-        .mainContent
-        .selectOrFail(s"form button[value=${SaveAndComeBackLater.toString}]")
-        .selectOnlyOneElementOrFail()
-        .text() shouldBe "Save and come back later"
 
     "render a form error when passed in" in:
       val field = ChOfficerSelectionForms.key
