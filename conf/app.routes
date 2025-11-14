@@ -55,8 +55,11 @@ GET         /apply/applicant/check-your-answers                    uk.gov.hmrc.a
 ## Agent details routes
 GET         /apply/agent-details/business-name                     uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentBusinessNameController.show
 POST        /apply/agent-details/business-name                     uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentBusinessNameController.submit
-GET         /apply/agent-details/telephone-number                   uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentTelephoneNumberController.show
-POST        /apply/agent-details/telephone-number                   uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentTelephoneNumberController.submit
+GET         /apply/agent-details/telephone-number                  uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentTelephoneNumberController.show
+POST        /apply/agent-details/telephone-number                  uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentTelephoneNumberController.submit
+GET         /apply/agent-details/email-address                     uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentEmailAddressController.show
+POST        /apply/agent-details/email-address                     uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentEmailAddressController.submit
+GET         /apply/agent-details/verify-email-address              uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentEmailAddressController.verify
 
 GET         /apply/agent-details/check-your-answers                uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.CheckYourAnswersController.show
 
@@ -86,6 +89,5 @@ POST        /provide-details/name                                   uk.gov.hmrc.
 GET         /provide-details/name-match                             uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CompaniesHouseMatchingController.show
 POST        /provide-details/name-match                             uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CompaniesHouseMatchingController.submit
 GET         /provide-details/telephone-number                       uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.TelephoneNumberController.show
-
 GET         /provide-details/exit                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.genericExitPage
 GET         /provide-details/multiple-provided-details              uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.multipleProvidedDetailsPage

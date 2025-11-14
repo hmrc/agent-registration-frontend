@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 
@@ -39,7 +39,7 @@ import scala.concurrent.Future
 class InitiateAgentApplicationController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  agentRegistrationService: AgentRegistrationService,
+  agentApplicationService: AgentApplicationService,
   enrolmentStoreProxyConnector: EnrolmentStoreProxyConnector,
   appConfig: AppConfig,
   applicationFactory: ApplicationFactory
@@ -74,12 +74,12 @@ extends FrontendController(mcc, actions):
 
         val nextEndpoint: Call = routes.GrsController.startJourney()
 
-        agentRegistrationService.find().flatMap:
+        agentApplicationService.find().flatMap:
           case Some(agentApplication) =>
             logger.info("Application already exists, redirecting to task list")
             Future.successful(Redirect(nextEndpoint))
           case None =>
             logger.info(s"Application does not exist, creating new application: $agentType, $businessType")
-            agentRegistrationService
+            agentApplicationService
               .upsert(applicationFactory.makeNewAgentApplicationLlp(request.internalUserId, request.groupId))
               .map(_ => Redirect(nextEndpoint))

@@ -20,7 +20,7 @@ import play.api.mvc.ActionRefiner
 import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistration.shared.*
@@ -71,14 +71,14 @@ object AgentApplicationRequest:
 
 @Singleton
 class AgentApplicationAction @Inject() (
-  agentRegistrationService: AgentRegistrationService
+  agentApplicationService: AgentApplicationService
 )(using ec: ExecutionContext)
 extends ActionRefiner[AuthorisedRequest, AgentApplicationRequest]
 with RequestAwareLogging:
 
   override protected def refine[A](request: AuthorisedRequest[A]): Future[Either[Result, AgentApplicationRequest[A]]] =
     given r: AuthorisedRequest[A] = request
-    agentRegistrationService
+    agentApplicationService
       .find()
       .flatMap:
         case Some(application) =>

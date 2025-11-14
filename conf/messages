@@ -168,11 +168,26 @@ otherAgentTelephoneNumber.error.required = Enter the telephone number for your a
 otherAgentTelephoneNumber.error.invalid = Telephone number must only include numbers, plus sign, hash sign, hyphens, brackets and spaces
 otherAgentTelephoneNumber.error.tooLong = The phone number must be 24 characters or fewer
 
+# Agent details / email address
+
+agentEmailAddress.title = What email address should we use for your agent services account?
+
+agentEmailAddress.contact.hint = This is the email address you have given us.
+agentEmailAddress.bpr.hint = This is the email address HMRC has in your business record.
+agentEmailAddress.other = Something else
+agentEmailAddress.error.required = Enter the email address for your agent services account
+otherAgentEmailAddress.label = Enter the email address you want to use
+otherAgentEmailAddress.hint = We will send a code to this email address to confirm it.
+otherAgentEmailAddress.error.required = Enter the email address for your agent services account
+otherAgentEmailAddress.error.invalid = Enter an email address in the correct format, like name@example.com
+otherAgentEmailAddress.error.tooLong = The email address must be 24 characters or fewer
+
 # Agent details / check your answers
 
 agentDetailsCheckYourAnswers.title = Check your answers
 agentDetailsCheckYourAnswers.businessName.label = Business name for clients
 agentDetailsCheckYourAnswers.telephone.label = Telephone number
+agentDetailsCheckYourAnswers.email.label = Email address
 
 # About your application / user role
 userRole.title = Are you the owner of the business?

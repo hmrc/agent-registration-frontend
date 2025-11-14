@@ -30,7 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.ApplicantRoleInLlpPage
 
 import javax.inject.Inject
@@ -43,7 +43,7 @@ class ApplicantRoleInLlpController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: ApplicantRoleInLlpPage,
-  applicationService: AgentRegistrationService
+  applicationService: AgentApplicationService
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 

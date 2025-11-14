@@ -22,9 +22,7 @@ import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentBusinessName
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -45,9 +43,8 @@ extends FrontendController(mcc, actions):
         logger.warn("Because we don't have complete agent details we are redirecting to where data is missing")
         request.agentApplication.asLlpApplication.agentDetails match {
           case None => Redirect(routes.AgentBusinessNameController.show)
-          case Some(AgentDetails(AgentBusinessName(a @ _, None), _)) if a === "other" => Redirect(routes.AgentBusinessNameController.show)
-          case Some(AgentDetails(_, None)) => Redirect(routes.AgentTelephoneNumberController.show)
-          case _ => Redirect(routes.AgentBusinessNameController.show)
+          case Some(AgentDetails(_, None, _)) => Redirect(routes.AgentTelephoneNumberController.show)
+          case Some(AgentDetails(_, _, _)) => Redirect(routes.AgentEmailAddressController.show)
         }
     )
 

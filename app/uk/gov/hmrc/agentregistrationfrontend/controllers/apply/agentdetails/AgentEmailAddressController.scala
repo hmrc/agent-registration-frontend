@@ -14,42 +14,46 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails
+package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 
-import com.softwaremill.quicklens.each
-import com.softwaremill.quicklens.modify
+import com.softwaremill.quicklens.*
 import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.Utr
+import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentVerifiedEmailAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.AgentEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.emailVerification.*
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.EmailVerificationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.EmailAddressPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.AgentEmailAddressPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class EmailAddressController @Inject() (
+class AgentEmailAddressController @Inject() (
   appConfig: AppConfig,
   mcc: MessagesControllerComponents,
   actions: Actions,
-  view: EmailAddressPage,
+  view: AgentEmailAddressPage,
+  placeholder: SimplePage,
   agentApplicationService: AgentApplicationService,
   emailVerificationService: EmailVerificationService,
-  placeholder: SimplePage
-)
+  businessPartnerRecordService: BusinessPartnerRecordService
+)(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
@@ -57,81 +61,98 @@ extends FrontendController(mcc, actions):
       _
         .agentApplication
         .asLlpApplication
-        .applicantContactDetails
+        .agentDetails
         .exists(_.telephoneNumber.isDefined),
       implicit request =>
-        logger.warn("Because we don't have a telephone number we are redirecting to the telephone number page")
-        Redirect(routes.TelephoneNumberController.show)
+        logger.warn("Because we don't have a telephone number selected we are redirecting to the telephone page")
+        Redirect(routes.AgentTelephoneNumberController.show)
     )
 
-  def show: Action[AnyContent] = baseAction:
+  def show: Action[AnyContent] = baseAction.async:
     implicit request =>
-      Ok(view(EmailAddressForm.form.fill(
-        request
-          .agentApplication
-          .asLlpApplication
-          .getApplicantContactDetails
-          .applicantEmailAddress
-          .map(_.emailAddress)
-      )))
+      businessPartnerRecordService
+        .getBusinessPartnerRecord(
+          Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
+        ).map: bprOpt =>
+          Ok(view(
+            form = AgentEmailAddressForm.form.fill:
+              request
+                .agentApplication
+                .asLlpApplication
+                .agentDetails
+                .flatMap(_.agentEmailAddress)
+                .map(_.emailAddress)
+            ,
+            bprEmailAddress = bprOpt.flatMap(_.emailAddress)
+          ))
 
-  def submit: Action[AnyContent] =
-    baseAction
-      .async:
-        implicit request =>
-          EmailAddressForm.form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-              emailAddress =>
-                val updatedApplication = request
-                  .agentApplication
-                  .asLlpApplication
-                  .modify(_.applicantContactDetails.each.applicantEmailAddress)
-                  .using {
-                    case Some(details) =>
-                      Some(ApplicantEmailAddress(
-                        emailAddress = emailAddress,
-                        // avoid unsetting verified status of any unchanged email if we are not ignoring verification
-                        isVerified =
-                          appConfig.ignoreEmailVerification ||
-                            (emailAddress === details.emailAddress && details.isVerified)
-                      ))
-                    case None =>
-                      Some(ApplicantEmailAddress(
-                        emailAddress = emailAddress,
-                        isVerified = appConfig.ignoreEmailVerification
-                      ))
-                  }
-
-                agentApplicationService
-                  .upsert(updatedApplication)
-                  .map(_ =>
-                    Redirect(
-                      routes.EmailAddressController.verify
+  def submit: Action[AnyContent] = baseAction
+    .async:
+      implicit request: AgentApplicationRequest[AnyContent] =>
+        AgentEmailAddressForm.form
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              businessPartnerRecordService
+                .getBusinessPartnerRecord(
+                  Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
+                ).map: bprOpt =>
+                  BadRequest(
+                    view(
+                      form = formWithErrors,
+                      bprEmailAddress = bprOpt.flatMap(_.emailAddress)
                     )
+                  ),
+            emailAddressFromForm =>
+              val updatedApplication: AgentApplication = request
+                .agentApplication
+                .asLlpApplication
+                .modify(_.agentDetails.each.agentEmailAddress)
+                .using {
+                  case Some(details) =>
+                    Some(AgentVerifiedEmailAddress(
+                      emailAddress = emailAddressFromForm,
+                      // avoid unsetting verified status of any unchanged email if we are not ignoring verification
+                      // also if selecting a pre-verified email i.e. not "other" then set to true
+                      isVerified =
+                        appConfig.ignoreEmailVerification ||
+                          emailAddressFromForm.otherAgentEmailAddress.isEmpty ||
+                          (emailAddressFromForm === details.emailAddress && details.isVerified)
+                    ))
+                  case None =>
+                    Some(AgentVerifiedEmailAddress(
+                      emailAddress = emailAddressFromForm,
+                      isVerified =
+                        appConfig.ignoreEmailVerification ||
+                          emailAddressFromForm.otherAgentEmailAddress.isEmpty
+                    ))
+                }
+              agentApplicationService
+                .upsert(updatedApplication)
+                .map: _ =>
+                  Redirect(
+                    routes.AgentEmailAddressController.verify
                   )
-            )
-      .redirectIfSaveForLater
+          )
 
   def verify: Action[AnyContent] = actions.getApplicationInProgress
     .ensure(
       _.agentApplication
         .asLlpApplication
-        .applicantContactDetails
-        .map(_.applicantEmailAddress).isDefined,
+        .agentDetails
+        .map(_.agentEmailAddress).isDefined,
       implicit request =>
         logger.info("Applicant email has not been provided, redirecting to email address page")
-        Redirect(routes.EmailAddressController.show)
+        Redirect(routes.AgentEmailAddressController.show)
     )
     .ensure(
       _.agentApplication
         .asLlpApplication
-        .getApplicantContactDetails
-        .getApplicantEmailAddress
+        .getAgentDetails
+        .getAgentEmailAddress
         .isVerified === false,
       implicit request =>
-        logger.info("Applicant email is already verified, redirecting to check your answers page")
+        logger.info("Agent email is already verified, redirecting to check your answers page")
         Redirect(routes.CheckYourAnswersController.show)
     )
     .async:
@@ -140,10 +161,9 @@ extends FrontendController(mcc, actions):
           request
             .agentApplication
             .asLlpApplication
-            .getApplicantContactDetails
-            .getApplicantEmailAddress
-            .emailAddress
-            .value
+            .getAgentDetails
+            .getAgentEmailAddress
+            .getEmailAddress
         val credId = request.credentials.providerId
         emailVerificationService.checkEmailVerificationStatus(
           credId = credId,
@@ -168,8 +188,8 @@ extends FrontendController(mcc, actions):
       .agentApplication
       .asLlpApplication
       .modify(
-        _.applicantContactDetails
-          .each.applicantEmailAddress
+        _.agentDetails
+          .each.agentEmailAddress
           .each.isVerified
       )
       .setTo(true)
@@ -186,11 +206,11 @@ extends FrontendController(mcc, actions):
     maybeEmail = Some(
       Email(
         address = emailToVerify,
-        enterUrl = appConfig.thisFrontendBaseUrl + routes.EmailAddressController.show.url
+        enterUrl = appConfig.thisFrontendBaseUrl + routes.AgentEmailAddressController.show.url
       )
     ),
-    continueUrl = appConfig.thisFrontendBaseUrl + routes.EmailAddressController.verify.url,
-    maybeBackUrl = Some(appConfig.thisFrontendBaseUrl + routes.EmailAddressController.show.url),
+    continueUrl = appConfig.thisFrontendBaseUrl + routes.AgentEmailAddressController.verify.url,
+    maybeBackUrl = Some(appConfig.thisFrontendBaseUrl + routes.AgentEmailAddressController.show.url),
     accessibilityStatementUrl = appConfig.accessibilityStatementPath,
     lang = messagesApi.preferred(request).lang.code
   ).map(redirectUrl =>

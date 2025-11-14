@@ -31,7 +31,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.GrsService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
@@ -45,7 +45,7 @@ class GrsController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   grsService: GrsService,
-  agentRegistrationService: AgentRegistrationService,
+  agentApplicationService: AgentApplicationService,
   simplePage: SimplePage
 )
 extends FrontendController(mcc, actions):
@@ -139,7 +139,7 @@ extends FrontendController(mcc, actions):
             businessDetails = Some(journeyData.asBusinessDetailsLlp)
           )
 
-    agentRegistrationService
+    agentApplicationService
       .upsert(updatedApplication)
       .map: _ =>
         Redirect(AppRoutes.apply.TaskListController.show.url)

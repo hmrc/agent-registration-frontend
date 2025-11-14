@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.MergeFormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
@@ -76,7 +76,7 @@ object MemberProvideDetailsRequest:
 @Singleton
 class ProvideDetailsAction @Inject() (
   memberProvideDetailsService: MemberProvideDetailsService,
-  applicationService: AgentRegistrationService
+  applicationService: AgentApplicationService
 )(using ec: ExecutionContext)
 extends ActionRefiner[IndividualAuthorisedRequest, MemberProvideDetailsRequest]
 with RequestAwareLogging:

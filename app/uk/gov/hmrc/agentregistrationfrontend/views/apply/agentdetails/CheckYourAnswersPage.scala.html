@@ -77,7 +77,26 @@
         ))
     )
 }
-@rows = @{Seq(businessNameRow, telephoneRow)}
+@emailRow = @{
+    SummaryListRow(
+        key = Key(
+            content = Text(messages(s"$key.email.label"))
+        ),
+        value = Value(
+            content = Text(agentDetails.getAgentEmailAddress.getEmailAddress)
+        ),
+        actions = Some(Actions(
+            items = Seq(
+                ActionItem(
+                    href = s"${AppRoutes.apply.agentdetails.AgentEmailAddressController.show}",
+                    content = Text(messages("common.change")),
+                    visuallyHiddenText = Some(messages(s"$key.email.label"))
+                )
+            )
+        ))
+    )
+}
+@rows = @{Seq(businessNameRow, telephoneRow, emailRow)}
 
 @layout(pageTitle = title) {
     <h2 class="govuk-caption-l">@messages("agentDetails.title")</h2>
