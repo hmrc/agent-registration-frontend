@@ -86,7 +86,7 @@ object AgentRegistrationStubs {
     agentApplication: AgentApplication
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/by-agent-applicationId/${agentApplicationId.value}"),
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/by-agent-application-Id/${agentApplicationId.value}"),
     responseStatus = 200,
     responseBody = Json.toJson(agentApplication).toString
   )
@@ -95,7 +95,7 @@ object AgentRegistrationStubs {
     agentApplicationId: AgentApplicationId
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/by-agent-applicationId/${agentApplicationId.value}"),
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/by-agent-application-Id/${agentApplicationId.value}"),
     responseStatus = Status.NO_CONTENT,
     responseBody = ""
   )
@@ -105,7 +105,7 @@ object AgentRegistrationStubs {
     count: Int = 1
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/by-agent-applicationId/${agentApplicationId.value}"),
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/by-agent-application-Id/${agentApplicationId.value}"),
     count = count
   )
 
