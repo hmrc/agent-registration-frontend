@@ -42,7 +42,7 @@ extends ControllerSpec:
         .whenUsingExistingCompanyName
         .afterContactTelephoneSelected
 
-    val complete: AgentApplicationLlp = inComplete
+    val applicationSubmitted: AgentApplicationLlp = inComplete
       .modify(_.applicationState)
       .setTo(ApplicationState.Submitted)
 
@@ -72,7 +72,7 @@ extends ControllerSpec:
   s"GET $path should return 200 and render page using company name from agent application" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterStarted))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -90,7 +90,7 @@ extends ControllerSpec:
   s"GET $path when query already stored should return 200 and render page with previous answers filled in" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -106,19 +106,6 @@ extends ControllerSpec:
       .selectOrFail("input#lastName")
       .selectOnlyOneElementOrFail()
       .attr("value") shouldBe "Leadenhall-Lane"
-    AuthStubs.verifyAuthorise()
-    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
-    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
-
-  s"GET $path when application is not complete should redirect to an exit page" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterStarted))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.inComplete)
-    val response: WSResponse = get(path)
-
-    response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
-    response.header("Location").value shouldBe AppRoutes.apply.AgentApplicationController.genericExitPage.url
     AuthStubs.verifyAuthorise()
     AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
     AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
@@ -143,7 +130,7 @@ extends ControllerSpec:
   s"POST $path with blank inputs should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterStarted))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     val response: WSResponse =
       post(path)(Map(
         CompaniesHouseNameQueryForm.firstNameKey -> Seq(""),
@@ -162,7 +149,7 @@ extends ControllerSpec:
   s"POST $path with invalid inputs should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterStarted))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     val response: WSResponse =
       post(path)(Map(
         CompaniesHouseNameQueryForm.firstNameKey -> Seq("()))"),

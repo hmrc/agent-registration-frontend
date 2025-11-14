@@ -43,7 +43,7 @@ extends ControllerSpec:
         .whenUsingExistingCompanyName
         .afterContactTelephoneSelected
 
-    val complete: AgentApplicationLlp = inComplete
+    val applicationSubmitted: AgentApplicationLlp = inComplete
       .modify(_.applicationState)
       .setTo(ApplicationState.Submitted)
 
@@ -80,7 +80,7 @@ extends ControllerSpec:
   s"GET $path should return 200 and render page when there is a single match" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse = get(path)
 
@@ -90,7 +90,7 @@ extends ControllerSpec:
   s"GET $path should return 200 and render page when there are multiple matches" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
     val response: WSResponse = get(path)
 
@@ -111,7 +111,7 @@ extends ControllerSpec:
   s"POST $path for single match without a valid selection should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse =
       post(path)(Map(
@@ -130,7 +130,7 @@ extends ControllerSpec:
   s"POST $path for single match with valid inputs should save officer and redirect to telephone page" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvidedDetails.afterOfficerChosen)
     val response: WSResponse =
@@ -150,7 +150,7 @@ extends ControllerSpec:
   s"POST $path for multiple matches without a valid selection should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
     val response: WSResponse =
       post(path)(Map(
@@ -169,7 +169,7 @@ extends ControllerSpec:
   s"POST $path for multiple matches with valid inputs should save officer and redirect to telephone page" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.complete)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
     AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvidedDetails.afterOfficerChosen)
     val response: WSResponse =
