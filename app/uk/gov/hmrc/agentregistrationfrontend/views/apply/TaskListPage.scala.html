@@ -45,9 +45,14 @@
         incompleteStatus
     }
 }
+@agentDetailsIsComplete = @{request.agentApplication.asLlpApplication.agentDetails.exists(_.isComplete)}
 @agentDetailsStatus = @{
     if(contactIsComplete) {
-        incompleteStatus
+      if(agentDetailsIsComplete) {
+          TaskListItemStatus(content = Text(messages(s"$key.status.Completed")))
+      } else {
+          incompleteStatus
+      }
     } else {
         TaskListItemStatus(content = Text(messages(s"$key.status.CannotStartYet")))
     }

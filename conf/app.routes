@@ -60,7 +60,9 @@ POST        /apply/agent-details/telephone-number                  uk.gov.hmrc.a
 GET         /apply/agent-details/email-address                     uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentEmailAddressController.show
 POST        /apply/agent-details/email-address                     uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentEmailAddressController.submit
 GET         /apply/agent-details/verify-email-address              uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentEmailAddressController.verify
-
+GET         /apply/agent-details/correspondence-address            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentCorrespondenceAddressController.show
+POST        /apply/agent-details/correspondence-address            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentCorrespondenceAddressController.submit
+GET         /apply/agent-details/address-lookup-response           uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentCorrespondenceAddressController.returnFromAddressLookupFrontend(id: String ?= "")
 GET         /apply/agent-details/check-your-answers                uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.CheckYourAnswersController.show
 
 ## Anti Money Laundering routes
