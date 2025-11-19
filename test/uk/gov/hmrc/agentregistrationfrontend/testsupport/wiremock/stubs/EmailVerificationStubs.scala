@@ -64,4 +64,19 @@ object EmailVerificationStubs {
     responseBody = Json.obj("redirectUri" -> "/response-url").toString
   )
 
+  def verifyEvStatusRequest(
+    credId: String,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"/email-verification/verification-status/$credId"),
+    count = count
+  )
+
+  def verifyEvRequest(count: Int = 1): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = urlMatching(s"/email-verification/verify-email"),
+    count = count
+  )
+
 }

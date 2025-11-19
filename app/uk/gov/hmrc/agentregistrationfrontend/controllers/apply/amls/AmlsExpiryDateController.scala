@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsExpiryDatePage
 
 import java.time.Clock
@@ -40,7 +40,7 @@ class AmlsExpiryDateController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: AmlsExpiryDatePage,
-  applicationService: AgentRegistrationService
+  applicationService: AgentApplicationService
 )(using clock: Clock)
 extends FrontendController(mcc, actions):
 

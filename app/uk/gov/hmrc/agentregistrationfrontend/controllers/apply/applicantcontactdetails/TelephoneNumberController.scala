@@ -30,7 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.TelephoneNumberForm
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentRegistrationService
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.TelephoneNumberPage
 
 import javax.inject.Inject
@@ -41,7 +41,7 @@ class TelephoneNumberController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: TelephoneNumberPage,
-  agentRegistrationService: AgentRegistrationService
+  agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
@@ -82,6 +82,6 @@ extends FrontendController(mcc, actions):
           val updatedApplication: AgentApplication = request.agentApplication.asLlpApplication
             .modify(_.applicantContactDetails.each.telephoneNumber)
             .setTo(Some(validFormData))
-          agentRegistrationService.upsert(updatedApplication).map: _ =>
+          agentApplicationService.upsert(updatedApplication).map: _ =>
             Redirect(routes.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater

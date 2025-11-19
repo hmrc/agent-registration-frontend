@@ -84,6 +84,8 @@ trait TdBase:
   def memberProvidedDetailsId: MemberProvidedDetailsId = MemberProvidedDetailsId("member-provided-details-id-12345")
   def bprPrimaryTelephoneNumber: String = "(+44) 78714743399"
   def newTelephoneNumber: String = "+44 (0) 7000000000"
+  def bprEmailAddress: String = "bpr@example.com"
+  def newEmailAddress: String = "new@example.com"
   def llpNameQuery = CompaniesHouseNameQuery(
     firstName = "Jane",
     lastName = "Leadenhall-Lane"
@@ -95,6 +97,19 @@ trait TdBase:
       month = 11,
       year = 1990
     ))
+  )
+  def businessPartnerRecordResponse: BusinessPartnerRecordResponse = BusinessPartnerRecordResponse(
+    organisationName = Some("Test Company Name"),
+    address = DesBusinessAddress(
+      addressLine1 = "Line 1",
+      addressLine2 = Some("Line 2"),
+      addressLine3 = None,
+      addressLine4 = None,
+      postalCode = Some("AB1 2CD"),
+      countryCode = "GB"
+    ),
+    primaryPhoneNumber = Some(bprPrimaryTelephoneNumber),
+    emailAddress = Some(bprEmailAddress)
   )
 
   val memberProvidedDetails: MemberProvidedDetails = MemberProvidedDetails(
