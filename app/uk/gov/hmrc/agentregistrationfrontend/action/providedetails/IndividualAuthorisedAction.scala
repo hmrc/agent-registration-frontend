@@ -42,7 +42,8 @@ class IndividualAuthorisedRequest[A](
   val internalUserId: InternalUserId,
   val request: Request[A],
   val credentials: Credentials,
-  val nino: Option[Nino]
+  val nino: Option[Nino],
+  val saUtr: Option[SaUtr]
 )
 extends WrappedRequest[A](request)
 
@@ -57,7 +58,8 @@ object IndividualAuthorisedRequest:
         r.internalUserId,
         r.request,
         r.credentials,
-        r.nino
+        r.nino,
+        r.saUtr
       ) with FormValue[T]:
         val formValue: T = t
 
@@ -91,7 +93,8 @@ with RequestAwareLogging:
             .getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing")),
           request = request,
           credentials = credentials.getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing")),
-          nino = getNino(allEnrolments)
+          nino = getNino(allEnrolments),
+          saUtr = getUtr(allEnrolments)
         )))
     .recoverWith:
       case _: NoActiveSession =>
@@ -121,19 +124,31 @@ with RequestAwareLogging:
           )
         ))
 
-  private def getNinoForEnrolmentKey(enrolmentKey: String)(using enrolments: Enrolments): Option[Nino] =
-    val ninoIdentifierKey = "NINO"
+  private def getIdentifierForEnrolmentKey(
+    enrolmentKey: String,
+    identifierKey: String
+  )(using enrolments: Enrolments): Option[EnrolmentIdentifier] =
     for {
       enrolment <- enrolments.getEnrolment(enrolmentKey)
-      identifier <- enrolment.getIdentifier(ninoIdentifierKey)
-    } yield Nino(identifier.value)
+      identifier <- enrolment.getIdentifier(identifierKey)
+    } yield identifier
 
   private def getNino(enrolments: Enrolments): Option[Nino] =
     given enr: Enrolments = enrolments
-    val ninoHmrcPtEnrolmentKey = "HMRC-PT"
-    val ninoHmrcNiEnrolmentKey = "HMRC-NI"
+    val hmrcPtEnrolmentKey = "HMRC-PT"
+    val hmrcNiEnrolmentKey = "HMRC-NI"
+    val ninoIdentifierKey = "NINO"
 
-    getNinoForEnrolmentKey(ninoHmrcPtEnrolmentKey)
-      .orElse(getNinoForEnrolmentKey(ninoHmrcNiEnrolmentKey))
+    getIdentifierForEnrolmentKey(hmrcPtEnrolmentKey, ninoIdentifierKey)
+      .orElse(getIdentifierForEnrolmentKey(hmrcNiEnrolmentKey, ninoIdentifierKey))
+      .map(x => Nino(x.value))
+
+  private def getUtr(enrolments: Enrolments): Option[SaUtr] =
+    given enr: Enrolments = enrolments
+    val hmrcPtEnrolmentKey = "IR-SA"
+    val utrIdentifierKey = "UTR"
+
+    getIdentifierForEnrolmentKey(hmrcPtEnrolmentKey, utrIdentifierKey)
+      .map(x => SaUtr(x.value))
 
   private given ExecutionContext = cc.executionContext

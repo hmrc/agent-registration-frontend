@@ -72,4 +72,22 @@ extends ISpec:
       .futureValue shouldBe result
     IndividualAuthStubs.verifyAuthorise()
 
+  "successfully authorise with Utr when user is logged in" in:
+    val individualAuthorisedAction: IndividualAuthorisedAction = app.injector.instanceOf[IndividualAuthorisedAction]
+
+    IndividualAuthStubs.stubAuthoriseWithSaUtr()
+    val result: Result = Ok("AllGood")
+    individualAuthorisedAction
+      .invokeBlock(
+        tdAll.requestLoggedIn,
+        (r: IndividualAuthorisedRequest[?]) =>
+          Future.successful {
+            r.internalUserId shouldBe tdAll.internalUserId
+            r.saUtr shouldBe Some(tdAll.saUtr)
+            result
+          }
+      )
+      .futureValue shouldBe result
+    IndividualAuthStubs.verifyAuthorise()
+
   def fakeResultF: Future[Result] = fail("this should not be executed if test works fine")

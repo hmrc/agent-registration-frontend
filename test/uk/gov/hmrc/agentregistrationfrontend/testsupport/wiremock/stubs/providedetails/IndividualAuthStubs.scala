@@ -23,6 +23,7 @@ import play.api.http.Status
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
@@ -40,6 +41,16 @@ object IndividualAuthStubs {
 
   def stubAuthoriseWithNino(
     responseBody: String = responseBodyAsAgentWithNino()
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlMatching("/auth/authorise"),
+    requestBody = Some(expectedRequestBody),
+    responseStatus = Status.OK,
+    responseBody = responseBody
+  )
+
+  def stubAuthoriseWithSaUtr(
+    responseBody: String = responseBodyAsAgentWithSaUtr()
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlMatching("/auth/authorise"),
@@ -89,6 +100,34 @@ object IndividualAuthStubs {
        |      "state": "Activated",
        |      "delegatedAuthRule": null,
        |      "key": "HMRC-PT"
+       |    }
+       |  ],
+       |  "agentInformation": {},
+       |  "internalId": "${internalUserId.value}",
+       |  "optionalCredentials": {"providerId":"cred-id-12345","providerType":"GovernmentGateway"}
+       |}
+       |""".stripMargin
+
+  def responseBodyAsAgentWithSaUtr(
+    internalUserId: InternalUserId = TdAll.tdAll.internalUserId,
+    groupId: GroupId = TdAll.tdAll.groupId,
+    saUtr: SaUtr = TdAll.tdAll.saUtr
+  ): String =
+    // language=JSON
+    s"""
+       |{
+       |  "authorisedEnrolments": [],
+       |  "allEnrolments": [
+       |   {
+       |      "identifiers": [
+       |        {
+       |          "key": "UTR",
+       |          "value":  "${saUtr.value}"
+       |        }
+       |      ],
+       |      "state": "Activated",
+       |      "delegatedAuthRule": null,
+       |      "key": "IR-SA"
        |    }
        |  ],
        |  "agentInformation": {},
