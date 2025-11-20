@@ -51,28 +51,23 @@ class AddressLookupFrontendConnector @Inject() (
     rh: RequestHeader,
     ec: ExecutionContext,
     lang: Lang
-  ): Future[String] = {
+  ): Future[String] =
     val addressConfig = Json.toJson(addressLookupConfig.config(s"${call.url}"))
     http
       .post(url"$initJourneyUrl")
       .withBody(Json.toJson(addressConfig))
-      .execute[HttpResponse] map { resp =>
-      resp.header(LOCATION).getOrElse {
-        throw new ALFLocationHeaderNotSetException
-      }
-    }
-  }
+      .execute[HttpResponse].map: resp =>
+        resp
+          .header(LOCATION)
+          .getOrElse(throw new ALFLocationHeaderNotSetException)
 
   def getAddressDetails(id: String)(implicit
     rh: RequestHeader,
     ec: ExecutionContext
-  ): Future[AddressLookupFrontendAddress] = {
-    http
-      .get(url"${confirmJourneyUrl(id)}")
-      .execute[JsObject]
-      .map(json => (json \ "address").as[AddressLookupFrontendAddress])
-
-  }
+  ): Future[AddressLookupFrontendAddress] = http
+    .get(url"${confirmJourneyUrl(id)}")
+    .execute[JsObject]
+    .map(json => (json \ "address").as[AddressLookupFrontendAddress])
 
   private def confirmJourneyUrl(id: String) = s"${appConfig.addressLookupFrontendBaseUrl}/api/confirmed?id=$id"
 
