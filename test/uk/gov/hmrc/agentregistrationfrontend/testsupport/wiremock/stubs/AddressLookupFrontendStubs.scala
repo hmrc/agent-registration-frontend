@@ -22,6 +22,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.HeaderNames
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
+import uk.gov.hmrc.agentregistration.shared.AddressLookupFrontendAddress
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AddressLookupFrontendStubs:
@@ -86,8 +87,27 @@ object AddressLookupFrontendStubs:
     responseHeaders = Seq(HeaderNames.LOCATION -> "http://localhost:22201/agent-registration/apply/agent-details/address-lookup-response")
   )
 
+  def stubAddressLookupWithId(
+    id: String,
+    address: AddressLookupFrontendAddress
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"/api/confirmed\\?id=$id"),
+    responseStatus = 200,
+    responseBody = Json.obj("address" -> Json.toJson(address)).toString
+  )
+
   def verifyAddressLookupInit(count: Int = 1): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = urlMatching("/api/v2/init"),
+    count = count
+  )
+
+  def verifyAddressLookupWithId(
+    id: String,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"/api/confirmed\\?id=$id"),
     count = count
   )

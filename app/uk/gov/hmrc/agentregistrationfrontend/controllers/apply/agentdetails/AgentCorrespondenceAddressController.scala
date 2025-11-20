@@ -23,7 +23,7 @@ import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.agentdetails.CorrespondenceAddress
+import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AddressLookupFrontendConnector
@@ -123,7 +123,7 @@ extends FrontendController(mcc, actions):
                     .agentApplication
                     .asLlpApplication
                     .modify(_.agentDetails.each.agentCorrespondenceAddress)
-                    .setTo(Some(CorrespondenceAddress.fromString(addressOption)))
+                    .setTo(Some(AgentCorrespondenceAddress.fromString(addressOption)))
                   agentApplicationService
                     .upsert(updatedApplication)
                     .map: _ =>
@@ -134,14 +134,13 @@ extends FrontendController(mcc, actions):
   def returnFromAddressLookupFrontend(id: String): Action[AnyContent] = baseAction
     .async:
       implicit request: AgentApplicationRequest[AnyContent] =>
-        addressLookUpConnector.getAddressDetails(id).flatMap { address =>
+        addressLookUpConnector.getAddressDetails(id).flatMap: address =>
           val updatedApplication: AgentApplication = request
             .agentApplication
             .asLlpApplication
             .modify(_.agentDetails.each.agentCorrespondenceAddress)
-            .setTo(Some(CorrespondenceAddress.fromAddressLookupAddress(address)))
+            .setTo(Some(AgentCorrespondenceAddress.fromAddressLookupAddress(address)))
           agentApplicationService
             .upsert(updatedApplication)
             .map: _ =>
               Redirect(routes.CheckYourAnswersController.show.url)
-        }

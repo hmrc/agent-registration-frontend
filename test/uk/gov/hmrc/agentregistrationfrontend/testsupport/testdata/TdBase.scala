@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.agentdetails.CorrespondenceAddress
+import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
 import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
@@ -94,7 +94,7 @@ trait TdBase:
   def newTelephoneNumber: String = "+44 (0) 7000000000"
   def bprEmailAddress: String = "bpr@example.com"
   def newEmailAddress: String = "new@example.com"
-  def chroAddress: CorrespondenceAddress = CorrespondenceAddress(
+  def chroAddress: AgentCorrespondenceAddress = AgentCorrespondenceAddress(
     addressLine1 = "23 Great Portland Street",
     addressLine2 = Some("London"),
     postalCode = Some("W1 8LT"),

@@ -20,14 +20,6 @@ import play.api.libs.json.*
 import uk.gov.hmrc.agentregistration.shared.AddressLookupFrontendAddress
 
 final case class AgentCorrespondenceAddress(
-  agentCorrespondenceAddress: String,
-  otherAgentCorrespondenceAddress: Option[String]
-)
-
-object AgentCorrespondenceAddress:
-  given format: Format[AgentCorrespondenceAddress] = Json.format[AgentCorrespondenceAddress]
-
-final case class CorrespondenceAddress(
   addressLine1: String,
   addressLine2: Option[String],
   addressLine3: Option[String] = None,
@@ -54,13 +46,13 @@ final case class CorrespondenceAddress(
     Some(countryCode)
   ).flatten.mkString("<br>")
 
-object CorrespondenceAddress:
+object AgentCorrespondenceAddress:
 
-  given format: Format[CorrespondenceAddress] = Json.format[CorrespondenceAddress]
-  def fromString(address: String): CorrespondenceAddress = {
+  given format: Format[AgentCorrespondenceAddress] = Json.format[AgentCorrespondenceAddress]
+  def fromString(address: String): AgentCorrespondenceAddress = {
     val parts = address.split(",").map(_.trim)
     if (parts.length == 6) then
-      CorrespondenceAddress(
+      AgentCorrespondenceAddress(
         addressLine1 = parts.headOption.getOrElse(""),
         addressLine2 = parts.lift(1),
         addressLine3 = parts.lift(2),
@@ -69,7 +61,7 @@ object CorrespondenceAddress:
         countryCode = parts.lift(5).getOrElse("")
       )
     else if (parts.length == 5) then
-      CorrespondenceAddress(
+      AgentCorrespondenceAddress(
         addressLine1 = parts.headOption.getOrElse(""),
         addressLine2 = parts.lift(1),
         addressLine3 = parts.lift(2),
@@ -78,7 +70,7 @@ object CorrespondenceAddress:
         countryCode = parts.lift(4).getOrElse("")
       )
     else if (parts.length == 4) then
-      CorrespondenceAddress(
+      AgentCorrespondenceAddress(
         addressLine1 = parts.headOption.getOrElse(""),
         addressLine2 = parts.lift(1),
         addressLine3 = None,
@@ -90,9 +82,9 @@ object CorrespondenceAddress:
       throw new IllegalArgumentException(s"Cannot parse CorrespondenceAddress from string: $address")
   }
 
-  def fromAddressLookupAddress(address: AddressLookupFrontendAddress): CorrespondenceAddress = {
+  def fromAddressLookupAddress(address: AddressLookupFrontendAddress): AgentCorrespondenceAddress = {
     val lines = address.lines
-    CorrespondenceAddress(
+    AgentCorrespondenceAddress(
       addressLine1 = lines.headOption.getOrElse(""),
       addressLine2 = lines.lift(1),
       addressLine3 = lines.lift(2),

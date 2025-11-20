@@ -24,7 +24,7 @@ final case class AgentDetails(
   businessName: AgentBusinessName,
   telephoneNumber: Option[AgentTelephoneNumber] = None,
   agentEmailAddress: Option[AgentVerifiedEmailAddress] = None,
-  agentCorrespondenceAddress: Option[CorrespondenceAddress] = None
+  agentCorrespondenceAddress: Option[AgentCorrespondenceAddress] = None
 ):
 
   def isComplete: Boolean =
@@ -35,7 +35,7 @@ final case class AgentDetails(
 
   def getTelephoneNumber: AgentTelephoneNumber = telephoneNumber.getOrThrowExpectedDataMissing("Telephone number is missing")
   def getAgentEmailAddress: AgentVerifiedEmailAddress = agentEmailAddress.getOrThrowExpectedDataMissing("Email address is missing")
-  def getAgentCorrespondenceAddress: CorrespondenceAddress = agentCorrespondenceAddress.getOrThrowExpectedDataMissing("Correspondence address is missing")
+  def getAgentCorrespondenceAddress: AgentCorrespondenceAddress = agentCorrespondenceAddress.getOrThrowExpectedDataMissing("Correspondence address is missing")
 
 object AgentDetails:
   given format: Format[AgentDetails] = Json.format[AgentDetails]

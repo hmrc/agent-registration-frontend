@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentEmailAddress
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentTelephoneNumber
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentVerifiedEmailAddress
-import uk.gov.hmrc.agentregistration.shared.agentdetails.CorrespondenceAddress
+import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
 trait TdSectionAgentDetails {
@@ -70,7 +70,7 @@ trait TdSectionAgentDetails {
         val afterBprAddressSelected: AgentApplicationLlp = afterVerifiedEmailAddressSelected
           .modify(_.agentDetails.each.agentCorrespondenceAddress)
           .setTo(Some(
-            CorrespondenceAddress
+            AgentCorrespondenceAddress
               .fromString(
                 dependencies
                   .bprRegisteredAddress
@@ -80,7 +80,7 @@ trait TdSectionAgentDetails {
         val afterOtherAddressProvided: AgentApplicationLlp = afterVerifiedEmailAddressSelected
           .modify(_.agentDetails.each.agentCorrespondenceAddress)
           .setTo(Some(
-            CorrespondenceAddress
+            AgentCorrespondenceAddress
               .fromAddressLookupAddress(dependencies.newCorrespondenceAddress)
           ))
 
