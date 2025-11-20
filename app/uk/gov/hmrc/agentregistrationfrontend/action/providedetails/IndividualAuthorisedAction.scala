@@ -33,6 +33,7 @@ import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.agentregistration.shared.Nino
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -40,7 +41,8 @@ import scala.concurrent.Future
 class IndividualAuthorisedRequest[A](
   val internalUserId: InternalUserId,
   val request: Request[A],
-  val credentials: Credentials
+  val credentials: Credentials,
+  val nino: Option[Nino]
 )
 extends WrappedRequest[A](request)
 
@@ -54,7 +56,8 @@ object IndividualAuthorisedRequest:
       new IndividualAuthorisedRequest[A](
         r.internalUserId,
         r.request,
-        r.credentials
+        r.credentials,
+        r.nino
       ) with FormValue[T]:
         val formValue: T = t
 
@@ -87,7 +90,8 @@ with RequestAwareLogging:
             .map(InternalUserId.apply)
             .getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing")),
           request = request,
-          credentials = credentials.getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing"))
+          credentials = credentials.getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing")),
+          nino = getNino(allEnrolments)
         )))
     .recoverWith:
       case _: NoActiveSession =>
@@ -116,5 +120,20 @@ with RequestAwareLogging:
             message = e.toString
           )
         ))
+
+  private def getNinoForEnrolmentKey(enrolmentKey: String)(using enrolments: Enrolments): Option[Nino] =
+    val ninoIdentifierKey = "NINO"
+    for {
+      enrolment <- enrolments.getEnrolment(enrolmentKey)
+      identifier <- enrolment.getIdentifier(ninoIdentifierKey)
+    } yield Nino(identifier.value)
+
+  private def getNino(enrolments: Enrolments): Option[Nino] =
+    given enr: Enrolments = enrolments
+    val ninoHmrcPtEnrolmentKey = "HMRC-PT"
+    val ninoHmrcNiEnrolmentKey = "HMRC-NI"
+
+    getNinoForEnrolmentKey(ninoHmrcPtEnrolmentKey)
+      .orElse(getNinoForEnrolmentKey(ninoHmrcNiEnrolmentKey))
 
   private given ExecutionContext = cc.executionContext

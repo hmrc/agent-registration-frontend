@@ -54,13 +54,15 @@ trait TdRequest {
     new IndividualAuthorisedRequest(
       internalUserId = internalUserId,
       request = requestLoggedInWithAgentApplicationId,
-      credentials = credentials
+      credentials = credentials,
+      nino = Some(nino)
     )
   def individualAuthorisedRequestLoggedInWithOutAgentApplicationId: IndividualAuthorisedRequest[AnyContentAsEmpty.type] =
     new IndividualAuthorisedRequest(
       internalUserId = internalUserId,
       request = requestNotLoggedIn,
-      credentials = credentials
+      credentials = credentials,
+      nino = Some(nino)
     )
 
 }

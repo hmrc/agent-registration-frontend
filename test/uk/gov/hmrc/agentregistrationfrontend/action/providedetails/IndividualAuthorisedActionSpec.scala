@@ -47,6 +47,25 @@ extends ISpec:
         (r: IndividualAuthorisedRequest[?]) =>
           Future.successful {
             r.internalUserId shouldBe tdAll.internalUserId
+            r.nino shouldBe None
+            result
+          }
+      )
+      .futureValue shouldBe result
+    IndividualAuthStubs.verifyAuthorise()
+
+  "successfully authorise with Nino when user is logged in" in:
+    val individualAuthorisedAction: IndividualAuthorisedAction = app.injector.instanceOf[IndividualAuthorisedAction]
+
+    IndividualAuthStubs.stubAuthoriseWithNino()
+    val result: Result = Ok("AllGood")
+    individualAuthorisedAction
+      .invokeBlock(
+        tdAll.requestLoggedIn,
+        (r: IndividualAuthorisedRequest[?]) =>
+          Future.successful {
+            r.internalUserId shouldBe tdAll.internalUserId
+            r.nino shouldBe Some(tdAll.nino)
             result
           }
       )

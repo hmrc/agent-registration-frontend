@@ -22,6 +22,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
@@ -29,6 +30,16 @@ object IndividualAuthStubs {
 
   def stubAuthorise(
     responseBody: String = responseBodyAsCleanAgent()
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlMatching("/auth/authorise"),
+    requestBody = Some(expectedRequestBody),
+    responseStatus = Status.OK,
+    responseBody = responseBody
+  )
+
+  def stubAuthoriseWithNino(
+    responseBody: String = responseBodyAsAgentWithNino()
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlMatching("/auth/authorise"),
@@ -52,6 +63,34 @@ object IndividualAuthStubs {
        |{
        |  "authorisedEnrolments": [],
        |  "allEnrolments": [],
+       |  "agentInformation": {},
+       |  "internalId": "${internalUserId.value}",
+       |  "optionalCredentials": {"providerId":"cred-id-12345","providerType":"GovernmentGateway"}
+       |}
+       |""".stripMargin
+
+  def responseBodyAsAgentWithNino(
+    internalUserId: InternalUserId = TdAll.tdAll.internalUserId,
+    groupId: GroupId = TdAll.tdAll.groupId,
+    nino: Nino = TdAll.tdAll.nino
+  ): String =
+    // language=JSON
+    s"""
+       |{
+       |  "authorisedEnrolments": [],
+       |  "allEnrolments": [
+       |   {
+       |      "identifiers": [
+       |        {
+       |          "key": "NINO",
+       |          "value":  "${nino.value}"
+       |        }
+       |      ],
+       |      "state": "Activated",
+       |      "delegatedAuthRule": null,
+       |      "key": "HMRC-PT"
+       |    }
+       |  ],
        |  "agentInformation": {},
        |  "internalId": "${internalUserId.value}",
        |  "optionalCredentials": {"providerId":"cred-id-12345","providerType":"GovernmentGateway"}

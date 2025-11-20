@@ -44,12 +44,14 @@ class MemberProvideDetailsRequest[A](
   val memberProvidedDetails: MemberProvidedDetails,
   override val internalUserId: InternalUserId,
   override val request: Request[A],
-  override val credentials: Credentials
+  override val credentials: Credentials,
+  override val nino: Option[Nino]
 )
 extends IndividualAuthorisedRequest[A](
   internalUserId,
   request,
-  credentials
+  credentials,
+  nino
 ):
   Errors.require(
     requirement = memberProvidedDetails.internalUserId === internalUserId,
@@ -69,7 +71,8 @@ object MemberProvideDetailsRequest:
         memberProvidedDetails = r.memberProvidedDetails,
         internalUserId = r.internalUserId,
         request = r,
-        credentials = r.credentials
+        credentials = r.credentials,
+        nino = r.nino
       ) with FormValue[T]:
         override val formValue: T = t
 
@@ -107,7 +110,8 @@ with RequestAwareLogging:
                 memberProvidedDetails = memberProvidedDetails,
                 internalUserId = request.internalUserId,
                 request = request.request,
-                credentials = request.credentials
+                credentials = request.credentials,
+                nino = request.nino
               ))
             case _ =>
               logger.info(s"Missing agentApplicationIn in session. Recovering failed. Multiple member provided details found, redirecting to ${multipleMpd.url}")
@@ -122,7 +126,8 @@ with RequestAwareLogging:
                 memberProvidedDetails = memberProvidedDetails,
                 internalUserId = request.internalUserId,
                 request = request.request,
-                credentials = request.credentials
+                credentials = request.credentials,
+                nino = request.nino
               )))
             case None =>
               applicationService
