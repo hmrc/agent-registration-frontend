@@ -16,6 +16,12 @@
 
 package uk.gov.hmrc.agentregistration.shared.util
 
-object StringOps:
+object StringExtensions:
 
-  def replaceCommasWithSpaces(s: String): String = s.replace(",", " ")
+  extension (s: String)
+
+    /* Removes leading/trailing spaces and replaces multiple spaces with a single space */
+    inline def canonicalise: String = s.trim.replaceAll("\\s+", " ")
+
+    /* Replaces commas with spaces and then canonicalise the string */
+    inline def replaceCommaWithSpaces: String = s.replaceAll(",", " ").canonicalise
