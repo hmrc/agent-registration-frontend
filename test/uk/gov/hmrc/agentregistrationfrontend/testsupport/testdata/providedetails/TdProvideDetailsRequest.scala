@@ -30,9 +30,7 @@ trait TdProvideDetailsRequest {
       request = dependencies.requestLoggedIn,
       memberProvidedDetails = memberProvidedDetails,
       internalUserId = dependencies.internalUserId,
-      credentials = dependencies.credentials,
-      nino = Some(dependencies.nino),
-      saUtr = Some(dependencies.saUtr)
+      credentials = dependencies.credentials
     )
 
 }

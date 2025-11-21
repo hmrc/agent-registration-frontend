@@ -24,6 +24,8 @@ import play.api.mvc.Results.Redirect
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedAction
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersAction
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.ProvideDetailsAction
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
@@ -41,6 +43,7 @@ class Actions @Inject() (
   authorisedAction: AuthorisedAction,
   agentApplicationAction: AgentApplicationAction,
   individualAuthorisedAction: IndividualAuthorisedAction,
+  individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction,
   provideDetailsAction: ProvideDetailsAction
 )(using ExecutionContext)
 extends RequestAwareLogging:
@@ -125,6 +128,9 @@ extends RequestAwareLogging:
 
   val authorisedIndividual: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
     .andThen(individualAuthorisedAction)
+
+  val authorisedIndividualWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = action
+    .andThen(individualAuthorisedWithIdentifiersAction)
 
   val getProvideDetailsInProgress: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorisedIndividual
     .andThen(provideDetailsAction)
