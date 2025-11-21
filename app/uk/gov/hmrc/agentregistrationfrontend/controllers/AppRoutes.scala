@@ -68,12 +68,14 @@ object AppRoutes:
       val AgentBusinessNameController = agentdetailsRoutes.AgentBusinessNameController
       val AgentTelephoneNumberController = agentdetailsRoutes.AgentTelephoneNumberController
       val AgentEmailAddressController = agentdetailsRoutes.AgentEmailAddressController
+      val AgentCorrespondenceAddressController = agentdetailsRoutes.AgentCorrespondenceAddressController
       val CheckYourAnswersController = agentdetailsRoutes.CheckYourAnswersController
 
     object internal:
 
       val InitiateAgentApplicationController = internalRoutes.InitiateAgentApplicationController
       val GrsController = internalRoutes.GrsController
+      val AddressLookupCallbackController = internalRoutes.AddressLookupCallbackController
 
   object providedetails:
 

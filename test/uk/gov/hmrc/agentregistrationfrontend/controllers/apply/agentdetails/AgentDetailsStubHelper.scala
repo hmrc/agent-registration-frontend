@@ -27,18 +27,16 @@ object AgentDetailsStubHelper:
 
   private val utr: Utr = Utr(tdAll.saUtr.value)
 
-  def stubsForAuthAction(application: AgentApplicationLlp): StubMapping = {
+  def stubsForAuthAction(application: AgentApplicationLlp): StubMapping =
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(application)
-  }
 
-  def stubsToRenderPage(application: AgentApplicationLlp): StubMapping = {
+  def stubsToRenderPage(application: AgentApplicationLlp): StubMapping =
     stubsForAuthAction(application)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
       utr = utr,
       responseBody = tdAll.businessPartnerRecordResponse
     )
-  }
 
   def stubsForSuccessfulUpdate(
     application: AgentApplicationLlp,
@@ -48,17 +46,14 @@ object AgentDetailsStubHelper:
     AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
   }
 
-  def verifyConnectorsForAuthAction(): Unit = {
+  def verifyConnectorsForAuthAction(): Unit =
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
-  }
 
-  def verifyConnectorsToRenderPage(): Unit = {
+  def verifyConnectorsToRenderPage(): Unit =
     verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyGetBusinessPartnerRecord(utr)
-  }
 
-  def verifyConnectorsForSuccessfulUpdate(): Unit = {
+  def verifyConnectorsForSuccessfulUpdate(): Unit =
     verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
-  }

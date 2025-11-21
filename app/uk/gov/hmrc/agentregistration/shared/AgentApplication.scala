@@ -69,6 +69,11 @@ sealed trait AgentApplication:
       case ApplicationState.GrsDataReceived => true
       case ApplicationState.Submitted => true
 
+  // all agent applications must have a UTR
+  def getUtr: Utr =
+    businessType match
+      case BusinessType.Partnership.LimitedLiabilityPartnership => asLlpApplication.getBusinessDetails.saUtr.asUtr
+      case _ => expectedDataNotDefinedError("currently utr is only defined for Llp applications")
   def getAmlsDetails: AmlsDetails = amlsDetails.getOrElse(expectedDataNotDefinedError("amlsDetails"))
 
   private def as[T <: AgentApplication](using ct: reflect.ClassTag[T]): Option[T] =

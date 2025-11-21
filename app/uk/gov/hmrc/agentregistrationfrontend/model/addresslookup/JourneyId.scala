@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.grs
+package uk.gov.hmrc.agentregistrationfrontend.model.addresslookup
 
 import play.api.libs.json.Format
 import play.api.mvc.QueryStringBindable
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 import uk.gov.hmrc.agentregistrationfrontend.util.ValueClassBinder
 
-/** Journey id for use in the Generic Registration Service (GRS) integrated frontend journey
+/** Journey id for use in the Address Lookup Frontend integrated frontend journey
   */
 final case class JourneyId(value: String)
-
 object JourneyId:
 
   given Format[JourneyId] = JsonFormatsFactory.makeValueClassFormat

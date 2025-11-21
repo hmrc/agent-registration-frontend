@@ -23,9 +23,9 @@ import play.api.libs.ws.JsonBodyWritables.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.GrsConfig
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyStartUrl
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
 import uk.gov.hmrc.http.HttpReads.Implicits.*

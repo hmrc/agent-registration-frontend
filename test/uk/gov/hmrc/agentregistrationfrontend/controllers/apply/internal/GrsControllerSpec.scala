@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal
 
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.*
-
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
