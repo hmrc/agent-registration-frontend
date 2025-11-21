@@ -20,16 +20,17 @@ import play.api.i18n.Lang
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.config.AppLangs
 import uk.gov.hmrc.agentregistrationfrontend.config.GrsConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.GrsConnector
+import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyLabels
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyStartUrl
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.TranslationLabels
-import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -73,11 +74,11 @@ class GrsService @Inject() (
       businessVerificationCheck = false,
       labels = Some(JourneyLabels(
         en = TranslationLabels(
-          optServiceName = messagesApi.translate("service.name", Nil)(Lang("en")),
+          optServiceName = messagesApi.translate("service.name", Nil)(AppLangs.en),
           optFullNamePageLabel = fullNamePageLabel
         ),
         cy = TranslationLabels(
-          optServiceName = messagesApi.translate("service.name", Nil)(Lang("cy")),
+          optServiceName = messagesApi.translate("service.name", Nil)(AppLangs.cy),
           optFullNamePageLabel = welshFullNamePageLabel
         )
       ))

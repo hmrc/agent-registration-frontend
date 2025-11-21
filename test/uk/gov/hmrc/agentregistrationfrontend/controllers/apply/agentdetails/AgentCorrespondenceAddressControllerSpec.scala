@@ -27,7 +27,6 @@ class AgentCorrespondenceAddressControllerSpec
 extends ControllerSpec:
 
   private val path = "/agent-registration/apply/agent-details/correspondence-address"
-  private val callbackPath = "/agent-registration/apply/agent-details/address-lookup-response"
 
   private object ExpectedStrings:
 
@@ -83,11 +82,6 @@ extends ControllerSpec:
       url = path
     )
     routes.AgentCorrespondenceAddressController.submit.url shouldBe routes.AgentCorrespondenceAddressController.show.url
-
-    routes.AgentCorrespondenceAddressController.returnFromAddressLookupFrontend() shouldBe Call(
-      method = "GET",
-      url = callbackPath
-    )
 
   s"GET $path before email address has been selected should redirect to the email address page" in:
     AgentDetailsStubHelper.stubsForAuthAction(agentApplication.beforeEmailAddressProvided)
@@ -160,7 +154,7 @@ extends ControllerSpec:
   s"POST $path with selection of other should redirect to Address Lookup Frontend" in:
     AgentDetailsStubHelper.stubsForAuthAction(agentApplication.afterEmailAddressSelected)
     AddressLookupFrontendStubs.stubAddressLookupInit(
-      continueUrl = "http://localhost:22201/agent-registration/apply/agent-details/address-lookup-response"
+      continueUrl = "http://localhost:22201/agent-registration/apply/internal/address-lookup/journey-callback"
     )
     val response: WSResponse =
       post(path)(Map(
@@ -216,20 +210,3 @@ extends ControllerSpec:
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
     AgentDetailsStubHelper.verifyConnectorsToRenderPage()
-
-  s"GET $callbackPath after returning from Address Lookup Frontend should save the selected address and redirect to CYA page" in:
-    AgentDetailsStubHelper.stubsForSuccessfulUpdate(
-      application = agentApplication.afterEmailAddressSelected,
-      updatedApplication = agentApplication.afterOtherAddressProvided
-    )
-    AddressLookupFrontendStubs.stubAddressLookupWithId(
-      id = "address-id-123",
-      address = tdAll.newCorrespondenceAddress
-    )
-    val response: WSResponse = get(s"$callbackPath?id=address-id-123")
-
-    response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
-    AgentDetailsStubHelper.verifyConnectorsForSuccessfulUpdate()
-    AddressLookupFrontendStubs.verifyAddressLookupWithId("address-id-123")

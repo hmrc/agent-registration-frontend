@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.config
 
-import play.api.i18n.Lang
 import play.api.i18n.MessagesApi
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
@@ -29,9 +28,7 @@ class AddressLookupConfig @Inject() (
   messagesApi: MessagesApi
 ) {
 
-  def config(continueUrl: String)(implicit lang: Lang): JsObject =
-
-    val cy = Lang("CY")
+  def createJourneyConfig(continueUrl: String): JsObject =
 
     Json.obj(
       "version" -> 2,
@@ -58,28 +55,28 @@ class AddressLookupConfig @Inject() (
       "labels" -> Json.obj(
         "en" -> Json.obj(
           "appLevelLabels" -> Json.obj(
-            "navTitle" -> messagesApi("service.name")
+            "navTitle" -> messagesApi("service.name")(AppLangs.en)
           ),
           "lookupPageLabels" -> Json.obj(
-            "title" -> messagesApi("address.lookup.title"),
-            "heading" -> messagesApi("address.lookup.header")
+            "title" -> messagesApi("address.lookup.title")(AppLangs.en),
+            "heading" -> messagesApi("address.lookup.header")(AppLangs.en)
           ),
           "editPageLabels" -> Json.obj(
-            "title" -> messagesApi("address.lookup.editPageLabels.title"),
-            "heading" -> messagesApi("address.lookup.editPageLabels.header")
+            "title" -> messagesApi("address.lookup.editPageLabels.title")(AppLangs.en),
+            "heading" -> messagesApi("address.lookup.editPageLabels.header")(AppLangs.en)
           )
         ),
         "cy" -> Json.obj(
           "appLevelLabels" -> Json.obj(
-            "navTitle" -> messagesApi("service.name")(cy)
+            "navTitle" -> messagesApi("service.name")(AppLangs.cy)
           ),
           "lookupPageLabels" -> Json.obj(
-            "title" -> messagesApi("address.lookup.title")(cy),
-            "heading" -> messagesApi("address.lookup.header")(cy)
+            "title" -> messagesApi("address.lookup.title")(AppLangs.cy),
+            "heading" -> messagesApi("address.lookup.header")(AppLangs.cy)
           ),
           "editPageLabels" -> Json.obj(
-            "title" -> messagesApi("address.lookup.editPageLabels.title")(cy),
-            "heading" -> messagesApi("address.lookup.editPageLabels.header")(cy)
+            "title" -> messagesApi("address.lookup.editPageLabels.title")(AppLangs.cy),
+            "heading" -> messagesApi("address.lookup.editPageLabels.header")(AppLangs.cy)
           )
         )
       )

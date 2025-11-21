@@ -23,11 +23,12 @@ import play.api.http.HeaderNames
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.AddressLookupFrontendAddress
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AddressLookupFrontendStubs:
 
-  def config(continueUrl: String): JsObject = Json.obj(
+  def makeJourneyConfig(continueUrl: String): JsObject = Json.obj(
     "version" -> 2,
     "options" -> Json.obj(
       "continueUrl" -> s"$continueUrl",
@@ -83,16 +84,16 @@ object AddressLookupFrontendStubs:
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = urlMatching("/api/v2/init"),
     responseStatus = 202,
-    requestBody = Some(wm.equalToJson(s"${config(continueUrl)}")),
+    requestBody = Some(wm.equalToJson(s"${makeJourneyConfig(continueUrl)}")),
     responseHeaders = Seq(HeaderNames.LOCATION -> "http://localhost:22201/agent-registration/apply/agent-details/address-lookup-response")
   )
 
   def stubAddressLookupWithId(
-    id: String,
+    journeyId: JourneyId,
     address: AddressLookupFrontendAddress
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/api/confirmed\\?id=$id"),
+    urlPattern = urlMatching(s"/api/confirmed\\?id=${journeyId.value}"),
     responseStatus = 200,
     responseBody = Json.obj("address" -> Json.toJson(address)).toString
   )
@@ -104,10 +105,10 @@ object AddressLookupFrontendStubs:
   )
 
   def verifyAddressLookupWithId(
-    id: String,
+    journeyId: JourneyId,
     count: Int = 1
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/api/confirmed\\?id=$id"),
+    urlPattern = urlMatching(s"/api/confirmed\\?id=${journeyId.value}"),
     count = count
   )

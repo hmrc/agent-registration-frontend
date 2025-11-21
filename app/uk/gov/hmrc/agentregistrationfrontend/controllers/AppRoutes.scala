@@ -75,6 +75,7 @@ object AppRoutes:
 
       val InitiateAgentApplicationController = internalRoutes.InitiateAgentApplicationController
       val GrsController = internalRoutes.GrsController
+      val AddressLookupCallbackController = internalRoutes.AddressLookupCallbackController
 
   object providedetails:
 

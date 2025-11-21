@@ -71,7 +71,7 @@ trait TdSectionAgentDetails {
           .modify(_.agentDetails.each.agentCorrespondenceAddress)
           .setTo(Some(
             AgentCorrespondenceAddress
-              .fromString(
+              .fromValueString(
                 dependencies
                   .bprRegisteredAddress
                   .toValueString

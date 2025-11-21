@@ -67,21 +67,21 @@ extends FrontendController(mcc, actions):
     implicit request =>
       businessPartnerRecordService
         .getBusinessPartnerRecord(
-          request.agentApplication.utr
+          request.agentApplication.getUtr
         ).map: bprOpt =>
           val agentApplication = request.agentApplication.asLlpApplication
-          val existingAddress = agentApplication
+          val existingAddressValueString = agentApplication
             .agentDetails
             .flatMap(
               _.agentCorrespondenceAddress.map(_.toValueString)
             )
-          val chroAddress = agentApplication
+          val chroAddressValueString = agentApplication
             .getBusinessDetails
             .companyProfile
             .unsanitisedCHROAddress.map(_.toValueString)
           val prefillValue: Option[String] =
-            existingAddress match
-              case Some(existingAddress) if existingAddress.contains(chroAddress.getOrElse("")) => Some(existingAddress)
+            existingAddressValueString match
+              case Some(existingAddress) if existingAddress.contains(chroAddressValueString.getOrElse("")) => Some(existingAddress)
               case Some(existingAddress) if existingAddress.contains(bprOpt.map(_.address.toValueString).getOrElse("")) => Some(existingAddress)
               case Some(existingAddress) => Some("other")
               case _ => None
@@ -103,7 +103,7 @@ extends FrontendController(mcc, actions):
               formWithErrors =>
                 businessPartnerRecordService
                   .getBusinessPartnerRecord(
-                    request.agentApplication.utr
+                    request.agentApplication.getUtr
                   ).map: bprOpt =>
                     BadRequest(
                       view(
@@ -115,7 +115,7 @@ extends FrontendController(mcc, actions):
                 if (addressOption.matches("other")) {
                   implicit val language: Lang = mcc.messagesApi.preferred(request).lang
                   addressLookUpConnector
-                    .initJourney(routes.AgentCorrespondenceAddressController.returnFromAddressLookupFrontend())
+                    .initJourney(AppRoutes.apply.internal.AddressLookupCallbackController.journeyCallback(None))
                     .map(Redirect(_))
                 }
                 else
@@ -123,24 +123,10 @@ extends FrontendController(mcc, actions):
                     .agentApplication
                     .asLlpApplication
                     .modify(_.agentDetails.each.agentCorrespondenceAddress)
-                    .setTo(Some(AgentCorrespondenceAddress.fromString(addressOption)))
+                    .setTo(Some(AgentCorrespondenceAddress.fromValueString(addressOption)))
                   agentApplicationService
                     .upsert(updatedApplication)
                     .map: _ =>
                       Redirect(routes.CheckYourAnswersController.show.url)
             )
       .redirectIfSaveForLater
-
-  def returnFromAddressLookupFrontend(id: String): Action[AnyContent] = baseAction
-    .async:
-      implicit request: AgentApplicationRequest[AnyContent] =>
-        addressLookUpConnector.getAddressDetails(id).flatMap: address =>
-          val updatedApplication: AgentApplication = request
-            .agentApplication
-            .asLlpApplication
-            .modify(_.agentDetails.each.agentCorrespondenceAddress)
-            .setTo(Some(AgentCorrespondenceAddress.fromAddressLookupAddress(address)))
-          agentApplicationService
-            .upsert(updatedApplication)
-            .map: _ =>
-              Redirect(routes.CheckYourAnswersController.show.url)

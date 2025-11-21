@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import uk.gov.hmrc.agentregistration.shared.AddressLookupFrontendAddress
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.HttpResponse
@@ -52,7 +53,7 @@ class AddressLookupFrontendConnector @Inject() (
     ec: ExecutionContext,
     lang: Lang
   ): Future[String] =
-    val addressConfig = Json.toJson(addressLookupConfig.config(s"${call.url}"))
+    val addressConfig = Json.toJson(addressLookupConfig.createJourneyConfig(s"${call.url}"))
     http
       .post(url"$initJourneyUrl")
       .withBody(Json.toJson(addressConfig))
@@ -61,15 +62,15 @@ class AddressLookupFrontendConnector @Inject() (
           .header(LOCATION)
           .getOrElse(throw new ALFLocationHeaderNotSetException)
 
-  def getAddressDetails(id: String)(implicit
+  def getAddressDetails(journeyId: JourneyId)(implicit
     rh: RequestHeader,
     ec: ExecutionContext
   ): Future[AddressLookupFrontendAddress] = http
-    .get(url"${confirmJourneyUrl(id)}")
+    .get(url"${confirmJourneyUrl(journeyId)}")
     .execute[JsObject]
     .map(json => (json \ "address").as[AddressLookupFrontendAddress])
 
-  private def confirmJourneyUrl(id: String) = s"${appConfig.addressLookupFrontendBaseUrl}/api/confirmed?id=$id"
+  private def confirmJourneyUrl(journeyId: JourneyId) = s"${appConfig.addressLookupFrontendBaseUrl}/api/confirmed?id=${journeyId.value}"
 
   private def initJourneyUrl: String = s"${appConfig.addressLookupFrontendBaseUrl}/api/v2/init"
 
