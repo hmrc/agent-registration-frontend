@@ -34,11 +34,15 @@ class MemberProvideDetailsFactory @Inject() (
 
   def makeNewMemberProvidedDetails(
     internalUserId: InternalUserId,
-    agentApplicationId: AgentApplicationId
+    agentApplicationId: AgentApplicationId,
+    nino: Option[Nino],
+    saUtr: Option[SaUtr]
   ): MemberProvidedDetails = MemberProvidedDetails(
     _id = memberProvidedDetailsIdGenerator.nextMemberProvidedDetailsId(),
     internalUserId = internalUserId,
     agentApplicationId = agentApplicationId,
     createdAt = Instant.now(clock),
-    providedDetailsState = Started
+    providedDetailsState = Started,
+    nino = nino,
+    saUtr = saUtr
   )

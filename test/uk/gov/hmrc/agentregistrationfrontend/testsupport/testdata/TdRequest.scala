@@ -20,6 +20,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withAuthTokenInSession
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withDeviceId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withRequestId
@@ -61,6 +62,33 @@ trait TdRequest {
       internalUserId = internalUserId,
       request = requestNotLoggedIn,
       credentials = credentials
+    )
+
+  def individualAuthorisedRequestLoggedInWithAgentApplicationIdAndIdentifiers: IndividualAuthorisedWithIdentifiersRequest[AnyContentAsEmpty.type] =
+    new IndividualAuthorisedWithIdentifiersRequest(
+      internalUserId = internalUserId,
+      request = requestLoggedInWithAgentApplicationId,
+      credentials = credentials,
+      nino = Some(nino),
+      saUtr = Some(saUtr)
+    )
+
+  def individualAuthorisedRequestLoggedInWithAgentApplicationIdNinoAndNoUtr: IndividualAuthorisedWithIdentifiersRequest[AnyContentAsEmpty.type] =
+    new IndividualAuthorisedWithIdentifiersRequest(
+      internalUserId = internalUserId,
+      request = requestLoggedInWithAgentApplicationId,
+      credentials = credentials,
+      nino = Some(nino),
+      saUtr = Some(saUtr)
+    )
+
+  def individualAuthorisedRequestLoggedInWithOutAgentApplicationIdAndIdentifiers: IndividualAuthorisedWithIdentifiersRequest[AnyContentAsEmpty.type] =
+    new IndividualAuthorisedWithIdentifiersRequest(
+      internalUserId = internalUserId,
+      request = requestNotLoggedIn,
+      credentials = credentials,
+      nino = Some(nino),
+      saUtr = Some(saUtr)
     )
 
 }
