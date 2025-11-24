@@ -72,7 +72,7 @@ extends FrontendController(mcc, actions):
                 .flatMap:
                   case None =>
                     for {
-                      memberProvidedDetails <- createMemberProvidedDetailsFor(agentApplication.agentApplicationId, request.internalUserId)
+                      memberProvidedDetails <- createMemberProvidedDetailsFor(agentApplication.agentApplicationId)
                       _ <- memberProvideDetailsService.upsert(memberProvidedDetails)
                     } yield Redirect(nextEndpoint).addToSession(agentApplication.agentApplicationId)
 
@@ -85,8 +85,7 @@ extends FrontendController(mcc, actions):
               Future.successful(Redirect(applicationGenericExitPageUrl))
 
   private def createMemberProvidedDetailsFor(
-    applicationId: AgentApplicationId,
-    internalUserId: InternalUserId
+    applicationId: AgentApplicationId
   )(using request: IndividualAuthorisedWithIdentifiersRequest[AnyContent]): Future[MemberProvidedDetails] =
     (request.nino, request.saUtr) match
       case (Some(nino), None) =>
@@ -94,7 +93,7 @@ extends FrontendController(mcc, actions):
           .getCitizenDetails(nino)
           .map { citizenDetails =>
             memberProvideDetailsService.createNewMemberProvidedDetails(
-              internalUserId = internalUserId,
+              internalUserId = request.internalUserId,
               agentApplicationId = applicationId,
               nino = request.nino,
               saUtr = citizenDetails.saUtr
@@ -104,7 +103,7 @@ extends FrontendController(mcc, actions):
       case _ =>
         Future.successful(
           memberProvideDetailsService.createNewMemberProvidedDetails(
-            internalUserId = internalUserId,
+            internalUserId = request.internalUserId,
             agentApplicationId = applicationId,
             nino = request.nino,
             saUtr = request.saUtr

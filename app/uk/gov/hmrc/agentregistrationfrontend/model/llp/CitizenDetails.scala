@@ -30,7 +30,7 @@ case class CitizenDetails(
   saUtr: Option[SaUtr]
 ) {
 
-  lazy val name: Option[String] = {
+  def name: Option[String] =
     val n = Seq(firstName, lastName)
       .flatten
       .map(_.trim)
@@ -39,7 +39,6 @@ case class CitizenDetails(
       None
     else
       Some(n.mkString(" "))
-  }
 }
 
 object CitizenDetails {

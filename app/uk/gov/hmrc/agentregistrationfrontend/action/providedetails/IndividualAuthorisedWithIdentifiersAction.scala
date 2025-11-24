@@ -40,13 +40,17 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 class IndividualAuthorisedWithIdentifiersRequest[A](
-  val internalUserId: InternalUserId,
-  val request: Request[A],
-  val credentials: Credentials,
+  override val internalUserId: InternalUserId,
+  override val request: Request[A],
+  override val credentials: Credentials,
   val nino: Option[ModelNino],
   val saUtr: Option[SaUtr]
 )
-extends WrappedRequest[A](request)
+extends IndividualAuthorisedRequest[A](
+  internalUserId = internalUserId,
+  request = request,
+  credentials = credentials
+)
 
 object IndividualAuthorisedWithIdentifiersRequest:
 
