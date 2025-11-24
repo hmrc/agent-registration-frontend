@@ -71,6 +71,15 @@ object AgentRegistrationStubs {
     responseBody = Json.toJson(agentApplication).toString
   )
 
+  def stubFindApplicationByLinkIdNoContent(
+    linkId: LinkId
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/linkId/${linkId.value}"),
+    responseStatus = Status.NO_CONTENT,
+    responseBody = ""
+  )
+
   def stubFindApplication(
     agentApplicationId: AgentApplicationId,
     agentApplication: AgentApplication
@@ -116,6 +125,15 @@ object AgentRegistrationStubs {
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/by-agent-application-id/${agentApplicationId.value}"),
+    count = count
+  )
+
+  def verifyFindApplicationByLinkId(
+    linkId: LinkId,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/linkId/${linkId.value}"),
     count = count
   )
 

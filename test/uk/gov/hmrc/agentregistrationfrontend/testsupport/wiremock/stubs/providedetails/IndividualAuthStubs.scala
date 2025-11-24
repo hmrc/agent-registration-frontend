@@ -59,6 +59,16 @@ object IndividualAuthStubs {
     responseBody = responseBody
   )
 
+  def stubAuthoriseWithNinoAndSaUtr(
+    responseBody: String = responseBodyAsAgentWithNinoAndSaUtr()
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlMatching("/auth/authorise"),
+    requestBody = Some(expectedRequestBody),
+    responseStatus = Status.OK,
+    responseBody = responseBody
+  )
+
   def verifyAuthorise(count: Int = 1): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlMatching("/auth/authorise"),
@@ -118,6 +128,46 @@ object IndividualAuthStubs {
        |{
        |  "authorisedEnrolments": [],
        |  "allEnrolments": [
+       |   {
+       |      "identifiers": [
+       |        {
+       |          "key": "UTR",
+       |          "value":  "${saUtr.value}"
+       |        }
+       |      ],
+       |      "state": "Activated",
+       |      "delegatedAuthRule": null,
+       |      "key": "IR-SA"
+       |    }
+       |  ],
+       |  "agentInformation": {},
+       |  "internalId": "${internalUserId.value}",
+       |  "optionalCredentials": {"providerId":"cred-id-12345","providerType":"GovernmentGateway"}
+       |}
+       |""".stripMargin
+
+  def responseBodyAsAgentWithNinoAndSaUtr(
+    internalUserId: InternalUserId = TdAll.tdAll.internalUserId,
+    groupId: GroupId = TdAll.tdAll.groupId,
+    nino: Nino = TdAll.tdAll.nino,
+    saUtr: SaUtr = TdAll.tdAll.saUtr
+  ): String =
+    // language=JSON
+    s"""
+       |{
+       |  "authorisedEnrolments": [],
+       |  "allEnrolments": [
+       |     {
+       |      "identifiers": [
+       |        {
+       |          "key": "NINO",
+       |          "value":  "${nino.value}"
+       |        }
+       |      ],
+       |      "state": "Activated",
+       |      "delegatedAuthRule": null,
+       |      "key": "HMRC-PT"
+       |    },
        |   {
        |      "identifiers": [
        |        {
