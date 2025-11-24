@@ -32,6 +32,7 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressFor
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.AgentCorrespondenceAddressPage
 
 import javax.inject.Inject
@@ -112,12 +113,12 @@ extends FrontendController(mcc, actions):
                       )
                     ).pipe(SubmissionHelper.redirectIfSaveForLater(request, _)),
               addressOption =>
-                if (addressOption.matches("other")) {
-                  implicit val language: Lang = mcc.messagesApi.preferred(request).lang
+                if addressOption.matches("other")
+                then
+                  given language: Lang = mcc.messagesApi.preferred(request).lang
                   addressLookUpConnector
                     .initJourney(AppRoutes.apply.internal.AddressLookupCallbackController.journeyCallback(None))
                     .map(Redirect(_))
-                }
                 else
                   val updatedApplication: AgentApplication = request
                     .agentApplication
