@@ -38,15 +38,16 @@ import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistration.shared.SafeId
 import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.*
+import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.Registration
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsNotCalled
@@ -241,8 +242,13 @@ extends FrontendController(mcc, actions):
             CompanyProfile(
               companyNumber = Crn(number),
               companyName = companyName.getOrElse(""),
-              dateOfIncorporation = dateOfIncorporation.map(LocalDate.parse)
-              // unsanitisedCHROAddress = ... when/if adding support for companies house address, don't add it to the stub page and just hardcode it here
+              dateOfIncorporation = dateOfIncorporation.map(LocalDate.parse),
+              unsanitisedCHROAddress = Some(ChroAddress(
+                address_line_1 = Some("23 Great Portland Street"),
+                address_line_2 = Some("London"),
+                country = Some("United Kingdom"),
+                postal_code = Some("W1 1AQ")
+              ))
             )
           ),
           ctutr = ctutr.map(CtUtr.apply),
@@ -289,7 +295,13 @@ extends FrontendController(mcc, actions):
         Some(CompanyProfile(
           companyNumber = Crn("12345678"),
           companyName = if businessType == LimitedCompany then "Test Company Ltd" else "Test Partnership LLP",
-          dateOfIncorporation = Some(LocalDate.now().minusYears(10))
+          dateOfIncorporation = Some(LocalDate.now().minusYears(10)),
+          unsanitisedCHROAddress = Some(ChroAddress(
+            address_line_1 = Some("23 Great Portland Street"),
+            address_line_2 = Some("London"),
+            country = Some("United Kingdom"),
+            postal_code = Some("W1 1AQ")
+          ))
         ))
       else None,
     ctutr = if businessType == LimitedCompany then Some(randomCtUtr()) else None,

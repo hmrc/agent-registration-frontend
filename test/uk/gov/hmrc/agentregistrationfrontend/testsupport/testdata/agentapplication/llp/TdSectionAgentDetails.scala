@@ -23,6 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentEmailAddress
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentTelephoneNumber
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentVerifiedEmailAddress
+import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
 trait TdSectionAgentDetails {
@@ -63,6 +64,25 @@ trait TdSectionAgentDetails {
         val afterVerifiedEmailAddressSelected: AgentApplicationLlp = afterContactTelephoneSelected
           .modify(_.agentDetails.each.agentEmailAddress)
           .setTo(Some(AgentEmailAddressHelper.afterVerifiedEmailAddressSelected))
+        val afterChroAddressSelected: AgentApplicationLlp = afterVerifiedEmailAddressSelected
+          .modify(_.agentDetails.each.agentCorrespondenceAddress)
+          .setTo(Some(dependencies.chroAddress))
+        val afterBprAddressSelected: AgentApplicationLlp = afterVerifiedEmailAddressSelected
+          .modify(_.agentDetails.each.agentCorrespondenceAddress)
+          .setTo(Some(
+            AgentCorrespondenceAddress
+              .fromValueString(
+                dependencies
+                  .bprRegisteredAddress
+                  .toValueString
+              )
+          ))
+        val afterOtherAddressProvided: AgentApplicationLlp = afterVerifiedEmailAddressSelected
+          .modify(_.agentDetails.each.agentCorrespondenceAddress)
+          .setTo(Some(
+            AgentCorrespondenceAddress
+              .fromAddressLookupAddress(dependencies.newCorrespondenceAddress)
+          ))
 
       object whenProvidingNewBusinessName:
 
