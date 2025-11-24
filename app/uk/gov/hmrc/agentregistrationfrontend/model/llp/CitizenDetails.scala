@@ -40,7 +40,6 @@ case class CitizenDetails(
     else
       Some(n.mkString(" "))
 
-
 object CitizenDetails:
 
   val citizenDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("ddMMyyyy")
@@ -59,5 +58,3 @@ object CitizenDetails:
       dateOfBirth,
       saUtr
     )
-
-
