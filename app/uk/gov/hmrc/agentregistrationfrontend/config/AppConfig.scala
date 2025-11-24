@@ -36,6 +36,7 @@ class AppConfig @Inject() (
 ):
 
   val govukStartPageUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.govuk-start-page", configuration)
+  val govukHmrcStandardForAgentsUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.govuk-hmrc-standard-for-agents", configuration)
   val thisFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.this-frontend", configuration)
   val feedbackFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.feedback-frontend", configuration)
   private val basFrontendSignBaseInBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-in", configuration)

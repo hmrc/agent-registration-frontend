@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AddressLookupFrontendStubs
@@ -84,13 +85,13 @@ extends ControllerSpec:
     routes.AgentCorrespondenceAddressController.submit.url shouldBe routes.AgentCorrespondenceAddressController.show.url
 
   s"GET $path before email address has been selected should redirect to the email address page" in:
-    AgentDetailsStubHelper.stubsForAuthAction(agentApplication.beforeEmailAddressProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeEmailAddressProvided)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe routes.AgentEmailAddressController.show.url
-    AgentDetailsStubHelper.verifyConnectorsForAuthAction()
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path should return 200, fetch the BPR and render page" in:
     AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterEmailAddressSelected)
@@ -137,7 +138,7 @@ extends ControllerSpec:
     AgentDetailsStubHelper.verifyConnectorsToRenderPage()
 
   s"POST $path with selection of BPR address should save data and redirect to CYA page" in:
-    AgentDetailsStubHelper.stubsForSuccessfulUpdate(
+    ApplyStubHelper.stubsForSuccessfulUpdate(
       application = agentApplication.afterEmailAddressSelected,
       updatedApplication = agentApplication.afterBprAddressSelected
     )
@@ -149,10 +150,10 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
-    AgentDetailsStubHelper.verifyConnectorsForSuccessfulUpdate()
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with selection of other should redirect to Address Lookup Frontend" in:
-    AgentDetailsStubHelper.stubsForAuthAction(agentApplication.afterEmailAddressSelected)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterEmailAddressSelected)
     AddressLookupFrontendStubs.stubAddressLookupInit(
       continueUrl = "http://localhost:22201/agent-registration/apply/internal/address-lookup/journey-callback"
     )
@@ -164,7 +165,7 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe "http://localhost:9028/any-uri-determined-by-alf"
-    AgentDetailsStubHelper.verifyConnectorsForAuthAction()
+    ApplyStubHelper.verifyConnectorsForAuthAction()
     AddressLookupFrontendStubs.verifyAddressLookupInit()
 
   s"POST $path with blank inputs should return 400" in:
@@ -183,7 +184,7 @@ extends ControllerSpec:
     AgentDetailsStubHelper.verifyConnectorsToRenderPage()
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
-    AgentDetailsStubHelper.stubsForSuccessfulUpdate(
+    ApplyStubHelper.stubsForSuccessfulUpdate(
       application = agentApplication.afterEmailAddressSelected,
       updatedApplication = agentApplication.afterBprAddressSelected
     )
@@ -196,7 +197,7 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
-    AgentDetailsStubHelper.verifyConnectorsForSuccessfulUpdate()
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
     AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterEmailAddressSelected)

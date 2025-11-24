@@ -14,26 +14,46 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
+package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.Utr
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
-object AgentDetailsStubHelper:
+object ApplyStubHelper:
+
+  def stubsForAuthAction(application: AgentApplicationLlp): StubMapping =
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(application)
+
+  def stubsForSuccessfulUpdate(
+    application: AgentApplicationLlp,
+    updatedApplication: AgentApplicationLlp
+  ): StubMapping = {
+    stubsForAuthAction(application)
+    AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
+  }
+
+  def verifyConnectorsForAuthAction(): Unit =
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetAgentApplication()
+
+  def verifyConnectorsForSuccessfulUpdate(): Unit =
+    verifyConnectorsForAuthAction()
+    AgentRegistrationStubs.verifyUpdateAgentApplication()
 
   private val utr: Utr = Utr(tdAll.saUtr.value)
 
-  def stubsToRenderPage(application: AgentApplicationLlp): StubMapping =
-    ApplyStubHelper.stubsForAuthAction(application)
+  def stubsToSupplyBprToPage(application: AgentApplicationLlp): StubMapping =
+    stubsForAuthAction(application)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
       utr = utr,
       responseBody = tdAll.businessPartnerRecordResponse
     )
 
-  def verifyConnectorsToRenderPage(): Unit =
-    ApplyStubHelper.verifyConnectorsForAuthAction()
+  def verifyConnectorsToSupplyBprToPage(): Unit =
+    verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyGetBusinessPartnerRecord(utr)

@@ -14,7 +14,10 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
+@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+@import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 
 @this(
@@ -22,14 +25,16 @@
         govukTaskList: GovukTaskList
 )
 
-@()(implicit
+@(
+        taskListStatus: TaskListStatus
+)(implicit
         request: AgentApplicationRequest[?],
         messages: Messages
 )
 
 @key = @{"taskList"}
 @title = @{messages(s"$key.title", request.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName)}
-@incompleteStatus = @{
+@incomplete = @{
     TaskListItemStatus(
         tag = Some(Tag(
             content = Text(messages(s"$key.status.Incomplete")),
@@ -37,33 +42,22 @@
         ))
     )
 }
-@contactIsComplete = @{request.agentApplication.asLlpApplication.applicantContactDetails.exists(_.isComplete)}
-@contactStatus = @{
-    if(contactIsComplete) {
-        TaskListItemStatus(content = Text(messages(s"$key.status.Completed")))
-    } else {
-        incompleteStatus
-    }
+@complete = @{
+    TaskListItemStatus(content = Text(messages(s"$key.status.Completed")))
 }
-@agentDetailsIsComplete = @{request.agentApplication.asLlpApplication.agentDetails.exists(_.isComplete)}
+@cannotStart = @{
+    TaskListItemStatus(content = Text(messages(s"$key.status.CannotStartYet")))
+}
+
+@contactStatus = @{if(taskListStatus.contactDetails.isComplete) complete else incomplete}
 @agentDetailsStatus = @{
-    if(contactIsComplete) {
-      if(agentDetailsIsComplete) {
-          TaskListItemStatus(content = Text(messages(s"$key.status.Completed")))
-      } else {
-          incompleteStatus
-      }
-    } else {
-        TaskListItemStatus(content = Text(messages(s"$key.status.CannotStartYet")))
-    }
+  if(taskListStatus.agentDetails.isComplete) complete
+  else if(taskListStatus.agentDetails.canStart) incomplete
+  else cannotStart
 }
-@amlsStatus = @{
-    if(request.agentApplication.amlsDetails.exists(_.isComplete)) {
-        TaskListItemStatus(content = Text(messages(s"$key.status.Completed")))
-    } else {
-        incompleteStatus
-    }
-}
+@amlsStatus = @{if(taskListStatus.amlsDetails.isComplete) complete else incomplete}
+@agentsStandardStatus = @{if(taskListStatus.hmrcStandardForAgents.isComplete) complete else incomplete}
+@declarationStatus = @{if(taskListStatus.declaration.canStart) incomplete else cannotStart}
 
 @layout(
     pageTitle = title,
@@ -71,7 +65,6 @@
 ) {
 
     <h1 class="govuk-heading-l">@title</h1>
-
     <h2 class="govuk-heading-m">@messages(s"$key.businessDetails.heading")</h2>
     @govukTaskList(TaskList(
         items = Seq(
@@ -79,9 +72,7 @@
                 title = TaskListItemTitle(
                     content = Text(messages(s"$key.businessDetails.linkText"))
                 ),
-                status = TaskListItemStatus(
-                    content = Text(messages(s"$key.status.Completed"))
-                ),
+                status = complete,
                 href = Some("#") // TODO we don't have a CYA view yet...
             )
         ),
@@ -110,7 +101,7 @@
                     content = Text(messages(s"$key.accountDetails.linkText"))
                 ),
                 status = agentDetailsStatus,
-                href = if contactIsComplete then Some(AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url) else None
+                href = if(taskListStatus.agentDetails.canStart) Some(AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url) else None
             )
         ),
         idPrefix = "accountDetails"
@@ -130,8 +121,8 @@
                 title = TaskListItemTitle(
                     content = Text(messages(s"$key.hmrcStandards.agreement.linkText"))
                 ),
-                status = incompleteStatus,
-                href = Some("#") // TODO Add link when available
+                status = agentsStandardStatus,
+                href = Some(AppRoutes.apply.HmrcStandardForAgentsController.show.url)
             )
         ),
         idPrefix = "hmrcStandards"
@@ -144,10 +135,8 @@
                 title = TaskListItemTitle(
                     content = Text(messages(s"$key.declaration.linkText"))
                 ),
-                status = TaskListItemStatus(
-                    content = Text(messages(s"$key.status.CannotStartYet"))
-                ),
-                href = None
+                status = declarationStatus,
+                href = if(taskListStatus.declaration.canStart) Some("#") else None
             )
         ),
         idPrefix = "declaration"

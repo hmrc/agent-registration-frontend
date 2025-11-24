@@ -19,8 +19,13 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
+import uk.gov.hmrc.agentregistrationfrontend.model.TaskStatus
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.TaskListPage
 
 import javax.inject.Inject
@@ -44,4 +49,39 @@ extends FrontendController(mcc, actions):
           Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
       ):
         implicit request =>
-          Ok(taskListPage())
+          Ok(taskListPage(request.agentApplication.asLlpApplication.taskListStatus))
+
+  extension (agentApplication: AgentApplicationLlp)
+
+    private def taskListStatus: TaskListStatus = {
+      val contactIsComplete = agentApplication.applicantContactDetails.exists(_.isComplete)
+      val amlsDetailsCompleted = agentApplication.amlsDetails.exists(_.isComplete)
+      val agentDetailsIsComplete = agentApplication.agentDetails.exists(_.isComplete)
+      val hmrcStandardForAgentsAgreed = agentApplication.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed
+      TaskListStatus(
+        contactDetails = TaskStatus(
+          canStart = true, // Contact details can be started at any time
+          isComplete = contactIsComplete
+        ),
+        amlsDetails = TaskStatus(
+          canStart = true, // AMLS details can be started at any time
+          isComplete = amlsDetailsCompleted
+        ),
+        agentDetails = TaskStatus(
+          canStart = contactIsComplete, // Agent details can be started only when contact details are complete
+          isComplete = agentDetailsIsComplete
+        ),
+        hmrcStandardForAgents = TaskStatus(
+          canStart = true, // HMRC Standard for Agents can be started at any time
+          isComplete = hmrcStandardForAgentsAgreed
+        ),
+        declaration = TaskStatus(
+          canStart =
+            contactIsComplete
+              && amlsDetailsCompleted
+              && agentDetailsIsComplete
+              && hmrcStandardForAgentsAgreed, // Declaration can be started only when all prior tasks are complete
+          isComplete = false // Declaration is never "complete" until submission
+        )
+      )
+    }

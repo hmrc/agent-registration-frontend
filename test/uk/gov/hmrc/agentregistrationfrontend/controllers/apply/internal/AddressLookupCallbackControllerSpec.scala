@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentDetailsStubHelper
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AddressLookupFrontendStubs
@@ -52,7 +52,7 @@ extends ControllerSpec:
     )
 
   s"GET $path after returning from Address Lookup Frontend should save the selected address and redirect to CYA page" in:
-    AgentDetailsStubHelper.stubsForSuccessfulUpdate(
+    ApplyStubHelper.stubsForSuccessfulUpdate(
       application = agentApplication.afterEmailAddressSelected,
       updatedApplication = agentApplication.afterOtherAddressProvided
     )
@@ -65,5 +65,5 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url
-    AgentDetailsStubHelper.verifyConnectorsForSuccessfulUpdate()
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
     AddressLookupFrontendStubs.verifyAddressLookupWithId(JourneyId("address-id-123"))
