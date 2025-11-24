@@ -163,7 +163,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe "http://localhost:22201/agent-registration/apply/agent-details/address-lookup-response"
+    response.header("Location").value shouldBe "http://localhost:9028/any-uri-determined-by-alf"
     AgentDetailsStubHelper.verifyConnectorsForAuthAction()
     AddressLookupFrontendStubs.verifyAddressLookupInit()
 

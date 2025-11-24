@@ -85,7 +85,7 @@ object AddressLookupFrontendStubs:
     urlPattern = urlMatching("/api/v2/init"),
     responseStatus = 202,
     requestBody = Some(wm.equalToJson(s"${makeJourneyConfig(continueUrl)}")),
-    responseHeaders = Seq(HeaderNames.LOCATION -> "http://localhost:22201/agent-registration/apply/agent-details/address-lookup-response")
+    responseHeaders = Seq(HeaderNames.LOCATION -> "http://localhost:9028/any-uri-determined-by-alf")
   )
 
   def stubAddressLookupWithId(
