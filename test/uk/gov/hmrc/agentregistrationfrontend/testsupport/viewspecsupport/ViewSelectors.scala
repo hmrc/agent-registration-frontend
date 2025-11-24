@@ -141,11 +141,14 @@ object ViewSelectors:
           rows = element.selectOrFail(summaryListRow).toList.map { (row: Element) =>
             val key = row.selectOrFail(summaryListRowKey).text()
             val value = row.selectOrFail(summaryListRowValue).text()
-            val changeLink = row.selectOrFail(s"${summaryListRowActions} > a").selectOnlyOneElementOrFail().selectAttrOrFail("href")
+            val changeLink = row.selectOrFail(s"${summaryListRowActions} > a").selectOnlyOneElementOrFail()
+            val changeLinkHref = changeLink.selectAttrOrFail("href")
+            val changeLinkText = changeLink.text()
             TestSummaryRow(
               key = key,
               value = value,
-              action = changeLink
+              action = changeLinkHref,
+              changeLinkAccessibleContent = changeLinkText
             )
           }
         )
@@ -199,7 +202,8 @@ object ViewSelectors:
   final case class TestSummaryRow(
     key: String,
     value: String,
-    action: String
+    action: String,
+    changeLinkAccessibleContent: String
   )
 
   final case class TestSummaryList(rows: List[TestSummaryRow])
