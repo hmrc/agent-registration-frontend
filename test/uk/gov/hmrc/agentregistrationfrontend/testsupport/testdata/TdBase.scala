@@ -17,6 +17,8 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
+import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
@@ -74,7 +76,13 @@ trait TdBase:
   def companyProfile: CompanyProfile = CompanyProfile(
     companyNumber = crn,
     companyName = companyName,
-    dateOfIncorporation = Some(dateOfIncorporation)
+    dateOfIncorporation = Some(dateOfIncorporation),
+    unsanitisedCHROAddress = Some(ChroAddress(
+      address_line_1 = Some("23 Great Portland Street"),
+      address_line_2 = Some("London"),
+      postal_code = Some("W1 8LT"),
+      country = Some("GB")
+    ))
   )
   def postcode: String = "AA1 1AA"
   def authorisedPersonName: String = "Alice Smith"
@@ -86,6 +94,28 @@ trait TdBase:
   def newTelephoneNumber: String = "+44 (0) 7000000000"
   def bprEmailAddress: String = "bpr@example.com"
   def newEmailAddress: String = "new@example.com"
+  def chroAddress: AgentCorrespondenceAddress = AgentCorrespondenceAddress(
+    addressLine1 = "23 Great Portland Street",
+    addressLine2 = Some("London"),
+    postalCode = Some("W1 8LT"),
+    countryCode = "GB"
+  )
+  def bprRegisteredAddress: DesBusinessAddress = DesBusinessAddress(
+    addressLine1 = "Registered Line 1",
+    addressLine2 = Some("Registered Line 2"),
+    addressLine3 = None,
+    addressLine4 = None,
+    postalCode = Some("AB1 2CD"),
+    countryCode = "GB"
+  )
+  def newCorrespondenceAddress: AddressLookupFrontendAddress = AddressLookupFrontendAddress(
+    lines = Seq("New Line 1", "New Line 2"),
+    postcode = Some("CD3 4EF"),
+    country = Country(
+      code = "GB",
+      name = Some("United Kingdom")
+    )
+  )
   def llpNameQuery = CompaniesHouseNameQuery(
     firstName = "Jane",
     lastName = "Leadenhall-Lane"
@@ -100,14 +130,7 @@ trait TdBase:
   )
   def businessPartnerRecordResponse: BusinessPartnerRecordResponse = BusinessPartnerRecordResponse(
     organisationName = Some("Test Company Name"),
-    address = DesBusinessAddress(
-      addressLine1 = "Line 1",
-      addressLine2 = Some("Line 2"),
-      addressLine3 = None,
-      addressLine4 = None,
-      postalCode = Some("AB1 2CD"),
-      countryCode = "GB"
-    ),
+    address = bprRegisteredAddress,
     primaryPhoneNumber = Some(bprPrimaryTelephoneNumber),
     emailAddress = Some(bprEmailAddress)
   )

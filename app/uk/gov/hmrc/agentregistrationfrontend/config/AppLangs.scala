@@ -14,15 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared
+package uk.gov.hmrc.agentregistrationfrontend.config
 
-import play.api.libs.json.Format
-import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import play.api.i18n.Lang
 
-/** Corporation Tax (Ct) Unique Taxpayer Reference (Utr)
-  */
-final case class CtUtr(value: String):
-  def asUtr: Utr = Utr(value)
+object AppLangs:
 
-object CtUtr:
-  given format: Format[CtUtr] = JsonFormatsFactory.makeValueClassFormat
+  val en: Lang = Lang("en")
+  val cy: Lang = Lang("cy")
