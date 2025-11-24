@@ -32,7 +32,6 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressFor
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.AgentCorrespondenceAddressPage
 
 import javax.inject.Inject

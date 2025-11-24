@@ -28,6 +28,7 @@ import uk.gov.hmrc.agentregistration.shared.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.config.AddressLookupConfig
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.StringContextOps
