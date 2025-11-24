@@ -100,7 +100,6 @@ object AgentCorrespondenceAddress:
     else
       throw new IllegalArgumentException(s"Cannot parse CorrespondenceAddress from string: $address")
 
-
   /** Create an `AgentCorrespondenceAddress` from an `AddressLookupFrontendAddress`.
     *
     * Only the first four lines from the ALF address are used to remain compatible with this type.

@@ -20,25 +20,25 @@ import play.api.http.HeaderNames.LOCATION
 import play.api.i18n.Lang
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import play.api.mvc.Call
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistration.shared.AddressLookupFrontendAddress
+import uk.gov.hmrc.agentregistration.shared.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.config.AddressLookupConfig
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
-import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
-import uk.gov.hmrc.agentregistration.shared.AddressLookupFrontendAddress
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
 import uk.gov.hmrc.http.HttpReads.Implicits.*
-import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.StringContextOps
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
+import java.net.URL
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-import scala.util.control.NoStackTrace
 
 @Singleton
 class AddressLookupFrontendConnector @Inject() (
@@ -55,26 +55,23 @@ class AddressLookupFrontendConnector @Inject() (
   ): Future[String] =
     val addressConfig = Json.toJson(addressLookupConfig.createJourneyConfig(s"${call.url}"))
     http
-      .post(url"$initJourneyUrl")
+      .post(initJourneyUrl)
       .withBody(Json.toJson(addressConfig))
       .execute[HttpResponse].map: resp =>
         resp
           .header(LOCATION)
-          .getOrElse(throw new ALFLocationHeaderNotSetException)
+          .getOrElse(Errors.throwExpectedDataMissing("Location header not set in ALF response"))
 
   def getAddressDetails(journeyId: JourneyId)(implicit
     rh: RequestHeader,
     ec: ExecutionContext
   ): Future[AddressLookupFrontendAddress] = http
-    .get(url"${confirmJourneyUrl(journeyId)}")
+    .get(confirmJourneyUrl(journeyId))
     .execute[JsObject]
     .map(json => (json \ "address").as[AddressLookupFrontendAddress])
 
-  private def confirmJourneyUrl(journeyId: JourneyId) = s"${appConfig.addressLookupFrontendBaseUrl}/api/confirmed?id=${journeyId.value}"
+  private def confirmJourneyUrl(journeyId: JourneyId): URL = url"${appConfig.addressLookupFrontendBaseUrl}/api/confirmed?id=${journeyId.value}"
 
-  private def initJourneyUrl: String = s"${appConfig.addressLookupFrontendBaseUrl}/api/v2/init"
+  private def initJourneyUrl: URL = url"${appConfig.addressLookupFrontendBaseUrl}/api/v2/init"
 
 }
-
-class ALFLocationHeaderNotSetException
-extends NoStackTrace
