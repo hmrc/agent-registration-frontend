@@ -41,14 +41,12 @@ class AppConfig @Inject() (
   private val basFrontendSignBaseInBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-in", configuration)
   val basFrontendSignOutUrlBase: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-out", configuration)
   val emailVerificationFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.email-verification-frontend", configuration)
-  val addressLookupFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.address-lookup-frontend", configuration)
-
   val asaDashboardUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.asa-fe-dashboard-url", configuration)
   val taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment: String = ConfigHelper.readConfigAsValidUrlString(
     "urls.taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment",
     configuration
   )
-
+  val addressLookupFrontendBaseUrl: String = servicesConfig.baseUrl("address-lookup-frontend")
   val agentsExternalStubsBaseUrl: String = servicesConfig.baseUrl("agents-external-stubs")
   val companiesHouseApiProxyBaseUrl: String = servicesConfig.baseUrl("companies-house-api-proxy")
   val enrolmentStoreProxyBaseUrl: String = servicesConfig.baseUrl("enrolment-store-proxy")
