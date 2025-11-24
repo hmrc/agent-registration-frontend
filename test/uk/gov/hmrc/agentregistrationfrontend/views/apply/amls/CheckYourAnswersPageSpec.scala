@@ -79,12 +79,14 @@ extends ViewSpec:
           TestSummaryRow(
             key = "Supervisory body",
             value = "HM Revenue and Customs (HMRC)",
-            action = "/agent-registration/apply/anti-money-laundering/supervisor-name"
+            action = AppRoutes.apply.amls.AmlsSupervisorController.show.url,
+            changeLinkAccessibleContent = "Change Supervisory body"
           ),
           TestSummaryRow(
             key = "Registration number",
             value = "XAML00000123456",
-            action = "/agent-registration/apply/anti-money-laundering/registration-number"
+            action = AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url,
+            changeLinkAccessibleContent = "Change Registration number"
           )
         )
       )
@@ -127,22 +129,26 @@ extends ViewSpec:
           TestSummaryRow(
             key = "Supervisory body",
             value = "Association of TaxationTechnicians (ATT)",
-            action = "/agent-registration/apply/anti-money-laundering/supervisor-name"
+            action = AppRoutes.apply.amls.AmlsSupervisorController.show.url,
+            changeLinkAccessibleContent = "Change Supervisory body"
           ),
           TestSummaryRow(
             key = "Registration number",
             value = "NONHMRC-REF-AMLS-NUMBER-00001",
-            action = "/agent-registration/apply/anti-money-laundering/registration-number"
+            action = AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url,
+            changeLinkAccessibleContent = "Change Registration number"
           ),
           TestSummaryRow(
             key = "Supervision expiry date",
             value = "25 May 2060",
-            action = "/agent-registration/apply/anti-money-laundering/supervision-runs-out"
+            action = AppRoutes.apply.amls.AmlsExpiryDateController.show.url,
+            changeLinkAccessibleContent = "Change Supervision expiry date"
           ),
           TestSummaryRow(
             key = "Evidence of anti-money laundering supervision",
             value = "evidence.pdf",
-            action = "/agent-registration/apply/anti-money-laundering/evidence"
+            action = AppRoutes.apply.amls.AmlsEvidenceUploadController.show.url,
+            changeLinkAccessibleContent = "Change Evidence of anti-money laundering supervision"
           )
         )
       )

@@ -14,25 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.apply.applicantcontactdetails
+package uk.gov.hmrc.agentregistrationfrontend.views.apply.agentdetails
 
-import com.google.inject.AbstractModule
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.CheckYourAnswersPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.CheckYourAnswersPage
 
 class CheckYourAnswersPageSpec
 extends ViewSpec:
-
-  override lazy val overridesModule: AbstractModule =
-    new AbstractModule:
-      override def configure(): Unit = bind(classOf[AmlsCodes]).asEagerSingleton()
 
   val viewTemplate: CheckYourAnswersPage = app.injector.instanceOf[CheckYourAnswersPage]
 
@@ -42,32 +36,37 @@ extends ViewSpec:
     val complete: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
-        .sectionContactDetails
-        .whenApplicantIsAuthorised
-        .afterEmailAddressVerified
+        .sectionAgentDetails
+        .whenUsingExistingCompanyName
+        .afterBprAddressSelected
 
   private val heading: String = "Check your answers"
 
-  "CheckYourAnswersPage for complete Applicant Contact Details" should:
+  "CheckYourAnswersPage for complete Agent Details" should:
     given agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(agentApplication.complete)
 
     val doc: Document = Jsoup.parse(viewTemplate().body)
     "contain content" in:
       doc.mainContent shouldContainContent
         """
-          |Applicant contact details
+          |Agent services account details
           |Check your answers
-          |Member of the limited liability partnership
-          |No, but I’m authorised by them to set up this account
-          |Change Member of the limited liability partnership
-          |Name
-          |Miss Alexa Fantastic
-          |Change Name
+          |Name shown to clients
+          |Test Company Name
+          |Change Name shown to clients
           |Telephone number
           |(+44) 10794554342
           |Change Telephone number
           |Email address
-          |user@test.com
+          |new@example.com
+          |Change Email address
+          |Correspondence address
+          |Registered Line 1
+          |Registered Line 2
+          |AB1 2CD
+          |GB
+          |Change Correspondence address
+          |Confirm and continue
           """.stripMargin
 
     "have the correct title" in:
@@ -77,28 +76,28 @@ extends ViewSpec:
       val expectedSummaryList: TestSummaryList = TestSummaryList(
         List(
           TestSummaryRow(
-            key = "Member of the limited liability partnership",
-            value = "No, but I’m authorised by them to set up this account",
-            action = AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show.url,
-            changeLinkAccessibleContent = "Change Member of the limited liability partnership"
-          ),
-          TestSummaryRow(
-            key = "Name",
-            value = "Miss Alexa Fantastic",
-            action = AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.show.url,
-            changeLinkAccessibleContent = "Change Name"
+            key = "Name shown to clients",
+            value = "Test Company Name",
+            action = AppRoutes.apply.agentdetails.AgentBusinessNameController.show.url,
+            changeLinkAccessibleContent = "Change Name shown to clients"
           ),
           TestSummaryRow(
             key = "Telephone number",
             value = "(+44) 10794554342",
-            action = AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.show.url,
+            action = AppRoutes.apply.agentdetails.AgentTelephoneNumberController.show.url,
             changeLinkAccessibleContent = "Change Telephone number"
           ),
           TestSummaryRow(
             key = "Email address",
-            value = "user@test.com",
-            action = AppRoutes.apply.applicantcontactdetails.EmailAddressController.show.url,
+            value = "new@example.com",
+            action = AppRoutes.apply.agentdetails.AgentEmailAddressController.show.url,
             changeLinkAccessibleContent = "Change Email address"
+          ),
+          TestSummaryRow(
+            key = "Correspondence address",
+            value = "Registered Line 1 Registered Line 2 AB1 2CD GB",
+            action = AppRoutes.apply.agentdetails.AgentCorrespondenceAddressController.show.url,
+            changeLinkAccessibleContent = "Change Correspondence address"
           )
         )
       )
