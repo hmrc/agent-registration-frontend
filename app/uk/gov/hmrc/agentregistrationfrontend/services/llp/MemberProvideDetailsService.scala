@@ -20,6 +20,7 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.llp.MemberProvidedDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
@@ -35,9 +36,19 @@ class MemberProvideDetailsService @Inject() (
 )
 extends RequestAwareLogging:
 
-  def createNewMemberProvidedDetails(applicationId: AgentApplicationId)(using request: IndividualAuthorisedRequest[?]): MemberProvidedDetails =
-    logger.info(s"creating new provided details for user:[${request.internalUserId}] and applicationId:[${applicationId}] ")
-    provideDetailsFactory.makeNewMemberProvidedDetails(request.internalUserId, applicationId)
+  def createNewMemberProvidedDetails(
+    internalUserId: InternalUserId,
+    agentApplicationId: AgentApplicationId,
+    nino: Option[Nino],
+    saUtr: Option[SaUtr]
+  )(using request: IndividualAuthorisedWithIdentifiersRequest[?]): MemberProvidedDetails =
+    logger.info(s"creating new provided details for user:[${internalUserId.value}] and applicationId:[${agentApplicationId.value}] ")
+    provideDetailsFactory.makeNewMemberProvidedDetails(
+      internalUserId,
+      agentApplicationId,
+      nino,
+      saUtr
+    )
 
   def findByApplicationId(applicationId: AgentApplicationId)(using request: IndividualAuthorisedRequest[?]): Future[Option[MemberProvidedDetails]] =
     memberProvideDetailsConnector

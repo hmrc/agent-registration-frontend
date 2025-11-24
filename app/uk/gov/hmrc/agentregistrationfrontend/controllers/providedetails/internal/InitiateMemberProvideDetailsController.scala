@@ -21,7 +21,11 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.connectors.llp.CitizenDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
@@ -36,7 +40,8 @@ class InitiateMemberProvideDetailsController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   memberProvideDetailsService: MemberProvideDetailsService,
-  agentApplicationService: AgentApplicationService
+  agentApplicationService: AgentApplicationService,
+  citizenDetailsConnector: CitizenDetailsConnector
 )
 extends FrontendController(mcc, actions):
 
@@ -45,9 +50,16 @@ extends FrontendController(mcc, actions):
   def initiateMemberProvideDetails(
     linkId: LinkId
   ): Action[AnyContent] = actions
-    .authorisedIndividual
+    .authorisedIndividualWithIdentifiers
     .async:
-      implicit request =>
+      implicit request: IndividualAuthorisedWithIdentifiersRequest[AnyContent] =>
+
+        implicit val individualAuthorisedRequest: IndividualAuthorisedRequest[AnyContent] =
+          new IndividualAuthorisedRequest[AnyContent](
+            request.internalUserId,
+            request.request,
+            request.credentials
+          )
 
         val nextEndpoint: Call = AppRoutes.providedetails.CompaniesHouseNameQueryController.show
         val applicationGenericExitPageUrl: String = AppRoutes.apply.AgentApplicationController.genericExitPage.url
@@ -59,10 +71,10 @@ extends FrontendController(mcc, actions):
                 .findByApplicationId(agentApplication.agentApplicationId)
                 .flatMap:
                   case None =>
-                    memberProvideDetailsService
-                      .upsert(memberProvideDetailsService
-                        .createNewMemberProvidedDetails(agentApplication.agentApplicationId))
-                      .map(_ => Redirect(nextEndpoint).addToSession(agentApplication.agentApplicationId))
+                    for {
+                      memberProvidedDetails <- createMemberProvidedDetailsFor(agentApplication.agentApplicationId)
+                      _ <- memberProvideDetailsService.upsert(memberProvidedDetails)
+                    } yield Redirect(nextEndpoint).addToSession(agentApplication.agentApplicationId)
 
                   case Some(memberProvideDetails) =>
                     logger.info("Member provided details already exists, redirecting to member name page")
@@ -71,3 +83,29 @@ extends FrontendController(mcc, actions):
             case None =>
               logger.info(s"Application for linkId $linkId not found, redirecting to $applicationGenericExitPageUrl")
               Future.successful(Redirect(applicationGenericExitPageUrl))
+
+  private def createMemberProvidedDetailsFor(
+    applicationId: AgentApplicationId
+  )(using request: IndividualAuthorisedWithIdentifiersRequest[AnyContent]): Future[MemberProvidedDetails] =
+    (request.nino, request.saUtr) match
+      case (Some(nino), None) =>
+        citizenDetailsConnector
+          .getCitizenDetails(nino)
+          .map { citizenDetails =>
+            memberProvideDetailsService.createNewMemberProvidedDetails(
+              internalUserId = request.internalUserId,
+              agentApplicationId = applicationId,
+              nino = request.nino,
+              saUtr = citizenDetails.saUtr
+            )
+          }
+
+      case _ =>
+        Future.successful(
+          memberProvideDetailsService.createNewMemberProvidedDetails(
+            internalUserId = request.internalUserId,
+            agentApplicationId = applicationId,
+            nino = request.nino,
+            saUtr = request.saUtr
+          )
+        )

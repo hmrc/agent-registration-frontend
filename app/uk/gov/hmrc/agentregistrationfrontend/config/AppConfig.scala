@@ -56,6 +56,7 @@ class AppConfig @Inject() (
   val emailVerificationBaseUrl: String = servicesConfig.baseUrl("email-verification")
   val selfBaseUrl: String = servicesConfig.baseUrl("agent-registration-frontend")
   val hmrcAsAgentEnrolment: Enrolment = Enrolment(key = "HMRC-AS-AGENT")
+  val citizenDetailsBaseUrl: String = servicesConfig.baseUrl("citizen-details")
 
   def signInUri(
     continueUri: Uri,
