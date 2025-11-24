@@ -28,7 +28,7 @@ case class CitizenDetails(
   lastName: Option[String],
   dateOfBirth: Option[LocalDate],
   saUtr: Option[SaUtr]
-) {
+):
 
   def name: Option[String] =
     val n = Seq(firstName, lastName)
@@ -39,9 +39,9 @@ case class CitizenDetails(
       None
     else
       Some(n.mkString(" "))
-}
 
-object CitizenDetails {
+
+object CitizenDetails:
 
   val citizenDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("ddMMyyyy")
 
@@ -60,4 +60,4 @@ object CitizenDetails {
       saUtr
     )
 
-}
+
