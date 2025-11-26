@@ -18,13 +18,14 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls
 
 import com.softwaremill.quicklens.*
 import play.api.data.Form
-
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -57,12 +58,12 @@ extends FrontendController(mcc, actions):
       .getApplicationInProgress
       .ensureValidFormAndRedirectIfSaveForLater(amlsCodeForm.form, implicit r => view(_))
       .async:
-        implicit request =>
+        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[AmlsCode]) =>
           val supervisoryBody = request.formValue
 
           applicationService
             .upsert(
-              request.agentApplication
+              request.agentApplication.asLlpApplication
                 .modify(_.amlsDetails)
                 .using {
                   case Some(details) =>

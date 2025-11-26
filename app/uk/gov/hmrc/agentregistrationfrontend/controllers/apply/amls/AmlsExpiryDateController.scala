@@ -25,6 +25,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -71,11 +72,11 @@ extends FrontendController(mcc, actions):
     baseAction
       .ensureValidFormAndRedirectIfSaveForLater[LocalDate](AmlsExpiryDateForm.form(), implicit request => view(_))
       .async:
-        implicit request =>
+        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[LocalDate]) =>
           val amlsExpiryDate = request.formValue
           applicationService
             .upsert(
-              request.agentApplication
+              request.agentApplication.asLlpApplication
                 .modify(_.amlsDetails.each.amlsExpiryDate)
                 .setTo(Some(amlsExpiryDate))
             )

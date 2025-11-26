@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentBusinessNameForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
@@ -91,7 +92,7 @@ extends ControllerSpec:
     AgentDetailsStubHelper.verifyConnectorsToRenderPage()
 
   s"POST $path with selection of existing company name should save data and redirect to CYA page" in:
-    AgentDetailsStubHelper.stubsForSuccessfulUpdate(
+    ApplyStubHelper.stubsForSuccessfulUpdate(
       application = agentApplication.beforeBusinessNameProvided,
       updatedApplication = agentApplication.afterBusinessNameReused
     )
@@ -103,10 +104,10 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
-    AgentDetailsStubHelper.verifyConnectorsForSuccessfulUpdate()
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with selection of other and valid input for other name should save data and redirect to CYA page" in:
-    AgentDetailsStubHelper.stubsForSuccessfulUpdate(
+    ApplyStubHelper.stubsForSuccessfulUpdate(
       application = agentApplication.beforeBusinessNameProvided,
       updatedApplication = agentApplication.afterNewBusinessNameProvided
     )
@@ -119,7 +120,7 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
-    AgentDetailsStubHelper.verifyConnectorsForSuccessfulUpdate()
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with blank inputs should return 400" in:
     AgentDetailsStubHelper.stubsToRenderPage(agentApplication.beforeBusinessNameProvided)
@@ -183,7 +184,7 @@ extends ControllerSpec:
     AgentDetailsStubHelper.verifyConnectorsToRenderPage()
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
-    AgentDetailsStubHelper.stubsForSuccessfulUpdate(
+    ApplyStubHelper.stubsForSuccessfulUpdate(
       application = agentApplication.beforeBusinessNameProvided,
       updatedApplication = agentApplication.afterBusinessNameReused
     )
@@ -196,7 +197,7 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
-    AgentDetailsStubHelper.verifyConnectorsForSuccessfulUpdate()
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
     AgentDetailsStubHelper.stubsToRenderPage(agentApplication.beforeBusinessNameProvided)

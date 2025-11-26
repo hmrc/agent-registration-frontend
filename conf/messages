@@ -11,6 +11,7 @@ common.errorPrefix = Error
 common.or = or
 common.dobPrefix = Date of birth
 common.change = Change
+common.warning = Warning
 
 months.1 = January
 months.2 = February
@@ -201,6 +202,17 @@ agentDetailsCheckYourAnswers.businessName.label = Name shown to clients
 agentDetailsCheckYourAnswers.telephone.label = Telephone number
 agentDetailsCheckYourAnswers.email.label = Email address
 agentDetailsCheckYourAnswers.address.label = Correspondence address
+
+## Agent standards - HMRC standard for agents
+hmrcStandardForAgents.caption = HMRC standard for agents
+hmrcStandardForAgents.title = Agree to meet the HMRC standard for agents
+hmrcStandardForAgents.warning = We carry out checks to make sure agents meet the standard. We take action against individuals and organisations who do not comply.
+hmrcStandardForAgents.read.h2 = Read the standard on GOV.UK
+hmrcStandardForAgents.read.linkText = The HMRC standard for agents
+hmrcStandardForAgents.agree.h2 = Declaration
+hmrcStandardForAgents.agree.p1 = I have read the HMRC standard for agents.
+hmrcStandardForAgents.agree.p2 = I agree that {0} will meet the standard when working on behalf of clients.
+hmrcStandardForAgents.agree.button = Agree and continue
 
 # About your application / user role
 userRole.title = Are you the owner of the business?

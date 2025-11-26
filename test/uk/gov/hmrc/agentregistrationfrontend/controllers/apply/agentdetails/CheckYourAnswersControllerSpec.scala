@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
 class CheckYourAnswersControllerSpec
@@ -114,19 +115,19 @@ extends ControllerSpec:
   ).foreach: testCase =>
     if testCase.expectedRedirect.isEmpty then
       s"GET $path with ${testCase.name} should return 200 and render page" in:
-        AgentDetailsStubHelper.stubsForAuthAction(testCase.application)
+        ApplyStubHelper.stubsForAuthAction(testCase.application)
         val response: WSResponse = get(path)
 
         response.status shouldBe Status.OK
         val doc = response.parseBodyAsJsoupDocument
         doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
         doc.select("h2.govuk-caption-l").text() shouldBe "Agent services account details"
-        AgentDetailsStubHelper.verifyConnectorsForAuthAction()
+        ApplyStubHelper.verifyConnectorsForAuthAction()
     else
       s"GET $path with missing ${testCase.name} should redirect to the ${testCase.name} page" in:
-        AgentDetailsStubHelper.stubsForAuthAction(testCase.application)
+        ApplyStubHelper.stubsForAuthAction(testCase.application)
         val response: WSResponse = get(path)
 
         response.status shouldBe Status.SEE_OTHER
         response.header("Location").value shouldBe testCase.expectedRedirect.get
-        AgentDetailsStubHelper.verifyConnectorsForAuthAction()
+        ApplyStubHelper.verifyConnectorsForAuthAction()
