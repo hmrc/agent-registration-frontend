@@ -87,18 +87,20 @@ extends RequestAwareLogging:
           Redirect(call.url)
     )
 
-  extension (ab: ActionBuilder[AgentApplicationRequest, AnyContent])(using ec: ExecutionContext)
+  extension [
+    R <: [X] =>> Request[X]
+  ](ab: ActionBuilder[R, AnyContent])(using ec: ExecutionContext)
 
     def ensureValidFormAndRedirectIfSaveForLater[T](
-      form: AgentApplicationRequest[AnyContent] => Form[T],
-      viewToServeWhenFormHasErrors: AgentApplicationRequest[AnyContent] => Form[T] => HtmlFormat.Appendable
+      form: R[AnyContent] => Form[T],
+      viewToServeWhenFormHasErrors: R[AnyContent] => Form[T] => HtmlFormat.Appendable
     )(using
       fb: FormBinding,
-      merge: MergeFormValue[AgentApplicationRequest[AnyContent], T]
-    ): ActionBuilder[[X] =>> AgentApplicationRequest[X] & FormValue[T], AnyContent] = ab
+      merge: MergeFormValue[R[AnyContent], T]
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], AnyContent] = ab
       .ensureValidFormGeneric[T](
         form,
-        (r: AgentApplicationRequest[AnyContent]) =>
+        (r: R[AnyContent]) =>
           (f: Form[T]) =>
             viewToServeWhenFormHasErrors(r)(f)
               .pipe(BadRequest.apply)
@@ -107,11 +109,11 @@ extends RequestAwareLogging:
 
     def ensureValidFormAndRedirectIfSaveForLater[T](
       form: Form[T],
-      viewToServeWhenFormHasErrors: AgentApplicationRequest[AnyContent] => Form[T] => HtmlFormat.Appendable
+      viewToServeWhenFormHasErrors: R[AnyContent] => Form[T] => HtmlFormat.Appendable
     )(using
       fb: FormBinding,
-      merge: MergeFormValue[AgentApplicationRequest[AnyContent], T]
-    ): ActionBuilder[[X] =>> AgentApplicationRequest[X] & FormValue[T], AnyContent] = ab.ensureValidFormAndRedirectIfSaveForLater(
+      merge: MergeFormValue[R[AnyContent], T]
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], AnyContent] = ab.ensureValidFormAndRedirectIfSaveForLater(
       _ => form,
       viewToServeWhenFormHasErrors
     )
