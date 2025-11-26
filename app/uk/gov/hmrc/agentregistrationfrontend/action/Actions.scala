@@ -24,6 +24,8 @@ import play.api.mvc.Results.Redirect
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedAction
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersAction
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.ProvideDetailsAction
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
@@ -41,6 +43,7 @@ class Actions @Inject() (
   authorisedAction: AuthorisedAction,
   agentApplicationAction: AgentApplicationAction,
   individualAuthorisedAction: IndividualAuthorisedAction,
+  individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction,
   provideDetailsAction: ProvideDetailsAction
 )(using ExecutionContext)
 extends RequestAwareLogging:
@@ -84,18 +87,20 @@ extends RequestAwareLogging:
           Redirect(call.url)
     )
 
-  extension (ab: ActionBuilder[AgentApplicationRequest, AnyContent])(using ec: ExecutionContext)
+  extension [
+    R <: [X] =>> Request[X]
+  ](ab: ActionBuilder[R, AnyContent])(using ec: ExecutionContext)
 
     def ensureValidFormAndRedirectIfSaveForLater[T](
-      form: AgentApplicationRequest[AnyContent] => Form[T],
-      viewToServeWhenFormHasErrors: AgentApplicationRequest[AnyContent] => Form[T] => HtmlFormat.Appendable
+      form: R[AnyContent] => Form[T],
+      viewToServeWhenFormHasErrors: R[AnyContent] => Form[T] => HtmlFormat.Appendable
     )(using
       fb: FormBinding,
-      merge: MergeFormValue[AgentApplicationRequest[AnyContent], T]
-    ): ActionBuilder[[X] =>> AgentApplicationRequest[X] & FormValue[T], AnyContent] = ab
+      merge: MergeFormValue[R[AnyContent], T]
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], AnyContent] = ab
       .ensureValidFormGeneric[T](
         form,
-        (r: AgentApplicationRequest[AnyContent]) =>
+        (r: R[AnyContent]) =>
           (f: Form[T]) =>
             viewToServeWhenFormHasErrors(r)(f)
               .pipe(BadRequest.apply)
@@ -104,11 +109,11 @@ extends RequestAwareLogging:
 
     def ensureValidFormAndRedirectIfSaveForLater[T](
       form: Form[T],
-      viewToServeWhenFormHasErrors: AgentApplicationRequest[AnyContent] => Form[T] => HtmlFormat.Appendable
+      viewToServeWhenFormHasErrors: R[AnyContent] => Form[T] => HtmlFormat.Appendable
     )(using
       fb: FormBinding,
-      merge: MergeFormValue[AgentApplicationRequest[AnyContent], T]
-    ): ActionBuilder[[X] =>> AgentApplicationRequest[X] & FormValue[T], AnyContent] = ab.ensureValidFormAndRedirectIfSaveForLater(
+      merge: MergeFormValue[R[AnyContent], T]
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], AnyContent] = ab.ensureValidFormAndRedirectIfSaveForLater(
       _ => form,
       viewToServeWhenFormHasErrors
     )
@@ -125,6 +130,9 @@ extends RequestAwareLogging:
 
   val authorisedIndividual: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
     .andThen(individualAuthorisedAction)
+
+  val authorisedIndividualWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = action
+    .andThen(individualAuthorisedWithIdentifiersAction)
 
   val getProvideDetailsInProgress: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorisedIndividual
     .andThen(provideDetailsAction)

@@ -18,10 +18,10 @@ package uk.gov.hmrc.agentregistrationfrontend.model.grs
 
 import play.api.libs.json.Format
 import play.api.mvc.QueryStringBindable
-import uk.gov.hmrc.agentregistrationfrontend.util.ValueClassBinder
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import uk.gov.hmrc.agentregistrationfrontend.util.ValueClassBinder
 
-/** Grs' identifier of a Journey.
+/** Journey id for use in the Generic Registration Service (GRS) integrated frontend journey
   */
 final case class JourneyId(value: String)
 

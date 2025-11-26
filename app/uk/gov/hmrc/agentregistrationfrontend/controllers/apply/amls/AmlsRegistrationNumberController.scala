@@ -26,6 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -68,12 +69,12 @@ extends FrontendController(mcc, actions):
         implicit r => view(_)
       )
       .async:
-        implicit request =>
+        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[AmlsRegistrationNumber]) =>
           val amlsRegistrationNumber: AmlsRegistrationNumber = request.formValue
 
           applicationService
             .upsert(
-              request.agentApplication
+              request.agentApplication.asLlpApplication
                 .modify(_.amlsDetails.each.amlsRegistrationNumber)
                 .setTo(Some(amlsRegistrationNumber))
             )

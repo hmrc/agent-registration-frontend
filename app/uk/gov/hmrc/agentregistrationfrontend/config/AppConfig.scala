@@ -36,18 +36,18 @@ class AppConfig @Inject() (
 ):
 
   val govukStartPageUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.govuk-start-page", configuration)
+  val govukHmrcStandardForAgentsUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.govuk-hmrc-standard-for-agents", configuration)
   val thisFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.this-frontend", configuration)
   val feedbackFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.feedback-frontend", configuration)
   private val basFrontendSignBaseInBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-in", configuration)
   val basFrontendSignOutUrlBase: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-out", configuration)
   val emailVerificationFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.email-verification-frontend", configuration)
-
   val asaDashboardUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.asa-fe-dashboard-url", configuration)
   val taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment: String = ConfigHelper.readConfigAsValidUrlString(
     "urls.taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment",
     configuration
   )
-
+  val addressLookupFrontendBaseUrl: String = servicesConfig.baseUrl("address-lookup-frontend")
   val agentsExternalStubsBaseUrl: String = servicesConfig.baseUrl("agents-external-stubs")
   val companiesHouseApiProxyBaseUrl: String = servicesConfig.baseUrl("companies-house-api-proxy")
   val enrolmentStoreProxyBaseUrl: String = servicesConfig.baseUrl("enrolment-store-proxy")
@@ -55,6 +55,7 @@ class AppConfig @Inject() (
   val emailVerificationBaseUrl: String = servicesConfig.baseUrl("email-verification")
   val selfBaseUrl: String = servicesConfig.baseUrl("agent-registration-frontend")
   val hmrcAsAgentEnrolment: Enrolment = Enrolment(key = "HMRC-AS-AGENT")
+  val citizenDetailsBaseUrl: String = servicesConfig.baseUrl("citizen-details")
 
   def signInUri(
     continueUri: Uri,

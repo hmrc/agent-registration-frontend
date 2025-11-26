@@ -34,7 +34,8 @@ GET         /apply/about-your-business/sign-in                       uk.gov.hmrc
 #  These routes are for internal navigation and should not be accessed directly through the browser URL and meant to be accessed via redirects from other routes.
 GET        /apply/internal/initiate-agent-application/:agentType/:businessType        uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.InitiateAgentApplicationController.initiateAgentApplication(agentType: AgentType, businessType: BusinessType)
 GET        /apply/internal/grs/start-journey                                          uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.GrsController.startJourney()
-GET        /apply/internal/grs/journey-callback                                       uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.GrsController.journeyCallback(journeyId: Option[JourneyId])
+GET        /apply/internal/grs/journey-callback                                       uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.GrsController.journeyCallback(journeyId: Option[grs.JourneyId])
+GET        /apply/internal/address-lookup/journey-callback                            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.AddressLookupCallbackController.journeyCallback(id: Option[addresslookup.JourneyId])
 
 ## Applicant contact details routes
 GET         /apply/applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.ApplicantRoleInLlpController.show
@@ -60,7 +61,8 @@ POST        /apply/agent-details/telephone-number                  uk.gov.hmrc.a
 GET         /apply/agent-details/email-address                     uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentEmailAddressController.show
 POST        /apply/agent-details/email-address                     uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentEmailAddressController.submit
 GET         /apply/agent-details/verify-email-address              uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentEmailAddressController.verify
-
+GET         /apply/agent-details/correspondence-address            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentCorrespondenceAddressController.show
+POST        /apply/agent-details/correspondence-address            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.AgentCorrespondenceAddressController.submit
 GET         /apply/agent-details/check-your-answers                uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.CheckYourAnswersController.show
 
 ## Anti Money Laundering routes
@@ -76,6 +78,9 @@ GET         /apply/anti-money-laundering/evidence/upload-result     uk.gov.hmrc.
 GET         /apply/anti-money-laundering/evidence/upload-error      uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsEvidenceUploadController.showError(errorCode: String, errorMessage: String, errorRequestId: String, key: String)
 GET         /apply/anti-money-laundering/check-your-answers         uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.CheckYourAnswersController.show
 
+# Agents Standard route
+GET         /apply/agent-standard/accept-agent-standard             uk.gov.hmrc.agentregistrationfrontend.controllers.apply.HmrcStandardForAgentsController.show
+POST        /apply/agent-standard/accept-agent-standard             uk.gov.hmrc.agentregistrationfrontend.controllers.apply.HmrcStandardForAgentsController.submit
 
 # Individuals (directors/partners/members/owners) providing details
 GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.start(linkId: LinkId)

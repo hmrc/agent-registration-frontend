@@ -83,7 +83,7 @@ extends FrontendController(mcc, actions):
         // store the upscan fileReference in the application
         _ <- applicationService
           .upsert(
-            request.agentApplication
+            request.agentApplication.asLlpApplication
               .modify(_.amlsDetails.each.amlsEvidence)
               .setTo(Some(UploadDetails(
                 status = UploadStatus.InProgress,
@@ -131,7 +131,7 @@ extends FrontendController(mcc, actions):
   def pollResultWithJavaScript: Action[AnyContent] = actions.getApplicationInProgress:
     implicit request =>
       request
-        .agentApplication
+        .agentApplication.asLlpApplication
         .getAmlsDetails
         .getAmlsEvidence
         .status match {

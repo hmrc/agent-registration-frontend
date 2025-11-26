@@ -19,46 +19,21 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.Utr
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
 object AgentDetailsStubHelper:
 
   private val utr: Utr = Utr(tdAll.saUtr.value)
 
-  def stubsForAuthAction(application: AgentApplicationLlp): StubMapping = {
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(application)
-  }
-
-  def stubsToRenderPage(application: AgentApplicationLlp): StubMapping = {
-    stubsForAuthAction(application)
+  def stubsToRenderPage(application: AgentApplicationLlp): StubMapping =
+    ApplyStubHelper.stubsForAuthAction(application)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
       utr = utr,
       responseBody = tdAll.businessPartnerRecordResponse
     )
-  }
 
-  def stubsForSuccessfulUpdate(
-    application: AgentApplicationLlp,
-    updatedApplication: AgentApplicationLlp
-  ): StubMapping = {
-    stubsForAuthAction(application)
-    AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
-  }
-
-  def verifyConnectorsForAuthAction(): Unit = {
-    AuthStubs.verifyAuthorise()
-    AgentRegistrationStubs.verifyGetAgentApplication()
-  }
-
-  def verifyConnectorsToRenderPage(): Unit = {
-    verifyConnectorsForAuthAction()
+  def verifyConnectorsToRenderPage(): Unit =
+    ApplyStubHelper.verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyGetBusinessPartnerRecord(utr)
-  }
-
-  def verifyConnectorsForSuccessfulUpdate(): Unit = {
-    verifyConnectorsForAuthAction()
-    AgentRegistrationStubs.verifyUpdateAgentApplication()
-  }

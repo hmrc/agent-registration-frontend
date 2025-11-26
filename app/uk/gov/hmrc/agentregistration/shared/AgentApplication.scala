@@ -44,6 +44,7 @@ sealed trait AgentApplication:
   def businessType: BusinessType
   def amlsDetails: Option[AmlsDetails]
   def agentDetails: Option[AgentDetails]
+  def hmrcStandardForAgentsAgreed: StateOfAgreement
 
   //  /** Updates the application state to the next state */
   //  def updateApplicationState: AgentApplication =
@@ -69,6 +70,11 @@ sealed trait AgentApplication:
       case ApplicationState.GrsDataReceived => true
       case ApplicationState.Submitted => true
 
+  // all agent applications must have a UTR
+  def getUtr: Utr =
+    this match
+      case a: AgentApplicationLlp => a.getBusinessDetails.saUtr.asUtr
+      case _ => expectedDataNotDefinedError("currently utr is only defined for Llp applications, as other types are not implemented yet")
   def getAmlsDetails: AmlsDetails = amlsDetails.getOrElse(expectedDataNotDefinedError("amlsDetails"))
 
   private def as[T <: AgentApplication](using ct: reflect.ClassTag[T]): Option[T] =
@@ -94,7 +100,8 @@ final case class AgentApplicationSoleTrader(
   userRole: Option[UserRole] = None,
   businessDetails: Option[BusinessDetailsSoleTrader],
   override val amlsDetails: Option[AmlsDetails],
-  override val agentDetails: Option[AgentDetails]
+  override val agentDetails: Option[AgentDetails],
+  override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
 extends AgentApplication:
 
@@ -114,7 +121,8 @@ final case class AgentApplicationLlp(
   businessDetails: Option[BusinessDetailsLlp],
   applicantContactDetails: Option[ApplicantContactDetails],
   override val amlsDetails: Option[AmlsDetails],
-  override val agentDetails: Option[AgentDetails]
+  override val agentDetails: Option[AgentDetails],
+  override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
 extends AgentApplication:
 

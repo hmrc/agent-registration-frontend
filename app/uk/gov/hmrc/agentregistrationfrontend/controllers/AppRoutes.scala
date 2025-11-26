@@ -37,6 +37,7 @@ object AppRoutes:
     val AgentApplicationController = applyRoutes.AgentApplicationController
     val TaskListController = applyRoutes.TaskListController
     val SaveForLaterController = applyRoutes.SaveForLaterController
+    val HmrcStandardForAgentsController = applyRoutes.HmrcStandardForAgentsController
 
     object aboutyourbusiness:
 
@@ -68,12 +69,14 @@ object AppRoutes:
       val AgentBusinessNameController = agentdetailsRoutes.AgentBusinessNameController
       val AgentTelephoneNumberController = agentdetailsRoutes.AgentTelephoneNumberController
       val AgentEmailAddressController = agentdetailsRoutes.AgentEmailAddressController
+      val AgentCorrespondenceAddressController = agentdetailsRoutes.AgentCorrespondenceAddressController
       val CheckYourAnswersController = agentdetailsRoutes.CheckYourAnswersController
 
     object internal:
 
       val InitiateAgentApplicationController = internalRoutes.InitiateAgentApplicationController
       val GrsController = internalRoutes.GrsController
+      val AddressLookupCallbackController = internalRoutes.AddressLookupCallbackController
 
   object providedetails:
 

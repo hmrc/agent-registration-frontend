@@ -20,6 +20,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.ApplicationState.GrsDataReceived
 import uk.gov.hmrc.agentregistration.shared.BusinessDetailsLlp
+import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName.NameOfAuthorised
@@ -40,7 +41,8 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       businessDetails = None,
       applicantContactDetails = None,
       amlsDetails = None,
-      agentDetails = None
+      agentDetails = None,
+      hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
     )
 
     val afterGrsDataReceived: AgentApplicationLlp = afterStarted.copy(
@@ -48,6 +50,10 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
         dependencies.grs.llp.businessDetails
       ),
       applicationState = GrsDataReceived
+    )
+
+    val afterHmrcStandardForAgentsAgreed: AgentApplicationLlp = afterGrsDataReceived.copy(
+      hmrcStandardForAgentsAgreed = StateOfAgreement.Agreed
     )
 
     val afterContactDetailsComplete: AgentApplicationLlp = afterGrsDataReceived.copy(

@@ -11,6 +11,7 @@ common.errorPrefix = Error
 common.or = or
 common.dobPrefix = Date of birth
 common.change = Change
+common.warning = Warning
 
 months.1 = January
 months.2 = February
@@ -24,6 +25,11 @@ months.9 = September
 months.10 = October
 months.11 = November
 months.12 = December
+
+address.lookup.title=What correspondence address should we use for your agent services account? - Apply for an agent services account - GOV.UK
+address.lookup.header=What correspondence address should we use for your agent services account?
+address.lookup.editPageLabels.title=Change your address - Apply for an agent services account - GOV.UK
+address.lookup.editPageLabels.header=Change your address
 
 # About your application
 about-application.title = About your application
@@ -182,12 +188,31 @@ otherAgentEmailAddress.error.required = Enter the email address for your agent s
 otherAgentEmailAddress.error.invalid = Enter an email address in the correct format, like name@example.com
 otherAgentEmailAddress.error.tooLong = The email address must be 24 characters or fewer
 
+# Agent details / correspondence address
+agentCorrespondenceAddress.title = What correspondence address should we use for your agent services account?
+agentCorrespondenceAddress.chro.hint = This is your Companies House registered office address.
+agentCorrespondenceAddress.bpr.hint = This is the address HMRC has in your business record.
+agentCorrespondenceAddress.other = Something else
+agentCorrespondenceAddress.error.required = Enter the correspondence address you want to use on your agent services account
+
 # Agent details / check your answers
 
 agentDetailsCheckYourAnswers.title = Check your answers
-agentDetailsCheckYourAnswers.businessName.label = Business name for clients
+agentDetailsCheckYourAnswers.businessName.label = Name shown to clients
 agentDetailsCheckYourAnswers.telephone.label = Telephone number
 agentDetailsCheckYourAnswers.email.label = Email address
+agentDetailsCheckYourAnswers.address.label = Correspondence address
+
+## Agent standards - HMRC standard for agents
+hmrcStandardForAgents.caption = HMRC standard for agents
+hmrcStandardForAgents.title = Agree to meet the HMRC standard for agents
+hmrcStandardForAgents.warning = We carry out checks to make sure agents meet the standard. We take action against individuals and organisations who do not comply.
+hmrcStandardForAgents.read.h2 = Read the standard on GOV.UK
+hmrcStandardForAgents.read.linkText = The HMRC standard for agents
+hmrcStandardForAgents.agree.h2 = Declaration
+hmrcStandardForAgents.agree.p1 = I have read the HMRC standard for agents.
+hmrcStandardForAgents.agree.p2 = I agree that {0} will meet the standard when working on behalf of clients.
+hmrcStandardForAgents.agree.button = Agree and continue
 
 # About your application / user role
 userRole.title = Are you the owner of the business?

@@ -79,22 +79,26 @@ extends ViewSpec:
           TestSummaryRow(
             key = "Member of the limited liability partnership",
             value = "No, but I’m authorised by them to set up this account",
-            action = "/agent-registration/apply/applicant/llp-member"
+            action = AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show.url,
+            changeLinkAccessibleContent = "Change Member of the limited liability partnership"
           ),
           TestSummaryRow(
             key = "Name",
             value = "Miss Alexa Fantastic",
-            action = "/agent-registration/apply/applicant/applicant-name"
+            action = AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.show.url,
+            changeLinkAccessibleContent = "Change Name"
           ),
           TestSummaryRow(
             key = "Telephone number",
             value = "(+44) 10794554342",
-            action = "/agent-registration/apply/applicant/telephone-number"
+            action = AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.show.url,
+            changeLinkAccessibleContent = "Change Telephone number"
           ),
           TestSummaryRow(
             key = "Email address",
             value = "user@test.com",
-            action = "/agent-registration/apply/applicant/email-address"
+            action = AppRoutes.apply.applicantcontactdetails.EmailAddressController.show.url,
+            changeLinkAccessibleContent = "Change Email address"
           )
         )
       )

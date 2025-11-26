@@ -21,7 +21,8 @@ import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 
 /** Corporation Tax (Ct) Unique Taxpayer Reference (Utr)
   */
-final case class CtUtr(value: String)
+final case class CtUtr(value: String):
+  def asUtr: Utr = Utr(value)
 
 object CtUtr:
   given format: Format[CtUtr] = JsonFormatsFactory.makeValueClassFormat
