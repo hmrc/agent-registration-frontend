@@ -84,6 +84,7 @@ object AppRoutes:
     val CompaniesHouseNameQueryController = providedetailsRoutes.CompaniesHouseNameQueryController
     val CompaniesHouseMatchingController = providedetailsRoutes.CompaniesHouseMatchingController
     val ExitController = providedetailsRoutes.ExitController
+    val MemberTelephoneNumberController = providedetailsRoutes.MemberTelephoneNumberController
 
     object internal:
       val InitiateMemberProvideDetailsController = internalProviDedetailsRoutes.InitiateMemberProvideDetailsController

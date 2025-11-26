@@ -25,10 +25,8 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class TelephoneNumberController @Inject() (
+class MemberEmailAddressController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
   placeholder: SimplePage
@@ -38,6 +36,6 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] = actions.getProvideDetailsInProgress:
     implicit request: RequestHeader =>
       Ok(placeholder(
-        h1 = "Telephone Number Page",
-        bodyText = Some("This is a placeholder page for the telephone number page.")
+        h1 = "Email Address Page",
+        bodyText = Some("This is a placeholder page for the email address page.")
       ))
