@@ -52,6 +52,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
+      .ensureValidFormAndRedirectIfSaveForLater(MemberTelephoneNumberForm.form, implicit r => view(_))
       .async:
         implicit request: MemberProvideDetailsRequest[AnyContent] =>
           MemberTelephoneNumberForm.form
