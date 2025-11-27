@@ -47,7 +47,7 @@ extends FrontendController(mcc, actions):
     .ensure(
       _.memberProvidedDetails.companiesHouseMatch.nonEmpty, // TODO: Add check for companies house details
       implicit request =>
-        Redirect(routes.CompaniesHouseNameQueryController.show)
+        Redirect(AppRoutes.providedetails.CompaniesHouseNameQueryController.show)
     )
 
   def submit: Action[AnyContent] =
@@ -67,7 +67,7 @@ extends FrontendController(mcc, actions):
                 memberProvideDetailsService
                   .upsert(updatedApplication)
                   .map: _ =>
-                    Redirect(routes.MemberEmailAddressController.show.url)
+                    Redirect(AppRoutes.providedetails.MemberEmailAddressController.show.url)
             )
       .redirectIfSaveForLater
 
