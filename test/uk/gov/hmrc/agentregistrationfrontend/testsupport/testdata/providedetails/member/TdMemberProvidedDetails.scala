@@ -52,4 +52,8 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
         ))
       )
 
+    val afterTelephoneNumberProvided: MemberProvidedDetails = afterOfficerChosen
+      .modify(_.telephoneNumber)
+      .setTo(Some(dependencies.telephoneNumber))
+
 }

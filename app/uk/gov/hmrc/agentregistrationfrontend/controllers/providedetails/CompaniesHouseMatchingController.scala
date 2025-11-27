@@ -64,7 +64,7 @@ extends FrontendController(mcc, actions):
       _.memberProvidedDetails.companiesHouseMatch.isDefined,
       implicit request =>
         logger.info("Redirecting to member name page due to missing memberNameQuery value")
-        Redirect(routes.CompaniesHouseNameQueryController.show)
+        Redirect(AppRoutes.providedetails.CompaniesHouseNameQueryController.show)
     )
 
   def show: Action[AnyContent] = baseAction
@@ -124,7 +124,7 @@ extends FrontendController(mcc, actions):
         case YesNo.No =>
           // TODO: do we need to reset data here?
           Future.successful(
-            Redirect(routes.CompaniesHouseNameQueryController.show.url)
+            Redirect(AppRoutes.providedetails.CompaniesHouseNameQueryController.show.url)
           )
     )
 
@@ -170,4 +170,4 @@ extends FrontendController(mcc, actions):
         .modify(_.companiesHouseMatch.each.companiesHouseOfficer)
         .setTo(Some(officer))
     )
-    .map(_ => Redirect(routes.MemberTelephoneNumberController.show.url))
+    .map(_ => Redirect(AppRoutes.providedetails.MemberTelephoneNumberController.show.url))
