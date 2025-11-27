@@ -19,12 +19,10 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontact
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.emailVerification.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.EmailVerificationStubs
 
 class EmailAddressControllerSpec
@@ -32,6 +30,14 @@ extends ControllerSpec:
 
   private val path = "/agent-registration/apply/applicant/email-address"
   private val verifyPath = "/agent-registration/apply/applicant/verify-email-address"
+
+  private object ExpectedStrings:
+
+    private val heading = "If we need to email you about this application, what’s the email address?"
+    val title = s"$heading - Apply for an agent services account - GOV.UK"
+    val errorTitle = s"Error: $heading - Apply for an agent services account - GOV.UK"
+    val requiredError = "Enter your email address"
+    val invalidError = "Enter your email address with a name, @ symbol and a domain name, like yourname@example.com"
 
   private object agentApplication:
 
@@ -90,51 +96,52 @@ extends ControllerSpec:
     routes.EmailAddressController.submit.url shouldBe routes.EmailAddressController.show.url
 
   s"GET $path should return 200 and render page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeEmailAddressProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeEmailAddressProvided)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe "If we need to email you about this application, what’s the email address? - Apply for an agent services account - GOV.UK"
+    response.parseBodyAsJsoupDocument.title() shouldBe ExpectedStrings.title
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path should redirect to telephone number page when telephone number is missing" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeTelephoneProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeTelephoneProvided)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.TelephoneNumberController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with well formed email address should save data and redirect to the verify endpoint" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterEmailAddressProvided)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterEmailAddressProvided)
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.beforeEmailAddressProvided,
+      updatedApplication = agentApplication.afterEmailAddressProvided
+    )
     val response: WSResponse =
       post(path)(Map(
         EmailAddressForm.key -> Seq("user@test.com")
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.EmailAddressController.verify.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with blank inputs should return 400" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeEmailAddressProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeEmailAddressProvided)
     val response: WSResponse =
       post(path)(Map(
-        EmailAddressForm.key -> Seq("")
+        EmailAddressForm.key -> Seq(Constants.EMPTY_STRING)
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: If we need to email you about this application, what’s the email address? - Apply for an agent services account - GOV.UK"
-    doc.mainContent.select("#emailAddress-error").text() shouldBe "Error: Enter your email address"
+    doc.title() shouldBe ExpectedStrings.errorTitle
+    doc.mainContent.select(s"#${EmailAddressForm.key}-error").text() shouldBe s"Error: ${ExpectedStrings.requiredError}"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with invalid characters should return 400" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeEmailAddressProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeEmailAddressProvided)
     val response: WSResponse =
       post(path)(Map(
         EmailAddressForm.key -> Seq("[[)(*%")
@@ -142,15 +149,15 @@ extends ControllerSpec:
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: If we need to email you about this application, what’s the email address? - Apply for an agent services account - GOV.UK"
-    doc.mainContent.select(
-      "#emailAddress-error"
-    ).text() shouldBe "Error: Enter your email address with a name, @ symbol and a domain name, like yourname@example.com"
+    doc.title() shouldBe ExpectedStrings.errorTitle
+    doc.mainContent.select(s"#${EmailAddressForm.key}-error").text() shouldBe s"Error: ${ExpectedStrings.invalidError}"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with save for later and valid email address should save data and redirect to the saved for later page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeEmailAddressProvided)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterEmailAddressProvided)
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.beforeEmailAddressProvided,
+      updatedApplication = agentApplication.afterEmailAddressProvided
+    )
     val response: WSResponse =
       post(path)(Map(
         EmailAddressForm.key -> Seq("user@test.com"),
@@ -158,12 +165,12 @@ extends ControllerSpec:
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeEmailAddressProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeEmailAddressProvided)
     val response: WSResponse =
       post(path)(Map(
         EmailAddressForm.key -> Seq("[[)(*%"),
@@ -171,43 +178,45 @@ extends ControllerSpec:
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $verifyPath with an email to verify in the application should redirect to the email verification frontend" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterEmailAddressProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterEmailAddressProvided)
     EmailVerificationStubs.stubEmailStatusUnverified(tdAll.credentials.providerId)
     EmailVerificationStubs.stubVerificationRequest(applicantEmailVerificationRequest)
     val response: WSResponse = get(verifyPath)
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe "http://localhost:9890/response-url"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+    EmailVerificationStubs.verifyEvStatusRequest(tdAll.credentials.providerId)
+    EmailVerificationStubs.verifyEvRequest()
 
   s"GET $verifyPath with an already verified email not yet stored in the application should redirect to check your answers" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterEmailAddressProvided)
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.afterEmailAddressProvided,
+      updatedApplication = agentApplication.afterEmailAddressVerified
+    )
     EmailVerificationStubs.stubEmailStatusVerified(
       credId = tdAll.credentials.providerId,
       emailAddress = tdAll.applicantEmailAddress
     )
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterEmailAddressVerified)
     val response: WSResponse = get(verifyPath)
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
+    EmailVerificationStubs.verifyEvStatusRequest(tdAll.credentials.providerId)
 
   s"GET $verifyPath with an already verified email stored in the application should redirect to check your answers" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterEmailAddressVerified)
-    EmailVerificationStubs.stubEmailStatusVerified(
-      credId = tdAll.credentials.providerId,
-      emailAddress = tdAll.applicantEmailAddress
-    )
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterEmailAddressVerified)
     val response: WSResponse = get(verifyPath)
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()

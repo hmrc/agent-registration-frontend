@@ -18,11 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontact
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
 class MemberNameControllerSpec
 extends ControllerSpec:
@@ -56,17 +54,18 @@ extends ControllerSpec:
     routes.MemberNameController.submit.url shouldBe routes.MemberNameController.show.url
 
   s"GET $path should return 200 and render page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeNameQueryProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeNameQueryProvided)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "What is your name? - Apply for an agent services account - GOV.UK"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with first and last names should save data and redirect to the show name matches page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeNameQueryProvided)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterNameQueryProvided)
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.beforeNameQueryProvided,
+      updatedApplication = agentApplication.afterNameQueryProvided
+    )
     val response: WSResponse =
       post(path)(Map(
         CompaniesHouseNameQueryForm.firstNameKey -> Seq(agentApplication.whenApplicantIsAMember.firstNameQuery),
@@ -76,10 +75,10 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe routes.CompaniesHouseMatchingController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with blank inputs should return 400" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeNameQueryProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeNameQueryProvided)
     val response: WSResponse =
       post(path)(Map(
         CompaniesHouseNameQueryForm.firstNameKey -> Seq(""),
@@ -91,10 +90,10 @@ extends ControllerSpec:
     doc.title() shouldBe "Error: What is your name? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#firstName-error").text() shouldBe "Error: Enter your first name"
     doc.mainContent.select("#lastName-error").text() shouldBe "Error: Enter your last name"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with invalid inputs should return 400" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeNameQueryProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeNameQueryProvided)
     val response: WSResponse =
       post(path)(Map(
         CompaniesHouseNameQueryForm.firstNameKey -> Seq("()))"),
@@ -106,11 +105,13 @@ extends ControllerSpec:
     doc.title() shouldBe "Error: What is your name? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#firstName-error").text() shouldBe "Error: Your first name must only include letters a to z, hyphens, apostrophes and spaces"
     doc.mainContent.select("#lastName-error").text() shouldBe "Error: Your last name must only include letters a to z, hyphens, apostrophes and spaces"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeNameQueryProvided)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterNameQueryProvided)
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.beforeNameQueryProvided,
+      updatedApplication = agentApplication.afterNameQueryProvided
+    )
     val response: WSResponse =
       post(path)(Map(
         CompaniesHouseNameQueryForm.firstNameKey -> Seq(agentApplication.whenApplicantIsAMember.firstNameQuery),
@@ -121,10 +122,10 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeNameQueryProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeNameQueryProvided)
     val response: WSResponse =
       post(path)(Map(
         CompaniesHouseNameQueryForm.firstNameKey -> Seq(""),
@@ -135,3 +136,4 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()

@@ -31,6 +31,11 @@ extends ISpec,
   export play.api.mvc.Call
   export play.api.http.Status
 
+  object Constants:
+
+    val EMPTY_STRING = ""
+    val OTHER = "other"
+
   def addAgentTypeToSession(agentType: AgentType): WSResponse = get(
     s"/agent-registration/test-only/add-agent-type/${agentType.toStringHyphenated}"
   )
