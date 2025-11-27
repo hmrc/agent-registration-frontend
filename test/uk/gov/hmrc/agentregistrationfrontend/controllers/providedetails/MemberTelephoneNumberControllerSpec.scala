@@ -36,15 +36,15 @@ extends ControllerSpec:
     val afterTelephoneNumberProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.afterTelephoneNumberProvided
 
   "routes should have correct paths and methods" in:
-    routes.MemberTelephoneNumberController.show shouldBe Call(
+    AppRoutes.providedetails.MemberTelephoneNumberController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.MemberTelephoneNumberController.submit shouldBe Call(
+    AppRoutes.providedetails.MemberTelephoneNumberController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.MemberTelephoneNumberController.submit.url shouldBe routes.MemberTelephoneNumberController.show.url
+    AppRoutes.providedetails.MemberTelephoneNumberController.submit.url shouldBe AppRoutes.providedetails.MemberTelephoneNumberController.show.url
 
   s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthoriseIndividual()
