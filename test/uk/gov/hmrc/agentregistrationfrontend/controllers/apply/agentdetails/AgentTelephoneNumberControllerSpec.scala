@@ -84,15 +84,15 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path should return 200, fetch the BPR and render page" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterBusinessNameReused)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterBusinessNameReused)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "What telephone number should we use for your agent services account? - Apply for an agent services account - GOV.UK"
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $path when existing contact telephone number already chosen should return 200 and render page with previous answer filled in" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterBprTelephoneNumberSelected)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterBprTelephoneNumberSelected)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -101,10 +101,10 @@ extends ControllerSpec:
     val radioForContactTelephoneNumber = doc.mainContent.select(s"input#${AgentTelephoneNumberForm.key}")
     radioForContactTelephoneNumber.attr("value") shouldBe tdAll.telephoneNumber.value
     radioForContactTelephoneNumber.attr("checked") shouldBe "" // checked attribute is present when selected and has no value
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $path when existing BPR telephone number already chosen should return 200 and render page with previous answer filled in" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterBprTelephoneNumberSelected)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterBprTelephoneNumberSelected)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -113,10 +113,10 @@ extends ControllerSpec:
     val radioForBprTelephoneNumber = doc.mainContent.select(s"input#${AgentTelephoneNumberForm.key}-2")
     radioForBprTelephoneNumber.attr("value") shouldBe tdAll.bprPrimaryTelephoneNumber
     radioForBprTelephoneNumber.attr("checked") shouldBe "" // checked attribute is present when selected and has no value
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $path when new telephone number already provided should return 200 and render page with previous answer filled in" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterOtherTelephoneNumberProvided)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterOtherTelephoneNumberProvided)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -124,7 +124,7 @@ extends ControllerSpec:
     doc.title() shouldBe "What telephone number should we use for your agent services account? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(s"input#${AgentTelephoneNumberForm.otherKey}")
       .attr("value") shouldBe tdAll.newTelephoneNumber
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with selection of existing telephone number should save data and redirect to CYA page" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(
@@ -148,7 +148,7 @@ extends ControllerSpec:
     )
     val response: WSResponse =
       post(path)(Map(
-        AgentTelephoneNumberForm.key -> Seq("other"),
+        AgentTelephoneNumberForm.key -> Seq(Constants.OTHER),
         AgentTelephoneNumberForm.otherKey -> Seq("+44 (0) 7000000000")
       ))
 
@@ -158,7 +158,7 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with blank inputs should return 400" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterBusinessNameReused)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterBusinessNameReused)
     val response: WSResponse =
       post(path)(Map(
         AgentTelephoneNumberForm.key -> Seq("")
@@ -170,13 +170,13 @@ extends ControllerSpec:
     doc.mainContent.select(
       s"#${AgentTelephoneNumberForm.key}-error"
     ).text() shouldBe "Error: Enter the telephone number for your agent services account"
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with selection of other and blank field for other telephone number should return 400" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterBusinessNameReused)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterBusinessNameReused)
     val response: WSResponse =
       post(path)(Map(
-        AgentTelephoneNumberForm.key -> Seq("other"),
+        AgentTelephoneNumberForm.key -> Seq(Constants.OTHER),
         AgentTelephoneNumberForm.otherKey -> Seq("")
       ))
 
@@ -186,13 +186,13 @@ extends ControllerSpec:
     doc.mainContent.select(
       s"#${AgentTelephoneNumberForm.otherKey}-error"
     ).text() shouldBe "Error: Enter the telephone number for your agent services account"
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with selection of other and invalid characters should return 400" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterBusinessNameReused)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterBusinessNameReused)
     val response: WSResponse =
       post(path)(Map(
-        AgentTelephoneNumberForm.key -> Seq("other"),
+        AgentTelephoneNumberForm.key -> Seq(Constants.OTHER),
         AgentTelephoneNumberForm.otherKey -> Seq("[[)(*%")
       ))
 
@@ -202,13 +202,13 @@ extends ControllerSpec:
     doc.mainContent.select(
       s"#${AgentTelephoneNumberForm.otherKey}-error"
     ).text() shouldBe "Error: Telephone number must only include numbers, plus sign, hash sign, hyphens, brackets and spaces"
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with selection of other and more than 24 characters without spaces should return 400" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterBusinessNameReused)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterBusinessNameReused)
     val response: WSResponse =
       post(path)(Map(
-        AgentTelephoneNumberForm.key -> Seq("other"),
+        AgentTelephoneNumberForm.key -> Seq(Constants.OTHER),
         AgentTelephoneNumberForm.otherKey -> Seq("A".repeat(25))
       ))
 
@@ -216,7 +216,7 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: What telephone number should we use for your agent services account? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(s"#${AgentTelephoneNumberForm.otherKey}-error").text() shouldBe "Error: The phone number must be 24 characters or fewer"
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(
@@ -235,10 +235,10 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterBusinessNameReused)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterBusinessNameReused)
     val response: WSResponse =
       post(path)(Map(
-        AgentTelephoneNumberForm.key -> Seq("other"),
+        AgentTelephoneNumberForm.key -> Seq(Constants.OTHER),
         AgentTelephoneNumberForm.otherKey -> Seq("[[)(*%"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
@@ -246,4 +246,4 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()

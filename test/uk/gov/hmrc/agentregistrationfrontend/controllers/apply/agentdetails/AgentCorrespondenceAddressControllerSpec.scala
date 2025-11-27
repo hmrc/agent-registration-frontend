@@ -94,15 +94,15 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path should return 200, fetch the BPR and render page" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterEmailAddressSelected)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterEmailAddressSelected)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe ExpectedStrings.documentTitle
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $path when existing CHRO address already chosen should return 200 and render page with previous answer filled in" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterChroAddressSelected)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterChroAddressSelected)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -111,10 +111,10 @@ extends ControllerSpec:
     val radioForChro = doc.mainContent.select(s"input#${AgentCorrespondenceAddressForm.key}") // the first radio button
     radioForChro.attr("value") shouldBe tdAll.chroAddress.toValueString
     radioForChro.attr("checked") shouldBe "" // checked attribute is present when selected and has no value
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $path when existing BPR address already chosen should return 200 and render page with previous answer filled in" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterBprAddressSelected)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterBprAddressSelected)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -123,19 +123,19 @@ extends ControllerSpec:
     val radioForBprAddress = doc.mainContent.select(s"input#${AgentCorrespondenceAddressForm.key}-2") // the second radio button
     radioForBprAddress.attr("value") shouldBe tdAll.bprRegisteredAddress.toValueString
     radioForBprAddress.attr("checked") shouldBe "" // checked attribute is present when selected and has no value
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $path when new address already provided via ALF should return 200 and render page with previous answer filled in" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterOtherAddressProvided)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterOtherAddressProvided)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe ExpectedStrings.documentTitle
     val radioForOtherAddress = doc.mainContent.select(s"input#${AgentCorrespondenceAddressForm.key}-4") // third radio button indexed 4 as the radio divider is the third radio item
-    radioForOtherAddress.attr("value") shouldBe "other" // we do not replay the ALF provided address value in the radio button
+    radioForOtherAddress.attr("value") shouldBe Constants.OTHER // we do not replay the ALF provided address value in the radio button
     radioForOtherAddress.attr("checked") shouldBe "" // checked attribute is present when selected and has no value
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with selection of BPR address should save data and redirect to CYA page" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(
@@ -159,7 +159,7 @@ extends ControllerSpec:
     )
     val response: WSResponse =
       post(path)(Map(
-        AgentCorrespondenceAddressForm.key -> Seq("other")
+        AgentCorrespondenceAddressForm.key -> Seq(Constants.OTHER)
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -169,7 +169,7 @@ extends ControllerSpec:
     AddressLookupFrontendStubs.verifyAddressLookupInit()
 
   s"POST $path with blank inputs should return 400" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterEmailAddressSelected)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterEmailAddressSelected)
     val response: WSResponse =
       post(path)(Map(
         AgentCorrespondenceAddressForm.key -> Seq("")
@@ -181,7 +181,7 @@ extends ControllerSpec:
     doc.mainContent.select(
       s"#${AgentCorrespondenceAddressForm.key}-error"
     ).text() shouldBe ExpectedStrings.requiredError
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(
@@ -200,7 +200,7 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterEmailAddressSelected)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterEmailAddressSelected)
     val response: WSResponse =
       post(path)(Map(
         AgentCorrespondenceAddressForm.key -> Seq(""),
@@ -210,4 +210,4 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()

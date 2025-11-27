@@ -17,12 +17,12 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls
 
 import com.google.inject.AbstractModule
+import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
 class CheckYourAnswersControllerSpec
 extends ControllerSpec:
@@ -40,7 +40,7 @@ extends ControllerSpec:
     )
 
   private case class TestCaseForCya(
-    application: AgentApplication,
+    application: AgentApplicationLlp,
     amlsType: String,
     expectedRedirect: Option[String] = None
   )
@@ -99,18 +99,19 @@ extends ControllerSpec:
   ).foreach: testCase =>
     if testCase.expectedRedirect.isEmpty then
       s"GET $path with complete amls details should return 200 and render page for ${testCase.amlsType}" in:
-        AuthStubs.stubAuthorise()
-        AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
+        ApplyStubHelper.stubsForAuthAction(testCase.application)
         val response: WSResponse = get(path)
 
-        response.status shouldBe 200
+        response.status shouldBe Status.OK
         val doc = response.parseBodyAsJsoupDocument
         doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
+        ApplyStubHelper.verifyConnectorsForAuthAction()
     else
       s"GET $path with incomplete amls details should redirect to ${testCase.expectedRedirect.value} for ${testCase.amlsType}" in:
-        AuthStubs.stubAuthorise()
-        AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
+        ApplyStubHelper.stubsForAuthAction(testCase.application)
         val response: WSResponse = get(path)
 
-        response.status shouldBe 303
+        response.status shouldBe Status.SEE_OTHER
+        response.body[String] shouldBe Constants.EMPTY_STRING
         response.header("Location").value shouldBe testCase.expectedRedirect.value
+        ApplyStubHelper.verifyConnectorsForAuthAction()

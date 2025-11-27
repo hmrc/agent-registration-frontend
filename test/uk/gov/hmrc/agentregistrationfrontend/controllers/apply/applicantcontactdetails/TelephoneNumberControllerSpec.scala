@@ -19,11 +19,9 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontact
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.TelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
 class TelephoneNumberControllerSpec
 extends ControllerSpec:
@@ -46,6 +44,15 @@ extends ControllerSpec:
         .whenApplicantIsAuthorised
         .afterTelephoneNumberProvided
 
+  private object ExpectedStrings:
+
+    private val heading = "If we need to speak to you about this application, what number do we call?"
+    val title = s"$heading - Apply for an agent services account - GOV.UK"
+    val errorTitle = s"Error: $heading - Apply for an agent services account - GOV.UK"
+    val requiredError = "Enter the number we should call to speak to you about this application"
+    val invalidError = "Enter a phone number, like 01632 960 001 or 07700 900 982"
+    val maxLengthError = "The phone number must be 25 characters or fewer"
+
   "routes should have correct paths and methods" in:
     routes.TelephoneNumberController.show shouldBe Call(
       method = "GET",
@@ -58,43 +65,43 @@ extends ControllerSpec:
     routes.TelephoneNumberController.submit.url shouldBe routes.TelephoneNumberController.show.url
 
   s"GET $path should return 200 and render page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeTelephoneUpdate)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeTelephoneUpdate)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe "If we need to speak to you about this application, what number do we call? - Apply for an agent services account - GOV.UK"
+    response.parseBodyAsJsoupDocument.title() shouldBe ExpectedStrings.title
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with valid name should save data and redirect to check your answers" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeTelephoneUpdate)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterTelephoneNumberProvided)
-
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.beforeTelephoneUpdate,
+      updatedApplication = agentApplication.afterTelephoneNumberProvided
+    )
     val response: WSResponse =
       post(path)(Map(
         TelephoneNumberForm.key -> Seq(tdAll.telephoneNumber.value)
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with blank inputs should return 400" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeTelephoneUpdate)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeTelephoneUpdate)
     val response: WSResponse =
       post(path)(Map(
-        TelephoneNumberForm.key -> Seq("")
+        TelephoneNumberForm.key -> Seq(Constants.EMPTY_STRING)
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: If we need to speak to you about this application, what number do we call? - Apply for an agent services account - GOV.UK"
-    doc.mainContent.select("#telephoneNumber-error").text() shouldBe "Error: Enter the number we should call to speak to you about this application"
+    doc.title() shouldBe ExpectedStrings.errorTitle
+    doc.mainContent.select(s"#${TelephoneNumberForm.key}-error").text() shouldBe s"Error: ${ExpectedStrings.requiredError}"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with invalid characters should return 400" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeTelephoneUpdate)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeTelephoneUpdate)
     val response: WSResponse =
       post(path)(Map(
         TelephoneNumberForm.key -> Seq("[[)(*%")
@@ -102,12 +109,12 @@ extends ControllerSpec:
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: If we need to speak to you about this application, what number do we call? - Apply for an agent services account - GOV.UK"
-    doc.mainContent.select("#telephoneNumber-error").text() shouldBe "Error: Enter a phone number, like 01632 960 001 or 07700 900 982"
+    doc.title() shouldBe ExpectedStrings.errorTitle
+    doc.mainContent.select(s"#${TelephoneNumberForm.key}-error").text() shouldBe s"Error: ${ExpectedStrings.invalidError}"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with more than 25 characters should return 400" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeTelephoneUpdate)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeTelephoneUpdate)
     val response: WSResponse =
       post(path)(Map(
         TelephoneNumberForm.key -> Seq("2".repeat(26))
@@ -115,13 +122,15 @@ extends ControllerSpec:
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: If we need to speak to you about this application, what number do we call? - Apply for an agent services account - GOV.UK"
-    doc.mainContent.select("#telephoneNumber-error").text() shouldBe "Error: The phone number must be 25 characters or fewer"
+    doc.title() shouldBe ExpectedStrings.errorTitle
+    doc.mainContent.select(s"#${TelephoneNumberForm.key}-error").text() shouldBe s"Error: ${ExpectedStrings.maxLengthError}"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeTelephoneUpdate)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterTelephoneNumberProvided)
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.beforeTelephoneUpdate,
+      updatedApplication = agentApplication.afterTelephoneNumberProvided
+    )
     val response: WSResponse =
       post(path)(Map(
         TelephoneNumberForm.key -> Seq(tdAll.telephoneNumber.value),
@@ -129,12 +138,12 @@ extends ControllerSpec:
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeTelephoneUpdate)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeTelephoneUpdate)
     val response: WSResponse =
       post(path)(Map(
         TelephoneNumberForm.key -> Seq("[[*%"),
@@ -142,5 +151,6 @@ extends ControllerSpec:
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
