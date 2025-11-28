@@ -17,11 +17,14 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
+import uk.gov.hmrc.agentregistration.shared.agentdetails.*
 import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName.NameOfAuthorised
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState
@@ -86,6 +89,38 @@ trait TdBase:
   )
   def postcode: String = "AA1 1AA"
   def authorisedPersonName: String = "Alice Smith"
+  def authorisedContactDetails: ApplicantContactDetails = ApplicantContactDetails(
+    applicantName = NameOfAuthorised(name = Some(authorisedPersonName)),
+    telephoneNumber = Some(telephoneNumber),
+    applicantEmailAddress = Some(ApplicantEmailAddress(
+      emailAddress = applicantEmailAddress,
+      isVerified = true
+    ))
+  )
+  def completeAgentDetails: AgentDetails = AgentDetails(
+    agentCorrespondenceAddress = Some(chroAddress),
+    telephoneNumber = Some(AgentTelephoneNumber(
+      agentTelephoneNumber = telephoneNumber.value,
+      otherAgentTelephoneNumber = None
+    )),
+    agentEmailAddress = Some(AgentVerifiedEmailAddress(
+      emailAddress = AgentEmailAddress(
+        agentEmailAddress = applicantEmailAddress.value,
+        otherAgentEmailAddress = None
+      ),
+      isVerified = true
+    )),
+    businessName = AgentBusinessName(
+      agentBusinessName = companyName,
+      otherAgentBusinessName = None
+    )
+  )
+  def completeAmlsDetails: AmlsDetails = AmlsDetails(
+    supervisoryBody = AmlsCode("HMRC"),
+    amlsRegistrationNumber = Some(AmlsRegistrationNumber("XAML1234567890")),
+    amlsExpiryDate = None,
+    amlsEvidence = None
+  )
   def agentApplicationId: AgentApplicationId = AgentApplicationId("agent-application-id-12345")
   def agentApplicationId2: AgentApplicationId = AgentApplicationId("agent-application-id-6789")
 

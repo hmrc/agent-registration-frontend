@@ -19,11 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplicat
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.ApplicationState.GrsDataReceived
-import uk.gov.hmrc.agentregistration.shared.BusinessDetailsLlp
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName.NameOfAuthorised
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
 
@@ -52,22 +48,25 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       applicationState = GrsDataReceived
     )
 
-    val afterHmrcStandardForAgentsAgreed: AgentApplicationLlp = afterGrsDataReceived.copy(
+    val afterContactDetailsComplete: AgentApplicationLlp = afterGrsDataReceived.copy(
+      applicantContactDetails = Some(dependencies.authorisedContactDetails),
+      agentDetails = None
+    )
+
+    val afterAgentDetailsComplete: AgentApplicationLlp = afterContactDetailsComplete.copy(
+      agentDetails = Some(dependencies.completeAgentDetails)
+    )
+
+    val afterAmlsComplete: AgentApplicationLlp = afterAgentDetailsComplete.copy(
+      amlsDetails = Some(dependencies.completeAmlsDetails)
+    )
+
+    val afterHmrcStandardForAgentsAgreed: AgentApplicationLlp = afterAmlsComplete.copy(
       hmrcStandardForAgentsAgreed = StateOfAgreement.Agreed
     )
 
-    val afterContactDetailsComplete: AgentApplicationLlp = afterGrsDataReceived.copy(
-      applicantContactDetails = Some(
-        ApplicantContactDetails(
-          applicantName = NameOfAuthorised(name = Some(dependencies.authorisedPersonName)),
-          telephoneNumber = Some(dependencies.telephoneNumber),
-          applicantEmailAddress = Some(ApplicantEmailAddress(
-            emailAddress = dependencies.applicantEmailAddress,
-            isVerified = true
-          ))
-        )
-      ),
-      agentDetails = None
+    val afterDeclarationSubmitted: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
+      applicationState = ApplicationState.Submitted
     )
 
     val baseForSectionAmls: AgentApplicationLlp = afterGrsDataReceived

@@ -21,65 +21,68 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
-class HmrcStandardForAgentsControllerSpec
+class DeclarationControllerSpec
 extends ControllerSpec:
 
-  private val path = "/agent-registration/apply/agent-standard/accept-agent-standard"
+  private val path = "/agent-registration/apply/agent-declaration/confirm-declaration"
 
   "route should have correct path and method" in:
-    routes.HmrcStandardForAgentsController.show shouldBe Call(
+    routes.DeclarationController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.HmrcStandardForAgentsController.submit shouldBe Call(
+    routes.DeclarationController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-  routes.HmrcStandardForAgentsController.submit.url shouldBe routes.HmrcStandardForAgentsController.show.url
+  routes.DeclarationController.submit.url shouldBe routes.DeclarationController.show.url
 
   object agentApplication:
 
-    val beforeTermsAgreed: AgentApplicationLlp =
+    val beforeAllTasksComplete: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
-        .afterAmlsComplete
+        .afterGrsDataReceived
 
-    val afterTermsAgreed: AgentApplicationLlp =
+    val afterAllOtherTasksComplete: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
         .afterHmrcStandardForAgentsAgreed
 
-  s"GET $path before agreeing terms should return 200 and render page" in:
-    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeTermsAgreed)
+    val afterDeclarationSubmitted: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .afterDeclarationSubmitted
+
+  s"GET $path before completing all other tasks should redirect to the tasklist" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeAllTasksComplete)
     val response: WSResponse = get(path)
-
-    response.status shouldBe Status.OK
-    val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Agree to meet the HMRC standard for agents - Apply for an agent services account - GOV.UK"
-    doc.select("h2.govuk-caption-xl").text() shouldBe "HMRC standard for agents"
-    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
-
-  s"GET $path after agreeing terms should return 200 and render page" in:
-    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterTermsAgreed)
-    val response: WSResponse = get(path)
-
-    response.status shouldBe Status.OK
-    val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Agree to meet the HMRC standard for agents - Apply for an agent services account - GOV.UK"
-    doc.select("h2.govuk-caption-xl").text() shouldBe "HMRC standard for agents"
-    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
-
-  s"POST $path with agree should update the application and redirect to the task list" in:
-    ApplyStubHelper.stubsForSuccessfulUpdate(
-      application = agentApplication.beforeTermsAgreed,
-      updatedApplication = agentApplication.afterTermsAgreed
-    )
-    val response: WSResponse =
-      post(path)(
-        Map("submit" -> Seq("AgreeAndContinue"))
-      )
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.TaskListController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+
+  s"GET $path after all tasks are complete should return 200 and render page" in:
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterAllOtherTasksComplete)
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.OK
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "Declaration - Apply for an agent services account - GOV.UK"
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+
+  s"POST $path with accept and send should update the application state and redirect to the submitted page" in:
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.afterAllOtherTasksComplete,
+      updatedApplication = agentApplication.afterDeclarationSubmitted
+    )
+    val response: WSResponse =
+      post(path)(
+        Map("submit" -> Seq("AcceptAndSend"))
+      )
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe Constants.EMPTY_STRING
+    response.header("Location").value shouldBe AppRoutes.apply.AgentApplicationController.applicationSubmitted.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()

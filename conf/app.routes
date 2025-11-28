@@ -78,9 +78,13 @@ GET         /apply/anti-money-laundering/evidence/upload-result     uk.gov.hmrc.
 GET         /apply/anti-money-laundering/evidence/upload-error      uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsEvidenceUploadController.showError(errorCode: String, errorMessage: String, errorRequestId: String, key: String)
 GET         /apply/anti-money-laundering/check-your-answers         uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.CheckYourAnswersController.show
 
-# Agents Standard route
+# Agents Standard routes
 GET         /apply/agent-standard/accept-agent-standard             uk.gov.hmrc.agentregistrationfrontend.controllers.apply.HmrcStandardForAgentsController.show
 POST        /apply/agent-standard/accept-agent-standard             uk.gov.hmrc.agentregistrationfrontend.controllers.apply.HmrcStandardForAgentsController.submit
+
+# Apply declaration
+GET         /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.DeclarationController.show
+POST        /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.DeclarationController.submit
 
 # Individuals (directors/partners/members/owners) providing details
 GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.start(linkId: LinkId)
