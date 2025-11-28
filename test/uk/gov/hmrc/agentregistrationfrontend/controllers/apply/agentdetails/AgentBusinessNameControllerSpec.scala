@@ -61,15 +61,15 @@ extends ControllerSpec:
     routes.AgentBusinessNameController.submit.url shouldBe routes.AgentBusinessNameController.show.url
 
   s"GET $path should return 200 and render page" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.beforeBusinessNameProvided)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeBusinessNameProvided)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "What business name will you use for clients? - Apply for an agent services account - GOV.UK"
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $path when existing name already chosen should return 200 and render page with previous answer filled in" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterBusinessNameReused)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterBusinessNameReused)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -78,10 +78,10 @@ extends ControllerSpec:
     val radioForExistingBusinessName = doc.mainContent.select(s"input#${AgentBusinessNameForm.key}")
     radioForExistingBusinessName.attr("value") shouldBe "Test Company Name"
     radioForExistingBusinessName.attr("checked") shouldBe "" // checked attribute is present when selected and has no value
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $path when new name already provided should return 200 and render page with previous answer filled in" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterNewBusinessNameProvided)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNewBusinessNameProvided)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -89,7 +89,7 @@ extends ControllerSpec:
     doc.title() shouldBe "What business name will you use for clients? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(s"input#${AgentBusinessNameForm.otherKey}")
       .attr("value") shouldBe "New Agent Business Llp"
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with selection of existing company name should save data and redirect to CYA page" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(
@@ -102,7 +102,7 @@ extends ControllerSpec:
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
@@ -113,20 +113,20 @@ extends ControllerSpec:
     )
     val response: WSResponse =
       post(path)(Map(
-        AgentBusinessNameForm.key -> Seq("other"),
+        AgentBusinessNameForm.key -> Seq(Constants.OTHER),
         AgentBusinessNameForm.otherKey -> Seq("New Agent Business Llp")
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with blank inputs should return 400" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.beforeBusinessNameProvided)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeBusinessNameProvided)
     val response: WSResponse =
       post(path)(Map(
-        AgentBusinessNameForm.key -> Seq("")
+        AgentBusinessNameForm.key -> Seq(Constants.EMPTY_STRING)
       ))
 
     response.status shouldBe Status.BAD_REQUEST
@@ -135,14 +135,14 @@ extends ControllerSpec:
     doc.mainContent.select(
       s"#${AgentBusinessNameForm.key}-error"
     ).text() shouldBe "Error: Enter the business name you want to use on your agent services account"
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with selection of other and blank field for other name should return 400" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.beforeBusinessNameProvided)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeBusinessNameProvided)
     val response: WSResponse =
       post(path)(Map(
-        AgentBusinessNameForm.key -> Seq("other"),
-        AgentBusinessNameForm.otherKey -> Seq("")
+        AgentBusinessNameForm.key -> Seq(Constants.OTHER),
+        AgentBusinessNameForm.otherKey -> Seq(Constants.EMPTY_STRING)
       ))
 
     response.status shouldBe Status.BAD_REQUEST
@@ -151,13 +151,13 @@ extends ControllerSpec:
     doc.mainContent.select(
       s"#${AgentBusinessNameForm.otherKey}-error"
     ).text() shouldBe "Error: Enter the business name you want to use on your agent services account"
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with selection of other and invalid characters should return 400" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.beforeBusinessNameProvided)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeBusinessNameProvided)
     val response: WSResponse =
       post(path)(Map(
-        AgentBusinessNameForm.key -> Seq("other"),
+        AgentBusinessNameForm.key -> Seq(Constants.OTHER),
         AgentBusinessNameForm.otherKey -> Seq("[[)(*%")
       ))
 
@@ -167,13 +167,13 @@ extends ControllerSpec:
     doc.mainContent.select(
       s"#${AgentBusinessNameForm.otherKey}-error"
     ).text() shouldBe "Error: Name shown to clients must only include letters a to z, numbers, commas, full stops, apostrophes, hyphens, forward slashes and spaces"
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with selection of other and more than 40 characters should return 400" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.beforeBusinessNameProvided)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeBusinessNameProvided)
     val response: WSResponse =
       post(path)(Map(
-        AgentBusinessNameForm.key -> Seq("other"),
+        AgentBusinessNameForm.key -> Seq(Constants.OTHER),
         AgentBusinessNameForm.otherKey -> Seq("A".repeat(41))
       ))
 
@@ -181,7 +181,7 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: What business name will you use for clients? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(s"#${AgentBusinessNameForm.otherKey}-error").text() shouldBe "Error: Name shown to clients must be 40 characters or less"
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(
@@ -195,20 +195,20 @@ extends ControllerSpec:
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.beforeBusinessNameProvided)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeBusinessNameProvided)
     val response: WSResponse =
       post(path)(Map(
-        AgentBusinessNameForm.key -> Seq("other"),
+        AgentBusinessNameForm.key -> Seq(Constants.OTHER),
         AgentBusinessNameForm.otherKey -> Seq("[[)(*%"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()

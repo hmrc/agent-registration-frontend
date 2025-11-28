@@ -18,16 +18,40 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontact
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
 class ApplicantRoleInLlpControllerSpec
 extends ControllerSpec:
 
   private val path = "/agent-registration/apply/applicant/llp-member"
+
+  private object agentApplication:
+
+    val afterGrsDataReceived =
+      tdAll
+        .agentApplicationLlp
+        .afterGrsDataReceived
+
+    val whenApplicantIsAMember =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAMember
+
+    val whenApplicantIsAuthorised =
+      tdAll
+        .agentApplicationLlp
+        .sectionContactDetails
+        .whenApplicantIsAuthorised
+
+  private object ExpectedStrings:
+
+    val heading = "Are you a member of the limited liability partnership?"
+    val title = s"$heading - Apply for an agent services account - GOV.UK"
+    val errorTitle = s"Error: $heading - Apply for an agent services account - GOV.UK"
+    val requiredError = "Select whether you are a member of the limited liability partnership"
 
   "routes should have correct paths and methods" in:
     routes.ApplicantRoleInLlpController.show shouldBe Call(
@@ -41,60 +65,49 @@ extends ControllerSpec:
     routes.ApplicantRoleInLlpController.submit.url shouldBe routes.ApplicantRoleInLlpController.show.url
 
   s"GET $path should return 200 and render page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterGrsDataReceived)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterGrsDataReceived)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe "Are you a member of the limited liability partnership? - Apply for an agent services account - GOV.UK"
+    response.parseBodyAsJsoupDocument.title() shouldBe ExpectedStrings.title
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with Yes should redirect to the member name page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterGrsDataReceived)
-    AgentRegistrationStubs.stubUpdateAgentApplication(tdAll
-      .agentApplicationLlp
-      .sectionContactDetails
-      .whenApplicantIsAMember
-      .afterRoleSelected)
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.afterGrsDataReceived,
+      updatedApplication = agentApplication.whenApplicantIsAMember.afterRoleSelected
+    )
     val response: WSResponse = post(path)(Map(ApplicantRoleInLlpForm.key -> Seq("Member")))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.MemberNameController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with No should redirect to applicant name page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterGrsDataReceived)
-    AgentRegistrationStubs.stubUpdateAgentApplication(
-      tdAll
-        .agentApplicationLlp
-        .sectionContactDetails
-        .whenApplicantIsAuthorised
-        .afterRoleSelected
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.afterGrsDataReceived,
+      updatedApplication = agentApplication.whenApplicantIsAuthorised.afterRoleSelected
     )
     val response: WSResponse = post(path)(Map(ApplicantRoleInLlpForm.key -> Seq("Authorised")))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.AuthorisedNameController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path without valid selection should return 400" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterGrsDataReceived)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterGrsDataReceived)
     val response: WSResponse = post(path)(Map(ApplicantRoleInLlpForm.key -> Seq("")))
 
     response.status shouldBe Status.BAD_REQUEST
-    response.parseBodyAsJsoupDocument.title() shouldBe "Error: Are you a member of the limited liability partnership? - Apply for an agent services account - GOV.UK"
+    response.parseBodyAsJsoupDocument.title() shouldBe ExpectedStrings.errorTitle
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with save for later and valid selection should redirect to the saved for later page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterGrsDataReceived)
-    AgentRegistrationStubs.stubUpdateAgentApplication(
-      tdAll
-        .agentApplicationLlp
-        .sectionContactDetails
-        .whenApplicantIsAMember
-        .afterRoleSelected
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.afterGrsDataReceived,
+      updatedApplication = agentApplication.whenApplicantIsAMember.afterRoleSelected
     )
     val response: WSResponse =
       post(path)(Map(
@@ -103,12 +116,12 @@ extends ControllerSpec:
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with save for later and invalid selection should not return errors and redirect to save for later page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterGrsDataReceived)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterGrsDataReceived)
     val response: WSResponse =
       post(path)(Map(
         ApplicantRoleInLlpForm.key -> Seq(""),
@@ -116,5 +129,6 @@ extends ControllerSpec:
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()

@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll
@@ -25,13 +26,13 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStub
 
 object ApplyStubHelper:
 
-  def stubsForAuthAction(application: AgentApplicationLlp): StubMapping =
+  def stubsForAuthAction(application: AgentApplication): StubMapping =
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(application)
 
   def stubsForSuccessfulUpdate(
-    application: AgentApplicationLlp,
-    updatedApplication: AgentApplicationLlp
+    application: AgentApplication,
+    updatedApplication: AgentApplication
   ): StubMapping = {
     stubsForAuthAction(application)
     AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)

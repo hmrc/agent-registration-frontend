@@ -16,11 +16,11 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails
 
+import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
 class CheckYourAnswersControllerSpec
 extends ControllerSpec:
@@ -102,55 +102,56 @@ extends ControllerSpec:
     ),
     TestCaseForCya(
       application = agentApplication.missingVerifiedEmail,
-      name = "missing verified email address",
+      name = "verified email address",
       expectedRedirect = Some(routes.EmailAddressController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.missingEmail,
-      name = "missing email address",
+      name = "email address",
       expectedRedirect = Some(routes.EmailAddressController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.missingTelephone,
-      name = "missing telephone number",
+      name = "telephone number",
       expectedRedirect = Some(routes.TelephoneNumberController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.missingCompaniesHouseOfficerSelection,
-      name = "missing companies house office selection",
+      name = "companies house office selection",
       expectedRedirect = Some(routes.CompaniesHouseMatchingController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.missingMemberNameQuery,
-      name = "missing name to query companies house with",
+      name = "name to query companies house with",
       expectedRedirect = Some(routes.MemberNameController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.missingAuthorisedName,
-      name = "missing authorised applicant name",
+      name = "authorised applicant name",
       expectedRedirect = Some(routes.AuthorisedNameController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.noContactDetails,
-      name = "missing all contact details",
+      name = "all contact details",
       expectedRedirect = Some(routes.ApplicantRoleInLlpController.show.url)
     )
   ).foreach: testCase =>
     if testCase.expectedRedirect.isEmpty then
       s"GET $path with complete contact details should return 200 and render page" in:
-        AuthStubs.stubAuthorise()
-        AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
+        ApplyStubHelper.stubsForAuthAction(testCase.application)
         val response: WSResponse = get(path)
 
-        response.status shouldBe 200
+        response.status shouldBe Status.OK
         val doc = response.parseBodyAsJsoupDocument
         doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
         doc.select("h2.govuk-caption-l").text() shouldBe "Applicant contact details"
+        ApplyStubHelper.verifyConnectorsForAuthAction()
     else
-      s"GET $path with ${testCase.name} should redirect to the email entry page" in:
-        AuthStubs.stubAuthorise()
-        AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
+      s"GET $path with missing ${testCase.name} should redirect to the ${testCase.name} page" in:
+        ApplyStubHelper.stubsForAuthAction(testCase.application)
         val response: WSResponse = get(path)
 
-        response.status shouldBe 303
+        response.status shouldBe Status.SEE_OTHER
+        response.body[String] shouldBe Constants.EMPTY_STRING
         response.header("Location").value shouldBe testCase.expectedRedirect.get
+        ApplyStubHelper.verifyConnectorsForAuthAction()

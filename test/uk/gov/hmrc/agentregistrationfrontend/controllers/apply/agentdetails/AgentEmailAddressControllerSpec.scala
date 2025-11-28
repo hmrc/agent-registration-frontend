@@ -121,15 +121,15 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path should return 200 and render page" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.beforeEmailAddressProvided)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeEmailAddressProvided)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe ExpectedStrings.documentTitle
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $path when existing contact email address already chosen should return 200 and render page with previous answer filled in" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterContactEmailAddressSelected)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterContactEmailAddressSelected)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -138,10 +138,10 @@ extends ControllerSpec:
     val radioForContact = doc.mainContent.select(s"input#${AgentEmailAddressForm.key}")
     radioForContact.attr("value") shouldBe tdAll.applicantEmailAddress.value
     radioForContact.attr("checked") shouldBe "" // checked attribute is present when selected and has no value
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $path when existing BPR email address already chosen should return 200 and render page with previous answer filled in" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterBprEmailAddressSelected)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterBprEmailAddressSelected)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -150,10 +150,10 @@ extends ControllerSpec:
     val radioForBprTelephoneNumber = doc.mainContent.select(s"input#${AgentEmailAddressForm.key}-2")
     radioForBprTelephoneNumber.attr("value") shouldBe tdAll.bprEmailAddress
     radioForBprTelephoneNumber.attr("checked") shouldBe "" // checked attribute is present when selected and has no value
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $path when new email address already provided should return 200 and render page with previous answer filled in" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.afterEmailAddressVerified)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterEmailAddressVerified)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -161,7 +161,7 @@ extends ControllerSpec:
     doc.title() shouldBe ExpectedStrings.documentTitle
     doc.mainContent.select(s"input#${AgentEmailAddressForm.otherKey}")
       .attr("value") shouldBe tdAll.newEmailAddress
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with a new well formed email address should save data and redirect to the verify endpoint" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(
@@ -170,7 +170,7 @@ extends ControllerSpec:
     )
     val response: WSResponse =
       post(path)(Map(
-        AgentEmailAddressForm.key -> Seq("other"),
+        AgentEmailAddressForm.key -> Seq(Constants.OTHER),
         AgentEmailAddressForm.otherKey -> Seq(tdAll.newEmailAddress)
       ))
 
@@ -180,7 +180,7 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with blank inputs should return 400" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.beforeEmailAddressProvided)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeEmailAddressProvided)
     val response: WSResponse =
       post(path)(Map(
         AgentEmailAddressForm.key -> Seq("")
@@ -190,13 +190,13 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe ExpectedStrings.errorTitle
     doc.mainContent.select(s"#${AgentEmailAddressForm.key}-error").text() shouldBe ExpectedStrings.requiredError
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with invalid characters should return 400" in:
-    AgentDetailsStubHelper.stubsToRenderPage(agentApplication.beforeEmailAddressProvided)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeEmailAddressProvided)
     val response: WSResponse =
       post(path)(Map(
-        AgentEmailAddressForm.key -> Seq("other"),
+        AgentEmailAddressForm.key -> Seq(Constants.OTHER),
         AgentEmailAddressForm.otherKey -> Seq("invalid-email-address")
       ))
 
@@ -206,7 +206,7 @@ extends ControllerSpec:
     doc.mainContent.select(
       s"#${AgentEmailAddressForm.otherKey}-error"
     ).text() shouldBe ExpectedStrings.patternError
-    AgentDetailsStubHelper.verifyConnectorsToRenderPage()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $verifyPath with an email yet to be verified in the application should redirect to the email verification frontend" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterOtherEmailAddressSelected)

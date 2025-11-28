@@ -18,11 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontact
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CompaniesHouseStubs
 
 class CompaniesHouseMatchingControllerSpec
@@ -59,26 +57,27 @@ extends ControllerSpec:
     routes.CompaniesHouseMatchingController.submit.url shouldBe routes.CompaniesHouseMatchingController.show.url
 
   s"GET $path should return 200 and render page when there is a single match" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterNameQueryProvided)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Are these your details? - Apply for an agent services account - GOV.UK"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+    CompaniesHouseStubs.verifySingleMatchCalls(lastName = lastName)
 
   s"GET $path should return 200 and render page when there are multiple matches" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterNameQueryProvided)
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "2 records match this name - Apply for an agent services account - GOV.UK"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+    CompaniesHouseStubs.verifyMultipleMatchCalls(lastName = lastName)
 
   s"POST $path for single match without a valid selection should return 400" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterNameQueryProvided)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse =
       post(path)(Map(
@@ -89,12 +88,15 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: Are these your details? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#companiesHouseOfficer-error").text() shouldBe "Error: Select yes if these are your details"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+    CompaniesHouseStubs.verifySingleMatchCalls(lastName = lastName)
 
   s"POST $path for single match with valid inputs should save officer and redirect to check your answers" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.afterNameQueryProvided,
+      updatedApplication = agentApplication.afterOfficerChosen
+    )
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterOfficerChosen)
     val response: WSResponse =
       post(path)(Map(
         "ChOfficerSelectionFormType" -> Seq("YesNoForm"),
@@ -102,12 +104,13 @@ extends ControllerSpec:
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
+    CompaniesHouseStubs.verifySingleMatchCalls(lastName = lastName)
 
   s"POST $path for multiple matches without a valid selection should return 400" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterNameQueryProvided)
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
     val response: WSResponse =
       post(path)(Map(
@@ -118,12 +121,15 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: 2 records match this name - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#companiesHouseOfficer-error").text() shouldBe "Error: Select the name and date of birth that matches your details"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+    CompaniesHouseStubs.verifyMultipleMatchCalls(lastName = lastName)
 
   s"POST $path for multiple matches with valid inputs should save officer and redirect to check your answers" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.afterNameQueryProvided,
+      updatedApplication = agentApplication.afterOfficerChosen
+    )
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterOfficerChosen)
     val response: WSResponse =
       post(path)(Map(
         "ChOfficerSelectionFormType" -> Seq("OfficerSelectionForm"),
@@ -131,30 +137,32 @@ extends ControllerSpec:
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
+    CompaniesHouseStubs.verifyMultipleMatchCalls(lastName = lastName)
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
-    CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
-    AgentRegistrationStubs.stubUpdateAgentApplication(
-      agentApplication.afterOfficerChosen
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.afterNameQueryProvided,
+      updatedApplication = agentApplication.afterOfficerChosen
     )
+    CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
     val response: WSResponse =
       post(path)(Map(
         "ChOfficerSelectionFormType" -> Seq("OfficerSelectionForm"),
-        ChOfficerSelectionForms.key -> Seq("First Last|/1/1990"),
+        ChOfficerSelectionForms.key -> Seq("Taylor Reed|12/11/1990"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
+    CompaniesHouseStubs.verifyMultipleMatchCalls(lastName = lastName)
 
   s"POST $path with save for later and without a valid selection should not return errors and redirect to save for later page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterNameQueryProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterNameQueryProvided)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse =
       post(path)(Map(
@@ -163,5 +171,7 @@ extends ControllerSpec:
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+    CompaniesHouseStubs.verifySingleMatchCalls(lastName = lastName)

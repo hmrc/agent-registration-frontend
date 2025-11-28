@@ -18,13 +18,10 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
 class AmlsSupervisorControllerSpec
 extends ControllerSpec:
@@ -33,7 +30,7 @@ extends ControllerSpec:
 
   private object agentApplication:
 
-    val baseForSectionAmls: AgentApplication = tdAll.agentApplicationLlp.baseForSectionAmls
+    val baseForSectionAmls: AgentApplicationLlp = tdAll.agentApplicationLlp.baseForSectionAmls
 
     val afterSupervisoryBodySelected: AgentApplicationLlp =
       tdAll
@@ -49,12 +46,19 @@ extends ControllerSpec:
         .whenSupervisorBodyIsHmrc
         .afterSupervisoryBodySelected
 
-    val afterHmrcRegistrationNumberStored: AgentApplication =
+    val afterHmrcRegistrationNumberStored: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
         .sectionAmls
         .whenSupervisorBodyIsHmrc
         .afterRegistrationNumberProvided
+
+  private object ExpectedStrings:
+
+    private val heading = "What is the name of your supervisory body?"
+    val title = s"$heading - Apply for an agent services account - GOV.UK"
+    val errorTitle = s"Error: $heading - Apply for an agent services account - GOV.UK"
+    val requiredError = "Enter a name and choose your supervisor from the list"
 
   "routes should have correct paths and methods" in:
     routes.AmlsSupervisorController.show shouldBe Call(
@@ -68,49 +72,54 @@ extends ControllerSpec:
     routes.AmlsSupervisorController.submit.url shouldBe routes.AmlsSupervisorController.show.url
 
   s"GET $path should return 200 and render page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.baseForSectionAmls)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.baseForSectionAmls)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "What is the name of your supervisory body? - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe ExpectedStrings.title
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path when supervisory body already stored should return 200 and render page with previous answer selected" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterSupervisoryBodySelected)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterSupervisoryBodySelected)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "What is the name of your supervisory body? - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe ExpectedStrings.title
     doc.select("select[name=amlsSupervisoryBody] option[selected]")
       .attr("value") shouldBe "ATT"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with valid selection should redirect to the next page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.baseForSectionAmls)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterHmrcSelected)
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.baseForSectionAmls,
+      updatedApplication = agentApplication.afterHmrcSelected
+    )
     val response: WSResponse = post(path)(Map(AmlsCodeForm.key -> Seq("HMRC")))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path when changing value should unset registration number and redirect to the next page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterHmrcRegistrationNumberStored)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterSupervisoryBodySelected)
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.afterHmrcRegistrationNumberStored,
+      updatedApplication = agentApplication.afterSupervisoryBodySelected
+    )
     val response: WSResponse = post(path)(Map(AmlsCodeForm.key -> Seq("ATT")))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with save for later and valid selection should redirect to the saved for later page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.baseForSectionAmls)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterHmrcSelected)
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.baseForSectionAmls,
+      updatedApplication = agentApplication.afterHmrcSelected
+    )
     val response: WSResponse =
       post(path)(Map(
         AmlsCodeForm.key -> Seq("HMRC"),
@@ -118,15 +127,21 @@ extends ControllerSpec:
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path without valid selection should return 400" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.baseForSectionAmls)
-    val response: WSResponse = post(path)(Map(AmlsCodeForm.key -> Seq("")))
+    ApplyStubHelper.stubsForAuthAction(agentApplication.baseForSectionAmls)
+    val response: WSResponse =
+      post(path)(
+        Map(
+          AmlsCodeForm.key -> Seq(Constants.EMPTY_STRING)
+        )
+      )
 
     response.status shouldBe Status.BAD_REQUEST
-    val content = response.body[String]
-    content should include("There is a problem")
-    content should include("Enter a name and choose your supervisor from the list")
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe ExpectedStrings.errorTitle
+    doc.mainContent.select(s"#${AmlsCodeForm.key}-error").text() shouldBe s"Error: ${ExpectedStrings.requiredError}"
+    ApplyStubHelper.verifyConnectorsForAuthAction()

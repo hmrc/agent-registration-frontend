@@ -18,17 +18,54 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistrationfrontend.controllers
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
 class AmlsRegistrationNumberControllerSpec
 extends ControllerSpec:
 
   private val path = "/agent-registration/apply/anti-money-laundering/registration-number"
+
+  private object agentApplication:
+
+    val hmrcAfterSupervisoryBodySelected: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsHmrc
+        .afterSupervisoryBodySelected
+
+    val hmrcAfterRegistrationNumberProvided: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsHmrc
+        .afterRegistrationNumberProvided
+
+    val nonHmrcAfterSupervisoryBodySelected: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsNonHmrc
+        .afterSupervisoryBodySelected
+
+    val nonHmrcAfterRegistrationNumberProvided: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsNonHmrc
+        .afterRegistrationNumberProvided
+
+  private object ExpectedStrings:
+
+    val heading = "What is your registration number?"
+    val title = s"$heading - Apply for an agent services account - GOV.UK"
+    val errorTitle = s"Error: $heading - Apply for an agent services account - GOV.UK"
+    val hint = "This is the registration number given to you by your supervisory body."
+    val requiredError = "Enter your registration number"
+    val invalidFormatError = "Enter your registration number in the correct format"
 
   "routes should have correct paths and methods" in:
     routes.AmlsRegistrationNumberController.show shouldBe Call(
@@ -41,39 +78,9 @@ extends ControllerSpec:
     )
     routes.AmlsRegistrationNumberController.submit.url shouldBe routes.AmlsRegistrationNumberController.show.url
 
-  object agentApplication:
-
-    val hmrcAfterSupervisoryBodySelected: AgentApplication =
-      tdAll
-        .agentApplicationLlp
-        .sectionAmls
-        .whenSupervisorBodyIsHmrc
-        .afterSupervisoryBodySelected
-
-    val hmrcAfterRegistrationNumberProvided: AgentApplication =
-      tdAll
-        .agentApplicationLlp
-        .sectionAmls
-        .whenSupervisorBodyIsHmrc
-        .afterRegistrationNumberProvided
-
-    val nonHmrcAfterSupervisoryBodySelected: AgentApplication =
-      tdAll
-        .agentApplicationLlp
-        .sectionAmls
-        .whenSupervisorBodyIsNonHmrc
-        .afterSupervisoryBodySelected
-
-    val nonHmrcAfterRegistrationNumberProvided: AgentApplication =
-      tdAll
-        .agentApplicationLlp
-        .sectionAmls
-        .whenSupervisorBodyIsNonHmrc
-        .afterRegistrationNumberProvided
-
   private case class TestCaseForAmlsRegistrationNumber(
-    application: AgentApplication,
-    updatedApplication: AgentApplication,
+    application: AgentApplicationLlp,
+    updatedApplication: AgentApplicationLlp,
     amlsType: String,
     validInput: String,
     invalidInput: String,
@@ -99,18 +106,19 @@ extends ControllerSpec:
     )
   ).foreach: testCase =>
     s"GET $path should return 200 for ${testCase.amlsType} and render page" in:
-      AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
+      ApplyStubHelper.stubsForAuthAction(testCase.application)
       val response: WSResponse = get(path)
 
       response.status shouldBe Status.OK
       val doc = response.parseBodyAsJsoupDocument
-      doc.title() shouldBe "What is your registration number? - Apply for an agent services account - GOV.UK"
+      doc.title() shouldBe ExpectedStrings.title
+      ApplyStubHelper.verifyConnectorsForAuthAction()
 
     s"POST $path with valid input for ${testCase.amlsType} should redirect to the next page" in:
-      AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
-      AgentRegistrationStubs.stubUpdateAgentApplication(testCase.updatedApplication)
+      ApplyStubHelper.stubsForSuccessfulUpdate(
+        application = testCase.application,
+        updatedApplication = testCase.updatedApplication
+      )
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(testCase.validInput),
@@ -118,13 +126,15 @@ extends ControllerSpec:
         ))
 
       response.status shouldBe Status.SEE_OTHER
-      response.body[String] shouldBe ""
+      response.body[String] shouldBe Constants.EMPTY_STRING
       response.header("Location").value shouldBe testCase.nextPage
+      ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
     s"POST $path with save for later and valid input for ${testCase.amlsType} should redirect to the saved for later page" in:
-      AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
-      AgentRegistrationStubs.stubUpdateAgentApplication(testCase.updatedApplication)
+      ApplyStubHelper.stubsForSuccessfulUpdate(
+        application = testCase.application,
+        updatedApplication = testCase.updatedApplication
+      )
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(testCase.validInput),
@@ -132,39 +142,41 @@ extends ControllerSpec:
         ))
 
       response.status shouldBe Status.SEE_OTHER
-      response.body[String] shouldBe ""
+      response.body[String] shouldBe Constants.EMPTY_STRING
       response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+      ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
     s"POST $path as blank form for ${testCase.amlsType} should return 400" in:
-      AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
+      ApplyStubHelper.stubsForAuthAction(testCase.application)
       val response: WSResponse =
         post(path)(Map(
-          AmlsRegistrationNumberForm.key -> Seq(""),
+          AmlsRegistrationNumberForm.key -> Seq(Constants.EMPTY_STRING),
           "submit" -> Seq("SaveAndContinue")
         ))
 
       response.status shouldBe Status.BAD_REQUEST
-      val content = response.body[String]
-      content should include("There is a problem")
-      content should include("Enter your registration number")
+      val doc = response.parseBodyAsJsoupDocument
+      doc.title shouldBe ExpectedStrings.errorTitle
+      doc.mainContent.select(
+        s"#${AmlsRegistrationNumberForm.key}-error"
+      ).text() shouldBe s"Error: ${ExpectedStrings.requiredError}"
+      ApplyStubHelper.verifyConnectorsForAuthAction()
 
     s"POST $path as blank form and save for later for ${testCase.amlsType} should redirect to save for later page" in:
-      AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
+      ApplyStubHelper.stubsForAuthAction(testCase.application)
       val response: WSResponse =
         post(path)(Map(
-          AmlsRegistrationNumberForm.key -> Seq(""),
+          AmlsRegistrationNumberForm.key -> Seq(Constants.EMPTY_STRING),
           "submit" -> Seq("SaveAndComeBackLater")
         ))
 
       response.status shouldBe Status.SEE_OTHER
-      response.body[String] shouldBe ""
+      response.body[String] shouldBe Constants.EMPTY_STRING
       response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+      ApplyStubHelper.verifyConnectorsForAuthAction()
 
     s"POST $path with an invalid value for ${testCase.amlsType} should return 400" in:
-      AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
+      ApplyStubHelper.stubsForAuthAction(testCase.application)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(testCase.invalidInput),
@@ -172,13 +184,15 @@ extends ControllerSpec:
         ))
 
       response.status shouldBe Status.BAD_REQUEST
-      val content = response.body[String]
-      content should include("There is a problem")
-      content should include("Enter your registration number in the correct format")
+      val doc = response.parseBodyAsJsoupDocument
+      doc.title shouldBe ExpectedStrings.errorTitle
+      doc.mainContent.select(
+        s"#${AmlsRegistrationNumberForm.key}-error"
+      ).text() shouldBe s"Error: ${ExpectedStrings.invalidFormatError}"
+      ApplyStubHelper.verifyConnectorsForAuthAction()
 
     s"POST $path with an invalid value and save for later for ${testCase.amlsType} should not save and redirect to save for later" in:
-      AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(testCase.application)
+      ApplyStubHelper.stubsForAuthAction(testCase.application)
       val response: WSResponse =
         post(path)(Map(
           AmlsRegistrationNumberForm.key -> Seq(testCase.invalidInput),
@@ -186,37 +200,39 @@ extends ControllerSpec:
         ))
 
       response.status shouldBe Status.SEE_OTHER
-      response.body[String] shouldBe ""
+      response.body[String] shouldBe Constants.EMPTY_STRING
       response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+      ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path when registration number already stored should return 200 and render page with previous answer filled in" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.nonHmrcAfterRegistrationNumberProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.nonHmrcAfterRegistrationNumberProvided)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "What is your registration number? - Apply for an agent services account - GOV.UK"
-    doc.select(s"input[name='${AmlsRegistrationNumberForm.key}']")
+    doc.title() shouldBe ExpectedStrings.title
+    doc
+      .select(s"input[name='${AmlsRegistrationNumberForm.key}']")
       .attr("value") shouldBe "NONHMRC-REF-AMLS-NUMBER-00001"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path when amls details are missing should redirect to supervisory body page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterGrsDataReceived)
+    ApplyStubHelper.stubsForAuthAction(tdAll.agentApplicationLlp.afterGrsDataReceived)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.AmlsSupervisorController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path when amls details are missing should redirect to supervisory body page" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterGrsDataReceived)
+    ApplyStubHelper.stubsForAuthAction(tdAll.agentApplicationLlp.afterGrsDataReceived)
     val response: WSResponse =
       post(path)(Map(
         AmlsRegistrationNumberForm.key -> Seq("1234567890")
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.AmlsSupervisorController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()

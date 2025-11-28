@@ -69,4 +69,10 @@ object UpscanStubs {
     responseBody = responseJson
   )
 
+  def verifyUpscanInitiateRequest(count: Int = 1): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlEqualTo("/upscan/v2/initiate"),
+    count = count
+  )
+
 }
