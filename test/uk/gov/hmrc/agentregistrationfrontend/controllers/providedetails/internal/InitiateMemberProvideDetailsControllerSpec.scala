@@ -52,13 +52,21 @@ extends ControllerSpec:
         .providedDetailsLlp
         .afterStarted
 
-    val afterStartedWithNinoAndSaUtr: MemberProvidedDetails = tdAll
+    val afterStartedWithNinoAndSaUtrFromAuth: MemberProvidedDetails = tdAll
       .providedDetailsLlp
       .afterStarted
-      .modify(_.nino)
-      .setTo(Some(tdAll.nino))
-      .modify(_.saUtr)
-      .setTo(Some(tdAll.saUtr))
+      .modify(_.ninoWithSource)
+      .setTo(Some(tdAll.ninoFromAuth))
+      .modify(_.saUtrWithSource)
+      .setTo(Some(tdAll.saUtrFromAuth))
+
+    val afterStartedWithNinoAndSaUtrFromCitizenDetails: MemberProvidedDetails = tdAll
+      .providedDetailsLlp
+      .afterStarted
+      .modify(_.ninoWithSource)
+      .setTo(Some(tdAll.ninoFromAuth))
+      .modify(_.saUtrWithSource)
+      .setTo(Some(tdAll.saUtrFromCitizenDetails))
 
   private def path(linkId: LinkId) = s"/agent-registration/provide-details/internal/initiate-member-provide-details/${linkId.value}"
 
@@ -72,7 +80,7 @@ extends ControllerSpec:
     IndividualAuthStubs.stubAuthoriseWithNino()
     AgentRegistrationStubs.stubFindApplicationByLinkId(tdAll.linkId, agentApplication.applicationSubmitted)
     AgentRegistrationMemberProvidedDetailsStubs.stubFindMemberProvidedDetailsNoContent(agentApplication.applicationSubmitted.agentApplicationId)
-    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvidedDetails.afterStartedWithNinoAndSaUtr)
+    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvidedDetails.afterStartedWithNinoAndSaUtrFromCitizenDetails)
     CitizenDetailsStub.stubFindSaUtr(tdAll.nino, tdAll.saUtr)
 
     val response: WSResponse = get(path(tdAll.linkId))
@@ -90,7 +98,7 @@ extends ControllerSpec:
     IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
     AgentRegistrationStubs.stubFindApplicationByLinkId(tdAll.linkId, agentApplication.applicationSubmitted)
     AgentRegistrationMemberProvidedDetailsStubs.stubFindMemberProvidedDetailsNoContent(agentApplication.applicationSubmitted.agentApplicationId)
-    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvidedDetails.afterStartedWithNinoAndSaUtr)
+    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvidedDetails.afterStartedWithNinoAndSaUtrFromAuth)
 
     val response: WSResponse = get(path(tdAll.linkId))
 
@@ -106,7 +114,7 @@ extends ControllerSpec:
   "GET initiateMemberProvideDetails should not create new memberProvidedDetails and should redirect to member name page when memberProvidedDetails already exist" in:
     IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
     AgentRegistrationStubs.stubFindApplicationByLinkId(tdAll.linkId, agentApplication.applicationSubmitted)
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindMemberProvidedDetails(memberProvidedDetails.afterStartedWithNinoAndSaUtr)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindMemberProvidedDetails(memberProvidedDetails.afterStartedWithNinoAndSaUtrFromAuth)
 
     val response: WSResponse = get(path(tdAll.linkId))
 

@@ -25,9 +25,12 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName.NameOfAuthorised
+import uk.gov.hmrc.agentregistration.shared.llp.MemberIdentifiersSource
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.llp.NinoWithSource
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState
+import uk.gov.hmrc.agentregistration.shared.llp.SaUtrWithSource
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import java.time.*
@@ -63,6 +66,9 @@ trait TdBase:
     providerType = "GovernmentGateway"
   )
   def nino = Nino("AB123456C")
+  def ninoFromAuth = NinoWithSource(nino, MemberIdentifiersSource.FromAuth)
+  def saUtrFromAuth = SaUtrWithSource(saUtr, MemberIdentifiersSource.FromAuth)
+  def saUtrFromCitizenDetails = SaUtrWithSource(saUtr, MemberIdentifiersSource.FromCitizenDetails)
   def safeId: SafeId = SafeId("XA0001234512345")
   def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
   def applicantEmailAddress: EmailAddress = EmailAddress("user@test.com")
