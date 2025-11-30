@@ -21,6 +21,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.llp.MemberIdentifiersSource
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
@@ -30,6 +31,8 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
+import uk.gov.hmrc.agentregistration.shared.llp.NinoWithSource
+import uk.gov.hmrc.agentregistration.shared.llp.SaUtrWithSource
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -95,8 +98,8 @@ extends FrontendController(mcc, actions):
             memberProvideDetailsService.createNewMemberProvidedDetails(
               internalUserId = request.internalUserId,
               agentApplicationId = applicationId,
-              nino = request.nino,
-              saUtr = citizenDetails.saUtr
+              ninoWithSource = request.nino.map(NinoWithSource(_, MemberIdentifiersSource.FromAuth)),
+              saUtrWithSource = citizenDetails.saUtr.map(SaUtrWithSource(_, MemberIdentifiersSource.FromCitizenDetails))
             )
           }
 
@@ -105,7 +108,7 @@ extends FrontendController(mcc, actions):
           memberProvideDetailsService.createNewMemberProvidedDetails(
             internalUserId = request.internalUserId,
             agentApplicationId = applicationId,
-            nino = request.nino,
-            saUtr = request.saUtr
+            ninoWithSource = request.nino.map(NinoWithSource(_, MemberIdentifiersSource.FromAuth)),
+            saUtrWithSource = request.saUtr.map(SaUtrWithSource(_, MemberIdentifiersSource.FromAuth))
           )
         )
