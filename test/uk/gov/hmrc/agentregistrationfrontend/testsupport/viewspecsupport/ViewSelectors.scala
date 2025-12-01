@@ -153,6 +153,21 @@ object ViewSelectors:
           }
         )
 
+    inline def extractReadOnlySummaryList(index: Int = 1): TestReadOnlySummaryList = element
+      .selectOrFail(summaryList)
+      .selectOrFail(index)
+      .pipe: element =>
+        TestReadOnlySummaryList(
+          rows = element.selectOrFail(summaryListRow).toList.map { (row: Element) =>
+            val key = row.selectOrFail(summaryListRowKey).text()
+            val value = row.selectOrFail(summaryListRowValue).text()
+            TestReadOnlySummaryRow(
+              key = key,
+              value = value
+            )
+          }
+        )
+
     inline def extractTable(
       index: Int,
       numberOfCols: Int
@@ -206,7 +221,14 @@ object ViewSelectors:
     changeLinkAccessibleContent: String
   )
 
+  final case class TestReadOnlySummaryRow(
+    key: String,
+    value: String
+  )
+
   final case class TestSummaryList(rows: List[TestSummaryRow])
+
+  final case class TestReadOnlySummaryList(rows: List[TestReadOnlySummaryRow])
 
   final case class TestNumberedList(items: List[String])
 

@@ -19,10 +19,13 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-
+import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.ConfirmationPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.ViewApplicationPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,7 +35,10 @@ import scala.concurrent.Future
 class AgentApplicationController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  simplePage: SimplePage
+  simplePage: SimplePage,
+  confirmationPage: ConfirmationPage,
+  viewApplicationPage: ViewApplicationPage,
+  businessPartnerRecordService: BusinessPartnerRecordService
 )
 extends FrontendController(mcc, actions):
 
@@ -58,14 +64,33 @@ extends FrontendController(mcc, actions):
 
   def applicationSubmitted: Action[AnyContent] = actions
     .Applicant
-    .getApplicationSubmitted.async { implicit request =>
-      Future.successful(Ok(simplePage(
-        h1 = "Application Submitted...",
-        bodyText = Some(
-          "Placeholder for the Application Submitted page..."
-        )
-      )))
-    }
+    .getApplicationSubmitted.async:
+      implicit request =>
+        businessPartnerRecordService
+          .getBusinessPartnerRecord(request.agentApplication.getUtr)
+          .map: bprOpt =>
+            Ok(confirmationPage(
+              entityName = bprOpt
+                .flatMap(_.organisationName)
+                .getOrThrowExpectedDataMissing(
+                  "Business Partner Record organisation name is missing for confirmation page"
+                )
+            ))
+
+  def viewSubmittedApplication: Action[AnyContent] = actions
+    .Applicant
+    .getApplicationSubmitted.async:
+      implicit request =>
+        businessPartnerRecordService
+          .getBusinessPartnerRecord(request.agentApplication.getUtr)
+          .map: bprOpt =>
+            Ok(viewApplicationPage(
+              entityName = bprOpt
+                .flatMap(_.organisationName)
+                .getOrThrowExpectedDataMissing(
+                  "Business Partner Record organisation name is missing for View Application page"
+                )
+            ))
 
   def startRegistration: Action[AnyContent] = action:
     implicit request =>

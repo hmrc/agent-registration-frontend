@@ -46,6 +46,7 @@ object AppRoutes:
       val TypeOfSignInController = aboutyourbusinessRoutes.TypeOfSignInController
       val PartnershipTypeController = aboutyourbusinessRoutes.PartnershipTypeController
       val BusinessTypeSessionController = aboutyourbusinessRoutes.BusinessTypeSessionController
+      val CheckYourAnswersController = aboutyourbusinessRoutes.CheckYourAnswersController
 
     object amls:
 

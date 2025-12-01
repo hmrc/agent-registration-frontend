@@ -18,6 +18,7 @@
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AnswerSummary
 @import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 
@@ -25,7 +26,8 @@
         layout: Layout,
         govukButton: GovukButton,
         govukSummaryList: GovukSummaryList,
-        amlsCodes: AmlsCodes
+        amlsCodes: AmlsCodes,
+        answerSummary: AnswerSummary
 )
 
 
@@ -40,106 +42,14 @@
 @title = @{
     messages(s"$key.title")
 }
-@amlsDetails = @{
-    request.agentApplication.getAmlsDetails
-}
-
-@supervisorRow = @{
-    SummaryListRow(
-        key = Key(
-            content = Text(messages(s"$key.supervisoryBody.label"))
-        ),
-        value = Value(
-            content = Text(
-                amlsCodes.getSupervisoryName(
-                    amlsDetails
-                    .supervisoryBody
-                ).value
-            )
-        ),
-        actions = Some(Actions(
-            items = Seq(
-                ActionItem(
-                    href = s"${AppRoutes.apply.amls.AmlsSupervisorController.show}",
-                    content = Text(messages(s"$key.change")),
-                    visuallyHiddenText = Some(messages(s"$key.supervisoryBody.label"))
-                )
-            )
-        ))
-    )
-}
-
-@registrationNumberRow = @{
-    SummaryListRow(
-        key = Key(
-            content = Text(messages(s"$key.registrationNumber.label"))
-        ),
-        value = Value(
-            content = Text(
-                amlsDetails
-                .getRegistrationNumber
-                .value
-            )
-        ),
-        actions = Some(Actions(
-            items = Seq(
-                ActionItem(
-                    href = s"${AppRoutes.apply.amls.AmlsRegistrationNumberController.show}",
-                    content = Text(messages(s"$key.change")),
-                    visuallyHiddenText = Some(messages(s"$key.registrationNumber.label"))
-                )
-            )
-        ))
-    )
-}
-
-@expiryDateRow = @{
-    SummaryListRow(
-        key = Key(
-            content = Text(messages(s"$key.expiryDate.label"))
-        ),
-        value = Value(
-            content = Text(if amlsDetails.isHmrc then messages(s"$key.notApplicable") else displayDateForLang(Some(amlsDetails.getAmlsExpiryDate)))
-        ),
-        actions = Some(Actions(
-            items = Seq(
-                ActionItem(
-                    href = s"${AppRoutes.apply.amls.AmlsExpiryDateController.show}",
-                    content = Text(messages(s"$key.change")),
-                    visuallyHiddenText = Some(messages(s"$key.expiryDate.label"))
-                )
-            )
-        ))
-    )
-}
-
-@evidenceRow = @{
-    SummaryListRow(
-        key = Key(
-            content = Text(messages(s"$key.evidence.label"))
-        ),
-        value = Value(
-            content = Text(if amlsDetails.isHmrc then messages(s"$key.notApplicable") else amlsDetails.getAmlsEvidenceName)
-        ),
-        actions = Some(Actions(
-            items = Seq(
-                ActionItem(
-                    href = s"${AppRoutes.apply.amls.AmlsEvidenceUploadController.show}",
-                    content = Text(messages(s"$key.change")),
-                    visuallyHiddenText = Some(messages(s"$key.evidence.label"))
-                )
-            )
-        ))
-    )
-}
-@commonRows = @{Seq(supervisorRow, registrationNumberRow)}
-@nonHmrcRows = @{Seq(expiryDateRow, evidenceRow)}
-@rows = @{if amlsDetails.isHmrc then commonRows else commonRows ++ nonHmrcRows}
 
 @layout(pageTitle = title) {
     <h2 class="govuk-caption-l">@messages("amlsDetails.title")</h2>
     <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
-    @govukSummaryList(SummaryList(rows))
+    @answerSummary(
+        key,
+        answers = request.agentApplication.getAmlsDetails
+    )
     <p class="govuk-body">
       @govukButton(Button(
           href = Some(AppRoutes.apply.TaskListController.show.url),

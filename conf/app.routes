@@ -10,6 +10,7 @@ GET         /time-out                                                  uk.gov.hm
 GET         /timed-out                                                 uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timedOut
 
 GET         /application-submitted                                     uk.gov.hmrc.agentregistrationfrontend.controllers.apply.AgentApplicationController.applicationSubmitted
+GET         /view-application                                          uk.gov.hmrc.agentregistrationfrontend.controllers.apply.AgentApplicationController.viewSubmittedApplication
 
 # Agent apply routes
 GET         /apply                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.apply.AgentApplicationController.startRegistration
@@ -29,6 +30,7 @@ POST        /apply/about-your-business/partnership-type             uk.gov.hmrc.
 GET         /apply/about-your-business/agent-online-services-account uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.TypeOfSignInController.show
 POST        /apply/about-your-business/agent-online-services-account uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.TypeOfSignInController.submit
 GET         /apply/about-your-business/sign-in                       uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.TypeOfSignInController.showSignInPage
+GET         /apply/about-your-business/check-your-answers            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.CheckYourAnswersController.show
 
 ## Internal Routes for apply
 #  These routes are for internal navigation and should not be accessed directly through the browser URL and meant to be accessed via redirects from other routes.

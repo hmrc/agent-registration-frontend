@@ -12,6 +12,11 @@ common.or = or
 common.dobPrefix = Date of birth
 common.change = Change
 common.warning = Warning
+common.yes = Yes
+common.no = No
+
+button.copy=Copy link to clipboard
+button.copied=Link copied
 
 months.1 = January
 months.2 = February
@@ -83,6 +88,14 @@ signInWithAgentDetails.p1=Sign in using the details for your existing agent acco
 signInWithAgentDetails.p2=Your new agent services account will then be linked to those sign in details.
 signInWithAgentDetails.h2=If you have more than one set of sign in details
 signInWithAgentDetails.p3=Choose the one you want to be linked to your new agent services account.
+
+# Apply / About your business CYA
+aboutYourBusinessCheckYourAnswers.title = Check your answers
+aboutYourBusinessCheckYourAnswers.agentType.label = UK-based agent
+aboutYourBusinessCheckYourAnswers.businessType.label = Business type
+aboutYourBusinessCheckYourAnswers.companyName.label = Company name
+aboutYourBusinessCheckYourAnswers.utr.label = Unique taxpayer reference
+aboutYourBusinessCheckYourAnswers.saPostcode = Self Assessment postcode
 
 # Apply / Applicant contact details
 
@@ -295,6 +308,22 @@ declaration.p3 = I understand that applying for an HMRC agent services account w
 declaration.p4 = I understand that HMRC can suspend an agent services account if the agent business or any individual officer working on its behalf, fails up uphold the HMRC standard for agents.
 declaration.accept.button = Accept and send
 
+# Apply / Confirmation of submission
+confirmation.title = You’ve finished the first stage of the application
+confirmation.subtitle = Application reference:
+confirmation.whatNext.h2 = What to do next
+confirmation.whatNext.p1 = Everyone listed in Companies House as a current member of {0} needs to sign in and provide some personal details.
+confirmation.whatNext.p2.Member = Send this link to all members, including yourself:
+confirmation.whatNext.p2.Authorised = Send this link to all members:
+confirmation.checkProgress.h2 = How to check the progress of your application
+confirmation.checkProgress.p1 = You can click the link on the GOV.UK page “Apply for an agent services account”.
+confirmation.checkProgress.p2 = This will let you check which members have provided their provided their personal details.
+confirmation.checkProgress.p3 = When all members have provided their personal details, we will:
+confirmation.checkProgress.bullet1 = automatically submit your application
+confirmation.checkProgress.bullet2 = email you at <strong>{0}</strong> to confirm this
+confirmation.viewLink = View or print your application
+confirmation.signOutLink = Finish and sign out
+
 
 # About your application / user role
 userRole.title = Are you the owner of the business?
@@ -337,6 +366,20 @@ taskList.hmrcStandards.amls.linkText = Anti-money laundering supervision details
 taskList.hmrcStandards.agreement.linkText = HMRC standard for agents
 taskList.declaration.heading = Finish this stage of the process
 taskList.declaration.linkText = Declaration
+
+# Apply / View application
+viewApplication.title = Application for {0}
+viewApplication.subHeading = Application reference: {0}
+viewApplication.contact.h2 = Applicant contact details
+viewApplication.agentdetails.h2 = Agency contact details
+viewApplication.amls.h2 = Anti-money laundering supervision details
+viewApplication.hmrcStandard.h2 = HMRC standard for agents
+viewApplication.hmrcStandard.label = Agreed to meet the HMRC standard for agents
+viewApplication.whatNext.h2 = What to do next
+viewApplication.whatNext.p1 = The members of {0} need to sign in and provide some personal details.
+viewApplication.whatNext.p2 = Send this link to all members <strong>{0}</strong>
+viewApplication.whatNext.p3 = Your can check the progress of your application by clicking the link on the GOV.UK page “Apply for an agent services account”.
+viewApplication.print = Print this page
 
 # Save for later
 saveForLater.title = Your progress has been saved for 30 days
