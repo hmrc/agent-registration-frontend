@@ -25,4 +25,8 @@ final case class SaUtrWithSource(
   source: MemberIdentifiersSource
 )
 object SaUtrWithSource:
+
   given Format[SaUtrWithSource] = Json.format[SaUtrWithSource]
+
+  def applyUserSupplied(saUtr: String): SaUtrWithSource = SaUtrWithSource(Some(SaUtr(saUtr)), MemberIdentifiersSource.UserSupplied)
+  def applyUserDoNotHaveSaUtr(): SaUtrWithSource = SaUtrWithSource(None, MemberIdentifiersSource.UserSupplied)

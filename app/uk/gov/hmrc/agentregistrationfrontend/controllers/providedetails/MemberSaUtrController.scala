@@ -26,21 +26,20 @@ import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.MemberNinoForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.MemberSaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberNinoPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberSaUtrPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
 
 //TODO WG - check URL, error messages
-
 @Singleton
-class MemberNinoController @Inject() (
+class MemberSaUtrController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  view: MemberNinoPage,
+  view: MemberSaUtrPage,
   memberProvideDetailsService: MemberProvideDetailsService
 )
 extends FrontendController(mcc, actions):
@@ -48,40 +47,40 @@ extends FrontendController(mcc, actions):
   private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions.getProvideDetailsInProgress
     .ensure(
       mpd =>
-        mpd.memberProvidedDetails.ninoWithSource.isEmpty
-          || mpd.memberProvidedDetails.ninoWithSource.exists(_.source == UserSupplied),
+        mpd.memberProvidedDetails.saUtrWithSource.isEmpty
+          || mpd.memberProvidedDetails.saUtrWithSource.exists(_.source == UserSupplied),
       implicit request =>
         // TODO WG - next saUtr Page !!!
-        Redirect(routes.MemberSaUtrController.show.url)
+        Redirect(routes.MemberApproveApplicationController.show.url)
     )
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
       Ok(view(
-        MemberNinoForm.form
+        MemberSaUtrForm.form
           .fill:
             request
               .memberProvidedDetails
-              .ninoWithSource
+              .saUtrWithSource
       ))
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater(MemberNinoForm.form, implicit r => view(_))
+      .ensureValidFormAndRedirectIfSaveForLater(MemberSaUtrForm.form, implicit r => view(_))
       .async:
         implicit request: MemberProvideDetailsRequest[AnyContent] =>
-          MemberNinoForm.form
+          MemberSaUtrForm.form
             .bindFromRequest()
             .fold(
               formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-              ninoWithSource =>
+              saUtrWithSource =>
                 val updatedApplication: MemberProvidedDetails = request
                   .memberProvidedDetails
-                  .modify(_.ninoWithSource)
-                  .setTo(Some(ninoWithSource))
+                  .modify(_.saUtrWithSource)
+                  .setTo(Some(saUtrWithSource))
                 memberProvideDetailsService
                   .upsert(updatedApplication)
                   .map: _ =>
-                    Redirect(routes.MemberSaUtrController.show.url)
+                    Redirect(routes.MemberApproveApplicationController.show.url)
             )
       .redirectIfSaveForLater
