@@ -48,7 +48,7 @@ object AgentEmailAddressForm:
             )
             .verifying(
               ErrorKeys.inputTooLongErrorMessage(otherKey),
-              canonicalise(_).length <= 24
+              canonicalise(_).length <= 132
             )
             .verifying(
               ErrorKeys.invalidInputErrorMessage(otherKey),

@@ -183,7 +183,7 @@ otherAgentEmailAddress.label = Enter the email address you want to use
 otherAgentEmailAddress.hint = We will send a code to this email address to confirm it.
 otherAgentEmailAddress.error.required = Enter the email address for your agent services account
 otherAgentEmailAddress.error.invalid = Enter an email address in the correct format, like name@example.com
-otherAgentEmailAddress.error.tooLong = The email address must be 24 characters or fewer
+otherAgentEmailAddress.error.tooLong = The email address must be 132 characters or fewer
 
 ## Apply / Agent details / correspondence address
 agentCorrespondenceAddress.title = What correspondence address should we use for your agent services account?
