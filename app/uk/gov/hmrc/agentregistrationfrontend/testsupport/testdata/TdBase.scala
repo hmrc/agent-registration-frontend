@@ -66,9 +66,9 @@ trait TdBase:
     providerType = "GovernmentGateway"
   )
   def nino = Nino("AB123456C")
-  def ninoFromAuth = NinoWithSource(nino, MemberIdentifiersSource.FromAuth)
-  def saUtrFromAuth = SaUtrWithSource(saUtr, MemberIdentifiersSource.FromAuth)
-  def saUtrFromCitizenDetails = SaUtrWithSource(saUtr, MemberIdentifiersSource.FromCitizenDetails)
+  def ninoFromAuth = NinoWithSource(Some(nino), MemberIdentifiersSource.FromAuth)
+  def saUtrFromAuth = SaUtrWithSource(Some(saUtr), MemberIdentifiersSource.FromAuth)
+  def saUtrFromCitizenDetails = SaUtrWithSource(Some(saUtr), MemberIdentifiersSource.FromCitizenDetails)
   def safeId: SafeId = SafeId("XA0001234512345")
   def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
   def applicantEmailAddress: EmailAddress = EmailAddress("user@test.com")
