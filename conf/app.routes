@@ -96,8 +96,6 @@ GET         /provide-details/start/:linkId                          uk.gov.hmrc.
 GET        /provide-details/internal/initiate-member-provide-details/:linkId  uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.InitiateMemberProvideDetailsController.initiateMemberProvideDetails(linkId: LinkId)
 
 
-GET         /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberNinoController.show
-POST        /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberNinoController.submit
 GET         /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CompaniesHouseNameQueryController.show
 POST        /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CompaniesHouseNameQueryController.submit
 GET         /provide-details/name-match                             uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CompaniesHouseMatchingController.show
@@ -105,5 +103,10 @@ POST        /provide-details/name-match                             uk.gov.hmrc.
 GET         /provide-details/telephone-number                       uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberTelephoneNumberController.show
 POST        /provide-details/telephone-number                       uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberTelephoneNumberController.submit
 GET         /provide-details/email-address                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberEmailAddressController.show
+GET         /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberNinoController.show
+POST        /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberNinoController.submit
+GET         /provide-details/utr                                    uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberSaUtrController.show
+POST        /provide-details/utr                                    uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberSaUtrController.submit
+GET         /provide-details/approve-application                    uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberApproveApplicationController.show
 GET         /provide-details/exit                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.genericExitPage
 GET         /provide-details/multiple-provided-details              uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.multipleProvidedDetailsPage
