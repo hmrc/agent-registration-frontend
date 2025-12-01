@@ -429,3 +429,13 @@ memberTelephoneNumber.hint = We will not send a code to confirm this number.
 memberTelephoneNumber.error.required = Enter the number we should call to speak to you about this application
 memberTelephoneNumber.error.invalid = Enter a phone number, like 01632 960 001 or 07700 900 982
 memberTelephoneNumber.error.tooLong = The phone number must be 24 characters or fewer
+
+## Member Nino
+memberNino.title = What business name will you use for clients?
+memberNino.hasNino.yes = Yes
+memberNino.hasNino.no = No
+memberNino.hasNino.title = Do you have a National Insurance number?
+memberNino.nino.label = Enter your National Insurance number
+memberNino.nino.error.invalid = Enter a National Insurance number in the correct format, like QQ 12 34 56 C
+memberNino.nino.error.required = Enter your National Insurance number
+memberNino.nino.hint = For example, QQ 12 34 56 C.
