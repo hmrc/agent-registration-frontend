@@ -54,6 +54,7 @@ extends FrontendController(mcc, actions):
             case _ @MemberNino.NotProvided => true
           },
       implicit request =>
+        logger.info(s"Nino is already provided from auth or citizen details. Skipping page and moving to next page.")
         Redirect(routes.MemberSaUtrController.show.url)
     )
 
