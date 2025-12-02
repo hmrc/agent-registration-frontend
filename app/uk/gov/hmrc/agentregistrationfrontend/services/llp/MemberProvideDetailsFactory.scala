@@ -19,8 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.services.llp
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsIdGenerator
-import uk.gov.hmrc.agentregistration.shared.llp.NinoWithSource
-import uk.gov.hmrc.agentregistration.shared.llp.SaUtrWithSource
+import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
+import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Started
 
 import java.time.Clock
@@ -37,14 +37,14 @@ class MemberProvideDetailsFactory @Inject() (
   def makeNewMemberProvidedDetails(
     internalUserId: InternalUserId,
     agentApplicationId: AgentApplicationId,
-    ninoWithSource: Option[NinoWithSource],
-    saUtrWithSource: Option[SaUtrWithSource]
+    memberNino: Option[MemberNino],
+    memberSaUtr: Option[MemberSaUtr]
   ): MemberProvidedDetails = MemberProvidedDetails(
     _id = memberProvidedDetailsIdGenerator.nextMemberProvidedDetailsId(),
     internalUserId = internalUserId,
     agentApplicationId = agentApplicationId,
     createdAt = Instant.now(clock),
     providedDetailsState = Started,
-    ninoWithSource = ninoWithSource,
-    saUtrWithSource = saUtrWithSource
+    memberNino = memberNino,
+    memberSauUtr = memberSaUtr
   )

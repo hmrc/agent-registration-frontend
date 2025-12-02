@@ -23,7 +23,7 @@ import play.api.data.Forms.text
 import uk.gov.voa.play.form.ConditionalMappings.isEqual
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 import uk.gov.hmrc.agentregistration.shared.Nino
-import uk.gov.hmrc.agentregistration.shared.llp.NinoWithSource
+import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.TextFormatter
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
@@ -35,7 +35,7 @@ object MemberNinoForm:
   val hasNinoKey = "memberNino.hasNino"
   val ninoKey = "memberNino.nino"
 
-  val form: Form[NinoWithSource] = Form(
+  val form: Form[MemberNino] = Form(
     mapping(
       hasNinoKey -> Forms.of(TextFormatter(ErrorKeys.requiredFieldErrorMessage(hasNinoKey)))
         .verifying(
@@ -60,11 +60,11 @@ object MemberNinoForm:
         ninoStrOpt
       ) =>
         (hasNinoStr, ninoStrOpt) match
-          case (x, Some(ninoStr)) if x.equals(yes) => NinoWithSource.applyUserSupplied(ninoStr)
-          case _ => NinoWithSource.applyUserDoNotHaveNino()
-    )(ninoWithSource =>
-      ninoWithSource.nino match
-        case Some(n) => Some((yes, Some(n.value)))
-        case None => Some((no, None))
-    )
+          case (x, Some(ninoStr)) if x.equals(yes) => MemberNino.Provided(Nino(ninoStr))
+          case _ => MemberNino.NotProvided
+    ) {
+      case MemberNino.Provided(nino) => Some((yes, Some(nino.value)))
+      case MemberNino.NotProvided => Some((no, None))
+      case MemberNino.FromAuth(nino) => Some((yes, Some(nino.value)))
+    }
   )

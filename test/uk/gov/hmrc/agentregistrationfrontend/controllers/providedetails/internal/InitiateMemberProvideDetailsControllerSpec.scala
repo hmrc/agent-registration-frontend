@@ -55,17 +55,17 @@ extends ControllerSpec:
     val afterStartedWithNinoAndSaUtrFromAuth: MemberProvidedDetails = tdAll
       .providedDetailsLlp
       .afterStarted
-      .modify(_.ninoWithSource)
+      .modify(_.memberNino)
       .setTo(Some(tdAll.ninoFromAuth))
-      .modify(_.saUtrWithSource)
+      .modify(_.memberSauUtr)
       .setTo(Some(tdAll.saUtrFromAuth))
 
     val afterStartedWithNinoAndSaUtrFromCitizenDetails: MemberProvidedDetails = tdAll
       .providedDetailsLlp
       .afterStarted
-      .modify(_.ninoWithSource)
+      .modify(_.memberNino)
       .setTo(Some(tdAll.ninoFromAuth))
-      .modify(_.saUtrWithSource)
+      .modify(_.memberSauUtr)
       .setTo(Some(tdAll.saUtrFromCitizenDetails))
 
   private def path(linkId: LinkId) = s"/agent-registration/provide-details/internal/initiate-member-provide-details/${linkId.value}"

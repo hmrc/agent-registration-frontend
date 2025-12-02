@@ -21,7 +21,7 @@ import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.llp.MemberIdentifiersSource.UserSupplied
+import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
@@ -47,10 +47,13 @@ extends FrontendController(mcc, actions):
   private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions.getProvideDetailsInProgress
     .ensure(
       mpd =>
-        mpd.memberProvidedDetails.saUtrWithSource.isEmpty
-          || mpd.memberProvidedDetails.saUtrWithSource.exists(_.source == UserSupplied),
+        mpd.memberProvidedDetails.memberSauUtr.isEmpty ||
+          mpd.memberProvidedDetails.memberSauUtr.exists {
+            case _: MemberSaUtr.Provided => true
+            case _ @MemberSaUtr.NotProvided => true
+            case _ => false
+          },
       implicit request =>
-        // TODO WG - next saUtr Page !!!
         Redirect(routes.MemberApproveApplicationController.show.url)
     )
 
@@ -61,7 +64,7 @@ extends FrontendController(mcc, actions):
           .fill:
             request
               .memberProvidedDetails
-              .saUtrWithSource
+              .memberSauUtr
       ))
 
   def submit: Action[AnyContent] =
@@ -76,7 +79,7 @@ extends FrontendController(mcc, actions):
               saUtrWithSource =>
                 val updatedApplication: MemberProvidedDetails = request
                   .memberProvidedDetails
-                  .modify(_.saUtrWithSource)
+                  .modify(_.memberSauUtr)
                   .setTo(Some(saUtrWithSource))
                 memberProvideDetailsService
                   .upsert(updatedApplication)
