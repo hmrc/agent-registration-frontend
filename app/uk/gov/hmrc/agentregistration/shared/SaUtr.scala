@@ -28,7 +28,6 @@ object SaUtr:
 
   given format: Format[SaUtr] = JsonFormatsFactory.makeValueClassFormat
 
-  // TODO WG - check with team to see if this is the correct regex
   private val saUtrRegex = "^[0-9]{10}$"
 
   def isValid(utr: String): Boolean = utr.matches(saUtrRegex)

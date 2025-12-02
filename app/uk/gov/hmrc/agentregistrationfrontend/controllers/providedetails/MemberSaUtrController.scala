@@ -28,6 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberPro
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.MemberSaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberSaUtrPage
 
 import javax.inject.Inject
@@ -48,9 +49,10 @@ extends FrontendController(mcc, actions):
       mpd =>
         mpd.memberProvidedDetails.memberSauUtr.isEmpty ||
           mpd.memberProvidedDetails.memberSauUtr.exists {
+            case _: MemberSaUtr.FromAuth => false
+            case _: MemberSaUtr.FromCitizenDetails => false
             case _: MemberSaUtr.Provided => true
             case _ @MemberSaUtr.NotProvided => true
-            case _ => false
           },
       implicit request =>
         Redirect(routes.MemberApproveApplicantController.show.url)
@@ -66,23 +68,24 @@ extends FrontendController(mcc, actions):
               .memberSauUtr
       ))
 
-  def submit: Action[AnyContent] =
-    baseAction
-      .ensureValidFormAndRedirectIfSaveForLater(MemberSaUtrForm.form, implicit r => view(_))
-      .async:
-        implicit request: MemberProvideDetailsRequest[AnyContent] =>
-          MemberSaUtrForm.form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-              saUtrWithSource =>
-                val updatedApplication: MemberProvidedDetails = request
-                  .memberProvidedDetails
-                  .modify(_.memberSauUtr)
-                  .setTo(Some(saUtrWithSource))
-                memberProvideDetailsService
-                  .upsert(updatedApplication)
-                  .map: _ =>
-                    Redirect(routes.MemberApproveApplicantController.show.url)
-            )
-      .redirectIfSaveForLater
+  def submit: Action[AnyContent] = baseAction
+    .ensureValidForm[MemberSaUtr](
+      MemberSaUtrForm.form,
+      implicit request => formWithErrors => Errors.throwBadRequestException(s"Unexpected errors in the FormType: $formWithErrors")
+    )
+    .async:
+      implicit request: MemberProvideDetailsRequest[AnyContent] =>
+        MemberSaUtrForm.form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+            saUtrWithSource =>
+              val updatedApplication: MemberProvidedDetails = request
+                .memberProvidedDetails
+                .modify(_.memberSauUtr)
+                .setTo(Some(saUtrWithSource))
+              memberProvideDetailsService
+                .upsert(updatedApplication)
+                .map: _ =>
+                  Redirect(routes.MemberApproveApplicantController.show.url)
+          )
