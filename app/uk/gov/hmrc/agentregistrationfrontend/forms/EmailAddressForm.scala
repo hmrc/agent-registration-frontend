@@ -20,21 +20,24 @@ import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.text
 import uk.gov.hmrc.agentregistration.shared.EmailAddress
+import uk.gov.hmrc.agentregistration.shared.util.StringExtensions.stripAllWhiteSpace
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
 object EmailAddressForm:
 
   val key: String = "emailAddress"
 
-  private def canonicalise(value: String): String = value.trim.replaceAll("\\s+", " ")
-
   val form: Form[EmailAddress] = Form(
     mapping(
       key -> text
-        .transform[String](canonicalise, identity)
+        .transform[String](stripAllWhiteSpace, identity)
         .verifying(
           ErrorKeys.requiredFieldErrorMessage(key),
           _.trim.nonEmpty
+        )
+        .verifying(
+          ErrorKeys.inputTooLongErrorMessage(key),
+          _.length <= 132
         )
         .transform[EmailAddress](EmailAddress(_), _.value)
         .verifying(

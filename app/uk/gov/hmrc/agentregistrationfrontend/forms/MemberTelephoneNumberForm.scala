@@ -21,6 +21,7 @@ import play.api.data.Forms.mapping
 import play.api.data.Forms.text
 import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
 import uk.gov.hmrc.agentregistration.shared.util.StringExtensions.canonicalise
+import uk.gov.hmrc.agentregistration.shared.util.StringExtensions.stripAllWhiteSpace
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
 object MemberTelephoneNumberForm:
@@ -37,7 +38,7 @@ object MemberTelephoneNumberForm:
         )
         .verifying(
           ErrorKeys.inputTooLongErrorMessage(key),
-          _.length <= 25
+          _.stripAllWhiteSpace.length <= 24
         )
         .transform[TelephoneNumber](TelephoneNumber(_), _.value)
         .verifying(

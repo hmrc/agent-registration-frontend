@@ -21,6 +21,7 @@ import play.api.data.Forms
 import play.api.data.Forms.mapping
 import play.api.data.Forms.text
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentEmailAddress
+import uk.gov.hmrc.agentregistration.shared.util.StringExtensions.stripAllWhiteSpace
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.TextFormatter
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 import uk.gov.voa.play.form.ConditionalMappings.isEqual
@@ -30,7 +31,6 @@ object AgentEmailAddressForm:
 
   val key: String = "agentEmailAddress"
   val otherKey: String = "otherAgentEmailAddress"
-  private def canonicalise(value: String): String = value.trim.replaceAll("\\s", "")
   val form: Form[AgentEmailAddress] = Form(
     mapping =
       mapping(
@@ -42,17 +42,18 @@ object AgentEmailAddressForm:
         otherKey -> mandatoryIf(
           isEqual(key, "other"),
           text
+            .transform[String](stripAllWhiteSpace, identity)
             .verifying(
               ErrorKeys.requiredFieldErrorMessage(otherKey),
               _.nonEmpty
             )
             .verifying(
               ErrorKeys.inputTooLongErrorMessage(otherKey),
-              canonicalise(_).length <= 132
+              _.length <= 132
             )
             .verifying(
               ErrorKeys.invalidInputErrorMessage(otherKey),
-              value => AgentEmailAddress.isValid(canonicalise(value))
+              value => AgentEmailAddress.isValid(value)
             )
         )
       )(AgentEmailAddress.apply)(a => Some((a.agentEmailAddress, a.otherAgentEmailAddress)))
