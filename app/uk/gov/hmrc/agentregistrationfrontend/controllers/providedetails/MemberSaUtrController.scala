@@ -24,6 +24,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.MemberSaUtrForm
@@ -33,7 +34,6 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.membercon
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.Future
 
 @Singleton
 class MemberSaUtrController @Inject() (
@@ -74,18 +74,13 @@ extends FrontendController(mcc, actions):
       implicit request => formWithErrors => Errors.throwBadRequestException(s"Unexpected errors in the FormType: $formWithErrors")
     )
     .async:
-      implicit request: MemberProvideDetailsRequest[AnyContent] =>
-        MemberSaUtrForm.form
-          .bindFromRequest()
-          .fold(
-            formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-            saUtrWithSource =>
-              val updatedApplication: MemberProvidedDetails = request
-                .memberProvidedDetails
-                .modify(_.memberSauUtr)
-                .setTo(Some(saUtrWithSource))
-              memberProvideDetailsService
-                .upsert(updatedApplication)
-                .map: _ =>
-                  Redirect(routes.MemberApproveApplicantController.show.url)
-          )
+      implicit request: (MemberProvideDetailsRequest[AnyContent] & FormValue[MemberSaUtr]) =>
+        val validFormData: MemberSaUtr = request.formValue
+        val updatedApplication: MemberProvidedDetails = request
+          .memberProvidedDetails
+          .modify(_.memberSauUtr)
+          .setTo(Some(validFormData))
+        memberProvideDetailsService
+          .upsert(updatedApplication)
+          .map: _ =>
+            Redirect(routes.MemberApproveApplicantController.show.url)
