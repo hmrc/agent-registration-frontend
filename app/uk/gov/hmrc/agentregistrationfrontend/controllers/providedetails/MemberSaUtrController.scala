@@ -55,6 +55,7 @@ extends FrontendController(mcc, actions):
             case _ @MemberSaUtr.NotProvided => true
           },
       implicit request =>
+        logger.info(s"SaUtr is already provided from auth or citizen details. Skipping page and moving to next page.")
         Redirect(routes.MemberApproveApplicantController.show.url)
     )
 
