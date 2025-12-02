@@ -34,8 +34,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
 
-//TODO WG - check URL, error messages
-
 @Singleton
 class MemberNinoController @Inject() (
   actions: Actions,

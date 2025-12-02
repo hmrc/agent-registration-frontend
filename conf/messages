@@ -435,8 +435,9 @@ memberNino.title = What business name will you use for clients?
 memberNino.hasNino.yes = Yes
 memberNino.hasNino.no = No
 memberNino.hasNino.title = Do you have a National Insurance number?
+memberNino.hasNino.error.required = Select yes if you have a National Insurance number
 memberNino.nino.label = Enter your National Insurance number
-memberNino.nino.error.invalid = Enter a National Insurance number in the correct format, like QQ 12 34 56 C
+memberNino.nino.error.invalid = Enter a National Insurance number in the correct format
 memberNino.nino.error.required = Enter your National Insurance number
 memberNino.nino.hint = For example, QQ 12 34 56 C.
 
@@ -449,4 +450,4 @@ memberSaUtr.hasSaUtr.error.required = Select yes if you have a Self Assessment U
 memberSaUtr.saUtr.label = Enter your Self Assessment Unique Taxpayer Reference
 memberSaUtr.saUtr.hint = This is 10 numbers, for example 1234567890.
 memberSaUtr.saUtr.error.required = Enter your Self Assessment Unique Taxpayer Reference
-memberSaUtr.saUtr.error.invalid = Enter a Self Assessment Unique Taxpayer Reference in the correct format, like 1234567890
+memberSaUtr.saUtr.error.invalid = Enter a Self Assessment Unique Taxpayer Reference in the correct format
