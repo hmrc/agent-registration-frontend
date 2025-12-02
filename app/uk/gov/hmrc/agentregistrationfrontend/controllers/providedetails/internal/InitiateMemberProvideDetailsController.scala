@@ -97,8 +97,8 @@ extends FrontendController(mcc, actions):
             memberProvideDetailsService.createNewMemberProvidedDetails(
               internalUserId = request.internalUserId,
               agentApplicationId = applicationId,
-              memberNino = request.nino.map(MemberNino.FromAuth(_)),
-              memberSaUtr = citizenDetails.saUtr.map(MemberSaUtr.FromCitizenDetails(_))
+              memberNino = request.nino.map(MemberNino.FromAuth.apply),
+              memberSaUtr = citizenDetails.saUtr.map(MemberSaUtr.FromCitizenDetails.apply)
             )
           }
 
@@ -107,7 +107,7 @@ extends FrontendController(mcc, actions):
           memberProvideDetailsService.createNewMemberProvidedDetails(
             internalUserId = request.internalUserId,
             agentApplicationId = applicationId,
-            memberNino = request.nino.map(MemberNino.FromAuth(_)),
-            memberSaUtr = request.saUtr.map(MemberSaUtr.FromAuth(_))
+            memberNino = request.nino.map(MemberNino.FromAuth.apply),
+            memberSaUtr = request.saUtr.map(MemberSaUtr.FromAuth.apply)
           )
         )

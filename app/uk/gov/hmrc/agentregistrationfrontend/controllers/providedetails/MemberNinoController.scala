@@ -28,6 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberPro
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.MemberNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberNinoPage
 
 import javax.inject.Inject
@@ -48,9 +49,9 @@ extends FrontendController(mcc, actions):
       mpd =>
         mpd.memberProvidedDetails.memberNino.isEmpty ||
           mpd.memberProvidedDetails.memberNino.exists {
+            case _: MemberNino.FromAuth => false
             case _: MemberNino.Provided => true
             case _ @MemberNino.NotProvided => true
-            case _ => false
           },
       implicit request =>
         Redirect(routes.MemberSaUtrController.show.url)
@@ -66,23 +67,24 @@ extends FrontendController(mcc, actions):
               .memberNino
       ))
 
-  def submit: Action[AnyContent] =
-    baseAction
-      .ensureValidFormAndRedirectIfSaveForLater(MemberNinoForm.form, implicit r => view(_))
-      .async:
-        implicit request: MemberProvideDetailsRequest[AnyContent] =>
-          MemberNinoForm.form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-              ninoWithSource =>
-                val updatedApplication: MemberProvidedDetails = request
-                  .memberProvidedDetails
-                  .modify(_.memberNino)
-                  .setTo(Some(ninoWithSource))
-                memberProvideDetailsService
-                  .upsert(updatedApplication)
-                  .map: _ =>
-                    Redirect(routes.MemberSaUtrController.show.url)
-            )
-      .redirectIfSaveForLater
+  def submit: Action[AnyContent] = baseAction
+    .ensureValidForm[MemberNino](
+      MemberNinoForm.form,
+      implicit request => formWithErrors => Errors.throwBadRequestException(s"Unexpected errors in the FormType: $formWithErrors")
+    )
+    .async:
+      implicit request: MemberProvideDetailsRequest[AnyContent] =>
+        MemberNinoForm.form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+            ninoWithSource =>
+              val updatedApplication: MemberProvidedDetails = request
+                .memberProvidedDetails
+                .modify(_.memberNino)
+                .setTo(Some(ninoWithSource))
+              memberProvideDetailsService
+                .upsert(updatedApplication)
+                .map: _ =>
+                  Redirect(routes.MemberSaUtrController.show.url)
+          )
