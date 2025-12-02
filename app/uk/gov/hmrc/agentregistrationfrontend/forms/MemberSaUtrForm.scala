@@ -21,7 +21,7 @@ import play.api.data.Forms
 import play.api.data.Forms.mapping
 import play.api.data.Forms.text
 import uk.gov.hmrc.agentregistration.shared.SaUtr
-import uk.gov.hmrc.agentregistration.shared.llp.SaUtrWithSource
+import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.TextFormatter
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 import uk.gov.voa.play.form.ConditionalMappings.isEqual
@@ -35,7 +35,7 @@ object MemberSaUtrForm:
   val hasSaUtrKey = "memberSaUtr.hasSaUtr"
   val saUtrKey = "memberSaUtr.saUtr"
 
-  val form: Form[SaUtrWithSource] = Form(
+  val form: Form[MemberSaUtr] = Form(
     mapping(
       hasSaUtrKey -> Forms.of(TextFormatter(ErrorKeys.requiredFieldErrorMessage(hasSaUtrKey)))
         .verifying(
@@ -60,11 +60,12 @@ object MemberSaUtrForm:
         saUtrStrOpt
       ) =>
         (hasSaUtrStr, saUtrStrOpt) match
-          case (x, Some(saUtrStr)) if x.equals(yes) => SaUtrWithSource.applyUserSupplied(saUtrStr)
-          case _ => SaUtrWithSource.applyUserDoNotHaveSaUtr()
-    )(saUtrWithSource =>
-      saUtrWithSource.saUtr match
-        case Some(n) => Some((yes, Some(n.value)))
-        case None => Some((no, None))
-    )
+          case (x, Some(saUtrStr)) if x.equals(yes) => MemberSaUtr.Provided(SaUtr(saUtrStr))
+          case _ => MemberSaUtr.NotProvided
+    ) {
+      case MemberSaUtr.Provided(saUtr) => Some((yes, Some(saUtr.value)))
+      case MemberSaUtr.NotProvided => Some((no, None))
+      case MemberSaUtr.FromAuth(saUtr) => Some((yes, Some(saUtr.value)))
+      case MemberSaUtr.FromCitizenDetails(saUtr) => Some((yes, Some(saUtr.value)))
+    }
   )

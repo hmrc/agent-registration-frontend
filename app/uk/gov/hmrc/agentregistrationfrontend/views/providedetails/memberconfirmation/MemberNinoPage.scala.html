@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.llp.NinoWithSource
+@import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
 @import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 @import uk.gov.hmrc.agentregistrationfrontend.forms.MemberNinoForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
@@ -33,7 +33,7 @@
 )
 
 @(
-        form: Form[NinoWithSource]
+        form: Form[MemberNino]
 )(implicit request: MemberProvideDetailsRequest[?], messages: Messages)
 
 @key = @{

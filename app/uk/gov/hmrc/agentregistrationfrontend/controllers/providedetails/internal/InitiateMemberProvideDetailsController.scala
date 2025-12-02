@@ -21,7 +21,6 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.llp.MemberIdentifiersSource
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
@@ -31,8 +30,8 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
-import uk.gov.hmrc.agentregistration.shared.llp.NinoWithSource
-import uk.gov.hmrc.agentregistration.shared.llp.SaUtrWithSource
+import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
+import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -99,8 +98,8 @@ extends FrontendController(mcc, actions):
             memberProvideDetailsService.createNewMemberProvidedDetails(
               internalUserId = request.internalUserId,
               agentApplicationId = applicationId,
-              ninoWithSource = request.nino.map(n => NinoWithSource(Some(n), MemberIdentifiersSource.FromAuth)),
-              saUtrWithSource = citizenDetails.saUtr.map(u => SaUtrWithSource(Some(u), MemberIdentifiersSource.FromCitizenDetails))
+              memberNino = request.nino.map(MemberNino.FromAuth(_)),
+              memberSaUtr = citizenDetails.saUtr.map(MemberSaUtr.FromCitizenDetails(_))
             )
           }
 
@@ -109,7 +108,7 @@ extends FrontendController(mcc, actions):
           memberProvideDetailsService.createNewMemberProvidedDetails(
             internalUserId = request.internalUserId,
             agentApplicationId = applicationId,
-            ninoWithSource = request.nino.map(n => NinoWithSource(Some(n), MemberIdentifiersSource.FromAuth)),
-            saUtrWithSource = request.saUtr.map(u => SaUtrWithSource(Some(u), MemberIdentifiersSource.FromAuth))
+            memberNino = request.nino.map(MemberNino.FromAuth(_)),
+            memberSaUtr = request.saUtr.map(MemberSaUtr.FromAuth(_))
           )
         )
