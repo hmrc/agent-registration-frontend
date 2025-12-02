@@ -37,8 +37,8 @@ final case class MemberProvidedDetails(
   agentApplicationId: AgentApplicationId,
   companiesHouseMatch: Option[CompaniesHouseMatch] = None,
   telephoneNumber: Option[TelephoneNumber] = None,
-  ninoWithSource: Option[NinoWithSource] = None,
-  saUtrWithSource: Option[SaUtrWithSource] = None
+  memberNino: Option[MemberNino] = None,
+  memberSauUtr: Option[MemberSaUtr] = None
 ):
 
   val memberProvidedDetailsId: MemberProvidedDetailsId = _id

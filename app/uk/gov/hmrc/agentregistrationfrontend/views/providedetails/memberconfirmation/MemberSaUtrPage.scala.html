@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.llp.SaUtrWithSource
+@import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
 @import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 @import uk.gov.hmrc.agentregistrationfrontend.forms.MemberSaUtrForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
@@ -33,7 +33,7 @@
 )
 
 @(
-        form: Form[SaUtrWithSource]
+        form: Form[MemberSaUtr]
 )(implicit request: MemberProvideDetailsRequest[?], messages: Messages)
 
 @key = @{
