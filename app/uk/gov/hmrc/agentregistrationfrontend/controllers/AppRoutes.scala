@@ -89,7 +89,7 @@ object AppRoutes:
     val MemberEmailAddressController = providedetailsRoutes.MemberEmailAddressController
     val MemberNinoController = providedetailsRoutes.MemberNinoController
     val MemberSaUtrController = providedetailsRoutes.MemberSaUtrController
-    val MemberApproveApplicationController = providedetailsRoutes.MemberApproveApplicationController
+    val MemberApproveApplicantController = providedetailsRoutes.MemberApproveApplicantController
 
     object internal:
       val InitiateMemberProvideDetailsController = internalProviDedetailsRoutes.InitiateMemberProvideDetailsController

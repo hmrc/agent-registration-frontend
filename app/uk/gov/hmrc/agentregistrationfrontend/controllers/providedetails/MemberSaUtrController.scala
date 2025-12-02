@@ -34,7 +34,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
 
-//TODO WG - check URL, error messages
 @Singleton
 class MemberSaUtrController @Inject() (
   actions: Actions,
@@ -54,7 +53,7 @@ extends FrontendController(mcc, actions):
             case _ => false
           },
       implicit request =>
-        Redirect(routes.MemberApproveApplicationController.show.url)
+        Redirect(routes.MemberApproveApplicantController.show.url)
     )
 
   def show: Action[AnyContent] = baseAction:
@@ -84,6 +83,6 @@ extends FrontendController(mcc, actions):
                 memberProvideDetailsService
                   .upsert(updatedApplication)
                   .map: _ =>
-                    Redirect(routes.MemberApproveApplicationController.show.url)
+                    Redirect(routes.MemberApproveApplicantController.show.url)
             )
       .redirectIfSaveForLater
