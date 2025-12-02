@@ -46,7 +46,9 @@ class AuthorisedNameController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
+  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress
     .ensure(
       _.agentApplication.asLlpApplication.applicantContactDetails.map(_.applicantName.role).contains(ApplicantRoleInLlp.Authorised),
       implicit request =>

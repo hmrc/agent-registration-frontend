@@ -33,9 +33,11 @@ class MemberEmailAddressController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getProvideDetailsInProgress:
-    implicit request: RequestHeader =>
-      Ok(placeholder(
-        h1 = "Email Address Page",
-        bodyText = Some("This is a placeholder page for the email address page.")
-      ))
+  def show: Action[AnyContent] = actions
+    .Member
+    .getProvideDetailsInProgress:
+      implicit request: RequestHeader =>
+        Ok(placeholder(
+          h1 = "Email Address Page",
+          bodyText = Some("This is a placeholder page for the email address page.")
+        ))

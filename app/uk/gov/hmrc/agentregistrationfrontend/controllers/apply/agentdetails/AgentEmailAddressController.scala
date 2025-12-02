@@ -56,7 +56,9 @@ class AgentEmailAddressController @Inject() (
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
+  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress
     .ensure(
       _
         .agentApplication
@@ -135,7 +137,9 @@ extends FrontendController(mcc, actions):
                   )
           )
 
-  def verify: Action[AnyContent] = actions.getApplicationInProgress
+  def verify: Action[AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress
     .ensure(
       _.agentApplication
         .asLlpApplication

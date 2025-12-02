@@ -45,6 +45,7 @@ class AmlsSupervisorController @Inject() (
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
+    .Applicant
     .getApplicationInProgress:
       implicit request =>
         val form: Form[AmlsCode] = amlsCodeForm.form.fill(request
@@ -55,6 +56,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     actions
+      .Applicant
       .getApplicationInProgress
       .ensureValidFormAndRedirectIfSaveForLater(amlsCodeForm.form, implicit r => view(_))
       .async:

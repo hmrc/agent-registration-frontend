@@ -44,7 +44,9 @@ class AddressLookupCallbackController @Inject() (
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
-  def journeyCallback(id: Option[JourneyId]): Action[AnyContent] = actions.getApplicationInProgress
+  def journeyCallback(id: Option[JourneyId]): Action[AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress
     .ensure(
       _ => id.isDefined,
       implicit r =>

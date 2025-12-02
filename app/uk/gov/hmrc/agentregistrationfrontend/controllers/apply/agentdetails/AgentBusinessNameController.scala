@@ -47,24 +47,28 @@ class AgentBusinessNameController @Inject() (
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getApplicationInProgress.async:
-    implicit request =>
-      businessPartnerRecordService
-        .getBusinessPartnerRecord(
-          Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
-        ).map: bprOpt =>
-          Ok(view(
-            form = AgentBusinessNameForm.form.fill:
-              request
-                .agentApplication
-                .asLlpApplication
-                .agentDetails.map(_.businessName)
-            ,
-            bprBusinessName = bprOpt.flatMap(_.organisationName)
-          ))
+  def show: Action[AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress
+    .async:
+      implicit request =>
+        businessPartnerRecordService
+          .getBusinessPartnerRecord(
+            Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
+          ).map: bprOpt =>
+            Ok(view(
+              form = AgentBusinessNameForm.form.fill:
+                request
+                  .agentApplication
+                  .asLlpApplication
+                  .agentDetails.map(_.businessName)
+              ,
+              bprBusinessName = bprOpt.flatMap(_.organisationName)
+            ))
 
   def submit: Action[AnyContent] =
     actions
+      .Applicant
       .getApplicationInProgress
       .async:
         implicit request: AgentApplicationRequest[AnyContent] =>

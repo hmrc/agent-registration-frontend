@@ -52,7 +52,9 @@ class EmailAddressController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
+  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress
     .ensure(
       _
         .agentApplication
@@ -114,7 +116,9 @@ extends FrontendController(mcc, actions):
             )
       .redirectIfSaveForLater
 
-  def verify: Action[AnyContent] = actions.getApplicationInProgress
+  def verify: Action[AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress
     .ensure(
       _.agentApplication
         .asLlpApplication

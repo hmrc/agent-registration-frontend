@@ -42,6 +42,7 @@ class HmrcStandardForAgentsController @Inject() (
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
+    .Applicant
     .getApplicationInProgress
     .async:
       implicit request =>
@@ -57,6 +58,7 @@ extends FrontendController(mcc, actions):
             ))
 
   def submit: Action[AnyContent] = actions
+    .Applicant
     .getApplicationInProgress
     .async:
       implicit request =>

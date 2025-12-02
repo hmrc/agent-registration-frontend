@@ -21,6 +21,7 @@ import play.api.data.FormBinding
 import play.api.mvc.*
 import play.api.mvc.Results.BadRequest
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import scala.concurrent.ExecutionContext
@@ -88,6 +89,35 @@ extends RequestAwareLogging:
       merge: MergeFormValue[R[B], T]
     ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ab
       .ensureValidFormGeneric[T](_ => form, (r: R[B]) => (f: Form[T]) => viewToServeWhenFormHasErrors(r)(f).pipe(BadRequest.apply)) //
+
+    def ensureValidFormAndRedirectIfSaveForLater[T](
+      form: R[B] => Form[T],
+      viewToServeWhenFormHasErrors: R[B] => Form[T] => HtmlFormat.Appendable
+    )(using
+      fb: FormBinding,
+      merge: MergeFormValue[R[B], T],
+      ev: B =:= AnyContent
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ab
+      .ensureValidFormGeneric[T](
+        form,
+        (r: R[B]) =>
+          (f: Form[T]) =>
+            viewToServeWhenFormHasErrors(r)(f)
+              .pipe(BadRequest.apply)
+              .pipe(SubmissionHelper.redirectIfSaveForLater(ev.substituteCo(r), _))
+      )
+
+    def ensureValidFormAndRedirectIfSaveForLater[T](
+      form: Form[T],
+      viewToServeWhenFormHasErrors: R[B] => Form[T] => HtmlFormat.Appendable
+    )(using
+      fb: FormBinding,
+      merge: MergeFormValue[R[B], T],
+      ev: B =:= AnyContent
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ab.ensureValidFormAndRedirectIfSaveForLater(
+      _ => form,
+      viewToServeWhenFormHasErrors
+    )
 
     def genericFilter(
       condition: R[B] => Boolean,

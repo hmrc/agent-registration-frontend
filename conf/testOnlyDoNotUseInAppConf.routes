@@ -27,3 +27,6 @@ GET         /agent-registration/test-only/add-partnership-type/:partnershipType 
 GET         /agent-registration/test-only/add-agent-applicationId/:agentApplicationId  uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.TestOnlyController.addAgentApplicationIdToSession(agentApplicationId: AgentApplicationId)
 
 GET         /agent-registration/test-only/get-link-id                uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.TestOnlyController.makeTestSubmittedApplication()
+
+GET        /agent-registration/test-only/fast-forward                             uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.FastForwardController.showFastForwardPage()
+GET        /agent-registration/test-only/fast-forward-to/:completedSection        uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.FastForwardController.fastForward(completedSection: CompletedSection)

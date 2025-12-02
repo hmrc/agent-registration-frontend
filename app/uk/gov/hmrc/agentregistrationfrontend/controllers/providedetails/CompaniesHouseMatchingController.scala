@@ -59,7 +59,9 @@ class CompaniesHouseMatchingController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions.getProvideDetailsInProgress
+  private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions
+    .Member
+    .getProvideDetailsInProgress
     .ensure(
       _.memberProvidedDetails.companiesHouseMatch.isDefined,
       implicit request =>

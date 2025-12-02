@@ -48,27 +48,32 @@ class TestOnlyController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  val showAgentApplication: Action[AnyContent] = actions.getApplicationInProgress: request =>
-    Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))
+  val showAgentApplication: Action[AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress: request =>
+      Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))
 
-  def setUploadToComplete(): Action[AnyContent] = actions.getApplicationInProgress.async:
-    implicit request =>
-      applicationService
-        .upsert(
-          request.agentApplication
-            .modify(_.amlsDetails.each.amlsEvidence)
-            .setTo(Some(UploadDetails(
-              reference = request.agentApplication.getAmlsDetails.getAmlsEvidence.reference,
-              status = UploadStatus.UploadedSuccessfully(
-                name = "test.pdf",
-                mimeType = "application/pdf",
-                downloadUrl = ObjectStoreUrl(uri"http://example.com/download"),
-                size = Some(12345),
-                checksum = "checksum"
-              )
-            )))
-        )
-        .map(_ => Ok("upload set to complete"))
+  def setUploadToComplete(): Action[AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress
+    .async:
+      implicit request =>
+        applicationService
+          .upsert(
+            request.agentApplication
+              .modify(_.amlsDetails.each.amlsEvidence)
+              .setTo(Some(UploadDetails(
+                reference = request.agentApplication.getAmlsDetails.getAmlsEvidence.reference,
+                status = UploadStatus.UploadedSuccessfully(
+                  name = "test.pdf",
+                  mimeType = "application/pdf",
+                  downloadUrl = ObjectStoreUrl(uri"http://example.com/download"),
+                  size = Some(12345),
+                  checksum = "checksum"
+                )
+              )))
+          )
+          .map(_ => Ok("upload set to complete"))
 
   def addAgentTypeToSession(
     agentType: AgentType

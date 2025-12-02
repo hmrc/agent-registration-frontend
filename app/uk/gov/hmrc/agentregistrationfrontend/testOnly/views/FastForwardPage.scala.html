@@ -1,0 +1,58 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.TestOnlyLink
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistration.shared.BusinessType
+@import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.FastForwardController
+@import sttp.model.Uri.UriContext
+@import uk.gov.hmrc.auth.core.AffinityGroup
+
+@this(
+    appConfig: AppConfig,
+    layout: Layout
+)
+
+@()(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@layout(
+    pageTitle = "Fast Forward",
+    suppressBackLink = true
+) {
+    <h1 class="govuk-heading-xl">Fast Forward to completed sections of applicant journey</h1>
+    <p class="govuk-body">
+        Use these links to fast forward through the journey to a specific section.
+        These links require you to log in using the correct credentials.
+    </p>
+    <p class="govuk-body">
+      <a class="govuk-link" href="@{appConfig.signInUri(uri"${appConfig.thisFrontendBaseUrl + uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.routes.FastForwardController.showFastForwardPage().url}", AffinityGroup.Agent)}">Log In</a>
+    </p>
+
+    <p class="govuk-body">
+        <h2 class="govuk-caption-xl">Limited Liability Partnership</h2>
+        <ul class="govuk-list govuk-list--bullet">
+            @FastForwardController.CompletedSection.CompletedSectionLlp.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
+              <li>
+                  <a class="govuk-link" href="@{uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.routes.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
+              </li>
+            }
+        </ul>
+    </p>
+}

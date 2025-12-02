@@ -52,6 +52,7 @@ extends FrontendController(mcc, actions):
     agentType: AgentType,
     businessType: BusinessType
   ): Action[AnyContent] = actions
+    .Applicant
     .authorised
     .ensureAsync(
       condition =
