@@ -54,7 +54,7 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "What is your telephone number? - Apply for an agent services account - GOV.UK"
 
-  s"POST $path with valid name should save data and redirect to check your answers" in:
+  s"POST $path with a valid number should save data and redirect to check your answers" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeTelephoneUpdate))
     AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvideDetails.afterTelephoneNumberProvided)
@@ -94,18 +94,18 @@ extends ControllerSpec:
     doc.title() shouldBe "Error: What is your telephone number? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#memberTelephoneNumber-error").text() shouldBe "Error: Enter a phone number, like 01632 960 001 or 07700 900 982"
 
-  s"POST $path with more than 25 characters should return 400" in:
+  s"POST $path with more than 24 characters should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeTelephoneUpdate))
     val response: WSResponse =
       post(path)(Map(
-        MemberTelephoneNumberForm.key -> Seq("2".repeat(26))
+        MemberTelephoneNumberForm.key -> Seq("2".repeat(25))
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: What is your telephone number? - Apply for an agent services account - GOV.UK"
-    doc.mainContent.select("#memberTelephoneNumber-error").text() shouldBe "Error: The phone number must be 25 characters or fewer"
+    doc.mainContent.select("#memberTelephoneNumber-error").text() shouldBe "Error: The phone number must be 24 characters or fewer"
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
     AuthStubs.stubAuthoriseIndividual()
