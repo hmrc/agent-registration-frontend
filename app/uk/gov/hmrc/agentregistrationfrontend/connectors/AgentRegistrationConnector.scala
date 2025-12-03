@@ -20,9 +20,9 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.given
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistration.shared._
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
@@ -49,68 +49,105 @@ extends RequestAwareLogging:
 
   def findApplication()(using
     request: AuthorisedRequest[?]
-  ): Future[Option[AgentApplication]] = httpClient
-    .get(url"$baseUrl/application")
-    .execute[HttpResponse]
-    .map { response =>
-      response.status match {
-        case Status.OK => Some(response.json.as[AgentApplication])
-        case Status.NO_CONTENT => None
-        case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
+  ): Future[Option[AgentApplication]] = {
+    val url = url"$baseUrl/application"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map { response =>
+        response.status match {
+          case Status.OK => Some(response.json.as[AgentApplication])
+          case Status.NO_CONTENT => None
+          case other =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = other,
+              response = response,
+              info = "findApplication problem"
+            )
+        }
       }
-    }
+  }
 
   def upsertApplication(application: AgentApplication)(using
     request: RequestHeader
-  ): Future[Unit] = httpClient
-    .post(url"$baseUrl/application")
-    .withBody(Json.toJson(application))
-    .execute[HttpResponse]
-    .map { response =>
-      response.status match {
-        case Status.OK => ()
-        case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
-      }
-    }
+  ): Future[Unit] =
+    val url = url"$baseUrl/application"
+    httpClient
+      .post(url)
+      .withBody(Json.toJson(application))
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => ()
+          case other =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = other,
+              response = response,
+              info = "upsertApplication problem"
+            )
 
   def findApplication(linkId: LinkId)(using
     request: RequestHeader
-  ): Future[Option[AgentApplication]] = httpClient
-    .get(url"$baseUrl/application/linkId/${linkId.value}")
-    .execute[HttpResponse]
-    .map { response =>
-      response.status match {
-        case Status.OK => Some(response.json.as[AgentApplication])
-        case Status.NO_CONTENT => None
-        case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
-      }
-    }
+  ): Future[Option[AgentApplication]] =
+    val url = url"$baseUrl/application/linkId/${linkId.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => Some(response.json.as[AgentApplication])
+          case Status.NO_CONTENT => None
+          case other =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = other,
+              response = response,
+              info = s"findApplication by $linkId problem"
+            )
 
   def findApplication(agentApplicationId: AgentApplicationId)(using
     request: RequestHeader
-  ): Future[Option[AgentApplication]] = httpClient
-    .get(url"$baseUrl/application/by-agent-application-id/${agentApplicationId.value}")
-    .execute[HttpResponse]
-    .map { response =>
-      response.status match {
-        case Status.OK => Some(response.json.as[AgentApplication])
-        case Status.NO_CONTENT => None
-        case other =>
-          Errors.throwServerErrorException(s"Unexpected status when searching by AgentApplicationId $agentApplicationId in the http response: $other.")
-      }
-    }
+  ): Future[Option[AgentApplication]] =
+    val url = url"$baseUrl/application/by-agent-application-id/${agentApplicationId.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => Some(response.json.as[AgentApplication])
+          case Status.NO_CONTENT => None
+          case other =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = other,
+              response = response,
+              info = s"findApplication by $agentApplicationId problem"
+            )
 
   def getBusinessPartnerRecord(utr: Utr)(using
     request: RequestHeader
-  ): Future[Option[BusinessPartnerRecordResponse]] = httpClient
-    .get(url"$baseUrl/business-partner-record/utr/${utr.value}")
-    .execute[HttpResponse]
-    .map { response =>
-      response.status match {
-        case Status.OK => Some(response.json.as[BusinessPartnerRecordResponse])
-        case Status.NO_CONTENT => None
-        case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
-      }
-    }
+  ): Future[Option[BusinessPartnerRecordResponse]] =
+    val url = url"$baseUrl/business-partner-record/utr/${utr.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => Some(response.json.as[BusinessPartnerRecordResponse])
+          case Status.NO_CONTENT => None
+          case other =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = other,
+              response = response,
+              info = s"getBusinessPartnerRecord problem"
+            )
 
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration"

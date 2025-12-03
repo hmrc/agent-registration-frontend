@@ -16,34 +16,27 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers
 
-import com.softwaremill.quicklens.*
-import play.api.libs.json.Json
-import play.api.mvc.Action
-import play.api.mvc.AnyContent
-import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.PathBindable
-import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
-import uk.gov.hmrc.agentregistration.shared.AgentType
-import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.upscan.*
-import uk.gov.hmrc.agentregistration.shared.util.EnumValues
+import play.api.mvc.*
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
 import uk.gov.hmrc.agentregistration.shared.util.SealedObjects
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.FastForwardController.CompletedSection
 import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.FastForwardController.CompletedSection.CompletedSectionLlp
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.TestOnlyLink
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.services.TestApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.FastForwardController.CompletedSection.CompletedSectionSoleTrader
 import uk.gov.hmrc.agentregistrationfrontend.testOnly.views.html.FastForwardPage
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.views.html.TestLinkPage
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
+import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
+import java.time.Clock
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.Future
+import scala.util.chaining.scalaUtilChainingOps
 
 object FastForwardController:
 
@@ -94,14 +87,14 @@ object FastForwardController:
       extends CompletedSectionLlp:
 
         override def sectionName: String = "HMRC standard for agents"
-        override def alreadyDeveloped: Boolean = false
+        override def alreadyDeveloped: Boolean = true
         override def displayOrder: Int = 5
 
       case object LlpDeclaration
       extends CompletedSectionLlp:
 
         override def sectionName: String = "Declaration"
-        override def alreadyDeveloped: Boolean = false
+        override def alreadyDeveloped: Boolean = true
         override def displayOrder: Int = 6
 
       val values: Seq[CompletedSectionLlp] = SealedObjects.all[CompletedSectionLlp]
@@ -116,7 +109,7 @@ object FastForwardController:
       extends CompletedSectionSoleTrader:
 
         override def sectionName: String = "About your business"
-        override def alreadyDeveloped: Boolean = false
+        override def alreadyDeveloped: Boolean = true
         override def displayOrder: Int = 1
 
     val values: Seq[CompletedSection] = SealedObjects.all[CompletedSection]
@@ -127,12 +120,14 @@ class FastForwardController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   applicationService: AgentApplicationService,
-  testApplicationService: TestApplicationService,
-  fastForwardPage: FastForwardPage
-)
+  fastForwardPage: FastForwardPage,
+  agentApplicationIdGenerator: AgentApplicationIdGenerator,
+  linkIdGenerator: LinkIdGenerator,
+  simplePage: SimplePage
+)(using clock: Clock)
 extends FrontendController(mcc, actions):
 
-  def showFastForwardPage: Action[AnyContent] = actions.action { implicit request =>
+  def show: Action[AnyContent] = actions.action { implicit request =>
     Ok(fastForwardPage())
   }
 
@@ -140,14 +135,44 @@ extends FrontendController(mcc, actions):
     completedSection: CompletedSection
   ): Action[AnyContent] =
     completedSection match
-      case c: CompletedSectionLlp =>
-        actions.Applicant.authorised { implicit request =>
-          handleCompletedSectionLlp(c)
+      case c: CompletedSectionLlp => actions.Applicant.authorised.async(handleCompletedSectionLlp(c)(using _, summon))
+      case c: CompletedSectionSoleTrader =>
+        actions.action { implicit request =>
+          Ok(simplePage(
+            h1 = "Sole Trader Task List Page",
+            bodyText = Some("Fast Forwarding to Sole Trader Task List Page isn't implemented yet")
+          ))
         }
+      // TODO: other business types
 
-  def handleCompletedSectionLlp(c: CompletedSectionLlp) = ???
+  private def handleCompletedSectionLlp(completedSection: CompletedSectionLlp)(using
+    r: AuthorisedRequest[AnyContent],
+    clock: Clock
+  ): Future[Result] =
+    (completedSection match
+      case CompletedSectionLlp.LlpAboutYourBusiness => TestOnlyData.agentApplicationLlp.afterGrsDataReceived
+      case CompletedSectionLlp.LlpApplicantContactDetails => TestOnlyData.agentApplicationLlp.afterContactDetailsComplete
+      case CompletedSectionLlp.LlpAgentServicesAccountDetails => TestOnlyData.agentApplicationLlp.afterAgentDetailsComplete
+      case CompletedSectionLlp.LlpAntiMoneyLaunderingSupervisionDetails => TestOnlyData.agentApplicationLlp.afterAmlsComplete
+      case CompletedSectionLlp.LlpHmrcStandardForAgents => TestOnlyData.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
+      case CompletedSectionLlp.LlpDeclaration => TestOnlyData.agentApplicationLlp.afterDeclarationSubmitted
+    )
+      .pipe(updateIdentifiers(_))
+      .flatMap(applicationService.upsert)
+      .map(_ => Redirect(AppRoutes.apply.TaskListController.show))
 
-//    completedSection match
-//      case CompletedSection.CompletedSectionLlp.LlpAboutYourBusiness =>
-//        Ok("LlpAboutYourBusiness Todo")
-//      case _ => Ok("This section is not developed yet")
+  private def updateIdentifiers(agentApplication: AgentApplicationLlp)(using
+    r: AuthorisedRequest[AnyContent],
+    clock: Clock
+  ): Future[AgentApplicationLlp] =
+    val identifiers: Future[(AgentApplicationId, LinkId)] = applicationService.find().map:
+      case Some(existingApplication) => (existingApplication.agentApplicationId, existingApplication.linkId)
+      case None => (agentApplicationIdGenerator.nextApplicationId(), linkIdGenerator.nextLinkId())
+    identifiers.map: t =>
+      agentApplication.copy(
+        _id = t._1,
+        internalUserId = r.internalUserId,
+        linkId = t._2,
+        groupId = r.groupId,
+        createdAt = Instant.now(clock)
+      )

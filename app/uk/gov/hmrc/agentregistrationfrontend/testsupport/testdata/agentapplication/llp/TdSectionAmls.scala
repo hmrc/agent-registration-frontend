@@ -25,7 +25,6 @@ import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
 import uk.gov.hmrc.agentregistration.shared.upscan.Reference
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.RichMatchers.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
 import java.time.LocalDate
@@ -87,7 +86,7 @@ trait TdSectionAmls {
 
           def afterRegistrationNumberProvided: AmlsDetails = afterSupervisoryBodySelected.copy(
             amlsRegistrationNumber = Some(amlsRegistrationNumber)
-          ).tap(_.isComplete shouldBe true withClue "when HMRC - no evidence or expiry date is required to be considered complete")
+          ).tap(x => require(x.isComplete, "when HMRC - no evidence or expiry date is required to be considered complete"))
 
         def afterSupervisoryBodySelected: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterSupervisoryBodySelected))
 
@@ -95,7 +94,7 @@ trait TdSectionAmls {
           Some(amlsDetailsHelper.afterRegistrationNumberProvided)
         )
 
-        def complete: AgentApplicationLlp = afterRegistrationNumberProvided.tap(_.amlsDetails.value.isComplete shouldBe true withClue "sanity check")
+        def complete: AgentApplicationLlp = afterRegistrationNumberProvided.tap(x => require(x.amlsDetails.exists(_.isComplete), "sanity check"))
 
       object whenSupervisorBodyIsNonHmrc:
 
@@ -142,6 +141,6 @@ trait TdSectionAmls {
 
         def afterUploadSucceded: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadSucceded))
 
-        def complete: AgentApplicationLlp = afterUploadSucceded.tap(_.amlsDetails.value.isComplete shouldBe true withClue "sanity check")
+        def complete: AgentApplicationLlp = afterUploadSucceded.tap(x => require(x.amlsDetails.exists(_.isComplete), "sanity check"))
 
 }
