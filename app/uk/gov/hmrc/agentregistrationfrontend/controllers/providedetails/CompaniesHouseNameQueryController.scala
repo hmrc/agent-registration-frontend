@@ -42,7 +42,9 @@ class CompaniesHouseNameQueryController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getProvideDetailsInProgress
+  def show: Action[AnyContent] = actions
+    .Member
+    .getProvideDetailsInProgress
     .async:
       implicit request =>
         agentApplicationService
@@ -66,7 +68,9 @@ extends FrontendController(mcc, actions):
               logger.warn(s"Attempt to access Companies House name query page for application that does not exist")
               Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
 
-  def submit: Action[AnyContent] = actions.getProvideDetailsInProgress
+  def submit: Action[AnyContent] = actions
+    .Member
+    .getProvideDetailsInProgress
     .async:
       implicit request =>
         CompaniesHouseNameQueryForm.form

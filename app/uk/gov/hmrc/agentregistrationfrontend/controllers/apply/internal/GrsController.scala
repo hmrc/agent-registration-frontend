@@ -51,6 +51,7 @@ class GrsController @Inject() (
 extends FrontendController(mcc, actions):
 
   val baseAction = actions
+    .Applicant
     .getApplicationInProgress
     .ensure(
       condition = !_.agentApplication.isGrsDataReceived,

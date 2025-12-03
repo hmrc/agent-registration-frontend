@@ -1,6 +1,7 @@
 import play.sbt.PlayRunHook
 
 object PlayRunHook {
+
   def apply(httpPort: Int): PlayRunHook = {
     new PlayRunHook {
 
@@ -13,6 +14,7 @@ object PlayRunHook {
   private def printLinksForConvenience(httpPort: Int): Unit = {
     println(s"http://localhost:$httpPort/agent-registration")
     println(s"http://localhost:$httpPort/agent-registration/test-only/show-agent-application")
+    println(s"http://localhost:$httpPort/agent-registration/test-only/fast-forward")
     println(s"http://localhost:$httpPort/agent-registration/apply")
   }
 }

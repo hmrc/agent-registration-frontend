@@ -34,6 +34,8 @@ class SaveForLaterController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getApplicationInProgress:
-    implicit request =>
-      Ok(saveForLaterPage())
+  def show: Action[AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress:
+      implicit request =>
+        Ok(saveForLaterPage())

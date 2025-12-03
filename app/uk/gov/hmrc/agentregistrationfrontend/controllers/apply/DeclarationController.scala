@@ -47,6 +47,7 @@ class DeclarationController @Inject() (
 extends FrontendController(mcc, actions):
 
   private val baseAction = actions
+    .Applicant
     .getApplicationInProgress
     .ensure(
       _.agentApplication.asLlpApplication.taskListStatus.declaration.canStart,

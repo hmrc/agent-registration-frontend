@@ -50,7 +50,8 @@ extends FrontendController(mcc, actions):
   def initiateMemberProvideDetails(
     linkId: LinkId
   ): Action[AnyContent] = actions
-    .authorisedIndividualWithIdentifiers
+    .Member
+    .authorisedWithIdentifiers
     .async:
       implicit request: IndividualAuthorisedWithIdentifiersRequest[AnyContent] =>
 

@@ -54,6 +54,7 @@ class AmlsEvidenceUploadController @Inject() (
 extends FrontendController(mcc, actions):
 
   val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+    .Applicant
     .getApplicationInProgress
     .ensure(
       _.agentApplication.amlsDetails.exists(!_.isHmrc),
@@ -105,21 +106,25 @@ extends FrontendController(mcc, actions):
     errorMessage: String,
     errorRequestId: String,
     key: String
-  ): Action[AnyContent] = actions.getApplicationInProgress:
-    implicit request =>
-      Ok(errorView(
-        pageTitle = "Upload Error",
-        heading = "Upload Error",
-        message = s"$errorMessage, Code: $errorCode, RequestId: $errorRequestId, FileReference: $key"
-      ))
+  ): Action[AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress:
+      implicit request =>
+        Ok(errorView(
+          pageTitle = "Upload Error",
+          heading = "Upload Error",
+          message = s"$errorMessage, Code: $errorCode, RequestId: $errorRequestId, FileReference: $key"
+        ))
 
-  def showResult: Action[AnyContent] = actions.getApplicationInProgress:
-    implicit request =>
-      Ok(progressView(request
-        .agentApplication
-        .getAmlsDetails
-        .getAmlsEvidence
-        .status))
+  def showResult: Action[AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress:
+      implicit request =>
+        Ok(progressView(request
+          .agentApplication
+          .getAmlsDetails
+          .getAmlsEvidence
+          .status))
 
   private val corsHeaders: Seq[(String, String)] = Seq(
     "Access-Control-Allow-Origin" -> appConfig.allowedCorsOrigin,
@@ -128,15 +133,17 @@ extends FrontendController(mcc, actions):
   )
 
   // this method returns a status code only for AJAX polling
-  def pollResultWithJavaScript: Action[AnyContent] = actions.getApplicationInProgress:
-    implicit request =>
-      request
-        .agentApplication.asLlpApplication
-        .getAmlsDetails
-        .getAmlsEvidence
-        .status match {
-        case UploadStatus.InProgress => NoContent.withHeaders(corsHeaders*)
-        case _: UploadStatus.UploadedSuccessfully => Accepted.withHeaders(corsHeaders*)
-        case failed: UploadStatus.Failed if failed.failureReason == "QUARANTINE" => Conflict.withHeaders(corsHeaders*)
-        case _: UploadStatus.Failed => BadRequest.withHeaders(corsHeaders*)
-      }
+  def pollResultWithJavaScript: Action[AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress:
+      implicit request =>
+        request
+          .agentApplication.asLlpApplication
+          .getAmlsDetails
+          .getAmlsEvidence
+          .status match {
+          case UploadStatus.InProgress => NoContent.withHeaders(corsHeaders*)
+          case _: UploadStatus.UploadedSuccessfully => Accepted.withHeaders(corsHeaders*)
+          case failed: UploadStatus.Failed if failed.failureReason == "QUARANTINE" => Conflict.withHeaders(corsHeaders*)
+          case _: UploadStatus.Failed => BadRequest.withHeaders(corsHeaders*)
+        }

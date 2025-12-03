@@ -29,6 +29,7 @@ import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
 
+import java.net.URL
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
@@ -50,20 +51,20 @@ extends RequestAwareLogging:
 
   def checkEmailVerificationStatus(credId: String)(using
     rh: RequestHeader
-  ): Future[VerificationStatusResponse] = http
-    .get(url"${appConfig.emailVerificationBaseUrl}/email-verification/verification-status/$credId")
-    .execute[HttpResponse]
-    .map { response =>
-      response.status match {
-        case 200 => response.json.as[VerificationStatusResponse]
-        case 404 => VerificationStatusResponse(List.empty)
-        case status =>
-          logger.error(s"email verification status error for $credId; HTTP status: $status, message: $response")
-          Errors.throwUpstreamErrorResponse(
-            httpMethod = "GET",
-            url = s"${appConfig.emailVerificationBaseUrl}/email-verification/verification-status/$credId",
-            status = status,
-            response = response
-          )
-      }
-    }
+  ): Future[VerificationStatusResponse] =
+    val url: URL = url"${appConfig.emailVerificationBaseUrl}/email-verification/verification-status/$credId"
+    http
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case 200 => response.json.as[VerificationStatusResponse]
+          case 404 => VerificationStatusResponse(List.empty)
+          case status =>
+            logger.error(s"email verification status error for $credId; HTTP status: $status, message: $response")
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )

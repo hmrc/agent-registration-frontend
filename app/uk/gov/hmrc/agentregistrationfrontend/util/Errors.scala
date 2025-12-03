@@ -25,6 +25,7 @@ import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.http.UpstreamErrorResponse
 
+import java.net.URL
 import scala.concurrent.Future
 
 object Errors
@@ -85,17 +86,19 @@ extends RequestAwareLogging:
 
   def throwUpstreamErrorResponse(
     httpMethod: String,
-    url: String,
+    url: URL,
     status: Int,
-    response: => HttpResponse
+    response: => HttpResponse,
+    info: String = ""
   ): Nothing =
     throw UpstreamErrorResponse(
-      message = httpErrorFunctions.upstreamResponseMessage(
-        httpMethod,
-        url,
-        status,
-        response.body
-      ),
+      message =
+        info + "; " + httpErrorFunctions.upstreamResponseMessage(
+          httpMethod,
+          url.toString,
+          status,
+          response.body
+        ),
       statusCode = status,
       reportAs =
         if status === Status.BAD_GATEWAY

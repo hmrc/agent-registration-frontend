@@ -36,29 +36,36 @@ class AgentApplicationController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def landing: Action[AnyContent] = actions.getApplicationInProgress:
-    implicit request =>
-      // until we have more than the registration journey just go to the task list
-      // which will redirect to the start of registration if needed
-      Redirect(routes.TaskListController.show)
+  def landing: Action[AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress:
+      implicit request =>
+        // until we have more than the registration journey just go to the task list
+        // which will redirect to the start of registration if needed
+        Redirect(routes.TaskListController.show)
 
-  def applicationDashboard: Action[AnyContent] = actions.getApplicationInProgress.async { implicit request =>
-    Future.successful(Ok(simplePage(
-      h1 = "Application Dashboard page...",
-      bodyText = Some(
-        "Placeholder for the Application Dashboard page..."
-      )
-    )))
-  }
+  def applicationDashboard: Action[AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress
+    .async { implicit request =>
+      Future.successful(Ok(simplePage(
+        h1 = "Application Dashboard page...",
+        bodyText = Some(
+          "Placeholder for the Application Dashboard page..."
+        )
+      )))
+    }
 
-  def applicationSubmitted: Action[AnyContent] = actions.getApplicationSubmitted.async { implicit request =>
-    Future.successful(Ok(simplePage(
-      h1 = "Application Submitted...",
-      bodyText = Some(
-        "Placeholder for the Application Submitted page..."
-      )
-    )))
-  }
+  def applicationSubmitted: Action[AnyContent] = actions
+    .Applicant
+    .getApplicationSubmitted.async { implicit request =>
+      Future.successful(Ok(simplePage(
+        h1 = "Application Submitted...",
+        bodyText = Some(
+          "Placeholder for the Application Submitted page..."
+        )
+      )))
+    }
 
   def startRegistration: Action[AnyContent] = action:
     implicit request =>

@@ -47,17 +47,20 @@ class ApplicantRoleInLlpController @Inject() (
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getApplicationInProgress:
-    implicit request =>
-      val form: Form[ApplicantRoleInLlp] = ApplicantRoleInLlpForm.form.fill:
-        request
-          .agentApplication
-          .asLlpApplication
-          .applicantContactDetails.map(_.applicantName.role)
-      Ok(view(form))
+  def show: Action[AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress:
+      implicit request =>
+        val form: Form[ApplicantRoleInLlp] = ApplicantRoleInLlpForm.form.fill:
+          request
+            .agentApplication
+            .asLlpApplication
+            .applicantContactDetails.map(_.applicantName.role)
+        Ok(view(form))
 
   def submit: Action[AnyContent] =
     actions
+      .Applicant
       .getApplicationInProgress
       .ensureValidFormAndRedirectIfSaveForLater(ApplicantRoleInLlpForm.form, implicit r => view(_))
       .async:

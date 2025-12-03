@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend
+package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-object RoutesExports:
-
-  export uk.gov.hmrc.agentregistration.shared.BusinessType
-  export uk.gov.hmrc.agentregistration.shared.AgentType
-  export uk.gov.hmrc.agentregistration.shared.LinkId
-  export uk.gov.hmrc.agentregistration.shared.AgentApplicationId
-  export uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
-  export uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.FastForwardController.CompletedSection
+object TestOnlyData
+extends TdBase,
+  TdGrs,
+  agentapplication.llp.TdAgentApplicationLlp,
+  agentapplication.llp.TdSectionContactDetails,
+  agentapplication.llp.TdSectionAgentDetails,
+  agentapplication.llp.TdSectionAmls,
+  agentapplication.soletrader.TdAgentApplicationSoleTrader,
+  providedetails.member.TdMemberProvidedDetails

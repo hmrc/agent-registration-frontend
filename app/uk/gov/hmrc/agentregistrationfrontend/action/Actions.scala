@@ -16,12 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action
 
-import play.api.data.Form
-import play.api.data.FormBinding
 import play.api.mvc.*
-import play.api.mvc.Results.BadRequest
 import play.api.mvc.Results.Redirect
-import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedAction
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersAction
@@ -29,13 +25,12 @@ import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAut
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.ProvideDetailsAction
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
-import scala.util.chaining.scalaUtilChainingOps
 
 @Singleton
 class Actions @Inject() (
@@ -52,71 +47,80 @@ extends RequestAwareLogging:
 
   val action: ActionBuilder[Request, AnyContent] = actionBuilder
 
-  val authorised: ActionBuilder[AuthorisedRequest, AnyContent] = action
-    .andThen(authorisedAction)
+  object Applicant:
 
-  val getApplicationInProgress: ActionBuilder[AgentApplicationRequest, AnyContent] = authorised
-    .andThen(agentApplicationAction)
-    .ensure(
-      condition = _.agentApplication.isInProgress,
-      resultWhenConditionNotMet =
-        implicit request =>
-          // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-          val call = AppRoutes.apply.AgentApplicationController.applicationSubmitted
-          logger.warn(
-            s"The application is not in the final state" +
-              s" (current application state: ${request.agentApplication.applicationState.toString}), " +
-              s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
-          )
-          Redirect(call.url)
-    )
+    val authorised: ActionBuilder[AuthorisedRequest, AnyContent] = action
+      .andThen(authorisedAction)
 
-  val getApplicationSubmitted: ActionBuilder[AgentApplicationRequest, AnyContent] = authorised
-    .andThen(agentApplicationAction)
-    .ensure(
-      condition = (r: AgentApplicationRequest[?]) => r.agentApplication.hasFinished,
-      resultWhenConditionNotMet =
-        implicit request =>
-          // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-          val call = AppRoutes.apply.AgentApplicationController.landing // or task list
-          logger.warn(
-            s"The application is not in the final state" +
-              s" (current application state: ${request.agentApplication.applicationState.toString}), " +
-              s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
-          )
-          Redirect(call.url)
-    )
-
-  extension [
-    R <: [X] =>> Request[X]
-  ](ab: ActionBuilder[R, AnyContent])(using ec: ExecutionContext)
-
-    def ensureValidFormAndRedirectIfSaveForLater[T](
-      form: R[AnyContent] => Form[T],
-      viewToServeWhenFormHasErrors: R[AnyContent] => Form[T] => HtmlFormat.Appendable
-    )(using
-      fb: FormBinding,
-      merge: MergeFormValue[R[AnyContent], T]
-    ): ActionBuilder[[X] =>> R[X] & FormValue[T], AnyContent] = ab
-      .ensureValidFormGeneric[T](
-        form,
-        (r: R[AnyContent]) =>
-          (f: Form[T]) =>
-            viewToServeWhenFormHasErrors(r)(f)
-              .pipe(BadRequest.apply)
-              .pipe(SubmissionHelper.redirectIfSaveForLater(r, _))
+    val getApplicationInProgress: ActionBuilder[AgentApplicationRequest, AnyContent] = authorised
+      .andThen(agentApplicationAction)
+      .ensure(
+        condition = _.agentApplication.isInProgress,
+        resultWhenConditionNotMet =
+          implicit request =>
+            // TODO: this is a temporary solution and should be revisited once we have full journey implemented
+            val call = AppRoutes.apply.AgentApplicationController.applicationSubmitted
+            logger.warn(
+              s"The application is not in the final state" +
+                s" (current application state: ${request.agentApplication.applicationState.toString}), " +
+                s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
+            )
+            Redirect(call.url)
       )
 
-    def ensureValidFormAndRedirectIfSaveForLater[T](
-      form: Form[T],
-      viewToServeWhenFormHasErrors: R[AnyContent] => Form[T] => HtmlFormat.Appendable
-    )(using
-      fb: FormBinding,
-      merge: MergeFormValue[R[AnyContent], T]
-    ): ActionBuilder[[X] =>> R[X] & FormValue[T], AnyContent] = ab.ensureValidFormAndRedirectIfSaveForLater(
-      _ => form,
-      viewToServeWhenFormHasErrors
-    )
+    val getApplicationSubmitted: ActionBuilder[AgentApplicationRequest, AnyContent] = authorised
+      .andThen(agentApplicationAction)
+      .ensure(
+        condition = (r: AgentApplicationRequest[?]) => r.agentApplication.hasFinished,
+        resultWhenConditionNotMet =
+          implicit request =>
+            // TODO: this is a temporary solution and should be revisited once we have full journey implemented
+            val call = AppRoutes.apply.AgentApplicationController.landing // or task list
+            logger.warn(
+              s"The application is not in the final state" +
+                s" (current application state: ${request.agentApplication.applicationState.toString}), " +
+                s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
+            )
+            Redirect(call.url)
+      )
+
+  object Member:
+
+    val authorised: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
+      .andThen(individualAuthorisedAction)
+
+    val authorisedWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = action
+      .andThen(individualAuthorisedWithIdentifiersAction)
+
+    val getProvideDetailsInProgress: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorised
+      .andThen(provideDetailsAction)
+      .ensure(
+        condition = _.memberProvidedDetails.isInProgress,
+        resultWhenConditionNotMet =
+          implicit request =>
+            val mpdGenericExitPage = AppRoutes.providedetails.ExitController.genericExitPage
+            logger.warn(
+              s"The provided details are not in the final state" +
+                s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +
+                s"redirecting to [${mpdGenericExitPage.url}]."
+            )
+            Redirect(mpdGenericExitPage.url)
+      )
+
+    val getSubmitedDetailsInProgress: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorised
+      .andThen(provideDetailsAction)
+      .ensure(
+        condition = _.memberProvidedDetails.hasFinished,
+        resultWhenConditionNotMet =
+          implicit request =>
+            val mpdGenericExitPage = AppRoutes.providedetails.ExitController.genericExitPage
+            logger.warn(
+              s"The provided details are in the final state" +
+                s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +
+                s"redirecting to [${mpdGenericExitPage.url}]."
+            )
+            Redirect(mpdGenericExitPage.url)
+      )
 
   extension (a: Action[AnyContent])
     /** Modifies the action result to handle "Save and Come Back Later" functionality. If the form submission contains a "Save and Come Back Later" action,
@@ -126,40 +130,4 @@ extends RequestAwareLogging:
       originalResult =>
         if SubmissionHelper.getSubmitAction(request).isSaveAndComeBackLater then Redirect(AppRoutes.apply.SaveForLaterController.show)
         else originalResult
-    )
-
-  val authorisedIndividual: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
-    .andThen(individualAuthorisedAction)
-
-  val authorisedIndividualWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = action
-    .andThen(individualAuthorisedWithIdentifiersAction)
-
-  val getProvideDetailsInProgress: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorisedIndividual
-    .andThen(provideDetailsAction)
-    .ensure(
-      condition = _.memberProvidedDetails.isInProgress,
-      resultWhenConditionNotMet =
-        implicit request =>
-          val mpdGenericExitPage = AppRoutes.providedetails.ExitController.genericExitPage
-          logger.warn(
-            s"The provided details are not in the final state" +
-              s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +
-              s"redirecting to [${mpdGenericExitPage.url}]."
-          )
-          Redirect(mpdGenericExitPage.url)
-    )
-
-  val getSubmitedDetailsInProgress: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorisedIndividual
-    .andThen(provideDetailsAction)
-    .ensure(
-      condition = _.memberProvidedDetails.hasFinished,
-      resultWhenConditionNotMet =
-        implicit request =>
-          val mpdGenericExitPage = AppRoutes.providedetails.ExitController.genericExitPage
-          logger.warn(
-            s"The provided details are in the final state" +
-              s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +
-              s"redirecting to [${mpdGenericExitPage.url}]."
-          )
-          Redirect(mpdGenericExitPage.url)
     )
