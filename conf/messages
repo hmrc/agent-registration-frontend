@@ -387,7 +387,7 @@ memberTelephoneNumber.error.invalid = Enter a phone number, like 01632 960 001 o
 memberTelephoneNumber.error.tooLong = The phone number must be 25 characters or fewer
 
 ## Member Nino
-memberNino.title = What business name will you use for clients?
+memberNino.title = Do you have a National Insurance number?
 memberNino.hasNino.yes = Yes
 memberNino.hasNino.no = No
 memberNino.hasNino.title = Do you have a National Insurance number?
@@ -398,7 +398,7 @@ memberNino.nino.error.required = Enter your National Insurance number
 memberNino.nino.hint = For example, QQ 12 34 56 C.
 
 ## Member SA UTR
-memberSaUtr.title = LLP member confirmation
+memberSaUtr.title = Do you have a Self Assessment Unique Taxpayer Reference?
 memberSaUtr.hasSaUtr.title = Do you have a Self Assessment Unique Taxpayer Reference?
 memberSaUtr.hasSaUtr.yes = Yes
 memberSaUtr.hasSaUtr.no = No

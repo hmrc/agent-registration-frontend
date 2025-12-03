@@ -29,7 +29,6 @@ import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberPro
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.MemberNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberNinoPage
 
 import javax.inject.Inject
@@ -71,7 +70,7 @@ extends FrontendController(mcc, actions):
   def submit: Action[AnyContent] = baseAction
     .ensureValidForm[MemberNino](
       MemberNinoForm.form,
-      implicit request => formWithErrors => Errors.throwBadRequestException(s"Unexpected errors in the FormType: $formWithErrors")
+      implicit r => view(_)
     )
     .async:
       implicit request: (MemberProvideDetailsRequest[AnyContent] & FormValue[MemberNino]) =>
