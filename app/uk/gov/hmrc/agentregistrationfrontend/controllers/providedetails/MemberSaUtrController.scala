@@ -68,19 +68,21 @@ extends FrontendController(mcc, actions):
               .memberSauUtr
       ))
 
-  def submit: Action[AnyContent] = baseAction
-    .ensureValidForm[MemberSaUtr](
-      MemberSaUtrForm.form,
-      implicit r => view(_)
-    )
-    .async:
-      implicit request: (MemberProvideDetailsRequest[AnyContent] & FormValue[MemberSaUtr]) =>
-        val validFormData: MemberSaUtr = request.formValue
-        val updatedApplication: MemberProvidedDetails = request
-          .memberProvidedDetails
-          .modify(_.memberSauUtr)
-          .setTo(Some(validFormData))
-        memberProvideDetailsService
-          .upsert(updatedApplication)
-          .map: _ =>
-            Redirect(routes.MemberApproveApplicantController.show.url)
+  def submit: Action[AnyContent] =
+    baseAction
+      .ensureValidFormAndRedirectIfSaveForLater[MemberSaUtr](
+        MemberSaUtrForm.form,
+        implicit r => view(_)
+      )
+      .async:
+        implicit request: (MemberProvideDetailsRequest[AnyContent] & FormValue[MemberSaUtr]) =>
+          val validFormData: MemberSaUtr = request.formValue
+          val updatedApplication: MemberProvidedDetails = request
+            .memberProvidedDetails
+            .modify(_.memberSauUtr)
+            .setTo(Some(validFormData))
+          memberProvideDetailsService
+            .upsert(updatedApplication)
+            .map: _ =>
+              Redirect(routes.MemberApproveApplicantController.show.url)
+      .redirectIfSaveForLater

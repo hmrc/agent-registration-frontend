@@ -67,19 +67,21 @@ extends FrontendController(mcc, actions):
               .memberNino
       ))
 
-  def submit: Action[AnyContent] = baseAction
-    .ensureValidForm[MemberNino](
-      MemberNinoForm.form,
-      implicit r => view(_)
-    )
-    .async:
-      implicit request: (MemberProvideDetailsRequest[AnyContent] & FormValue[MemberNino]) =>
-        val validFormData: MemberNino = request.formValue
-        val updatedApplication: MemberProvidedDetails = request
-          .memberProvidedDetails
-          .modify(_.memberNino)
-          .setTo(Some(validFormData))
-        memberProvideDetailsService
-          .upsert(updatedApplication)
-          .map: _ =>
-            Redirect(routes.MemberSaUtrController.show.url)
+  def submit: Action[AnyContent] =
+    baseAction
+      .ensureValidFormAndRedirectIfSaveForLater[MemberNino](
+        MemberNinoForm.form,
+        implicit r => view(_)
+      )
+      .async:
+        implicit request: (MemberProvideDetailsRequest[AnyContent] & FormValue[MemberNino]) =>
+          val validFormData: MemberNino = request.formValue
+          val updatedApplication: MemberProvidedDetails = request
+            .memberProvidedDetails
+            .modify(_.memberNino)
+            .setTo(Some(validFormData))
+          memberProvideDetailsService
+            .upsert(updatedApplication)
+            .map: _ =>
+              Redirect(routes.MemberSaUtrController.show.url)
+      .redirectIfSaveForLater
