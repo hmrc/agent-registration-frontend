@@ -203,6 +203,7 @@ otherAgentEmailAddress.error.tooLong = The email address must be 132 characters 
 agentCorrespondenceAddress.title = What correspondence address should we use for your agent services account?
 agentCorrespondenceAddress.chro.hint = This is your Companies House registered office address.
 agentCorrespondenceAddress.bpr.hint = This is the address HMRC has in your business record.
+agentCorrespondenceAddress.existingOther.hint = This is the address you have given us.
 agentCorrespondenceAddress.other = Something else
 agentCorrespondenceAddress.error.required = Enter the correspondence address you want to use on your agent services account
 
