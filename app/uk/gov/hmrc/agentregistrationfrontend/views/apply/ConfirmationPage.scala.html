@@ -1,0 +1,98 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.components.CopyButton
+@import views.html.helper.CSPNonce
+
+@this(
+        appConfig: AppConfig,
+        layout: Layout,
+        govukPanel: GovukPanel,
+        copyButton: CopyButton
+)
+
+@(
+        entityName: String
+)(implicit
+        request: AgentApplicationRequest[?],
+        messages: Messages
+)
+
+@key = @{"confirmation"}
+@pageTitle = @{messages(s"$key.title")}
+@provideDetailsLink = @{appConfig.applicationLink(request.agentApplication.linkId.value).toString}
+@applicantRole = @{request.agentApplication.asLlpApplication.getApplicantContactDetails.applicantName.role.toString}
+@templateScripts = {
+  <script src="@{controllers.routes.Assets.versioned("javascripts/copy-button.js")}" @{CSPNonce.attr}></script>
+}
+@templateStyles = {
+  <link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/copy-button.css")}" @{CSPNonce.attr}>
+  <style @{CSPNonce.attr}>
+    .govuk-panel.govuk-panel--confirmation {
+      background-color: rgb(29, 112, 184);
+      color: white;
+    }
+  </style>
+}
+@layout(
+    pageTitle = pageTitle,
+    suppressBackLink = true,
+    templateScripts = Some(templateScripts),
+    templateStyles = Some(templateStyles)
+) {
+
+  @govukPanel(Panel(
+    title = Text(pageTitle),
+    content = Text(s"""${messages(s"$key.subtitle")} HDJ2123F""")
+  ))
+
+  <h2 class="govuk-heading-m">
+    @{messages(s"$key.whatNext.h2")}
+  </h2>
+  <p class="govuk-body">
+    @{messages(s"$key.whatNext.p1", entityName)}
+  </p>
+  <p class="govuk-body">
+    @{messages(s"$key.whatNext.p2.$applicantRole")}
+  </p>
+  <p class="govuk-body govuk-!-font-weight-bold">@provideDetailsLink</p>
+  @copyButton(clip = provideDetailsLink)
+
+  <h2 class="govuk-heading-m">@{messages(s"$key.checkProgress.h2")}</h2>
+  <p class="govuk-body">
+    @{messages(s"$key.checkProgress.p1")}
+  </p>
+  <p class="govuk-body">
+    @{messages(s"$key.checkProgress.p2")}
+  </p>
+  <p class="govuk-body">
+    @{messages(s"$key.checkProgress.p3")}
+  </p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>@{messages(s"$key.checkProgress.bullet1")}</li>
+    <li>@{Html(messages(s"$key.checkProgress.bullet2", request.agentApplication.asLlpApplication.getApplicantContactDetails.getVerifiedEmail.value))}</li>
+  </ul>
+
+  <p class="govuk-body govuk-!-display-none-print">
+    <a class="govuk-link" href="@{AppRoutes.apply.AgentApplicationController.viewSubmittedApplication.url}">@{messages(s"$key.viewLink")}</a>
+  </p>
+  <p class="govuk-body govuk-!-display-none-print">
+    <a class="govuk-link" href="#">@{messages(s"$key.signOutLink")}</a>
+  </p>
+}

@@ -16,9 +16,8 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.AnswerSummary
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.AnswerSummary
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-@import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
 
 @this(
         layout: Layout,
@@ -33,18 +32,19 @@
 )
 
 @key = @{
-    "contactCheckYourAnswers"
+    "aboutYourBusinessCheckYourAnswers"
 }
 @title = @{
     messages(s"$key.title")
 }
 
 @layout(pageTitle = title) {
-    <h2 class="govuk-caption-l">@messages("applicant-contact-details.title")</h2>
+    <h2 class="govuk-caption-l">@messages("about-your-business.title")</h2>
     <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
     @answerSummary(
       key = key,
-      answers = request.agentApplication.asLlpApplication.getApplicantContactDetails
+      answers = request.agentApplication.asLlpApplication.getBusinessDetails,
+      canChange = false
     )
     <p class="govuk-body">
       @govukButton(Button(

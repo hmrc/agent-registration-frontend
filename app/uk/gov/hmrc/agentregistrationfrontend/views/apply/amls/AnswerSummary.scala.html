@@ -1,0 +1,126 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+@import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
+@import uk.gov.hmrc.agentregistration.shared.AmlsDetails
+@import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
+@import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
+
+@this(
+        govukSummaryList: GovukSummaryList,
+        amlsCodes: AmlsCodes
+)
+
+@(
+        key: String,
+        answers: AmlsDetails,
+        canChange: Boolean = true
+)(implicit request: Request[?], messages: Messages)
+
+@supervisorRow = @{
+  SummaryListRow(
+    key = Key(
+      content = Text(messages(s"$key.supervisoryBody.label"))
+    ),
+    value = Value(
+      content = Text(
+        amlsCodes.getSupervisoryName(
+          answers
+          .supervisoryBody
+        ).value
+      )
+    ),
+    actions = if(!canChange) None else Some(Actions(
+      items = Seq(
+        ActionItem(
+          href = s"${AppRoutes.apply.amls.AmlsSupervisorController.show}",
+          content = Text(messages(s"$key.change")),
+          visuallyHiddenText = Some(messages(s"$key.supervisoryBody.label"))
+        )
+      )
+    ))
+  )
+}
+
+@registrationNumberRow = @{
+  SummaryListRow(
+    key = Key(
+      content = Text(messages(s"$key.registrationNumber.label"))
+    ),
+    value = Value(
+      content = Text(
+        answers
+        .getRegistrationNumber
+        .value
+      )
+    ),
+    actions = if(!canChange) None else Some(Actions(
+      items = Seq(
+        ActionItem(
+          href = s"${AppRoutes.apply.amls.AmlsRegistrationNumberController.show}",
+          content = Text(messages(s"$key.change")),
+          visuallyHiddenText = Some(messages(s"$key.registrationNumber.label"))
+        )
+      )
+    ))
+  )
+}
+
+@expiryDateRow = @{
+  SummaryListRow(
+    key = Key(
+      content = Text(messages(s"$key.expiryDate.label"))
+    ),
+    value = Value(
+      content = Text(if(answers.isHmrc) messages(s"$key.notApplicable") else displayDateForLang(Some(answers.getAmlsExpiryDate)))
+    ),
+    actions = if(!canChange) None else Some(Actions(
+      items = Seq(
+        ActionItem(
+          href = s"${AppRoutes.apply.amls.AmlsExpiryDateController.show}",
+          content = Text(messages(s"$key.change")),
+          visuallyHiddenText = Some(messages(s"$key.expiryDate.label"))
+        )
+      )
+    ))
+  )
+}
+
+@evidenceRow = @{
+  SummaryListRow(
+    key = Key(
+      content = Text(messages(s"$key.evidence.label"))
+    ),
+    value = Value(
+      content = Text(if(answers.isHmrc) messages(s"$key.notApplicable") else answers.getAmlsEvidenceName)
+    ),
+    actions = if(!canChange) None else Some(Actions(
+      items = Seq(
+        ActionItem(
+          href = s"${AppRoutes.apply.amls.AmlsEvidenceUploadController.show}",
+          content = Text(messages(s"$key.change")),
+          visuallyHiddenText = Some(messages(s"$key.evidence.label"))
+        )
+      )
+    ))
+  )
+}
+@commonRows = @{Seq(supervisorRow, registrationNumberRow)}
+@nonHmrcRows = @{Seq(expiryDateRow, evidenceRow)}
+@rows = @{if(answers.isHmrc) commonRows else commonRows ++ nonHmrcRows}
+
+@govukSummaryList(SummaryList(rows = rows))

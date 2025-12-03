@@ -1,0 +1,119 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.{AnswerSummary as AboutYourBusinessAnswers}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.{AnswerSummary as ContactAnswers}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.{AnswerSummary as AgentDetailsAnswers}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.{AnswerSummary as AmlsAnswers}
+@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+@import views.html.helper.CSPNonce
+
+@this(
+        appConfig: AppConfig,
+        layout: Layout,
+        govukButton: GovukButton,
+        govukSummaryList: GovukSummaryList,
+        aboutYourBusinessAnswers: AboutYourBusinessAnswers,
+        contactAnswers: ContactAnswers,
+        agentDetailsAnswers: AgentDetailsAnswers,
+        amlsAnswers: AmlsAnswers
+)
+
+@(
+        entityName: String
+)(implicit
+        request: AgentApplicationRequest[?],
+        messages: Messages
+)
+
+@key = @{
+    "viewApplication"
+}
+@title = @{
+    messages(s"$key.title", entityName)
+}
+@provideDetailsLink = @{appConfig.applicationLink(request.agentApplication.linkId.value).toString}
+@templateScripts = {
+  <script src="@{controllers.routes.Assets.versioned("javascripts/print-link.js")}" @{CSPNonce.attr}></script>
+}
+@templateStyles = {
+  <link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/print-button.css")}" @{CSPNonce.attr}>
+}
+@layout(
+  pageTitle = title,
+  templateScripts = Some(templateScripts),
+  templateStyles = Some(templateStyles)
+) {
+  <h1 class="govuk-heading-l">@title</h1>
+  <h2 class="govuk-heading-m">@{messages(s"$key.subHeading", "HDJ2123F")}</h2>
+
+  <h2 class="govuk-heading-m">@{messages("about-your-business.title")}</h2>
+  @aboutYourBusinessAnswers(
+    key = "aboutYourBusinessCheckYourAnswers",
+    answers = request.agentApplication.asLlpApplication.getBusinessDetails,
+    canChange = false
+  )
+
+  <h2 class="govuk-heading-m">@{messages(s"$key.contact.h2")}</h2>
+  @contactAnswers(
+    key = "contactCheckYourAnswers",
+    answers = request.agentApplication.asLlpApplication.getApplicantContactDetails,
+    canChange = false
+  )
+
+  <h2 class="govuk-heading-m">@{messages(s"$key.agentdetails.h2")}</h2>
+  @agentDetailsAnswers(
+    key = "agentDetailsCheckYourAnswers",
+    answers = request.agentApplication.asLlpApplication.getAgentDetails,
+    canChange = false
+  )
+
+  <h2 class="govuk-heading-m">@{messages(s"$key.amls.h2")}</h2>
+  @amlsAnswers(
+    key = "amlsCheckYourAnswers",
+    answers = request.agentApplication.getAmlsDetails,
+    canChange = false
+  )
+
+  <h2 class="govuk-heading-m">@{messages(s"$key.hmrcStandard.h2")}</h2>
+  @govukSummaryList(SummaryList(
+    rows = Seq(
+      SummaryListRow(
+        key = Key(
+          content = Text(messages(s"$key.hmrcStandard.label"))
+        ),
+        value = Value(
+          content = Text(messages("common.yes"))
+        )
+      )
+    )
+  ))
+
+  <h2 class="govuk-heading-m">@{messages(s"$key.whatNext.h2")}</h2>
+  <p class="govuk-body">@{messages(s"$key.whatNext.p1", entityName)}</p>
+  <p class="govuk-body">@{Html(messages(s"$key.whatNext.p2", provideDetailsLink))}</p>
+  <p class="govuk-body">@{messages(s"$key.whatNext.p3")}</p>
+  <p class="govuk-body govuk-!-display-none-print">
+    @govukButton(Button(
+      href = Some("#print-dialogue"),
+      classes = "govuk-button--secondary gem-c-print-link__button",
+      content = Text(messages("viewApplication.print"))
+    ))
+  </p>
+
+}
