@@ -43,18 +43,18 @@ class MemberNinoController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions.getProvideDetailsInProgress
+  private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions.Member.getProvideDetailsInProgress
     .ensure(
       mpd =>
-        mpd.memberProvidedDetails.memberNino.isEmpty ||
-          mpd.memberProvidedDetails.memberNino.exists {
-            case _: MemberNino.FromAuth => false
-            case _: MemberNino.Provided => true
-            case _ @MemberNino.NotProvided => true
-          },
+        // TODO check email address is present
+//        mpd.memberProvidedDetails.emailAddress.nonEmpty &&
+        mpd.memberProvidedDetails.memberNino.exists {
+          case MemberNino.FromAuth(_) => false
+          case _ => true
+        },
       implicit request =>
         logger.info(s"Nino is already provided from auth or citizen details. Skipping page and moving to next page.")
-        Redirect(routes.MemberSaUtrController.show.url)
+        Redirect(AppRoutes.providedetails.MemberSaUtrController.show.url)
     )
 
   def show: Action[AnyContent] = baseAction:
@@ -83,5 +83,5 @@ extends FrontendController(mcc, actions):
           memberProvideDetailsService
             .upsert(updatedApplication)
             .map: _ =>
-              Redirect(routes.MemberSaUtrController.show.url)
+              Redirect(AppRoutes.providedetails.MemberSaUtrController.show.url)
       .redirectIfSaveForLater

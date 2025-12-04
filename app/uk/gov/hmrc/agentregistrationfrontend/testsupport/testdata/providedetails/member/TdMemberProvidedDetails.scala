@@ -81,23 +81,23 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
       .setTo(Some(dependencies.ninoProvided))
 
     def withSaUtrProvided(state: MemberProvidedDetails): MemberProvidedDetails = state
-      .modify(_.memberSauUtr)
+      .modify(_.memberSaUtr)
       .setTo(Some(dependencies.saUtrProvided))
 
     def withSaUtrFromAuth(state: MemberProvidedDetails): MemberProvidedDetails = state
-      .modify(_.memberSauUtr)
+      .modify(_.memberSaUtr)
       .setTo(Some(dependencies.saUtrFromAuth))
 
     def withSaUtrFromCitizenDetails(state: MemberProvidedDetails): MemberProvidedDetails = state
-      .modify(_.memberSauUtr)
+      .modify(_.memberSaUtr)
       .setTo(Some(dependencies.saUtrFromCitizenDetails))
 
     def withSaUtrNotProvided(state: MemberProvidedDetails): MemberProvidedDetails = state
-      .modify(_.memberSauUtr)
+      .modify(_.memberSaUtr)
       .setTo(Some(MemberSaUtr.NotProvided))
 
     val afterSaUtrProvided: MemberProvidedDetails = afterNinoProvided
-      .modify(_.memberSauUtr)
+      .modify(_.memberSaUtr)
       .setTo(Some(dependencies.saUtrProvided))
 
 }

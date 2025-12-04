@@ -43,19 +43,18 @@ class MemberSaUtrController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions.getProvideDetailsInProgress
+  private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions.Member.getProvideDetailsInProgress
     .ensure(
       mpd =>
-        mpd.memberProvidedDetails.memberSauUtr.isEmpty ||
-          mpd.memberProvidedDetails.memberSauUtr.exists {
-            case _: MemberSaUtr.FromAuth => false
-            case _: MemberSaUtr.FromCitizenDetails => false
-            case _: MemberSaUtr.Provided => true
-            case _ @MemberSaUtr.NotProvided => true
+        mpd.memberProvidedDetails.memberNino.nonEmpty &&
+          mpd.memberProvidedDetails.memberSaUtr.exists {
+            case MemberSaUtr.FromAuth(_) => false
+            case MemberSaUtr.FromCitizenDetails(_) => false
+            case _ => true
           },
       implicit request =>
         logger.info(s"SaUtr is already provided from auth or citizen details. Skipping page and moving to next page.")
-        Redirect(routes.MemberApproveApplicantController.show.url)
+        Redirect(AppRoutes.providedetails.MemberApproveApplicantController.show.url)
     )
 
   def show: Action[AnyContent] = baseAction:
@@ -65,7 +64,7 @@ extends FrontendController(mcc, actions):
           .fill:
             request
               .memberProvidedDetails
-              .memberSauUtr
+              .memberSaUtr
       ))
 
   def submit: Action[AnyContent] =
@@ -79,10 +78,10 @@ extends FrontendController(mcc, actions):
           val validFormData: MemberSaUtr = request.formValue
           val updatedApplication: MemberProvidedDetails = request
             .memberProvidedDetails
-            .modify(_.memberSauUtr)
+            .modify(_.memberSaUtr)
             .setTo(Some(validFormData))
           memberProvideDetailsService
             .upsert(updatedApplication)
             .map: _ =>
-              Redirect(routes.MemberApproveApplicantController.show.url)
+              Redirect(AppRoutes.providedetails.MemberApproveApplicantController.show.url)
       .redirectIfSaveForLater

@@ -33,7 +33,7 @@ class MemberApproveApplicantController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getProvideDetailsInProgress:
+  def show: Action[AnyContent] = actions.Member.getProvideDetailsInProgress:
     implicit request: RequestHeader =>
       Ok(placeholder(
         h1 = "Approve Applicant Page",

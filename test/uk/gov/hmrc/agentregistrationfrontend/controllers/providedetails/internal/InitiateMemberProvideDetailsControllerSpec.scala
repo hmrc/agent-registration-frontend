@@ -57,7 +57,7 @@ extends ControllerSpec:
       .afterStarted
       .modify(_.memberNino)
       .setTo(Some(tdAll.ninoFromAuth))
-      .modify(_.memberSauUtr)
+      .modify(_.memberSaUtr)
       .setTo(Some(tdAll.saUtrFromAuth))
 
     val afterStartedWithNinoAndSaUtrFromCitizenDetails: MemberProvidedDetails = tdAll
@@ -65,7 +65,7 @@ extends ControllerSpec:
       .afterStarted
       .modify(_.memberNino)
       .setTo(Some(tdAll.ninoFromAuth))
-      .modify(_.memberSauUtr)
+      .modify(_.memberSaUtr)
       .setTo(Some(tdAll.saUtrFromCitizenDetails))
 
   private def path(linkId: LinkId) = s"/agent-registration/provide-details/internal/initiate-member-provide-details/${linkId.value}"

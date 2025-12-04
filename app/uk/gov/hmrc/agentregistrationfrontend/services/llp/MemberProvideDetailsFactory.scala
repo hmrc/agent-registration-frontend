@@ -46,5 +46,5 @@ class MemberProvideDetailsFactory @Inject() (
     createdAt = Instant.now(clock),
     providedDetailsState = Started,
     memberNino = memberNino,
-    memberSauUtr = memberSaUtr
+    memberSaUtr = memberSaUtr
   )
