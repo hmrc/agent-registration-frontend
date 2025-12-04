@@ -1,0 +1,122 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+@import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
+@import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
+
+@this(
+  govukSummaryList: GovukSummaryList
+)
+
+@(
+        key: String,
+        answers: ApplicantContactDetails,
+        canChange: Boolean = true
+)(implicit messages: Messages)
+
+@llpMemberRow = @{
+  SummaryListRow(
+    key = Key(
+      content = Text(messages(s"$key.llpMember.label"))
+    ),
+    value = Value(
+      content = Text(
+        messages(s"$key.llpMember.${answers.applicantName.role.toString}")
+      )
+    ),
+    actions = if(!canChange) None else Some(Actions(
+      items = Seq(
+        ActionItem(
+          href = s"${AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show}",
+          content = Text(messages(s"$key.change")),
+          visuallyHiddenText = Some(messages(s"$key.llpMember.label"))
+        )
+      )
+    ))
+  )
+}
+@nameChangeRoute = @{
+  answers.applicantName.role match {
+    case ApplicantRoleInLlp.Member => AppRoutes.apply.applicantcontactdetails.MemberNameController.show
+    case ApplicantRoleInLlp.Authorised => AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.show
+  }
+}
+@nameRow = @{
+  SummaryListRow(
+    key = Key(
+      content = Text(messages(s"$key.name.label"))
+    ),
+    value = Value(
+      content = Text(
+        answers.getApplicantName
+      )
+    ),
+    actions = if(!canChange) None else Some(Actions(
+      items = Seq(
+        ActionItem(
+          href = nameChangeRoute.url,
+          content = Text(messages(s"$key.change")),
+          visuallyHiddenText = Some(messages(s"$key.name.label"))
+        )
+      )
+    ))
+  )
+}
+
+@telephoneRow = @{
+  SummaryListRow(
+    key = Key(
+      content = Text(messages(s"$key.telephone.label"))
+    ),
+    value = Value(
+      content = Text(answers.getTelephoneNumber.value)
+    ),
+    actions = if(!canChange) None else Some(Actions(
+      items = Seq(
+        ActionItem(
+          href = s"${AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.show}",
+          content = Text(messages(s"$key.change")),
+          visuallyHiddenText = Some(messages(s"$key.telephone.label"))
+        )
+      )
+    ))
+  )
+}
+
+@emailRow = @{
+  SummaryListRow(
+    key = Key(
+      content = Text(messages(s"$key.email.label"))
+    ),
+    value = Value(
+      content = Text(answers.getVerifiedEmail.value)
+    ),
+    actions = if(!canChange) None else Some(Actions(
+      items = Seq(
+        ActionItem(
+          href = s"${AppRoutes.apply.applicantcontactdetails.EmailAddressController.show}",
+          content = Text(messages(s"$key.change")),
+          visuallyHiddenText = Some(messages(s"$key.email.label"))
+        )
+      )
+    ))
+  )
+}
+
+@rows = @{Seq(llpMemberRow, nameRow, telephoneRow, emailRow)}
+
+@govukSummaryList(SummaryList(rows = rows))

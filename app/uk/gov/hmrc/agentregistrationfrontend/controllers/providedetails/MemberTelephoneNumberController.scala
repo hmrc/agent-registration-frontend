@@ -43,7 +43,9 @@ class MemberTelephoneNumberController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions.getProvideDetailsInProgress
+  private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions
+    .Member
+    .getProvideDetailsInProgress
     .ensure(
       _.memberProvidedDetails.companiesHouseMatch.nonEmpty, // TODO: Add check for companies house details
       implicit request =>

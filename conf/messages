@@ -12,6 +12,11 @@ common.or = or
 common.dobPrefix = Date of birth
 common.change = Change
 common.warning = Warning
+common.yes = Yes
+common.no = No
+
+button.copy=Copy link to clipboard
+button.copied=Link copied
 
 months.1 = January
 months.2 = February
@@ -31,29 +36,26 @@ address.lookup.header=What correspondence address should we use for your agent s
 address.lookup.editPageLabels.title=Change your address - Apply for an agent services account - GOV.UK
 address.lookup.editPageLabels.header=Change your address
 
-# About your application
-about-application.title = About your application
-
-# About your business
+# Apply / About your business
 about-your-business.title = About your business
 
-## About your business / Agent type
+## Apply / About your business / Agent type
 agentType.title = Is your agent business based in the UK?
 agentType.UkTaxAgent = Yes
 agentType.NonUkTaxAgent = No, it’s based outside the UK
 agentType.error.required = Select yes if your agent business is based in the UK
 agentType.error.invalid = Select yes if your agent business is based in the UK
 
-## About your business / business type
+## Apply / About your business / business type
 
-# About your application / business type
+# Apply / About your application / business type
 businessType.title = How is your business set up?
 businessType.SoleTrader = Sole trader
 businessType.LimitedCompany = Limited company
 businessType.PartnershipType = A type of partnership
 businessType.Other = Something else
 
-## About your business / partnership type
+## Apply / About your business / partnership type
 partnershipType.title = What type of partnership?
 partnershipType.GeneralPartnership = General partnership
 partnershipType.ScottishPartnership = Scottish partnership
@@ -68,7 +70,7 @@ businessType.error.invalid = Tell us how your business is set up
 partnershipType.error.required = Tell us what type of partnership
 partnershipType.error.invalid = Tell us what type of partnership
 
-## About your business / Type of sign in page
+## Apply / About your business / Type of sign in page
 typeOfSignIn.title = Do you have an HMRC online services for agents account?
 typeOfSignIn.hint = You’ll have this account if you already manage taxes on behalf of clients.
 typeOfSignIn.HmrcOnlineServices = Yes
@@ -87,11 +89,19 @@ signInWithAgentDetails.p2=Your new agent services account will then be linked to
 signInWithAgentDetails.h2=If you have more than one set of sign in details
 signInWithAgentDetails.p3=Choose the one you want to be linked to your new agent services account.
 
-# Applicant contact details
+# Apply / About your business CYA
+aboutYourBusinessCheckYourAnswers.title = Check your answers
+aboutYourBusinessCheckYourAnswers.agentType.label = UK-based agent
+aboutYourBusinessCheckYourAnswers.businessType.label = Business type
+aboutYourBusinessCheckYourAnswers.companyName.label = Company name
+aboutYourBusinessCheckYourAnswers.utr.label = Unique taxpayer reference
+aboutYourBusinessCheckYourAnswers.saPostcode = Self Assessment postcode
+
+# Apply / Applicant contact details
 
 applicant-contact-details.title = Applicant contact details
 
-## Applicant contact details / Llp role
+## Apply / Applicant contact details / Llp role
 applicantRoleInLlp.title = Are you a member of the limited liability partnership?
 applicantRoleInLlp.hint = Being a member means you are listed in Companies House as a current officer of {0}.
 applicantRoleInLlp.Member = Yes
@@ -99,7 +109,7 @@ applicantRoleInLlp.Authorised = No, but I’m authorised by them to set up this 
 applicantRoleInLlp.error.required = Select yes if you are a member of the limited liability partnership
 applicantRoleInLlp.error.invalid = Select yes if you are a member of the limited liability partnership
 
-## Applicant contact details / Llp member name
+## Apply / Applicant contact details / Llp member name
 llpMemberName.title = What is your name?
 llpMemberName.p1 = We’ll check this against the business records for {0} on Companies House.
 llpMemberName.firstName.label = First names
@@ -109,7 +119,7 @@ firstName.error.invalid = Your first name must only include letters a to z, hyph
 lastName.error.required = Enter your last name
 lastName.error.invalid = Your last name must only include letters a to z, hyphens, apostrophes and spaces
 
-## Applicant contact details / Companies House match
+## Apply / Applicant contact details / Companies House match
 companiesHouseOfficer.single.title=Are these your details?
 companiesHouseOfficer.single.yes=Yes
 companiesHouseOfficer.single.no=No
@@ -120,26 +130,27 @@ companiesHouseOfficer.multiple.hint=Select your details
 companiesHouseOfficer.error.required=Select the name and date of birth that matches your details
 companiesHouseOfficer.error.invalid=Select the name and date of birth that matches your details
 
-## Applicant contact details / Authorised name
+## Apply / Applicant contact details / Authorised name
 authorisedName.title = What is your full name?
 authorisedName.error.required = Enter your full name
 authorisedName.error.invalid = Your full name must only include letters a to z, hyphens, apostrophes and spaces
 authorisedName.error.tooLong = Your full name must be 100 characters or fewer
 
-## Applicant contact details / Telephone number
+## Apply / Applicant contact details / Telephone number
 telephoneNumber.title = If we need to speak to you about this application, what number do we call?
 telephoneNumber.hint = We will not send a code to confirm this number.
 telephoneNumber.error.required = Enter the number we should call to speak to you about this application
 telephoneNumber.error.invalid = Enter a phone number, like 01632 960 001 or 07700 900 982
-telephoneNumber.error.tooLong = The phone number must be 25 characters or fewer
+telephoneNumber.error.tooLong = The phone number must be 24 characters or fewer
 
-## Applicant contact details / Email address
+## Apply / Applicant contact details / Email address
 emailAddress.title = If we need to email you about this application, what’s the email address?
 emailAddress.hint = We will send a code to this email address to confirm it.
 emailAddress.error.required = Enter your email address
 emailAddress.error.invalid = Enter your email address with a name, @ symbol and a domain name, like yourname@example.com
+emailAddress.error.tooLong = The email address must be 132 characters or fewer
 
-## Applicant contact details / Check your answers
+## Apply / Applicant contact details / Check your answers
 contactCheckYourAnswers.title = Check your answers
 contactCheckYourAnswers.llpMember.label = Member of the limited liability partnership
 contactCheckYourAnswers.llpMember.Member = Yes
@@ -149,10 +160,10 @@ contactCheckYourAnswers.telephone.label = Telephone number
 contactCheckYourAnswers.email.label = Email address
 contactCheckYourAnswers.change = Change
 
-## Agent details - agent services account setup
+# Apply / Agent details
 agentDetails.title = Agent services account details
 
-# Agent details / business name
+## Apply / Agent details / business name
 agentBusinessName.title = What business name will you use for clients?
 agentBusinessName.hint = Choose a name your clients know. We’ll use it when clients respond to authorisation requests or manage their agent relationships.
 agentBusinessName.other = Something else
@@ -162,7 +173,7 @@ otherAgentBusinessName.error.required = Enter the business name you want to use 
 otherAgentBusinessName.error.tooLong = Name shown to clients must be 40 characters or less
 otherAgentBusinessName.error.invalid = Name shown to clients must only include letters a to z, numbers, commas, full stops, apostrophes, hyphens, forward slashes and spaces
 
-# Agent details / telephone number
+## Apply / Agent details / telephone number
 agentTelephoneNumber.title = What telephone number should we use for your agent services account?
 agentTelephoneNumber.contact.hint = This is the number you have given us.
 agentTelephoneNumber.bpr.hint = This is the number HMRC has in your business record.
@@ -174,7 +185,7 @@ otherAgentTelephoneNumber.error.required = Enter the telephone number for your a
 otherAgentTelephoneNumber.error.invalid = Telephone number must only include numbers, plus sign, hash sign, hyphens, brackets and spaces
 otherAgentTelephoneNumber.error.tooLong = The phone number must be 24 characters or fewer
 
-# Agent details / email address
+## Apply / Agent details / email address
 
 agentEmailAddress.title = What email address should we use for your agent services account?
 
@@ -186,16 +197,17 @@ otherAgentEmailAddress.label = Enter the email address you want to use
 otherAgentEmailAddress.hint = We will send a code to this email address to confirm it.
 otherAgentEmailAddress.error.required = Enter the email address for your agent services account
 otherAgentEmailAddress.error.invalid = Enter an email address in the correct format, like name@example.com
-otherAgentEmailAddress.error.tooLong = The email address must be 24 characters or fewer
+otherAgentEmailAddress.error.tooLong = The email address must be 132 characters or fewer
 
-# Agent details / correspondence address
+## Apply / Agent details / correspondence address
 agentCorrespondenceAddress.title = What correspondence address should we use for your agent services account?
 agentCorrespondenceAddress.chro.hint = This is your Companies House registered office address.
 agentCorrespondenceAddress.bpr.hint = This is the address HMRC has in your business record.
+agentCorrespondenceAddress.existingOther.hint = This is the address you have given us.
 agentCorrespondenceAddress.other = Something else
 agentCorrespondenceAddress.error.required = Enter the correspondence address you want to use on your agent services account
 
-# Agent details / check your answers
+## Apply / Agent details / check your answers
 
 agentDetailsCheckYourAnswers.title = Check your answers
 agentDetailsCheckYourAnswers.businessName.label = Name shown to clients
@@ -203,8 +215,10 @@ agentDetailsCheckYourAnswers.telephone.label = Telephone number
 agentDetailsCheckYourAnswers.email.label = Email address
 agentDetailsCheckYourAnswers.address.label = Correspondence address
 
-## Agent standards - HMRC standard for agents
+# Apply / Meet the HMRC standard for agents
 hmrcStandardForAgents.caption = HMRC standard for agents
+
+## Apply / Meet the HMRC standard for agents / HMRC standard for agents
 hmrcStandardForAgents.title = Agree to meet the HMRC standard for agents
 hmrcStandardForAgents.warning = We carry out checks to make sure agents meet the standard. We take action against individuals and organisations who do not comply.
 hmrcStandardForAgents.read.h2 = Read the standard on GOV.UK
@@ -214,45 +228,21 @@ hmrcStandardForAgents.agree.p1 = I have read the HMRC standard for agents.
 hmrcStandardForAgents.agree.p2 = I agree that {0} will meet the standard when working on behalf of clients.
 hmrcStandardForAgents.agree.button = Agree and continue
 
-# About your application / user role
-userRole.title = Are you the owner of the business?
-userRole.Owner = Yes
-userRole.Authorised = No, but I’m authorised by them to set up this account
-userRole.other.signOut = Finish and sign out
-userRole.error.required = Select yes if you are the owner of the business
-userRole.error.invalid = Select yes if you are the owner of the business
-
-# About your application / check your answers
-checkYourAnswer.title = Check your answers
-checkYourAnswer.businessType.label = Business type
-checkYourAnswer.businessType.SoleTrader = Sole trader
-checkYourAnswer.businessType.LimitedCompany = Limited company
-checkYourAnswer.businessType.GeneralPartnership = Partnership
-checkYourAnswer.businessType.LimitedLiabilityPartnership = Limited liability partnership
-checkYourAnswer.userRole.label = Are you the business owner?
-checkYourAnswer.userRole.Owner = Yes
-checkYourAnswer.change = Change
-checkYourAnswer.userRole.Authorised = No, but I’m authorised by them to set up this account
-checkYourAnswer.other.signOut = Finish and sign out
-
-# GRS overrides
-grs.optFullNamePageLabel = What is the business owner’s full name?
-
-# AmlsDetails
+# Apply / Meet the HMRC standard for agents / AmlsDetails
 amlsDetails.title = Anti-money laundering supervision details
 
-## AmlsDetails / Supervisory body
+## Apply / Meet the HMRC standard for agents / AmlsDetails / Supervisory body
 amlsSupervisoryBody.title = What is the name of your supervisory body?
 amlsSupervisoryBody.hint = Start to enter a name and choose your supervisor from the list
 amlsSupervisoryBody.error.required = Enter a name and choose your supervisor from the list
 amlsSupervisoryBody.error.invalid = Enter a name and choose your supervisor from the list
 
-## AmlsDetails / Registration number
+## Apply / Meet the HMRC standard for agents / AmlsDetails / Registration number
 amlsRegistrationNumber.title = What is your registration number?
 amlsRegistrationNumber.error.required = Enter your registration number
 amlsRegistrationNumber.error.invalid = Enter your registration number in the correct format
 
-## AmlsDetails / Expiry date
+## Apply / Meet the HMRC standard for agents / AmlsDetails / Expiry date
 amlsExpiryDate.title = When does your supervision run out?
 amlsExpiryDate.hint = Tells us the last day you will be covered in your current 12-month supervision period. For example, 27 3 2026
 amlsExpiryDate.error.required = Enter the date your supervision runs out
@@ -266,7 +256,7 @@ amlsExpiryDate.error.invalid = The date your supervision runs out must be a real
 amlsExpiryDate.error.past = The date your supervision runs out must be in the future
 amlsExpiryDate.error.future = The date your supervision runs out must be in the next 13 months
 
-## AmlsDetails / Evidence upload
+## Apply / Meet the HMRC standard for agents / AmlsDetails / Evidence upload
 amlsEvidenceUpload.title = Evidence of your anti-money laundering supervision
 amlsEvidenceUpload.p1=Upload evidence to show that {0} is your current anti-money laundering supervisor.
 amlsEvidenceUpload.p2=You can choose what evidence to upload.
@@ -302,7 +292,7 @@ fileUploadProgress.REJECTED=The selected file must be a JPG, JPEG, PNG, TIFF, PD
 fileUploadProgress.TOO_LARGE=The selected file must not be larger than 5MB.
 fileUploadProgress.failed=Your file upload has failed. Try uploading your file again.
 
-## AmlsDetails / Check your answers
+## Apply / Meet the HMRC standard for agents / AmlsDetails / Check your answers
 amlsCheckYourAnswers.title = Check your answers
 amlsCheckYourAnswers.supervisoryBody.label = Supervisory body
 amlsCheckYourAnswers.registrationNumber.label = Registration number
@@ -310,6 +300,56 @@ amlsCheckYourAnswers.expiryDate.label = Supervision expiry date
 amlsCheckYourAnswers.notApplicable = n/a
 amlsCheckYourAnswers.evidence.label = Evidence of anti-money laundering supervision
 amlsCheckYourAnswers.change = Change
+
+# Apply / Declaration
+declaration.title = Declaration
+declaration.p1 = I am authorised by {0} to apply for an agent services account with HMRC.
+declaration.p2 = The information I have given in this application is accurate to the best of my knowledge.
+declaration.p3 = I understand that applying for an HMRC agent services account with the intention to commit tax fraud is a crime.
+declaration.p4 = I understand that HMRC can suspend an agent services account if the agent business or any individual officer working on its behalf, fails up uphold the HMRC standard for agents.
+declaration.accept.button = Accept and send
+
+# Apply / Confirmation of submission
+confirmation.title = You’ve finished the first stage of the application
+confirmation.subtitle = Application reference:
+confirmation.whatNext.h2 = What to do next
+confirmation.whatNext.p1 = Everyone listed in Companies House as a current member of {0} needs to sign in and provide some personal details.
+confirmation.whatNext.p2.Member = Send this link to all members, including yourself:
+confirmation.whatNext.p2.Authorised = Send this link to all members:
+confirmation.checkProgress.h2 = How to check the progress of your application
+confirmation.checkProgress.p1 = You can click the link on the GOV.UK page “Apply for an agent services account”.
+confirmation.checkProgress.p2 = This will let you check which members have provided their provided their personal details.
+confirmation.checkProgress.p3 = When all members have provided their personal details, we will:
+confirmation.checkProgress.bullet1 = automatically submit your application
+confirmation.checkProgress.bullet2 = email you at <strong>{0}</strong> to confirm this
+confirmation.viewLink = View or print your application
+confirmation.signOutLink = Finish and sign out
+
+
+# About your application / user role
+userRole.title = Are you the owner of the business?
+userRole.Owner = Yes
+userRole.Authorised = No, but I’m authorised by them to set up this account
+userRole.other.signOut = Finish and sign out
+userRole.error.required = Select yes if you are the owner of the business
+userRole.error.invalid = Select yes if you are the owner of the business
+
+# About your application / check your answers
+checkYourAnswer.title = Check your answers
+checkYourAnswer.businessType.label = Business type
+checkYourAnswer.businessType.SoleTrader = Sole trader
+checkYourAnswer.businessType.LimitedCompany = Limited company
+checkYourAnswer.businessType.GeneralPartnership = Partnership
+checkYourAnswer.businessType.LimitedLiabilityPartnership = Limited liability partnership
+checkYourAnswer.userRole.label = Are you the business owner?
+checkYourAnswer.userRole.Owner = Yes
+checkYourAnswer.change = Change
+checkYourAnswer.userRole.Authorised = No, but I’m authorised by them to set up this account
+checkYourAnswer.other.signOut = Finish and sign out
+
+# GRS overrides
+grs.optFullNamePageLabel = What is the business owner’s full name?
+
 
 taskList.status.Incomplete = Incomplete
 taskList.status.Completed = Completed
@@ -327,6 +367,20 @@ taskList.hmrcStandards.amls.linkText = Anti-money laundering supervision details
 taskList.hmrcStandards.agreement.linkText = HMRC standard for agents
 taskList.declaration.heading = Finish this stage of the process
 taskList.declaration.linkText = Declaration
+
+# Apply / View application
+viewApplication.title = Application for {0}
+viewApplication.subHeading = Application reference: {0}
+viewApplication.contact.h2 = Applicant contact details
+viewApplication.agentdetails.h2 = Agency contact details
+viewApplication.amls.h2 = Anti-money laundering supervision details
+viewApplication.hmrcStandard.h2 = HMRC standard for agents
+viewApplication.hmrcStandard.label = Agreed to meet the HMRC standard for agents
+viewApplication.whatNext.h2 = What to do next
+viewApplication.whatNext.p1 = The members of {0} need to sign in and provide some personal details.
+viewApplication.whatNext.p2 = Send this link to all members <strong>{0}</strong>
+viewApplication.whatNext.p3 = Your can check the progress of your application by clicking the link on the GOV.UK page “Apply for an agent services account”.
+viewApplication.print = Print this page
 
 # Save for later
 saveForLater.title = Your progress has been saved for 30 days
@@ -375,7 +429,7 @@ memberTelephoneNumber.title = What is your telephone number?
 memberTelephoneNumber.hint = We will not send a code to confirm this number.
 memberTelephoneNumber.error.required = Enter the number we should call to speak to you about this application
 memberTelephoneNumber.error.invalid = Enter a phone number, like 01632 960 001 or 07700 900 982
-memberTelephoneNumber.error.tooLong = The phone number must be 25 characters or fewer
+memberTelephoneNumber.error.tooLong = The phone number must be 24 characters or fewer
 
 ## Member Email Address
 
@@ -383,3 +437,25 @@ memberEmailAddress.title = What is your email address?
 memberEmailAddress.hint = We will send a code to this email address to confirm it.
 memberEmailAddress.error.required = Enter your email address
 memberEmailAddress.error.invalid = Enter your email address with a name, @ symbol and a domain name, like yourname@example.com
+
+## Member Nino
+memberNino.title = Do you have a National Insurance number?
+memberNino.hasNino.yes = Yes
+memberNino.hasNino.no = No
+memberNino.hasNino.title = Do you have a National Insurance number?
+memberNino.hasNino.error.required = Select yes if you have a National Insurance number
+memberNino.nino.label = Enter your National Insurance number
+memberNino.nino.error.invalid = Enter a National Insurance number in the correct format
+memberNino.nino.error.required = Enter your National Insurance number
+memberNino.nino.hint = For example, QQ 12 34 56 C.
+
+## Member SA UTR
+memberSaUtr.title = Do you have a Self Assessment Unique Taxpayer Reference?
+memberSaUtr.hasSaUtr.title = Do you have a Self Assessment Unique Taxpayer Reference?
+memberSaUtr.hasSaUtr.yes = Yes
+memberSaUtr.hasSaUtr.no = No
+memberSaUtr.hasSaUtr.error.required = Select yes if you have a Self Assessment Unique Taxpayer Reference
+memberSaUtr.saUtr.label = Enter your Self Assessment Unique Taxpayer Reference
+memberSaUtr.saUtr.hint = This is 10 numbers, for example 1234567890.
+memberSaUtr.saUtr.error.required = Enter your Self Assessment Unique Taxpayer Reference
+memberSaUtr.saUtr.error.invalid = Enter a Self Assessment Unique Taxpayer Reference in the correct format

@@ -51,7 +51,7 @@ extends ControllerSpec:
     val errorTitle = s"Error: $heading - Apply for an agent services account - GOV.UK"
     val requiredError = "Enter the number we should call to speak to you about this application"
     val invalidError = "Enter a phone number, like 01632 960 001 or 07700 900 982"
-    val maxLengthError = "The phone number must be 25 characters or fewer"
+    val maxLengthError = "The phone number must be 24 characters or fewer"
 
   "routes should have correct paths and methods" in:
     routes.TelephoneNumberController.show shouldBe Call(
@@ -72,7 +72,7 @@ extends ControllerSpec:
     response.parseBodyAsJsoupDocument.title() shouldBe ExpectedStrings.title
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
-  s"POST $path with valid name should save data and redirect to check your answers" in:
+  s"POST $path with a valid number should save data and redirect to check your answers" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(
       application = agentApplication.beforeTelephoneUpdate,
       updatedApplication = agentApplication.afterTelephoneNumberProvided
@@ -113,11 +113,11 @@ extends ControllerSpec:
     doc.mainContent.select(s"#${TelephoneNumberForm.key}-error").text() shouldBe s"Error: ${ExpectedStrings.invalidError}"
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
-  s"POST $path with more than 25 characters should return 400" in:
+  s"POST $path with more than 24 characters should return 400" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeTelephoneUpdate)
     val response: WSResponse =
       post(path)(Map(
-        TelephoneNumberForm.key -> Seq("2".repeat(26))
+        TelephoneNumberForm.key -> Seq("2".repeat(25))
       ))
 
     response.status shouldBe Status.BAD_REQUEST

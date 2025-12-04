@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 
+import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -41,7 +42,7 @@ extends ControllerSpec:
     val beforeTermsAgreed: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
-        .afterGrsDataReceived
+        .afterAmlsComplete
 
     val afterTermsAgreed: AgentApplicationLlp =
       tdAll
@@ -79,5 +80,6 @@ extends ControllerSpec:
       )
 
     response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe routes.TaskListController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()

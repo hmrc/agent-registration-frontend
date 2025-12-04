@@ -30,6 +30,8 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
+import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
+import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -50,7 +52,8 @@ extends FrontendController(mcc, actions):
   def initiateMemberProvideDetails(
     linkId: LinkId
   ): Action[AnyContent] = actions
-    .authorisedIndividualWithIdentifiers
+    .Member
+    .authorisedWithIdentifiers
     .async:
       implicit request: IndividualAuthorisedWithIdentifiersRequest[AnyContent] =>
 
@@ -95,8 +98,8 @@ extends FrontendController(mcc, actions):
             memberProvideDetailsService.createNewMemberProvidedDetails(
               internalUserId = request.internalUserId,
               agentApplicationId = applicationId,
-              nino = request.nino,
-              saUtr = citizenDetails.saUtr
+              memberNino = request.nino.map(MemberNino.FromAuth.apply),
+              memberSaUtr = citizenDetails.saUtr.map(MemberSaUtr.FromCitizenDetails.apply)
             )
           }
 
@@ -105,7 +108,7 @@ extends FrontendController(mcc, actions):
           memberProvideDetailsService.createNewMemberProvidedDetails(
             internalUserId = request.internalUserId,
             agentApplicationId = applicationId,
-            nino = request.nino,
-            saUtr = request.saUtr
+            memberNino = request.nino.map(MemberNino.FromAuth.apply),
+            memberSaUtr = request.saUtr.map(MemberSaUtr.FromAuth.apply)
           )
         )

@@ -16,20 +16,26 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 
-import com.softwaremill.quicklens.*
+import com.softwaremill.quicklens.each
+import com.softwaremill.quicklens.modify
 import play.api.i18n.Lang
 import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.DesBusinessAddress
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
+import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AddressLookupFrontendConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
+import uk.gov.hmrc.agentregistrationfrontend.model.AddressOptions
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.AgentCorrespondenceAddressPage
@@ -50,7 +56,9 @@ class AgentCorrespondenceAddressController @Inject() (
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
+  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress
     .ensure(
       _
         .agentApplication
@@ -69,28 +77,19 @@ extends FrontendController(mcc, actions):
         .getBusinessPartnerRecord(
           request.agentApplication.getUtr
         ).map: bprOpt =>
-          val agentApplication = request.agentApplication.asLlpApplication
-          val existingAddressValueString = agentApplication
+          val existingAddress = request.agentApplication.asLlpApplication
             .agentDetails
             .flatMap(
-              _.agentCorrespondenceAddress.map(_.toValueString)
+              _.agentCorrespondenceAddress
             )
-          val chroAddressValueString = agentApplication
-            .getBusinessDetails
-            .companyProfile
-            .unsanitisedCHROAddress.map(_.toValueString)
-          val prefillValue: Option[String] =
-            existingAddressValueString match
-              case Some(existingAddress) if existingAddress.contains(chroAddressValueString.getOrElse("")) => Some(existingAddress)
-              case Some(existingAddress) if existingAddress.contains(bprOpt.map(_.address.toValueString).getOrElse("")) => Some(existingAddress)
-              case Some(existingAddress) => Some("other")
-              case _ => None
-
           Ok(view(
             form = AgentCorrespondenceAddressForm.form.fill:
-              prefillValue
+              existingAddress.map(_.toValueString)
             ,
-            bprAddress = bprOpt.map(_.address)
+            addressOptions = makeAddressOptions(
+              agentApplication = request.agentApplication.asLlpApplication,
+              bprOption = bprOpt.map(_.address)
+            )
           ))
 
   def submit: Action[AnyContent] =
@@ -108,7 +107,10 @@ extends FrontendController(mcc, actions):
                     BadRequest(
                       view(
                         form = formWithErrors,
-                        bprAddress = bprOpt.map(_.address)
+                        addressOptions = makeAddressOptions(
+                          agentApplication = request.agentApplication.asLlpApplication,
+                          bprOption = bprOpt.map(_.address)
+                        )
                       )
                     ).pipe(SubmissionHelper.redirectIfSaveForLater(request, _)),
               addressOption =>
@@ -130,3 +132,42 @@ extends FrontendController(mcc, actions):
                       Redirect(routes.CheckYourAnswersController.show.url)
             )
       .redirectIfSaveForLater
+
+  /*
+   * Determine whether to show an option for an "other" address on the form.
+   * We infer the existing address to be "other" if it matches neither the CHRO address nor the BPR address.
+   * This is could be because it originated from Address Lookup Frontend (ALF) in the first place, but it
+   * also handles the case when either the CHRO or BPR address has changed since the last time we saved the application.
+   */
+  private def inferAnyOtherAddress(
+    existingAddress: Option[AgentCorrespondenceAddress],
+    bprAddress: Option[DesBusinessAddress],
+    chroAddress: Option[ChroAddress]
+  ): Option[AgentCorrespondenceAddress] =
+    existingAddress match
+      case Some(a: AgentCorrespondenceAddress) if a.toValueString === chroAddress.map(_.toValueString).getOrElse("") => None
+      case Some(a: AgentCorrespondenceAddress) if a.toValueString === bprAddress.map(_.toValueString).getOrElse("") => None
+      case Some(other: AgentCorrespondenceAddress) => Some(other)
+      case _ => None
+
+  private def makeAddressOptions(
+    agentApplication: AgentApplicationLlp,
+    bprOption: Option[DesBusinessAddress]
+  ): AddressOptions =
+    val chroAddressOption: Option[ChroAddress] =
+      agentApplication
+        .getBusinessDetails
+        .companyProfile
+        .unsanitisedCHROAddress
+
+    AddressOptions(
+      chroAddress = chroAddressOption,
+      bprAddress = bprOption,
+      otherAddress = inferAnyOtherAddress(
+        existingAddress = agentApplication
+          .agentDetails
+          .flatMap(_.agentCorrespondenceAddress),
+        bprAddress = bprOption,
+        chroAddress = chroAddressOption
+      )
+    )

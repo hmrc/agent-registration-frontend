@@ -39,7 +39,7 @@ extends ControllerSpec:
     val errorTitle = s"Error: $documentTitle"
     val requiredError = "Error: Enter the email address for your agent services account"
     val patternError = "Error: Enter an email address in the correct format, like name@example.com"
-    val tooLongError = "Error: The email address must be 24 characters or fewer"
+    val tooLongError = "Error: The email address must be 132 characters or fewer"
 
   private object agentApplication:
 
@@ -207,6 +207,36 @@ extends ControllerSpec:
       s"#${AgentEmailAddressForm.otherKey}-error"
     ).text() shouldBe ExpectedStrings.patternError
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+
+  s"POST $path with more than 132 characters should return 400" in:
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeEmailAddressProvided)
+    val response: WSResponse =
+      post(path)(Map(
+        AgentEmailAddressForm.key -> Seq(Constants.OTHER),
+        AgentEmailAddressForm.otherKey -> Seq(s"invalid@${"a".repeat(133)}.com")
+      ))
+
+    response.status shouldBe Status.BAD_REQUEST
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe ExpectedStrings.errorTitle
+    doc.mainContent.select(
+      s"#${AgentEmailAddressForm.otherKey}-error"
+    ).text() shouldBe ExpectedStrings.tooLongError
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+
+  s"POST $path with save for later should redirect to the saved for later page" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeEmailAddressProvided)
+    val response: WSResponse =
+      post(path)(Map(
+        AgentEmailAddressForm.key -> Seq(Constants.OTHER),
+        AgentEmailAddressForm.otherKey -> Seq(s"valid@email.com"),
+        "submit" -> Seq("SaveAndComeBackLater")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe Constants.EMPTY_STRING
+    response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $verifyPath with an email yet to be verified in the application should redirect to the email verification frontend" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterOtherEmailAddressSelected)

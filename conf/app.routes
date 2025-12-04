@@ -10,6 +10,7 @@ GET         /time-out                                                  uk.gov.hm
 GET         /timed-out                                                 uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timedOut
 
 GET         /application-submitted                                     uk.gov.hmrc.agentregistrationfrontend.controllers.apply.AgentApplicationController.applicationSubmitted
+GET         /view-application                                          uk.gov.hmrc.agentregistrationfrontend.controllers.apply.AgentApplicationController.viewSubmittedApplication
 
 # Agent apply routes
 GET         /apply                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.apply.AgentApplicationController.startRegistration
@@ -29,6 +30,7 @@ POST        /apply/about-your-business/partnership-type             uk.gov.hmrc.
 GET         /apply/about-your-business/agent-online-services-account uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.TypeOfSignInController.show
 POST        /apply/about-your-business/agent-online-services-account uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.TypeOfSignInController.submit
 GET         /apply/about-your-business/sign-in                       uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.TypeOfSignInController.showSignInPage
+GET         /apply/about-your-business/check-your-answers            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.CheckYourAnswersController.show
 
 ## Internal Routes for apply
 #  These routes are for internal navigation and should not be accessed directly through the browser URL and meant to be accessed via redirects from other routes.
@@ -78,9 +80,13 @@ GET         /apply/anti-money-laundering/evidence/upload-result     uk.gov.hmrc.
 GET         /apply/anti-money-laundering/evidence/upload-error      uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsEvidenceUploadController.showError(errorCode: String, errorMessage: String, errorRequestId: String, key: String)
 GET         /apply/anti-money-laundering/check-your-answers         uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.CheckYourAnswersController.show
 
-# Agents Standard route
+# Agents Standard routes
 GET         /apply/agent-standard/accept-agent-standard             uk.gov.hmrc.agentregistrationfrontend.controllers.apply.HmrcStandardForAgentsController.show
 POST        /apply/agent-standard/accept-agent-standard             uk.gov.hmrc.agentregistrationfrontend.controllers.apply.HmrcStandardForAgentsController.submit
+
+# Apply declaration
+GET         /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.DeclarationController.show
+POST        /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.DeclarationController.submit
 
 # Individuals (directors/partners/members/owners) providing details
 GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.start(linkId: LinkId)
@@ -88,6 +94,7 @@ GET         /provide-details/start/:linkId                          uk.gov.hmrc.
 ## Internal Routes for provide-details
 #  These routes are for internal navigation and should not be accessed directly through the browser URL and meant to be accessed via redirects from other routes.
 GET        /provide-details/internal/initiate-member-provide-details/:linkId  uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.InitiateMemberProvideDetailsController.initiateMemberProvideDetails(linkId: LinkId)
+
 
 GET         /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CompaniesHouseNameQueryController.show
 POST        /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CompaniesHouseNameQueryController.submit
@@ -99,5 +106,9 @@ GET         /provide-details/email-address                          uk.gov.hmrc.
 POST        /provide-details/email-address                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberEmailAddressController.submit
 GET         /provide-details/verify-email-address                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberEmailAddressController.verify
 GET         /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberNinoController.show
+POST        /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberNinoController.submit
+GET         /provide-details/utr                                    uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberSaUtrController.show
+POST        /provide-details/utr                                    uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberSaUtrController.submit
+GET         /provide-details/approve-applicant                    uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberApproveApplicantController.show
 GET         /provide-details/exit                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.genericExitPage
 GET         /provide-details/multiple-provided-details              uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.multipleProvidedDetailsPage

@@ -16,13 +16,20 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
+import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
+import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import play.api.mvc.Results.Ok
+import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.forms.MemberNinoForm
+import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberNinoPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -31,15 +38,53 @@ import javax.inject.Singleton
 class MemberNinoController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  placeholder: SimplePage
+  view: MemberNinoPage,
+  memberProvideDetailsService: MemberProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = action:
+  private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions.Member.getProvideDetailsInProgress
+    .ensure(
+      mpd =>
+        // TODO check email address is present
+//        mpd.memberProvidedDetails.emailAddress.nonEmpty &&
+        mpd.memberProvidedDetails.memberNino.exists {
+          case MemberNino.FromAuth(_) => false
+          case _ => true
+        },
+      implicit request =>
+        logger.info(s"Nino is already provided from auth or citizen details. Skipping page and moving to next page.")
+        // TODO check email address is present
+        /*if (request.memberProvidedDetails.emailAddress.isEmpty) Redirect(AppRoutes.providedetails.MemberEmailAddressController.show.url)
+        else*/
+        Redirect(AppRoutes.providedetails.MemberSaUtrController.show.url)
+    )
+
+  def show: Action[AnyContent] = baseAction:
     implicit request =>
-      Ok(placeholder(
-        h1 = "Enter Nino",
-        bodyText = Some(
-          "Placeholder for Member nino page..."
-        )
+      Ok(view(
+        MemberNinoForm.form
+          .fill:
+            request
+              .memberProvidedDetails
+              .memberNino
       ))
+
+  def submit: Action[AnyContent] =
+    baseAction
+      .ensureValidFormAndRedirectIfSaveForLater[MemberNino](
+        MemberNinoForm.form,
+        implicit r => view(_)
+      )
+      .async:
+        implicit request: (MemberProvideDetailsRequest[AnyContent] & FormValue[MemberNino]) =>
+          val validFormData: MemberNino = request.formValue
+          val updatedApplication: MemberProvidedDetails = request
+            .memberProvidedDetails
+            .modify(_.memberNino)
+            .setTo(Some(validFormData))
+          memberProvideDetailsService
+            .upsert(updatedApplication)
+            .map: _ =>
+              Redirect(AppRoutes.providedetails.MemberSaUtrController.show.url)
+      .redirectIfSaveForLater

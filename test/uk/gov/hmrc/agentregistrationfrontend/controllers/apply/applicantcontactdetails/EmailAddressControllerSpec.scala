@@ -38,6 +38,7 @@ extends ControllerSpec:
     val errorTitle = s"Error: $heading - Apply for an agent services account - GOV.UK"
     val requiredError = "Enter your email address"
     val invalidError = "Enter your email address with a name, @ symbol and a domain name, like yourname@example.com"
+    val tooLongError = "The email address must be 132 characters or fewer"
 
   private object agentApplication:
 
@@ -153,11 +154,23 @@ extends ControllerSpec:
     doc.mainContent.select(s"#${EmailAddressForm.key}-error").text() shouldBe s"Error: ${ExpectedStrings.invalidError}"
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
-  s"POST $path with save for later and valid email address should save data and redirect to the saved for later page" in:
-    ApplyStubHelper.stubsForSuccessfulUpdate(
-      application = agentApplication.beforeEmailAddressProvided,
-      updatedApplication = agentApplication.afterEmailAddressProvided
-    )
+  s"POST $path with more than 132 characters should return 400" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeEmailAddressProvided)
+    val response: WSResponse =
+      post(path)(Map(
+        EmailAddressForm.key -> Seq(s"invalid@${"a".repeat(132)}.com")
+      ))
+
+    response.status shouldBe Status.BAD_REQUEST
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe ExpectedStrings.errorTitle
+    doc.mainContent.select(
+      s"#${EmailAddressForm.key}-error"
+    ).text() shouldBe s"Error: ${ExpectedStrings.tooLongError}"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+
+  s"POST $path with save for later should redirect to the saved for later page" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeEmailAddressProvided)
     val response: WSResponse =
       post(path)(Map(
         EmailAddressForm.key -> Seq("user@test.com"),
@@ -167,7 +180,7 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
-    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeEmailAddressProvided)

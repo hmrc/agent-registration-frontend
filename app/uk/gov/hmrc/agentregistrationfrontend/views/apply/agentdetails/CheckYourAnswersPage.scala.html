@@ -16,12 +16,13 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.AnswerSummary
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 
 @this(
         layout: Layout,
         govukButton: GovukButton,
-        govukSummaryList: GovukSummaryList
+        answerSummary: AnswerSummary
 )
 
 @(implicit
@@ -39,88 +40,13 @@
     request.agentApplication.asLlpApplication.getAgentDetails
 }
 
-@businessNameRow = @{
-    SummaryListRow(
-        key = Key(
-            content = Text(messages(s"$key.businessName.label"))
-        ),
-        value = Value(
-            content = Text(agentDetails.businessName.getAgentBusinessName)
-        ),
-        actions = Some(Actions(
-            items = Seq(
-                ActionItem(
-                    href = s"${AppRoutes.apply.agentdetails.AgentBusinessNameController.show}",
-                    content = Text(messages("common.change")),
-                    visuallyHiddenText = Some(messages(s"$key.businessName.label"))
-                )
-            )
-        ))
-    )
-}
-@telephoneRow = @{
-    SummaryListRow(
-        key = Key(
-            content = Text(messages(s"$key.telephone.label"))
-        ),
-        value = Value(
-            content = Text(agentDetails.getTelephoneNumber.getAgentTelephoneNumber)
-        ),
-        actions = Some(Actions(
-            items = Seq(
-                ActionItem(
-                    href = s"${AppRoutes.apply.agentdetails.AgentTelephoneNumberController.show}",
-                    content = Text(messages("common.change")),
-                    visuallyHiddenText = Some(messages(s"$key.telephone.label"))
-                )
-            )
-        ))
-    )
-}
-@emailRow = @{
-    SummaryListRow(
-        key = Key(
-            content = Text(messages(s"$key.email.label"))
-        ),
-        value = Value(
-            content = Text(agentDetails.getAgentEmailAddress.getEmailAddress)
-        ),
-        actions = Some(Actions(
-            items = Seq(
-                ActionItem(
-                    href = s"${AppRoutes.apply.agentdetails.AgentEmailAddressController.show}",
-                    content = Text(messages("common.change")),
-                    visuallyHiddenText = Some(messages(s"$key.email.label"))
-                )
-            )
-        ))
-    )
-}
-@addressRow = @{
-    SummaryListRow(
-        key = Key(
-            content = Text(messages(s"$key.address.label"))
-        ),
-        value = Value(
-            content = HtmlContent(agentDetails.getAgentCorrespondenceAddress.toHtml)
-        ),
-        actions = Some(Actions(
-            items = Seq(
-                ActionItem(
-                    href = s"${AppRoutes.apply.agentdetails.AgentCorrespondenceAddressController.show}",
-                    content = Text(messages("common.change")),
-                    visuallyHiddenText = Some(messages(s"$key.address.label"))
-                )
-            )
-        ))
-    )
-}
-@rows = @{Seq(businessNameRow, telephoneRow, emailRow, addressRow)}
-
 @layout(pageTitle = title) {
     <h2 class="govuk-caption-l">@messages("agentDetails.title")</h2>
     <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
-    @govukSummaryList(SummaryList(rows))
+    @answerSummary(
+      key,
+      answers = agentDetails
+    )
     <p class="govuk-body">
       @govukButton(Button(
           href = Some(AppRoutes.apply.TaskListController.show.url),

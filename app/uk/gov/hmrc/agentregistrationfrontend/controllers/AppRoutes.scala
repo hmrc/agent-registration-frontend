@@ -38,6 +38,7 @@ object AppRoutes:
     val TaskListController = applyRoutes.TaskListController
     val SaveForLaterController = applyRoutes.SaveForLaterController
     val HmrcStandardForAgentsController = applyRoutes.HmrcStandardForAgentsController
+    val DeclarationController = applyRoutes.DeclarationController
 
     object aboutyourbusiness:
 
@@ -45,6 +46,7 @@ object AppRoutes:
       val TypeOfSignInController = aboutyourbusinessRoutes.TypeOfSignInController
       val PartnershipTypeController = aboutyourbusinessRoutes.PartnershipTypeController
       val BusinessTypeSessionController = aboutyourbusinessRoutes.BusinessTypeSessionController
+      val CheckYourAnswersController = aboutyourbusinessRoutes.CheckYourAnswersController
 
     object amls:
 
@@ -87,6 +89,8 @@ object AppRoutes:
     val MemberTelephoneNumberController = providedetailsRoutes.MemberTelephoneNumberController
     val MemberEmailAddressController = providedetailsRoutes.MemberEmailAddressController
     val MemberNinoController = providedetailsRoutes.MemberNinoController
+    val MemberSaUtrController = providedetailsRoutes.MemberSaUtrController
+    val MemberApproveApplicantController = providedetailsRoutes.MemberApproveApplicantController
 
     object internal:
       val InitiateMemberProvideDetailsController = internalProviDedetailsRoutes.InitiateMemberProvideDetailsController

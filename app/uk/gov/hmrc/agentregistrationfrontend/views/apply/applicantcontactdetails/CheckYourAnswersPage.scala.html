@@ -16,13 +16,15 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.AnswerSummary
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 @import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
 
 @this(
         layout: Layout,
         govukButton: GovukButton,
-        govukSummaryList: GovukSummaryList
+        govukSummaryList: GovukSummaryList,
+        answerSummary: AnswerSummary
 )
 
 @(implicit
@@ -36,104 +38,14 @@
 @title = @{
     messages(s"$key.title")
 }
-@contactDetails = @{
-    request.agentApplication.asLlpApplication.getApplicantContactDetails
-}
-
-@llpMemberRow = @{
-    SummaryListRow(
-        key = Key(
-            content = Text(messages(s"$key.llpMember.label"))
-        ),
-        value = Value(
-            content = Text(
-                messages(s"$key.llpMember.${contactDetails.applicantName.role.toString}")
-            )
-        ),
-        actions = Some(Actions(
-            items = Seq(
-                ActionItem(
-                    href = s"${AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show}",
-                    content = Text(messages(s"$key.change")),
-                    visuallyHiddenText = Some(messages(s"$key.llpMember.label"))
-                )
-            )
-        ))
-    )
-}
-@nameChangeRoute = @{
-    contactDetails.applicantName.role match {
-        case ApplicantRoleInLlp.Member => AppRoutes.apply.applicantcontactdetails.MemberNameController.show
-        case ApplicantRoleInLlp.Authorised => AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.show
-    }}
-@nameRow = @{
-    SummaryListRow(
-        key = Key(
-            content = Text(messages(s"$key.name.label"))
-        ),
-        value = Value(
-            content = Text(
-                contactDetails.getApplicantName
-            )
-        ),
-        actions = Some(Actions(
-            items = Seq(
-                ActionItem(
-                    href = nameChangeRoute.url,
-                    content = Text(messages(s"$key.change")),
-                    visuallyHiddenText = Some(messages(s"$key.name.label"))
-                )
-            )
-        ))
-    )
-}
-
-@telephoneRow = @{
-    SummaryListRow(
-        key = Key(
-            content = Text(messages(s"$key.telephone.label"))
-        ),
-        value = Value(
-            content = Text(contactDetails.getTelephoneNumber.value)
-        ),
-        actions = Some(Actions(
-            items = Seq(
-                ActionItem(
-                    href = s"${AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.show}",
-                    content = Text(messages(s"$key.change")),
-                    visuallyHiddenText = Some(messages(s"$key.telephone.label"))
-                )
-            )
-        ))
-    )
-}
-
-@emailRow = @{
-    SummaryListRow(
-        key = Key(
-            content = Text(messages(s"$key.email.label"))
-        ),
-        value = Value(
-            content = Text(contactDetails.getVerifiedEmail.value)
-        ),
-        actions = Some(Actions(
-            items = Seq(
-                ActionItem(
-                    href = s"${AppRoutes.apply.applicantcontactdetails.EmailAddressController.show}",
-                    content = Text(messages(s"$key.change")),
-                    visuallyHiddenText = Some(messages(s"$key.email.label"))
-                )
-            )
-        ))
-    )
-}
-
-@rows = @{Seq(llpMemberRow, nameRow, telephoneRow, emailRow)}
 
 @layout(pageTitle = title) {
     <h2 class="govuk-caption-l">@messages("applicant-contact-details.title")</h2>
     <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
-    @govukSummaryList(SummaryList(rows))
+    @answerSummary(
+      key = key,
+      answers = request.agentApplication.asLlpApplication.getApplicantContactDetails
+    )
     <p class="govuk-body">
       @govukButton(Button(
           href = Some(AppRoutes.apply.TaskListController.show.url),

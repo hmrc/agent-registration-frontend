@@ -61,7 +61,9 @@ class CompaniesHouseMatchingController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
+  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress
     .ensure(
       _.agentApplication.asLlpApplication.memberNameQuery.isDefined,
       implicit request =>

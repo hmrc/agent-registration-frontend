@@ -79,62 +79,67 @@ extends FrontendController(mcc, actions):
   def showGrsData(
     businessType: BusinessType,
     journeyId: JourneyId
-  ): Action[AnyContent] = actions.authorised:
-    implicit request =>
-      val prefilledForm =
-        request.session.get(journeyId.value).map(data => Json.parse(data).as[JourneyData]) match {
-          case Some(data) => form(businessType).fill(data)
-          case _ => formWithDefaults(businessType)
-        }
-      Ok(view(
-        prefilledForm,
-        businessType,
-        journeyId
-      ))
+  ): Action[AnyContent] = actions
+    .Applicant
+    .authorised:
+      implicit request =>
+        val prefilledForm =
+          request.session.get(journeyId.value).map(data => Json.parse(data).as[JourneyData]) match {
+            case Some(data) => form(businessType).fill(data)
+            case _ => formWithDefaults(businessType)
+          }
+        Ok(view(
+          prefilledForm,
+          businessType,
+          journeyId
+        ))
 
   def submitGrsData(
     businessType: BusinessType,
     journeyId: JourneyId
-  ): Action[AnyContent] = actions.authorised.async:
-    implicit request =>
-      form(businessType).bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest(view(
-            formWithErrors,
-            businessType,
-            journeyId
-          ))),
-        grsResponse =>
-          val json: JsValue = Json.toJson(grsResponse)
-          // to get BPR fetches working we need to store a BPR in stubs using GRS data
-          agentsExternalStubsConnector.storeBusinessPartnerRecord(
-            BusinessPartnerRecord(
-              businessPartnerExists = true,
-              uniqueTaxReference = grsResponse.sautr.map(_.value),
-              utr = grsResponse.sautr.map(_.value),
-              safeId = grsResponse.registration.registeredBusinessPartnerId.map(_.value).getOrElse(""),
-              organisation = Some(Organisation(
-                organisationName = grsResponse.companyProfile.map(_.companyName).getOrElse("BPR Test Org"),
-                organisationType = "5T"
-              )),
-              addressDetails = AddressDetails(
-                addressLine1 = "1 Test Street",
-                addressLine2 = "Test Area",
-                addressLine3 = None,
-                addressLine4 = None,
-                postalCode = grsResponse.postcode,
-                countryCode = "GB"
-              ),
-              contactDetails = Some(ContactDetails(
-                primaryPhoneNumber = Some("01234567890"),
-                emailAddress = Some("test@example.com")
-              ))
+  ): Action[AnyContent] = actions
+    .Applicant
+    .authorised
+    .async:
+      implicit request =>
+        form(businessType).bindFromRequest().fold(
+          formWithErrors =>
+            Future.successful(BadRequest(view(
+              formWithErrors,
+              businessType,
+              journeyId
+            ))),
+          grsResponse =>
+            val json: JsValue = Json.toJson(grsResponse)
+            // to get BPR fetches working we need to store a BPR in stubs using GRS data
+            agentsExternalStubsConnector.storeBusinessPartnerRecord(
+              BusinessPartnerRecord(
+                businessPartnerExists = true,
+                uniqueTaxReference = grsResponse.sautr.map(_.value),
+                utr = grsResponse.sautr.map(_.value),
+                safeId = grsResponse.registration.registeredBusinessPartnerId.map(_.value).getOrElse(""),
+                organisation = Some(Organisation(
+                  organisationName = grsResponse.companyProfile.map(_.companyName).getOrElse("BPR Test Org"),
+                  organisationType = "5T"
+                )),
+                addressDetails = AddressDetails(
+                  addressLine1 = "1 Test Street",
+                  addressLine2 = "Test Area",
+                  addressLine3 = None,
+                  addressLine4 = None,
+                  postalCode = grsResponse.postcode,
+                  countryCode = "GB"
+                ),
+                contactDetails = Some(ContactDetails(
+                  primaryPhoneNumber = Some("01234567890"),
+                  emailAddress = Some("test@example.com")
+                ))
+              )
+            ).map(_ =>
+              Redirect(AppRoutes.apply.internal.GrsController.journeyCallback(Some(journeyId)))
+                .addingToSession(journeyId.value -> json.toString)
             )
-          ).map(_ =>
-            Redirect(AppRoutes.apply.internal.GrsController.journeyCallback(Some(journeyId)))
-              .addingToSession(journeyId.value -> json.toString)
-          )
-      )
+        )
 
   def retrieveGrsData(journeyId: JourneyId): Action[AnyContent] = Action: request =>
     request.session.get(journeyId.value) match {

@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 abstract class FrontendController(
   mcc: MessagesControllerComponents,
-  actions: Actions
+  val actions: Actions
 )
 extends uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController(mcc),
   I18nSupport,

@@ -31,6 +31,8 @@ import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentEmailAddressForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
+import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.model.emailVerification.*
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
@@ -56,7 +58,9 @@ class AgentEmailAddressController @Inject() (
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions.getApplicationInProgress
+  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress
     .ensure(
       _
         .agentApplication
@@ -87,6 +91,13 @@ extends FrontendController(mcc, actions):
           ))
 
   def submit: Action[AnyContent] = baseAction
+    .ensure(
+      // because we cannot store any submitted email without checking it's verified status first
+      // if user is saving and continuing then handle the submission normally else redirect to save for later
+      SubmissionHelper.getSubmitAction(_) === SaveAndContinue,
+      implicit request =>
+        Redirect(AppRoutes.apply.SaveForLaterController.show)
+    )
     .async:
       implicit request: AgentApplicationRequest[AnyContent] =>
         AgentEmailAddressForm.form
@@ -135,7 +146,9 @@ extends FrontendController(mcc, actions):
                   )
           )
 
-  def verify: Action[AnyContent] = actions.getApplicationInProgress
+  def verify: Action[AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress
     .ensure(
       _.agentApplication
         .asLlpApplication

@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -132,8 +133,8 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe ExpectedStrings.documentTitle
-    val radioForOtherAddress = doc.mainContent.select(s"input#${AgentCorrespondenceAddressForm.key}-4") // third radio button indexed 4 as the radio divider is the third radio item
-    radioForOtherAddress.attr("value") shouldBe Constants.OTHER // we do not replay the ALF provided address value in the radio button
+    val radioForOtherAddress = doc.mainContent.select(s"input#${AgentCorrespondenceAddressForm.key}-3") // third radio button dynamically added for "other" address
+    radioForOtherAddress.attr("value") shouldBe AgentCorrespondenceAddress.fromAddressLookupAddress(tdAll.newCorrespondenceAddress).toValueString
     radioForOtherAddress.attr("checked") shouldBe "" // checked attribute is present when selected and has no value
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 

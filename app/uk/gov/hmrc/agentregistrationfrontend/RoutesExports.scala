@@ -23,3 +23,4 @@ object RoutesExports:
   export uk.gov.hmrc.agentregistration.shared.LinkId
   export uk.gov.hmrc.agentregistration.shared.AgentApplicationId
   export uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
+  export uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.FastForwardController.CompletedSection

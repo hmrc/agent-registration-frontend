@@ -18,12 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplicat
 
 import com.softwaremill.quicklens.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentBusinessName
-import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
-import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentEmailAddress
-import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentTelephoneNumber
-import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentVerifiedEmailAddress
-import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
+import uk.gov.hmrc.agentregistration.shared.agentdetails.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
 trait TdSectionAgentDetails {

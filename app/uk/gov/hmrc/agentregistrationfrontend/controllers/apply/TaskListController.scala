@@ -41,6 +41,7 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] =
     actions
+      .Applicant
       .getApplicationInProgress
       .ensure(
         _.agentApplication.isGrsDataReceived,
@@ -53,7 +54,7 @@ extends FrontendController(mcc, actions):
 
   extension (agentApplication: AgentApplicationLlp)
 
-    private def taskListStatus: TaskListStatus = {
+    def taskListStatus: TaskListStatus = {
       val contactIsComplete = agentApplication.applicantContactDetails.exists(_.isComplete)
       val amlsDetailsCompleted = agentApplication.amlsDetails.exists(_.isComplete)
       val agentDetailsIsComplete = agentApplication.agentDetails.exists(_.isComplete)

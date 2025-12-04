@@ -46,6 +46,7 @@ class AmlsExpiryDateController @Inject() (
 extends FrontendController(mcc, actions):
 
   val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+    .Applicant
     .getApplicationInProgress
     .ensure(
       _.agentApplication.amlsDetails.exists(_.amlsRegistrationNumber.isDefined),

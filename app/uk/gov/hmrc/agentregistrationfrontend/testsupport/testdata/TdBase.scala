@@ -17,22 +17,22 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
+import uk.gov.hmrc.agentregistration.shared.agentdetails.*
 import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName.NameOfAuthorised
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState
+import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
-import java.time.Clock
-import java.time.Instant
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
+import java.time.*
 import java.time.format.DateTimeFormatter
 
 trait TdBase:
@@ -65,6 +65,11 @@ trait TdBase:
     providerType = "GovernmentGateway"
   )
   def nino = Nino("AB123456C")
+  def ninoFromAuth = MemberNino.FromAuth(nino)
+  def ninoProvided = MemberNino.Provided(nino)
+  def saUtrFromAuth = MemberSaUtr.FromAuth(saUtr)
+  def saUtrFromCitizenDetails = MemberSaUtr.FromCitizenDetails(saUtr)
+  def saUtrProvided = MemberSaUtr.Provided(saUtr)
   def safeId: SafeId = SafeId("XA0001234512345")
   def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
   def applicantEmailAddress: EmailAddress = EmailAddress("user@test.com")
@@ -86,6 +91,38 @@ trait TdBase:
   )
   def postcode: String = "AA1 1AA"
   def authorisedPersonName: String = "Alice Smith"
+  def authorisedContactDetails: ApplicantContactDetails = ApplicantContactDetails(
+    applicantName = NameOfAuthorised(name = Some(authorisedPersonName)),
+    telephoneNumber = Some(telephoneNumber),
+    applicantEmailAddress = Some(ApplicantEmailAddress(
+      emailAddress = applicantEmailAddress,
+      isVerified = true
+    ))
+  )
+  def completeAgentDetails: AgentDetails = AgentDetails(
+    agentCorrespondenceAddress = Some(chroAddress),
+    telephoneNumber = Some(AgentTelephoneNumber(
+      agentTelephoneNumber = telephoneNumber.value,
+      otherAgentTelephoneNumber = None
+    )),
+    agentEmailAddress = Some(AgentVerifiedEmailAddress(
+      emailAddress = AgentEmailAddress(
+        agentEmailAddress = applicantEmailAddress.value,
+        otherAgentEmailAddress = None
+      ),
+      isVerified = true
+    )),
+    businessName = AgentBusinessName(
+      agentBusinessName = companyName,
+      otherAgentBusinessName = None
+    )
+  )
+  def completeAmlsDetails: AmlsDetails = AmlsDetails(
+    supervisoryBody = AmlsCode("HMRC"),
+    amlsRegistrationNumber = Some(AmlsRegistrationNumber("XAML1234567890")),
+    amlsExpiryDate = None,
+    amlsEvidence = None
+  )
   def agentApplicationId: AgentApplicationId = AgentApplicationId("agent-application-id-12345")
   def agentApplicationId2: AgentApplicationId = AgentApplicationId("agent-application-id-6789")
 
