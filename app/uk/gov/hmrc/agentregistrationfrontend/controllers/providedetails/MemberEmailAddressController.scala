@@ -52,7 +52,7 @@ class MemberEmailAddressController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions.Member.getProvideDetailsInProgress
+  private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions.getProvideDetailsInProgress
     .ensure(
       _.memberProvidedDetails.telephoneNumber.isDefined,
       implicit request =>
@@ -101,7 +101,7 @@ extends FrontendController(mcc, actions):
                   )
           )
 
-  def verify: Action[AnyContent] = actions.Member.getProvideDetailsInProgress
+  def verify: Action[AnyContent] = actions.getProvideDetailsInProgress
     .ensure(
       _.memberProvidedDetails.emailAddress.isDefined,
       implicit request =>
