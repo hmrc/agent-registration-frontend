@@ -14,12 +14,12 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
-@import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
-@import uk.gov.hmrc.agentregistrationfrontend.forms.MemberTelephoneNumberForm
+@import uk.gov.hmrc.agentregistration.shared.EmailAddress
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.partials.SaveAndContinue
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
+@import uk.gov.hmrc.agentregistrationfrontend.forms.MemberEmailAddressForm
+@import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.partials.SaveAndContinue
 
 @this(
         layout: Layout,
@@ -29,10 +29,10 @@
         saveAndContinue: SaveAndContinue
 )
 
-@(form: Form[TelephoneNumber])(implicit request: MemberProvideDetailsRequest[AnyContent], messages: Messages)
+@(form: Form[EmailAddress])(implicit request: MemberProvideDetailsRequest[AnyContent], messages: Messages)
 
 @key = @{
-    MemberTelephoneNumberForm.key
+    MemberEmailAddressForm.key
 }
 @title = @{
     messages(s"$key.title")
@@ -42,17 +42,17 @@
     maybeForm = Some(form)
 ) {
     <h2 class="govuk-caption-l">@messages("provide-details.llp.title")</h2>
-    @formWithCSRF(action = AppRoutes.providedetails.MemberTelephoneNumberController.submit) {
+    @formWithCSRF(action = AppRoutes.providedetails.MemberEmailAddressController.submit) {
         @govukInput(Input(
             label = Label(
                 content = Text(title),
                 isPageHeading = true,
                 classes = "govuk-label--l"
             ),
-            inputType = "tel",
+            inputType = "email",
             hint = Some(Hint(content = Text(messages(s"$key.hint")))),
-            autocomplete = Some("tel"),
-            classes = "govuk-input--width-20"
+            autocomplete = Some("email"),
+            spellcheck = Some("false")
         ).withFormField(form(key)))
 
         @saveAndContinue()

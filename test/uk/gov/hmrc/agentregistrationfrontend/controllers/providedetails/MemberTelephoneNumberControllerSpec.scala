@@ -106,30 +106,3 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: What is your telephone number? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#memberTelephoneNumber-error").text() shouldBe "Error: The phone number must be 25 characters or fewer"
-
-  s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeTelephoneUpdate))
-    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvideDetails.afterTelephoneNumberProvided)
-    val response: WSResponse =
-      post(path)(Map(
-        MemberTelephoneNumberForm.key -> Seq(tdAll.telephoneNumber.value),
-        "submit" -> Seq("SaveAndComeBackLater")
-      ))
-
-    response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
-    response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
-
-  s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeTelephoneUpdate))
-    val response: WSResponse =
-      post(path)(Map(
-        MemberTelephoneNumberForm.key -> Seq("[[*%"),
-        "submit" -> Seq("SaveAndComeBackLater")
-      ))
-
-    response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
-    response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url

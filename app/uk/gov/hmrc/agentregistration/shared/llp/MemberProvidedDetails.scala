@@ -39,6 +39,7 @@ final case class MemberProvidedDetails(
   agentApplicationId: AgentApplicationId,
   companiesHouseMatch: Option[CompaniesHouseMatch] = None,
   telephoneNumber: Option[TelephoneNumber] = None,
+  emailAddress: Option[MemberVerifiedEmailAddress] = None,
   nino: Option[Nino] = None,
   saUtr: Option[SaUtr] = None
 ):
@@ -49,6 +50,7 @@ final case class MemberProvidedDetails(
   def getCompaniesHouseMatch: CompaniesHouseMatch = companiesHouseMatch.getOrThrowExpectedDataMissing(
     "Companies house query is missing for member provided details"
   )
+  def getEmailAddress: MemberVerifiedEmailAddress = emailAddress.getOrThrowExpectedDataMissing("Email address is missing")
 
 object MemberProvidedDetails:
   given format: OFormat[MemberProvidedDetails] = Json.format[MemberProvidedDetails]
