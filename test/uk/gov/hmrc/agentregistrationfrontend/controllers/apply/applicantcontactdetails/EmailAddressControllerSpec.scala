@@ -169,11 +169,8 @@ extends ControllerSpec:
     ).text() shouldBe s"Error: ${ExpectedStrings.tooLongError}"
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
-  s"POST $path with save for later and valid email address should save data and redirect to the saved for later page" in:
-    ApplyStubHelper.stubsForSuccessfulUpdate(
-      application = agentApplication.beforeEmailAddressProvided,
-      updatedApplication = agentApplication.afterEmailAddressProvided
-    )
+  s"POST $path with save for later should redirect to the saved for later page" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeEmailAddressProvided)
     val response: WSResponse =
       post(path)(Map(
         EmailAddressForm.key -> Seq("user@test.com"),
@@ -183,7 +180,7 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
-    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeEmailAddressProvided)

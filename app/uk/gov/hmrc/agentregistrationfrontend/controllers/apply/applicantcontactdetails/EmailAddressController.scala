@@ -30,6 +30,8 @@ import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
+import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.model.emailVerification.*
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.EmailVerificationService
@@ -77,44 +79,49 @@ extends FrontendController(mcc, actions):
           .map(_.emailAddress)
       )))
 
-  def submit: Action[AnyContent] =
-    baseAction
-      .async:
-        implicit request =>
-          EmailAddressForm.form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-              emailAddress =>
-                val updatedApplication = request
-                  .agentApplication
-                  .asLlpApplication
-                  .modify(_.applicantContactDetails.each.applicantEmailAddress)
-                  .using {
-                    case Some(details) =>
-                      Some(ApplicantEmailAddress(
-                        emailAddress = emailAddress,
-                        // avoid unsetting verified status of any unchanged email if we are not ignoring verification
-                        isVerified =
-                          appConfig.ignoreEmailVerification ||
-                            (emailAddress === details.emailAddress && details.isVerified)
-                      ))
-                    case None =>
-                      Some(ApplicantEmailAddress(
-                        emailAddress = emailAddress,
-                        isVerified = appConfig.ignoreEmailVerification
-                      ))
-                  }
+  def submit: Action[AnyContent] = baseAction
+    .ensure(
+      // because we cannot store any submitted email without checking it's verified status first
+      // if user is saving and continuing then handle the submission normally else redirect to save for later
+      SubmissionHelper.getSubmitAction(_) === SaveAndContinue,
+      implicit request =>
+        Redirect(AppRoutes.apply.SaveForLaterController.show)
+    )
+    .async:
+      implicit request =>
+        EmailAddressForm.form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+            emailAddress =>
+              val updatedApplication = request
+                .agentApplication
+                .asLlpApplication
+                .modify(_.applicantContactDetails.each.applicantEmailAddress)
+                .using {
+                  case Some(details) =>
+                    Some(ApplicantEmailAddress(
+                      emailAddress = emailAddress,
+                      // avoid unsetting verified status of any unchanged email if we are not ignoring verification
+                      isVerified =
+                        appConfig.ignoreEmailVerification ||
+                          (emailAddress === details.emailAddress && details.isVerified)
+                    ))
+                  case None =>
+                    Some(ApplicantEmailAddress(
+                      emailAddress = emailAddress,
+                      isVerified = appConfig.ignoreEmailVerification
+                    ))
+                }
 
-                agentApplicationService
-                  .upsert(updatedApplication)
-                  .map(_ =>
-                    Redirect(
-                      routes.EmailAddressController.verify
-                    )
+              agentApplicationService
+                .upsert(updatedApplication)
+                .map(_ =>
+                  Redirect(
+                    routes.EmailAddressController.verify
                   )
-            )
-      .redirectIfSaveForLater
+                )
+          )
 
   def verify: Action[AnyContent] = actions
     .Applicant

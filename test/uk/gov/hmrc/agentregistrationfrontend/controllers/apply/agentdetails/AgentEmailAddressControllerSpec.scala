@@ -224,6 +224,20 @@ extends ControllerSpec:
     ).text() shouldBe ExpectedStrings.tooLongError
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
+  s"POST $path with save for later should redirect to the saved for later page" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeEmailAddressProvided)
+    val response: WSResponse =
+      post(path)(Map(
+        AgentEmailAddressForm.key -> Seq(Constants.OTHER),
+        AgentEmailAddressForm.otherKey -> Seq(s"valid@email.com"),
+        "submit" -> Seq("SaveAndComeBackLater")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe Constants.EMPTY_STRING
+    response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+
   s"GET $verifyPath with an email yet to be verified in the application should redirect to the email verification frontend" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterOtherEmailAddressSelected)
     EmailVerificationStubs.stubEmailStatusUnverified(tdAll.credentials.providerId)
