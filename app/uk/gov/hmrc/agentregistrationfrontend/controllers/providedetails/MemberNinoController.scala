@@ -54,6 +54,9 @@ extends FrontendController(mcc, actions):
         },
       implicit request =>
         logger.info(s"Nino is already provided from auth or citizen details. Skipping page and moving to next page.")
+        // TODO check email address is present
+        /*if (request.memberProvidedDetails.emailAddress.isEmpty) Redirect(AppRoutes.providedetails.MemberEmailAddressController.show.url)
+        else*/
         Redirect(AppRoutes.providedetails.MemberSaUtrController.show.url)
     )
 

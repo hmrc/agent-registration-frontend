@@ -67,6 +67,14 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe routes.MemberApproveApplicantController.show.url
 
+  s"GET $path should redirect to previous page when Nino is not provided from HMRC systems (Auth)" in:
+    AuthStubs.stubAuthoriseIndividual()
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeSaUtrFromAuth.copy(memberNino = None)))
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe routes.MemberNinoController.show.url
+
   s"POST $path with selected Yes and valid name should save data and redirect to check your answers" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeSaUtrMissingInHmrcSystems))

@@ -54,7 +54,10 @@ extends FrontendController(mcc, actions):
           },
       implicit request =>
         logger.info(s"SaUtr is already provided from auth or citizen details. Skipping page and moving to next page.")
-        Redirect(AppRoutes.providedetails.MemberApproveApplicantController.show.url)
+        if (request.memberProvidedDetails.memberNino.isEmpty)
+          Redirect(AppRoutes.providedetails.MemberNinoController.show.url)
+        else
+          Redirect(AppRoutes.providedetails.MemberApproveApplicantController.show.url)
     )
 
   def show: Action[AnyContent] = baseAction:

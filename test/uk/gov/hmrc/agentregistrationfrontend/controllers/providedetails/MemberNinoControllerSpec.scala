@@ -66,6 +66,17 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe routes.MemberSaUtrController.show.url
 
+  // TODO - reenable after email merge
+  /*
+    s"GET $path should redirect to previous page when EmailAddress is not provided from HMRC systems (Auth)" in :
+      AuthStubs.stubAuthoriseIndividual()
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoFromAuth.copy(emailAddress = None)))
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe routes.MemberEmailAddressController.show.url
+   */
+
   s"POST $path with selected Yes and valid name should save data and redirect to check your answers" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoMissingInHmrcSystems))
