@@ -18,7 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.providedetail
 
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseMatch
+import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Started
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
@@ -55,5 +57,47 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
     val afterTelephoneNumberProvided: MemberProvidedDetails = afterOfficerChosen
       .modify(_.telephoneNumber)
       .setTo(Some(dependencies.telephoneNumber))
+
+    // TODO - update this once we have a email field in MemberProvidedDetails
+    val afterEmailProvided: MemberProvidedDetails = afterTelephoneNumberProvided
+//      .modify(_.emailAddress)
+//      .setTo(Some(dependencies.emailAddress))
+
+    // That way is better than having to write a bunch of methods for each field in MemberProvidedDetails
+    def withNinoProvided(state: MemberProvidedDetails): MemberProvidedDetails = state
+      .modify(_.memberNino)
+      .setTo(Some(dependencies.ninoProvided))
+
+    def withNinoFromAuth(state: MemberProvidedDetails): MemberProvidedDetails = state
+      .modify(_.memberNino)
+      .setTo(Some(dependencies.ninoFromAuth))
+
+    def withNinoNotProvided(state: MemberProvidedDetails): MemberProvidedDetails = state
+      .modify(_.memberNino)
+      .setTo(Some(MemberNino.NotProvided))
+
+    val afterNinoProvided: MemberProvidedDetails = afterEmailProvided
+      .modify(_.memberNino)
+      .setTo(Some(dependencies.ninoProvided))
+
+    def withSaUtrProvided(state: MemberProvidedDetails): MemberProvidedDetails = state
+      .modify(_.memberSaUtr)
+      .setTo(Some(dependencies.saUtrProvided))
+
+    def withSaUtrFromAuth(state: MemberProvidedDetails): MemberProvidedDetails = state
+      .modify(_.memberSaUtr)
+      .setTo(Some(dependencies.saUtrFromAuth))
+
+    def withSaUtrFromCitizenDetails(state: MemberProvidedDetails): MemberProvidedDetails = state
+      .modify(_.memberSaUtr)
+      .setTo(Some(dependencies.saUtrFromCitizenDetails))
+
+    def withSaUtrNotProvided(state: MemberProvidedDetails): MemberProvidedDetails = state
+      .modify(_.memberSaUtr)
+      .setTo(Some(MemberSaUtr.NotProvided))
+
+    val afterSaUtrProvided: MemberProvidedDetails = afterNinoProvided
+      .modify(_.memberSaUtr)
+      .setTo(Some(dependencies.saUtrProvided))
 
 }

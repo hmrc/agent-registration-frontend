@@ -88,6 +88,9 @@ object AppRoutes:
     val ExitController = providedetailsRoutes.ExitController
     val MemberTelephoneNumberController = providedetailsRoutes.MemberTelephoneNumberController
     val MemberEmailAddressController = providedetailsRoutes.MemberEmailAddressController
+    val MemberNinoController = providedetailsRoutes.MemberNinoController
+    val MemberSaUtrController = providedetailsRoutes.MemberSaUtrController
+    val MemberApproveApplicantController = providedetailsRoutes.MemberApproveApplicantController
 
     object internal:
       val InitiateMemberProvideDetailsController = internalProviDedetailsRoutes.InitiateMemberProvideDetailsController
