@@ -14,10 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.DesBusinessAddress
-@import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 @import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
+@import uk.gov.hmrc.agentregistrationfrontend.model.AddressOptions
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
@@ -33,28 +32,20 @@
 
 @(
         form: Form[String],
-        bprAddress: Option[DesBusinessAddress]
+        addressOptions: AddressOptions
 )(implicit request: AgentApplicationRequest[?], messages: Messages)
 
 @key = @{
     AgentCorrespondenceAddressForm.key
 }
-@chroAddress = @{
-    request
-    .agentApplication
-    .asLlpApplication
-    .getBusinessDetails
-    .companyProfile
-    .unsanitisedCHROAddress
-}
 @bprRadio = @{
-  if(bprAddress.isEmpty) {
+  if(addressOptions.bprAddress.isEmpty) {
     Seq.empty[RadioItem]
   } else
     Seq(
         RadioItem(
-            content = Text(bprAddress.get.toValueString),
-            value = Some(bprAddress.get.toValueString),
+            content = Text(addressOptions.bprAddress.get.toValueString),
+            value = Some(addressOptions.bprAddress.get.toValueString),
             hint = Some(Hint(
                 content = Text(messages(s"$key.bpr.hint"))
             ))
@@ -62,22 +53,38 @@
     )
 }
 @companiesHouseRadio = @{
-  if(chroAddress.isDefined) {
-    Seq(
-        RadioItem(
-            content = Text(chroAddress.get.toValueString),
-            value = Some(chroAddress.get.toValueString),
-            hint = Some(Hint(
-                content = Text(messages(s"$key.chro.hint"))
-            ))
-        )
-    )
-  } else {
+  if(addressOptions.chroAddress.isEmpty) {
     Seq.empty[RadioItem]
+  } else {
+    Seq(
+      RadioItem(
+        content = Text(addressOptions.chroAddress.get.toValueString),
+        value = Some(addressOptions.chroAddress.get.toValueString),
+        hint = Some(Hint(
+          content = Text(messages(s"$key.chro.hint"))
+        ))
+      )
+    )
   }
 }
 
-@otherRadios = @{
+@otherAddressRadio = @{
+  if(addressOptions.otherAddress.isEmpty) {
+    Seq.empty[RadioItem]
+  } else {
+    Seq(
+      RadioItem(
+        content = Text(addressOptions.otherAddress.get.toValueString),
+        value = Some(addressOptions.otherAddress.get.toValueString),
+        hint = Some(Hint(
+          content = Text(messages(s"$key.existingOther.hint"))
+        ))
+      )
+    )
+  }
+}
+
+@somethingElseRadio = @{
   Seq(
     RadioItem(
         divider = Some(messages("common.or"))
@@ -89,7 +96,7 @@
   )
 }
 @title = @{messages(s"$key.title")}
-@allRadios = @{companiesHouseRadio ++ bprRadio ++ otherRadios}
+@allRadios = @{companiesHouseRadio ++ bprRadio ++ otherAddressRadio ++ somethingElseRadio}
 @layout(
     pageTitle = title,
     maybeForm = Some(form)
