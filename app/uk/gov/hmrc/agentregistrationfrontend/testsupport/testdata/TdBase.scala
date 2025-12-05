@@ -73,6 +73,7 @@ trait TdBase:
   def safeId: SafeId = SafeId("XA0001234512345")
   def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
   def applicantEmailAddress: EmailAddress = EmailAddress("user@test.com")
+  def memberEmailAddress: EmailAddress = EmailAddress("member@test.com")
 
   def telephoneNumber: TelephoneNumber = TelephoneNumber("(+44) 10794554342")
   def crn: Crn = Crn("1234567890")

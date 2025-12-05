@@ -52,26 +52,23 @@ extends FrontendController(mcc, actions):
         Redirect(AppRoutes.providedetails.CompaniesHouseNameQueryController.show)
     )
 
-  def submit: Action[AnyContent] =
-    baseAction
-      .ensureValidFormAndRedirectIfSaveForLater(MemberTelephoneNumberForm.form, implicit r => view(_))
-      .async:
-        implicit request: MemberProvideDetailsRequest[AnyContent] =>
-          MemberTelephoneNumberForm.form
-            .bindFromRequest()
-            .fold(
-              formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-              telephoneNumberFromForm =>
-                val updatedApplication: MemberProvidedDetails = request
-                  .memberProvidedDetails
-                  .modify(_.telephoneNumber)
-                  .setTo(Some(telephoneNumberFromForm))
-                memberProvideDetailsService
-                  .upsert(updatedApplication)
-                  .map: _ =>
-                    Redirect(AppRoutes.providedetails.MemberEmailAddressController.show.url)
-            )
-      .redirectIfSaveForLater
+  def submit: Action[AnyContent] = baseAction
+    .async:
+      implicit request: MemberProvideDetailsRequest[AnyContent] =>
+        MemberTelephoneNumberForm.form
+          .bindFromRequest()
+          .fold(
+            formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
+            telephoneNumberFromForm =>
+              val updatedProvidedDetails: MemberProvidedDetails = request
+                .memberProvidedDetails
+                .modify(_.telephoneNumber)
+                .setTo(Some(telephoneNumberFromForm))
+              memberProvideDetailsService
+                .upsert(updatedProvidedDetails)
+                .map: _ =>
+                  Redirect(AppRoutes.providedetails.MemberEmailAddressController.show.url)
+          )
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>

@@ -21,6 +21,7 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseMatch
 import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
+import uk.gov.hmrc.agentregistration.shared.llp.MemberVerifiedEmailAddress
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Started
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
@@ -58,10 +59,19 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
       .modify(_.telephoneNumber)
       .setTo(Some(dependencies.telephoneNumber))
 
-    // TODO - update this once we have a email field in MemberProvidedDetails
     val afterEmailProvided: MemberProvidedDetails = afterTelephoneNumberProvided
-//      .modify(_.emailAddress)
-//      .setTo(Some(dependencies.emailAddress))
+      .modify(_.emailAddress)
+      .setTo(Some(MemberVerifiedEmailAddress(
+        emailAddress = dependencies.memberEmailAddress,
+        isVerified = false
+      )))
+
+    val afterVerfiedEmailProvided: MemberProvidedDetails = afterTelephoneNumberProvided
+      .modify(_.emailAddress)
+      .setTo(Some(MemberVerifiedEmailAddress(
+        emailAddress = dependencies.memberEmailAddress,
+        isVerified = true
+      )))
 
     // That way is better than having to write a bunch of methods for each field in MemberProvidedDetails
     def withNinoProvided(state: MemberProvidedDetails): MemberProvidedDetails = state
