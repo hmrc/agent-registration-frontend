@@ -21,6 +21,9 @@ import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.given
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
@@ -148,6 +151,46 @@ extends RequestAwareLogging:
               status = other,
               response = response,
               info = s"getBusinessPartnerRecord problem"
+            )
+
+  def initiateUpscanUpload(uploadDetails: UploadDetails)(using
+    request: RequestHeader
+  ): Future[Unit] =
+    val url = url"$baseUrl/application/amls/upscan-initiate"
+    httpClient
+      .post(url)
+      .withBody(Json.toJson(uploadDetails))
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.CREATED => ()
+          case other =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = other,
+              response = response,
+              info = s"initiateUpscanUpload problem"
+            )
+
+  def getUpscanStatus(uploadId: UploadId)(using
+    request: RequestHeader
+  ): Future[Option[UploadStatus]] =
+    val url = url"$baseUrl/application/amls/upscan-status/${uploadId.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => Some(response.json.as[UploadStatus])
+          case Status.NO_CONTENT => None
+          case other =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = other,
+              response = response,
+              info = s"getUpscanStatus problem"
             )
 
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration"

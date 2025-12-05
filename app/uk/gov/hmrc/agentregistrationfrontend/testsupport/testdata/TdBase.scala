@@ -30,6 +30,7 @@ import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState
 import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import java.time.*
@@ -123,6 +124,8 @@ trait TdBase:
     amlsExpiryDate = None,
     amlsEvidence = None
   )
+  def uploadId: UploadId = UploadId("upload-id-12345")
+  def objectStoreValidHexVal: String = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   def agentApplicationId: AgentApplicationId = AgentApplicationId("agent-application-id-12345")
   def agentApplicationId2: AgentApplicationId = AgentApplicationId("agent-application-id-6789")
 

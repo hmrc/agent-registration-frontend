@@ -23,7 +23,10 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsName
+import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadIdGenerator
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
@@ -31,13 +34,18 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanConnector
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.ErrorTemplate
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.UpscanErrorPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadProgressPage
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.services.ObjectStoreService
+import uk.gov.hmrc.agentregistrationfrontend.services.UpscanProgressService
+import uk.gov.hmrc.objectstore.client.Path
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class AmlsEvidenceUploadController @Inject() (
@@ -45,12 +53,15 @@ class AmlsEvidenceUploadController @Inject() (
   actions: Actions,
   view: AmlsEvidenceUploadPage,
   progressView: AmlsEvidenceUploadProgressPage,
-  errorView: ErrorTemplate,
+  errorView: UpscanErrorPage,
   appConfig: AppConfig,
   upscanInitiateConnector: UpscanConnector,
   applicationService: AgentApplicationService,
-  amlsCodes: AmlsCodes
-)
+  amlsCodes: AmlsCodes,
+  upscanProgressService: UpscanProgressService,
+  objectStoreService: ObjectStoreService,
+  uploadIdGenerator: UploadIdGenerator
+)(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
   val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
@@ -73,7 +84,7 @@ extends FrontendController(mcc, actions):
     implicit request =>
       val amlsCode: AmlsCode = request.agentApplication.getAmlsDetails.supervisoryBody
       val amlsName: AmlsName = amlsCodes.getSupervisoryName(amlsCode)
-
+      val newUploadId: UploadId = uploadIdGenerator.nextUploadId()
       for
         upscanInitiateResponse <- upscanInitiateConnector.initiate(
           redirectOnSuccess = Some(appConfig.upscanRedirectBase + routes.AmlsEvidenceUploadController.showResult.url),
@@ -81,16 +92,21 @@ extends FrontendController(mcc, actions):
           redirectOnError = Some(appConfig.upscanRedirectBase + "/agent-registration/apply/anti-money-laundering/evidence/error"),
           maxFileSize = appConfig.maxFileSize
         )
-        // store the upscan fileReference in the application
+        uploadDetails = UploadDetails(
+          uploadId = newUploadId,
+          status = UploadStatus.InProgress,
+          reference = upscanInitiateResponse.fileReference
+        )
+        // store the upscan fileReference and new uploadId in the application
+        // and initiate the upscan progress tracking in agent-registration backend
         _ <- applicationService
           .upsert(
             request.agentApplication.asLlpApplication
               .modify(_.amlsDetails.each.amlsEvidence)
-              .setTo(Some(UploadDetails(
-                status = UploadStatus.InProgress,
-                reference = upscanInitiateResponse.fileReference
-              )))
-          )
+              .setTo(Some(uploadDetails))
+          ).flatMap: _ =>
+            upscanProgressService
+              .initiate(uploadDetails)
       yield Ok(view(
         upscanInitiateResponse = upscanInitiateResponse,
         supervisoryBodyName = amlsName
@@ -98,8 +114,9 @@ extends FrontendController(mcc, actions):
 
   /** Handles file upload errors from Upscan.
     *
-    * This endpoint is called when a file transfer to Upscan service fails. Upscan will redirect to this endpoint and append error information as query
-    * parameters to the redirect URL.
+    * This endpoint is called when a file transfer to Upscan service fails. It is not the endpoint for reporting file scanning failures, that happens in
+    * showResult which reads the upload status from the application. Upscan will redirect to this endpoint and append error information as query parameters to
+    * the redirect URL.
     */
   def showError(
     errorCode: String,
@@ -110,21 +127,48 @@ extends FrontendController(mcc, actions):
     .Applicant
     .getApplicationInProgress:
       implicit request =>
-        Ok(errorView(
-          pageTitle = "Upload Error",
-          heading = "Upload Error",
-          message = s"$errorMessage, Code: $errorCode, RequestId: $errorRequestId, FileReference: $key"
-        ))
+        logger.warn(
+          s"Received Upscan upload error callback: errorCode=$errorCode, errorMessage=$errorMessage, " +
+            s"errorRequestId=$errorRequestId, key=$key"
+        )
+        Ok(errorView(errorCode))
 
   def showResult: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress:
+    .getApplicationInProgress
+    .async:
       implicit request =>
-        Ok(progressView(request
-          .agentApplication
-          .getAmlsDetails
-          .getAmlsEvidence
-          .status))
+        upscanProgressService.getUpscanStatus().flatMap:
+          case Some(status) if status != UploadStatus.InProgress =>
+            for {
+              objectStorePath <- objectStoreService
+                .transferFileToObjectStore(
+                  request
+                    .agentApplication
+                    .getAmlsDetails
+                    .getAmlsEvidence
+                    .reference,
+                  status
+                )
+              updatedApplication =
+                (objectStorePath, status) match
+                  case (Some(path: Path.File), success: UploadStatus.UploadedSuccessfully) =>
+                    request.agentApplication.asLlpApplication
+                      .modify(_.amlsDetails.each.amlsEvidence.each.status)
+                      .setTo(
+                        success
+                          .modify(_.objectStoreLocation)
+                          .setTo(Some(ObjectStoreUrl(path.asUri)))
+                      )
+                  case _ =>
+                    request.agentApplication.asLlpApplication
+                      .modify(_.amlsDetails.each.amlsEvidence.each.status)
+                      .setTo(status)
+              _ <- applicationService.upsert(updatedApplication)
+            } yield Ok(progressView(status))
+          case _ =>
+            // no status change, just render the page
+            Future.successful(Ok(progressView(UploadStatus.InProgress)))
 
   private val corsHeaders: Seq[(String, String)] = Seq(
     "Access-Control-Allow-Origin" -> appConfig.allowedCorsOrigin,
@@ -132,18 +176,16 @@ extends FrontendController(mcc, actions):
     "Access-Control-Allow-Methods" -> "GET, OPTIONS"
   )
 
-  // this method returns a status code only for AJAX polling
+  // this method returns a status code to a JavaScript process polling - JS will redirect to result page when upload is complete or failed
   def pollResultWithJavaScript: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress:
+    .getApplicationInProgress
+    .async:
       implicit request =>
-        request
-          .agentApplication.asLlpApplication
-          .getAmlsDetails
-          .getAmlsEvidence
-          .status match {
-          case UploadStatus.InProgress => NoContent.withHeaders(corsHeaders*)
-          case _: UploadStatus.UploadedSuccessfully => Accepted.withHeaders(corsHeaders*)
-          case failed: UploadStatus.Failed if failed.failureReason == "QUARANTINE" => Conflict.withHeaders(corsHeaders*)
-          case _: UploadStatus.Failed => BadRequest.withHeaders(corsHeaders*)
-        }
+        upscanProgressService.getUpscanStatus().map:
+          case Some(status) =>
+            status match
+              case UploadStatus.InProgress => NoContent.withHeaders(corsHeaders*)
+              case _: UploadStatus.UploadedSuccessfully => Accepted.withHeaders(corsHeaders*)
+              case UploadStatus.Failed => BadRequest.withHeaders(corsHeaders*)
+          case _ => NoContent.withHeaders(corsHeaders*) // no status change

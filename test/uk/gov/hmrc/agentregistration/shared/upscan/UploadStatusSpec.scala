@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistration.shared.upscan
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
+import uk.gov.hmrc.http.StringContextOps
 
 class UploadStatusSpec
 extends UnitSpec:
@@ -28,9 +29,9 @@ extends UnitSpec:
     val uploadedSuccessfully: UploadStatus = UploadStatus.UploadedSuccessfully(
       name = "test.pdf",
       mimeType = "application/pdf",
-      downloadUrl = ObjectStoreUrl("http://localhost:9000/test.pdf"),
+      downloadUrl = url"http://localhost:9000/test.pdf",
       size = Some(1000),
-      checksum = "checksum"
+      checksum = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     )
 
     val uploadedSuccessfullyJson: JsValue = Json.parse(
@@ -47,12 +48,11 @@ extends UnitSpec:
         |""".stripMargin
     )
 
-    val uploadFailed: UploadStatus = UploadStatus.Failed("Invalid file type")
+    val uploadFailed: UploadStatus = UploadStatus.Failed
     val uploadFailedJson: JsValue = Json.parse(
       // language=JSON
       """
         |{
-        |  "failureReason": "Invalid file type",
         |  "type": "Failed"
         |}
         |""".stripMargin

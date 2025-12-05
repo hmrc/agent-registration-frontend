@@ -276,21 +276,19 @@ amlsEvidenceUpload.error.required = Upload a file as evidence of your anti-money
 amlsEvidenceUpload.error.wrong-file-type = The selected file must be a JPG, JPEG, PNG, TIFF, PDF, TXT, MSG, DOC, DOCX, XLS, XLSX, PPT, PPTX, ODT, ODS or ODP file
 amlsEvidenceUpload.error.file-too-large = The selected file must not be larger than 5MB
 amlsEvidenceUpload.error.virus = The file you uploaded was infected with a virus
-amlsEvidenceUpload.error.generic = The file upload has failed. Try uploading your file again.
+amlsEvidenceUpload.error.generic = The file upload has failed. Try uploading another file.
 
 fileUploadProgress.title=We are checking your upload
 fileUploadProgress.complete.title=Your upload is complete
-fileUploadProgress.QUARANTINE.title=Your upload has a virus
-fileUploadProgress.TOO_LARGE.title=Your upload is too large
-fileUploadProgress.REJECTED.title=Your upload is the wrong type of file
-fileUploadProgress.failed.title=Your upload has failed
+fileUploadProgress.failed.title=Your upload has failed scanning
 fileUploadProgress.message=Checking file
 fileUploadProgress.inProgress=Wait a few seconds and then select ‘Continue’.
 fileUploadProgress.complete=Your file {0} has been uploaded successfully.
-fileUploadProgress.QUARANTINE=Your file upload has failed. Try uploading another file.
-fileUploadProgress.REJECTED=The selected file must be a JPG, JPEG, PNG, TIFF, PDF, TXT, MSG, DOC, DOCX, XLS, XLSX, PPT, PPTX, ODT, ODS or ODP file.
-fileUploadProgress.TOO_LARGE=The selected file must not be larger than 5MB.
-fileUploadProgress.failed=Your file upload has failed. Try uploading your file again.
+fileUploadProgress.failed=Your file upload has failed scanning. Try uploading another file.
+
+upscanError.TOO_LARGE.title = Your upload is too large
+upscanError.TOO_LARGE.message = The file you are trying to upload is too large. The maximum file size is 5MB. Try uploading a smaller file.
+
 
 ## Apply / Meet the HMRC standard for agents / AmlsDetails / Check your answers
 amlsCheckYourAnswers.title = Check your answers

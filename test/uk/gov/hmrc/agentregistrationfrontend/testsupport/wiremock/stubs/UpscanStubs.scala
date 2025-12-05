@@ -28,7 +28,7 @@ object UpscanStubs {
     // language=JSON
     s"""
    {
-       "callbackUrl": "http://localhost:${WireMockSupport.port}/agent-registration/upscan-callback",
+       "callbackUrl": "http://localhost:${WireMockSupport.port}/agent-registration/application/amls/upscan-callback",
        "successRedirect": "http://localhost:22201/agent-registration/apply/anti-money-laundering/evidence/upload-result",
        "errorRedirect": "http://localhost:22201/agent-registration/apply/anti-money-laundering/evidence/error",
        "maximumFileSize": 5242880
@@ -43,7 +43,7 @@ object UpscanStubs {
        "uploadRequest": {
            "href": "https://bucketName.s3.eu-west-2.amazonaws.com",
            "fields": {
-               "x-amz-meta-callback-url": "http://localhost:22202/agent-registration/upscan-callback",
+               "x-amz-meta-callback-url": "http://localhost:22202/agent-registration/application/amls/upscan-callback",
                "x-amz-date": "yyyyMMddThhmmssZ",
                "x-amz-credential": "ASIAxxxxxxxxx/20180202/eu-west-2/s3/aws4_request",
                "x-amz-algorithm": "AWS4-HMAC-SHA256",
