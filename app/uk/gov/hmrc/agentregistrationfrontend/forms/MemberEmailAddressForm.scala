@@ -35,6 +35,10 @@ object MemberEmailAddressForm:
           ErrorKeys.requiredFieldErrorMessage(key),
           _.trim.nonEmpty
         )
+        .verifying(
+          ErrorKeys.inputTooLongErrorMessage(key),
+          _.length <= 132
+        )
         .transform[EmailAddress](EmailAddress(_), _.value)
         .verifying(
           ErrorKeys.invalidInputErrorMessage(key),

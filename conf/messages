@@ -437,6 +437,7 @@ memberEmailAddress.title = What is your email address?
 memberEmailAddress.hint = We will send a code to this email address to confirm it.
 memberEmailAddress.error.required = Enter your email address
 memberEmailAddress.error.invalid = Enter your email address with a name, @ symbol and a domain name, like yourname@example.com
+memberEmailAddress.error.tooLong = The email address must be 132 characters or fewer
 
 ## Member Nino
 memberNino.title = Do you have a National Insurance number?
