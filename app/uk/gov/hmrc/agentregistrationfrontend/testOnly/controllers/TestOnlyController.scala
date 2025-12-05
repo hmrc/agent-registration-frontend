@@ -34,6 +34,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.TestOnlyLink
 import uk.gov.hmrc.agentregistrationfrontend.testOnly.services.TestApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testOnly.views.html.TestLinkPage
+import uk.gov.hmrc.http.StringContextOps
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -61,17 +62,16 @@ extends FrontendController(mcc, actions):
         applicationService
           .upsert(
             request.agentApplication
-              .modify(_.amlsDetails.each.amlsEvidence)
-              .setTo(Some(UploadDetails(
-                reference = request.agentApplication.getAmlsDetails.getAmlsEvidence.reference,
-                status = UploadStatus.UploadedSuccessfully(
+              .modify(_.amlsDetails.each.amlsEvidence.each.status)
+              .setTo(
+                UploadStatus.UploadedSuccessfully(
                   name = "test.pdf",
                   mimeType = "application/pdf",
-                  downloadUrl = ObjectStoreUrl(uri"http://example.com/download"),
+                  downloadUrl = url"http://example.com/download",
                   size = Some(12345),
                   checksum = "checksum"
                 )
-              )))
+              )
           )
           .map(_ => Ok("upload set to complete"))
 

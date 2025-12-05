@@ -24,6 +24,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsName
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
@@ -81,12 +82,13 @@ extends FrontendController(mcc, actions):
           redirectOnError = Some(appConfig.upscanRedirectBase + "/agent-registration/apply/anti-money-laundering/evidence/error"),
           maxFileSize = appConfig.maxFileSize
         )
-        // store the upscan fileReference in the application
+        // store the upscan fileReference and new uploadId in the application
         _ <- applicationService
           .upsert(
             request.agentApplication.asLlpApplication
               .modify(_.amlsDetails.each.amlsEvidence)
               .setTo(Some(UploadDetails(
+                uploadId = UploadId.generate,
                 status = UploadStatus.InProgress,
                 reference = upscanInitiateResponse.fileReference
               )))
@@ -97,10 +99,12 @@ extends FrontendController(mcc, actions):
       ))
 
   /** Handles file upload errors from Upscan.
-    *
-    * This endpoint is called when a file transfer to Upscan service fails. Upscan will redirect to this endpoint and append error information as query
-    * parameters to the redirect URL.
-    */
+   *
+   * This endpoint is called when a file transfer to Upscan service fails.
+   * It is not the endpoint for reporting file scanning failures, that happens in showResult which reads the
+   * upload status from the application. Upscan will redirect to this endpoint and append error information
+   * as query parameters to the redirect URL.
+   */
   def showError(
     errorCode: String,
     errorMessage: String,
@@ -119,12 +123,15 @@ extends FrontendController(mcc, actions):
   def showResult: Action[AnyContent] = actions
     .Applicant
     .getApplicationInProgress:
+      // check status with new BE endpoint and update application if necessary
+      // before rendering the result page to show the current status
       implicit request =>
         Ok(progressView(request
           .agentApplication
           .getAmlsDetails
           .getAmlsEvidence
-          .status))
+          .status
+        ))
 
   private val corsHeaders: Seq[(String, String)] = Seq(
     "Access-Control-Allow-Origin" -> appConfig.allowedCorsOrigin,
@@ -144,6 +151,5 @@ extends FrontendController(mcc, actions):
           .status match {
           case UploadStatus.InProgress => NoContent.withHeaders(corsHeaders*)
           case _: UploadStatus.UploadedSuccessfully => Accepted.withHeaders(corsHeaders*)
-          case failed: UploadStatus.Failed if failed.failureReason == "QUARANTINE" => Conflict.withHeaders(corsHeaders*)
-          case _: UploadStatus.Failed => BadRequest.withHeaders(corsHeaders*)
+          case UploadStatus.Failed => BadRequest.withHeaders(corsHeaders*)
         }
