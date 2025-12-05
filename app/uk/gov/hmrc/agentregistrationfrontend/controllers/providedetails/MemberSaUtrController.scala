@@ -45,19 +45,18 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions.Member.getProvideDetailsInProgress
     .ensure(
-      mpd =>
-        mpd.memberProvidedDetails.memberNino.nonEmpty &&
-          mpd.memberProvidedDetails.memberSaUtr.exists {
-            case MemberSaUtr.FromAuth(_) => false
-            case MemberSaUtr.FromCitizenDetails(_) => false
-            case _ => true
-          },
+      _.memberProvidedDetails.memberNino.nonEmpty,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.MemberNinoController.show.url)
+    )
+    .ensure(
+      _.memberProvidedDetails.memberSaUtr.exists {
+        case MemberSaUtr.FromAuth(_) | MemberSaUtr.FromCitizenDetails(_) => false
+        case _ => true
+      },
       implicit request =>
         logger.info(s"SaUtr is already provided from auth or citizen details. Skipping page and moving to next page.")
-        if (request.memberProvidedDetails.memberNino.isEmpty)
-          Redirect(AppRoutes.providedetails.MemberNinoController.show.url)
-        else
-          Redirect(AppRoutes.providedetails.MemberApproveApplicantController.show.url)
+        Redirect(AppRoutes.providedetails.MemberApproveApplicantController.show.url)
     )
 
   def show: Action[AnyContent] = baseAction:
