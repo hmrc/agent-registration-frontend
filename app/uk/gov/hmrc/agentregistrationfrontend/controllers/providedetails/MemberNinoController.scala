@@ -23,6 +23,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.UserProvidedNino
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
@@ -50,7 +51,7 @@ extends FrontendController(mcc, actions):
         Redirect(AppRoutes.providedetails.MemberEmailAddressController.show.url)
     )*/
     .ensure(
-      _.memberProvidedDetails.memberNino.exists {
+      _.memberProvidedDetails.memberNino.fold(true) {
         case MemberNino.FromAuth(_) => false
         case _ => true
       },
@@ -67,16 +68,17 @@ extends FrontendController(mcc, actions):
             request
               .memberProvidedDetails
               .memberNino
+              .map(_.toUserProvidedNino)
       ))
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater[MemberNino](
+      .ensureValidFormAndRedirectIfSaveForLater[UserProvidedNino](
         MemberNinoForm.form,
         implicit r => view(_)
       )
       .async:
-        implicit request: (MemberProvideDetailsRequest[AnyContent] & FormValue[MemberNino]) =>
+        implicit request: (MemberProvideDetailsRequest[AnyContent] & FormValue[UserProvidedNino]) =>
           val validFormData: MemberNino = request.formValue
           val updatedApplication: MemberProvidedDetails = request
             .memberProvidedDetails

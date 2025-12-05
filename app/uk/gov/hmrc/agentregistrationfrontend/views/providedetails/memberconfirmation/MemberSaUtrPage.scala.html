@@ -15,6 +15,7 @@
  *@
 
 @import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
+@import uk.gov.hmrc.agentregistration.shared.llp.UserProvidedSaUtr
 @import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 @import uk.gov.hmrc.agentregistrationfrontend.forms.MemberSaUtrForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
@@ -33,7 +34,7 @@
 )
 
 @(
-        form: Form[MemberSaUtr]
+        form: Form[UserProvidedSaUtr]
 )(implicit request: MemberProvideDetailsRequest[?], messages: Messages)
 
 @key = @{
