@@ -19,36 +19,42 @@ package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.forms.MemberTelephoneNumberForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.MemberEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberTelephoneNumberPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberEmailAddressPage
 
-class MemberTelephoneNumberPageSpec
+class MemberEmailAddressPageSpec
 extends ViewSpec:
 
-  val viewTemplate: MemberTelephoneNumberPage = app.injector.instanceOf[MemberTelephoneNumberPage]
-  implicit val memberProvideDetailsRequest: MemberProvideDetailsRequest[AnyContent] = tdAll
-    .makeProvideDetailsRequest(memberProvidedDetails = tdAll.memberProvidedDetails)
-  val doc: Document = Jsoup.parse(viewTemplate(MemberTelephoneNumberForm.form).body)
-  private val heading: String = "What is your telephone number?"
+  private val viewTemplate: MemberEmailAddressPage = app.injector.instanceOf[MemberEmailAddressPage]
 
-  "MemberTelephoneNumberPage" should:
+  private object memberProvidedDetails:
+
+    val beforeEmailAddressProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.afterTelephoneNumberProvided
+
+  given memberProvideDetailsRequest: MemberProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(memberProvidedDetails.beforeEmailAddressProvided)
+
+  val doc: Document = Jsoup.parse(viewTemplate(MemberEmailAddressForm.form).body)
+  private val heading: String = "What is your email address?"
+
+  "MemberEmailAddressPage" should:
 
     "have the correct title" in:
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
 
-    "render a form with an input of type tel for telephone number" in:
+    "render a form with an input of type email for email address" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe AppRoutes.providedetails.MemberTelephoneNumberController.submit.url
+      form.attr("action") shouldBe AppRoutes.providedetails.MemberEmailAddressController.submit.url
       form
-        .selectOrFail("label[for=memberTelephoneNumber]")
+        .selectOrFail("label[for=memberEmailAddress]")
         .selectOnlyOneElementOrFail()
         .text() shouldBe heading
       form
-        .selectOrFail("input[name=memberTelephoneNumber][type=tel]")
+        .selectOrFail("input[name=memberEmailAddress][type=email]")
         .selectOnlyOneElementOrFail()
 
     "render a save and continue button" in:
@@ -59,9 +65,9 @@ extends ViewSpec:
         .text() shouldBe "Save and continue"
 
     "render the form error correctly when the form contains an error" in:
-      val field = MemberTelephoneNumberForm.key
-      val errorMessage = "Enter the number we should call to speak to you about this application"
-      val formWithError = MemberTelephoneNumberForm.form
+      val field = MemberEmailAddressForm.key
+      val errorMessage = "Enter your email address"
+      val formWithError = MemberEmailAddressForm.form
         .withError(field, errorMessage)
       behavesLikePageWithErrorHandling(
         field = field,

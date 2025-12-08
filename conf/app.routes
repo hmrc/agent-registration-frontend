@@ -103,6 +103,8 @@ POST        /provide-details/name-match                             uk.gov.hmrc.
 GET         /provide-details/telephone-number                       uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberTelephoneNumberController.show
 POST        /provide-details/telephone-number                       uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberTelephoneNumberController.submit
 GET         /provide-details/email-address                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberEmailAddressController.show
+POST        /provide-details/email-address                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberEmailAddressController.submit
+GET         /provide-details/verify-email-address                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberEmailAddressController.verify
 GET         /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberNinoController.show
 POST        /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberNinoController.submit
 GET         /provide-details/utr                                    uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberSaUtrController.show

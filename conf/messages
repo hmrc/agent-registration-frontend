@@ -431,6 +431,14 @@ memberTelephoneNumber.error.required = Enter the number we should call to speak 
 memberTelephoneNumber.error.invalid = Enter a phone number, like 01632 960 001 or 07700 900 982
 memberTelephoneNumber.error.tooLong = The phone number must be 24 characters or fewer
 
+## Member Email Address
+
+memberEmailAddress.title = What is your email address?
+memberEmailAddress.hint = We will send a code to this email address to confirm it.
+memberEmailAddress.error.required = Enter your email address
+memberEmailAddress.error.invalid = Enter your email address with a name, @ symbol and a domain name, like yourname@example.com
+memberEmailAddress.error.tooLong = The email address must be 132 characters or fewer
+
 ## Member Nino
 memberNino.title = Do you have a National Insurance number?
 memberNino.hasNino.yes = Yes
