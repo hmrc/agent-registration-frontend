@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.MemberTelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberTelephoneNumberPage
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import com.softwaremill.quicklens.modify
@@ -32,7 +33,6 @@ import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsSe
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.Future
 
 @Singleton
 class MemberTelephoneNumberController @Inject() (
@@ -53,22 +53,21 @@ extends FrontendController(mcc, actions):
     )
 
   def submit: Action[AnyContent] = baseAction
+    .ensureValidForm[TelephoneNumber](
+      MemberTelephoneNumberForm.form,
+      implicit r => view(_)
+    )
     .async:
-      implicit request: MemberProvideDetailsRequest[AnyContent] =>
-        MemberTelephoneNumberForm.form
-          .bindFromRequest()
-          .fold(
-            formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-            telephoneNumberFromForm =>
-              val updatedProvidedDetails: MemberProvidedDetails = request
-                .memberProvidedDetails
-                .modify(_.telephoneNumber)
-                .setTo(Some(telephoneNumberFromForm))
-              memberProvideDetailsService
-                .upsert(updatedProvidedDetails)
-                .map: _ =>
-                  Redirect(AppRoutes.providedetails.MemberEmailAddressController.show.url)
-          )
+      implicit request: (MemberProvideDetailsRequest[AnyContent] & FormValue[TelephoneNumber]) =>
+        val telephoneNumberFromForm: TelephoneNumber = request.formValue
+        val updatedProvidedDetails: MemberProvidedDetails = request
+          .memberProvidedDetails
+          .modify(_.telephoneNumber)
+          .setTo(Some(telephoneNumberFromForm))
+        memberProvideDetailsService
+          .upsert(updatedProvidedDetails)
+          .map: _ =>
+            Redirect(AppRoutes.providedetails.MemberEmailAddressController.show.url)
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>

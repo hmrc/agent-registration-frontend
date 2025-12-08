@@ -22,6 +22,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.MemberEmailAddressForm
@@ -32,6 +33,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberEmailAddressPage
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import com.softwaremill.quicklens.*
+import uk.gov.hmrc.agentregistration.shared.EmailAddress
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.MemberVerifiedEmailAddress
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
@@ -70,42 +72,41 @@ extends FrontendController(mcc, actions):
       ))
 
   def submit: Action[AnyContent] = baseAction
+    .ensureValidForm[EmailAddress](
+      MemberEmailAddressForm.form,
+      implicit r => view(_)
+    )
     .async:
-      implicit request: MemberProvideDetailsRequest[AnyContent] =>
-        MemberEmailAddressForm.form
-          .bindFromRequest()
-          .fold(
-            formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-            emailAddressFromForm =>
-              val updatedProvidedDetails: MemberProvidedDetails = request
-                .memberProvidedDetails
-                .modify(_.emailAddress)
-                .using {
-                  case Some(details) =>
-                    Some(MemberVerifiedEmailAddress(
-                      emailAddress = emailAddressFromForm,
-                      // avoid unsetting verified status of any unchanged email if we are not ignoring verification
-                      isVerified = appConfig.ignoreEmailVerification || (emailAddressFromForm === details.emailAddress && details.isVerified)
-                    ))
-                  case None =>
-                    Some(MemberVerifiedEmailAddress(
-                      emailAddress = emailAddressFromForm,
-                      isVerified = appConfig.ignoreEmailVerification
-                    ))
-                }
-              memberProvideDetailsService
-                .upsert(updatedProvidedDetails)
-                .map: _ =>
-                  Redirect(
-                    AppRoutes.providedetails.MemberEmailAddressController.verify
-                  )
-          )
+      implicit request: (MemberProvideDetailsRequest[AnyContent] & FormValue[EmailAddress]) =>
+        val emailAddressFromForm: EmailAddress = request.formValue
+        val updatedProvidedDetails: MemberProvidedDetails = request
+          .memberProvidedDetails
+          .modify(_.emailAddress)
+          .using {
+            case Some(details) =>
+              Some(MemberVerifiedEmailAddress(
+                emailAddress = emailAddressFromForm,
+                // avoid unsetting verified status of any unchanged email if we are not ignoring verification
+                isVerified = appConfig.ignoreEmailVerification || (emailAddressFromForm === details.emailAddress && details.isVerified)
+              ))
+            case None =>
+              Some(MemberVerifiedEmailAddress(
+                emailAddress = emailAddressFromForm,
+                isVerified = appConfig.ignoreEmailVerification
+              ))
+          }
+        memberProvideDetailsService
+          .upsert(updatedProvidedDetails)
+          .map: _ =>
+            Redirect(
+              AppRoutes.providedetails.MemberEmailAddressController.verify
+            )
 
   def verify: Action[AnyContent] = actions.Member.getProvideDetailsInProgress
     .ensure(
       _.memberProvidedDetails.emailAddress.isDefined,
       implicit request =>
-        logger.info("Member email has not been provided, redirecting to email address page")
+        // Member email has not been provided, redirecting to email address page
         Redirect(AppRoutes.providedetails.MemberEmailAddressController.show)
     )
     .ensure(
@@ -113,7 +114,7 @@ extends FrontendController(mcc, actions):
         .getEmailAddress
         .isVerified === false,
       implicit request =>
-        logger.info("Agent email is already verified, redirecting to Nino page")
+        // Member email has already been provided and verified, redirecting to nino page
         Redirect(AppRoutes.providedetails.MemberNinoController.show)
     )
     .async:
@@ -123,20 +124,19 @@ extends FrontendController(mcc, actions):
         emailVerificationService.checkEmailVerificationStatus(
           credId = credId,
           email = emailToVerify
-        ).flatMap {
+        ).flatMap:
           case EmailVerificationStatus.Verified =>
-            logger.info(s"[checkEmailVerificationStatus] Verified status received for memberEmail using credId $credId and email $emailToVerify")
+            logger.info(s"[checkEmailVerificationStatus] Verified status received for memberEmail")
             onEmailVerified()
           case EmailVerificationStatus.Unverified =>
-            logger.info(s"[checkEmailVerificationStatus] Unverified status received for memberEmail using credId $credId and email $emailToVerify")
+            logger.info(s"[checkEmailVerificationStatus] Unverified status received for memberEmail")
             onEmailUnverified(credId, emailToVerify)
           case EmailVerificationStatus.Locked =>
-            logger.info(s"[checkEmailVerificationStatus] Locked status received for memberEmail using credId $credId and email $emailToVerify")
+            logger.info(s"[checkEmailVerificationStatus] Locked status received for memberEmail")
             onEmailLocked()
           case EmailVerificationStatus.Error =>
-            logger.info(s"[checkEmailVerificationStatus] Error received for memberEmail using credId $credId and email $emailToVerify")
+            logger.info(s"[checkEmailVerificationStatus] Error received for memberEmail")
             onEmailError()
-        }
 
   private def onEmailVerified()(implicit request: MemberProvideDetailsRequest[AnyContent]): Future[Result] =
     val updatedProvidedDetails = request
