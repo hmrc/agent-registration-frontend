@@ -23,6 +23,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.UserProvidedNino
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
@@ -45,18 +46,17 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions.Member.getProvideDetailsInProgress
     .ensure(
-      mpd =>
-        // TODO check email address is present
-//        mpd.memberProvidedDetails.emailAddress.nonEmpty &&
-        mpd.memberProvidedDetails.memberNino.exists {
-          case MemberNino.FromAuth(_) => false
-          case _ => true
-        },
+      _.memberProvidedDetails.emailAddress.nonEmpty,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.MemberEmailAddressController.show.url)
+    )
+    .ensure(
+      _.memberProvidedDetails.memberNino.fold(true) {
+        case MemberNino.FromAuth(_) => false
+        case _ => true
+      },
       implicit request =>
         logger.info(s"Nino is already provided from auth or citizen details. Skipping page and moving to next page.")
-        // TODO check email address is present
-        /*if (request.memberProvidedDetails.emailAddress.isEmpty) Redirect(AppRoutes.providedetails.MemberEmailAddressController.show.url)
-        else*/
         Redirect(AppRoutes.providedetails.MemberSaUtrController.show.url)
     )
 
@@ -68,16 +68,17 @@ extends FrontendController(mcc, actions):
             request
               .memberProvidedDetails
               .memberNino
+              .map(_.toUserProvidedNino)
       ))
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater[MemberNino](
+      .ensureValidFormAndRedirectIfSaveForLater[UserProvidedNino](
         MemberNinoForm.form,
         implicit r => view(_)
       )
       .async:
-        implicit request: (MemberProvideDetailsRequest[AnyContent] & FormValue[MemberNino]) =>
+        implicit request: (MemberProvideDetailsRequest[AnyContent] & FormValue[UserProvidedNino]) =>
           val validFormData: MemberNino = request.formValue
           val updatedApplication: MemberProvidedDetails = request
             .memberProvidedDetails

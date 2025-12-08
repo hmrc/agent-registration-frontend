@@ -22,6 +22,7 @@ import play.api.data.Forms.mapping
 import play.api.data.Forms.text
 import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
+import uk.gov.hmrc.agentregistration.shared.llp.UserProvidedSaUtr
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.TextFormatter
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 import uk.gov.voa.play.form.ConditionalMappings.isEqual
@@ -35,7 +36,7 @@ object MemberSaUtrForm:
   val hasSaUtrKey = "memberSaUtr.hasSaUtr"
   val saUtrKey = "memberSaUtr.saUtr"
 
-  val form: Form[MemberSaUtr] = Form(
+  val form: Form[UserProvidedSaUtr] = Form(
     mapping(
       hasSaUtrKey -> Forms.of(TextFormatter(ErrorKeys.requiredFieldErrorMessage(hasSaUtrKey)))
         .verifying(
@@ -65,7 +66,5 @@ object MemberSaUtrForm:
     ) {
       case MemberSaUtr.Provided(saUtr) => Some((yes, Some(saUtr.value)))
       case MemberSaUtr.NotProvided => Some((no, None))
-      case MemberSaUtr.FromAuth(saUtr) => Some((yes, Some(saUtr.value)))
-      case MemberSaUtr.FromCitizenDetails(saUtr) => Some((yes, Some(saUtr.value)))
     }
   )
