@@ -45,11 +45,11 @@ class MemberNinoController @Inject() (
 extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions.Member.getProvideDetailsInProgress
-    /*    .ensure(
+    .ensure(
       _.memberProvidedDetails.emailAddress.nonEmpty,
       implicit request =>
         Redirect(AppRoutes.providedetails.MemberEmailAddressController.show.url)
-    )*/
+    )
     .ensure(
       _.memberProvidedDetails.memberNino.fold(true) {
         case MemberNino.FromAuth(_) => false
