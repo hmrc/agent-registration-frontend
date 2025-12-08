@@ -31,7 +31,7 @@ extends ControllerSpec:
 
   private object memberProvideDetails:
 
-    private val afterEmailUpdate: MemberProvidedDetails = tdAll.providedDetailsLlp.afterEmailProvided
+    private val afterEmailUpdate: MemberProvidedDetails = tdAll.providedDetailsLlp.afterEmailAddressProvided
     val beforeNinoMissingInHmrcSystems: MemberProvidedDetails = tdAll.providedDetailsLlp.withNinoNotProvided(afterEmailUpdate)
     val beforeNinoFromAuth: MemberProvidedDetails = tdAll.providedDetailsLlp.withNinoFromAuth(afterEmailUpdate)
 

@@ -47,9 +47,9 @@ extends ControllerSpec:
 
     val beforeEmailAddressProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.afterTelephoneNumberProvided
 
-    val afterEmailAddressProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.afterEmailProvided
+    val afterEmailAddressProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.afterEmailAddressProvided
 
-    val afterEmailAddressVerified: MemberProvidedDetails = tdAll.providedDetailsLlp.afterVerfiedEmailProvided
+    val afterEmailAddressVerified: MemberProvidedDetails = tdAll.providedDetailsLlp.afterEmailAddressVerified
 
   private val memberEmailVerificationRequest: VerifyEmailRequest = VerifyEmailRequest(
     credId = tdAll.credentials.providerId,

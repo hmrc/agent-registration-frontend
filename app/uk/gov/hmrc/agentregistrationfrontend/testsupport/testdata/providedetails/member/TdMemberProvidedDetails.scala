@@ -59,14 +59,14 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
       .modify(_.telephoneNumber)
       .setTo(Some(dependencies.telephoneNumber))
 
-    val afterEmailProvided: MemberProvidedDetails = afterTelephoneNumberProvided
+    val afterEmailAddressProvided: MemberProvidedDetails = afterTelephoneNumberProvided
       .modify(_.emailAddress)
       .setTo(Some(MemberVerifiedEmailAddress(
         emailAddress = dependencies.memberEmailAddress,
         isVerified = false
       )))
 
-    val afterVerfiedEmailProvided: MemberProvidedDetails = afterTelephoneNumberProvided
+    val afterEmailAddressVerified: MemberProvidedDetails = afterTelephoneNumberProvided
       .modify(_.emailAddress)
       .setTo(Some(MemberVerifiedEmailAddress(
         emailAddress = dependencies.memberEmailAddress,
@@ -86,7 +86,7 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
       .modify(_.memberNino)
       .setTo(Some(MemberNino.NotProvided))
 
-    val afterNinoProvided: MemberProvidedDetails = afterEmailProvided
+    val afterNinoProvided: MemberProvidedDetails = afterEmailAddressProvided
       .modify(_.memberNino)
       .setTo(Some(dependencies.ninoProvided))
 
