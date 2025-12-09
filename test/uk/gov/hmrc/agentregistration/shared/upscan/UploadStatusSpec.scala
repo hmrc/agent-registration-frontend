@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistration.shared.upscan
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.http.StringContextOps
 
 class UploadStatusSpec
@@ -31,21 +32,21 @@ extends UnitSpec:
       mimeType = "application/pdf",
       downloadUrl = url"http://localhost:9000/test.pdf",
       size = Some(1000),
-      checksum = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      checksum = TdAll.tdAll.objectStoreValidHexVal
     )
 
     val uploadedSuccessfullyJson: JsValue = Json.parse(
       // language=JSON
-      """
-        |{
-        |  "name": "test.pdf",
-        |  "mimeType": "application/pdf",
-        |  "downloadUrl": "http://localhost:9000/test.pdf",
-        |  "size": 1000,
-        |  "checksum": "checksum",
-        |  "type": "UploadedSuccessfully"
-        |}
-        |""".stripMargin
+      s"""
+         |{
+         |  "name": "test.pdf",
+         |  "mimeType": "application/pdf",
+         |  "downloadUrl": "http://localhost:9000/test.pdf",
+         |  "size": 1000,
+         |  "checksum": "${TdAll.tdAll.objectStoreValidHexVal}",
+         |  "type": "UploadedSuccessfully"
+         |}
+         |""".stripMargin
     )
 
     val uploadFailed: UploadStatus = UploadStatus.Failed

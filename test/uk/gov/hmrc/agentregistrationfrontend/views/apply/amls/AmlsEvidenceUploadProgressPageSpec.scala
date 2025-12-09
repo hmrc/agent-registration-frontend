@@ -39,7 +39,7 @@ extends ViewSpec:
         mimeType = "application/pdf",
         downloadUrl = url"http://localhost:1234/download/file.pdf",
         size = Some(12345),
-        checksum = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        checksum = tdAll.objectStoreValidHexVal
       )
     ).body
   )
