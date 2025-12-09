@@ -31,6 +31,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.EmailVerificationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberEmailAddressPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberEmailLockedPage
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import com.softwaremill.quicklens.*
 import uk.gov.hmrc.agentregistration.shared.EmailAddress
@@ -47,7 +48,8 @@ class MemberEmailAddressController @Inject() (
   appConfig: AppConfig,
   actions: Actions,
   mcc: MessagesControllerComponents,
-  view: MemberEmailAddressPage,
+  memberEmailAddressView: MemberEmailAddressPage,
+  memberEmailLockedView: MemberEmailLockedPage,
   memberProvideDetailsService: MemberProvideDetailsService,
   emailVerificationService: EmailVerificationService,
   placeholder: SimplePage
@@ -63,7 +65,7 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
-      Ok(view(
+      Ok(memberEmailAddressView(
         MemberEmailAddressForm.form
           .fill:
             request
@@ -74,7 +76,7 @@ extends FrontendController(mcc, actions):
   def submit: Action[AnyContent] = baseAction
     .ensureValidForm[EmailAddress](
       MemberEmailAddressForm.form,
-      implicit r => view(_)
+      implicit r => memberEmailAddressView(_)
     )
     .async:
       implicit request: (MemberProvideDetailsRequest[AnyContent] & FormValue[EmailAddress]) =>
@@ -171,7 +173,7 @@ extends FrontendController(mcc, actions):
   )
 
   private def onEmailLocked()(implicit request: MemberProvideDetailsRequest[AnyContent]): Future[Result] = Future.successful(
-    Ok(placeholder(h1 = "Email address locked", bodyText = Some("placeholder for Your email address has been locked")))
+    Ok(memberEmailLockedView())
   )
 
   private def onEmailError()(implicit request: MemberProvideDetailsRequest[AnyContent]): Future[Result] = Future.successful(

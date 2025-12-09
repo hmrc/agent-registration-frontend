@@ -439,6 +439,16 @@ memberEmailAddress.error.required = Enter your email address
 memberEmailAddress.error.invalid = Enter your email address with a name, @ symbol and a domain name, like yourname@example.com
 memberEmailAddress.error.tooLong = The email address must be 132 characters or fewer
 
+## Member Locked Email
+
+memberEmailLocked.title = We could not confirm your identity
+memberEmailLocked.p1 = We cannot check your identity because you entered an incorrect verification code too many times.
+memberEmailLocked.p2 = The verification code was emailed to you.
+memberEmailLocked.h2 = What to do next
+memberEmailLocked.p3 = You can try again in 24 hours.
+memberEmailLocked.p4 = If you want to try again with a different email address
+memberEmailLocked.linkText = you can change the email address you entered
+
 ## Member Nino
 memberNino.title = Do you have a National Insurance number?
 memberNino.hasNino.yes = Yes

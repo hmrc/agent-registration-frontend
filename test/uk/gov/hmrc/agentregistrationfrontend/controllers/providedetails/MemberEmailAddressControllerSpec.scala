@@ -184,3 +184,14 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.providedetails.MemberNinoController.show.url
+
+  s"GET $verifyPath with an email to verify in the application that is locked should show email locked page" in:
+    AuthStubs.stubAuthoriseIndividual()
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterEmailAddressProvided))
+    EmailVerificationStubs.stubEmailStatusLocked(tdAll.credentials.providerId, tdAll.memberEmailAddress)
+    val response: WSResponse = get(verifyPath)
+
+    response.status shouldBe Status.OK
+
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "We could not confirm your identity - Apply for an agent services account - GOV.UK"

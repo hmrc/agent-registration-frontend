@@ -54,6 +54,25 @@ object EmailVerificationStubs {
       ).toString
   )
 
+  def stubEmailStatusLocked(
+    credId: String,
+    emailAddress: EmailAddress
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"/email-verification/verification-status/$credId"),
+    responseStatus = 200,
+    responseBody =
+      Json.obj(
+        "emails" -> Json.arr(
+          Json.obj(
+            "emailAddress" -> s"${emailAddress.value}",
+            "verified" -> false,
+            "locked" -> true
+          )
+        )
+      ).toString
+  )
+
   def stubVerificationRequest(verifyEmailRequest: VerifyEmailRequest): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = urlMatching(s"/email-verification/verify-email"),
