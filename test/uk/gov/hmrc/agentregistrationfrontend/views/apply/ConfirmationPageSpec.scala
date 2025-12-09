@@ -52,7 +52,7 @@ extends ViewSpec:
           |Link copied
           |How to check the progress of your application
           |You can click the link on the GOV.UK page “Apply for an agent services account”.
-          |This will let you check which members have provided their provided their personal details.
+          |This will let you check which members have provided their personal details.
           |When all members have provided their personal details, we will:
           |automatically submit your application
           |email you at user@test.com to confirm this
