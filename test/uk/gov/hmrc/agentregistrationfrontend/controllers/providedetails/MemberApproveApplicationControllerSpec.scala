@@ -58,7 +58,7 @@ extends ControllerSpec:
     val heading = "Approve the applicant"
     val title = s"$heading - Apply for an agent services account - GOV.UK"
     val errorTitle = s"Error: $heading - Apply for an agent services account - GOV.UK"
-    def requiredError(applyOfficerName: String) = s"Select yes if you agree that ${applyOfficerName} can apply for an account"
+    def requiredError(applyOfficerName: String) = s"Error: Select yes if you agree that ${applyOfficerName} can apply for an account"
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.MemberApproveApplicantController.show shouldBe Call(
@@ -140,22 +140,21 @@ extends ControllerSpec:
     response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.providedetails.MemberConfirmStopController.show.url
 
-//  s"POST $path  without selecting and option should return 400" in:
-//    AuthStubs.stubAuthoriseIndividual()
-//    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterSaUtrProvided))
-//    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvideDetails.afterApproveAgentApplication)
-//    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
-//
-//    val response: WSResponse =
-//      post(path)(Map(
-//        MemberApproveApplicationForm.key -> Seq().empty
-//      ))
-//
-//    response.status shouldBe Status.BAD_REQUEST
-//
-//    val doc = response.parseBodyAsJsoupDocument
-//    doc.title() shouldBe ExpectedStrings.errorTitle
-//    println(s"${Console.MAGENTA} ${doc.html()} ${Console.RESET}")
-//    doc.mainContent.select("#memberApproveAgentApplication-error").text() shouldBe ExpectedStrings.requiredError(
-//      agentApplication.applicationSubmitted.getApplicantContactDetails.getApplicantName
-//    )
+  s"POST $path  without selecting and option should return 400" in:
+    AuthStubs.stubAuthoriseIndividual()
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterSaUtrProvided))
+    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvideDetails.afterApproveAgentApplication)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
+
+    val response: WSResponse =
+      post(path)(Map(
+        MemberApproveApplicationForm.key -> Seq().empty
+      ))
+
+    response.status shouldBe Status.BAD_REQUEST
+
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe ExpectedStrings.errorTitle
+    doc.mainContent.select("#memberApproveAgentApplication-error").text() shouldBe ExpectedStrings.requiredError(
+      agentApplication.applicationSubmitted.getApplicantContactDetails.getApplicantName
+    )
