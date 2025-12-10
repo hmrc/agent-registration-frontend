@@ -29,13 +29,12 @@ object EmailVerificationStubs {
   def stubEmailStatus(
     credId: String,
     emailAddress: EmailAddress,
-    responseStatus: Int = 200,
     verified: Boolean = false,
     locked: Boolean = false
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = urlMatching(s"/email-verification/verification-status/$credId"),
-    responseStatus = responseStatus,
+    responseStatus = 200,
     responseBody =
       Json.obj(
         "emails" -> Json.arr(
@@ -46,15 +45,6 @@ object EmailVerificationStubs {
           )
         )
       ).toString
-  )
-
-  def stubEmailStatusUnverified(
-    credId: String,
-    emailAddress: EmailAddress
-  ): StubMapping = stubEmailStatus(
-    credId,
-    emailAddress,
-    responseStatus = 404
   )
 
   def stubEmailStatusVerified(
@@ -73,6 +63,15 @@ object EmailVerificationStubs {
     credId,
     emailAddress,
     locked = true
+  )
+
+  def stubEmailStatusUnverified(
+    credId: String
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"/email-verification/verification-status/$credId"),
+    responseStatus = 404,
+    responseBody = Json.obj("error" -> s"no verified or locked emails found for cred ID: $credId").toString
   )
 
   def stubVerificationRequest(verifyEmailRequest: VerifyEmailRequest): StubMapping = StubMaker.make(
