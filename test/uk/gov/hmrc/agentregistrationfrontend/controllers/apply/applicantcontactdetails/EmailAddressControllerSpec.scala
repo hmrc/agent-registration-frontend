@@ -195,9 +195,22 @@ extends ControllerSpec:
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
-  s"GET $verifyPath with an email to verify in the application should redirect to the email verification frontend" in:
+  s"GET $verifyPath with an email yet to be verified should redirect to the email verification frontend" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterEmailAddressProvided)
-    EmailVerificationStubs.stubEmailStatusUnverified(tdAll.credentials.providerId)
+    EmailVerificationStubs.stubEmailYetToBeVerified(tdAll.credentials.providerId)
+    EmailVerificationStubs.stubVerificationRequest(applicantEmailVerificationRequest)
+    val response: WSResponse = get(verifyPath)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe Constants.EMPTY_STRING
+    response.header("Location").value shouldBe "http://localhost:9890/response-url"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+    EmailVerificationStubs.verifyEvStatusRequest(tdAll.credentials.providerId)
+    EmailVerificationStubs.verifyEvRequest()
+
+  s"GET $verifyPath with an email that has not been verified should redirect to the email verification frontend" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterEmailAddressProvided)
+    EmailVerificationStubs.stubEmailStatusUnverified(tdAll.credentials.providerId, tdAll.applicantEmailAddress)
     EmailVerificationStubs.stubVerificationRequest(applicantEmailVerificationRequest)
     val response: WSResponse = get(verifyPath)
 
