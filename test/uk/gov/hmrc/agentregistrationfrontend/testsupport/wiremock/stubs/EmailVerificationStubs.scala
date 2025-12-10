@@ -26,51 +26,53 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object EmailVerificationStubs {
 
-  def stubEmailStatusUnverified(
-    credId: String
+  def stubEmailStatus(
+    credId: String,
+    emailAddress: EmailAddress,
+    responseStatus: Int = 200,
+    verified: Boolean = false,
+    locked: Boolean = false
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = urlMatching(s"/email-verification/verification-status/$credId"),
-    responseStatus = 404,
-    responseBody = Json.obj("emails" -> Json.arr()).toString
+    responseStatus = responseStatus,
+    responseBody =
+      Json.obj(
+        "emails" -> Json.arr(
+          Json.obj(
+            "emailAddress" -> s"${emailAddress.value}",
+            "verified" -> verified,
+            "locked" -> locked
+          )
+        )
+      ).toString
+  )
+
+  def stubEmailStatusUnverified(
+    credId: String,
+    emailAddress: EmailAddress
+  ): StubMapping = stubEmailStatus(
+    credId,
+    emailAddress,
+    responseStatus = 404
   )
 
   def stubEmailStatusVerified(
     credId: String,
     emailAddress: EmailAddress
-  ): StubMapping = StubMaker.make(
-    httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/email-verification/verification-status/$credId"),
-    responseStatus = 200,
-    responseBody =
-      Json.obj(
-        "emails" -> Json.arr(
-          Json.obj(
-            "emailAddress" -> s"${emailAddress.value}",
-            "verified" -> true,
-            "locked" -> false
-          )
-        )
-      ).toString
+  ): StubMapping = stubEmailStatus(
+    credId,
+    emailAddress,
+    verified = true
   )
 
   def stubEmailStatusLocked(
     credId: String,
     emailAddress: EmailAddress
-  ): StubMapping = StubMaker.make(
-    httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/email-verification/verification-status/$credId"),
-    responseStatus = 200,
-    responseBody =
-      Json.obj(
-        "emails" -> Json.arr(
-          Json.obj(
-            "emailAddress" -> s"${emailAddress.value}",
-            "verified" -> false,
-            "locked" -> true
-          )
-        )
-      ).toString
+  ): StubMapping = stubEmailStatus(
+    credId,
+    emailAddress,
+    locked = true
   )
 
   def stubVerificationRequest(verifyEmailRequest: VerifyEmailRequest): StubMapping = StubMaker.make(

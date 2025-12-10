@@ -240,7 +240,7 @@ extends ControllerSpec:
 
   s"GET $verifyPath with an email yet to be verified in the application should redirect to the email verification frontend" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterOtherEmailAddressSelected)
-    EmailVerificationStubs.stubEmailStatusUnverified(tdAll.credentials.providerId)
+    EmailVerificationStubs.stubEmailStatusUnverified(tdAll.credentials.providerId, tdAll.memberEmailAddress)
     EmailVerificationStubs.stubVerificationRequest(agentEmailVerificationRequest)
     val response: WSResponse = get(verifyPath)
 

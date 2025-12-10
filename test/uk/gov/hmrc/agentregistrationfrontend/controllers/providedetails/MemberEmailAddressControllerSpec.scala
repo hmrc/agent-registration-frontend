@@ -151,7 +151,7 @@ extends ControllerSpec:
   s"GET $verifyPath with an email to verify in the application should redirect to the email verification frontend" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterEmailAddressProvided))
-    EmailVerificationStubs.stubEmailStatusUnverified(tdAll.credentials.providerId)
+    EmailVerificationStubs.stubEmailStatusUnverified(tdAll.credentials.providerId, tdAll.memberEmailAddress)
     EmailVerificationStubs.stubVerificationRequest(memberEmailVerificationRequest)
     val response: WSResponse = get(verifyPath)
 
