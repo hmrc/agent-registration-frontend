@@ -148,10 +148,23 @@ extends ControllerSpec:
       s"#${MemberEmailAddressForm.key}-error"
     ).text() shouldBe s"Error: ${ExpectedStrings.tooLongError}"
 
-  s"GET $verifyPath with an email to verify in the application should redirect to the email verification frontend" in:
+  s"GET $verifyPath with an email not yet verified should redirect to the email verification frontend" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterEmailAddressProvided))
-    EmailVerificationStubs.stubEmailStatusUnverified(tdAll.credentials.providerId)
+    EmailVerificationStubs.stubEmailYetToBeVerified(tdAll.credentials.providerId)
+    EmailVerificationStubs.stubVerificationRequest(memberEmailVerificationRequest)
+    val response: WSResponse = get(verifyPath)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe Constants.EMPTY_STRING
+    response.header("Location").value shouldBe "http://localhost:9890/response-url"
+    EmailVerificationStubs.verifyEvStatusRequest(tdAll.credentials.providerId)
+    EmailVerificationStubs.verifyEvRequest()
+
+  s"GET $verifyPath with an email that is unverified should redirect to the email verification frontend" in:
+    AuthStubs.stubAuthoriseIndividual()
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterEmailAddressProvided))
+    EmailVerificationStubs.stubEmailStatusUnverified(tdAll.credentials.providerId, tdAll.memberEmailAddress)
     EmailVerificationStubs.stubVerificationRequest(memberEmailVerificationRequest)
     val response: WSResponse = get(verifyPath)
 

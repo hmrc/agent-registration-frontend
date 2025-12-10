@@ -26,11 +26,11 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object EmailVerificationStubs {
 
-  def stubEmailStatus(
+  private def stubEmailStatus(
     credId: String,
     emailAddress: EmailAddress,
-    verified: Boolean = false,
-    locked: Boolean = false
+    verified: Boolean,
+    locked: Boolean
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = urlMatching(s"/email-verification/verification-status/$credId"),
@@ -47,13 +47,24 @@ object EmailVerificationStubs {
       ).toString
   )
 
+  def stubEmailStatusUnverified(
+    credId: String,
+    emailAddress: EmailAddress
+  ): StubMapping = stubEmailStatus(
+    credId,
+    emailAddress,
+    verified = false,
+    locked = false
+  )
+
   def stubEmailStatusVerified(
     credId: String,
     emailAddress: EmailAddress
   ): StubMapping = stubEmailStatus(
     credId,
     emailAddress,
-    verified = true
+    verified = true,
+    locked = false
   )
 
   def stubEmailStatusLocked(
@@ -62,10 +73,11 @@ object EmailVerificationStubs {
   ): StubMapping = stubEmailStatus(
     credId,
     emailAddress,
+    verified = false,
     locked = true
   )
 
-  def stubEmailStatusUnverified(
+  def stubEmailYetToBeVerified(
     credId: String
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
