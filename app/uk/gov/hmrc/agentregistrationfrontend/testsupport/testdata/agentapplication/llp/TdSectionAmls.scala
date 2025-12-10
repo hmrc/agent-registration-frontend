@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.llp
 
-import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
@@ -24,8 +23,10 @@ import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
 import uk.gov.hmrc.agentregistration.shared.upscan.Reference
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
+import uk.gov.hmrc.http.StringContextOps
 
 import java.time.LocalDate
 import scala.util.chaining.scalaUtilChainingOps
@@ -43,24 +44,26 @@ trait TdSectionAmls {
   def amlsExpiryDateInvalid: LocalDate = dependencies.nowPlus13mAsLocalDateTime.toLocalDate
 
   def amlsUploadDetailsAfterUploadInProgress: UploadDetails = UploadDetails(
+    uploadId = dependencies.uploadId,
     reference = Reference("test-file-reference"),
     status = UploadStatus.InProgress
   )
 
   def amlsUploadDetailsAfterUploadSucceeded: UploadDetails = amlsUploadDetailsAfterUploadInProgress.copy(
     status = UploadStatus.UploadedSuccessfully(
-      downloadUrl = ObjectStoreUrl(uri"https://bucketName.s3.eu-west-2.amazonaws.com/xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"),
+      downloadUrl = url"https://bucketName.s3.eu-west-2.amazonaws.com/xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
       name = "evidence.pdf",
       mimeType = "application/pdf",
       size = Some(12345L),
-      checksum = "md5:1B2M2Y8AsgTpgAmY7PhCfg=="
+      checksum = dependencies.objectStoreValidHexVal,
+      objectStoreLocation = Some(ObjectStoreUrl(
+        "amls-evidence/xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+      ))
     )
   )
 
-  def amlsUploadDetailsAfterUploadFailed: UploadDetails = amlsUploadDetailsAfterUploadInProgress.copy(
-    status = UploadStatus.Failed(
-      failureReason = "QUARANTINE"
-    )
+  private def amlsUploadDetailsAfterUploadFailedScanning: UploadDetails = amlsUploadDetailsAfterUploadInProgress.copy(
+    status = UploadStatus.Failed
   )
 
   class AgentApplicationLlpWithSectionAmls(baseForSectionAmls: AgentApplicationLlp):
@@ -121,7 +124,7 @@ trait TdSectionAmls {
             amlsEvidence = Some(amlsUploadDetailsAfterUploadInProgress)
           )
           def afterUploadFailed = afterAmlsExpiryDateProvided.copy(
-            amlsEvidence = Some(amlsUploadDetailsAfterUploadFailed)
+            amlsEvidence = Some(amlsUploadDetailsAfterUploadFailedScanning)
           )
           def afterUploadSucceded = afterAmlsExpiryDateProvided.copy(
             amlsEvidence = Some(amlsUploadDetailsAfterUploadSucceeded)

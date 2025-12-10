@@ -18,11 +18,10 @@ package uk.gov.hmrc.agentregistrationfrontend.views.apply.amls
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadProgressPage
+import uk.gov.hmrc.http.StringContextOps
 
 class AmlsEvidenceUploadProgressPageSpec
 extends ViewSpec:
@@ -30,9 +29,7 @@ extends ViewSpec:
   val viewTemplate: AmlsEvidenceUploadProgressPage = app.injector.instanceOf[AmlsEvidenceUploadProgressPage]
 
   val inProgressDoc: Document = Jsoup.parse(
-    viewTemplate(
-      status = UploadStatus.InProgress
-    ).body
+    viewTemplate(status = UploadStatus.InProgress).body
   )
 
   val successfulDoc: Document = Jsoup.parse(
@@ -40,24 +37,20 @@ extends ViewSpec:
       status = UploadStatus.UploadedSuccessfully(
         name = "file.pdf",
         mimeType = "application/pdf",
-        downloadUrl = ObjectStoreUrl(uri"http://localhost:1234/download/file.pdf"),
+        downloadUrl = url"http://localhost:1234/download/file.pdf",
         size = Some(12345),
-        checksum = "checksum"
+        checksum = tdAll.objectStoreValidHexVal
       )
     ).body
   )
 
   val virusDoc: Document = Jsoup.parse(
-    viewTemplate(
-      status = UploadStatus.Failed(
-        failureReason = "QUARANTINE"
-      )
-    ).body
+    viewTemplate(status = UploadStatus.Failed).body
   )
 
   private val inProgressHeading: String = "We are checking your upload"
   private val uploadSuccessfulHeading: String = "Your upload is complete"
-  private val virusHeading: String = "Your upload has a virus"
+  private val virusHeading: String = "Your upload has failed scanning"
 
   "AmlsEvidenceUploadProgressPage view" should:
 
@@ -105,22 +98,22 @@ extends ViewSpec:
         .selectOnlyOneElementOrFail()
         .text() shouldBe "Continue"
 
-    "contain expected content when status is Failed with a virus" in:
+    "contain expected content when status has failed scanning" in:
       virusDoc.mainContent shouldContainContent
         """
           |Anti-money laundering supervision details
-          |Your upload has a virus
-          |Your file upload has failed. Try uploading another file.
+          |Your upload has failed scanning
+          |Your file upload has failed scanning. Try uploading another file.
           |Try again
           |""".stripMargin
 
-    "have the correct title when status is Failed with a virus" in:
+    "have the correct title when status has failed scanning" in:
       virusDoc.title() shouldBe s"$virusHeading - Apply for an agent services account - GOV.UK"
 
-    "have the correct h1 when status is Failed with a virus" in:
+    "have the correct h1 when status has failed scanning" in:
       virusDoc.h1 shouldBe virusHeading
 
-    "render a Try again button when status is Failed with a virus" in:
+    "render a Try again button when status has failed scanning" in:
       virusDoc
         .mainContent
         .selectOrFail(".govuk-button")

@@ -36,6 +36,8 @@ import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsName
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.LinkIdGenerator
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadIdGenerator
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.CsvLoader
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
@@ -73,6 +75,7 @@ extends AnyWordSpecLike,
       "microservice.services.upscan.port" -> WireMockSupport.port,
       "microservice.services.citizen-details.port" -> WireMockSupport.port,
       "microservice.services.address-lookup-frontend.port" -> WireMockSupport.port,
+      "microservice.services.object-store.port" -> WireMockSupport.port,
       "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
       "auditing.consumer.baseUri.port" -> WireMockSupport.port,
       "auditing.enabled" -> false,
@@ -98,6 +101,9 @@ extends AnyWordSpecLike,
         })
         bind(classOf[AgentApplicationIdGenerator]).toInstance(new AgentApplicationIdGenerator {
           override def nextApplicationId(): AgentApplicationId = tdAll.agentApplicationId
+        })
+        bind(classOf[UploadIdGenerator]).toInstance(new UploadIdGenerator {
+          override def nextUploadId(): UploadId = tdAll.uploadId
         })
         bind(classOf[MemberProvidedDetailsIdGenerator]).toInstance(new MemberProvidedDetailsIdGenerator {
           override def nextMemberProvidedDetailsId(): MemberProvidedDetailsId = tdAll.memberProvidedDetailsId

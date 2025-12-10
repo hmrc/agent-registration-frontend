@@ -25,7 +25,12 @@ sm2 --start AGENT_REGISTRATION_ALL \
 sm2 -stop-all \
 && sm2 -s
 ```
+In addition, if you are running this service from source and intending to upload AMLS evidence files in localhost then 
+you may also need to initialise an internal auth token used for object-store transfers by running the following command:
 
+```bash
+./setup-object-store.sh
+```
 
 # Project Setup in IntelliJ
 

@@ -90,7 +90,7 @@ class AppConfig @Inject() (
   val upscanRedirectBase: String = configuration.get[String]("microservice.services.upscan.redirect-base")
   val fileUploadMaxPolls: Int = configuration.get[Int]("uploads.maximum-js-polls")
   val millisecondsBeforePoll: Int = configuration.get[Int]("uploads.milliseconds-before-poll")
-  val upscanCallbackEndpoint: String = s"$agentRegistrationBaseUrl/agent-registration/upscan-callback"
+  val upscanCallbackEndpoint: String = s"$agentRegistrationBaseUrl/agent-registration/application/amls/upscan-callback"
   val maxFileSize: Int = configuration.get[Int]("uploads.max-file-size-in-bytes")
   val allowedCorsOrigin: String = configuration.get[String]("microservice.services.upscan.redirect-base")
 

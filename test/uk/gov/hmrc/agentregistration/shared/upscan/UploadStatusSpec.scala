@@ -19,6 +19,8 @@ package uk.gov.hmrc.agentregistration.shared.upscan
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
+import uk.gov.hmrc.http.StringContextOps
 
 class UploadStatusSpec
 extends UnitSpec:
@@ -28,31 +30,30 @@ extends UnitSpec:
     val uploadedSuccessfully: UploadStatus = UploadStatus.UploadedSuccessfully(
       name = "test.pdf",
       mimeType = "application/pdf",
-      downloadUrl = ObjectStoreUrl("http://localhost:9000/test.pdf"),
+      downloadUrl = url"http://localhost:9000/test.pdf",
       size = Some(1000),
-      checksum = "checksum"
+      checksum = TdAll.tdAll.objectStoreValidHexVal
     )
 
     val uploadedSuccessfullyJson: JsValue = Json.parse(
       // language=JSON
-      """
-        |{
-        |  "name": "test.pdf",
-        |  "mimeType": "application/pdf",
-        |  "downloadUrl": "http://localhost:9000/test.pdf",
-        |  "size": 1000,
-        |  "checksum": "checksum",
-        |  "type": "UploadedSuccessfully"
-        |}
-        |""".stripMargin
+      s"""
+         |{
+         |  "name": "test.pdf",
+         |  "mimeType": "application/pdf",
+         |  "downloadUrl": "http://localhost:9000/test.pdf",
+         |  "size": 1000,
+         |  "checksum": "${TdAll.tdAll.objectStoreValidHexVal}",
+         |  "type": "UploadedSuccessfully"
+         |}
+         |""".stripMargin
     )
 
-    val uploadFailed: UploadStatus = UploadStatus.Failed("Invalid file type")
+    val uploadFailed: UploadStatus = UploadStatus.Failed
     val uploadFailedJson: JsValue = Json.parse(
       // language=JSON
       """
         |{
-        |  "failureReason": "Invalid file type",
         |  "type": "Failed"
         |}
         |""".stripMargin

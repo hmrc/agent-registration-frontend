@@ -42,7 +42,7 @@ end
 end
 alt READY (File scan == ok)
 UN->>BE: Callback READY + <presigned downloadUrl>
-Note over BE: BE updates Agent Application upload status for {reference} to READY
+Note over BE: BE stores upload status for {reference} in upscan-upload-details
 FE-->>U: Show "Upload successful" & continue journey
 BE->>OSC: uploadFromUrl(<downloadUrl>, path, retention, contentType)
 OSC->>OS: Store object (owner = agent-reg)
