@@ -66,7 +66,7 @@ extends FrontendController(mcc, actions):
                     // TODO PAV - remaping not the best idea, but we need to convert from YesNo to Boolean, any other way?
                     .map(_.toYesNo)
               ,
-              request.memberProvidedDetails.getOfficerName,
+              agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName,
               agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
             ))
           case None =>
@@ -89,7 +89,7 @@ extends FrontendController(mcc, actions):
                       BadRequest(
                         view(
                           formWithErrors,
-                          request.memberProvidedDetails.getOfficerName,
+                          agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName,
                           agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
                         )
                       )
