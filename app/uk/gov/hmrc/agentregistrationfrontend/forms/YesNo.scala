@@ -21,7 +21,6 @@ enum YesNo:
   case Yes
   case No
 
-//TODO PAV - hmm con convinced that is the right plave to configure that
 object YesNo:
 
   extension (yn: YesNo)

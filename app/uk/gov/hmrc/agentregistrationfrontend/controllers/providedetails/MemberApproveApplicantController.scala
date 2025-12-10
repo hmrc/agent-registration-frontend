@@ -68,7 +68,6 @@ extends FrontendController(mcc, actions):
                   request
                     .memberProvidedDetails
                     .hasApprovedApplication
-                    // TODO PAV - remaping not the best idea, but we need to convert from YesNo to Boolean, any other way?
                     .map(_.toYesNo)
               ,
               agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName,
@@ -78,7 +77,6 @@ extends FrontendController(mcc, actions):
             logger.info(s"Application for agent applicationId ${request.memberProvidedDetails.agentApplicationId} not found")
             Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
 
-  // TODO PAV - we do not have async version of ensureValidFormAndRedirectIfSaveForLater !?!?
   def submit: Action[AnyContent] =
     baseAction
       .async:
@@ -91,17 +89,28 @@ extends FrontendController(mcc, actions):
                   .find(request.memberProvidedDetails.agentApplicationId)
                   .map:
                     case Some(agentApplication) =>
+                      val applicantName = agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName
+
+                      val formWithNameErrors = formWithErrors.copy(
+                        errors = formWithErrors.errors.map {
+                          case err
+                              if err.key == MemberApproveApplicationForm.key &&
+                                err.message == s"${MemberApproveApplicationForm.key}.error.required" =>
+                            err.copy(args = Seq(applicantName))
+                          case other => other
+                        }
+                      )
+
                       BadRequest(
                         view(
-                          formWithErrors,
-                          agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName,
+                          formWithNameErrors,
+                          applicantName,
                           agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
                         )
                       )
                     case None => Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
               ,
               validYesNo =>
-                // TODO PAV - remaping not the best idea, but we need to convert from YesNo to Boolean, any other way?
                 val approved = validYesNo.toBoolean
 
                 val updatedApplication = request.memberProvidedDetails
