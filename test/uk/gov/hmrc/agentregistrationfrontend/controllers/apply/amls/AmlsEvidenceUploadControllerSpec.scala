@@ -199,7 +199,7 @@ extends ControllerSpec:
 
   s"GET $uploadErrorPath with params should render the error page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterAmlsExpiryDateProvided)
-    val response: WSResponse = get(s"$uploadErrorPath?key=reference&errorRequestId=1&errorCode=TOO_LARGE&errorMessage=The%20file%20is%20too%20large")
+    val response: WSResponse = get(s"$uploadErrorPath?key=reference&errorRequestId=1&errorCode=EntityTooLarge&errorMessage=The%20file%20is%20too%20large")
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title shouldBe ExpectedStrings.tooLargeTitle
     ApplyStubHelper.verifyConnectorsForAuthAction()
