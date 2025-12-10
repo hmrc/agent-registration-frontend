@@ -20,3 +20,15 @@ enum YesNo:
 
   case Yes
   case No
+
+//TODO PAV - hmm con convinced that is the right plave to configure that 
+object YesNo:
+
+  extension (yn: YesNo)
+    def toBoolean: Boolean =
+      yn match
+        case YesNo.Yes => true
+        case YesNo.No => false
+
+  extension (b: Boolean)
+    def toYesNo: YesNo = if b then YesNo.Yes else YesNo.No
