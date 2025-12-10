@@ -50,6 +50,11 @@ extends FrontendController(mcc, actions):
       implicit request =>
         Redirect(AppRoutes.providedetails.MemberSaUtrController.show.url)
     )
+    .ensure(
+      _.memberProvidedDetails.emailAddress.nonEmpty,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.MemberEmailAddressController.show.url)
+    )
 
   def show: Action[AnyContent] = baseAction.async:
     implicit request =>

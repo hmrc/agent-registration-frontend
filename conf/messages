@@ -475,3 +475,4 @@ memberApproveAgentApplication.info = {0} has applied for an agent services accou
 memberApproveAgentApplication.question = Do you agree that {0} can apply for an account?
 memberApproveAgentApplication.yes = Yes
 memberApproveAgentApplication.no = No
+memberApproveAgentApplication.error.required = Select yes if you agree that {0} can apply for an account
