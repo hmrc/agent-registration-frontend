@@ -25,13 +25,16 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName.NameOfAuthorised
+import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
-import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
-import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState
 import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
+import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState
+import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.auth.core.retrieve.Credentials
+import uk.gov.hmrc.http.StringContextOps
 
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -124,6 +127,14 @@ trait TdBase:
     amlsRegistrationNumber = Some(AmlsRegistrationNumber("XAML1234567890")),
     amlsExpiryDate = None,
     amlsEvidence = None
+  )
+  def successfulUploadStatus: UploadStatus.UploadedSuccessfully = UploadStatus.UploadedSuccessfully(
+    downloadUrl = url"https://example.com/download-url",
+    name = "evidence.pdf",
+    mimeType = "application/pdf",
+    size = Some(12345L),
+    checksum = objectStoreValidHexVal,
+    objectStoreLocation = Some(ObjectStoreUrl("test-file-reference/evidence.pdf"))
   )
   def uploadId: UploadId = UploadId("upload-id-12345")
   def objectStoreValidHexVal: String = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"

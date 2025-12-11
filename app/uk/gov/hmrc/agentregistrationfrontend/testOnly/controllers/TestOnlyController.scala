@@ -66,7 +66,7 @@ extends FrontendController(mcc, actions):
                 UploadStatus.UploadedSuccessfully(
                   name = "test.pdf",
                   mimeType = "application/pdf",
-                  downloadUrl = url"http://example.com/download",
+                  downloadUrl = url"https://example.com/download",
                   size = Some(12345),
                   checksum = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
                 )

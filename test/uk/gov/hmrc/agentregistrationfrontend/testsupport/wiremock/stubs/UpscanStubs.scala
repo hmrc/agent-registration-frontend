@@ -22,7 +22,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.WireMockSupport
 
-object UpscanStubs {
+object UpscanStubs:
 
   val requestJson: String =
     // language=JSON
@@ -74,5 +74,3 @@ object UpscanStubs {
     urlPattern = wm.urlEqualTo("/upscan/v2/initiate"),
     count = count
   )
-
-}
