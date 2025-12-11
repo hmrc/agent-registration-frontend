@@ -13,6 +13,7 @@ addSbtPlugin("uk.gov.hmrc"        % "sbt-sass-compiler"  % "0.12.0")
 addSbtPlugin("org.scalastyle"     %% "scalastyle-sbt-plugin" % "1.0.0")
 addSbtPlugin("org.wartremover"    %  "sbt-wartremover"       % "3.3.0")
 addSbtPlugin("com.timushev.sbt"   %  "sbt-updates"           % "0.6.3")
-addSbtPlugin("org.scalameta"      % "sbt-scalafmt"            % "2.5.4")
+addSbtPlugin("org.scalameta"      % "sbt-scalafmt"           % "2.5.4")
+addSbtPlugin("ch.epfl.scala"      % "sbt-scalafix"           % "0.14.4")
 
 addDependencyTreePlugin
