@@ -21,7 +21,7 @@ import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
-import uk.gov.hmrc.agentregistration.shared.upscan.Reference
+import uk.gov.hmrc.agentregistration.shared.upscan.FileUploadReference
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
@@ -45,7 +45,7 @@ trait TdSectionAmls {
 
   def amlsUploadDetailsAfterUploadInProgress: UploadDetails = UploadDetails(
     uploadId = dependencies.uploadId,
-    reference = Reference("test-file-reference"),
+    reference = FileUploadReference("test-file-reference"),
     status = UploadStatus.InProgress
   )
 

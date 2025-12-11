@@ -19,8 +19,9 @@ package uk.gov.hmrc.agentregistrationfrontend.views.apply.amls
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AmlsName
-import uk.gov.hmrc.agentregistration.shared.upscan.Reference
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UpscanInitiateResponse
+import uk.gov.hmrc.agentregistration.shared.upscan.FileUploadReference
+import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector.UploadRequest
+import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector.UpscanInitiateResponse
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadPage
 
@@ -32,9 +33,11 @@ extends ViewSpec:
   val doc: Document = Jsoup.parse(
     viewTemplate(
       upscanInitiateResponse = UpscanInitiateResponse(
-        fileReference = Reference("reference"),
-        postTarget = "https://bucketName.s3.eu-west-2.amazonaws.com/upload",
-        formFields = Map("hiddenKey" -> "hiddenValue")
+        reference = FileUploadReference("reference"),
+        uploadRequest = UploadRequest(
+          href = "https://bucketName.s3.eu-west-2.amazonaws.com/upload",
+          fields = Map("hiddenKey" -> "hiddenValue")
+        )
       ),
       supervisoryBodyName = AmlsName("Gambling Commission")
     ).body
