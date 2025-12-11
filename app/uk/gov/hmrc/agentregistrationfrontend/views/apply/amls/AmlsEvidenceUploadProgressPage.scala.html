@@ -55,7 +55,7 @@
             }
             case UploadStatus.InProgress => {
                 @govukButton(Button(
-                    href = Some(AppRoutes.apply.amls.AmlsEvidenceUploadController.showResult.url),
+                    href = Some(AppRoutes.apply.amls.AmlsEvidenceUploadController.showUploadResult.url),
                     content = Text(messages("common.continue"))
                 ))
             }

@@ -75,8 +75,8 @@ POST        /apply/anti-money-laundering/registration-number        uk.gov.hmrc.
 GET         /apply/anti-money-laundering/supervision-runs-out       uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsExpiryDateController.show
 POST        /apply/anti-money-laundering/supervision-runs-out       uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsExpiryDateController.submit
 GET         /apply/anti-money-laundering/evidence                   uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsEvidenceUploadController.show
-GET         /apply/anti-money-laundering/evidence/status            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsEvidenceUploadController.pollResultWithJavaScript
-GET         /apply/anti-money-laundering/evidence/upload-result     uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsEvidenceUploadController.showResult
+GET         /apply/anti-money-laundering/evidence/check-upload-status  uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsEvidenceUploadController.checkUploadStatus
+GET         /apply/anti-money-laundering/evidence/upload-result     uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsEvidenceUploadController.showUploadResult
 GET         /apply/anti-money-laundering/evidence/error      uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsEvidenceUploadController.showError(errorCode: String, errorMessage: String, errorRequestId: String, key: String)
 GET         /apply/anti-money-laundering/check-your-answers         uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.CheckYourAnswersController.show
 

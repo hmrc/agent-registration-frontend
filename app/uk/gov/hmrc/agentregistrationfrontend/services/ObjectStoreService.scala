@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.services
 
-import uk.gov.hmrc.agentregistration.shared.upscan.Reference
+import uk.gov.hmrc.agentregistration.shared.upscan.FileUploadReference
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.StringContextOps
@@ -39,7 +39,7 @@ class ObjectStoreService @Inject() (
    * Returns the Object Store file path if the transfer was successful, None otherwise.
    */
   def transferFileToObjectStore(
-    fileReference: Reference,
+    fileReference: FileUploadReference,
     uploadStatus: UploadStatus
   )(using hc: HeaderCarrier): Future[Option[Path.File]] =
     uploadStatus match
