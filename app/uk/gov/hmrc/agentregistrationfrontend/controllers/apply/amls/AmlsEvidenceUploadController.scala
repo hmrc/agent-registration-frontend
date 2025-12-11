@@ -21,6 +21,7 @@ import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsName
 import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
@@ -32,7 +33,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanConnector
+import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.UpscanErrorPage
@@ -55,7 +56,7 @@ class AmlsEvidenceUploadController @Inject() (
   progressView: AmlsEvidenceUploadProgressPage,
   errorView: UpscanErrorPage,
   appConfig: AppConfig,
-  upscanInitiateConnector: UpscanConnector,
+  upscanInitiateConnector: UpscanInitiateConnector,
   applicationService: AgentApplicationService,
   amlsCodes: AmlsCodes,
   upscanProgressService: UpscanProgressService,
@@ -84,18 +85,17 @@ extends FrontendController(mcc, actions):
     implicit request =>
       val amlsCode: AmlsCode = request.agentApplication.getAmlsDetails.supervisoryBody
       val amlsName: AmlsName = amlsCodes.getSupervisoryName(amlsCode)
-      val newUploadId: UploadId = uploadIdGenerator.nextUploadId()
       for
         upscanInitiateResponse <- upscanInitiateConnector.initiate(
-          redirectOnSuccess = Some(appConfig.upscanRedirectBase + routes.AmlsEvidenceUploadController.showResult.url),
+          redirectOnSuccessUrl = uri"${appConfig.thisFrontendBaseUrl + routes.AmlsEvidenceUploadController.showUploadResult.url}",
           // cannot use controller.routes for the error url because upscan will respond with query parameters
-          redirectOnError = Some(appConfig.upscanRedirectBase + "/agent-registration/apply/anti-money-laundering/evidence/error"),
-          maxFileSize = appConfig.maxFileSize
+          redirectOnErrorUrl = appConfig.thisFrontendBaseUrl + "/agent-registration/apply/anti-money-laundering/evidence/error",
+          maxFileSize = appConfig.Upscan.maxFileSize
         )
         uploadDetails = UploadDetails(
-          uploadId = newUploadId,
+          uploadId = uploadIdGenerator.nextUploadId(),
           status = UploadStatus.InProgress,
-          reference = upscanInitiateResponse.fileReference
+          reference = upscanInitiateResponse.reference
         )
         // store the upscan fileReference and new uploadId in the application
         // and initiate the upscan progress tracking in agent-registration backend
@@ -133,7 +133,7 @@ extends FrontendController(mcc, actions):
         )
         Ok(errorView(errorCode))
 
-  def showResult: Action[AnyContent] = actions
+  def showUploadResult: Action[AnyContent] = actions
     .Applicant
     .getApplicationInProgress
     .async:
@@ -171,13 +171,14 @@ extends FrontendController(mcc, actions):
             Future.successful(Ok(progressView(UploadStatus.InProgress)))
 
   private val corsHeaders: Seq[(String, String)] = Seq(
-    "Access-Control-Allow-Origin" -> appConfig.allowedCorsOrigin,
+    "Access-Control-Allow-Origin" -> appConfig.thisFrontendBaseUrl,
     "Access-Control-Allow-Credentials" -> "true",
     "Access-Control-Allow-Methods" -> "GET, OPTIONS"
   )
 
-  // this method returns a status code to a JavaScript process polling - JS will redirect to result page when upload is complete or failed
-  def pollResultWithJavaScript: Action[AnyContent] = actions
+  /** This endpoint is called via JavaScript in a poll loop to check the status of the file upload. The upload status is encoded in the HTTP status response:
+    */
+  def checkUploadStatus: Action[AnyContent] = actions
     .Applicant
     .getApplicationInProgress
     .async:
