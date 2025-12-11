@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.upscan
+package uk.gov.hmrc.agentregistration.shared.upscan
 
-import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.Format
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
+import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 
-case class UpscanInitiateRequest(
-  callbackUrl: String,
-  successRedirect: Option[String] = None,
-  errorRedirect: Option[String] = None,
-  minimumFileSize: Option[Int] = None,
-  maximumFileSize: Option[Int] = Some(5242880) // 5 MB file limit specified in bytes
-)
+/** Upscan File Reference
+  */
+final case class FileUploadReference(value: String)
 
-object UpscanInitiateRequest {
-  implicit val format: OFormat[UpscanInitiateRequest] = Json.format[UpscanInitiateRequest]
-}
+object FileUploadReference:
+
+  given format: Format[FileUploadReference] = JsonFormatsFactory.makeValueClassFormat

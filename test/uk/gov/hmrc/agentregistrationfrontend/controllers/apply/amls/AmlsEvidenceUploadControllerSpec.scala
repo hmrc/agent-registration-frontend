@@ -105,11 +105,11 @@ extends ControllerSpec:
         .afterUploadFailed
 
   "routes should have correct paths and methods" in:
-    routes.AmlsEvidenceUploadController.show shouldBe Call(
+    AppRoutes.apply.amls.AmlsEvidenceUploadController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.AmlsEvidenceUploadController.showResult shouldBe Call(
+    AppRoutes.apply.amls.AmlsEvidenceUploadController.showUploadResult shouldBe Call(
       method = "GET",
       url = resultPath
     )
