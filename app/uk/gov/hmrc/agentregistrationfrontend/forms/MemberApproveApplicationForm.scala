@@ -26,10 +26,11 @@ object MemberApproveApplicationForm:
 
   val key: String = "memberApproveAgentApplication"
 
-  val form: Form[YesNo] =
+  def form(applicantName: String): Form[YesNo] =
     val fieldMapping: FieldMapping[YesNo] = Forms.of(FormatterFactory.makeEnumFormatter[YesNo](
       errorMessageIfMissing = s"$key.error.required",
-      errorMessageIfEnumError = ErrorKeys.invalidInputErrorMessage(MemberApproveApplicationForm.key)
+      errorMessageIfEnumError = ErrorKeys.invalidInputErrorMessage(MemberApproveApplicationForm.key),
+      missingArgs = Seq(applicantName)
     ))
     Form(
       mapping =
