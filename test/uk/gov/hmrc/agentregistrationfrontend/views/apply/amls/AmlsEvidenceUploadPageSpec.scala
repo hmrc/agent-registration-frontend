@@ -73,11 +73,26 @@ extends ViewSpec:
     "have the correct h1" in:
       doc.h1 shouldBe heading
 
-    "have only one file input element in the form" in:
-      doc
+    "render the correct values to control acceptable mime types for the file input" in:
+      val fileInput = doc
         .mainContent
         .selectOrFail("form input[type='file']")
         .selectOnlyOneElementOrFail()
+      fileInput.attr("name") shouldBe "file"
+      fileInput.attr("accept") shouldBe "image/jpeg,image/png,image/tiff,application/pdf,text/plain,application/vnd.ms-outlook,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.spreadsheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.oasis.opendocument.presentation"
+
+    "render config values correctly for JavaScript to use when enabled" in:
+      val progressIndicator = doc
+        .mainContent
+        .selectOrFail("#file-upload-progress")
+        .selectOnlyOneElementOrFail()
+      progressIndicator.attr("data-max-file-size") shouldBe "5242880" // 5MiB in bytes
+      progressIndicator.attr("data-check-upload-status-max-attempts") shouldBe "20"
+      progressIndicator.attr("data-check-upload-status-interval-ms") shouldBe "1000"
+      progressIndicator.attr(
+        "data-check-upload-status-url"
+      ) shouldBe AppRoutes.apply.amls.AmlsEvidenceUploadController.checkUploadStatus.url
+      progressIndicator.attr("data-success") shouldBe s"http://localhost:22201${AppRoutes.apply.amls.AmlsEvidenceUploadController.showUploadResult.url}"
 
     "have hidden fields for upscan initiate form fields" in:
       val hiddenFields = doc
