@@ -74,9 +74,9 @@ extends ControllerSpec:
       case Some(expectedRedirect) =>
         s"GET $path with missing GRS data should redirect to the agent type page" in:
           ApplyStubHelper.stubsForAuthAction(testCase.application)
-        val response: WSResponse = get(path)
+          val response: WSResponse = get(path)
 
-        response.status shouldBe Status.SEE_OTHER
-        response.body[String] shouldBe Constants.EMPTY_STRING
-        response.header("Location").value shouldBe expectedRedirect
-        ApplyStubHelper.verifyConnectorsForAuthAction()
+          response.status shouldBe Status.SEE_OTHER
+          response.body[String] shouldBe Constants.EMPTY_STRING
+          response.header("Location").value shouldBe expectedRedirect
+          ApplyStubHelper.verifyConnectorsForAuthAction()

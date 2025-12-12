@@ -140,13 +140,13 @@ extends ControllerSpec:
       case None =>
         s"GET $path with complete contact details should return 200 and render page" in:
           ApplyStubHelper.stubsForAuthAction(testCase.application)
-        val response: WSResponse = get(path)
+          val response: WSResponse = get(path)
 
-        response.status shouldBe Status.OK
-        val doc = response.parseBodyAsJsoupDocument
-        doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
-        doc.select("h2.govuk-caption-l").text() shouldBe "Applicant contact details"
-        ApplyStubHelper.verifyConnectorsForAuthAction()
+          response.status shouldBe Status.OK
+          val doc = response.parseBodyAsJsoupDocument
+          doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
+          doc.select("h2.govuk-caption-l").text() shouldBe "Applicant contact details"
+          ApplyStubHelper.verifyConnectorsForAuthAction()
 
       case Some(expectedRedirect) =>
         s"GET $path with missing ${testCase.name} should redirect to the ${testCase.name} page" in:
