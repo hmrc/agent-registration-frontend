@@ -93,7 +93,7 @@
                 classes = "govuk-label--m"
             ),
             attributes = Map(
-                "accept" -> "application/pdf, image/jpg, image/jpeg, image/png, image/tiff, text/plain, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/msword, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "accept" -> appConfig.Upscan.acceptMimeTypes,
                 "required" -> "true"
             )
         ))
