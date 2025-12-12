@@ -27,7 +27,6 @@ import play.api.mvc.Request
 import play.api.mvc.Session
 import play.api.mvc.SessionCookieBaker
 import play.api.test.FakeRequest
-import play.api.test.Helpers.*
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.crypto.PlainText
 import uk.gov.hmrc.http.SessionKeys
@@ -35,7 +34,7 @@ import uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCrypto
 
 import scala.concurrent.ExecutionContext
 
-trait WsHelper {
+trait WsHelper:
   self: ISpec =>
 
   implicit val ws: WSClient = app.injector.instanceOf[WSClient]
@@ -45,28 +44,48 @@ trait WsHelper {
   def get[T](
     uri: String,
     cookies: Seq[WSCookie] = Seq.empty
-  ): WSResponse = await(buildClient(uri, cookies).withHttpHeaders("Authorization" -> "Bearer 123").get())
+  ): WSResponse =
+    buildClient(
+      path = uri,
+      cookies = cookies
+    )
+      .withHttpHeaders("Authorization" -> "Bearer 123")
+      .get()
+      .futureValue
 
   def post(
     uri: String,
     cookies: Seq[WSCookie] = Seq.empty
-  )(body: Map[String, Seq[String]]): WSResponse = await(
-    buildClient(uri, cookies)
-      .withHttpHeaders("Authorization" -> "Bearer 123", "Csrf-Token" -> "nocheck")
+  )(body: Map[String, Seq[String]]): WSResponse =
+    buildClient(
+      path = uri,
+      cookies = cookies
+    )
+      .withHttpHeaders(
+        "Authorization" -> "Bearer 123",
+        "Csrf-Token" -> "nocheck"
+      )
       .post(body)
-  )
+      .futureValue
 
   def delete[T](
     uri: String,
     cookies: Seq[WSCookie] = Seq.empty
-  ): WSResponse = await(buildClient(uri, cookies).withHttpHeaders("Authorization" -> "Bearer 123").delete())
+  ): WSResponse =
+    buildClient(
+      path = uri,
+      cookies = cookies
+    )
+      .withHttpHeaders("Authorization" -> "Bearer 123")
+      .delete()
+      .futureValue
 
   val baseUrl: String = "/agent-registration"
 
   private def buildClient(
     path: String,
     cookies: Seq[WSCookie] = Seq.empty
-  ): WSRequest = {
+  ): WSRequest =
     val allCookies =
       if (cookies.nonEmpty)
         cookies
@@ -75,10 +94,10 @@ trait WsHelper {
           DefaultWSCookie("PLAY_LANG", "en"),
           mockSessionCookie
         )
-    ws.url(s"http://localhost:$port$baseUrl${path.replace(baseUrl, "")}")
+    ws
+      .url(s"http://localhost:$port$baseUrl${path.replace(baseUrl, "")}")
       .withFollowRedirects(false)
       .withCookies(allCookies*)
-  }
 
   val sessionHeaders: Map[String, String] = Map(
     SessionKeys.lastRequestTimestamp -> System.currentTimeMillis().toString,
@@ -86,9 +105,11 @@ trait WsHelper {
     SessionKeys.sessionId -> "mock-sessionid"
   )
 
-  implicit val request: Request[AnyContentAsFormUrlEncoded] = FakeRequest().withSession(sessionHeaders.toSeq*).withFormUrlEncodedBody()
+  implicit val request: Request[AnyContentAsFormUrlEncoded] = FakeRequest()
+    .withSession(sessionHeaders.toSeq*)
+    .withFormUrlEncodedBody()
 
-  def mockSessionCookie: WSCookie = {
+  def mockSessionCookie: WSCookie =
 
     val cookieCrypto = app.injector.instanceOf[SessionCookieCrypto]
     val cookieBaker = app.injector.instanceOf[SessionCookieBaker]
@@ -96,7 +117,7 @@ trait WsHelper {
     val encryptedValue = cookieCrypto.crypto.encrypt(PlainText(sessionCookie.value))
     val cookie = sessionCookie.copy(value = encryptedValue.value)
 
-    new WSCookie() {
+    new WSCookie():
       override def name: String = cookie.name
       override def value: String = cookie.value
       override def domain: Option[String] = cookie.domain
@@ -104,13 +125,9 @@ trait WsHelper {
       override def maxAge: Option[Long] = cookie.maxAge.map(_.toLong)
       override def secure: Boolean = cookie.secure
       override def httpOnly: Boolean = cookie.httpOnly
-    }
-  }
 
   extension (response: WSResponse)
 
     /** Extract all cookies from a WSResponse for use in subsequent requests.
       */
     def extractCookies: scala.collection.immutable.Seq[WSCookie] = response.cookies.toList
-
-}
