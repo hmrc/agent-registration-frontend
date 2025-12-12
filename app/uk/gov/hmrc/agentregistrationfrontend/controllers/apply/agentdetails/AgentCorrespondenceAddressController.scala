@@ -31,10 +31,10 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AddressLookupFrontendConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
-import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.model.AddressOptions
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
@@ -43,7 +43,6 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.Agent
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
-import scala.util.chaining.scalaUtilChainingOps
 
 @Singleton
 class AgentCorrespondenceAddressController @Inject() (
@@ -94,43 +93,40 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
+      .ensureValidFormAndRedirectIfSaveForLaterAsync[String](
+        form = AgentCorrespondenceAddressForm.form,
+        viewToServeWhenFormHasErrors =
+          implicit request =>
+            formWithErrors =>
+              businessPartnerRecordService
+                .getBusinessPartnerRecord(request.agentApplication.getUtr).map: bprOpt =>
+                  view(
+                    form = formWithErrors,
+                    addressOptions = makeAddressOptions(
+                      agentApplication = request.agentApplication.asLlpApplication,
+                      bprOption = bprOpt.map(_.address)
+                    )
+                  )
+      )
       .async:
-        implicit request: AgentApplicationRequest[AnyContent] =>
-          AgentCorrespondenceAddressForm.form
-            .bindFromRequest()
-            .fold(
-              formWithErrors =>
-                businessPartnerRecordService
-                  .getBusinessPartnerRecord(
-                    request.agentApplication.getUtr
-                  ).map: bprOpt =>
-                    BadRequest(
-                      view(
-                        form = formWithErrors,
-                        addressOptions = makeAddressOptions(
-                          agentApplication = request.agentApplication.asLlpApplication,
-                          bprOption = bprOpt.map(_.address)
-                        )
-                      )
-                    ).pipe(SubmissionHelper.redirectIfSaveForLater(request, _)),
-              addressOption =>
-                if addressOption.matches("other")
-                then
-                  given language: Lang = mcc.messagesApi.preferred(request).lang
-                  addressLookUpConnector
-                    .initJourney(AppRoutes.apply.internal.AddressLookupCallbackController.journeyCallback(None))
-                    .map(Redirect(_))
-                else
-                  val updatedApplication: AgentApplication = request
-                    .agentApplication
-                    .asLlpApplication
-                    .modify(_.agentDetails.each.agentCorrespondenceAddress)
-                    .setTo(Some(AgentCorrespondenceAddress.fromValueString(addressOption)))
-                  agentApplicationService
-                    .upsert(updatedApplication)
-                    .map: _ =>
-                      Redirect(routes.CheckYourAnswersController.show.url)
-            )
+        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[String]) =>
+          val addressOption = request.formValue
+          if addressOption.matches("other")
+          then
+            given language: Lang = mcc.messagesApi.preferred(request).lang
+            addressLookUpConnector
+              .initJourney(AppRoutes.apply.internal.AddressLookupCallbackController.journeyCallback(None))
+              .map(Redirect(_))
+          else
+            val updatedApplication: AgentApplication = request
+              .agentApplication
+              .asLlpApplication
+              .modify(_.agentDetails.each.agentCorrespondenceAddress)
+              .setTo(Some(AgentCorrespondenceAddress.fromValueString(addressOption)))
+            agentApplicationService
+              .upsert(updatedApplication)
+              .map: _ =>
+                Redirect(routes.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater
 
   /*

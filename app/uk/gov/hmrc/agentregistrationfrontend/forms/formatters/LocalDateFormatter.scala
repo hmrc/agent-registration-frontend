@@ -18,12 +18,14 @@ package uk.gov.hmrc.agentregistrationfrontend.forms.formatters
 
 import play.api.data.FormError
 import play.api.data.format.Formatter
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import java.time.LocalDate
 import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
 
+@SuppressWarnings(Array("org.wartremover.warts.OptionPartial"))
 class LocalDateFormatter(messagePrefix: String)
 extends Formatter[LocalDate] {
 
@@ -90,13 +92,13 @@ extends Formatter[LocalDate] {
         }
       case (None, Right(_), Some(_)) => Seq(FormError(s"$key.day", dayRequiredKey))
       case (Some(_), Right(_), None) => Seq(FormError(s"$key.year", yearRequiredKey))
-      case (Some(_), Left(monthError), None) if monthError == emptyMonthResult =>
+      case (Some(_), Left(monthError), None) if monthError === emptyMonthResult =>
         Seq(FormError(s"$key.month", monthYearRequiredKey)) ++ Seq(FormError(s"$key.year", monthYearRequiredKey))
       case (Some(_), Left(monthError), None) => monthError ++ Seq(FormError(s"$key.year", yearRequiredKey))
-      case (None, Left(monthError), Some(_)) if monthError == emptyMonthResult =>
+      case (None, Left(monthError), Some(_)) if monthError === emptyMonthResult =>
         Seq(FormError(s"$key.day", dayMonthRequiredKey)) ++ Seq(FormError(s"$key.month", dayMonthRequiredKey))
       case (None, Left(monthError), Some(_)) => Seq(FormError(s"$key.day", dayRequiredKey)) ++ monthError
-      case (Some(_), Left(monthError), Some(_)) if monthError == emptyMonthResult => monthError
+      case (Some(_), Left(monthError), Some(_)) if monthError === emptyMonthResult => monthError
       case (Some(_), Left(monthError), Some(_)) =>
         (validateDay, validateYear) match {
           case (true, true) => monthError

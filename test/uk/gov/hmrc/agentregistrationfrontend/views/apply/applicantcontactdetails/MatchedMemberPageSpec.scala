@@ -42,19 +42,17 @@ extends ViewSpec:
   )
   private val heading: String = "Are these your details?"
 
-  private val singleOfficer = Seq(
-    CompaniesHouseOfficer(
-      name = "First Last",
-      dateOfBirth = Some(CompaniesHouseDateOfBirth(
-        day = None,
-        month = 1,
-        year = 1990
-      ))
-    )
+  private val singleOfficer: CompaniesHouseOfficer = CompaniesHouseOfficer(
+    name = "First Last",
+    dateOfBirth = Some(CompaniesHouseDateOfBirth(
+      day = None,
+      month = 1,
+      year = 1990
+    ))
   )
 
   "MatchedMembersPage with a single match" should:
-    val doc: Document = Jsoup.parse(viewTemplate(ChOfficerSelectionForms.yesNoForm, singleOfficer.head).body)
+    val doc: Document = Jsoup.parse(viewTemplate(ChOfficerSelectionForms.yesNoForm, singleOfficer).body)
     "have the correct title for a single match" in:
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
 
@@ -99,6 +97,6 @@ extends ViewSpec:
       behavesLikePageWithErrorHandling(
         field = field,
         errorMessage = errorMessage,
-        errorDoc = Jsoup.parse(viewTemplate(formWithError, singleOfficer.head).body),
+        errorDoc = Jsoup.parse(viewTemplate(formWithError, singleOfficer).body),
         heading = heading
       )

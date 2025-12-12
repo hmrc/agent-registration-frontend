@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.viewspecsupport
 
 import org.scalactic.source.Position
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 object JsoupHelper:
 
@@ -29,5 +30,5 @@ object JsoupHelper:
       .replaceAll("[^\\S\\r\\n]+", " ") // replace many consecutive white-spaces (but not new lines) with one space
       .replaceAll("[\r\n]+", "\n") // replace many consecutive new lines with one new line
       .split("\n").map(_.trim) // trim each line
-      .filterNot(_ == "") // remove any empty lines
+      .filterNot(_ === "") // remove any empty lines
       .mkString("\n")

@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.viewspecsupport
 import org.jsoup.nodes.Element
 import org.jsoup.select.Elements
 import org.scalactic.source.Position
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.RichMatchers.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.viewspecsupport.JsoupHelper.*
 
@@ -44,7 +45,7 @@ object ElementsSupport:
       .getOrElse(fail(s"Index $index is out of bounds (size: ${elements.size()}) $hints"))
 
     inline def selectOnlyOneElementOrFail()(using pos: Position): Element =
-      if elements.size() != 1 then
+      if elements.size() =!= 1 then
         fail(s"Expected elements to contain only one element (size: ${elements.size()}) $hints")
       else elements.first()
 

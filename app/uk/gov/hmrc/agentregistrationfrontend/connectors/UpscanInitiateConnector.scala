@@ -61,7 +61,7 @@ class UpscanInitiateConnector @Inject() (
 
 object UpscanInitiateConnector:
 
-  case class UpscanInitiateRequest(
+  final case class UpscanInitiateRequest(
     callbackUrl: String,
     successRedirect: Option[String] = None,
     errorRedirect: Option[String] = None,

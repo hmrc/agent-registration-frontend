@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.SaUtr
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-case class CitizenDetails(
+final case class CitizenDetails(
   firstName: Option[String],
   lastName: Option[String],
   dateOfBirth: Option[LocalDate],

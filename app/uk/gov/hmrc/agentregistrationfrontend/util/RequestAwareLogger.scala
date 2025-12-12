@@ -30,13 +30,13 @@ class RequestAwareLogger(
   delegateLogger: Logger
 ):
 
-  def debug(message: => String)(using request: RequestHeader): Unit = logMessage(message, Debug)
+  def debug(message: => String)(using request: RequestHeader): Unit = logMessage(message, LogLevel.Debug)
 
-  def info(message: => String)(using request: RequestHeader): Unit = logMessage(message, Info)
+  def info(message: => String)(using request: RequestHeader): Unit = logMessage(message, LogLevel.Info)
 
-  def warn(message: => String)(using request: RequestHeader): Unit = logMessage(message, Warn)
+  def warn(message: => String)(using request: RequestHeader): Unit = logMessage(message, LogLevel.Warn)
 
-  def error(message: => String)(using request: RequestHeader): Unit = logMessage(message, Error)
+  def error(message: => String)(using request: RequestHeader): Unit = logMessage(message, LogLevel.Error)
 
   def debug(
     message: => String,
@@ -44,7 +44,7 @@ class RequestAwareLogger(
   )(using request: RequestHeader): Unit = logMessage(
     message,
     ex,
-    Debug
+    LogLevel.Debug
   )
 
   def info(
@@ -53,7 +53,7 @@ class RequestAwareLogger(
   )(using request: RequestHeader): Unit = logMessage(
     message,
     ex,
-    Info
+    LogLevel.Info
   )
 
   def warn(
@@ -62,7 +62,7 @@ class RequestAwareLogger(
   )(using request: RequestHeader): Unit = logMessage(
     message,
     ex,
-    Warn
+    LogLevel.Warn
   )
 
   def error(
@@ -71,7 +71,7 @@ class RequestAwareLogger(
   )(using request: RequestHeader): Unit = logMessage(
     message,
     ex,
-    Error
+    LogLevel.Error
   )
 
   private def context(using request: RequestHeader) = s"[Context: ${request.method} ${request.path}] $sessionId $requestId $userAgent $referer $deviceId"
@@ -90,19 +90,12 @@ class RequestAwareLogger(
     request match
       case _ => s"$message $context "
 
-  private sealed trait LogLevel
+  private enum LogLevel:
 
-  private case object Debug
-  extends LogLevel
-
-  private case object Info
-  extends LogLevel
-
-  private case object Warn
-  extends LogLevel
-
-  private case object Error
-  extends LogLevel
+    case Debug
+    case Info
+    case Warn
+    case Error
 
   private def logMessage(
     message: => String,
@@ -110,10 +103,10 @@ class RequestAwareLogger(
   )(using request: RequestHeader): Unit =
     lazy val richMessage = makeRichMessage(message)
     level match
-      case Debug => delegateLogger.debug(richMessage)
-      case Info => delegateLogger.info(richMessage)
-      case Warn => delegateLogger.warn(richMessage)
-      case Error => delegateLogger.error(richMessage)
+      case LogLevel.Debug => delegateLogger.debug(richMessage)
+      case LogLevel.Info => delegateLogger.info(richMessage)
+      case LogLevel.Warn => delegateLogger.warn(richMessage)
+      case LogLevel.Error => delegateLogger.error(richMessage)
 
   private def logMessage(
     message: => String,
@@ -122,7 +115,7 @@ class RequestAwareLogger(
   )(using request: RequestHeader): Unit =
     lazy val richMessage = makeRichMessage(message)
     level match
-      case Debug => delegateLogger.debug(richMessage, ex)
-      case Info => delegateLogger.info(richMessage, ex)
-      case Warn => delegateLogger.warn(richMessage, ex)
-      case Error => delegateLogger.error(richMessage, ex)
+      case LogLevel.Debug => delegateLogger.debug(richMessage, ex)
+      case LogLevel.Info => delegateLogger.info(richMessage, ex)
+      case LogLevel.Warn => delegateLogger.warn(richMessage, ex)
+      case LogLevel.Error => delegateLogger.error(richMessage, ex)

@@ -61,7 +61,7 @@ object MemberNinoForm:
         ninoStrOpt
       ) =>
         (hasNinoStr, ninoStrOpt) match
-          case (x, Some(ninoStr)) if x.equals(yes) => MemberNino.Provided(Nino(ninoStr))
+          case (`yes`, Some(ninoStr)) => MemberNino.Provided(Nino(ninoStr))
           case _ => MemberNino.NotProvided
     ) {
       case MemberNino.Provided(nino) => Some((yes, Some(nino.value)))
