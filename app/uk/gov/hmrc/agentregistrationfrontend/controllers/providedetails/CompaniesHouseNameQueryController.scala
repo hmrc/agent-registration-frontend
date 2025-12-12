@@ -21,8 +21,11 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseMatch
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsWithApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -71,42 +74,37 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] = actions
     .Member
-    .getProvideDetailsInProgress
+    .getProvideDetailsWithApplicationInProgress
+    .ensureValidForm[CompaniesHouseNameQuery](
+      form = CompaniesHouseNameQueryForm.form,
+      viewToServeWhenFormHasErrors =
+        implicit request =>
+          formWithErrors =>
+            view(
+              formWithErrors,
+              request.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
+            )
+    )
     .async:
-      implicit request =>
-        CompaniesHouseNameQueryForm.form
-          .bindFromRequest()
-          .fold(
-            formWithErrors =>
-              agentApplicationService
-                .find(request.memberProvidedDetails.agentApplicationId)
-                .map:
-                  case Some(app) =>
-                    BadRequest(view(
-                      formWithErrors,
-                      app.asLlpApplication.getBusinessDetails.companyProfile.companyName
-                    ))
-                  case _ => Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
-            ,
-            validFormData =>
-              val hasChanged: Boolean =
-                request.memberProvidedDetails
-                  .companiesHouseMatch
-                  .map(_.memberNameQuery)
-                  .getOrElse("") =!= validFormData
-              val redirectRoute = AppRoutes.providedetails.CompaniesHouseMatchingController.show
-              if hasChanged then
-                memberProvideDetailsService
-                  .upsert(
-                    request.memberProvidedDetails
-                      .modify(_.companiesHouseMatch)
-                      .setTo(Some(CompaniesHouseMatch(
-                        memberNameQuery = validFormData,
-                        companiesHouseOfficer = None
-                      )))
-                  )
-                  .map: _ =>
-                    Redirect(redirectRoute)
-              else
-                Future.successful(Redirect(redirectRoute))
-          )
+      implicit request: (MemberProvideDetailsWithApplicationRequest[AnyContent] & FormValue[CompaniesHouseNameQuery]) =>
+        val companiesHouseNameQuery: CompaniesHouseNameQuery = request.formValue
+        val hasChanged: Boolean =
+          request.memberProvidedDetails
+            .companiesHouseMatch
+            .map(_.memberNameQuery)
+            .getOrElse("") =!= companiesHouseNameQuery
+        val redirectRoute = AppRoutes.providedetails.CompaniesHouseMatchingController.show
+        if hasChanged then
+          memberProvideDetailsService
+            .upsert(
+              request.memberProvidedDetails
+                .modify(_.companiesHouseMatch)
+                .setTo(Some(CompaniesHouseMatch(
+                  memberNameQuery = companiesHouseNameQuery,
+                  companiesHouseOfficer = None
+                )))
+            )
+            .map: _ =>
+              Redirect(redirectRoute)
+        else
+          Future.successful(Redirect(redirectRoute))

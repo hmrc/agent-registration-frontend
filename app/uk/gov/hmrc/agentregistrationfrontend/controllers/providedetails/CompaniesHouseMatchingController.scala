@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import com.softwaremill.quicklens.each
 import com.softwaremill.quicklens.modify
+import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
@@ -120,7 +121,7 @@ extends FrontendController(mcc, actions):
         s"Unexpected response from companies house, expected one officer but got: ${officers.size}"
       )
     ChOfficerSelectionForms.yesNoForm.bindFromRequest().fold(
-      hasErrors = formWithErrors => Future.successful(BadRequest(matchedMemberView(formWithErrors, officer))),
+      hasErrors = (formWithErrors: Form[YesNo]) => Future.successful(BadRequest(matchedMemberView(formWithErrors, officer))),
       success =
         case YesNo.Yes => updateProvidedDetails(officer)
         case YesNo.No =>
