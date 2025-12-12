@@ -28,36 +28,54 @@ object FormatterFactory:
 
   inline def makeEnumFormatter[E <: reflect.Enum](
     errorMessageIfMissing: String = "error.required",
-    errorMessageIfEnumError: String = "invalid input"
+    errorMessageIfEnumError: String = "invalid input",
+    missingArgs: => Seq[Any] = Nil,
+    enumErrorArgs: => Seq[Any] = Nil
   )(using classTag: ClassTag[E]): Formatter[E] = makeFormatter[E](
     errorMessageIfMissing,
     errorMessageIfEnumError,
-    EnumValues.all[E]
+    EnumValues.all[E],
+    () => missingArgs,
+    () => enumErrorArgs
   )
 
   inline def makeSealedObjectsFormatter[E](
     errorMessageIfMissing: String = "error.required",
-    errorMessageIfEnumError: String = "invalid input"
+    errorMessageIfEnumError: String = "invalid input",
+    missingArgs: => Seq[Any] = Nil,
+    enumErrorArgs: => Seq[Any] = Nil
   )(using classTag: ClassTag[E]): Formatter[E] = makeFormatter[E](
     errorMessageIfMissing,
     errorMessageIfEnumError,
-    SealedObjects.all[E]
+    SealedObjects.all[E],
+    () => missingArgs,
+    () => enumErrorArgs
   )
 
   private[formatters] def makeFormatter[E](
     errorMessageIfMissing: String,
     errorMessageIfEnumError: String,
-    values: Seq[E]
+    values: Seq[E],
+    missingArgs: () => Seq[Any],
+    enumErrorArgs: () => Seq[Any]
   ): Formatter[E] =
     new Formatter[E] {
       override def bind(
         key: String,
         data: Map[String, String]
       ): Either[Seq[FormError], E] = data.get(key)
-        .toRight(Seq(FormError(key, errorMessageIfMissing)))
+        .toRight(Seq(FormError(
+          key,
+          errorMessageIfMissing,
+          missingArgs()
+        )))
         .flatMap { str =>
           values.find(e => e.toString === str)
-            .toRight(Seq(FormError(key, errorMessageIfEnumError)))
+            .toRight(Seq(FormError(
+              key,
+              errorMessageIfEnumError,
+              enumErrorArgs()
+            )))
         }
 
       override def unbind(
