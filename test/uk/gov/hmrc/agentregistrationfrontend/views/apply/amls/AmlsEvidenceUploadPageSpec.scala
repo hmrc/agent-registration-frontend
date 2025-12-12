@@ -19,8 +19,9 @@ package uk.gov.hmrc.agentregistrationfrontend.views.apply.amls
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AmlsName
-import uk.gov.hmrc.agentregistration.shared.upscan.Reference
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UpscanInitiateResponse
+import uk.gov.hmrc.agentregistration.shared.upscan.FileUploadReference
+import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector.UploadRequest
+import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector.UpscanInitiateResponse
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadPage
 
@@ -32,9 +33,11 @@ extends ViewSpec:
   val doc: Document = Jsoup.parse(
     viewTemplate(
       upscanInitiateResponse = UpscanInitiateResponse(
-        fileReference = Reference("reference"),
-        postTarget = "https://bucketName.s3.eu-west-2.amazonaws.com/upload",
-        formFields = Map("hiddenKey" -> "hiddenValue")
+        reference = FileUploadReference("reference"),
+        uploadRequest = UploadRequest(
+          href = "https://bucketName.s3.eu-west-2.amazonaws.com/upload",
+          fields = Map("hiddenKey" -> "hiddenValue")
+        )
       ),
       supervisoryBodyName = AmlsName("Gambling Commission")
     ).body
@@ -70,11 +73,26 @@ extends ViewSpec:
     "have the correct h1" in:
       doc.h1 shouldBe heading
 
-    "have only one file input element in the form" in:
-      doc
+    "render the correct values to control acceptable mime types for the file input" in:
+      val fileInput = doc
         .mainContent
         .selectOrFail("form input[type='file']")
         .selectOnlyOneElementOrFail()
+      fileInput.attr("name") shouldBe "file"
+      fileInput.attr("accept") shouldBe "image/jpeg,image/png,image/tiff,application/pdf,text/plain,application/vnd.ms-outlook,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.spreadsheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.oasis.opendocument.presentation"
+
+    "render config values correctly for JavaScript to use when enabled" in:
+      val progressIndicator = doc
+        .mainContent
+        .selectOrFail("#file-upload-progress")
+        .selectOnlyOneElementOrFail()
+      progressIndicator.attr("data-max-file-size") shouldBe "5242880" // 5MiB in bytes
+      progressIndicator.attr("data-check-upload-status-max-attempts") shouldBe "20"
+      progressIndicator.attr("data-check-upload-status-interval-ms") shouldBe "1000"
+      progressIndicator.attr(
+        "data-check-upload-status-url"
+      ) shouldBe AppRoutes.apply.amls.AmlsEvidenceUploadController.checkUploadStatus.url
+      progressIndicator.attr("data-success") shouldBe s"http://localhost:22201${AppRoutes.apply.amls.AmlsEvidenceUploadController.showUploadResult.url}"
 
     "have hidden fields for upscan initiate form fields" in:
       val hiddenFields = doc

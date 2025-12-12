@@ -17,14 +17,18 @@
 package uk.gov.hmrc.agentregistration.shared.upscan
 
 import play.api.libs.json.Format
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
+import play.api.mvc.PathBindable
+
+import java.util.UUID
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import uk.gov.hmrc.agentregistration.shared.util.ValueClassBinder
 
-/** Upscan File Reference
-  */
-final case class Reference(value: String)
+final case class UploadId(value: String)
 
-object Reference:
+object UploadId:
 
-  given format: Format[Reference] = JsonFormatsFactory.makeValueClassFormat
+  given format: Format[UploadId] = JsonFormatsFactory.makeValueClassFormat
+  given pathBindable: PathBindable[UploadId] = ValueClassBinder.valueClassBinder[UploadId](_.value)
+
+class UploadIdGenerator:
+  def nextUploadId(): UploadId = UploadId(UUID.randomUUID().toString)

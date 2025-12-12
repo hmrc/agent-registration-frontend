@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.llp
 
-import sttp.model.Uri.UriContext
+import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
-import uk.gov.hmrc.agentregistration.shared.upscan.Reference
+import uk.gov.hmrc.agentregistration.shared.upscan.FileUploadReference
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
@@ -43,24 +43,21 @@ trait TdSectionAmls {
   def amlsExpiryDateInvalid: LocalDate = dependencies.nowPlus13mAsLocalDateTime.toLocalDate
 
   def amlsUploadDetailsAfterUploadInProgress: UploadDetails = UploadDetails(
-    reference = Reference("test-file-reference"),
+    uploadId = dependencies.uploadId,
+    reference = FileUploadReference("test-file-reference"),
     status = UploadStatus.InProgress
   )
 
-  def amlsUploadDetailsAfterUploadSucceeded: UploadDetails = amlsUploadDetailsAfterUploadInProgress.copy(
-    status = UploadStatus.UploadedSuccessfully(
-      downloadUrl = ObjectStoreUrl(uri"https://bucketName.s3.eu-west-2.amazonaws.com/xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"),
-      name = "evidence.pdf",
-      mimeType = "application/pdf",
-      size = Some(12345L),
-      checksum = "md5:1B2M2Y8AsgTpgAmY7PhCfg=="
-    )
+  def amlsUploadDetailsAfterUploadScannedOk: UploadDetails = amlsUploadDetailsAfterUploadInProgress.copy(
+    status = dependencies.successfulUploadStatus.modify(_.objectStoreLocation).setTo(None)
   )
 
-  def amlsUploadDetailsAfterUploadFailed: UploadDetails = amlsUploadDetailsAfterUploadInProgress.copy(
-    status = UploadStatus.Failed(
-      failureReason = "QUARANTINE"
-    )
+  def amlsUploadDetailsAfterUploadSucceeded: UploadDetails = amlsUploadDetailsAfterUploadInProgress.copy(
+    status = dependencies.successfulUploadStatus
+  )
+
+  private def amlsUploadDetailsAfterUploadFailedScanning: UploadDetails = amlsUploadDetailsAfterUploadInProgress.copy(
+    status = UploadStatus.Failed
   )
 
   class AgentApplicationLlpWithSectionAmls(baseForSectionAmls: AgentApplicationLlp):
@@ -121,9 +118,12 @@ trait TdSectionAmls {
             amlsEvidence = Some(amlsUploadDetailsAfterUploadInProgress)
           )
           def afterUploadFailed = afterAmlsExpiryDateProvided.copy(
-            amlsEvidence = Some(amlsUploadDetailsAfterUploadFailed)
+            amlsEvidence = Some(amlsUploadDetailsAfterUploadFailedScanning)
           )
-          def afterUploadSucceded = afterAmlsExpiryDateProvided.copy(
+          def afterUploadScannedOk = afterAmlsExpiryDateProvided.copy(
+            amlsEvidence = Some(amlsUploadDetailsAfterUploadScannedOk)
+          )
+          def afterUploadSucceeded = afterAmlsExpiryDateProvided.copy(
             amlsEvidence = Some(amlsUploadDetailsAfterUploadSucceeded)
           )
 
@@ -139,8 +139,9 @@ trait TdSectionAmls {
 
         def afterUploadFailed: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadFailed))
 
-        def afterUploadSucceded: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadSucceded))
+        def afterUploadScannedOk: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadScannedOk))
+        def afterUploadSucceeded: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadSucceeded))
 
-        def complete: AgentApplicationLlp = afterUploadSucceded.tap(x => require(x.amlsDetails.exists(_.isComplete), "sanity check"))
+        def complete: AgentApplicationLlp = afterUploadSucceeded.tap(x => require(x.amlsDetails.exists(_.isComplete), "sanity check"))
 
 }

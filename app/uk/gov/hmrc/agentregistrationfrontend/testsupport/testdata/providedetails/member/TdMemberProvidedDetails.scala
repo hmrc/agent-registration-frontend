@@ -110,4 +110,12 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
       .modify(_.memberSaUtr)
       .setTo(Some(dependencies.saUtrProvided))
 
+    val afterApproveAgentApplication: MemberProvidedDetails = afterSaUtrProvided
+      .modify(_.hasApprovedApplication)
+      .setTo(Some(true))
+
+    val afterDoNotApproveAgentApplication: MemberProvidedDetails = afterSaUtrProvided
+      .modify(_.hasApprovedApplication)
+      .setTo(Some(false))
+
 }

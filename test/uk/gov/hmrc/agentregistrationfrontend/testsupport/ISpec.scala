@@ -28,21 +28,27 @@ import play.api.inject.guice.GuiceableModule
 import play.api.test.DefaultTestServerFactory
 import play.api.test.TestServerFactory
 import play.core.server.ServerConfig
-import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
-import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsIdGenerator
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationIdGenerator
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsName
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.LinkIdGenerator
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsIdGenerator
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadIdGenerator
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.CsvLoader
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.WireMockSupport
+import uk.gov.hmrc.objectstore.client.RetentionPeriod
+import uk.gov.hmrc.objectstore.client.config.ObjectStoreClientConfig
+import uk.gov.hmrc.objectstore.client.play.PlayObjectStoreClient
 
 import java.time.Clock
 import java.time.Instant
+import java.util.UUID.randomUUID
 
 trait ISpec
 extends AnyWordSpecLike,
@@ -70,7 +76,7 @@ extends AnyWordSpecLike,
       "microservice.services.sole-trader-identification-frontend.port" -> WireMockSupport.port,
       "microservice.services.incorporated-entity-identification-frontend.port" -> WireMockSupport.port,
       "microservice.services.partnership-identification-frontend.port" -> WireMockSupport.port,
-      "microservice.services.upscan.port" -> WireMockSupport.port,
+      "microservice.services.upscan-initiate.port" -> WireMockSupport.port,
       "microservice.services.citizen-details.port" -> WireMockSupport.port,
       "microservice.services.address-lookup-frontend.port" -> WireMockSupport.port,
       "play.http.router" -> "testOnlyDoNotUseInAppConf.Routes",
@@ -82,6 +88,13 @@ extends AnyWordSpecLike,
     ) ++ configOverrides
 
   protected def configOverrides: Map[String, Any] = Map[String, Any]()
+
+  private val objectStoreConfig = ObjectStoreClientConfig(
+    baseUrl = s"http://localhost:${WireMockSupport.port}",
+    owner = s"owner-${randomUUID().toString}",
+    authorizationToken = s"token-${randomUUID().toString}",
+    defaultRetentionPeriod = RetentionPeriod.OneWeek
+  )
 
   lazy val overridesModule: AbstractModule =
     new AbstractModule:
@@ -99,9 +112,14 @@ extends AnyWordSpecLike,
         bind(classOf[AgentApplicationIdGenerator]).toInstance(new AgentApplicationIdGenerator {
           override def nextApplicationId(): AgentApplicationId = tdAll.agentApplicationId
         })
+        bind(classOf[UploadIdGenerator]).toInstance(new UploadIdGenerator {
+          override def nextUploadId(): UploadId = tdAll.uploadId
+        })
         bind(classOf[MemberProvidedDetailsIdGenerator]).toInstance(new MemberProvidedDetailsIdGenerator {
           override def nextMemberProvidedDetailsId(): MemberProvidedDetailsId = tdAll.memberProvidedDetailsId
         })
+        bind(classOf[ObjectStoreClientConfig]).toInstance(objectStoreConfig)
+        bind(classOf[PlayObjectStoreClient]).toProvider(classOf[StubPlayObjectStoreClientProvider]).asEagerSingleton()
 
   override def fakeApplication(): Application = GuiceApplicationBuilder()
     .overrides(GuiceableModule.fromGuiceModules(Seq(overridesModule)))

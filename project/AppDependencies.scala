@@ -13,7 +13,8 @@ object AppDependencies {
     "uk.gov.hmrc" %% "play-frontend-hmrc-play-30" % "12.22.0",
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30" % hmrcMongoVersion,
     "com.softwaremill.quicklens" %% "quicklens" % "1.9.12", // Updated for Scala 3 compatibility
-    "uk.gov.hmrc" %% "play-conditional-form-mapping-play-30" % "3.4.0"
+    "uk.gov.hmrc" %% "play-conditional-form-mapping-play-30" % "3.4.0",
+    "uk.gov.hmrc.objectstore" %% "object-store-client-play-30" % "2.5.0"
   )
 
   val test: Seq[ModuleID] = Seq(

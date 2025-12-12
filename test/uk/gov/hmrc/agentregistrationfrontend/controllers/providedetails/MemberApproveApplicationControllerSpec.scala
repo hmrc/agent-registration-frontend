@@ -16,10 +16,15 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
-//import play.api.libs.ws.DefaultBodyReadables.*
+import play.api.libs.ws.DefaultBodyReadables.*
+import com.softwaremill.quicklens.modify
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+import uk.gov.hmrc.agentregistrationfrontend.forms.MemberApproveApplicationForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationMemberProvidedDetailsStubs
 
@@ -28,19 +33,32 @@ extends ControllerSpec:
 
   private val path = "/agent-registration/provide-details/approve-applicant"
 
+  object agentApplication:
+    val applicationSubmitted: AgentApplicationLlp = tdAll
+      .agentApplicationLlp
+      .sectionAgentDetails
+      .whenUsingExistingCompanyName
+      .afterContactTelephoneSelected
+      .modify(_.applicationState)
+      .setTo(ApplicationState.Submitted)
+
   private object memberProvideDetails:
 
     val afterSaUtrProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.afterSaUtrProvided
-    val afterSaUtrNotProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.afterNinoProvided
+    val withSaUtrNotProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.afterNinoProvided
+    val withNinoAndSaUtrFromAuthButEmailNotProvided: MemberProvidedDetails = tdAll.providedDetailsLlp
+      .withNinoFromAuth(tdAll.providedDetailsLlp
+        .withSaUtrFromAuth(tdAll.providedDetailsLlp.afterTelephoneNumberProvided))
+
+    val afterApproveAgentApplication = tdAll.providedDetailsLlp.afterApproveAgentApplication
+    val afterDoNotApproveAgentApplication = tdAll.providedDetailsLlp.afterDoNotApproveAgentApplication
 
   private object ExpectedStrings:
 
     val heading = "Approve the applicant"
     val title = s"$heading - Apply for an agent services account - GOV.UK"
     val errorTitle = s"Error: $heading - Apply for an agent services account - GOV.UK"
-    val requiredError = "Enter your email address"
-    val invalidError = "Enter your email address with a name, @ symbol and a domain name, like yourname@example.com"
-    val tooLongError = "The email address must be 132 characters or fewer"
+    def requiredError(applyOfficerName: String) = s"Error: Select yes if you agree that ${applyOfficerName} can apply for an account"
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.MemberApproveApplicantController.show shouldBe Call(
@@ -56,99 +74,89 @@ extends ControllerSpec:
   s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterSaUtrProvided))
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe ExpectedStrings.title
 
-/*
-  s"GET $path should redirect to next page when Nino is already provided from HMRC systems (Auth)" in:
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
+
+  s"GET $path should redirect to saUtr if is missing" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoFromAuth))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.withSaUtrNotProvided))
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
+
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe routes.MemberApproveApplicantController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.MemberSaUtrController.show.url
 
-  s"GET $path should redirect to previous page when EmailAddress is not provided from HMRC systems (Auth)" in:
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId, 1)
+
+  s"GET $path should redirect to emailAddress if is missing" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoFromAuth.copy(emailAddress = None)))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.withNinoAndSaUtrFromAuthButEmailNotProvided))
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
+
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe routes.MemberEmailAddressController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.MemberEmailAddressController.show.url
 
-  s"POST $path with selected Yes and valid name should save data and redirect to check your answers" in:
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId, 1)
+
+  s"POST $path with selected Yes should save data and redirect to agree standard" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoMissingInHmrcSystems))
-    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvideDetails.afterNinoProvided)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterSaUtrProvided))
+    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvideDetails.afterApproveAgentApplication)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
 
     val response: WSResponse =
       post(path)(Map(
-        MemberNinoForm.hasNinoKey -> Seq("Yes"),
-        MemberNinoForm.ninoKey -> Seq(tdAll.ninoProvided.nino.value)
+        MemberApproveApplicationForm.key -> Seq("Yes")
       ))
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.MemberApproveApplicantController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.MemberAgreeStandardController.show.url
 
-  s"POST $path with selected No should save data and redirect to check your answers" in:
+  s"POST $path with selected No should save data and redirect to agree standard" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoMissingInHmrcSystems))
-    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvideDetails.afterNinoNotProvided)
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterSaUtrProvided))
+    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvideDetails.afterDoNotApproveAgentApplication)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
 
     val response: WSResponse =
       post(path)(Map(
-        MemberNinoForm.hasNinoKey -> Seq("No")
+        MemberApproveApplicationForm.key -> Seq("No")
       ))
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.MemberApproveApplicantController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.MemberConfirmStopController.show.url
 
   s"POST $path  without selecting and option should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoMissingInHmrcSystems))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterSaUtrProvided))
+    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvideDetails.afterApproveAgentApplication)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
+
     val response: WSResponse =
       post(path)(Map(
-        MemberNinoForm.hasNinoKey -> Seq(Constants.EMPTY_STRING),
-        MemberNinoForm.ninoKey -> Seq(Constants.EMPTY_STRING)
+        MemberApproveApplicationForm.key -> Seq().empty
       ))
 
     response.status shouldBe Status.BAD_REQUEST
 
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: Do you have a National Insurance number? - Apply for an agent services account - GOV.UK"
-    doc.mainContent.select("#memberNino\\.hasNino-error").text() shouldBe "Error: Select yes if you have a National Insurance number"
-
-  s"POST $path with selected Yes and blank inputs should return 400" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoMissingInHmrcSystems))
-    val response: WSResponse =
-      post(path)(Map(
-        MemberNinoForm.hasNinoKey -> Seq("Yes"),
-        MemberNinoForm.ninoKey -> Seq(Constants.EMPTY_STRING)
-      ))
-
-    response.status shouldBe Status.BAD_REQUEST
-
-    val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: Do you have a National Insurance number? - Apply for an agent services account - GOV.UK"
-    doc.mainContent.select("#memberNino\\.nino-error").text() shouldBe "Error: Enter your National Insurance number"
-
-  s"POST $path with selected Yes and invalid characters should return 400" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoMissingInHmrcSystems))
-    val response: WSResponse =
-      post(path)(Map(
-        MemberNinoForm.hasNinoKey -> Seq("Yes"),
-        MemberNinoForm.ninoKey -> Seq("[[)(*%")
-      ))
-
-    response.status shouldBe Status.BAD_REQUEST
-
-    val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: Do you have a National Insurance number? - Apply for an agent services account - GOV.UK"
-    doc.mainContent.select("#memberNino\\.nino-error").text() shouldBe "Error: Enter a National Insurance number in the correct format"
- */
+    doc.title() shouldBe ExpectedStrings.errorTitle
+    doc.mainContent.select("#memberApproveAgentApplication-error").text() shouldBe ExpectedStrings.requiredError(
+      agentApplication.applicationSubmitted.getApplicantContactDetails.getApplicantName
+    )

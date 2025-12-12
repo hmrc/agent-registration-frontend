@@ -28,7 +28,7 @@
 @pageTitle =  @{status match {
     case UploadStatus.InProgress               => messages("fileUploadProgress.title")
     case s : UploadStatus.UploadedSuccessfully => messages("fileUploadProgress.complete.title")
-    case UploadStatus.Failed(f)  => messages(s"fileUploadProgress.$f.title")
+    case UploadStatus.Failed  => messages(s"fileUploadProgress.failed.title")
 }}
 
 @layout(
@@ -41,7 +41,7 @@
         @status match {
             case UploadStatus.InProgress               => { @messages("fileUploadProgress.inProgress") }
             case s : UploadStatus.UploadedSuccessfully => { @messages("fileUploadProgress.complete", s.name) }
-            case UploadStatus.Failed(f)     => { @messages(s"fileUploadProgress.$f") }
+            case UploadStatus.Failed     => { @messages("fileUploadProgress.failed") }
         }
     </p>
 
@@ -55,7 +55,7 @@
             }
             case UploadStatus.InProgress => {
                 @govukButton(Button(
-                    href = Some(AppRoutes.apply.amls.AmlsEvidenceUploadController.showResult.url),
+                    href = Some(AppRoutes.apply.amls.AmlsEvidenceUploadController.showUploadResult.url),
                     content = Text(messages("common.continue"))
                 ))
             }

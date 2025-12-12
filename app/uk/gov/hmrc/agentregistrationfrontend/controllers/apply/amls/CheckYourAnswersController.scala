@@ -56,7 +56,7 @@ extends FrontendController(mcc, actions):
                   AmlsCode(amlsCode),
                   Some(_),
                   Some(_),
-                  None
+                  _
                 )) if !amlsCode.contains("HMRC") =>
               Redirect(routes.AmlsEvidenceUploadController.show)
             case _ => Redirect(routes.AmlsSupervisorController.show)

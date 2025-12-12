@@ -17,98 +17,96 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import play.api.mvc.Action
-import com.softwaremill.quicklens.modify
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsWithApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.MemberApproveApplicationForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberApproveApplicationPage
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.toYesNo
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.toBoolean
 
+import scala.concurrent.Future
 import javax.inject.Inject
 
 class MemberApproveApplicantController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
   view: MemberApproveApplicationPage,
-  memberProvideDetailsService: MemberProvideDetailsService,
-  agentApplicationService: AgentApplicationService
+  memberProvideDetailsService: MemberProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions.Member.getProvideDetailsInProgress
+  private val baseAction: ActionBuilder[MemberProvideDetailsWithApplicationRequest, AnyContent] = actions.Member.getProvideDetailsWithApplicationInProgress
     .ensure(
       _.memberProvidedDetails.memberSaUtr.nonEmpty,
       implicit request =>
         Redirect(AppRoutes.providedetails.MemberSaUtrController.show.url)
     )
+    .ensure(
+      _.memberProvidedDetails.emailAddress.nonEmpty,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.MemberEmailAddressController.show.url)
+    )
 
   def show: Action[AnyContent] = baseAction.async:
     implicit request =>
-      agentApplicationService
-        .find(request.memberProvidedDetails.agentApplicationId)
-        .map:
-          case Some(agentApplication) =>
-            Ok(view(
-              MemberApproveApplicationForm.form
-                .fill:
-                  request
-                    .memberProvidedDetails
-                    .hasApprovedApplication
-                    // TODO PAV - remaping not the best idea, but we need to convert from YesNo to Boolean, any other way?
-                    .map(_.toYesNo)
-              ,
-              agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName,
-              agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
-            ))
-          case None =>
-            logger.info(s"Application for agent applicationId ${request.memberProvidedDetails.agentApplicationId} not found")
-            Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
+      val applicantName = request.agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName
+      val companyName = request.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
+      val filledForm = MemberApproveApplicationForm
+        .form(applicantName)
+        .fill:
+          request
+            .memberProvidedDetails
+            .hasApprovedApplication
+            .map(_.toYesNo)
 
-  // TODO PAV - we do not have async version of ensureValidFormAndRedirectIfSaveForLater !?!?
+      Future.successful(
+        Ok(
+          view(
+            filledForm,
+            applicantName,
+            companyName
+          )
+        )
+      )
+
   def submit: Action[AnyContent] =
     baseAction
+      .ensureValidFormAndRedirectIfSaveForLater[YesNo](
+        implicit r =>
+          val applicantName = r.agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName
+          MemberApproveApplicationForm.form(applicantName)
+        ,
+        implicit r =>
+          val applicantName = r.agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName
+          val companyName = r.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
+          view(
+            _,
+            applicantName,
+            companyName
+          )
+      )
       .async:
-        implicit request =>
-          MemberApproveApplicationForm.form
-            .bindFromRequest()
-            .fold(
-              formWithErrors =>
-                agentApplicationService
-                  .find(request.memberProvidedDetails.agentApplicationId)
-                  .map:
-                    case Some(agentApplication) =>
-                      BadRequest(
-                        view(
-                          formWithErrors,
-                          agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName,
-                          agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
-                        )
-                      )
-                    case None => Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
-              ,
-              validYesNo =>
-                // TODO PAV - remaping not the best idea, but we need to convert from YesNo to Boolean, any other way?
-                val approved = validYesNo.toBoolean
+        implicit r: MemberProvideDetailsWithApplicationRequest[AnyContent] & FormValue[YesNo] =>
+          val approved: Boolean = r.formValue.toBoolean
 
-                val updatedApplication = request.memberProvidedDetails
-                  .modify(_.hasApprovedApplication)
-                  .setTo(Some(approved))
+          val updatedApplication: MemberProvidedDetails = r.memberProvidedDetails
+            .modify(_.hasApprovedApplication)
+            .setTo(Some(approved))
 
-                memberProvideDetailsService
-                  .upsert(updatedApplication)
-                  .map: _ =>
-                    if approved then
-                      Redirect(AppRoutes.providedetails.MemberAgreeStandardController.show.url)
-                    else
-                      Redirect(AppRoutes.providedetails.MemberConfirmStopController.show.url)
-            )
+          memberProvideDetailsService
+            .upsert(updatedApplication)
+            .map: _ =>
+              if approved then
+                Redirect(AppRoutes.providedetails.MemberAgreeStandardController.show.url)
+              else
+                Redirect(AppRoutes.providedetails.MemberConfirmStopController.show.url)
       .redirectIfSaveForLater

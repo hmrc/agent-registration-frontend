@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.config
 import play.api.i18n.MessagesApi
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 
 import javax.inject.Inject
 
@@ -35,7 +35,7 @@ class AddressLookupConfig @Inject() (
       "options" -> Json.obj(
         "continueUrl" -> s"${appConfig.thisFrontendBaseUrl}$continueUrl",
         "includeHMRCBranding" -> true,
-        "signOutHref" -> s"${appConfig.thisFrontendBaseUrl}${routes.SignOutController.signOut.url}",
+        "signOutHref" -> s"${appConfig.thisFrontendBaseUrl}${AppRoutes.SignOutController.signOut.url}",
         "selectPageConfig" -> Json.obj(
           "proposedListLimit" -> 30,
           "showSearchLinkAgain" -> true
@@ -49,7 +49,7 @@ class AddressLookupConfig @Inject() (
         ),
         "timeoutConfig" -> Json.obj(
           "timeoutAmount" -> 900,
-          "timeoutUrl" -> s"${appConfig.thisFrontendBaseUrl}${routes.SignOutController.timeOut.url}"
+          "timeoutUrl" -> s"${appConfig.thisFrontendBaseUrl}${AppRoutes.SignOutController.timeOut.url}"
         )
       ),
       "labels" -> Json.obj(
