@@ -97,6 +97,7 @@ object AppRoutes:
     val MemberSaUtrController = providedetailsRoutes.MemberSaUtrController
     val MemberApproveApplicantController = providedetailsRoutes.MemberApproveApplicantController
     val MemberHmrcStandardForAgentsController = providedetailsRoutes.MemberHmrcStandardForAgentsController
+    val MemberConfirmStopController = providedetailsRoutes.MemberConfirmStopController
 
     object internal:
       val InitiateMemberProvideDetailsController = internalProviDedetailsRoutes.InitiateMemberProvideDetailsController

@@ -479,3 +479,11 @@ memberHmrcStandardForAgents.agree.h2 = Declaration
 memberHmrcStandardForAgents.agree.p1 = I have read the HMRC standard for agents.
 memberHmrcStandardForAgents.agree.p2 = I agree to meet the standard when working on behalf of clients.
 memberHmrcStandardForAgents.agree.button = Agree and continue
+
+## Member Approve Agent Application
+memberApproveAgentApplication.title = Approve the applicant
+memberApproveAgentApplication.info = {0} has applied for an agent services account on behalf of {1}.
+memberApproveAgentApplication.question = Do you agree that {0} can apply for an account?
+memberApproveAgentApplication.yes = Yes
+memberApproveAgentApplication.no = No
+memberApproveAgentApplication.error.required = Select yes if you agree that {0} can apply for an account
