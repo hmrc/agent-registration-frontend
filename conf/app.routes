@@ -40,15 +40,9 @@ GET        /apply/internal/grs/journey-callback                                 
 GET        /apply/internal/address-lookup/journey-callback                            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.AddressLookupCallbackController.journeyCallback(id: Option[addresslookup.JourneyId])
 
 ## Applicant contact details routes
-GET         /apply/applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.ApplicantRoleInLlpController.show
-POST        /apply/applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.ApplicantRoleInLlpController.submit
-GET         /apply/applicant/applicant-name                        uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.AuthorisedNameController.show
-POST        /apply/applicant/applicant-name                        uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.AuthorisedNameController.submit
-GET         /apply/applicant/member-name                           uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.MemberNameController.show
-POST        /apply/applicant/member-name              uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.MemberNameController.submit
-GET         /apply/applicant/member-name-match        uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.CompaniesHouseMatchingController.show
-POST        /apply/applicant/member-name-match        uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.CompaniesHouseMatchingController.submit
-GET         /apply/applicant/telephone-number         uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.TelephoneNumberController.show
+GET         /apply/applicant/applicant-name                        uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.ApplicantNameController.show
+POST        /apply/applicant/applicant-name                        uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.ApplicantNameController.submit
+GET         /apply/applicant/telephone-number                      uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.TelephoneNumberController.show
 POST        /apply/applicant/telephone-number                      uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.TelephoneNumberController.submit
 GET         /apply/applicant/email-address                         uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.EmailAddressController.show
 POST        /apply/applicant/email-address                         uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.EmailAddressController.submit

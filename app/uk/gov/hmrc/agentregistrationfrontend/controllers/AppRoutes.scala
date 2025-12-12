@@ -63,13 +63,10 @@ object AppRoutes:
 
     object applicantcontactdetails:
 
-      val AuthorisedNameController = applicantcontactdetailsRoutes.AuthorisedNameController
-      val CompaniesHouseMatchingController = applicantcontactdetailsRoutes.CompaniesHouseMatchingController
-      val MemberNameController = applicantcontactdetailsRoutes.MemberNameController
+      val ApplicantNameController = applicantcontactdetailsRoutes.ApplicantNameController
       val CheckYourAnswersController = applicantcontactdetailsRoutes.CheckYourAnswersController
       val EmailAddressController = applicantcontactdetailsRoutes.EmailAddressController
       val TelephoneNumberController = applicantcontactdetailsRoutes.TelephoneNumberController
-      val ApplicantRoleInLlpController = applicantcontactdetailsRoutes.ApplicantRoleInLlpController
 
     object agentdetails:
 

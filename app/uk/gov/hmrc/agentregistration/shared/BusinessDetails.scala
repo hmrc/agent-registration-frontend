@@ -51,6 +51,7 @@ object BusinessDetails:
 final case class LimitedCompanyDetails(
   safeId: SafeId,
   businessType: BusinessType = LimitedCompany,
+  ctUtr: CtUtr,
   companyProfile: CompanyProfile
 )
 extends BusinessDetails
@@ -70,6 +71,7 @@ object LimitedCompanyDetails:
 final case class SoleTraderDetails(
   safeId: SafeId,
   businessType: BusinessType = SoleTrader,
+  saUtr: SaUtr,
   fullName: FullName,
   dateOfBirth: LocalDate,
   nino: Option[Nino],

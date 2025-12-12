@@ -19,70 +19,55 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontact
 import com.softwaremill.quicklens.each
 import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.AuthorisedNameForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantNameForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.AuthorisedNamePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.ApplicantNamePage
 
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class AuthorisedNameController @Inject() (
+class ApplicantNameController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  view: AuthorisedNamePage,
+  view: ApplicantNamePage,
   applicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+  def show: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress
-    .ensure(
-      _.agentApplication.asLlpApplication.applicantContactDetails.map(_.applicantName.role).contains(ApplicantRoleInLlp.Authorised),
+    .getApplicationInProgress:
       implicit request =>
-        logger.warn("Authorised name page requires Authorised role. Redirecting to applicant role selection page")
-        Redirect(routes.ApplicantRoleInLlpController.show)
-    )
-
-  def show: Action[AnyContent] = baseAction:
-    implicit request =>
-      Ok(view(
-        AuthorisedNameForm.form
-          .fill:
-            request.agentApplication.asLlpApplication.authorisedName
-      ))
+        Ok(view(
+          ApplicantNameForm.form
+            .fill:
+              request
+                .agentApplication
+                .applicantContactDetails
+                .map(_.applicantName)
+        ))
 
   def submit: Action[AnyContent] =
-    baseAction
-      .ensureValidFormAndRedirectIfSaveForLater(AuthorisedNameForm.form, implicit r => view(_))
+    actions
+      .Applicant
+      .getApplicationInProgress
+      .ensureValidFormAndRedirectIfSaveForLater(ApplicantNameForm.form, implicit r => view(_))
       .async:
-        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[String]) =>
-          val validFormData: String = request.formValue
-          val updatedApplication: AgentApplication = request.agentApplication.asLlpApplication
+        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[ApplicantName]) =>
+          val validFormData: ApplicantName = request.formValue
+          val updatedApplication: AgentApplication = request.agentApplication
             .modify(_.applicantContactDetails.each.applicantName)
-            .setTo(ApplicantName.NameOfAuthorised(
-              name = Some(validFormData)
-            ))
+            .setTo(validFormData)
+
           applicationService.upsert(updatedApplication).map: _ =>
             Redirect(routes.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater
-
-  extension (agentApplication: AgentApplicationLlp)
-    private def authorisedName: Option[String] =
-      for
-        acd <- agentApplication.applicantContactDetails
-        authorisedName <- acd.applicantName.as[ApplicantName.NameOfAuthorised]
-        name <- authorisedName.name
-      yield name

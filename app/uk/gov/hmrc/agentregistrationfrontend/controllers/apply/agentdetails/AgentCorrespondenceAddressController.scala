@@ -61,7 +61,6 @@ extends FrontendController(mcc, actions):
     .ensure(
       _
         .agentApplication
-        .asLlpApplication
         .agentDetails.exists(
           _.agentEmailAddress.exists(_.isVerified)
         ),
@@ -76,7 +75,7 @@ extends FrontendController(mcc, actions):
         .getBusinessPartnerRecord(
           request.agentApplication.getUtr
         ).map: bprOpt =>
-          val existingAddress = request.agentApplication.asLlpApplication
+          val existingAddress = request.agentApplication
             .agentDetails
             .flatMap(
               _.agentCorrespondenceAddress
@@ -86,7 +85,7 @@ extends FrontendController(mcc, actions):
               existingAddress.map(_.toValueString)
             ,
             addressOptions = makeAddressOptions(
-              agentApplication = request.agentApplication.asLlpApplication,
+              agentApplication = request.agentApplication,
               bprOption = bprOpt.map(_.address)
             )
           ))
@@ -103,7 +102,7 @@ extends FrontendController(mcc, actions):
                   view(
                     form = formWithErrors,
                     addressOptions = makeAddressOptions(
-                      agentApplication = request.agentApplication.asLlpApplication,
+                      agentApplication = request.agentApplication,
                       bprOption = bprOpt.map(_.address)
                     )
                   )
@@ -120,7 +119,6 @@ extends FrontendController(mcc, actions):
           else
             val updatedApplication: AgentApplication = request
               .agentApplication
-              .asLlpApplication
               .modify(_.agentDetails.each.agentCorrespondenceAddress)
               .setTo(Some(AgentCorrespondenceAddress.fromValueString(addressOption)))
             agentApplicationService
@@ -147,14 +145,15 @@ extends FrontendController(mcc, actions):
       case _ => None
 
   private def makeAddressOptions(
-    agentApplication: AgentApplicationLlp,
+    agentApplication: AgentApplication,
     bprOption: Option[DesBusinessAddress]
   ): AddressOptions =
     val chroAddressOption: Option[ChroAddress] =
-      agentApplication
-        .getBusinessDetails
-        .companyProfile
-        .unsanitisedCHROAddress
+      if !agentApplication.isIncorporated then None
+      else
+        agentApplication
+          .getCompanyProfile
+          .unsanitisedCHROAddress
 
     AddressOptions(
       chroAddress = chroAddressOption,

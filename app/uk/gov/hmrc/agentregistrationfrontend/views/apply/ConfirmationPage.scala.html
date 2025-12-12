@@ -37,7 +37,6 @@
 @key = @{"confirmation"}
 @pageTitle = @{messages(s"$key.title")}
 @provideDetailsLink = @{appConfig.applicationLink(request.agentApplication.linkId.value).toString}
-@applicantRole = @{request.agentApplication.asLlpApplication.getApplicantContactDetails.applicantName.role.toString}
 @templateScripts = {
   <script src="@{controllers.routes.Assets.versioned("javascripts/copy-button.js")}" @{CSPNonce.attr}></script>
 }
@@ -69,7 +68,7 @@
     @{messages(s"$key.whatNext.p1", entityName)}
   </p>
   <p class="govuk-body">
-    @{messages(s"$key.whatNext.p2.$applicantRole")}
+    @{messages(s"$key.whatNext.p2")}
   </p>
   <p class="govuk-body govuk-!-font-weight-bold">@provideDetailsLink</p>
   @copyButton(clip = provideDetailsLink)
@@ -86,7 +85,7 @@
   </p>
   <ul class="govuk-list govuk-list--bullet">
     <li>@{messages(s"$key.checkProgress.bullet1")}</li>
-    <li>@{Html(messages(s"$key.checkProgress.bullet2", request.agentApplication.asLlpApplication.getApplicantContactDetails.getVerifiedEmail.value))}</li>
+    <li>@{Html(messages(s"$key.checkProgress.bullet2", request.agentApplication.getApplicantContactDetails.getVerifiedEmail.value))}</li>
   </ul>
 
   <p class="govuk-body govuk-!-display-none-print">

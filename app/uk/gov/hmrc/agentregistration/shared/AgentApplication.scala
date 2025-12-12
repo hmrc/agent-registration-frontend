@@ -42,6 +42,7 @@ sealed trait AgentApplication:
   def createdAt: Instant
   def applicationState: ApplicationState
   def businessType: BusinessType
+  def applicantContactDetails: Option[ApplicantContactDetails]
   def amlsDetails: Option[AmlsDetails]
   def agentDetails: Option[AgentDetails]
   def hmrcStandardForAgentsAgreed: StateOfAgreement
@@ -70,10 +71,23 @@ sealed trait AgentApplication:
       case ApplicationState.GrsDataReceived => true
       case ApplicationState.Submitted => true
 
+  def isIncorporated: Boolean =
+    businessType match
+      case BusinessType.Partnership.LimitedLiabilityPartnership => true
+      case _ => false
+
+  def getApplicantContactDetails: ApplicantContactDetails = applicantContactDetails.getOrThrowExpectedDataMissing("agentDetails")
+  def getAgentDetails: AgentDetails = agentDetails.getOrThrowExpectedDataMissing("agentDetails")
+
+  def getCompanyProfile: CompanyProfile =
+    businessType match
+      case BusinessType.Partnership.LimitedLiabilityPartnership => this.asLlpApplication.getBusinessDetails.companyProfile
+      case _ => expectedDataNotDefinedError("currently company profile is only defined for Llp applications, as other types are not implemented yet")
+
   // all agent applications must have a UTR
   def getUtr: Utr =
-    this match
-      case a: AgentApplicationLlp => a.getBusinessDetails.saUtr.asUtr
+    businessType match
+      case BusinessType.Partnership.LimitedLiabilityPartnership => this.asLlpApplication.getBusinessDetails.saUtr.asUtr
       case _ => expectedDataNotDefinedError("currently utr is only defined for Llp applications, as other types are not implemented yet")
   def getAmlsDetails: AmlsDetails = amlsDetails.getOrElse(expectedDataNotDefinedError("amlsDetails"))
 
@@ -87,6 +101,7 @@ sealed trait AgentApplication:
   )
 
   def asLlpApplication: AgentApplicationLlp = asExpected[AgentApplicationLlp]
+  def asSoleTraderApplication: AgentApplicationSoleTrader = asExpected[AgentApplicationSoleTrader]
 
 /** Sole Trader Application. This final case class represents the data entered by a user for registering as a sole trader.
   */
@@ -99,6 +114,7 @@ final case class AgentApplicationSoleTrader(
   override val applicationState: ApplicationState,
   userRole: Option[UserRole] = None,
   businessDetails: Option[BusinessDetailsSoleTrader],
+  override val applicantContactDetails: Option[ApplicantContactDetails],
   override val amlsDetails: Option[AmlsDetails],
   override val agentDetails: Option[AgentDetails],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
@@ -109,7 +125,7 @@ extends AgentApplication:
   def getUserRole: UserRole = userRole.getOrElse(expectedDataNotDefinedError("userRole"))
   def getBusinessDetails: BusinessDetailsSoleTrader = businessDetails.getOrElse(expectedDataNotDefinedError("businessDetails"))
 
-/** Application Applicatoin for Limited Liability Partnership (Llp). This final case class represents the data entered by a user for registering as an Llp.
+/** Application for Limited Liability Partnership (Llp). This final case class represents the data entered by a user for registering as an Llp.
   */
 final case class AgentApplicationLlp(
   override val _id: AgentApplicationId,
@@ -119,7 +135,7 @@ final case class AgentApplicationLlp(
   override val createdAt: Instant,
   override val applicationState: ApplicationState,
   businessDetails: Option[BusinessDetailsLlp],
-  applicantContactDetails: Option[ApplicantContactDetails],
+  override val applicantContactDetails: Option[ApplicantContactDetails],
   override val amlsDetails: Option[AmlsDetails],
   override val agentDetails: Option[AgentDetails],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
@@ -128,10 +144,8 @@ extends AgentApplication:
 
   override val businessType: BusinessType.Partnership.LimitedLiabilityPartnership.type = BusinessType.Partnership.LimitedLiabilityPartnership
 
-  def getApplicantContactDetails: ApplicantContactDetails = applicantContactDetails.getOrThrowExpectedDataMissing("ApplicantContactDetails")
   def getBusinessDetails: BusinessDetailsLlp = businessDetails.getOrThrowExpectedDataMissing("businessDetails")
   def getCrn: Crn = getBusinessDetails.companyProfile.companyNumber
-  def getAgentDetails: AgentDetails = agentDetails.getOrThrowExpectedDataMissing("agentDetails")
 
 object AgentApplication:
 

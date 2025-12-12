@@ -49,7 +49,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
     )
 
     val afterContactDetailsComplete: AgentApplicationLlp = afterGrsDataReceived.copy(
-      applicantContactDetails = Some(dependencies.authorisedContactDetails),
+      applicantContactDetails = Some(dependencies.applicantContactDetails),
       agentDetails = None
     )
 

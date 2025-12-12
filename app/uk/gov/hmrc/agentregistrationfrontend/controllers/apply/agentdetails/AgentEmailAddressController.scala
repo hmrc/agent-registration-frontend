@@ -24,7 +24,6 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
-import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentEmailAddress
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentVerifiedEmailAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
@@ -67,7 +66,6 @@ extends FrontendController(mcc, actions):
     .ensure(
       _
         .agentApplication
-        .asLlpApplication
         .agentDetails
         .exists(_.telephoneNumber.isDefined),
       implicit request =>
@@ -85,7 +83,6 @@ extends FrontendController(mcc, actions):
             form = AgentEmailAddressForm.form.fill:
               request
                 .agentApplication
-                .asLlpApplication
                 .agentDetails
                 .flatMap(_.agentEmailAddress)
                 .map(_.emailAddress)
