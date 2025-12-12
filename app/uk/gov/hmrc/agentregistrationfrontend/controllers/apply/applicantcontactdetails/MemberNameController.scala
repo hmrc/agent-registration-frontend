@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
@@ -69,7 +70,7 @@ extends FrontendController(mcc, actions):
       .async:
         implicit request: (AgentApplicationRequest[AnyContent] & FormValue[CompaniesHouseNameQuery]) =>
           val submittedNameQuery: CompaniesHouseNameQuery = request.formValue
-          val hasChanged = request.agentApplication.asLlpApplication.memberNameQuery != Some(submittedNameQuery)
+          val hasChanged = request.agentApplication.asLlpApplication.memberNameQuery =!= Some(submittedNameQuery)
 
           val updatedApplication =
             if hasChanged

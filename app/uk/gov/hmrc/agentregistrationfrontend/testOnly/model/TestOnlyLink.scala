@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testOnly.model
 import play.api.libs.json.Json
 import play.api.libs.json.Reads
 
-case class TestOnlyLink(linkId: String)
+final case class TestOnlyLink(linkId: String)
 
 object TestOnlyLink:
   given Reads[TestOnlyLink] = Json.reads[TestOnlyLink]

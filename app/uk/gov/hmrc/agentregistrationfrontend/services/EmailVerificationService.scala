@@ -47,7 +47,7 @@ extends RequestAwareLogging:
           credId = credId,
           continueUrl = continueUrl,
           origin =
-            if (lang == "cy")
+            if (lang === "cy")
               "Gwasanaethau Asiant CThEM"
             else
               "HMRC Agent Services",

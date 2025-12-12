@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.model.emailVerification
 import play.api.libs.json.Json
 import play.api.libs.json.Writes
 
-case class VerifyEmailRequest(
+final case class VerifyEmailRequest(
   credId: String,
   continueUrl: String,
   origin: String,

@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.model.emailVerification
 import play.api.libs.json.Format
 import play.api.libs.json.Json
 
-case class VerifyEmailResponse(redirectUri: String)
+final case class VerifyEmailResponse(redirectUri: String)
 
 object VerifyEmailResponse:
   given Format[VerifyEmailResponse] = Json.format[VerifyEmailResponse]

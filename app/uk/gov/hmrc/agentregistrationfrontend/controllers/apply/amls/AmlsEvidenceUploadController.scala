@@ -29,6 +29,7 @@ import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadIdGenerator
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
@@ -139,7 +140,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         upscanProgressService.getUpscanStatus().flatMap:
-          case Some(status) if status != UploadStatus.InProgress =>
+          case Some(status) if status =!= UploadStatus.InProgress =>
             for {
               objectStorePath <- objectStoreService
                 .transferFileToObjectStore(

@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.model.emailVerification
 import play.api.libs.json.Format
 import play.api.libs.json.Json
 
-case class Email(
+final case class Email(
   address: String,
   enterUrl: String
 )

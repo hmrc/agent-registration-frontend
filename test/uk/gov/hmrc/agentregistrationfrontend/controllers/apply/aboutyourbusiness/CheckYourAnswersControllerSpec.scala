@@ -45,7 +45,7 @@ extends ControllerSpec:
         .agentApplicationLlp
         .afterGrsDataReceived
 
-  private case class TestCaseForCya(
+  private final case class TestCaseForCya(
     application: AgentApplicationLlp,
     expectedRedirect: Option[String] = None
   )
@@ -59,22 +59,24 @@ extends ControllerSpec:
       expectedRedirect = Some(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url)
     )
   ).foreach: testCase =>
-    if testCase.expectedRedirect.isEmpty then
-      s"GET $path with complete GRS details should return 200 and render page" in:
-        ApplyStubHelper.stubsForAuthAction(testCase.application)
-        val response: WSResponse = get(path)
+    testCase.expectedRedirect match
+      case None =>
+        s"GET $path with complete GRS details should return 200 and render page" in:
+          ApplyStubHelper.stubsForAuthAction(testCase.application)
+          val response: WSResponse = get(path)
 
-        response.status shouldBe Status.OK
-        val doc = response.parseBodyAsJsoupDocument
-        doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
-        doc.select("h2.govuk-caption-l").text() shouldBe "About your business"
-        ApplyStubHelper.verifyConnectorsForAuthAction()
-    else
-      s"GET $path with missing GRS data should redirect to the agent type page" in:
-        ApplyStubHelper.stubsForAuthAction(testCase.application)
-        val response: WSResponse = get(path)
+          response.status shouldBe Status.OK
+          val doc = response.parseBodyAsJsoupDocument
+          doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
+          doc.select("h2.govuk-caption-l").text() shouldBe "About your business"
+          ApplyStubHelper.verifyConnectorsForAuthAction()
 
-        response.status shouldBe Status.SEE_OTHER
-        response.body[String] shouldBe Constants.EMPTY_STRING
-        response.header("Location").value shouldBe testCase.expectedRedirect.get
-        ApplyStubHelper.verifyConnectorsForAuthAction()
+      case Some(expectedRedirect) =>
+        s"GET $path with missing GRS data should redirect to the agent type page" in:
+          ApplyStubHelper.stubsForAuthAction(testCase.application)
+          val response: WSResponse = get(path)
+
+          response.status shouldBe Status.SEE_OTHER
+          response.body[String] shouldBe Constants.EMPTY_STRING
+          response.header("Location").value shouldBe expectedRedirect
+          ApplyStubHelper.verifyConnectorsForAuthAction()
