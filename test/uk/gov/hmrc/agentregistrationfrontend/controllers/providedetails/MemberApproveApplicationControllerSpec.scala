@@ -87,6 +87,7 @@ extends ControllerSpec:
   s"GET $path should redirect to saUtr if is missing" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.withSaUtrNotProvided))
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
 
     val response: WSResponse = get(path)
 
@@ -95,11 +96,12 @@ extends ControllerSpec:
 
     AuthStubs.verifyAuthorise()
     AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
-    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId, 0)
+    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId, 1)
 
   s"GET $path should redirect to emailAddress if is missing" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.withNinoAndSaUtrFromAuthButEmailNotProvided))
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
 
     val response: WSResponse = get(path)
 
@@ -108,7 +110,7 @@ extends ControllerSpec:
 
     AuthStubs.verifyAuthorise()
     AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
-    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId, 0)
+    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId, 1)
 
   s"POST $path with selected Yes should save data and redirect to agree standard" in:
     AuthStubs.stubAuthoriseIndividual()
