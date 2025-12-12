@@ -93,7 +93,7 @@
                 classes = "govuk-label--m"
             ),
             attributes = Map(
-                "accept" -> "application/pdf, image/jpg, image/jpeg, image/png, image/tiff, text/plain, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/msword, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "accept" -> appConfig.Upscan.acceptMimeTypes,
                 "required" -> "true"
             )
         ))
@@ -105,7 +105,7 @@
             data-success="@{appConfig.thisFrontendBaseUrl}@{AppRoutes.apply.amls.AmlsEvidenceUploadController.showUploadResult.url}"
             data-check-upload-status-max-attempts="@{appConfig.Upscan.checkUploadStatusMaxAttempts}"
             data-check-upload-status-interval-ms="@{appConfig.Upscan.checkUploadStatusInterval.toMillis}"
-            data-max-file-size="@{appConfig.Upscan.maxFileSize}"
+            data-max-file-size="@{appConfig.Upscan.maxFileSize.toBytes}"
             aria-live="assertive"
             >
             </span>

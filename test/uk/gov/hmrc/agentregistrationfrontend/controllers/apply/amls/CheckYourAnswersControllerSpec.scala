@@ -68,7 +68,7 @@ extends ControllerSpec:
       application =
         sectionAmls
           .whenSupervisorBodyIsNonHmrc
-          .afterUploadSucceded,
+          .afterUploadSucceeded,
       amlsType = "non-HMRC",
       expectedRedirect = None
     ),

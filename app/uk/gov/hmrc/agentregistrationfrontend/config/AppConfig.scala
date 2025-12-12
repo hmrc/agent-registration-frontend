@@ -93,6 +93,7 @@ class AppConfig @Inject() (
     val maxFileSize: ConfigMemorySize = configuration.underlying.getMemorySize("uploads.max-file-size")
     val checkUploadStatusInterval: FiniteDuration = configuration.get[FiniteDuration]("uploads.check-upload-status-interval")
     val checkUploadStatusMaxAttempts: Int = configuration.get[Int]("uploads.check-upload-status-max-attempts")
+    val acceptMimeTypes: String = configuration.get[String]("uploads.accept-mime-types")
 
   // !!!
   // Access objects eagerly to initialize its vals, ensuring config errors are detected at startup
