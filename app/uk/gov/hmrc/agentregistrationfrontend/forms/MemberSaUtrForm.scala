@@ -61,7 +61,7 @@ object MemberSaUtrForm:
         saUtrStrOpt
       ) =>
         (hasSaUtrStr, saUtrStrOpt) match
-          case (x, Some(saUtrStr)) if x.equals(yes) => MemberSaUtr.Provided(SaUtr(saUtrStr))
+          case (`yes`, Some(saUtrStr)) => MemberSaUtr.Provided(SaUtr(saUtrStr))
           case _ => MemberSaUtr.NotProvided
     ) {
       case MemberSaUtr.Provided(saUtr) => Some((yes, Some(saUtr.value)))

@@ -28,6 +28,6 @@ object JourneyId:
 
   given Format[JourneyId] = JsonFormatsFactory.makeValueClassFormat
 
-  /** Allows JourneyId case class to be used as a query parameter in routes and controllers
+  /** Allows JourneyId final case class to be used as a query parameter in routes and controllers
     */
   given QueryStringBindable[JourneyId] = ValueClassBinder.queryStringValueBinder(_.value)

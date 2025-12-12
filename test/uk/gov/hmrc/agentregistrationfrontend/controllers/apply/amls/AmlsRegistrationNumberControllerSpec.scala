@@ -78,7 +78,7 @@ extends ControllerSpec:
     )
     routes.AmlsRegistrationNumberController.submit.url shouldBe routes.AmlsRegistrationNumberController.show.url
 
-  private case class TestCaseForAmlsRegistrationNumber(
+  private final case class TestCaseForAmlsRegistrationNumber(
     application: AgentApplicationLlp,
     updatedApplication: AgentApplicationLlp,
     amlsType: String,

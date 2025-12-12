@@ -39,7 +39,7 @@ extends ControllerSpec:
       url = path
     )
 
-  private case class TestCaseForCya(
+  private final case class TestCaseForCya(
     application: AgentApplicationLlp,
     amlsType: String,
     expectedRedirect: Option[String] = None

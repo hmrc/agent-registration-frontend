@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.model.emailVerification
 import play.api.libs.json.Json
 import play.api.libs.json.Reads
 
-case class CompletedEmail(
+final case class CompletedEmail(
   emailAddress: String,
   verified: Boolean,
   locked: Boolean

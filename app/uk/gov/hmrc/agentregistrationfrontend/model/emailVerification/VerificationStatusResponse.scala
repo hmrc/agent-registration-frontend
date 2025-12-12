@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.model.emailVerification
 import play.api.libs.json.Json
 import play.api.libs.json.Reads
 
-case class VerificationStatusResponse(emails: List[CompletedEmail])
+final case class VerificationStatusResponse(emails: List[CompletedEmail])
 
 object VerificationStatusResponse:
   given Reads[VerificationStatusResponse] = Json.reads[VerificationStatusResponse]

@@ -21,7 +21,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 
-case class VerifyEmailRequest(
+final case class VerifyEmailRequest(
   credId: String,
   continueUrl: String,
   origin: String,
@@ -33,7 +33,7 @@ case class VerifyEmailRequest(
   pageTitle: Option[String]
 )
 
-case class Email(
+final case class Email(
   address: String,
   enterUrl: String
 )
@@ -45,13 +45,13 @@ object VerifyEmailRequest {
   implicit val writes: Writes[VerifyEmailRequest] = Json.writes[VerifyEmailRequest]
 }
 
-case class VerifyEmailResponse(redirectUri: String)
+final case class VerifyEmailResponse(redirectUri: String)
 
 object VerifyEmailResponse {
   implicit val formats: Format[VerifyEmailResponse] = Json.format[VerifyEmailResponse]
 }
 
-case class CompletedEmail(
+final case class CompletedEmail(
   emailAddress: String,
   verified: Boolean,
   locked: Boolean
@@ -61,7 +61,7 @@ object CompletedEmail {
   implicit val reads: Reads[CompletedEmail] = Json.reads[CompletedEmail]
 }
 
-case class VerificationStatusResponse(emails: List[CompletedEmail])
+final case class VerificationStatusResponse(emails: List[CompletedEmail])
 
 object VerificationStatusResponse {
   implicit val reads: Reads[VerificationStatusResponse] = Json.reads[VerificationStatusResponse]

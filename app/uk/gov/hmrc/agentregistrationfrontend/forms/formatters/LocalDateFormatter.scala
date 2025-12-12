@@ -25,6 +25,7 @@ import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
 
+@SuppressWarnings(Array("org.wartremover.warts.OptionPartial"))
 class LocalDateFormatter(messagePrefix: String)
 extends Formatter[LocalDate] {
 

@@ -41,17 +41,6 @@ object FormFieldHelper {
       Invalid(ValidationError(ErrorKeys.requiredFieldErrorMessage(errorMessageKey), args*))
   }
 
-  def mandatoryRadio(
-    errorMessageKey: String,
-    options: Seq[String],
-    args: String*
-  ): Constraint[Option[String]] = Constraint[Option[String]] { fieldValue =>
-    if (fieldValue.isDefined && options.contains(fieldValue.get))
-      Valid
-    else
-      Invalid(ValidationError(ErrorKeys.requiredFieldErrorMessage(errorMessageKey), args*))
-  }
-
   def invalidMandatoryField(
     messageKey: String,
     inputFieldClass: String

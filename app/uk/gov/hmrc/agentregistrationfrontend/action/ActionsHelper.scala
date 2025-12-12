@@ -68,6 +68,7 @@ extends RequestAwareLogging:
       merge: MergeFormValue[R[B], T]
     ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ab.andThen(new ActionRefiner[R, [X] =>> R[X] & FormValue[T]] {
 
+      @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
       override protected def refine[A](rA: R[A]): Future[Either[Result, R[A] & FormValue[T]]] = Future.successful {
         val rB: R[B] = rA.asInstanceOf[R[B]]
         form(rB).bindFromRequest()(using rB, fb).fold(
@@ -132,6 +133,8 @@ extends RequestAwareLogging:
       resultWhenConditionNotMet: R[B] => Future[Result]
     ): ActionBuilder[R, B] = ab.andThen(new ActionFilter[R]:
       protected def executionContext: ExecutionContext = ec
+
+      @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
       def filter[A](rA: R[A]): Future[Option[Result]] =
         val rB: R[B] = rA.asInstanceOf[R[B]]
         for
@@ -141,6 +144,8 @@ extends RequestAwareLogging:
 
     def genericActionFunction[P[_]](f: R[B] => P[B]): ActionFunction[R, P] = ab.andThen(new ActionFunction[R, P] {
       protected def executionContext: ExecutionContext = ec
+
+      @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
       def invokeBlock[A](
         request: R[A],
         block: P[A] => Future[Result]
@@ -150,6 +155,7 @@ extends RequestAwareLogging:
     def genericActionRefiner[P[_]](f: R[B] => Either[Result, P[B]]): ActionBuilder[P, B] = ab.andThen(new ActionRefiner[R, P] {
       protected def executionContext: ExecutionContext = ec
 
+      @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
       protected def refine[A](request: R[A]): Future[Either[Result, P[A]]] = Future.successful(
         f.asInstanceOf[R[A] => Either[Result, P[A]]](request)
       )

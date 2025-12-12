@@ -36,7 +36,7 @@ lazy val microservice = Project("agent-registration-frontend", file("."))
   .settings(CodeCoverageSettings.settings)
   .settings(commands ++= SbtCommands.commands)
   .settings(SbtUpdatesSettings.sbtUpdatesSettings *)
-//  .settings(WartRemoverSettings.wartRemoverSettings)
+  .settings(WartRemoverSettings.wartRemoverSettings)
   .settings(PlayKeys.playDefaultPort := playPort)
   .settings(
     TwirlKeys.templateImports ++= Seq(
@@ -46,4 +46,3 @@ lazy val microservice = Project("agent-registration-frontend", file("."))
       "uk.gov.hmrc.hmrcfrontend.views.html.components._"
     )
   )
-

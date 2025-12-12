@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMi
 import java.time.Clock
 import java.time.Instant
 
-/** Agent (Registration) Application. This case class represents the data entered by a user for registering as an agent.
+/** Agent (Registration) Application. This final case class represents the data entered by a user for registering as an agent.
   */
 final case class AgentApplicationOld(
   internalUserId: InternalUserId,
