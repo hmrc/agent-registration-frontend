@@ -23,7 +23,9 @@ import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAut
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersAction
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsWithApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.ProvideDetailsAction
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.EnrichWithAgentApplicationAction
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
@@ -39,7 +41,8 @@ class Actions @Inject() (
   agentApplicationAction: AgentApplicationAction,
   individualAuthorisedAction: IndividualAuthorisedAction,
   individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction,
-  provideDetailsAction: ProvideDetailsAction
+  provideDetailsAction: ProvideDetailsAction,
+  enrichWithAgentApplicationAction: EnrichWithAgentApplicationAction
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
@@ -106,6 +109,11 @@ extends RequestAwareLogging:
             )
             Redirect(mpdGenericExitPage.url)
       )
+
+    val getProvideDetailsWithApplicationInProgress: ActionBuilder[
+      MemberProvideDetailsWithApplicationRequest,
+      AnyContent
+    ] = getProvideDetailsInProgress.andThen(enrichWithAgentApplicationAction)
 
     val getSubmitedDetailsInProgress: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorised
       .andThen(provideDetailsAction)
