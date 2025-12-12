@@ -95,7 +95,7 @@ extends FrontendController(mcc, actions):
           )
       )
       .async:
-        implicit r: MemberProvideDetailsWithApplicationRequest[AnyContent] & FormValue[YesNo] =>
+        implicit r: (MemberProvideDetailsWithApplicationRequest[AnyContent] & FormValue[YesNo]) =>
           val approved: Boolean = r.formValue.toBoolean
 
           val updatedApplication: MemberProvidedDetails = r.memberProvidedDetails
