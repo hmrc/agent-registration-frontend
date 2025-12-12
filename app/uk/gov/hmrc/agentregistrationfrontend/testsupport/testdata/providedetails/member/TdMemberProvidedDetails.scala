@@ -73,6 +73,13 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
         isVerified = true
       )))
 
+    val afterApplicantApproved: MemberProvidedDetails = afterEmailAddressVerified
+      .modify(_.)
+      .setTo(Some(MemberVerifiedEmailAddress(
+        emailAddress = dependencies.memberEmailAddress,
+        isVerified = true
+      )))
+
     // That way is better than having to write a bunch of methods for each field in MemberProvidedDetails
     def withNinoProvided(state: MemberProvidedDetails): MemberProvidedDetails = state
       .modify(_.memberNino)
