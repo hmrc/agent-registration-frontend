@@ -22,6 +22,8 @@ import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -40,7 +42,7 @@ extends FrontendController(mcc, actions):
     .Applicant
     .getApplicationInProgress
     .ensure(
-      _.agentApplication.asLlpApplication.businessDetails.isDefined,
+      _.agentApplication.applicationState === ApplicationState.GrsDataReceived,
       implicit request =>
         logger.warn("Because we don't have business details we are redirecting to where they can be captured")
         Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show)

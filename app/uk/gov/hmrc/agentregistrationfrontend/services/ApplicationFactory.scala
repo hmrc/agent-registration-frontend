@@ -30,6 +30,23 @@ class ApplicationFactory @Inject() (
   agentApplicationIdGenerator: AgentApplicationIdGenerator
 ):
 
+  def makeNewAgentApplicationSoleTrader(
+    internalUserId: InternalUserId,
+    groupId: GroupId
+  ): AgentApplicationSoleTrader = AgentApplicationSoleTrader(
+    _id = agentApplicationIdGenerator.nextApplicationId(),
+    internalUserId = internalUserId,
+    linkId = linkIdGenerator.nextLinkId(),
+    groupId = groupId,
+    createdAt = Instant.now(clock),
+    applicationState = ApplicationState.Started,
+    businessDetails = None,
+    applicantContactDetails = None,
+    amlsDetails = None,
+    agentDetails = None,
+    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
+  )
+
   def makeNewAgentApplicationLlp(
     internalUserId: InternalUserId,
     groupId: GroupId

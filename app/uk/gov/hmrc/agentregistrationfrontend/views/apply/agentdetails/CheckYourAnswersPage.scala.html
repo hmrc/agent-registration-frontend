@@ -37,7 +37,7 @@
     messages(s"$key.title")
 }
 @agentDetails = @{
-    request.agentApplication.asLlpApplication.getAgentDetails
+    request.agentApplication.getAgentDetails
 }
 
 @layout(pageTitle = title) {

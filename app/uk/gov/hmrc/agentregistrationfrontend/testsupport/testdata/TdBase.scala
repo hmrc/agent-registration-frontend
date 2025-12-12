@@ -182,6 +182,7 @@ trait TdBase:
   )
   def businessPartnerRecordResponse: BusinessPartnerRecordResponse = BusinessPartnerRecordResponse(
     organisationName = Some("Test Company Name"),
+    individualName = None,
     address = bprRegisteredAddress,
     primaryPhoneNumber = Some(bprPrimaryTelephoneNumber),
     emailAddress = Some(bprEmailAddress)

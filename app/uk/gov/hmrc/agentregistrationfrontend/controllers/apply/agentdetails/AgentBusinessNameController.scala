@@ -62,7 +62,7 @@ extends FrontendController(mcc, actions):
                   .agentApplication
                   .agentDetails.map(_.businessName)
               ,
-              bprBusinessName = bprOpt.flatMap(_.organisationName)
+              bprBusinessName = bprOpt.flatMap(_.getEntityName)
             ))
 
   def submit: Action[AnyContent] =

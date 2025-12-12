@@ -311,8 +311,16 @@ declaration.accept.button = Accept and send
 confirmation.title = You’ve finished the first stage of the application
 confirmation.subtitle = Application reference:
 confirmation.whatNext.h2 = What to do next
-confirmation.whatNext.p1 = Everyone listed in Companies House as a current member of {0} needs to sign in and provide some personal details.
-confirmation.whatNext.p2 = Send this link to all members:
+
+confirmation.whatNext.p1.SoleTrader.Owner = As you have told us that you are the applicant {0} we now need to validate your identity and that you have the authority to make this application.
+confirmation.whatNext.p2.SoleTrader.Owner = Use this link to sign in with the details you use to file your Self Assessment tax return:
+
+confirmation.whatNext.p1.SoleTrader.Authorised = As you have told us that you are not the applicant {0} we now need to validate you have the authority to make this application.
+confirmation.whatNext.p2.SoleTrader.Authorised = Send this link to the business owner and ask them to sign in with the details they use to file their Self Assessment tax return:
+
+confirmation.whatNext.p1.Llp = Everyone listed in Companies House as a current member of {0} needs to sign in and provide some personal details.
+confirmation.whatNext.p2.Llp = Send this link to all members:
+
 confirmation.checkProgress.h2 = How to check the progress of your application
 confirmation.checkProgress.p1 = You can click the link on the GOV.UK page “Apply for an agent services account”.
 confirmation.checkProgress.p2 = This will let you check which members have provided their personal details.

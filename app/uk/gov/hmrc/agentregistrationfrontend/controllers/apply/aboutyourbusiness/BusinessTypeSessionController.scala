@@ -60,9 +60,13 @@ extends FrontendController(mcc, actions):
       .ensureValidForm(BusinessTypeSessionForm.form, implicit r => businessTypeSessionPage(_)):
         implicit request =>
           request.formValue match
-            case businessType @ (BusinessTypeAnswer.SoleTrader | BusinessTypeAnswer.LimitedCompany) =>
-              // TODO SoleTrader or LimitedCompany journeys not yet built
+            case businessType @ BusinessTypeAnswer.LimitedCompany =>
+              // TODO LimitedCompany journey not yet built
               Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
+                .addToSession(businessType)
+                .removePartnershipTypeFromSession
+            case businessType @ BusinessTypeAnswer.SoleTrader =>
+              Redirect(routes.TypeOfSignInController.show.url)
                 .addToSession(businessType)
                 .removePartnershipTypeFromSession
             case businessType @ BusinessTypeAnswer.PartnershipType =>

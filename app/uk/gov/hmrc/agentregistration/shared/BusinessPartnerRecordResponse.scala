@@ -21,10 +21,12 @@ import play.api.libs.json.Json
 
 final case class BusinessPartnerRecordResponse(
   organisationName: Option[String],
+  individualName: Option[String],
   address: DesBusinessAddress,
   emailAddress: Option[String],
   primaryPhoneNumber: Option[String]
-)
+):
+  def getEntityName: Option[String] = organisationName.orElse(individualName)
 
 object BusinessPartnerRecordResponse:
   given format: Format[BusinessPartnerRecordResponse] = Json.format[BusinessPartnerRecordResponse]

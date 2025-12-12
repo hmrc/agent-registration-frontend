@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.agentregistration.shared.BusinessType
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
@@ -40,6 +41,11 @@
 @templateScripts = {
   <script src="@{controllers.routes.Assets.versioned("javascripts/copy-button.js")}" @{CSPNonce.attr}></script>
 }
+  @businessType = @{request.agentApplication.businessType match {
+    case BusinessType.SoleTrader => s"SoleTrader.${request.agentApplication.asSoleTraderApplication.userRole.getOrElse("").toString}"
+    case BusinessType.Partnership.LimitedLiabilityPartnership => "Llp"
+    case _ => "other"
+  }}
 @templateStyles = {
   <link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/copy-button.css")}" @{CSPNonce.attr}>
   <style @{CSPNonce.attr}>
@@ -65,10 +71,10 @@
     @{messages(s"$key.whatNext.h2")}
   </h2>
   <p class="govuk-body">
-    @{messages(s"$key.whatNext.p1", entityName)}
+    @{messages(s"$key.whatNext.p1.$businessType", entityName)}
   </p>
   <p class="govuk-body">
-    @{messages(s"$key.whatNext.p2")}
+    @{messages(s"$key.whatNext.p2.$businessType")}
   </p>
   <p class="govuk-body govuk-!-font-weight-bold">@provideDetailsLink</p>
   @copyButton(clip = provideDetailsLink)

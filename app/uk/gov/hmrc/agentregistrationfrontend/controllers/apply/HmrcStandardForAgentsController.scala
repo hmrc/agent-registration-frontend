@@ -51,9 +51,9 @@ extends FrontendController(mcc, actions):
           .map: bprOpt =>
             Ok(view(
               entityName = bprOpt
-                .flatMap(_.organisationName)
+                .flatMap(_.getEntityName)
                 .getOrThrowExpectedDataMissing(
-                  "Business Partner Record organisation name is missing for declaration"
+                  "Business Partner Record entity name is missing"
                 )
             ))
 

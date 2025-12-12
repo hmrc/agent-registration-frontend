@@ -48,7 +48,7 @@ extends FrontendController(mcc, actions):
     .Applicant
     .getApplicationInProgress
     .ensure(
-      _.agentApplication.asLlpApplication.applicantContactDetails.map(_.applicantName).nonEmpty,
+      _.agentApplication.applicantContactDetails.map(_.applicantName).nonEmpty,
       implicit request =>
         logger.warn("Because we don't have name details we are redirecting to that page")
         Redirect(AppRoutes.apply.applicantcontactdetails.ApplicantNameController.show)
@@ -61,7 +61,6 @@ extends FrontendController(mcc, actions):
           .fill:
             request
               .agentApplication
-              .asLlpApplication
               .getApplicantContactDetails
               .telephoneNumber
       ))
@@ -72,7 +71,7 @@ extends FrontendController(mcc, actions):
       .async:
         implicit request: (AgentApplicationRequest[AnyContent] & FormValue[TelephoneNumber]) =>
           val validFormData: TelephoneNumber = request.formValue
-          val updatedApplication: AgentApplication = request.agentApplication.asLlpApplication
+          val updatedApplication: AgentApplication = request.agentApplication
             .modify(_.applicantContactDetails.each.telephoneNumber)
             .setTo(Some(validFormData))
           agentApplicationService.upsert(updatedApplication).map: _ =>

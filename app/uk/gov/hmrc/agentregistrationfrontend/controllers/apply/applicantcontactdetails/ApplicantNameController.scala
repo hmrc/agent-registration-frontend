@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails
 
-import com.softwaremill.quicklens.each
 import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
@@ -65,8 +65,20 @@ extends FrontendController(mcc, actions):
         implicit request: (AgentApplicationRequest[AnyContent] & FormValue[ApplicantName]) =>
           val validFormData: ApplicantName = request.formValue
           val updatedApplication: AgentApplication = request.agentApplication
-            .modify(_.applicantContactDetails.each.applicantName)
-            .setTo(validFormData)
+            .modify(_.applicantContactDetails)
+            .using:
+              case None => // applicant enters
+                Some(
+                  ApplicantContactDetails(
+                    applicantName = validFormData
+                  )
+                )
+              case Some(details) => // applicant updates
+                Some(
+                  details
+                    .modify(_.applicantName)
+                    .setTo(validFormData)
+                )
 
           applicationService.upsert(updatedApplication).map: _ =>
             Redirect(routes.CheckYourAnswersController.show.url)

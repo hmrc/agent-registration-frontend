@@ -19,13 +19,15 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskStatus
+import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.TaskListPage
 
 import javax.inject.Inject
@@ -35,24 +37,35 @@ import javax.inject.Singleton
 class TaskListController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  taskListPage: TaskListPage
+  taskListPage: TaskListPage,
+  businessPartnerRecordService: BusinessPartnerRecordService
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] =
-    actions
-      .Applicant
-      .getApplicationInProgress
-      .ensure(
-        _.agentApplication.isGrsDataReceived,
-        implicit request =>
-          logger.warn("Missing data from GRS, redirecting to start GRS registration")
-          Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
-      ):
-        implicit request =>
-          Ok(taskListPage(request.agentApplication.asLlpApplication.taskListStatus))
+  def show: Action[AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress
+    .ensure(
+      _.agentApplication.isGrsDataReceived,
+      implicit request =>
+        logger.warn("Missing data from GRS, redirecting to start GRS registration")
+        Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
+    )
+    .async:
+      implicit request =>
+        businessPartnerRecordService
+          .getBusinessPartnerRecord(request.agentApplication.getUtr)
+          .map: bprOpt =>
+            Ok(taskListPage(
+              taskListStatus = request.agentApplication.taskListStatus,
+              entityName = bprOpt
+                .flatMap(_.getEntityName)
+                .getOrThrowExpectedDataMissing(
+                  "Business Partner Record entity name is missing"
+                )
+            ))
 
-  extension (agentApplication: AgentApplicationLlp)
+  extension (agentApplication: AgentApplication)
 
     def taskListStatus: TaskListStatus = {
       val contactIsComplete = agentApplication.applicantContactDetails.exists(_.isComplete)

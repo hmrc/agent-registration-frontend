@@ -15,15 +15,18 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.agentregistration.shared.BusinessType
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.AnswerSummary
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.Llp.{AnswerSummary as AnswerSummaryLlp}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.SoleTrader.{AnswerSummary as AnswerSummarySoleTrader}
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 
 @this(
         layout: Layout,
         govukButton: GovukButton,
         govukSummaryList: GovukSummaryList,
-        answerSummary: AnswerSummary
+        answerSummaryLlp: AnswerSummaryLlp,
+        answerSummarySoleTrader: AnswerSummarySoleTrader
 )
 
 @(implicit
@@ -37,15 +40,29 @@
 @title = @{
     messages(s"$key.title")
 }
+@answerSummary = @{
+  request.agentApplication.businessType match {
+    case BusinessType.SoleTrader =>
+      answerSummarySoleTrader(
+        key = key,
+        answers = request.agentApplication.asSoleTraderApplication.getBusinessDetails,
+        canChange = false
+      )
+    case BusinessType.Partnership.LimitedLiabilityPartnership =>
+      answerSummaryLlp(
+        key = key,
+        answers = request.agentApplication.asLlpApplication.getBusinessDetails,
+        canChange = false
+      )
+    case _ =>
+      throw new IllegalArgumentException(s"Unsupported business type for Check Your Answers page: ${request.agentApplication.businessType}")
+  }
+}
 
 @layout(pageTitle = title) {
     <h2 class="govuk-caption-l">@messages("about-your-business.title")</h2>
     <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
-    @answerSummary(
-      key = key,
-      answers = request.agentApplication.asLlpApplication.getBusinessDetails,
-      canChange = false
-    )
+    @answerSummary
     <p class="govuk-body">
       @govukButton(Button(
           href = Some(AppRoutes.apply.TaskListController.show.url),

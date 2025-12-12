@@ -71,8 +71,6 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         if agentType =!= AgentType.UkTaxAgent then Errors.notImplemented("only UkTaxAgent is supported for now") else ()
-        if businessType =!= BusinessType.Partnership.LimitedLiabilityPartnership then Errors.notImplemented("only LLP is supported for now") else ()
-
         val nextEndpoint: Call = routes.GrsController.startJourney()
 
         agentApplicationService.find().flatMap:
@@ -81,6 +79,13 @@ extends FrontendController(mcc, actions):
             Future.successful(Redirect(nextEndpoint))
           case None =>
             logger.info(s"Application does not exist, creating new application: $agentType, $businessType")
-            agentApplicationService
-              .upsert(applicationFactory.makeNewAgentApplicationLlp(request.internalUserId, request.groupId))
-              .map(_ => Redirect(nextEndpoint))
+            businessType match
+              case BusinessType.Partnership.LimitedLiabilityPartnership =>
+                agentApplicationService
+                  .upsert(applicationFactory.makeNewAgentApplicationLlp(request.internalUserId, request.groupId))
+                  .map(_ => Redirect(nextEndpoint))
+              case BusinessType.SoleTrader =>
+                agentApplicationService
+                  .upsert(applicationFactory.makeNewAgentApplicationSoleTrader(request.internalUserId, request.groupId))
+                  .map(_ => Redirect(nextEndpoint))
+              case _ => Errors.notImplemented(s"business type $businessType is not yet supported")

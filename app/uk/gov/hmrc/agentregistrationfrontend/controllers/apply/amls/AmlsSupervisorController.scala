@@ -65,7 +65,7 @@ extends FrontendController(mcc, actions):
 
           applicationService
             .upsert(
-              request.agentApplication.asLlpApplication
+              request.agentApplication
                 .modify(_.amlsDetails)
                 .using {
                   case Some(details) =>

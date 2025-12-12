@@ -76,6 +76,13 @@ sealed trait AgentApplication:
       case BusinessType.Partnership.LimitedLiabilityPartnership => true
       case _ => false
 
+  def getBusinessDetails: BusinessDetailsLlp | BusinessDetailsSoleTrader =
+    businessType match
+      case BusinessType.Partnership.LimitedLiabilityPartnership => this.asLlpApplication.getBusinessDetails
+      case BusinessType.SoleTrader => this.asSoleTraderApplication.getBusinessDetails
+      case _ =>
+        expectedDataNotDefinedError("currently business details is only defined for Llp and Sole Trader applications, as other types are not implemented yet")
+
   def getApplicantContactDetails: ApplicantContactDetails = applicantContactDetails.getOrThrowExpectedDataMissing("agentDetails")
   def getAgentDetails: AgentDetails = agentDetails.getOrThrowExpectedDataMissing("agentDetails")
 
@@ -88,6 +95,7 @@ sealed trait AgentApplication:
   def getUtr: Utr =
     businessType match
       case BusinessType.Partnership.LimitedLiabilityPartnership => this.asLlpApplication.getBusinessDetails.saUtr.asUtr
+      case BusinessType.SoleTrader => this.asSoleTraderApplication.getBusinessDetails.saUtr.asUtr
       case _ => expectedDataNotDefinedError("currently utr is only defined for Llp applications, as other types are not implemented yet")
   def getAmlsDetails: AmlsDetails = amlsDetails.getOrElse(expectedDataNotDefinedError("amlsDetails"))
 
@@ -112,7 +120,7 @@ final case class AgentApplicationSoleTrader(
   override val groupId: GroupId,
   override val createdAt: Instant,
   override val applicationState: ApplicationState,
-  userRole: Option[UserRole] = None,
+  userRole: Option[UserRole] = Some(UserRole.Authorised),
   businessDetails: Option[BusinessDetailsSoleTrader],
   override val applicantContactDetails: Option[ApplicantContactDetails],
   override val amlsDetails: Option[AmlsDetails],
@@ -123,7 +131,7 @@ extends AgentApplication:
 
   override val businessType: BusinessType.SoleTrader.type = BusinessType.SoleTrader
   def getUserRole: UserRole = userRole.getOrElse(expectedDataNotDefinedError("userRole"))
-  def getBusinessDetails: BusinessDetailsSoleTrader = businessDetails.getOrElse(expectedDataNotDefinedError("businessDetails"))
+  override def getBusinessDetails: BusinessDetailsSoleTrader = businessDetails.getOrElse(expectedDataNotDefinedError("businessDetails"))
 
 /** Application for Limited Liability Partnership (Llp). This final case class represents the data entered by a user for registering as an Llp.
   */
@@ -144,7 +152,7 @@ extends AgentApplication:
 
   override val businessType: BusinessType.Partnership.LimitedLiabilityPartnership.type = BusinessType.Partnership.LimitedLiabilityPartnership
 
-  def getBusinessDetails: BusinessDetailsLlp = businessDetails.getOrThrowExpectedDataMissing("businessDetails")
+  override def getBusinessDetails: BusinessDetailsLlp = businessDetails.getOrThrowExpectedDataMissing("businessDetails")
   def getCrn: Crn = getBusinessDetails.companyProfile.companyNumber
 
 object AgentApplication:

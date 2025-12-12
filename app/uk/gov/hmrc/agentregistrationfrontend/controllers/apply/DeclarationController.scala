@@ -20,7 +20,7 @@ import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
@@ -50,7 +50,7 @@ extends FrontendController(mcc, actions):
     .Applicant
     .getApplicationInProgress
     .ensure(
-      _.agentApplication.asLlpApplication.taskListStatus.declaration.canStart,
+      _.agentApplication.taskListStatus.declaration.canStart,
       implicit request =>
         logger.warn("Cannot start declaration whilst tasks are outstanding, redirecting to task list")
         Redirect(AppRoutes.apply.TaskListController.show)
@@ -64,9 +64,9 @@ extends FrontendController(mcc, actions):
           .map: bprOpt =>
             Ok(view(
               entityName = bprOpt
-                .flatMap(_.organisationName)
+                .flatMap(_.getEntityName)
                 .getOrThrowExpectedDataMissing(
-                  "Business Partner Record organisation name is missing for declaration"
+                  "Business Partner Record entity name is missing"
                 )
             ))
 
@@ -81,7 +81,7 @@ extends FrontendController(mcc, actions):
           ).map: _ =>
             Redirect(AppRoutes.apply.AgentApplicationController.applicationSubmitted)
 
-  extension (agentApplication: AgentApplicationLlp)
+  extension (agentApplication: AgentApplication)
 
     def taskListStatus: TaskListStatus = {
       val contactIsComplete = agentApplication.applicantContactDetails.exists(_.isComplete)

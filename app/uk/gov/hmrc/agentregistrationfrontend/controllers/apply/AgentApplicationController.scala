@@ -71,7 +71,7 @@ extends FrontendController(mcc, actions):
           .map: bprOpt =>
             Ok(confirmationPage(
               entityName = bprOpt
-                .flatMap(_.organisationName)
+                .flatMap(_.getEntityName)
                 .getOrThrowExpectedDataMissing(
                   "Business Partner Record organisation name is missing for confirmation page"
                 )
@@ -86,7 +86,7 @@ extends FrontendController(mcc, actions):
           .map: bprOpt =>
             Ok(viewApplicationPage(
               entityName = bprOpt
-                .flatMap(_.organisationName)
+                .flatMap(_.getEntityName)
                 .getOrThrowExpectedDataMissing(
                   "Business Partner Record organisation name is missing for View Application page"
                 )

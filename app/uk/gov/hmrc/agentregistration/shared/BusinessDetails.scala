@@ -126,7 +126,8 @@ object BusinessDetailsPartnership:
 final case class FullName(
   firstName: String,
   lastName: String
-)
+):
+  def toStringFull: String = s"$firstName $lastName"
 
 object FullName:
   given Format[FullName] = Json.format[FullName]
