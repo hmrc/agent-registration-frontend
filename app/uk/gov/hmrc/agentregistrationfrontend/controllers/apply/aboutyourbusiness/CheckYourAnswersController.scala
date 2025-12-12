@@ -22,16 +22,21 @@ import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.CheckYourAnswersPage
+import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 
 @Singleton
 class CheckYourAnswersController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  view: CheckYourAnswersPage
+  view: CheckYourAnswersPage,
+  businessPartnerRecordService: BusinessPartnerRecordService
 )
 extends FrontendController(mcc, actions):
 
@@ -40,11 +45,23 @@ extends FrontendController(mcc, actions):
     .Applicant
     .getApplicationInProgress
     .ensure(
-      _.agentApplication.asLlpApplication.businessDetails.isDefined,
+      _.agentApplication.applicationState === ApplicationState.GrsDataReceived,
       implicit request =>
         logger.warn("Because we don't have business details we are redirecting to where they can be captured")
         Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show)
     )
 
-  def show: Action[AnyContent] = baseAction:
-    implicit request => Ok(view())
+  def show: Action[AnyContent] = baseAction
+    .async:
+      implicit request =>
+        businessPartnerRecordService
+          .getBusinessPartnerRecord(request.agentApplication.getUtr)
+          .map { bprOpt =>
+            Ok(
+              view(
+                bprOpt.getOrThrowExpectedDataMissing(
+                  s"Business Partner Record for UTR ${request.agentApplication.getUtr.value}"
+                )
+              )
+            )
+          }

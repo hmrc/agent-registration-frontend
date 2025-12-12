@@ -75,7 +75,7 @@ extends FrontendController(mcc, actions):
 
           applicationService
             .upsert(
-              request.agentApplication.asLlpApplication
+              request.agentApplication
                 .modify(_.amlsDetails.each.amlsRegistrationNumber)
                 .setTo(Some(amlsRegistrationNumber))
             )

@@ -28,33 +28,6 @@
         canChange: Boolean = true
 )(implicit messages: Messages)
 
-@llpMemberRow = @{
-  SummaryListRow(
-    key = Key(
-      content = Text(messages(s"$key.llpMember.label"))
-    ),
-    value = Value(
-      content = Text(
-        messages(s"$key.llpMember.${answers.applicantName.role.toString}")
-      )
-    ),
-    actions = if(!canChange) None else Some(Actions(
-      items = Seq(
-        ActionItem(
-          href = s"${AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show}",
-          content = Text(messages(s"$key.change")),
-          visuallyHiddenText = Some(messages(s"$key.llpMember.label"))
-        )
-      )
-    ))
-  )
-}
-@nameChangeRoute = @{
-  answers.applicantName.role match {
-    case ApplicantRoleInLlp.Member => AppRoutes.apply.applicantcontactdetails.MemberNameController.show
-    case ApplicantRoleInLlp.Authorised => AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.show
-  }
-}
 @nameRow = @{
   SummaryListRow(
     key = Key(
@@ -62,13 +35,13 @@
     ),
     value = Value(
       content = Text(
-        answers.getApplicantName
+        answers.applicantName.value
       )
     ),
     actions = if(!canChange) None else Some(Actions(
       items = Seq(
         ActionItem(
-          href = nameChangeRoute.url,
+          href = AppRoutes.apply.applicantcontactdetails.ApplicantNameController.show.url,
           content = Text(messages(s"$key.change")),
           visuallyHiddenText = Some(messages(s"$key.name.label"))
         )
@@ -117,6 +90,6 @@
   )
 }
 
-@rows = @{Seq(llpMemberRow, nameRow, telephoneRow, emailRow)}
+@rows = @{Seq(nameRow, telephoneRow, emailRow)}
 
 @govukSummaryList(SummaryList(rows = rows))

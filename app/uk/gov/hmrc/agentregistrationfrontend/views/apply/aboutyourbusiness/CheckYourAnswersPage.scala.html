@@ -15,18 +15,32 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.agentregistration.shared.BusinessType
+@import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.AnswerSummary
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.LimitedCompany.{AnswerSummary as AnswerSummaryLimitedCompany}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.Llp.{AnswerSummary as AnswerSummaryLlp}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.SoleTrader.{AnswerSummary as AnswerSummarySoleTrader}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.GeneralPartnership.{AnswerSummary as AnswerSummaryGeneralPartnership}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.LimitedPartnership.{AnswerSummary as AnswerSummaryLimitedPartnership}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.ScottishLimitedPartnership.{AnswerSummary as AnswerSummaryScottishLimitedPartnership}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.ScottishPartnership.{AnswerSummary as AnswerSummaryScottishPartnership}
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 
 @this(
         layout: Layout,
         govukButton: GovukButton,
         govukSummaryList: GovukSummaryList,
-        answerSummary: AnswerSummary
+        answerSummaryLimitedCompany: AnswerSummaryLimitedCompany,
+        answerSummaryLlp: AnswerSummaryLlp,
+        answerSummarySoleTrader: AnswerSummarySoleTrader,
+        answerSummaryGeneralPartnership: AnswerSummaryGeneralPartnership,
+        answerSummaryLimitedPartnership: AnswerSummaryLimitedPartnership,
+        answerSummaryScottishLimitedPartnership: AnswerSummaryScottishLimitedPartnership,
+        answerSummaryScottishPartnership: AnswerSummaryScottishPartnership
 )
 
-@(implicit
+@(bpr: BusinessPartnerRecordResponse)(implicit
         request: AgentApplicationRequest[?],
         messages: Messages
 )
@@ -37,15 +51,70 @@
 @title = @{
     messages(s"$key.title")
 }
+@answerSummary = @{
+  request.agentApplication.businessType match {
+    case BusinessType.SoleTrader =>
+      answerSummarySoleTrader(
+        key = key,
+        answers = request.agentApplication.asSoleTraderApplication.getBusinessDetails,
+        userRole = request.agentApplication.getUserRole,
+        canChange = false
+      )
+    case BusinessType.Partnership.LimitedLiabilityPartnership =>
+      answerSummaryLlp(
+        key = key,
+        answers = request.agentApplication.asLlpApplication.getBusinessDetails,
+        userRole = request.agentApplication.getUserRole,
+        canChange = false
+      )
+    case BusinessType.LimitedCompany =>
+      answerSummaryLimitedCompany(
+        key = key,
+        answers = request.agentApplication.asLimitedCompanyApplication.getBusinessDetails,
+        userRole = request.agentApplication.getUserRole,
+        canChange = false
+      )
+    case BusinessType.Partnership.GeneralPartnership =>
+      answerSummaryGeneralPartnership(
+        key = key,
+        answers = request.agentApplication.asGeneralPartnershipApplication.getBusinessDetails,
+        userRole = request.agentApplication.getUserRole,
+        canChange = false,
+        entityName = bpr.getEntityName
+      )
+    case BusinessType.Partnership.LimitedPartnership =>
+      answerSummaryLimitedPartnership(
+        key = key,
+        answers = request.agentApplication.asLimitedPartnershipApplication.getBusinessDetails,
+        userRole = request.agentApplication.getUserRole,
+        canChange = false,
+        entityName = bpr.getEntityName
+      )
+    case BusinessType.Partnership.ScottishLimitedPartnership =>
+      answerSummaryScottishLimitedPartnership(
+        key = key,
+        answers = request.agentApplication.asScottishLimitedPartnershipApplication.getBusinessDetails,
+        userRole = request.agentApplication.getUserRole,
+        canChange = false,
+        entityName = bpr.getEntityName
+      )
+    case BusinessType.Partnership.ScottishPartnership =>
+      answerSummaryScottishPartnership(
+        key = key,
+        answers = request.agentApplication.asScottishPartnershipApplication.getBusinessDetails,
+        userRole = request.agentApplication.getUserRole,
+        canChange = false,
+        entityName = bpr.getEntityName
+      )
+    case _ =>
+      throw new IllegalArgumentException(s"Unsupported business type for Check Your Answers page: ${request.agentApplication.businessType}")
+  }
+}
 
 @layout(pageTitle = title) {
     <h2 class="govuk-caption-l">@messages("about-your-business.title")</h2>
     <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
-    @answerSummary(
-      key = key,
-      answers = request.agentApplication.asLlpApplication.getBusinessDetails,
-      canChange = false
-    )
+    @answerSummary
     <p class="govuk-body">
       @govukButton(Button(
           href = Some(AppRoutes.apply.TaskListController.show.url),

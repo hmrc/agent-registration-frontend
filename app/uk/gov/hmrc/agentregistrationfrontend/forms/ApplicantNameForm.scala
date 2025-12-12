@@ -22,13 +22,13 @@ import play.api.data.Forms.text
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
-object AuthorisedNameForm:
+object ApplicantNameForm:
 
   val key: String = "authorisedName"
 
   private def canonicalise(name: String): String = name.trim.replaceAll("\\s+", " ")
 
-  val form: Form[String] = Form[String](
+  val form: Form[ApplicantName] = Form[ApplicantName](
     mapping(
       key -> text.transform[String](canonicalise, identity)
         .verifying(
@@ -39,9 +39,10 @@ object AuthorisedNameForm:
           ErrorKeys.inputTooLongErrorMessage(key),
           _.length <= 100
         )
+        .transform[ApplicantName](ApplicantName(_), _.value)
         .verifying(
           ErrorKeys.invalidInputErrorMessage(key),
-          value => ApplicantName.isValidName(value)
+          _.isValidName
         )
     )(identity)(Some(_))
   )

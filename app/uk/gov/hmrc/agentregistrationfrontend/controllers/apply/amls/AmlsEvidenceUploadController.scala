@@ -110,7 +110,7 @@ extends FrontendController(mcc, actions):
         // and initiate the upscan progress tracking in agent-registration backend
         _ <- applicationService
           .upsert(
-            request.agentApplication.asLlpApplication
+            request.agentApplication
               .modify(_.amlsDetails.each.amlsEvidence)
               .setTo(Some(uploadDetails))
           ).flatMap: _ =>
@@ -169,7 +169,7 @@ extends FrontendController(mcc, actions):
               updatedApplication =
                 (objectStorePath, status) match
                   case (Some(path: Path.File), success: UploadStatus.UploadedSuccessfully) =>
-                    request.agentApplication.asLlpApplication
+                    request.agentApplication
                       .modify(_.amlsDetails.each.amlsEvidence.each.status)
                       .setTo(
                         success

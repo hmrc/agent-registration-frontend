@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.forms.AuthorisedNameForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantNameForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -38,7 +38,7 @@ extends ViewSpec:
         .whenApplicantIsAuthorised
         .afterRoleSelected
   )
-  val doc: Document = Jsoup.parse(viewTemplate(AuthorisedNameForm.form).body)
+  val doc: Document = Jsoup.parse(viewTemplate(ApplicantNameForm.form).body)
   private val heading: String = "What is your full name?"
 
   "MemberNamePage" should:
@@ -73,9 +73,9 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render a form error when the form contains an error on the name" in:
-      val field = AuthorisedNameForm.key
+      val field = ApplicantNameForm.key
       val errorMessage = "Enter your full name"
-      val formWithError = AuthorisedNameForm.form
+      val formWithError = ApplicantNameForm.form
         .withError(field, errorMessage)
       behavesLikePageWithErrorHandling(
         field = field,

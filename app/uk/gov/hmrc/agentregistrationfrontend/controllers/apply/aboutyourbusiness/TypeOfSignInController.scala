@@ -23,6 +23,7 @@ import sttp.model.Uri
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -70,6 +71,7 @@ extends FrontendController(mcc, actions):
           val agentType: AgentType = request.getAgentType
           val businessType: BusinessType = request.getBusinessType
           val typeOfSignIn: TypeOfSignIn = request.getTypeOfSignIn
+          val userRole: UserRole = request.readUserRole.getOrElse(UserRole.Authorised) // default to Authorised if missing
 
           val signInLink: Uri = AppRoutes
             .apply
@@ -77,7 +79,8 @@ extends FrontendController(mcc, actions):
             .InitiateAgentApplicationController
             .initiateAgentApplication(
               agentType = agentType,
-              businessType = businessType
+              businessType = businessType,
+              userRole = userRole
             )
             .url
             .pipe(initiateUrl => uri"${appConfig.thisFrontendBaseUrl + initiateUrl}")

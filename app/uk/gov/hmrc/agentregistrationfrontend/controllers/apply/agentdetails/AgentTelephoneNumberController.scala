@@ -22,7 +22,6 @@ import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentTelephoneNumber
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
@@ -53,7 +52,6 @@ extends FrontendController(mcc, actions):
     .ensure(
       _
         .agentApplication
-        .asLlpApplication
         .agentDetails
         .isDefined,
       implicit request =>
@@ -65,13 +63,12 @@ extends FrontendController(mcc, actions):
     implicit request =>
       businessPartnerRecordService
         .getBusinessPartnerRecord(
-          Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
+          request.agentApplication.getUtr
         ).map: bprOpt =>
           Ok(view(
             form = AgentTelephoneNumberForm.form.fill:
               request
                 .agentApplication
-                .asLlpApplication
                 .agentDetails.flatMap(_.telephoneNumber)
             ,
             bprTelephoneNumber = bprOpt.flatMap(_.primaryPhoneNumber)
@@ -85,7 +82,7 @@ extends FrontendController(mcc, actions):
           implicit request =>
             formWithErrors =>
               businessPartnerRecordService
-                .getBusinessPartnerRecord(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.asUtr)
+                .getBusinessPartnerRecord(request.agentApplication.getUtr)
                 .map: bprOpt =>
                   view(
                     form = formWithErrors,
@@ -97,7 +94,6 @@ extends FrontendController(mcc, actions):
           val agentTelephoneNumber: AgentTelephoneNumber = request.formValue
           val updatedApplication: AgentApplication = request
             .agentApplication
-            .asLlpApplication
             .modify(_.agentDetails.each.telephoneNumber)
             .setTo(Some(agentTelephoneNumber))
           agentApplicationService

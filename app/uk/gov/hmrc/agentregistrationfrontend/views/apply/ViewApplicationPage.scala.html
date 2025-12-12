@@ -14,9 +14,16 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.agentregistration.shared.BusinessType
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.{AnswerSummary as AboutYourBusinessAnswers}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.LimitedCompany.{AnswerSummary as AnswerSummaryLimitedCompany}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.Llp.{AnswerSummary as AnswerSummaryLlp}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.SoleTrader.{AnswerSummary as AnswerSummarySoleTrader}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.GeneralPartnership.{AnswerSummary as AnswerSummaryGeneralPartnership}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.LimitedPartnership.{AnswerSummary as AnswerSummaryLimitedPartnership}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.ScottishLimitedPartnership.{AnswerSummary as AnswerSummaryScottishLimitedPartnership}
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.ScottishPartnership.{AnswerSummary as AnswerSummaryScottishPartnership}
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.{AnswerSummary as ContactAnswers}
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.{AnswerSummary as AgentDetailsAnswers}
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.{AnswerSummary as AmlsAnswers}
@@ -28,7 +35,13 @@
         layout: Layout,
         govukButton: GovukButton,
         govukSummaryList: GovukSummaryList,
-        aboutYourBusinessAnswers: AboutYourBusinessAnswers,
+        answerSummaryLlp: AnswerSummaryLlp,
+        answerSummaryLimitedCompany: AnswerSummaryLimitedCompany,
+        answerSummarySoleTrader: AnswerSummarySoleTrader,
+        answerSummaryGeneralPartnership: AnswerSummaryGeneralPartnership,
+        answerSummaryLimitedPartnership: AnswerSummaryLimitedPartnership,
+        answerSummaryScottishLimitedPartnership: AnswerSummaryScottishLimitedPartnership,
+        answerSummaryScottishPartnership: AnswerSummaryScottishPartnership,
         contactAnswers: ContactAnswers,
         agentDetailsAnswers: AgentDetailsAnswers,
         amlsAnswers: AmlsAnswers
@@ -48,6 +61,65 @@
     messages(s"$key.title", entityName)
 }
 @provideDetailsLink = @{appConfig.applicationLink(request.agentApplication.linkId.value).toString}
+@aboutYourBusinessAnswers =  @{
+  request.agentApplication.businessType match {
+    case BusinessType.SoleTrader =>
+      answerSummarySoleTrader(
+        key = "aboutYourBusinessCheckYourAnswers",
+        answers = request.agentApplication.asSoleTraderApplication.getBusinessDetails,
+        userRole = request.agentApplication.getUserRole,
+        canChange = false
+      )
+    case BusinessType.Partnership.LimitedLiabilityPartnership =>
+      answerSummaryLlp(
+        key = "aboutYourBusinessCheckYourAnswers",
+        answers = request.agentApplication.asLlpApplication.getBusinessDetails,
+        userRole = request.agentApplication.getUserRole,
+        canChange = false
+      )
+    case BusinessType.LimitedCompany =>
+      answerSummaryLimitedCompany(
+        key = "aboutYourBusinessCheckYourAnswers",
+        answers = request.agentApplication.asLimitedCompanyApplication.getBusinessDetails,
+        userRole = request.agentApplication.getUserRole,
+        canChange = false
+      )
+    case BusinessType.Partnership.GeneralPartnership =>
+      answerSummaryGeneralPartnership(
+        key = "aboutYourBusinessCheckYourAnswers",
+        answers = request.agentApplication.asGeneralPartnershipApplication.getBusinessDetails,
+        userRole = request.agentApplication.getUserRole,
+        canChange = false,
+        entityName = entityName
+      )
+    case BusinessType.Partnership.LimitedPartnership =>
+      answerSummaryLimitedPartnership(
+        key = "aboutYourBusinessCheckYourAnswers",
+        answers = request.agentApplication.asLimitedPartnershipApplication.getBusinessDetails,
+        userRole = request.agentApplication.getUserRole,
+        canChange = false,
+        entityName = entityName
+      )
+    case BusinessType.Partnership.ScottishLimitedPartnership =>
+      answerSummaryScottishLimitedPartnership(
+        key = "aboutYourBusinessCheckYourAnswers",
+        answers = request.agentApplication.asScottishLimitedPartnershipApplication.getBusinessDetails,
+        userRole = request.agentApplication.getUserRole,
+        canChange = false,
+        entityName = entityName
+      )
+    case BusinessType.Partnership.ScottishPartnership =>
+      answerSummaryScottishPartnership(
+        key = "aboutYourBusinessCheckYourAnswers",
+        answers = request.agentApplication.asScottishPartnershipApplication.getBusinessDetails,
+        userRole = request.agentApplication.getUserRole,
+        canChange = false,
+        entityName = entityName
+      )
+    case _ =>
+      throw new IllegalArgumentException(s"Unsupported business type for Check Your Answers page: ${request.agentApplication.businessType}")
+  }
+}
 @templateScripts = {
   <script src="@{controllers.routes.Assets.versioned("javascripts/print-link.js")}" @{CSPNonce.attr}></script>
 }
@@ -63,23 +135,19 @@
   <h2 class="govuk-heading-m">@{messages(s"$key.subHeading", "HDJ2123F")}</h2>
 
   <h2 class="govuk-heading-m">@{messages("about-your-business.title")}</h2>
-  @aboutYourBusinessAnswers(
-    key = "aboutYourBusinessCheckYourAnswers",
-    answers = request.agentApplication.asLlpApplication.getBusinessDetails,
-    canChange = false
-  )
+  @aboutYourBusinessAnswers
 
   <h2 class="govuk-heading-m">@{messages(s"$key.contact.h2")}</h2>
   @contactAnswers(
     key = "contactCheckYourAnswers",
-    answers = request.agentApplication.asLlpApplication.getApplicantContactDetails,
+    answers = request.agentApplication.getApplicantContactDetails,
     canChange = false
   )
 
   <h2 class="govuk-heading-m">@{messages(s"$key.agentdetails.h2")}</h2>
   @agentDetailsAnswers(
     key = "agentDetailsCheckYourAnswers",
-    answers = request.agentApplication.asLlpApplication.getAgentDetails,
+    answers = request.agentApplication.getAgentDetails,
     canChange = false
   )
 
@@ -104,10 +172,6 @@
     )
   ))
 
-  <h2 class="govuk-heading-m">@{messages(s"$key.whatNext.h2")}</h2>
-  <p class="govuk-body">@{messages(s"$key.whatNext.p1", entityName)}</p>
-  <p class="govuk-body">@{Html(messages(s"$key.whatNext.p2", provideDetailsLink))}</p>
-  <p class="govuk-body">@{messages(s"$key.whatNext.p3")}</p>
   <p class="govuk-body govuk-!-display-none-print">
     @govukButton(Button(
       href = Some("#print-dialogue"),

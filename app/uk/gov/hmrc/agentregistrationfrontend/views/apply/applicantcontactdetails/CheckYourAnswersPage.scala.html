@@ -18,7 +18,6 @@
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.AnswerSummary
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-@import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
 
 @this(
         layout: Layout,
@@ -44,7 +43,7 @@
     <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
     @answerSummary(
       key = key,
-      answers = request.agentApplication.asLlpApplication.getApplicantContactDetails
+      answers = request.agentApplication.getApplicantContactDetails
     )
     <p class="govuk-body">
       @govukButton(Button(

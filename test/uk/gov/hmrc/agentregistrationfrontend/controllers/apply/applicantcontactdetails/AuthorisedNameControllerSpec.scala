@@ -20,7 +20,7 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
-import uk.gov.hmrc.agentregistrationfrontend.forms.AuthorisedNameForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantNameForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
 class AuthorisedNameControllerSpec
@@ -79,7 +79,7 @@ extends ControllerSpec:
     )
     val response: WSResponse =
       post(path)(Map(
-        AuthorisedNameForm.key -> Seq("Miss Alexa Fantastic")
+        ApplicantNameForm.key -> Seq("Miss Alexa Fantastic")
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -91,32 +91,32 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeNameDeclared)
     val response: WSResponse =
       post(path)(Map(
-        AuthorisedNameForm.key -> Seq(Constants.EMPTY_STRING)
+        ApplicantNameForm.key -> Seq(Constants.EMPTY_STRING)
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe ExpectedStrings.errorTitle
-    doc.mainContent.select(s"#${AuthorisedNameForm.key}-error").text() shouldBe s"Error: ${ExpectedStrings.requiredError}"
+    doc.mainContent.select(s"#${ApplicantNameForm.key}-error").text() shouldBe s"Error: ${ExpectedStrings.requiredError}"
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with invalid characters should return 400" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeNameDeclared)
     val response: WSResponse =
       post(path)(Map(
-        AuthorisedNameForm.key -> Seq("[[)(*%")
+        ApplicantNameForm.key -> Seq("[[)(*%")
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe ExpectedStrings.errorTitle
-    doc.mainContent.select(s"#${AuthorisedNameForm.key}-error").text() shouldBe s"Error: ${ExpectedStrings.invalidError}"
+    doc.mainContent.select(s"#${ApplicantNameForm.key}-error").text() shouldBe s"Error: ${ExpectedStrings.invalidError}"
 
   s"POST $path with more than 100 characters should return 400" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeNameDeclared)
     val response: WSResponse =
       post(path)(Map(
-        AuthorisedNameForm.key -> Seq("A".repeat(101))
+        ApplicantNameForm.key -> Seq("A".repeat(101))
       ))
 
     response.status shouldBe Status.BAD_REQUEST
@@ -131,7 +131,7 @@ extends ControllerSpec:
     )
     val response: WSResponse =
       post(path)(Map(
-        AuthorisedNameForm.key -> Seq("Miss Alexa Fantastic"),
+        ApplicantNameForm.key -> Seq("Miss Alexa Fantastic"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
@@ -144,7 +144,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeNameDeclared)
     val response: WSResponse =
       post(path)(Map(
-        AuthorisedNameForm.key -> Seq("[[)(*%"),
+        ApplicantNameForm.key -> Seq("[[)(*%"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 

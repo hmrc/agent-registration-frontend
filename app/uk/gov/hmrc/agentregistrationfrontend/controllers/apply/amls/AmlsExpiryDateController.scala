@@ -77,7 +77,7 @@ extends FrontendController(mcc, actions):
           val amlsExpiryDate = request.formValue
           applicationService
             .upsert(
-              request.agentApplication.asLlpApplication
+              request.agentApplication
                 .modify(_.amlsDetails.each.amlsExpiryDate)
                 .setTo(Some(amlsExpiryDate))
             )

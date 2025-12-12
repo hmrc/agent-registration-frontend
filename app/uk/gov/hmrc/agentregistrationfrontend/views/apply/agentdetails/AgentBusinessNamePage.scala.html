@@ -44,15 +44,7 @@
 }
 @title = @{messages(s"$key.title")}
 @existingBusinessName = @{
-    bprBusinessName
-    .getOrElse(
-        request
-        .agentApplication
-        .asLlpApplication
-        .getBusinessDetails
-        .companyProfile
-        .companyName
-    )
+    bprBusinessName.getOrElse("")
 }
 @otherInput = {
     @govukInput(Input(

@@ -15,7 +15,8 @@
  *@
 
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-@import uk.gov.hmrc.agentregistrationfrontend.forms.AuthorisedNameForm
+@import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
+@import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantNameForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
@@ -28,10 +29,10 @@
         continueOrSaveForLater: ContinueOrSaveForLater
 )
 
-@(form: Form[String])(implicit request: AgentApplicationRequest[?], messages: Messages)
+@(form: Form[ApplicantName])(implicit request: AgentApplicationRequest[?], messages: Messages)
 
 @key = @{
-    AuthorisedNameForm.key
+    ApplicantNameForm.key
 }
 @title = @{messages(s"$key.title")}
 @layout(
@@ -39,7 +40,7 @@
     maybeForm = Some(form)
 ) {
     <h2 class="govuk-caption-l">@messages("applicant-contact-details.title")</h2>
-    @formWithCSRF(action = AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.submit) {
+    @formWithCSRF(action = AppRoutes.apply.applicantcontactdetails.ApplicantNameController.submit) {
         @govukInput(Input(
             label = Label(
               content = Text(title),

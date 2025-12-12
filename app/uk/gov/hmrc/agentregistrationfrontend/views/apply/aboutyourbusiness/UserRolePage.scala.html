@@ -14,33 +14,33 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
-@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-@import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
+@import uk.gov.hmrc.agentregistration.shared.UserRole
+@import uk.gov.hmrc.agentregistrationfrontend.forms.UserRoleForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
 
 @this(
         layout: Layout,
         govukRadios: GovukRadios,
         formWithCSRF: FormWithCSRF,
-        govukButton: GovukButton,
-        continueOrSaveForLater: ContinueOrSaveForLater
+        govukButton: GovukButton
 )
 
-@(form: Form[ApplicantRoleInLlp])(implicit request: AgentApplicationRequest[?], messages: Messages)
+@(
+        form: Form[UserRole],
+        userRoleOption: UserRole
+)(implicit request: Request[?], messages: Messages)
 
 @key = @{
-    ApplicantRoleInLlpForm.key
+    UserRoleForm.key
 }
-@title = @{messages(s"$key.title")}
+@title = @{messages(s"$key.${userRoleOption.toString}.title")}
 @layout(
     pageTitle = title,
     maybeForm = Some(form)
 ) {
-    <h2 class="govuk-caption-l">@messages("applicant-contact-details.title")</h2>
-    @formWithCSRF(action = AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.submit) {
+    <h2 class="govuk-caption-l">@messages("about-your-business.title")</h2>
+    @formWithCSRF(action = AppRoutes.apply.aboutyourbusiness.UserRoleController.submit) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(
@@ -49,20 +49,20 @@
                     classes = "govuk-fieldset__legend--l"
                 ))
             )),
-            hint = Some(Hint(
-                content = HtmlContent(messages(
-                    s"$key.hint",
-                    request.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
-                ))
-            )),
-            items = ApplicantRoleInLlp.values.toSeq.map(applicantRoleInLlp =>
+            items = Seq(
                 RadioItem(
-                    content = Text(messages(s"$key.${applicantRoleInLlp.toString}")),
-                    value = Some(applicantRoleInLlp.toString)
+                    content = Text(messages(s"$key.${userRoleOption.toString}")),
+                    value = Some(userRoleOption.toString)
+                ),
+                RadioItem(
+                    content = Text(messages(s"$key.${UserRole.Authorised.toString}")),
+                    value = Some(UserRole.Authorised.toString)
                 )
             )
         ).withFormField(form(key)))
 
-        @continueOrSaveForLater()
+        @govukButton(Button(
+            content = Text(messages("common.continue"))
+        ))
     }
 }

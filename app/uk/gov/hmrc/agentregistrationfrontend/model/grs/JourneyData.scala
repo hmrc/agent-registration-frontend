@@ -59,7 +59,8 @@ final case class JourneyData(
         LimitedCompanyDetails(
           safeId = registration.registeredBusinessPartnerId.getOrElse(missingDataError("safeId")),
           businessType = businessType,
-          companyProfile = companyProfile.getOrElse(missingDataError("companyProfile"))
+          companyProfile = companyProfile.getOrElse(missingDataError("companyProfile")),
+          ctUtr = ctutr.getOrElse(missingDataError("ctutr"))
         )
       case SoleTrader =>
         SoleTraderDetails(
@@ -68,7 +69,8 @@ final case class JourneyData(
           fullName = fullName.getOrElse(missingDataError("fullName")),
           dateOfBirth = dateOfBirth.getOrElse(missingDataError("dateOfBirth")),
           nino = nino,
-          trn = trn
+          trn = trn,
+          saUtr = sautr.getOrElse(missingDataError("saUtr"))
         )
       case GeneralPartnership | LimitedLiabilityPartnership | LimitedPartnership | ScottishLimitedPartnership | ScottishPartnership =>
         PartnershipDetails(
