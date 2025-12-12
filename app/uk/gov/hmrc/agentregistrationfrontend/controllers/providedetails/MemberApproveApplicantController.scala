@@ -37,12 +37,12 @@ import scala.concurrent.Future
 import javax.inject.Inject
 
 class MemberApproveApplicantController @Inject() (
-                                                   actions: Actions,
-                                                   mcc: MessagesControllerComponents,
-                                                   view: MemberApproveApplicationPage,
-                                                   memberProvideDetailsService: MemberProvideDetailsService
-                                                 )
-  extends FrontendController(mcc, actions):
+  actions: Actions,
+  mcc: MessagesControllerComponents,
+  view: MemberApproveApplicationPage,
+  memberProvideDetailsService: MemberProvideDetailsService
+)
+extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[MemberProvideDetailsWithApplicationRequest, AnyContent] = actions.Member.getProvideDetailsWithApplicationInProgress
     .ensure(

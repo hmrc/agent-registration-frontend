@@ -26,7 +26,6 @@ import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-import scala.util.chaining.*
 
 object ActionsHelper
 extends RequestAwareLogging:
@@ -60,27 +59,50 @@ extends RequestAwareLogging:
           result
     )
 
-    def ensureValidFormGeneric[T](
+    def ensureValidFormGenericAsync[T](
       form: R[B] => Form[T],
-      resultToServeWhenFormHasErrors: R[B] => Form[T] => Result
+      resultToServeWhenFormHasErrors: R[B] => Form[T] => Future[Result]
     )(using
       fb: FormBinding,
       merge: MergeFormValue[R[B], T]
     ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ab.andThen(new ActionRefiner[R, [X] =>> R[X] & FormValue[T]] {
 
       @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-      override protected def refine[A](rA: R[A]): Future[Either[Result, R[A] & FormValue[T]]] = Future.successful {
+      override protected def refine[A](rA: R[A]): Future[Either[Result, R[A] & FormValue[T]]] = {
         val rB: R[B] = rA.asInstanceOf[R[B]]
         form(rB).bindFromRequest()(using rB, fb).fold(
-          hasErrors = formWithErrors => Left(resultToServeWhenFormHasErrors(rB)(formWithErrors)),
+          hasErrors = formWithErrors => resultToServeWhenFormHasErrors(rB)(formWithErrors).map(Left(_)),
           success =
             (formValue: T) =>
               val x: R[A] & FormValue[T] = merge.mergeFormValue(rB, formValue).asInstanceOf[R[A] & FormValue[T]]
-              Right(x)
+              Future.successful(Right(x))
         )
       }
       override protected def executionContext: ExecutionContext = ec
     })
+
+    def ensureValidFormGeneric[T](
+      form: R[B] => Form[T],
+      resultToServeWhenFormHasErrors: R[B] => Form[T] => Result
+    )(using
+      fb: FormBinding,
+      merge: MergeFormValue[R[B], T]
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ensureValidFormGenericAsync(
+      form,
+      request => form => Future.successful(resultToServeWhenFormHasErrors(request)(form))
+    )
+
+    def ensureValidFormAsync[T](
+      form: Form[T],
+      viewToServeWhenFormHasErrors: R[B] => Form[T] => Future[HtmlFormat.Appendable]
+    )(using
+      fb: FormBinding,
+      merge: MergeFormValue[R[B], T]
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ab
+      .ensureValidFormGenericAsync[T](
+        _ => form,
+        (r: R[B]) => (f: Form[T]) => viewToServeWhenFormHasErrors(r)(f).map(BadRequest.apply)
+      )
 
     def ensureValidForm[T](
       form: Form[T],
@@ -88,8 +110,27 @@ extends RequestAwareLogging:
     )(using
       fb: FormBinding,
       merge: MergeFormValue[R[B], T]
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ensureValidFormAsync(
+      form,
+      request => form => Future.successful(viewToServeWhenFormHasErrors(request)(form))
+    )
+
+    def ensureValidFormAndRedirectIfSaveForLaterAsync[T](
+      form: R[B] => Form[T],
+      viewToServeWhenFormHasErrors: R[B] => Form[T] => Future[HtmlFormat.Appendable]
+    )(using
+      fb: FormBinding,
+      merge: MergeFormValue[R[B], T],
+      ev: B =:= AnyContent
     ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ab
-      .ensureValidFormGeneric[T](_ => form, (r: R[B]) => (f: Form[T]) => viewToServeWhenFormHasErrors(r)(f).pipe(BadRequest.apply)) //
+      .ensureValidFormGenericAsync[T](
+        form,
+        (r: R[B]) =>
+          (f: Form[T]) =>
+            viewToServeWhenFormHasErrors(r)(f)
+              .map(BadRequest.apply)
+              .map(SubmissionHelper.redirectIfSaveForLater(ev.substituteCo(r), _))
+      )
 
     def ensureValidFormAndRedirectIfSaveForLater[T](
       form: R[B] => Form[T],
@@ -98,15 +139,22 @@ extends RequestAwareLogging:
       fb: FormBinding,
       merge: MergeFormValue[R[B], T],
       ev: B =:= AnyContent
-    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ab
-      .ensureValidFormGeneric[T](
-        form,
-        (r: R[B]) =>
-          (f: Form[T]) =>
-            viewToServeWhenFormHasErrors(r)(f)
-              .pipe(BadRequest.apply)
-              .pipe(SubmissionHelper.redirectIfSaveForLater(ev.substituteCo(r), _))
-      )
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ensureValidFormAndRedirectIfSaveForLaterAsync(
+      form,
+      request => form => Future.successful(viewToServeWhenFormHasErrors(request)(form))
+    )
+
+    def ensureValidFormAndRedirectIfSaveForLaterAsync[T](
+      form: Form[T],
+      viewToServeWhenFormHasErrors: R[B] => Form[T] => Future[HtmlFormat.Appendable]
+    )(using
+      fb: FormBinding,
+      merge: MergeFormValue[R[B], T],
+      ev: B =:= AnyContent
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ab.ensureValidFormAndRedirectIfSaveForLaterAsync(
+      _ => form,
+      viewToServeWhenFormHasErrors
+    )
 
     def ensureValidFormAndRedirectIfSaveForLater[T](
       form: Form[T],
