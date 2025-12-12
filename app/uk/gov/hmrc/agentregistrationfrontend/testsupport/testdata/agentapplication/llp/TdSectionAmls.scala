@@ -16,17 +16,16 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.llp
 
+import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
-import uk.gov.hmrc.agentregistration.shared.upscan.Reference
+import uk.gov.hmrc.agentregistration.shared.upscan.FileUploadReference
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
-import uk.gov.hmrc.http.StringContextOps
 
 import java.time.LocalDate
 import scala.util.chaining.scalaUtilChainingOps
@@ -45,21 +44,16 @@ trait TdSectionAmls {
 
   def amlsUploadDetailsAfterUploadInProgress: UploadDetails = UploadDetails(
     uploadId = dependencies.uploadId,
-    reference = Reference("test-file-reference"),
+    reference = FileUploadReference("test-file-reference"),
     status = UploadStatus.InProgress
   )
 
+  def amlsUploadDetailsAfterUploadScannedOk: UploadDetails = amlsUploadDetailsAfterUploadInProgress.copy(
+    status = dependencies.successfulUploadStatus.modify(_.objectStoreLocation).setTo(None)
+  )
+
   def amlsUploadDetailsAfterUploadSucceeded: UploadDetails = amlsUploadDetailsAfterUploadInProgress.copy(
-    status = UploadStatus.UploadedSuccessfully(
-      downloadUrl = url"https://bucketName.s3.eu-west-2.amazonaws.com/xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-      name = "evidence.pdf",
-      mimeType = "application/pdf",
-      size = Some(12345L),
-      checksum = dependencies.objectStoreValidHexVal,
-      objectStoreLocation = Some(ObjectStoreUrl(
-        "amls-evidence/xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-      ))
-    )
+    status = dependencies.successfulUploadStatus
   )
 
   private def amlsUploadDetailsAfterUploadFailedScanning: UploadDetails = amlsUploadDetailsAfterUploadInProgress.copy(
@@ -126,7 +120,10 @@ trait TdSectionAmls {
           def afterUploadFailed = afterAmlsExpiryDateProvided.copy(
             amlsEvidence = Some(amlsUploadDetailsAfterUploadFailedScanning)
           )
-          def afterUploadSucceded = afterAmlsExpiryDateProvided.copy(
+          def afterUploadScannedOk = afterAmlsExpiryDateProvided.copy(
+            amlsEvidence = Some(amlsUploadDetailsAfterUploadScannedOk)
+          )
+          def afterUploadSucceeded = afterAmlsExpiryDateProvided.copy(
             amlsEvidence = Some(amlsUploadDetailsAfterUploadSucceeded)
           )
 
@@ -142,8 +139,9 @@ trait TdSectionAmls {
 
         def afterUploadFailed: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadFailed))
 
-        def afterUploadSucceded: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadSucceded))
+        def afterUploadScannedOk: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadScannedOk))
+        def afterUploadSucceeded: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadSucceeded))
 
-        def complete: AgentApplicationLlp = afterUploadSucceded.tap(x => require(x.amlsDetails.exists(_.isComplete), "sanity check"))
+        def complete: AgentApplicationLlp = afterUploadSucceeded.tap(x => require(x.amlsDetails.exists(_.isComplete), "sanity check"))
 
 }

@@ -1,14 +1,20 @@
+/**
+ * File upload status checker module
+ * This module handles file upload validation and status checking in a polling fashion.
+ * It periodically checks the upload status by making HTTP requests to a specified endpoint
+ * until either a success or failure condition is met, or maximum attempts are reached.
+ */
 (function(document, window) {
     const fileUploadForm = document.getElementById('fileUploadForm')
     const uploadInput = document.getElementById('fileToUpload')
     const progressIndicator = document.getElementById('file-upload-progress')
 
-    function poll(config, count) {
-        const maxPolls = Number(config['maxPolls'])
-        if(count > maxPolls) {
+    function checkUploadStatus(config, count) {
+        const checkUploadStatusMaxAttempts = Number(config['checkUploadStatusMaxAttempts'])
+        if(count > checkUploadStatusMaxAttempts) {
             renderFormError("generic")
         } else {
-            window.fetch(config['urlToPoll'], {
+            window.fetch(config['checkUploadStatusUrl'], {
                 credentials: 'include',
                 mode: 'cors'
             })
@@ -22,8 +28,8 @@
                         renderFormError("generic")
                     } else {
                         setTimeout(function () {
-                            poll(config, count+1)
-                        }, Number(config['millisecondsBeforePoll']))
+                            checkUploadStatus(config, count+1)
+                        }, Number(config['checkUploadStatusIntervalMs']))
                     }
                 })
                 .catch(function(e) {
@@ -116,7 +122,7 @@
                         if(r.status > 399) {
                             renderFormError("generic")
                         } else {
-                            poll(config, 1)
+                            checkUploadStatus(config, 1)
                         }
                     } catch (error) {
                         console.error("No response from upscan when uploading file", error);

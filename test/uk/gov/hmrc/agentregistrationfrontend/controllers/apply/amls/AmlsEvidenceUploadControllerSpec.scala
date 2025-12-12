@@ -16,45 +16,16 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls
 
-import com.google.inject.AbstractModule
-import org.apache.pekko.actor.ActorSystem
 import play.api.libs.ws.WSResponse
 import play.api.libs.ws.readableAsString
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadIdGenerator
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
-import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.objectstore.client.RetentionPeriod.OneWeek
-import uk.gov.hmrc.objectstore.client.config.ObjectStoreClientConfig
-import uk.gov.hmrc.objectstore.client.play.PlayObjectStoreClient
-import uk.gov.hmrc.objectstore.client.play.test.stub
-
-import scala.concurrent.ExecutionContext
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.ObjectStoreStubs
 
 class AmlsEvidenceUploadControllerSpec
 extends ControllerSpec:
-
-  private given as: ActorSystem = ActorSystem()
-  private given ec: ExecutionContext = as.dispatcher
-
-  override lazy val overridesModule: AbstractModule =
-    new AbstractModule:
-      override def configure(): Unit =
-        bind(classOf[AmlsCodes]).asEagerSingleton()
-        bind(classOf[UploadIdGenerator]).toInstance(new UploadIdGenerator {
-          override def nextUploadId(): UploadId = tdAll.uploadId
-        })
-        bind(classOf[PlayObjectStoreClient]).toInstance(
-          new stub.StubPlayObjectStoreClient(ObjectStoreClientConfig(
-            baseUrl = "http://basurl.com",
-            owner = "owner",
-            authorizationToken = "token",
-            defaultRetentionPeriod = OneWeek
-          ))
-        )
 
   private val path = "/agent-registration/apply/anti-money-laundering/evidence"
   private val resultPath = "/agent-registration/apply/anti-money-laundering/evidence/upload-result"
@@ -90,12 +61,19 @@ extends ControllerSpec:
         .whenSupervisorBodyIsNonHmrc
         .afterUploadInitiated
 
-    val afterUploadSucceded: AgentApplicationLlp =
+    val afterUploadScannedOk: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
-        .afterUploadSucceded
+        .afterUploadScannedOk
+
+    val afterUploadSucceeded: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .sectionAmls
+        .whenSupervisorBodyIsNonHmrc
+        .afterUploadSucceeded
 
     val afterUploadFailed: AgentApplicationLlp =
       tdAll
@@ -105,11 +83,11 @@ extends ControllerSpec:
         .afterUploadFailed
 
   "routes should have correct paths and methods" in:
-    routes.AmlsEvidenceUploadController.show shouldBe Call(
+    AppRoutes.apply.amls.AmlsEvidenceUploadController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.AmlsEvidenceUploadController.showResult shouldBe Call(
+    AppRoutes.apply.amls.AmlsEvidenceUploadController.showUploadResult shouldBe Call(
       method = "GET",
       url = resultPath
     )
@@ -162,27 +140,20 @@ extends ControllerSpec:
     response.parseBodyAsJsoupDocument.title shouldBe ExpectedStrings.pendingTitle
     ApplyStubHelper.verifyConnectorsForUploadInProgress()
 
-  /* TODO: this test is consistently timing out a future promise - I think it's because of the stubbed object store client - investigate later
-  s"GET $resultPath when upload is successfully scanned should render the upload result page" in:
+  s"GET $resultPath when upload is successfully scanned should transfer to object store and render the upload result page" in:
     ApplyStubHelper.stubsForUploadStatusChange(
-      application = agentApplication.afterUploadInitiated,
-      updatedApplication = agentApplication.afterUploadSucceded,
+      application = agentApplication.afterUploadScannedOk,
+      updatedApplication = agentApplication.afterUploadSucceeded,
       uploadId = tdAll.uploadId,
-      uploadStatus = UploadStatus.UploadedSuccessfully(
-        downloadUrl = url"https://bucketName.s3.eu-west-2.amazonaws.com/xxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
-        name = "evidence.pdf",
-        mimeType = "application/pdf",
-        size = Some(12345L),
-        checksum = tdAll.objectStoreValidHexVal,
-        objectStoreLocation = Some(ObjectStoreUrl("any-file-reference/any-file-name"))
-      )
+      uploadStatus = tdAll.successfulUploadStatus
     )
+    ObjectStoreStubs.stubObjectStoreTransfer()
     val response: WSResponse = get(resultPath)
 
     response.status shouldBe 200
     response.parseBodyAsJsoupDocument.title shouldBe ExpectedStrings.completeTitle
     ApplyStubHelper.verifyConnectorsForUploadResult()
-   */
+    ObjectStoreStubs.verifyObjectStoreTransfer()
 
   s"GET $resultPath when upload has a virus should render the upload result page" in:
     ApplyStubHelper.stubsForUploadStatusChange(

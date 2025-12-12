@@ -16,9 +16,11 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.config
 
+import com.typesafe.config.ConfigMemorySize
 import play.api.Configuration
 import sttp.model.Uri
 import sttp.model.Uri.UriContext
+import uk.gov.hmrc.agentregistrationfrontend.config.ConfigHelper.ensureValidUrl
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -83,16 +85,19 @@ class AppConfig @Inject() (
   val incorpIdBaseUrl: String = servicesConfig.baseUrl("incorporated-entity-identification-frontend")
   val partnershipIdBaseUrl: String = servicesConfig.baseUrl("partnership-identification-frontend")
 
-  /*
-   * UPSCAN CONFIG START
-   */
-  val upscanInitiateHost: String = servicesConfig.baseUrl("upscan")
-  val upscanRedirectBase: String = configuration.get[String]("microservice.services.upscan.redirect-base")
-  val fileUploadMaxPolls: Int = configuration.get[Int]("uploads.maximum-js-polls")
-  val millisecondsBeforePoll: Int = configuration.get[Int]("uploads.milliseconds-before-poll")
-  val upscanCallbackEndpoint: String = s"$agentRegistrationBaseUrl/agent-registration/application/amls/upscan-callback"
-  val maxFileSize: Int = configuration.get[Int]("uploads.max-file-size-in-bytes")
-  val allowedCorsOrigin: String = configuration.get[String]("microservice.services.upscan.redirect-base")
+  val upscanInitiateBaseUrl: String = servicesConfig.baseUrl("upscan-initiate")
+
+  object Upscan:
+
+    val callbackUrl: String = s"$agentRegistrationBaseUrl/agent-registration/application/amls/upscan-callback".ensureValidUrl("callbackUrl")
+    val maxFileSize: ConfigMemorySize = configuration.underlying.getMemorySize("uploads.max-file-size")
+    val checkUploadStatusInterval: FiniteDuration = configuration.get[FiniteDuration]("uploads.check-upload-status-interval")
+    val checkUploadStatusMaxAttempts: Int = configuration.get[Int]("uploads.check-upload-status-max-attempts")
+    val acceptMimeTypes: String = configuration.get[String]("uploads.accept-mime-types")
+
+  // !!!
+  // Access objects eagerly to initialize its vals, ensuring config errors are detected at startup
+  Upscan
 
 object ConfigHelper:
 
@@ -103,10 +108,13 @@ object ConfigHelper:
   def readConfigAsValidUrlString(
     configPath: String,
     configuration: Configuration
-  ): String =
-    val url: String = configuration.get[String](configPath)
-    Try(new java.net.URI(url).toURL).fold[String](
-      e => throw new RuntimeException(s"Invalid URL in config under [$configPath], value was [$url]", e),
+  ): String = configuration
+    .get[String](configPath)
+    .ensureValidUrl(s"config-path: [$configPath]")
+
+  extension (url: String)
+    def ensureValidUrl(hint: String): String = Try(new java.net.URI(url).toURL).fold[String](
+      e => throw new RuntimeException(s"This is not a valid URL: [$url], $hint", e),
       _ => url
     )
 

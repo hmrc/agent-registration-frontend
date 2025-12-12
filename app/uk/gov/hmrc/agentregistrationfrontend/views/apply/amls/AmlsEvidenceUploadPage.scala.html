@@ -17,7 +17,7 @@
 @import play.twirl.api.Html
 @import uk.gov.hmrc.agentregistration.shared.AmlsName
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UpscanInitiateResponse
+@import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector.UpscanInitiateResponse
 @import uk.gov.hmrc.agentregistrationfrontend.views.html._
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import views.html.helper.CSPNonce
@@ -40,7 +40,7 @@
 @key = @{"amlsEvidenceUpload"}
 @title = @{messages(s"$key.title")}
 @templateScripts = {
-    <script src="@{controllers.routes.Assets.versioned("javascripts/file-upload-enhancements.js")}" @CSPNonce.attr></script>
+    <script src="@{controllers.routes.Assets.versioned("javascripts/check-upload-status.js")}" @CSPNonce.attr></script>
 }
 @templateStyles = {
     <link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/file-upload-styles.css")}" @CSPNonce.attr>
@@ -81,8 +81,8 @@
         content = HtmlContent(detailsHtml)
     ))
 
-    <form id="fileUploadForm" action="@upscanInitiateResponse.postTarget" method="post" enctype="multipart/form-data">
-        @for(field <- upscanInitiateResponse.formFields) {
+    <form id="fileUploadForm" action="@upscanInitiateResponse.uploadRequest.href" method="post" enctype="multipart/form-data">
+        @for(field <- upscanInitiateResponse.uploadRequest.fields) {
             <input type="hidden" name="@field._1" value="@field._2"/>
         }
         @govukFileUpload(FileUpload(
@@ -93,7 +93,7 @@
                 classes = "govuk-label--m"
             ),
             attributes = Map(
-                "accept" -> "application/pdf, image/jpg, image/jpeg, image/png, image/tiff, text/plain, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/msword, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "accept" -> appConfig.Upscan.acceptMimeTypes,
                 "required" -> "true"
             )
         ))
@@ -101,11 +101,11 @@
         <div id="upload-handling">
             <span
             id="file-upload-progress"
-            data-url-to-poll="@{AppRoutes.apply.amls.AmlsEvidenceUploadController.pollResultWithJavaScript.url}"
-            data-success="@{appConfig.upscanRedirectBase}@{AppRoutes.apply.amls.AmlsEvidenceUploadController.showResult.url}"
-            data-max-polls="@{appConfig.fileUploadMaxPolls}"
-            data-milliseconds-before-poll="@{appConfig.millisecondsBeforePoll}"
-            data-max-file-size="@{appConfig.maxFileSize}"
+            data-check-upload-status-url="@{AppRoutes.apply.amls.AmlsEvidenceUploadController.checkUploadStatus.url}"
+            data-success="@{appConfig.thisFrontendBaseUrl}@{AppRoutes.apply.amls.AmlsEvidenceUploadController.showUploadResult.url}"
+            data-check-upload-status-max-attempts="@{appConfig.Upscan.checkUploadStatusMaxAttempts}"
+            data-check-upload-status-interval-ms="@{appConfig.Upscan.checkUploadStatusInterval.toMillis}"
+            data-max-file-size="@{appConfig.Upscan.maxFileSize.toBytes}"
             aria-live="assertive"
             >
             </span>

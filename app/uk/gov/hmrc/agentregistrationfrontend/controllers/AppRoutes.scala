@@ -15,7 +15,9 @@
  */
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers
+// scalafix:off DisableSyntax
 
+import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as rootRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.routes as aboutyourbusinessRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.routes as amlsRoutes
@@ -25,12 +27,15 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes a
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.routes as providedetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.routes as internalProviDedetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.routes as testOnlyRoutes
 
 /** All application routes centralized in one place for convenience and clarity. It helps avoid naming conflicts and makes route management easier.
   *
   * Please add new controllers here.
   */
 object AppRoutes:
+
+  val SignOutController = rootRoutes.SignOutController
 
   object apply:
 
@@ -95,3 +100,9 @@ object AppRoutes:
 
     object internal:
       val InitiateMemberProvideDetailsController = internalProviDedetailsRoutes.InitiateMemberProvideDetailsController
+
+  object testOnly:
+
+    val TestOnlyController = testOnlyRoutes.TestOnlyController
+    val GrsStubController = testOnlyRoutes.GrsStubController
+    val FastForwardController = testOnlyRoutes.FastForwardController

@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.routes
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.CompaniesHouseNameQueryPage
@@ -45,7 +44,7 @@ extends ViewSpec:
     "render a form with inputs for first and last name" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe routes.CompaniesHouseNameQueryController.submit.url
+      form.attr("action") shouldBe AppRoutes.providedetails.CompaniesHouseNameQueryController.submit.url
       form
         .selectOrFail("label[for=firstName]")
         .selectOnlyOneElementOrFail()

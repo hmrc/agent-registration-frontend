@@ -24,7 +24,6 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AppLangs
 import uk.gov.hmrc.agentregistrationfrontend.config.GrsConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.GrsConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
@@ -68,7 +67,7 @@ class GrsService @Inject() (
     JourneyConfig(
       continueUrl = AppRoutes.apply.internal.GrsController.journeyCallback(None).url,
       deskProServiceId = grsConfig.deskProServiceId,
-      signOutUrl = routes.SignOutController.signOut.url,
+      signOutUrl = AppRoutes.SignOutController.signOut.url,
       accessibilityUrl = grsConfig.accessibilityUrl,
       regime = grsConfig.regime,
       businessVerificationCheck = false,
