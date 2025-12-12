@@ -96,6 +96,8 @@ object AppRoutes:
     val MemberNinoController = providedetailsRoutes.MemberNinoController
     val MemberSaUtrController = providedetailsRoutes.MemberSaUtrController
     val MemberApproveApplicantController = providedetailsRoutes.MemberApproveApplicantController
+    val MemberAgreeStandardController = providedetailsRoutes.MemberAgreeStandardController
+    val MemberConfirmStopController = providedetailsRoutes.MemberConfirmStopController
 
     object internal:
       val InitiateMemberProvideDetailsController = internalProviDedetailsRoutes.InitiateMemberProvideDetailsController

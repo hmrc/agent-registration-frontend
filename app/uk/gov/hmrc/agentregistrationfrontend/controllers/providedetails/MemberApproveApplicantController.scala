@@ -17,25 +17,96 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import play.api.mvc.Action
+import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.RequestHeader
+import com.softwaremill.quicklens.modify
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsWithApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.forms.MemberApproveApplicationForm
+import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberApproveApplicationPage
+import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
+import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.toYesNo
+import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.toBoolean
 
+import scala.concurrent.Future
 import javax.inject.Inject
 
 class MemberApproveApplicantController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  placeholder: SimplePage
+  view: MemberApproveApplicationPage,
+  memberProvideDetailsService: MemberProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.Member.getProvideDetailsInProgress:
-    implicit request: RequestHeader =>
-      Ok(placeholder(
-        h1 = "Approve Applicant Page",
-        bodyText = Some("This is a placeholder page for the email address page.")
-      ))
+  private val baseAction: ActionBuilder[MemberProvideDetailsWithApplicationRequest, AnyContent] = actions.Member.getProvideDetailsWithApplicationInProgress
+    .ensure(
+      _.memberProvidedDetails.memberSaUtr.nonEmpty,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.MemberSaUtrController.show.url)
+    )
+    .ensure(
+      _.memberProvidedDetails.emailAddress.nonEmpty,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.MemberEmailAddressController.show.url)
+    )
+
+  def show: Action[AnyContent] = baseAction.async:
+    implicit request =>
+      val applicantName = request.agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName
+      val companyName = request.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
+      val filledForm = MemberApproveApplicationForm
+        .form(applicantName)
+        .fill:
+          request
+            .memberProvidedDetails
+            .hasApprovedApplication
+            .map(_.toYesNo)
+
+      Future.successful(
+        Ok(
+          view(
+            filledForm,
+            applicantName,
+            companyName
+          )
+        )
+      )
+
+  def submit: Action[AnyContent] =
+    baseAction
+      .ensureValidFormAndRedirectIfSaveForLater[YesNo](
+        implicit r =>
+          val applicantName = r.agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName
+          MemberApproveApplicationForm.form(applicantName)
+        ,
+        implicit r =>
+          val applicantName = r.agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName
+          val companyName = r.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
+          view(
+            _,
+            applicantName,
+            companyName
+          )
+      )
+      .async:
+        implicit r: MemberProvideDetailsWithApplicationRequest[AnyContent] & FormValue[YesNo] =>
+          val approved: Boolean = r.formValue.toBoolean
+
+          val updatedApplication: MemberProvidedDetails = r.memberProvidedDetails
+            .modify(_.hasApprovedApplication)
+            .setTo(Some(approved))
+
+          memberProvideDetailsService
+            .upsert(updatedApplication)
+            .map: _ =>
+              if approved then
+                Redirect(AppRoutes.providedetails.MemberAgreeStandardController.show.url)
+              else
+                Redirect(AppRoutes.providedetails.MemberConfirmStopController.show.url)
+      .redirectIfSaveForLater
