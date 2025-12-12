@@ -125,7 +125,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.providedetails.MemberAgreeStandardController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.MemberHmrcStandardForAgentsController.show.url
 
   s"POST $path with selected No should save data and redirect to agree standard" in:
     AuthStubs.stubAuthoriseIndividual()

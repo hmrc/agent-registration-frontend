@@ -18,9 +18,10 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationMemberProvidedDetailsStubs
 
 class MemberHmrcStandardForAgentsControllerSpec
 extends ControllerSpec:
@@ -38,49 +39,41 @@ extends ControllerSpec:
     )
   AppRoutes.providedetails.MemberHmrcStandardForAgentsController.submit.url shouldBe AppRoutes.providedetails.MemberHmrcStandardForAgentsController.show.url
 
-  object provideDetails:
+  object memberProvidedDetails:
 
-    val beforeTermsAgreed: MemberProvidedDetails =
-      tdAll
-        .memberProvidedDetails
-        .afterAmlsComplete
+    val beforeTermsAgreed: MemberProvidedDetails = tdAll.providedDetailsLlp.afterApproveAgentApplication
 
-    val afterTermsAgreed: AgentApplicationLlp =
-      tdAll
-        .agentApplicationLlp
-        .afterHmrcStandardForAgentsAgreed
+    val afterTermsAgreed: MemberProvidedDetails = tdAll.providedDetailsLlp.afterHmrcStandardforAgentsAgreed
 
   s"GET $path before agreeing terms should return 200 and render page" in:
-    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeTermsAgreed)
+    AuthStubs.stubAuthoriseIndividual()
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.beforeTermsAgreed))
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Agree to meet the HMRC standard for agents - Apply for an agent services account - GOV.UK"
     doc.select("h2.govuk-caption-xl").text() shouldBe "HMRC standard for agents"
-    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $path after agreeing terms should return 200 and render page" in:
-    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterTermsAgreed)
+    AuthStubs.stubAuthoriseIndividual()
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterTermsAgreed))
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Agree to meet the HMRC standard for agents - Apply for an agent services account - GOV.UK"
     doc.select("h2.govuk-caption-xl").text() shouldBe "HMRC standard for agents"
-    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with agree should update the application and redirect to the task list" in:
-    ApplyStubHelper.stubsForSuccessfulUpdate(
-      application = agentApplication.beforeTermsAgreed,
-      updatedApplication = agentApplication.afterTermsAgreed
-    )
+    AuthStubs.stubAuthoriseIndividual()
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.beforeTermsAgreed))
+    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvidedDetails.afterTermsAgreed)
     val response: WSResponse =
       post(path)(
-        Map("submit" -> Seq("AgreeAndContinue"))
+        Map()
       )
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.TaskListController.show.url
-    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
+    response.header("Location").value shouldBe AppRoutes.providedetails.MemberCheckYourAnswersController.show.url

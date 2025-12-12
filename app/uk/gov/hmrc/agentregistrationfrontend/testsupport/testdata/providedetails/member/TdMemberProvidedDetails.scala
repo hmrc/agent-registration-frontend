@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.providedetails.member
 
 import com.softwaremill.quicklens.modify
+import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseMatch
 import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
@@ -73,13 +74,6 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
         isVerified = true
       )))
 
-    val afterApplicantApproved: MemberProvidedDetails = afterEmailAddressVerified
-      .modify(_.)
-      .setTo(Some(MemberVerifiedEmailAddress(
-        emailAddress = dependencies.memberEmailAddress,
-        isVerified = true
-      )))
-
     // That way is better than having to write a bunch of methods for each field in MemberProvidedDetails
     def withNinoProvided(state: MemberProvidedDetails): MemberProvidedDetails = state
       .modify(_.memberNino)
@@ -124,5 +118,9 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
     val afterDoNotApproveAgentApplication: MemberProvidedDetails = afterSaUtrProvided
       .modify(_.hasApprovedApplication)
       .setTo(Some(false))
+
+    val afterHmrcStandardforAgentsAgreed: MemberProvidedDetails = afterApproveAgentApplication
+      .modify(_.hmrcStandardForAgentsAgreed)
+      .setTo(StateOfAgreement.Agreed)
 
 }

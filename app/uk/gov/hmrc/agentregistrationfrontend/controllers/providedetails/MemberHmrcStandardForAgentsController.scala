@@ -50,7 +50,7 @@ extends FrontendController(mcc, actions):
       _.memberProvidedDetails.hmrcStandardForAgentsAgreed == StateOfAgreement.NotSet,
       implicit request =>
         logger.info(s"HMRC Standard for agents already accepted. Skipping page and moving to next page.")
-        Redirect(AppRoutes.apply.TaskListController.show)
+        Redirect(AppRoutes.providedetails.MemberCheckYourAnswersController.show)
     )
 
   def show: Action[AnyContent] = baseAction:
@@ -66,4 +66,4 @@ extends FrontendController(mcc, actions):
               .modify(_.hmrcStandardForAgentsAgreed)
               .setTo(StateOfAgreement.Agreed)
           ).map: _ =>
-            Redirect(AppRoutes.apply.TaskListController.show)
+            Redirect(AppRoutes.providedetails.MemberCheckYourAnswersController.show)
