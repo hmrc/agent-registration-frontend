@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.model.grs
 
 import play.api.libs.json.*
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 enum RegistrationStatus(val key: String):
 
@@ -30,7 +31,7 @@ enum RegistrationStatus(val key: String):
 object RegistrationStatus:
   given Format[RegistrationStatus] = Format(
     _.validate[String].flatMap { string =>
-      RegistrationStatus.values.find(_.key == string).map(JsSuccess(_))
+      RegistrationStatus.values.find(_.key === string).map(JsSuccess(_))
         .getOrElse(JsError(s"Unknown value for GrsRegistrationStatus: '$string'"))
     },
     status => JsString(status.key)

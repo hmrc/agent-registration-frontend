@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.forms.formatters
 
 import play.api.data.FormError
 import play.api.data.format.Formatter
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import java.time.Month
 
@@ -69,7 +70,7 @@ extends Formatter[Int] {
       .flatMap {
         str =>
           months
-            .find(m => m.getValue.toString == str.replaceAll("^0+", "") || m.toString == str.toUpperCase || m.toString.take(3) == str.toUpperCase)
+            .find(m => m.getValue.toString === str.replaceAll("^0+", "") || m.toString === str.toUpperCase || m.toString.take(3) === str.toUpperCase)
             .map(x => Right(x.getValue))
             .getOrElse(Left(List(FormError(
               key = key,

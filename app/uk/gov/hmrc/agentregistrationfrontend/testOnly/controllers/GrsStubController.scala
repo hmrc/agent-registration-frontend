@@ -39,6 +39,7 @@ import uk.gov.hmrc.agentregistration.shared.SafeId
 import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.*
 import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 
@@ -170,23 +171,23 @@ extends FrontendController(mcc, actions):
         nonEmptyText
       ),
       "firstName" -> mandatoryIf(
-        _ => businessType == SoleTrader,
+        _ => businessType === SoleTrader,
         nonEmptyText
       ),
       "lastName" -> mandatoryIf(
-        _ => businessType == SoleTrader,
+        _ => businessType === SoleTrader,
         nonEmptyText
       ),
       "dateOfBirth" -> mandatoryIf(
-        _ => businessType == SoleTrader,
+        _ => businessType === SoleTrader,
         nonEmptyText
       ),
       "nino" -> mandatoryIf(
-        isEqual("trn", "").and(_ => businessType == SoleTrader),
+        isEqual("trn", "").and(_ => businessType === SoleTrader),
         nonEmptyText
       ),
       "trn" -> mandatoryIf(
-        isEqual("nino", "").and(_ => businessType == SoleTrader),
+        isEqual("nino", "").and(_ => businessType === SoleTrader),
         nonEmptyText
       ),
       "sautr" -> mandatoryIf(
@@ -208,7 +209,7 @@ extends FrontendController(mcc, actions):
       ),
       "dateOfIncorporation" -> optional(nonEmptyText),
       "ctutr" -> mandatoryIf(
-        _ => businessType == LimitedCompany,
+        _ => businessType === LimitedCompany,
         nonEmptyText
       ),
       "postcode" -> mandatoryIf(
@@ -232,7 +233,7 @@ extends FrontendController(mcc, actions):
         postcode
       ) =>
         JourneyData(
-          identifiersMatch = if status == GrsNotCalled then false else true,
+          identifiersMatch = if status === GrsNotCalled then false else true,
           registration = Registration(
             registrationStatus = status,
             registeredBusinessPartnerId = safeId.map(SafeId.apply)
@@ -283,9 +284,9 @@ extends FrontendController(mcc, actions):
       registrationStatus = GrsRegistered,
       registeredBusinessPartnerId = Some(SafeId("XA0001234512345"))
     ),
-    fullName = if businessType == SoleTrader then Some(FullName("Test", "User")) else None,
-    dateOfBirth = if businessType == SoleTrader then Some(LocalDate.now().minusYears(20)) else None,
-    nino = if businessType == SoleTrader then Some(Nino("AB123456C")) else None,
+    fullName = if businessType === SoleTrader then Some(FullName("Test", "User")) else None,
+    dateOfBirth = if businessType === SoleTrader then Some(LocalDate.now().minusYears(20)) else None,
+    nino = if businessType === SoleTrader then Some(Nino("AB123456C")) else None,
     trn = None,
     sautr =
       if Seq(
@@ -299,7 +300,7 @@ extends FrontendController(mcc, actions):
       if Seq(LimitedCompany, LimitedLiabilityPartnership /*General Limited, Scottish Limited */ ).contains(businessType) then
         Some(CompanyProfile(
           companyNumber = Crn("12345678"),
-          companyName = if businessType == LimitedCompany then "Test Company Ltd" else "Test Partnership LLP",
+          companyName = if businessType === LimitedCompany then "Test Company Ltd" else "Test Partnership LLP",
           dateOfIncorporation = Some(LocalDate.now().minusYears(10)),
           unsanitisedCHROAddress = Some(ChroAddress(
             address_line_1 = Some("23 Great Portland Street"),
@@ -309,7 +310,7 @@ extends FrontendController(mcc, actions):
           ))
         ))
       else None,
-    ctutr = if businessType == LimitedCompany then Some(randomCtUtr()) else None,
+    ctutr = if businessType === LimitedCompany then Some(randomCtUtr()) else None,
     postcode =
       if Seq(GeneralPartnership, LimitedLiabilityPartnership /*Scottish, General Limited, Scottish Limited */ ).contains(businessType) then Some("AA1 1AA")
       else None

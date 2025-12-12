@@ -46,3 +46,4 @@ lazy val microservice = Project("agent-registration-frontend", file("."))
       "uk.gov.hmrc.hmrcfrontend.views.html.components._"
     )
   )
+

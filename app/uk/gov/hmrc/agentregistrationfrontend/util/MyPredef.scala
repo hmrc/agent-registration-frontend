@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.util
+package uk.gov.hmrc.agentregistrationfrontend.util
 
-// scalafix:off DisableSyntax
-object SafeEquals:
-  /** Simple safe equals so we don't have to import cats
-    */
-  extension [A](v: A)
+object MyPredef:
 
-    @SuppressWarnings(Array("org.wartremover.warts.Equals"))
-    def ===(other: A): Boolean = v == other
-    @SuppressWarnings(Array("org.wartremover.warts.Equals"))
-    def =!=(other: A): Boolean = v != other
+//  export scala.Predef.*
+
+  val barabara: Int = 123
+
+  extension (s: String)
+    def sialala: String = s + "123"
