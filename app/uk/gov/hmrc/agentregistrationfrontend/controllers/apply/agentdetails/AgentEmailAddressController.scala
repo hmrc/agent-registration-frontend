@@ -79,7 +79,7 @@ extends FrontendController(mcc, actions):
     implicit request =>
       businessPartnerRecordService
         .getBusinessPartnerRecord(
-          Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
+          request.agentApplication.getUtr
         ).map: bprOpt =>
           Ok(view(
             form = AgentEmailAddressForm.form.fill:
@@ -107,7 +107,7 @@ extends FrontendController(mcc, actions):
         implicit request =>
           formWithErrors =>
             businessPartnerRecordService
-              .getBusinessPartnerRecord(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.asUtr)
+              .getBusinessPartnerRecord(request.agentApplication.getUtr)
               .map: (bprOpt: Option[BusinessPartnerRecordResponse]) =>
                 view(
                   form = formWithErrors,
@@ -119,7 +119,6 @@ extends FrontendController(mcc, actions):
         val emailAddressFromForm = request.formValue
         val updatedApplication: AgentApplication = request
           .agentApplication
-          .asLlpApplication
           .modify(_.agentDetails.each.agentEmailAddress)
           .using {
             case Some(details) =>
@@ -149,7 +148,6 @@ extends FrontendController(mcc, actions):
     .getApplicationInProgress
     .ensure(
       _.agentApplication
-        .asLlpApplication
         .agentDetails
         .map(_.agentEmailAddress).isDefined,
       implicit request =>
@@ -158,7 +156,6 @@ extends FrontendController(mcc, actions):
     )
     .ensure(
       _.agentApplication
-        .asLlpApplication
         .getAgentDetails
         .getAgentEmailAddress
         .isVerified === false,
@@ -171,7 +168,6 @@ extends FrontendController(mcc, actions):
         val emailToVerify =
           request
             .agentApplication
-            .asLlpApplication
             .getAgentDetails
             .getAgentEmailAddress
             .getEmailAddress
@@ -197,7 +193,6 @@ extends FrontendController(mcc, actions):
   private def onEmailVerified()(implicit request: AgentApplicationRequest[AnyContent]): Future[Result] =
     val updatedApplication = request
       .agentApplication
-      .asLlpApplication
       .modify(
         _.agentDetails
           .each.agentEmailAddress
@@ -224,6 +219,8 @@ extends FrontendController(mcc, actions):
     maybeBackUrl = Some(appConfig.thisFrontendBaseUrl + routes.AgentEmailAddressController.show.url),
     accessibilityStatementUrl = appConfig.accessibilityStatementPath,
     lang = messagesApi.preferred(request).lang.code
+  ).map(redirectUrl =>
+    Redirect(appConfig.emailVerificationFrontendBaseUrl + redirectUrl)
   )
 
   private def onEmailLocked()(implicit request: AgentApplicationRequest[AnyContent]): Future[Result] = Future.successful(

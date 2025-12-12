@@ -65,7 +65,7 @@ extends FrontendController(mcc, actions):
     implicit request =>
       businessPartnerRecordService
         .getBusinessPartnerRecord(
-          Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
+          request.agentApplication.getUtr
         ).map: bprOpt =>
           Ok(view(
             form = AgentTelephoneNumberForm.form.fill:
@@ -85,7 +85,7 @@ extends FrontendController(mcc, actions):
           implicit request =>
             formWithErrors =>
               businessPartnerRecordService
-                .getBusinessPartnerRecord(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.asUtr)
+                .getBusinessPartnerRecord(request.agentApplication.getUtr)
                 .map: bprOpt =>
                   view(
                     form = formWithErrors,
@@ -97,7 +97,6 @@ extends FrontendController(mcc, actions):
           val agentTelephoneNumber: AgentTelephoneNumber = request.formValue
           val updatedApplication: AgentApplication = request
             .agentApplication
-            .asLlpApplication
             .modify(_.agentDetails.each.telephoneNumber)
             .setTo(Some(agentTelephoneNumber))
           agentApplicationService

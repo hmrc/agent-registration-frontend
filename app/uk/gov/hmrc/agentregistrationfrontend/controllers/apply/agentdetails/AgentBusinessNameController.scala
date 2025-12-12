@@ -55,7 +55,7 @@ extends FrontendController(mcc, actions):
       implicit request =>
         businessPartnerRecordService
           .getBusinessPartnerRecord(
-            Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
+            request.agentApplication.getUtr
           ).map: bprOpt =>
             Ok(view(
               form = AgentBusinessNameForm.form.fill:
