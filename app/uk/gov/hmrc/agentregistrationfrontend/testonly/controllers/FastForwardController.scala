@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers
+package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers
 
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
@@ -24,10 +24,10 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.FastForwardController.CompletedSection
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.FastForwardController.CompletedSection.CompletedSectionLlp
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.FastForwardController.CompletedSection.CompletedSectionSoleTrader
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.views.html.FastForwardPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection
+import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection.CompletedSectionLlp
+import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection.CompletedSectionSoleTrader
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testOnly.connectors
+package uk.gov.hmrc.agentregistrationfrontend.testonly.connectors
 
 import play.api.http.Status
 import play.api.libs.json.Json
 import play.api.libs.ws.writeableOf_JsValue
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.BusinessPartnerRecord
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.BusinessPartnerRecord
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
 import uk.gov.hmrc.http.HttpReads.Implicits.*

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers
+package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers
 
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
@@ -24,8 +24,8 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.EmailVerificationPasscodesController.*
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.views.html.EmailVerificationPasscodesPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.EmailVerificationPasscodesController.*
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.EmailVerificationPasscodesPage
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.isSignedIn
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.http.HttpReads.Implicits.*

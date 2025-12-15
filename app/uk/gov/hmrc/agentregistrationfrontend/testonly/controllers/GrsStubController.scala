@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers
+package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers
 
 import play.api.data.FieldMapping
 import play.api.data.Form
@@ -55,12 +55,12 @@ import uk.gov.hmrc.agentregistrationfrontend.model.grs.Registration
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsNotCalled
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsRegistered
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.connectors.AgentsExternalStubsConnector
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.AddressDetails
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.BusinessPartnerRecord
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.ContactDetails
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.Organisation
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.views.html.GrsStub
+import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.AddressDetails
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.BusinessPartnerRecord
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.ContactDetails
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.Organisation
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.GrsStub
 import uk.gov.voa.play.form.ConditionalMappings.isEqual
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 import uk.gov.voa.play.form.conditionOpts

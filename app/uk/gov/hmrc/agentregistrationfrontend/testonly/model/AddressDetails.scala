@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testOnly.model
+package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
+import play.api.libs.json.Format
 import play.api.libs.json.Json
-import play.api.libs.json.Reads
 
-final case class TestOnlyLink(linkId: String)
+final case class AddressDetails(
+  addressLine1: String,
+  addressLine2: String,
+  addressLine3: Option[String] = None,
+  addressLine4: Option[String] = None,
+  postalCode: Option[String] = None,
+  countryCode: String
+)
 
-object TestOnlyLink:
-  given Reads[TestOnlyLink] = Json.reads[TestOnlyLink]
+object AddressDetails:
+  given format: Format[AddressDetails] = Json.format[AddressDetails]

@@ -54,7 +54,6 @@ class AppConfig @Inject() (
   val enrolmentStoreProxyBaseUrl: String = servicesConfig.baseUrl("enrolment-store-proxy")
   val agentRegistrationBaseUrl: String = servicesConfig.baseUrl("agent-registration")
 
-  object Email
   val emailVerificationBaseUrl: String = servicesConfig.baseUrl("email-verification")
   val emailVerificationFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.email-verification-frontend", configuration)
 

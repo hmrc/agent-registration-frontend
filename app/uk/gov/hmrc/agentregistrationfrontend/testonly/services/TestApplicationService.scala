@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testOnly.services
+package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.connectors.TestAgentRegistrationConnector
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.TestOnlyLink
+import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject

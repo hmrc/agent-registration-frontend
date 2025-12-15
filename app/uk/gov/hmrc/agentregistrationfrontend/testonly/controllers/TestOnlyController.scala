@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers
+package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers
 
 import com.softwaremill.quicklens.*
 import play.api.libs.json.Json
@@ -30,10 +30,10 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.TestOnlyLink
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.services.TestApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.views.html.TestLinkPage
-import uk.gov.hmrc.agentregistrationfrontend.testOnly.views.html.TestOnlyHubPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
+import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestLinkPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyHubPage
 import uk.gov.hmrc.http.StringContextOps
 
 import javax.inject.Inject
