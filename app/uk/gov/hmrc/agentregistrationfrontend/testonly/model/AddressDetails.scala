@@ -14,12 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.emailVerification
+package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
+import play.api.libs.json.Format
 import play.api.libs.json.Json
-import play.api.libs.json.Reads
 
-final case class VerificationStatusResponse(emails: List[CompletedEmail])
+final case class AddressDetails(
+  addressLine1: String,
+  addressLine2: String,
+  addressLine3: Option[String] = None,
+  addressLine4: Option[String] = None,
+  postalCode: Option[String] = None,
+  countryCode: String
+)
 
-object VerificationStatusResponse:
-  given Reads[VerificationStatusResponse] = Json.reads[VerificationStatusResponse]
+object AddressDetails:
+  given format: Format[AddressDetails] = Json.format[AddressDetails]

@@ -15,10 +15,10 @@
  *@
 
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.TestOnlyLink
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistration.shared.BusinessType
-@import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.FastForwardController
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController
 @import sttp.model.Uri.UriContext
 @import uk.gov.hmrc.auth.core.AffinityGroup
 
@@ -42,7 +42,7 @@
         These links require you to log in using the correct credentials.
     </p>
     <p class="govuk-body">
-      <a class="govuk-link" href="@{appConfig.signInUri(uri"${appConfig.thisFrontendBaseUrl + uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.routes.FastForwardController.show.url}", AffinityGroup.Agent)}">Log In</a>
+      <a class="govuk-link" href="@{appConfig.signInUri(uri"${appConfig.thisFrontendBaseUrl + uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.routes.FastForwardController.show.url}", AffinityGroup.Agent)}">Log In</a>
     </p>
 
     <p class="govuk-body">
@@ -50,7 +50,7 @@
         <ul class="govuk-list govuk-list--bullet">
             @FastForwardController.CompletedSection.CompletedSectionLlp.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
               <li>
-                  <a class="govuk-link" href="@{uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.routes.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
+                  <a class="govuk-link" href="@{uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.routes.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
               </li>
             }
         </ul>

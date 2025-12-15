@@ -14,15 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testOnly.model
+package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
 import play.api.libs.json.Format
 import play.api.libs.json.Json
 
-final case class ContactDetails(
-  primaryPhoneNumber: Option[String] = None,
-  emailAddress: Option[String] = None
+final case class Organisation(
+  organisationName: String,
+  isAGroup: Boolean = false,
+  organisationType: String
 )
 
-object ContactDetails:
-  given format: Format[ContactDetails] = Json.format[ContactDetails]
+object Organisation:
+  given format: Format[Organisation] = Json.format[Organisation]

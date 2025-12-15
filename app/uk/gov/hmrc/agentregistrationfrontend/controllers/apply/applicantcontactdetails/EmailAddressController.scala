@@ -35,7 +35,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
-import uk.gov.hmrc.agentregistrationfrontend.model.emailVerification.*
+import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.EmailVerificationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
@@ -106,14 +106,12 @@ extends FrontendController(mcc, actions):
               Some(ApplicantEmailAddress(
                 emailAddress = emailAddress,
                 // avoid unsetting verified status of any unchanged email if we are not ignoring verification
-                isVerified =
-                  appConfig.ignoreEmailVerification ||
-                    (emailAddress === details.emailAddress && details.isVerified)
+                isVerified = emailAddress === details.emailAddress && details.isVerified
               ))
             case None =>
               Some(ApplicantEmailAddress(
                 emailAddress = emailAddress,
-                isVerified = appConfig.ignoreEmailVerification
+                isVerified = false
               ))
           }
 
@@ -206,8 +204,6 @@ extends FrontendController(mcc, actions):
     maybeBackUrl = Some(appConfig.thisFrontendBaseUrl + routes.EmailAddressController.show.url),
     accessibilityStatementUrl = appConfig.accessibilityStatementPath,
     lang = messagesApi.preferred(request).lang.code
-  ).map(redirectUrl =>
-    Redirect(appConfig.emailVerificationFrontendBaseUrl + redirectUrl)
   )
 
   private def onEmailLocked()(implicit request: AgentApplicationRequest[AnyContent]): Future[Result] = Future.successful(

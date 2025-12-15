@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.MemberEmailAddressForm
-import uk.gov.hmrc.agentregistrationfrontend.model.emailVerification.*
+import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
 import uk.gov.hmrc.agentregistrationfrontend.services.EmailVerificationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
@@ -89,12 +89,12 @@ extends FrontendController(mcc, actions):
               Some(MemberVerifiedEmailAddress(
                 emailAddress = emailAddressFromForm,
                 // avoid unsetting verified status of any unchanged email if we are not ignoring verification
-                isVerified = appConfig.ignoreEmailVerification || (emailAddressFromForm === details.emailAddress && details.isVerified)
+                isVerified = emailAddressFromForm === details.emailAddress && details.isVerified
               ))
             case None =>
               Some(MemberVerifiedEmailAddress(
                 emailAddress = emailAddressFromForm,
-                isVerified = appConfig.ignoreEmailVerification
+                isVerified = false
               ))
           }
         memberProvideDetailsService
@@ -168,8 +168,6 @@ extends FrontendController(mcc, actions):
     maybeBackUrl = Some(appConfig.thisFrontendBaseUrl + AppRoutes.providedetails.MemberEmailAddressController.show.url),
     accessibilityStatementUrl = appConfig.accessibilityStatementPath,
     lang = messagesApi.preferred(request).lang.code
-  ).map(redirectUrl =>
-    Redirect(appConfig.emailVerificationFrontendBaseUrl + redirectUrl)
   )
 
   private def onEmailLocked()(implicit request: MemberProvideDetailsRequest[AnyContent]): Future[Result] = Future.successful(

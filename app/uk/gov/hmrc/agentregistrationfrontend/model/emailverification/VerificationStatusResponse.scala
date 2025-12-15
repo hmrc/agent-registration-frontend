@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testOnly.model
+package uk.gov.hmrc.agentregistrationfrontend.model.emailverification
 
 import play.api.libs.json.Json
 import play.api.libs.json.Reads
 
-final case class TestOnlyLink(linkId: String)
+final case class VerificationStatusResponse(emails: List[CompletedEmail])
 
-object TestOnlyLink:
-  given Reads[TestOnlyLink] = Json.reads[TestOnlyLink]
+object VerificationStatusResponse:
+  given Reads[VerificationStatusResponse] = Json.reads[VerificationStatusResponse]

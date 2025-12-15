@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testOnly.model
+package uk.gov.hmrc.agentregistrationfrontend.model.emailverification
 
 import play.api.libs.json.Format
 import play.api.libs.json.Json
 
-final case class Organisation(
-  organisationName: String,
-  isAGroup: Boolean = false,
-  organisationType: String
-)
+final case class VerifyEmailResponse(redirectUri: String)
 
-object Organisation:
-  given format: Format[Organisation] = Json.format[Organisation]
+object VerifyEmailResponse:
+  given Format[VerifyEmailResponse] = Json.format[VerifyEmailResponse]

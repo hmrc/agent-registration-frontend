@@ -84,7 +84,8 @@ extends AnyWordSpecLike,
       "auditing.enabled" -> false,
       "auditing.traceRequests" -> false,
       "play.filters.csrf.header.bypassHeaders.Csrf-Token" -> "nocheck",
-      "features.grs-stub" -> false
+      "features.grs-stub" -> false,
+      "inject-email-verification-passcodes-page" -> false // false to match production behavior where email verification is performed without injected test only page
     ) ++ configOverrides
 
   protected def configOverrides: Map[String, Any] = Map[String, Any]()

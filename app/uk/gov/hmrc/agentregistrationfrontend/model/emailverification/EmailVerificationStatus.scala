@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.emailVerification
+package uk.gov.hmrc.agentregistrationfrontend.model.emailverification
 
 sealed trait EmailVerificationStatus
 object EmailVerificationStatus:

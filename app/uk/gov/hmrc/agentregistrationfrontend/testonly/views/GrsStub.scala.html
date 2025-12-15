@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistration.shared.BusinessType
-@import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.routes
+@import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 @import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
@@ -47,7 +47,7 @@
 @layout(pageTitle = "GRS Test Data Setup") {
     <h2 class="govuk-heading-xl">GRS Test Data Setup</h2>
 
-    @formWithCSRF(action = routes.GrsStubController.submitGrsData(businessType, journeyId)) {
+    @formWithCSRF(action = AppRoutes.testOnly.GrsStubController.submitGrsData(businessType, journeyId)) {
         <h3 class="govuk-heading-l">Registration Details</h3>
         @govukButton(Button(
             content = Text(messages("Save Test Data"))
@@ -55,7 +55,7 @@
 
         @govukButton(Button(
             content = Text(messages("Reset Test Data")),
-            href = Some(routes.GrsStubController.showGrsData(businessType, JourneyId(UUID.randomUUID().toString)).url)
+            href = Some(AppRoutes.testOnly.GrsStubController.showGrsData(businessType, JourneyId(UUID.randomUUID().toString)).url)
         ))
         @registrationInput
         @if(businessType === SoleTrader) {
@@ -87,7 +87,7 @@
 
         @govukButton(Button(
             content = Text(messages("Reset Test Data")),
-            href = Some(routes.GrsStubController.showGrsData(businessType, JourneyId(UUID.randomUUID().toString)).url)
+            href = Some(AppRoutes.testOnly.GrsStubController.showGrsData(businessType, JourneyId(UUID.randomUUID().toString)).url)
         ))
     }
 }

@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testOnly.model
+package uk.gov.hmrc.agentregistrationfrontend.model.emailverification
 
 import play.api.libs.json.Format
 import play.api.libs.json.Json
 
-final case class AddressDetails(
-  addressLine1: String,
-  addressLine2: String,
-  addressLine3: Option[String] = None,
-  addressLine4: Option[String] = None,
-  postalCode: Option[String] = None,
-  countryCode: String
+final case class Email(
+  address: String,
+  enterUrl: String
 )
 
-object AddressDetails:
-  given format: Format[AddressDetails] = Json.format[AddressDetails]
+object Email {
+  implicit val format: Format[Email] = Json.format[Email]
+}

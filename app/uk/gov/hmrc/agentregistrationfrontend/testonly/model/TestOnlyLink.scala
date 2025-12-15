@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.emailVerification
+package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
-import play.api.libs.json.Format
 import play.api.libs.json.Json
+import play.api.libs.json.Reads
 
-final case class Email(
-  address: String,
-  enterUrl: String
-)
+final case class TestOnlyLink(linkId: String)
 
-object Email {
-  implicit val format: Format[Email] = Json.format[Email]
-}
+object TestOnlyLink:
+  given Reads[TestOnlyLink] = Json.reads[TestOnlyLink]
