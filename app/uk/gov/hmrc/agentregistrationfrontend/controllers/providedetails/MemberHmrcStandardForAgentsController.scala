@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberPro
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberHmrcStandardForAgentsPage
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -47,7 +48,7 @@ extends FrontendController(mcc, actions):
         Redirect(AppRoutes.providedetails.MemberSaUtrController.show)
     )
     .ensure(
-      _.memberProvidedDetails.hmrcStandardForAgentsAgreed == StateOfAgreement.NotSet,
+      _.memberProvidedDetails.hmrcStandardForAgentsAgreed === StateOfAgreement.NotSet,
       implicit request =>
         logger.info(s"HMRC Standard for agents already accepted. Skipping page and moving to next page.")
         Redirect(AppRoutes.providedetails.MemberCheckYourAnswersController.show)
