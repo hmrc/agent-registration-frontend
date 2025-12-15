@@ -323,8 +323,8 @@ confirmation.whatNext.p2.Llp = Send this link to all members:
 
 confirmation.checkProgress.h2 = How to check the progress of your application
 confirmation.checkProgress.p1 = You can click the link on the GOV.UK page “Apply for an agent services account”.
-confirmation.checkProgress.p2 = This will let you check which members have provided their personal details.
-confirmation.checkProgress.p3 = When all members have provided their personal details, we will:
+confirmation.checkProgress.p2 = This will let you check who has provided their personal details.
+confirmation.checkProgress.p3 = When everyone has provided their personal details, we will:
 confirmation.checkProgress.bullet1 = automatically submit your application
 confirmation.checkProgress.bullet2 = email you at <strong>{0}</strong> to confirm this
 confirmation.viewLink = View or print your application

@@ -216,8 +216,6 @@ extends FrontendController(mcc, actions):
     maybeBackUrl = Some(appConfig.thisFrontendBaseUrl + routes.AgentEmailAddressController.show.url),
     accessibilityStatementUrl = appConfig.accessibilityStatementPath,
     lang = messagesApi.preferred(request).lang.code
-  ).map(redirectUrl =>
-    Redirect(appConfig.emailVerificationFrontendBaseUrl + redirectUrl)
   )
 
   private def onEmailLocked()(implicit request: AgentApplicationRequest[AnyContent]): Future[Result] = Future.successful(

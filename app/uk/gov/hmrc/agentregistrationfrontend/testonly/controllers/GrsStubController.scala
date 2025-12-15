@@ -123,14 +123,15 @@ extends FrontendController(mcc, actions):
             uniqueTaxReference = journeyData.sautr.map(_.value),
             utr = journeyData.sautr.map(_.value),
             safeId = journeyData.registration.registeredBusinessPartnerId.map(_.value).getOrElse(""),
-            isAnIndividual = businessType == SoleTrader,
-            organisation =  businessType match
-              case BusinessType.Partnership.LimitedLiabilityPartnership =>
-                Some(Organisation(
-                  organisationName = journeyData.companyProfile.map(_.companyName).getOrElse("BPR Test Org"),
-                  organisationType = "5T"
-                ))
-              case _ => None,
+            isAnIndividual = businessType === SoleTrader,
+            organisation =
+              businessType match
+                case BusinessType.Partnership.LimitedLiabilityPartnership =>
+                  Some(Organisation(
+                    organisationName = journeyData.companyProfile.map(_.companyName).getOrElse("BPR Test Org"),
+                    organisationType = "5T"
+                  ))
+                case _ => None,
             addressDetails = AddressDetails(
               addressLine1 = "1 Test Street",
               addressLine2 = Some("Test Area"),

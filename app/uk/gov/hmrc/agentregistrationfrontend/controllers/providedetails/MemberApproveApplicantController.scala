@@ -58,10 +58,10 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = baseAction.async:
     implicit request =>
-      val applicantName = request.agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName
+      val applicantName = request.agentApplication.asLlpApplication.getApplicantContactDetails.applicantName
       val companyName = request.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
       val filledForm = MemberApproveApplicationForm
-        .form(applicantName)
+        .form(applicantName.value)
         .fill:
           request
             .memberProvidedDetails
@@ -72,7 +72,7 @@ extends FrontendController(mcc, actions):
         Ok(
           view(
             filledForm,
-            applicantName,
+            applicantName.value,
             companyName
           )
         )
@@ -82,15 +82,15 @@ extends FrontendController(mcc, actions):
     baseAction
       .ensureValidFormAndRedirectIfSaveForLater[YesNo](
         implicit r =>
-          val applicantName = r.agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName
-          MemberApproveApplicationForm.form(applicantName)
+          val applicantName = r.agentApplication.asLlpApplication.getApplicantContactDetails.applicantName
+          MemberApproveApplicationForm.form(applicantName.value)
         ,
         implicit r =>
-          val applicantName = r.agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName
+          val applicantName = r.agentApplication.asLlpApplication.getApplicantContactDetails.applicantName
           val companyName = r.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
           view(
             _,
-            applicantName,
+            applicantName.value,
             companyName
           )
       )

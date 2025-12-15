@@ -23,7 +23,7 @@ import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.EmailAddress
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
@@ -95,7 +95,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request: (AgentApplicationRequest[AnyContent] & FormValue[EmailAddress]) =>
         val emailAddress: EmailAddress = request.formValue
-        val updatedApplication: AgentApplicationLlp = request
+        val updatedApplication: AgentApplication = request
           .agentApplication
           .modify(_.applicantContactDetails.each.applicantEmailAddress)
           .using {
