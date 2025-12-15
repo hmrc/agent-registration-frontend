@@ -17,9 +17,13 @@
 package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.mvc.RequestHeader
+import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EmailVerificationConnector
-import uk.gov.hmrc.agentregistrationfrontend.model.emailVerification.*
+import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
+import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
@@ -29,7 +33,8 @@ import scala.concurrent.Future
 
 @Singleton
 class EmailVerificationService @Inject() (
-  emailVerificationConnector: EmailVerificationConnector
+  emailVerificationConnector: EmailVerificationConnector,
+  appConfig: AppConfig
 )(using ec: ExecutionContext)
 extends RequestAwareLogging:
 
@@ -40,7 +45,7 @@ extends RequestAwareLogging:
     maybeBackUrl: Option[String],
     accessibilityStatementUrl: String,
     lang: String
-  )(using rh: RequestHeader): Future[String] =
+  )(using rh: RequestHeader): Future[Result] =
     for {
       verifyEmailResponse <- emailVerificationConnector.verifyEmail(
         VerifyEmailRequest(
@@ -59,7 +64,12 @@ extends RequestAwareLogging:
           pageTitle = None
         )
       )
-    } yield verifyEmailResponse.redirectUri
+    } yield
+      val redirectToEmailVerificationUrl: String = appConfig.emailVerificationFrontendBaseUrl + verifyEmailResponse.redirectUri
+      if appConfig.injectEmailVerificationPasscodesPage
+      then
+        Redirect(AppRoutes.testOnly.EmailVerificationPasscodesController.showEmailVerificationPassCodes(emailVerificationLink = redirectToEmailVerificationUrl))
+      else Redirect(redirectToEmailVerificationUrl)
 
   def checkEmailVerificationStatus(
     credId: String,

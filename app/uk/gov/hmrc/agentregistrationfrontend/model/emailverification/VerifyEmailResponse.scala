@@ -14,16 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.emailVerification
+package uk.gov.hmrc.agentregistrationfrontend.model.emailverification
 
 import play.api.libs.json.Format
 import play.api.libs.json.Json
 
-final case class Email(
-  address: String,
-  enterUrl: String
-)
+final case class VerifyEmailResponse(redirectUri: String)
 
-object Email {
-  implicit val format: Format[Email] = Json.format[Email]
-}
+object VerifyEmailResponse:
+  given Format[VerifyEmailResponse] = Json.format[VerifyEmailResponse]

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.emailVerification
+package uk.gov.hmrc.agentregistrationfrontend.model.emailverification
 
 import play.api.libs.json.Json
 import play.api.libs.json.Writes

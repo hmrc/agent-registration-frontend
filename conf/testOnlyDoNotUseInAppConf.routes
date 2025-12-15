@@ -12,6 +12,8 @@
 # Add all the application routes to the prod.routes file
 ->          /                                                                 prod.Routes
 
+
+GET         /agent-registration/test-only                                     uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.TestOnlyController.showTestOnlyHub
 GET         /agent-registration/test-only/show-agent-application              uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.TestOnlyController.showAgentApplication
 GET         /agent-registration/test-only/set-upload-to-complete              uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.TestOnlyController.setUploadToComplete()
 
@@ -30,3 +32,5 @@ GET         /agent-registration/test-only/get-link-id                uk.gov.hmrc
 
 GET        /agent-registration/test-only/fast-forward                             uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.FastForwardController.show
 GET        /agent-registration/test-only/fast-forward-to/:completedSection        uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.FastForwardController.fastForward(completedSection: CompletedSection)
+
+GET        /agent-registration/test-only/email-verification-pass-codes        uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.EmailVerificationPasscodesController.showEmailVerificationPassCodes(emailVerificationLink: String)

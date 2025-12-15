@@ -1,0 +1,46 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.TestOnlyLink
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+
+@this(
+        appConfig: AppConfig,
+        layout: Layout
+)
+
+@(
+
+)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@layout(
+    pageTitle = "Test Only Hub",
+    suppressBackLink = true
+) {
+    <h1 class="govuk-heading-xl">Test Only Hub</h1>
+    <p class="govuk-body">
+        <ul>
+            <li><a class="govuk-link" href="@AppRoutes.testOnly.FastForwardController.show">fast forward links</a></li>
+            <li><a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showAgentApplication">showAgentApplication</a></li>
+            <li><a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.setUploadToComplete()">set-upload-to-complete</a></li>
+            <li><a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.setUploadToComplete()">get-link-id</a></li>
+        </ul>
+    </p>
+}

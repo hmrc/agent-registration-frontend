@@ -33,6 +33,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.testOnly.model.TestOnlyLink
 import uk.gov.hmrc.agentregistrationfrontend.testOnly.services.TestApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testOnly.views.html.TestLinkPage
+import uk.gov.hmrc.agentregistrationfrontend.testOnly.views.html.TestOnlyHubPage
 import uk.gov.hmrc.http.StringContextOps
 
 import javax.inject.Inject
@@ -44,9 +45,15 @@ class TestOnlyController @Inject() (
   actions: Actions,
   applicationService: AgentApplicationService,
   testApplicationService: TestApplicationService,
-  testLinkPage: TestLinkPage
+  testLinkPage: TestLinkPage,
+  testOnlyHubPage: TestOnlyHubPage
 )
 extends FrontendController(mcc, actions):
+
+  def showTestOnlyHub: Action[AnyContent] = actions
+    .action:
+      implicit request =>
+        Ok(testOnlyHubPage())
 
   val showAgentApplication: Action[AnyContent] = actions
     .Applicant

@@ -1,0 +1,77 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.testOnly.controllers.EmailVerificationPasscodesController.Passcode
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.components.CopyButton
+@import views.html.helper.CSPNonce
+
+@this(
+        appConfig: AppConfig,
+        layout: Layout,
+        copyButton: CopyButton,
+        govukButton: GovukButton
+)
+
+@(
+        passcode: Option[Passcode],
+        emailVerificationLink: String
+)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@templateScripts = {
+    <script src="@{controllers.routes.Assets.versioned("javascripts/copy-button.js")}" @{CSPNonce.attr}></script>
+}
+@templateStyles = {
+    <link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/copy-button.css")}" @{CSPNonce.attr}>
+    <style @{CSPNonce.attr}>
+            .govuk-panel.govuk-panel--confirmation {
+                background-color: rgb(29, 112, 184);
+                color: white;
+            }
+    </style>
+}
+
+@layout(
+    pageTitle = "Email Verification Code (Test Only Page)",
+    templateScripts = Some(templateScripts),
+    templateStyles = Some(templateStyles)
+) {
+    <h1 class="govuk-heading-xl">Email Verification Code (Test Only Page)</h1>
+    @passcode.fold(
+        <p class="govuk-body">
+        There aren't any email passcodes to display.
+        </p>
+    ) { passcode =>
+        <p class="govuk-body">
+        <p class="govuk-body">Here is your email passcode:</p>
+            <p class="govuk-body govuk-!-font-weight-bold">@{passcode.email}</p>
+            <p id="email-verification-passcode" class="govuk-body govuk-!-font-weight-bold">@{passcode.passcode}</p>
+        @copyButton(clip = passcode.passcode)
+        </p>
+    }
+    <p class="govuk-body">
+    @govukButton(Button(
+        href = Some(emailVerificationLink),
+        content = Text(messages("common.confirmAndContinue"))
+    ))
+    </p>
+}
+
+

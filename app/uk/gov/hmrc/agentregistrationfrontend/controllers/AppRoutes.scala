@@ -107,3 +107,4 @@ object AppRoutes:
     val TestOnlyController = testOnlyRoutes.TestOnlyController
     val GrsStubController = testOnlyRoutes.GrsStubController
     val FastForwardController = testOnlyRoutes.FastForwardController
+    val EmailVerificationPasscodesController = testOnlyRoutes.EmailVerificationPasscodesController

@@ -43,7 +43,6 @@ class AppConfig @Inject() (
   val feedbackFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.feedback-frontend", configuration)
   private val basFrontendSignBaseInBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-in", configuration)
   val basFrontendSignOutUrlBase: String = ConfigHelper.readConfigAsValidUrlString("urls.bas-gateway-sign-out", configuration)
-  val emailVerificationFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.email-verification-frontend", configuration)
   val asaDashboardUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.asa-fe-dashboard-url", configuration)
   val taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment: String = ConfigHelper.readConfigAsValidUrlString(
     "urls.taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment",
@@ -54,7 +53,15 @@ class AppConfig @Inject() (
   val companiesHouseApiProxyBaseUrl: String = servicesConfig.baseUrl("companies-house-api-proxy")
   val enrolmentStoreProxyBaseUrl: String = servicesConfig.baseUrl("enrolment-store-proxy")
   val agentRegistrationBaseUrl: String = servicesConfig.baseUrl("agent-registration")
+
+  object Email
   val emailVerificationBaseUrl: String = servicesConfig.baseUrl("email-verification")
+  val emailVerificationFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.email-verification-frontend", configuration)
+
+  val injectEmailVerificationPasscodesPage: Boolean = configuration
+    .getOptional[Boolean]("inject-email-verification-passcodes-page")
+    .getOrElse(false)
+
   val selfBaseUrl: String = servicesConfig.baseUrl("agent-registration-frontend")
   val hmrcAsAgentEnrolment: Enrolment = Enrolment(key = "HMRC-AS-AGENT")
   val citizenDetailsBaseUrl: String = servicesConfig.baseUrl("citizen-details")
@@ -72,9 +79,6 @@ class AppConfig @Inject() (
   val welshLanguageSupportEnabled: Boolean = configuration.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
   val contactFrontendId: String = configuration.get[String]("contact-frontend.serviceId") // TODO placeholder
   val accessibilityStatementPath: String = configuration.get[String]("accessibility-statement.service-path")
-  val ignoreEmailVerification: Boolean = configuration
-    .getOptional[Boolean]("ignoreEmailVerification")
-    .getOrElse(false)
 
   /*
    * GRS CONFIG START

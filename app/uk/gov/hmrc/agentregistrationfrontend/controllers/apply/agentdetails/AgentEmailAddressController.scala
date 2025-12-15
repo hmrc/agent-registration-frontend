@@ -36,7 +36,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
-import uk.gov.hmrc.agentregistrationfrontend.model.emailVerification.*
+import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.EmailVerificationService
@@ -128,16 +128,13 @@ extends FrontendController(mcc, actions):
                 // avoid unsetting verified status of any unchanged email if we are not ignoring verification
                 // also if selecting a pre-verified email i.e. not "other" then set to true
                 isVerified =
-                  appConfig.ignoreEmailVerification ||
-                    emailAddressFromForm.otherAgentEmailAddress.isEmpty ||
+                  emailAddressFromForm.otherAgentEmailAddress.isEmpty ||
                     (emailAddressFromForm === details.emailAddress && details.isVerified)
               ))
             case None =>
               Some(AgentVerifiedEmailAddress(
                 emailAddress = emailAddressFromForm,
-                isVerified =
-                  appConfig.ignoreEmailVerification ||
-                    emailAddressFromForm.otherAgentEmailAddress.isEmpty
+                isVerified = emailAddressFromForm.otherAgentEmailAddress.isEmpty
               ))
           }
         agentApplicationService
@@ -227,8 +224,6 @@ extends FrontendController(mcc, actions):
     maybeBackUrl = Some(appConfig.thisFrontendBaseUrl + routes.AgentEmailAddressController.show.url),
     accessibilityStatementUrl = appConfig.accessibilityStatementPath,
     lang = messagesApi.preferred(request).lang.code
-  ).map(redirectUrl =>
-    Redirect(appConfig.emailVerificationFrontendBaseUrl + redirectUrl)
   )
 
   private def onEmailLocked()(implicit request: AgentApplicationRequest[AnyContent]): Future[Result] = Future.successful(
