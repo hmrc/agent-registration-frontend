@@ -23,10 +23,13 @@ import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.EmailAddress
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
@@ -87,40 +90,39 @@ extends FrontendController(mcc, actions):
       implicit request =>
         Redirect(AppRoutes.apply.SaveForLaterController.show)
     )
+    .ensureValidForm[EmailAddress](
+      form = EmailAddressForm.form,
+      viewToServeWhenFormHasErrors = implicit r => view(_)
+    )
     .async:
-      implicit request =>
-        EmailAddressForm.form
-          .bindFromRequest()
-          .fold(
-            formWithErrors => Future.successful(BadRequest(view(formWithErrors))),
-            emailAddress =>
-              val updatedApplication = request
-                .agentApplication
-                .asLlpApplication
-                .modify(_.applicantContactDetails.each.applicantEmailAddress)
-                .using {
-                  case Some(details) =>
-                    Some(ApplicantEmailAddress(
-                      emailAddress = emailAddress,
-                      // avoid unsetting verified status of any unchanged email if we are not ignoring verification
-                      isVerified =
-                        appConfig.ignoreEmailVerification ||
-                          (emailAddress === details.emailAddress && details.isVerified)
-                    ))
-                  case None =>
-                    Some(ApplicantEmailAddress(
-                      emailAddress = emailAddress,
-                      isVerified = appConfig.ignoreEmailVerification
-                    ))
-                }
+      implicit request: (AgentApplicationRequest[AnyContent] & FormValue[EmailAddress]) =>
+        val emailAddress: EmailAddress = request.formValue
+        val updatedApplication: AgentApplicationLlp = request
+          .agentApplication
+          .asLlpApplication
+          .modify(_.applicantContactDetails.each.applicantEmailAddress)
+          .using {
+            case Some(details) =>
+              Some(ApplicantEmailAddress(
+                emailAddress = emailAddress,
+                // avoid unsetting verified status of any unchanged email if we are not ignoring verification
+                isVerified =
+                  appConfig.ignoreEmailVerification ||
+                    (emailAddress === details.emailAddress && details.isVerified)
+              ))
+            case None =>
+              Some(ApplicantEmailAddress(
+                emailAddress = emailAddress,
+                isVerified = appConfig.ignoreEmailVerification
+              ))
+          }
 
-              agentApplicationService
-                .upsert(updatedApplication)
-                .map(_ =>
-                  Redirect(
-                    routes.EmailAddressController.verify
-                  )
-                )
+        agentApplicationService
+          .upsert(updatedApplication)
+          .map(_ =>
+            Redirect(
+              routes.EmailAddressController.verify
+            )
           )
 
   def verify: Action[AnyContent] = actions
