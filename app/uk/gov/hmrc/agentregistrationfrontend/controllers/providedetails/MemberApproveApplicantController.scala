@@ -106,7 +106,7 @@ extends FrontendController(mcc, actions):
             .upsert(updatedApplication)
             .map: _ =>
               if approved then
-                Redirect(AppRoutes.providedetails.MemberAgreeStandardController.show.url)
+                Redirect(AppRoutes.providedetails.MemberHmrcStandardForAgentsController.show.url)
               else
                 Redirect(AppRoutes.providedetails.MemberConfirmStopController.show.url)
       .redirectIfSaveForLater

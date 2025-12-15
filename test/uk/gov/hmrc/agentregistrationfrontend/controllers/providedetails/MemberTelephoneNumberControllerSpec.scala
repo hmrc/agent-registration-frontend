@@ -54,7 +54,7 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "What is your telephone number? - Apply for an agent services account - GOV.UK"
 
-  s"POST $path with a valid number should save data and redirect to check your answers" in:
+  s"POST $path with a valid number should save data and redirect to email address page" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeTelephoneUpdate))
     AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvideDetails.afterTelephoneNumberProvided)

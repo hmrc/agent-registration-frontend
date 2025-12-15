@@ -111,7 +111,9 @@ GET         /provide-details/utr                                    uk.gov.hmrc.
 POST        /provide-details/utr                                    uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberSaUtrController.submit
 GET         /provide-details/approve-applicant                      uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberApproveApplicantController.show
 POST        /provide-details/approve-applicant                      uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberApproveApplicantController.submit
-GET         /provide-details/agree-standard                         uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberAgreeStandardController.show
-GET         /provide-details/confirm-stop                           uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberConfirmStopController.show
+GET         /provide-details/confirm-stop                            uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberConfirmStopController.show
 GET         /provide-details/exit                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.genericExitPage
 GET         /provide-details/multiple-provided-details              uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.multipleProvidedDetailsPage
+GET         /provide-details/check-answers                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberCheckYourAnswersController.show
+GET         /provide-details/agree-standard                         uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberHmrcStandardForAgentsController.show
+POST        /provide-details/agree-standard                         uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberHmrcStandardForAgentsController.submit

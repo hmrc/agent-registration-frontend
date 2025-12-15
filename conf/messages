@@ -469,6 +469,17 @@ memberSaUtr.saUtr.hint = This is 10 numbers, for example 1234567890.
 memberSaUtr.saUtr.error.required = Enter your Self Assessment Unique Taxpayer Reference
 memberSaUtr.saUtr.error.invalid = Enter a Self Assessment Unique Taxpayer Reference in the correct format
 
+## Member Meet the HMRC standard for agents
+memberHmrcStandardForAgents.caption = HMRC standard for agents
+memberHmrcStandardForAgents.title = Agree to meet the HMRC standard for agents
+memberHmrcStandardForAgents.warning = We carry out checks to make sure agents meet the standard. We take action against individuals and organisations who do not comply.
+memberHmrcStandardForAgents.read.h2 = Read the standard on GOV.UK
+memberHmrcStandardForAgents.read.linkText = The HMRC standard for agents
+memberHmrcStandardForAgents.agree.h2 = Declaration
+memberHmrcStandardForAgents.agree.p1 = I have read the HMRC standard for agents.
+memberHmrcStandardForAgents.agree.p2 = I agree to meet the standard when working on behalf of clients.
+memberHmrcStandardForAgents.agree.button = Agree and continue
+
 ## Member Approve Agent Application
 memberApproveAgentApplication.title = Approve the applicant
 memberApproveAgentApplication.info = {0} has applied for an agent services account on behalf of {1}.
