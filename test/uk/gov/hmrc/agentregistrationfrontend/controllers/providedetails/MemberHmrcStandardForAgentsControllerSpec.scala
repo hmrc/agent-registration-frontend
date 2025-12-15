@@ -55,15 +55,14 @@ extends ControllerSpec:
     doc.title() shouldBe "Agree to meet the HMRC standard for agents - Apply for an agent services account - GOV.UK"
     doc.select("h2.govuk-caption-xl").text() shouldBe "HMRC standard for agents"
 
-  s"GET $path after agreeing terms should return 200 and render page" in:
+  s"GET $path after agreeing terms should redirect to the task list" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterTermsAgreed))
     val response: WSResponse = get(path)
 
-    response.status shouldBe Status.OK
-    val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Agree to meet the HMRC standard for agents - Apply for an agent services account - GOV.UK"
-    doc.select("h2.govuk-caption-xl").text() shouldBe "HMRC standard for agents"
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe Constants.EMPTY_STRING
+    response.header("Location").value shouldBe AppRoutes.providedetails.MemberCheckYourAnswersController.show.url
 
   s"POST $path with agree should update the application and redirect to the task list" in:
     AuthStubs.stubAuthoriseIndividual()
