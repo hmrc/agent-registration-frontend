@@ -117,3 +117,4 @@ GET         /provide-details/multiple-provided-details              uk.gov.hmrc.
 GET         /provide-details/check-answers                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberCheckYourAnswersController.show
 GET         /provide-details/agree-standard                         uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberHmrcStandardForAgentsController.show
 POST        /provide-details/agree-standard                         uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberHmrcStandardForAgentsController.submit
+GET         /provide-details/confirmation                            uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberConfirmationController.show
