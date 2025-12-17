@@ -32,7 +32,6 @@ extends ViewSpec:
 
   private object memberDetailsData:
 
-    // TODO WG - update this test data once the agree standart flow is complete
     val complete = tdAll.providedDetailsLlp.afterApproveAgentApplication
     val completeWithNinoAndSaUtrNotProvided = tdAll.providedDetailsLlp.withSaUtrNotProvided(
       tdAll.providedDetailsLlp.withNinoNotProvided(tdAll.providedDetailsLlp.afterApproveAgentApplication)

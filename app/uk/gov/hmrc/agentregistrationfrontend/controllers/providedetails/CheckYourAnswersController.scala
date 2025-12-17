@@ -22,6 +22,8 @@ import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -35,7 +37,6 @@ class CheckYourAnswersController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  // TODO WG - check if I need to confirm all or just
   private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions
     .Member
     .getProvideDetailsInProgress
@@ -69,12 +70,11 @@ extends FrontendController(mcc, actions):
       implicit request =>
         Redirect(AppRoutes.providedetails.MemberApproveApplicantController.show)
     )
-  // TODO WG - add check for agree to st
-//    .ensure(
-//      _.memberProvidedDetails.hasAgreeToStandard.getOrElse(false),
-//      implicit request =>
-//        Redirect(AppRoutes.providedetails.MemberAgreeStandardController.show.url)
-//    )
+    .ensure(
+      _.memberProvidedDetails.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.MemberHmrcStandardForAgentsController.show.url)
+    )
 
   def show: Action[AnyContent] = baseAction:
     implicit request => Ok(view())

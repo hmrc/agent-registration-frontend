@@ -35,11 +35,10 @@ extends ControllerSpec:
 
   private object memberProvideDetails:
 
-    // TODO WG - update this test data once the agree standart flow is complete
-    val complete = tdAll.providedDetailsLlp.afterApproveAgentApplication
+    val complete = tdAll.providedDetailsLlp.afterHmrcStandardforAgentsAgreed
 
-    // TODO WG - update this test data once the agree standart flow is complete
-    val missingAgreeStandarts = tdAll.providedDetailsLlp.afterSaUtrProvided
+    val missingAgreeStandarts = tdAll.providedDetailsLlp.afterApproveAgentApplication
+    val missingApproveApplication = tdAll.providedDetailsLlp.afterSaUtrProvided
     val missingSaUtr = tdAll.providedDetailsLlp.afterNinoProvided
     val missingNino = tdAll.providedDetailsLlp.afterEmailAddressVerified
     val missingEmail = tdAll.providedDetailsLlp.afterTelephoneNumberProvided
@@ -59,6 +58,11 @@ extends ControllerSpec:
     ),
     TestCaseForCya(
       providedDetails = memberProvideDetails.missingAgreeStandarts,
+      name = "agree to standards of agents",
+      expectedRedirect = Some(AppRoutes.providedetails.MemberHmrcStandardForAgentsController.show.url)
+    ),
+    TestCaseForCya(
+      providedDetails = memberProvideDetails.missingApproveApplication,
       name = "approve applicant",
       expectedRedirect = Some(AppRoutes.providedetails.MemberApproveApplicantController.show.url)
     ),
@@ -72,11 +76,6 @@ extends ControllerSpec:
       name = "nino",
       expectedRedirect = Some(AppRoutes.providedetails.MemberNinoController.show.url)
     ),
-//    TestCaseForCya(
-//      providedDetails = memberProvideDetails.missingVerifiedEmail,
-//      name = "verified email address",
-//      expectedRedirect = Some(routes.AgentEmailAddressController.show.url)
-//    ),
     TestCaseForCya(
       providedDetails = memberProvideDetails.missingEmail,
       name = "email address",
