@@ -288,6 +288,8 @@ fileUploadProgress.failed=Your file upload has failed scanning. Try uploading an
 
 upscanError.EntityTooLarge.title = Your upload is too large
 upscanError.EntityTooLarge.message = The file you are trying to upload is too large. The maximum file size is 5MB. Try uploading a smaller file.
+upscanError.Unknown.title = TODO
+upscanError.Unknown.message = TODO
 
 
 ## Apply / Meet the HMRC standard for agents / AmlsDetails / Check your answers

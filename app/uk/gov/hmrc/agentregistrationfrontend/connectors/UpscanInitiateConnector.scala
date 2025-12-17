@@ -47,14 +47,14 @@ class UpscanInitiateConnector @Inject() (
     */
   def initiate(
     redirectOnSuccessUrl: Uri,
-    redirectOnErrorUrl: String,
+    redirectOnErrorUrl: Uri,
     maxFileSize: ConfigMemorySize
   )(using RequestHeader): Future[UpscanInitiateResponse] = httpClientV2
     .post(url"$baseUrl/upscan/v2/initiate")
     .withBody(Json.toJson(UpscanInitiateRequest(
       callbackUrl = appConfig.Upscan.callbackUrl,
       successRedirect = Some(redirectOnSuccessUrl.toString),
-      errorRedirect = Some(redirectOnErrorUrl),
+      errorRedirect = Some(redirectOnErrorUrl.toString),
       maximumFileSize = Some(maxFileSize.toBytes)
     )))
     .execute[UpscanInitiateResponse]
