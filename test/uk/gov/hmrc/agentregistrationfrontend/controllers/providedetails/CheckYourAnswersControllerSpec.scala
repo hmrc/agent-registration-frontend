@@ -1,0 +1,120 @@
+/*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
+
+import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationMemberProvidedDetailsStubs
+
+class CheckYourAnswersControllerSpec
+extends ControllerSpec:
+
+  private val path = "/agent-registration/provide-details/check-your-answers"
+
+  "route should have correct path and method" in:
+    routes.CheckYourAnswersController.show shouldBe Call(
+      method = "GET",
+      url = path
+    )
+
+  private object memberProvideDetails:
+
+    // TODO WG - update this test data once the agree standart flow is complete
+    val complete = tdAll.providedDetailsLlp.afterApproveAgentApplication
+
+    // TODO WG - update this test data once the agree standart flow is complete
+    val missingAgreeStandarts = tdAll.providedDetailsLlp.afterSaUtrProvided
+    val missingSaUtr = tdAll.providedDetailsLlp.afterNinoProvided
+    val missingNino = tdAll.providedDetailsLlp.afterEmailAddressVerified
+    val missingEmail = tdAll.providedDetailsLlp.afterTelephoneNumberProvided
+    val missingTelephone = tdAll.providedDetailsLlp.afterOfficerChosen
+    val missingName = tdAll.providedDetailsLlp.afterStarted
+
+  private final case class TestCaseForCya(
+    providedDetails: MemberProvidedDetails,
+    name: String,
+    expectedRedirect: Option[String] = None
+  )
+
+  List(
+    TestCaseForCya(
+      providedDetails = memberProvideDetails.complete,
+      name = "complete agent details"
+    ),
+    TestCaseForCya(
+      providedDetails = memberProvideDetails.missingAgreeStandarts,
+      name = "approve applicant",
+      expectedRedirect = Some(AppRoutes.providedetails.MemberApproveApplicantController.show.url)
+    ),
+    TestCaseForCya(
+      providedDetails = memberProvideDetails.missingSaUtr,
+      name = "saUtr",
+      expectedRedirect = Some(AppRoutes.providedetails.MemberSaUtrController.show.url)
+    ),
+    TestCaseForCya(
+      providedDetails = memberProvideDetails.missingNino,
+      name = "nino",
+      expectedRedirect = Some(AppRoutes.providedetails.MemberNinoController.show.url)
+    ),
+//    TestCaseForCya(
+//      providedDetails = memberProvideDetails.missingVerifiedEmail,
+//      name = "verified email address",
+//      expectedRedirect = Some(routes.AgentEmailAddressController.show.url)
+//    ),
+    TestCaseForCya(
+      providedDetails = memberProvideDetails.missingEmail,
+      name = "email address",
+      expectedRedirect = Some(AppRoutes.providedetails.MemberEmailAddressController.show.url)
+    ),
+    TestCaseForCya(
+      providedDetails = memberProvideDetails.missingTelephone,
+      name = "telephone number",
+      expectedRedirect = Some(AppRoutes.providedetails.MemberTelephoneNumberController.show.url)
+    ),
+    TestCaseForCya(
+      providedDetails = memberProvideDetails.missingName,
+      name = "business name",
+      expectedRedirect = Some(AppRoutes.providedetails.CompaniesHouseNameQueryController.show.url)
+    )
+  ).foreach: testCase =>
+    testCase.expectedRedirect match
+      case None =>
+        s"GET $path with ${testCase.name} should return 200 and render page" in:
+          AuthStubs.stubAuthoriseIndividual()
+          AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(testCase.providedDetails))
+
+          val response: WSResponse = get(path)
+
+          response.status shouldBe Status.OK
+          val doc = response.parseBodyAsJsoupDocument
+          doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
+          doc.select("h2.govuk-caption-l").text() shouldBe "LLP member confirmation"
+          AuthStubs.verifyAuthorise()
+          AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+      case Some(expectedRedirect) =>
+        s"GET $path with missing ${testCase.name} should redirect to the ${testCase.name} page" in:
+          AuthStubs.stubAuthoriseIndividual()
+          AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(testCase.providedDetails))
+
+          val response: WSResponse = get(path)
+
+          response.status shouldBe Status.SEE_OTHER
+          response.header("Location").value shouldBe expectedRedirect
+          AuthStubs.verifyAuthorise()
+          AgentRegistrationMemberProvidedDetailsStubs.verifyFind()

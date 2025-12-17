@@ -487,3 +487,13 @@ memberApproveAgentApplication.question = Do you agree that {0} can apply for an 
 memberApproveAgentApplication.yes = Yes
 memberApproveAgentApplication.no = No
 memberApproveAgentApplication.error.required = Select yes if you agree that {0} can apply for an account
+
+## Member / LLP / check your answers
+
+memberDetailsCheckYourAnswers.title = Check your answers
+memberDetailsCheckYourAnswers.memberName.label = Name
+memberDetailsCheckYourAnswers.telephone.label = Telephone number
+memberDetailsCheckYourAnswers.email.label = Email address
+memberDetailsCheckYourAnswers.saUtr.label = Self Assessment Unique Taxpayer Reference
+memberDetailsCheckYourAnswers.nino.label = National Insurance number
+memberDetailsCheckYourAnswers.change = Change

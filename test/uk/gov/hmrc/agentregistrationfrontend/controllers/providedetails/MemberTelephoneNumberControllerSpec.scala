@@ -66,7 +66,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.MemberEmailAddressController.show.url
+    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
 
   s"POST $path with blank inputs should return 400" in:
     AuthStubs.stubAuthoriseIndividual()

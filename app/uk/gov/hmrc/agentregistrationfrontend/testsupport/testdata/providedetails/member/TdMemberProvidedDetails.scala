@@ -87,7 +87,7 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
       .modify(_.memberNino)
       .setTo(Some(MemberNino.NotProvided))
 
-    val afterNinoProvided: MemberProvidedDetails = afterEmailAddressProvided
+    val afterNinoProvided: MemberProvidedDetails = afterEmailAddressVerified
       .modify(_.memberNino)
       .setTo(Some(dependencies.ninoProvided))
 

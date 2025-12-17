@@ -64,7 +64,7 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe routes.MemberSaUtrController.show.url
+    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
 
   s"GET $path should redirect to previous page when EmailAddress is not provided from HMRC systems (Auth)" in:
     AuthStubs.stubAuthoriseIndividual()
@@ -87,7 +87,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.MemberSaUtrController.show.url
+    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
 
   s"POST $path with selected No should save data and redirect to check your answers" in:
     AuthStubs.stubAuthoriseIndividual()
@@ -101,7 +101,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.MemberSaUtrController.show.url
+    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
 
   s"POST $path  without selecting and option should return 400" in:
     AuthStubs.stubAuthoriseIndividual()

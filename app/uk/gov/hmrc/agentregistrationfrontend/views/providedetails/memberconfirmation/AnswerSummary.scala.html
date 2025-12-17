@@ -1,0 +1,132 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+
+@this(
+  govukSummaryList: GovukSummaryList
+)
+
+@(
+        key: String,
+        answers: MemberProvidedDetails,
+        canChange: Boolean = true
+)(implicit messages: Messages)
+
+@memberNameRow = @{
+  SummaryListRow(
+    key = Key(
+      content = Text(messages(s"$key.memberName.label"))
+    ),
+    value = Value(
+      content = Text(answers.getOfficerName)
+    ),
+    actions = if(!canChange) None else Some(Actions(
+      items = Seq(
+        ActionItem(
+          href = s"${AppRoutes.providedetails.CompaniesHouseNameQueryController.show}",
+          content = Text(messages("common.change")),
+          visuallyHiddenText = Some(messages(s"$key.memberName.label"))
+        )
+      )
+    ))
+  )
+}
+@telephoneRow = @{
+  SummaryListRow(
+    key = Key(
+      content = Text(messages(s"$key.telephone.label"))
+    ),
+    value = Value(
+      content = Text(answers.getTelephoneNumber.value)
+    ),
+    actions = if(!canChange) None else Some(Actions(
+      items = Seq(
+        ActionItem(
+          href = s"${AppRoutes.providedetails.MemberTelephoneNumberController.show}",
+          content = Text(messages("common.change")),
+          visuallyHiddenText = Some(messages(s"$key.telephone.label"))
+        )
+      )
+    ))
+  )
+}
+@emailRow = @{
+  SummaryListRow(
+    key = Key(
+      content = Text(messages(s"$key.email.label"))
+    ),
+    value = Value(
+      content = Text(answers.getEmailAddress.emailAddress.value)
+    ),
+    actions = if(!canChange) None else Some(Actions(
+      items = Seq(
+        ActionItem(
+          href = s"${AppRoutes.providedetails.MemberEmailAddressController.show}",
+          content = Text(messages("common.change")),
+          visuallyHiddenText = Some(messages(s"$key.email.label"))
+        )
+      )
+    ))
+  )
+}
+@ninoRow = @{
+  SummaryListRow(
+    key = Key(
+      content = Text(messages(s"$key.nino.label"))
+    ),
+    value = Value(
+      content = Text(answers.getNinoString)
+    ),
+    actions = if(!answers.isUserProvidedNino) None else Some(Actions(
+      items = Seq(
+        ActionItem(
+          href = s"${AppRoutes.providedetails.MemberNinoController.show}",
+          content = Text(messages("common.change")),
+          visuallyHiddenText = Some(messages(s"$key.nino.label"))
+        )
+      )
+    ))
+  )
+}
+@saUtrRow = @{
+  SummaryListRow(
+    key = Key(
+      content = Text(messages(s"$key.saUtr.label"))
+    ),
+    value = Value(
+      content = Text(answers.getSaUtrString)
+    ),
+    actions = if(!answers.isUserProvidedSaUtr) None else Some(Actions(
+      items = Seq(
+        ActionItem(
+          href = s"${AppRoutes.providedetails.MemberSaUtrController.show}",
+          content = Text(messages("common.change")),
+          visuallyHiddenText = Some(messages(s"$key.saUtr.label"))
+        )
+      )
+    ))
+  )
+}
+
+
+@rows = @{
+  Seq(memberNameRow, telephoneRow, emailRow) ++
+          (if (answers.isUserProvidedNino) Seq(ninoRow) else Seq.empty) ++
+          (if (answers.isUserProvidedSaUtr) Seq(saUtrRow) else Seq.empty)
+}
+
+@govukSummaryList(SummaryList(rows = rows))

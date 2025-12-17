@@ -45,6 +45,15 @@ final case class MemberProvidedDetails(
   hasApprovedApplication: Option[Boolean] = None
 ):
 
+  // TODO WG - check if any other checks are required here
+  val isComplete: Boolean =
+    companiesHouseMatch.isDefined
+      && telephoneNumber.isDefined
+      && emailAddress.isDefined
+      && memberNino.isDefined
+      && memberSaUtr.isDefined
+      && hasApprovedApplication.isDefined
+
   val memberProvidedDetailsId: MemberProvidedDetailsId = _id
   val hasFinished: Boolean = if providedDetailsState === Finished then true else false
   val isInProgress: Boolean = !hasFinished
@@ -52,6 +61,38 @@ final case class MemberProvidedDetails(
     "Companies house query is missing for member provided details"
   )
   def getEmailAddress: MemberVerifiedEmailAddress = emailAddress.getOrThrowExpectedDataMissing("Email address is missing")
+  def getTelephoneNumber: TelephoneNumber = telephoneNumber.getOrThrowExpectedDataMissing("Telephone number is missing")
+
+  def isUserProvidedNino: Boolean = memberNino.exists {
+    case MemberNino.Provided(_) => true
+    case MemberNino.NotProvided => true
+    case MemberNino.FromAuth(_) => false
+  }
+
+  def isUserProvidedSaUtr: Boolean = memberSaUtr.exists {
+    case MemberSaUtr.Provided(_) => true
+    case MemberSaUtr.NotProvided => true
+    case MemberSaUtr.FromAuth(_) => false
+    case MemberSaUtr.FromCitizenDetails(_) => false
+  }
+
+  def getNinoString: String =
+    memberNino match {
+      case Some(MemberNino.Provided(nino)) => nino.value
+      case Some(MemberNino.FromAuth(nino)) => nino.value
+      case Some(MemberNino.NotProvided) => "" // TODO WG - check if this is correct
+      case None => throwExpectedDataMissing("Nino is missing")
+    }
+
+  def getSaUtrString: String =
+    memberSaUtr match {
+      case Some(MemberSaUtr.Provided(nino)) => nino.value
+      case Some(MemberSaUtr.FromAuth(nino)) => nino.value
+      case Some(MemberSaUtr.FromCitizenDetails(nino)) => nino.value
+      case Some(MemberSaUtr.NotProvided) => "" // TODO WG - check if this is correct
+      case None => throwExpectedDataMissing("SaUtr is missing")
+    }
+  // TODO WG - check if logic correct
   def getOfficerName: String = companiesHouseMatch.flatMap(
     _.companiesHouseOfficer.map(_.name)
   ).getOrThrowExpectedDataMissing("Companies house officer name is missing")
