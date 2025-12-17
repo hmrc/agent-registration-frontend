@@ -92,7 +92,13 @@ extends FrontendController(mcc, actions):
         upscanInitiateResponse <- upscanInitiateConnector.initiate(
           redirectOnSuccessUrl = uri"${appConfig.thisFrontendBaseUrl + routes.AmlsEvidenceUploadController.showUploadResult.url}",
           // cannot use controller.routes for the error url because upscan will respond with query parameters
-          redirectOnErrorUrl = uri"${appConfig.thisFrontendBaseUrl + AppRoutes.apply.amls.AmlsEvidenceUploadController.showError().url}",
+          redirectOnErrorUrl =
+            uri"${appConfig.thisFrontendBaseUrl + AppRoutes.apply.amls.AmlsEvidenceUploadController.showError(
+                errorCode = None,
+                errorMessage = None,
+                errorRequestId = None,
+                key = None
+              ).url}",
           maxFileSize = appConfig.Upscan.maxFileSize
         )
         uploadDetails = UploadDetails(
@@ -137,9 +143,9 @@ extends FrontendController(mcc, actions):
 
         val upscanErrorCode: UpscanErrorCode =
           (for
-            key <- key
-            errorCode <- UpscanErrorCode.values.find(_.toString.toLowerCase === key.toLowerCase)
-          yield errorCode).getOrElse(UpscanErrorCode.Unknown)
+            errorCodeString <- errorCode
+            upscanErrorCode <- UpscanErrorCode.values.find(_.toString.toLowerCase === errorCodeString.toLowerCase)
+          yield upscanErrorCode).getOrElse(UpscanErrorCode.Unknown)
 
         Ok(upscanErrorPage(upscanErrorCode))
 
