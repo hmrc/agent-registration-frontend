@@ -30,6 +30,7 @@ import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadIdGenerator
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
@@ -40,6 +41,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceU
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.UpscanErrorPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadProgressPage
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UpscanErrorCode
 import uk.gov.hmrc.agentregistrationfrontend.services.ObjectStoreService
 import uk.gov.hmrc.agentregistrationfrontend.services.UpscanProgressService
 import uk.gov.hmrc.objectstore.client.Path
@@ -55,7 +57,7 @@ class AmlsEvidenceUploadController @Inject() (
   actions: Actions,
   view: AmlsEvidenceUploadPage,
   progressView: AmlsEvidenceUploadProgressPage,
-  errorView: UpscanErrorPage,
+  upscanErrorPage: UpscanErrorPage,
   appConfig: AppConfig,
   upscanInitiateConnector: UpscanInitiateConnector,
   applicationService: AgentApplicationService,
@@ -90,7 +92,7 @@ extends FrontendController(mcc, actions):
         upscanInitiateResponse <- upscanInitiateConnector.initiate(
           redirectOnSuccessUrl = uri"${appConfig.thisFrontendBaseUrl + routes.AmlsEvidenceUploadController.showUploadResult.url}",
           // cannot use controller.routes for the error url because upscan will respond with query parameters
-          redirectOnErrorUrl = appConfig.thisFrontendBaseUrl + "/agent-registration/apply/anti-money-laundering/evidence/error",
+          redirectOnErrorUrl = uri"${appConfig.thisFrontendBaseUrl + AppRoutes.apply.amls.AmlsEvidenceUploadController.showError().url}",
           maxFileSize = appConfig.Upscan.maxFileSize
         )
         uploadDetails = UploadDetails(
@@ -120,10 +122,10 @@ extends FrontendController(mcc, actions):
     * the redirect URL.
     */
   def showError(
-    errorCode: String,
-    errorMessage: String,
-    errorRequestId: String,
-    key: String
+    errorCode: Option[String],
+    errorMessage: Option[String],
+    errorRequestId: Option[String],
+    key: Option[String]
   ): Action[AnyContent] = actions
     .Applicant
     .getApplicationInProgress:
@@ -132,7 +134,14 @@ extends FrontendController(mcc, actions):
           s"Received Upscan upload error callback: errorCode=$errorCode, errorMessage=$errorMessage, " +
             s"errorRequestId=$errorRequestId, key=$key"
         )
-        Ok(errorView(errorCode))
+
+        val upscanErrorCode: UpscanErrorCode =
+          (for
+            key <- key
+            errorCode <- UpscanErrorCode.values.find(_.toString.toLowerCase === key.toLowerCase)
+          yield errorCode).getOrElse(UpscanErrorCode.Unknown)
+
+        Ok(upscanErrorPage(upscanErrorCode))
 
   def showUploadResult: Action[AnyContent] = actions
     .Applicant

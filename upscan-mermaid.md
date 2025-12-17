@@ -9,7 +9,7 @@ participant S3 as upscan-upload
 participant UN as upscan-notify
 participant OSC as object‑store-client
 participant OS as object-store
-U->>FE: On Page Load
+U->>FE: On Page Load (GET /apply/anti-money-laundering/evidence) 
 FE->>UI: POST /upscan/v2/initiate (callbackUrl, successUrl, errorUrl, size/type limits)
 UI-->>FE: Upload form (form action href, fields, reference) - Return form to browser
 FE->>BE: Store upload details (reference) in Agent Application
