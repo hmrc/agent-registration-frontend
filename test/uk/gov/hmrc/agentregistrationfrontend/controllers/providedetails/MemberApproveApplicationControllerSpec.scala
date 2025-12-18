@@ -44,9 +44,9 @@ extends ControllerSpec:
 
   private object memberProvideDetails:
 
-    val afterSaUtrProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtrProvided.afterSaUtrProvided
-    val withSaUtrNotProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterNinoProvided.afterNinoProvided
-    val withNinoAndSaUtrFromAuthButEmailNotProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtrProvided.afterSaUtrFromAuth.copy(
+    val afterSaUtrProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrProvided
+    val withSaUtrNotProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoProvided
+    val withNinoAndSaUtrFromAuthButEmailNotProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrFromAuth.copy(
       emailAddress = None
     )
     val afterApproveAgentApplication = tdAll.providedDetailsLlp.afterApproveAgentApplication

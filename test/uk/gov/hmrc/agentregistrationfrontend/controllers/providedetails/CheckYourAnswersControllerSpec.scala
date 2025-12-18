@@ -38,8 +38,8 @@ extends ControllerSpec:
     val complete = tdAll.providedDetailsLlp.afterHmrcStandardforAgentsAgreed
 
     val missingAgreeStandarts = tdAll.providedDetailsLlp.afterApproveAgentApplication
-    val missingApproveApplication = tdAll.providedDetailsLlp.AfterSaUtrProvided.afterSaUtrProvided
-    val missingSaUtr = tdAll.providedDetailsLlp.AfterNinoProvided.afterNinoProvided
+    val missingApproveApplication = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrProvided
+    val missingSaUtr = tdAll.providedDetailsLlp.AfterNino.afterNinoProvided
     val missingNino = tdAll.providedDetailsLlp.afterEmailAddressVerified
     val missingEmail = tdAll.providedDetailsLlp.afterTelephoneNumberProvided
     val missingEmailValidation = tdAll.providedDetailsLlp.afterEmailAddressProvided

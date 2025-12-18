@@ -31,11 +31,11 @@ extends ControllerSpec:
 
   private object memberProvideDetails:
 
-    val afterNinoProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterNinoProvided.afterNinoProvided
-    val afterSaUtrNotProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtrProvided.afterSaUtrNotProvided
-    val afterSaUtrFromAuth: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtrProvided.afterSaUtrFromAuth
-    val afterSaUtrFromCitizenDetails: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtrProvided.afterSaUtrFromCitizenDetails
-    val afterSaUtrProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtrProvided.afterSaUtrProvided
+    val afterNinoProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoProvided
+    val afterSaUtrNotProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrNotProvided
+    val afterSaUtrFromAuth: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrFromAuth
+    val afterSaUtrFromCitizenDetails: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrFromCitizenDetails
+    val afterSaUtrProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrProvided
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.MemberSaUtrController.show shouldBe Call(

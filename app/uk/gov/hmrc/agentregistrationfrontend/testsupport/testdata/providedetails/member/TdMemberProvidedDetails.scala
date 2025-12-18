@@ -74,7 +74,7 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
         isVerified = true
       )))
 
-    object AfterNinoProvided:
+    object AfterNino:
 
       val afterNinoProvided: MemberProvidedDetails = afterEmailAddressVerified
         .modify(_.memberNino)
@@ -88,29 +88,29 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
         .modify(_.memberNino)
         .setTo(Some(MemberNino.NotProvided))
 
-    object AfterSaUtrProvided:
+    object AfterSaUtr:
 
-      val afterSaUtrProvided: MemberProvidedDetails = AfterNinoProvided.afterNinoProvided
+      val afterSaUtrProvided: MemberProvidedDetails = AfterNino.afterNinoProvided
         .modify(_.memberSaUtr)
         .setTo(Some(dependencies.saUtrProvided))
 
-      val afterSaUtrFromAuth: MemberProvidedDetails = AfterNinoProvided.afterNinoFromAuth
+      val afterSaUtrFromAuth: MemberProvidedDetails = AfterNino.afterNinoFromAuth
         .modify(_.memberSaUtr)
         .setTo(Some(dependencies.saUtrFromAuth))
 
-      val afterSaUtrFromCitizenDetails: MemberProvidedDetails = AfterNinoProvided.afterNinoFromAuth
+      val afterSaUtrFromCitizenDetails: MemberProvidedDetails = AfterNino.afterNinoFromAuth
         .modify(_.memberSaUtr)
         .setTo(Some(dependencies.saUtrFromCitizenDetails))
 
-      val afterSaUtrNotProvided: MemberProvidedDetails = AfterNinoProvided.afterNinoNotProvided
+      val afterSaUtrNotProvided: MemberProvidedDetails = AfterNino.afterNinoNotProvided
         .modify(_.memberSaUtr)
         .setTo(Some(MemberSaUtr.NotProvided))
 
-    val afterApproveAgentApplication: MemberProvidedDetails = AfterSaUtrProvided.afterSaUtrProvided
+    val afterApproveAgentApplication: MemberProvidedDetails = AfterSaUtr.afterSaUtrProvided
       .modify(_.hasApprovedApplication)
       .setTo(Some(true))
 
-    val afterDoNotApproveAgentApplication: MemberProvidedDetails = AfterSaUtrProvided.afterSaUtrProvided
+    val afterDoNotApproveAgentApplication: MemberProvidedDetails = AfterSaUtr.afterSaUtrProvided
       .modify(_.hasApprovedApplication)
       .setTo(Some(false))
 

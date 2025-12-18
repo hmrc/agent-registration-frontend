@@ -32,9 +32,9 @@ extends ControllerSpec:
   private object memberProvideDetails:
 
     val afterEmailProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.afterEmailAddressVerified
-    val afterNinoNotProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterNinoProvided.afterNinoNotProvided
-    val afterNinoFromAuth: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterNinoProvided.afterNinoFromAuth
-    val afterNinoProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterNinoProvided.afterNinoProvided
+    val afterNinoNotProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoNotProvided
+    val afterNinoFromAuth: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoFromAuth
+    val afterNinoProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoProvided
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.MemberNinoController.show shouldBe Call(
