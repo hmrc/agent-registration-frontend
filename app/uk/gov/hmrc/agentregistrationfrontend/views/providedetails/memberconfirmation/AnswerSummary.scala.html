@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
-@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.toYesNo
+@import uk.gov.hmrc.agentregistration.shared.llp.{MemberNino, UserProvidedNino}
 
 @this(
   govukSummaryList: GovukSummaryList
@@ -27,6 +27,7 @@
         canChange: Boolean = true
 )(implicit messages: Messages)
 
+@import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
 @mkRow(labelKey: String, valueText: String, changeHref: String) = @{
   SummaryListRow(
     key = Key(content = Text(messages(labelKey))),
@@ -70,34 +71,34 @@
   )
 }
 
-@hasNinoRow = @{
+@hasNinoRow(hasNino: String) = @{
   mkRow(
     labelKey = s"$key.hasNino.label",
-    valueText = memberProvidedDetails.hasNino.toYesNo.toString,
+    valueText = hasNino,
     changeHref = AppRoutes.providedetails.MemberNinoController.show.toString
   )
 }
 
-@ninoRow = @{
+@ninoRow(ninoText: String) = @{
   mkRow(
     labelKey = s"$key.nino.label",
-    valueText = memberProvidedDetails.getNinoString,
+    valueText = ninoText,
     changeHref = AppRoutes.providedetails.MemberNinoController.show.toString
   )
 }
 
-@hasSaUtrRow = @{
+@hasSaUtrRow(hasSaUtr: String) = @{
   mkRow(
     labelKey = s"$key.hasSaUtr.label",
-    valueText = memberProvidedDetails.hasSaUtr.toYesNo.toString,
+    valueText = hasSaUtr,
     changeHref = AppRoutes.providedetails.MemberSaUtrController.show.toString
   )
 }
 
-@saUtrRow = @{
+@saUtrRow(saUtrText: String) = @{
   mkRow(
     labelKey = s"$key.saUtr.label",
-    valueText = memberProvidedDetails.getSaUtrString,
+    valueText = saUtrText,
     changeHref = AppRoutes.providedetails.MemberSaUtrController.show.toString
   )
 }
@@ -105,13 +106,17 @@
 @rows = @{
   val base = Seq(memberNameRow, telephoneRow, emailRow)
 
-  val ninoRows =
-    Option.when(memberProvidedDetails.isUserProvidedNino)(hasNinoRow).toSeq ++
-      Option.when(memberProvidedDetails.isUserProvidedNino && memberProvidedDetails.hasNino)(ninoRow).toSeq
+  val ninoRows = memberProvidedDetails.getNino match {
+    case MemberNino.Provided(nino) =>  Seq(hasNinoRow("Yes"),ninoRow(nino.value))
+    case MemberNino.NotProvided => Seq(hasNinoRow("No"))
+    case MemberNino.FromAuth(nino) => Seq.empty[SummaryListRow]
+  }
 
-  val saUtrRows =
-    Option.when(memberProvidedDetails.isUserProvidedSaUtr)(hasSaUtrRow).toSeq ++
-      Option.when(memberProvidedDetails.isUserProvidedSaUtr && memberProvidedDetails.hasSaUtr)(saUtrRow).toSeq
+  val saUtrRows = memberProvidedDetails.getSaUtr match {
+    case MemberSaUtr.Provided(saUtr) =>  Seq(hasSaUtrRow("Yes"), saUtrRow(saUtr.value))
+    case MemberSaUtr.NotProvided => Seq(hasSaUtrRow("No"))
+    case MemberSaUtr.FromAuth(_) | MemberSaUtr.FromCitizenDetails(_) => Seq.empty[SummaryListRow]
+  }
 
   base ++ ninoRows ++ saUtrRows
 }

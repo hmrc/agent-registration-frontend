@@ -60,29 +60,9 @@ final case class MemberProvidedDetails(
 
   def getTelephoneNumber: TelephoneNumber = required(telephoneNumber, "Telephone number is missing")
 
-  def isUserProvidedNino: Boolean = memberNino.exists {
-    case _: UserProvidedNino => true
-    case _ => false
-  }
+  def getNino: MemberNino = required(memberNino, "Nino is missing")
 
-  def isUserProvidedSaUtr: Boolean = memberSaUtr.exists {
-    case _: UserProvidedSaUtr => true
-    case _ => false
-  }
-
-  def hasNino: Boolean = memberNino.exists {
-    case MemberNino.Provided(_) | MemberNino.FromAuth(_) => true
-    case MemberNino.NotProvided => false
-  }
-
-  def getNinoString: String = required(memberNino.flatMap(ninoValue), "Nino is missing")
-
-  def hasSaUtr: Boolean = memberSaUtr.exists {
-    case MemberSaUtr.Provided(_) | MemberSaUtr.FromAuth(_) | MemberSaUtr.FromCitizenDetails(_) => true
-    case MemberSaUtr.NotProvided => false
-  }
-
-  def getSaUtrString: String = required(memberSaUtr.flatMap(saUtrValue), "SaUtr is missing")
+  def getSaUtr: MemberSaUtr = required(memberSaUtr, "SaUtr is missing")
 
   def getOfficerName: String =
     val officerName =
@@ -92,19 +72,6 @@ final case class MemberProvidedDetails(
       yield officer.name
 
     required(officerName, "Companies house officer name is missing")
-
-  private def saUtrValue(saUtr: MemberSaUtr): Option[String] =
-    saUtr match
-      case MemberSaUtr.Provided(v) => Some(v.value)
-      case MemberSaUtr.FromAuth(v) => Some(v.value)
-      case MemberSaUtr.FromCitizenDetails(v) => Some(v.value)
-      case MemberSaUtr.NotProvided => None
-
-  private def ninoValue(nino: MemberNino): Option[String] =
-    nino match
-      case MemberNino.Provided(v) => Some(v.value)
-      case MemberNino.FromAuth(v) => Some(v.value)
-      case MemberNino.NotProvided => None
 
 object MemberProvidedDetails:
   given format: OFormat[MemberProvidedDetails] = Json.format[MemberProvidedDetails]
