@@ -92,7 +92,7 @@ class AppConfig @Inject() (
 
   object Upscan:
 
-    val callbackUrl: String = s"$agentRegistrationBaseUrl/agent-registration/application/amls/upscan-callback".ensureValidUrl("callbackUrl")
+    val callbackUrl: String = s"$agentRegistrationBaseUrl/agent-registration/upload/".ensureValidUrl("callbackUrl")
     val maxFileSize: ConfigMemorySize = configuration.underlying.getMemorySize("uploads.max-file-size")
     val checkUploadStatusInterval: FiniteDuration = configuration.get[FiniteDuration]("uploads.check-upload-status-interval")
     val checkUploadStatusMaxAttempts: Int = configuration.get[Int]("uploads.check-upload-status-max-attempts")
