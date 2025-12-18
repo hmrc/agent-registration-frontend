@@ -21,14 +21,12 @@ import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.CheckYourAnswersPage
 
 class CheckYourAnswersPageSpec
 extends ViewSpec:
 
   val viewTemplate: CheckYourAnswersPage = app.injector.instanceOf[CheckYourAnswersPage]
-  private val tdAll: TdAll = TdAll()
 
   private object memberDetailsData:
 

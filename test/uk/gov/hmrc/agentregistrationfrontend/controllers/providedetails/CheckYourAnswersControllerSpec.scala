@@ -94,6 +94,11 @@ extends ControllerSpec:
       expectedRedirect = Some(AppRoutes.providedetails.MemberTelephoneNumberController.show.url)
     ),
     TestCaseForCya(
+      providedDetails = memberProvideDetails.missingCompaniesHouseOfficerSelection,
+      name = "name selection",
+      expectedRedirect = Some(AppRoutes.providedetails.CompaniesHouseNameQueryController.show.url)
+    ),
+    TestCaseForCya(
       providedDetails = memberProvideDetails.missingName,
       name = "name",
       expectedRedirect = Some(AppRoutes.providedetails.CompaniesHouseNameQueryController.show.url)

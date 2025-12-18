@@ -23,7 +23,7 @@
 
 @(
         key: String,
-        answers: MemberProvidedDetails,
+        memberProvidedDetails: MemberProvidedDetails,
         canChange: Boolean = true
 )(implicit messages: Messages)
 
@@ -49,7 +49,7 @@
 @memberNameRow = @{
   mkRow(
     labelKey = s"$key.memberName.label",
-    valueText = answers.getOfficerName,
+    valueText = memberProvidedDetails.getOfficerName,
     changeHref = AppRoutes.providedetails.CompaniesHouseNameQueryController.show.toString
   )
 }
@@ -57,7 +57,7 @@
 @telephoneRow = @{
   mkRow(
     labelKey = s"$key.telephone.label",
-    valueText = answers.getTelephoneNumber.value,
+    valueText = memberProvidedDetails.getTelephoneNumber.value,
     changeHref = AppRoutes.providedetails.MemberTelephoneNumberController.show.toString
   )
 }
@@ -65,7 +65,7 @@
 @emailRow = @{
   mkRow(
     labelKey = s"$key.email.label",
-    valueText = answers.getEmailAddress.emailAddress.value,
+    valueText = memberProvidedDetails.getEmailAddress.emailAddress.value,
     changeHref = AppRoutes.providedetails.MemberEmailAddressController.show.toString
   )
 }
@@ -73,7 +73,7 @@
 @hasNinoRow = @{
   mkRow(
     labelKey = s"$key.hasNino.label",
-    valueText = answers.hasNino.toYesNo.toString,
+    valueText = memberProvidedDetails.hasNino.toYesNo.toString,
     changeHref = AppRoutes.providedetails.MemberNinoController.show.toString
   )
 }
@@ -81,7 +81,7 @@
 @ninoRow = @{
   mkRow(
     labelKey = s"$key.nino.label",
-    valueText = answers.getNinoString,
+    valueText = memberProvidedDetails.getNinoString,
     changeHref = AppRoutes.providedetails.MemberNinoController.show.toString
   )
 }
@@ -89,7 +89,7 @@
 @hasSaUtrRow = @{
   mkRow(
     labelKey = s"$key.hasSaUtr.label",
-    valueText = answers.hasSaUtr.toYesNo.toString,
+    valueText = memberProvidedDetails.hasSaUtr.toYesNo.toString,
     changeHref = AppRoutes.providedetails.MemberSaUtrController.show.toString
   )
 }
@@ -97,7 +97,7 @@
 @saUtrRow = @{
   mkRow(
     labelKey = s"$key.saUtr.label",
-    valueText = answers.getSaUtrString,
+    valueText = memberProvidedDetails.getSaUtrString,
     changeHref = AppRoutes.providedetails.MemberSaUtrController.show.toString
   )
 }
@@ -106,12 +106,12 @@
   val base = Seq(memberNameRow, telephoneRow, emailRow)
 
   val ninoRows =
-    Option.when(answers.isUserProvidedNino)(hasNinoRow).toSeq ++
-      Option.when(answers.isUserProvidedNino && answers.hasNino)(ninoRow).toSeq
+    Option.when(memberProvidedDetails.isUserProvidedNino)(hasNinoRow).toSeq ++
+      Option.when(memberProvidedDetails.isUserProvidedNino && memberProvidedDetails.hasNino)(ninoRow).toSeq
 
   val saUtrRows =
-    Option.when(answers.isUserProvidedSaUtr)(hasSaUtrRow).toSeq ++
-      Option.when(answers.isUserProvidedSaUtr && answers.hasSaUtr)(saUtrRow).toSeq
+    Option.when(memberProvidedDetails.isUserProvidedSaUtr)(hasSaUtrRow).toSeq ++
+      Option.when(memberProvidedDetails.isUserProvidedSaUtr && memberProvidedDetails.hasSaUtr)(saUtrRow).toSeq
 
   base ++ ninoRows ++ saUtrRows
 }

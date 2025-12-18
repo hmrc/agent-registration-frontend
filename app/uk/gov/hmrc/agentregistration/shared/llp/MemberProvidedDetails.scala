@@ -44,14 +44,6 @@ final case class MemberProvidedDetails(
   hasApprovedApplication: Option[Boolean] = None
 ):
 
-  val isComplete: Boolean =
-    companiesHouseMatch.isDefined
-      && telephoneNumber.isDefined
-      && emailAddress.isDefined
-      && memberNino.isDefined
-      && memberSaUtr.isDefined
-      && hasApprovedApplication.isDefined
-
   val memberProvidedDetailsId: MemberProvidedDetailsId = _id
 
   private def required[T](
