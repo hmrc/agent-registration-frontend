@@ -53,13 +53,13 @@ final case class MemberProvidedDetails(
     "Companies house query is missing for member provided details"
   )
 
-  def getEmailAddress: MemberVerifiedEmailAddress = emailAddress.getOrThrowExpectedDataMissing("Email address is missing")
+  def getEmailAddress: MemberVerifiedEmailAddress = emailAddress.getOrThrowExpectedDataMissing("Email address")
 
-  def getTelephoneNumber: TelephoneNumber = telephoneNumber.getOrThrowExpectedDataMissing("Telephone number is missing")
+  def getTelephoneNumber: TelephoneNumber = telephoneNumber.getOrThrowExpectedDataMissing("Telephone number")
 
-  def getNino: MemberNino = memberNino.getOrThrowExpectedDataMissing("Nino is missing")
+  def getNino: MemberNino = memberNino.getOrThrowExpectedDataMissing("Nino")
 
-  def getSaUtr: MemberSaUtr = memberSaUtr.getOrThrowExpectedDataMissing("SaUtr is missing")
+  def getSaUtr: MemberSaUtr = memberSaUtr.getOrThrowExpectedDataMissing("SaUtr")
 
   def getOfficerName: String =
     val officerName =
@@ -68,7 +68,7 @@ final case class MemberProvidedDetails(
         officer <- ch.companiesHouseOfficer
       yield officer.name
 
-    officerName.getOrThrowExpectedDataMissing("Companies house officer name is missing")
+    officerName.getOrThrowExpectedDataMissing("Companies house officer name")
 
 object MemberProvidedDetails:
   given format: OFormat[MemberProvidedDetails] = Json.format[MemberProvidedDetails]
