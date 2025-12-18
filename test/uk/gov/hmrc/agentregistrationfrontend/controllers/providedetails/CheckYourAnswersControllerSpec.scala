@@ -42,7 +42,9 @@ extends ControllerSpec:
     val missingSaUtr = tdAll.providedDetailsLlp.afterNinoProvided
     val missingNino = tdAll.providedDetailsLlp.afterEmailAddressVerified
     val missingEmail = tdAll.providedDetailsLlp.afterTelephoneNumberProvided
+    val missingEmailValidation = tdAll.providedDetailsLlp.afterEmailAddressProvided
     val missingTelephone = tdAll.providedDetailsLlp.afterOfficerChosen
+    val missingCompaniesHouseOfficerSelection = tdAll.providedDetailsLlp.afterNameQueryProvided
     val missingName = tdAll.providedDetailsLlp.afterStarted
 
   private final case class TestCaseForCya(
@@ -77,6 +79,11 @@ extends ControllerSpec:
       expectedRedirect = Some(AppRoutes.providedetails.MemberNinoController.show.url)
     ),
     TestCaseForCya(
+      providedDetails = memberProvideDetails.missingEmailValidation,
+      name = "email address validation",
+      expectedRedirect = Some(AppRoutes.providedetails.MemberEmailAddressController.show.url)
+    ),
+    TestCaseForCya(
       providedDetails = memberProvideDetails.missingEmail,
       name = "email address",
       expectedRedirect = Some(AppRoutes.providedetails.MemberEmailAddressController.show.url)
@@ -88,7 +95,7 @@ extends ControllerSpec:
     ),
     TestCaseForCya(
       providedDetails = memberProvideDetails.missingName,
-      name = "business name",
+      name = "name",
       expectedRedirect = Some(AppRoutes.providedetails.CompaniesHouseNameQueryController.show.url)
     )
   ).foreach: testCase =>
