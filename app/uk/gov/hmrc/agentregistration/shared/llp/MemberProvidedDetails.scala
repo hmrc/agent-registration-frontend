@@ -46,23 +46,18 @@ final case class MemberProvidedDetails(
 
   val memberProvidedDetailsId: MemberProvidedDetailsId = _id
 
-  private def required[T](
-    value: Option[T],
-    missingMessage: => String
-  ): T = value.getOrThrowExpectedDataMissing(missingMessage)
-
   val hasFinished: Boolean = providedDetailsState === Finished
   val isInProgress: Boolean = !hasFinished
 
-  def getCompaniesHouseMatch: CompaniesHouseMatch = required(companiesHouseMatch, "Companies house query is missing for member provided details")
+  def getCompaniesHouseMatch: CompaniesHouseMatch = companiesHouseMatch.getOrThrowExpectedDataMissing("Companies house query is missing for member provided details")
 
-  def getEmailAddress: MemberVerifiedEmailAddress = required(emailAddress, "Email address is missing")
+  def getEmailAddress: MemberVerifiedEmailAddress = emailAddress.getOrThrowExpectedDataMissing( "Email address is missing")
 
-  def getTelephoneNumber: TelephoneNumber = required(telephoneNumber, "Telephone number is missing")
+  def getTelephoneNumber: TelephoneNumber =telephoneNumber.getOrThrowExpectedDataMissing("Telephone number is missing")
 
-  def getNino: MemberNino = required(memberNino, "Nino is missing")
+  def getNino: MemberNino = memberNino.getOrThrowExpectedDataMissing("Nino is missing")
 
-  def getSaUtr: MemberSaUtr = required(memberSaUtr, "SaUtr is missing")
+  def getSaUtr: MemberSaUtr = memberSaUtr.getOrThrowExpectedDataMissing("SaUtr is missing")
 
   def getOfficerName: String =
     val officerName =
@@ -71,7 +66,7 @@ final case class MemberProvidedDetails(
         officer <- ch.companiesHouseOfficer
       yield officer.name
 
-    required(officerName, "Companies house officer name is missing")
+    officerName.getOrThrowExpectedDataMissing("Companies house officer name is missing")
 
 object MemberProvidedDetails:
   given format: OFormat[MemberProvidedDetails] = Json.format[MemberProvidedDetails]
