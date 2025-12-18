@@ -19,6 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
+import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
+import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.CheckYourAnswersPage
@@ -31,12 +33,10 @@ extends ViewSpec:
   private object memberDetailsData:
 
     val complete = tdAll.providedDetailsLlp.afterApproveAgentApplication
-    val completeWithNinoAndSaUtrNotProvided = tdAll.providedDetailsLlp.withSaUtrNotProvided(
-      tdAll.providedDetailsLlp.withNinoNotProvided(tdAll.providedDetailsLlp.afterApproveAgentApplication)
-    )
-    val incomplete = tdAll.providedDetailsLlp.withSaUtrFromCitizenDetails(
-      tdAll.providedDetailsLlp.withNinoFromAuth(tdAll.providedDetailsLlp.afterApproveAgentApplication)
-    )
+    val completeWithNinoAndSaUtrNotProvided = tdAll.providedDetailsLlp.afterApproveAgentApplication
+      .copy(memberNino = Some(MemberNino.NotProvided), memberSaUtr = Some(MemberSaUtr.NotProvided))
+    val completeWithNinoAndSaUtrFromHmrc = tdAll.providedDetailsLlp.afterApproveAgentApplication
+      .copy(memberNino = Some(tdAll.ninoFromAuth), memberSaUtr = Some(tdAll.saUtrFromAuth))
 
   private val heading: String = "Check your answers"
   private val serviceTitleSuffix: String = "Apply for an agent services account - GOV.UK"
@@ -141,7 +141,9 @@ extends ViewSpec:
       doc.extractLinkButton(1).text shouldBe confirmAndContinueText
 
   "CheckYourAnswersPage for incomplete Member Provided Details - when Nino and SaUtr coming from HMRC systems" should:
-    given memberProvideDetailsRequest: MemberProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(memberDetailsData.incomplete)
+    given memberProvideDetailsRequest: MemberProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(
+      memberDetailsData.completeWithNinoAndSaUtrFromHmrc
+    )
 
     val doc: Document = renderDoc()
 
