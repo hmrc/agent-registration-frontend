@@ -49,11 +49,13 @@ final case class MemberProvidedDetails(
   val hasFinished: Boolean = providedDetailsState === Finished
   val isInProgress: Boolean = !hasFinished
 
-  def getCompaniesHouseMatch: CompaniesHouseMatch = companiesHouseMatch.getOrThrowExpectedDataMissing("Companies house query is missing for member provided details")
+  def getCompaniesHouseMatch: CompaniesHouseMatch = companiesHouseMatch.getOrThrowExpectedDataMissing(
+    "Companies house query is missing for member provided details"
+  )
 
-  def getEmailAddress: MemberVerifiedEmailAddress = emailAddress.getOrThrowExpectedDataMissing( "Email address is missing")
+  def getEmailAddress: MemberVerifiedEmailAddress = emailAddress.getOrThrowExpectedDataMissing("Email address is missing")
 
-  def getTelephoneNumber: TelephoneNumber =telephoneNumber.getOrThrowExpectedDataMissing("Telephone number is missing")
+  def getTelephoneNumber: TelephoneNumber = telephoneNumber.getOrThrowExpectedDataMissing("Telephone number is missing")
 
   def getNino: MemberNino = memberNino.getOrThrowExpectedDataMissing("Nino is missing")
 
