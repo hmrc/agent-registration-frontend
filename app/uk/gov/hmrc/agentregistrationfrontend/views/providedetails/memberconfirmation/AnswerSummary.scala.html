@@ -15,6 +15,7 @@
  *@
 
 @import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.toYesNo
 
 @this(
   govukSummaryList: GovukSummaryList
@@ -26,107 +27,93 @@
         canChange: Boolean = true
 )(implicit messages: Messages)
 
-@memberNameRow = @{
+@mkRow(labelKey: String, valueText: String, changeHref: String) = @{
   SummaryListRow(
-    key = Key(
-      content = Text(messages(s"$key.memberName.label"))
-    ),
-    value = Value(
-      content = Text(answers.getOfficerName)
-    ),
-    actions = if(!canChange) None else Some(Actions(
-      items = Seq(
-        ActionItem(
-          href = s"${AppRoutes.providedetails.CompaniesHouseNameQueryController.show}",
-          content = Text(messages("common.change")),
-          visuallyHiddenText = Some(messages(s"$key.memberName.label"))
+    key = Key(content = Text(messages(labelKey))),
+    value = Value(content = Text(valueText)),
+    actions =
+      Option.when(canChange)(
+        Actions(
+          items = Seq(
+            ActionItem(
+              href = changeHref,
+              content = Text(messages("common.change")),
+              visuallyHiddenText = Some(messages(labelKey))
+            )
+          )
         )
       )
-    ))
-  )
-}
-@telephoneRow = @{
-  SummaryListRow(
-    key = Key(
-      content = Text(messages(s"$key.telephone.label"))
-    ),
-    value = Value(
-      content = Text(answers.getTelephoneNumber.value)
-    ),
-    actions = if(!canChange) None else Some(Actions(
-      items = Seq(
-        ActionItem(
-          href = s"${AppRoutes.providedetails.MemberTelephoneNumberController.show}",
-          content = Text(messages("common.change")),
-          visuallyHiddenText = Some(messages(s"$key.telephone.label"))
-        )
-      )
-    ))
-  )
-}
-@emailRow = @{
-  SummaryListRow(
-    key = Key(
-      content = Text(messages(s"$key.email.label"))
-    ),
-    value = Value(
-      content = Text(answers.getEmailAddress.emailAddress.value)
-    ),
-    actions = if(!canChange) None else Some(Actions(
-      items = Seq(
-        ActionItem(
-          href = s"${AppRoutes.providedetails.MemberEmailAddressController.show}",
-          content = Text(messages("common.change")),
-          visuallyHiddenText = Some(messages(s"$key.email.label"))
-        )
-      )
-    ))
-  )
-}
-@ninoRow = @{
-  SummaryListRow(
-    key = Key(
-      content = Text(messages(s"$key.nino.label"))
-    ),
-    value = Value(
-      content = Text(answers.getNinoString)
-    ),
-    actions = if(!answers.isUserProvidedNino) None else Some(Actions(
-      items = Seq(
-        ActionItem(
-          href = s"${AppRoutes.providedetails.MemberNinoController.show}",
-          content = Text(messages("common.change")),
-          visuallyHiddenText = Some(messages(s"$key.nino.label"))
-        )
-      )
-    ))
-  )
-}
-@saUtrRow = @{
-  SummaryListRow(
-    key = Key(
-      content = Text(messages(s"$key.saUtr.label"))
-    ),
-    value = Value(
-      content = Text(answers.getSaUtrString)
-    ),
-    actions = if(!answers.isUserProvidedSaUtr) None else Some(Actions(
-      items = Seq(
-        ActionItem(
-          href = s"${AppRoutes.providedetails.MemberSaUtrController.show}",
-          content = Text(messages("common.change")),
-          visuallyHiddenText = Some(messages(s"$key.saUtr.label"))
-        )
-      )
-    ))
   )
 }
 
+@memberNameRow = @{
+  mkRow(
+    labelKey = s"$key.memberName.label",
+    valueText = answers.getOfficerName,
+    changeHref = AppRoutes.providedetails.CompaniesHouseNameQueryController.show.toString
+  )
+}
+
+@telephoneRow = @{
+  mkRow(
+    labelKey = s"$key.telephone.label",
+    valueText = answers.getTelephoneNumber.value,
+    changeHref = AppRoutes.providedetails.MemberTelephoneNumberController.show.toString
+  )
+}
+
+@emailRow = @{
+  mkRow(
+    labelKey = s"$key.email.label",
+    valueText = answers.getEmailAddress.emailAddress.value,
+    changeHref = AppRoutes.providedetails.MemberEmailAddressController.show.toString
+  )
+}
+
+@hasNinoRow = @{
+  mkRow(
+    labelKey = s"$key.hasNino.label",
+    valueText = answers.hasNino.toYesNo.toString,
+    changeHref = AppRoutes.providedetails.MemberNinoController.show.toString
+  )
+}
+
+@ninoRow = @{
+  mkRow(
+    labelKey = s"$key.nino.label",
+    valueText = answers.getNinoString,
+    changeHref = AppRoutes.providedetails.MemberNinoController.show.toString
+  )
+}
+
+@hasSaUtrRow = @{
+  mkRow(
+    labelKey = s"$key.hasSaUtr.label",
+    valueText = answers.hasSaUtr.toYesNo.toString,
+    changeHref = AppRoutes.providedetails.MemberSaUtrController.show.toString
+  )
+}
+
+@saUtrRow = @{
+  mkRow(
+    labelKey = s"$key.saUtr.label",
+    valueText = answers.getSaUtrString,
+    changeHref = AppRoutes.providedetails.MemberSaUtrController.show.toString
+  )
+}
 
 @rows = @{
-  Seq(memberNameRow, telephoneRow, emailRow) ++
-          (if (answers.isUserProvidedNino) Seq(ninoRow) else Seq.empty) ++
-          (if (answers.isUserProvidedSaUtr) Seq(saUtrRow) else Seq.empty)
+  val base = Seq(memberNameRow, telephoneRow, emailRow)
+
+  val ninoRows =
+    Option.when(answers.isUserProvidedNino)(hasNinoRow).toSeq ++
+      Option.when(answers.isUserProvidedNino && answers.hasNino)(ninoRow).toSeq
+
+  val saUtrRows =
+    Option.when(answers.isUserProvidedSaUtr)(hasSaUtrRow).toSeq ++
+      Option.when(answers.isUserProvidedSaUtr && answers.hasSaUtr)(saUtrRow).toSeq
+
+  base ++ ninoRows ++ saUtrRows
 }
 
 @govukSummaryList(SummaryList(rows = rows))

@@ -78,9 +78,15 @@ extends ViewSpec:
           |Email address
           |member@test.com
           |Change Email address
+          |Do you have a National Insurance number?
+          |Yes
+          |Change Do you have a National Insurance number?
           |National Insurance number
           |AB123456C
           |Change National Insurance number
+          |Do you have a Self Assessment Unique Taxpayer Reference?
+          |Yes
+          |Change Do you have a Self Assessment Unique Taxpayer Reference?
           |Self Assessment Unique Taxpayer Reference
           |1234567895
           |Change Self Assessment Unique Taxpayer Reference
@@ -110,9 +116,19 @@ extends ViewSpec:
             action = AppRoutes.providedetails.MemberEmailAddressController.show.url
           ),
           summaryRow(
+            key = "Do you have a National Insurance number?",
+            value = "Yes",
+            action = AppRoutes.providedetails.MemberNinoController.show.url
+          ),
+          summaryRow(
             key = "National Insurance number",
             value = "AB123456C",
             action = AppRoutes.providedetails.MemberNinoController.show.url
+          ),
+          summaryRow(
+            key = "Do you have a Self Assessment Unique Taxpayer Reference?",
+            value = "Yes",
+            action = AppRoutes.providedetails.MemberSaUtrController.show.url
           ),
           summaryRow(
             key = "Self Assessment Unique Taxpayer Reference",
@@ -198,12 +214,12 @@ extends ViewSpec:
           |Email address
           |member@test.com
           |Change Email address
-          |National Insurance number
-          |
-          |Change National Insurance number
-          |Self Assessment Unique Taxpayer Reference
-          |
-          |Change Self Assessment Unique Taxpayer Reference
+          |Do you have a National Insurance number?
+          |No
+          |Change Do you have a National Insurance number?
+          |Do you have a Self Assessment Unique Taxpayer Reference?
+          |No
+          |Change Do you have a Self Assessment Unique Taxpayer Reference?
           |Confirm and continue
           |Is this page not working properly? (opens in new tab)
               """.stripMargin
@@ -230,13 +246,13 @@ extends ViewSpec:
             action = AppRoutes.providedetails.MemberEmailAddressController.show.url
           ),
           summaryRow(
-            key = "National Insurance number",
-            value = "",
+            key = "Do you have a National Insurance number?",
+            value = "No",
             action = AppRoutes.providedetails.MemberNinoController.show.url
           ),
           summaryRow(
-            key = "Self Assessment Unique Taxpayer Reference",
-            value = "",
+            key = "Do you have a Self Assessment Unique Taxpayer Reference?",
+            value = "No",
             action = AppRoutes.providedetails.MemberSaUtrController.show.url
           )
         )

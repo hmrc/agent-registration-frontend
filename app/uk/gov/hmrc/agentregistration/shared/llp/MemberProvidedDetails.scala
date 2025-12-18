@@ -25,7 +25,6 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseMatch
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistration.shared.util.Errors.*
-
 import java.time.Instant
 
 /** Member provided details for Limited Liability Partnership (Llp). This final case class represents the data entered by a user for approving as an Llp.
@@ -45,7 +44,6 @@ final case class MemberProvidedDetails(
   hasApprovedApplication: Option[Boolean] = None
 ):
 
-  // TODO WG - check if any other checks are required here
   val isComplete: Boolean =
     companiesHouseMatch.isDefined
       && telephoneNumber.isDefined
@@ -55,47 +53,66 @@ final case class MemberProvidedDetails(
       && hasApprovedApplication.isDefined
 
   val memberProvidedDetailsId: MemberProvidedDetailsId = _id
-  val hasFinished: Boolean = if providedDetailsState === Finished then true else false
+
+  private def required[T](
+    value: Option[T],
+    missingMessage: => String
+  ): T = value.getOrThrowExpectedDataMissing(missingMessage)
+
+  val hasFinished: Boolean = providedDetailsState === Finished
   val isInProgress: Boolean = !hasFinished
-  def getCompaniesHouseMatch: CompaniesHouseMatch = companiesHouseMatch.getOrThrowExpectedDataMissing(
-    "Companies house query is missing for member provided details"
-  )
-  def getEmailAddress: MemberVerifiedEmailAddress = emailAddress.getOrThrowExpectedDataMissing("Email address is missing")
-  def getTelephoneNumber: TelephoneNumber = telephoneNumber.getOrThrowExpectedDataMissing("Telephone number is missing")
+
+  def getCompaniesHouseMatch: CompaniesHouseMatch = required(companiesHouseMatch, "Companies house query is missing for member provided details")
+
+  def getEmailAddress: MemberVerifiedEmailAddress = required(emailAddress, "Email address is missing")
+
+  def getTelephoneNumber: TelephoneNumber = required(telephoneNumber, "Telephone number is missing")
 
   def isUserProvidedNino: Boolean = memberNino.exists {
-    case MemberNino.Provided(_) => true
-    case MemberNino.NotProvided => true
-    case MemberNino.FromAuth(_) => false
+    case _: UserProvidedNino => true
+    case _ => false
   }
 
   def isUserProvidedSaUtr: Boolean = memberSaUtr.exists {
-    case MemberSaUtr.Provided(_) => true
-    case MemberSaUtr.NotProvided => true
-    case MemberSaUtr.FromAuth(_) => false
-    case MemberSaUtr.FromCitizenDetails(_) => false
+    case _: UserProvidedSaUtr => true
+    case _ => false
   }
 
-  def getNinoString: String =
-    memberNino match {
-      case Some(MemberNino.Provided(nino)) => nino.value
-      case Some(MemberNino.FromAuth(nino)) => nino.value
-      case Some(MemberNino.NotProvided) => "" // TODO WG - check if this is correct
-      case None => throwExpectedDataMissing("Nino is missing")
-    }
+  def hasNino: Boolean = memberNino.exists {
+    case MemberNino.Provided(_) | MemberNino.FromAuth(_) => true
+    case MemberNino.NotProvided => false
+  }
 
-  def getSaUtrString: String =
-    memberSaUtr match {
-      case Some(MemberSaUtr.Provided(nino)) => nino.value
-      case Some(MemberSaUtr.FromAuth(nino)) => nino.value
-      case Some(MemberSaUtr.FromCitizenDetails(nino)) => nino.value
-      case Some(MemberSaUtr.NotProvided) => "" // TODO WG - check if this is correct
-      case None => throwExpectedDataMissing("SaUtr is missing")
-    }
-  // TODO WG - check if logic correct
-  def getOfficerName: String = companiesHouseMatch.flatMap(
-    _.companiesHouseOfficer.map(_.name)
-  ).getOrThrowExpectedDataMissing("Companies house officer name is missing")
+  def getNinoString: String = required(memberNino.flatMap(ninoValue), "Nino is missing")
+
+  def hasSaUtr: Boolean = memberSaUtr.exists {
+    case MemberSaUtr.Provided(_) | MemberSaUtr.FromAuth(_) | MemberSaUtr.FromCitizenDetails(_) => true
+    case MemberSaUtr.NotProvided => false
+  }
+
+  def getSaUtrString: String = required(memberSaUtr.flatMap(saUtrValue), "SaUtr is missing")
+
+  def getOfficerName: String =
+    val officerName =
+      for
+        ch <- companiesHouseMatch
+        officer <- ch.companiesHouseOfficer
+      yield officer.name
+
+    required(officerName, "Companies house officer name is missing")
+
+  private def saUtrValue(saUtr: MemberSaUtr): Option[String] =
+    saUtr match
+      case MemberSaUtr.Provided(v) => Some(v.value)
+      case MemberSaUtr.FromAuth(v) => Some(v.value)
+      case MemberSaUtr.FromCitizenDetails(v) => Some(v.value)
+      case MemberSaUtr.NotProvided => None
+
+  private def ninoValue(nino: MemberNino): Option[String] =
+    nino match
+      case MemberNino.Provided(v) => Some(v.value)
+      case MemberNino.FromAuth(v) => Some(v.value)
+      case MemberNino.NotProvided => None
 
 object MemberProvidedDetails:
   given format: OFormat[MemberProvidedDetails] = Json.format[MemberProvidedDetails]
