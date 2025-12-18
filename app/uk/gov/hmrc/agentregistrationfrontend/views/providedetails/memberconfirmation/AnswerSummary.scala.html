@@ -28,7 +28,7 @@
 )(implicit messages: Messages)
 
 @import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
-@mkRow(labelKey: String, valueText: String, changeHref: String) = @{
+@makeSummaryListRow(labelKey: String, valueText: String, changeHref: String) = @{
   SummaryListRow(
     key = Key(content = Text(messages(labelKey))),
     value = Value(content = Text(valueText)),
@@ -48,7 +48,7 @@
 }
 
 @memberNameRow = @{
-  mkRow(
+  makeSummaryListRow(
     labelKey = s"$key.memberName.label",
     valueText = memberProvidedDetails.getOfficerName,
     changeHref = AppRoutes.providedetails.CompaniesHouseNameQueryController.show.toString
@@ -56,7 +56,7 @@
 }
 
 @telephoneRow = @{
-  mkRow(
+  makeSummaryListRow(
     labelKey = s"$key.telephone.label",
     valueText = memberProvidedDetails.getTelephoneNumber.value,
     changeHref = AppRoutes.providedetails.MemberTelephoneNumberController.show.toString
@@ -64,7 +64,7 @@
 }
 
 @emailRow = @{
-  mkRow(
+  makeSummaryListRow(
     labelKey = s"$key.email.label",
     valueText = memberProvidedDetails.getEmailAddress.emailAddress.value,
     changeHref = AppRoutes.providedetails.MemberEmailAddressController.show.toString
@@ -72,7 +72,7 @@
 }
 
 @hasNinoRow(hasNino: String) = @{
-  mkRow(
+  makeSummaryListRow(
     labelKey = s"$key.hasNino.label",
     valueText = hasNino,
     changeHref = AppRoutes.providedetails.MemberNinoController.show.toString
@@ -80,7 +80,7 @@
 }
 
 @ninoRow(ninoText: String) = @{
-  mkRow(
+  makeSummaryListRow(
     labelKey = s"$key.nino.label",
     valueText = ninoText,
     changeHref = AppRoutes.providedetails.MemberNinoController.show.toString
@@ -88,7 +88,7 @@
 }
 
 @hasSaUtrRow(hasSaUtr: String) = @{
-  mkRow(
+  makeSummaryListRow(
     labelKey = s"$key.hasSaUtr.label",
     valueText = hasSaUtr,
     changeHref = AppRoutes.providedetails.MemberSaUtrController.show.toString
@@ -96,7 +96,7 @@
 }
 
 @saUtrRow(saUtrText: String) = @{
-  mkRow(
+  makeSummaryListRow(
     labelKey = s"$key.saUtr.label",
     valueText = saUtrText,
     changeHref = AppRoutes.providedetails.MemberSaUtrController.show.toString
