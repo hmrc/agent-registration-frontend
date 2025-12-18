@@ -30,7 +30,7 @@ extends ViewSpec:
 
   val viewTemplate: CheckYourAnswersPage = app.injector.instanceOf[CheckYourAnswersPage]
 
-  private object memberDetailsData:
+  private object memberProvideDetails:
 
     val complete = tdAll.providedDetailsLlp.afterApproveAgentApplication
     val completeWithNinoAndSaUtrNotProvided = tdAll.providedDetailsLlp.afterApproveAgentApplication
@@ -58,7 +58,7 @@ extends ViewSpec:
   )
 
   "CheckYourAnswersPage for complete Member Provided Details" should:
-    given memberProvideDetailsRequest: MemberProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(memberDetailsData.complete)
+    given memberProvideDetailsRequest: MemberProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(memberProvideDetails.complete)
 
     val doc: Document = renderDoc()
 
@@ -142,7 +142,7 @@ extends ViewSpec:
 
   "CheckYourAnswersPage for incomplete Member Provided Details - when Nino and SaUtr coming from HMRC systems" should:
     given memberProvideDetailsRequest: MemberProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(
-      memberDetailsData.completeWithNinoAndSaUtrFromHmrc
+      memberProvideDetails.completeWithNinoAndSaUtrFromHmrc
     )
 
     val doc: Document = renderDoc()
@@ -195,7 +195,7 @@ extends ViewSpec:
 
   "CheckYourAnswersPage for incomplete Member Provided Details - when Nino and SaUtr not provided" should:
     given memberProvideDetailsRequest: MemberProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(
-      memberDetailsData.completeWithNinoAndSaUtrNotProvided
+      memberProvideDetails.completeWithNinoAndSaUtrNotProvided
     )
 
     val doc: Document = renderDoc()
