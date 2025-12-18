@@ -16,12 +16,10 @@
 
 package uk.gov.hmrc.agentregistration.shared.upscan
 
+import org.bson.types.ObjectId
 import play.api.libs.json.Format
 import play.api.mvc.PathBindable
-
-import java.util.UUID
-import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
-import uk.gov.hmrc.agentregistration.shared.util.ValueClassBinder
+import uk.gov.hmrc.agentregistration.shared.util.{JsonFormatsFactory, ValueClassBinder}
 
 final case class UploadId(value: String)
 
@@ -31,4 +29,4 @@ object UploadId:
   given pathBindable: PathBindable[UploadId] = ValueClassBinder.valueClassBinder[UploadId](_.value)
 
 class UploadIdGenerator:
-  def nextUploadId(): UploadId = UploadId(UUID.randomUUID().toString)
+  def nextUploadId(): UploadId = UploadId(ObjectId.get().toHexString)

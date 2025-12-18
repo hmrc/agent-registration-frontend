@@ -68,7 +68,7 @@ extends FrontendController(mcc, actions):
         applicationService
           .upsert(
             request.agentApplication
-              .modify(_.amlsDetails.each.amlsEvidence.each.status)
+              .modify(_.amlsDetails.each.amlsEvidence.each.uploadStatus)
               .setTo(
                 UploadStatus.UploadedSuccessfully(
                   name = "test.pdf",

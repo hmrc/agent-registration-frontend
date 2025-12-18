@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
 import uk.gov.hmrc.agentregistration.shared.upscan.FileUploadReference
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
+import uk.gov.hmrc.agentregistration.shared.upscan.Upload
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
@@ -42,22 +42,22 @@ trait TdSectionAmls {
   def amlsExpiryDateValid: LocalDate = dependencies.nowPlus6mAsLocalDateTime.toLocalDate
   def amlsExpiryDateInvalid: LocalDate = dependencies.nowPlus13mAsLocalDateTime.toLocalDate
 
-  def amlsUploadDetailsAfterUploadInProgress: UploadDetails = UploadDetails(
-    uploadId = dependencies.uploadId,
-    reference = FileUploadReference("test-file-reference"),
-    status = UploadStatus.InProgress
+  def amlsUploadDetailsAfterUploadInProgress: Upload = Upload(
+    _id = dependencies.uploadId,
+    fileUploadReference = FileUploadReference("test-file-reference"),
+    uploadStatus = UploadStatus.InProgress
   )
 
-  def amlsUploadDetailsAfterUploadScannedOk: UploadDetails = amlsUploadDetailsAfterUploadInProgress.copy(
-    status = dependencies.successfulUploadStatus.modify(_.objectStoreLocation).setTo(None)
+  def amlsUploadDetailsAfterUploadScannedOk: Upload = amlsUploadDetailsAfterUploadInProgress.copy(
+    uploadStatus = dependencies.successfulUploadStatus.modify(_.objectStoreLocation).setTo(None)
   )
 
-  def amlsUploadDetailsAfterUploadSucceeded: UploadDetails = amlsUploadDetailsAfterUploadInProgress.copy(
-    status = dependencies.successfulUploadStatus
+  def amlsUploadDetailsAfterUploadSucceeded: Upload = amlsUploadDetailsAfterUploadInProgress.copy(
+    uploadStatus = dependencies.successfulUploadStatus
   )
 
-  private def amlsUploadDetailsAfterUploadFailedScanning: UploadDetails = amlsUploadDetailsAfterUploadInProgress.copy(
-    status = UploadStatus.Failed
+  private def amlsUploadDetailsAfterUploadFailedScanning: Upload = amlsUploadDetailsAfterUploadInProgress.copy(
+    uploadStatus = UploadStatus.Failed
   )
 
   class AgentApplicationLlpWithSectionAmls(baseForSectionAmls: AgentApplicationLlp):

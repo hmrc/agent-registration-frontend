@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistration.shared
 import play.api.libs.json.Format
 import play.api.libs.json.Json
 import upscan.UploadStatus
-import upscan.UploadDetails
+import upscan.Upload
 
 import java.time.LocalDate
 
@@ -27,7 +27,7 @@ final case class AmlsDetails(
   supervisoryBody: AmlsCode,
   amlsRegistrationNumber: Option[AmlsRegistrationNumber] = None,
   amlsExpiryDate: Option[LocalDate] = None,
-  amlsEvidence: Option[UploadDetails] = None
+  amlsEvidence: Option[Upload] = None
 ):
 
   val isHmrc: Boolean = supervisoryBody.value.contains("HMRC")
@@ -44,7 +44,7 @@ final case class AmlsDetails(
             _,
             Some(_),
             Some(_),
-            Some(UploadDetails(
+            Some(Upload(
               _,
               _,
               UploadStatus.UploadedSuccessfully(
@@ -60,15 +60,15 @@ final case class AmlsDetails(
         true
       case _ => false
     }
-  def getAmlsEvidence: UploadDetails = amlsEvidence.getOrElse(throw new RuntimeException("AmlsEvidence missing when required"))
+  def getAmlsEvidence: Upload = amlsEvidence.getOrElse(throw new RuntimeException("AmlsEvidence missing when required"))
   def getRegistrationNumber: AmlsRegistrationNumber = amlsRegistrationNumber.getOrElse(
     throw new RuntimeException("amlsRegistrationNumber missing when required")
   )
   def getAmlsExpiryDate: LocalDate = amlsExpiryDate.getOrElse(throw new RuntimeException("amlsExpiryDate missing when required"))
   def getAmlsEvidenceName: String =
-    getAmlsEvidence.status match
+    getAmlsEvidence.uploadStatus match
       case s: UploadStatus.UploadedSuccessfully => s.name
-      case _ => throw new RuntimeException(s"AmlsEvidence not ready: ${getAmlsEvidence.status}")
+      case _ => throw new RuntimeException(s"AmlsEvidence not ready: ${getAmlsEvidence.uploadStatus}")
 
 object AmlsDetails:
   implicit val format: Format[AmlsDetails] = Json.format[AmlsDetails]

@@ -25,7 +25,7 @@ import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsName
 import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
+import uk.gov.hmrc.agentregistration.shared.upscan.Upload
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadIdGenerator
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
@@ -101,10 +101,10 @@ extends FrontendController(mcc, actions):
               ).url}",
           maxFileSize = appConfig.Upscan.maxFileSize
         )
-        uploadDetails = UploadDetails(
-          uploadId = uploadIdGenerator.nextUploadId(),
-          status = UploadStatus.InProgress,
-          reference = upscanInitiateResponse.reference
+        uploadDetails = Upload(
+          _id = uploadIdGenerator.nextUploadId(),
+          uploadStatus = UploadStatus.InProgress,
+          fileUploadReference = upscanInitiateResponse.reference
         )
         // store the upscan fileReference and new uploadId in the application
         // and initiate the upscan progress tracking in agent-registration backend
@@ -163,14 +163,14 @@ extends FrontendController(mcc, actions):
                     .agentApplication
                     .getAmlsDetails
                     .getAmlsEvidence
-                    .reference,
+                    .fileUploadReference,
                   status
                 )
               updatedApplication =
                 (objectStorePath, status) match
                   case (Some(path: Path.File), success: UploadStatus.UploadedSuccessfully) =>
                     request.agentApplication.asLlpApplication
-                      .modify(_.amlsDetails.each.amlsEvidence.each.status)
+                      .modify(_.amlsDetails.each.amlsEvidence.each.uploadStatus)
                       .setTo(
                         success
                           .modify(_.objectStoreLocation)
@@ -178,7 +178,7 @@ extends FrontendController(mcc, actions):
                       )
                   case _ =>
                     request.agentApplication.asLlpApplication
-                      .modify(_.amlsDetails.each.amlsEvidence.each.status)
+                      .modify(_.amlsDetails.each.amlsEvidence.each.uploadStatus)
                       .setTo(status)
               _ <- applicationService.upsert(updatedApplication)
             } yield Ok(progressView(status))

@@ -21,7 +21,7 @@ import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.given
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
+import uk.gov.hmrc.agentregistration.shared.upscan.Upload
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
 import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
@@ -153,8 +153,8 @@ extends RequestAwareLogging:
               info = s"getBusinessPartnerRecord problem"
             )
 
-  def initiateUpscanUpload(uploadDetails: UploadDetails)(using
-    request: RequestHeader
+  def initiateUpscanUpload(uploadDetails: Upload)(using
+                                                  request: RequestHeader
   ): Future[Unit] =
     val url = url"$baseUrl/application/amls/upscan-initiate"
     httpClient

@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.services
 
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
+import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistration.shared.upscan.{Upload, UploadId, UploadStatus}
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 
@@ -30,14 +30,8 @@ class UpscanProgressService @Inject() (
   agentRegistrationConnector: AgentRegistrationConnector
 ):
 
-  def initiate(uploadDetails: UploadDetails)(using request: AgentApplicationRequest[?]): Future[Unit] = agentRegistrationConnector
+  def initiate(uploadDetails: Upload)(using request: AgentApplicationRequest[?]): Future[Unit] = agentRegistrationConnector
     .initiateUpscanUpload(uploadDetails)
 
-  def getUpscanStatus()(using request: AgentApplicationRequest[?]): Future[Option[UploadStatus]] = agentRegistrationConnector
-    .getUpscanStatus(
-      request
-        .agentApplication
-        .getAmlsDetails
-        .getAmlsEvidence
-        .uploadId
-    )
+  def getUpscanStatus(uploadId: UploadId)(using request: RequestHeader): Future[Option[UploadStatus]] = agentRegistrationConnector
+    .getUpscanStatus(uploadId)

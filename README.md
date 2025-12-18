@@ -21,6 +21,55 @@ sm2 --start AGENT_REGISTRATION_ALL \
 && sm2 -s
 ```
 
+```
+ AWESOME_STUBS_FRONTEND                      [====================][100%] Done
+ AWESOME_STUBS                               [====================][100%] Done
+ INTERNAL_AUTH                               [====================][100%] Done
+ ADDRESS_LOOKUP_FRONTEND                     [===========         ][ 59%] Install
+ ADDRESS_LOOKUP                              [====================][100%] Starting
+ ADDRESS_SEARCH_API                          [                    ][  0%] Pending
+ AGENT_REGISTRATION                          [                    ][  0%] Pending
+ AGENT_REGISTRATION_FRONTEND                 [                    ][  0%] Pending
+ EMAIL                                       [                    ][  0%] Pending
+ EMAIL_VERIFICATION_FRONTEND                 [                    ][  0%] Pending
+ EMAIL_VERIFICATION                          [                    ][  0%] Pending
+ EMAIL_VERIFICATION_STUBS                    [                    ][  0%] Pending
+ HMRC_EMAIL_RENDERER                         [                    ][  0%] Pending
+ PARTNERSHIP_IDENTIFICATION                  [                    ][  0%] Pending
+ PARTNERSHIP_IDENTIFICATION_FRONTEND         [                    ][  0%] Pending
+ SOLE_TRADER_IDENTIFICATION                  [                    ][  0%] Pending
+ SOLE_TRADER_IDENTIFICATION_FRONTEND         [                    ][  0%] Pending
+ INCORPORATED_ENTITY_IDENTIFICATION_FRONTEND [                    ][  0%] Pending
+ INCORPORATED_ENTITY_IDENTIFICATION          [                    ][  0%] Pending
+ TRACKING_CONSENT_FRONTEND                   [                    ][  0%] Pending
+ UPSCAN_STUB                                 [                    ][  0%] Pending
+```
+```
++---------+-------+------------------------------------------------------------------+
+| PID     | Port  | Reserved by                                                      |
++---------+-------+------------------------------------------------------------------+
+| 279696  | 8100  | DATASTREAM                                                       |
+| 279696  | 9984  | USERS_GROUPS_SEARCH                                              |
+| 279696  | 8899  | FILE_UPLOAD_FRONTEND                                             |
+| 279696  | 8500  | AUTH                                                             |
+| 279696  | 7775  | ENROLMENT_STORE_PROXY_AM_JENKINS                                 |
+| 279696  | 9967  | PERSONAL_DETAILS_VALIDATION                                      |
+| 279696  | 9974  | SSO                                                              |
+| 279571  | 9938  | IDENTITY_VERIFICATION_FRONTEND                                   |
+| 279696  | 8898  | FILE_UPLOAD                                                      |
+| 279571  | 9553  | BAS_GATEWAY_FRONTEND                                             |
+| 279696  | 9978  | USER_DETAILS                                                     |
+| 279696  | 9337  | CITIZEN_DETAILS                                                  |
+| 279696  | 9927  | IDENTITY_VERIFICATION                                            |
+| 279696  | 9995  | TAX_ENROLMENTS_DDCN                                              |
+| 279571  | 9949  | AUTH_LOGIN_STUB                                                  |
+| 279571  | 9041  | STRIDE_AUTH_FRONTEND                                             |
+| 279571  | 9968  | PERSONAL_DETAILS_VALIDATION_FRONTEND                             |
+| 279696  | 9904  | NINO_INSIGHTS_PROXY                                              |
+| 279696  | 9991  | COMPANIES_HOUSE_API_PROXY                                        |
++---------+-------+------------------------------------------------------------------+
+
+```
 ```bash
 sm2 -stop-all \
 && sm2 -s
