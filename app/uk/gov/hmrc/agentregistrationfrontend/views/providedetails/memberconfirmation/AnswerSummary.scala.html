@@ -19,110 +19,108 @@
 @import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 
 @this(
-  govukSummaryList: GovukSummaryList
+        govukSummaryList: GovukSummaryList
 )
 
 @(
         key: String,
-        memberProvidedDetails: MemberProvidedDetails,
-        canChange: Boolean = true
+        memberProvidedDetails: MemberProvidedDetails
 )(implicit messages: Messages)
 
 @makeSummaryListRow(labelKey: String, valueText: String, changeHref: String) = @{
-  SummaryListRow(
-    key = Key(content = Text(messages(labelKey))),
-    value = Value(content = Text(valueText)),
-    actions =
-      Option.when(canChange)(
-        Actions(
-          items = Seq(
-            ActionItem(
-              href = changeHref,
-              content = Text(messages("common.change")),
-              visuallyHiddenText = Some(messages(labelKey))
+    SummaryListRow(
+        key = Key(content = Text(messages(labelKey))),
+        value = Value(content = Text(valueText)),
+        actions = Some(
+            Actions(
+                items = Seq(
+                    ActionItem(
+                        href = changeHref,
+                        content = Text(messages("common.change")),
+                        visuallyHiddenText = Some(messages(labelKey))
+                    )
+                )
             )
-          )
         )
-      )
-  )
+    )
 }
 
 @memberNameRow = @{
-  makeSummaryListRow(
-    labelKey = s"$key.memberName.label",
-    valueText = memberProvidedDetails.getCompaniesHouseMatch
-    .companiesHouseOfficer
-    .map(_.name)
-    .getOrThrowExpectedDataMissing("Officer name"),
-    changeHref = AppRoutes.providedetails.CompaniesHouseNameQueryController.show.toString
-  )
+    makeSummaryListRow(
+        labelKey = s"$key.memberName.label",
+        valueText = memberProvidedDetails.getCompaniesHouseMatch
+        .companiesHouseOfficer
+        .map(_.name)
+        .getOrThrowExpectedDataMissing("Officer name"),
+        changeHref = AppRoutes.providedetails.CompaniesHouseNameQueryController.show.toString
+    )
 }
 
 @telephoneRow = @{
-  makeSummaryListRow(
-    labelKey = s"$key.telephone.label",
-    valueText = memberProvidedDetails.getTelephoneNumber.value,
-    changeHref = AppRoutes.providedetails.MemberTelephoneNumberController.show.toString
-  )
+    makeSummaryListRow(
+        labelKey = s"$key.telephone.label",
+        valueText = memberProvidedDetails.getTelephoneNumber.value,
+        changeHref = AppRoutes.providedetails.MemberTelephoneNumberController.show.toString
+    )
 }
 
 @emailRow = @{
-  makeSummaryListRow(
-    labelKey = s"$key.email.label",
-    valueText = memberProvidedDetails.getEmailAddress.emailAddress.value,
-    changeHref = AppRoutes.providedetails.MemberEmailAddressController.show.toString
-  )
+    makeSummaryListRow(
+        labelKey = s"$key.email.label",
+        valueText = memberProvidedDetails.getEmailAddress.emailAddress.value,
+        changeHref = AppRoutes.providedetails.MemberEmailAddressController.show.toString
+    )
 }
 
 @hasNinoRow(hasNino: String) = @{
-  makeSummaryListRow(
-    labelKey = s"$key.hasNino.label",
-    valueText = hasNino,
-    changeHref = AppRoutes.providedetails.MemberNinoController.show.toString
-  )
+    makeSummaryListRow(
+        labelKey = s"$key.hasNino.label",
+        valueText = hasNino,
+        changeHref = AppRoutes.providedetails.MemberNinoController.show.toString
+    )
 }
 
 @ninoRow(ninoText: String) = @{
-  makeSummaryListRow(
-    labelKey = s"$key.nino.label",
-    valueText = ninoText,
-    changeHref = AppRoutes.providedetails.MemberNinoController.show.toString
-  )
+    makeSummaryListRow(
+        labelKey = s"$key.nino.label",
+        valueText = ninoText,
+        changeHref = AppRoutes.providedetails.MemberNinoController.show.toString
+    )
 }
 
 @hasSaUtrRow(hasSaUtr: String) = @{
-  makeSummaryListRow(
-    labelKey = s"$key.hasSaUtr.label",
-    valueText = hasSaUtr,
-    changeHref = AppRoutes.providedetails.MemberSaUtrController.show.toString
-  )
+    makeSummaryListRow(
+        labelKey = s"$key.hasSaUtr.label",
+        valueText = hasSaUtr,
+        changeHref = AppRoutes.providedetails.MemberSaUtrController.show.toString
+    )
 }
 
 @saUtrRow(saUtrText: String) = @{
-  makeSummaryListRow(
-    labelKey = s"$key.saUtr.label",
-    valueText = saUtrText,
-    changeHref = AppRoutes.providedetails.MemberSaUtrController.show.toString
-  )
+    makeSummaryListRow(
+        labelKey = s"$key.saUtr.label",
+        valueText = saUtrText,
+        changeHref = AppRoutes.providedetails.MemberSaUtrController.show.toString
+    )
 }
 
 @rows = @{
-  val base = Seq(memberNameRow, telephoneRow, emailRow)
+    val base = Seq(memberNameRow, telephoneRow, emailRow)
 
-  val ninoRows = memberProvidedDetails.getNino match {
-    case MemberNino.Provided(nino) =>  Seq(hasNinoRow("Yes"),ninoRow(nino.value))
-    case MemberNino.NotProvided => Seq(hasNinoRow("No"))
-    case _: MemberNino.FromAuth => Seq.empty[SummaryListRow]
-  }
+    val ninoRows = memberProvidedDetails.getNino match {
+        case MemberNino.Provided(nino) => Seq(hasNinoRow("Yes"), ninoRow(nino.value))
+        case MemberNino.NotProvided => Seq(hasNinoRow("No"))
+        case _: MemberNino.FromAuth => Seq.empty[SummaryListRow]
+    }
 
-  val saUtrRows = memberProvidedDetails.getSaUtr match {
-    case MemberSaUtr.Provided(saUtr) =>  Seq(hasSaUtrRow("Yes"), saUtrRow(saUtr.value))
-    case MemberSaUtr.NotProvided => Seq(hasSaUtrRow("No"))
-    case _ : MemberSaUtr.FromAuth => Seq.empty[SummaryListRow]
-    case _ : MemberSaUtr.FromCitizenDetails => Seq.empty[SummaryListRow]
-  }
+    val saUtrRows = memberProvidedDetails.getSaUtr match {
+        case MemberSaUtr.Provided(saUtr) => Seq(hasSaUtrRow("Yes"), saUtrRow(saUtr.value))
+        case MemberSaUtr.NotProvided => Seq(hasSaUtrRow("No"))
+        case _: MemberSaUtr.FromAuth => Seq.empty[SummaryListRow]
+        case _: MemberSaUtr.FromCitizenDetails => Seq.empty[SummaryListRow]
+    }
 
-  base ++ ninoRows ++ saUtrRows
+    base ++ ninoRows ++ saUtrRows
 }
 
 @govukSummaryList(SummaryList(rows = rows))
