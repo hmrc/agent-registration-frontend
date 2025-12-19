@@ -74,48 +74,43 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
         isVerified = true
       )))
 
-    // That way is better than having to write a bunch of methods for each field in MemberProvidedDetails
-    def withNinoProvided(state: MemberProvidedDetails): MemberProvidedDetails = state
-      .modify(_.memberNino)
-      .setTo(Some(dependencies.ninoProvided))
+    object AfterNino:
 
-    def withNinoFromAuth(state: MemberProvidedDetails): MemberProvidedDetails = state
-      .modify(_.memberNino)
-      .setTo(Some(dependencies.ninoFromAuth))
+      val afterNinoProvided: MemberProvidedDetails = afterEmailAddressVerified
+        .modify(_.memberNino)
+        .setTo(Some(dependencies.ninoProvided))
 
-    def withNinoNotProvided(state: MemberProvidedDetails): MemberProvidedDetails = state
-      .modify(_.memberNino)
-      .setTo(Some(MemberNino.NotProvided))
+      val afterNinoFromAuth: MemberProvidedDetails = afterEmailAddressVerified
+        .modify(_.memberNino)
+        .setTo(Some(dependencies.ninoFromAuth))
 
-    val afterNinoProvided: MemberProvidedDetails = afterEmailAddressProvided
-      .modify(_.memberNino)
-      .setTo(Some(dependencies.ninoProvided))
+      val afterNinoNotProvided: MemberProvidedDetails = afterEmailAddressVerified
+        .modify(_.memberNino)
+        .setTo(Some(MemberNino.NotProvided))
 
-    def withSaUtrProvided(state: MemberProvidedDetails): MemberProvidedDetails = state
-      .modify(_.memberSaUtr)
-      .setTo(Some(dependencies.saUtrProvided))
+    object AfterSaUtr:
 
-    def withSaUtrFromAuth(state: MemberProvidedDetails): MemberProvidedDetails = state
-      .modify(_.memberSaUtr)
-      .setTo(Some(dependencies.saUtrFromAuth))
+      val afterSaUtrProvided: MemberProvidedDetails = AfterNino.afterNinoProvided
+        .modify(_.memberSaUtr)
+        .setTo(Some(dependencies.saUtrProvided))
 
-    def withSaUtrFromCitizenDetails(state: MemberProvidedDetails): MemberProvidedDetails = state
-      .modify(_.memberSaUtr)
-      .setTo(Some(dependencies.saUtrFromCitizenDetails))
+      val afterSaUtrFromAuth: MemberProvidedDetails = AfterNino.afterNinoFromAuth
+        .modify(_.memberSaUtr)
+        .setTo(Some(dependencies.saUtrFromAuth))
 
-    def withSaUtrNotProvided(state: MemberProvidedDetails): MemberProvidedDetails = state
-      .modify(_.memberSaUtr)
-      .setTo(Some(MemberSaUtr.NotProvided))
+      val afterSaUtrFromCitizenDetails: MemberProvidedDetails = AfterNino.afterNinoFromAuth
+        .modify(_.memberSaUtr)
+        .setTo(Some(dependencies.saUtrFromCitizenDetails))
 
-    val afterSaUtrProvided: MemberProvidedDetails = afterNinoProvided
-      .modify(_.memberSaUtr)
-      .setTo(Some(dependencies.saUtrProvided))
+      val afterSaUtrNotProvided: MemberProvidedDetails = AfterNino.afterNinoNotProvided
+        .modify(_.memberSaUtr)
+        .setTo(Some(MemberSaUtr.NotProvided))
 
-    val afterApproveAgentApplication: MemberProvidedDetails = afterSaUtrProvided
+    val afterApproveAgentApplication: MemberProvidedDetails = AfterSaUtr.afterSaUtrProvided
       .modify(_.hasApprovedApplication)
       .setTo(Some(true))
 
-    val afterDoNotApproveAgentApplication: MemberProvidedDetails = afterSaUtrProvided
+    val afterDoNotApproveAgentApplication: MemberProvidedDetails = AfterSaUtr.afterSaUtrProvided
       .modify(_.hasApprovedApplication)
       .setTo(Some(false))
 

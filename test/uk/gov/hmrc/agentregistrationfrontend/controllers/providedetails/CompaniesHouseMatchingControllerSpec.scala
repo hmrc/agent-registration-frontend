@@ -141,7 +141,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.MemberTelephoneNumberController.show.url
+    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
     AuthStubs.verifyAuthorise()
     AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
     AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
@@ -180,7 +180,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.MemberTelephoneNumberController.show.url
+    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
     AuthStubs.verifyAuthorise()
     AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
     AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)

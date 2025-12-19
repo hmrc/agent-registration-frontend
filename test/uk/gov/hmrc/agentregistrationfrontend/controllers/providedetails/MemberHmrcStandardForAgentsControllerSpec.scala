@@ -62,7 +62,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.providedetails.MemberCheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
 
   s"POST $path with agree should update the application and redirect to the task list" in:
     AuthStubs.stubAuthoriseIndividual()
@@ -75,4 +75,4 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.providedetails.MemberCheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url

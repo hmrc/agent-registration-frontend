@@ -57,7 +57,7 @@ extends FrontendController(mcc, actions):
       },
       implicit request =>
         logger.info(s"Nino is already provided from auth or citizen details. Skipping page and moving to next page.")
-        Redirect(AppRoutes.providedetails.MemberSaUtrController.show.url)
+        Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url)
     )
 
   def show: Action[AnyContent] = baseAction:
@@ -87,5 +87,5 @@ extends FrontendController(mcc, actions):
           memberProvideDetailsService
             .upsert(updatedApplication)
             .map: _ =>
-              Redirect(AppRoutes.providedetails.MemberSaUtrController.show.url)
+              Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater

@@ -31,14 +31,11 @@ extends ControllerSpec:
 
   private object memberProvideDetails:
 
-    private val afterNinoUpdate: MemberProvidedDetails = tdAll.providedDetailsLlp.afterNinoProvided
-    val beforeSaUtrMissingInHmrcSystems: MemberProvidedDetails = tdAll.providedDetailsLlp.withSaUtrNotProvided(afterNinoUpdate)
-    val beforeSaUtrFromAuth: MemberProvidedDetails = tdAll.providedDetailsLlp.withSaUtrFromAuth(afterNinoUpdate)
-    val beforeSaUtrFromCitizenDetails: MemberProvidedDetails = tdAll.providedDetailsLlp.withSaUtrFromCitizenDetails(afterNinoUpdate)
-
-    val afterSaUtrFromAuth: MemberProvidedDetails = beforeSaUtrFromAuth
-    val afterSaUtrProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.withSaUtrProvided(afterNinoUpdate)
-    val afterSaUtrNotProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.withSaUtrNotProvided(afterNinoUpdate)
+    val afterNinoProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoProvided
+    val afterSaUtrNotProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrNotProvided
+    val afterSaUtrFromAuth: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrFromAuth
+    val afterSaUtrFromCitizenDetails: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrFromCitizenDetails
+    val afterSaUtrProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrProvided
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.MemberSaUtrController.show shouldBe Call(
@@ -53,7 +50,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page when SaUtr is not provided in HMRC systems" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeSaUtrMissingInHmrcSystems))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterSaUtrNotProvided))
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -61,15 +58,15 @@ extends ControllerSpec:
 
   s"GET $path should redirect to next page when SaUtr is already provided from HMRC systems (Auth)" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeSaUtrFromAuth))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterSaUtrFromAuth))
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe routes.MemberApproveApplicantController.show.url
+    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
 
   s"GET $path should redirect to previous page when Nino is not provided from HMRC systems (Auth)" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeSaUtrFromAuth.copy(memberNino = None)))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterSaUtrFromAuth.copy(memberNino = None)))
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
@@ -77,7 +74,7 @@ extends ControllerSpec:
 
   s"POST $path with selected Yes and valid name should save data and redirect to check your answers" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeSaUtrMissingInHmrcSystems))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterNinoProvided))
     AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvideDetails.afterSaUtrProvided)
 
     val response: WSResponse =
@@ -88,11 +85,11 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.MemberApproveApplicantController.show.url
+    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
 
   s"POST $path with selected No should save data and redirect to check your answers" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeSaUtrMissingInHmrcSystems))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterSaUtrNotProvided))
     AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvideDetails.afterSaUtrNotProvided)
 
     val response: WSResponse =
@@ -102,11 +99,11 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.MemberApproveApplicantController.show.url
+    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
 
   s"POST $path  without selecting and option should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeSaUtrMissingInHmrcSystems))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterSaUtrNotProvided))
     val response: WSResponse =
       post(path)(Map(
         MemberSaUtrForm.hasSaUtrKey -> Seq(Constants.EMPTY_STRING),
@@ -121,7 +118,7 @@ extends ControllerSpec:
 
   s"POST $path with selected Yes and blank inputs should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeSaUtrMissingInHmrcSystems))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterSaUtrNotProvided))
     val response: WSResponse =
       post(path)(Map(
         MemberSaUtrForm.hasSaUtrKey -> Seq("Yes"),
@@ -136,7 +133,7 @@ extends ControllerSpec:
 
   s"POST $path with selected Yes and invalid characters should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeSaUtrMissingInHmrcSystems))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterSaUtrNotProvided))
     val response: WSResponse =
       post(path)(Map(
         MemberSaUtrForm.hasSaUtrKey -> Seq("Yes"),

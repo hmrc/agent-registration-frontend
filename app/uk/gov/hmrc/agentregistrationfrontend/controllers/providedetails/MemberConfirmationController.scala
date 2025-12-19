@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import javax.inject.Inject
 
-class MemberAgreeStandardController @Inject() (
+class MemberConfirmationController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
   placeholder: SimplePage
@@ -36,6 +36,6 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] = actions.Member.getProvideDetailsInProgress:
     implicit request: RequestHeader =>
       Ok(placeholder(
-        h1 = "Agree to HMRC Standard Page",
-        bodyText = Some("This is a placeholder page for the email address page.")
+        h1 = "Confirmation Page",
+        bodyText = Some("This is a placeholder page for the confirmation page.")
       ))
