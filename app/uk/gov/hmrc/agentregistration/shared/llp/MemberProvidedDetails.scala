@@ -60,11 +60,6 @@ final case class MemberProvidedDetails(
   def getNino: MemberNino = memberNino.getOrThrowExpectedDataMissing("Nino")
 
   def getSaUtr: MemberSaUtr = memberSaUtr.getOrThrowExpectedDataMissing("SaUtr")
-  
-  def getOfficerName: String = companiesHouseMatch
-    .map(_.companiesHouseOfficer.map(_.name)
-      .getOrThrowExpectedDataMissing("Officer name"))
-    .getOrThrowExpectedDataMissing("Companies house name")
 
 object MemberProvidedDetails:
   given format: OFormat[MemberProvidedDetails] = Json.format[MemberProvidedDetails]

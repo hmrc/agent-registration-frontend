@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 @import uk.gov.hmrc.agentregistration.shared.llp.{MemberNino, MemberSaUtr}
+@import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 
 @this(
   govukSummaryList: GovukSummaryList
@@ -27,7 +28,6 @@
         canChange: Boolean = true
 )(implicit messages: Messages)
 
-@import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
 @makeSummaryListRow(labelKey: String, valueText: String, changeHref: String) = @{
   SummaryListRow(
     key = Key(content = Text(messages(labelKey))),
@@ -50,7 +50,10 @@
 @memberNameRow = @{
   makeSummaryListRow(
     labelKey = s"$key.memberName.label",
-    valueText = memberProvidedDetails.getOfficerName,
+    valueText = memberProvidedDetails.getCompaniesHouseMatch
+    .companiesHouseOfficer
+    .map(_.name)
+    .getOrThrowExpectedDataMissing("Officer name"),
     changeHref = AppRoutes.providedetails.CompaniesHouseNameQueryController.show.toString
   )
 }
@@ -109,13 +112,14 @@
   val ninoRows = memberProvidedDetails.getNino match {
     case MemberNino.Provided(nino) =>  Seq(hasNinoRow("Yes"),ninoRow(nino.value))
     case MemberNino.NotProvided => Seq(hasNinoRow("No"))
-    case MemberNino.FromAuth(nino) => Seq.empty[SummaryListRow]
+    case _: MemberNino.FromAuth => Seq.empty[SummaryListRow]
   }
 
   val saUtrRows = memberProvidedDetails.getSaUtr match {
     case MemberSaUtr.Provided(saUtr) =>  Seq(hasSaUtrRow("Yes"), saUtrRow(saUtr.value))
     case MemberSaUtr.NotProvided => Seq(hasSaUtrRow("No"))
-    case MemberSaUtr.FromAuth(_) | MemberSaUtr.FromCitizenDetails(_) => Seq.empty[SummaryListRow]
+    case _ : MemberSaUtr.FromAuth => Seq.empty[SummaryListRow]
+    case _ : MemberSaUtr.FromCitizenDetails => Seq.empty[SummaryListRow]
   }
 
   base ++ ninoRows ++ saUtrRows
