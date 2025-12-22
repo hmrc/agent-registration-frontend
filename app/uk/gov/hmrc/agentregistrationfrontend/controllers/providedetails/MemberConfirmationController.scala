@@ -40,7 +40,7 @@ extends FrontendController(mcc, actions):
     .ensure(
       _.memberProvidedDetails.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed,
       implicit request =>
-        Redirect(AppRoutes.providedetails.MemberCheckYourAnswersController.show.url)
+        Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url)
     )
 
   def show: Action[AnyContent] = baseAction.async:

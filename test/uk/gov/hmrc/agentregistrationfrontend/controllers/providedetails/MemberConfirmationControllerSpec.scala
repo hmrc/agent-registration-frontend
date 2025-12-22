@@ -74,4 +74,4 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location") shouldBe Some(AppRoutes.providedetails.MemberCheckYourAnswersController.show.url)
+    response.header("Location") shouldBe Some(AppRoutes.providedetails.CheckYourAnswersController.show.url)
