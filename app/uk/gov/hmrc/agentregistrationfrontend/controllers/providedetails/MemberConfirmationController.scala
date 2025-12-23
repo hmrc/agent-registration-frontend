@@ -16,26 +16,38 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
-import play.api.mvc.Action
-import play.api.mvc.AnyContent
-import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.RequestHeader
+import play.api.mvc.*
+import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsWithApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberConfirmationPage
 
 import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.Future
 
+@Singleton
 class MemberConfirmationController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
-  placeholder: SimplePage
+  memberConfirmationPage: MemberConfirmationPage
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.Member.getProvideDetailsInProgress:
-    implicit request: RequestHeader =>
-      Ok(placeholder(
-        h1 = "Confirmation Page",
-        bodyText = Some("This is a placeholder page for the confirmation page.")
+  private val baseAction: ActionBuilder[MemberProvideDetailsWithApplicationRequest, AnyContent] = actions.Member.getProvideDetailsWithApplicationInProgress
+    .ensure(
+      _.memberProvidedDetails.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url)
+    )
+
+  def show: Action[AnyContent] = baseAction.async:
+    implicit request =>
+      val applicantName = request.agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName
+      val companyName = request.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
+      Future successful Ok(memberConfirmationPage(
+        applicantName = applicantName,
+        companyName = companyName
       ))

@@ -501,3 +501,13 @@ memberDetailsCheckYourAnswers.nino.label = National Insurance number
 memberDetailsCheckYourAnswers.change = Change
 memberDetailsCheckYourAnswers.hasSaUtr.label = Do you have a Self Assessment Unique Taxpayer Reference?
 memberDetailsCheckYourAnswers.hasNino.label = Do you have a National Insurance number?
+
+
+# Member Confirmation of submission
+memberConfirmation.title = You have finished this process
+memberConfirmation.whatNext.h2 = What happens next
+memberConfirmation.whatNext.p1 = We need to collect information for all members of {0}.
+memberConfirmation.whatNext.p2 = When we have the information we need, we’ll automatically submit the application and begin our checks.
+memberConfirmation.whatNext.p3 = If we need any further information from you, we will contact you by email or telephone.
+memberConfirmation.whatNext.p4 = When we have finished our checks, we’ll email {0} with a decision about the application.
+memberConfirmation.signOutLink = Finish and sign out
