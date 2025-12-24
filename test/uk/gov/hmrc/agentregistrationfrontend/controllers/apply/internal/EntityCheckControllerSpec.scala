@@ -62,27 +62,27 @@ extends ControllerSpec:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterGrsDataProvided)
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterHmrcEntityVerificationPass)
-    AgentAssuranceStubs.stubIsRefusedToDealWith(saUtr = saUtr.value, isRefused = false)
+    AgentAssuranceStubs.stubIsRefusedToDealWith(saUtr = saUtr, isRefused = false)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe AppRoutes.apply.TaskListController.show.url
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
-    AgentAssuranceStubs.verifyIsRefusedToDealWith(saUtr.value)
+    AgentAssuranceStubs.verifyIsRefusedToDealWith(saUtr)
 
   s"GET $path should update application with fail status and open entity checks fail page when agent fail entity verification checks" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterGrsDataProvided)
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterHmrcEntityVerificationFail)
-    AgentAssuranceStubs.stubIsRefusedToDealWith(saUtr = saUtr.value, isRefused = true)
+    AgentAssuranceStubs.stubIsRefusedToDealWith(saUtr = saUtr, isRefused = true)
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Entity verification failed... - Apply for an agent services account - GOV.UK"
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
-    AgentAssuranceStubs.verifyIsRefusedToDealWith(saUtr.value)
+    AgentAssuranceStubs.verifyIsRefusedToDealWith(saUtr)
 
   s"GET $path should redirect to start registration page when GRS business details not defined" in:
     AuthStubs.stubAuthorise()

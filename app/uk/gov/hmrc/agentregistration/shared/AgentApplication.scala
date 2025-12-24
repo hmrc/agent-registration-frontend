@@ -103,7 +103,7 @@ final case class AgentApplicationSoleTrader(
   businessDetails: Option[BusinessDetailsSoleTrader],
   override val amlsDetails: Option[AmlsDetails],
   override val agentDetails: Option[AgentDetails],
-  override val hmrcEntityVerificationPassed: Option[EntityCheckResult] = None,
+  override val hmrcEntityVerificationPassed: Option[EntityCheckResult],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
 extends AgentApplication:
@@ -125,7 +125,7 @@ final case class AgentApplicationLlp(
   applicantContactDetails: Option[ApplicantContactDetails],
   override val amlsDetails: Option[AmlsDetails],
   override val agentDetails: Option[AgentDetails],
-  override val hmrcEntityVerificationPassed: Option[EntityCheckResult] = None,
+  override val hmrcEntityVerificationPassed: Option[EntityCheckResult],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
 extends AgentApplication:

@@ -39,6 +39,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       applicantContactDetails = None,
       amlsDetails = None,
       agentDetails = None,
+      hmrcEntityVerificationPassed = None,
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
     )
 

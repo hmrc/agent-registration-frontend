@@ -18,16 +18,17 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import com.github.tomakehurst.wiremock.client.WireMock.*
+import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AgentAssuranceStubs {
 
   def stubIsRefusedToDealWith(
-    saUtr: String,
+    saUtr: SaUtr,
     isRefused: Boolean
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlEqualTo(s"/agent-assurance/refusal-to-deal-with/utr/$saUtr"),
+    urlPattern = urlEqualTo(s"/agent-assurance/refusal-to-deal-with/utr/${saUtr.value}"),
     responseStatus =
       if (isRefused)
         403
@@ -37,11 +38,11 @@ object AgentAssuranceStubs {
   )
 
   def verifyIsRefusedToDealWith(
-    utr: String,
+    utr: SaUtr,
     count: Int = 1
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlEqualTo(s"/agent-assurance/refusal-to-deal-with/utr/$utr"),
+    urlPattern = urlEqualTo(s"/agent-assurance/refusal-to-deal-with/utr/${utr.value}"),
     count = count
   )
 
