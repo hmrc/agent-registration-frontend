@@ -44,10 +44,11 @@ extends FrontendController(mcc, actions):
       .Applicant
       .getApplicationInProgress
       .ensure(
-        _.agentApplication.isGrsDataReceived,
-        implicit request =>
-          logger.warn("Missing data from GRS, redirecting to start GRS registration")
-          Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
+        condition = _.agentApplication.isGrsDataReceived,
+        resultWhenConditionNotMet =
+          implicit request =>
+            logger.warn("Missing entity verification data, redirecting to entity verification service.")
+            Redirect(AppRoutes.apply.internal.EntityCheckController.verifyEntity())
       ):
         implicit request =>
           Ok(taskListPage(request.agentApplication.asLlpApplication.taskListStatus))
