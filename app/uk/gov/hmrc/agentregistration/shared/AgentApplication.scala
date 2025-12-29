@@ -44,7 +44,7 @@ sealed trait AgentApplication:
   def businessType: BusinessType
   def amlsDetails: Option[AmlsDetails]
   def agentDetails: Option[AgentDetails]
-  def hmrcEntityVerificationStatus: Option[EntityCheckResult]
+  def entityCheckResult: Option[EntityCheckResult]
   def hmrcStandardForAgentsAgreed: StateOfAgreement
 
   //  /** Updates the application state to the next state */
@@ -77,7 +77,7 @@ sealed trait AgentApplication:
       case a: AgentApplicationLlp => a.getBusinessDetails.saUtr.asUtr
       case _ => expectedDataNotDefinedError("currently utr is only defined for Llp applications, as other types are not implemented yet")
   def getAmlsDetails: AmlsDetails = amlsDetails.getOrElse(expectedDataNotDefinedError("amlsDetails"))
-  def getHmrcEntityVerificationPassed: EntityCheckResult = hmrcEntityVerificationStatus.getOrElse(expectedDataNotDefinedError("hmrcEntityVerificationPassed"))
+  def getEntityCheckResult: EntityCheckResult = entityCheckResult.getOrElse(expectedDataNotDefinedError("entityCheckResult"))
 
   private def as[T <: AgentApplication](using ct: reflect.ClassTag[T]): Option[T] =
     this match
@@ -103,7 +103,7 @@ final case class AgentApplicationSoleTrader(
   businessDetails: Option[BusinessDetailsSoleTrader],
   override val amlsDetails: Option[AmlsDetails],
   override val agentDetails: Option[AgentDetails],
-  override val hmrcEntityVerificationStatus: Option[EntityCheckResult],
+  override val entityCheckResult: Option[EntityCheckResult],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
 extends AgentApplication:
@@ -125,7 +125,7 @@ final case class AgentApplicationLlp(
   applicantContactDetails: Option[ApplicantContactDetails],
   override val amlsDetails: Option[AmlsDetails],
   override val agentDetails: Option[AgentDetails],
-  override val hmrcEntityVerificationStatus: Option[EntityCheckResult],
+  override val entityCheckResult: Option[EntityCheckResult],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
 extends AgentApplication:
