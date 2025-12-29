@@ -55,7 +55,7 @@ extends FrontendController(mcc, actions):
           Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
     )
     .ensure(
-      condition = _.agentApplication.hmrcEntityVerificationPassed.isEmpty,
+      condition = _.agentApplication.hmrcEntityVerificationStatus.isEmpty,
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Entity verification already done. Redirecting to task list page.")
@@ -72,7 +72,7 @@ extends FrontendController(mcc, actions):
             .refusalToDealCheck(llpApplication.getBusinessDetails.saUtr)
           _ <- agentApplicationService
             .upsert(llpApplication
-              .modify(_.hmrcEntityVerificationPassed)
+              .modify(_.hmrcEntityVerificationStatus)
               .setTo(Some(checkResult)))
         yield checkResult match
           case EntityCheckResult.Pass => Redirect(AppRoutes.apply.TaskListController.show)
