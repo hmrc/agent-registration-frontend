@@ -22,9 +22,9 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentAssuranceConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.services.EntityCheckService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import javax.inject.Inject
@@ -34,7 +34,7 @@ import javax.inject.Singleton
 class EntityCheckController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  entityCheckService: EntityCheckService,
+  agentAssuranceConnector: AgentAssuranceConnector,
   agentApplicationService: AgentApplicationService,
   simplePage: SimplePage
 )
@@ -68,8 +68,8 @@ extends FrontendController(mcc, actions):
         val llpApplication = request.agentApplication.asLlpApplication
 
         for
-          checkResult <- entityCheckService
-            .refusalToDealCheck(llpApplication.getBusinessDetails.saUtr)
+          checkResult <- agentAssuranceConnector
+            .isRefusedToDealWith(llpApplication.getBusinessDetails.saUtr)
           _ <- agentApplicationService
             .upsert(llpApplication
               .modify(_.entityCheckResult)
