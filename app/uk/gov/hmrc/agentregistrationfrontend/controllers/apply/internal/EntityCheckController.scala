@@ -54,38 +54,31 @@ extends FrontendController(mcc, actions):
           logger.warn("Missing data from GRS, redirecting to start GRS registration")
           Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
     )
+    .ensure(
+      condition = _.agentApplication.hmrcEntityVerificationPassed.isEmpty,
+      resultWhenConditionNotMet =
+        implicit request =>
+          logger.warn("Entity verification already done. Redirecting to task list page.")
+          Redirect(AppRoutes.apply.TaskListController.show)
+    )
 
   def verifyEntity(): Action[AnyContent] = baseAction
     .async:
       implicit request =>
-        entityCheckService
-          .refusalToDealCheck(
-            saUtr = request.agentApplication.asLlpApplication.getBusinessDetails.saUtr
-          )
-          .flatMap {
-            case EntityCheckResult.Pass =>
-              agentApplicationService
-                .upsert(
-                  request.agentApplication.asLlpApplication
-                    .modify(_.hmrcEntityVerificationPassed)
-                    .setTo(Some(EntityCheckResult.Pass))
-                )
-                .map(_ =>
-                  Redirect(AppRoutes.apply.TaskListController.show)
-                )
+        val llpApplication = request.agentApplication.asLlpApplication
 
-            case EntityCheckResult.Fail =>
-              logger.warn("Entity verification failed. Redirecting to iverification failed page.")
-              agentApplicationService
-                .upsert(
-                  request.agentApplication.asLlpApplication
-                    .modify(_.hmrcEntityVerificationPassed)
-                    .setTo(Some(EntityCheckResult.Fail))
-                )
-                .map(_ =>
-                  Ok(simplePage(
-                    h1 = "Entity verification failed...",
-                    bodyText = Some("Placeholder for entity verification failed page...")
-                  ))
-                )
-          }
+        for
+          checkResult <- entityCheckService
+            .refusalToDealCheck(llpApplication.getBusinessDetails.saUtr)
+          _ <- agentApplicationService
+            .upsert(llpApplication
+              .modify(_.hmrcEntityVerificationPassed)
+              .setTo(Some(checkResult)))
+        yield checkResult match
+          case EntityCheckResult.Pass => Redirect(AppRoutes.apply.TaskListController.show)
+          case EntityCheckResult.Fail =>
+            logger.warn("Entity verification failed. Redirecting to verification failed page.")
+            Ok(simplePage(
+              h1 = "Entity verification failed...",
+              bodyText = Some("Placeholder for entity verification failed page...")
+            ))

@@ -92,3 +92,12 @@ extends ControllerSpec:
     response.header("Location").value shouldBe AppRoutes.apply.AgentApplicationController.startRegistration.url
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
+
+  s"GET $path should redirect to task list page when entity verification already done" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterHmrcEntityVerificationPass)
+    val response: WSResponse = get(path)
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.TaskListController.show.url
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetAgentApplication()

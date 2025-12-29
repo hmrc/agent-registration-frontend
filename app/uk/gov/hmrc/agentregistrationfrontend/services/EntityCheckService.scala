@@ -31,4 +31,4 @@ class EntityCheckService @Inject() (
 )
 extends RequestAwareLogging:
 
-  def refusalToDealCheck(saUtr: SaUtr)(using rh: RequestHeader): Future[EntityCheckResult] = agentAssuranceConnector.isRefusedToDealWith(saUtr.value)
+  def refusalToDealCheck(saUtr: SaUtr)(using rh: RequestHeader): Future[EntityCheckResult] = agentAssuranceConnector.isRefusedToDealWith(saUtr)
