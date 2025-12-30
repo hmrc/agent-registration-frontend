@@ -62,7 +62,7 @@ extends FrontendController(mcc, actions):
           Redirect(AppRoutes.apply.TaskListController.show)
     )
 
-  def verifyEntity(): Action[AnyContent] = baseAction
+  def entityCheck(): Action[AnyContent] = baseAction
     .async:
       implicit request =>
         val llpApplication = request.agentApplication.asLlpApplication

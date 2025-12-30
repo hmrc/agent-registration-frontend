@@ -48,7 +48,7 @@ extends FrontendController(mcc, actions):
         resultWhenConditionNotMet =
           implicit request =>
             logger.warn("Missing entity verification data, redirecting to entity verification service.")
-            Redirect(AppRoutes.apply.internal.EntityCheckController.verifyEntity())
+            Redirect(AppRoutes.apply.internal.EntityCheckController.entityCheck())
       ):
         implicit request =>
           Ok(taskListPage(request.agentApplication.asLlpApplication.taskListStatus))

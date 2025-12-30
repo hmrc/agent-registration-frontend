@@ -49,11 +49,11 @@ extends ControllerSpec:
         .agentApplicationLlp
         .afterHmrcEntityVerificationFail
 
-  private val path: String = "/agent-registration/apply/internal/entity-check/verify-entity"
+  private val path: String = "/agent-registration/apply/internal/entity-check"
 //  private val startGrsJourneyPath: String = "/agent-registration/apply/internal/grs/start-journey"
 
   "routes should have correct paths and methods" in:
-    AppRoutes.apply.internal.EntityCheckController.verifyEntity() shouldBe Call(
+    AppRoutes.apply.internal.EntityCheckController.entityCheck() shouldBe Call(
       method = "GET",
       url = path
     )
