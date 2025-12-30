@@ -81,5 +81,5 @@ extends FrontendController(mcc, actions):
                     ))
                 }
             )
-            .map(_ => Redirect(routes.CheckYourAnswersController.show.url))
+            .map(_ => Redirect(AppRoutes.apply.amls.CheckYourAnswersController.show.url))
       .redirectIfSaveForLater

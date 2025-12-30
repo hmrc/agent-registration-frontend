@@ -36,8 +36,7 @@ import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.LinkIdGenerator
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsIdGenerator
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadIdGenerator
+
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.CsvLoader
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll

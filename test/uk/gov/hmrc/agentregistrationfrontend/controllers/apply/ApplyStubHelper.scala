@@ -20,8 +20,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.Utr
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
+
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs

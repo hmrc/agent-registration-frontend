@@ -21,6 +21,7 @@ import play.api.Configuration
 import sttp.model.Uri
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistrationfrontend.config.ConfigHelper.ensureValidUrl
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadId
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -92,15 +93,18 @@ class AppConfig @Inject() (
 
   object Upscan:
 
-    val callbackUrl: String = s"$agentRegistrationBaseUrl/agent-registration/upload/".ensureValidUrl("callbackUrl")
     val maxFileSize: ConfigMemorySize = configuration.underlying.getMemorySize("uploads.max-file-size")
     val checkUploadStatusInterval: FiniteDuration = configuration.get[FiniteDuration]("uploads.check-upload-status-interval")
     val checkUploadStatusMaxAttempts: Int = configuration.get[Int]("uploads.check-upload-status-max-attempts")
     val acceptMimeTypes: String = configuration.get[String]("uploads.accept-mime-types")
 
+  object UploadRepo:
+    val ttl: FiniteDuration = ConfigHelper.readFiniteDuration("mongodb.upload-repo-ttl", servicesConfig)
+
   // !!!
   // Access objects eagerly to initialize its vals, ensuring config errors are detected at startup
   Upscan
+  UploadRepo
 
 object ConfigHelper:
 

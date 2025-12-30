@@ -21,11 +21,12 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
-import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
-import uk.gov.hmrc.agentregistration.shared.upscan.FileUploadReference
-import uk.gov.hmrc.agentregistration.shared.upscan.Upload
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
+import uk.gov.hmrc.objectstore.client.Path
 
 import java.time.LocalDate
 import scala.util.chaining.scalaUtilChainingOps
@@ -44,20 +45,14 @@ trait TdSectionAmls {
 
   def amlsUploadDetailsAfterUploadInProgress: Upload = Upload(
     _id = dependencies.uploadId,
+    internalUserId = dependencies.internalUserId,
+    createdAt = dependencies.nowAsInstant,
     fileUploadReference = FileUploadReference("test-file-reference"),
     uploadStatus = UploadStatus.InProgress
   )
 
-  def amlsUploadDetailsAfterUploadScannedOk: Upload = amlsUploadDetailsAfterUploadInProgress.copy(
-    uploadStatus = dependencies.successfulUploadStatus.modify(_.objectStoreLocation).setTo(None)
-  )
-
-  def amlsUploadDetailsAfterUploadSucceeded: Upload = amlsUploadDetailsAfterUploadInProgress.copy(
-    uploadStatus = dependencies.successfulUploadStatus
-  )
-
   private def amlsUploadDetailsAfterUploadFailedScanning: Upload = amlsUploadDetailsAfterUploadInProgress.copy(
-    uploadStatus = UploadStatus.Failed
+    uploadStatus = UploadStatus.Failed(failureReason = "QUARANTINE", messageFromUpscan = "Suspicious file uploaded.")
   )
 
   class AgentApplicationLlpWithSectionAmls(baseForSectionAmls: AgentApplicationLlp):
@@ -107,24 +102,16 @@ trait TdSectionAmls {
             amlsEvidence = None
           )
 
-          def afterRegistrationNumberProvided = afterSupervisoryBodySelected.copy(
+          def afterRegistrationNumberProvided: AmlsDetails = afterSupervisoryBodySelected.copy(
             amlsRegistrationNumber = Some(amlsRegistrationNumber)
           )
 
-          def afterAmlsExpiryDateProvided = afterRegistrationNumberProvided.copy(
+          def afterAmlsExpiryDateProvided: AmlsDetails = afterRegistrationNumberProvided.copy(
             amlsExpiryDate = Some(amlsExpiryDateValid)
           )
-          def afterUploadInitiated = afterAmlsExpiryDateProvided.copy(
-            amlsEvidence = Some(amlsUploadDetailsAfterUploadInProgress)
-          )
-          def afterUploadFailed = afterAmlsExpiryDateProvided.copy(
-            amlsEvidence = Some(amlsUploadDetailsAfterUploadFailedScanning)
-          )
-          def afterUploadScannedOk = afterAmlsExpiryDateProvided.copy(
-            amlsEvidence = Some(amlsUploadDetailsAfterUploadScannedOk)
-          )
-          def afterUploadSucceeded = afterAmlsExpiryDateProvided.copy(
-            amlsEvidence = Some(amlsUploadDetailsAfterUploadSucceeded)
+
+          def afterUploadedAmlsEvidence: AmlsDetails = afterAmlsExpiryDateProvided.copy(
+            amlsEvidence = Some(AmlsEvidence("evidence.pdf", Path.File("object-store/object/agent-registration-frontend/test-file-reference/evidence.pdf")))
           )
 
         def afterSupervisoryBodySelected: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterSupervisoryBodySelected))
@@ -135,12 +122,7 @@ trait TdSectionAmls {
 
         def afterAmlsExpiryDateProvided: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterAmlsExpiryDateProvided))
 
-        def afterUploadInitiated: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadInitiated))
-
-        def afterUploadFailed: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadFailed))
-
-        def afterUploadScannedOk: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadScannedOk))
-        def afterUploadSucceeded: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadSucceeded))
+        def afterUploadSucceeded: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadedAmlsEvidence))
 
         def complete: AgentApplicationLlp = afterUploadSucceeded.tap(x => require(x.amlsDetails.exists(_.isComplete), "sanity check"))
 

@@ -28,7 +28,7 @@ extends UnitSpec:
   "De/Serialize UploadStatus" in:
 
     val uploadedSuccessfully: UploadStatus = UploadStatus.UploadedSuccessfully(
-      name = "test.pdf",
+      fileName = "test.pdf",
       mimeType = "application/pdf",
       downloadUrl = url"http://localhost:9000/test.pdf",
       size = Some(1000),

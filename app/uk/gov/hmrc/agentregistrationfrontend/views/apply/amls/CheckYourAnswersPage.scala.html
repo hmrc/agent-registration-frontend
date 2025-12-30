@@ -48,7 +48,7 @@
     <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
     @answerSummary(
         key,
-        answers = request.agentApplication.getAmlsDetails
+        amlsDetails = request.agentApplication.getAmlsDetails
     )
     <p class="govuk-body">
       @govukButton(Button(

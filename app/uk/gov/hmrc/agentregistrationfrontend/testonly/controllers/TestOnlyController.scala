@@ -21,9 +21,11 @@ import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
 import uk.gov.hmrc.agentregistration.shared.upscan.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -35,6 +37,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationSe
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestLinkPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyHubPage
 import uk.gov.hmrc.http.StringContextOps
+import uk.gov.hmrc.objectstore.client.Path
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -68,15 +71,12 @@ extends FrontendController(mcc, actions):
         applicationService
           .upsert(
             request.agentApplication
-              .modify(_.amlsDetails.each.amlsEvidence.each.uploadStatus)
+              .modify(_.amlsDetails.each.amlsEvidence)
               .setTo(
-                UploadStatus.UploadedSuccessfully(
-                  name = "test.pdf",
-                  mimeType = "application/pdf",
-                  downloadUrl = url"https://example.com/download",
-                  size = Some(12345),
-                  checksum = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
-                )
+                Some(AmlsEvidence(
+                  fileName = "test.pdf",
+                  Path.File(uri = "https://example.com/download")
+                ))
               )
           )
           .map(_ => Ok("upload set to complete"))

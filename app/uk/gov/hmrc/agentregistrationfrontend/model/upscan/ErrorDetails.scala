@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.upscan
+package uk.gov.hmrc.agentregistrationfrontend.model.upscan
 
-import play.api.libs.json.Format
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
-
-/** Upscan File Reference
-  */
-final case class FileUploadReference(value: String)
-
-object FileUploadReference:
-
-  given format: Format[FileUploadReference] = JsonFormatsFactory.makeValueClassFormat
+final case class ErrorDetails(
+  failureReason: String,
+  message: String
+)

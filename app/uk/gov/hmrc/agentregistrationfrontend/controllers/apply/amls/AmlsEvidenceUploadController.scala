@@ -21,31 +21,38 @@ import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Result
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsName
-import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
-import uk.gov.hmrc.agentregistration.shared.upscan.Upload
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadIdGenerator
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
+import uk.gov.hmrc.agentregistration.shared.util
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
+import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector
+import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.ObjectStoreService
+import uk.gov.hmrc.agentregistrationfrontend.services.UpscanInitiateService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.UpscanErrorPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadProgressPage
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadId
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadIdGenerator
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UpscanErrorCode
-import uk.gov.hmrc.agentregistrationfrontend.services.ObjectStoreService
-import uk.gov.hmrc.agentregistrationfrontend.services.UpscanProgressService
+import uk.gov.hmrc.agentregistrationfrontend.repository.UploadRepo
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.objectstore.client.Path
 
+import java.time.Clock
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
@@ -59,12 +66,14 @@ class AmlsEvidenceUploadController @Inject() (
   progressView: AmlsEvidenceUploadProgressPage,
   upscanErrorPage: UpscanErrorPage,
   appConfig: AppConfig,
-  upscanInitiateConnector: UpscanInitiateConnector,
+  upscanInitiateService: UpscanInitiateService,
   applicationService: AgentApplicationService,
   amlsCodes: AmlsCodes,
-  upscanProgressService: UpscanProgressService,
   objectStoreService: ObjectStoreService,
-  uploadIdGenerator: UploadIdGenerator
+  uploadIdGenerator: UploadIdGenerator,
+  agentRegistrationConnector: AgentRegistrationConnector,
+  uploadRepo: UploadRepo,
+  clock: Clock
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
@@ -75,13 +84,13 @@ extends FrontendController(mcc, actions):
       _.agentApplication.amlsDetails.exists(!_.isHmrc),
       implicit r =>
         logger.warn("Uploaded evidence is not required as supervisor is HMRC, redirecting to Check Your Answers")
-        Redirect(routes.CheckYourAnswersController.show.url)
+        Redirect(AppRoutes.apply.amls.CheckYourAnswersController.show.url)
     )
     .ensure(
       _.agentApplication.getAmlsDetails.amlsExpiryDate.isDefined, // safe to getAmlsDetails as ensured above
       implicit r =>
         logger.warn("Missing AmlsExpiryDate, redirecting to AmlsExpiryDate page")
-        Redirect(routes.AmlsExpiryDateController.show.url)
+        Redirect(AppRoutes.apply.amls.AmlsExpiryDateController.show.url)
     )
 
   def show: Action[AnyContent] = baseAction.async:
@@ -89,33 +98,15 @@ extends FrontendController(mcc, actions):
       val amlsCode: AmlsCode = request.agentApplication.getAmlsDetails.supervisoryBody
       val amlsName: AmlsName = amlsCodes.getSupervisoryName(amlsCode)
       for
-        upscanInitiateResponse <- upscanInitiateConnector.initiate(
-          redirectOnSuccessUrl = uri"${appConfig.thisFrontendBaseUrl + routes.AmlsEvidenceUploadController.showUploadResult.url}",
-          // cannot use controller.routes for the error url because upscan will respond with query parameters
-          redirectOnErrorUrl =
-            uri"${appConfig.thisFrontendBaseUrl + AppRoutes.apply.amls.AmlsEvidenceUploadController.showError(
-                errorCode = None,
-                errorMessage = None,
-                errorRequestId = None,
-                key = None
-              ).url}",
-          maxFileSize = appConfig.Upscan.maxFileSize
-        )
-        uploadDetails = Upload(
+        upscanInitiateResponse <- upscanInitiateService.initiate(uploadIdGenerator.nextUploadId())
+        upload = Upload(
           _id = uploadIdGenerator.nextUploadId(),
+          internalUserId = request.internalUserId,
+          createdAt = Instant.now(clock),
           uploadStatus = UploadStatus.InProgress,
           fileUploadReference = upscanInitiateResponse.reference
         )
-        // store the upscan fileReference and new uploadId in the application
-        // and initiate the upscan progress tracking in agent-registration backend
-        _ <- applicationService
-          .upsert(
-            request.agentApplication.asLlpApplication
-              .modify(_.amlsDetails.each.amlsEvidence)
-              .setTo(Some(uploadDetails))
-          ).flatMap: _ =>
-            upscanProgressService
-              .initiate(uploadDetails)
+        _ <- uploadRepo.upsert(upload) // generate ephemeral record to track upload status
       yield Ok(view(
         upscanInitiateResponse = upscanInitiateResponse,
         supervisoryBodyName = amlsName
@@ -153,44 +144,34 @@ extends FrontendController(mcc, actions):
     .Applicant
     .getApplicationInProgress
     .async:
-      implicit request =>
-        upscanProgressService.getUpscanStatus().flatMap:
-          case Some(status) if status =!= UploadStatus.InProgress =>
-            for {
-              objectStorePath <- objectStoreService
-                .transferFileToObjectStore(
-                  request
-                    .agentApplication
-                    .getAmlsDetails
-                    .getAmlsEvidence
-                    .fileUploadReference,
-                  status
-                )
-              updatedApplication =
-                (objectStorePath, status) match
-                  case (Some(path: Path.File), success: UploadStatus.UploadedSuccessfully) =>
+      implicit request: AgentApplicationRequest[AnyContent] =>
+        for
+          upload: Upload <- uploadRepo.findLatestByInternalUserId(request.internalUserId).map(_.getOrThrowExpectedDataMissing("upload"))
+          result <-
+            upload.uploadStatus match
+              case inProgress @ UploadStatus.InProgress => Future.successful(Ok(progressView(inProgress)))
+              case failed: UploadStatus.Failed => Future.successful(Ok(progressView(failed)))
+              case succeeded: UploadStatus.UploadedSuccessfully =>
+                for
+                  objectStoreLocation <- objectStoreService.transferFileToObjectStore(
+                    fileReference = upload.fileUploadReference,
+                    downloadUrl = succeeded.downloadUrl,
+                    mimeType = succeeded.mimeType,
+                    checksum = succeeded.checksum,
+                    fileName = succeeded.fileName
+                  )
+                  _ <- agentRegistrationConnector.upsertApplication(
                     request.agentApplication.asLlpApplication
-                      .modify(_.amlsDetails.each.amlsEvidence.each.uploadStatus)
+                      .modify(_.amlsDetails.each.amlsEvidence)
                       .setTo(
-                        success
-                          .modify(_.objectStoreLocation)
-                          .setTo(Some(ObjectStoreUrl(path.asUri)))
+                        Some(AmlsEvidence(
+                          fileName = succeeded.fileName,
+                          objectStoreLocation = objectStoreLocation
+                        ))
                       )
-                  case _ =>
-                    request.agentApplication.asLlpApplication
-                      .modify(_.amlsDetails.each.amlsEvidence.each.uploadStatus)
-                      .setTo(status)
-              _ <- applicationService.upsert(updatedApplication)
-            } yield Ok(progressView(status))
-          case _ =>
-            // no status change, just render the page
-            Future.successful(Ok(progressView(UploadStatus.InProgress)))
-
-  private val corsHeaders: Seq[(String, String)] = Seq(
-    "Access-Control-Allow-Origin" -> appConfig.thisFrontendBaseUrl,
-    "Access-Control-Allow-Credentials" -> "true",
-    "Access-Control-Allow-Methods" -> "GET, OPTIONS"
-  )
+                  )
+                yield Ok(progressView(succeeded))
+        yield result
 
   /** This endpoint is called via JavaScript in a poll loop to check the status of the file upload. The upload status is encoded in the HTTP status response:
     */
@@ -198,11 +179,22 @@ extends FrontendController(mcc, actions):
     .Applicant
     .getApplicationInProgress
     .async:
-      implicit request =>
-        upscanProgressService.getUpscanStatus().map:
+      implicit request: AgentApplicationRequest[AnyContent] =>
+
+        extension (r: Result)
+          def withCorsHeaders: Result = r.withHeaders(
+            "Access-Control-Allow-Origin" -> appConfig.thisFrontendBaseUrl,
+            "Access-Control-Allow-Credentials" -> "true",
+            "Access-Control-Allow-Methods" -> "GET, OPTIONS"
+          )
+
+        uploadRepo.findLatestByInternalUserId(request.internalUserId).map:
           case Some(status) =>
-            status match
-              case UploadStatus.InProgress => NoContent.withHeaders(corsHeaders*)
-              case _: UploadStatus.UploadedSuccessfully => Accepted.withHeaders(corsHeaders*)
-              case UploadStatus.Failed => BadRequest.withHeaders(corsHeaders*)
-          case _ => NoContent.withHeaders(corsHeaders*) // no status change
+            status.uploadStatus match
+              case UploadStatus.InProgress => NoContent.withCorsHeaders
+              case _: UploadStatus.UploadedSuccessfully => Accepted.withCorsHeaders
+              case _: UploadStatus.Failed => BadRequest.withCorsHeaders
+          case None =>
+            Errors.throwServerErrorException(
+              s"Upload record not found in database but expected to exist"
+            )

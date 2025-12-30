@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.upscan
+package uk.gov.hmrc.agentregistration.shared.amls
 
-import org.bson.types.ObjectId
-import play.api.libs.json.Format
-import play.api.mvc.PathBindable
-import uk.gov.hmrc.agentregistration.shared.util.{JsonFormatsFactory, ValueClassBinder}
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import uk.gov.hmrc.objectstore.client.Path
 
-final case class UploadId(value: String)
+final case class AmlsEvidence(
+  fileName: String,
+  objectStoreLocation: Path.File
+)
 
-object UploadId:
-
-  given format: Format[UploadId] = JsonFormatsFactory.makeValueClassFormat
-  given pathBindable: PathBindable[UploadId] = ValueClassBinder.valueClassBinder[UploadId](_.value)
-
-class UploadIdGenerator:
-  def nextUploadId(): UploadId = UploadId(ObjectId.get().toHexString)
+object AmlsEvidence:
+  given OFormat[AmlsEvidence] =
+    given OFormat[Path.File] = Json.format[Path.File]
+    given OFormat[Path.Directory] = Json.format[Path.Directory]
+    Json.format[AmlsEvidence]

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
+import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.agentdetails.*
 import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
@@ -30,9 +31,8 @@ import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState
-import uk.gov.hmrc.agentregistration.shared.upscan.ObjectStoreUrl
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadId
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadStatus
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.http.StringContextOps
 
@@ -128,13 +128,12 @@ trait TdBase:
     amlsExpiryDate = None,
     amlsEvidence = None
   )
-  def successfulUploadStatus: UploadStatus.UploadedSuccessfully = UploadStatus.UploadedSuccessfully(
-    downloadUrl = url"https://example.com/download-url",
-    name = "evidence.pdf",
+  def uploadedSuccessfully: UploadStatus.UploadedSuccessfully = UploadStatus.UploadedSuccessfully(
+    downloadUrl = uri"https://example.com/download-url",
+    fileName = "evidence.pdf",
     mimeType = "application/pdf",
-    size = Some(12345L),
-    checksum = objectStoreValidHexVal,
-    objectStoreLocation = Some(ObjectStoreUrl("test-file-reference/evidence.pdf"))
+    sizeInBytes = 12345L,
+    checksum = objectStoreValidHexVal
   )
   def uploadId: UploadId = UploadId("upload-id-12345")
   def objectStoreValidHexVal: String = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"

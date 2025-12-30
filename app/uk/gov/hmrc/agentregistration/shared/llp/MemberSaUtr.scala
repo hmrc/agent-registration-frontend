@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistration.shared.llp
 
 import play.api.libs.json.*
 import uk.gov.hmrc.agentregistration.shared.SaUtr
+import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
 
 import scala.annotation.nowarn
 

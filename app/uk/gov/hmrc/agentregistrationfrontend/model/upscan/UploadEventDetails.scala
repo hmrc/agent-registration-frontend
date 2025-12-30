@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend
+package uk.gov.hmrc.agentregistrationfrontend.model.upscan
 
-object RoutesExports:
+import java.time.Instant
 
-  export uk.gov.hmrc.agentregistration.shared.BusinessType
-  export uk.gov.hmrc.agentregistration.shared.AgentType
-  export uk.gov.hmrc.agentregistration.shared.LinkId
-  export uk.gov.hmrc.agentregistration.shared.AgentApplicationId
-  export uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
-  export uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadId
-  export uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection
+final case class UploadEventDetails(
+  uploadTimestamp: Instant,
+  checksum: String,
+  fileMimeType: String,
+  fileName: String,
+  size: Long
+)

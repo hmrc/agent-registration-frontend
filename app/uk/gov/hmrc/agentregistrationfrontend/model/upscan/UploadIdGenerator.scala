@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.upscan
+package uk.gov.hmrc.agentregistrationfrontend.model.upscan
 
-import play.api.libs.json.Format
-import play.api.libs.json.Json
+import org.bson.types.ObjectId
 
-final case class Upload(
-                         _id: UploadId,
-                         fileUploadReference: FileUploadReference,
-                         uploadStatus: UploadStatus
-)
-
-object Upload:
-
-  given format: Format[Upload] = Json.format[Upload]
+class UploadIdGenerator:
+  def nextUploadId(): UploadId = UploadId(ObjectId.get().toHexString)

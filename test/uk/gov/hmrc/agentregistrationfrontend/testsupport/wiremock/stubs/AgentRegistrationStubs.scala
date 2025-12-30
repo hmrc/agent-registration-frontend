@@ -25,9 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.Utr
-import uk.gov.hmrc.agentregistration.shared.upscan.Upload
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
+
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AgentRegistrationStubs:

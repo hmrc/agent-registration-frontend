@@ -209,6 +209,13 @@ extends RequestAwareLogging:
       )
     })
 
+    def genericActionRefinerAsync[P[_]](f: R[B] => Future[Either[Result, P[B]]]): ActionBuilder[P, B] = ab.andThen(new ActionRefiner[R, P] {
+      protected def executionContext: ExecutionContext = ec
+
+      @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+      protected def refine[A](request: R[A]): Future[Either[Result, P[A]]] = f.asInstanceOf[R[A] => Future[Either[Result, P[A]]]](request)
+    })
+
   extension [
     B // B Represents Play Framework's Content Type parameter, commonly denoted as B
   ](a: Action[B])(using ec: ExecutionContext)

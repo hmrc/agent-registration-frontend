@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.apply.amls
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadProgressPage
 import uk.gov.hmrc.http.StringContextOps
@@ -35,7 +35,7 @@ extends ViewSpec:
   val successfulDoc: Document = Jsoup.parse(
     viewTemplate(
       status = UploadStatus.UploadedSuccessfully(
-        name = "file.pdf",
+        fileName = "file.pdf",
         mimeType = "application/pdf",
         downloadUrl = url"http://localhost:1234/download/file.pdf",
         size = Some(12345),

@@ -14,14 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend
+package uk.gov.hmrc.agentregistrationfrontend.model.upscan
 
-object RoutesExports:
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
 
-  export uk.gov.hmrc.agentregistration.shared.BusinessType
-  export uk.gov.hmrc.agentregistration.shared.AgentType
-  export uk.gov.hmrc.agentregistration.shared.LinkId
-  export uk.gov.hmrc.agentregistration.shared.AgentApplicationId
-  export uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
-  export uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadId
-  export uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection
+import java.time.Instant
+
+final case class Upload(
+  private val _id: UploadId,
+  internalUserId: InternalUserId,
+  createdAt: Instant,
+  fileUploadReference: FileUploadReference,
+  uploadStatus: UploadStatus
+):
+  val uploadId: UploadId = _id
+
+object Upload:
+  given format: OFormat[Upload] = Json.format[Upload]

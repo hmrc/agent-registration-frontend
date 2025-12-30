@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls
 import play.api.libs.ws.WSResponse
 import play.api.libs.ws.readableAsString
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
+
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.ObjectStoreStubs
@@ -145,7 +145,7 @@ extends ControllerSpec:
       application = agentApplication.afterUploadScannedOk,
       updatedApplication = agentApplication.afterUploadSucceeded,
       uploadId = tdAll.uploadId,
-      uploadStatus = tdAll.successfulUploadStatus
+      uploadStatus = tdAll.uploadedSuccessfully
     )
     ObjectStoreStubs.stubObjectStoreTransfer()
     val response: WSResponse = get(resultPath)
