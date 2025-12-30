@@ -75,8 +75,8 @@ POST        /apply/anti-money-laundering/registration-number        uk.gov.hmrc.
 GET         /apply/anti-money-laundering/supervision-runs-out       uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsExpiryDateController.show
 POST        /apply/anti-money-laundering/supervision-runs-out       uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsExpiryDateController.submit
 
-GET         /apply/anti-money-laundering/evidence                   uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsEvidenceUploadController.show
-GET         /apply/anti-money-laundering/evidence/check-upload-status  uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsEvidenceUploadController.checkUploadStatus
+GET         /apply/anti-money-laundering/evidence                   uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsEvidenceUploadController.showAmlsEvidenceUploadPage
+GET         /apply/anti-money-laundering/evidence/check-upload-status-js  uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsEvidenceUploadController.checkUploadStatusJs
 GET         /apply/anti-money-laundering/evidence/upload-result     uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsEvidenceUploadController.showUploadResult
 GET         /apply/anti-money-laundering/evidence/error             uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.AmlsEvidenceUploadController.showError(errorCode: Option[String], errorMessage: Option[String], errorRequestId: Option[String], key: Option[String])
 

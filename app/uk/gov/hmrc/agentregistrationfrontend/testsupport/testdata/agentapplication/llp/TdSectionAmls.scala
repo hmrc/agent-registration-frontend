@@ -16,15 +16,11 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.llp
 
-import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 import uk.gov.hmrc.objectstore.client.Path
 
@@ -32,7 +28,7 @@ import java.time.LocalDate
 import scala.util.chaining.scalaUtilChainingOps
 
 trait TdSectionAmls {
-  dependencies: TdBase =>
+  dependencies: TdBase & TdUpload =>
 
   final def amlsCodeHmrc: AmlsCode = AmlsCode("HMRC")
   def amlsCodeNonHmrc: AmlsCode = AmlsCode("ATT") /// Association of TaxationTechnicians
@@ -42,18 +38,6 @@ trait TdSectionAmls {
 
   def amlsExpiryDateValid: LocalDate = dependencies.nowPlus6mAsLocalDateTime.toLocalDate
   def amlsExpiryDateInvalid: LocalDate = dependencies.nowPlus13mAsLocalDateTime.toLocalDate
-
-  def amlsUploadDetailsAfterUploadInProgress: Upload = Upload(
-    _id = dependencies.uploadId,
-    internalUserId = dependencies.internalUserId,
-    createdAt = dependencies.nowAsInstant,
-    fileUploadReference = FileUploadReference("test-file-reference"),
-    uploadStatus = UploadStatus.InProgress
-  )
-
-  private def amlsUploadDetailsAfterUploadFailedScanning: Upload = amlsUploadDetailsAfterUploadInProgress.copy(
-    uploadStatus = UploadStatus.Failed(failureReason = "QUARANTINE", messageFromUpscan = "Suspicious file uploaded.")
-  )
 
   class AgentApplicationLlpWithSectionAmls(baseForSectionAmls: AgentApplicationLlp):
 
@@ -111,7 +95,13 @@ trait TdSectionAmls {
           )
 
           def afterUploadedAmlsEvidence: AmlsDetails = afterAmlsExpiryDateProvided.copy(
-            amlsEvidence = Some(AmlsEvidence("evidence.pdf", Path.File("object-store/object/agent-registration-frontend/test-file-reference/evidence.pdf")))
+            amlsEvidence = Some(
+              AmlsEvidence(
+                uploadId = dependencies.uploadId,
+                fileName = "evidence.pdf",
+                objectStoreLocation = Path.File("object-store/object/agent-registration-frontend/test-file-reference/evidence.pdf")
+              )
+            )
           )
 
         def afterSupervisoryBodySelected: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterSupervisoryBodySelected))

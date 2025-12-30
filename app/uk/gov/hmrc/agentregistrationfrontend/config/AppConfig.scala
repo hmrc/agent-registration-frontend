@@ -20,8 +20,6 @@ import com.typesafe.config.ConfigMemorySize
 import play.api.Configuration
 import sttp.model.Uri
 import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistrationfrontend.config.ConfigHelper.ensureValidUrl
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadId
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.auth.core.Enrolment
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig

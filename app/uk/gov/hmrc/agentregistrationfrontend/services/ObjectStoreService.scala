@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.services
 import play.api.mvc.RequestHeader
 import sttp.model.Uri
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
 import uk.gov.hmrc.objectstore.client.Path
 import uk.gov.hmrc.objectstore.client.RetentionPeriod
@@ -33,7 +34,14 @@ import scala.concurrent.Future
 @Singleton
 class ObjectStoreService @Inject() (
   playObjectStoreClient: PlayObjectStoreClient
-)(using ec: ExecutionContext) {
+)(using ec: ExecutionContext)
+extends RequestAwareLogging:
+
+  def deleteObject(path: Path.File)(using request: RequestHeader): Future[Unit] = playObjectStoreClient
+    .deleteObject(
+      path
+    ).recover:
+      case e => logger.error(s"Failed to delete object $path", e)
 
   /** Transfers the file from Upscan to Object Store if the upload was successful. Returns the Object Store file path if the transfer was successful, None
     * otherwise.
@@ -44,21 +52,14 @@ class ObjectStoreService @Inject() (
     mimeType: String,
     checksum: String,
     fileName: String
-//    uploadStatus: UploadStatus
   )(using request: RequestHeader): Future[Path.File] =
-
-//        val fileLocation: Path.File = Path.File(s"${fileReference.value}/${details.name}")
     val fileLocation: Path.File = Path.File(s"${fileReference.value}/$fileName")
-//        val contentSha256 = Sha256Checksum.fromHex(details.checksum)
     val contentSha256 = Sha256Checksum.fromHex(checksum)
     playObjectStoreClient.uploadFromUrl(
-//          from = url"${details.downloadUrl}",
       from = downloadUrl.toJavaUri.toURL,
       to = fileLocation,
       retentionPeriod = RetentionPeriod.SixMonths, // TODO: how long do we need to keep these files?
-//          contentType = Some(details.mimeType),
       contentType = Some(mimeType),
       contentSha256 = Some(contentSha256)
     )
       .map(_.location)
-}

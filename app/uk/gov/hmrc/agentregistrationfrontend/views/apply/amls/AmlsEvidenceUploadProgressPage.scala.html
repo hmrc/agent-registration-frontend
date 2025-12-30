@@ -62,7 +62,7 @@
             }
           case  _: UploadStatus.Failed => {
               @govukButton(Button(
-                  href = Some(AppRoutes.apply.amls.AmlsEvidenceUploadController.show.url),
+                  href = Some(AppRoutes.apply.amls.AmlsEvidenceUploadController.showAmlsEvidenceUploadPage.url),
                   content = Text(messages("common.tryAgain"))
               ))
           }

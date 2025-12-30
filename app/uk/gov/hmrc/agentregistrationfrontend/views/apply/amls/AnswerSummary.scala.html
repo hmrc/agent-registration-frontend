@@ -111,7 +111,7 @@
     actions = if(!canChange) None else Some(Actions(
       items = Seq(
         ActionItem(
-          href = s"${AppRoutes.apply.amls.AmlsEvidenceUploadController.show}",
+          href = s"${AppRoutes.apply.amls.AmlsEvidenceUploadController.showAmlsEvidenceUploadPage}",
           content = Text(messages(s"$key.change")),
           visuallyHiddenText = Some(messages(s"$key.evidence.label"))
         )

@@ -19,19 +19,10 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.api
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.*
 import uk.gov.hmrc.agentregistrationfrontend.repository.UploadRepo
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.services.ObjectStoreService
-import uk.gov.hmrc.agentregistrationfrontend.services.UpscanInitiateService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadProgressPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.UpscanErrorPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -42,16 +33,6 @@ import scala.concurrent.Future
 class NotificationFromUpscanController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  view: AmlsEvidenceUploadPage,
-  progressView: AmlsEvidenceUploadProgressPage,
-  upscanErrorPage: UpscanErrorPage,
-  appConfig: AppConfig,
-  upscanInitiateService: UpscanInitiateService,
-  applicationService: AgentApplicationService,
-  amlsCodes: AmlsCodes,
-  objectStoreService: ObjectStoreService,
-  uploadIdGenerator: UploadIdGenerator,
-  agentRegistrationConnector: AgentRegistrationConnector,
   uploadRepo: UploadRepo
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
