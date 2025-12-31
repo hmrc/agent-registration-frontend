@@ -38,6 +38,7 @@ GET        /apply/internal/initiate-agent-application/:agentType/:businessType  
 GET        /apply/internal/grs/start-journey                                          uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.GrsController.startJourney()
 GET        /apply/internal/grs/journey-callback                                       uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.GrsController.journeyCallback(journeyId: Option[grs.JourneyId])
 GET        /apply/internal/address-lookup/journey-callback                            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.AddressLookupCallbackController.journeyCallback(id: Option[addresslookup.JourneyId])
+GET        /apply/internal/entity-check                                               uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.EntityCheckController.entityCheck()
 
 ## Applicant contact details routes
 GET         /apply/applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.ApplicantRoleInLlpController.show
