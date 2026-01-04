@@ -73,7 +73,7 @@ extends FrontendController(mcc, actions):
         if agentType =!= AgentType.UkTaxAgent then Errors.notImplemented("only UkTaxAgent is supported for now") else ()
         if businessType =!= BusinessType.Partnership.LimitedLiabilityPartnership then Errors.notImplemented("only LLP is supported for now") else ()
 
-        val nextEndpoint: Call = routes.GrsController.startJourney()
+        val nextEndpoint: Call = routes.GrsController.startJourney() // scalafix:ok DisableSyntax
 
         agentApplicationService.find().flatMap:
           case Some(agentApplication) =>

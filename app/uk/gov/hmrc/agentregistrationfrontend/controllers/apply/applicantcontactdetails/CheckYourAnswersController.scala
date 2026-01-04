@@ -45,27 +45,27 @@ extends FrontendController(mcc, actions):
       implicit request =>
         logger.warn("Because we don't have complete applicant contact details we are redirecting to where data is missing")
         request.agentApplication.asLlpApplication.applicantContactDetails match {
-          case None => Redirect(routes.ApplicantRoleInLlpController.show)
+          case None => Redirect(AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show)
           case Some(ApplicantContactDetails(
                 ApplicantName.NameOfAuthorised(None),
                 _,
                 _
               )) =>
-            Redirect(routes.AuthorisedNameController.show)
+            Redirect(AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.show)
           case Some(ApplicantContactDetails(
                 ApplicantName.NameOfMember(None, None),
                 _,
                 _
               )) =>
-            Redirect(routes.MemberNameController.show)
+            Redirect(AppRoutes.apply.applicantcontactdetails.MemberNameController.show)
           case Some(ApplicantContactDetails(
                 ApplicantName.NameOfMember(Some(_), None),
                 _,
                 _
               )) =>
-            Redirect(routes.CompaniesHouseMatchingController.show)
-          case Some(ApplicantContactDetails(_, None, _)) => Redirect(routes.TelephoneNumberController.show)
-          case Some(ApplicantContactDetails(_, Some(_), _)) => Redirect(routes.EmailAddressController.show)
+            Redirect(AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.show)
+          case Some(ApplicantContactDetails(_, None, _)) => Redirect(AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.show)
+          case Some(ApplicantContactDetails(_, Some(_), _)) => Redirect(AppRoutes.apply.applicantcontactdetails.EmailAddressController.show)
         }
     )
 

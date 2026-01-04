@@ -153,9 +153,8 @@ extends FrontendController(mcc, actions):
   def setupGrsJourney(businessType: BusinessType): Action[JourneyConfig] =
     Action(parse.json[JourneyConfig]): (_: Request[JourneyConfig]) =>
       Created(Json.obj(
-        "journeyStartUrl" -> routes.GrsStubController.showGrsData(businessType, randomJourneyId()).url
+        "journeyStartUrl" -> routes.GrsStubController.showGrsData(businessType, randomJourneyId()).url // scalafix:ok DisableSyntax
       ))
-
   def randomSaUtr(): SaUtr = SaUtr("%010d".format(Random.nextLong(9999999999L)))
   def randomCtUtr(): CtUtr = CtUtr("%010d".format(Random.nextLong(9999999999L)))
   def randomJourneyId(): JourneyId = JourneyId(UUID.randomUUID().toString)

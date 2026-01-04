@@ -57,9 +57,9 @@ extends FrontendController(mcc, actions):
       implicit request =>
         logger.warn("Because we don't have name details we are computing which name type to redirect to and redirecting to that page")
         request.agentApplication.asLlpApplication.applicantContactDetails.map(_.applicantName) match {
-          case Some(ApplicantName.NameOfMember(_, _)) => Redirect(routes.CompaniesHouseMatchingController.show)
-          case Some(ApplicantName.NameOfAuthorised(_)) => Redirect(routes.AuthorisedNameController.show)
-          case _ => Redirect(routes.ApplicantRoleInLlpController.show)
+          case Some(_: ApplicantName.NameOfMember) => Redirect(AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.show)
+          case Some(_: ApplicantName.NameOfAuthorised) => Redirect(AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.show)
+          case None => Redirect(AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show)
         }
     )
 
@@ -85,5 +85,5 @@ extends FrontendController(mcc, actions):
             .modify(_.applicantContactDetails.each.telephoneNumber)
             .setTo(Some(validFormData))
           agentApplicationService.upsert(updatedApplication).map: _ =>
-            Redirect(routes.CheckYourAnswersController.show.url)
+            Redirect(AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater

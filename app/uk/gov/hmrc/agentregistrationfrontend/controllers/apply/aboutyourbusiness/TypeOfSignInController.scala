@@ -58,14 +58,14 @@ extends FrontendController(mcc, actions):
       .ensureValidForm(TypeOfSignInForm.form, implicit request => view(_)):
         implicit request =>
           val typeOfSignIn: TypeOfSignIn = request.formValue
-          Redirect(routes.TypeOfSignInController.showSignInPage)
+          Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.showSignInPage)
             .addToSession(typeOfSignIn)
 
   def showSignInPage: Action[AnyContent] =
     action
-      .ensure(_.readAgentType.isDefined, Redirect(routes.AgentTypeController.show.url))
-      .ensure(_.readBusinessType.isDefined, Redirect(routes.BusinessTypeSessionController.show.url))
-      .ensure(_.readTypeOfSignIn.isDefined, Redirect(routes.TypeOfSignInController.show.url)):
+      .ensure(_.readAgentType.isDefined, Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url))
+      .ensure(_.readBusinessType.isDefined, Redirect(AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show.url))
+      .ensure(_.readTypeOfSignIn.isDefined, Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show.url)):
         implicit request =>
           val agentType: AgentType = request.getAgentType
           val businessType: BusinessType = request.getBusinessType
