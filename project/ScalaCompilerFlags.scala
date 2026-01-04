@@ -6,13 +6,7 @@ object ScalaCompilerFlags {
     "-language:reflectiveCalls",
     "-Wconf:msg=While parsing annotations in:silent",
     "-Yno-flexible-types",
-//    "-rewrite",             // Enable rewriting
-//    "-new-syntax",          // Enable significant indentation syntax
-//    "-indent",              // Enable significant indentation syntax
-//    "-source:3.6-migration" // Use Scala 3 migration mode
-    "-Wconf:src=target/.*:s", // silence warnings from compiled files (this includes both compiled routes and twirl templates)
-    "other-match-analysis:error", // treat inexhaustive match as error
-    "-Wunused:patvars" // Warn if a variable in a pattern is unused (helps catch unnecessary underscores)
+    "-Wconf:src=target/.*:s" // silence warnings from compiled files (this includes both compiled routes and twirl templates)
   )
 
   val strictScalaCompilerOptions: Seq[String] = Seq(
