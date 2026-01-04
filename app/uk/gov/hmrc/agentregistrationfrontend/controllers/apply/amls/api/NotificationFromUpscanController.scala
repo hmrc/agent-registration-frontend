@@ -16,7 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.api
 
+import play.api.libs.json.JsValue
+import play.api.libs.json.Json
 import play.api.mvc.*
+import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -41,13 +44,14 @@ extends FrontendController(mcc, actions):
     *
     * For detailed callback format see [[UploadNotificationRequest]]
     */
-  def processNotificationFromUpscan(uploadId: UploadId): Action[UploadNotificationRequest] =
+  def processNotificationFromUpscan(uploadId: UploadId): Action[JsValue] =
     actions
       .action
-      .async(parse.json[UploadNotificationRequest]):
+      .async(parse.json):
         implicit request =>
-          val notificationRequest: UploadNotificationRequest = request.body
-          logger.info(s"Upscan notification received for uploadId: $uploadId, status: $notificationRequest")
+          val notificationRequestJson: JsValue = request.body
+          logger.info(s"Upscan notification received for uploadId: $uploadId:\n ${Json.prettyPrint(notificationRequestJson)}")
+          val notificationRequest: UploadNotificationRequest = request.body.as[UploadNotificationRequest]
 
           uploadRepo.findById(uploadId).flatMap:
             case None =>
@@ -55,11 +59,11 @@ extends FrontendController(mcc, actions):
               logger.error(message)
               Future.successful(NotFound(message))
             case Some(upload: Upload) =>
-              val uploadStatus: UploadStatus = request.body.asUploadStatus
+              val uploadStatus: UploadStatus = notificationRequest.asUploadStatus
               for
                 _ <- Errors.requireF(
-                  request.body.reference === upload.fileUploadReference,
-                  s"Callback reference '${request.body.reference.value}'does not match upload reference '${upload.fileUploadReference.value}'"
+                  notificationRequest.reference === upload.fileUploadReference,
+                  s"Callback reference '${notificationRequest.reference.value}'does not match upload reference '${upload.fileUploadReference.value}'"
                 )
                 _ <- uploadRepo.upsert(upload.copy(uploadStatus = uploadStatus))
               yield Ok("")
@@ -67,7 +71,7 @@ extends FrontendController(mcc, actions):
   extension (notificationRequest: UploadNotificationRequest)
     def asUploadStatus: UploadStatus =
       notificationRequest match
-        case unr: UploadNotificationRequest.Success =>
+        case unr: UploadNotificationRequest.Succeeded =>
           UploadStatus.UploadedSuccessfully(
             fileName = unr.uploadDetails.fileName,
             mimeType = unr.uploadDetails.fileMimeType,

@@ -72,16 +72,16 @@ extends ControllerSpec:
 
   private val applicantEmailVerificationRequest: VerifyEmailRequest = VerifyEmailRequest(
     credId = tdAll.credentials.providerId,
-    continueUrl = "http://localhost:22201/agent-registration/apply/applicant/verify-email-address",
+    continueUrl = s"$thisFrontendBaseUrl/agent-registration/apply/applicant/verify-email-address",
     origin = "HMRC Agent Services",
     deskproServiceName = None,
     accessibilityStatementUrl = "/agent-services-account",
     email = Some(Email(
       address = tdAll.applicantEmailAddress.value,
-      enterUrl = "http://localhost:22201/agent-registration/apply/applicant/email-address"
+      enterUrl = s"$thisFrontendBaseUrl/agent-registration/apply/applicant/email-address"
     )),
     lang = Some("en"),
-    backUrl = Some("http://localhost:22201/agent-registration/apply/applicant/email-address"),
+    backUrl = Some(s"$thisFrontendBaseUrl/agent-registration/apply/applicant/email-address"),
     pageTitle = None
   )
 

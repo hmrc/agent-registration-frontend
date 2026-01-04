@@ -77,7 +77,10 @@ extends FrontendController(mcc, actions):
                     )
                   case None =>
                     Some(AmlsDetails(
-                      supervisoryBody = supervisoryBody
+                      supervisoryBody = supervisoryBody,
+                      amlsRegistrationNumber = None,
+                      amlsExpiryDate = None,
+                      amlsEvidence = None
                     ))
                 }
             )

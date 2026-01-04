@@ -18,10 +18,10 @@ package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.mvc.RequestHeader
 import sttp.model.Uri.UriContext
+import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadId
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject

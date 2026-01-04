@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers
 
-import com.softwaremill.quicklens.*
 import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
@@ -24,18 +23,14 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadId
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestLinkPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyHubPage
-import uk.gov.hmrc.objectstore.client.Path
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -44,7 +39,6 @@ import javax.inject.Singleton
 class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  applicationService: AgentApplicationService,
   testApplicationService: TestApplicationService,
   testLinkPage: TestLinkPage,
   testOnlyHubPage: TestOnlyHubPage
@@ -60,25 +54,6 @@ extends FrontendController(mcc, actions):
     .Applicant
     .getApplicationInProgress: request =>
       Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))
-
-  def setUploadToComplete(): Action[AnyContent] = actions
-    .Applicant
-    .getApplicationInProgress
-    .async:
-      implicit request =>
-        applicationService
-          .upsert(
-            request.agentApplication
-              .modify(_.amlsDetails.each.amlsEvidence)
-              .setTo(
-                Some(AmlsEvidence(
-                  uploadId = UploadId("test-upload-id"),
-                  fileName = "test.pdf",
-                  Path.File(uri = "https://example.com/download")
-                ))
-              )
-          )
-          .map(_ => Ok("upload set to complete"))
 
   def addAgentTypeToSession(
     agentType: AgentType

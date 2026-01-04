@@ -22,9 +22,9 @@ import org.mongodb.scala.model.IndexOptions
 import org.mongodb.scala.model.Indexes
 import org.mongodb.scala.model.Sorts
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadId
 import uk.gov.hmrc.agentregistrationfrontend.repository.Repo.IdExtractor
 import uk.gov.hmrc.agentregistrationfrontend.repository.Repo.IdString
 import uk.gov.hmrc.agentregistrationfrontend.repository.UploadRepoHelp.given

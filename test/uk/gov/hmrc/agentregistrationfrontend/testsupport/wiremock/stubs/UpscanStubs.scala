@@ -19,31 +19,35 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs
 import com.github.tomakehurst.wiremock.client.WireMock as wm
 import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import uk.gov.hmrc.agentregistration.shared.upload.UploadId
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.WireMockSupport
 
 object UpscanStubs:
 
-  val requestJson: String =
+  def requestJson(uploadId: UploadId): String = {
     // language=JSON
     s"""
    {
-       "callbackUrl": "http://localhost:${WireMockSupport.port}/agent-registration/application/amls/upscan-callback",
-       "successRedirect": "http://localhost:22201/agent-registration/apply/anti-money-laundering/evidence/upload-result",
-       "errorRedirect": "http://localhost:22201/agent-registration/apply/anti-money-laundering/evidence/error",
+       "callbackUrl": "${ISpec.thisFrontendBaseUrl}/api/amls/process-notification-from-upscan/${uploadId.value}",
+       "successRedirect": "${ISpec.thisFrontendBaseUrl}/agent-registration/apply/anti-money-laundering/evidence/upload-result",
+       "errorRedirect": "${ISpec.thisFrontendBaseUrl}/agent-registration/apply/anti-money-laundering/evidence/error",
        "maximumFileSize": 5242880
    }
    """
+  }
 
-  val responseJson: String =
+  def responseJson(fileUploadReference: FileUploadReference): String =
     // language=JSON
     s"""
    {
-       "reference": "test-file-reference",
+       "reference": "${fileUploadReference.value}",
        "uploadRequest": {
            "href": "https://bucketName.s3.eu-west-2.amazonaws.com",
            "fields": {
-               "x-amz-meta-callback-url": "http://localhost:22202/agent-registration/application/amls/upscan-callback",
+               "x-amz-meta-callback-url": "${ISpec.thisFrontendBaseUrl}/agent-registration/application/amls/upscan-callback",
                "x-amz-date": "yyyyMMddThhmmssZ",
                "x-amz-credential": "ASIAxxxxxxxxx/20180202/eu-west-2/s3/aws4_request",
                "x-amz-algorithm": "AWS4-HMAC-SHA256",
@@ -57,16 +61,19 @@ object UpscanStubs:
    }
    """
 
-  def stubUpscanInitiateResponse(): StubMapping = StubMaker.make(
+  def stubUpscanInitiate(
+    fileUploadReference: FileUploadReference = TdAll.tdAll.fileUploadReference,
+    uploadId: UploadId = TdAll.tdAll.uploadId
+  ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlEqualTo("/upscan/v2/initiate"),
     requestBody = Some(equalToJson(
-      requestJson,
+      requestJson(uploadId),
       true,
       true
     )),
     responseStatus = 200,
-    responseBody = responseJson
+    responseBody = responseJson(fileUploadReference)
   )
 
   def verifyUpscanInitiateRequest(count: Int = 1): Unit = StubMaker.verify(

@@ -24,6 +24,9 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.EmailVerificationStubs
 
 class AgentEmailAddressControllerSpec
@@ -87,16 +90,16 @@ extends ControllerSpec:
 
   private val agentEmailVerificationRequest: VerifyEmailRequest = VerifyEmailRequest(
     credId = tdAll.credentials.providerId,
-    continueUrl = "http://localhost:22201/agent-registration/apply/agent-details/verify-email-address",
+    continueUrl = s"${ISpec.thisFrontendBaseUrl}/agent-registration/apply/agent-details/verify-email-address",
     origin = "HMRC Agent Services",
     deskproServiceName = None,
     accessibilityStatementUrl = "/agent-services-account",
     email = Some(Email(
       address = tdAll.newEmailAddress,
-      enterUrl = "http://localhost:22201/agent-registration/apply/agent-details/email-address"
+      enterUrl = s"${ISpec.thisFrontendBaseUrl}/agent-registration/apply/agent-details/email-address"
     )),
     lang = Some("en"),
-    backUrl = Some("http://localhost:22201/agent-registration/apply/agent-details/email-address"),
+    backUrl = Some(s"${ISpec.thisFrontendBaseUrl}/agent-registration/apply/agent-details/email-address"),
     pageTitle = None
   )
 
@@ -239,7 +242,9 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $verifyPath with an email yet to be verified in the application should redirect to the email verification frontend" in:
-    ApplyStubHelper.stubsForAuthAction(agentApplication.afterOtherEmailAddressSelected)
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterOtherEmailAddressSelected)
+
     EmailVerificationStubs.stubEmailYetToBeVerified(tdAll.credentials.providerId)
     EmailVerificationStubs.stubVerificationRequest(agentEmailVerificationRequest)
     val response: WSResponse = get(verifyPath)

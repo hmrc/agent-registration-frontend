@@ -41,53 +41,53 @@ extends ViewSpec:
 
     "have expected content" in:
       doc.mainContent shouldContainContent
-        """
-          |Application for Test Company Name
-          |Application reference: HDJ2123F
-          |About your business
-          |UK-based agent
-          |Yes
-          |Business type
-          |Limited liability partnership
-          |Company name
-          |Test Company Name
-          |Unique taxpayer reference
-          |1234567895
-          |Applicant contact details
-          |Member of the limited liability partnership
-          |No, but I’m authorised by them to set up this account
-          |Name
-          |Alice Smith
-          |Telephone number
-          |(+44) 10794554342
-          |Email address
-          |user@test.com
-          |Agency contact details
-          |Name shown to clients
-          |Test Company Name
-          |Telephone number
-          |(+44) 10794554342
-          |Email address
-          |user@test.com
-          |Correspondence address
-          |23 Great Portland Street
-          |London
-          |W1 8LT
-          |GB
-          |Anti-money laundering supervision details
-          |Supervisory body
-          |HM Revenue and Customs (HMRC)
-          |Registration number
-          |XAML1234567890
-          |HMRC standard for agents
-          |Agreed to meet the HMRC standard for agents
-          |Yes
-          |What to do next
-          |The members of Test Company Name need to sign in and provide some personal details.
-          |Send this link to all members http://localhost:22201/agent-registration/provide-details/start/link-id-12345
-          |Your can check the progress of your application by clicking the link on the GOV.UK page “Apply for an agent services account”.
-          |Print this page
-          |"""
+        s"""
+           |Application for Test Company Name
+           |Application reference: HDJ2123F
+           |About your business
+           |UK-based agent
+           |Yes
+           |Business type
+           |Limited liability partnership
+           |Company name
+           |Test Company Name
+           |Unique taxpayer reference
+           |1234567895
+           |Applicant contact details
+           |Member of the limited liability partnership
+           |No, but I’m authorised by them to set up this account
+           |Name
+           |Alice Smith
+           |Telephone number
+           |(+44) 10794554342
+           |Email address
+           |user@test.com
+           |Agency contact details
+           |Name shown to clients
+           |Test Company Name
+           |Telephone number
+           |(+44) 10794554342
+           |Email address
+           |user@test.com
+           |Correspondence address
+           |23 Great Portland Street
+           |London
+           |W1 8LT
+           |GB
+           |Anti-money laundering supervision details
+           |Supervisory body
+           |HM Revenue and Customs (HMRC)
+           |Registration number
+           |XAML1234567890
+           |HMRC standard for agents
+           |Agreed to meet the HMRC standard for agents
+           |Yes
+           |What to do next
+           |The members of Test Company Name need to sign in and provide some personal details.
+           |Send this link to all members $thisFrontendBaseUrl/agent-registration/provide-details/start/link-id-12345
+           |Your can check the progress of your application by clicking the link on the GOV.UK page “Apply for an agent services account”.
+           |Print this page
+           |"""
           .stripMargin
 
     "have the correct title" in:

@@ -24,6 +24,8 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AddressLookupFrontendStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
 class AgentCorrespondenceAddressControllerSpec
 extends ControllerSpec:
@@ -154,9 +156,10 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with selection of other should redirect to Address Lookup Frontend" in:
-    ApplyStubHelper.stubsForAuthAction(agentApplication.afterEmailAddressSelected)
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterEmailAddressSelected)
     AddressLookupFrontendStubs.stubAddressLookupInit(
-      continueUrl = "http://localhost:22201/agent-registration/apply/internal/address-lookup/journey-callback"
+      continueUrl = s"$thisFrontendBaseUrl/agent-registration/apply/internal/address-lookup/journey-callback"
     )
     val response: WSResponse =
       post(path)(Map(
@@ -166,7 +169,9 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe "http://localhost:9028/any-uri-determined-by-alf"
-    ApplyStubHelper.verifyConnectorsForAuthAction()
+
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetAgentApplication()
     AddressLookupFrontendStubs.verifyAddressLookupInit()
 
   s"POST $path with blank inputs should return 400" in:

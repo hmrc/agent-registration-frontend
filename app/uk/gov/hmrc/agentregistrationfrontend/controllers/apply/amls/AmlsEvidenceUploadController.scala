@@ -22,6 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsName
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
+import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
@@ -87,10 +88,11 @@ extends FrontendController(mcc, actions):
     implicit request =>
       val amlsCode: AmlsCode = request.agentApplication.getAmlsDetails.supervisoryBody
       val amlsName: AmlsName = amlsCodes.getSupervisoryName(amlsCode)
+      val uploadId: UploadId = uploadIdGenerator.nextUploadId()
       for
-        upscanInitiateResponse <- upscanInitiateService.initiate(uploadIdGenerator.nextUploadId())
+        upscanInitiateResponse <- upscanInitiateService.initiate(uploadId)
         upload = Upload(
-          _id = uploadIdGenerator.nextUploadId(),
+          _id = uploadId,
           internalUserId = request.internalUserId,
           createdAt = Instant.now(clock),
           uploadStatus = UploadStatus.InProgress,
@@ -193,7 +195,10 @@ extends FrontendController(mcc, actions):
             status.uploadStatus match
               case UploadStatus.InProgress => NoContent.withCorsHeaders
               case _: UploadStatus.UploadedSuccessfully => Accepted.withCorsHeaders
-              case _: UploadStatus.Failed => BadRequest.withCorsHeaders
+              case _: UploadStatus.Failed =>
+                // TODO: maybe ExpectationFailed would be better instead of BadRequest, as this request isn't bad
+                // TODO: also we could pass in the failureReason to choose a better error message, which is not implemented yet
+                BadRequest.withCorsHeaders
           case None =>
             Errors.throwServerErrorException(
               s"Upload record not found in database but expected to exist"

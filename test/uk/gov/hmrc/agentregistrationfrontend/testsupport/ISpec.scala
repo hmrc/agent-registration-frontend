@@ -28,26 +28,19 @@ import play.api.inject.guice.GuiceableModule
 import play.api.test.DefaultTestServerFactory
 import play.api.test.TestServerFactory
 import play.core.server.ServerConfig
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationIdGenerator
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsName
-import uk.gov.hmrc.agentregistration.shared.LinkId
-import uk.gov.hmrc.agentregistration.shared.LinkIdGenerator
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsIdGenerator
-
+import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.CsvLoader
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadIdGenerator
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.WireMockSupport
-import uk.gov.hmrc.objectstore.client.RetentionPeriod
-import uk.gov.hmrc.objectstore.client.config.ObjectStoreClientConfig
-import uk.gov.hmrc.objectstore.client.play.PlayObjectStoreClient
 
 import java.time.Clock
 import java.time.Instant
-import java.util.UUID.randomUUID
+import scala.concurrent.ExecutionContext
 
 trait ISpec
 extends AnyWordSpecLike,
@@ -58,15 +51,19 @@ extends AnyWordSpecLike,
 
 //  override implicit val patienceConfig: PatienceConfig = PatienceConfig(timeout = scaled(Span(3, Seconds)), interval = scaled(Span(300, Millis)))
   private val testServerPort = ISpec.testServerPort
+  val thisFrontendBaseUrl: String = ISpec.thisFrontendBaseUrl
 
   lazy val tdAll: TdAll = TdAll.tdAll
   lazy val frozenInstant: Instant = tdAll.nowAsInstant
   given clock: Clock = tdAll.clock
+  given ExecutionContext = app.injector.instanceOf[ExecutionContext]
 
   protected final val AppRoutes = uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes // alias so no need to import it everywhere in ISpecs
 
   protected def configMap: Map[String, Any] =
     Map[String, Any](
+      "urls.this-frontend" -> thisFrontendBaseUrl,
+      "microservice.services.object-store.port" -> WireMockSupport.port,
       "microservice.services.agent-registration.port" -> WireMockSupport.port,
       "microservice.services.auth.port" -> WireMockSupport.port,
       "microservice.services.companies-house-api-proxy.port" -> WireMockSupport.port,
@@ -88,13 +85,6 @@ extends AnyWordSpecLike,
     ) ++ configOverrides
 
   protected def configOverrides: Map[String, Any] = Map[String, Any]()
-
-  private val objectStoreConfig = ObjectStoreClientConfig(
-    baseUrl = s"http://localhost:${WireMockSupport.port}",
-    owner = s"owner-${randomUUID().toString}",
-    authorizationToken = s"token-${randomUUID().toString}",
-    defaultRetentionPeriod = RetentionPeriod.OneWeek
-  )
 
   lazy val overridesModule: AbstractModule =
     new AbstractModule:
@@ -118,8 +108,8 @@ extends AnyWordSpecLike,
         bind(classOf[MemberProvidedDetailsIdGenerator]).toInstance(new MemberProvidedDetailsIdGenerator {
           override def nextMemberProvidedDetailsId(): MemberProvidedDetailsId = tdAll.memberProvidedDetailsId
         })
-        bind(classOf[ObjectStoreClientConfig]).toInstance(objectStoreConfig)
-        bind(classOf[PlayObjectStoreClient]).toProvider(classOf[StubPlayObjectStoreClientProvider]).asEagerSingleton()
+//        bind(classOf[ObjectStoreClientConfig]).toInstance(objectStoreConfig)
+//        bind(classOf[PlayObjectStoreClient]).toProvider(classOf[StubPlayObjectStoreClientProvider]).asEagerSingleton()
 
   override def fakeApplication(): Application = GuiceApplicationBuilder()
     .overrides(GuiceableModule.fromGuiceModules(Seq(overridesModule)))
@@ -143,4 +133,5 @@ extends AnyWordSpecLike,
 object ISpec
 extends Logging:
 
-  lazy val testServerPort: Int = 19001
+  val testServerPort: Int = 19001
+  val thisFrontendBaseUrl: String = s"http://localhost:$testServerPort"

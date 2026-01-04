@@ -24,9 +24,9 @@ import java.time.LocalDate
 
 final case class AmlsDetails(
   supervisoryBody: AmlsCode,
-  amlsRegistrationNumber: Option[AmlsRegistrationNumber] = None,
-  amlsExpiryDate: Option[LocalDate] = None,
-  amlsEvidence: Option[AmlsEvidence] = None
+  amlsRegistrationNumber: Option[AmlsRegistrationNumber],
+  amlsExpiryDate: Option[LocalDate],
+  amlsEvidence: Option[AmlsEvidence]
 ):
 
   val isHmrc: Boolean = supervisoryBody.value.contains("HMRC")

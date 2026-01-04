@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistration.shared.amls
 
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadId
+import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.objectstore.client.Path
 
 final case class AmlsEvidence(

@@ -94,7 +94,7 @@ extends ControllerSpec:
           .whenSupervisorBodyIsNonHmrc
           .afterAmlsExpiryDateProvided,
       amlsType = "non-HMRC",
-      expectedRedirect = Some(routes.AmlsEvidenceUploadController.show.url)
+      expectedRedirect = Some(routes.AmlsEvidenceUploadController.showAmlsEvidenceUploadPage.url)
     )
   ).foreach: testCase =>
     if testCase.expectedRedirect.isEmpty then

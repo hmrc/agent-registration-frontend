@@ -27,7 +27,7 @@ extends ControllerSpec:
   private val signOutPath = "/agent-registration/sign-out"
   private val timeOutPath = "/agent-registration/time-out"
   private val timedOutPath = "/agent-registration/timed-out"
-  private val selfExternalUrl = "http://localhost:22201/agent-registration"
+  private val selfExternalUrl = s"$thisFrontendBaseUrl/agent-registration"
   private val signOutViaBasGatewayUrl = uri"http://localhost:9099/bas-gateway/sign-out-without-state"
 
   private def signOutWithContinue(continue: String): String = uri"$signOutViaBasGatewayUrl?${Map("continue" -> continue)}".toString

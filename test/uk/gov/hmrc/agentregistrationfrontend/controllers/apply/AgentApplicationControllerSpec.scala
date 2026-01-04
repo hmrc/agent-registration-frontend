@@ -52,7 +52,7 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe aboutyourbusiness.routes.AgentTypeController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url
 
   s"GET $submittedPath should return OK" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.submitted)

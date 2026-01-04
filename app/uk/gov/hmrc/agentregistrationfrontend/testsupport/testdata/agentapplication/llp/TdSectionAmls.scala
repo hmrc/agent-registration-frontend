@@ -94,15 +94,15 @@ trait TdSectionAmls {
             amlsExpiryDate = Some(amlsExpiryDateValid)
           )
 
-          def afterUploadedAmlsEvidence: AmlsDetails = afterAmlsExpiryDateProvided.copy(
-            amlsEvidence = Some(
-              AmlsEvidence(
+          def afterUploadedAmlsEvidence: AmlsDetails = {
+            afterAmlsExpiryDateProvided.copy(
+              amlsEvidence = Some(AmlsEvidence(
                 uploadId = dependencies.uploadId,
-                fileName = "evidence.pdf",
-                objectStoreLocation = Path.File("object-store/object/agent-registration-frontend/test-file-reference/evidence.pdf")
-              )
+                fileName = dependencies.fileName,
+                objectStoreLocation = Path.File(dependencies.objectStoreLocation)
+              ))
             )
-          )
+          }
 
         def afterSupervisoryBodySelected: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterSupervisoryBodySelected))
 
@@ -110,9 +110,13 @@ trait TdSectionAmls {
           Some(amlsDetailsHelper.afterRegistrationNumberProvided)
         )
 
-        def afterAmlsExpiryDateProvided: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterAmlsExpiryDateProvided))
+        def afterAmlsExpiryDateProvided: AgentApplicationLlp = baseForSectionAmls.copy(
+          amlsDetails = Some(amlsDetailsHelper.afterAmlsExpiryDateProvided)
+        )
 
-        def afterUploadSucceeded: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterUploadedAmlsEvidence))
+        def afterUploadSucceeded: AgentApplicationLlp = baseForSectionAmls.copy(
+          amlsDetails = Some(amlsDetailsHelper.afterUploadedAmlsEvidence)
+        )
 
         def complete: AgentApplicationLlp = afterUploadSucceeded.tap(x => require(x.amlsDetails.exists(_.isComplete), "sanity check"))
 

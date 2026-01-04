@@ -61,7 +61,7 @@ sealed trait UploadNotificationRequest:
 
 object UploadNotificationRequest:
 
-  final case class Success(
+  final case class Succeeded(
     reference: FileUploadReference,
     downloadUrl: Uri,
     uploadDetails: UploadEventDetails
@@ -78,6 +78,12 @@ object UploadNotificationRequest:
     given Reads[UploadEventDetails] = Json.reads[UploadEventDetails]
     given Reads[ErrorDetails] = Json.reads[ErrorDetails]
     given Format[Uri] = UriFormat.uriFormat
-    given Reads[Success] = Json.reads[Success]
+    given Reads[Succeeded] = Json.reads[Succeeded]
     given Reads[Failed] = Json.reads[Failed]
-    Json.reads[UploadNotificationRequest]
+
+    (json: JsValue) =>
+      json \ "fileStatus" match
+        case JsDefined(JsString("READY")) => json.validate[Succeeded]
+        case JsDefined(JsString("FAILED")) => json.validate[Failed]
+        case JsDefined(value) => JsError(s"Invalid type discriminator: $value")
+        case _ => JsError(s"Missing type discriminator")

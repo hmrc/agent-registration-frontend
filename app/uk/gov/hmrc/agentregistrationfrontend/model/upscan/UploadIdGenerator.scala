@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.model.upscan
 
 import org.bson.types.ObjectId
+import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 
 class UploadIdGenerator:
   def nextUploadId(): UploadId = UploadId(ObjectId.get().toHexString)

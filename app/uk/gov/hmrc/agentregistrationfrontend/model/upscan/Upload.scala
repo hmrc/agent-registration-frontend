@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.model.upscan
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 
 import java.time.Instant
 
