@@ -34,7 +34,7 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/anti-money-laundering/check-your-answers"
 
   "route should have correct path and method" in:
-    routes.CheckYourAnswersController.show shouldBe Call(
+    AppRoutes.apply.amls.CheckYourAnswersController.show shouldBe Call(
       method = "GET",
       url = path
     )
@@ -54,7 +54,7 @@ extends ControllerSpec:
           .whenSupervisorBodyIsHmrc
           .afterSupervisoryBodySelected,
       amlsType = "HMRC",
-      expectedRedirect = Some(routes.AmlsRegistrationNumberController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url)
     ),
     TestCaseForCya(
       application =
@@ -78,7 +78,7 @@ extends ControllerSpec:
           .whenSupervisorBodyIsNonHmrc
           .afterSupervisoryBodySelected,
       amlsType = "non-HMRC",
-      expectedRedirect = Some(routes.AmlsRegistrationNumberController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url)
     ),
     TestCaseForCya(
       application =
@@ -86,7 +86,7 @@ extends ControllerSpec:
           .whenSupervisorBodyIsNonHmrc
           .afterRegistrationNumberProvided,
       amlsType = "non-HMRC",
-      expectedRedirect = Some(routes.AmlsExpiryDateController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.amls.AmlsExpiryDateController.show.url)
     ),
     TestCaseForCya(
       application =
@@ -94,7 +94,7 @@ extends ControllerSpec:
           .whenSupervisorBodyIsNonHmrc
           .afterAmlsExpiryDateProvided,
       amlsType = "non-HMRC",
-      expectedRedirect = Some(routes.AmlsEvidenceUploadController.showAmlsEvidenceUploadPage.url)
+      expectedRedirect = Some(AppRoutes.apply.amls.AmlsEvidenceUploadController.showAmlsEvidenceUploadPage.url)
     )
   ).foreach: testCase =>
     if testCase.expectedRedirect.isEmpty then

@@ -28,7 +28,7 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/applicant/check-your-answers"
 
   "route should have correct path and method" in:
-    routes.CheckYourAnswersController.show shouldBe Call(
+    AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show shouldBe Call(
       method = "GET",
       url = path
     )
@@ -103,37 +103,37 @@ extends ControllerSpec:
     TestCaseForCya(
       application = agentApplication.missingVerifiedEmail,
       name = "verified email address",
-      expectedRedirect = Some(routes.EmailAddressController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.applicantcontactdetails.EmailAddressController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.missingEmail,
       name = "email address",
-      expectedRedirect = Some(routes.EmailAddressController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.applicantcontactdetails.EmailAddressController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.missingTelephone,
       name = "telephone number",
-      expectedRedirect = Some(routes.TelephoneNumberController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.missingCompaniesHouseOfficerSelection,
       name = "companies house office selection",
-      expectedRedirect = Some(routes.CompaniesHouseMatchingController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.missingMemberNameQuery,
       name = "name to query companies house with",
-      expectedRedirect = Some(routes.MemberNameController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.applicantcontactdetails.MemberNameController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.missingAuthorisedName,
       name = "authorised applicant name",
-      expectedRedirect = Some(routes.AuthorisedNameController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.noContactDetails,
       name = "all contact details",
-      expectedRedirect = Some(routes.ApplicantRoleInLlpController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show.url)
     )
   ).foreach: testCase =>
     testCase.expectedRedirect match

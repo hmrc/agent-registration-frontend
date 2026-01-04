@@ -59,15 +59,15 @@ extends ControllerSpec:
         .afterNameQueryProvided
 
   "routes should have correct paths and methods" in:
-    routes.CompaniesHouseNameQueryController.show shouldBe Call(
+    AppRoutes.providedetails.CompaniesHouseNameQueryController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.CompaniesHouseNameQueryController.submit shouldBe Call(
+    AppRoutes.providedetails.CompaniesHouseNameQueryController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.CompaniesHouseNameQueryController.submit.url shouldBe routes.CompaniesHouseNameQueryController.show.url
+    AppRoutes.providedetails.CompaniesHouseNameQueryController.submit.url shouldBe AppRoutes.providedetails.CompaniesHouseNameQueryController.show.url
 
   s"GET $path should return 200 and render page using company name from agent application" in:
     AuthStubs.stubAuthoriseIndividual()
@@ -123,7 +123,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CompaniesHouseMatchingController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CompaniesHouseMatchingController.show.url
     AuthStubs.verifyAuthorise()
     AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
     AgentRegistrationMemberProvidedDetailsStubs.verifyUpsert()

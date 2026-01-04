@@ -54,15 +54,15 @@ extends ControllerSpec:
     val maxLengthError = "The phone number must be 24 characters or fewer"
 
   "routes should have correct paths and methods" in:
-    routes.TelephoneNumberController.show shouldBe Call(
+    AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.TelephoneNumberController.submit shouldBe Call(
+    AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.TelephoneNumberController.submit.url shouldBe routes.TelephoneNumberController.show.url
+    AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.submit.url shouldBe AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.show.url
 
   s"GET $path should return 200 and render page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeTelephoneUpdate)
@@ -83,8 +83,8 @@ extends ControllerSpec:
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with blank inputs should return 400" in:

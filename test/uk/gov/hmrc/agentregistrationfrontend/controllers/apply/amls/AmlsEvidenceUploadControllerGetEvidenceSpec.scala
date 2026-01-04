@@ -82,7 +82,7 @@ extends ControllerSpec:
     val response: WSResponse = get(evidencePath)
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.AmlsExpiryDateController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.amls.AmlsExpiryDateController.show.url
 
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
@@ -94,7 +94,7 @@ extends ControllerSpec:
     val response: WSResponse = get(evidencePath)
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.amls.CheckYourAnswersController.show.url
 
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()

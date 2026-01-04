@@ -29,22 +29,22 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/about-your-business/partnership-type"
 
   "routes should have correct paths and methods" in:
-    routes.PartnershipTypeController.show shouldBe Call(
+    AppRoutes.apply.aboutyourbusiness.PartnershipTypeController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.PartnershipTypeController.submit shouldBe Call(
+    AppRoutes.apply.aboutyourbusiness.PartnershipTypeController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.PartnershipTypeController.submit.url shouldBe routes.PartnershipTypeController.show.url
+    AppRoutes.apply.aboutyourbusiness.PartnershipTypeController.submit.url shouldBe AppRoutes.apply.aboutyourbusiness.PartnershipTypeController.show.url
 
   s"GET $path without BusinessType in session should return 303 and redirect to business type page" in:
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.BusinessTypeSessionController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show.url
 
   s"GET $path with something other than PartnershipType in session should return 303 and redirect to business type page" in:
     val response: WSResponse = get(
@@ -54,7 +54,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.BusinessTypeSessionController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show.url
 
   s"GET $path with BusinessType as PartnershipType in session should return 200 and render page" in:
     val response: WSResponse = get(
@@ -75,7 +75,7 @@ extends ControllerSpec:
 
       response.status shouldBe Status.SEE_OTHER
       response.body[String] shouldBe ""
-      response.header("Location").value shouldBe routes.TypeOfSignInController.show.url
+      response.header("Location").value shouldBe AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show.url
 
   s"POST $path without valid selection should return 400" in:
     val response: WSResponse =

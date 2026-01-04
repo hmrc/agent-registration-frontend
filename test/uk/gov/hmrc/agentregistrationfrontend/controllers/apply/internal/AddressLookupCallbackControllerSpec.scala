@@ -46,7 +46,7 @@ extends ControllerSpec:
         .afterOtherAddressProvided
 
   "routes should have correct paths and methods" in:
-    routes.AddressLookupCallbackController.journeyCallback(None) shouldBe Call(
+    AppRoutes.apply.internal.AddressLookupCallbackController.journeyCallback(None) shouldBe Call(
       method = "GET",
       url = path
     )

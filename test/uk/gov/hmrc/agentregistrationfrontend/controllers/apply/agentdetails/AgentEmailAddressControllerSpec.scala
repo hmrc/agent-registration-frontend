@@ -104,15 +104,15 @@ extends ControllerSpec:
   )
 
   "routes should have correct paths and methods" in:
-    routes.AgentEmailAddressController.show shouldBe Call(
+    AppRoutes.apply.agentdetails.AgentEmailAddressController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.AgentEmailAddressController.submit shouldBe Call(
+    AppRoutes.apply.agentdetails.AgentEmailAddressController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.AgentEmailAddressController.submit.url shouldBe routes.AgentEmailAddressController.show.url
+    AppRoutes.apply.agentdetails.AgentEmailAddressController.submit.url shouldBe AppRoutes.apply.agentdetails.AgentEmailAddressController.show.url
 
   s"GET $path should redirect to telephone number page when telephone number is missing" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeTelephoneProvided)
@@ -120,7 +120,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.AgentTelephoneNumberController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.agentdetails.AgentTelephoneNumberController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path should return 200 and render page" in:
@@ -179,7 +179,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.AgentEmailAddressController.verify.url
+    response.header("Location").value shouldBe AppRoutes.apply.agentdetails.AgentEmailAddressController.verify.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with blank inputs should return 400" in:
@@ -282,7 +282,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
     EmailVerificationStubs.verifyEvStatusRequest(tdAll.credentials.providerId)
 
@@ -292,5 +292,5 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()

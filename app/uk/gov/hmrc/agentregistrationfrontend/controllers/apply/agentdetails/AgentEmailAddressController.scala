@@ -72,7 +72,7 @@ extends FrontendController(mcc, actions):
         .exists(_.telephoneNumber.isDefined),
       implicit request =>
         logger.warn("Because we don't have a telephone number selected we are redirecting to the telephone page")
-        Redirect(routes.AgentTelephoneNumberController.show)
+        Redirect(AppRoutes.apply.agentdetails.AgentTelephoneNumberController.show)
     )
 
   def show: Action[AnyContent] = baseAction.async:
@@ -141,7 +141,7 @@ extends FrontendController(mcc, actions):
           .upsert(updatedApplication)
           .map: _ =>
             Redirect(
-              routes.AgentEmailAddressController.verify
+              AppRoutes.apply.agentdetails.AgentEmailAddressController.verify
             )
 
   def verify: Action[AnyContent] = actions
@@ -154,7 +154,7 @@ extends FrontendController(mcc, actions):
         .map(_.agentEmailAddress).isDefined,
       implicit request =>
         logger.info("Applicant email has not been provided, redirecting to email address page")
-        Redirect(routes.AgentEmailAddressController.show)
+        Redirect(AppRoutes.apply.agentdetails.AgentEmailAddressController.show)
     )
     .ensure(
       _.agentApplication
@@ -164,7 +164,7 @@ extends FrontendController(mcc, actions):
         .isVerified === false,
       implicit request =>
         logger.info("Agent email is already verified, redirecting to check your answers page")
-        Redirect(routes.CheckYourAnswersController.show)
+        Redirect(AppRoutes.apply.agentdetails.CheckYourAnswersController.show)
     )
     .async:
       implicit request =>
@@ -206,7 +206,7 @@ extends FrontendController(mcc, actions):
       .setTo(true)
     agentApplicationService.upsert(updatedApplication).map { _ =>
       logger.info("Applicant email status reported as verified, redirecting to check your answers page")
-      Redirect(routes.CheckYourAnswersController.show)
+      Redirect(AppRoutes.apply.agentdetails.CheckYourAnswersController.show)
     }
 
   private def onEmailUnverified(
@@ -217,11 +217,11 @@ extends FrontendController(mcc, actions):
     maybeEmail = Some(
       Email(
         address = emailToVerify,
-        enterUrl = appConfig.thisFrontendBaseUrl + routes.AgentEmailAddressController.show.url
+        enterUrl = appConfig.thisFrontendBaseUrl + AppRoutes.apply.agentdetails.AgentEmailAddressController.show.url
       )
     ),
-    continueUrl = appConfig.thisFrontendBaseUrl + routes.AgentEmailAddressController.verify.url,
-    maybeBackUrl = Some(appConfig.thisFrontendBaseUrl + routes.AgentEmailAddressController.show.url),
+    continueUrl = appConfig.thisFrontendBaseUrl + AppRoutes.apply.agentdetails.AgentEmailAddressController.verify.url,
+    maybeBackUrl = Some(appConfig.thisFrontendBaseUrl + AppRoutes.apply.agentdetails.AgentEmailAddressController.show.url),
     accessibilityStatementUrl = appConfig.accessibilityStatementPath,
     lang = messagesApi.preferred(request).lang.code
   )

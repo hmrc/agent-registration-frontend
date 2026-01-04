@@ -61,15 +61,15 @@ extends ControllerSpec:
     val requiredError = "Enter a name and choose your supervisor from the list"
 
   "routes should have correct paths and methods" in:
-    routes.AmlsSupervisorController.show shouldBe Call(
+    AppRoutes.apply.amls.AmlsSupervisorController.show shouldBe Call(
       method = "GET",
       url = "/agent-registration/apply/anti-money-laundering/supervisor-name"
     )
-    routes.AmlsSupervisorController.submit shouldBe Call(
+    AppRoutes.apply.amls.AmlsSupervisorController.submit shouldBe Call(
       method = "POST",
       url = "/agent-registration/apply/anti-money-laundering/supervisor-name"
     )
-    routes.AmlsSupervisorController.submit.url shouldBe routes.AmlsSupervisorController.show.url
+    AppRoutes.apply.amls.AmlsSupervisorController.submit.url shouldBe AppRoutes.apply.amls.AmlsSupervisorController.show.url
 
   s"GET $path should return 200 and render page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.baseForSectionAmls)
@@ -100,7 +100,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.amls.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path when changing value should unset registration number and redirect to the next page" in:
@@ -112,7 +112,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.amls.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with save for later and valid selection should redirect to the saved for later page" in:

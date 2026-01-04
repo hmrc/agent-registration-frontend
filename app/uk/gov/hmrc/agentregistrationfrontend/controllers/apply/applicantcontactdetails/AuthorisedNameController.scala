@@ -53,7 +53,7 @@ extends FrontendController(mcc, actions):
       _.agentApplication.asLlpApplication.applicantContactDetails.map(_.applicantName.role).contains(ApplicantRoleInLlp.Authorised),
       implicit request =>
         logger.warn("Authorised name page requires Authorised role. Redirecting to applicant role selection page")
-        Redirect(routes.ApplicantRoleInLlpController.show)
+        Redirect(AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show)
     )
 
   def show: Action[AnyContent] = baseAction:
@@ -76,7 +76,7 @@ extends FrontendController(mcc, actions):
               name = Some(validFormData)
             ))
           applicationService.upsert(updatedApplication).map: _ =>
-            Redirect(routes.CheckYourAnswersController.show.url)
+            Redirect(AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater
 
   extension (agentApplication: AgentApplicationLlp)

@@ -35,15 +35,15 @@ extends ControllerSpec:
         .afterDeclarationSubmitted
 
   "routes should have correct paths and methods" in:
-    routes.AgentApplicationController.startRegistration shouldBe Call(
+    AppRoutes.apply.AgentApplicationController.startRegistration shouldBe Call(
       method = "GET",
       url = "/agent-registration/apply"
     )
-    routes.AgentApplicationController.applicationSubmitted shouldBe Call(
+    AppRoutes.apply.AgentApplicationController.applicationSubmitted shouldBe Call(
       method = "GET",
       url = "/agent-registration/application-submitted"
     )
-    routes.AgentApplicationController.viewSubmittedApplication shouldBe Call(
+    AppRoutes.apply.AgentApplicationController.viewSubmittedApplication shouldBe Call(
       method = "GET",
       url = "/agent-registration/view-application"
     )

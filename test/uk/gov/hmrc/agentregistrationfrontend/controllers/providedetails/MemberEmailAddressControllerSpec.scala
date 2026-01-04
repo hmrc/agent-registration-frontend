@@ -75,7 +75,7 @@ extends ControllerSpec:
       method = "POST",
       url = path
     )
-    AppRoutes.providedetails.MemberEmailAddressController.submit.url shouldBe routes.MemberEmailAddressController.show.url
+    AppRoutes.providedetails.MemberEmailAddressController.submit.url shouldBe AppRoutes.providedetails.MemberEmailAddressController.show.url
 
   s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthoriseIndividual()

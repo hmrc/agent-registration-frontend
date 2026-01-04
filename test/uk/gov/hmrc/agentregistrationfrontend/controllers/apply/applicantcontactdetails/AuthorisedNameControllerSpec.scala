@@ -54,15 +54,15 @@ extends ControllerSpec:
     val maxLengthError = "Your full name must be 100 characters or fewer"
 
   "routes should have correct paths and methods" in:
-    routes.AuthorisedNameController.show shouldBe Call(
+    AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.AuthorisedNameController.submit shouldBe Call(
+    AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.AuthorisedNameController.submit.url shouldBe routes.AuthorisedNameController.show.url
+    AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.submit.url shouldBe AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.show.url
 
   s"GET $path should return 200 and render page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeNameDeclared)
@@ -84,7 +84,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with blank inputs should return 400" in:

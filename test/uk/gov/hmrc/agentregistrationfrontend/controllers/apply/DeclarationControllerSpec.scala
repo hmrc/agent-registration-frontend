@@ -27,15 +27,15 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/agent-declaration/confirm-declaration"
 
   "route should have correct path and method" in:
-    routes.DeclarationController.show shouldBe Call(
+    AppRoutes.apply.DeclarationController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.DeclarationController.submit shouldBe Call(
+    AppRoutes.apply.DeclarationController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-  routes.DeclarationController.submit.url shouldBe routes.DeclarationController.show.url
+  AppRoutes.apply.DeclarationController.submit.url shouldBe AppRoutes.apply.DeclarationController.show.url
 
   object agentApplication:
 
@@ -60,7 +60,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.TaskListController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.TaskListController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path after all tasks are complete should return 200 and render page" in:

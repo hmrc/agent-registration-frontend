@@ -46,15 +46,15 @@ extends ControllerSpec:
   private val lastName = tdAll.agentApplicationLlp.sectionContactDetails.whenApplicantIsAMember.lastNameQuery
 
   "routes should have correct paths and methods" in:
-    routes.CompaniesHouseMatchingController.show shouldBe Call(
+    AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.CompaniesHouseMatchingController.submit shouldBe Call(
+    AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.CompaniesHouseMatchingController.submit.url shouldBe routes.CompaniesHouseMatchingController.show.url
+    AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.submit.url shouldBe AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.show.url
 
   s"GET $path should return 200 and render page when there is a single match" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNameQueryProvided)
@@ -105,7 +105,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
     CompaniesHouseStubs.verifySingleMatchCalls(lastName = lastName)
 
@@ -138,7 +138,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
     CompaniesHouseStubs.verifyMultipleMatchCalls(lastName = lastName)
 
