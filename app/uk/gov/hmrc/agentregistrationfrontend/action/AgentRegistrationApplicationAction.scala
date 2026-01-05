@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 import play.api.mvc.ActionRefiner
 import play.api.mvc.Request
 import play.api.mvc.Result
-import play.api.mvc.WrappedRequest
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
