@@ -34,12 +34,6 @@ import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-class RequestAndData[A](
-  val request: Request[A],
-  val data: A
-)
-extends WrappedRequest[A](request)
-
 class AgentApplicationRequest[A](
   val agentApplication: AgentApplication,
   override val internalUserId: InternalUserId,
