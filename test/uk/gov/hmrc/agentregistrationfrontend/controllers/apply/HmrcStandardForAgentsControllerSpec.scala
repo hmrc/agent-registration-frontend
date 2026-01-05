@@ -69,7 +69,7 @@ extends ControllerSpec:
     doc.select("h2.govuk-caption-xl").text() shouldBe "HMRC standard for agents"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
-  s"POST path with agree should update the application and redirect to the task list" in:
+  s"POST $path with agree should update the application and redirect to the task list" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(
       application = agentApplication.beforeTermsAgreed,
       updatedApplication = agentApplication.afterTermsAgreed
