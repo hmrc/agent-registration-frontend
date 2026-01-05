@@ -62,7 +62,7 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe AppRoutes.providedetails.MemberApproveApplicantController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
 
   s"GET $path should redirect to previous page when Nino is not provided from HMRC systems (Auth)" in:
     AuthStubs.stubAuthoriseIndividual()
