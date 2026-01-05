@@ -104,5 +104,5 @@ extends FrontendController(mcc, actions):
           agentApplicationService
             .upsert(updatedApplication)
             .map: _ =>
-              Redirect(routes.CheckYourAnswersController.show.url)
+              Redirect(AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater

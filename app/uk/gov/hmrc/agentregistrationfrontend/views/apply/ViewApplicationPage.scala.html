@@ -86,7 +86,7 @@
   <h2 class="govuk-heading-m">@{messages(s"$key.amls.h2")}</h2>
   @amlsAnswers(
     key = "amlsCheckYourAnswers",
-    answers = request.agentApplication.getAmlsDetails,
+    amlsDetails = request.agentApplication.getAmlsDetails,
     canChange = false
   )
 

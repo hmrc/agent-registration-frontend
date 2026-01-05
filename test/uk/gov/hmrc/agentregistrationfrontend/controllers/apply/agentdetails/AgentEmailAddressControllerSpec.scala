@@ -24,6 +24,9 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.EmailVerificationStubs
 
 class AgentEmailAddressControllerSpec
@@ -87,29 +90,29 @@ extends ControllerSpec:
 
   private val agentEmailVerificationRequest: VerifyEmailRequest = VerifyEmailRequest(
     credId = tdAll.credentials.providerId,
-    continueUrl = "http://localhost:22201/agent-registration/apply/agent-details/verify-email-address",
+    continueUrl = s"${ISpec.thisFrontendBaseUrl}/agent-registration/apply/agent-details/verify-email-address",
     origin = "HMRC Agent Services",
     deskproServiceName = None,
     accessibilityStatementUrl = "/agent-services-account",
     email = Some(Email(
       address = tdAll.newEmailAddress,
-      enterUrl = "http://localhost:22201/agent-registration/apply/agent-details/email-address"
+      enterUrl = s"${ISpec.thisFrontendBaseUrl}/agent-registration/apply/agent-details/email-address"
     )),
     lang = Some("en"),
-    backUrl = Some("http://localhost:22201/agent-registration/apply/agent-details/email-address"),
+    backUrl = Some(s"${ISpec.thisFrontendBaseUrl}/agent-registration/apply/agent-details/email-address"),
     pageTitle = None
   )
 
   "routes should have correct paths and methods" in:
-    routes.AgentEmailAddressController.show shouldBe Call(
+    AppRoutes.apply.agentdetails.AgentEmailAddressController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.AgentEmailAddressController.submit shouldBe Call(
+    AppRoutes.apply.agentdetails.AgentEmailAddressController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.AgentEmailAddressController.submit.url shouldBe routes.AgentEmailAddressController.show.url
+    AppRoutes.apply.agentdetails.AgentEmailAddressController.submit.url shouldBe AppRoutes.apply.agentdetails.AgentEmailAddressController.show.url
 
   s"GET $path should redirect to telephone number page when telephone number is missing" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeTelephoneProvided)
@@ -117,7 +120,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.AgentTelephoneNumberController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.agentdetails.AgentTelephoneNumberController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path should return 200 and render page" in:
@@ -176,7 +179,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.AgentEmailAddressController.verify.url
+    response.header("Location").value shouldBe AppRoutes.apply.agentdetails.AgentEmailAddressController.verify.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with blank inputs should return 400" in:
@@ -239,7 +242,9 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $verifyPath with an email yet to be verified in the application should redirect to the email verification frontend" in:
-    ApplyStubHelper.stubsForAuthAction(agentApplication.afterOtherEmailAddressSelected)
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterOtherEmailAddressSelected)
+
     EmailVerificationStubs.stubEmailYetToBeVerified(tdAll.credentials.providerId)
     EmailVerificationStubs.stubVerificationRequest(agentEmailVerificationRequest)
     val response: WSResponse = get(verifyPath)
@@ -277,7 +282,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
     EmailVerificationStubs.verifyEvStatusRequest(tdAll.credentials.providerId)
 
@@ -287,5 +292,5 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()

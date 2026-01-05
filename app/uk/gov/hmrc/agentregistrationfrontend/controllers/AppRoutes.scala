@@ -21,6 +21,8 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as rootRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.routes as aboutyourbusinessRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.routes as amlsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.api.routes as amlsApiRoutes
+
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.routes as applicantcontactdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.routes as agentdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes as internalRoutes
@@ -54,6 +56,9 @@ object AppRoutes:
       val CheckYourAnswersController = aboutyourbusinessRoutes.CheckYourAnswersController
 
     object amls:
+
+      object api:
+        val NotificationFromUpscanController = amlsApiRoutes.NotificationFromUpscanController
 
       val AmlsExpiryDateController = amlsRoutes.AmlsExpiryDateController
       val CheckYourAnswersController = amlsRoutes.CheckYourAnswersController

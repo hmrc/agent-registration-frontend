@@ -50,15 +50,15 @@ extends ControllerSpec:
         .afterBusinessNameProvided
 
   "routes should have correct paths and methods" in:
-    routes.AgentBusinessNameController.show shouldBe Call(
+    AppRoutes.apply.agentdetails.AgentBusinessNameController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.AgentBusinessNameController.submit shouldBe Call(
+    AppRoutes.apply.agentdetails.AgentBusinessNameController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.AgentBusinessNameController.submit.url shouldBe routes.AgentBusinessNameController.show.url
+    AppRoutes.apply.agentdetails.AgentBusinessNameController.submit.url shouldBe AppRoutes.apply.agentdetails.AgentBusinessNameController.show.url
 
   s"GET $path should return 200 and render page" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeBusinessNameProvided)
@@ -103,7 +103,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with selection of other and valid input for other name should save data and redirect to CYA page" in:
@@ -119,7 +119,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with blank inputs should return 400" in:

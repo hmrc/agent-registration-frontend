@@ -22,6 +22,7 @@ extends TdBase,
   agentapplication.llp.TdAgentApplicationLlp,
   agentapplication.llp.TdSectionContactDetails,
   agentapplication.llp.TdSectionAgentDetails,
+  agentapplication.llp.TdUpload,
   agentapplication.llp.TdSectionAmls,
   agentapplication.soletrader.TdAgentApplicationSoleTrader,
   providedetails.member.TdMemberProvidedDetails

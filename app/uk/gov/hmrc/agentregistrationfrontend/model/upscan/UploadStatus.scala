@@ -14,13 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.upscan
+package uk.gov.hmrc.agentregistrationfrontend.model.upscan
 
-import play.api.libs.json.*
-import uk.gov.hmrc.agentregistration.shared.util.HttpUrlFormat
+import play.api.libs.json.Json
+import play.api.libs.json.JsonConfiguration
+import play.api.libs.json.OFormat
+import sttp.model.Uri
+import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
 
-import java.net.URL
 import scala.annotation.nowarn
+import uk.gov.hmrc.agentregistration.shared.util.UriFormat
 
 sealed trait UploadStatus
 
@@ -29,33 +32,28 @@ object UploadStatus:
   case object InProgress
   extends UploadStatus
 
-  case object Failed
-  extends UploadStatus
-
-  final case class UploadedSuccessfully(
-    name: String,
-    mimeType: String,
-    downloadUrl: URL,
-    size: Option[Long],
-    checksum: String,
-    objectStoreLocation: Option[ObjectStoreUrl] = None
+  final case class Failed(
+    failureReason: String,
+    messageFromUpscan: String
   )
   extends UploadStatus
 
-  given Format[URL] = HttpUrlFormat.format
-  given OFormat[InProgress.type] = Json.format[InProgress.type]
-  given OFormat[Failed.type] = Json.format[Failed.type]
-  given uploadedFormat: OFormat[UploadedSuccessfully] = Json.format[UploadedSuccessfully]
+  final case class UploadedSuccessfully(
+    fileName: String,
+    mimeType: String,
+    downloadUrl: Uri,
+    sizeInBytes: Long,
+    checksum: String
+  )
+  extends UploadStatus
 
   @nowarn()
   given OFormat[UploadStatus] =
-    given JsonConfiguration = JsonConfiguration(
-      discriminator = "type",
-      typeNaming = JsonNaming { fullName =>
-        fullName.split('.').last // Extract just the class name
-      }
-    )
-
+    import UriFormat.uriFormat
+    given OFormat[InProgress.type] = Json.format[InProgress.type]
+    given OFormat[Failed] = Json.format[Failed]
+    given uploadedFormat: OFormat[UploadedSuccessfully] = Json.format[UploadedSuccessfully]
+    given JsonConfiguration = JsonConfig.jsonConfiguration
     val dontDeleteMe = """
         |Don't delete me.
         |I will emit a warning so `@nowarn` can be applied to address below

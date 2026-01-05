@@ -46,7 +46,7 @@ extends FrontendController(mcc, actions):
     signOutWithContinue(continueUrl.toString)
 
   def timeOut: Action[AnyContent] = action:
-    val continueUrl = uri"${appConfig.thisFrontendBaseUrl + routes.SignOutController.timedOut.url}"
+    val continueUrl = uri"${appConfig.thisFrontendBaseUrl + AppRoutes.SignOutController.timedOut.url}"
     signOutWithContinue(continueUrl.toString)
 
   def timedOut: Action[AnyContent] = action:

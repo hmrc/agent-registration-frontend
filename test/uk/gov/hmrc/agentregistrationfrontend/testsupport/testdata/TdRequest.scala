@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.with
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withTrueClientIp
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withTrueClientPort
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withAgentApplicationId
+import uk.gov.hmrc.http.HeaderCarrier
 
 trait TdRequest {
   dependencies: TdBase =>
@@ -43,6 +44,8 @@ trait TdRequest {
     .withTrueClientIp()
     .withTrueClientPort()
     .withDeviceId()
+
+  def headerCarrier: HeaderCarrier = HeaderCarrier()
 
   def requestNotLoggedIn: Request[AnyContentAsEmpty.type] = baseRequest
   def requestLoggedIn: Request[AnyContentAsEmpty.type] = baseRequest.withAuthTokenInSession()

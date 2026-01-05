@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import play.api.libs.json.Json
-import play.api.libs.ws.writeableOf_JsValue
+import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*

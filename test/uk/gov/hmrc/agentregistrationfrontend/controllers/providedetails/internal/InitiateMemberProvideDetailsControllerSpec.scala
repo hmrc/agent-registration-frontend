@@ -71,7 +71,7 @@ extends ControllerSpec:
   private def path(linkId: LinkId) = s"/agent-registration/provide-details/internal/initiate-member-provide-details/${linkId.value}"
 
   "routes should have correct paths and methods" in:
-    routes.InitiateMemberProvideDetailsController.initiateMemberProvideDetails(tdAll.linkId) shouldBe Call(
+    AppRoutes.providedetails.internal.InitiateMemberProvideDetailsController.initiateMemberProvideDetails(tdAll.linkId) shouldBe Call(
       method = "GET",
       url = path(tdAll.linkId)
     )

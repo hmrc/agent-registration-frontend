@@ -50,7 +50,7 @@ extends ControllerSpec:
   ).foreach: t =>
     val initiateAgentApplicationUrl: String = initiateAgentApplication(agentType = t.agentType, businessType = t.businessType)
     s"routes should have correct paths and methods (${t.agentType}, ${t.businessType})" in:
-      routes.InitiateAgentApplicationController.initiateAgentApplication(t.agentType, t.businessType) shouldBe Call(
+      AppRoutes.apply.internal.InitiateAgentApplicationController.initiateAgentApplication(t.agentType, t.businessType) shouldBe Call(
         method = "GET",
         url = initiateAgentApplicationUrl
       )
@@ -63,7 +63,7 @@ extends ControllerSpec:
 
       val response: WSResponse = get(initiateAgentApplicationUrl)
       response.status shouldBe Status.SEE_OTHER
-      response.header("Location").value shouldBe routes.GrsController.startJourney().url
+      response.header("Location").value shouldBe AppRoutes.apply.internal.GrsController.startJourney().url
       AuthStubs.verifyAuthorise()
       AgentRegistrationStubs.verifyGetAgentApplication()
       AgentRegistrationStubs.verifyUpdateAgentApplication()

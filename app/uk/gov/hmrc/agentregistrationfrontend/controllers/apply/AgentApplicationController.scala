@@ -42,14 +42,16 @@ class AgentApplicationController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
+  // TODO: is this endpoint really needed?
   def landing: Action[AnyContent] = actions
     .Applicant
     .getApplicationInProgress:
       implicit request =>
         // until we have more than the registration journey just go to the task list
         // which will redirect to the start of registration if needed
-        Redirect(routes.TaskListController.show)
+        Redirect(AppRoutes.apply.TaskListController.show)
 
+  // TODO: is this endpoint really needed?
   def applicationDashboard: Action[AnyContent] = actions
     .Applicant
     .getApplicationInProgress

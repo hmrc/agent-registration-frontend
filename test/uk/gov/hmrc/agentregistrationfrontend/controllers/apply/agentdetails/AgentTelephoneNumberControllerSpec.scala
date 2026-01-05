@@ -64,15 +64,15 @@ extends ControllerSpec:
         .afterOtherTelephoneNumberProvided
 
   "routes should have correct paths and methods" in:
-    routes.AgentTelephoneNumberController.show shouldBe Call(
+    AppRoutes.apply.agentdetails.AgentTelephoneNumberController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.AgentTelephoneNumberController.submit shouldBe Call(
+    AppRoutes.apply.agentdetails.AgentTelephoneNumberController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.AgentTelephoneNumberController.submit.url shouldBe routes.AgentTelephoneNumberController.show.url
+    AppRoutes.apply.agentdetails.AgentTelephoneNumberController.submit.url shouldBe AppRoutes.apply.agentdetails.AgentTelephoneNumberController.show.url
 
   s"GET $path before business name has been selected should redirect to the business name page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeBusinessNameProvided)
@@ -80,7 +80,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.AgentBusinessNameController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.agentdetails.AgentBusinessNameController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path should return 200, fetch the BPR and render page" in:
@@ -138,7 +138,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with selection of other and valid input for other name should save data and redirect to CYA page" in:
@@ -154,7 +154,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with blank inputs should return 400" in:

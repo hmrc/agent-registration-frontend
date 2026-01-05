@@ -35,15 +35,15 @@ extends ControllerSpec:
         .afterDeclarationSubmitted
 
   "routes should have correct paths and methods" in:
-    routes.AgentApplicationController.startRegistration shouldBe Call(
+    AppRoutes.apply.AgentApplicationController.startRegistration shouldBe Call(
       method = "GET",
       url = "/agent-registration/apply"
     )
-    routes.AgentApplicationController.applicationSubmitted shouldBe Call(
+    AppRoutes.apply.AgentApplicationController.applicationSubmitted shouldBe Call(
       method = "GET",
       url = "/agent-registration/application-submitted"
     )
-    routes.AgentApplicationController.viewSubmittedApplication shouldBe Call(
+    AppRoutes.apply.AgentApplicationController.viewSubmittedApplication shouldBe Call(
       method = "GET",
       url = "/agent-registration/view-application"
     )
@@ -52,7 +52,7 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe aboutyourbusiness.routes.AgentTypeController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url
 
   s"GET $submittedPath should return OK" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.submitted)

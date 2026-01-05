@@ -44,8 +44,8 @@
 @head = {
     @if(isSignedIn) {
         @hmrcTimeoutDialogHelper(
-            signOutUrl = routes.SignOutController.signOut.url,
-            timeoutUrl = Some(routes.SignOutController.timeOut.url)
+            signOutUrl = AppRoutes.SignOutController.signOut.url,
+            timeoutUrl = Some(AppRoutes.SignOutController.timeOut.url)
         )
     }
     @autocompleteCss()
@@ -84,7 +84,7 @@
       pageTitle = Some(gdsTitle),
       serviceName = Some(""), // None will display a default, not blank as required
       serviceURLs = ServiceURLs(
-          signOutUrl = if (isSignedIn) Some(routes.SignOutController.signOut.url) else None
+          signOutUrl = if (isSignedIn) Some(AppRoutes.SignOutController.signOut.url) else None
       ),
       serviceNavigation = Some(ServiceNavigation(
           serviceName = Some(messages("service.name")),

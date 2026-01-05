@@ -27,7 +27,7 @@
 
 @(
         key: String,
-        answers: AmlsDetails,
+        amlsDetails: AmlsDetails,
         canChange: Boolean = true
 )(implicit request: Request[?], messages: Messages)
 
@@ -39,7 +39,7 @@
     value = Value(
       content = Text(
         amlsCodes.getSupervisoryName(
-          answers
+          amlsDetails
           .supervisoryBody
         ).value
       )
@@ -63,7 +63,7 @@
     ),
     value = Value(
       content = Text(
-        answers
+        amlsDetails
         .getRegistrationNumber
         .value
       )
@@ -86,7 +86,7 @@
       content = Text(messages(s"$key.expiryDate.label"))
     ),
     value = Value(
-      content = Text(if(answers.isHmrc) messages(s"$key.notApplicable") else displayDateForLang(Some(answers.getAmlsExpiryDate)))
+      content = Text(if(amlsDetails.isHmrc) messages(s"$key.notApplicable") else displayDateForLang(Some(amlsDetails.getAmlsExpiryDate)))
     ),
     actions = if(!canChange) None else Some(Actions(
       items = Seq(
@@ -106,12 +106,12 @@
       content = Text(messages(s"$key.evidence.label"))
     ),
     value = Value(
-      content = Text(if(answers.isHmrc) messages(s"$key.notApplicable") else answers.getAmlsEvidenceName)
+      content = Text(if(amlsDetails.isHmrc) messages(s"$key.notApplicable") else amlsDetails.getAmlsEvidence.fileName)
     ),
     actions = if(!canChange) None else Some(Actions(
       items = Seq(
         ActionItem(
-          href = s"${AppRoutes.apply.amls.AmlsEvidenceUploadController.show}",
+          href = s"${AppRoutes.apply.amls.AmlsEvidenceUploadController.showAmlsEvidenceUploadPage}",
           content = Text(messages(s"$key.change")),
           visuallyHiddenText = Some(messages(s"$key.evidence.label"))
         )
@@ -121,6 +121,6 @@
 }
 @commonRows = @{Seq(supervisorRow, registrationNumberRow)}
 @nonHmrcRows = @{Seq(expiryDateRow, evidenceRow)}
-@rows = @{if(answers.isHmrc) commonRows else commonRows ++ nonHmrcRows}
+@rows = @{if(amlsDetails.isHmrc) commonRows else commonRows ++ nonHmrcRows}
 
 @govukSummaryList(SummaryList(rows = rows))

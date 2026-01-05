@@ -27,19 +27,14 @@ import play.api.mvc.Request
 import play.api.mvc.Session
 import play.api.mvc.SessionCookieBaker
 import play.api.test.FakeRequest
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.crypto.PlainText
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.frontend.filters.crypto.SessionCookieCrypto
 
-import scala.concurrent.ExecutionContext
-
 trait WsHelper:
   self: ISpec =>
 
-  implicit val ws: WSClient = app.injector.instanceOf[WSClient]
-  implicit val executionContext: ExecutionContext = app.injector.instanceOf[ExecutionContext]
-  val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
+  private val ws: WSClient = app.injector.instanceOf[WSClient]
 
   def get[T](
     uri: String,

@@ -28,7 +28,7 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/about-your-business/check-your-answers"
 
   "route should have correct path and method" in:
-    routes.CheckYourAnswersController.show shouldBe Call(
+    AppRoutes.apply.aboutyourbusiness.CheckYourAnswersController.show shouldBe Call(
       method = "GET",
       url = path
     )

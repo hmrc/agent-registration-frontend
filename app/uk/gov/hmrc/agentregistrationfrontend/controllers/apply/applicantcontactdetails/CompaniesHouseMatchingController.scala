@@ -68,7 +68,7 @@ extends FrontendController(mcc, actions):
       _.agentApplication.asLlpApplication.memberNameQuery.isDefined,
       implicit request =>
         logger.info("Redirecting to member name page due to missing memberNameQuery value")
-        Redirect(routes.MemberNameController.show)
+        Redirect(AppRoutes.apply.applicantcontactdetails.MemberNameController.show)
     )
 
   def show: Action[AnyContent] = baseAction
@@ -136,7 +136,7 @@ extends FrontendController(mcc, actions):
           case YesNo.No =>
             // TODO: do we need to reset data here?
             Future.successful(
-              Redirect(routes.ApplicantRoleInLlpController.show.url)
+              Redirect(AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show.url)
             )
       )
 
@@ -169,7 +169,7 @@ extends FrontendController(mcc, actions):
       ))
     agentApplicationService
       .upsert(updatedApplication)
-      .map(_ => Redirect(routes.CheckYourAnswersController.show.url))
+      .map(_ => Redirect(AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show.url))
 
 object CompaniesHouseMatchingController:
 

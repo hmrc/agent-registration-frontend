@@ -27,7 +27,7 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/agent-details/check-your-answers"
 
   "route should have correct path and method" in:
-    routes.CheckYourAnswersController.show shouldBe Call(
+    AppRoutes.apply.agentdetails.CheckYourAnswersController.show shouldBe Call(
       method = "GET",
       url = path
     )
@@ -90,27 +90,27 @@ extends ControllerSpec:
     TestCaseForCya(
       application = agentApplication.missingAddress,
       name = "correspondence address",
-      expectedRedirect = Some(routes.AgentCorrespondenceAddressController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.agentdetails.AgentCorrespondenceAddressController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.missingVerifiedEmail,
       name = "verified email address",
-      expectedRedirect = Some(routes.AgentEmailAddressController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.agentdetails.AgentEmailAddressController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.missingEmail,
       name = "email address",
-      expectedRedirect = Some(routes.AgentEmailAddressController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.agentdetails.AgentEmailAddressController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.missingTelephone,
       name = "telephone number",
-      expectedRedirect = Some(routes.AgentTelephoneNumberController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.agentdetails.AgentTelephoneNumberController.show.url)
     ),
     TestCaseForCya(
       application = agentApplication.missingBusinessName,
       name = "business name",
-      expectedRedirect = Some(routes.AgentBusinessNameController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.agentdetails.AgentBusinessNameController.show.url)
     )
   ).foreach: testCase =>
     testCase.expectedRedirect match

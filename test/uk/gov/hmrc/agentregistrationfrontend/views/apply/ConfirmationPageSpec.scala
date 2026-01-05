@@ -41,24 +41,24 @@ extends ViewSpec:
 
     "have expected content" in:
       doc.mainContent shouldContainContent
-        """
-          |You’ve finished the first stage of the application
-          |Application reference: HDJ2123F
-          |What to do next
-          |Everyone listed in Companies House as a current member of Test Company Name needs to sign in and provide some personal details.
-          |Send this link to all members:
-          |http://localhost:22201/agent-registration/provide-details/start/link-id-12345
-          |Copy link to clipboard
-          |Link copied
-          |How to check the progress of your application
-          |You can click the link on the GOV.UK page “Apply for an agent services account”.
-          |This will let you check which members have provided their personal details.
-          |When all members have provided their personal details, we will:
-          |automatically submit your application
-          |email you at user@test.com to confirm this
-          |View or print your application
-          |Finish and sign out
-          |"""
+        s"""
+           |You’ve finished the first stage of the application
+           |Application reference: HDJ2123F
+           |What to do next
+           |Everyone listed in Companies House as a current member of Test Company Name needs to sign in and provide some personal details.
+           |Send this link to all members:
+           |$thisFrontendBaseUrl/agent-registration/provide-details/start/link-id-12345
+           |Copy link to clipboard
+           |Link copied
+           |How to check the progress of your application
+           |You can click the link on the GOV.UK page “Apply for an agent services account”.
+           |This will let you check which members have provided their personal details.
+           |When all members have provided their personal details, we will:
+           |automatically submit your application
+           |email you at user@test.com to confirm this
+           |View or print your application
+           |Finish and sign out
+           |"""
           .stripMargin
 
     "have the correct title" in:

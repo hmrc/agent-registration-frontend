@@ -24,6 +24,8 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AddressLookupFrontendStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
 class AgentCorrespondenceAddressControllerSpec
 extends ControllerSpec:
@@ -75,15 +77,15 @@ extends ControllerSpec:
         .afterOtherAddressProvided
 
   "routes should have correct paths and methods" in:
-    routes.AgentCorrespondenceAddressController.show shouldBe Call(
+    AppRoutes.apply.agentdetails.AgentCorrespondenceAddressController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.AgentCorrespondenceAddressController.submit shouldBe Call(
+    AppRoutes.apply.agentdetails.AgentCorrespondenceAddressController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.AgentCorrespondenceAddressController.submit.url shouldBe routes.AgentCorrespondenceAddressController.show.url
+    AppRoutes.apply.agentdetails.AgentCorrespondenceAddressController.submit.url shouldBe AppRoutes.apply.agentdetails.AgentCorrespondenceAddressController.show.url
 
   s"GET $path before email address has been selected should redirect to the email address page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeEmailAddressProvided)
@@ -91,7 +93,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.AgentEmailAddressController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.agentdetails.AgentEmailAddressController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path should return 200, fetch the BPR and render page" in:
@@ -150,13 +152,14 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with selection of other should redirect to Address Lookup Frontend" in:
-    ApplyStubHelper.stubsForAuthAction(agentApplication.afterEmailAddressSelected)
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterEmailAddressSelected)
     AddressLookupFrontendStubs.stubAddressLookupInit(
-      continueUrl = "http://localhost:22201/agent-registration/apply/internal/address-lookup/journey-callback"
+      continueUrl = s"$thisFrontendBaseUrl/agent-registration/apply/internal/address-lookup/journey-callback"
     )
     val response: WSResponse =
       post(path)(Map(
@@ -166,7 +169,9 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe "http://localhost:9028/any-uri-determined-by-alf"
-    ApplyStubHelper.verifyConnectorsForAuthAction()
+
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetAgentApplication()
     AddressLookupFrontendStubs.verifyAddressLookupInit()
 
   s"POST $path with blank inputs should return 400" in:

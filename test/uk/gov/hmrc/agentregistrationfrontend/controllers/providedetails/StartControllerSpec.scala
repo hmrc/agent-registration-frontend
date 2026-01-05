@@ -54,7 +54,7 @@ extends ControllerSpec:
         .afterStarted
 
   "routes should have correct paths and methods" in:
-    routes.StartController.start(linkId) shouldBe Call(
+    AppRoutes.providedetails.StartController.start(linkId) shouldBe Call(
       method = "GET",
       url = path
     )

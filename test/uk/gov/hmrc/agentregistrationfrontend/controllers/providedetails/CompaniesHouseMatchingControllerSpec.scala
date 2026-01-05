@@ -67,15 +67,15 @@ extends ControllerSpec:
   private val lastName = "Leadenhall-Lane"
 
   "routes should have correct paths and methods" in:
-    routes.CompaniesHouseMatchingController.show shouldBe Call(
+    AppRoutes.providedetails.CompaniesHouseMatchingController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.CompaniesHouseMatchingController.submit shouldBe Call(
+    AppRoutes.providedetails.CompaniesHouseMatchingController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.CompaniesHouseMatchingController.submit.url shouldBe routes.CompaniesHouseMatchingController.show.url
+    AppRoutes.providedetails.CompaniesHouseMatchingController.submit.url shouldBe AppRoutes.providedetails.CompaniesHouseMatchingController.show.url
 
   s"GET $path should return 200 and render page when there is a single match" in:
     AuthStubs.stubAuthoriseIndividual()
@@ -104,7 +104,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CompaniesHouseNameQueryController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CompaniesHouseNameQueryController.show.url
     AuthStubs.verifyAuthorise()
     AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
 
@@ -141,7 +141,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
     AuthStubs.verifyAuthorise()
     AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
     AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
@@ -180,7 +180,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
     AuthStubs.verifyAuthorise()
     AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
     AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)

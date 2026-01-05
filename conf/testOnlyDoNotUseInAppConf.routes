@@ -15,7 +15,6 @@
 
 GET         /agent-registration/test-only                                     uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.showTestOnlyHub
 GET         /agent-registration/test-only/show-agent-application              uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.showAgentApplication
-GET         /agent-registration/test-only/set-upload-to-complete              uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.setUploadToComplete()
 
 GET         /agent-registration/test-only/grs-stub/:businessType              uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.GrsStubController.showGrsData(businessType: BusinessType, journeyId: grs.JourneyId)
 POST        /agent-registration/test-only/grs-stub/:businessType              uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.GrsStubController.submitGrsData(businessType: BusinessType, journeyId: grs.JourneyId)

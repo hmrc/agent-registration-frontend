@@ -35,7 +35,7 @@ extends ISpec:
     individualAuthorisedWithIdentifiersAction
       .invokeBlock(notLoggedInRequest, _ => fakeResultF)
       .futureValue shouldBe Redirect(
-      """http://localhost:9099/bas-gateway/sign-in?continue_url=http://localhost:22201/&origin=agent-registration-frontend&affinityGroup=individual"""
+      s"""http://localhost:9099/bas-gateway/sign-in?continue_url=$thisFrontendBaseUrl/&origin=agent-registration-frontend&affinityGroup=individual"""
     )
     IndividualAuthStubs.verifyAuthorise(0)
 

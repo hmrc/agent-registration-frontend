@@ -77,9 +77,12 @@ extends FrontendController(mcc, actions):
                     )
                   case None =>
                     Some(AmlsDetails(
-                      supervisoryBody = supervisoryBody
+                      supervisoryBody = supervisoryBody,
+                      amlsRegistrationNumber = None,
+                      amlsExpiryDate = None,
+                      amlsEvidence = None
                     ))
                 }
             )
-            .map(_ => Redirect(routes.CheckYourAnswersController.show.url))
+            .map(_ => Redirect(AppRoutes.apply.amls.CheckYourAnswersController.show.url))
       .redirectIfSaveForLater

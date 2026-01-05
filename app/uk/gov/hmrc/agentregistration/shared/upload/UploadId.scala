@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.upscan
+package uk.gov.hmrc.agentregistration.shared.upload
 
 import play.api.libs.json.Format
 import play.api.mvc.PathBindable
-
-import java.util.UUID
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 import uk.gov.hmrc.agentregistration.shared.util.ValueClassBinder
 
@@ -29,6 +27,3 @@ object UploadId:
 
   given format: Format[UploadId] = JsonFormatsFactory.makeValueClassFormat
   given pathBindable: PathBindable[UploadId] = ValueClassBinder.valueClassBinder[UploadId](_.value)
-
-class UploadIdGenerator:
-  def nextUploadId(): UploadId = UploadId(UUID.randomUUID().toString)

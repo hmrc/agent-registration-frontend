@@ -67,7 +67,7 @@ extends FrontendController(mcc, actions):
         ),
       implicit request =>
         logger.warn("Because we don't have a verified email address we are redirecting to the email address page")
-        Redirect(routes.AgentEmailAddressController.show)
+        Redirect(AppRoutes.apply.agentdetails.AgentEmailAddressController.show)
     )
 
   def show: Action[AnyContent] = baseAction.async:
@@ -126,7 +126,7 @@ extends FrontendController(mcc, actions):
             agentApplicationService
               .upsert(updatedApplication)
               .map: _ =>
-                Redirect(routes.CheckYourAnswersController.show.url)
+                Redirect(AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater
 
   /*
