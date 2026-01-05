@@ -173,4 +173,4 @@ extends FrontendController(mcc, actions):
         .modify(_.companiesHouseMatch.each.companiesHouseOfficer)
         .setTo(Some(officer))
     )
-    .map(_ => Redirect(AppRoutes.providedetails.MemberTelephoneNumberController.show.url))
+    .map(_ => Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url))

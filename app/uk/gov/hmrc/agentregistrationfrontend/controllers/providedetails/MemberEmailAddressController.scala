@@ -117,7 +117,7 @@ extends FrontendController(mcc, actions):
         .isVerified === false,
       implicit request =>
         // Member email has already been provided and verified, redirecting to nino page
-        Redirect(AppRoutes.providedetails.MemberNinoController.show)
+        Redirect(AppRoutes.providedetails.CheckYourAnswersController.show)
     )
     .async:
       implicit request =>
@@ -150,7 +150,7 @@ extends FrontendController(mcc, actions):
       .setTo(true)
     memberProvideDetailsService.upsert(updatedProvidedDetails).map { _ =>
       logger.info("Member email status reported as verified, redirecting to Nino page")
-      Redirect(AppRoutes.providedetails.MemberNinoController.show)
+      Redirect(AppRoutes.providedetails.CheckYourAnswersController.show)
     }
 
   private def onEmailUnverified(

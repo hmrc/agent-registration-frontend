@@ -37,5 +37,5 @@ extends FrontendController(mcc, actions):
     implicit request: RequestHeader =>
       Ok(placeholder(
         h1 = "Confirm Stop Page",
-        bodyText = Some("This is a placeholder page for the email address page.")
+        bodyText = Some("This is a placeholder for stop apllication  page.")
       ))

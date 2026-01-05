@@ -67,7 +67,7 @@ extends FrontendController(mcc, actions):
         memberProvideDetailsService
           .upsert(updatedProvidedDetails)
           .map: _ =>
-            Redirect(AppRoutes.providedetails.MemberEmailAddressController.show.url)
+            Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url)
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>

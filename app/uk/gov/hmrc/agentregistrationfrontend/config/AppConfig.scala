@@ -55,6 +55,7 @@ class AppConfig @Inject() (
 
   val emailVerificationBaseUrl: String = servicesConfig.baseUrl("email-verification")
   val emailVerificationFrontendBaseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.email-verification-frontend", configuration)
+  val agentAssuranceBaseUrl: String = servicesConfig.baseUrl("agent-assurance")
 
   val injectEmailVerificationPasscodesPage: Boolean = configuration
     .getOptional[Boolean]("inject-email-verification-passcodes-page")

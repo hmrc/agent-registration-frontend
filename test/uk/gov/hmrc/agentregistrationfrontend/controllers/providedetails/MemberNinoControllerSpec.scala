@@ -31,13 +31,10 @@ extends ControllerSpec:
 
   private object memberProvideDetails:
 
-    private val afterEmailUpdate: MemberProvidedDetails = tdAll.providedDetailsLlp.afterEmailAddressProvided
-    val beforeNinoMissingInHmrcSystems: MemberProvidedDetails = tdAll.providedDetailsLlp.withNinoNotProvided(afterEmailUpdate)
-    val beforeNinoFromAuth: MemberProvidedDetails = tdAll.providedDetailsLlp.withNinoFromAuth(afterEmailUpdate)
-
-    val afterNinoFromAuth: MemberProvidedDetails = beforeNinoFromAuth
-    val afterNinoProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.withNinoProvided(afterEmailUpdate)
-    val afterNinoNotProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.withNinoNotProvided(afterEmailUpdate)
+    val afterEmailProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.afterEmailAddressVerified
+    val afterNinoNotProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoNotProvided
+    val afterNinoFromAuth: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoFromAuth
+    val afterNinoProvided: MemberProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoProvided
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.MemberNinoController.show shouldBe Call(
@@ -52,7 +49,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page when Nino is not provided in HMRC systems" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoMissingInHmrcSystems))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterEmailProvided))
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -60,15 +57,15 @@ extends ControllerSpec:
 
   s"GET $path should redirect to next page when Nino is already provided from HMRC systems (Auth)" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoFromAuth))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterNinoFromAuth))
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe AppRoutes.providedetails.MemberSaUtrController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
 
   s"GET $path should redirect to previous page when EmailAddress is not provided from HMRC systems (Auth)" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoFromAuth.copy(emailAddress = None)))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterNinoFromAuth.copy(emailAddress = None)))
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
@@ -76,7 +73,7 @@ extends ControllerSpec:
 
   s"POST $path with selected Yes and valid name should save data and redirect to check your answers" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoMissingInHmrcSystems))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterEmailProvided))
     AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvideDetails.afterNinoProvided)
 
     val response: WSResponse =
@@ -87,11 +84,11 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.providedetails.MemberSaUtrController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
 
   s"POST $path with selected No should save data and redirect to check your answers" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoMissingInHmrcSystems))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterNinoNotProvided))
     AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvideDetails.afterNinoNotProvided)
 
     val response: WSResponse =
@@ -101,11 +98,11 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.providedetails.MemberSaUtrController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
 
   s"POST $path  without selecting and option should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoMissingInHmrcSystems))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterNinoNotProvided))
     val response: WSResponse =
       post(path)(Map(
         MemberNinoForm.hasNinoKey -> Seq(Constants.EMPTY_STRING),
@@ -120,7 +117,7 @@ extends ControllerSpec:
 
   s"POST $path with selected Yes and blank inputs should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoMissingInHmrcSystems))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterNinoNotProvided))
     val response: WSResponse =
       post(path)(Map(
         MemberNinoForm.hasNinoKey -> Seq("Yes"),
@@ -135,7 +132,7 @@ extends ControllerSpec:
 
   s"POST $path with selected Yes and invalid characters should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.beforeNinoMissingInHmrcSystems))
+    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvideDetails.afterNinoNotProvided))
     val response: WSResponse =
       post(path)(Map(
         MemberNinoForm.hasNinoKey -> Seq("Yes"),

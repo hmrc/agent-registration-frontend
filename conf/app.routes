@@ -38,6 +38,7 @@ GET        /apply/internal/initiate-agent-application/:agentType/:businessType  
 GET        /apply/internal/grs/start-journey                                          uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.GrsController.startJourney()
 GET        /apply/internal/grs/journey-callback                                       uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.GrsController.journeyCallback(journeyId: Option[grs.JourneyId])
 GET        /apply/internal/address-lookup/journey-callback                            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.AddressLookupCallbackController.journeyCallback(id: Option[addresslookup.JourneyId])
+GET        /apply/internal/entity-check                                               uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.EntityCheckController.entityCheck()
 
 ## Applicant contact details routes
 GET         /apply/applicant/llp-member                            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.ApplicantRoleInLlpController.show
@@ -91,6 +92,7 @@ GET         /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.
 POST        /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.DeclarationController.submit
 
 # Individuals (directors/partners/members/owners) providing details
+GET         /provide-details/exit                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.genericExitPage
 GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.start(linkId: LinkId)
 
 ## Internal Routes for provide-details
@@ -113,9 +115,9 @@ GET         /provide-details/utr                                    uk.gov.hmrc.
 POST        /provide-details/utr                                    uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberSaUtrController.submit
 GET         /provide-details/approve-applicant                      uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberApproveApplicantController.show
 POST        /provide-details/approve-applicant                      uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberApproveApplicantController.submit
-GET         /provide-details/confirm-stop                            uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberConfirmStopController.show
-GET         /provide-details/exit                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.genericExitPage
-GET         /provide-details/multiple-provided-details              uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.multipleProvidedDetailsPage
-GET         /provide-details/check-answers                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberCheckYourAnswersController.show
 GET         /provide-details/agree-standard                         uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberHmrcStandardForAgentsController.show
 POST        /provide-details/agree-standard                         uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberHmrcStandardForAgentsController.submit
+GET         /provide-details/confirm-stop                           uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberConfirmStopController.show
+GET         /provide-details/check-your-answers                     uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CheckYourAnswersController.show
+GET         /provide-details/confirmation                           uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberConfirmationController.show
+GET         /provide-details/multiple-provided-details              uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.multipleProvidedDetailsPage

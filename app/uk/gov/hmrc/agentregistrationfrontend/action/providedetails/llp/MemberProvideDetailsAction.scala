@@ -128,7 +128,6 @@ with RequestAwareLogging:
               applicationService
                 .find(agentApplicationId)
                 .map:
-                  // TODO WG - do not like repeating this logic here. same as on start page. Risk of drifting
                   case Some(app) if app.hasFinished =>
                     val initiateMpdUrl: Call = initiateMpd(app.linkId)
                     logger.info(s"Missing member provided details in DB. Recovering success. Recovered  LinkId: ${app.linkId} for user:${app.internalUserId} and redirecting to initiate journey ${initiateMpdUrl.url}.")

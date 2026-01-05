@@ -89,6 +89,7 @@ object AppRoutes:
       val InitiateAgentApplicationController = internalRoutes.InitiateAgentApplicationController
       val GrsController = internalRoutes.GrsController
       val AddressLookupCallbackController = internalRoutes.AddressLookupCallbackController
+      val EntityCheckController = internalRoutes.EntityCheckController
 
   object providedetails:
 
@@ -103,7 +104,8 @@ object AppRoutes:
     val MemberApproveApplicantController = providedetailsRoutes.MemberApproveApplicantController
     val MemberHmrcStandardForAgentsController = providedetailsRoutes.MemberHmrcStandardForAgentsController
     val MemberConfirmStopController = providedetailsRoutes.MemberConfirmStopController
-    val MemberCheckYourAnswersController = providedetailsRoutes.MemberCheckYourAnswersController
+    val CheckYourAnswersController = providedetailsRoutes.CheckYourAnswersController
+    val MemberConfirmationController = providedetailsRoutes.MemberConfirmationController
 
     object internal:
       val InitiateMemberProvideDetailsController = internalProviDedetailsRoutes.InitiateMemberProvideDetailsController

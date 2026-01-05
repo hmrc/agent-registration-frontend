@@ -186,7 +186,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.providedetails.MemberNinoController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
     EmailVerificationStubs.verifyEvStatusRequest(tdAll.credentials.providerId)
 
   s"GET $verifyPath with an already verified email stored in provided details should redirect to Member Nino page" in:
@@ -196,7 +196,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.providedetails.MemberNinoController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
 
   s"GET $verifyPath with an email to verify in the application that is locked should show email locked page" in:
     AuthStubs.stubAuthoriseIndividual()
