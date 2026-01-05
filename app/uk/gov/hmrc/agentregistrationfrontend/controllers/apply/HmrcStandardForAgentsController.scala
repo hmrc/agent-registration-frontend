@@ -64,7 +64,9 @@ extends FrontendController(mcc, actions):
       implicit request =>
         agentApplicationService
           .upsert(
-            request.agentApplication
+            request
+              .agentApplication
+              .asLlpApplication
               .modify(_.hmrcStandardForAgentsAgreed)
               .setTo(StateOfAgreement.Agreed)
           ).map: _ =>
