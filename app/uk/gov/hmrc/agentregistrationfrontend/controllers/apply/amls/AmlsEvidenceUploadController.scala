@@ -30,6 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
+import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadIdGenerator
@@ -90,7 +91,7 @@ extends FrontendController(mcc, actions):
       val amlsName: AmlsName = amlsCodes.getSupervisoryName(amlsCode)
       val uploadId: UploadId = uploadIdGenerator.nextUploadId()
       for
-        upscanInitiateResponse <- upscanInitiateService.initiate(uploadId)
+        upscanInitiateResponse: UpscanInitiateConnector.UpscanInitiateResponse <- upscanInitiateService.initiate(uploadId)
         upload = Upload(
           _id = uploadId,
           internalUserId = request.internalUserId,
