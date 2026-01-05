@@ -61,13 +61,13 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.model.BusinessPartnerRecor
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.ContactDetails
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.Organisation
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.GrsStub
+import uk.gov.hmrc.domain.SaUtrGenerator
 import uk.gov.voa.play.form.ConditionalMappings.isEqual
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 import uk.gov.voa.play.form.conditionOpts
 
 import java.time.LocalDate
 import java.util.UUID
-import scala.util.Random
 
 @Singleton
 class GrsStubController @Inject() (
@@ -155,8 +155,11 @@ extends FrontendController(mcc, actions):
       Created(Json.obj(
         "journeyStartUrl" -> routes.GrsStubController.showGrsData(businessType, randomJourneyId()).url // scalafix:ok DisableSyntax
       ))
-  def randomSaUtr(): SaUtr = SaUtr("%010d".format(Random.nextLong(9999999999L)))
-  def randomCtUtr(): CtUtr = CtUtr("%010d".format(Random.nextLong(9999999999L)))
+
+  val seed = 123456
+  val utrGenerator = SaUtrGenerator(seed) // for our test-only purposes we can use SaUtrGenerator to generate both SA UTRs and CT UTRs
+  def randomSaUtr(): SaUtr = SaUtr(utrGenerator.nextSaUtr.utr)
+  def randomCtUtr(): CtUtr = CtUtr(utrGenerator.nextSaUtr.utr)
   def randomJourneyId(): JourneyId = JourneyId(UUID.randomUUID().toString)
 
   private def form(businessType: BusinessType): Form[JourneyData] =
