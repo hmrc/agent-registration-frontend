@@ -88,6 +88,7 @@ object AppRoutes:
       val GrsController = internalRoutes.GrsController
       val AddressLookupCallbackController = internalRoutes.AddressLookupCallbackController
       val EntityCheckController = internalRoutes.EntityCheckController
+      val CompaniesHouseStatusController = internalRoutes.CompaniesHouseStatusController
 
   object providedetails:
 

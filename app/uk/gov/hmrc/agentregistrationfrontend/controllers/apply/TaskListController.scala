@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
@@ -46,7 +46,9 @@ extends FrontendController(mcc, actions):
     .Applicant
     .getApplicationInProgress
     .ensure(
-      _.agentApplication.isGrsDataReceived,
+      _.agentApplication
+        .companyStatusCheckResult
+        .isDefined,
       implicit request =>
         logger.warn("Missing data from GRS, redirecting to start GRS registration")
         Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)

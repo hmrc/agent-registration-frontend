@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs
 import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.Json
+import uk.gov.hmrc.agentregistration.shared.Crn
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object CompaniesHouseStubs {
@@ -80,6 +81,137 @@ object CompaniesHouseStubs {
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=$lastName&register_view=true&register_type=llp_members"),
+    count = count
+  )
+
+  def givenUnsuccessfulGetCompanyHouseResponse(
+    crn: Crn,
+    statusResponse: Int
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"/companies-house-api-proxy/company/${crn.value}"),
+    responseStatus = statusResponse,
+    responseBody = ""
+  )
+
+  def givenSuccessfulGetCompanyHouseResponse(
+    crn: Crn,
+    companyStatus: String
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"/companies-house-api-proxy/company/${crn.value}"),
+    responseStatus = 200,
+    responseBody =
+      Json.obj(
+        "accounts" -> Json.obj(
+          "accounting_reference_date" -> Json.obj(
+            "day" -> 1,
+            "month" -> 1
+          ),
+          "last_accounts" -> Json.obj(
+            "made_up_to" -> "2024-01-01",
+            "type" -> "string"
+          ),
+          "next_due" -> "2025-01-01",
+          "next_made_up_to" -> "2025-01-01",
+          "overdue" -> false
+        ),
+        "annual_return" -> Json.obj(
+          "last_made_up_to" -> "2024-01-01",
+          "next_due" -> "2025-01-01",
+          "next_made_up_to" -> "2025-01-01",
+          "overdue" -> false
+        ),
+        "branch_company_details" -> Json.obj(
+          "business_activity" -> "string",
+          "parent_company_name" -> "string",
+          "parent_company_number" -> "string"
+        ),
+        "can_file" -> true,
+        "company_name" -> "Watford Microbreweries",
+        "company_number" -> crn.value,
+        "company_status" -> companyStatus,
+        "company_status_detail" -> "string",
+        "confirmation_statement" -> Json.obj(
+          "last_made_up_to" -> "2024-01-01",
+          "next_due" -> "2025-01-01",
+          "next_made_up_to" -> "2025-01-01",
+          "overdue" -> false
+        ),
+        "date_of_creation" -> "2020-01-01",
+        "date_of_dissolution" -> "2024-01-01",
+        "etag" -> "string",
+        "foreign_company_details" -> Json.obj(
+          "accounting_requirement" -> Json.obj(
+            "foreign_account_type" -> "string",
+            "terms_of_account_publication" -> "string"
+          ),
+          "accounts" -> Json.obj(
+            "account_period_from" -> Json.obj("day" -> 1, "month" -> 1),
+            "account_period_to" -> Json.obj("day" -> 31, "month" -> 12),
+            "must_file_within" -> Json.obj("months" -> 9)
+          ),
+          "business_activity" -> "string",
+          "company_type" -> "string",
+          "governed_by" -> "string",
+          "is_a_credit_finance_institution" -> false,
+          "originating_registry" -> Json.obj(
+            "country" -> "string",
+            "name" -> "string"
+          ),
+          "registration_number" -> "string"
+        ),
+        "has_been_liquidated" -> false,
+        "has_charges" -> false,
+        "has_insolvency_history" -> false,
+        "is_community_interest_company" -> false,
+        "jurisdiction" -> "string",
+        "last_full_members_list_date" -> "2024-01-01",
+        "links" -> Json.obj(
+          "persons_with_significant_control_list" -> "string",
+          "persons_with_significant_control_statements_list" -> "string",
+          "self" -> "string"
+        ),
+        "officer_summary" -> Json.obj(
+          "active_count" -> 1,
+          "officers" -> Json.arr(
+            Json.obj(
+              "appointed_on" -> "2020-01-01",
+              "date_of_birth" -> Json.obj(
+                "day" -> 23,
+                "month" -> 4,
+                "year" -> 1948
+              ),
+              "name" -> "Jim Ferguson",
+              "officer_role" -> "director"
+            )
+          ),
+          "resigned_count" -> 0
+        ),
+        "registered_office_address" -> Json.obj(
+          "address_line_1" -> "string",
+          "address_line_2" -> "string",
+          "care_of" -> "string",
+          "country" -> "string",
+          "locality" -> "string",
+          "po_box" -> "string",
+          "postal_code" -> "string",
+          "premises" -> "string",
+          "region" -> "string"
+        ),
+        "registered_office_is_in_dispute" -> false,
+        "sic_codes" -> Json.arr("string"),
+        "type" -> "string",
+        "undeliverable_registered_office_address" -> false
+      ).toString
+  )
+
+  def verifyGetCompanyHouse(
+    crn: Crn,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"/companies-house-api-proxy/company/${crn.value}"),
     count = count
   )
 

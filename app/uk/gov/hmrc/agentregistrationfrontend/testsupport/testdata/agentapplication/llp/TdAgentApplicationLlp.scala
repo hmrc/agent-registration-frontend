@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplicat
 import uk.gov.hmrc.agentregistration.shared.ApplicationState.GrsDataReceived
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.CompanyStatusCheckResult
 import uk.gov.hmrc.agentregistration.shared.EntityCheckResult
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.UserRole
@@ -42,6 +43,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       amlsDetails = None,
       agentDetails = None,
       entityCheckResult = None,
+      companyStatusCheckResult = None,
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
     )
 
@@ -60,8 +62,16 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       entityCheckResult = Some(EntityCheckResult.Fail)
     )
 
-    val afterContactDetailsComplete: AgentApplicationLlp = afterHmrcEntityVerificationPass.copy(
-      applicantContactDetails = Some(dependencies.applicantContactDetails),
+    val afterCompaniesHouseStatusAllow: AgentApplicationLlp = afterHmrcEntityVerificationPass.copy(
+      companyStatusCheckResult = Some(CompanyStatusCheckResult.Allow)
+    )
+
+    val afterCompaniesHouseStatusBlock: AgentApplicationLlp = afterHmrcEntityVerificationPass.copy(
+      companyStatusCheckResult = Some(CompanyStatusCheckResult.Block)
+    )
+
+    val afterContactDetailsComplete: AgentApplicationLlp = afterCompaniesHouseStatusAllow.copy(
+      applicantContactDetails = Some(dependencies.authorisedContactDetails),
       agentDetails = None
     )
 

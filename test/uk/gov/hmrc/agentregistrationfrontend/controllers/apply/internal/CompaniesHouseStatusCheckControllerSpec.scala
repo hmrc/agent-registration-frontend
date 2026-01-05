@@ -18,23 +18,19 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal
 
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompanyHouseStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData.saUtr
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentAssuranceStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData.crn
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CompaniesHouseStubs
 
-class EntityCheckControllerSpec
+class CompaniesHouseStatusCheckControllerSpec
 extends ControllerSpec:
 
   object agentApplication:
 
-    val beforeGrsDataProvided: AgentApplicationLlp =
-      tdAll
-        .agentApplicationLlp
-        .afterStarted
-
-    val afterGrsDataProvided: AgentApplicationLlp =
+    val beforeHmrcEntityVerificationPass: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
         .afterGrsDataReceived
@@ -44,59 +40,64 @@ extends ControllerSpec:
         .agentApplicationLlp
         .afterHmrcEntityVerificationPass
 
-    val afterHmrcEntityVerificationFail =
+    val afterCompaniesHouseStatusAllow =
       tdAll
         .agentApplicationLlp
-        .afterHmrcEntityVerificationFail
+        .afterCompaniesHouseStatusAllow
 
-  private val path: String = "/agent-registration/apply/internal/entity-check"
-  private val nextPageUrl: String = "/agent-registration/apply/internal/status-check"
-  private val previousPage: String = "/agent-registration/apply"
+    val afterCompaniesHouseStatusBlock =
+      tdAll
+        .agentApplicationLlp
+        .afterCompaniesHouseStatusBlock
+
+  private val path: String = "/agent-registration/apply/internal/status-check"
+  private val nextPageUrl: String = "/agent-registration/apply/task-list"
+  private val previousPage: String = "/agent-registration/apply/internal/entity-check"
 
   "routes should have correct paths and methods" in:
-    AppRoutes.apply.internal.EntityCheckController.entityCheck() shouldBe Call(
+    AppRoutes.apply.internal.CompaniesHouseStatusController.companyStatusCheck() shouldBe Call(
       method = "GET",
       url = path
     )
 
-  s"GET $path should update application with pass status and redirect to company status check  when agent pass entity verification checks" in:
+  s"GET $path should update application with active company status and redirect to task list when company is active" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterGrsDataProvided)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterHmrcEntityVerificationPass)
-    AgentAssuranceStubs.stubIsRefusedToDealWith(saUtr = saUtr, isRefused = false)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterHmrcEntityVerificationPass)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterCompaniesHouseStatusAllow)
+    CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompanyHouseStatus.Active.key)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe nextPageUrl
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
-    AgentAssuranceStubs.verifyIsRefusedToDealWith(saUtr)
+    CompaniesHouseStubs.verifyGetCompanyHouse(crn = crn)
 
-  s"GET $path should update application with fail status and open entity checks fail page when agent fail entity verification checks" in:
+  s"GET $path should update application with fail status and open company status fail page when company status is blocked" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterGrsDataProvided)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterHmrcEntityVerificationFail)
-    AgentAssuranceStubs.stubIsRefusedToDealWith(saUtr = saUtr, isRefused = true)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterHmrcEntityVerificationPass)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterCompaniesHouseStatusBlock)
+    CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompanyHouseStatus.Closed.key)
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe "Entity verification failed... - Apply for an agent services account - GOV.UK"
+    response.parseBodyAsJsoupDocument.title() shouldBe "Company status is blocked... - Apply for an agent services account - GOV.UK"
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
-    AgentAssuranceStubs.verifyIsRefusedToDealWith(saUtr)
+    CompaniesHouseStubs.verifyGetCompanyHouse(crn = crn)
 
-  s"GET $path should redirect to start registration page when GRS business details not defined" in:
+  s"GET $path should redirect to entity check  when entity checks not defined" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeGrsDataProvided)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeHmrcEntityVerificationPass)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe previousPage
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
 
-  s"GET $path should redirect to company status check when entity verification already done" in:
+  s"GET $path should redirect to task list page when entity verification already done" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterHmrcEntityVerificationPass)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterCompaniesHouseStatusAllow)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe nextPageUrl

@@ -40,6 +40,7 @@ GET        /apply/internal/grs/start-journey                                    
 GET        /apply/internal/grs/journey-callback                                       uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.GrsController.journeyCallback(journeyId: Option[grs.JourneyId])
 GET        /apply/internal/address-lookup/journey-callback                            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.AddressLookupCallbackController.journeyCallback(id: Option[addresslookup.JourneyId])
 GET        /apply/internal/entity-check                                               uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.EntityCheckController.entityCheck()
+GET        /apply/internal/status-check                                               uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.CompaniesHouseStatusController.companyStatusCheck()
 
 ## Applicant contact details routes
 GET         /apply/applicant/applicant-name                        uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.ApplicantNameController.show
