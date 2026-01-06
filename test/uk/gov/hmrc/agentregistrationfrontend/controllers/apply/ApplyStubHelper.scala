@@ -20,12 +20,9 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.Utr
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.UpscanStubs
 
 object ApplyStubHelper:
 
@@ -40,36 +37,6 @@ object ApplyStubHelper:
     stubsForAuthAction(application)
     AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
 
-  def stubsForInitialisingUpload(
-    application: AgentApplication,
-    updatedApplication: AgentApplication
-  ): StubMapping =
-    stubsForSuccessfulUpdate(
-      application,
-      updatedApplication
-    )
-    UpscanStubs.stubUpscanInitiateResponse()
-    AgentRegistrationStubs.stubInitiateUpscanProgress(updatedApplication.getAmlsDetails.getAmlsEvidence)
-
-  def stubsForUploadInProgress(
-    application: AgentApplication,
-    uploadId: UploadId
-  ): StubMapping =
-    stubsForAuthAction(application)
-    AgentRegistrationStubs.stubGetUpscanStatus(uploadId, UploadStatus.InProgress)
-
-  def stubsForUploadStatusChange(
-    application: AgentApplication,
-    updatedApplication: AgentApplication,
-    uploadId: UploadId,
-    uploadStatus: UploadStatus
-  ): StubMapping =
-    stubsForSuccessfulUpdate(
-      application,
-      updatedApplication
-    )
-    AgentRegistrationStubs.stubGetUpscanStatus(uploadId, uploadStatus)
-
   def verifyConnectorsForAuthAction(): Unit =
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
@@ -77,19 +44,6 @@ object ApplyStubHelper:
   def verifyConnectorsForSuccessfulUpdate(): Unit =
     verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
-
-  def verifyConnectorsForUploadInitiate(): Unit =
-    verifyConnectorsForSuccessfulUpdate()
-    UpscanStubs.verifyUpscanInitiateRequest()
-    AgentRegistrationStubs.verifyInitiateUpscanProgress()
-
-  def verifyConnectorsForUploadInProgress(): Unit =
-    verifyConnectorsForAuthAction()
-    AgentRegistrationStubs.verifyGetUpscanStatus(tdAll.uploadId)
-
-  def verifyConnectorsForUploadResult(): Unit =
-    verifyConnectorsForSuccessfulUpdate()
-    AgentRegistrationStubs.verifyGetUpscanStatus(tdAll.uploadId)
 
   private val utr: Utr = Utr(tdAll.saUtr.value)
 

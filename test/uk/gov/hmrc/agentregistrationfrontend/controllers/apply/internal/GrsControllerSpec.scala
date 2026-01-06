@@ -33,11 +33,11 @@ extends ControllerSpec:
   private val journeyCallbackPath: String = s"/agent-registration/apply/internal/grs/journey-callback?journeyId=${journeyId.value}"
 
   "routes should have correct paths and methods" in:
-    routes.GrsController.startJourney() shouldBe Call(
+    AppRoutes.apply.internal.GrsController.startJourney() shouldBe Call(
       method = "GET",
       url = startJourneyPath
     )
-    routes.GrsController.journeyCallback(Some(journeyId)) shouldBe Call(
+    AppRoutes.apply.internal.GrsController.journeyCallback(Some(journeyId)) shouldBe Call(
       method = "GET",
       url = journeyCallbackPath
     )

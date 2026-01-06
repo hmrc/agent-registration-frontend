@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.services
 
-import uk.gov.hmrc.agentregistration.shared.upscan.FileUploadReference
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.StringContextOps
+import play.api.mvc.RequestHeader
+import sttp.model.Uri
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
 import uk.gov.hmrc.objectstore.client.Path
 import uk.gov.hmrc.objectstore.client.RetentionPeriod
 import uk.gov.hmrc.objectstore.client.Sha256Checksum
@@ -32,27 +33,33 @@ import scala.concurrent.Future
 
 @Singleton
 class ObjectStoreService @Inject() (
-  osClient: PlayObjectStoreClient
-)(using ec: ExecutionContext) {
+  playObjectStoreClient: PlayObjectStoreClient
+)(using ec: ExecutionContext)
+extends RequestAwareLogging:
 
-  /* Transfers the file from Upscan to Object Store if the upload was successful.
-   * Returns the Object Store file path if the transfer was successful, None otherwise.
-   */
+  def deleteObject(path: Path.File)(using request: RequestHeader): Future[Unit] = playObjectStoreClient
+    .deleteObject(
+      path
+    ).recover:
+      case e => logger.error(s"Failed to delete object $path", e)
+
+  /** Transfers the file from Upscan to Object Store if the upload was successful. Returns the Object Store file path if the transfer was successful, None
+    * otherwise.
+    */
   def transferFileToObjectStore(
     fileReference: FileUploadReference,
-    uploadStatus: UploadStatus
-  )(using hc: HeaderCarrier): Future[Option[Path.File]] =
-    uploadStatus match
-      case details: UploadStatus.UploadedSuccessfully =>
-        val fileLocation = Path.File(s"${fileReference.value}/${details.name}")
-        val contentSha256 = Sha256Checksum.fromHex(details.checksum)
-        osClient.uploadFromUrl(
-          from = url"${details.downloadUrl}",
-          to = fileLocation,
-          retentionPeriod = RetentionPeriod.SixMonths, // TODO: how long do we need to keep these files?
-          contentType = Some(details.mimeType),
-          contentSha256 = Some(contentSha256)
-        )
-          .map(_ => Some(fileLocation))
-      case _ => Future.successful(None)
-}
+    downloadUrl: Uri,
+    mimeType: String,
+    checksum: String,
+    fileName: String
+  )(using request: RequestHeader): Future[Path.File] =
+    val fileLocation: Path.File = Path.File(s"${fileReference.value}/$fileName")
+    val contentSha256 = Sha256Checksum.fromHex(checksum)
+    playObjectStoreClient.uploadFromUrl(
+      from = downloadUrl.toJavaUri.toURL,
+      to = fileLocation,
+      retentionPeriod = RetentionPeriod.SixMonths, // TODO: how long do we need to keep these files?
+      contentType = Some(mimeType),
+      contentSha256 = Some(contentSha256)
+    )
+      .map(_.location)

@@ -53,7 +53,7 @@ extends FrontendController(mcc, actions):
       _.agentApplication.asLlpApplication.applicantContactDetails.map(_.applicantName.role).contains(ApplicantRoleInLlp.Member),
       implicit request =>
         logger.warn("Member name page requires Member role. Redirecting to applicant role selection page")
-        Redirect(routes.ApplicantRoleInLlpController.show)
+        Redirect(AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show)
     )
 
   def show: Action[AnyContent] = baseAction:
@@ -88,7 +88,7 @@ extends FrontendController(mcc, actions):
             .upsert(updatedApplication)
             .map: _ =>
               Redirect(
-                routes.CompaniesHouseMatchingController.show.url
+                AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.show.url
               )
       .redirectIfSaveForLater
 

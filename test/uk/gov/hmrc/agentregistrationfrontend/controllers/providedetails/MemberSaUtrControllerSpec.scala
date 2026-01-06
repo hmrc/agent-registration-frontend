@@ -62,7 +62,7 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
 
   s"GET $path should redirect to previous page when Nino is not provided from HMRC systems (Auth)" in:
     AuthStubs.stubAuthoriseIndividual()
@@ -70,7 +70,7 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe routes.MemberNinoController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.MemberNinoController.show.url
 
   s"POST $path with selected Yes and valid name should save data and redirect to check your answers" in:
     AuthStubs.stubAuthoriseIndividual()
@@ -85,7 +85,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
 
   s"POST $path with selected No should save data and redirect to check your answers" in:
     AuthStubs.stubAuthoriseIndividual()
@@ -99,7 +99,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
 
   s"POST $path  without selecting and option should return 400" in:
     AuthStubs.stubAuthoriseIndividual()

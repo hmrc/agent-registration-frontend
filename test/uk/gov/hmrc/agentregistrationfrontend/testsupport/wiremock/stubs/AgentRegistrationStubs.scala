@@ -25,9 +25,6 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.Utr
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadDetails
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadId
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AgentRegistrationStubs:
@@ -122,25 +119,6 @@ object AgentRegistrationStubs:
     responseBody = ""
   )
 
-  def stubInitiateUpscanProgress(
-    uploadDetails: UploadDetails
-  ): StubMapping = StubMaker.make(
-    httpMethod = StubMaker.HttpMethod.POST,
-    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/amls/upscan-initiate"),
-    responseStatus = Status.CREATED,
-    requestBody = Some(wm.equalToJson(Json.toJson(uploadDetails).toString))
-  )
-
-  def stubGetUpscanStatus(
-    uploadId: UploadId,
-    uploadStatus: UploadStatus
-  ): StubMapping = StubMaker.make(
-    httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/amls/upscan-status/${uploadId.value}"),
-    responseStatus = Status.OK,
-    responseBody = Json.toJson(uploadStatus).toString
-  )
-
   def verifyFindApplicationByAgentApplicationId(
     agentApplicationId: AgentApplicationId,
     count: Int = 1
@@ -165,22 +143,5 @@ object AgentRegistrationStubs:
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/business-partner-record/utr/${utr.value}"),
-    count = count
-  )
-
-  def verifyInitiateUpscanProgress(
-    count: Int = 1
-  ): Unit = StubMaker.verify(
-    httpMethod = StubMaker.HttpMethod.POST,
-    urlPattern = wm.urlPathEqualTo("/agent-registration/application/amls/upscan-initiate"),
-    count = count
-  )
-
-  def verifyGetUpscanStatus(
-    uploadId: UploadId,
-    count: Int = 1
-  ): Unit = StubMaker.verify(
-    httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/amls/upscan-status/${uploadId.value}"),
     count = count
   )

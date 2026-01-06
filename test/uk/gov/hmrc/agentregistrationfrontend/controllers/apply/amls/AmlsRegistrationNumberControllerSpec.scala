@@ -68,15 +68,15 @@ extends ControllerSpec:
     val invalidFormatError = "Enter your registration number in the correct format"
 
   "routes should have correct paths and methods" in:
-    routes.AmlsRegistrationNumberController.show shouldBe Call(
+    AppRoutes.apply.amls.AmlsRegistrationNumberController.show shouldBe Call(
       method = "GET",
       url = "/agent-registration/apply/anti-money-laundering/registration-number"
     )
-    routes.AmlsRegistrationNumberController.submit shouldBe Call(
+    AppRoutes.apply.amls.AmlsRegistrationNumberController.submit shouldBe Call(
       method = "POST",
       url = "/agent-registration/apply/anti-money-laundering/registration-number"
     )
-    routes.AmlsRegistrationNumberController.submit.url shouldBe routes.AmlsRegistrationNumberController.show.url
+    AppRoutes.apply.amls.AmlsRegistrationNumberController.submit.url shouldBe AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url
 
   private final case class TestCaseForAmlsRegistrationNumber(
     application: AgentApplicationLlp,
@@ -94,7 +94,7 @@ extends ControllerSpec:
       amlsType = "HMRC",
       validInput = "XAML00000123456", // when the supervisory body is HMRC, the registration number has a different format to non-HMRC bodies
       invalidInput = "123",
-      nextPage = routes.CheckYourAnswersController.show.url
+      nextPage = AppRoutes.apply.amls.CheckYourAnswersController.show.url
     ),
     TestCaseForAmlsRegistrationNumber(
       application = agentApplication.nonHmrcAfterSupervisoryBodySelected,
@@ -102,7 +102,7 @@ extends ControllerSpec:
       amlsType = "non-HMRC",
       validInput = "NONHMRC-REF-AMLS-NUMBER-00001",
       invalidInput = ";</\\>",
-      nextPage = routes.CheckYourAnswersController.show.url
+      nextPage = AppRoutes.apply.amls.CheckYourAnswersController.show.url
     )
   ).foreach: testCase =>
     s"GET $path should return 200 for ${testCase.amlsType} and render page" in:
@@ -222,7 +222,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.AmlsSupervisorController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.amls.AmlsSupervisorController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path when amls details are missing should redirect to supervisory body page" in:
@@ -234,5 +234,5 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.AmlsSupervisorController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.amls.AmlsSupervisorController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()

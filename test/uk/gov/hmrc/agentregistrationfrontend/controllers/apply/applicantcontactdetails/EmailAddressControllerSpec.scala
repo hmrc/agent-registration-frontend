@@ -72,29 +72,29 @@ extends ControllerSpec:
 
   private val applicantEmailVerificationRequest: VerifyEmailRequest = VerifyEmailRequest(
     credId = tdAll.credentials.providerId,
-    continueUrl = "http://localhost:22201/agent-registration/apply/applicant/verify-email-address",
+    continueUrl = s"$thisFrontendBaseUrl/agent-registration/apply/applicant/verify-email-address",
     origin = "HMRC Agent Services",
     deskproServiceName = None,
     accessibilityStatementUrl = "/agent-services-account",
     email = Some(Email(
       address = tdAll.applicantEmailAddress.value,
-      enterUrl = "http://localhost:22201/agent-registration/apply/applicant/email-address"
+      enterUrl = s"$thisFrontendBaseUrl/agent-registration/apply/applicant/email-address"
     )),
     lang = Some("en"),
-    backUrl = Some("http://localhost:22201/agent-registration/apply/applicant/email-address"),
+    backUrl = Some(s"$thisFrontendBaseUrl/agent-registration/apply/applicant/email-address"),
     pageTitle = None
   )
 
   "routes should have correct paths and methods" in:
-    routes.EmailAddressController.show shouldBe Call(
+    AppRoutes.apply.applicantcontactdetails.EmailAddressController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.EmailAddressController.submit shouldBe Call(
+    AppRoutes.apply.applicantcontactdetails.EmailAddressController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.EmailAddressController.submit.url shouldBe routes.EmailAddressController.show.url
+    AppRoutes.apply.applicantcontactdetails.EmailAddressController.submit.url shouldBe AppRoutes.apply.applicantcontactdetails.EmailAddressController.show.url
 
   s"GET $path should return 200 and render page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeEmailAddressProvided)
@@ -110,7 +110,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.TelephoneNumberController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with well formed email address should save data and redirect to the verify endpoint" in:
@@ -125,7 +125,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.EmailAddressController.verify.url
+    response.header("Location").value shouldBe AppRoutes.apply.applicantcontactdetails.EmailAddressController.verify.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with blank inputs should return 400" in:
@@ -234,7 +234,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
     EmailVerificationStubs.verifyEvStatusRequest(tdAll.credentials.providerId)
 
@@ -244,5 +244,5 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()

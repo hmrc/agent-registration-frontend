@@ -147,7 +147,7 @@ extends ViewSpec:
           TestSummaryRow(
             key = "Evidence of anti-money laundering supervision",
             value = "evidence.pdf",
-            action = AppRoutes.apply.amls.AmlsEvidenceUploadController.show.url,
+            action = AppRoutes.apply.amls.AmlsEvidenceUploadController.showAmlsEvidenceUploadPage.url,
             changeLinkAccessibleContent = "Change Evidence of anti-money laundering supervision"
           )
         )

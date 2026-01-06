@@ -19,9 +19,9 @@ package uk.gov.hmrc.agentregistrationfrontend.views.apply.amls
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AmlsName
-import uk.gov.hmrc.agentregistration.shared.upscan.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector.UploadRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector.UpscanInitiateResponse
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadPage
 
@@ -91,8 +91,8 @@ extends ViewSpec:
       progressIndicator.attr("data-check-upload-status-interval-ms") shouldBe "1000"
       progressIndicator.attr(
         "data-check-upload-status-url"
-      ) shouldBe AppRoutes.apply.amls.AmlsEvidenceUploadController.checkUploadStatus.url
-      progressIndicator.attr("data-success") shouldBe s"http://localhost:22201${AppRoutes.apply.amls.AmlsEvidenceUploadController.showUploadResult.url}"
+      ) shouldBe AppRoutes.apply.amls.AmlsEvidenceUploadController.checkUploadStatusJs.url
+      progressIndicator.attr("data-success") shouldBe s"$thisFrontendBaseUrl${AppRoutes.apply.amls.AmlsEvidenceUploadController.showUploadResult.url}"
 
     "have hidden fields for upscan initiate form fields" in:
       val hiddenFields = doc

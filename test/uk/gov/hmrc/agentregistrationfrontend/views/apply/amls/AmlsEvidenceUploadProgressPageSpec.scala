@@ -18,10 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.views.apply.amls
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadProgressPage
-import uk.gov.hmrc.http.StringContextOps
 
 class AmlsEvidenceUploadProgressPageSpec
 extends ViewSpec:
@@ -34,18 +33,12 @@ extends ViewSpec:
 
   val successfulDoc: Document = Jsoup.parse(
     viewTemplate(
-      status = UploadStatus.UploadedSuccessfully(
-        name = "file.pdf",
-        mimeType = "application/pdf",
-        downloadUrl = url"http://localhost:1234/download/file.pdf",
-        size = Some(12345),
-        checksum = tdAll.objectStoreValidHexVal
-      )
+      status = tdAll.uploadUploadedSuccessfully.uploadStatus
     ).body
   )
 
   val virusDoc: Document = Jsoup.parse(
-    viewTemplate(status = UploadStatus.Failed).body
+    viewTemplate(status = tdAll.uploadFailed.uploadStatus).body
   )
 
   private val inProgressHeading: String = "We are checking your upload"
@@ -81,7 +74,7 @@ extends ViewSpec:
         """
           |Anti-money laundering supervision details
           |Your upload is complete
-          |Your file file.pdf has been uploaded successfully.
+          |Your file evidence.pdf has been uploaded successfully.
           |Continue
           |""".stripMargin
 

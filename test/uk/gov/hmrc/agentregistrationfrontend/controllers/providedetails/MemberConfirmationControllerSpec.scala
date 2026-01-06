@@ -54,7 +54,7 @@ extends ControllerSpec:
         .afterHmrcStandardforAgentsAgreed
 
   "routes should have correct paths and methods" in:
-    routes.MemberConfirmationController.show shouldBe Call(
+    AppRoutes.providedetails.MemberConfirmationController.show shouldBe Call(
       method = "GET",
       url = path
     )

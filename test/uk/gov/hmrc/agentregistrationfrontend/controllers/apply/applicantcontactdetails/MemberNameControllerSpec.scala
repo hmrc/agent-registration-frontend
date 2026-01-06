@@ -54,15 +54,15 @@ extends ControllerSpec:
     val lastNameInvalidError = "Your last name must only include letters a to z, hyphens, apostrophes and spaces"
 
   "routes should have correct paths and methods" in:
-    routes.MemberNameController.show shouldBe Call(
+    AppRoutes.apply.applicantcontactdetails.MemberNameController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.MemberNameController.submit shouldBe Call(
+    AppRoutes.apply.applicantcontactdetails.MemberNameController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.MemberNameController.submit.url shouldBe routes.MemberNameController.show.url
+    AppRoutes.apply.applicantcontactdetails.MemberNameController.submit.url shouldBe AppRoutes.apply.applicantcontactdetails.MemberNameController.show.url
 
   s"GET $path should return 200 and render page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeNameQueryProvided)
@@ -84,8 +84,8 @@ extends ControllerSpec:
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.CompaniesHouseMatchingController.show.url
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with blank inputs should return 400" in:

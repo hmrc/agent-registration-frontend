@@ -153,7 +153,7 @@ extends FrontendController(mcc, actions):
   def setupGrsJourney(businessType: BusinessType): Action[JourneyConfig] =
     Action(parse.json[JourneyConfig]): (_: Request[JourneyConfig]) =>
       Created(Json.obj(
-        "journeyStartUrl" -> routes.GrsStubController.showGrsData(businessType, randomJourneyId()).url
+        "journeyStartUrl" -> routes.GrsStubController.showGrsData(businessType, randomJourneyId()).url // scalafix:ok DisableSyntax
       ))
 
   val seed = 123456

@@ -1,0 +1,3 @@
+
++nocsrf
+POST        /amls/process-notification-from-upscan/:uploadId        uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.api.NotificationFromUpscanController.processNotificationFromUpscan(uploadId: UploadId)

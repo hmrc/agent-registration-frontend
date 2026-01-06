@@ -28,22 +28,22 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/about-your-business/business-type"
 
   "routes should have correct paths and methods" in:
-    routes.BusinessTypeSessionController.show shouldBe Call(
+    AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.BusinessTypeSessionController.submit shouldBe Call(
+    AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.BusinessTypeSessionController.submit.url shouldBe routes.BusinessTypeSessionController.show.url
+    AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.submit.url shouldBe AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show.url
 
   s"GET $path without AgentType in session should return 303 and redirect to agent type page" in:
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe routes.AgentTypeController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url
 
   s"GET $path with AgentType in session should return 200 and render page" in:
     val response: WSResponse = get(

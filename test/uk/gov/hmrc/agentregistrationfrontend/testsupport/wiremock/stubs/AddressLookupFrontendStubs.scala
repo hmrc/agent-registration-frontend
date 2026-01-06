@@ -24,6 +24,7 @@ import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.AddressLookupFrontendAddress
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AddressLookupFrontendStubs:
@@ -33,7 +34,7 @@ object AddressLookupFrontendStubs:
     "options" -> Json.obj(
       "continueUrl" -> s"$continueUrl",
       "includeHMRCBranding" -> true,
-      "signOutHref" -> "http://localhost:22201/agent-registration/sign-out",
+      "signOutHref" -> s"${ISpec.thisFrontendBaseUrl}/agent-registration/sign-out",
       "selectPageConfig" -> Json.obj(
         "proposedListLimit" -> 30,
         "showSearchLinkAgain" -> true
@@ -47,7 +48,7 @@ object AddressLookupFrontendStubs:
       ),
       "timeoutConfig" -> Json.obj(
         "timeoutAmount" -> 900,
-        "timeoutUrl" -> "http://localhost:22201/agent-registration/time-out"
+        "timeoutUrl" -> s"${ISpec.thisFrontendBaseUrl}/agent-registration/time-out"
       )
     ),
     "labels" -> Json.obj(

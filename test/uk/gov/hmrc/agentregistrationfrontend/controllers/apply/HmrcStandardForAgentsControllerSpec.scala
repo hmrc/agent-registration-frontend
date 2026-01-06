@@ -27,15 +27,15 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/agent-standard/accept-agent-standard"
 
   "route should have correct path and method" in:
-    routes.HmrcStandardForAgentsController.show shouldBe Call(
+    AppRoutes.apply.HmrcStandardForAgentsController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.HmrcStandardForAgentsController.submit shouldBe Call(
+    AppRoutes.apply.HmrcStandardForAgentsController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-  routes.HmrcStandardForAgentsController.submit.url shouldBe routes.HmrcStandardForAgentsController.show.url
+  AppRoutes.apply.HmrcStandardForAgentsController.submit.url shouldBe AppRoutes.apply.HmrcStandardForAgentsController.show.url
 
   object agentApplication:
 
@@ -81,5 +81,5 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.TaskListController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.TaskListController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()

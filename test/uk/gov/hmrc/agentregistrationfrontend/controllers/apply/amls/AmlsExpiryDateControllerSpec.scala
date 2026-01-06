@@ -67,15 +67,15 @@ extends ControllerSpec:
     val invalidError = "Enter a valid date"
 
   "routes should have correct paths and methods" in:
-    routes.AmlsExpiryDateController.show shouldBe Call(
+    AppRoutes.apply.amls.AmlsExpiryDateController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.AmlsExpiryDateController.submit shouldBe Call(
+    AppRoutes.apply.amls.AmlsExpiryDateController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.AmlsExpiryDateController.submit.url shouldBe routes.AmlsExpiryDateController.show.url
+    AppRoutes.apply.amls.AmlsExpiryDateController.submit.url shouldBe AppRoutes.apply.amls.AmlsExpiryDateController.show.url
 
   s"GET $path should return 200 render page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterRegistrationNumberProvided)
@@ -115,7 +115,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.AmlsRegistrationNumberController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path when supervisor is HMRC should redirect to check your answers" in:
@@ -124,7 +124,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.amls.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with valid inputs should redirect to the next page" in:
@@ -142,7 +142,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.amls.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with save for later and valid input should redirect to the saved for later page" in:

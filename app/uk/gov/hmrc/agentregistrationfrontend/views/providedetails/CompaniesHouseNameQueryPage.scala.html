@@ -45,7 +45,7 @@
         s"$key.p1",
         companyName
     )</p>
-    @formWithCSRF(action = routes.CompaniesHouseNameQueryController.submit) {
+    @formWithCSRF(action = AppRoutes.providedetails.CompaniesHouseNameQueryController.submit) {
         @govukInput(Input(
             label = Label(
               content = Text(messages(s"$key.firstName.label")),

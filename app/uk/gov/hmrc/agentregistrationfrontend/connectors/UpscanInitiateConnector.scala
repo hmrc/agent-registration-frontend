@@ -23,9 +23,9 @@ import play.api.libs.json.OFormat
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
 import play.api.mvc.RequestHeader
 import sttp.model.Uri
-import uk.gov.hmrc.agentregistration.shared.upscan.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector.*
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
 import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.StringContextOps
@@ -35,6 +35,8 @@ import javax.inject.Inject
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
+/** Connector for interacting with the upscan-initiate µservice.
+  */
 class UpscanInitiateConnector @Inject() (
   appConfig: AppConfig,
   httpClientV2: HttpClientV2
@@ -48,11 +50,12 @@ class UpscanInitiateConnector @Inject() (
   def initiate(
     redirectOnSuccessUrl: Uri,
     redirectOnErrorUrl: Uri,
+    callbackUrl: Uri,
     maxFileSize: ConfigMemorySize
   )(using RequestHeader): Future[UpscanInitiateResponse] = httpClientV2
     .post(url"$baseUrl/upscan/v2/initiate")
     .withBody(Json.toJson(UpscanInitiateRequest(
-      callbackUrl = appConfig.Upscan.callbackUrl,
+      callbackUrl = callbackUrl.toString,
       successRedirect = Some(redirectOnSuccessUrl.toString),
       errorRedirect = Some(redirectOnErrorUrl.toString),
       maximumFileSize = Some(maxFileSize.toBytes)

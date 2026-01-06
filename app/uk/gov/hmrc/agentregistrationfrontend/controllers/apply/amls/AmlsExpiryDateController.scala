@@ -52,13 +52,13 @@ extends FrontendController(mcc, actions):
       _.agentApplication.amlsDetails.exists(_.amlsRegistrationNumber.isDefined),
       implicit r =>
         logger.warn("Missing AmlsRegistrationNumber, redirecting to registration number page")
-        Redirect(routes.AmlsRegistrationNumberController.show.url)
+        Redirect(AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url)
     )
     .ensure(
       !_.agentApplication.getAmlsDetails.isHmrc, // safe to getAmlsDetails as ensured above
       implicit r =>
         logger.warn("Expiry date is not required as supervisor is HMRC, redirecting to Check Your Answers")
-        Redirect(routes.CheckYourAnswersController.show.url)
+        Redirect(AppRoutes.apply.amls.CheckYourAnswersController.show.url)
     )
 
   def show: Action[AnyContent] = baseAction:
@@ -81,5 +81,5 @@ extends FrontendController(mcc, actions):
                 .modify(_.amlsDetails.each.amlsExpiryDate)
                 .setTo(Some(amlsExpiryDate))
             )
-            .map(_ => Redirect(routes.CheckYourAnswersController.show.url))
+            .map(_ => Redirect(AppRoutes.apply.amls.CheckYourAnswersController.show.url))
       .redirectIfSaveForLater

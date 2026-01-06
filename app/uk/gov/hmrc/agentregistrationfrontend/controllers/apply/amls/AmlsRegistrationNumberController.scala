@@ -51,7 +51,7 @@ extends FrontendController(mcc, actions):
       _.agentApplication.amlsDetails.isDefined,
       implicit r =>
         logger.warn("Missing AmlsDetails, redirecting to AmlsSupervisor page")
-        Redirect(routes.AmlsSupervisorController.show.url)
+        Redirect(AppRoutes.apply.amls.AmlsSupervisorController.show.url)
     )
 
   def show: Action[AnyContent] = baseAction:
@@ -80,6 +80,6 @@ extends FrontendController(mcc, actions):
                 .setTo(Some(amlsRegistrationNumber))
             )
             .map(_ =>
-              Redirect(routes.CheckYourAnswersController.show.url)
+              Redirect(AppRoutes.apply.amls.CheckYourAnswersController.show.url)
             )
       .redirectIfSaveForLater

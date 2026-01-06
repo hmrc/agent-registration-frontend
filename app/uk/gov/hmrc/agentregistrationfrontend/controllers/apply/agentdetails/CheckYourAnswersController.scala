@@ -44,10 +44,10 @@ extends FrontendController(mcc, actions):
       implicit request =>
         logger.warn("Because we don't have complete agent details we are redirecting to where data is missing")
         request.agentApplication.asLlpApplication.agentDetails match {
-          case None => Redirect(routes.AgentBusinessNameController.show)
-          case Some(AgentDetails(_, None, _, _)) => Redirect(routes.AgentTelephoneNumberController.show)
-          case Some(AgentDetails(_, _, None, _)) => Redirect(routes.AgentEmailAddressController.show)
-          case Some(AgentDetails(_, _, _, _)) => Redirect(routes.AgentCorrespondenceAddressController.show)
+          case None => Redirect(AppRoutes.apply.agentdetails.AgentBusinessNameController.show)
+          case Some(AgentDetails(_, None, _, _)) => Redirect(AppRoutes.apply.agentdetails.AgentTelephoneNumberController.show)
+          case Some(AgentDetails(_, _, None, _)) => Redirect(AppRoutes.apply.agentdetails.AgentEmailAddressController.show)
+          case Some(AgentDetails(_, _, _, _)) => Redirect(AppRoutes.apply.agentdetails.AgentCorrespondenceAddressController.show)
         }
     )
 

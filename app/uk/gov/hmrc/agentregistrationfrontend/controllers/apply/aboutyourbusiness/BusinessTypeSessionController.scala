@@ -44,7 +44,7 @@ extends FrontendController(mcc, actions):
       _.readAgentType.isDefined,
       implicit request =>
         logger.warn("Agent type not selected - redirecting to agent type selection page")
-        Redirect(routes.AgentTypeController.show)
+        Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show)
     )
 
   def show: Action[AnyContent] = baseAction:
@@ -66,7 +66,7 @@ extends FrontendController(mcc, actions):
                 .addToSession(businessType)
                 .removePartnershipTypeFromSession
             case businessType @ BusinessTypeAnswer.PartnershipType =>
-              Redirect(routes.PartnershipTypeController.show.url)
+              Redirect(AppRoutes.apply.aboutyourbusiness.PartnershipTypeController.show.url)
                 .addToSession(businessType)
             case businessType @ BusinessTypeAnswer.Other =>
               Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)

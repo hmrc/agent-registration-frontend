@@ -14,17 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.upscan
+package uk.gov.hmrc.agentregistration.shared.amls
 
-import play.api.libs.json.Format
-import play.api.libs.json.Reads
-import play.api.libs.json.Writes
-import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
+import uk.gov.hmrc.agentregistration.shared.upload.UploadId
+import uk.gov.hmrc.objectstore.client.Path
 
-/** Upscan File Reference
-  */
-final case class FileUploadReference(value: String)
+final case class AmlsEvidence(
+  uploadId: UploadId,
+  fileName: String,
+  objectStoreLocation: Path.File
+)
 
-object FileUploadReference:
-
-  given format: Format[FileUploadReference] = JsonFormatsFactory.makeValueClassFormat
+object AmlsEvidence:
+  given OFormat[AmlsEvidence] =
+    given OFormat[Path.File] = Json.format[Path.File]
+    given OFormat[Path.Directory] = Json.format[Path.Directory]
+    Json.format[AmlsEvidence]

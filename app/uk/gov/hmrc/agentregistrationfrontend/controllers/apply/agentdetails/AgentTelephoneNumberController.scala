@@ -58,7 +58,7 @@ extends FrontendController(mcc, actions):
         .isDefined,
       implicit request =>
         logger.warn("Because we don't have a business name selected we are redirecting to the business name page")
-        Redirect(routes.AgentBusinessNameController.show)
+        Redirect(AppRoutes.apply.agentdetails.AgentBusinessNameController.show)
     )
 
   def show: Action[AnyContent] = baseAction.async:
@@ -103,5 +103,5 @@ extends FrontendController(mcc, actions):
           agentApplicationService
             .upsert(updatedApplication)
             .map: _ =>
-              Redirect(routes.CheckYourAnswersController.show.url)
+              Redirect(AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater

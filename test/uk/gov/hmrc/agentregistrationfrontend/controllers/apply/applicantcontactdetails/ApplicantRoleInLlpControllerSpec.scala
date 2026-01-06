@@ -54,15 +54,15 @@ extends ControllerSpec:
     val requiredError = "Select whether you are a member of the limited liability partnership"
 
   "routes should have correct paths and methods" in:
-    routes.ApplicantRoleInLlpController.show shouldBe Call(
+    AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    routes.ApplicantRoleInLlpController.submit shouldBe Call(
+    AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    routes.ApplicantRoleInLlpController.submit.url shouldBe routes.ApplicantRoleInLlpController.show.url
+    AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.submit.url shouldBe AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show.url
 
   s"GET $path should return 200 and render page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterGrsDataReceived)
@@ -81,7 +81,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.MemberNameController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.applicantcontactdetails.MemberNameController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with No should redirect to applicant name page" in:
@@ -93,7 +93,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe routes.AuthorisedNameController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path without valid selection should return 400" in:
