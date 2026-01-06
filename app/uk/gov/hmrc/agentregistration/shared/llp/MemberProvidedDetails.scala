@@ -41,7 +41,8 @@ final case class MemberProvidedDetails(
   memberNino: Option[MemberNino] = None,
   memberSaUtr: Option[MemberSaUtr] = None,
   hmrcStandardForAgentsAgreed: StateOfAgreement = StateOfAgreement.NotSet,
-  hasApprovedApplication: Option[Boolean] = None
+  hasApprovedApplication: Option[Boolean] = None,
+  hasConfirmedProvidedDetails: Option[Boolean] = None
 ):
 
   val memberProvidedDetailsId: MemberProvidedDetailsId = _id
