@@ -369,6 +369,14 @@ confirmation.checkProgress.bullet2 = email you at <strong>{0}</strong> to confir
 confirmation.viewLink = View or print your application
 confirmation.signOutLink = Finish and sign out
 
+# Apply / CompanyStatusBlock
+companyStatusBlock.title = We cannot create an account for this company
+companyStatusBlock.p1 = We cannot register this company for an agent services account. This is because of the company''s status on the Companies House register.
+companyStatusBlock.p2 = To view your company status you can <a class="govuk-link" href={0} target='_blank'>search the Companies House register (opens in a new tab)</a>. If you believe the status is incorrect, contact Companies House.
+companyStatusBlock.p3 = If you''ve entered the incorrect details, you can try again.
+companyStatusBlock.tryAgain.button = Try again
+
+
 
 # About your application / user role
 userRole.Owner.title = Are you the owner of the business?

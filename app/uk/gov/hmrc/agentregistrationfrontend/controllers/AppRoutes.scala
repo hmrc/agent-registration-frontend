@@ -46,6 +46,7 @@ object AppRoutes:
     val SaveForLaterController = applyRoutes.SaveForLaterController
     val HmrcStandardForAgentsController = applyRoutes.HmrcStandardForAgentsController
     val DeclarationController = applyRoutes.DeclarationController
+    val CompanyStatusBlockController = applyRoutes.CompanyStatusBlockController
 
     object aboutyourbusiness:
 

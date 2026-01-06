@@ -16,6 +16,7 @@ GET         /view-application                                          uk.gov.hm
 GET         /apply                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.apply.AgentApplicationController.startRegistration
 GET         /apply/task-list                                        uk.gov.hmrc.agentregistrationfrontend.controllers.apply.TaskListController.show
 GET         /apply/save-and-come-back-later                         uk.gov.hmrc.agentregistrationfrontend.controllers.apply.SaveForLaterController.show
+GET         /apply/cannot-register-company-or-partnership           uk.gov.hmrc.agentregistrationfrontend.controllers.apply.CompanyStatusBlockController.showBlockedPage          
 GET         /apply/exit                                             uk.gov.hmrc.agentregistrationfrontend.controllers.apply.AgentApplicationController.genericExitPage
 
 ## About your business routes

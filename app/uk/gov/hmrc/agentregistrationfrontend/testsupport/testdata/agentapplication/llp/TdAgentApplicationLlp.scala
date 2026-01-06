@@ -62,15 +62,15 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       entityCheckResult = Some(EntityCheckResult.Fail)
     )
 
-    val afterCompaniesHouseStatusAllow: AgentApplicationLlp = afterHmrcEntityVerificationPass.copy(
+    val afterCompaniesHouseStatusCheckAllow: AgentApplicationLlp = afterHmrcEntityVerificationPass.copy(
       companyStatusCheckResult = Some(CompanyStatusCheckResult.Allow)
     )
 
-    val afterCompaniesHouseStatusBlock: AgentApplicationLlp = afterHmrcEntityVerificationPass.copy(
+    val afterCompaniesHouseStatusCheckBlock: AgentApplicationLlp = afterHmrcEntityVerificationPass.copy(
       companyStatusCheckResult = Some(CompanyStatusCheckResult.Block)
     )
 
-    val afterContactDetailsComplete: AgentApplicationLlp = afterCompaniesHouseStatusAllow.copy(
+    val afterContactDetailsComplete: AgentApplicationLlp = afterCompaniesHouseStatusCheckAllow.copy(
       applicantContactDetails = Some(dependencies.authorisedContactDetails),
       agentDetails = None
     )

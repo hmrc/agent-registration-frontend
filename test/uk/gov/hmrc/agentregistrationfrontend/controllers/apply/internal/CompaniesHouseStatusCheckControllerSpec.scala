@@ -43,16 +43,17 @@ extends ControllerSpec:
     val afterCompaniesHouseStatusAllow =
       tdAll
         .agentApplicationLlp
-        .afterCompaniesHouseStatusAllow
+        .afterCompaniesHouseStatusCheckAllow
 
     val afterCompaniesHouseStatusBlock =
       tdAll
         .agentApplicationLlp
-        .afterCompaniesHouseStatusBlock
+        .afterCompaniesHouseStatusCheckBlock
 
   private val path: String = "/agent-registration/apply/internal/status-check"
   private val nextPageUrl: String = "/agent-registration/apply/task-list"
   private val previousPage: String = "/agent-registration/apply/internal/entity-check"
+  private val comapanyStatusBlock: String = "/agent-registration/apply/cannot-register-company-or-partnership"
 
   "routes should have correct paths and methods" in:
     AppRoutes.apply.internal.CompaniesHouseStatusController.companyStatusCheck() shouldBe Call(
@@ -79,8 +80,8 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterCompaniesHouseStatusBlock)
     CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompanyHouseStatus.Closed.key)
     val response: WSResponse = get(path)
-    response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe "Company status is blocked... - Apply for an agent services account - GOV.UK"
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe comapanyStatusBlock
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()

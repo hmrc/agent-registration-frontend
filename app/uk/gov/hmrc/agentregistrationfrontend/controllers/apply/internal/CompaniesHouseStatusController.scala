@@ -26,7 +26,6 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CompaniesHouseApiProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistration.shared.CompanyStatusCheckResult
 
 import javax.inject.Inject
@@ -37,8 +36,7 @@ class CompaniesHouseStatusController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   companiesHouseApiProxyConnector: CompaniesHouseApiProxyConnector,
-  agentApplicationService: AgentApplicationService,
-  simplePage: SimplePage
+  agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
@@ -80,9 +78,4 @@ extends FrontendController(mcc, actions):
               .setTo(Some(companyStatusCheckResult)))
         yield companyStatusCheckResult match
           case CompanyStatusCheckResult.Allow => Redirect(nextPage)
-          case CompanyStatusCheckResult.Block =>
-            logger.warn("Company status is blocked. Redirecting to company status blocked page.")
-            Ok(simplePage(
-              h1 = "Company status is blocked...",
-              bodyText = Some("Placeholder for company status blocked page...")
-            ))
+          case CompanyStatusCheckResult.Block => Redirect(AppRoutes.apply.CompanyStatusBlockController.showBlockedPage)
