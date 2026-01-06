@@ -33,8 +33,10 @@ trait TdSectionContactDetails {
         val afterNameDeclared: ApplicantName = ApplicantName("Miss Alexa Fantastic")
 
       val afterNameDeclared: AgentApplicationLlp = baseForSectionContactDetails
-        .modify(_.applicantContactDetails.each.applicantName)
-        .setTo(ApplicantNameHelper.afterNameDeclared)
+        .modify(_.applicantContactDetails)
+        .setTo(Some(ApplicantContactDetails(
+          applicantName = ApplicantNameHelper.afterNameDeclared
+        )))
 
       val afterTelephoneNumberProvided: AgentApplicationLlp = afterNameDeclared
         .modify(_.applicantContactDetails.each.telephoneNumber)

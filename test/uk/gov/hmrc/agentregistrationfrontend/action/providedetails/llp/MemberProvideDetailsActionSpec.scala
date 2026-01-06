@@ -41,7 +41,6 @@ extends ISpec:
   val submittedAgentApplication: AgentApplicationLlp = tdAll
     .agentApplicationLlp
     .sectionContactDetails
-    .whenApplicantIsAuthorised
     .afterEmailAddressVerified
     .modify(_.applicationState)
     .setTo(ApplicationState.Submitted)
@@ -49,7 +48,6 @@ extends ISpec:
   val inProgressAgentApplication: AgentApplicationLlp = tdAll
     .agentApplicationLlp
     .sectionContactDetails
-    .whenApplicantIsAuthorised
     .afterEmailAddressVerified
     .modify(_.applicationState)
     .setTo(ApplicationState.Started)

@@ -41,7 +41,6 @@ extends ControllerSpec:
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
-        .whenApplicantIsAuthorised
         .afterEmailAddressVerified
     val complete: AgentApplicationLlp = inComplete
       .modify(_.applicationState)

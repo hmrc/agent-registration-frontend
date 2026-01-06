@@ -73,7 +73,6 @@ extends ControllerSpec:
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
-        .whenApplicantIsAMember
         .afterEmailAddressVerified
 
   private final case class TestCaseForCya(

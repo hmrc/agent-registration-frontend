@@ -30,7 +30,8 @@ extends ControllerSpec:
 
   def initiateAgentApplication(
     agentType: AgentType,
-    businessType: BusinessType
+    businessType: BusinessType,
+    userRole: UserRole
   ): String =
     val agentTypePathSegment =
       import uk.gov.hmrc.agentregistration.shared.util.EnumExtensions.toStringHyphenated
@@ -38,19 +39,35 @@ extends ControllerSpec:
     val businessTypePathSegment =
       import uk.gov.hmrc.agentregistration.shared.util.SealedObjectsExtensions.toStringHyphenated
       businessType.toStringHyphenated
-    s"/agent-registration/apply/internal/initiate-agent-application/$agentTypePathSegment/$businessTypePathSegment"
+    val userRoleSegment =
+      import uk.gov.hmrc.agentregistration.shared.util.EnumExtensions.toStringHyphenated
+      userRole.toStringHyphenated
+    s"/agent-registration/apply/internal/initiate-agent-application/$agentTypePathSegment/$businessTypePathSegment/$userRoleSegment"
 
   final case class TestCase(
     agentType: AgentType,
-    businessType: BusinessType
+    businessType: BusinessType,
+    userRole: UserRole
   )
 
   Seq(
-    TestCase(AgentType.UkTaxAgent, LimitedLiabilityPartnership)
+    TestCase(
+      AgentType.UkTaxAgent,
+      LimitedLiabilityPartnership,
+      UserRole.Authorised
+    )
   ).foreach: t =>
-    val initiateAgentApplicationUrl: String = initiateAgentApplication(agentType = t.agentType, businessType = t.businessType)
-    s"routes should have correct paths and methods (${t.agentType}, ${t.businessType})" in:
-      AppRoutes.apply.internal.InitiateAgentApplicationController.initiateAgentApplication(t.agentType, t.businessType) shouldBe Call(
+    val initiateAgentApplicationUrl: String = initiateAgentApplication(
+      agentType = t.agentType,
+      businessType = t.businessType,
+      userRole = t.userRole
+    )
+    s"routes should have correct paths and methods (${t.agentType}, ${t.businessType}, ${t.userRole})" in:
+      AppRoutes.apply.internal.InitiateAgentApplicationController.initiateAgentApplication(
+        t.agentType,
+        t.businessType,
+        t.userRole
+      ) shouldBe Call(
         method = "GET",
         url = initiateAgentApplicationUrl
       )

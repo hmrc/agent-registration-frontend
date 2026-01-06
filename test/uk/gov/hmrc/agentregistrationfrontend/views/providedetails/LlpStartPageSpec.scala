@@ -32,7 +32,6 @@ extends ViewSpec:
   val submittedAgentApplication: AgentApplicationLlp = tdAll
     .agentApplicationLlp
     .sectionContactDetails
-    .whenApplicantIsAuthorised
     .afterEmailAddressVerified
     .modify(_.applicationState)
     .setTo(ApplicationState.Submitted)

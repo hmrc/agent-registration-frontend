@@ -34,14 +34,12 @@ extends ControllerSpec:
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
-        .whenApplicantIsAuthorised
         .afterNameDeclared
 
     val afterTelephoneNumberProvided: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
-        .whenApplicantIsAuthorised
         .afterTelephoneNumberProvided
 
   private object ExpectedStrings:

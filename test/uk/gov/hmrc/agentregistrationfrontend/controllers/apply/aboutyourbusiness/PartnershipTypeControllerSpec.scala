@@ -75,7 +75,7 @@ extends ControllerSpec:
 
       response.status shouldBe Status.SEE_OTHER
       response.body[String] shouldBe ""
-      response.header("Location").value shouldBe AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show.url
+      response.header("Location").value shouldBe AppRoutes.apply.aboutyourbusiness.UserRoleController.show.url
 
   s"POST $path without valid selection should return 400" in:
     val response: WSResponse =

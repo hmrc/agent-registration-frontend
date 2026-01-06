@@ -43,7 +43,6 @@ extends ViewSpec:
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
-        .whenApplicantIsAuthorised
         .afterEmailAddressVerified
 
   private val heading: String = "Check your answers"
@@ -57,9 +56,6 @@ extends ViewSpec:
         """
           |Applicant contact details
           |Check your answers
-          |Member of the limited liability partnership
-          |No, but I’m authorised by them to set up this account
-          |Change Member of the limited liability partnership
           |Name
           |Miss Alexa Fantastic
           |Change Name
@@ -77,15 +73,9 @@ extends ViewSpec:
       val expectedSummaryList: TestSummaryList = TestSummaryList(
         List(
           TestSummaryRow(
-            key = "Member of the limited liability partnership",
-            value = "No, but I’m authorised by them to set up this account",
-            action = AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show.url,
-            changeLinkAccessibleContent = "Change Member of the limited liability partnership"
-          ),
-          TestSummaryRow(
             key = "Name",
             value = "Miss Alexa Fantastic",
-            action = AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.show.url,
+            action = AppRoutes.apply.applicantcontactdetails.ApplicantNameController.show.url,
             changeLinkAccessibleContent = "Change Name"
           ),
           TestSummaryRow(

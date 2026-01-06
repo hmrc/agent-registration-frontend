@@ -39,50 +39,25 @@ extends ControllerSpec:
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
-        .whenApplicantIsAuthorised
         .afterEmailAddressVerified
 
     val missingVerifiedEmail: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
-        .whenApplicantIsAuthorised
         .afterEmailAddressProvided
 
     val missingEmail: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
-        .whenApplicantIsAuthorised
         .afterTelephoneNumberProvided
 
     val missingTelephone: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
-        .whenApplicantIsAuthorised
         .afterNameDeclared
-
-    val missingCompaniesHouseOfficerSelection: AgentApplicationLlp =
-      tdAll
-        .agentApplicationLlp
-        .sectionContactDetails
-        .whenApplicantIsAMember
-        .afterNameQueryProvided
-
-    val missingMemberNameQuery: AgentApplicationLlp =
-      tdAll
-        .agentApplicationLlp
-        .sectionContactDetails
-        .whenApplicantIsAMember
-        .afterRoleSelected
-
-    val missingAuthorisedName: AgentApplicationLlp =
-      tdAll
-        .agentApplicationLlp
-        .sectionContactDetails
-        .whenApplicantIsAuthorised
-        .afterRoleSelected
 
     val noContactDetails: AgentApplicationLlp =
       tdAll
@@ -114,26 +89,6 @@ extends ControllerSpec:
       application = agentApplication.missingTelephone,
       name = "telephone number",
       expectedRedirect = Some(AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.show.url)
-    ),
-    TestCaseForCya(
-      application = agentApplication.missingCompaniesHouseOfficerSelection,
-      name = "companies house office selection",
-      expectedRedirect = Some(AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.show.url)
-    ),
-    TestCaseForCya(
-      application = agentApplication.missingMemberNameQuery,
-      name = "name to query companies house with",
-      expectedRedirect = Some(AppRoutes.apply.applicantcontactdetails.MemberNameController.show.url)
-    ),
-    TestCaseForCya(
-      application = agentApplication.missingAuthorisedName,
-      name = "authorised applicant name",
-      expectedRedirect = Some(AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.show.url)
-    ),
-    TestCaseForCya(
-      application = agentApplication.noContactDetails,
-      name = "all contact details",
-      expectedRedirect = Some(AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show.url)
     )
   ).foreach: testCase =>
     testCase.expectedRedirect match
