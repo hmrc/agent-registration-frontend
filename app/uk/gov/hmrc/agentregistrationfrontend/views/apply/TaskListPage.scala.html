@@ -26,14 +26,15 @@
 )
 
 @(
-        taskListStatus: TaskListStatus
+        taskListStatus: TaskListStatus,
+        entityName: String
 )(implicit
         request: AgentApplicationRequest[?],
         messages: Messages
 )
 
 @key = @{"taskList"}
-@title = @{messages(s"$key.title", request.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName)}
+@title = @{messages(s"$key.title", entityName)}
 @incomplete = @{
     TaskListItemStatus(
         tag = Some(Tag(

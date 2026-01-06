@@ -59,6 +59,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalS
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.AddressDetails
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.BusinessPartnerRecord
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.ContactDetails
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.Individual
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.Organisation
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.GrsStub
 import uk.gov.hmrc.domain.SaUtrGenerator
@@ -116,23 +117,39 @@ extends FrontendController(mcc, actions):
       implicit request: (AuthorisedRequest[AnyContent] & FormValue[JourneyData]) =>
         val journeyData: JourneyData = request.formValue
         val json: JsValue = Json.toJson(journeyData)
+        val utr = journeyData.sautr.map(_.value).getOrElse(journeyData.ctutr.map(_.value).getOrElse(""))
         // to get BPR fetches working we need to store a BPR in stubs using GRS data
         agentsExternalStubsConnector.storeBusinessPartnerRecord(
           BusinessPartnerRecord(
             businessPartnerExists = true,
-            uniqueTaxReference = journeyData.sautr.map(_.value),
-            utr = journeyData.sautr.map(_.value),
+            uniqueTaxReference = Some(utr),
+            utr = Some(utr),
             safeId = journeyData.registration.registeredBusinessPartnerId.map(_.value).getOrElse(""),
-            organisation = Some(Organisation(
-              organisationName = journeyData.companyProfile.map(_.companyName).getOrElse("BPR Test Org"),
-              organisationType = "5T"
-            )),
+            isAnIndividual = businessType === SoleTrader,
+            individual =
+              if businessType === SoleTrader then
+                Some(
+                  Individual(
+                    firstName = journeyData.fullName.map(_.firstName).getOrElse("Test"),
+                    lastName = journeyData.fullName.map(_.lastName).getOrElse("User"),
+                    dateOfBirth = journeyData.dateOfBirth.map(_.toString).getOrElse("1990-01-01")
+                  )
+                )
+              else None,
+            organisation =
+              businessType match
+                case BusinessType.Partnership.LimitedLiabilityPartnership | BusinessType.LimitedCompany | BusinessType.Partnership.LimitedPartnership | BusinessType.Partnership.ScottishLimitedPartnership =>
+                  Some(Organisation(
+                    organisationName = journeyData.companyProfile.map(_.companyName).getOrElse("BPR Test Org"),
+                    organisationType = "5T"
+                  ))
+                case _ => None,
             addressDetails = AddressDetails(
               addressLine1 = "1 Test Street",
-              addressLine2 = "Test Area",
+              addressLine2 = Some("Test Area"),
               addressLine3 = None,
               addressLine4 = None,
-              postalCode = journeyData.postcode,
+              postalCode = journeyData.postcode.getOrElse("TE1 1ST"),
               countryCode = "GB"
             ),
             contactDetails = Some(ContactDetails(
@@ -199,16 +216,31 @@ extends FrontendController(mcc, actions):
           Seq(
             SoleTrader,
             GeneralPartnership,
-            LimitedLiabilityPartnership
+            LimitedLiabilityPartnership,
+            LimitedPartnership,
+            ScottishLimitedPartnership,
+            ScottishPartnership
           ).contains(businessType),
         nonEmptyText
       ),
       "companyNumber" -> mandatoryIf(
-        _ => Seq(LimitedCompany, LimitedLiabilityPartnership).contains(businessType),
+        _ =>
+          Seq(
+            LimitedCompany,
+            LimitedLiabilityPartnership,
+            LimitedPartnership,
+            ScottishLimitedPartnership
+          ).contains(businessType),
         nonEmptyText
       ),
       "companyName" -> mandatoryIf(
-        _ => Seq(LimitedCompany, LimitedLiabilityPartnership).contains(businessType),
+        _ =>
+          Seq(
+            LimitedCompany,
+            LimitedLiabilityPartnership,
+            LimitedPartnership,
+            ScottishLimitedPartnership
+          ).contains(businessType),
         nonEmptyText
       ),
       "dateOfIncorporation" -> optional(nonEmptyText),
@@ -217,7 +249,14 @@ extends FrontendController(mcc, actions):
         nonEmptyText
       ),
       "postcode" -> mandatoryIf(
-        _ => Seq(GeneralPartnership, LimitedLiabilityPartnership).contains(businessType),
+        _ =>
+          Seq(
+            GeneralPartnership,
+            LimitedLiabilityPartnership,
+            LimitedPartnership,
+            ScottishLimitedPartnership,
+            ScottishPartnership
+          ).contains(businessType),
         nonEmptyText
       )
     )(
@@ -248,9 +287,9 @@ extends FrontendController(mcc, actions):
           trn = trn,
           sautr = sautr.map(SaUtr.apply),
           // address = ... when/if adding support for SoleTrader address, don't add it to the stub page and just hardcode it here when trn is defined
-          companyProfile = companyNumber.map(number =>
+          companyProfile = companyNumber.map(crn =>
             CompanyProfile(
-              companyNumber = Crn(number),
+              companyNumber = Crn(crn),
               companyName = companyName.getOrElse(""),
               dateOfIncorporation = dateOfIncorporation.map(LocalDate.parse),
               unsanitisedCHROAddress = Some(ChroAddress(
@@ -296,15 +335,24 @@ extends FrontendController(mcc, actions):
       if Seq(
           SoleTrader,
           GeneralPartnership,
-          LimitedLiabilityPartnership /*Scottish, General Limited, Scottish Limited */
+          LimitedLiabilityPartnership,
+          ScottishPartnership,
+          LimitedPartnership,
+          ScottishLimitedPartnership
         ).contains(businessType)
       then Some(randomSaUtr())
       else None,
     companyProfile =
-      if Seq(LimitedCompany, LimitedLiabilityPartnership /*General Limited, Scottish Limited */ ).contains(businessType) then
+      if Seq(
+          LimitedCompany,
+          LimitedLiabilityPartnership,
+          LimitedPartnership,
+          ScottishLimitedPartnership
+        ).contains(businessType)
+      then
         Some(CompanyProfile(
           companyNumber = Crn("12345678"),
-          companyName = if businessType === LimitedCompany then "Test Company Ltd" else "Test Partnership LLP",
+          companyName = if businessType === LimitedCompany then "Test Company Ltd" else "Test Partnership",
           dateOfIncorporation = Some(LocalDate.now().minusYears(10)),
           unsanitisedCHROAddress = Some(ChroAddress(
             address_line_1 = Some("23 Great Portland Street"),
@@ -316,6 +364,13 @@ extends FrontendController(mcc, actions):
       else None,
     ctutr = if businessType === LimitedCompany then Some(randomCtUtr()) else None,
     postcode =
-      if Seq(GeneralPartnership, LimitedLiabilityPartnership /*Scottish, General Limited, Scottish Limited */ ).contains(businessType) then Some("AA1 1AA")
+      if Seq(
+          GeneralPartnership,
+          LimitedLiabilityPartnership,
+          LimitedPartnership,
+          ScottishLimitedPartnership,
+          ScottishPartnership
+        ).contains(businessType)
+      then Some("AA1 1AA")
       else None
   ))

@@ -21,6 +21,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.EntityCheckResult
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
+import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
 
@@ -35,6 +36,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       groupId = dependencies.groupId,
       createdAt = dependencies.nowAsInstant,
       applicationState = ApplicationState.Started,
+      userRole = Some(UserRole.Authorised),
       businessDetails = None,
       applicantContactDetails = None,
       amlsDetails = None,
@@ -59,7 +61,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
     )
 
     val afterContactDetailsComplete: AgentApplicationLlp = afterHmrcEntityVerificationPass.copy(
-      applicantContactDetails = Some(dependencies.authorisedContactDetails),
+      applicantContactDetails = Some(dependencies.applicantContactDetails),
       agentDetails = None
     )
 

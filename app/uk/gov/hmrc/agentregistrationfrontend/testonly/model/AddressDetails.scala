@@ -21,10 +21,10 @@ import play.api.libs.json.Json
 
 final case class AddressDetails(
   addressLine1: String,
-  addressLine2: String,
+  addressLine2: Option[String],
   addressLine3: Option[String] = None,
   addressLine4: Option[String] = None,
-  postalCode: Option[String] = None,
+  postalCode: String,
   countryCode: String
 )
 

@@ -23,7 +23,7 @@ import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.EmailAddress
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
@@ -63,7 +63,6 @@ extends FrontendController(mcc, actions):
     .ensure(
       _
         .agentApplication
-        .asLlpApplication
         .applicantContactDetails
         .exists(_.telephoneNumber.isDefined),
       implicit request =>
@@ -76,7 +75,6 @@ extends FrontendController(mcc, actions):
       Ok(view(EmailAddressForm.form.fill(
         request
           .agentApplication
-          .asLlpApplication
           .getApplicantContactDetails
           .applicantEmailAddress
           .map(_.emailAddress)
@@ -97,9 +95,8 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request: (AgentApplicationRequest[AnyContent] & FormValue[EmailAddress]) =>
         val emailAddress: EmailAddress = request.formValue
-        val updatedApplication: AgentApplicationLlp = request
+        val updatedApplication: AgentApplication = request
           .agentApplication
-          .asLlpApplication
           .modify(_.applicantContactDetails.each.applicantEmailAddress)
           .using {
             case Some(details) =>
@@ -128,7 +125,6 @@ extends FrontendController(mcc, actions):
     .getApplicationInProgress
     .ensure(
       _.agentApplication
-        .asLlpApplication
         .applicantContactDetails
         .map(_.applicantEmailAddress).isDefined,
       implicit request =>
@@ -137,7 +133,6 @@ extends FrontendController(mcc, actions):
     )
     .ensure(
       _.agentApplication
-        .asLlpApplication
         .getApplicantContactDetails
         .getApplicantEmailAddress
         .isVerified === false,
@@ -150,7 +145,6 @@ extends FrontendController(mcc, actions):
         val emailToVerify =
           request
             .agentApplication
-            .asLlpApplication
             .getApplicantContactDetails
             .getApplicantEmailAddress
             .emailAddress
@@ -177,7 +171,6 @@ extends FrontendController(mcc, actions):
   private def onEmailVerified()(implicit request: AgentApplicationRequest[AnyContent]): Future[Result] =
     val updatedApplication = request
       .agentApplication
-      .asLlpApplication
       .modify(
         _.applicantContactDetails
           .each.applicantEmailAddress

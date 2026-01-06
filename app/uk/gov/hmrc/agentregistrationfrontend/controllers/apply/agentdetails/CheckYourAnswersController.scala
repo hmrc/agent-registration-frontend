@@ -40,10 +40,10 @@ extends FrontendController(mcc, actions):
     .Applicant
     .getApplicationInProgress
     .ensure(
-      _.agentApplication.asLlpApplication.agentDetails.exists(_.isComplete),
+      _.agentApplication.agentDetails.exists(_.isComplete),
       implicit request =>
         logger.warn("Because we don't have complete agent details we are redirecting to where data is missing")
-        request.agentApplication.asLlpApplication.agentDetails match {
+        request.agentApplication.agentDetails match {
           case None => Redirect(AppRoutes.apply.agentdetails.AgentBusinessNameController.show)
           case Some(AgentDetails(_, None, _, _)) => Redirect(AppRoutes.apply.agentdetails.AgentTelephoneNumberController.show)
           case Some(AgentDetails(_, _, None, _)) => Redirect(AppRoutes.apply.agentdetails.AgentEmailAddressController.show)

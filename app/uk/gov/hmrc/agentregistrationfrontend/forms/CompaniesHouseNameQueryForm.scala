@@ -20,13 +20,13 @@ import play.api.data.Form
 import play.api.data.Forms.mapping
 import play.api.data.Forms.text
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
 object CompaniesHouseNameQueryForm:
 
   val firstNameKey: String = "firstName"
   val lastNameKey: String = "lastName"
+  private val nameRegex = "^[a-zA-Z\\-' ]+$"
 
   val form: Form[CompaniesHouseNameQuery] = Form[CompaniesHouseNameQuery](
     mapping(
@@ -37,7 +37,7 @@ object CompaniesHouseNameQueryForm:
         )
         .verifying(
           ErrorKeys.invalidInputErrorMessage(firstNameKey),
-          value => ApplicantName.isValidName(value)
+          _.matches(nameRegex)
         ),
       lastNameKey -> text
         .verifying(
@@ -46,7 +46,7 @@ object CompaniesHouseNameQueryForm:
         )
         .verifying(
           ErrorKeys.invalidInputErrorMessage(lastNameKey),
-          value => ApplicantName.isValidName(value)
+          _.matches(nameRegex)
         )
     )(CompaniesHouseNameQuery.apply)(CompaniesHouseNameQuery.unapply)
   )

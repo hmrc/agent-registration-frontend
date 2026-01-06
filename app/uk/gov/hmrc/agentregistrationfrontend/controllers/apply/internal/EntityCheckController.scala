@@ -21,6 +21,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentAssuranceConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -46,9 +47,7 @@ extends FrontendController(mcc, actions):
     .ensure(
       condition =
         _.agentApplication
-          .asLlpApplication
-          .businessDetails
-          .isDefined,
+          .applicationState === ApplicationState.GrsDataReceived,
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Missing data from GRS, redirecting to start GRS registration")
@@ -65,13 +64,11 @@ extends FrontendController(mcc, actions):
   def entityCheck(): Action[AnyContent] = baseAction
     .async:
       implicit request =>
-        val llpApplication = request.agentApplication.asLlpApplication
-
         for
           checkResult <- agentAssuranceConnector
-            .isRefusedToDealWith(llpApplication.getBusinessDetails.saUtr)
+            .isRefusedToDealWith(request.agentApplication.getUtr)
           _ <- agentApplicationService
-            .upsert(llpApplication
+            .upsert(request.agentApplication
               .modify(_.entityCheckResult)
               .setTo(Some(checkResult)))
         yield checkResult match

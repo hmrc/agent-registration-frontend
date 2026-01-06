@@ -20,7 +20,6 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantRoleInLlpForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec

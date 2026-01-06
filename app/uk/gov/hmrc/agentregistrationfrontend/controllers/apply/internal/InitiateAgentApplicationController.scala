@@ -50,7 +50,8 @@ extends FrontendController(mcc, actions):
     */
   def initiateAgentApplication(
     agentType: AgentType,
-    businessType: BusinessType
+    businessType: BusinessType,
+    userRole: UserRole
   ): Action[AnyContent] = actions
     .Applicant
     .authorised
@@ -71,8 +72,6 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         if agentType =!= AgentType.UkTaxAgent then Errors.notImplemented("only UkTaxAgent is supported for now") else ()
-        if businessType =!= BusinessType.Partnership.LimitedLiabilityPartnership then Errors.notImplemented("only LLP is supported for now") else ()
-
         val nextEndpoint: Call = AppRoutes.apply.internal.GrsController.startJourney()
 
         agentApplicationService.find().flatMap:
@@ -81,6 +80,60 @@ extends FrontendController(mcc, actions):
             Future.successful(Redirect(nextEndpoint))
           case None =>
             logger.info(s"Application does not exist, creating new application: $agentType, $businessType")
-            agentApplicationService
-              .upsert(applicationFactory.makeNewAgentApplicationLlp(request.internalUserId, request.groupId))
-              .map(_ => Redirect(nextEndpoint))
+            businessType match
+              case BusinessType.Partnership.LimitedLiabilityPartnership =>
+                agentApplicationService
+                  .upsert(applicationFactory.makeNewAgentApplicationLlp(
+                    internalUserId = request.internalUserId,
+                    groupId = request.groupId,
+                    userRole = userRole
+                  ))
+                  .map(_ => Redirect(nextEndpoint))
+              case BusinessType.SoleTrader =>
+                agentApplicationService
+                  .upsert(applicationFactory.makeNewAgentApplicationSoleTrader(
+                    internalUserId = request.internalUserId,
+                    groupId = request.groupId,
+                    userRole = userRole
+                  ))
+                  .map(_ => Redirect(nextEndpoint))
+              case BusinessType.LimitedCompany =>
+                agentApplicationService
+                  .upsert(applicationFactory.makeNewAgentApplicationLimitedCompany(
+                    internalUserId = request.internalUserId,
+                    groupId = request.groupId,
+                    userRole = userRole
+                  ))
+                  .map(_ => Redirect(nextEndpoint))
+              case BusinessType.Partnership.GeneralPartnership =>
+                agentApplicationService
+                  .upsert(applicationFactory.makeNewAgentApplicationGeneralPartnership(
+                    internalUserId = request.internalUserId,
+                    groupId = request.groupId,
+                    userRole = userRole
+                  ))
+                  .map(_ => Redirect(nextEndpoint))
+              case BusinessType.Partnership.LimitedPartnership =>
+                agentApplicationService
+                  .upsert(applicationFactory.makeNewAgentApplicationLimitedPartnership(
+                    internalUserId = request.internalUserId,
+                    groupId = request.groupId,
+                    userRole = userRole
+                  ))
+                  .map(_ => Redirect(nextEndpoint))
+              case BusinessType.Partnership.ScottishLimitedPartnership =>
+                agentApplicationService
+                  .upsert(applicationFactory.makeNewAgentApplicationScottishLimitedPartnership(
+                    internalUserId = request.internalUserId,
+                    groupId = request.groupId,
+                    userRole = userRole
+                  ))
+                  .map(_ => Redirect(nextEndpoint))
+              case BusinessType.Partnership.ScottishPartnership =>
+                agentApplicationService
+                  .upsert(applicationFactory.makeNewAgentApplicationScottishPartnership(
+                    internalUserId = request.internalUserId,
+                    groupId = request.groupId,
+                    userRole = userRole
+                  ))
+                  .map(_ => Redirect(nextEndpoint))

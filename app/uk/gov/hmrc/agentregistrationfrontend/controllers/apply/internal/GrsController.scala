@@ -21,12 +21,12 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.GrsController.*
-
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
@@ -67,7 +67,8 @@ extends FrontendController(mcc, actions):
         grsService
           .createGrsJourney(
             businessType = request.agentApplication.businessType,
-            includeNamePageLabel = false
+            includeNamePageLabel =
+              request.agentApplication.businessType === SoleTrader && request.agentApplication.asSoleTraderApplication.userRole.contains(UserRole.Authorised)
           )
           .map(journeyStartUrl => Redirect(journeyStartUrl.value))
 
@@ -139,6 +140,31 @@ extends FrontendController(mcc, actions):
             applicationState = ApplicationState.GrsDataReceived,
             businessDetails = Some(journeyData.asBusinessDetailsLlp)
           )
+        case aa: AgentApplicationLimitedCompany =>
+          aa.copy(
+            applicationState = ApplicationState.GrsDataReceived,
+            businessDetails = Some(journeyData.asLimitedCompanyDetails)
+          )
+        case aa: AgentApplicationGeneralPartnership =>
+          aa.copy(
+            applicationState = ApplicationState.GrsDataReceived,
+            businessDetails = Some(journeyData.asBusinessDetailsPartnership)
+          )
+        case aa: AgentApplicationLimitedPartnership =>
+          aa.copy(
+            applicationState = ApplicationState.GrsDataReceived,
+            businessDetails = Some(journeyData.asBusinessDetailsPartnership)
+          )
+        case aa: AgentApplicationScottishLimitedPartnership =>
+          aa.copy(
+            applicationState = ApplicationState.GrsDataReceived,
+            businessDetails = Some(journeyData.asBusinessDetailsPartnership)
+          )
+        case aa: AgentApplicationScottishPartnership =>
+          aa.copy(
+            applicationState = ApplicationState.GrsDataReceived,
+            businessDetails = Some(journeyData.asBusinessDetailsPartnership)
+          )
 
     agentApplicationService
       .upsert(updatedApplication)
@@ -162,4 +188,17 @@ object GrsController:
       safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
       saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
       companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
+    )
+
+    def asLimitedCompanyDetails: LimitedCompanyDetails = LimitedCompanyDetails(
+      safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+      ctUtr = journeyData.ctutr.getOrThrowExpectedDataMissing("ctutr"),
+      companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
+    )
+
+    def asBusinessDetailsPartnership: BusinessDetailsPartnership = BusinessDetailsPartnership(
+      safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+      saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
+      companyProfile = journeyData.companyProfile,
+      postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode")
     )

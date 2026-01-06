@@ -61,7 +61,6 @@ extends FrontendController(mcc, actions):
           ).flatMap: address =>
             val updatedApplication: AgentApplication = request
               .agentApplication
-              .asLlpApplication
               .modify(_.agentDetails.each.agentCorrespondenceAddress)
               .setTo(Some(AgentCorrespondenceAddress.fromAddressLookupAddress(address)))
             agentApplicationService

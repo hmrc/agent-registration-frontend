@@ -22,7 +22,6 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentBusinessName
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
@@ -55,16 +54,15 @@ extends FrontendController(mcc, actions):
       implicit request =>
         businessPartnerRecordService
           .getBusinessPartnerRecord(
-            Utr(request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.value)
+            request.agentApplication.getUtr
           ).map: bprOpt =>
             Ok(view(
               form = AgentBusinessNameForm.form.fill:
                 request
                   .agentApplication
-                  .asLlpApplication
                   .agentDetails.map(_.businessName)
               ,
-              bprBusinessName = bprOpt.flatMap(_.organisationName)
+              bprBusinessName = bprOpt.map(_.getEntityName)
             ))
 
   def submit: Action[AnyContent] =
@@ -78,11 +76,11 @@ extends FrontendController(mcc, actions):
             (formWithErrors: Form[AgentBusinessName]) =>
               businessPartnerRecordService
                 .getBusinessPartnerRecord(
-                  request.agentApplication.asLlpApplication.getBusinessDetails.saUtr.asUtr
+                  request.agentApplication.getUtr
                 ).map: bprOpt =>
                   view(
                     form = formWithErrors,
-                    bprBusinessName = bprOpt.flatMap(_.organisationName)
+                    bprBusinessName = bprOpt.map(_.getEntityName)
                   )
       )
       .async:
@@ -90,7 +88,6 @@ extends FrontendController(mcc, actions):
           val businessNameFromForm = request.formValue
           val updatedApplication: AgentApplication = request
             .agentApplication
-            .asLlpApplication
             .modify(_.agentDetails)
             .using:
               case None => // applicant enters agent details for first time

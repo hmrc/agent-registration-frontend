@@ -24,7 +24,6 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
@@ -49,18 +48,10 @@ extends FrontendController(mcc, actions):
     .Applicant
     .getApplicationInProgress
     .ensure(
-      _.agentApplication.asLlpApplication.applicantContactDetails.map(_.applicantName) match {
-        case Some(ApplicantName.NameOfMember(_, Some(_))) => true
-        case Some(ApplicantName.NameOfAuthorised(Some(_))) => true
-        case _ => false
-      },
+      _.agentApplication.applicantContactDetails.map(_.applicantName).nonEmpty,
       implicit request =>
-        logger.warn("Because we don't have name details we are computing which name type to redirect to and redirecting to that page")
-        request.agentApplication.asLlpApplication.applicantContactDetails.map(_.applicantName) match {
-          case Some(_: ApplicantName.NameOfMember) => Redirect(AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.show)
-          case Some(_: ApplicantName.NameOfAuthorised) => Redirect(AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.show)
-          case None => Redirect(AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show)
-        }
+        logger.warn("Because we don't have name details we are redirecting to that page")
+        Redirect(AppRoutes.apply.applicantcontactdetails.ApplicantNameController.show)
     )
 
   def show: Action[AnyContent] = baseAction:
@@ -70,7 +61,6 @@ extends FrontendController(mcc, actions):
           .fill:
             request
               .agentApplication
-              .asLlpApplication
               .getApplicantContactDetails
               .telephoneNumber
       ))
@@ -81,7 +71,7 @@ extends FrontendController(mcc, actions):
       .async:
         implicit request: (AgentApplicationRequest[AnyContent] & FormValue[TelephoneNumber]) =>
           val validFormData: TelephoneNumber = request.formValue
-          val updatedApplication: AgentApplication = request.agentApplication.asLlpApplication
+          val updatedApplication: AgentApplication = request.agentApplication
             .modify(_.applicantContactDetails.each.telephoneNumber)
             .setTo(Some(validFormData))
           agentApplicationService.upsert(updatedApplication).map: _ =>

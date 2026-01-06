@@ -51,9 +51,9 @@ extends FrontendController(mcc, actions):
           .map: bprOpt =>
             Ok(view(
               entityName = bprOpt
-                .flatMap(_.organisationName)
+                .map(_.getEntityName)
                 .getOrThrowExpectedDataMissing(
-                  "Business Partner Record organisation name is missing for declaration"
+                  "Business Partner Record is missing"
                 )
             ))
 
@@ -66,7 +66,6 @@ extends FrontendController(mcc, actions):
           .upsert(
             request
               .agentApplication
-              .asLlpApplication
               .modify(_.hmrcStandardForAgentsAgreed)
               .setTo(StateOfAgreement.Agreed)
           ).map: _ =>

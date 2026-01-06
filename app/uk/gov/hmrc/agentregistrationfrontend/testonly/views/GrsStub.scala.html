@@ -70,12 +70,12 @@
             @companyProfileInput
         }
         @* Includes Scottish Partnership *@
-        @if(businessType === GeneralPartnership) {
+        @if(Seq(ScottishPartnership, GeneralPartnership).contains(businessType)) {
             @sautrInput
             @partnershipPostcodeInput
         }
         @* Includes Limited and Scottish Limited Partnerships *@
-        @if(businessType === LimitedLiabilityPartnership) {
+        @if(Seq(LimitedLiabilityPartnership, LimitedPartnership, ScottishLimitedPartnership).contains(businessType)) {
             @sautrInput
             @partnershipPostcodeInput
             @companyProfileInput
