@@ -275,7 +275,7 @@ amlsEvidenceUpload.scanning.paragraph = Do not close this window, it will refres
 amlsEvidenceUpload.error.required = Upload a file as evidence of your anti-money laundering supervision
 amlsEvidenceUpload.error.wrong-file-type = The selected file must be a JPG, JPEG, PNG, TIFF, PDF, TXT, MSG, DOC, DOCX, XLS, XLSX, PPT, PPTX, ODT, ODS or ODP file
 amlsEvidenceUpload.error.file-too-large = The selected file must not be larger than 5MB
-amlsEvidenceUpload.error.virus = The file you uploaded was infected with a virus
+amlsEvidenceUpload.error.virus = A virus has been detected in your uploaded file, try uploading another file.
 amlsEvidenceUpload.error.generic = The file upload has failed. Try uploading another file.
 
 fileUploadProgress.title=We are checking your upload
@@ -286,7 +286,7 @@ fileUploadProgress.message=Checking file
 fileUploadProgress.inProgress=Wait a few seconds and then select ‘Continue’.
 fileUploadProgress.complete=Your file {0} has been uploaded successfully.
 fileUploadProgress.failed=Your file upload has failed scanning. Try uploading another file.
-fileUploadProgress.virus=A virus has been detected in your uploaded file. Try uploading another file.
+fileUploadProgress.virus=A virus has been detected in your uploaded file, try uploading another file.
 
 upscanError.EntityTooLarge.title = Your upload is too large
 upscanError.EntityTooLarge.message = The file you are trying to upload is too large. The maximum file size is 5MB. Try uploading a smaller file.
