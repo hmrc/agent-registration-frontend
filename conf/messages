@@ -281,10 +281,12 @@ amlsEvidenceUpload.error.generic = The file upload has failed. Try uploading ano
 fileUploadProgress.title=We are checking your upload
 fileUploadProgress.complete.title=Your upload is complete
 fileUploadProgress.failed.title=Your upload has failed scanning
+fileUploadProgress.virus.title=Your upload has a virus
 fileUploadProgress.message=Checking file
 fileUploadProgress.inProgress=Wait a few seconds and then select ‘Continue’.
 fileUploadProgress.complete=Your file {0} has been uploaded successfully.
 fileUploadProgress.failed=Your file upload has failed scanning. Try uploading another file.
+fileUploadProgress.virus=A virus has been detected in your uploaded file. Try uploading another file.
 
 upscanError.EntityTooLarge.title = Your upload is too large
 upscanError.EntityTooLarge.message = The file you are trying to upload is too large. The maximum file size is 5MB. Try uploading a smaller file.

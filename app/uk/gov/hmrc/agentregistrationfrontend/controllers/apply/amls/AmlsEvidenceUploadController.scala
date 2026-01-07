@@ -185,7 +185,7 @@ extends FrontendController(mcc, actions):
       implicit request: AgentApplicationRequest[AnyContent] =>
 
         extension (r: Result)
-          def withCorsHeaders: Result = r.withHeaders(
+          private def withCorsHeaders: Result = r.withHeaders(
             "Access-Control-Allow-Origin" -> appConfig.thisFrontendBaseUrl,
             "Access-Control-Allow-Credentials" -> "true",
             "Access-Control-Allow-Methods" -> "GET, OPTIONS"
@@ -196,10 +196,8 @@ extends FrontendController(mcc, actions):
             status.uploadStatus match
               case UploadStatus.InProgress => NoContent.withCorsHeaders
               case _: UploadStatus.UploadedSuccessfully => Accepted.withCorsHeaders
-              case _: UploadStatus.Failed =>
-                // TODO: maybe ExpectationFailed would be better instead of BadRequest, as this request isn't bad
-                // TODO: also we could pass in the failureReason to choose a better error message, which is not implemented yet
-                BadRequest.withCorsHeaders
+              case failure: UploadStatus.Failed if failure.isInQuarantine => Conflict.withCorsHeaders
+              case _: UploadStatus.Failed => BadRequest.withCorsHeaders // generic error as reason for file rejection is not known here, we do know it's not file type or file size as we are using JS validation - file could be corrupted for example
           case None =>
             Errors.throwServerErrorException(
               s"Upload record not found in database but expected to exist"
