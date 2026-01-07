@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQue
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName.NameOfAuthorised
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.llp.*
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
@@ -88,8 +88,8 @@ trait TdBase:
   )
   def postcode: String = "AA1 1AA"
   def authorisedPersonName: String = "Alice Smith"
-  def authorisedContactDetails: ApplicantContactDetails = ApplicantContactDetails(
-    applicantName = NameOfAuthorised(name = Some(authorisedPersonName)),
+  def applicantContactDetails: ApplicantContactDetails = ApplicantContactDetails(
+    applicantName = ApplicantName(authorisedPersonName),
     telephoneNumber = Some(telephoneNumber),
     applicantEmailAddress = Some(ApplicantEmailAddress(
       emailAddress = applicantEmailAddress,
@@ -164,6 +164,7 @@ trait TdBase:
   )
   def businessPartnerRecordResponse: BusinessPartnerRecordResponse = BusinessPartnerRecordResponse(
     organisationName = Some("Test Company Name"),
+    individualName = None,
     address = bprRegisteredAddress,
     primaryPhoneNumber = Some(bprPrimaryTelephoneNumber),
     emailAddress = Some(bprEmailAddress)

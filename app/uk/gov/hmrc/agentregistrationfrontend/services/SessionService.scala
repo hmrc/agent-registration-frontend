@@ -22,6 +22,7 @@ import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
@@ -35,6 +36,7 @@ object SessionService:
   private val partnershipTypeKey: String = s"$microserviceName.partnershipType"
   private val typeOfSignInKey: String = s"$microserviceName.typeOfSignIn"
   private val agentApplicationId: String = s"$microserviceName.agentApplicationId"
+  private val userRoleKey: String = s"$microserviceName.userRole"
 
   extension (r: Result)
 
@@ -43,6 +45,7 @@ object SessionService:
     def addSession(pt: BusinessType.Partnership)(using request: RequestHeader): Result = r.addingToSession(partnershipTypeKey -> pt.toString)
     def addToSession(tos: TypeOfSignIn)(using request: RequestHeader): Result = r.addingToSession(typeOfSignInKey -> tos.toString)
     def addToSession(aid: AgentApplicationId)(using request: RequestHeader): Result = r.addingToSession(agentApplicationId -> aid.value)
+    def addToSession(ur: UserRole)(using request: RequestHeader): Result = r.addingToSession(userRoleKey -> ur.toString)
     def removePartnershipTypeFromSession(using request: RequestHeader): Result = r.removingFromSession(partnershipTypeKey)
 
   extension (r: Request[?])
@@ -70,6 +73,14 @@ object SessionService:
         .getOrElse(throw new RuntimeException(s"Invalid Partnership type in session: '$value'"))
 
     def getPartnershipType: BusinessType.Partnership = readPartnershipType.getOrThrowExpectedDataMissing("PartnershipType")
+
+    def readUserRole: Option[UserRole] = r.session.get(userRoleKey).map: value =>
+      UserRole
+        .values
+        .find(_.toString === value)
+        .getOrElse(throw new RuntimeException(s"Invalid UserRole type in session: '$value'"))
+
+    def getUserRole: UserRole = readUserRole.getOrThrowExpectedDataMissing("UserRole")
 
     def readTypeOfSignIn: Option[TypeOfSignIn] = r.session.get(typeOfSignInKey).map: value =>
       TypeOfSignIn

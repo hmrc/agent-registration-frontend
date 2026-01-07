@@ -38,7 +38,6 @@ extends ViewSpec:
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
-        .whenApplicantIsAuthorised
         .afterTelephoneNumberProvided
 
   given agentApplicationRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(agentApplication.beforeEmailAddressProvided)

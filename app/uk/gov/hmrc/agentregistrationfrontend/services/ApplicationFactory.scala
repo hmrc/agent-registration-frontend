@@ -30,10 +30,11 @@ class ApplicationFactory @Inject() (
   agentApplicationIdGenerator: AgentApplicationIdGenerator
 ):
 
-  def makeNewAgentApplicationLlp(
+  def makeNewAgentApplicationSoleTrader(
     internalUserId: InternalUserId,
-    groupId: GroupId
-  ): AgentApplicationLlp = AgentApplicationLlp(
+    groupId: GroupId,
+    userRole: UserRole
+  ): AgentApplicationSoleTrader = AgentApplicationSoleTrader(
     _id = agentApplicationIdGenerator.nextApplicationId(),
     internalUserId = internalUserId,
     linkId = linkIdGenerator.nextLinkId(),
@@ -41,6 +42,127 @@ class ApplicationFactory @Inject() (
     createdAt = Instant.now(clock),
     applicationState = ApplicationState.Started,
     businessDetails = None,
+    userRole = Some(userRole),
+    applicantContactDetails = None,
+    amlsDetails = None,
+    agentDetails = None,
+    entityCheckResult = None,
+    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
+  )
+
+  def makeNewAgentApplicationLlp(
+    internalUserId: InternalUserId,
+    groupId: GroupId,
+    userRole: UserRole
+  ): AgentApplicationLlp = AgentApplicationLlp(
+    _id = agentApplicationIdGenerator.nextApplicationId(),
+    internalUserId = internalUserId,
+    linkId = linkIdGenerator.nextLinkId(),
+    groupId = groupId,
+    createdAt = Instant.now(clock),
+    applicationState = ApplicationState.Started,
+    userRole = Some(userRole),
+    businessDetails = None,
+    applicantContactDetails = None,
+    amlsDetails = None,
+    agentDetails = None,
+    entityCheckResult = None,
+    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
+  )
+
+  def makeNewAgentApplicationLimitedCompany(
+    internalUserId: InternalUserId,
+    groupId: GroupId,
+    userRole: UserRole
+  ): AgentApplicationLimitedCompany = AgentApplicationLimitedCompany(
+    _id = agentApplicationIdGenerator.nextApplicationId(),
+    internalUserId = internalUserId,
+    linkId = linkIdGenerator.nextLinkId(),
+    groupId = groupId,
+    createdAt = Instant.now(clock),
+    applicationState = ApplicationState.Started,
+    businessDetails = None,
+    userRole = Some(userRole),
+    applicantContactDetails = None,
+    amlsDetails = None,
+    agentDetails = None,
+    entityCheckResult = None,
+    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
+  )
+
+  def makeNewAgentApplicationGeneralPartnership(
+    internalUserId: InternalUserId,
+    groupId: GroupId,
+    userRole: UserRole
+  ): AgentApplicationGeneralPartnership = AgentApplicationGeneralPartnership(
+    _id = agentApplicationIdGenerator.nextApplicationId(),
+    internalUserId = internalUserId,
+    linkId = linkIdGenerator.nextLinkId(),
+    groupId = groupId,
+    createdAt = Instant.now(clock),
+    applicationState = ApplicationState.Started,
+    businessDetails = None,
+    userRole = Some(userRole),
+    applicantContactDetails = None,
+    amlsDetails = None,
+    agentDetails = None,
+    entityCheckResult = None,
+    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
+  )
+
+  def makeNewAgentApplicationLimitedPartnership(
+    internalUserId: InternalUserId,
+    groupId: GroupId,
+    userRole: UserRole
+  ): AgentApplicationLimitedPartnership = AgentApplicationLimitedPartnership(
+    _id = agentApplicationIdGenerator.nextApplicationId(),
+    internalUserId = internalUserId,
+    linkId = linkIdGenerator.nextLinkId(),
+    groupId = groupId,
+    createdAt = Instant.now(clock),
+    applicationState = ApplicationState.Started,
+    businessDetails = None,
+    userRole = Some(userRole),
+    applicantContactDetails = None,
+    amlsDetails = None,
+    agentDetails = None,
+    entityCheckResult = None,
+    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
+  )
+
+  def makeNewAgentApplicationScottishLimitedPartnership(
+    internalUserId: InternalUserId,
+    groupId: GroupId,
+    userRole: UserRole
+  ): AgentApplicationScottishLimitedPartnership = AgentApplicationScottishLimitedPartnership(
+    _id = agentApplicationIdGenerator.nextApplicationId(),
+    internalUserId = internalUserId,
+    linkId = linkIdGenerator.nextLinkId(),
+    groupId = groupId,
+    createdAt = Instant.now(clock),
+    applicationState = ApplicationState.Started,
+    businessDetails = None,
+    userRole = Some(userRole),
+    applicantContactDetails = None,
+    amlsDetails = None,
+    agentDetails = None,
+    entityCheckResult = None,
+    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
+  )
+
+  def makeNewAgentApplicationScottishPartnership(
+    internalUserId: InternalUserId,
+    groupId: GroupId,
+    userRole: UserRole
+  ): AgentApplicationScottishPartnership = AgentApplicationScottishPartnership(
+    _id = agentApplicationIdGenerator.nextApplicationId(),
+    internalUserId = internalUserId,
+    linkId = linkIdGenerator.nextLinkId(),
+    groupId = groupId,
+    createdAt = Instant.now(clock),
+    applicationState = ApplicationState.Started,
+    businessDetails = None,
+    userRole = Some(userRole),
     applicantContactDetails = None,
     amlsDetails = None,
     agentDetails = None,

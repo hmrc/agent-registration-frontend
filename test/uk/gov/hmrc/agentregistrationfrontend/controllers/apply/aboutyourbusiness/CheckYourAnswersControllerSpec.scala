@@ -62,14 +62,14 @@ extends ControllerSpec:
     testCase.expectedRedirect match
       case None =>
         s"GET $path with complete GRS details should return 200 and render page" in:
-          ApplyStubHelper.stubsForAuthAction(testCase.application)
+          ApplyStubHelper.stubsToSupplyBprToPage(testCase.application)
           val response: WSResponse = get(path)
 
           response.status shouldBe Status.OK
           val doc = response.parseBodyAsJsoupDocument
           doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
           doc.select("h2.govuk-caption-l").text() shouldBe "About your business"
-          ApplyStubHelper.verifyConnectorsForAuthAction()
+          ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
       case Some(expectedRedirect) =>
         s"GET $path with missing GRS data should redirect to the agent type page" in:

@@ -157,5 +157,5 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe ExpectedStrings.errorTitle
     doc.mainContent.select("#memberApproveAgentApplication-error").text() shouldBe ExpectedStrings.requiredError(
-      agentApplication.applicationSubmitted.getApplicantContactDetails.getApplicantName
+      agentApplication.applicationSubmitted.getApplicantContactDetails.applicantName.value
     )

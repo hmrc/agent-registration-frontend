@@ -49,13 +49,13 @@ extends ViewSpec:
            |Yes
            |Business type
            |Limited liability partnership
+           |Are you a member of the limited liability partnership?
+           |No, but I’m authorised by them to set up this account
            |Company name
            |Test Company Name
            |Unique taxpayer reference
            |1234567895
            |Applicant contact details
-           |Member of the limited liability partnership
-           |No, but I’m authorised by them to set up this account
            |Name
            |Alice Smith
            |Telephone number
@@ -82,10 +82,6 @@ extends ViewSpec:
            |HMRC standard for agents
            |Agreed to meet the HMRC standard for agents
            |Yes
-           |What to do next
-           |The members of Test Company Name need to sign in and provide some personal details.
-           |Send this link to all members $thisFrontendBaseUrl/agent-registration/provide-details/start/link-id-12345
-           |Your can check the progress of your application by clicking the link on the GOV.UK page “Apply for an agent services account”.
            |Print this page
            |"""
           .stripMargin

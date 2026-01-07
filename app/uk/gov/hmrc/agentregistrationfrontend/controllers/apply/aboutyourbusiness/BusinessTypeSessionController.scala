@@ -22,7 +22,6 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-
 import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeSessionForm
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
@@ -60,9 +59,12 @@ extends FrontendController(mcc, actions):
       .ensureValidForm(BusinessTypeSessionForm.form, implicit r => businessTypeSessionPage(_)):
         implicit request =>
           request.formValue match
-            case businessType @ (BusinessTypeAnswer.SoleTrader | BusinessTypeAnswer.LimitedCompany) =>
-              // TODO SoleTrader or LimitedCompany journeys not yet built
-              Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
+            case businessType @ BusinessTypeAnswer.LimitedCompany =>
+              Redirect(AppRoutes.apply.aboutyourbusiness.UserRoleController.show.url)
+                .addToSession(businessType)
+                .removePartnershipTypeFromSession
+            case businessType @ BusinessTypeAnswer.SoleTrader =>
+              Redirect(AppRoutes.apply.aboutyourbusiness.UserRoleController.show.url)
                 .addToSession(businessType)
                 .removePartnershipTypeFromSession
             case businessType @ BusinessTypeAnswer.PartnershipType =>

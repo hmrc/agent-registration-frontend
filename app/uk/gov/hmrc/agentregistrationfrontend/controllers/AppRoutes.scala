@@ -53,6 +53,7 @@ object AppRoutes:
       val TypeOfSignInController = aboutyourbusinessRoutes.TypeOfSignInController
       val PartnershipTypeController = aboutyourbusinessRoutes.PartnershipTypeController
       val BusinessTypeSessionController = aboutyourbusinessRoutes.BusinessTypeSessionController
+      val UserRoleController = aboutyourbusinessRoutes.UserRoleController
       val CheckYourAnswersController = aboutyourbusinessRoutes.CheckYourAnswersController
 
     object amls:
@@ -68,13 +69,10 @@ object AppRoutes:
 
     object applicantcontactdetails:
 
-      val AuthorisedNameController = applicantcontactdetailsRoutes.AuthorisedNameController
-      val CompaniesHouseMatchingController = applicantcontactdetailsRoutes.CompaniesHouseMatchingController
-      val MemberNameController = applicantcontactdetailsRoutes.MemberNameController
+      val ApplicantNameController = applicantcontactdetailsRoutes.ApplicantNameController
       val CheckYourAnswersController = applicantcontactdetailsRoutes.CheckYourAnswersController
       val EmailAddressController = applicantcontactdetailsRoutes.EmailAddressController
       val TelephoneNumberController = applicantcontactdetailsRoutes.TelephoneNumberController
-      val ApplicantRoleInLlpController = applicantcontactdetailsRoutes.ApplicantRoleInLlpController
 
     object agentdetails:
 

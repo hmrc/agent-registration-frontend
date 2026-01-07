@@ -65,5 +65,5 @@ extends FrontendController(mcc, actions):
       implicit request =>
         val partnershipType: BusinessType.Partnership = request.formValue
         Redirect(
-          AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show
+          AppRoutes.apply.aboutyourbusiness.UserRoleController.show
         ).addSession(partnershipType)

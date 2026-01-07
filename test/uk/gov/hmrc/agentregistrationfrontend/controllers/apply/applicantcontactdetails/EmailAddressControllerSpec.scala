@@ -46,28 +46,24 @@ extends ControllerSpec:
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
-        .whenApplicantIsAuthorised
         .afterNameDeclared
 
     val beforeEmailAddressProvided: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
-        .whenApplicantIsAuthorised
         .afterTelephoneNumberProvided
 
     val afterEmailAddressProvided: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
-        .whenApplicantIsAuthorised
         .afterEmailAddressProvided
 
     val afterEmailAddressVerified: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
-        .whenApplicantIsAuthorised
         .afterEmailAddressVerified
 
   private val applicantEmailVerificationRequest: VerifyEmailRequest = VerifyEmailRequest(

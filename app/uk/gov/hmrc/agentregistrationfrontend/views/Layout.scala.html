@@ -82,7 +82,6 @@
 @hmrcStandardPage(
   HmrcStandardPageParams(
       pageTitle = Some(gdsTitle),
-      serviceName = Some(""), // None will display a default, not blank as required
       serviceURLs = ServiceURLs(
           signOutUrl = if (isSignedIn) Some(AppRoutes.SignOutController.signOut.url) else None
       ),

@@ -19,6 +19,9 @@
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+@import uk.gov.hmrc.agentregistration.shared.UserRole
+@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 @this(
         appConfig: AppConfig,
@@ -32,7 +35,7 @@
 @(
         entityName: String
 )(implicit
-        request: RequestHeader,
+        request: AgentApplicationRequest[?],
         messages: Messages
 )
 
@@ -63,7 +66,7 @@
         @{messages(s"$key.agree.p1")}
     </p>
     <p class="govuk-body">
-        @{messages(s"$key.agree.p2", entityName)}
+        @{messages(s"$key.agree.p2${if(request.agentApplication.getUserRole === UserRole.Owner) ".Owner" else ""}", entityName)}
     </p>
 
     @formWithCSRF(action = AppRoutes.apply.HmrcStandardForAgentsController.submit) {

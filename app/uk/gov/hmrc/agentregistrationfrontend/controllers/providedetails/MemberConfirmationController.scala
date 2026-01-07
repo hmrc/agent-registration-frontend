@@ -45,9 +45,9 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = baseAction.async:
     implicit request =>
-      val applicantName = request.agentApplication.asLlpApplication.getApplicantContactDetails.getApplicantName
-      val companyName = request.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
+      val applicantName = request.agentApplication.getApplicantContactDetails.applicantName
+      val companyName = request.agentApplication.getCompanyProfile.companyName
       Future successful Ok(memberConfirmationPage(
-        applicantName = applicantName,
+        applicantName = applicantName.value,
         companyName = companyName
       ))

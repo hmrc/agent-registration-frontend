@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls
 
 import com.softwaremill.quicklens.*
 import play.api.mvc.*
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsName
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
@@ -133,12 +133,12 @@ extends FrontendController(mcc, actions):
       implicit request: AgentApplicationRequest[AnyContent] =>
         for
           upload: Upload <- uploadRepo.findLatestByInternalUserId(request.internalUserId).map(_.getOrThrowExpectedDataMissing("upload"))
-          _ <- updateRecordsIfNeeded(upload, request.agentApplication.asLlpApplication)
+          _ <- updateRecordsIfNeeded(upload, request.agentApplication)
         yield Ok(progressView(upload.uploadStatus))
 
   private def updateRecordsIfNeeded(
     upload: Upload,
-    agentApplication: AgentApplicationLlp
+    agentApplication: AgentApplication
   )(using request: RequestHeader): Future[Unit] =
     upload.uploadStatus match
       case UploadStatus.InProgress => Future.successful(())
@@ -164,7 +164,7 @@ extends FrontendController(mcc, actions):
                 fileName = succeeded.fileName
               )
             _ <- agentRegistrationConnector.upsertApplication(
-              agentApplication.asLlpApplication
+              agentApplication
                 .modify(_.amlsDetails.each.amlsEvidence)
                 .setTo(
                   Some(AmlsEvidence(

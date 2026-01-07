@@ -20,6 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
@@ -43,8 +44,8 @@ extends ViewSpec:
 
   "CheckYourAnswersPage for complete GRS details received" should:
     given agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(agentApplication.complete)
-
-    val doc: Document = Jsoup.parse(viewTemplate.apply.body)
+    val bpr: BusinessPartnerRecordResponse = tdAll.businessPartnerRecordResponse
+    val doc: Document = Jsoup.parse(viewTemplate(bpr).body)
     "contain content" in:
       doc.mainContent shouldContainContent
         """
@@ -54,6 +55,8 @@ extends ViewSpec:
           |Yes
           |Business type
           |Limited liability partnership
+          |Are you a member of the limited liability partnership?
+          |No, but I’m authorised by them to set up this account
           |Company name
           |Test Company Name
           |Unique taxpayer reference
@@ -74,6 +77,10 @@ extends ViewSpec:
           TestReadOnlySummaryRow(
             key = "Business type",
             value = "Limited liability partnership"
+          ),
+          TestReadOnlySummaryRow(
+            key = "Are you a member of the limited liability partnership?",
+            value = "No, but I’m authorised by them to set up this account"
           ),
           TestReadOnlySummaryRow(
             key = "Company name",

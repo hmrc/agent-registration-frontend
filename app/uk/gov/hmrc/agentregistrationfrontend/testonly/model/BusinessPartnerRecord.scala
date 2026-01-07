@@ -29,6 +29,7 @@ final case class BusinessPartnerRecord(
   isAnASAgent: Boolean = false,
   isAnIndividual: Boolean = false,
   isAnOrganisation: Boolean = false,
+  individual: Option[Individual] = None,
   organisation: Option[Organisation] = None,
   addressDetails: AddressDetails,
   contactDetails: Option[ContactDetails] = None,

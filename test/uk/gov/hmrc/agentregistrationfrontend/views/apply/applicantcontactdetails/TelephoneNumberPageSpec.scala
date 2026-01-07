@@ -36,7 +36,6 @@ extends ViewSpec:
         tdAll
           .agentApplicationLlp
           .sectionContactDetails
-          .whenApplicantIsAuthorised
           .afterNameDeclared
     )
   val doc: Document = Jsoup.parse(viewTemplate(TelephoneNumberForm.form).body)

@@ -23,7 +23,6 @@ import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -41,29 +40,11 @@ extends FrontendController(mcc, actions):
     .Applicant
     .getApplicationInProgress
     .ensure(
-      _.agentApplication.asLlpApplication.applicantContactDetails.exists(_.isComplete),
+      _.agentApplication.applicantContactDetails.exists(_.isComplete),
       implicit request =>
         logger.warn("Because we don't have complete applicant contact details we are redirecting to where data is missing")
-        request.agentApplication.asLlpApplication.applicantContactDetails match {
-          case None => Redirect(AppRoutes.apply.applicantcontactdetails.ApplicantRoleInLlpController.show)
-          case Some(ApplicantContactDetails(
-                ApplicantName.NameOfAuthorised(None),
-                _,
-                _
-              )) =>
-            Redirect(AppRoutes.apply.applicantcontactdetails.AuthorisedNameController.show)
-          case Some(ApplicantContactDetails(
-                ApplicantName.NameOfMember(None, None),
-                _,
-                _
-              )) =>
-            Redirect(AppRoutes.apply.applicantcontactdetails.MemberNameController.show)
-          case Some(ApplicantContactDetails(
-                ApplicantName.NameOfMember(Some(_), None),
-                _,
-                _
-              )) =>
-            Redirect(AppRoutes.apply.applicantcontactdetails.CompaniesHouseMatchingController.show)
+        request.agentApplication.applicantContactDetails match {
+          case None => Redirect(AppRoutes.apply.applicantcontactdetails.ApplicantNameController.show)
           case Some(ApplicantContactDetails(_, None, _)) => Redirect(AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.show)
           case Some(ApplicantContactDetails(_, Some(_), _)) => Redirect(AppRoutes.apply.applicantcontactdetails.EmailAddressController.show)
         }

@@ -31,7 +31,7 @@
 
 @key = @{"llpProvideDetailsStart"}
 @pageTitle = @{messages(s"$key.title")}
-@applicantName = @{agentApplication.getApplicantContactDetails.getApplicantName}
+@applicantName = @{agentApplication.getApplicantContactDetails.applicantName.value}
 @applicantBusinessName = @{agentApplication.getBusinessDetails.companyProfile.companyName}
 
 @layout(pageTitle = pageTitle, suppressBackLink = true) {
