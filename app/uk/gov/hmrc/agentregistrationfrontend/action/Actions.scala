@@ -121,13 +121,13 @@ extends RequestAwareLogging:
         condition = _.memberProvidedDetails.hasFinished,
         resultWhenConditionNotMet =
           implicit request =>
-            val mdpCYAPage = AppRoutes.providedetails.CheckYourAnswersController.show
+            val mdpCyaPage = AppRoutes.providedetails.CheckYourAnswersController.show
             logger.warn(
               s"The provided details are not in the final state" +
                 s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +
-                s"redirecting to [${mdpCYAPage.url}]."
+                s"redirecting to [${mdpCyaPage.url}]."
             )
-            Redirect(mdpCYAPage.url)
+            Redirect(mdpCyaPage.url)
       ).andThen(enrichWithAgentApplicationAction)
 
   extension (a: Action[AnyContent])
