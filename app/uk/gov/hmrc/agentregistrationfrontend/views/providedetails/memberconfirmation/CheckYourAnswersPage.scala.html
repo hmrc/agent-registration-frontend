@@ -22,7 +22,8 @@
 @this(
         layout: Layout,
         govukButton: GovukButton,
-        answerSummary: AnswerSummary
+        answerSummary: AnswerSummary,
+        formWithCSRF: FormWithCSRF
 )
 
 @(implicit
@@ -48,10 +49,11 @@
         memberProvidedDetails = memberDetails
     )
     <p class="govuk-body">
-    @govukButton(Button(
-        href = Some(AppRoutes.providedetails.MemberConfirmationController.show.url),
-        content = Text(messages("common.confirmAndContinue"))
-    ))
+    @formWithCSRF(action = AppRoutes.providedetails.CheckYourAnswersController.submit) {
+        @govukButton(Button(
+            content = Text(messages("common.confirmAndContinue"))
+        ))
+    }
     </p>
 
 }

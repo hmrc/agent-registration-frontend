@@ -119,5 +119,6 @@ GET         /provide-details/agree-standard                         uk.gov.hmrc.
 POST        /provide-details/agree-standard                         uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberHmrcStandardForAgentsController.submit
 GET         /provide-details/confirm-stop                           uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberConfirmStopController.show
 GET         /provide-details/check-your-answers                     uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CheckYourAnswersController.show
+POST        /provide-details/check-your-answers                     uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CheckYourAnswersController.submit
 GET         /provide-details/confirmation                           uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberConfirmationController.show
 GET         /provide-details/multiple-provided-details              uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.multipleProvidedDetailsPage

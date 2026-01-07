@@ -36,7 +36,7 @@ class MemberConfirmationController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[MemberProvideDetailsWithApplicationRequest, AnyContent] = actions.Member.getProvideDetailsWithApplicationInProgress
+  private val baseAction: ActionBuilder[MemberProvideDetailsWithApplicationRequest, AnyContent] = actions.Member.getSubmitedDetailsWithApplicationInProgress
     .ensure(
       _.memberProvidedDetails.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed,
       implicit request =>

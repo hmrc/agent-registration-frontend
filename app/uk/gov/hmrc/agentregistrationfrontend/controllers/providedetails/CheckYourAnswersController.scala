@@ -22,18 +22,23 @@ import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
+import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.CheckYourAnswersPage
 
 @Singleton
 class CheckYourAnswersController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  view: CheckYourAnswersPage
+  view: CheckYourAnswersPage,
+  memberProvideDetailsService: MemberProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
@@ -78,3 +83,13 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = baseAction:
     implicit request => Ok(view())
+
+  def submit: Action[AnyContent] = baseAction.async:
+    implicit request =>
+      memberProvideDetailsService
+        .upsert(
+          request.memberProvidedDetails
+            .modify(_.providedDetailsState)
+            .setTo(Finished)
+        ).map: _ =>
+          Redirect(AppRoutes.providedetails.MemberConfirmationController.show)

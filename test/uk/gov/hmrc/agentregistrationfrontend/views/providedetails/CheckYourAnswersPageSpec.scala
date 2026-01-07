@@ -138,7 +138,7 @@ extends ViewSpec:
       doc.mainContent.extractSummaryList() shouldBe expectedSummaryList
 
     "render a confirm and continue button" in:
-      doc.extractLinkButton(1).text shouldBe confirmAndContinueText
+      doc.extractSubmitButtonText shouldBe confirmAndContinueText
 
   "CheckYourAnswersPage for incomplete Member Provided Details - when Nino and SaUtr coming from HMRC systems" should:
     given memberProvideDetailsRequest: MemberProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(
@@ -191,7 +191,7 @@ extends ViewSpec:
       doc.mainContent.extractSummaryList() shouldBe expectedSummaryList
 
     "render a confirm and continue button" in:
-      doc.extractLinkButton(1).text shouldBe confirmAndContinueText
+      doc.extractSubmitButtonText shouldBe confirmAndContinueText
 
   "CheckYourAnswersPage for incomplete Member Provided Details - when Nino and SaUtr not provided" should:
     given memberProvideDetailsRequest: MemberProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(
@@ -260,4 +260,4 @@ extends ViewSpec:
       doc.mainContent.extractSummaryList() shouldBe expectedSummaryList
 
     "render a confirm and continue button" in:
-      doc.extractLinkButton(1).text shouldBe confirmAndContinueText
+      doc.extractSubmitButtonText shouldBe confirmAndContinueText
