@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfB
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompanyHouseStatus
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
 import uk.gov.hmrc.http.HttpErrorFunctions.*
@@ -88,9 +89,9 @@ extends RequestAwareLogging:
   ): Future[CompanyHouseStatus] =
 
     val CompanyStatusPath = "company_status"
-
+    val url = url"$baseUrl/companies-house-api-proxy/company/${crn.value}"
     http
-      .get(url"$baseUrl/companies-house-api-proxy/company/${crn.value}")
+      .get(url)
       .execute[HttpResponse]
       .map { response =>
         response.status match {
@@ -98,6 +99,13 @@ extends RequestAwareLogging:
             (response.json \ CompanyStatusPath)
               .asOpt[CompanyHouseStatus]
               .getOrElse(throw UpstreamErrorResponse(s"Invalid or missing '$CompanyStatusPath' in response for CRN: ${crn.value}", OK))
-          case s => throw UpstreamErrorResponse(s"Upstream error response from Companies House API Proxy: $s", s)
+          case status =>
+            logger.error(s"company status check error for ${crn.value}; HTTP status: $status")
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
         }
       }
