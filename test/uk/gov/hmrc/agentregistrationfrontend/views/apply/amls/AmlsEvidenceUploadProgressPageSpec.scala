@@ -43,7 +43,7 @@ extends ViewSpec:
 
   private val inProgressHeading: String = "We are checking your upload"
   private val uploadSuccessfulHeading: String = "Your upload is complete"
-  private val virusHeading: String = "Your upload has failed scanning"
+  private val virusHeading: String = "Your upload has a virus"
 
   "AmlsEvidenceUploadProgressPage view" should:
 
@@ -95,8 +95,8 @@ extends ViewSpec:
       virusDoc.mainContent shouldContainContent
         """
           |Anti-money laundering supervision details
-          |Your upload has failed scanning
-          |Your file upload has failed scanning. Try uploading another file.
+          |Your upload has a virus
+          |A virus has been detected in your uploaded file, try uploading another file.
           |Try again
           |""".stripMargin
 
