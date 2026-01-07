@@ -101,13 +101,13 @@ extends RequestAwareLogging:
         condition = _.memberProvidedDetails.isInProgress,
         resultWhenConditionNotMet =
           implicit request =>
-            val mpdGenericExitPage = AppRoutes.providedetails.ExitController.genericExitPage
+            val mpdConfirmationPage = AppRoutes.providedetails.MemberConfirmationController.show
             logger.warn(
-              s"The provided details are not in the final state" +
+              s"The provided details have already been confirmed" +
                 s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +
-                s"redirecting to [${mpdGenericExitPage.url}]."
+                s"redirecting to [${mpdConfirmationPage.url}]."
             )
-            Redirect(mpdGenericExitPage.url)
+            Redirect(mpdConfirmationPage.url)
       )
 
     val getProvideDetailsWithApplicationInProgress: ActionBuilder[
@@ -115,20 +115,20 @@ extends RequestAwareLogging:
       AnyContent
     ] = getProvideDetailsInProgress.andThen(enrichWithAgentApplicationAction)
 
-    val getSubmitedDetailsInProgress: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorised
+    val getSubmitedDetailsWithApplicationInProgress: ActionBuilder[MemberProvideDetailsWithApplicationRequest, AnyContent] = authorised
       .andThen(provideDetailsAction)
       .ensure(
         condition = _.memberProvidedDetails.hasFinished,
         resultWhenConditionNotMet =
           implicit request =>
-            val mpdGenericExitPage = AppRoutes.providedetails.ExitController.genericExitPage
+            val mdpCYAPage = AppRoutes.providedetails.CheckYourAnswersController.show
             logger.warn(
-              s"The provided details are in the final state" +
+              s"The provided details are not in the final state" +
                 s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +
-                s"redirecting to [${mpdGenericExitPage.url}]."
+                s"redirecting to [${mdpCYAPage.url}]."
             )
-            Redirect(mpdGenericExitPage.url)
-      )
+            Redirect(mdpCYAPage.url)
+      ).andThen(enrichWithAgentApplicationAction)
 
   extension (a: Action[AnyContent])
     /** Modifies the action result to handle "Save and Come Back Later" functionality. If the form submission contains a "Save and Come Back Later" action,

@@ -23,6 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.MemberVerifiedEmailAddress
+import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Started
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
@@ -117,5 +118,9 @@ trait TdMemberProvidedDetails { dependencies: (TdBase) =>
     val afterHmrcStandardforAgentsAgreed: MemberProvidedDetails = afterApproveAgentApplication
       .modify(_.hmrcStandardForAgentsAgreed)
       .setTo(StateOfAgreement.Agreed)
+
+    val afterProvidedDetailsConfirmed: MemberProvidedDetails = afterHmrcStandardforAgentsAgreed
+      .modify(_.providedDetailsState)
+      .setTo(Finished)
 
 }

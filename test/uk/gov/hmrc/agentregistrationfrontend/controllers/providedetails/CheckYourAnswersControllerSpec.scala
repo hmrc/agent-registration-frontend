@@ -36,6 +36,7 @@ extends ControllerSpec:
   private object memberProvideDetails:
 
     val complete = tdAll.providedDetailsLlp.afterHmrcStandardforAgentsAgreed
+    val completeAndConfirmed = tdAll.providedDetailsLlp.afterProvidedDetailsConfirmed
 
     val missingAgreeStandarts = tdAll.providedDetailsLlp.afterApproveAgentApplication
     val missingApproveApplication = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrProvided
@@ -54,6 +55,11 @@ extends ControllerSpec:
   )
 
   List(
+    TestCaseForCya(
+      providedDetails = memberProvideDetails.completeAndConfirmed,
+      name = "Confirmed member details",
+      expectedRedirect = Some(AppRoutes.providedetails.MemberConfirmationController.show.url)
+    ),
     TestCaseForCya(
       providedDetails = memberProvideDetails.complete,
       name = "complete agent details"

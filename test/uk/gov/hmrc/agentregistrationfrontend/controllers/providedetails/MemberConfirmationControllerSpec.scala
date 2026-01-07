@@ -46,12 +46,12 @@ extends ControllerSpec:
     val incompleteProvidedDetails: MemberProvidedDetails =
       tdAll
         .providedDetailsLlp
-        .afterApproveAgentApplication
+        .afterHmrcStandardforAgentsAgreed
 
     val completedProvidedDetails: MemberProvidedDetails =
       tdAll
         .providedDetailsLlp
-        .afterHmrcStandardforAgentsAgreed
+        .afterProvidedDetailsConfirmed
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.MemberConfirmationController.show shouldBe Call(

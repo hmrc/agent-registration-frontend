@@ -25,6 +25,7 @@ import play.api.mvc.MessagesControllerComponents
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
@@ -79,11 +80,6 @@ extends FrontendController(mcc, actions):
       implicit request =>
         Redirect(AppRoutes.providedetails.MemberHmrcStandardForAgentsController.show.url)
     )
-    .ensure(
-      _.memberProvidedDetails.hasConfirmedProvidedDetails.isEmpty,
-      implicit request =>
-        Redirect(AppRoutes.providedetails.MemberConfirmationController.show.url)
-    )
 
   def show: Action[AnyContent] = baseAction:
     implicit request => Ok(view())
@@ -93,7 +89,7 @@ extends FrontendController(mcc, actions):
       memberProvideDetailsService
         .upsert(
           request.memberProvidedDetails
-            .modify(_.hasConfirmedProvidedDetails)
-            .setTo(Some(true))
+            .modify(_.providedDetailsState)
+            .setTo(Finished)
         ).map: _ =>
           Redirect(AppRoutes.providedetails.MemberConfirmationController.show)
