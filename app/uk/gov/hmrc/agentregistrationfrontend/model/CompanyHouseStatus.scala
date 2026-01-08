@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.companieshouse
+package uk.gov.hmrc.agentregistrationfrontend.model
 
-import play.api.libs.json.Format
-import play.api.libs.json.JsError
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsString
-import play.api.libs.json.JsSuccess
-import play.api.libs.json.JsValue
+import play.api.libs.json.*
 import uk.gov.hmrc.agentregistration.shared.CompanyStatusCheckResult
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 

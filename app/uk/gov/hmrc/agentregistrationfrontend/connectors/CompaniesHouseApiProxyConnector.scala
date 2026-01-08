@@ -23,7 +23,6 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.Crn
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
-import uk.gov.hmrc.agentregistration.shared.companieshouse.CompanyHouseStatus
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
@@ -36,6 +35,7 @@ import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 import play.api.http.Status.*
+import uk.gov.hmrc.agentregistrationfrontend.model.CompanyHouseStatus
 
 import javax.inject.Inject
 import javax.inject.Singleton
