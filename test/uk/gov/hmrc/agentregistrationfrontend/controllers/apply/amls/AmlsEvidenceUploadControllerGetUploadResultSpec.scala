@@ -56,6 +56,7 @@ extends ControllerSpec:
 
     val titleInProgress: String = "We are checking your upload - Apply for an agent services account - GOV.UK"
     val titleUploadFailed: String = "Your upload has failed scanning - Apply for an agent services account - GOV.UK"
+    val titleUploadFailedWithVirus: String = "Your upload has a virus - Apply for an agent services account - GOV.UK"
     val titleSucceeded: String = "Your upload is complete - Apply for an agent services account - GOV.UK"
 
   s"GET $uploadResultPath, if the Upload is in progress, should render appropriate message without updating any records" in:
@@ -85,6 +86,21 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title shouldBe ExpectedStrings.titleUploadFailed
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetAgentApplication()
+
+  s"GET $uploadResultPath, if the Upload failed with a virus, should render a appropriate message without updating any records" in:
+    withClue("prerequisite to reflect that the Upload failed"):
+      val uploadRepo: UploadRepo = app.injector.instanceOf[UploadRepo]
+      uploadRepo.drop().futureValue
+      uploadRepo.upsert(tdAll.uploadFailedWithVirus).futureValue
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterAmlsExpiryDateProvided)
+
+    val response: WSResponse = get(uploadResultPath)
+
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title shouldBe ExpectedStrings.titleUploadFailedWithVirus
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
 

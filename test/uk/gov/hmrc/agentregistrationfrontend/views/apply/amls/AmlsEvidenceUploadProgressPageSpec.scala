@@ -38,12 +38,17 @@ extends ViewSpec:
   )
 
   val virusDoc: Document = Jsoup.parse(
+    viewTemplate(status = tdAll.uploadFailedWithVirus.uploadStatus).body
+  )
+
+  val failedDoc: Document = Jsoup.parse(
     viewTemplate(status = tdAll.uploadFailed.uploadStatus).body
   )
 
   private val inProgressHeading: String = "We are checking your upload"
   private val uploadSuccessfulHeading: String = "Your upload is complete"
-  private val virusHeading: String = "Your upload has failed scanning"
+  private val virusHeading: String = "Your upload has a virus"
+  private val failedHeading: String = "Your upload has failed scanning"
 
   "AmlsEvidenceUploadProgressPage view" should:
 
@@ -91,8 +96,8 @@ extends ViewSpec:
         .selectOnlyOneElementOrFail()
         .text() shouldBe "Continue"
 
-    "contain expected content when status has failed scanning" in:
-      virusDoc.mainContent shouldContainContent
+    "contain expected content when status has failed scanning for unknown reason" in:
+      failedDoc.mainContent shouldContainContent
         """
           |Anti-money laundering supervision details
           |Your upload has failed scanning
@@ -100,13 +105,35 @@ extends ViewSpec:
           |Try again
           |""".stripMargin
 
-    "have the correct title when status has failed scanning" in:
-      virusDoc.title() shouldBe s"$virusHeading - Apply for an agent services account - GOV.UK"
+    "have the correct title when status has failed scanning for unknown reason" in:
+      failedDoc.title() shouldBe s"$failedHeading - Apply for an agent services account - GOV.UK"
 
     "have the correct h1 when status has failed scanning" in:
+      failedDoc.h1 shouldBe failedHeading
+
+    "render a Try again button when status has failed scanning for unknown reason" in:
+      failedDoc
+        .mainContent
+        .selectOrFail(".govuk-button")
+        .selectOnlyOneElementOrFail()
+        .text() shouldBe "Try again"
+
+    "contain expected content when status has failed scanning with a virus" in:
+      virusDoc.mainContent shouldContainContent
+        """
+          |Anti-money laundering supervision details
+          |Your upload has a virus
+          |A virus has been detected in your uploaded file, try uploading another file.
+          |Try again
+          |""".stripMargin
+
+    "have the correct title when status has failed scanning with a virus" in:
+      virusDoc.title() shouldBe s"$virusHeading - Apply for an agent services account - GOV.UK"
+
+    "have the correct h1 when status has failed scanning with a virus" in:
       virusDoc.h1 shouldBe virusHeading
 
-    "render a Try again button when status has failed scanning" in:
+    "render a Try again button when status has failed scanning with a virus" in:
       virusDoc
         .mainContent
         .selectOrFail(".govuk-button")

@@ -41,6 +41,7 @@ trait TdUpload { dependencies: TdBase =>
   def fileName: String = "evidence.pdf"
   def sizeInBytes: Long = 12345L
   def upscanFailureReason: String = "QUARANTINE"
+  def upscanUnknownFailureReason: String = "UNKNOWN"
   def upscanFailureMessage: String = "Suspicious file uploaded."
   def objectStoreLocation: String = s"agent-registration-frontend/9d5ddeed-d26e-4005-97ca-e40f2466e0a3/$fileName"
 
@@ -100,6 +101,13 @@ trait TdUpload { dependencies: TdBase =>
   )
 
   def uploadFailed: Upload = uploadInProgress.copy(
+    uploadStatus = UploadStatus.Failed(
+      failureReason = upscanUnknownFailureReason,
+      messageFromUpscan = upscanFailureMessage
+    )
+  )
+
+  def uploadFailedWithVirus: Upload = uploadInProgress.copy(
     uploadStatus = UploadStatus.Failed(
       failureReason = upscanFailureReason,
       messageFromUpscan = upscanFailureMessage

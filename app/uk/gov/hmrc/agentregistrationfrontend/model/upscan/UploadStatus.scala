@@ -21,6 +21,7 @@ import play.api.libs.json.JsonConfiguration
 import play.api.libs.json.OFormat
 import sttp.model.Uri
 import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import scala.annotation.nowarn
 import uk.gov.hmrc.agentregistration.shared.util.UriFormat
@@ -36,7 +37,8 @@ object UploadStatus:
     failureReason: String,
     messageFromUpscan: String
   )
-  extends UploadStatus
+  extends UploadStatus:
+    def isInQuarantine: Boolean = failureReason === "QUARANTINE"
 
   final case class UploadedSuccessfully(
     fileName: String,
