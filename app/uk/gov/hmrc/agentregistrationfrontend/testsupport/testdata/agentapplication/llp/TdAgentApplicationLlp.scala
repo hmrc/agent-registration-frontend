@@ -71,7 +71,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
     )
 
     val afterContactDetailsComplete: AgentApplicationLlp = afterCompaniesHouseStatusCheckAllow.copy(
-      applicantContactDetails = Some(dependencies.authorisedContactDetails),
+      applicantContactDetails = Some(dependencies.applicantContactDetails),
       agentDetails = None
     )
 

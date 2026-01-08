@@ -47,6 +47,7 @@ class ApplicationFactory @Inject() (
     amlsDetails = None,
     agentDetails = None,
     entityCheckResult = None,
+    companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
 
@@ -67,6 +68,7 @@ class ApplicationFactory @Inject() (
     amlsDetails = None,
     agentDetails = None,
     entityCheckResult = None,
+    companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
 
@@ -87,6 +89,7 @@ class ApplicationFactory @Inject() (
     amlsDetails = None,
     agentDetails = None,
     entityCheckResult = None,
+    companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
 
@@ -107,6 +110,7 @@ class ApplicationFactory @Inject() (
     amlsDetails = None,
     agentDetails = None,
     entityCheckResult = None,
+    companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
 
@@ -127,6 +131,7 @@ class ApplicationFactory @Inject() (
     amlsDetails = None,
     agentDetails = None,
     entityCheckResult = None,
+    companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
 
@@ -147,6 +152,7 @@ class ApplicationFactory @Inject() (
     amlsDetails = None,
     agentDetails = None,
     entityCheckResult = None,
+    companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
 
