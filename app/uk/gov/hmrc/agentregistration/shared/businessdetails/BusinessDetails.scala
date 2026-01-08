@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared
+package uk.gov.hmrc.agentregistration.shared.businessdetails
 
 import play.api.libs.json.Format
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedCompany
-import uk.gov.hmrc.agentregistration.shared.businessdetails.CompanyProfile
-import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
+import uk.gov.hmrc.agentregistration.shared.*
 
 import java.time.LocalDate
 

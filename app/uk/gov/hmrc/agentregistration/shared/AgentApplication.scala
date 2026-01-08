@@ -16,17 +16,14 @@
 
 package uk.gov.hmrc.agentregistration.shared
 
-import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 import play.api.libs.json.JsonConfiguration
 import play.api.libs.json.OFormat
-import play.api.libs.json.OWrites
-import play.api.libs.json.Reads
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
-import uk.gov.hmrc.agentregistration.shared.businessdetails.CompanyProfile
+import uk.gov.hmrc.agentregistration.shared.businessdetails.*
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
+import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
 
 import java.time.Clock
 import java.time.Instant

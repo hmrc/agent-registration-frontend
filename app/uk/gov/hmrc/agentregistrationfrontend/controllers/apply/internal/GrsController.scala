@@ -22,6 +22,12 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsGeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLimitedCompany
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLlp
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsPartnership
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsScottishPartnership
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsSoleTrader
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
@@ -50,7 +56,7 @@ class GrsController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  val baseAction = actions
+  private val baseAction = actions
     .Applicant
     .getApplicationInProgress
     .ensure(
