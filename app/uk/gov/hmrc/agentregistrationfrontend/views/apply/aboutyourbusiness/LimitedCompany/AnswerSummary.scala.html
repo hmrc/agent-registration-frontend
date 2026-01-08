@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.LimitedCompanyDetails
+@import uk.gov.hmrc.agentregistration.shared.BusinessDetailsLimitedCompany
 @import uk.gov.hmrc.agentregistration.shared.UserRole
 
 @this(
@@ -23,7 +23,7 @@
 
 @(
         key: String,
-        answers: LimitedCompanyDetails,
+        answers: BusinessDetailsLimitedCompany,
         userRole: UserRole,
         canChange: Boolean = true
 )(implicit messages: Messages)

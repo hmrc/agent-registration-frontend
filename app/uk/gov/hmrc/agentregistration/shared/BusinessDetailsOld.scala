@@ -25,41 +25,41 @@ import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
 
 import java.time.LocalDate
 
-sealed trait BusinessDetails:
+sealed trait OldBusinessDetails:
 
   val safeId: SafeId
   val businessType: BusinessType // Duplicated from AgentApplication to simplify json reads
 
-object BusinessDetails:
+object OldBusinessDetails:
 
-  given Format[BusinessDetails] = Format(
+  given Format[OldBusinessDetails] = Format(
     { json =>
       (json \ "businessType").as[BusinessType] match {
-        case LimitedCompany => Json.fromJson[LimitedCompanyDetails](json)
-        case SoleTrader => Json.fromJson[SoleTraderDetails](json)
+        case LimitedCompany => Json.fromJson[OldLimitedCompanyDetails](json)
+        case SoleTrader => Json.fromJson[OldSoleTraderDetails](json)
         case GeneralPartnership | LimitedLiabilityPartnership | LimitedPartnership | ScottishLimitedPartnership | ScottishPartnership =>
-          Json.fromJson[PartnershipDetails](json)
+          Json.fromJson[OldPartnershipDetails](json)
       }
     },
     {
-      case limitedCompany: LimitedCompanyDetails => Json.toJson(limitedCompany)
-      case soleTrader: SoleTraderDetails => Json.toJson(soleTrader)
-      case partnership: PartnershipDetails => Json.toJson(partnership)
+      case limitedCompany: OldLimitedCompanyDetails => Json.toJson(limitedCompany)
+      case soleTrader: OldSoleTraderDetails => Json.toJson(soleTrader)
+      case partnership: OldPartnershipDetails => Json.toJson(partnership)
     }
   )
 
-final case class LimitedCompanyDetails(
+final case class OldLimitedCompanyDetails(
   safeId: SafeId,
   businessType: BusinessType = LimitedCompany,
   ctUtr: CtUtr,
   companyProfile: CompanyProfile
 )
-extends BusinessDetails
+extends OldBusinessDetails
 
-object LimitedCompanyDetails:
-  given Format[LimitedCompanyDetails] = Json.format[LimitedCompanyDetails]
+object OldLimitedCompanyDetails:
+  given Format[OldLimitedCompanyDetails] = Json.format[OldLimitedCompanyDetails]
 
-final case class SoleTraderDetails(
+final case class OldSoleTraderDetails(
   safeId: SafeId,
   businessType: BusinessType = SoleTrader,
   saUtr: SaUtr,
@@ -71,19 +71,19 @@ final case class SoleTraderDetails(
   // address (only when trn present)
   // overseas company details (optional and only when trn present)
 )
-extends BusinessDetails
+extends OldBusinessDetails
 //  def getNinoOrTrn: String = nino.orElse(trn).getOrElse(throw new RuntimeException("Sole trader missing nino and trn"))
 
-object SoleTraderDetails:
-  given Format[SoleTraderDetails] = Json.format[SoleTraderDetails]
+object OldSoleTraderDetails:
+  given Format[OldSoleTraderDetails] = Json.format[OldSoleTraderDetails]
 
-final case class PartnershipDetails(
+final case class OldPartnershipDetails(
   safeId: SafeId,
   businessType: BusinessType,
   companyProfile: Option[CompanyProfile],
   postcode: String
 )
-extends BusinessDetails
+extends OldBusinessDetails
 
-object PartnershipDetails:
-  given Format[PartnershipDetails] = Json.format[PartnershipDetails]
+object OldPartnershipDetails:
+  given Format[OldPartnershipDetails] = Json.format[OldPartnershipDetails]

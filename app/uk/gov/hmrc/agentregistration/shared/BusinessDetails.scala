@@ -18,10 +18,30 @@ package uk.gov.hmrc.agentregistration.shared
 
 import play.api.libs.json.Format
 import play.api.libs.json.Json
+import uk.gov.hmrc.agentregistration.shared.BusinessType.LimitedCompany
 import uk.gov.hmrc.agentregistration.shared.businessdetails.CompanyProfile
 import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
 
 import java.time.LocalDate
+
+final case class BusinessDetailsPartnership(
+  safeId: SafeId,
+  saUtr: SaUtr,
+  companyProfile: CompanyProfile,
+  postcode: String
+)
+
+final case class BusinessDetailsGeneralPartnership(
+  safeId: SafeId,
+  saUtr: SaUtr,
+  postcode: String
+)
+
+final case class BusinessDetailsScottishPartnership(
+  safeId: SafeId,
+  saUtr: SaUtr,
+  postcode: String
+)
 
 final case class BusinessDetailsLlp(
   safeId: SafeId,
@@ -29,8 +49,12 @@ final case class BusinessDetailsLlp(
   companyProfile: CompanyProfile
 )
 
-object BusinessDetailsLlp:
-  given Format[BusinessDetailsLlp] = Json.format[BusinessDetailsLlp]
+final case class BusinessDetailsLimitedCompany(
+  safeId: SafeId,
+  businessType: BusinessType = LimitedCompany,
+  ctUtr: CtUtr,
+  companyProfile: CompanyProfile
+)
 
 final case class BusinessDetailsSoleTrader(
   safeId: SafeId,
@@ -45,15 +69,20 @@ final case class BusinessDetailsSoleTrader(
 )
 //  def getNinoOrTrn: String = nino.orElse(trn).getOrElse(throw new RuntimeException("Sole trader missing nino and trn"))
 
+object BusinessDetailsLlp:
+  given Format[BusinessDetailsLlp] = Json.format[BusinessDetailsLlp]
+
 object BusinessDetailsSoleTrader:
   given Format[BusinessDetailsSoleTrader] = Json.format[BusinessDetailsSoleTrader]
 
-final case class BusinessDetailsPartnership(
-  safeId: SafeId,
-  saUtr: SaUtr,
-  companyProfile: Option[CompanyProfile],
-  postcode: String
-)
-
 object BusinessDetailsPartnership:
   given Format[BusinessDetailsPartnership] = Json.format[BusinessDetailsPartnership]
+
+object BusinessDetailsGeneralPartnership:
+  given Format[BusinessDetailsGeneralPartnership] = Json.format[BusinessDetailsGeneralPartnership]
+
+object BusinessDetailsLimitedCompany:
+  given Format[BusinessDetailsLimitedCompany] = Json.format[BusinessDetailsLimitedCompany]
+
+object BusinessDetailsScottishPartnership:
+  given Format[BusinessDetailsScottishPartnership] = Json.format[BusinessDetailsScottishPartnership]
