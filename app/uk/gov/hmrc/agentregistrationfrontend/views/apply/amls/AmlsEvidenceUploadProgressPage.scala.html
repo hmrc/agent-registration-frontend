@@ -29,6 +29,7 @@
 @pageTitle =  @{status match {
     case UploadStatus.InProgress               => messages("fileUploadProgress.title")
     case s : UploadStatus.UploadedSuccessfully => messages("fileUploadProgress.complete.title")
+    case s: UploadStatus.Failed if s.isInQuarantine => messages(s"fileUploadProgress.virus.title")
     case _: UploadStatus.Failed  => messages(s"fileUploadProgress.failed.title")
 }}
 
@@ -42,6 +43,7 @@
         @status match {
             case UploadStatus.InProgress               => { @messages("fileUploadProgress.inProgress") }
             case s : UploadStatus.UploadedSuccessfully => { @messages("fileUploadProgress.complete", s.fileName) }
+            case s: UploadStatus.Failed if s.isInQuarantine => { @messages("fileUploadProgress.virus") }
             case _: UploadStatus.Failed     => { @messages("fileUploadProgress.failed") }
         }
     </p>

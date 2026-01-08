@@ -93,6 +93,8 @@ class AppConfig @Inject() (
 
   val upscanInitiateBaseUrl: String = servicesConfig.baseUrl("upscan-initiate")
 
+  val companiesHouseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.companies-house", configuration)
+
   object Upscan:
 
     val maxFileSize: ConfigMemorySize = configuration.underlying.getMemorySize("uploads.max-file-size")
