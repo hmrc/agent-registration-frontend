@@ -85,13 +85,27 @@ sealed trait AgentApplication:
   def getApplicantContactDetails: ApplicantContactDetails = applicantContactDetails.getOrThrowExpectedDataMissing("agentDetails")
   def getAgentDetails: AgentDetails = agentDetails.getOrThrowExpectedDataMissing("agentDetails")
 
-  def getCompanyProfile: CompanyProfile =
+  def getCompanyProfileOld: CompanyProfile =
     businessType match
       case BusinessType.Partnership.LimitedLiabilityPartnership => this.asLlpApplication.getBusinessDetails.companyProfile
       case BusinessType.LimitedCompany => this.asLimitedCompanyApplication.getBusinessDetails.companyProfile
       case BusinessType.Partnership.LimitedPartnership => this.asLimitedPartnershipApplication.getBusinessDetails.companyProfile
       case BusinessType.Partnership.ScottishLimitedPartnership => this.asScottishLimitedPartnershipApplication.getBusinessDetails.companyProfile
       case _ => expectedDataNotDefinedError("currently company profile is only defined for Llp applications, as other types are not implemented yet")
+
+  def companyProfile: Option[CompanyProfile] =
+    this match
+      case a: AgentApplicationLlp => Some(a.getBusinessDetails.companyProfile)
+      case a: AgentApplicationLimitedCompany => Some(a.getBusinessDetails.companyProfile)
+      case a: AgentApplicationLimitedPartnership => Some(a.getBusinessDetails.companyProfile)
+      case a: AgentApplicationScottishLimitedPartnership => Some(a.getBusinessDetails.companyProfile)
+      case a: AgentApplicationScottishPartnership => None
+      case a: AgentApplicationSoleTrader => None
+      case a: AgentApplicationGeneralPartnership => None
+
+  def getCompanyProfile: CompanyProfile = companyProfile.getOrThrowExpectedDataMissing(
+    s"company profile is not available for ${getClass.getSimpleName}"
+  )
 
   // all agent applications must have a UTR
   def getUtr: Utr =

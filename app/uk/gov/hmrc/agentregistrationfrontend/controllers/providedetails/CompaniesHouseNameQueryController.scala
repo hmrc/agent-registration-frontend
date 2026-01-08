@@ -62,6 +62,7 @@ extends FrontendController(mcc, actions):
                       .companiesHouseMatch
                       .map(_.memberNameQuery)
                 ,
+                //TODO: there are application types which have no company profile and this will throw exception for those.
                 app.getCompanyProfile.companyName
               ))
             case Some(app) =>
@@ -82,6 +83,7 @@ extends FrontendController(mcc, actions):
           formWithErrors =>
             view(
               formWithErrors,
+              //TODO: there are application types which have no company profile and this will throw exception for those.
               request.agentApplication.getCompanyProfile.companyName
             )
     )
