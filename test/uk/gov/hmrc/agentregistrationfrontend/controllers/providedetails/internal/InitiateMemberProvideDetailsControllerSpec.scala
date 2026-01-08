@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.interna
 import com.softwaremill.quicklens.modify
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CitizenDetailsStub
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationMemberProvidedDetailsStubs
 import play.api.mvc.Call
 import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
@@ -27,7 +28,6 @@ import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.CitizenDetailsStub
 
 class InitiateMemberProvideDetailsControllerSpec
 extends ControllerSpec:

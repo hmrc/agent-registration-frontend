@@ -21,21 +21,26 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.EntityCheckResult.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentAssuranceConnector
+import uk.gov.hmrc.agentregistrationfrontend.connectors.CitizenDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.Future
 
 @Singleton
 class EntityCheckController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   agentAssuranceConnector: AgentAssuranceConnector,
+  citizenDetailsConnector: CitizenDetailsConnector,
   agentApplicationService: AgentApplicationService,
   simplePage: SimplePage
 )
@@ -67,8 +72,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         for
-          checkResult <- agentAssuranceConnector
-            .isRefusedToDealWith(request.agentApplication.getUtr)
+          checkResult <- getEntityCheckResults
           _ <- agentApplicationService
             .upsert(request.agentApplication
               .modify(_.entityCheckResult)
@@ -81,3 +85,17 @@ extends FrontendController(mcc, actions):
               h1 = "Entity verification failed...",
               bodyText = Some("Placeholder for entity verification failed page...")
             ))
+
+  private def getEntityCheckResults(implicit request: AgentApplicationRequest[AnyContent]): Future[EntityCheckResult] =
+    request.agentApplication.businessType match
+
+      case BusinessType.SoleTrader =>
+        for
+          deceasedCheck <-
+            request.agentApplication.asSoleTraderApplication.getBusinessDetails.nino match
+              case Some(nino) => citizenDetailsConnector.isDeceased(nino).map(_.asEntityCheckResult)
+              case None => Future.successful(EntityCheckResult.Pass)
+          refusedToDealWith <- agentAssuranceConnector.isRefusedToDealWith(request.agentApplication.getUtr)
+        yield deceasedCheck && refusedToDealWith
+
+      case _ => agentAssuranceConnector.isRefusedToDealWith(request.agentApplication.getUtr)
