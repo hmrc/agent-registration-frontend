@@ -30,6 +30,7 @@ import uk.gov.hmrc.agentregistration.shared.CompanyStatusCheckResult
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.Future
 
 @Singleton
 class CompaniesHouseStatusController @Inject() (
@@ -66,16 +67,18 @@ extends FrontendController(mcc, actions):
   def companyStatusCheck(): Action[AnyContent] = baseAction
     .async:
       implicit request =>
-        val llpApplication = request.agentApplication.asLlpApplication
-
-        for
-          companyStatusCheckResult <- companiesHouseApiProxyConnector
-            .getCompanyHouseStatus(llpApplication.getCrn)
-            .map(_.toCompanyStatusCheckResult)
-          _ <- agentApplicationService
-            .upsert(llpApplication
-              .modify(_.companyStatusCheckResult)
-              .setTo(Some(companyStatusCheckResult)))
-        yield companyStatusCheckResult match
-          case CompanyStatusCheckResult.Allow => Redirect(nextPage)
-          case CompanyStatusCheckResult.Block => Redirect(AppRoutes.apply.CompanyStatusBlockController.showBlockedPage)
+        val agentApplication = request.agentApplication
+        if !agentApplication.isIncorporated then
+          Future.successful(Redirect(nextPage))
+        else
+          for
+            companyStatusCheckResult <- companiesHouseApiProxyConnector
+              .getCompanyHouseStatus(agentApplication.getCompanyProfile.companyNumber)
+              .map(_.toCompanyStatusCheckResult)
+            _ <- agentApplicationService
+              .upsert(agentApplication
+                .modify(_.companyStatusCheckResult)
+                .setTo(Some(companyStatusCheckResult)))
+          yield companyStatusCheckResult match
+            case CompanyStatusCheckResult.Allow => Redirect(nextPage)
+            case CompanyStatusCheckResult.Block => Redirect(AppRoutes.apply.CompanyStatusBlockController.showBlockedPage)

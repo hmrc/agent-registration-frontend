@@ -46,12 +46,17 @@ extends FrontendController(mcc, actions):
     .Applicant
     .getApplicationInProgress
     .ensure(
-      _.agentApplication
-        .companyStatusCheckResult
-        .isDefined,
+      _.agentApplication.isGrsDataReceived,
       implicit request =>
-        logger.warn("Missing data from GRS, redirecting to start GRS registration")
+        logger.warn("GRS data is missing from application, redirecting to start GRS registration")
         Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
+    )
+    .ensure(
+      _.agentApplication
+        .hasPassedAllEntityChecks,
+      implicit request =>
+        logger.warn("entity checks have failed, redirecting to generic exit page")
+        Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage)
     )
     .async:
       implicit request =>
