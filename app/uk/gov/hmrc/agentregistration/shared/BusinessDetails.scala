@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,43 +18,10 @@ package uk.gov.hmrc.agentregistration.shared
 
 import play.api.libs.json.Format
 import play.api.libs.json.Json
-import play.api.libs.json.Reads
-import uk.gov.hmrc.agentregistration.shared.BusinessType.*
-import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.*
-import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
+import uk.gov.hmrc.agentregistration.shared.businessdetails.CompanyProfile
+import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
 
 import java.time.LocalDate
-
-sealed trait BusinessDetails:
-
-  val safeId: SafeId
-  val businessType: BusinessType // Duplicated from AgentApplication to simplify json reads
-
-object BusinessDetails:
-
-  given Format[BusinessDetails] = Format(
-    { json =>
-      (json \ "businessType").as[BusinessType] match {
-        case LimitedCompany => Json.fromJson[LimitedCompanyDetails](json)
-        case SoleTrader => Json.fromJson[SoleTraderDetails](json)
-        case GeneralPartnership | LimitedLiabilityPartnership | LimitedPartnership | ScottishLimitedPartnership | ScottishPartnership =>
-          Json.fromJson[PartnershipDetails](json)
-      }
-    },
-    {
-      case limitedCompany: LimitedCompanyDetails => Json.toJson(limitedCompany)
-      case soleTrader: SoleTraderDetails => Json.toJson(soleTrader)
-      case partnership: PartnershipDetails => Json.toJson(partnership)
-    }
-  )
-
-final case class LimitedCompanyDetails(
-  safeId: SafeId,
-  businessType: BusinessType = LimitedCompany,
-  ctUtr: CtUtr,
-  companyProfile: CompanyProfile
-)
-extends BusinessDetails
 
 final case class BusinessDetailsLlp(
   safeId: SafeId,
@@ -64,27 +31,6 @@ final case class BusinessDetailsLlp(
 
 object BusinessDetailsLlp:
   given Format[BusinessDetailsLlp] = Json.format[BusinessDetailsLlp]
-
-object LimitedCompanyDetails:
-  given Format[LimitedCompanyDetails] = Json.format[LimitedCompanyDetails]
-
-final case class SoleTraderDetails(
-  safeId: SafeId,
-  businessType: BusinessType = SoleTrader,
-  saUtr: SaUtr,
-  fullName: FullName,
-  dateOfBirth: LocalDate,
-  nino: Option[Nino],
-  trn: Option[String]
-  // saPostcode (only when trn present)
-  // address (only when trn present)
-  // overseas company details (optional and only when trn present)
-)
-extends BusinessDetails
-//  def getNinoOrTrn: String = nino.orElse(trn).getOrElse(throw new RuntimeException("Sole trader missing nino and trn"))
-
-object SoleTraderDetails:
-  given Format[SoleTraderDetails] = Json.format[SoleTraderDetails]
 
 final case class BusinessDetailsSoleTrader(
   safeId: SafeId,
@@ -102,17 +48,6 @@ final case class BusinessDetailsSoleTrader(
 object BusinessDetailsSoleTrader:
   given Format[BusinessDetailsSoleTrader] = Json.format[BusinessDetailsSoleTrader]
 
-final case class PartnershipDetails(
-  safeId: SafeId,
-  businessType: BusinessType,
-  companyProfile: Option[CompanyProfile],
-  postcode: String
-)
-extends BusinessDetails
-
-object PartnershipDetails:
-  given Format[PartnershipDetails] = Json.format[PartnershipDetails]
-
 final case class BusinessDetailsPartnership(
   safeId: SafeId,
   saUtr: SaUtr,
@@ -122,22 +57,3 @@ final case class BusinessDetailsPartnership(
 
 object BusinessDetailsPartnership:
   given Format[BusinessDetailsPartnership] = Json.format[BusinessDetailsPartnership]
-
-final case class FullName(
-  firstName: String,
-  lastName: String
-):
-  def toStringFull: String = s"$firstName $lastName"
-
-object FullName:
-  given Format[FullName] = Json.format[FullName]
-
-final case class CompanyProfile(
-  companyNumber: Crn,
-  companyName: String,
-  dateOfIncorporation: Option[LocalDate],
-  unsanitisedCHROAddress: Option[ChroAddress]
-)
-
-object CompanyProfile:
-  given Format[CompanyProfile] = Json.format[CompanyProfile]

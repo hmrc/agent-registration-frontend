@@ -24,7 +24,8 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedPart
 import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.ScottishLimitedPartnership
 import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.ScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
-
+import uk.gov.hmrc.agentregistration.shared.businessdetails.CompanyProfile
+import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.Registration.given
 
 import java.time.LocalDate

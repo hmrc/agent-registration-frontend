@@ -13,3 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package uk.gov.hmrc.agentregistration.shared.businessdetails
+
+import play.api.libs.json.Format
+import play.api.libs.json.Json
+import uk.gov.hmrc.agentregistration.shared.Crn
+import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
+
+import java.time.LocalDate
+
+final case class CompanyProfile(
+  companyNumber: Crn,
+  companyName: String,
+  dateOfIncorporation: Option[LocalDate],
+  unsanitisedCHROAddress: Option[ChroAddress]
+)
+
+object CompanyProfile:
+  given Format[CompanyProfile] = Json.format[CompanyProfile]

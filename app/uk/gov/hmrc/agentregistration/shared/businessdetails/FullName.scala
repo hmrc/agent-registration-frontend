@@ -13,3 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package uk.gov.hmrc.agentregistration.shared.businessdetails
+
+import play.api.libs.json.Format
+import play.api.libs.json.Json
+
+final case class FullName(
+  firstName: String,
+  lastName: String
+):
+  def toStringFull: String = s"$firstName $lastName"
+
+object FullName:
+  given Format[FullName] = Json.format[FullName]

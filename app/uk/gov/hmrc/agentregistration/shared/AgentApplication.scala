@@ -23,6 +23,7 @@ import play.api.libs.json.OFormat
 import play.api.libs.json.OWrites
 import play.api.libs.json.Reads
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
+import uk.gov.hmrc.agentregistration.shared.businessdetails.CompanyProfile
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
