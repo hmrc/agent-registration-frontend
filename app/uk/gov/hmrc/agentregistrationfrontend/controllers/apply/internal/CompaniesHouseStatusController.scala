@@ -19,29 +19,28 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal
 import com.softwaremill.quicklens.*
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
+import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentAssuranceConnector
+import uk.gov.hmrc.agentregistrationfrontend.connectors.CompaniesHouseApiProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistration.shared.CompanyStatusCheckResult
 
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class EntityCheckController @Inject() (
+class CompaniesHouseStatusController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  agentAssuranceConnector: AgentAssuranceConnector,
-  agentApplicationService: AgentApplicationService,
-  simplePage: SimplePage
+  companiesHouseApiProxyConnector: CompaniesHouseApiProxyConnector,
+  agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
-  private def nextPage = AppRoutes.apply.internal.CompaniesHouseStatusController.companyStatusCheck()
+  private def nextPage: Call = AppRoutes.apply.TaskListController.show
 
   val baseAction = actions
     .Applicant
@@ -49,35 +48,34 @@ extends FrontendController(mcc, actions):
     .ensure(
       condition =
         _.agentApplication
-          .applicationState === ApplicationState.GrsDataReceived,
+          .entityCheckResult
+          .isDefined,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("Missing data from GRS, redirecting to start GRS registration")
-          Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
+          logger.warn("Entity verification has not been done. Redirecting to entity check.")
+          Redirect(AppRoutes.apply.internal.EntityCheckController.entityCheck())
     )
     .ensure(
-      condition = _.agentApplication.entityCheckResult.isEmpty,
+      condition = _.agentApplication.companyStatusCheckResult.isEmpty,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("Entity verification already done. Redirecting to task list page.")
+          logger.warn("Company status already done. Redirecting to task list page.")
           Redirect(nextPage)
     )
 
-  def entityCheck(): Action[AnyContent] = baseAction
+  def companyStatusCheck(): Action[AnyContent] = baseAction
     .async:
       implicit request =>
+        val llpApplication = request.agentApplication.asLlpApplication
+
         for
-          checkResult <- agentAssuranceConnector
-            .isRefusedToDealWith(request.agentApplication.getUtr)
+          companyStatusCheckResult <- companiesHouseApiProxyConnector
+            .getCompanyHouseStatus(llpApplication.getCrn)
+            .map(_.toCompanyStatusCheckResult)
           _ <- agentApplicationService
-            .upsert(request.agentApplication
-              .modify(_.entityCheckResult)
-              .setTo(Some(checkResult)))
-        yield checkResult match
-          case EntityCheckResult.Pass => Redirect(nextPage)
-          case EntityCheckResult.Fail =>
-            logger.warn("Entity verification failed. Redirecting to verification failed page.")
-            Ok(simplePage(
-              h1 = "Entity verification failed...",
-              bodyText = Some("Placeholder for entity verification failed page...")
-            ))
+            .upsert(llpApplication
+              .modify(_.companyStatusCheckResult)
+              .setTo(Some(companyStatusCheckResult)))
+        yield companyStatusCheckResult match
+          case CompanyStatusCheckResult.Allow => Redirect(nextPage)
+          case CompanyStatusCheckResult.Block => Redirect(AppRoutes.apply.CompanyStatusBlockController.showBlockedPage)

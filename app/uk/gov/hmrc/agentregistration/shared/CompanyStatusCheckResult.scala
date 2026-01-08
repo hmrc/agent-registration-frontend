@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,3 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package uk.gov.hmrc.agentregistration.shared
+
+import play.api.libs.json.Format
+import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+
+enum CompanyStatusCheckResult:
+
+  case Allow
+  case Block
+
+object CompanyStatusCheckResult:
+  given Format[CompanyStatusCheckResult] = JsonFormatsFactory.makeEnumFormat[CompanyStatusCheckResult]

@@ -24,6 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.Crn
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
 import uk.gov.hmrc.http.HttpErrorFunctions.*
@@ -33,6 +34,8 @@ import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.play.bootstrap.metrics.Metrics
+import play.api.http.Status.*
+import uk.gov.hmrc.agentregistrationfrontend.model.CompanyHouseStatus
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -76,5 +79,33 @@ extends RequestAwareLogging:
         response.status match {
           case s if is2xx(s) => (response.json \ "items").as[Seq[CompaniesHouseOfficer]]
           case s => throw UpstreamErrorResponse(s"Upstream error response from Companies House API Proxy: $s", s)
+        }
+      }
+
+  def getCompanyHouseStatus(
+    crn: Crn
+  )(implicit
+    rh: RequestHeader
+  ): Future[CompanyHouseStatus] =
+
+    val CompanyStatusPath = "company_status"
+    val url = url"$baseUrl/companies-house-api-proxy/company/${crn.value}"
+    http
+      .get(url)
+      .execute[HttpResponse]
+      .map { response =>
+        response.status match {
+          case s if is2xx(s) =>
+            (response.json \ CompanyStatusPath)
+              .asOpt[CompanyHouseStatus]
+              .getOrElse(throw UpstreamErrorResponse(s"Invalid or missing '$CompanyStatusPath' in response for CRN: ${crn.value}", OK))
+          case status =>
+            logger.error(s"company status check error for ${crn.value}; HTTP status: $status")
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
         }
       }
