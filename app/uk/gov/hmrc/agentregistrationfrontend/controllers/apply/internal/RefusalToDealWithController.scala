@@ -53,14 +53,11 @@ extends FrontendController(mcc, actions):
           Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
     )
     .ensure(
-      condition = _.agentApplication.refusalToDealWithCheck.isEmpty,
+      condition = _.agentApplication.refusalToDealWithCheck.forall(_ === EntityCheckResult.Fail),
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("Entity verification already done. Redirecting to next check.")
-          if (request.agentApplication.refusalToDealWithCheck.exists(_ === EntityCheckResult.Pass))
-            Redirect(nextPage)
-          else
-            Redirect(failedCheckPage)
+          logger.warn("Refusal to deal with verification already done and passed. Redirecting to next check.")
+          Redirect(nextPage)
     )
     .async:
       implicit request =>
