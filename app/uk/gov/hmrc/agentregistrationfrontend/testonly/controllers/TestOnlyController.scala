@@ -50,10 +50,18 @@ extends FrontendController(mcc, actions):
       implicit request =>
         Ok(testOnlyHubPage())
 
-  val showAgentApplication: Action[AnyContent] = actions
+  def showAgentApplication: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress: request =>
+    .getApplication: request =>
       Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))
+
+  def showProvidedDetails: Action[AnyContent] = actions
+    .Member
+    .getProvidedDetails: request =>
+      Ok(Json.prettyPrint(Json.toJson(request.memberProvidedDetails)))
+
+  def showPlaySession: Action[AnyContent] = actions.action: request =>
+    Ok(Json.prettyPrint(Json.toJson(request.session.data)))
 
   def addAgentTypeToSession(
     agentType: AgentType
