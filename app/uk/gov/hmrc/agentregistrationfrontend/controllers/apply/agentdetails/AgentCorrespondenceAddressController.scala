@@ -149,11 +149,10 @@ extends FrontendController(mcc, actions):
     bprOption: Option[DesBusinessAddress]
   ): AddressOptions =
     val chroAddressOption: Option[ChroAddress] =
-      if !agentApplication.isIncorporated then None
-      else
-        agentApplication
-          .getCompanyProfile
-          .unsanitisedCHROAddress
+      for
+        companyProfile <- agentApplication.companyProfile
+        address <- companyProfile.unsanitisedCHROAddress
+      yield address
 
     AddressOptions(
       chroAddress = chroAddressOption,

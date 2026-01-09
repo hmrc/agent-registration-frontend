@@ -46,6 +46,8 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] = baseAction.async:
     implicit request =>
       val applicantName = request.agentApplication.getApplicantContactDetails.applicantName
+
+      // TODO: there are application types which have no company profile and this will throw exception for those.
       val companyName = request.agentApplication.getCompanyProfile.companyName
       Future successful Ok(memberConfirmationPage(
         applicantName = applicantName.value,
