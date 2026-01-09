@@ -22,6 +22,12 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsGeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLimitedCompany
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLlp
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsPartnership
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsScottishPartnership
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsSoleTrader
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
@@ -50,7 +56,7 @@ class GrsController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  val baseAction = actions
+  private val baseAction = actions
     .Applicant
     .getApplicationInProgress
     .ensure(
@@ -73,7 +79,7 @@ extends FrontendController(mcc, actions):
           .map(journeyStartUrl => Redirect(journeyStartUrl.value))
 
   /** This endpoint is called by GRS when a user is navigated back from GRS to this Frontend Service. This is where we get [[GrsJourneyData]], extract
-    * [[BusinessDetails]] from it and store within [[AgentApplication]]
+    * [[OldBusinessDetails]] from it and store within [[AgentApplication]]
     */
   def journeyCallback(
     journeyId: Option[JourneyId]
@@ -127,7 +133,7 @@ extends FrontendController(mcc, actions):
       journeyData.identifiersMatch,
       "this function is meant to be called when identifiers match"
     )
-    val updatedApplication =
+    val updatedApplication: AgentApplication =
       request.agentApplication match
         case aa: AgentApplicationSoleTrader =>
           aa
@@ -143,12 +149,12 @@ extends FrontendController(mcc, actions):
         case aa: AgentApplicationLimitedCompany =>
           aa.copy(
             applicationState = ApplicationState.GrsDataReceived,
-            businessDetails = Some(journeyData.asLimitedCompanyDetails)
+            businessDetails = Some(journeyData.asBusinessDetailsLimitedCompany)
           )
         case aa: AgentApplicationGeneralPartnership =>
           aa.copy(
             applicationState = ApplicationState.GrsDataReceived,
-            businessDetails = Some(journeyData.asBusinessDetailsPartnership)
+            businessDetails = Some(journeyData.asBusinessDetailsGeneralPartnership)
           )
         case aa: AgentApplicationLimitedPartnership =>
           aa.copy(
@@ -163,7 +169,7 @@ extends FrontendController(mcc, actions):
         case aa: AgentApplicationScottishPartnership =>
           aa.copy(
             applicationState = ApplicationState.GrsDataReceived,
-            businessDetails = Some(journeyData.asBusinessDetailsPartnership)
+            businessDetails = Some(journeyData.asBusinessScottishPartnership)
           )
 
     agentApplicationService
@@ -190,7 +196,7 @@ object GrsController:
       companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
     )
 
-    def asLimitedCompanyDetails: LimitedCompanyDetails = LimitedCompanyDetails(
+    def asBusinessDetailsLimitedCompany: BusinessDetailsLimitedCompany = BusinessDetailsLimitedCompany(
       safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
       ctUtr = journeyData.ctutr.getOrThrowExpectedDataMissing("ctutr"),
       companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
@@ -199,6 +205,18 @@ object GrsController:
     def asBusinessDetailsPartnership: BusinessDetailsPartnership = BusinessDetailsPartnership(
       safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
       saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
-      companyProfile = journeyData.companyProfile,
+      companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile"),
+      postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode")
+    )
+
+    def asBusinessScottishPartnership: BusinessDetailsScottishPartnership = BusinessDetailsScottishPartnership(
+      safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+      saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
+      postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode")
+    )
+
+    def asBusinessDetailsGeneralPartnership: BusinessDetailsGeneralPartnership = BusinessDetailsGeneralPartnership(
+      safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+      saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
       postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode")
     )

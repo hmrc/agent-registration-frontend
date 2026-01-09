@@ -13,3 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package uk.gov.hmrc.agentregistration.shared.businessdetails
+
+import uk.gov.hmrc.agentregistration.shared.SaUtr
+import uk.gov.hmrc.agentregistration.shared.SafeId
+import play.api.libs.json.Format
+import play.api.libs.json.Json
+
+final case class BusinessDetailsLlp(
+  safeId: SafeId,
+  saUtr: SaUtr,
+  companyProfile: CompanyProfile
+)
+
+object BusinessDetailsLlp:
+  given Format[BusinessDetailsLlp] = Json.format[BusinessDetailsLlp]

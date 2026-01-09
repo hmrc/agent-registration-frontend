@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-import uk.gov.hmrc.agentregistration.shared.BusinessDetailsLlp
-import uk.gov.hmrc.agentregistration.shared.BusinessDetailsSoleTrader
-import uk.gov.hmrc.agentregistration.shared.FullName
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLlp
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsSoleTrader
+import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.*
 

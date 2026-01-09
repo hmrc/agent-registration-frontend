@@ -18,14 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.model.grs
 
 import play.api.libs.json.*
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.GeneralPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedLiabilityPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.ScottishLimitedPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.ScottishPartnership
-import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
-
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.Registration.given
+import uk.gov.hmrc.agentregistration.shared.businessdetails.CompanyProfile
+import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
 
 import java.time.LocalDate
 
@@ -46,41 +40,7 @@ final case class JourneyData(
   postcode: Option[String], // any partnership
   identifiersMatch: Boolean,
   registration: Registration
-):
-
-  // TODO: distinguish between CT and SA Utrs, make dedicated types and analyse when to use correct identifier
-//  def getUtr: Utr = sautr.orElse(ctutr).getOrElse(throw new Exception("Business details missing Utr"))
-
-  def toBusinessDetails(businessType: BusinessType): BusinessDetails = {
-    def missingDataError(key: String): Nothing = throw new RuntimeException(s"Business details missing $key for $businessType type")
-
-    businessType match {
-      case BusinessType.LimitedCompany =>
-        LimitedCompanyDetails(
-          safeId = registration.registeredBusinessPartnerId.getOrElse(missingDataError("safeId")),
-          businessType = businessType,
-          companyProfile = companyProfile.getOrElse(missingDataError("companyProfile")),
-          ctUtr = ctutr.getOrElse(missingDataError("ctutr"))
-        )
-      case SoleTrader =>
-        SoleTraderDetails(
-          safeId = registration.registeredBusinessPartnerId.getOrElse(missingDataError("safeId")),
-          businessType = businessType,
-          fullName = fullName.getOrElse(missingDataError("fullName")),
-          dateOfBirth = dateOfBirth.getOrElse(missingDataError("dateOfBirth")),
-          nino = nino,
-          trn = trn,
-          saUtr = sautr.getOrElse(missingDataError("saUtr"))
-        )
-      case GeneralPartnership | LimitedLiabilityPartnership | LimitedPartnership | ScottishLimitedPartnership | ScottishPartnership =>
-        PartnershipDetails(
-          safeId = registration.registeredBusinessPartnerId.getOrElse(missingDataError("safeId")),
-          businessType = businessType,
-          companyProfile = companyProfile,
-          postcode = postcode.getOrElse(missingDataError("postcode"))
-        )
-    }
-  }
+)
 
 object JourneyData:
   given Format[JourneyData] = Json.format[JourneyData]
