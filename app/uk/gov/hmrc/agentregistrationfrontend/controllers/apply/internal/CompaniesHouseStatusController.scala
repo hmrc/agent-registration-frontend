@@ -48,6 +48,15 @@ extends FrontendController(mcc, actions):
     .ensure(
       condition =
         _.agentApplication
+          .isIncorporated,
+      resultWhenConditionNotMet =
+        implicit request =>
+          logger.warn("No Companies House check required for non-incorporated business types, redirecting to task list.")
+          Redirect(AppRoutes.apply.TaskListController.show)
+    )
+    .ensure(
+      condition =
+        _.agentApplication
           .entityCheckResult
           .isDefined,
       resultWhenConditionNotMet =
@@ -66,14 +75,14 @@ extends FrontendController(mcc, actions):
   def companyStatusCheck(): Action[AnyContent] = baseAction
     .async:
       implicit request =>
-        val llpApplication = request.agentApplication.asLlpApplication
+        val agentApplication = request.agentApplication
 
         for
           companyStatusCheckResult <- companiesHouseApiProxyConnector
-            .getCompanyHouseStatus(llpApplication.getCrn)
+            .getCompanyHouseStatus(agentApplication.getCompanyProfile.companyNumber)
             .map(_.toCompanyStatusCheckResult)
           _ <- agentApplicationService
-            .upsert(llpApplication
+            .upsert(agentApplication
               .modify(_.companyStatusCheckResult)
               .setTo(Some(companyStatusCheckResult)))
         yield companyStatusCheckResult match
