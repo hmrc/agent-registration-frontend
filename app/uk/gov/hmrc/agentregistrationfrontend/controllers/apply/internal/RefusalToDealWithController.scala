@@ -21,34 +21,26 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.EntityCheckResult.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentAssuranceConnector
-import uk.gov.hmrc.agentregistrationfrontend.connectors.CitizenDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.Future
 
 @Singleton
-class EntityCheckController @Inject() (
+class RefusalToDealWithController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   agentAssuranceConnector: AgentAssuranceConnector,
-  citizenDetailsConnector: CitizenDetailsConnector,
-  agentApplicationService: AgentApplicationService,
-  simplePage: SimplePage
+  agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
-  private def nextPage = AppRoutes.apply.internal.CompaniesHouseStatusController.companyStatusCheck()
-
-  val baseAction = actions
+  def check(): Action[AnyContent] = actions
     .Applicant
     .getApplicationInProgress
     .ensure(
@@ -61,41 +53,31 @@ extends FrontendController(mcc, actions):
           Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
     )
     .ensure(
-      condition = _.agentApplication.entityCheckResult.isEmpty,
+      condition = _.agentApplication.refusalToDealWithCheck.isEmpty,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("Entity verification already done. Redirecting to task list page.")
-          Redirect(nextPage)
+          logger.warn("Entity verification already done. Redirecting to next check.")
+          if (request.agentApplication.refusalToDealWithCheck.exists(_ === EntityCheckResult.Pass))
+            Redirect(nextPage)
+          else
+            Redirect(failedCheckPage)
     )
-
-  def entityCheck(): Action[AnyContent] = baseAction
     .async:
       implicit request =>
         for
-          checkResult <- getEntityCheckResults
+          checkResult <- agentAssuranceConnector
+            .isRefusedToDealWith(request.agentApplication.getUtr)
           _ <- agentApplicationService
             .upsert(request.agentApplication
-              .modify(_.entityCheckResult)
+              .modify(_.refusalToDealWithCheck)
               .setTo(Some(checkResult)))
         yield checkResult match
           case EntityCheckResult.Pass => Redirect(nextPage)
-          case EntityCheckResult.Fail =>
-            logger.warn("Entity verification failed. Redirecting to verification failed page.")
-            Ok(simplePage(
-              h1 = "Entity verification failed...",
-              bodyText = Some("Placeholder for entity verification failed page...")
-            ))
+          case EntityCheckResult.Fail => Redirect(failedCheckPage)
 
-  private def getEntityCheckResults(implicit request: AgentApplicationRequest[AnyContent]): Future[EntityCheckResult] =
-    request.agentApplication.businessType match
-
-      case BusinessType.SoleTrader =>
-        for
-          deceasedCheck <-
-            request.agentApplication.asSoleTraderApplication.getBusinessDetails.nino match
-              case Some(nino) => citizenDetailsConnector.isDeceased(nino).map(_.asEntityCheckResult)
-              case None => Future.successful(EntityCheckResult.Pass)
-          refusedToDealWith <- agentAssuranceConnector.isRefusedToDealWith(request.agentApplication.getUtr)
-        yield deceasedCheck && refusedToDealWith
-
-      case _ => agentAssuranceConnector.isRefusedToDealWith(request.agentApplication.getUtr)
+  private def failedCheckPage = AppRoutes.apply.entitycheckfailed.CanNotRegisterController.show
+  private def nextPage(implicit request: AgentApplicationRequest[AnyContent]) =
+    if (request.agentApplication.businessType === BusinessType.SoleTrader)
+      AppRoutes.apply.internal.RefusalToDealWithController.check()
+    else
+      AppRoutes.apply.internal.CompaniesHouseStatusController.check()

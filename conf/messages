@@ -369,12 +369,24 @@ confirmation.checkProgress.bullet2 = email you at <strong>{0}</strong> to confir
 confirmation.viewLink = View or print your application
 confirmation.signOutLink = Finish and sign out
 
-# Apply / CompanyStatusBlock
+# Apply / entitycheckfailed/ CompanyStatusBlock
 companyStatusBlock.title = We cannot create an account for this company
 companyStatusBlock.p1 = We cannot register this company for an agent services account. This is because of the company''s status on the Companies House register.
 companyStatusBlock.p2 = To view your company status you can <a class="govuk-link" href={0} target='_blank'>search the Companies House register (opens in a new tab)</a>. If you believe the status is incorrect, contact Companies House.
 companyStatusBlock.p3 = If you''ve entered the incorrect details, you can try again.
 companyStatusBlock.tryAgain.button = Try again
+
+# Apply / entitycheckfailed/ CannotConfirmIdentity
+cannotConfirmIdentity.title=Get in touch to confirm your details
+cannotConfirmIdentity.p1=We need more details to confirm who you are. Get in touch using the information on <a class="govuk-link" href={0} target="_blank" rel="noopener noreferrer">Contact HMRC (opens in new tab)</a>.
+cannotConfirmIdentity.p2=If you’ve entered the incorrect details, you can try again.
+cannotConfirmIdentity.tryAgain.button = Try again
+
+# Apply / entitycheckfailed/ CannotRegister
+cannotRegister.title=This {0} cannot be registered for an Agent Services Account
+cannotRegister.p1=If you wish to register a different Agent, use <a class="govuk-link" href={0} target="_blank" rel="noopener noreferrer">this link (opens in new tab)</a>.
+cannotRegister.tryAgain.button = Try again
+
 
 
 

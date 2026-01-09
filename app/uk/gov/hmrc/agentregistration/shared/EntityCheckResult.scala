@@ -24,11 +24,6 @@ enum EntityCheckResult:
   case Pass
   case Fail
 
-  def &&(other: EntityCheckResult): EntityCheckResult =
-    (this, other) match
-      case (Pass, Pass) => Pass
-      case _ => Fail
-
 object EntityCheckResult:
 
   given Format[EntityCheckResult] = JsonFormatsFactory.makeEnumFormat[EntityCheckResult]

@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentAss
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
-class EntityCheckControllerSpec
+class RefusalToDealWithControllerSpec
 extends ControllerSpec:
 
   object agentApplication:
@@ -49,12 +49,14 @@ extends ControllerSpec:
         .agentApplicationLlp
         .afterHmrcEntityVerificationFail
 
-  private val path: String = "/agent-registration/apply/internal/entity-check"
+  private val path: String = "/agent-registration/apply/internal/register-check"
   private val nextPageUrl: String = "/agent-registration/apply/internal/status-check"
+//  private val nextPageSoleTraderUrl: String = "/agent-registration/apply/internal/confirm-identity-check"
   private val previousPage: String = "/agent-registration/apply"
+  private val cannotRegisterPage: String = "/agent-registration/apply/cannot-register"
 
   "routes should have correct paths and methods" in:
-    AppRoutes.apply.internal.EntityCheckController.entityCheck() shouldBe Call(
+    AppRoutes.apply.internal.RefusalToDealWithController.check() shouldBe Call(
       method = "GET",
       url = path
     )
@@ -78,8 +80,8 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterHmrcEntityVerificationFail)
     AgentAssuranceStubs.stubIsRefusedToDealWith(saUtr = saUtr, isRefused = true)
     val response: WSResponse = get(path)
-    response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe "Entity verification failed... - Apply for an agent services account - GOV.UK"
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe cannotRegisterPage
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
@@ -102,3 +104,13 @@ extends ControllerSpec:
     response.header("Location").value shouldBe nextPageUrl
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
+
+  // TODO WG - add testing for Sole trader
+//  s"GET $path should redirect to deceased check when entity verification already done for sole trader" in :
+//    AuthStubs.stubAuthorise()
+//    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterHmrcEntityVerificationPass)
+//    val response: WSResponse = get(path)
+//    response.status shouldBe Status.SEE_OTHER
+//    response.header("Location").value shouldBe nextPageSoleTraderUrl
+//    AuthStubs.verifyAuthorise()
+//    AgentRegistrationStubs.verifyGetAgentApplication()

@@ -58,7 +58,7 @@ extends FrontendController(mcc, actions):
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Data from GRS already exists. Redirecting to verify entity.")
-          Redirect(AppRoutes.apply.internal.EntityCheckController.entityCheck())
+          Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
     )
 
   def startJourney(): Action[AnyContent] = baseAction
@@ -169,7 +169,7 @@ extends FrontendController(mcc, actions):
     agentApplicationService
       .upsert(updatedApplication)
       .map: _ =>
-        Redirect(AppRoutes.apply.internal.EntityCheckController.entityCheck())
+        Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
 
 object GrsController:
 
