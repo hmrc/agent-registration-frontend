@@ -62,19 +62,10 @@ extends FrontendController(mcc, actions):
           Redirect(nextPage)
     )
     .ensure(
-      condition =
-        _.agentApplication
-          .asSoleTraderApplication
-          .deceasedCheck
-          .isEmpty,
+      condition = _.agentApplication.asSoleTraderApplication.deceasedCheck.forall(_ === EntityCheckResult.Fail),
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Deceased verification already done. Redirecting to company status check.")
-          if (request.agentApplication.asSoleTraderApplication.deceasedCheck.exists(_ === EntityCheckResult.Pass))
-            Redirect(nextPage)
-          else
-            Redirect(failedCheckPage)
-
           Redirect(nextPage)
     )
     .async:
