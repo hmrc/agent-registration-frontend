@@ -20,10 +20,9 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.EntityCheckResult
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
@@ -53,13 +52,12 @@ extends FrontendController(mcc, actions):
         logger.warn("Missing data from GRS, redirecting to start GRS registration")
         Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
     )
-    // TODO: this next .ensure is only checking entity checks as they are for all business types but needs a more comprehensive method to check all checks required are passed
     .ensure(
       _.agentApplication
-        .getEntityCheckResult === EntityCheckResult.Pass,
+        .hasPassedAllEntityChecks,
       implicit request =>
-        logger.warn("Entity check not passed, redirecting to generic exit page")
-        Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage)
+        logger.warn("Entity checks not passed, redirecting to begin checks where failures will be handled")
+        Redirect(AppRoutes.apply.internal.EntityCheckController.entityCheck())
     )
     .async:
       implicit request =>

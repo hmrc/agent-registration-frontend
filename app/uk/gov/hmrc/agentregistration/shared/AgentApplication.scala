@@ -24,6 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.businessdetails.*
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import java.time.Clock
 import java.time.Instant
@@ -71,6 +72,26 @@ sealed trait AgentApplication:
       case ApplicationState.Started => false
       case ApplicationState.GrsDataReceived => true
       case ApplicationState.Submitted => true
+
+  def hasPassedAllEntityChecks: Boolean =
+    this match
+      case a: AgentApplicationLlp =>
+        a.getEntityCheckResult === EntityCheckResult.Pass &&
+        a.getCompanyStatusCheckResult === CompanyStatusCheckResult.Allow
+      case a: AgentApplicationLimitedCompany =>
+        a.getEntityCheckResult === EntityCheckResult.Pass &&
+        a.getCompanyStatusCheckResult === CompanyStatusCheckResult.Allow
+      case a: AgentApplicationLimitedPartnership =>
+        a.getEntityCheckResult === EntityCheckResult.Pass &&
+        a.getCompanyStatusCheckResult === CompanyStatusCheckResult.Allow
+      case a: AgentApplicationGeneralPartnership => a.getEntityCheckResult === EntityCheckResult.Pass
+      case a: AgentApplicationScottishLimitedPartnership =>
+        a.getEntityCheckResult === EntityCheckResult.Pass &&
+        a.getCompanyStatusCheckResult === CompanyStatusCheckResult.Allow
+      case a: AgentApplicationScottishPartnership =>
+        a.getEntityCheckResult === EntityCheckResult.Pass &&
+        a.getCompanyStatusCheckResult === CompanyStatusCheckResult.Allow
+      case a: AgentApplicationSoleTrader => a.getEntityCheckResult === EntityCheckResult.Pass // TODO: add deceased check outcome when implemented
 
   def getUserRole: UserRole = userRole.getOrElse(expectedDataNotDefinedError("userRole"))
 
