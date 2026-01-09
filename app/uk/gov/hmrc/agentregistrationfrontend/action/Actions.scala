@@ -55,8 +55,10 @@ extends RequestAwareLogging:
     val authorised: ActionBuilder[AuthorisedRequest, AnyContent] = action
       .andThen(authorisedAction)
 
-    val getApplicationInProgress: ActionBuilder[AgentApplicationRequest, AnyContent] = authorised
+    val getApplication: ActionBuilder[AgentApplicationRequest, AnyContent] = authorised
       .andThen(agentApplicationAction)
+
+    val getApplicationInProgress: ActionBuilder[AgentApplicationRequest, AnyContent] = getApplication
       .ensure(
         condition = _.agentApplication.isInProgress,
         resultWhenConditionNotMet =
@@ -71,8 +73,7 @@ extends RequestAwareLogging:
             Redirect(call.url)
       )
 
-    val getApplicationSubmitted: ActionBuilder[AgentApplicationRequest, AnyContent] = authorised
-      .andThen(agentApplicationAction)
+    val getApplicationSubmitted: ActionBuilder[AgentApplicationRequest, AnyContent] = getApplication
       .ensure(
         condition = (r: AgentApplicationRequest[?]) => r.agentApplication.hasFinished,
         resultWhenConditionNotMet =
@@ -95,8 +96,9 @@ extends RequestAwareLogging:
     val authorisedWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = action
       .andThen(individualAuthorisedWithIdentifiersAction)
 
-    val getProvideDetailsInProgress: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorised
+    val getProvidedDetails: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorised
       .andThen(provideDetailsAction)
+    val getProvideDetailsInProgress: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = getProvidedDetails
       .ensure(
         condition = _.memberProvidedDetails.isInProgress,
         resultWhenConditionNotMet =
@@ -115,8 +117,7 @@ extends RequestAwareLogging:
       AnyContent
     ] = getProvideDetailsInProgress.andThen(enrichWithAgentApplicationAction)
 
-    val getSubmitedDetailsWithApplicationInProgress: ActionBuilder[MemberProvideDetailsWithApplicationRequest, AnyContent] = authorised
-      .andThen(provideDetailsAction)
+    val getSubmitedDetailsWithApplicationInProgress: ActionBuilder[MemberProvideDetailsWithApplicationRequest, AnyContent] = getProvidedDetails
       .ensure(
         condition = _.memberProvidedDetails.hasFinished,
         resultWhenConditionNotMet =
