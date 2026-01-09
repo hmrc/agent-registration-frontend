@@ -14,40 +14,42 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
+package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.entitycheckfailed
 
 import play.api.mvc.*
-import uk.gov.hmrc.agentregistration.shared.CompanyStatusCheckResult.Block
+import uk.gov.hmrc.agentregistration.shared.EntityCheckResult.Fail
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.CompanyStatusBlockPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.entitycheckfailed.CanNotRegisterPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class CompanyStatusBlockController @Inject() (
+class CanNotRegisterController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  companyStatusBlockPage: CompanyStatusBlockPage
+  canNotRegisterPage: CanNotRegisterPage
 )
 extends FrontendController(mcc, actions):
 
-  val baseAction = actions
-    .Applicant
-    .getApplicationInProgress
-    .ensure(
-      condition =
-        _.agentApplication
-          .companyStatusCheckResult
-          .exists(_ === Block),
-      resultWhenConditionNotMet =
+  def show: Action[AnyContent] =
+    actions
+      .Applicant
+      .getApplicationInProgress
+      .ensure(
+        condition =
+          _.agentApplication
+            .refusalToDealWithCheck
+            .exists(_ === Fail),
+        resultWhenConditionNotMet =
+          implicit request =>
+            logger.warn("Refusal to deal with has not failed. Redirecting to run refusal to deal with check.")
+            Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
+      ):
         implicit request =>
-          logger.warn("Entity verification has not been done. Redirecting to entity check.")
-          Redirect(AppRoutes.apply.internal.CompaniesHouseStatusController.companyStatusCheck())
-    )
-
-  def showBlockedPage: Action[AnyContent] = baseAction:
-    implicit request =>
-      Ok(companyStatusBlockPage())
+          Ok(canNotRegisterPage(request
+            .agentApplication
+            .getCompanyProfile
+            .companyName))

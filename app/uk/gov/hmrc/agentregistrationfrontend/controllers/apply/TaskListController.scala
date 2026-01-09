@@ -47,11 +47,17 @@ extends FrontendController(mcc, actions):
     .getApplicationInProgress
     .ensure(
       _.agentApplication
-        .companyStatusCheckResult
-        .isDefined,
+        .isGrsDataReceived,
       implicit request =>
         logger.warn("Missing data from GRS, redirecting to start GRS registration")
         Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
+    )
+    .ensure(
+      _.agentApplication
+        .hasEntityCheckPassed.forall(_ === true),
+      implicit request =>
+        logger.warn("Entity failed or has not been completed, redirecting to entity check.")
+        Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
     )
     .async:
       implicit request =>

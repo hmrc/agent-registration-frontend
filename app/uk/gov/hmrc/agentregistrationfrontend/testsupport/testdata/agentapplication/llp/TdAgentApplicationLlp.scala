@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplicat
 import uk.gov.hmrc.agentregistration.shared.ApplicationState.GrsDataReceived
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
-import uk.gov.hmrc.agentregistration.shared.CompanyStatusCheckResult
 import uk.gov.hmrc.agentregistration.shared.EntityCheckResult
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.UserRole
@@ -42,7 +41,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       applicantContactDetails = None,
       amlsDetails = None,
       agentDetails = None,
-      entityCheckResult = None,
+      refusalToDealWithCheck = None,
       companyStatusCheckResult = None,
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
     )
@@ -55,22 +54,22 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
     )
 
     val afterHmrcEntityVerificationPass: AgentApplicationLlp = afterGrsDataReceived.copy(
-      entityCheckResult = Some(EntityCheckResult.Pass)
+      refusalToDealWithCheck = Some(EntityCheckResult.Pass)
     )
 
     val afterHmrcEntityVerificationFail: AgentApplicationLlp = afterGrsDataReceived.copy(
-      entityCheckResult = Some(EntityCheckResult.Fail)
+      refusalToDealWithCheck = Some(EntityCheckResult.Fail)
     )
 
-    val afterCompaniesHouseStatusCheckAllow: AgentApplicationLlp = afterHmrcEntityVerificationPass.copy(
-      companyStatusCheckResult = Some(CompanyStatusCheckResult.Allow)
+    val afterCompaniesHouseStatusCheckPass: AgentApplicationLlp = afterHmrcEntityVerificationPass.copy(
+      companyStatusCheckResult = Some(EntityCheckResult.Pass)
     )
 
-    val afterCompaniesHouseStatusCheckBlock: AgentApplicationLlp = afterHmrcEntityVerificationPass.copy(
-      companyStatusCheckResult = Some(CompanyStatusCheckResult.Block)
+    val afterCompaniesHouseStatusCheckFail: AgentApplicationLlp = afterHmrcEntityVerificationPass.copy(
+      companyStatusCheckResult = Some(EntityCheckResult.Fail)
     )
 
-    val afterContactDetailsComplete: AgentApplicationLlp = afterCompaniesHouseStatusCheckAllow.copy(
+    val afterContactDetailsComplete: AgentApplicationLlp = afterCompaniesHouseStatusCheckPass.copy(
       applicantContactDetails = Some(dependencies.applicantContactDetails),
       agentDetails = None
     )

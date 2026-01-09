@@ -21,63 +21,76 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.EntityCheckResult.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentAssuranceConnector
+import uk.gov.hmrc.agentregistrationfrontend.connectors.CitizenDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.Future
 
 @Singleton
-class EntityCheckController @Inject() (
+class DeceasedController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  agentAssuranceConnector: AgentAssuranceConnector,
-  agentApplicationService: AgentApplicationService,
-  simplePage: SimplePage
+  citizenDetailsConnector: CitizenDetailsConnector,
+  agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
-  private def nextPage = AppRoutes.apply.internal.CompaniesHouseStatusController.companyStatusCheck()
-
-  val baseAction = actions
+  def check(): Action[AnyContent] = actions
     .Applicant
     .getApplicationInProgress
     .ensure(
       condition =
         _.agentApplication
-          .applicationState === ApplicationState.GrsDataReceived,
+          .refusalToDealWithCheck
+          .isDefined,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("Missing data from GRS, redirecting to start GRS registration")
-          Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
+          logger.warn("Entity verification has not been done. Redirecting to entity check.")
+          Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
     )
     .ensure(
-      condition = _.agentApplication.entityCheckResult.isEmpty,
+      condition = _.agentApplication.businessType === BusinessType.SoleTrader,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("Entity verification already done. Redirecting to task list page.")
+          logger.warn("Deceased verification not required. Redirecting to company status check.")
           Redirect(nextPage)
     )
-
-  def entityCheck(): Action[AnyContent] = baseAction
+    .ensure(
+      condition = _.agentApplication.asSoleTraderApplication.deceasedCheck.forall(_ === EntityCheckResult.Fail),
+      resultWhenConditionNotMet =
+        implicit request =>
+          logger.warn("Deceased verification already done. Redirecting to company status check.")
+          Redirect(nextPage)
+    )
     .async:
       implicit request =>
         for
-          checkResult <- agentAssuranceConnector
-            .isRefusedToDealWith(request.agentApplication.getUtr)
+          checkResult <-
+            request
+              .agentApplication
+              .asSoleTraderApplication
+              .getBusinessDetails
+              .nino match
+              case Some(nino) =>
+                citizenDetailsConnector
+                  .isDeceased(nino)
+                  .map(_.asEntityCheckResult)
+              case None => Future.successful(EntityCheckResult.Pass) // TODO - confirm this is correct
+
           _ <- agentApplicationService
             .upsert(request.agentApplication
-              .modify(_.entityCheckResult)
+              .asSoleTraderApplication
+              .modify(_.deceasedCheck)
               .setTo(Some(checkResult)))
         yield checkResult match
           case EntityCheckResult.Pass => Redirect(nextPage)
-          case EntityCheckResult.Fail =>
-            logger.warn("Entity verification failed. Redirecting to verification failed page.")
-            Ok(simplePage(
-              h1 = "Entity verification failed...",
-              bodyText = Some("Placeholder for entity verification failed page...")
-            ))
+          case EntityCheckResult.Fail => Redirect(failedCheckPage)
+
+  private def failedCheckPage = AppRoutes.apply.entitycheckfailed.CanNotConfirmIdentityController.show
+  private def nextPage = AppRoutes.apply.internal.CompaniesHouseStatusController.check()

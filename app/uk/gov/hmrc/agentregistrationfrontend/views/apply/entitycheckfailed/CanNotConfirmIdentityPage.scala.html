@@ -29,25 +29,22 @@
         messages: Messages
 )
 
-@key = @{"companyStatusBlock"}
+@key = @{"cannotConfirmIdentity"}
 @pageTitle = @{messages(s"$key.title")}
 
 @layout(pageTitle = pageTitle) {
     <h1 class="govuk-heading-xl">@pageTitle</h1>
 
     <p class="govuk-body">
-        @{messages(s"$key.p1")}
+        @Html(messages(s"$key.p1", appConfig.hmrcContactUrl))
     </p>
     <p class="govuk-body">
-        @Html(messages(s"$key.p2", appConfig.companiesHouseUrl))
-    </p>
-    <p class="govuk-body">
-        @{messages(s"$key.p3")}
+        @{messages(s"$key.p2")}
     </p>
 
     <p class="govuk-body govuk-!-display-none-print">
     @govukButton(Button(
-        href = Some(AppRoutes.apply.internal.CompaniesHouseStatusController.companyStatusCheck().url),
+        href = Some(AppRoutes.apply.internal.DeceasedController.check().url),
         classes = "govuk-link",
         content = Text(messages(s"$key.tryAgain.button"))
     ))

@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.connectors.llp
+package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.llp.CitizenDetails
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
+import uk.gov.hmrc.http.HttpErrorFunctions.is2xx
 import uk.gov.hmrc.http.HttpReads.Implicits.given
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
 
@@ -45,3 +48,26 @@ extends RequestAwareLogging:
   )(using rh: RequestHeader): Future[CitizenDetails] = httpClient
     .get(url"${baseUrl}/citizen-details/nino/${nino.value}")
     .execute[CitizenDetails]
+
+  def isDeceased(
+    nino: Nino
+  )(using rh: RequestHeader): Future[Boolean] =
+    val url = url"$baseUrl/citizen-details/${nino.value}/designatory-details"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map { response =>
+        response.status match
+          case s if is2xx(s) =>
+            (response.json \ "person" \ "deceased")
+              .asOpt[Boolean]
+              .getOrElse(false)
+          case status =>
+            logger.error(s"Citizen details designatory details deceased check error for ${nino.value}; HTTP status: $status")
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      }
