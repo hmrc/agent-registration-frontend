@@ -24,7 +24,6 @@ import uk.gov.hmrc.agentregistration.shared.businessdetails.*
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
-import uk.gov.hmrc.agentregistration.shared.CompanyStatusCheckResult.Allow
 
 import java.time.Clock
 import java.time.Instant
@@ -113,7 +112,7 @@ sealed trait AgentApplication:
 
   def hasEntityCheckPassed: Boolean =
     (getRefusalToDealWithCheck, getCompanyStatusCheckResult) match
-      case (Pass, Allow) => true
+      case (EntityCheckResult.Pass, CompanyStatusCheckResult.Allow) => true
       case _ => false
 
   private def as[T <: AgentApplication](using ct: reflect.ClassTag[T]): Option[T] =
@@ -160,7 +159,7 @@ extends AgentApplication:
 
   override def hasEntityCheckPassed: Boolean =
     (getRefusalToDealWithCheck, getDeceasedCheck, getCompanyStatusCheckResult) match
-      case (Pass, Pass, Allow) => true
+      case (EntityCheckResult.Pass, EntityCheckResult.Pass, CompanyStatusCheckResult.Allow) => true
       case _ => false
 
   def getBusinessDetails: BusinessDetailsSoleTrader = businessDetails.getOrElse(expectedDataNotDefinedError("businessDetails"))
