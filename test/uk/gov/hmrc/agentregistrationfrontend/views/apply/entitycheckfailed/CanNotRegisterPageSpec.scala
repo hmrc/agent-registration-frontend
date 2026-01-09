@@ -14,40 +14,38 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.apply
+package uk.gov.hmrc.agentregistrationfrontend.views.apply.entitycheckfailed
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.CompanyStatusBlockPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.entitycheckfailed.CanNotRegisterPage
 
-class CompanyStatusBlockPageSpec
+class CanNotRegisterPageSpec
 extends ViewSpec:
 
-  val viewTemplate: CompanyStatusBlockPage = app.injector.instanceOf[CompanyStatusBlockPage]
+  val viewTemplate: CanNotRegisterPage = app.injector.instanceOf[CanNotRegisterPage]
 
   val doc: Document = Jsoup.parse(
-    viewTemplate().body
+    viewTemplate("TestCompanyName").body
   )
 
-  "CompanyStatusBlockPage" should:
+  "CannotRegister" should:
 
     "have expected content" in:
       doc.mainContent shouldContainContent
         """
-          |We cannot create an account for this company
-          |We cannot register this company for an agent services account. This is because of the company's status on the Companies House register.
-          |To view your company status you can search the Companies House register (opens in a new tab). If you believe the status is incorrect, contact Companies House.
-          |If you've entered the incorrect details, you can try again.
+          |This TestCompanyName cannot be registered for an Agent Services Account
+          |If you wish to register a different Agent, use this link (opens in new tab).
           |Try again
           |"""
           .stripMargin
 
     "have the correct title" in:
-      doc.title() shouldBe "We cannot create an account for this company - Apply for an agent services account - GOV.UK"
+      doc.title() shouldBe "This TestCompanyName cannot be registered for an Agent Services Account - Apply for an agent services account - GOV.UK"
 
     "have the correct h1" in:
-      doc.h1 shouldBe "We cannot create an account for this company"
+      doc.h1 shouldBe "This TestCompanyName cannot be registered for an Agent Services Account"
 
     "render a try again button" in:
       val button = doc
@@ -56,4 +54,4 @@ extends ViewSpec:
         .selectOnlyOneElementOrFail()
 
       button.text() shouldBe "Try again"
-      button.attr("href") shouldBe "/agent-registration/apply/internal/status-check"
+      button.attr("href") shouldBe "/agent-registration/apply/internal/register-check"
