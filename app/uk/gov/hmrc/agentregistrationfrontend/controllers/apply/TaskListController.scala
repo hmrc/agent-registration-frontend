@@ -54,17 +54,9 @@ extends FrontendController(mcc, actions):
     )
     .ensure(
       _.agentApplication
-        .companyStatusCheckResult
-        .isDefined,
+        .hasEntityCheckPassed.forall(_ === true),
       implicit request =>
-        logger.warn("Missing company status check, redirecting to company status check.")
-        Redirect(AppRoutes.apply.internal.CompaniesHouseStatusController.check())
-    )
-    .ensure(
-      _.agentApplication
-        .hasEntityCheckPassed,
-      implicit request =>
-        logger.warn("Entity check failed, redirecting to check failed page.")
+        logger.warn("Entity failed or has not been completed, redirecting to entity check.")
         Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
     )
     .async:

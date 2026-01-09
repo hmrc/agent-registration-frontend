@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.entitycheckfailed
 
 import play.api.mvc.*
-import uk.gov.hmrc.agentregistration.shared.CompanyStatusCheckResult.Block
+import uk.gov.hmrc.agentregistration.shared.EntityCheckResult.Fail
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -42,7 +42,7 @@ extends FrontendController(mcc, actions):
         condition =
           _.agentApplication
             .companyStatusCheckResult
-            .exists(_ === Block),
+            .exists(_ === Fail),
         resultWhenConditionNotMet =
           implicit request =>
             logger.warn("Company status check has not been blocked. Redirecting to company status check.")
