@@ -68,14 +68,11 @@ extends FrontendController(mcc, actions):
             Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
     )
     .ensure(
-      condition = _.agentApplication.companyStatusCheckResult.isEmpty,
+      condition = _.agentApplication.companyStatusCheckResult.forall(_ === CompanyStatusCheckResult.Block),
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("Company status already done. Redirecting to task list page.")
-          if (request.agentApplication.companyStatusCheckResult.exists(_ === CompanyStatusCheckResult.Allow))
-            Redirect(nextPage)
-          else
-            Redirect(failedCheckPage)
+          logger.warn("Company status check already completed successfully. Redirecting to task list.")
+          Redirect(nextPage)
     )
     .async:
       implicit request =>
