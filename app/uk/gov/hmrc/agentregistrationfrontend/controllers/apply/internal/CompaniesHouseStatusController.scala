@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.connectors.CompaniesHouseApiProxyCo
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistration.shared.CompanyStatusCheckResult
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -40,30 +41,42 @@ class CompaniesHouseStatusController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private def nextPage: Call = AppRoutes.apply.TaskListController.show
-
-  val baseAction = actions
+  def check(): Action[AnyContent] = actions
     .Applicant
     .getApplicationInProgress
     .ensure(
       condition =
-        _.agentApplication
-          .entityCheckResult
-          .isDefined,
+        implicit request =>
+          if (request.agentApplication.businessType === BusinessType.SoleTrader)
+            request
+              .agentApplication
+              .asSoleTraderApplication
+              .deceasedCheck
+              .isDefined
+          else
+            request.agentApplication
+              .refusalToDealWithCheck
+              .isDefined,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("Entity verification has not been done. Redirecting to entity check.")
-          Redirect(AppRoutes.apply.internal.EntityCheckController.entityCheck())
+          if (request.agentApplication.businessType === BusinessType.SoleTrader) {
+            logger.warn("Deceased verification has not been completed. Redirecting to deceased check.")
+            Redirect(AppRoutes.apply.internal.DeceasedController.check())
+          }
+          else
+            logger.warn("Refusal to deal with verification has not been completed. Redirecting to refusal to deal with check.")
+            Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
     )
     .ensure(
       condition = _.agentApplication.companyStatusCheckResult.isEmpty,
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Company status already done. Redirecting to task list page.")
-          Redirect(nextPage)
+          if (request.agentApplication.companyStatusCheckResult.exists(_ === CompanyStatusCheckResult.Allow))
+            Redirect(nextPage)
+          else
+            Redirect(failedCheckPage)
     )
-
-  def companyStatusCheck(): Action[AnyContent] = baseAction
     .async:
       implicit request =>
         val llpApplication = request.agentApplication.asLlpApplication
@@ -78,4 +91,7 @@ extends FrontendController(mcc, actions):
               .setTo(Some(companyStatusCheckResult)))
         yield companyStatusCheckResult match
           case CompanyStatusCheckResult.Allow => Redirect(nextPage)
-          case CompanyStatusCheckResult.Block => Redirect(AppRoutes.apply.CompanyStatusBlockController.showBlockedPage)
+          case CompanyStatusCheckResult.Block => Redirect(failedCheckPage)
+
+  private def failedCheckPage = AppRoutes.apply.entitycheckfailed.CanNotRegisterCompanyOrPartnershipController.show
+  private def nextPage: Call = AppRoutes.apply.TaskListController.show

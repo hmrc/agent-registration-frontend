@@ -52,11 +52,11 @@ extends ControllerSpec:
 
   private val path: String = "/agent-registration/apply/internal/status-check"
   private val nextPageUrl: String = "/agent-registration/apply/task-list"
-  private val previousPage: String = "/agent-registration/apply/internal/entity-check"
+  private val previousPage: String = "/agent-registration/apply/internal/register-check"
   private val comapanyStatusBlock: String = "/agent-registration/apply/cannot-register-company-or-partnership"
 
   "routes should have correct paths and methods" in:
-    AppRoutes.apply.internal.CompaniesHouseStatusController.companyStatusCheck() shouldBe Call(
+    AppRoutes.apply.internal.CompaniesHouseStatusController.check() shouldBe Call(
       method = "GET",
       url = path
     )
@@ -104,3 +104,5 @@ extends ControllerSpec:
     response.header("Location").value shouldBe nextPageUrl
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
+
+//TODO - add test case for Sole trader

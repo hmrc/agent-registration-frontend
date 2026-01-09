@@ -83,7 +83,7 @@ extends ControllerSpec:
 
       val response: WSResponse = get(journeyCallbackPath)
       response.status shouldBe Status.SEE_OTHER
-      response.header("Location").value shouldBe AppRoutes.apply.internal.EntityCheckController.entityCheck().url
+      response.header("Location").value shouldBe AppRoutes.apply.internal.RefusalToDealWithController.check().url
       AuthStubs.verifyAuthorise()
       AgentRegistrationStubs.verifyGetAgentApplication()
       GrsStubs.verifyGetJourneyData(t.businessType, journeyId)
@@ -95,7 +95,7 @@ extends ControllerSpec:
 
     val response: WSResponse = get(startJourneyPath)
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe AppRoutes.apply.internal.EntityCheckController.entityCheck().url
+    response.header("Location").value shouldBe AppRoutes.apply.internal.RefusalToDealWithController.check().url
 
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
@@ -106,7 +106,7 @@ extends ControllerSpec:
 
     val response: WSResponse = get(startJourneyPath)
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe AppRoutes.apply.internal.EntityCheckController.entityCheck().url
+    response.header("Location").value shouldBe AppRoutes.apply.internal.RefusalToDealWithController.check().url
 
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
