@@ -24,11 +24,20 @@ import uk.gov.hmrc.agentregistration.shared.businessdetails.*
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import java.time.Clock
 import java.time.Instant
 import scala.annotation.nowarn
+
+sealed trait IsIncorporated
+extends AgentApplication:
+
+  def companyStatusCheckResult: Option[CompanyStatusCheckResult]
+  // derived stuff:
+  def companyProfile: CompanyProfile
+
+//sealed trait IsNotIncorporated
+//extends AgentApplication
 
 /** Agent (Registration) Application. This final case class represents the data entered by a user for registering as an agent.
   */
@@ -46,7 +55,6 @@ sealed trait AgentApplication:
   def amlsDetails: Option[AmlsDetails]
   def agentDetails: Option[AgentDetails]
   def entityCheckResult: Option[EntityCheckResult]
-  def companyStatusCheckResult: Option[CompanyStatusCheckResult]
   def hmrcStandardForAgentsAgreed: StateOfAgreement
 
   //  /** Updates the application state to the next state */
@@ -75,23 +83,14 @@ sealed trait AgentApplication:
 
   def hasPassedAllEntityChecks: Boolean =
     this match
-      case a: AgentApplicationLlp =>
-        a.getEntityCheckResult === EntityCheckResult.Pass &&
-        a.getCompanyStatusCheckResult === CompanyStatusCheckResult.Allow
-      case a: AgentApplicationLimitedCompany =>
-        a.getEntityCheckResult === EntityCheckResult.Pass &&
-        a.getCompanyStatusCheckResult === CompanyStatusCheckResult.Allow
-      case a: AgentApplicationLimitedPartnership =>
-        a.getEntityCheckResult === EntityCheckResult.Pass &&
-        a.getCompanyStatusCheckResult === CompanyStatusCheckResult.Allow
-      case a: AgentApplicationGeneralPartnership => a.getEntityCheckResult === EntityCheckResult.Pass
-      case a: AgentApplicationScottishLimitedPartnership =>
-        a.getEntityCheckResult === EntityCheckResult.Pass &&
-        a.getCompanyStatusCheckResult === CompanyStatusCheckResult.Allow
-      case a: AgentApplicationScottishPartnership =>
-        a.getEntityCheckResult === EntityCheckResult.Pass &&
-        a.getCompanyStatusCheckResult === CompanyStatusCheckResult.Allow
-      case a: AgentApplicationSoleTrader => a.getEntityCheckResult === EntityCheckResult.Pass // TODO: add deceased check outcome when implemented
+      case a: IsIncorporated =>
+        (a.entityCheckResult, a.companyStatusCheckResult) match
+          case (Some(EntityCheckResult.Pass), Some(CompanyStatusCheckResult.Allow)) => true
+          case _ => false
+      case a: AgentApplication =>
+        a.entityCheckResult match
+          case Some(EntityCheckResult.Pass) => true
+          case _ => false
 
   def getUserRole: UserRole = userRole.getOrElse(expectedDataNotDefinedError("userRole"))
 
@@ -127,7 +126,6 @@ sealed trait AgentApplication:
 
   def getAmlsDetails: AmlsDetails = amlsDetails.getOrElse(expectedDataNotDefinedError("amlsDetails"))
   def getEntityCheckResult: EntityCheckResult = entityCheckResult.getOrElse(expectedDataNotDefinedError("entityCheckResult"))
-  def getCompanyStatusCheckResult: CompanyStatusCheckResult = companyStatusCheckResult.getOrElse(expectedDataNotDefinedError("companyStatusCheckResult"))
 
   private def as[T <: AgentApplication](using ct: reflect.ClassTag[T]): Option[T] =
     this match
@@ -161,7 +159,6 @@ final case class AgentApplicationSoleTrader(
   override val amlsDetails: Option[AmlsDetails],
   override val agentDetails: Option[AgentDetails],
   override val entityCheckResult: Option[EntityCheckResult],
-  override val companyStatusCheckResult: Option[CompanyStatusCheckResult],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
 extends AgentApplication:
@@ -187,12 +184,15 @@ final case class AgentApplicationLlp(
   override val companyStatusCheckResult: Option[CompanyStatusCheckResult],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
-extends AgentApplication:
+extends AgentApplication,
+  IsIncorporated:
 
   override val businessType: BusinessType.Partnership.LimitedLiabilityPartnership.type = BusinessType.Partnership.LimitedLiabilityPartnership
 
   def getBusinessDetails: BusinessDetailsLlp = businessDetails.getOrThrowExpectedDataMissing("businessDetails")
   def getCrn: Crn = getBusinessDetails.companyProfile.companyNumber
+
+  override def companyProfile: CompanyProfile = getBusinessDetails.companyProfile
 
 /** Application for Limited Company. This final case class represents the data entered by a user for registering as a Limited Company.
   */
@@ -212,9 +212,11 @@ final case class AgentApplicationLimitedCompany(
   override val companyStatusCheckResult: Option[CompanyStatusCheckResult],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
-extends AgentApplication:
+extends AgentApplication,
+  IsIncorporated:
 
   override val businessType: BusinessType.LimitedCompany.type = BusinessType.LimitedCompany
+  override def companyProfile: CompanyProfile = getBusinessDetails.companyProfile
 
   def getBusinessDetails: BusinessDetailsLimitedCompany = businessDetails.getOrThrowExpectedDataMissing("businessDetails")
   def getCrn: Crn = getBusinessDetails.companyProfile.companyNumber
@@ -234,7 +236,6 @@ final case class AgentApplicationGeneralPartnership(
   override val amlsDetails: Option[AmlsDetails],
   override val agentDetails: Option[AgentDetails],
   override val entityCheckResult: Option[EntityCheckResult],
-  override val companyStatusCheckResult: Option[CompanyStatusCheckResult],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
 extends AgentApplication:
@@ -260,9 +261,11 @@ final case class AgentApplicationLimitedPartnership(
   override val companyStatusCheckResult: Option[CompanyStatusCheckResult],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
-extends AgentApplication:
+extends AgentApplication,
+  IsIncorporated:
 
   override val businessType: BusinessType.Partnership.LimitedPartnership.type = BusinessType.Partnership.LimitedPartnership
+  override def companyProfile: CompanyProfile = getBusinessDetails.companyProfile
 
   def getBusinessDetails: BusinessDetailsPartnership = businessDetails.getOrThrowExpectedDataMissing("businessDetails")
   def getCrn: Crn = getBusinessDetails.companyProfile.companyNumber
@@ -283,9 +286,11 @@ final case class AgentApplicationScottishLimitedPartnership(
   override val companyStatusCheckResult: Option[CompanyStatusCheckResult],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
-extends AgentApplication:
+extends AgentApplication,
+  IsIncorporated:
 
   override val businessType: BusinessType.Partnership.ScottishLimitedPartnership.type = BusinessType.Partnership.ScottishLimitedPartnership
+  override def companyProfile: CompanyProfile = getBusinessDetails.companyProfile
 
   def getBusinessDetails: BusinessDetailsPartnership = businessDetails.getOrThrowExpectedDataMissing("businessDetails")
   def getCrn: Crn = getBusinessDetails.companyProfile.companyNumber
@@ -303,7 +308,6 @@ final case class AgentApplicationScottishPartnership(
   override val amlsDetails: Option[AmlsDetails],
   override val agentDetails: Option[AgentDetails],
   override val entityCheckResult: Option[EntityCheckResult],
-  override val companyStatusCheckResult: Option[CompanyStatusCheckResult],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
 extends AgentApplication:

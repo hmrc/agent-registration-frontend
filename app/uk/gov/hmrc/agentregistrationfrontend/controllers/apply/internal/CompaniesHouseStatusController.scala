@@ -21,8 +21,10 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CompaniesHouseApiProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -30,6 +32,7 @@ import uk.gov.hmrc.agentregistration.shared.CompanyStatusCheckResult
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.Future
 
 @Singleton
 class CompaniesHouseStatusController @Inject() (
@@ -42,7 +45,7 @@ extends FrontendController(mcc, actions):
 
   private def nextPage: Call = AppRoutes.apply.TaskListController.show
 
-  val baseAction = actions
+  def companyStatusCheck(): Action[AnyContent] = actions
     .Applicant
     .getApplicationInProgress
     .ensure(
@@ -65,26 +68,33 @@ extends FrontendController(mcc, actions):
           Redirect(AppRoutes.apply.internal.EntityCheckController.entityCheck())
     )
     .ensure(
-      condition = _.agentApplication.companyStatusCheckResult.isEmpty,
+      condition =
+        _.agentApplication match
+          case a: IsIncorporated => a.companyStatusCheckResult.isEmpty
+          case _ => true,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("Company status already done. Redirecting to task list page.")
+          logger.info("Company status already done or not needed. Redirecting to task list page.")
           Redirect(nextPage)
     )
-
-  def companyStatusCheck(): Action[AnyContent] = baseAction
     .async:
       implicit request =>
-        val agentApplication = request.agentApplication
+        request.agentApplication match
+          case a: IsIncorporated => doCompanyStatusCheck(a)
+          case _ =>
+            Future.failed[Result](
+              new RuntimeException(s"Unexpected application type: ${getClass.getSimpleName}.")
+            )
 
-        for
-          companyStatusCheckResult <- companiesHouseApiProxyConnector
-            .getCompanyHouseStatus(agentApplication.getCompanyProfile.companyNumber)
-            .map(_.toCompanyStatusCheckResult)
-          _ <- agentApplicationService
-            .upsert(agentApplication
-              .modify(_.companyStatusCheckResult)
-              .setTo(Some(companyStatusCheckResult)))
-        yield companyStatusCheckResult match
-          case CompanyStatusCheckResult.Allow => Redirect(nextPage)
-          case CompanyStatusCheckResult.Block => Redirect(AppRoutes.apply.CompanyStatusBlockController.showBlockedPage)
+  private def doCompanyStatusCheck(agentApplication: IsIncorporated)(using request: AuthorisedRequest[?]): Future[Result] =
+    for
+      companyStatusCheckResult: CompanyStatusCheckResult <- companiesHouseApiProxyConnector
+        .getCompanyHouseStatus(agentApplication.getCompanyProfile.companyNumber)
+        .map(_.toCompanyStatusCheckResult)
+      _ <- agentApplicationService
+        .upsert(agentApplication
+          .modify(_.companyStatusCheckResult)
+          .setTo(Some(companyStatusCheckResult)))
+    yield companyStatusCheckResult match
+      case CompanyStatusCheckResult.Allow => Redirect(nextPage)
+      case CompanyStatusCheckResult.Block => Redirect(AppRoutes.apply.CompanyStatusBlockController.showBlockedPage)
