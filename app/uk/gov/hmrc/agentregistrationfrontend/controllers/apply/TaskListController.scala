@@ -19,12 +19,13 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.{AppRoutes, FrontendController}
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskStatus
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
@@ -52,21 +53,23 @@ extends FrontendController(mcc, actions):
         logger.warn("Missing data from GRS, redirecting to start GRS registration")
         Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
     )
+//    .ensure(
+//      _.agentApplication
+//        .companyStatusCheckResult
+//        .isDefined,
+//      implicit request =>
+//        logger.warn("Missing company status check, redirecting to company status check.")
+//        Redirect(AppRoutes.apply.internal.CompaniesHouseStatusController.check())
+//    )
     .ensure(
       _.agentApplication
-        .companyStatusCheckResult
-        .isDefined,
+        .hasEntityCheckPassed.forall(_ === true),
       implicit request =>
-        logger.warn("Missing company status check, redirecting to company status check.")
-        Redirect(AppRoutes.apply.internal.CompaniesHouseStatusController.check())
+        logger.warn(s"Entity check have to succeed in order to progress, redirecting to the check page which takes care of redirecting to the eneity check start endpoint or error page if check fails: ${request.agentApplication.hasEntityCheckPassed}")
+        val endpointToStartAllEntityChecks = AppRoutes.apply.internal.RefusalToDealWithController.check
+        Redirect(endpointToStartAllEntityChecks)
     )
-    .ensure(
-      _.agentApplication
-        .hasEntityCheckPassed,
-      implicit request =>
-        logger.warn("Entity check failed, redirecting to check failed page.")
-        Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
-    )
+
     .async:
       implicit request =>
         businessPartnerRecordService

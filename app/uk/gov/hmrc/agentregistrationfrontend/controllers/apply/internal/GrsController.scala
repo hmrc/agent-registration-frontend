@@ -52,7 +52,7 @@ extends FrontendController(mcc, actions):
 
   val baseAction = actions
     .Applicant
-    .getApplicationInProgress
+    .getApplicationInProgressNotChecked
     .ensure(
       condition = !_.agentApplication.isGrsDataReceived,
       resultWhenConditionNotMet =

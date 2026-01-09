@@ -111,12 +111,11 @@ sealed trait AgentApplication:
 
   def getAmlsDetails: AmlsDetails = amlsDetails.getOrElse(expectedDataNotDefinedError("amlsDetails"))
 
-  def getCompanyStatusCheckResult: CompanyStatusCheckResult = companyStatusCheckResult.getOrElse(expectedDataNotDefinedError("companyStatusCheckResult"))
-
-  def getRefusalToDealWithCheck: EntityCheckResult = refusalToDealWithCheck.getOrElse(expectedDataNotDefinedError("refusalToDealWithCheck"))
-
-  def hasEntityCheckPassed: Boolean =
-    (getRefusalToDealWithCheck, getCompanyStatusCheckResult) match
+  def hasEntityCheckPassed: Option[Boolean] =
+    for
+      getRefusalToDealWithCheck <- refusalToDealWithCheck
+      getCompanyStatusCheckResult <- companyStatusCheckResult
+    yield (getRefusalToDealWithCheck, getCompanyStatusCheckResult) match
       case (Pass, Allow) => true
       case _ => false
 
@@ -157,14 +156,18 @@ final case class AgentApplicationSoleTrader(
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
 extends AgentApplication:
+  self =>
 
   override val businessType: BusinessType.SoleTrader.type = BusinessType.SoleTrader
 
   def getDeceasedCheck: EntityCheckResult = deceasedCheck.getOrThrowExpectedDataMissing("deceasedCheck")
 
-  override def hasEntityCheckPassed: Boolean =
-    (getRefusalToDealWithCheck, getDeceasedCheck, getCompanyStatusCheckResult) match
-      case (Pass, Pass, Allow) => true
+  override def hasEntityCheckPassed: Option[Boolean] =
+    for
+      getEntityCheckPassed <- self.hasEntityCheckPassed
+      getDeceasedCheck <- deceasedCheck
+    yield (getEntityCheckPassed, getDeceasedCheck) match
+      case (Pass, Pass) => true
       case _ => false
 
   def getBusinessDetails: BusinessDetailsSoleTrader = businessDetails.getOrElse(expectedDataNotDefinedError("businessDetails"))
