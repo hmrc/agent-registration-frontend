@@ -43,12 +43,12 @@ extends ControllerSpec:
     val afterCompaniesHouseStatusAllow =
       tdAll
         .agentApplicationLlp
-        .afterCompaniesHouseStatusCheckAllow
+        .afterCompaniesHouseStatusCheckPass
 
     val afterCompaniesHouseStatusBlock =
       tdAll
         .agentApplicationLlp
-        .afterCompaniesHouseStatusCheckBlock
+        .afterCompaniesHouseStatusCheckFail
 
   private val path: String = "/agent-registration/apply/internal/status-check"
   private val nextPageUrl: String = "/agent-registration/apply/task-list"
