@@ -136,3 +136,4 @@ extends Logging:
 
   val testServerPort: Int = 19001
   val thisFrontendBaseUrl: String = s"http://localhost:$testServerPort"
+  val selfBaseUrl: String = s"http://localhost:22001" // default port for agent-registration-frontend
