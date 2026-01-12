@@ -89,8 +89,6 @@ extends FrontendController(mcc, actions):
         for
           companyStatusCheckResult <- companiesHouseApiProxyConnector
             .getCompanyHouseStatus(agentApplication.getCompanyProfile.companyNumber)
-            .map(_.toCompanyStatusCheckResult)
-            .getCompanyHouseStatus(llpApplication.getCrn)
             .map(_.toEntityCheckResult)
           _ <- agentApplicationService
             .upsert(agentApplication
