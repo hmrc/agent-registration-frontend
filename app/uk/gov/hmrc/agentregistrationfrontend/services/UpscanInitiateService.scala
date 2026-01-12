@@ -44,6 +44,6 @@ extends RequestAwareLogging:
           errorRequestId = None,
           key = None
         ).url}",
-    callbackUrl = uri"${appConfig.thisFrontendBaseUrl + AppRoutes.apply.amls.api.NotificationFromUpscanController.processNotificationFromUpscan(uploadId).url}",
+    callbackUrl = uri"${appConfig.selfBaseUrl + AppRoutes.apply.amls.api.NotificationFromUpscanController.processNotificationFromUpscan(uploadId).url}",
     maxFileSize = appConfig.Upscan.maxFileSize
   )
