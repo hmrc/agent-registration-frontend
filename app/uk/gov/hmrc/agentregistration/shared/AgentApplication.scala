@@ -28,7 +28,6 @@ import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
 
 import java.time.Clock
 import java.time.Instant
-import scala.annotation.nowarn
 
 /** Agent (Registration) Application. This final case class represents the data entered by a user for registering as an agent.
   */
