@@ -29,16 +29,6 @@ import java.time.Clock
 import java.time.Instant
 import scala.annotation.nowarn
 
-sealed trait IsIncorporated
-extends AgentApplication:
-
-  def companyStatusCheckResult: Option[CompanyStatusCheckResult]
-  // derived stuff:
-  def companyProfile: CompanyProfile
-
-//sealed trait IsNotIncorporated
-//extends AgentApplication
-
 /** Agent (Registration) Application. This final case class represents the data entered by a user for registering as an agent.
   */
 sealed trait AgentApplication:
@@ -183,18 +173,15 @@ final case class AgentApplicationLlp(
   override val amlsDetails: Option[AmlsDetails],
   override val agentDetails: Option[AgentDetails],
   override val entityCheckResult: Option[EntityCheckResult],
-  override val companyStatusCheckResult: Option[CompanyStatusCheckResult],
+  companyStatusCheckResult: Option[CompanyStatusCheckResult],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
-extends AgentApplication,
-  IsIncorporated:
+extends AgentApplication:
 
   override val businessType: BusinessType.Partnership.LimitedLiabilityPartnership.type = BusinessType.Partnership.LimitedLiabilityPartnership
 
   def getBusinessDetails: BusinessDetailsLlp = businessDetails.getOrThrowExpectedDataMissing("businessDetails")
   def getCrn: Crn = getBusinessDetails.companyProfile.companyNumber
-
-  override def companyProfile: CompanyProfile = getBusinessDetails.companyProfile
 
 /** Application for Limited Company. This final case class represents the data entered by a user for registering as a Limited Company.
   */
@@ -211,14 +198,12 @@ final case class AgentApplicationLimitedCompany(
   override val amlsDetails: Option[AmlsDetails],
   override val agentDetails: Option[AgentDetails],
   override val entityCheckResult: Option[EntityCheckResult],
-  override val companyStatusCheckResult: Option[CompanyStatusCheckResult],
+  companyStatusCheckResult: Option[CompanyStatusCheckResult],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
-extends AgentApplication,
-  IsIncorporated:
+extends AgentApplication:
 
   override val businessType: BusinessType.LimitedCompany.type = BusinessType.LimitedCompany
-  override def companyProfile: CompanyProfile = getBusinessDetails.companyProfile
 
   def getBusinessDetails: BusinessDetailsLimitedCompany = businessDetails.getOrThrowExpectedDataMissing("businessDetails")
   def getCrn: Crn = getBusinessDetails.companyProfile.companyNumber
@@ -260,14 +245,12 @@ final case class AgentApplicationLimitedPartnership(
   override val amlsDetails: Option[AmlsDetails],
   override val agentDetails: Option[AgentDetails],
   override val entityCheckResult: Option[EntityCheckResult],
-  override val companyStatusCheckResult: Option[CompanyStatusCheckResult],
+  companyStatusCheckResult: Option[CompanyStatusCheckResult],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
-extends AgentApplication,
-  IsIncorporated:
+extends AgentApplication:
 
   override val businessType: BusinessType.Partnership.LimitedPartnership.type = BusinessType.Partnership.LimitedPartnership
-  override def companyProfile: CompanyProfile = getBusinessDetails.companyProfile
 
   def getBusinessDetails: BusinessDetailsPartnership = businessDetails.getOrThrowExpectedDataMissing("businessDetails")
   def getCrn: Crn = getBusinessDetails.companyProfile.companyNumber
@@ -285,14 +268,12 @@ final case class AgentApplicationScottishLimitedPartnership(
   override val amlsDetails: Option[AmlsDetails],
   override val agentDetails: Option[AgentDetails],
   override val entityCheckResult: Option[EntityCheckResult],
-  override val companyStatusCheckResult: Option[CompanyStatusCheckResult],
+  companyStatusCheckResult: Option[CompanyStatusCheckResult],
   override val hmrcStandardForAgentsAgreed: StateOfAgreement
 )
-extends AgentApplication,
-  IsIncorporated:
+extends AgentApplication:
 
   override val businessType: BusinessType.Partnership.ScottishLimitedPartnership.type = BusinessType.Partnership.ScottishLimitedPartnership
-  override def companyProfile: CompanyProfile = getBusinessDetails.companyProfile
 
   def getBusinessDetails: BusinessDetailsPartnership = businessDetails.getOrThrowExpectedDataMissing("businessDetails")
   def getCrn: Crn = getBusinessDetails.companyProfile.companyNumber

@@ -17,8 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 
 import play.api.mvc.*
-import uk.gov.hmrc.agentregistration.shared.CompanyStatusCheckResult
-import uk.gov.hmrc.agentregistration.shared.IsIncorporated
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController

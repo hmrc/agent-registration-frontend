@@ -92,9 +92,12 @@ extends FrontendController(mcc, actions):
         .getCompanyHouseStatus(agentApplication.dontCallMe_getCompanyProfile.companyNumber)
         .map(_.toCompanyStatusCheckResult)
       _ <- agentApplicationService
-        .upsert(agentApplication
-          .modify(_.companyStatusCheckResult)
-          .setTo(Some(companyStatusCheckResult)))
+        .upsert:
+          agentApplication match
+            case a: AgentApplicationLimitedCompany => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
+            case a: AgentApplicationLimitedPartnership => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
+            case a: AgentApplicationLlp => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
+            case a: AgentApplicationScottishLimitedPartnership => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
     yield companyStatusCheckResult match
       case CompanyStatusCheckResult.Allow => Redirect(nextPage)
       case CompanyStatusCheckResult.Block => Redirect(AppRoutes.apply.CompanyStatusBlockController.showBlockedPage)
