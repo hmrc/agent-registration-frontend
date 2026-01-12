@@ -158,8 +158,8 @@ object DisjointUnions:
       val isInRight = childRepr <:< rightRepr
 
       (isInLeft, isInRight) match
-        case (true, true) => errors += s"OVERLAP: '$childSymbolName' appears in both '$leftName' and '$rightName'. Remove it from one of them."
-        case (false, false) => errors += s"MISSING: '$childSymbolName' is not covered by either '$leftName' or '$rightName'. Add it to exactly one."
+        case (true, true) => errors += s"OVERLAP: '$childSymbolName' appears in both '$leftName' and '$rightName'. Remove it from one of them.\n"
+        case (false, false) => errors += s"MISSING: '$childSymbolName' is not covered by either '$leftName' or '$rightName'. Add it to exactly one.\n"
         case _ => // OK - in exactly one
     if errors.nonEmpty then
       val parentName = Type.show[Parent]
@@ -180,7 +180,7 @@ object DisjointUnions:
       report.errorAndAbort(errors.mkString(
         s"$header\n  • ",
         "\n  • ",
-        ""
+        "\n"
       ))
 
     '{ () }

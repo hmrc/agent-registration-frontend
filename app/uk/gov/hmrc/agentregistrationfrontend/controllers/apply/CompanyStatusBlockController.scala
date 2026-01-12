@@ -41,7 +41,7 @@ extends FrontendController(mcc, actions):
       .ensure(
         condition =
           _.agentApplication match
-            case a: IsIncorporated => a.companyStatusCheckResult.exists(_ === CompanyStatusCheckResult.Block)
+            case a: AgentApplication.IsIncorporated => a.companyStatusCheckResult.exists(_ === CompanyStatusCheckResult.Block)
             case _ => false,
         resultWhenConditionNotMet =
           implicit request =>

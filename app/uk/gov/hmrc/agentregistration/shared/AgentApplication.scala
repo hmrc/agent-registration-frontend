@@ -23,6 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
 import uk.gov.hmrc.agentregistration.shared.businessdetails.*
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
+import uk.gov.hmrc.agentregistration.shared.util.DisjointUnions
 import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
 
 import java.time.Clock
@@ -73,24 +74,16 @@ sealed trait AgentApplication:
 
   def hasPassedAllEntityChecks: Boolean =
     this match
-      case a: IsIncorporated =>
+      case a: AgentApplication.IsIncorporated =>
         (a.entityCheckResult, a.companyStatusCheckResult) match
           case (Some(EntityCheckResult.Pass), Some(CompanyStatusCheckResult.Allow)) => true
           case _ => false
-      case a: AgentApplication =>
+      case a: AgentApplication.IsNotIncorporated =>
         a.entityCheckResult match
           case Some(EntityCheckResult.Pass) => true
           case _ => false
 
   def getUserRole: UserRole = userRole.getOrElse(expectedDataNotDefinedError("userRole"))
-
-  def isIncorporated: Boolean =
-    businessType match
-      case BusinessType.Partnership.LimitedLiabilityPartnership => true
-      case BusinessType.LimitedCompany => true
-      case BusinessType.Partnership.LimitedPartnership => true
-      case BusinessType.Partnership.ScottishLimitedPartnership => true
-      case _ => false
 
   def getApplicantContactDetails: ApplicantContactDetails = applicantContactDetails.getOrThrowExpectedDataMissing("agentDetails")
   def getAgentDetails: AgentDetails = agentDetails.getOrThrowExpectedDataMissing("agentDetails")
@@ -300,6 +293,24 @@ extends AgentApplication:
   def getBusinessDetails: BusinessDetailsScottishPartnership = businessDetails.getOrThrowExpectedDataMissing("businessDetails")
 
 object AgentApplication:
+
+  type IsIncorporated =
+    (AgentApplicationLimitedCompany
+      | AgentApplicationLimitedPartnership
+      | AgentApplicationLlp
+      | AgentApplicationScottishLimitedPartnership) & AgentApplication
+
+  type IsNotIncorporated =
+    (AgentApplicationSoleTrader
+      | AgentApplicationGeneralPartnership
+      | AgentApplicationScottishPartnership) & AgentApplication
+
+  private object CompilationProofs:
+    DisjointUnions.prove[
+      AgentApplication,
+      IsIncorporated,
+      IsNotIncorporated
+    ]
 
   @nowarn()
   given format: OFormat[AgentApplication] =

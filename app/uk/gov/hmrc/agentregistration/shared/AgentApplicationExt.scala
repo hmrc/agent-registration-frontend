@@ -18,15 +18,16 @@ package uk.gov.hmrc.agentregistration.shared
 
 import uk.gov.hmrc.agentregistration.shared.businessdetails.CompanyProfile
 
-type IsIncorporated =
-  (AgentApplicationLimitedCompany
-    | AgentApplicationLimitedPartnership
-    | AgentApplicationLlp
-    | AgentApplicationScottishLimitedPartnership) & AgentApplication
+extension (agentApplication: AgentApplication)
 
-extension (agentApplication: IsIncorporated)
+  def isIncorporated: Boolean =
+    agentApplication match
+      case _: AgentApplication.IsIncorporated => true
+      case _: AgentApplication.IsNotIncorporated => false
 
-  def companyProfile: CompanyProfile =
+extension (agentApplication: AgentApplication.IsIncorporated)
+
+  def getCompanyProfile: CompanyProfile =
     agentApplication match
       case a: AgentApplicationLimitedCompany => a.getBusinessDetails.companyProfile
       case a: AgentApplicationLimitedPartnership => a.getBusinessDetails.companyProfile

@@ -70,7 +70,7 @@ extends FrontendController(mcc, actions):
     .ensure(
       condition =
         _.agentApplication match
-          case a: IsIncorporated => a.companyStatusCheckResult.isEmpty
+          case a: AgentApplication.IsIncorporated => a.companyStatusCheckResult.isEmpty
           case _ => true,
       resultWhenConditionNotMet =
         implicit request =>
@@ -80,13 +80,13 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         request.agentApplication match
-          case a: IsIncorporated => doCompanyStatusCheck(a)
-          case _ =>
+          case a: AgentApplication.IsIncorporated => doCompanyStatusCheck(a)
+          case _: AgentApplication.IsNotIncorporated =>
             Future.failed[Result](
               new RuntimeException(s"Unexpected application type: ${getClass.getSimpleName}.")
             )
 
-  private def doCompanyStatusCheck(agentApplication: IsIncorporated)(using request: AuthorisedRequest[?]): Future[Result] =
+  private def doCompanyStatusCheck(agentApplication: AgentApplication.IsIncorporated)(using request: AuthorisedRequest[?]): Future[Result] =
     for
       companyStatusCheckResult: CompanyStatusCheckResult <- companiesHouseApiProxyConnector
         .getCompanyHouseStatus(agentApplication.dontCallMe_getCompanyProfile.companyNumber)
