@@ -89,7 +89,7 @@ extends FrontendController(mcc, actions):
   private def doCompanyStatusCheck(agentApplication: IsIncorporated)(using request: AuthorisedRequest[?]): Future[Result] =
     for
       companyStatusCheckResult: CompanyStatusCheckResult <- companiesHouseApiProxyConnector
-        .getCompanyHouseStatus(agentApplication.getCompanyProfile.companyNumber)
+        .getCompanyHouseStatus(agentApplication.dontCallMe_getCompanyProfile.companyNumber)
         .map(_.toCompanyStatusCheckResult)
       _ <- agentApplicationService
         .upsert(agentApplication

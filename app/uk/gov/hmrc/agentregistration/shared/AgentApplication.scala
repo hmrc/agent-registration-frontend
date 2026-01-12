@@ -105,7 +105,8 @@ sealed trait AgentApplication:
   def getApplicantContactDetails: ApplicantContactDetails = applicantContactDetails.getOrThrowExpectedDataMissing("agentDetails")
   def getAgentDetails: AgentDetails = agentDetails.getOrThrowExpectedDataMissing("agentDetails")
 
-  def getCompanyProfile: CompanyProfile =
+  // TODO: This method is a bug and is called even if the application is not an Incorporated one.
+  def dontCallMe_getCompanyProfile: CompanyProfile =
     businessType match
       case BusinessType.Partnership.LimitedLiabilityPartnership => this.asLlpApplication.getBusinessDetails.companyProfile
       case BusinessType.LimitedCompany => this.asLimitedCompanyApplication.getBusinessDetails.companyProfile
@@ -118,7 +119,8 @@ sealed trait AgentApplication:
     businessType match
       case BusinessType.Partnership.LimitedLiabilityPartnership => this.asLlpApplication.getBusinessDetails.saUtr.asUtr
       case BusinessType.SoleTrader => this.asSoleTraderApplication.getBusinessDetails.saUtr.asUtr
-      case BusinessType.LimitedCompany => this.asLimitedCompanyApplication.getBusinessDetails.ctUtr.asUtr
+
+      case BusinessType.LimitedCompany => this.asLimitedCompanyApplication.getBusinessDetails.ctUtr.asUtr // incorporated
       case BusinessType.Partnership.GeneralPartnership => this.asGeneralPartnershipApplication.getBusinessDetails.saUtr.asUtr
       case BusinessType.Partnership.LimitedPartnership => this.asLimitedPartnershipApplication.getBusinessDetails.saUtr.asUtr
       case BusinessType.Partnership.ScottishLimitedPartnership => this.asScottishLimitedPartnershipApplication.getBusinessDetails.saUtr.asUtr

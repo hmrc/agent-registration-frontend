@@ -152,7 +152,7 @@ extends FrontendController(mcc, actions):
       if !agentApplication.isIncorporated then None
       else
         agentApplication
-          .getCompanyProfile
+          .dontCallMe_getCompanyProfile
           .unsanitisedCHROAddress
 
     AddressOptions(
