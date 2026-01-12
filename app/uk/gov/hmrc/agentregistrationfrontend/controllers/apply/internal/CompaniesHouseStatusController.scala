@@ -53,29 +53,6 @@ extends FrontendController(mcc, actions):
           Redirect(AppRoutes.apply.TaskListController.show)
     )
     .ensure(
-      condition =
-        implicit request =>
-          if (request.agentApplication.businessType === BusinessType.SoleTrader)
-            request
-              .agentApplication
-              .asSoleTraderApplication
-              .deceasedCheck
-              .isDefined
-          else
-            request.agentApplication
-              .refusalToDealWithCheck
-              .isDefined,
-      resultWhenConditionNotMet =
-        implicit request =>
-          if (request.agentApplication.businessType === BusinessType.SoleTrader) {
-            logger.warn("Deceased verification has not been completed. Redirecting to deceased check.")
-            Redirect(AppRoutes.apply.internal.DeceasedController.check())
-          }
-          else
-            logger.warn("Refusal to deal with verification has not been completed. Redirecting to refusal to deal with check.")
-            Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
-    )
-    .ensure(
       condition = _.agentApplication.companyStatusCheckResult.forall(_ === EntityCheckResult.Fail),
       resultWhenConditionNotMet =
         implicit request =>
