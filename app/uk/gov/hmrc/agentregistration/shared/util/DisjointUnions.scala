@@ -246,17 +246,6 @@ object DisjointUnions:
         s"$header\n  ",
         "\n  ",
         ""
-
-//    if errors.nonEmpty then
-//      val leftTypeName = Type.show[L]
-//      val rightTypeName = Type.show[R]
-//      val parentTypeName = Type.show[Parent]
-//      val header = s"Disjoint union check failed for '$parentTypeName' partitioned into:\n  :  $leftTypeName\n  : $rightTypeName\n\nErrors:"
-//
-//      report.errorAndAbort(errors.mkString(
-//        s"$header\n  - ",
-//        "\n  - ",
-//        ""
       ))
 
     '{ () }
