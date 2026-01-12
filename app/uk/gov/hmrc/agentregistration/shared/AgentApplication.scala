@@ -312,7 +312,7 @@ object AgentApplication:
       IsNotIncorporated
     ]
 
-  @nowarn()
+//  @nowarn()
   given format: OFormat[AgentApplication] =
     given OFormat[AgentApplicationSoleTrader] = Json.format[AgentApplicationSoleTrader]
     given OFormat[AgentApplicationLlp] = Json.format[AgentApplicationLlp]
@@ -323,10 +323,10 @@ object AgentApplication:
     given OFormat[AgentApplicationScottishPartnership] = Json.format[AgentApplicationScottishPartnership]
     given JsonConfiguration = JsonConfig.jsonConfiguration
 
-    val dontDeleteMe = """
-                         |Don't delete me.
-                         |I will emit a warning so `@nowarn` can be applied to address below
-                         |`Unreachable case except for null` problem emited by Play Json macro"""
+//    val dontDeleteMe = """
+//                         |Don't delete me.
+//                         |I will emit a warning so `@nowarn` can be applied to address below
+//                         |`Unreachable case except for null` problem emited by Play Json macro"""
 
     Json.format[AgentApplication]
 
