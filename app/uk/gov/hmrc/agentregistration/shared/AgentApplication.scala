@@ -28,6 +28,7 @@ import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
 
 import java.time.Clock
 import java.time.Instant
+import scala.annotation.nowarn
 
 /** Agent (Registration) Application. This final case class represents the data entered by a user for registering as an agent.
   */
@@ -293,6 +294,24 @@ extends AgentApplication:
 
 object AgentApplication:
 
+  @nowarn()
+  given format: OFormat[AgentApplication] =
+    given OFormat[AgentApplicationSoleTrader] = Json.format[AgentApplicationSoleTrader]
+    given OFormat[AgentApplicationLlp] = Json.format[AgentApplicationLlp]
+    given OFormat[AgentApplicationLimitedCompany] = Json.format[AgentApplicationLimitedCompany]
+    given OFormat[AgentApplicationGeneralPartnership] = Json.format[AgentApplicationGeneralPartnership]
+    given OFormat[AgentApplicationLimitedPartnership] = Json.format[AgentApplicationLimitedPartnership]
+    given OFormat[AgentApplicationScottishLimitedPartnership] = Json.format[AgentApplicationScottishLimitedPartnership]
+    given OFormat[AgentApplicationScottishPartnership] = Json.format[AgentApplicationScottishPartnership]
+    given JsonConfiguration = JsonConfig.jsonConfiguration
+
+    val dontDeleteMe = """
+                         |Don't delete me.
+                         |I will emit a warning so `@nowarn` can be applied to address below
+                         |`Unreachable case except for null` problem emited by Play Json macro"""
+
+    Json.format[AgentApplication]
+
   type IsIncorporated =
     (AgentApplicationLimitedCompany
       | AgentApplicationLimitedPartnership
@@ -310,23 +329,5 @@ object AgentApplication:
       IsIncorporated,
       IsNotIncorporated
     ]
-
-//  @nowarn()
-  given format: OFormat[AgentApplication] =
-    given OFormat[AgentApplicationSoleTrader] = Json.format[AgentApplicationSoleTrader]
-    given OFormat[AgentApplicationLlp] = Json.format[AgentApplicationLlp]
-    given OFormat[AgentApplicationLimitedCompany] = Json.format[AgentApplicationLimitedCompany]
-    given OFormat[AgentApplicationGeneralPartnership] = Json.format[AgentApplicationGeneralPartnership]
-    given OFormat[AgentApplicationLimitedPartnership] = Json.format[AgentApplicationLimitedPartnership]
-    given OFormat[AgentApplicationScottishLimitedPartnership] = Json.format[AgentApplicationScottishLimitedPartnership]
-    given OFormat[AgentApplicationScottishPartnership] = Json.format[AgentApplicationScottishPartnership]
-    given JsonConfiguration = JsonConfig.jsonConfiguration
-
-//    val dontDeleteMe = """
-//                         |Don't delete me.
-//                         |I will emit a warning so `@nowarn` can be applied to address below
-//                         |`Unreachable case except for null` problem emited by Play Json macro"""
-
-    Json.format[AgentApplication]
 
 private inline def expectedDataNotDefinedError(key: String): Nothing = throw new RuntimeException(s"Expected $key to be defined")
