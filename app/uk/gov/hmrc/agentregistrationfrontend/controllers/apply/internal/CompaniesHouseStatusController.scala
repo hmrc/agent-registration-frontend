@@ -26,6 +26,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CompaniesHouseApiProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import javax.inject.Inject
@@ -59,12 +60,10 @@ extends FrontendController(mcc, actions):
             request
               .agentApplication
               .asSoleTraderApplication
-              .deceasedCheck
-              .isDefined
+              .deceasedCheck === EntityCheckResult.Pass
           else
             request.agentApplication
-              .refusalToDealWithCheck
-              .isDefined,
+              .refusalToDealWithCheck === EntityCheckResult.Pass,
       resultWhenConditionNotMet =
         implicit request =>
           if (request.agentApplication.businessType === BusinessType.SoleTrader) {
@@ -76,7 +75,9 @@ extends FrontendController(mcc, actions):
             Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
     )
     .ensure(
-      condition = _.agentApplication.companyStatusCheckResult.forall(_ === EntityCheckResult.Fail),
+      condition =
+        _.agentApplication
+          .companyStatusCheckResult =!= EntityCheckResult.Pass,
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Company status check already completed successfully. Redirecting to task list.")
@@ -93,10 +94,11 @@ extends FrontendController(mcc, actions):
           _ <- agentApplicationService
             .upsert(agentApplication
               .modify(_.companyStatusCheckResult)
-              .setTo(Some(companyStatusCheckResult)))
+              .setTo(companyStatusCheckResult))
         yield companyStatusCheckResult match
           case EntityCheckResult.Pass => Redirect(nextPage)
           case EntityCheckResult.Fail => Redirect(failedCheckPage)
+          case EntityCheckResult.NotChecked => throwServerErrorException("Companies House status check resulted in NotChecked")
 
   private def failedCheckPage = AppRoutes.apply.entitycheckfailed.CanNotRegisterCompanyOrPartnershipController.show
   private def nextPage: Call = AppRoutes.apply.TaskListController.show

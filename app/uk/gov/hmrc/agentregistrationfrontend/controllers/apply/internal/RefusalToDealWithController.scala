@@ -21,6 +21,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
@@ -53,7 +54,7 @@ extends FrontendController(mcc, actions):
           Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
     )
     .ensure(
-      condition = _.agentApplication.refusalToDealWithCheck.forall(_ === EntityCheckResult.Fail),
+      condition = _.agentApplication.refusalToDealWithCheck =!= EntityCheckResult.Pass,
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Refusal to deal with verification already done and passed. Redirecting to next check.")
@@ -67,10 +68,11 @@ extends FrontendController(mcc, actions):
           _ <- agentApplicationService
             .upsert(request.agentApplication
               .modify(_.refusalToDealWithCheck)
-              .setTo(Some(checkResult)))
+              .setTo(checkResult))
         yield checkResult match
           case EntityCheckResult.Pass => Redirect(nextPage)
           case EntityCheckResult.Fail => Redirect(failedCheckPage)
+          case EntityCheckResult.NotChecked => throwServerErrorException("Refusal to deal with check resulted in NotChecked")
 
   private def failedCheckPage = AppRoutes.apply.entitycheckfailed.CanNotRegisterController.show
   private def nextPage(implicit request: AgentApplicationRequest[AnyContent]) =

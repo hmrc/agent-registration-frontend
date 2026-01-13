@@ -41,8 +41,7 @@ extends FrontendController(mcc, actions):
       .ensure(
         condition =
           _.agentApplication
-            .companyStatusCheckResult
-            .exists(_ === Fail),
+            .companyStatusCheckResult === Fail,
         resultWhenConditionNotMet =
           implicit request =>
             logger.warn("Company status check has not been blocked. Redirecting to company status check.")

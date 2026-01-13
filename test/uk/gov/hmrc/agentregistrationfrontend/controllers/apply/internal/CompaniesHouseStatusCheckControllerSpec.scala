@@ -40,12 +40,12 @@ extends ControllerSpec:
         .agentApplicationLlp
         .afterHmrcEntityVerificationPass
 
-    val afterCompaniesHouseStatusAllow =
+    val afterCompaniesHouseStatusCheckPass =
       tdAll
         .agentApplicationLlp
         .afterCompaniesHouseStatusCheckPass
 
-    val afterCompaniesHouseStatusBlock =
+    val afterCompaniesHouseStatusCheckFail =
       tdAll
         .agentApplicationLlp
         .afterCompaniesHouseStatusCheckFail
@@ -61,10 +61,10 @@ extends ControllerSpec:
       url = path
     )
 
-  s"GET $path should update application with active company status and redirect to task list when company is active" in:
+  s"GET $path should update application with pass company status check and redirect to task list when company is active" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterHmrcEntityVerificationPass)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterCompaniesHouseStatusAllow)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterCompaniesHouseStatusCheckPass)
     CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompanyHouseStatus.Active.key)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
@@ -77,7 +77,7 @@ extends ControllerSpec:
   s"GET $path should update application with fail status and open company status fail page when company status is blocked" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterHmrcEntityVerificationPass)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterCompaniesHouseStatusBlock)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterCompaniesHouseStatusCheckFail)
     CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompanyHouseStatus.Closed.key)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
@@ -98,7 +98,7 @@ extends ControllerSpec:
 
   s"GET $path should redirect to task list page when entity verification already done" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterCompaniesHouseStatusAllow)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterCompaniesHouseStatusCheckPass)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe nextPageUrl

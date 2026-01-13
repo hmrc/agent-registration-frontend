@@ -41,8 +41,8 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       applicantContactDetails = None,
       amlsDetails = None,
       agentDetails = None,
-      refusalToDealWithCheck = None,
-      companyStatusCheckResult = None,
+      refusalToDealWithCheck = EntityCheckResult.NotChecked,
+      companyStatusCheckResult = EntityCheckResult.NotChecked,
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
     )
 
@@ -54,19 +54,19 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
     )
 
     val afterHmrcEntityVerificationPass: AgentApplicationLlp = afterGrsDataReceived.copy(
-      refusalToDealWithCheck = Some(EntityCheckResult.Pass)
+      refusalToDealWithCheck = EntityCheckResult.Pass
     )
 
     val afterHmrcEntityVerificationFail: AgentApplicationLlp = afterGrsDataReceived.copy(
-      refusalToDealWithCheck = Some(EntityCheckResult.Fail)
+      refusalToDealWithCheck = EntityCheckResult.Fail
     )
 
     val afterCompaniesHouseStatusCheckPass: AgentApplicationLlp = afterHmrcEntityVerificationPass.copy(
-      companyStatusCheckResult = Some(EntityCheckResult.Pass)
+      companyStatusCheckResult = EntityCheckResult.Pass
     )
 
     val afterCompaniesHouseStatusCheckFail: AgentApplicationLlp = afterHmrcEntityVerificationPass.copy(
-      companyStatusCheckResult = Some(EntityCheckResult.Fail)
+      companyStatusCheckResult = EntityCheckResult.Fail
     )
 
     val afterContactDetailsComplete: AgentApplicationLlp = afterCompaniesHouseStatusCheckPass.copy(

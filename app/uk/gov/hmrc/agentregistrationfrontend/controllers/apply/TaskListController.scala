@@ -54,7 +54,7 @@ extends FrontendController(mcc, actions):
     )
     .ensure(
       _.agentApplication
-        .hasEntityCheckPassed.forall(_ === true),
+        .hasEntityCheckPassed === true,
       implicit request =>
         logger.warn("Entity failed or has not been completed, redirecting to entity check.")
         Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())

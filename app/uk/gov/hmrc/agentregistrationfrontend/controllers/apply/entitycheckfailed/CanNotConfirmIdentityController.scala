@@ -42,8 +42,7 @@ extends FrontendController(mcc, actions):
         condition =
           _.agentApplication
             .asSoleTraderApplication
-            .deceasedCheck
-            .exists(_ === Fail),
+            .deceasedCheck === Fail,
         resultWhenConditionNotMet =
           implicit request =>
             logger.warn("Deceased check has not failed. Redirecting to deceased check.")

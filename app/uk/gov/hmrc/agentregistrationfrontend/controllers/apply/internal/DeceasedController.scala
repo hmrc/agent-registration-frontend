@@ -22,6 +22,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.EntityCheckResult.*
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CitizenDetailsConnector
@@ -47,8 +48,7 @@ extends FrontendController(mcc, actions):
     .ensure(
       condition =
         _.agentApplication
-          .refusalToDealWithCheck
-          .isDefined,
+          .refusalToDealWithCheck === EntityCheckResult.Pass,
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Entity verification has not been done. Redirecting to entity check.")
@@ -62,7 +62,7 @@ extends FrontendController(mcc, actions):
           Redirect(nextPage)
     )
     .ensure(
-      condition = _.agentApplication.asSoleTraderApplication.deceasedCheck.forall(_ === EntityCheckResult.Fail),
+      condition = _.agentApplication.asSoleTraderApplication.deceasedCheck =!= EntityCheckResult.Pass,
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Deceased verification already done. Redirecting to company status check.")
@@ -87,10 +87,11 @@ extends FrontendController(mcc, actions):
             .upsert(request.agentApplication
               .asSoleTraderApplication
               .modify(_.deceasedCheck)
-              .setTo(Some(checkResult)))
+              .setTo(checkResult))
         yield checkResult match
           case EntityCheckResult.Pass => Redirect(nextPage)
           case EntityCheckResult.Fail => Redirect(failedCheckPage)
+          case EntityCheckResult.NotChecked => throwServerErrorException("CitizenDetails check resulted in NotChecked")
 
   private def failedCheckPage = AppRoutes.apply.entitycheckfailed.CanNotConfirmIdentityController.show
   private def nextPage = AppRoutes.apply.internal.CompaniesHouseStatusController.check()
