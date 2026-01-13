@@ -17,9 +17,14 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal
 
 import com.softwaremill.quicklens.*
-import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.Call
+import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CompaniesHouseApiProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -91,25 +96,22 @@ extends FrontendController(mcc, actions):
               new RuntimeException(s"Unexpected application type: ${getClass.getSimpleName}.")
             )
 
-
-
-      private def doCompanyStatusCheck(agentApplication: AgentApplication.IsIncorporated)(using request: AuthorisedRequest[?]): Future[Result] =
-
-        for
-          companyStatusCheckResult <- companiesHouseApiProxyConnector
-            .getCompanyHouseStatus(agentApplication.dontCallMe_getCompanyProfile..companyNumber)
-            .map(_.toEntityCheckResult)
-          _ <- agentApplicationService
-          _ <- agentApplicationService
-      .upsert:
-        agentApplication match
-          case a: AgentApplicationLimitedCompany => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
-          case a: AgentApplicationLimitedPartnership => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
-          case a: AgentApplicationLlp => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
-          case a: AgentApplicationScottishLimitedPartnership => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
-  yield companyStatusCheckResult match          case EntityCheckResult.Pass => Redirect(nextPage)
-          case EntityCheckResult.Fail => Redirect(failedCheckPage)
-          case EntityCheckResult.NotChecked => throwServerErrorException("Companies House status check resulted in NotChecked")
+  private def doCompanyStatusCheck(agentApplication: AgentApplication.IsIncorporated)(using request: AuthorisedRequest[?]): Future[Result] =
+    for
+      companyStatusCheckResult <- companiesHouseApiProxyConnector
+        .getCompanyHouseStatus(agentApplication.dontCallMe_getCompanyProfile.companyNumber)
+        .map(_.toEntityCheckResult)
+      _ <- agentApplicationService
+        .upsert:
+          agentApplication match
+            case a: AgentApplicationLimitedCompany => a.modify(_.companyStatusCheckResult).setTo(companyStatusCheckResult)
+            case a: AgentApplicationLimitedPartnership => a.modify(_.companyStatusCheckResult).setTo(companyStatusCheckResult)
+            case a: AgentApplicationLlp => a.modify(_.companyStatusCheckResult).setTo(companyStatusCheckResult)
+            case a: AgentApplicationScottishLimitedPartnership => a.modify(_.companyStatusCheckResult).setTo(companyStatusCheckResult)
+    yield companyStatusCheckResult match
+      case EntityCheckResult.Pass => Redirect(nextPage)
+      case EntityCheckResult.Fail => Redirect(failedCheckPage)
+      case EntityCheckResult.NotChecked => throwServerErrorException("Companies House status check resulted in NotChecked")
 
   private def failedCheckPage = AppRoutes.apply.entitycheckfailed.CanNotRegisterCompanyOrPartnershipController.show
   private def nextPage: Call = AppRoutes.apply.TaskListController.show

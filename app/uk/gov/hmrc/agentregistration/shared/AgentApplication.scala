@@ -21,6 +21,7 @@ import uk.gov.hmrc.agentregistration.shared.businessdetails.*
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.util.DisjointUnions
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import java.time.Clock
 import java.time.Instant
@@ -68,34 +69,6 @@ sealed trait AgentApplication:
       case ApplicationState.GrsDataReceived => true
       case ApplicationState.Submitted => true
 
-  def hasPassedAllEntityChecks: Boolean =
-    this match
-      case a: AgentApplicationLlp =>
-        a.getEntityCheckResult === EntityCheckResult.Pass &&
-        a.getCompanyStatusCheckResult === CompanyStatusCheckResult.Allow
-      case a: AgentApplicationLimitedCompany =>
-        a.getEntityCheckResult === EntityCheckResult.Pass &&
-        a.getCompanyStatusCheckResult === CompanyStatusCheckResult.Allow
-      case a: AgentApplicationLimitedPartnership =>
-        a.getEntityCheckResult === EntityCheckResult.Pass &&
-        a.getCompanyStatusCheckResult === CompanyStatusCheckResult.Allow
-      case a: AgentApplicationGeneralPartnership => a.getEntityCheckResult === EntityCheckResult.Pass
-      case a: AgentApplicationScottishLimitedPartnership =>
-        a.getEntityCheckResult === EntityCheckResult.Pass &&
-        a.getCompanyStatusCheckResult === CompanyStatusCheckResult.Allow
-      case a: AgentApplicationScottishPartnership =>
-        a.getEntityCheckResult === EntityCheckResult.Pass &&
-        a.getCompanyStatusCheckResult === CompanyStatusCheckResult.Allow
-      case a: AgentApplicationSoleTrader => a.getEntityCheckResult === EntityCheckResult.Pass // TODO: add deceased check outcome when implemented
-
-  def isIncorporated: Boolean =
-    businessType match
-      case BusinessType.Partnership.LimitedLiabilityPartnership => true
-      case BusinessType.LimitedCompany => true
-      case BusinessType.Partnership.LimitedPartnership => true
-      case BusinessType.Partnership.ScottishLimitedPartnership => true
-      case _ => false
-
   def getUserRole: UserRole = userRole.getOrElse(expectedDataNotDefinedError("userRole"))
 
   def getApplicantContactDetails: ApplicantContactDetails = applicantContactDetails.getOrThrowExpectedDataMissing("agentDetails")
@@ -126,7 +99,7 @@ sealed trait AgentApplication:
 
   def hasEntityCheckPassed: Boolean =
     (refusalToDealWithCheck, companyStatusCheckResult) match
-      case (Pass, Pass) => true
+      case (EntityCheckResult.Pass, EntityCheckResult.Pass) => true
       case _ => false
 
   private def as[T <: AgentApplication](using ct: reflect.ClassTag[T]): Option[T] =
@@ -171,7 +144,7 @@ extends AgentApplication:
 
   override def hasEntityCheckPassed: Boolean =
     (refusalToDealWithCheck, deceasedCheck) match
-      case (Pass, Pass) => true
+      case (EntityCheckResult.Pass, EntityCheckResult.Pass) => true
       case _ => false
 
   def getBusinessDetails: BusinessDetailsSoleTrader = businessDetails.getOrElse(expectedDataNotDefinedError("businessDetails"))
@@ -317,7 +290,7 @@ extends AgentApplication:
 
   override val businessType: BusinessType.Partnership.ScottishPartnership.type = BusinessType.Partnership.ScottishPartnership
 
-  override def hasEntityCheckPassed: Boolean = refusalToDealWithCheck === Pass
+  override def hasEntityCheckPassed: Boolean = refusalToDealWithCheck === EntityCheckResult.Pass
 
   def getBusinessDetails: BusinessDetailsScottishPartnership = businessDetails.getOrThrowExpectedDataMissing("businessDetails")
 

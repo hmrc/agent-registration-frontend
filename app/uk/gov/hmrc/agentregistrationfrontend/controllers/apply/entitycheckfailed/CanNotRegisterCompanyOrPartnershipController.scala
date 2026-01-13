@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.entitycheckfailed
 
 import play.api.mvc.*
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.EntityCheckResult.Fail
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions

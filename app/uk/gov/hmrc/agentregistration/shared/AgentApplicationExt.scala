@@ -34,7 +34,7 @@ extension (agentApplication: AgentApplication.IsIncorporated)
       case a: AgentApplicationLlp => a.getBusinessDetails.companyProfile
       case a: AgentApplicationScottishLimitedPartnership => a.getBusinessDetails.companyProfile
 
-  def companyStatusCheckResult: Option[CompanyStatusCheckResult] =
+  def companyStatusCheckResult: EntityCheckResult =
     agentApplication match
       case a: AgentApplicationLimitedCompany => a.companyStatusCheckResult
       case a: AgentApplicationLimitedPartnership => a.companyStatusCheckResult

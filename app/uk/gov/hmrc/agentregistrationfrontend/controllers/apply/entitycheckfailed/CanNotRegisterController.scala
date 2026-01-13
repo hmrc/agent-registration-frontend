@@ -50,5 +50,5 @@ extends FrontendController(mcc, actions):
         implicit request =>
           Ok(canNotRegisterPage(request
             .agentApplication
-            .getCompanyProfile
+            .dontCallMe_getCompanyProfile
             .companyName))
