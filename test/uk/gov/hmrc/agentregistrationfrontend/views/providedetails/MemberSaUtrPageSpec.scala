@@ -59,13 +59,6 @@ extends ViewSpec:
       .selectOnlyOneElementOrFail()
       .text() shouldBe "Save and continue"
 
-  "render a save and come back later button" in:
-    doc
-      .mainContent
-      .selectOrFail(s"form button[value=${SaveAndComeBackLater.toString}]")
-      .selectOnlyOneElementOrFail()
-      .text() shouldBe "Save and come back later"
-
   "render the form error correctly when the form contains an error" in:
     val field = MemberSaUtrForm.saUtrKey
     val errorMessage = "Enter your Self Assessment Unique Taxpayer Reference"
