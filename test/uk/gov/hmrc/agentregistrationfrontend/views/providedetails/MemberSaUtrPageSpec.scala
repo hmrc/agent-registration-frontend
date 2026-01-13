@@ -22,7 +22,6 @@ import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.forms.MemberSaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberSaUtrPage
