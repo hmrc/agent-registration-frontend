@@ -22,7 +22,6 @@ import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.forms.MemberNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.MemberNinoPage
@@ -58,13 +57,6 @@ extends ViewSpec:
       .selectOrFail(s"form button[value='${SaveAndContinue.toString}']")
       .selectOnlyOneElementOrFail()
       .text() shouldBe "Save and continue"
-
-  "render a save and come back later button" in:
-    doc
-      .mainContent
-      .selectOrFail(s"form button[value=${SaveAndComeBackLater.toString}]")
-      .selectOnlyOneElementOrFail()
-      .text() shouldBe "Save and come back later"
 
   "render the form error correctly when the form contains an error" in:
     val field = MemberNinoForm.ninoKey
