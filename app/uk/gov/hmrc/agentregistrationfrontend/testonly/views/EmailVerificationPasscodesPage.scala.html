@@ -24,7 +24,8 @@
         appConfig: AppConfig,
         layout: Layout,
         copyButton: CopyButton,
-        govukButton: GovukButton
+        govukButton: GovukButton,
+        govukNotificationBanner: GovukNotificationBanner
 )
 
 @(
@@ -40,38 +41,39 @@
 }
 @templateStyles = {
     <link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/copy-button.css")}" @{CSPNonce.attr}>
-    <style @{CSPNonce.attr}>
-            .govuk-panel.govuk-panel--confirmation {
-                background-color: rgb(29, 112, 184);
-                color: white;
-            }
-    </style>
 }
 
 @layout(
-    pageTitle = "Email Verification Code (Test Only Page)",
+    pageTitle = "Test only passcode helper",
     templateScripts = Some(templateScripts),
     templateStyles = Some(templateStyles)
 ) {
-    <h1 class="govuk-heading-xl">Email Verification Code (Test Only Page)</h1>
+    @govukNotificationBanner(NotificationBanner(
+      content = Text("This is a test only page. Do not use in production."),
+      bannerType = Some("alert"),
+      classes = "govuk-notification-banner--warning"
+    ))
+    <h1 class="govuk-heading-l">Test only passcode helper</h1>
     @passcode.fold(
         <p class="govuk-body">
         There aren't any email passcodes to display.
         </p>
     ) { passcode =>
+
         <p class="govuk-body">
-        <p class="govuk-body">Here is your email passcode:</p>
-            <p class="govuk-body govuk-!-font-weight-bold">@{passcode.email}</p>
-            <p id="email-verification-passcode" class="govuk-body govuk-!-font-weight-bold">@{passcode.passcode}</p>
-        @copyButton(clip = passcode.passcode)
+          The passcode for <span class="govuk-!-font-weight-bold">@{passcode.email}</span> is <span id="email-verification-passcode" class="govuk-!-font-weight-bold">@{passcode.passcode}</span>
         </p>
+        @copyButton(
+          copyContent = Some(s"Copy passcode `${passcode.passcode}`"),
+          copiedContent = Some(s"Passcode `${passcode.passcode}` copied"),
+          clip = passcode.passcode
+        )
+
     }
     <p class="govuk-body">
-    @govukButton(Button(
-        href = Some(emailVerificationLink),
-        content = Text(messages("common.confirmAndContinue"))
-    ))
+      @govukButton(Button(
+          href = Some(emailVerificationLink),
+          content = Text(messages("common.continue"))
+      ))
     </p>
 }
-
-
