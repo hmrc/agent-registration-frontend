@@ -17,10 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal
 
 import com.softwaremill.quicklens.*
-import play.api.mvc.Action
-import play.api.mvc.AnyContent
-import play.api.mvc.Call
-import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, Result}
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CompaniesHouseApiProxyConnector
@@ -31,6 +28,7 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.Future
 
 @Singleton
 class CompaniesHouseStatusController @Inject() (
@@ -76,27 +74,40 @@ extends FrontendController(mcc, actions):
     )
     .ensure(
       condition =
-        _.agentApplication
-          .companyStatusCheckResult =!= EntityCheckResult.Pass,
+        _.agentApplication match
+          case a: AgentApplication.IsIncorporated => a.companyStatusCheckResult =!= EntityCheckResult.Pass
+          case _ => true,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("Company status check already completed successfully. Redirecting to task list.")
+          logger.warn("Company status already done or not needed. Redirecting to task list page.")
           Redirect(nextPage)
     )
     .async:
       implicit request =>
-        val agentApplication = request.agentApplication
+        request.agentApplication match
+          case a: AgentApplication.IsIncorporated => doCompanyStatusCheck(a)
+          case _: AgentApplication.IsNotIncorporated =>
+            Future.failed[Result](
+              new RuntimeException(s"Unexpected application type: ${getClass.getSimpleName}.")
+            )
+
+
+
+      private def doCompanyStatusCheck(agentApplication: AgentApplication.IsIncorporated)(using request: AuthorisedRequest[?]): Future[Result] =
 
         for
           companyStatusCheckResult <- companiesHouseApiProxyConnector
-            .getCompanyHouseStatus(agentApplication.getCompanyProfile.companyNumber)
+            .getCompanyHouseStatus(agentApplication.dontCallMe_getCompanyProfile..companyNumber)
             .map(_.toEntityCheckResult)
           _ <- agentApplicationService
-            .upsert(agentApplication
-              .modify(_.companyStatusCheckResult)
-              .setTo(companyStatusCheckResult))
-        yield companyStatusCheckResult match
-          case EntityCheckResult.Pass => Redirect(nextPage)
+          _ <- agentApplicationService
+      .upsert:
+        agentApplication match
+          case a: AgentApplicationLimitedCompany => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
+          case a: AgentApplicationLimitedPartnership => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
+          case a: AgentApplicationLlp => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
+          case a: AgentApplicationScottishLimitedPartnership => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
+  yield companyStatusCheckResult match          case EntityCheckResult.Pass => Redirect(nextPage)
           case EntityCheckResult.Fail => Redirect(failedCheckPage)
           case EntityCheckResult.NotChecked => throwServerErrorException("Companies House status check resulted in NotChecked")
 

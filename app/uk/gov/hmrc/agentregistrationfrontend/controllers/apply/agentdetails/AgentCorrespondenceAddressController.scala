@@ -24,7 +24,7 @@ import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.getCompanyProfile
 import uk.gov.hmrc.agentregistration.shared.DesBusinessAddress
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
 import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
@@ -149,11 +149,12 @@ extends FrontendController(mcc, actions):
     bprOption: Option[DesBusinessAddress]
   ): AddressOptions =
     val chroAddressOption: Option[ChroAddress] =
-      if !agentApplication.isIncorporated then None
-      else
-        agentApplication
-          .getCompanyProfile
-          .unsanitisedCHROAddress
+      agentApplication match
+        case a: AgentApplication.IsNotIncorporated => None
+        case a: AgentApplication.IsIncorporated =>
+          a
+            .getCompanyProfile
+            .unsanitisedCHROAddress
 
     AddressOptions(
       chroAddress = chroAddressOption,

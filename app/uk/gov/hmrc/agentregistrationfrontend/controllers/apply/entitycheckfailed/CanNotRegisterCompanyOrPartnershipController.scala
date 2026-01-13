@@ -40,11 +40,12 @@ extends FrontendController(mcc, actions):
       .getApplicationInProgress
       .ensure(
         condition =
-          _.agentApplication
-            .companyStatusCheckResult === Fail,
+          _.agentApplication match
+            case a: AgentApplication.IsIncorporated => a.companyStatusCheckResult === Fail
+            case _ => false,
         resultWhenConditionNotMet =
           implicit request =>
-            logger.warn("Company status check has not been blocked. Redirecting to company status check.")
+            logger.warn("Companies house status check has not been blocked. Redirecting to company status check.")
             Redirect(AppRoutes.apply.internal.CompaniesHouseStatusController.check())
       ):
         implicit request =>

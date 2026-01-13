@@ -14,18 +14,28 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.businessdetails
+package uk.gov.hmrc.agentregistration.shared.util
 
-import uk.gov.hmrc.agentregistration.shared.CtUtr
-import uk.gov.hmrc.agentregistration.shared.SafeId
-import play.api.libs.json.Format
-import play.api.libs.json.Json
+object DisjointUnionsTest:
 
-final case class BusinessDetailsLimitedCompany(
-  safeId: SafeId,
-  ctUtr: CtUtr,
-  companyProfile: CompanyProfile
-)
+  sealed trait P
 
-object BusinessDetailsLimitedCompany:
-  given Format[BusinessDetailsLimitedCompany] = Json.format[BusinessDetailsLimitedCompany]
+  final case class C1(i: Int)
+  extends P
+
+  final case class C2(i: Int)
+  extends P
+
+  final case class C3(i: Int)
+  extends P
+
+  final case class C4(i: Int)
+  extends P
+
+  final case class Alien(i: Int)
+
+  type G1 = (C1 | C2) & P
+
+  type NotG1 = (C3 | C4) & P
+
+  DisjointUnions.prove[P, G1, NotG1]

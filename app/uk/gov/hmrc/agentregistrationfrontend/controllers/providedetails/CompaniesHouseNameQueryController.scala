@@ -62,7 +62,7 @@ extends FrontendController(mcc, actions):
                       .companiesHouseMatch
                       .map(_.memberNameQuery)
                 ,
-                app.getCompanyProfile.companyName
+                app.dontCallMe_getCompanyProfile.companyName
               ))
             case Some(app) =>
               logger.warn(s"Attempt to access Companies House name query page for application that has status ${app.applicationState}")
@@ -82,7 +82,7 @@ extends FrontendController(mcc, actions):
           formWithErrors =>
             view(
               formWithErrors,
-              request.agentApplication.getCompanyProfile.companyName
+              request.agentApplication.dontCallMe_getCompanyProfile.companyName
             )
     )
     .async:
