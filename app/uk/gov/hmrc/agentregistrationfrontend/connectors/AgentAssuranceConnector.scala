@@ -40,7 +40,7 @@ class AgentAssuranceConnector @Inject() (
 )(implicit val ec: ExecutionContext)
 extends RequestAwareLogging:
 
-  def isRefusedToDealWith(utr: Utr)(using
+  def checkForRefusalToDealWith(utr: Utr)(using
     rh: RequestHeader
   ): Future[EntityCheckResult] =
     val url = url"${appConfig.agentAssuranceBaseUrl}/agent-assurance/refusal-to-deal-with/utr/${utr.value}"

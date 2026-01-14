@@ -18,7 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.entitycheckfaile
 
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.EntityCheckResult.Fail
+import uk.gov.hmrc.agentregistration.shared.companyStatusCheck
+import uk.gov.hmrc.agentregistration.shared.EntityCheckResult
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -42,8 +43,8 @@ extends FrontendController(mcc, actions):
       .ensure(
         condition =
           _.agentApplication match
-            case a: AgentApplication.IsIncorporated => a.companyStatusCheckResult === Fail
-            case _ => false,
+            case a: AgentApplication.IsIncorporated => a.companyStatusCheck === Some(EntityCheckResult.Fail)
+            case a: AgentApplication.IsNotIncorporated => false,
         resultWhenConditionNotMet =
           implicit request =>
             logger.warn("Companies house status check has not been blocked. Redirecting to company status check.")

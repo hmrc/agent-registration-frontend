@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
+//import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.soletrader.TdAgentApplicationSoleTrader
+
 object TestOnlyData
 extends TdBase,
   TdGrs,

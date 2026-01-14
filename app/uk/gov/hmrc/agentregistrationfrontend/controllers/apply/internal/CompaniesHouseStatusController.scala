@@ -29,7 +29,6 @@ import uk.gov.hmrc.agentregistrationfrontend.connectors.CompaniesHouseApiProxyCo
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -53,35 +52,14 @@ extends FrontendController(mcc, actions):
           .isIncorporated,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("No Companies House check required for non-incorporated business types, redirecting to task list.")
+          logger.debug("No Companies House check required for non-incorporated business types, redirecting to task list.")
           Redirect(AppRoutes.apply.TaskListController.show)
     )
     .ensure(
       condition =
-        implicit request =>
-          if (request.agentApplication.businessType === BusinessType.SoleTrader)
-            request
-              .agentApplication
-              .asSoleTraderApplication
-              .deceasedCheck === EntityCheckResult.Pass
-          else
-            request.agentApplication
-              .refusalToDealWithCheck === EntityCheckResult.Pass,
-      resultWhenConditionNotMet =
-        implicit request =>
-          if (request.agentApplication.businessType === BusinessType.SoleTrader) {
-            logger.warn("Deceased verification has not been completed. Redirecting to deceased check.")
-            Redirect(AppRoutes.apply.internal.DeceasedController.check())
-          }
-          else
-            logger.warn("Refusal to deal with verification has not been completed. Redirecting to refusal to deal with check.")
-            Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
-    )
-    .ensure(
-      condition =
         _.agentApplication match
-          case a: AgentApplication.IsIncorporated => a.companyStatusCheckResult =!= EntityCheckResult.Pass
-          case _ => true,
+          case a: AgentApplication.IsIncorporated => a.isCompanyStatusCheckRequired
+          case _: AgentApplication.IsNotIncorporated => false,
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Company status already done or not needed. Redirecting to task list page.")
@@ -104,14 +82,23 @@ extends FrontendController(mcc, actions):
       _ <- agentApplicationService
         .upsert:
           agentApplication match
-            case a: AgentApplicationLimitedCompany => a.modify(_.companyStatusCheckResult).setTo(companyStatusCheckResult)
-            case a: AgentApplicationLimitedPartnership => a.modify(_.companyStatusCheckResult).setTo(companyStatusCheckResult)
-            case a: AgentApplicationLlp => a.modify(_.companyStatusCheckResult).setTo(companyStatusCheckResult)
-            case a: AgentApplicationScottishLimitedPartnership => a.modify(_.companyStatusCheckResult).setTo(companyStatusCheckResult)
+            case a: AgentApplicationLimitedCompany => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
+            case a: AgentApplicationLimitedPartnership => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
+            case a: AgentApplicationLlp => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
+            case a: AgentApplicationScottishLimitedPartnership => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
     yield companyStatusCheckResult match
       case EntityCheckResult.Pass => Redirect(nextPage)
       case EntityCheckResult.Fail => Redirect(failedCheckPage)
-      case EntityCheckResult.NotChecked => throwServerErrorException("Companies House status check resulted in NotChecked")
 
   private def failedCheckPage = AppRoutes.apply.entitycheckfailed.CanNotRegisterCompanyOrPartnershipController.show
   private def nextPage: Call = AppRoutes.apply.TaskListController.show
+
+  extension (agentApplication: AgentApplication)
+
+    private def isIncorporated: Boolean =
+      agentApplication match
+        case _: AgentApplication.IsIncorporated => true
+        case _: AgentApplication.IsNotIncorporated => false
+
+  extension (agentApplication: AgentApplication.IsIncorporated)
+    private def isCompanyStatusCheckRequired: Boolean = agentApplication.companyStatusCheck =!= Some(EntityCheckResult.Pass)

@@ -56,4 +56,4 @@ extends ViewSpec:
         .selectOnlyOneElementOrFail()
 
       button.text() shouldBe "Try again"
-      button.attr("href") shouldBe "/agent-registration/apply/internal/status-check"
+      button.attr("href") shouldBe "/agent-registration/apply/internal/companies-house-status-check"

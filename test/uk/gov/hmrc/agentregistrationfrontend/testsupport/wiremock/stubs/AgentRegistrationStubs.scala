@@ -56,9 +56,10 @@ object AgentRegistrationStubs:
     requestBody = Some(wm.equalToJson(Json.toJson(agentApplication).toString))
   )
 
-  def verifyUpdateAgentApplication(): Unit = StubMaker.verify(
+  def verifyUpdateAgentApplication(count: Int = 1): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.POST,
-    urlPattern = wm.urlPathEqualTo("/agent-registration/application")
+    urlPattern = wm.urlPathEqualTo("/agent-registration/application"),
+    count = count
   )
 
   def stubFindApplicationByLinkId(

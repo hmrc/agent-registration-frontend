@@ -46,9 +46,8 @@ class ApplicationFactory @Inject() (
     applicantContactDetails = None,
     amlsDetails = None,
     agentDetails = None,
-    refusalToDealWithCheck = EntityCheckResult.NotChecked,
-    deceasedCheck = EntityCheckResult.NotChecked,
-    companyStatusCheckResult = EntityCheckResult.NotChecked,
+    refusalToDealWithCheckResult = None,
+    deceasedCheck = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
 
@@ -68,8 +67,8 @@ class ApplicationFactory @Inject() (
     applicantContactDetails = None,
     amlsDetails = None,
     agentDetails = None,
-    refusalToDealWithCheck = EntityCheckResult.NotChecked,
-    companyStatusCheckResult = EntityCheckResult.NotChecked,
+    refusalToDealWithCheckResult = None,
+    companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
 
@@ -89,8 +88,8 @@ class ApplicationFactory @Inject() (
     applicantContactDetails = None,
     amlsDetails = None,
     agentDetails = None,
-    refusalToDealWithCheck = EntityCheckResult.NotChecked,
-    companyStatusCheckResult = EntityCheckResult.NotChecked,
+    refusalToDealWithCheckResult = None,
+    companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
 
@@ -110,8 +109,7 @@ class ApplicationFactory @Inject() (
     applicantContactDetails = None,
     amlsDetails = None,
     agentDetails = None,
-    refusalToDealWithCheck = EntityCheckResult.NotChecked,
-    companyStatusCheckResult = EntityCheckResult.NotChecked,
+    refusalToDealWithCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
 
@@ -131,8 +129,8 @@ class ApplicationFactory @Inject() (
     applicantContactDetails = None,
     amlsDetails = None,
     agentDetails = None,
-    refusalToDealWithCheck = EntityCheckResult.NotChecked,
-    companyStatusCheckResult = EntityCheckResult.NotChecked,
+    refusalToDealWithCheckResult = None,
+    companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
 
@@ -152,8 +150,8 @@ class ApplicationFactory @Inject() (
     applicantContactDetails = None,
     amlsDetails = None,
     agentDetails = None,
-    refusalToDealWithCheck = EntityCheckResult.NotChecked,
-    companyStatusCheckResult = EntityCheckResult.NotChecked,
+    refusalToDealWithCheckResult = None,
+    companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
 
@@ -173,7 +171,6 @@ class ApplicationFactory @Inject() (
     applicantContactDetails = None,
     amlsDetails = None,
     agentDetails = None,
-    refusalToDealWithCheck = EntityCheckResult.NotChecked,
-    companyStatusCheckResult = EntityCheckResult.NotChecked,
+    refusalToDealWithCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )

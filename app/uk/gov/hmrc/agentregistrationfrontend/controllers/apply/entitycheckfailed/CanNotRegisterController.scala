@@ -41,7 +41,7 @@ extends FrontendController(mcc, actions):
       .ensure(
         condition =
           _.agentApplication
-            .refusalToDealWithCheck === Fail,
+            .refusalToDealWithCheckResult === Fail,
         resultWhenConditionNotMet =
           implicit request =>
             logger.warn("Refusal to deal with has not failed. Redirecting to run refusal to deal with check.")

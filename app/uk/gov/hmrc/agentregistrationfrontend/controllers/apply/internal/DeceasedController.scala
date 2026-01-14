@@ -19,14 +19,15 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal
 import com.softwaremill.quicklens.*
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
+import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.EntityCheckResult.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CitizenDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.model.llp.DesignatoryDetailsResponse
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 
 import javax.inject.Inject
@@ -46,27 +47,18 @@ extends FrontendController(mcc, actions):
     .Applicant
     .getApplicationInProgress
     .ensure(
-      condition =
-        _.agentApplication
-          .refusalToDealWithCheck === EntityCheckResult.Pass,
-      resultWhenConditionNotMet =
-        implicit request =>
-          logger.warn("Entity verification has not been done. Redirecting to entity check.")
-          Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
-    )
-    .ensure(
       condition = _.agentApplication.businessType === BusinessType.SoleTrader,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("Deceased verification not required. Redirecting to company status check.")
-          Redirect(nextPage)
+          logger.debug(s"Deceased verification is required only for SoleTrader, this business type is ${request.agentApplication.businessType}. Redirecting to company status check.")
+          Redirect(nextCheckEndpoint)
     )
     .ensure(
-      condition = _.agentApplication.asSoleTraderApplication.deceasedCheck =!= EntityCheckResult.Pass,
+      condition = _.agentApplication.asSoleTraderApplication.isDeceasedCheckRequired,
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Deceased verification already done. Redirecting to company status check.")
-          Redirect(nextPage)
+          Redirect(nextCheckEndpoint)
     )
     .async:
       implicit request =>
@@ -79,19 +71,24 @@ extends FrontendController(mcc, actions):
               .nino match
               case Some(nino) =>
                 citizenDetailsConnector
-                  .isDeceased(nino)
-                  .map(_.asEntityCheckResult)
+                  .getDesignatoryDetails(nino)
+                  .map: (designatoryDetailsResponse: DesignatoryDetailsResponse) =>
+                    if designatoryDetailsResponse.deceased
+                    then EntityCheckResult.Fail
+                    else EntityCheckResult.Pass
               case None => Future.successful(EntityCheckResult.Pass) // TODO - confirm this is correct
 
           _ <- agentApplicationService
             .upsert(request.agentApplication
               .asSoleTraderApplication
               .modify(_.deceasedCheck)
-              .setTo(checkResult))
+              .setTo(Some(checkResult)))
         yield checkResult match
-          case EntityCheckResult.Pass => Redirect(nextPage)
+          case EntityCheckResult.Pass => Redirect(nextCheckEndpoint)
           case EntityCheckResult.Fail => Redirect(failedCheckPage)
-          case EntityCheckResult.NotChecked => throwServerErrorException("CitizenDetails check resulted in NotChecked")
 
-  private def failedCheckPage = AppRoutes.apply.entitycheckfailed.CanNotConfirmIdentityController.show
-  private def nextPage = AppRoutes.apply.internal.CompaniesHouseStatusController.check()
+  private def failedCheckPage: Call = AppRoutes.apply.entitycheckfailed.CanNotConfirmIdentityController.show
+  private def nextCheckEndpoint: Call = AppRoutes.apply.internal.CompaniesHouseStatusController.check()
+
+  extension (agentApplication: AgentApplicationSoleTrader)
+    private def isDeceasedCheckRequired: Boolean = agentApplication.deceasedCheck =!= Some(EntityCheckResult.Pass)

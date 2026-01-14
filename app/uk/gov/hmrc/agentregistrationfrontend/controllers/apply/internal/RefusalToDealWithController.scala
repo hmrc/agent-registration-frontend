@@ -19,12 +19,12 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal
 import com.softwaremill.quicklens.*
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
+import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentAssuranceConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -54,29 +54,27 @@ extends FrontendController(mcc, actions):
           Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
     )
     .ensure(
-      condition = _.agentApplication.refusalToDealWithCheck =!= EntityCheckResult.Pass,
+      condition = _.agentApplication.isRefusalToDealWithCheckRequired,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("Refusal to deal with verification already done and passed. Redirecting to next check.")
-          Redirect(nextPage)
+          logger.info("Refusal to deal with verification already done and passed. Redirecting to next check.")
+          Redirect(nextCheckEndpoint)
     )
     .async:
       implicit request =>
         for
           checkResult <- agentAssuranceConnector
-            .isRefusedToDealWith(request.agentApplication.getUtr)
+            .checkForRefusalToDealWith(request.agentApplication.getUtr)
           _ <- agentApplicationService
             .upsert(request.agentApplication
-              .modify(_.refusalToDealWithCheck)
-              .setTo(checkResult))
+              .modify(_.refusalToDealWithCheckResult)
+              .setTo(Some(checkResult)))
         yield checkResult match
-          case EntityCheckResult.Pass => Redirect(nextPage)
+          case EntityCheckResult.Pass => Redirect(nextCheckEndpoint)
           case EntityCheckResult.Fail => Redirect(failedCheckPage)
-          case EntityCheckResult.NotChecked => throwServerErrorException("Refusal to deal with check resulted in NotChecked")
 
-  private def failedCheckPage = AppRoutes.apply.entitycheckfailed.CanNotRegisterController.show
-  private def nextPage(implicit request: AgentApplicationRequest[AnyContent]) =
-    if (request.agentApplication.businessType === BusinessType.SoleTrader)
-      AppRoutes.apply.internal.RefusalToDealWithController.check()
-    else
-      AppRoutes.apply.internal.CompaniesHouseStatusController.check()
+  private def failedCheckPage: Call = AppRoutes.apply.entitycheckfailed.CanNotRegisterController.show
+  private def nextCheckEndpoint: Call = AppRoutes.apply.internal.DeceasedController.check()
+
+  extension (agentApplication: AgentApplication)
+    private def isRefusalToDealWithCheckRequired: Boolean = agentApplication.refusalToDealWithCheckResult =!= Some(EntityCheckResult.Pass)

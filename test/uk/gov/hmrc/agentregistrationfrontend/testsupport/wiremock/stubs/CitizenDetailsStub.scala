@@ -112,6 +112,6 @@ object CitizenDetailsStub:
     count: Int = 1
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlPathEqualTo(s"/citizen-details/nino/${nino.value}/designatory-details"),
+    urlPattern = urlPathEqualTo(s"/citizen-details/${nino.value}/designatory-details"),
     count = count
   )

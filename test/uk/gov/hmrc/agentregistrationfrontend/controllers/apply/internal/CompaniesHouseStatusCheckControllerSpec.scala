@@ -38,7 +38,7 @@ extends ControllerSpec:
     val afterHmrcEntityVerificationPass =
       tdAll
         .agentApplicationLlp
-        .afterHmrcEntityVerificationPass
+        .afterRefusalToDealWithCheckPass
 
     val afterCompaniesHouseStatusCheckPass =
       tdAll
@@ -50,10 +50,14 @@ extends ControllerSpec:
         .agentApplicationLlp
         .afterCompaniesHouseStatusCheckFail
 
-  private val path: String = "/agent-registration/apply/internal/status-check"
-  private val nextPageUrl: String = "/agent-registration/apply/task-list"
-  private val previousPage: String = "/agent-registration/apply/internal/register-check"
-  private val comapanyStatusBlock: String = "/agent-registration/apply/cannot-register-company-or-partnership"
+    val afterDeceasedCheckPassSoleTrader =
+      tdAll
+        .agentApplicationSoleTrader
+        .afterDeceasedCheckPass
+
+  private val path: String = "/agent-registration/apply/internal/companies-house-status-check"
+  private val nextUrl: String = "/agent-registration/apply/task-list"
+  private val failCheckPage: String = "/agent-registration/apply/cannot-register-company-or-partnership"
 
   "routes should have correct paths and methods" in:
     AppRoutes.apply.internal.CompaniesHouseStatusController.check() shouldBe Call(
@@ -68,7 +72,7 @@ extends ControllerSpec:
     CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompanyHouseStatus.Active.key)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe nextPageUrl
+    response.header("Location").value shouldBe nextUrl
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
@@ -81,28 +85,41 @@ extends ControllerSpec:
     CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompanyHouseStatus.Closed.key)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe comapanyStatusBlock
+    response.header("Location").value shouldBe failCheckPage
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
     CompaniesHouseStubs.verifyGetCompanyHouse(crn = crn)
-
-  s"GET $path should redirect to entity check  when entity checks not defined" in:
-    AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeHmrcEntityVerificationPass)
-    val response: WSResponse = get(path)
-    response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe previousPage
-    AuthStubs.verifyAuthorise()
-    AgentRegistrationStubs.verifyGetAgentApplication()
 
   s"GET $path should redirect to task list page when entity verification already done" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterCompaniesHouseStatusCheckPass)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe nextPageUrl
+    response.header("Location").value shouldBe nextUrl
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
+    AgentRegistrationStubs.verifyUpdateAgentApplication(0)
 
-//TODO - add test case for Sole trader
+  s"GET $path should run company status check when comapny status check Fail" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterCompaniesHouseStatusCheckFail)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterCompaniesHouseStatusCheckPass)
+    CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompanyHouseStatus.Active.key)
+    val response: WSResponse = get(path)
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe nextUrl
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetAgentApplication()
+    AgentRegistrationStubs.verifyUpdateAgentApplication()
+    CompaniesHouseStubs.verifyGetCompanyHouse(crn = crn)
+
+  s"GET $path should redirect to task list page when business type is not incorporated like SoleTrader" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterDeceasedCheckPassSoleTrader)
+    val response: WSResponse = get(path)
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe nextUrl
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetAgentApplication()
+    AgentRegistrationStubs.verifyUpdateAgentApplication(0)

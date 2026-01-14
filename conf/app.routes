@@ -42,9 +42,9 @@ GET        /apply/internal/initiate-agent-application/:agentType/:businessType/:
 GET        /apply/internal/grs/start-journey                                          uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.GrsController.startJourney()
 GET        /apply/internal/grs/journey-callback                                       uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.GrsController.journeyCallback(journeyId: Option[grs.JourneyId])
 GET        /apply/internal/address-lookup/journey-callback                            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.AddressLookupCallbackController.journeyCallback(id: Option[addresslookup.JourneyId])
-GET        /apply/internal/register-check                                             uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.RefusalToDealWithController.check()
-GET        /apply/internal/confirm-identity-check                                     uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.DeceasedController.check()
-GET        /apply/internal/status-check                                               uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.CompaniesHouseStatusController.check()
+GET        /apply/internal/refusal-to-deal-with-check                                 uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.RefusalToDealWithController.check()
+GET        /apply/internal/deceased-check                                             uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.DeceasedController.check()
+GET        /apply/internal/companies-house-status-check                               uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.CompaniesHouseStatusController.check()
 
 ## Applicant contact details routes
 GET         /apply/applicant/applicant-name                        uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.ApplicantNameController.show

@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared
+package uk.gov.hmrc.agentregistrationfrontend.model.llp
 
-import play.api.libs.json.Format
-import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
-
-enum EntityCheckResult:
-
-  case Pass
-  case Fail
-
-object EntityCheckResult:
-
-  given Format[EntityCheckResult] = JsonFormatsFactory.makeEnumFormat[EntityCheckResult]
-
-  extension (bool: Boolean)
-    def asEntityCheckResult: EntityCheckResult = if bool then EntityCheckResult.Pass else EntityCheckResult.Fail
+final case class DesignatoryDetailsResponse(
+  deceased: Boolean
+)

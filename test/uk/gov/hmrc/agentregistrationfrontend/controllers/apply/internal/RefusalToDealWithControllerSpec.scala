@@ -39,19 +39,18 @@ extends ControllerSpec:
         .agentApplicationLlp
         .afterGrsDataReceived
 
-    val afterHmrcEntityVerificationPass =
+    val afterRefusalToDealWithCheckPass =
       tdAll
         .agentApplicationLlp
-        .afterHmrcEntityVerificationPass
+        .afterRefusalToDealWithCheckPass
 
-    val afterHmrcEntityVerificationFail =
+    val afterRefusalToDealWithCheckFail =
       tdAll
         .agentApplicationLlp
-        .afterHmrcEntityVerificationFail
+        .afterRefusalToDealWithCheckFail
 
-  private val path: String = "/agent-registration/apply/internal/register-check"
-  private val nextPageUrl: String = "/agent-registration/apply/internal/status-check"
-//  private val nextPageSoleTraderUrl: String = "/agent-registration/apply/internal/confirm-identity-check"
+  private val path: String = "/agent-registration/apply/internal/refusal-to-deal-with-check"
+  private val nextPageUrl: String = "/agent-registration/apply/internal/deceased-check"
   private val previousPage: String = "/agent-registration/apply"
   private val cannotRegisterPage: String = "/agent-registration/apply/cannot-register"
 
@@ -64,7 +63,7 @@ extends ControllerSpec:
   s"GET $path should update application with pass status and redirect to company status check  when agent pass entity verification checks" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterGrsDataProvided)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterHmrcEntityVerificationPass)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterRefusalToDealWithCheckPass)
     AgentAssuranceStubs.stubIsRefusedToDealWith(saUtr = saUtr, isRefused = false)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
@@ -77,7 +76,7 @@ extends ControllerSpec:
   s"GET $path should update application with fail status and open entity checks fail page when agent fail entity verification checks" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterGrsDataProvided)
-    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterHmrcEntityVerificationFail)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterRefusalToDealWithCheckFail)
     AgentAssuranceStubs.stubIsRefusedToDealWith(saUtr = saUtr, isRefused = true)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
@@ -95,22 +94,29 @@ extends ControllerSpec:
     response.header("Location").value shouldBe previousPage
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
+    AgentRegistrationStubs.verifyUpdateAgentApplication(0)
+    AgentAssuranceStubs.verifyIsRefusedToDealWith(saUtr, 0)
 
-  s"GET $path should redirect to company status check when entity verification already done" in:
+  s"GET $path should redirect to deceased check when entity verification already done" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterHmrcEntityVerificationPass)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRefusalToDealWithCheckPass)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe nextPageUrl
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
+    AgentRegistrationStubs.verifyUpdateAgentApplication(0)
+    AgentAssuranceStubs.verifyIsRefusedToDealWith(saUtr, 0)
 
-  // TODO WG - add testing for Sole trader
-//  s"GET $path should redirect to deceased check when entity verification already done for sole trader" in :
-//    AuthStubs.stubAuthorise()
-//    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterHmrcEntityVerificationPass)
-//    val response: WSResponse = get(path)
-//    response.status shouldBe Status.SEE_OTHER
-//    response.header("Location").value shouldBe nextPageSoleTraderUrl
-//    AuthStubs.verifyAuthorise()
-//    AgentRegistrationStubs.verifyGetAgentApplication()
+  s"GET $path should run refusal to deal with check when refusal to deal with check Fail" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRefusalToDealWithCheckFail)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterRefusalToDealWithCheckPass)
+    AgentAssuranceStubs.stubIsRefusedToDealWith(saUtr = saUtr, isRefused = false)
+    val response: WSResponse = get(path)
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe nextPageUrl
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetAgentApplication()
+    AgentRegistrationStubs.verifyUpdateAgentApplication()
+    AgentAssuranceStubs.verifyIsRefusedToDealWith(saUtr)
