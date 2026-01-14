@@ -133,10 +133,9 @@ final case class AgentApplicationSoleTrader(
 extends AgentApplication:
 
   override val businessType: BusinessType.SoleTrader.type = BusinessType.SoleTrader
-
   def getBusinessDetails: BusinessDetailsSoleTrader = businessDetails.getOrElse(expectedDataNotDefinedError("businessDetails"))
 
-/** Application for Limited Liability Partnership (Llp). This final case class represents the data entered by a user for registering as a Llp.
+/** Application for Limited Liability Partnership (Llp). This final case class represents the data entered by a user for registering as an Llp.
   */
 final case class AgentApplicationLlp(
   override val _id: AgentApplicationId,

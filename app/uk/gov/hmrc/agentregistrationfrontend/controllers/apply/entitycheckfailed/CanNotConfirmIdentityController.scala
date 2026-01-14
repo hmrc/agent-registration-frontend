@@ -40,9 +40,9 @@ extends FrontendController(mcc, actions):
       .getApplicationInProgress
       .ensure(
         condition =
-          _.agentApplication
-            .asSoleTraderApplication
-            .deceasedCheck === Fail,
+          _.agentApplication.businessType match
+            case a: AgentApplication.IsIncorporated => a.companyStatusCheckResult.exists(_ === CompanyStatusCheckResult.Block)
+            case _ => false,
         resultWhenConditionNotMet =
           implicit request =>
             logger.warn("Deceased check has not failed. Redirecting to deceased check.")
