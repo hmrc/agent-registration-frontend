@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 
 import play.api.mvc.*
-import uk.gov.hmrc.agentregistration.shared.CompanyStatusCheckResult.Block
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -34,20 +34,19 @@ class CompanyStatusBlockController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  val baseAction = actions
-    .Applicant
-    .getApplicationInProgress
-    .ensure(
-      condition =
-        _.agentApplication
-          .companyStatusCheckResult
-          .exists(_ === Block),
-      resultWhenConditionNotMet =
+  def showBlockedPage: Action[AnyContent] =
+    actions
+      .Applicant
+      .getApplicationInProgress
+      .ensure(
+        condition =
+          _.agentApplication match
+            case a: AgentApplication.IsIncorporated => a.companyStatusCheckResult.exists(_ === CompanyStatusCheckResult.Block)
+            case _ => false,
+        resultWhenConditionNotMet =
+          implicit request =>
+            logger.warn("Companies house status check has not been done or is not applicable, redirecting to companyStatusCheck")
+            Redirect(AppRoutes.apply.internal.CompaniesHouseStatusController.companyStatusCheck())
+      ):
         implicit request =>
-          logger.warn("Entity verification has not been done. Redirecting to entity check.")
-          Redirect(AppRoutes.apply.internal.CompaniesHouseStatusController.companyStatusCheck())
-    )
-
-  def showBlockedPage: Action[AnyContent] = baseAction:
-    implicit request =>
-      Ok(companyStatusBlockPage())
+          Ok(companyStatusBlockPage())
