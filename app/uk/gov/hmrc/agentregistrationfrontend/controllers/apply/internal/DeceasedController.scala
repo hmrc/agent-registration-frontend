@@ -74,9 +74,9 @@ extends FrontendController(mcc, actions):
                   .getDesignatoryDetails(nino)
                   .map: (designatoryDetailsResponse: DesignatoryDetailsResponse) =>
                     if designatoryDetailsResponse.deceased
-                    then EntityCheckResult.Fail
-                    else EntityCheckResult.Pass
-              case None => Future.successful(EntityCheckResult.Pass) // TODO - confirm this is correct
+                    then CheckResult.Fail
+                    else CheckResult.Pass
+              case None => Future.successful(CheckResult.Pass) // TODO - confirm this is correct
 
           _ <- agentApplicationService
             .upsert(request.agentApplication
@@ -84,11 +84,11 @@ extends FrontendController(mcc, actions):
               .modify(_.deceasedCheckResult)
               .setTo(Some(checkResult)))
         yield checkResult match
-          case EntityCheckResult.Pass => Redirect(nextCheckEndpoint)
-          case EntityCheckResult.Fail => Redirect(failedCheckPage)
+          case CheckResult.Pass => Redirect(nextCheckEndpoint)
+          case CheckResult.Fail => Redirect(failedCheckPage)
 
-  private def failedCheckPage: Call = AppRoutes.apply.entitycheckfailed.CanNotConfirmIdentityController.show
+  private def failedCheckPage: Call = AppRoutes.apply.checkfailed.CanNotConfirmIdentityController.show
   private def nextCheckEndpoint: Call = AppRoutes.apply.internal.CompaniesHouseStatusController.check()
 
   extension (agentApplication: AgentApplicationSoleTrader)
-    private def isDeceasedCheckRequired: Boolean = agentApplication.deceasedCheckResult =!= Some(EntityCheckResult.Pass)
+    private def isDeceasedCheckRequired: Boolean = agentApplication.deceasedCheckResult =!= Some(CheckResult.Pass)

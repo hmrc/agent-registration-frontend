@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.model
 
 import play.api.libs.json.*
-import uk.gov.hmrc.agentregistration.shared.EntityCheckResult
+import uk.gov.hmrc.agentregistration.shared.CheckResult
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 enum CompanyHouseStatus(val key: String):
@@ -65,7 +65,7 @@ object CompanyHouseStatus:
     }
 
   extension (status: CompanyHouseStatus)
-    def toEntityCheckResult: EntityCheckResult =
+    def toCheckResult: CheckResult =
       status match
-        case Active | Administration | VoluntaryArrangement | Registered | Open => EntityCheckResult.Pass
-        case _ => EntityCheckResult.Fail
+        case Active | Administration | VoluntaryArrangement | Registered | Open => CheckResult.Pass
+        case _ => CheckResult.Fail

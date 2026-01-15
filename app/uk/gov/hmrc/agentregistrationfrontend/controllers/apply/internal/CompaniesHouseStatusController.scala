@@ -78,7 +78,7 @@ extends FrontendController(mcc, actions):
     for
       companyStatusCheckResult <- companiesHouseApiProxyConnector
         .getCompanyHouseStatus(agentApplication.dontCallMe_getCompanyProfile.companyNumber)
-        .map(_.toEntityCheckResult)
+        .map(_.toCheckResult)
       _ <- agentApplicationService
         .upsert:
           agentApplication match
@@ -87,10 +87,10 @@ extends FrontendController(mcc, actions):
             case a: AgentApplicationLlp => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
             case a: AgentApplicationScottishLimitedPartnership => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
     yield companyStatusCheckResult match
-      case EntityCheckResult.Pass => Redirect(nextPage)
-      case EntityCheckResult.Fail => Redirect(failedCheckPage)
+      case CheckResult.Pass => Redirect(nextPage)
+      case CheckResult.Fail => Redirect(failedCheckPage)
 
-  private def failedCheckPage = AppRoutes.apply.entitycheckfailed.CanNotRegisterCompanyOrPartnershipController.show
+  private def failedCheckPage = AppRoutes.apply.checkfailed.CanNotRegisterCompanyOrPartnershipController.show
   private def nextPage: Call = AppRoutes.apply.TaskListController.show
 
   extension (agentApplication: AgentApplication)
@@ -101,4 +101,4 @@ extends FrontendController(mcc, actions):
         case _: AgentApplication.IsNotIncorporated => false
 
   extension (agentApplication: AgentApplication.IsIncorporated)
-    private def isCompanyStatusCheckRequired: Boolean = agentApplication.companyStatusCheck =!= Some(EntityCheckResult.Pass)
+    private def isCompanyStatusCheckRequired: Boolean = agentApplication.companyStatusCheck =!= Some(CheckResult.Pass)

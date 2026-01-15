@@ -70,11 +70,11 @@ extends FrontendController(mcc, actions):
               .modify(_.refusalToDealWithCheckResult)
               .setTo(Some(checkResult)))
         yield checkResult match
-          case EntityCheckResult.Pass => Redirect(nextCheckEndpoint)
-          case EntityCheckResult.Fail => Redirect(failedCheckPage)
+          case CheckResult.Pass => Redirect(nextCheckEndpoint)
+          case CheckResult.Fail => Redirect(failedCheckPage)
 
-  private def failedCheckPage: Call = AppRoutes.apply.entitycheckfailed.CanNotRegisterController.show
+  private def failedCheckPage: Call = AppRoutes.apply.checkfailed.CanNotRegisterController.show
   private def nextCheckEndpoint: Call = AppRoutes.apply.internal.DeceasedController.check()
 
   extension (agentApplication: AgentApplication)
-    private def isRefusalToDealWithCheckRequired: Boolean = agentApplication.refusalToDealWithCheckResult =!= Some(EntityCheckResult.Pass)
+    private def isRefusalToDealWithCheckRequired: Boolean = agentApplication.refusalToDealWithCheckResult =!= Some(CheckResult.Pass)

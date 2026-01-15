@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.apply.entitycheckfailed
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.entitycheckfailed.CompanyStatusBlockPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.checkfailed.CompanyStatusBlockPage
 
 class CompanyStatusBlockPageSpec
 extends ViewSpec:

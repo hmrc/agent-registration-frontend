@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentregistration.shared.EntityCheckResult
+import uk.gov.hmrc.agentregistration.shared.CheckResult
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
@@ -42,15 +42,15 @@ extends RequestAwareLogging:
 
   def checkForRefusalToDealWith(utr: Utr)(using
     rh: RequestHeader
-  ): Future[EntityCheckResult] =
+  ): Future[CheckResult] =
     val url = url"${appConfig.agentAssuranceBaseUrl}/agent-assurance/refusal-to-deal-with/utr/${utr.value}"
     http
       .get(url)
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case 403 => EntityCheckResult.Fail
-          case 200 => EntityCheckResult.Pass
+          case 403 => CheckResult.Fail
+          case 200 => CheckResult.Pass
           case status =>
             logger.error(s"refusal-to-deal-with check error for ${utr.value}; HTTP status: $status")
             Errors.throwUpstreamErrorResponse(

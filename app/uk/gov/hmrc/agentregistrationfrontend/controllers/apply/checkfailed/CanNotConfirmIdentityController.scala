@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.entitycheckfailed
+package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.checkfailed
 
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
-import uk.gov.hmrc.agentregistration.shared.EntityCheckResult
+import uk.gov.hmrc.agentregistration.shared.CheckResult
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.entitycheckfailed.CanNotConfirmIdentityPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.checkfailed.CanNotConfirmIdentityPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -42,7 +42,7 @@ extends FrontendController(mcc, actions):
       .ensure(
         condition =
           _.agentApplication match
-            case a: AgentApplicationSoleTrader => a.deceasedCheckResult === Some(EntityCheckResult.Fail)
+            case a: AgentApplicationSoleTrader => a.deceasedCheckResult === Some(CheckResult.Fail)
             case _ => false,
         resultWhenConditionNotMet =
           implicit request =>

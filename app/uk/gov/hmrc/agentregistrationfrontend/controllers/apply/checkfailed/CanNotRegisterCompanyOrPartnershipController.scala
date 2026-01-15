@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.entitycheckfailed
+package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.checkfailed
 
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.companyStatusCheck
-import uk.gov.hmrc.agentregistration.shared.EntityCheckResult
+import uk.gov.hmrc.agentregistration.shared.CheckResult
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.entitycheckfailed.CompanyStatusBlockPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.checkfailed.CompanyStatusBlockPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,7 +43,7 @@ extends FrontendController(mcc, actions):
       .ensure(
         condition =
           _.agentApplication match
-            case a: AgentApplication.IsIncorporated => a.companyStatusCheck === Some(EntityCheckResult.Fail)
+            case a: AgentApplication.IsIncorporated => a.companyStatusCheck === Some(CheckResult.Fail)
             case a: AgentApplication.IsNotIncorporated => false,
         resultWhenConditionNotMet =
           implicit request =>

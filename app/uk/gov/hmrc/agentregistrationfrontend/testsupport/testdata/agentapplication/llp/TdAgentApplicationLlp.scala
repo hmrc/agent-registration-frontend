@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplicat
 import uk.gov.hmrc.agentregistration.shared.ApplicationState.GrsDataReceived
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
-import uk.gov.hmrc.agentregistration.shared.EntityCheckResult
+import uk.gov.hmrc.agentregistration.shared.CheckResult
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
@@ -54,19 +54,19 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
     )
 
     val afterRefusalToDealWithCheckPass: AgentApplicationLlp = afterGrsDataReceived.copy(
-      refusalToDealWithCheckResult = Some(EntityCheckResult.Pass)
+      refusalToDealWithCheckResult = Some(CheckResult.Pass)
     )
 
     val afterRefusalToDealWithCheckFail: AgentApplicationLlp = afterGrsDataReceived.copy(
-      refusalToDealWithCheckResult = Some(EntityCheckResult.Fail)
+      refusalToDealWithCheckResult = Some(CheckResult.Fail)
     )
 
     val afterCompaniesHouseStatusCheckPass: AgentApplicationLlp = afterRefusalToDealWithCheckPass.copy(
-      companyStatusCheckResult = Some(EntityCheckResult.Pass)
+      companyStatusCheckResult = Some(CheckResult.Pass)
     )
 
     val afterCompaniesHouseStatusCheckFail: AgentApplicationLlp = afterRefusalToDealWithCheckPass.copy(
-      companyStatusCheckResult = Some(EntityCheckResult.Fail)
+      companyStatusCheckResult = Some(CheckResult.Fail)
     )
 
     val afterContactDetailsComplete: AgentApplicationLlp = afterCompaniesHouseStatusCheckPass.copy(

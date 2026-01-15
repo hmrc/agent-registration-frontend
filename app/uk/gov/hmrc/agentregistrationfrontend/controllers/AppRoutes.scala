@@ -22,7 +22,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRo
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.routes as aboutyourbusinessRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.routes as amlsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.api.routes as amlsApiRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.entitycheckfailed.routes as entitycheckfailedRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.checkfailed.routes as entitycheckfailedRoutes
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.routes as applicantcontactdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.routes as agentdetailsRoutes
@@ -83,7 +83,7 @@ object AppRoutes:
       val AgentCorrespondenceAddressController = agentdetailsRoutes.AgentCorrespondenceAddressController
       val CheckYourAnswersController = agentdetailsRoutes.CheckYourAnswersController
 
-    object entitycheckfailed:
+    object checkfailed:
 
       val CanNotRegisterCompanyOrPartnershipController = entitycheckfailedRoutes.CanNotRegisterCompanyOrPartnershipController
       val CanNotRegisterController = entitycheckfailedRoutes.CanNotRegisterController

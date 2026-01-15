@@ -53,19 +53,19 @@ trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdSectionAmls & TdS
     )
 
     val afterRefusalToDealWithCheckPass: AgentApplicationSoleTrader = afterGrsDataReceived.copy(
-      refusalToDealWithCheckResult = Some(EntityCheckResult.Pass)
+      refusalToDealWithCheckResult = Some(CheckResult.Pass)
     )
 
     val afterRefusalToDealWithCheckFail: AgentApplicationSoleTrader = afterGrsDataReceived.copy(
-      refusalToDealWithCheckResult = Some(EntityCheckResult.Fail)
+      refusalToDealWithCheckResult = Some(CheckResult.Fail)
     )
 
     val afterDeceasedCheckPass: AgentApplicationSoleTrader = afterRefusalToDealWithCheckPass.copy(
-      deceasedCheckResult = Some(EntityCheckResult.Pass)
+      deceasedCheckResult = Some(CheckResult.Pass)
     )
 
     val afterDeceasedCheckFail: AgentApplicationSoleTrader = afterRefusalToDealWithCheckPass.copy(
-      deceasedCheckResult = Some(EntityCheckResult.Fail)
+      deceasedCheckResult = Some(CheckResult.Fail)
     )
 
     val afterContactDetailsComplete: AgentApplicationSoleTrader = afterDeceasedCheckPass.copy(
