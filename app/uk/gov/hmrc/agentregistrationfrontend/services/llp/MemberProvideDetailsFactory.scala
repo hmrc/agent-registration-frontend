@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Started
 
 import java.time.Clock
 import java.time.Instant
+import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -38,7 +39,8 @@ class MemberProvideDetailsFactory @Inject() (
     internalUserId: InternalUserId,
     agentApplicationId: AgentApplicationId,
     memberNino: Option[MemberNino],
-    memberSaUtr: Option[MemberSaUtr]
+    memberSaUtr: Option[MemberSaUtr],
+    memberDateOfBirth: Option[LocalDate]
   ): MemberProvidedDetails = MemberProvidedDetails(
     _id = memberProvidedDetailsIdGenerator.nextMemberProvidedDetailsId(),
     internalUserId = internalUserId,
@@ -46,5 +48,6 @@ class MemberProvideDetailsFactory @Inject() (
     createdAt = Instant.now(clock),
     providedDetailsState = Started,
     memberNino = memberNino,
-    memberSaUtr = memberSaUtr
+    memberSaUtr = memberSaUtr,
+    dateOfBirth = memberDateOfBirth
   )

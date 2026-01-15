@@ -99,7 +99,8 @@ extends FrontendController(mcc, actions):
               internalUserId = request.internalUserId,
               agentApplicationId = applicationId,
               memberNino = request.nino.map(MemberNino.FromAuth.apply),
-              memberSaUtr = citizenDetails.saUtr.map(MemberSaUtr.FromCitizenDetails.apply)
+              memberSaUtr = citizenDetails.saUtr.map(MemberSaUtr.FromCitizenDetails.apply),
+              memberDateOfBirth = citizenDetails.dateOfBirth
             )
           }
 

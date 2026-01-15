@@ -60,13 +60,15 @@ extends ControllerSpec:
       .modify(_.memberSaUtr)
       .setTo(Some(tdAll.saUtrFromAuth))
 
-    val afterStartedWithNinoAndSaUtrFromCitizenDetails: MemberProvidedDetails = tdAll
+    val afterStartedWithNinoAndSaUtrAndDoBFromCitizenDetails: MemberProvidedDetails = tdAll
       .providedDetailsLlp
       .afterStarted
       .modify(_.memberNino)
       .setTo(Some(tdAll.ninoFromAuth))
       .modify(_.memberSaUtr)
       .setTo(Some(tdAll.saUtrFromCitizenDetails))
+      .modify(_.dateOfBirth)
+      .setTo(Some(tdAll.dateOfBirth))
 
   private def path(linkId: LinkId) = s"/agent-registration/provide-details/internal/initiate-member-provide-details/${linkId.value}"
 
@@ -76,11 +78,11 @@ extends ControllerSpec:
       url = path(tdAll.linkId)
     )
 
-  "GET initiateMemberProvideDetails should create memberProvidedDetails and redirect to member name page when application exists and memberProvidedDetails do not exist (nino only, saUtr from citizen details)" in:
+  "GET initiateMemberProvideDetails should create memberProvidedDetails and redirect to member name page when application exists and memberProvidedDetails do not exist (nino only, saUtr, DoB from citizen details)" in:
     IndividualAuthStubs.stubAuthoriseWithNino()
     AgentRegistrationStubs.stubFindApplicationByLinkId(tdAll.linkId, agentApplication.applicationSubmitted)
     AgentRegistrationMemberProvidedDetailsStubs.stubFindMemberProvidedDetailsNoContent(agentApplication.applicationSubmitted.agentApplicationId)
-    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvidedDetails.afterStartedWithNinoAndSaUtrFromCitizenDetails)
+    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvidedDetails.afterStartedWithNinoAndSaUtrAndDoBFromCitizenDetails)
     CitizenDetailsStub.stubFindSaUtr(tdAll.nino, tdAll.saUtr)
 
     val response: WSResponse = get(path(tdAll.linkId))
@@ -94,7 +96,7 @@ extends ControllerSpec:
     AgentRegistrationMemberProvidedDetailsStubs.verifyUpsert()
     CitizenDetailsStub.verifyFind(tdAll.nino)
 
-  "GET initiateMemberProvideDetails should create memberProvidedDetails and redirect to member name page when application exists and memberProvidedDetails do not exist (nino only, saUtr from Enrolments)" in:
+  "GET initiateMemberProvideDetails should create memberProvidedDetails and redirect to member name page when application exists and memberProvidedDetails do not exist (nino only, saUtr from Enrolments, no DoB)" in:
     IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
     AgentRegistrationStubs.stubFindApplicationByLinkId(tdAll.linkId, agentApplication.applicationSubmitted)
     AgentRegistrationMemberProvidedDetailsStubs.stubFindMemberProvidedDetailsNoContent(agentApplication.applicationSubmitted.agentApplicationId)
