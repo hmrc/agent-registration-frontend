@@ -42,7 +42,7 @@ extends FrontendController(mcc, actions):
       .ensure(
         condition =
           _.agentApplication match
-            case a: AgentApplicationSoleTrader => a.deceasedCheck === Some(EntityCheckResult.Fail)
+            case a: AgentApplicationSoleTrader => a.deceasedCheckResult === Some(EntityCheckResult.Fail)
             case _ => false,
         resultWhenConditionNotMet =
           implicit request =>

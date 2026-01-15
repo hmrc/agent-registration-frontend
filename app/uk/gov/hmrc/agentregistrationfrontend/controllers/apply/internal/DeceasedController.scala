@@ -81,7 +81,7 @@ extends FrontendController(mcc, actions):
           _ <- agentApplicationService
             .upsert(request.agentApplication
               .asSoleTraderApplication
-              .modify(_.deceasedCheck)
+              .modify(_.deceasedCheckResult)
               .setTo(Some(checkResult)))
         yield checkResult match
           case EntityCheckResult.Pass => Redirect(nextCheckEndpoint)
@@ -91,4 +91,4 @@ extends FrontendController(mcc, actions):
   private def nextCheckEndpoint: Call = AppRoutes.apply.internal.CompaniesHouseStatusController.check()
 
   extension (agentApplication: AgentApplicationSoleTrader)
-    private def isDeceasedCheckRequired: Boolean = agentApplication.deceasedCheck =!= Some(EntityCheckResult.Pass)
+    private def isDeceasedCheckRequired: Boolean = agentApplication.deceasedCheckResult =!= Some(EntityCheckResult.Pass)

@@ -47,7 +47,7 @@ class ApplicationFactory @Inject() (
     amlsDetails = None,
     agentDetails = None,
     refusalToDealWithCheckResult = None,
-    deceasedCheck = None,
+    deceasedCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
 

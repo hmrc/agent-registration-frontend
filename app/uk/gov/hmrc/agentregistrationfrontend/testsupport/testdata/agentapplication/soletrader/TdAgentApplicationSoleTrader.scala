@@ -41,7 +41,7 @@ trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdSectionAmls & TdS
       amlsDetails = None,
       agentDetails = None,
       refusalToDealWithCheckResult = None,
-      deceasedCheck = None,
+      deceasedCheckResult = None,
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
     )
 
@@ -61,11 +61,11 @@ trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdSectionAmls & TdS
     )
 
     val afterDeceasedCheckPass: AgentApplicationSoleTrader = afterRefusalToDealWithCheckPass.copy(
-      deceasedCheck = Some(EntityCheckResult.Pass)
+      deceasedCheckResult = Some(EntityCheckResult.Pass)
     )
 
     val afterDeceasedCheckFail: AgentApplicationSoleTrader = afterRefusalToDealWithCheckPass.copy(
-      deceasedCheck = Some(EntityCheckResult.Fail)
+      deceasedCheckResult = Some(EntityCheckResult.Fail)
     )
 
     val afterContactDetailsComplete: AgentApplicationSoleTrader = afterDeceasedCheckPass.copy(
@@ -88,20 +88,5 @@ trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdSectionAmls & TdS
     val afterDeclarationSubmitted: AgentApplicationSoleTrader = afterHmrcStandardForAgentsAgreed.copy(
       applicationState = ApplicationState.Submitted
     )
-
-//    val baseForSectionAmls: AgentApplicationSoleTrader = afterGrsDataReceived
-//    protected val agentApplicationLlpWithSectionAmls = new AgentApplicationLlpWithSectionAmls(baseForSectionAmls = baseForSectionAmls)
-//    export agentApplicationLlpWithSectionAmls.sectionAmls
-
-//    val baseForSectionContactDetails: AgentApplicationSoleTrader = afterGrsDataReceived
-//    protected val tdAgentApplicationLlpWithSectionContactDetails =
-//      new TdAgentApplicationLlpWithSectionContactDetails(baseForSectionContactDetails = baseForSectionContactDetails)
-
-//    export tdAgentApplicationLlpWithSectionContactDetails.sectionContactDetails
-//
-//    protected val tdAgentApplicationLlpWithSectionAgentDetails =
-//      new TdAgentApplicationLlpWithSectionAgentDetails(baseForSectionAgentDetails = afterContactDetailsComplete)
-//
-//    export tdAgentApplicationLlpWithSectionAgentDetails.sectionAgentDetails
 
 }
