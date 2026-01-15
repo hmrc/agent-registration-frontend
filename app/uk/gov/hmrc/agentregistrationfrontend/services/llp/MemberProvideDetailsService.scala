@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.connectors.llp.MemberProvidedDetail
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
+import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
@@ -42,14 +43,16 @@ extends RequestAwareLogging:
     internalUserId: InternalUserId,
     agentApplicationId: AgentApplicationId,
     memberNino: Option[MemberNino],
-    memberSaUtr: Option[MemberSaUtr]
+    memberSaUtr: Option[MemberSaUtr],
+    memberDateOfBirth: Option[LocalDate] = None
   )(using request: IndividualAuthorisedWithIdentifiersRequest[?]): MemberProvidedDetails =
     logger.info(s"creating new provided details for user:[${internalUserId.value}] and applicationId:[${agentApplicationId.value}] ")
     provideDetailsFactory.makeNewMemberProvidedDetails(
       internalUserId,
       agentApplicationId,
       memberNino,
-      memberSaUtr
+      memberSaUtr,
+      memberDateOfBirth
     )
 
   def findByApplicationId(applicationId: AgentApplicationId)(using request: IndividualAuthorisedRequest[?]): Future[Option[MemberProvidedDetails]] =
