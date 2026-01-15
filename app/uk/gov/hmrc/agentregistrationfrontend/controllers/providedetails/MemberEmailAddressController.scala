@@ -165,7 +165,7 @@ extends FrontendController(mcc, actions):
       )
     ),
     continueUrl = appConfig.thisFrontendBaseUrl + AppRoutes.providedetails.MemberEmailAddressController.verify.url,
-    maybeBackUrl = Some(appConfig.thisFrontendBaseUrl + AppRoutes.providedetails.MemberEmailAddressController.show.url),
+    maybeBackUrl = None,
     accessibilityStatementUrl = appConfig.accessibilityStatementPath,
     lang = messagesApi.preferred(request).lang.code
   )
