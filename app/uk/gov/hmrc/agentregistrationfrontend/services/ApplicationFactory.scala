@@ -46,7 +46,8 @@ class ApplicationFactory @Inject() (
     applicantContactDetails = None,
     amlsDetails = None,
     agentDetails = None,
-    entityCheckResult = None,
+    refusalToDealWithCheckResult = None,
+    deceasedCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
 
@@ -66,7 +67,7 @@ class ApplicationFactory @Inject() (
     applicantContactDetails = None,
     amlsDetails = None,
     agentDetails = None,
-    entityCheckResult = None,
+    refusalToDealWithCheckResult = None,
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
@@ -87,7 +88,7 @@ class ApplicationFactory @Inject() (
     applicantContactDetails = None,
     amlsDetails = None,
     agentDetails = None,
-    entityCheckResult = None,
+    refusalToDealWithCheckResult = None,
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
@@ -108,7 +109,7 @@ class ApplicationFactory @Inject() (
     applicantContactDetails = None,
     amlsDetails = None,
     agentDetails = None,
-    entityCheckResult = None,
+    refusalToDealWithCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
 
@@ -128,7 +129,7 @@ class ApplicationFactory @Inject() (
     applicantContactDetails = None,
     amlsDetails = None,
     agentDetails = None,
-    entityCheckResult = None,
+    refusalToDealWithCheckResult = None,
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
@@ -149,7 +150,7 @@ class ApplicationFactory @Inject() (
     applicantContactDetails = None,
     amlsDetails = None,
     agentDetails = None,
-    entityCheckResult = None,
+    refusalToDealWithCheckResult = None,
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
@@ -170,6 +171,6 @@ class ApplicationFactory @Inject() (
     applicantContactDetails = None,
     amlsDetails = None,
     agentDetails = None,
-    entityCheckResult = None,
+    refusalToDealWithCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )

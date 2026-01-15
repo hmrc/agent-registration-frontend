@@ -14,39 +14,41 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
+package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.checkfailed
 
 import play.api.mvc.*
-import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.companyStatusCheck
+import uk.gov.hmrc.agentregistration.shared.CheckResult
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.CompanyStatusBlockPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.checkfailed.CompanyStatusBlockPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class CompanyStatusBlockController @Inject() (
+class CanNotRegisterCompanyOrPartnershipController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   companyStatusBlockPage: CompanyStatusBlockPage
 )
 extends FrontendController(mcc, actions):
 
-  def showBlockedPage: Action[AnyContent] =
+  def show: Action[AnyContent] =
     actions
       .Applicant
       .getApplicationInProgress
       .ensure(
         condition =
           _.agentApplication match
-            case a: AgentApplication.IsIncorporated => a.companyStatusCheckResult.exists(_ === CompanyStatusCheckResult.Block)
-            case _ => false,
+            case a: AgentApplication.IsIncorporated => a.companyStatusCheck === Some(CheckResult.Fail)
+            case a: AgentApplication.IsNotIncorporated => false,
         resultWhenConditionNotMet =
           implicit request =>
-            logger.warn("Companies house status check has not been done or is not applicable, redirecting to companyStatusCheck")
-            Redirect(AppRoutes.apply.internal.CompaniesHouseStatusController.companyStatusCheck())
+            logger.warn("Companies house status check has not been blocked. Redirecting to company status check.")
+            Redirect(AppRoutes.apply.internal.CompaniesHouseStatusController.check())
       ):
         implicit request =>
           Ok(companyStatusBlockPage())

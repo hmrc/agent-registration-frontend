@@ -22,6 +22,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRo
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.routes as aboutyourbusinessRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.routes as amlsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.api.routes as amlsApiRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.checkfailed.routes as entitycheckfailedRoutes
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.routes as applicantcontactdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.routes as agentdetailsRoutes
@@ -46,7 +47,6 @@ object AppRoutes:
     val SaveForLaterController = applyRoutes.SaveForLaterController
     val HmrcStandardForAgentsController = applyRoutes.HmrcStandardForAgentsController
     val DeclarationController = applyRoutes.DeclarationController
-    val CompanyStatusBlockController = applyRoutes.CompanyStatusBlockController
 
     object aboutyourbusiness:
 
@@ -83,12 +83,19 @@ object AppRoutes:
       val AgentCorrespondenceAddressController = agentdetailsRoutes.AgentCorrespondenceAddressController
       val CheckYourAnswersController = agentdetailsRoutes.CheckYourAnswersController
 
+    object checkfailed:
+
+      val CanNotRegisterCompanyOrPartnershipController = entitycheckfailedRoutes.CanNotRegisterCompanyOrPartnershipController
+      val CanNotRegisterController = entitycheckfailedRoutes.CanNotRegisterController
+      val CanNotConfirmIdentityController = entitycheckfailedRoutes.CanNotConfirmIdentityController
+
     object internal:
 
       val InitiateAgentApplicationController = internalRoutes.InitiateAgentApplicationController
       val GrsController = internalRoutes.GrsController
       val AddressLookupCallbackController = internalRoutes.AddressLookupCallbackController
-      val EntityCheckController = internalRoutes.EntityCheckController
+      val RefusalToDealWithController = internalRoutes.RefusalToDealWithController
+      val DeceasedController = internalRoutes.DeceasedController
       val CompaniesHouseStatusController = internalRoutes.CompaniesHouseStatusController
 
   object providedetails:

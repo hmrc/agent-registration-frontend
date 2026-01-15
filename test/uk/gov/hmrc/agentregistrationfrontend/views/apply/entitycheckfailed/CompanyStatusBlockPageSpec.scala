@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.apply
+package uk.gov.hmrc.agentregistrationfrontend.views.apply.entitycheckfailed
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.CompanyStatusBlockPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.checkfailed.CompanyStatusBlockPage
 
 class CompanyStatusBlockPageSpec
 extends ViewSpec:
@@ -56,4 +56,4 @@ extends ViewSpec:
         .selectOnlyOneElementOrFail()
 
       button.text() shouldBe "Try again"
-      button.attr("href") shouldBe "/agent-registration/apply/internal/status-check"
+      button.attr("href") shouldBe "/agent-registration/apply/internal/companies-house-status-check"

@@ -94,6 +94,7 @@ class AppConfig @Inject() (
   val upscanInitiateBaseUrl: String = servicesConfig.baseUrl("upscan-initiate")
 
   val companiesHouseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.companies-house", configuration)
+  val contacHmrctUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.contact-hmrc", configuration)
 
   object Upscan:
 

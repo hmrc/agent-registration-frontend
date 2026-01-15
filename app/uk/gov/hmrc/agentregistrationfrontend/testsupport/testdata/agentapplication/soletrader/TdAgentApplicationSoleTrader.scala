@@ -16,8 +16,77 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.soletrader
 
+import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.ApplicationState.GrsDataReceived
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.llp.TdSectionAgentDetails
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.llp.TdSectionAmls
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.llp.TdSectionContactDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
 
-trait TdAgentApplicationSoleTrader { dependencies: TdBase =>
+trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdSectionAmls & TdSectionContactDetails & TdGrs & TdSectionAgentDetails) =>
+
+  object agentApplicationSoleTrader:
+
+    val afterStarted: AgentApplicationSoleTrader = AgentApplicationSoleTrader(
+      _id = dependencies.agentApplicationId,
+      internalUserId = dependencies.internalUserId,
+      linkId = dependencies.linkId,
+      groupId = dependencies.groupId,
+      createdAt = dependencies.nowAsInstant,
+      applicationState = ApplicationState.Started,
+      userRole = Some(UserRole.Authorised),
+      businessDetails = None,
+      applicantContactDetails = None,
+      amlsDetails = None,
+      agentDetails = None,
+      refusalToDealWithCheckResult = None,
+      deceasedCheckResult = None,
+      hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
+    )
+
+    val afterGrsDataReceived: AgentApplicationSoleTrader = afterStarted.copy(
+      businessDetails = Some(
+        dependencies.grs.soleTrader.businessDetails
+      ),
+      applicationState = GrsDataReceived
+    )
+
+    val afterRefusalToDealWithCheckPass: AgentApplicationSoleTrader = afterGrsDataReceived.copy(
+      refusalToDealWithCheckResult = Some(CheckResult.Pass)
+    )
+
+    val afterRefusalToDealWithCheckFail: AgentApplicationSoleTrader = afterGrsDataReceived.copy(
+      refusalToDealWithCheckResult = Some(CheckResult.Fail)
+    )
+
+    val afterDeceasedCheckPass: AgentApplicationSoleTrader = afterRefusalToDealWithCheckPass.copy(
+      deceasedCheckResult = Some(CheckResult.Pass)
+    )
+
+    val afterDeceasedCheckFail: AgentApplicationSoleTrader = afterRefusalToDealWithCheckPass.copy(
+      deceasedCheckResult = Some(CheckResult.Fail)
+    )
+
+    val afterContactDetailsComplete: AgentApplicationSoleTrader = afterDeceasedCheckPass.copy(
+      applicantContactDetails = Some(dependencies.applicantContactDetails),
+      agentDetails = None
+    )
+
+    val afterAgentDetailsComplete: AgentApplicationSoleTrader = afterContactDetailsComplete.copy(
+      agentDetails = Some(dependencies.completeAgentDetails)
+    )
+
+    val afterAmlsComplete: AgentApplicationSoleTrader = afterAgentDetailsComplete.copy(
+      amlsDetails = Some(dependencies.completeAmlsDetails)
+    )
+
+    val afterHmrcStandardForAgentsAgreed: AgentApplicationSoleTrader = afterAmlsComplete.copy(
+      hmrcStandardForAgentsAgreed = StateOfAgreement.Agreed
+    )
+
+    val afterDeclarationSubmitted: AgentApplicationSoleTrader = afterHmrcStandardForAgentsAgreed.copy(
+      applicationState = ApplicationState.Submitted
+    )
 
 }

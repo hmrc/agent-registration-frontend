@@ -21,8 +21,9 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
-import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
+import uk.gov.hmrc.agentregistration.shared.hasCheckPassed
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
@@ -54,10 +55,10 @@ extends FrontendController(mcc, actions):
     )
     .ensure(
       _.agentApplication
-        .hasPassedAllEntityChecks,
+        .hasCheckPassed,
       implicit request =>
-        logger.warn("Entity checks not passed, redirecting to begin checks where failures will be handled")
-        Redirect(AppRoutes.apply.internal.EntityCheckController.entityCheck())
+        logger.warn("Entity failed or has not been completed, redirecting to entity check.")
+        Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
     )
     .async:
       implicit request =>

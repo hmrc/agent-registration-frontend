@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CompaniesHouseApiProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistration.shared.CompanyStatusCheckResult
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,9 +43,7 @@ class CompaniesHouseStatusController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private def nextPage: Call = AppRoutes.apply.TaskListController.show
-
-  def companyStatusCheck(): Action[AnyContent] = actions
+  def check(): Action[AnyContent] = actions
     .Applicant
     .getApplicationInProgress
     .ensure(
@@ -54,27 +52,17 @@ extends FrontendController(mcc, actions):
           .isIncorporated,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("No Companies House check required for non-incorporated business types, redirecting to task list.")
+          logger.debug("No Companies House check required for non-incorporated business types, redirecting to task list.")
           Redirect(AppRoutes.apply.TaskListController.show)
     )
     .ensure(
       condition =
-        _.agentApplication
-          .entityCheckResult
-          .isDefined,
-      resultWhenConditionNotMet =
-        implicit request =>
-          logger.warn("Entity verification has not been done. Redirecting to entity check.")
-          Redirect(AppRoutes.apply.internal.EntityCheckController.entityCheck())
-    )
-    .ensure(
-      condition =
         _.agentApplication match
-          case a: AgentApplication.IsIncorporated => a.companyStatusCheckResult.isEmpty
-          case _ => true,
+          case a: AgentApplication.IsIncorporated => a.isCompanyStatusCheckRequired
+          case _: AgentApplication.IsNotIncorporated => false,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.info("Company status already done or not needed. Redirecting to task list page.")
+          logger.warn("Company status already done or not needed. Redirecting to task list page.")
           Redirect(nextPage)
     )
     .async:
@@ -88,9 +76,9 @@ extends FrontendController(mcc, actions):
 
   private def doCompanyStatusCheck(agentApplication: AgentApplication.IsIncorporated)(using request: AuthorisedRequest[?]): Future[Result] =
     for
-      companyStatusCheckResult: CompanyStatusCheckResult <- companiesHouseApiProxyConnector
+      companyStatusCheckResult <- companiesHouseApiProxyConnector
         .getCompanyHouseStatus(agentApplication.dontCallMe_getCompanyProfile.companyNumber)
-        .map(_.toCompanyStatusCheckResult)
+        .map(_.toCheckResult)
       _ <- agentApplicationService
         .upsert:
           agentApplication match
@@ -99,5 +87,18 @@ extends FrontendController(mcc, actions):
             case a: AgentApplicationLlp => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
             case a: AgentApplicationScottishLimitedPartnership => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
     yield companyStatusCheckResult match
-      case CompanyStatusCheckResult.Allow => Redirect(nextPage)
-      case CompanyStatusCheckResult.Block => Redirect(AppRoutes.apply.CompanyStatusBlockController.showBlockedPage)
+      case CheckResult.Pass => Redirect(nextPage)
+      case CheckResult.Fail => Redirect(failedCheckPage)
+
+  private def failedCheckPage = AppRoutes.apply.checkfailed.CanNotRegisterCompanyOrPartnershipController.show
+  private def nextPage: Call = AppRoutes.apply.TaskListController.show
+
+  extension (agentApplication: AgentApplication)
+
+    private def isIncorporated: Boolean =
+      agentApplication match
+        case _: AgentApplication.IsIncorporated => true
+        case _: AgentApplication.IsNotIncorporated => false
+
+  extension (agentApplication: AgentApplication.IsIncorporated)
+    private def isCompanyStatusCheckRequired: Boolean = agentApplication.companyStatusCheck =!= Some(CheckResult.Pass)

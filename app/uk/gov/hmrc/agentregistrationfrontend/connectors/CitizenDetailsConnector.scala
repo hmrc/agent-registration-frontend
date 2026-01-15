@@ -14,17 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.connectors.llp
+package uk.gov.hmrc.agentregistrationfrontend.connectors
 
+import play.api.libs.json.JsPath
+import play.api.libs.json.Reads
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.llp.CitizenDetails
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
+import uk.gov.hmrc.agentregistrationfrontend.model.llp.DesignatoryDetailsResponse
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
+import uk.gov.hmrc.http.HttpErrorFunctions.is2xx
 import uk.gov.hmrc.http.HttpReads.Implicits.given
-import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.http.StringContextOps
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -45,3 +51,31 @@ extends RequestAwareLogging:
   )(using rh: RequestHeader): Future[CitizenDetails] = httpClient
     .get(url"${baseUrl}/citizen-details/nino/${nino.value}")
     .execute[CitizenDetails]
+
+  /** See https://github.com/hmrc/citizen-details?tab=readme-ov-file#get-citizen-detailsninodesignatory-details
+    */
+  def getDesignatoryDetails(
+    nino: Nino
+  )(using rh: RequestHeader): Future[DesignatoryDetailsResponse] =
+    val url = url"$baseUrl/citizen-details/${nino.value}/designatory-details"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case s if is2xx(s) => response.json.as[DesignatoryDetailsResponse]
+          case status =>
+            logger.error(s"Citizen details designatory details deceased check error for ${nino.value}; HTTP status: $status")
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+
+  private given Reads[DesignatoryDetailsResponse] =
+    for
+      deceased <- (JsPath \ "person" \ "deceased")
+        .readNullable[Boolean]
+        .map(_.getOrElse(false))
+    yield DesignatoryDetailsResponse(deceased = deceased)
