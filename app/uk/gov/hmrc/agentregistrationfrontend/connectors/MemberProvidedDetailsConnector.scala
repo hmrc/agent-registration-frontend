@@ -33,7 +33,7 @@ class MemberProvidedDetailsConnector @Inject() (
   httpClient: HttpClientV2,
   appConfig: AppConfig
 )(using
-  ec: ExecutionContext
+  ExecutionContext
 )
 extends Connector:
 
