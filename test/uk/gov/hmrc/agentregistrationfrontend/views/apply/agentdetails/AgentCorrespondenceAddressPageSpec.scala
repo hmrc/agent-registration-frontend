@@ -20,6 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
+import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.AddressOptions
@@ -48,7 +49,7 @@ extends ViewSpec:
   private val addressOptionsWithOther = addressOptions.copy(
     otherAddress = Some(
       AgentCorrespondenceAddress(
-        addressLine1 = tdAll.getConfirmedAddressResponse.lines.head,
+        addressLine1 = tdAll.getConfirmedAddressResponse.lines.headOption.getOrThrowExpectedDataMissing("getConfirmedAddressResponse.line.head"),
         addressLine2 = tdAll.getConfirmedAddressResponse.lines.lift(1),
         addressLine3 = tdAll.getConfirmedAddressResponse.lines.lift(2),
         addressLine4 = tdAll.getConfirmedAddressResponse.lines.lift(3),
