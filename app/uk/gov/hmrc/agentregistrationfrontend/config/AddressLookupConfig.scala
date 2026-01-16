@@ -41,11 +41,20 @@ class AddressLookupConfig @Inject() (
           "showSearchLinkAgain" -> true
         ),
         "allowedCountryCodes" -> Json.arr("GB"),
+        "ukMode" -> true,
         "confirmPageConfig" -> Json.obj(
           "showChangeLink" -> true,
           "showSubHeadingAndInfo" -> true,
           "showSearchAgainLink" -> false,
           "showConfirmChangeText" -> true
+        ),
+        "manualAddressEntryConfig" -> Json.obj(
+          "mandatoryFields" -> Json.obj(
+            "addressLine1" -> true,
+            "town" -> true,
+            "postcode" -> true
+          ),
+          "showOrganisationName" -> false
         ),
         "timeoutConfig" -> Json.obj(
           "timeoutAmount" -> 900,
