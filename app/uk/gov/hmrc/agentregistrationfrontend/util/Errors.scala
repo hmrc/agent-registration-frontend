@@ -26,40 +26,54 @@ import uk.gov.hmrc.http.UpstreamErrorResponse
 import java.net.URL
 import scala.concurrent.Future
 
-object Errors
-extends RequestAwareLogging:
+object Errors:
 
   export uk.gov.hmrc.agentregistration.shared.util.Errors.*
 
-  inline def throwBadRequestException(message: => String)(using request: RequestHeader): Nothing =
+  inline def throwBadRequestException(message: => String)(using
+    logger: RequestAwareLogger,
+    requestHeader: RequestHeader
+  ): Nothing =
     logger.error(message)
     throw UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.BAD_REQUEST
     )
 
-  inline def throwBadRequestExceptionF(message: => String)(using request: RequestHeader): Future[Nothing] =
+  inline def throwBadRequestExceptionF(message: => String)(using
+    logger: RequestAwareLogger,
+    requestHeader: RequestHeader
+  ): Future[Nothing] =
     logger.error(message)
     Future.failed(UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.BAD_REQUEST
     ))
 
-  inline def throwNotFoundException(message: => String)(using request: RequestHeader): Nothing =
+  inline def throwNotFoundException(message: => String)(using
+    logger: RequestAwareLogger,
+    requestHeader: RequestHeader
+  ): Nothing =
     logger.error(message)
     throw UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.NOT_FOUND
     )
 
-  inline def throwServerErrorException(message: => String)(using request: RequestHeader): Nothing =
+  inline def throwServerErrorException(message: => String)(using
+    logger: RequestAwareLogger,
+    requestHeader: RequestHeader
+  ): Nothing =
     logger.error(message)
     throw UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.INTERNAL_SERVER_ERROR
     )
 
-  inline def notImplemented(message: => String = "")(using request: RequestHeader): Nothing =
+  inline def notImplemented(message: => String = "")(using
+    logger: RequestAwareLogger,
+    requestHeader: RequestHeader
+  ): Nothing =
     val m = s"Unimplemented: $message"
     logger.error(m)
     throw UpstreamErrorResponse(m, play.mvc.Http.Status.NOT_IMPLEMENTED)

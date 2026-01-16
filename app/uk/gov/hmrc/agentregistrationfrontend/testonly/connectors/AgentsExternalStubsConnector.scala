@@ -16,23 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.connectors
 
-import play.api.http.Status
-import play.api.libs.json.Json
-import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
-import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.BusinessPartnerRecord
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
-import uk.gov.hmrc.http.HttpReads.Implicits.*
-import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
 /** Connector to agents external stubs service used in test environments only
   */
@@ -41,20 +32,28 @@ class AgentsExternalStubsConnector @Inject() (
   httpClient: HttpClientV2,
   appConfig: AppConfig
 )(using
-  ec: ExecutionContext
-):
+  ExecutionContext
+)
+extends Connector:
 
   def storeBusinessPartnerRecord(bpr: BusinessPartnerRecord)(using
     request: RequestHeader
-  ): Future[Unit] = httpClient
-    .post(url"$baseUrl/records/business-partner-record")
-    .withBody(Json.toJson(bpr))
-    .execute[HttpResponse]
-    .map { response =>
-      response.status match {
-        case Status.CREATED => ()
-        case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other.")
-      }
-    }
+  ): Future[Unit] =
+    val url: URL = url"$baseUrl/records/business-partner-record"
+    httpClient
+      .post(url)
+      .withBody(Json.toJson(bpr))
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.CREATED => ()
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to store business partner record")
 
   private val baseUrl: String = appConfig.agentsExternalStubsBaseUrl + "/agents-external-stubs"

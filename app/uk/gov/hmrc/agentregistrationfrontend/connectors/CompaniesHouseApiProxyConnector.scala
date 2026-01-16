@@ -16,55 +16,34 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
-import play.api.libs.json.Reads
 import play.api.libs.functional.syntax.*
-import play.api.libs.json.__
-import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.Crn
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
-import uk.gov.hmrc.http.HttpErrorFunctions.*
-import uk.gov.hmrc.http.HttpReads.Implicits.*
-import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.StringContextOps
-import uk.gov.hmrc.http.UpstreamErrorResponse
-import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.play.bootstrap.metrics.Metrics
-import play.api.http.Status.*
 import uk.gov.hmrc.agentregistrationfrontend.model.CompanyHouseStatus
+import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
 @Singleton
 class CompaniesHouseApiProxyConnector @Inject() (
   appConfig: AppConfig,
-  http: HttpClientV2,
-  val metrics: Metrics
-)(implicit val ec: ExecutionContext)
-extends RequestAwareLogging:
+  http: HttpClientV2
+)(using ExecutionContext)
+extends Connector:
 
-  val baseUrl: String = appConfig.companiesHouseApiProxyBaseUrl
+  private val baseUrl: String = appConfig.companiesHouseApiProxyBaseUrl
 
   def getCompaniesHouseOfficers(
     crn: Crn,
     surname: String,
     isLlp: Boolean = false
-  )(implicit
-    rh: RequestHeader
+  )(using
+    RequestHeader
   ): Future[Seq[CompaniesHouseOfficer]] =
-
-    implicit val companiesHouseOfficerReads: Reads[CompaniesHouseOfficer] =
-      (
-        (__ \ "name").read[String] and
-          (__ \ "date_of_birth").readNullable[CompaniesHouseDateOfBirth]
-      )(CompaniesHouseOfficer.apply)
 
     val registerType: String = if isLlp then "llp_members" else "directors"
     val params: Map[String, Any] = Map(
@@ -72,15 +51,23 @@ extends RequestAwareLogging:
       "register_view" -> true,
       "register_type" -> registerType
     )
+
+    val url: URL = url"$baseUrl/companies-house-api-proxy/company/${crn.value}/officers?$params"
+
     http
-      .get(url"$baseUrl/companies-house-api-proxy/company/${crn.value}/officers?$params")
+      .get(url)
       .execute[HttpResponse]
-      .map { response =>
-        response.status match {
-          case s if is2xx(s) => (response.json \ "items").as[Seq[CompaniesHouseOfficer]]
-          case s => throw UpstreamErrorResponse(s"Upstream error response from Companies House API Proxy: $s", s)
-        }
-      }
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => (response.json \ "items").as[Seq[CompaniesHouseOfficer]]
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to retrieve officers from Companies House for ${crn.value}")
 
   def getCompanyHouseStatus(
     crn: Crn
@@ -88,24 +75,24 @@ extends RequestAwareLogging:
     rh: RequestHeader
   ): Future[CompanyHouseStatus] =
 
-    val CompanyStatusPath = "company_status"
     val url = url"$baseUrl/companies-house-api-proxy/company/${crn.value}"
     http
       .get(url)
       .execute[HttpResponse]
-      .map { response =>
-        response.status match {
-          case s if is2xx(s) =>
-            (response.json \ CompanyStatusPath)
-              .asOpt[CompanyHouseStatus]
-              .getOrElse(throw UpstreamErrorResponse(s"Invalid or missing '$CompanyStatusPath' in response for CRN: ${crn.value}", OK))
+      .map: response =>
+        response.status match
+          case s if is2xx(s) => (response.json \ "company_status").as[CompanyHouseStatus]
           case status =>
-            logger.error(s"company status check error for ${crn.value}; HTTP status: $status")
             Errors.throwUpstreamErrorResponse(
               httpMethod = "GET",
               url = url,
               status = status,
               response = response
             )
-        }
-      }
+      .andLogOnFailure(s"Failed to retrieve company status for ${crn.value}")
+
+  private given Reads[CompaniesHouseOfficer] =
+    (
+      (__ \ "name").read[String] and
+        (__ \ "date_of_birth").readNullable[CompaniesHouseDateOfBirth]
+    )(CompaniesHouseOfficer.apply)

@@ -16,39 +16,31 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
-import play.api.libs.json.JsPath
-import play.api.libs.json.Reads
-import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.llp.CitizenDetails
+import uk.gov.hmrc.agentregistrationfrontend.model.citizendetails.CitizenDetails
 import uk.gov.hmrc.agentregistrationfrontend.model.llp.DesignatoryDetailsResponse
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-import uk.gov.hmrc.http.HttpErrorFunctions.is2xx
-import uk.gov.hmrc.http.HttpReads.Implicits.given
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.StringContextOps
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
 @Singleton
 class CitizenDetailsConnector @Inject() (
   appConfig: AppConfig,
   httpClient: HttpClientV2
-)(using ec: ExecutionContext)
-extends RequestAwareLogging:
+)(using ExecutionContext)
+extends Connector:
 
-  val baseUrl: String = appConfig.citizenDetailsBaseUrl
+  private val baseUrl: String = appConfig.citizenDetailsBaseUrl
 
   def getCitizenDetails(
     nino: Nino
-  )(using rh: RequestHeader): Future[CitizenDetails] = httpClient
+  )(using RequestHeader): Future[CitizenDetails] = httpClient
     .get(url"${baseUrl}/citizen-details/nino/${nino.value}")
     .execute[CitizenDetails]
 
@@ -56,8 +48,8 @@ extends RequestAwareLogging:
     */
   def getDesignatoryDetails(
     nino: Nino
-  )(using rh: RequestHeader): Future[DesignatoryDetailsResponse] =
-    val url = url"$baseUrl/citizen-details/${nino.value}/designatory-details"
+  )(using RequestHeader): Future[DesignatoryDetailsResponse] =
+    val url: URL = url"$baseUrl/citizen-details/${nino.value}/designatory-details"
     httpClient
       .get(url)
       .execute[HttpResponse]
@@ -65,17 +57,33 @@ extends RequestAwareLogging:
         response.status match
           case s if is2xx(s) => response.json.as[DesignatoryDetailsResponse]
           case status =>
-            logger.error(s"Citizen details designatory details deceased check error for ${nino.value}; HTTP status: $status")
             Errors.throwUpstreamErrorResponse(
               httpMethod = "GET",
               url = url,
               status = status,
               response = response
             )
+      .andLogOnFailure(s"Failed to get designatory details")
 
   private given Reads[DesignatoryDetailsResponse] =
     for
-      deceased <- (JsPath \ "person" \ "deceased")
+      deceased <- (__ \ "person" \ "deceased")
         .readNullable[Boolean]
         .map(_.getOrElse(false))
     yield DesignatoryDetailsResponse(deceased = deceased)
+
+  private given Reads[CitizenDetails] =
+    val citizenDateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("ddMMyyyy")
+    for
+      firstName <- (__ \ "name" \ "current" \ "firstName").readNullable[String]
+      lastName <- (__ \ "name" \ "current" \ "lastName").readNullable[String]
+      dateOfBirth <- (__ \ "dateOfBirth")
+        .readNullable[String]
+        .map(_.map(date => LocalDate.parse(date, citizenDateFormatter)))
+      saUtr <- (__ \ "ids" \ "sautr").readNullable[String].map(_.map(SaUtr.apply))
+    yield CitizenDetails(
+      firstName = firstName,
+      lastName = lastName,
+      dateOfBirth = dateOfBirth,
+      saUtr = saUtr
+    )
