@@ -20,6 +20,7 @@ import com.softwaremill.quicklens.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.agentdetails.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors.*
 
 trait TdSectionAgentDetails {
   dependencies: TdBase =>
@@ -78,7 +79,7 @@ trait TdSectionAgentDetails {
           .modify(_.agentDetails.each.agentCorrespondenceAddress)
           .setTo(Some(
             AgentCorrespondenceAddress(
-              addressLine1 = dependencies.getConfirmedAddressResponse.lines.head,
+              addressLine1 = dependencies.getConfirmedAddressResponse.lines.headOption.getOrThrowExpectedDataMissing("getConfirmedAddressResponse.line.head"),
               addressLine2 = dependencies.getConfirmedAddressResponse.lines.lift(1),
               addressLine3 = dependencies.getConfirmedAddressResponse.lines.lift(2),
               addressLine4 = dependencies.getConfirmedAddressResponse.lines.lift(3),
