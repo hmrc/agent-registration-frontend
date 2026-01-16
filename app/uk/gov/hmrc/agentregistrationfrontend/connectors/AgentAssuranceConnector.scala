@@ -16,33 +16,23 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
-import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.CheckResult
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
-import uk.gov.hmrc.http.HttpReads.Implicits.*
-import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
 @Singleton
 class AgentAssuranceConnector @Inject() (
   http: HttpClientV2,
   appConfig: AppConfig
-)(implicit val ec: ExecutionContext)
-extends RequestAwareLogging:
+)(using ExecutionContext)
+extends Connector:
 
-  def checkForRefusalToDealWith(utr: Utr)(using
-    rh: RequestHeader
-  ): Future[CheckResult] =
+  def checkForRefusalToDealWith(utr: Utr)(using RequestHeader): Future[CheckResult] =
     val url = url"${appConfig.agentAssuranceBaseUrl}/agent-assurance/refusal-to-deal-with/utr/${utr.value}"
     http
       .get(url)
@@ -52,10 +42,10 @@ extends RequestAwareLogging:
           case 403 => CheckResult.Fail
           case 200 => CheckResult.Pass
           case status =>
-            logger.error(s"refusal-to-deal-with check error for ${utr.value}; HTTP status: $status")
             Errors.throwUpstreamErrorResponse(
               httpMethod = "GET",
               url = url,
               status = status,
               response = response
             )
+      .andLogOnFailure(s"Failed to check for refusal to deal with")

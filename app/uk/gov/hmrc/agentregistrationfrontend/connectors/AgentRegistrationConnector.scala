@@ -16,25 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
-import play.api.http.Status
-import play.api.libs.json.Json
-import play.api.libs.ws.JsonBodyWritables.given
-import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
-import uk.gov.hmrc.http.HttpReads.Implicits.given
-import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
 /** Connector to the companion backend microservice
   */
@@ -43,14 +32,14 @@ class AgentRegistrationConnector @Inject() (
   httpClient: HttpClientV2,
   appConfig: AppConfig
 )(using
-  ec: ExecutionContext
+  ExecutionContext
 )
-extends RequestAwareLogging:
+extends Connector:
 
   def findApplication()(using
-    request: AuthorisedRequest[?]
+    AuthorisedRequest[?]
   ): Future[Option[AgentApplication]] =
-    val url = url"$baseUrl/application"
+    val url: URL = url"$baseUrl/application"
     httpClient
       .get(url)
       .execute[HttpResponse]
@@ -66,11 +55,12 @@ extends RequestAwareLogging:
               response = response,
               info = "findApplication problem"
             )
+      .andLogOnFailure(s"Failed to find Agent Application")
 
   def upsertApplication(application: AgentApplication)(using
-    request: RequestHeader
+    RequestHeader
   ): Future[Unit] =
-    val url = url"$baseUrl/application"
+    val url: URL = url"$baseUrl/application"
     httpClient
       .post(url)
       .withBody(Json.toJson(application))
@@ -86,11 +76,12 @@ extends RequestAwareLogging:
               response = response,
               info = "upsertApplication problem"
             )
+      .andLogOnFailure(s"Failed to upsert Agent Application: ${application.agentApplicationId}")
 
   def findApplication(linkId: LinkId)(using
-    request: RequestHeader
+    RequestHeader
   ): Future[Option[AgentApplication]] =
-    val url = url"$baseUrl/application/linkId/${linkId.value}"
+    val url: URL = url"$baseUrl/application/linkId/${linkId.value}"
     httpClient
       .get(url)
       .execute[HttpResponse]
@@ -103,14 +94,14 @@ extends RequestAwareLogging:
               httpMethod = "GET",
               url = url,
               status = other,
-              response = response,
-              info = s"findApplication by $linkId problem"
+              response = response
             )
+      .andLogOnFailure(s"Failed to find Agent Application by link-id: $linkId")
 
   def findApplication(agentApplicationId: AgentApplicationId)(using
     request: RequestHeader
   ): Future[Option[AgentApplication]] =
-    val url = url"$baseUrl/application/by-agent-application-id/${agentApplicationId.value}"
+    val url: URL = url"$baseUrl/application/by-agent-application-id/${agentApplicationId.value}"
     httpClient
       .get(url)
       .execute[HttpResponse]
@@ -123,14 +114,14 @@ extends RequestAwareLogging:
               httpMethod = "GET",
               url = url,
               status = other,
-              response = response,
-              info = s"findApplication by $agentApplicationId problem"
+              response = response
             )
+      .andLogOnFailure(s"Failed to find Agent Application by agentApplicationId: $agentApplicationId")
 
   def getBusinessPartnerRecord(utr: Utr)(using
     request: RequestHeader
   ): Future[Option[BusinessPartnerRecordResponse]] =
-    val url = url"$baseUrl/business-partner-record/utr/${utr.value}"
+    val url: URL = url"$baseUrl/business-partner-record/utr/${utr.value}"
     httpClient
       .get(url)
       .execute[HttpResponse]
@@ -143,8 +134,8 @@ extends RequestAwareLogging:
               httpMethod = "GET",
               url = url,
               status = other,
-              response = response,
-              info = s"getBusinessPartnerRecord problem"
+              response = response
             )
+      .andLogOnFailure(s"Failed to get business partner record")
 
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration"

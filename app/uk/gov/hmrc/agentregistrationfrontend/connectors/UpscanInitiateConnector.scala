@@ -17,30 +17,23 @@
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import com.typesafe.config.ConfigMemorySize
-import play.api.libs.json.Format
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
-import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
-import play.api.mvc.RequestHeader
-import sttp.model.Uri
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector.*
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
-import uk.gov.hmrc.http.HttpReads.Implicits.*
-import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Inject
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
 /** Connector for interacting with the upscan-initiate µservice.
   */
 class UpscanInitiateConnector @Inject() (
   appConfig: AppConfig,
   httpClientV2: HttpClientV2
-)(using ExecutionContext):
+)(using ExecutionContext)
+extends Connector:
 
   private val baseUrl: String = appConfig.upscanInitiateBaseUrl
 
@@ -52,15 +45,28 @@ class UpscanInitiateConnector @Inject() (
     redirectOnErrorUrl: Uri,
     callbackUrl: Uri,
     maxFileSize: ConfigMemorySize
-  )(using RequestHeader): Future[UpscanInitiateResponse] = httpClientV2
-    .post(url"$baseUrl/upscan/v2/initiate")
-    .withBody(Json.toJson(UpscanInitiateRequest(
-      callbackUrl = callbackUrl.toString,
-      successRedirect = Some(redirectOnSuccessUrl.toString),
-      errorRedirect = Some(redirectOnErrorUrl.toString),
-      maximumFileSize = Some(maxFileSize.toBytes)
-    )))
-    .execute[UpscanInitiateResponse]
+  )(using RequestHeader): Future[UpscanInitiateResponse] =
+    val url: URL = url"$baseUrl/upscan/v2/initiate"
+    httpClientV2
+      .post(url)
+      .withBody(Json.toJson(UpscanInitiateRequest(
+        callbackUrl = callbackUrl.toString,
+        successRedirect = Some(redirectOnSuccessUrl.toString),
+        errorRedirect = Some(redirectOnErrorUrl.toString),
+        maximumFileSize = Some(maxFileSize.toBytes)
+      )))
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => response.json.as[UpscanInitiateResponse]
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to initiate upscan")
 
 object UpscanInitiateConnector:
 
@@ -81,7 +87,7 @@ object UpscanInitiateConnector:
   )
 
   object UpscanInitiateResponse:
-    given Format[UpscanInitiateResponse] = Json.format[UpscanInitiateResponse]
+    given OFormat[UpscanInitiateResponse] = Json.format[UpscanInitiateResponse]
 
   final case class UploadRequest(
     href: String,
@@ -89,4 +95,4 @@ object UpscanInitiateConnector:
   )
 
   object UploadRequest:
-    given Format[UploadRequest] = Json.format[UploadRequest]
+    given OFormat[UploadRequest] = Json.format[UploadRequest]

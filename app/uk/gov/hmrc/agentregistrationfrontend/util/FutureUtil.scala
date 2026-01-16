@@ -13,3 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package uk.gov.hmrc.agentregistrationfrontend.util
+
+import play.api.mvc.RequestHeader
+
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
+import scala.util.Failure
+
+object FutureUtil:
+
+  extension [T](f: Future[T])(using
+    logger: RequestAwareLogger,
+    requestHeader: RequestHeader,
+    ec: ExecutionContext
+  )
+    def andLogOnFailure(message: => String): Future[T] = f.andThen:
+      case Failure(exception) => logger.error(message, exception)

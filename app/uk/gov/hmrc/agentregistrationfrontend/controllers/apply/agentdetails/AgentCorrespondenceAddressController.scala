@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 
 import com.softwaremill.quicklens.each
 import com.softwaremill.quicklens.modify
-import play.api.i18n.Lang
 import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
@@ -114,7 +113,6 @@ extends FrontendController(mcc, actions):
           val addressOption = request.formValue
           if addressOption.matches("other")
           then
-            given language: Lang = mcc.messagesApi.preferred(request).lang
             addressLookUpConnector
               .initJourney(AppRoutes.apply.internal.AddressLookupCallbackController.journeyCallback(None))
               .map(Redirect(_))
