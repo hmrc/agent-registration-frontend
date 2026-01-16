@@ -77,7 +77,7 @@ extends ControllerSpec:
       enterUrl = s"$thisFrontendBaseUrl/agent-registration/apply/applicant/email-address"
     )),
     lang = Some("en"),
-    backUrl = Some(s"$thisFrontendBaseUrl/agent-registration/apply/applicant/email-address"),
+    backUrl = None,
     pageTitle = None
   )
 

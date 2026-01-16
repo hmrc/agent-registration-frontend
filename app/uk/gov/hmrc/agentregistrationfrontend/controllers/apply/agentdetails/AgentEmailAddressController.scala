@@ -213,7 +213,7 @@ extends FrontendController(mcc, actions):
       )
     ),
     continueUrl = appConfig.thisFrontendBaseUrl + AppRoutes.apply.agentdetails.AgentEmailAddressController.verify.url,
-    maybeBackUrl = Some(appConfig.thisFrontendBaseUrl + AppRoutes.apply.agentdetails.AgentEmailAddressController.show.url),
+    maybeBackUrl = None, // APB-10609 explicitly no back url for email verification as it will be used to hard code a back link which breaks the history chain
     accessibilityStatementUrl = appConfig.accessibilityStatementPath,
     lang = messagesApi.preferred(request).lang.code
   )
