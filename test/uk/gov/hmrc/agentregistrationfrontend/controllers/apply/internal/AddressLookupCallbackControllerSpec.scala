@@ -58,7 +58,7 @@ extends ControllerSpec:
     )
     AddressLookupFrontendStubs.stubAddressLookupWithId(
       journeyId = JourneyId("address-id-123"),
-      address = tdAll.newCorrespondenceAddress
+      getConfirmedAddressResponse = tdAll.getConfirmedAddressResponse
     )
     val response: WSResponse = get(s"$path?id=${JourneyId("address-id-123").value}")
 

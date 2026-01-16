@@ -17,12 +17,10 @@
 package uk.gov.hmrc.agentregistrationfrontend.util
 
 import play.api.http.Status
-import play.api.mvc.Request
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.http.HttpErrorFunctions
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.http.UpstreamErrorResponse
 
 import java.net.URL
@@ -31,25 +29,7 @@ import scala.concurrent.Future
 object Errors
 extends RequestAwareLogging:
 
-  /** Creates a requirement which has to pass in order to continue computation.
-    */
-  inline def require(
-    requirement: Boolean,
-    message: => String
-  )(using request: RequestHeader): Unit =
-    if !requirement then
-      logger.error(s"Requirement failed: $message")
-      throw InternalServerException(message)
-    else ()
-
-  def requireF(
-    requirement: Boolean,
-    message: => String
-  )(using request: Request[?]): Future[Unit] =
-    if !requirement then
-      logger.error(s"Requirement failed: $message")
-      Future.failed(InternalServerException(message))
-    else Future.successful(())
+  export uk.gov.hmrc.agentregistration.shared.util.Errors.*
 
   inline def throwBadRequestException(message: => String)(using request: RequestHeader): Nothing =
     logger.error(message)

@@ -20,6 +20,7 @@ import com.softwaremill.quicklens.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.agentdetails.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors.*
 
 trait TdSectionAgentDetails {
   dependencies: TdBase =>
@@ -65,18 +66,26 @@ trait TdSectionAgentDetails {
         val afterBprAddressSelected: AgentApplicationLlp = afterVerifiedEmailAddressSelected
           .modify(_.agentDetails.each.agentCorrespondenceAddress)
           .setTo(Some(
-            AgentCorrespondenceAddress
-              .fromValueString(
-                dependencies
-                  .bprRegisteredAddress
-                  .toValueString
-              )
+            AgentCorrespondenceAddress(
+              addressLine1 = dependencies.bprRegisteredAddress.addressLine1,
+              addressLine2 = dependencies.bprRegisteredAddress.addressLine2,
+              addressLine3 = dependencies.bprRegisteredAddress.addressLine3,
+              addressLine4 = dependencies.bprRegisteredAddress.addressLine4,
+              postalCode = dependencies.bprRegisteredAddress.postalCode,
+              countryCode = dependencies.bprRegisteredAddress.countryCode
+            )
           ))
         val afterOtherAddressProvided: AgentApplicationLlp = afterVerifiedEmailAddressSelected
           .modify(_.agentDetails.each.agentCorrespondenceAddress)
           .setTo(Some(
-            AgentCorrespondenceAddress
-              .fromAddressLookupAddress(dependencies.newCorrespondenceAddress)
+            AgentCorrespondenceAddress(
+              addressLine1 = dependencies.getConfirmedAddressResponse.lines.headOption.getOrThrowExpectedDataMissing("getConfirmedAddressResponse.line.head"),
+              addressLine2 = dependencies.getConfirmedAddressResponse.lines.lift(1),
+              addressLine3 = dependencies.getConfirmedAddressResponse.lines.lift(2),
+              addressLine4 = dependencies.getConfirmedAddressResponse.lines.lift(3),
+              postalCode = dependencies.getConfirmedAddressResponse.postcode,
+              countryCode = dependencies.getConfirmedAddressResponse.country.code
+            )
           ))
 
       object whenProvidingNewBusinessName:
