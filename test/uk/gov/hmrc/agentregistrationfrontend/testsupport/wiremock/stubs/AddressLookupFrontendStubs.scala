@@ -22,7 +22,9 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.HeaderNames
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import uk.gov.hmrc.agentregistration.shared.AddressLookupFrontendAddress
+import play.api.libs.json.Writes
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.Country
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
@@ -89,15 +91,21 @@ object AddressLookupFrontendStubs:
     responseHeaders = Seq(HeaderNames.LOCATION -> "http://localhost:9028/any-uri-determined-by-alf")
   )
 
+  private given Writes[GetConfirmedAddressResponse] =
+    given Writes[Country] = Json.writes[Country]
+    Json.writes[GetConfirmedAddressResponse]
+
   def stubAddressLookupWithId(
     journeyId: JourneyId,
-    address: AddressLookupFrontendAddress
-  ): StubMapping = StubMaker.make(
-    httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/api/confirmed\\?id=${journeyId.value}"),
-    responseStatus = 200,
-    responseBody = Json.obj("address" -> Json.toJson(address)).toString
-  )
+    getConfirmedAddressResponse: GetConfirmedAddressResponse
+  ): StubMapping = {
+    StubMaker.make(
+      httpMethod = StubMaker.HttpMethod.GET,
+      urlPattern = urlMatching(s"/api/confirmed\\?id=${journeyId.value}"),
+      responseStatus = 200,
+      responseBody = Json.obj("address" -> Json.toJson(getConfirmedAddressResponse)).toString
+    )
+  }
 
   def verifyAddressLookupInit(count: Int = 1): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.POST,

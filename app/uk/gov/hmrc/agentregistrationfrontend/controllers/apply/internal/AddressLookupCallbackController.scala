@@ -22,12 +22,13 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
-import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AddressLookupFrontendConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
+import uk.gov.hmrc.agentregistrationfrontend.model.agentdetails.AgentCorrespondenceAddressHelper
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 
@@ -56,13 +57,13 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request: AgentApplicationRequest[AnyContent] =>
         addressLookUpConnector
-          .getAddressDetails(
+          .getConfirmedAddress(
             id.getOrThrowExpectedDataMissing("addressLookupJourneyId")
-          ).flatMap: address =>
+          ).flatMap: (address: GetConfirmedAddressResponse) =>
             val updatedApplication: AgentApplication = request
               .agentApplication
               .modify(_.agentDetails.each.agentCorrespondenceAddress)
-              .setTo(Some(AgentCorrespondenceAddress.fromAddressLookupAddress(address)))
+              .setTo(Some(AgentCorrespondenceAddressHelper.fromAddressLookupAddress(address)))
             agentApplicationService
               .upsert(updatedApplication)
               .map: _ =>

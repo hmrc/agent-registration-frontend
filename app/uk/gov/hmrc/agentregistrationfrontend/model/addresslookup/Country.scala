@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared
-
-import play.api.libs.json.*
+package uk.gov.hmrc.agentregistrationfrontend.model.addresslookup
 
 final case class Country(
   code: String,
   name: Option[String]
 )
-
-final case class AddressLookupFrontendAddress(
-  lines: Seq[String],
-  postcode: Option[String],
-  country: Country
-)
-
-object AddressLookupFrontendAddress:
-
-  given formatCountry: OFormat[Country] = Json.format[Country]
-  given formatAddressLookupAddress: OFormat[AddressLookupFrontendAddress] = Json.format[AddressLookupFrontendAddress]

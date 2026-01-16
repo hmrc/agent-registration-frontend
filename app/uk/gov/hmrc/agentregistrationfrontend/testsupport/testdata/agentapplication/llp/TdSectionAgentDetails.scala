@@ -65,18 +65,26 @@ trait TdSectionAgentDetails {
         val afterBprAddressSelected: AgentApplicationLlp = afterVerifiedEmailAddressSelected
           .modify(_.agentDetails.each.agentCorrespondenceAddress)
           .setTo(Some(
-            AgentCorrespondenceAddress
-              .fromValueString(
-                dependencies
-                  .bprRegisteredAddress
-                  .toValueString
-              )
+            AgentCorrespondenceAddress(
+              addressLine1 = dependencies.bprRegisteredAddress.addressLine1,
+              addressLine2 = dependencies.bprRegisteredAddress.addressLine2,
+              addressLine3 = dependencies.bprRegisteredAddress.addressLine3,
+              addressLine4 = dependencies.bprRegisteredAddress.addressLine4,
+              postalCode = dependencies.bprRegisteredAddress.postalCode,
+              countryCode = dependencies.bprRegisteredAddress.countryCode
+            )
           ))
         val afterOtherAddressProvided: AgentApplicationLlp = afterVerifiedEmailAddressSelected
           .modify(_.agentDetails.each.agentCorrespondenceAddress)
           .setTo(Some(
-            AgentCorrespondenceAddress
-              .fromAddressLookupAddress(dependencies.newCorrespondenceAddress)
+            AgentCorrespondenceAddress(
+              addressLine1 = dependencies.getConfirmedAddressResponse.lines.head,
+              addressLine2 = dependencies.getConfirmedAddressResponse.lines.lift(1),
+              addressLine3 = dependencies.getConfirmedAddressResponse.lines.lift(2),
+              addressLine4 = dependencies.getConfirmedAddressResponse.lines.lift(3),
+              postalCode = dependencies.getConfirmedAddressResponse.postcode,
+              countryCode = dependencies.getConfirmedAddressResponse.country.code
+            )
           ))
 
       object whenProvidingNewBusinessName:

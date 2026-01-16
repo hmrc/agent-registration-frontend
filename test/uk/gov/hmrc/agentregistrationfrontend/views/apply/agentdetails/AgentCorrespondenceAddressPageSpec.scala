@@ -46,7 +46,16 @@ extends ViewSpec:
     otherAddress = None
   )
   private val addressOptionsWithOther = addressOptions.copy(
-    otherAddress = Some(AgentCorrespondenceAddress.fromAddressLookupAddress(tdAll.newCorrespondenceAddress))
+    otherAddress = Some(
+      AgentCorrespondenceAddress(
+        addressLine1 = tdAll.getConfirmedAddressResponse.lines.head,
+        addressLine2 = tdAll.getConfirmedAddressResponse.lines.lift(1),
+        addressLine3 = tdAll.getConfirmedAddressResponse.lines.lift(2),
+        addressLine4 = tdAll.getConfirmedAddressResponse.lines.lift(3),
+        postalCode = tdAll.getConfirmedAddressResponse.postcode,
+        countryCode = tdAll.getConfirmedAddressResponse.country.code
+      )
+    )
   )
   val doc: Document = Jsoup.parse(viewTemplate(
     form = AgentCorrespondenceAddressForm.form,
@@ -101,8 +110,8 @@ extends ViewSpec:
       val expectedRadioGroup: TestRadioGroup = TestRadioGroup(
         legend = heading,
         options = List(
-          tdAll.chroAddress.toValueString -> tdAll.chroAddress.toValueString,
-          tdAll.bprRegisteredAddress.toValueString -> tdAll.bprRegisteredAddress.toValueString,
+          "23 Great Portland Street, London, W1 8LT, GB" -> "23 Great Portland Street, London, W1 8LT, GB",
+          "Registered Line 1, Registered Line 2, AB1 2CD, GB" -> "Registered Line 1, Registered Line 2, AB1 2CD, GB",
           "Something else" -> "other"
         ),
         hint = None
