@@ -57,7 +57,7 @@ extends Connector:
               status = status,
               response = response
             )
-      .andLogOnFailure(s"Failed to initiate journey at GRS")
+      .andLogOnFailure(s"Failed to initiate journey at ALF")
 
   /** See https://github.com/hmrc/address-lookup-frontend?tab=readme-ov-file#obtaining-the-confirmed-address
     */

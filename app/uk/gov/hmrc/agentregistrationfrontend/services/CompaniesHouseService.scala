@@ -47,7 +47,7 @@ extends RequestAwareLogging:
     companyRegistrationNumber: Crn,
     lastName: String
   )(using request: RequestHeader): Future[Seq[CompaniesHouseOfficer]] = getCompaniesHouseOfficers(
-    companyRegistrationNumber,
-    lastName,
+    companyRegistrationNumber = companyRegistrationNumber,
+    lastName = lastName,
     isLlp = true
   )
