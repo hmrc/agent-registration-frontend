@@ -16,54 +16,47 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
-import play.api.http.Status
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.Reads
 import play.api.libs.json.__
-import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistration.shared._
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
-import uk.gov.hmrc.http.HttpReads.Implicits.given
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.StringContextOps
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
 @Singleton
 class EnrolmentStoreProxyConnector @Inject() (
   httpClient: HttpClientV2,
   appConfig: AppConfig
 )(using
-  ec: ExecutionContext
+  ExecutionContext
 )
-extends RequestAwareLogging:
+extends Connector:
 
   /** ES3: Query Enrolments allocated to a group https://confluence.tools.tax.service.gov.uk/display/GGWRLS/ES3+-+Query+Enrolments+allocated+to+a+group
     */
   def queryEnrolmentsAllocatedToGroup(
     groupId: GroupId
-  )(using
-    request: RequestHeader
-  ): Future[List[EnrolmentStoreProxyConnector.Enrolment]] = {
-    val url = url"$baseUrl/enrolment-store/groups/${groupId.value}/enrolments"
+  )(using RequestHeader): Future[List[EnrolmentStoreProxyConnector.Enrolment]] =
+    val url: URL = url"$baseUrl/enrolment-store/groups/${groupId.value}/enrolments"
     httpClient
       .get(url)
       .execute[HttpResponse]
-      .map { response =>
-        response.status match {
+      .map: response =>
+        response.status match
           case Status.OK => response.json.as[List[EnrolmentStoreProxyConnector.Enrolment]]
           case Status.NO_CONTENT => List[EnrolmentStoreProxyConnector.Enrolment]()
-          case other => Errors.throwServerErrorException(s"Unexpected status in the http response: $other when calling GET '$url'.")
-        }
-      }
-  }
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed query for EnrolmentsAllocatedToGroup for $groupId")
 
   private val baseUrl: String = appConfig.enrolmentStoreProxyBaseUrl + "/enrolment-store-proxy"
 

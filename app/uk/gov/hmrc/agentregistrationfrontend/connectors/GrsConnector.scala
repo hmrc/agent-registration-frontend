@@ -16,28 +16,19 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
-import play.api.http.HeaderNames
-import play.api.http.Status.CREATED
-import play.api.libs.json.Json
-import play.api.libs.ws.JsonBodyWritables.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.GrsConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyStartUrl
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
-import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 import scala.util.chaining.scalaUtilChainingOps
 
 /** A connector that integrates with multiple Grs microservices sharing similar endpoints and data structures in their request and response bodies.
@@ -52,32 +43,52 @@ import scala.util.chaining.scalaUtilChainingOps
 class GrsConnector @Inject() (
   httpClient: HttpClientV2,
   grsConfig: GrsConfig
-)(using ExecutionContext):
+)(using ExecutionContext)
+extends Connector:
 
   def createJourney(
     journeyConfig: JourneyConfig,
     businessType: BusinessType
-  )(using request: AuthorisedRequest[?]): Future[JourneyStartUrl] = httpClient
-    .post(url"${grsConfig.createJourneyUrl(businessType)}")
-    .withBody(Json.toJson(journeyConfig))
-    .execute[HttpResponse]
-    .map {
-      case response @ HttpResponse(CREATED, _, _) =>
-        val journeyStartUrl: JourneyStartUrl = (response.json \ "journeyStartUrl").as[String].pipe(JourneyStartUrl.apply)
-        journeyStartUrl
-      // TODO dedicated exception which accepts context and standardizes error message (including agentApplication id, requestId, etc)
-      case response => throw new Exception(s"Unexpected response from GRS create journey for $businessType: Status: ${response.status} Body: ${response.body}")
-    }
+  )(using AuthorisedRequest[?]): Future[JourneyStartUrl] =
+    val url: URL = url"${grsConfig.createJourneyUrl(businessType)}"
+    httpClient
+      .post(url)
+      .withBody(Json.toJson(journeyConfig))
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.CREATED => (response.json \ "journeyStartUrl").as[String].pipe(JourneyStartUrl.apply)
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to create Grs Journey for $businessType")
 
   def getJourneyData(
     businessType: BusinessType,
     journeyId: JourneyId
-  )(using request: AuthorisedRequest[?]): Future[JourneyData] =
+  )(using AuthorisedRequest[?]): Future[JourneyData] =
     // HC override is needed because the GRS stub data is stored in the session cookie
     // By default the header carrier drops the session cookie
     given headerCarrier: HeaderCarrier =
       if grsConfig.enableGrsStub then hc.copy(extraHeaders = hc.headers(Seq(HeaderNames.COOKIE)))
       else hc
+
+    val url: URL = url"${grsConfig.retrieveJourneyDataUrl(businessType, journeyId)}"
     httpClient
-      .get(url"${grsConfig.retrieveJourneyDataUrl(businessType, journeyId)}")
-      .execute[JourneyData]
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => response.json.as[JourneyData]
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to retrieve Grs Journey for $journeyId, $businessType")

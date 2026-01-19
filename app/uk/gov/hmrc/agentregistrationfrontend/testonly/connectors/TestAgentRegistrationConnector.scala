@@ -16,20 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.connectors
 
-import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
-import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
-
-import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
 /** Connector to the companion backend microservice's testOnly endpoints
   */
@@ -40,12 +34,25 @@ class TestAgentRegistrationConnector @Inject() (
 )(using
   ec: ExecutionContext
 )
-extends RequestAwareLogging:
+extends Connector:
 
   def makeTestApplication()(using
     request: RequestHeader
-  ): Future[TestOnlyLink] = httpClient
-    .get(url"$baseUrl/create-submitted-application")
-    .execute[TestOnlyLink]
+  ): Future[TestOnlyLink] =
+    val url: URL = url"$baseUrl/create-submitted-application"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => response.json.as[TestOnlyLink]
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to created submitted application")
 
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration/test-only"

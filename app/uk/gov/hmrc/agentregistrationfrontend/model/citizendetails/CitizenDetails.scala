@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2024 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.util
+package uk.gov.hmrc.agentregistrationfrontend.model.citizendetails
 
-import play.api.Logger
+import uk.gov.hmrc.agentregistration.shared.SaUtr
 
-trait RequestAwareLogging:
-  given logger: RequestAwareLogger =
-    new RequestAwareLogger(
-      delegateLogger = Logger(getClass)
-    )
+import java.time.LocalDate
+
+final case class CitizenDetails(
+  firstName: Option[String],
+  lastName: Option[String],
+  dateOfBirth: Option[LocalDate],
+  saUtr: Option[SaUtr]
+)
