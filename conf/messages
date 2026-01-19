@@ -33,8 +33,8 @@ months.12 = December
 
 address.lookup.title=What correspondence address should we use for your agent services account? - Apply for an agent services account - GOV.UK
 address.lookup.header=What correspondence address should we use for your agent services account?
-address.lookup.editPageLabels.title=Change your address - Apply for an agent services account - GOV.UK
-address.lookup.editPageLabels.header=Change your address
+address.lookup.editPageLabels.title=Enter your correspondence address - Apply for an agent services account - GOV.UK
+address.lookup.editPageLabels.header=Enter your correspondence address
 
 # Apply / About your business
 about-your-business.title = About your business
