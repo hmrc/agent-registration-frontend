@@ -16,63 +16,70 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
-import play.api.http.HeaderNames.LOCATION
-import play.api.i18n.Lang
-import play.api.libs.json.JsObject
-import play.api.libs.json.Json
-import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
-import play.api.mvc.Call
-import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentregistration.shared.AddressLookupFrontendAddress
-import uk.gov.hmrc.agentregistration.shared.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.config.AddressLookupConfig
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.Country
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.given
-import uk.gov.hmrc.http.HttpReads.Implicits.*
-import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
-import uk.gov.hmrc.play.bootstrap.metrics.Metrics
 
-import java.net.URL
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
 @Singleton
 class AddressLookupFrontendConnector @Inject() (
   http: HttpClientV2,
-  val metrics: Metrics,
   addressLookupConfig: AddressLookupConfig,
   appConfig: AppConfig
-)(implicit val ec: ExecutionContext) {
+)(using ExecutionContext)
+extends Connector:
 
-  def initJourney(call: Call)(implicit
-    rh: RequestHeader,
-    ec: ExecutionContext,
-    lang: Lang
-  ): Future[String] =
-    val addressConfig = Json.toJson(addressLookupConfig.createJourneyConfig(s"${call.url}"))
+  /** See https://github.com/hmrc/address-lookup-frontend?tab=readme-ov-file#initializing-a-journey
+    */
+  def initJourney(call: Call)(using RequestHeader): Future[String] =
+    val addressConfig: JsValue = Json.toJson(addressLookupConfig.createJourneyConfig(s"${call.url}"))
+    val url: URL = url"${appConfig.addressLookupFrontendBaseUrl}/api/v2/init"
     http
-      .post(initJourneyUrl)
+      .post(url)
       .withBody(Json.toJson(addressConfig))
-      .execute[HttpResponse].map: resp =>
-        resp
-          .header(LOCATION)
-          .getOrElse(Errors.throwExpectedDataMissing("Location header not set in ALF response"))
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.ACCEPTED =>
+            response
+              .header(HeaderNames.LOCATION)
+              .getOrThrowExpectedDataMissing("Location header not set in ALF response")
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to initiate journey at ALF")
 
-  def getAddressDetails(journeyId: JourneyId)(implicit
-    rh: RequestHeader,
-    ec: ExecutionContext
-  ): Future[AddressLookupFrontendAddress] = http
-    .get(confirmJourneyUrl(journeyId))
-    .execute[JsObject]
-    .map(json => (json \ "address").as[AddressLookupFrontendAddress])
+  /** See https://github.com/hmrc/address-lookup-frontend?tab=readme-ov-file#obtaining-the-confirmed-address
+    */
+  def getConfirmedAddress(journeyId: JourneyId)(using RequestHeader): Future[GetConfirmedAddressResponse] =
+    val url: URL = url"${appConfig.addressLookupFrontendBaseUrl}/api/confirmed?id=${journeyId.value}"
+    http
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => (response.json \ "address").as[GetConfirmedAddressResponse]
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(
+        s"Failed to get confirmed address from ALF, JourneyId: ${journeyId.value}"
+      )
 
-  private def confirmJourneyUrl(journeyId: JourneyId): URL = url"${appConfig.addressLookupFrontendBaseUrl}/api/confirmed?id=${journeyId.value}"
-
-  private def initJourneyUrl: URL = url"${appConfig.addressLookupFrontendBaseUrl}/api/v2/init"
-
-}
+  private given Reads[GetConfirmedAddressResponse] =
+    given Reads[Country] = Json.reads[Country]
+    Json.reads[GetConfirmedAddressResponse]

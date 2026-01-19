@@ -40,12 +40,6 @@ object IndividualNino:
   final case class FromAuth(nino: Nino)
   extends IndividualNino
 
-  extension (memberNino: IndividualNino)
-    def toUserProvidedNino: UserProvidedNino =
-      memberNino match
-        case u: UserProvidedNino => u
-        case h: FromAuth => throw new IllegalArgumentException(s"Nino is already provided from auth enrolments (${h.nino})")
-
   @nowarn()
   given OFormat[IndividualNino] =
     given JsonConfiguration = JsonConfig.jsonConfiguration

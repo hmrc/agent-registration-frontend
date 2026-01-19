@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 
 import com.softwaremill.quicklens.each
 import com.softwaremill.quicklens.modify
-import play.api.i18n.Lang
 import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
@@ -36,6 +35,8 @@ import uk.gov.hmrc.agentregistrationfrontend.connectors.AddressLookupFrontendCon
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.AddressOptions
+import uk.gov.hmrc.agentregistrationfrontend.model.agentdetails.AgentCorrespondenceAddressHelper
+import uk.gov.hmrc.agentregistrationfrontend.model.agentdetails.AgentCorrespondenceAddressHelper.toValueString
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.AgentCorrespondenceAddressPage
@@ -112,7 +113,6 @@ extends FrontendController(mcc, actions):
           val addressOption = request.formValue
           if addressOption.matches("other")
           then
-            given language: Lang = mcc.messagesApi.preferred(request).lang
             addressLookUpConnector
               .initJourney(AppRoutes.apply.internal.AddressLookupCallbackController.journeyCallback(None))
               .map(Redirect(_))
@@ -120,7 +120,7 @@ extends FrontendController(mcc, actions):
             val updatedApplication: AgentApplication = request
               .agentApplication
               .modify(_.agentDetails.each.agentCorrespondenceAddress)
-              .setTo(Some(AgentCorrespondenceAddress.fromValueString(addressOption)))
+              .setTo(Some(AgentCorrespondenceAddressHelper.fromValueString(addressOption)))
             agentApplicationService
               .upsert(updatedApplication)
               .map: _ =>

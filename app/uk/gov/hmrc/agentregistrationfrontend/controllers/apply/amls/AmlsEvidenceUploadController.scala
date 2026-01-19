@@ -23,7 +23,6 @@ import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsName
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
 import uk.gov.hmrc.agentregistration.shared.upload.UploadId
-import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest

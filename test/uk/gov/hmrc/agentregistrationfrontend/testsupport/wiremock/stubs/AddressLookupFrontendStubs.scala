@@ -22,7 +22,9 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.HeaderNames
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import uk.gov.hmrc.agentregistration.shared.AddressLookupFrontendAddress
+import play.api.libs.json.Writes
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.Country
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
@@ -33,18 +35,28 @@ object AddressLookupFrontendStubs:
     "version" -> 2,
     "options" -> Json.obj(
       "continueUrl" -> s"$continueUrl",
-      "includeHMRCBranding" -> true,
+      "includeHMRCBranding" -> false,
+      "useNewGovUkServiceNavigation" -> true,
       "signOutHref" -> s"${ISpec.thisFrontendBaseUrl}/agent-registration/sign-out",
       "selectPageConfig" -> Json.obj(
         "proposedListLimit" -> 30,
         "showSearchLinkAgain" -> true
       ),
       "allowedCountryCodes" -> Json.arr("GB"),
+      "ukMode" -> true,
       "confirmPageConfig" -> Json.obj(
         "showChangeLink" -> true,
         "showSubHeadingAndInfo" -> true,
         "showSearchAgainLink" -> false,
         "showConfirmChangeText" -> true
+      ),
+      "manualAddressEntryConfig" -> Json.obj(
+        "mandatoryFields" -> Json.obj(
+          "addressLine1" -> true,
+          "town" -> true,
+          "postcode" -> true
+        ),
+        "showOrganisationName" -> false
       ),
       "timeoutConfig" -> Json.obj(
         "timeoutAmount" -> 900,
@@ -61,8 +73,8 @@ object AddressLookupFrontendStubs:
           "heading" -> "What correspondence address should we use for your agent services account?"
         ),
         "editPageLabels" -> Json.obj(
-          "title" -> "Change your address - Apply for an agent services account - GOV.UK",
-          "heading" -> "Change your address"
+          "title" -> "Enter your correspondence address - Apply for an agent services account - GOV.UK",
+          "heading" -> "Enter your correspondence address"
         )
       ),
       "cy" -> Json.obj(
@@ -74,8 +86,8 @@ object AddressLookupFrontendStubs:
           "heading" -> "What correspondence address should we use for your agent services account?"
         ),
         "editPageLabels" -> Json.obj(
-          "title" -> "Change your address - Apply for an agent services account - GOV.UK",
-          "heading" -> "Change your address"
+          "title" -> "Enter your correspondence address - Apply for an agent services account - GOV.UK",
+          "heading" -> "Enter your correspondence address"
         )
       )
     )
@@ -89,15 +101,21 @@ object AddressLookupFrontendStubs:
     responseHeaders = Seq(HeaderNames.LOCATION -> "http://localhost:9028/any-uri-determined-by-alf")
   )
 
+  private given Writes[GetConfirmedAddressResponse] =
+    given Writes[Country] = Json.writes[Country]
+    Json.writes[GetConfirmedAddressResponse]
+
   def stubAddressLookupWithId(
     journeyId: JourneyId,
-    address: AddressLookupFrontendAddress
-  ): StubMapping = StubMaker.make(
-    httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/api/confirmed\\?id=${journeyId.value}"),
-    responseStatus = 200,
-    responseBody = Json.obj("address" -> Json.toJson(address)).toString
-  )
+    getConfirmedAddressResponse: GetConfirmedAddressResponse
+  ): StubMapping = {
+    StubMaker.make(
+      httpMethod = StubMaker.HttpMethod.GET,
+      urlPattern = urlMatching(s"/api/confirmed\\?id=${journeyId.value}"),
+      responseStatus = 200,
+      responseBody = Json.obj("address" -> Json.toJson(getConfirmedAddressResponse)).toString
+    )
+  }
 
   def verifyAddressLookupInit(count: Int = 1): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.POST,

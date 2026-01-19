@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -112,7 +111,7 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe ExpectedStrings.documentTitle
     val radioForChro = doc.mainContent.select(s"input#${AgentCorrespondenceAddressForm.key}") // the first radio button
-    radioForChro.attr("value") shouldBe tdAll.chroAddress.toValueString
+    radioForChro.attr("value") shouldBe "23 Great Portland Street, London, W1 8LT, GB"
     radioForChro.attr("checked") shouldBe "" // checked attribute is present when selected and has no value
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
@@ -136,7 +135,7 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe ExpectedStrings.documentTitle
     val radioForOtherAddress = doc.mainContent.select(s"input#${AgentCorrespondenceAddressForm.key}-3") // third radio button dynamically added for "other" address
-    radioForOtherAddress.attr("value") shouldBe AgentCorrespondenceAddress.fromAddressLookupAddress(tdAll.newCorrespondenceAddress).toValueString
+    radioForOtherAddress.attr("value") shouldBe """New Line 1, New Line 2, CD3 4EF, GB"""
     radioForOtherAddress.attr("checked") shouldBe "" // checked attribute is present when selected and has no value
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 

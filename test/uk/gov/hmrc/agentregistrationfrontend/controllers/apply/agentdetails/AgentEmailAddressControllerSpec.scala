@@ -99,7 +99,7 @@ extends ControllerSpec:
       enterUrl = s"${ISpec.thisFrontendBaseUrl}/agent-registration/apply/agent-details/email-address"
     )),
     lang = Some("en"),
-    backUrl = Some(s"${ISpec.thisFrontendBaseUrl}/agent-registration/apply/agent-details/email-address"),
+    backUrl = None,
     pageTitle = None
   )
 

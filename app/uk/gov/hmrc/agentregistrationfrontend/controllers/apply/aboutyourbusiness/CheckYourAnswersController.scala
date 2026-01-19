@@ -29,7 +29,6 @@ import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.CheckYourAnswersPage
-import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 
 @Singleton
 class CheckYourAnswersController @Inject() (

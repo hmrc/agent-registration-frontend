@@ -14,22 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared
+package uk.gov.hmrc.agentregistrationfrontend.model.citizendetails
 
-import play.api.libs.json.*
+import uk.gov.hmrc.agentregistration.shared.SaUtr
 
-final case class Country(
-  code: String,
-  name: Option[String]
+import java.time.LocalDate
+
+final case class CitizenDetails(
+  firstName: Option[String],
+  lastName: Option[String],
+  dateOfBirth: Option[LocalDate],
+  saUtr: Option[SaUtr]
 )
-
-final case class AddressLookupFrontendAddress(
-  lines: Seq[String],
-  postcode: Option[String],
-  country: Country
-)
-
-object AddressLookupFrontendAddress:
-
-  given formatCountry: OFormat[Country] = Json.format[Country]
-  given formatAddressLookupAddress: OFormat[AddressLookupFrontendAddress] = Json.format[AddressLookupFrontendAddress]

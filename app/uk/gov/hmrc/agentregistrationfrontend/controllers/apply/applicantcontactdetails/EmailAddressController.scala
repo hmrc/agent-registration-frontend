@@ -196,7 +196,7 @@ extends FrontendController(mcc, actions):
       )
     ),
     continueUrl = appConfig.thisFrontendBaseUrl + AppRoutes.apply.applicantcontactdetails.EmailAddressController.verify.url,
-    maybeBackUrl = Some(appConfig.thisFrontendBaseUrl + AppRoutes.apply.applicantcontactdetails.EmailAddressController.show.url),
+    maybeBackUrl = None,
     accessibilityStatementUrl = appConfig.accessibilityStatementPath,
     lang = messagesApi.preferred(request).lang.code
   )

@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
-import uk.gov.hmrc.agentregistrationfrontend.connectors.llp.IndividualProvidedDetailsConnector
+import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 

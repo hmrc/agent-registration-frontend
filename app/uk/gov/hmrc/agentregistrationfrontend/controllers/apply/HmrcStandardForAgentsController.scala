@@ -21,7 +21,6 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
-import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService

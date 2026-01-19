@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.agentdetails
+package uk.gov.hmrc.agentregistrationfrontend.model.addresslookup
 
-import play.api.libs.json.*
-
-final case class AgentCorrespondenceAddress(
-  addressLine1: String,
-  addressLine2: Option[String],
-  addressLine3: Option[String] = None,
-  addressLine4: Option[String] = None,
-  postalCode: Option[String],
-  countryCode: String
+final case class Country(
+  code: String,
+  name: Option[String]
 )
-
-object AgentCorrespondenceAddress:
-  given Format[AgentCorrespondenceAddress] = Json.format[AgentCorrespondenceAddress]

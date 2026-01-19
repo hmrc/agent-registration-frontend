@@ -17,69 +17,63 @@
 package uk.gov.hmrc.agentregistrationfrontend.util
 
 import play.api.http.Status
-import play.api.mvc.Request
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.http.HttpErrorFunctions
 import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.http.InternalServerException
 import uk.gov.hmrc.http.UpstreamErrorResponse
 
 import java.net.URL
 import scala.concurrent.Future
 
-object Errors
-extends RequestAwareLogging:
+object Errors:
 
-  /** Creates a requirement which has to pass in order to continue computation.
-    */
-  inline def require(
-    requirement: Boolean,
-    message: => String
-  )(using request: RequestHeader): Unit =
-    if !requirement then
-      logger.error(s"Requirement failed: $message")
-      throw InternalServerException(message)
-    else ()
+  export uk.gov.hmrc.agentregistration.shared.util.Errors.*
 
-  def requireF(
-    requirement: Boolean,
-    message: => String
-  )(using request: Request[?]): Future[Unit] =
-    if !requirement then
-      logger.error(s"Requirement failed: $message")
-      Future.failed(InternalServerException(message))
-    else Future.successful(())
-
-  inline def throwBadRequestException(message: => String)(using request: RequestHeader): Nothing =
+  inline def throwBadRequestException(message: => String)(using
+    logger: RequestAwareLogger,
+    requestHeader: RequestHeader
+  ): Nothing =
     logger.error(message)
     throw UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.BAD_REQUEST
     )
 
-  inline def throwBadRequestExceptionF(message: => String)(using request: RequestHeader): Future[Nothing] =
+  inline def throwBadRequestExceptionF(message: => String)(using
+    logger: RequestAwareLogger,
+    requestHeader: RequestHeader
+  ): Future[Nothing] =
     logger.error(message)
     Future.failed(UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.BAD_REQUEST
     ))
 
-  inline def throwNotFoundException(message: => String)(using request: RequestHeader): Nothing =
+  inline def throwNotFoundException(message: => String)(using
+    logger: RequestAwareLogger,
+    requestHeader: RequestHeader
+  ): Nothing =
     logger.error(message)
     throw UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.NOT_FOUND
     )
 
-  inline def throwServerErrorException(message: => String)(using request: RequestHeader): Nothing =
+  inline def throwServerErrorException(message: => String)(using
+    logger: RequestAwareLogger,
+    requestHeader: RequestHeader
+  ): Nothing =
     logger.error(message)
     throw UpstreamErrorResponse(
       message,
       play.mvc.Http.Status.INTERNAL_SERVER_ERROR
     )
 
-  inline def notImplemented(message: => String = "")(using request: RequestHeader): Nothing =
+  inline def notImplemented(message: => String = "")(using
+    logger: RequestAwareLogger,
+    requestHeader: RequestHeader
+  ): Nothing =
     val m = s"Unimplemented: $message"
     logger.error(m)
     throw UpstreamErrorResponse(m, play.mvc.Http.Status.NOT_IMPLEMENTED)

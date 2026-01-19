@@ -22,6 +22,7 @@ import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino.FromAuth
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.UserProvidedNino
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
@@ -89,3 +90,9 @@ extends FrontendController(mcc, actions):
             .map: _ =>
               Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater
+
+  extension (individualNino: IndividualNino)
+    def toUserProvidedNino: UserProvidedNino =
+      individualNino match
+        case u: UserProvidedNino => u
+        case h: IndividualNino.FromAuth => throw new IllegalArgumentException(s"Nino is already provided from auth enrolments (${h.nino})")

@@ -25,7 +25,6 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.companieshouse.*
-import uk.gov.hmrc.agentregistration.shared.util.Errors.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
