@@ -34,18 +34,28 @@ class AddressLookupConfig @Inject() (
       "version" -> 2,
       "options" -> Json.obj(
         "continueUrl" -> s"${appConfig.thisFrontendBaseUrl}$continueUrl",
-        "includeHMRCBranding" -> true,
+        "includeHMRCBranding" -> false,
+        "useNewGovUkServiceNavigation" -> true,
         "signOutHref" -> s"${appConfig.thisFrontendBaseUrl}${AppRoutes.SignOutController.signOut.url}",
         "selectPageConfig" -> Json.obj(
           "proposedListLimit" -> 30,
           "showSearchLinkAgain" -> true
         ),
         "allowedCountryCodes" -> Json.arr("GB"),
+        "ukMode" -> true,
         "confirmPageConfig" -> Json.obj(
           "showChangeLink" -> true,
           "showSubHeadingAndInfo" -> true,
           "showSearchAgainLink" -> false,
           "showConfirmChangeText" -> true
+        ),
+        "manualAddressEntryConfig" -> Json.obj(
+          "mandatoryFields" -> Json.obj(
+            "addressLine1" -> true,
+            "town" -> true,
+            "postcode" -> true
+          ),
+          "showOrganisationName" -> false
         ),
         "timeoutConfig" -> Json.obj(
           "timeoutAmount" -> 900,

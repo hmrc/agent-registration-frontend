@@ -35,18 +35,28 @@ object AddressLookupFrontendStubs:
     "version" -> 2,
     "options" -> Json.obj(
       "continueUrl" -> s"$continueUrl",
-      "includeHMRCBranding" -> true,
+      "includeHMRCBranding" -> false,
+      "useNewGovUkServiceNavigation" -> true,
       "signOutHref" -> s"${ISpec.thisFrontendBaseUrl}/agent-registration/sign-out",
       "selectPageConfig" -> Json.obj(
         "proposedListLimit" -> 30,
         "showSearchLinkAgain" -> true
       ),
       "allowedCountryCodes" -> Json.arr("GB"),
+      "ukMode" -> true,
       "confirmPageConfig" -> Json.obj(
         "showChangeLink" -> true,
         "showSubHeadingAndInfo" -> true,
         "showSearchAgainLink" -> false,
         "showConfirmChangeText" -> true
+      ),
+      "manualAddressEntryConfig" -> Json.obj(
+        "mandatoryFields" -> Json.obj(
+          "addressLine1" -> true,
+          "town" -> true,
+          "postcode" -> true
+        ),
+        "showOrganisationName" -> false
       ),
       "timeoutConfig" -> Json.obj(
         "timeoutAmount" -> 900,
@@ -63,8 +73,8 @@ object AddressLookupFrontendStubs:
           "heading" -> "What correspondence address should we use for your agent services account?"
         ),
         "editPageLabels" -> Json.obj(
-          "title" -> "Change your address - Apply for an agent services account - GOV.UK",
-          "heading" -> "Change your address"
+          "title" -> "Enter your correspondence address - Apply for an agent services account - GOV.UK",
+          "heading" -> "Enter your correspondence address"
         )
       ),
       "cy" -> Json.obj(
@@ -76,8 +86,8 @@ object AddressLookupFrontendStubs:
           "heading" -> "What correspondence address should we use for your agent services account?"
         ),
         "editPageLabels" -> Json.obj(
-          "title" -> "Change your address - Apply for an agent services account - GOV.UK",
-          "heading" -> "Change your address"
+          "title" -> "Enter your correspondence address - Apply for an agent services account - GOV.UK",
+          "heading" -> "Enter your correspondence address"
         )
       )
     )
