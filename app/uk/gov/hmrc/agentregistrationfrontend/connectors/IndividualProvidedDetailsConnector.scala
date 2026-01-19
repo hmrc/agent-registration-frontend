@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -29,7 +29,7 @@ import scala.concurrent.ExecutionContext
 /** Connector to the companion backend microservice
   */
 @Singleton
-class MemberProvidedDetailsConnector @Inject() (
+class IndividualProvidedDetailsConnector @Inject() (
   httpClient: HttpClientV2,
   appConfig: AppConfig
 )(using
@@ -37,13 +37,13 @@ class MemberProvidedDetailsConnector @Inject() (
 )
 extends Connector:
 
-  def upsertMemberProvidedDetails(memberProvidedDetails: MemberProvidedDetails)(using
+  def upsertMemberProvidedDetails(individualProvidedDetails: IndividualProvidedDetails)(using
     request: IndividualAuthorisedRequest[?]
   ): Future[Unit] =
     val url: URL = url"$baseUrl/member-provided-details"
     httpClient
       .post(url)
-      .withBody(Json.toJson(memberProvidedDetails))
+      .withBody(Json.toJson(individualProvidedDetails))
       .execute[HttpResponse]
       .map: response =>
         response.status match
@@ -55,18 +55,18 @@ extends Connector:
               status = status,
               response = response
             )
-      .andLogOnFailure("Failed to upsert MemberProvidedDetails")
+      .andLogOnFailure("Failed to upsert IndividualProvidedDetails")
 
   def find(agentApplicationId: AgentApplicationId)(using
     IndividualAuthorisedRequest[?]
-  ): Future[Option[MemberProvidedDetails]] =
+  ): Future[Option[IndividualProvidedDetails]] =
     val url: URL = url"$baseUrl/member-provided-details/by-agent-applicationId/${agentApplicationId.value}"
     httpClient
       .get(url)
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => Some(response.json.as[MemberProvidedDetails])
+          case Status.OK => Some(response.json.as[IndividualProvidedDetails])
           case Status.NO_CONTENT => None
           case status =>
             Errors.throwUpstreamErrorResponse(
@@ -75,19 +75,19 @@ extends Connector:
               status = status,
               response = response
             )
-      .andLogOnFailure(s"Failed to find MemberProvidedDetails by agent application id: $agentApplicationId")
+      .andLogOnFailure(s"Failed to find IndividualProvidedDetails by agent application id: $agentApplicationId")
 
   def findAll()(using
     IndividualAuthorisedRequest[?]
-  ): Future[List[MemberProvidedDetails]] =
+  ): Future[List[IndividualProvidedDetails]] =
     val url: URL = url"$baseUrl/member-provided-details"
     httpClient
       .get(url)
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => response.json.as[List[MemberProvidedDetails]]
-          case Status.NO_CONTENT => List.empty[MemberProvidedDetails]
+          case Status.OK => response.json.as[List[IndividualProvidedDetails]]
+          case Status.NO_CONTENT => List.empty[IndividualProvidedDetails]
           case status =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "GET",
@@ -95,6 +95,6 @@ extends Connector:
               status = status,
               response = response
             )
-      .andLogOnFailure(s"Failed to find MemberProvidedDetails")
+      .andLogOnFailure(s"Failed to find IndividualProvidedDetails")
 
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration"
