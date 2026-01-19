@@ -86,8 +86,8 @@ object AddressLookupFrontendStubs:
           "heading" -> "What correspondence address should we use for your agent services account?"
         ),
         "editPageLabels" -> Json.obj(
-          "title" -> "Change your address - Apply for an agent services account - GOV.UK",
-          "heading" -> "Change your address"
+          "title" -> "Enter your correspondence address - Apply for an agent services account - GOV.UK",
+          "heading" -> "Enter your correspondence address"
         )
       )
     )
