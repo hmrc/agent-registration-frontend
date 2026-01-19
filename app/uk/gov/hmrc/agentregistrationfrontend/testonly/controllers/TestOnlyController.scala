@@ -56,9 +56,9 @@ extends FrontendController(mcc, actions):
       Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))
 
   def showProvidedDetails: Action[AnyContent] = actions
-    .Member
+    .Individual
     .getProvidedDetails: request =>
-      Ok(Json.prettyPrint(Json.toJson(request.memberProvidedDetails)))
+      Ok(Json.prettyPrint(Json.toJson(request.individualProvidedDetails)))
 
   def showPlaySession: Action[AnyContent] = actions.action: request =>
     Ok(Json.prettyPrint(Json.toJson(request.session.data)))

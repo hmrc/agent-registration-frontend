@@ -22,8 +22,8 @@ import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAut
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersAction
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsWithApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsWithApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.ProvideDetailsAction
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.EnrichWithAgentApplicationAction
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
@@ -88,7 +88,7 @@ extends RequestAwareLogging:
             Redirect(call.url)
       )
 
-  object Member:
+  object Individual:
 
     val authorised: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
       .andThen(individualAuthorisedAction)
@@ -96,36 +96,36 @@ extends RequestAwareLogging:
     val authorisedWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = action
       .andThen(individualAuthorisedWithIdentifiersAction)
 
-    val getProvidedDetails: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = authorised
+    val getProvidedDetails: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = authorised
       .andThen(provideDetailsAction)
-    val getProvideDetailsInProgress: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = getProvidedDetails
+    val getProvideDetailsInProgress: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = getProvidedDetails
       .ensure(
-        condition = _.memberProvidedDetails.isInProgress,
+        condition = _.individualProvidedDetails.isInProgress,
         resultWhenConditionNotMet =
           implicit request =>
-            val mpdConfirmationPage = AppRoutes.providedetails.MemberConfirmationController.show
+            val mpdConfirmationPage = AppRoutes.providedetails.IndividualConfirmationController.show
             logger.warn(
               s"The provided details have already been confirmed" +
-                s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +
+                s" (current provided details: ${request.individualProvidedDetails.providedDetailsState.toString}), " +
                 s"redirecting to [${mpdConfirmationPage.url}]."
             )
             Redirect(mpdConfirmationPage.url)
       )
 
     val getProvideDetailsWithApplicationInProgress: ActionBuilder[
-      MemberProvideDetailsWithApplicationRequest,
+      IndividualProvideDetailsWithApplicationRequest,
       AnyContent
     ] = getProvideDetailsInProgress.andThen(enrichWithAgentApplicationAction)
 
-    val getSubmitedDetailsWithApplicationInProgress: ActionBuilder[MemberProvideDetailsWithApplicationRequest, AnyContent] = getProvidedDetails
+    val getSubmitedDetailsWithApplicationInProgress: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] = getProvidedDetails
       .ensure(
-        condition = _.memberProvidedDetails.hasFinished,
+        condition = _.individualProvidedDetails.hasFinished,
         resultWhenConditionNotMet =
           implicit request =>
             val mdpCyaPage = AppRoutes.providedetails.CheckYourAnswersController.show
             logger.warn(
               s"The provided details are not in the final state" +
-                s" (current provided details: ${request.memberProvidedDetails.providedDetailsState.toString}), " +
+                s" (current provided details: ${request.individualProvidedDetails.providedDetailsState.toString}), " +
                 s"redirecting to [${mdpCyaPage.url}]."
             )
             Redirect(mdpCyaPage.url)

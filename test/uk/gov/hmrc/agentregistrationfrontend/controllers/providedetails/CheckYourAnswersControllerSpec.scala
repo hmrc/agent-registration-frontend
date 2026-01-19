@@ -17,10 +17,10 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationMemberProvidedDetailsStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
 class CheckYourAnswersControllerSpec
 extends ControllerSpec:
@@ -33,7 +33,7 @@ extends ControllerSpec:
       url = path
     )
 
-  private object memberProvideDetails:
+  private object individualProvideDetails:
 
     val complete = tdAll.providedDetailsLlp.afterHmrcStandardforAgentsAgreed
     val completeAndConfirmed = tdAll.providedDetailsLlp.afterProvidedDetailsConfirmed
@@ -49,63 +49,63 @@ extends ControllerSpec:
     val missingName = tdAll.providedDetailsLlp.afterStarted
 
   private final case class TestCaseForCya(
-    providedDetails: MemberProvidedDetails,
+    providedDetails: IndividualProvidedDetails,
     name: String,
     expectedRedirect: Option[String] = None
   )
 
   List(
     TestCaseForCya(
-      providedDetails = memberProvideDetails.completeAndConfirmed,
+      providedDetails = individualProvideDetails.completeAndConfirmed,
       name = "Confirmed member details",
-      expectedRedirect = Some(AppRoutes.providedetails.MemberConfirmationController.show.url)
+      expectedRedirect = Some(AppRoutes.providedetails.IndividualConfirmationController.show.url)
     ),
     TestCaseForCya(
-      providedDetails = memberProvideDetails.complete,
+      providedDetails = individualProvideDetails.complete,
       name = "complete agent details"
     ),
     TestCaseForCya(
-      providedDetails = memberProvideDetails.missingAgreeStandarts,
+      providedDetails = individualProvideDetails.missingAgreeStandarts,
       name = "agree to standards of agents",
-      expectedRedirect = Some(AppRoutes.providedetails.MemberHmrcStandardForAgentsController.show.url)
+      expectedRedirect = Some(AppRoutes.providedetails.IndividualHmrcStandardForAgentsController.show.url)
     ),
     TestCaseForCya(
-      providedDetails = memberProvideDetails.missingApproveApplication,
+      providedDetails = individualProvideDetails.missingApproveApplication,
       name = "approve applicant",
-      expectedRedirect = Some(AppRoutes.providedetails.MemberApproveApplicantController.show.url)
+      expectedRedirect = Some(AppRoutes.providedetails.IndividualApproveApplicantController.show.url)
     ),
     TestCaseForCya(
-      providedDetails = memberProvideDetails.missingSaUtr,
+      providedDetails = individualProvideDetails.missingSaUtr,
       name = "saUtr",
-      expectedRedirect = Some(AppRoutes.providedetails.MemberSaUtrController.show.url)
+      expectedRedirect = Some(AppRoutes.providedetails.IndividualSaUtrController.show.url)
     ),
     TestCaseForCya(
-      providedDetails = memberProvideDetails.missingNino,
+      providedDetails = individualProvideDetails.missingNino,
       name = "nino",
-      expectedRedirect = Some(AppRoutes.providedetails.MemberNinoController.show.url)
+      expectedRedirect = Some(AppRoutes.providedetails.IndividualNinoController.show.url)
     ),
     TestCaseForCya(
-      providedDetails = memberProvideDetails.missingEmailValidation,
+      providedDetails = individualProvideDetails.missingEmailValidation,
       name = "email address validation",
-      expectedRedirect = Some(AppRoutes.providedetails.MemberEmailAddressController.show.url)
+      expectedRedirect = Some(AppRoutes.providedetails.IndividualEmailAddressController.show.url)
     ),
     TestCaseForCya(
-      providedDetails = memberProvideDetails.missingEmail,
+      providedDetails = individualProvideDetails.missingEmail,
       name = "email address",
-      expectedRedirect = Some(AppRoutes.providedetails.MemberEmailAddressController.show.url)
+      expectedRedirect = Some(AppRoutes.providedetails.IndividualEmailAddressController.show.url)
     ),
     TestCaseForCya(
-      providedDetails = memberProvideDetails.missingTelephone,
+      providedDetails = individualProvideDetails.missingTelephone,
       name = "telephone number",
-      expectedRedirect = Some(AppRoutes.providedetails.MemberTelephoneNumberController.show.url)
+      expectedRedirect = Some(AppRoutes.providedetails.IndividualTelephoneNumberController.show.url)
     ),
     TestCaseForCya(
-      providedDetails = memberProvideDetails.missingCompaniesHouseOfficerSelection,
+      providedDetails = individualProvideDetails.missingCompaniesHouseOfficerSelection,
       name = "name selection",
       expectedRedirect = Some(AppRoutes.providedetails.CompaniesHouseNameQueryController.show.url)
     ),
     TestCaseForCya(
-      providedDetails = memberProvideDetails.missingName,
+      providedDetails = individualProvideDetails.missingName,
       name = "name",
       expectedRedirect = Some(AppRoutes.providedetails.CompaniesHouseNameQueryController.show.url)
     )
@@ -114,7 +114,7 @@ extends ControllerSpec:
       case None =>
         s"GET $path with ${testCase.name} should return 200 and render page" in:
           AuthStubs.stubAuthoriseIndividual()
-          AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(testCase.providedDetails))
+          AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(testCase.providedDetails))
 
           val response: WSResponse = get(path)
 
@@ -123,15 +123,15 @@ extends ControllerSpec:
           doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
           doc.select("h2.govuk-caption-l").text() shouldBe "LLP member confirmation"
           AuthStubs.verifyAuthorise()
-          AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+          AgentRegistrationIndividualProvidedDetailsStubs.verifyFind()
       case Some(expectedRedirect) =>
         s"GET $path with missing ${testCase.name} should redirect to the ${testCase.name} page" in:
           AuthStubs.stubAuthoriseIndividual()
-          AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(testCase.providedDetails))
+          AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(testCase.providedDetails))
 
           val response: WSResponse = get(path)
 
           response.status shouldBe Status.SEE_OTHER
           response.header("Location").value shouldBe expectedRedirect
           AuthStubs.verifyAuthorise()
-          AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+          AgentRegistrationIndividualProvidedDetailsStubs.verifyFind()

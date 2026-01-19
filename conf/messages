@@ -470,7 +470,7 @@ timed-out.header = You have been signed out
 timed-out.p1 = You have not done anything for 15 minutes, so we have signed you out to keep your account secure.
 timed-out.link = Sign in again
 
-# Llp member journeys
+# Llp individual journeys
 provide-details.llp.title=LLP member confirmation
 
 ## Llp start page
@@ -495,91 +495,91 @@ firstName.error.invalid = Your first name must only include letters a to z, hyph
 lastName.error.required = Enter your last name
 lastName.error.invalid = Your last name must only include letters a to z, hyphens, apostrophes and spaces
 
-## Member Telephone number
+## Individual Telephone number
 
-memberTelephoneNumber.title = What is your telephone number?
-memberTelephoneNumber.hint = We will not send a code to confirm this number.
-memberTelephoneNumber.error.required = Enter the number we should call to speak to you about this application
-memberTelephoneNumber.error.invalid = Enter a phone number, like 01632 960 001 or 07700 900 982
-memberTelephoneNumber.error.tooLong = The phone number must be 24 characters or fewer
+individualTelephoneNumber.title = What is your telephone number?
+individualTelephoneNumber.hint = We will not send a code to confirm this number.
+individualTelephoneNumber.error.required = Enter the number we should call to speak to you about this application
+individualTelephoneNumber.error.invalid = Enter a phone number, like 01632 960 001 or 07700 900 982
+individualTelephoneNumber.error.tooLong = The phone number must be 24 characters or fewer
 
-## Member Email Address
+## Individual Email Address
 
-memberEmailAddress.title = What is your email address?
-memberEmailAddress.hint = We will send a code to this email address to confirm it.
-memberEmailAddress.error.required = Enter your email address
-memberEmailAddress.error.invalid = Enter your email address with a name, @ symbol and a domain name, like yourname@example.com
-memberEmailAddress.error.tooLong = The email address must be 132 characters or fewer
+individualEmailAddress.title = What is your email address?
+individualEmailAddress.hint = We will send a code to this email address to confirm it.
+individualEmailAddress.error.required = Enter your email address
+individualEmailAddress.error.invalid = Enter your email address with a name, @ symbol and a domain name, like yourname@example.com
+individualEmailAddress.error.tooLong = The email address must be 132 characters or fewer
 
-## Member Locked Email
+## Individual Locked Email
 
-memberEmailLocked.title = We could not confirm your identity
-memberEmailLocked.p1 = We cannot check your identity because you entered an incorrect verification code too many times.
-memberEmailLocked.p2 = The verification code was emailed to you.
-memberEmailLocked.h2 = What to do next
-memberEmailLocked.p3 = You can try again in 24 hours.
-memberEmailLocked.p4 = If you want to try again with a different email address
-memberEmailLocked.linkText = you can change the email address you entered
+individualEmailLocked.title = We could not confirm your identity
+individualEmailLocked.p1 = We cannot check your identity because you entered an incorrect verification code too many times.
+individualEmailLocked.p2 = The verification code was emailed to you.
+individualEmailLocked.h2 = What to do next
+individualEmailLocked.p3 = You can try again in 24 hours.
+individualEmailLocked.p4 = If you want to try again with a different email address
+individualEmailLocked.linkText = you can change the email address you entered
 
-## Member Nino
-memberNino.title = Do you have a National Insurance number?
-memberNino.hasNino.yes = Yes
-memberNino.hasNino.no = No
-memberNino.hasNino.title = Do you have a National Insurance number?
-memberNino.hasNino.error.required = Select yes if you have a National Insurance number
-memberNino.nino.label = Enter your National Insurance number
-memberNino.nino.error.invalid = Enter a National Insurance number in the correct format
-memberNino.nino.error.required = Enter your National Insurance number
-memberNino.nino.hint = For example, QQ 12 34 56 C.
+## Individual Nino
+individualNino.title = Do you have a National Insurance number?
+individualNino.hasNino.yes = Yes
+individualNino.hasNino.no = No
+individualNino.hasNino.title = Do you have a National Insurance number?
+individualNino.hasNino.error.required = Select yes if you have a National Insurance number
+individualNino.nino.label = Enter your National Insurance number
+individualNino.nino.error.invalid = Enter a National Insurance number in the correct format
+individualNino.nino.error.required = Enter your National Insurance number
+individualNino.nino.hint = For example, QQ 12 34 56 C.
 
-## Member SA UTR
-memberSaUtr.title = Do you have a Self Assessment Unique Taxpayer Reference?
-memberSaUtr.hasSaUtr.title = Do you have a Self Assessment Unique Taxpayer Reference?
-memberSaUtr.hasSaUtr.yes = Yes
-memberSaUtr.hasSaUtr.no = No
-memberSaUtr.hasSaUtr.error.required = Select yes if you have a Self Assessment Unique Taxpayer Reference
-memberSaUtr.saUtr.label = Enter your Self Assessment Unique Taxpayer Reference
-memberSaUtr.saUtr.hint = This is 10 numbers, for example 1234567890.
-memberSaUtr.saUtr.error.required = Enter your Self Assessment Unique Taxpayer Reference
-memberSaUtr.saUtr.error.invalid = Enter a Self Assessment Unique Taxpayer Reference in the correct format
+## Individual SA UTR
+individualSaUtr.title = Do you have a Self Assessment Unique Taxpayer Reference?
+individualSaUtr.hasSaUtr.title = Do you have a Self Assessment Unique Taxpayer Reference?
+individualSaUtr.hasSaUtr.yes = Yes
+individualSaUtr.hasSaUtr.no = No
+individualSaUtr.hasSaUtr.error.required = Select yes if you have a Self Assessment Unique Taxpayer Reference
+individualSaUtr.saUtr.label = Enter your Self Assessment Unique Taxpayer Reference
+individualSaUtr.saUtr.hint = This is 10 numbers, for example 1234567890.
+individualSaUtr.saUtr.error.required = Enter your Self Assessment Unique Taxpayer Reference
+individualSaUtr.saUtr.error.invalid = Enter a Self Assessment Unique Taxpayer Reference in the correct format
 
-## Member Meet the HMRC standard for agents
-memberHmrcStandardForAgents.caption = HMRC standard for agents
-memberHmrcStandardForAgents.title = Agree to meet the HMRC standard for agents
-memberHmrcStandardForAgents.warning = We carry out checks to make sure agents meet the standard. We take action against individuals and organisations who do not comply.
-memberHmrcStandardForAgents.read.h2 = Read the standard on GOV.UK
-memberHmrcStandardForAgents.read.linkText = The HMRC standard for agents
-memberHmrcStandardForAgents.agree.h2 = Declaration
-memberHmrcStandardForAgents.agree.p1 = I have read the HMRC standard for agents.
-memberHmrcStandardForAgents.agree.p2 = I agree to meet the standard when working on behalf of clients.
-memberHmrcStandardForAgents.agree.button = Agree and continue
+## Individual Meet the HMRC standard for agents
+individualHmrcStandardForAgents.caption = HMRC standard for agents
+individualHmrcStandardForAgents.title = Agree to meet the HMRC standard for agents
+individualHmrcStandardForAgents.warning = We carry out checks to make sure agents meet the standard. We take action against individuals and organisations who do not comply.
+individualHmrcStandardForAgents.read.h2 = Read the standard on GOV.UK
+individualHmrcStandardForAgents.read.linkText = The HMRC standard for agents
+individualHmrcStandardForAgents.agree.h2 = Declaration
+individualHmrcStandardForAgents.agree.p1 = I have read the HMRC standard for agents.
+individualHmrcStandardForAgents.agree.p2 = I agree to meet the standard when working on behalf of clients.
+individualHmrcStandardForAgents.agree.button = Agree and continue
 
-## Member Approve Agent Application
-memberApproveAgentApplication.title = Approve the applicant
-memberApproveAgentApplication.info = {0} has applied for an agent services account on behalf of {1}.
-memberApproveAgentApplication.question = Do you agree that {0} can apply for an account?
-memberApproveAgentApplication.yes = Yes
-memberApproveAgentApplication.no = No
-memberApproveAgentApplication.error.required = Select yes if you agree that {0} can apply for an account
+## Individual Approve Agent Application
+individualApproveAgentApplication.title = Approve the applicant
+individualApproveAgentApplication.info = {0} has applied for an agent services account on behalf of {1}.
+individualApproveAgentApplication.question = Do you agree that {0} can apply for an account?
+individualApproveAgentApplication.yes = Yes
+individualApproveAgentApplication.no = No
+individualApproveAgentApplication.error.required = Select yes if you agree that {0} can apply for an account
 
-## Member / LLP / check your answers
+## Individual / LLP / check your answers
 
-memberDetailsCheckYourAnswers.title = Check your answers
-memberDetailsCheckYourAnswers.memberName.label = Name
-memberDetailsCheckYourAnswers.telephone.label = Telephone number
-memberDetailsCheckYourAnswers.email.label = Email address
-memberDetailsCheckYourAnswers.saUtr.label = Self Assessment Unique Taxpayer Reference
-memberDetailsCheckYourAnswers.nino.label = National Insurance number
-memberDetailsCheckYourAnswers.change = Change
-memberDetailsCheckYourAnswers.hasSaUtr.label = Do you have a Self Assessment Unique Taxpayer Reference?
-memberDetailsCheckYourAnswers.hasNino.label = Do you have a National Insurance number?
+individualDetailsCheckYourAnswers.title = Check your answers
+individualDetailsCheckYourAnswers.individualName.label = Name
+individualDetailsCheckYourAnswers.telephone.label = Telephone number
+individualDetailsCheckYourAnswers.email.label = Email address
+individualDetailsCheckYourAnswers.saUtr.label = Self Assessment Unique Taxpayer Reference
+individualDetailsCheckYourAnswers.nino.label = National Insurance number
+individualDetailsCheckYourAnswers.change = Change
+individualDetailsCheckYourAnswers.hasSaUtr.label = Do you have a Self Assessment Unique Taxpayer Reference?
+individualDetailsCheckYourAnswers.hasNino.label = Do you have a National Insurance number?
 
 
-# Member Confirmation of submission
-memberConfirmation.title = You have finished this process
-memberConfirmation.whatNext.h2 = What happens next
-memberConfirmation.whatNext.p1 = We need to collect information for all members of {0}.
-memberConfirmation.whatNext.p2 = When we have the information we need, we’ll automatically submit the application and begin our checks.
-memberConfirmation.whatNext.p3 = If we need any further information from you, we will contact you by email or telephone.
-memberConfirmation.whatNext.p4 = When we have finished our checks, we’ll email {0} with a decision about the application.
-memberConfirmation.signOutLink = Finish and sign out
+# Individual Confirmation of submission
+individualConfirmation.title = You have finished this process
+individualConfirmation.whatNext.h2 = What happens next
+individualConfirmation.whatNext.p1 = We need to collect information for all members of {0}.
+individualConfirmation.whatNext.p2 = When we have the information we need, we’ll automatically submit the application and begin our checks.
+individualConfirmation.whatNext.p3 = If we need any further information from you, we will contact you by email or telephone.
+individualConfirmation.whatNext.p4 = When we have finished our checks, we’ll email {0} with a decision about the application.
+individualConfirmation.signOutLink = Finish and sign out

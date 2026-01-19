@@ -25,4 +25,4 @@ extends TdBase,
   agentapplication.llp.TdUpload,
   agentapplication.llp.TdSectionAmls,
   agentapplication.soletrader.TdAgentApplicationSoleTrader,
-  providedetails.member.TdMemberProvidedDetails
+  providedetails.individual.TdIndividualProvidedDetails

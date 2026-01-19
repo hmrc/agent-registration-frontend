@@ -97,28 +97,28 @@ GET         /provide-details/start/:linkId                          uk.gov.hmrc.
 
 ## Internal Routes for provide-details
 #  These routes are for internal navigation and should not be accessed directly through the browser URL and meant to be accessed via redirects from other routes.
-GET        /provide-details/internal/initiate-member-provide-details/:linkId  uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.InitiateMemberProvideDetailsController.initiateMemberProvideDetails(linkId: LinkId)
+GET        /provide-details/internal/initiate-member-provide-details/:linkId  uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.InitiateIndividualProvideDetailsController.initiateMemberProvideDetails(linkId: LinkId)
 
 
 GET         /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CompaniesHouseNameQueryController.show
 POST        /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CompaniesHouseNameQueryController.submit
 GET         /provide-details/name-match                             uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CompaniesHouseMatchingController.show
 POST        /provide-details/name-match                             uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CompaniesHouseMatchingController.submit
-GET         /provide-details/telephone-number                       uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberTelephoneNumberController.show
-POST        /provide-details/telephone-number                       uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberTelephoneNumberController.submit
-GET         /provide-details/email-address                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberEmailAddressController.show
-POST        /provide-details/email-address                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberEmailAddressController.submit
-GET         /provide-details/verify-email-address                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberEmailAddressController.verify
-GET         /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberNinoController.show
-POST        /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberNinoController.submit
-GET         /provide-details/utr                                    uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberSaUtrController.show
-POST        /provide-details/utr                                    uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberSaUtrController.submit
-GET         /provide-details/approve-applicant                      uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberApproveApplicantController.show
-POST        /provide-details/approve-applicant                      uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberApproveApplicantController.submit
-GET         /provide-details/agree-standard                         uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberHmrcStandardForAgentsController.show
-POST        /provide-details/agree-standard                         uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberHmrcStandardForAgentsController.submit
-GET         /provide-details/confirm-stop                           uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberConfirmStopController.show
+GET         /provide-details/telephone-number                       uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualTelephoneNumberController.show
+POST        /provide-details/telephone-number                       uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualTelephoneNumberController.submit
+GET         /provide-details/email-address                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualEmailAddressController.show
+POST        /provide-details/email-address                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualEmailAddressController.submit
+GET         /provide-details/verify-email-address                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualEmailAddressController.verify
+GET         /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualNinoController.show
+POST        /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualNinoController.submit
+GET         /provide-details/utr                                    uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualSaUtrController.show
+POST        /provide-details/utr                                    uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualSaUtrController.submit
+GET         /provide-details/approve-applicant                      uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualApproveApplicantController.show
+POST        /provide-details/approve-applicant                      uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualApproveApplicantController.submit
+GET         /provide-details/agree-standard                         uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualHmrcStandardForAgentsController.show
+POST        /provide-details/agree-standard                         uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualHmrcStandardForAgentsController.submit
+GET         /provide-details/confirm-stop                           uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualConfirmStopController.show
 GET         /provide-details/check-your-answers                     uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CheckYourAnswersController.show
 POST        /provide-details/check-your-answers                     uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CheckYourAnswersController.submit
-GET         /provide-details/confirmation                           uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.MemberConfirmationController.show
+GET         /provide-details/confirmation                           uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualConfirmationController.show
 GET         /provide-details/multiple-provided-details              uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.multipleProvidedDetailsPage

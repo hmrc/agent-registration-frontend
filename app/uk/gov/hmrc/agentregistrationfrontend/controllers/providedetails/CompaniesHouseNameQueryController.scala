@@ -25,11 +25,11 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQue
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsWithApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsWithApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.CompaniesHouseNameQueryPage
 
 import javax.inject.Inject
@@ -41,24 +41,24 @@ class CompaniesHouseNameQueryController @Inject() (
   actions: Actions,
   mcc: MessagesControllerComponents,
   view: CompaniesHouseNameQueryPage,
-  memberProvideDetailsService: MemberProvideDetailsService,
+  individualProvideDetailsService: IndividualProvideDetailsService,
   agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
-    .Member
+    .Individual
     .getProvideDetailsInProgress
     .async:
       implicit request =>
         agentApplicationService
-          .find(request.memberProvidedDetails.agentApplicationId)
+          .find(request.individualProvidedDetails.agentApplicationId)
           .map:
             case Some(app) if app.hasFinished =>
               Ok(view(
                 CompaniesHouseNameQueryForm.form
                   .fill:
-                    request.memberProvidedDetails
+                    request.individualProvidedDetails
                       .companiesHouseMatch
                       .map(_.memberNameQuery)
                 ,
@@ -73,7 +73,7 @@ extends FrontendController(mcc, actions):
               Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
 
   def submit: Action[AnyContent] = actions
-    .Member
+    .Individual
     .getProvideDetailsWithApplicationInProgress
     .ensureValidForm[CompaniesHouseNameQuery](
       form = CompaniesHouseNameQueryForm.form,
@@ -86,18 +86,18 @@ extends FrontendController(mcc, actions):
             )
     )
     .async:
-      implicit request: (MemberProvideDetailsWithApplicationRequest[AnyContent] & FormValue[CompaniesHouseNameQuery]) =>
+      implicit request: (IndividualProvideDetailsWithApplicationRequest[AnyContent] & FormValue[CompaniesHouseNameQuery]) =>
         val companiesHouseNameQuery: CompaniesHouseNameQuery = request.formValue
         val hasChanged: Boolean =
-          request.memberProvidedDetails
+          request.individualProvidedDetails
             .companiesHouseMatch
             .map(_.memberNameQuery)
             .getOrElse("") =!= companiesHouseNameQuery
         val redirectRoute = AppRoutes.providedetails.CompaniesHouseMatchingController.show
         if hasChanged then
-          memberProvideDetailsService
+          individualProvideDetailsService
             .upsert(
-              request.memberProvidedDetails
+              request.individualProvidedDetails
                 .modify(_.companiesHouseMatch)
                 .setTo(Some(CompaniesHouseMatch(
                   memberNameQuery = companiesHouseNameQuery,

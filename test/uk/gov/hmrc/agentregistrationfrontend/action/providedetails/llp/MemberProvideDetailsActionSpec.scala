@@ -20,16 +20,16 @@ import org.scalatest.matchers.should.Matchers.*
 import com.softwaremill.quicklens.modify
 import play.api.mvc.Result
 import play.api.mvc.Results.*
-import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
-import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll.agentApplicationId
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll.memberProvidedDetails
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll.individualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationMemberProvidedDetailsStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
 import scala.concurrent.Future
 
@@ -52,9 +52,9 @@ extends ISpec:
     .modify(_.applicationState)
     .setTo(ApplicationState.Started)
 
-  "when agentApplicationId in session and member provided details found than redirects to name page" in:
-    AgentRegistrationMemberProvidedDetailsStubs
-      .stubFindMemberProvidedDetails(memberProvidedDetails)
+  "when agentApplicationId in session and individual provided details found than redirects to name page" in:
+    AgentRegistrationIndividualProvidedDetailsStubs
+      .stubFindIndividualProvidedDetails(individualProvidedDetails)
 
     val result: Result = Ok("AllGood")
     val provideDetailsAction = app.injector.instanceOf[ProvideDetailsAction]
@@ -62,18 +62,18 @@ extends ISpec:
     provideDetailsAction
       .invokeBlock(
         tdAll.individualAuthorisedRequestLoggedInWithAgentApplicationId,
-        (r: MemberProvideDetailsRequest[?]) =>
+        (r: IndividualProvideDetailsRequest[?]) =>
           Future.successful {
             r.internalUserId shouldBe tdAll.internalUserId
-            r.memberProvidedDetails shouldBe memberProvidedDetails
+            r.individualProvidedDetails shouldBe individualProvidedDetails
             result
           }
       ).futureValue shouldBe result
 
-    AgentRegistrationMemberProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplicationId)
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplicationId)
 
-  "when agentApplicationId in session but no member provided details found but application found - try to recover - find linkId and start journey" in:
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindMemberProvidedDetailsNoContent(agentApplicationId)
+  "when agentApplicationId in session but no individual provided details found but application found - try to recover - find linkId and start journey" in:
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindIndividualProvidedDetailsNoContent(agentApplicationId)
     AgentRegistrationStubs.stubFindApplicationByAgentApplicationId(submittedAgentApplication.agentApplicationId, submittedAgentApplication)
 
     val provideDetailsAction = app.injector.instanceOf[ProvideDetailsAction]
@@ -81,16 +81,16 @@ extends ISpec:
     provideDetailsAction
       .invokeBlock(
         tdAll.individualAuthorisedRequestLoggedInWithAgentApplicationId,
-        (r: MemberProvideDetailsRequest[?]) => fakeResultF
+        (r: IndividualProvideDetailsRequest[?]) => fakeResultF
       ).futureValue shouldBe Redirect(
       s"""/agent-registration/provide-details/internal/initiate-member-provide-details/${submittedAgentApplication.linkId.value}"""
     )
 
     AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(submittedAgentApplication.agentApplicationId)
-    AgentRegistrationMemberProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplicationId)
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplicationId)
 
-  "when agentApplicationId in session but no member provided details found and no application found - try to recover will fail with error page" in:
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindMemberProvidedDetailsNoContent(agentApplicationId)
+  "when agentApplicationId in session but no individual provided details found and no application found - try to recover will fail with error page" in:
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindIndividualProvidedDetailsNoContent(agentApplicationId)
     AgentRegistrationStubs.stubFindApplicationByAgentApplicationIdNoContent(submittedAgentApplication.agentApplicationId)
 
     val provideDetailsAction = app.injector.instanceOf[ProvideDetailsAction]
@@ -98,31 +98,31 @@ extends ISpec:
     provideDetailsAction
       .invokeBlock(
         tdAll.individualAuthorisedRequestLoggedInWithAgentApplicationId,
-        (r: MemberProvideDetailsRequest[?]) => fakeResultF
+        (r: IndividualProvideDetailsRequest[?]) => fakeResultF
       ).futureValue shouldBe Redirect(
       s"""/agent-registration/apply/exit"""
     )
 
     AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(submittedAgentApplication.agentApplicationId)
-    AgentRegistrationMemberProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplicationId)
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplicationId)
 
-  "when agentApplicationId in session and no member provided details found action recover - failed - redirect error page" in:
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetailsNoContent()
+  "when agentApplicationId in session and no individual provided details found action recover - failed - redirect error page" in:
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetailsNoContent()
 
     val provideDetailsAction = app.injector.instanceOf[ProvideDetailsAction]
 
     provideDetailsAction
       .invokeBlock(
         tdAll.individualAuthorisedRequestLoggedInWithOutAgentApplicationId,
-        (_: MemberProvideDetailsRequest[?]) => fakeResultF
+        (_: IndividualProvideDetailsRequest[?]) => fakeResultF
       ).futureValue shouldBe Redirect(
       """/agent-registration/provide-details/exit"""
     )
 
-    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyFind()
 
-  "when agentApplicationId in session and one member provided details found - try recover - success - redirect next page" in:
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails))
+  "when agentApplicationId in session and one individual provided details found - try recover - success - redirect next page" in:
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvidedDetails))
 
     val result: Result = Ok("AllGood")
     val provideDetailsAction = app.injector.instanceOf[ProvideDetailsAction]
@@ -130,23 +130,23 @@ extends ISpec:
     provideDetailsAction
       .invokeBlock(
         tdAll.individualAuthorisedRequestLoggedInWithOutAgentApplicationId,
-        (r: MemberProvideDetailsRequest[?]) =>
+        (r: IndividualProvideDetailsRequest[?]) =>
           Future.successful {
             r.internalUserId shouldBe tdAll.internalUserId
-            r.memberProvidedDetails shouldBe memberProvidedDetails
+            r.individualProvidedDetails shouldBe individualProvidedDetails
             result
           }
       ).futureValue shouldBe result
 
-    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyFind()
 
-  "when agentApplicationId in session and more than one member provided details found action recover - failed - redirect error page" in:
-    AgentRegistrationMemberProvidedDetailsStubs
-      .stubFindAllMemberProvidedDetails(
+  "when agentApplicationId in session and more than one individual provided details found action recover - failed - redirect error page" in:
+    AgentRegistrationIndividualProvidedDetailsStubs
+      .stubFindAllIndividualProvidedDetails(
         List(
-          memberProvidedDetails,
-          memberProvidedDetails.copy(
-            _id = MemberProvidedDetailsId("member-provided-details-id-67890"),
+          individualProvidedDetails,
+          individualProvidedDetails.copy(
+            _id = IndividualProvidedDetailsId("member-provided-details-id-67890"),
             agentApplicationId = AgentApplicationId(value = "another-agent-application-id")
           )
         )
@@ -157,9 +157,9 @@ extends ISpec:
     provideDetailsAction
       .invokeBlock(
         tdAll.individualAuthorisedRequestLoggedInWithOutAgentApplicationId,
-        (_: MemberProvideDetailsRequest[?]) => fakeResultF
+        (_: IndividualProvideDetailsRequest[?]) => fakeResultF
       ).futureValue shouldBe Redirect(
       """/agent-registration/provide-details/multiple-provided-details"""
     )
 
-    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyFind()

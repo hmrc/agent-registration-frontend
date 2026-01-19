@@ -129,7 +129,7 @@ extends FrontendController(mcc, actions):
             individual =
               if businessType === SoleTrader then
                 Some(
-                  Individual(
+                  uk.gov.hmrc.agentregistrationfrontend.testonly.model.Individual(
                     firstName = journeyData.fullName.map(_.firstName).getOrElse("Test"),
                     lastName = journeyData.fullName.map(_.lastName).getOrElse("User"),
                     dateOfBirth = journeyData.dateOfBirth.map(_.toString).getOrElse("1990-01-01")

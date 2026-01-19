@@ -17,18 +17,18 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.providedetails
 
 import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdRequest
 
 trait TdProvideDetailsRequest {
   dependencies: (TdBase & TdRequest) =>
 
-  def makeProvideDetailsRequest(memberProvidedDetails: MemberProvidedDetails): MemberProvideDetailsRequest[AnyContent] =
-    new MemberProvideDetailsRequest(
+  def makeProvideDetailsRequest(individualProvidedDetails: IndividualProvidedDetails): IndividualProvideDetailsRequest[AnyContent] =
+    new IndividualProvideDetailsRequest(
       request = dependencies.requestLoggedIn,
-      memberProvidedDetails = memberProvidedDetails,
+      individualProvidedDetails = individualProvidedDetails,
       internalUserId = dependencies.internalUserId,
       credentials = dependencies.credentials
     )

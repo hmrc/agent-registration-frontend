@@ -24,61 +24,61 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
-import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.CheckYourAnswersPage
+import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.CheckYourAnswersPage
 
 @Singleton
 class CheckYourAnswersController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: CheckYourAnswersPage,
-  memberProvideDetailsService: MemberProvideDetailsService
+  individualProvideDetailsService: IndividualProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions
-    .Member
+  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions
+    .Individual
     .getProvideDetailsInProgress
     .ensure(
-      _.memberProvidedDetails.companiesHouseMatch.flatMap(_.companiesHouseOfficer).isDefined,
+      _.individualProvidedDetails.companiesHouseMatch.flatMap(_.companiesHouseOfficer).isDefined,
       implicit request =>
         Redirect(AppRoutes.providedetails.CompaniesHouseNameQueryController.show)
     )
     .ensure(
-      _.memberProvidedDetails.telephoneNumber.isDefined,
+      _.individualProvidedDetails.telephoneNumber.isDefined,
       implicit request =>
-        Redirect(AppRoutes.providedetails.MemberTelephoneNumberController.show)
+        Redirect(AppRoutes.providedetails.IndividualTelephoneNumberController.show)
     )
     .ensure(
-      _.memberProvidedDetails.emailAddress.exists(_.isVerified),
+      _.individualProvidedDetails.emailAddress.exists(_.isVerified),
       implicit request =>
-        Redirect(AppRoutes.providedetails.MemberEmailAddressController.show)
+        Redirect(AppRoutes.providedetails.IndividualEmailAddressController.show)
     )
     .ensure(
-      _.memberProvidedDetails.memberNino.nonEmpty,
+      _.individualProvidedDetails.individualNino.nonEmpty,
       implicit request =>
-        Redirect(AppRoutes.providedetails.MemberNinoController.show)
+        Redirect(AppRoutes.providedetails.IndividualNinoController.show)
     )
     .ensure(
-      _.memberProvidedDetails.memberSaUtr.nonEmpty,
+      _.individualProvidedDetails.individualSaUtr.nonEmpty,
       implicit request =>
-        Redirect(AppRoutes.providedetails.MemberSaUtrController.show)
+        Redirect(AppRoutes.providedetails.IndividualSaUtrController.show)
     )
     .ensure(
-      _.memberProvidedDetails.hasApprovedApplication.getOrElse(false),
+      _.individualProvidedDetails.hasApprovedApplication.getOrElse(false),
       implicit request =>
-        Redirect(AppRoutes.providedetails.MemberApproveApplicantController.show)
+        Redirect(AppRoutes.providedetails.IndividualApproveApplicantController.show)
     )
     .ensure(
-      _.memberProvidedDetails.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed,
+      _.individualProvidedDetails.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed,
       implicit request =>
-        Redirect(AppRoutes.providedetails.MemberHmrcStandardForAgentsController.show.url)
+        Redirect(AppRoutes.providedetails.IndividualHmrcStandardForAgentsController.show.url)
     )
 
   def show: Action[AnyContent] = baseAction:
@@ -86,10 +86,10 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] = baseAction.async:
     implicit request =>
-      memberProvideDetailsService
+      individualProvideDetailsService
         .upsert(
-          request.memberProvidedDetails
+          request.individualProvidedDetails
             .modify(_.providedDetailsState)
             .setTo(Finished)
         ).map: _ =>
-          Redirect(AppRoutes.providedetails.MemberConfirmationController.show)
+          Redirect(AppRoutes.providedetails.IndividualConfirmationController.show)

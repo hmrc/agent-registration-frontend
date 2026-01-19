@@ -62,15 +62,15 @@ trait TdBase:
     providerType = "GovernmentGateway"
   )
   def nino = Nino("AB123456C")
-  def ninoFromAuth = MemberNino.FromAuth(nino)
-  def ninoProvided = MemberNino.Provided(nino)
-  def saUtrFromAuth = MemberSaUtr.FromAuth(saUtr)
-  def saUtrFromCitizenDetails = MemberSaUtr.FromCitizenDetails(saUtr)
-  def saUtrProvided = MemberSaUtr.Provided(saUtr)
+  def ninoFromAuth = IndividualNino.FromAuth(nino)
+  def ninoProvided = IndividualNino.Provided(nino)
+  def saUtrFromAuth = IndividualSaUtr.FromAuth(saUtr)
+  def saUtrFromCitizenDetails = IndividualSaUtr.FromCitizenDetails(saUtr)
+  def saUtrProvided = IndividualSaUtr.Provided(saUtr)
   def safeId: SafeId = SafeId("XA0001234512345")
   def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
   def applicantEmailAddress: EmailAddress = EmailAddress("user@test.com")
-  def memberEmailAddress: EmailAddress = EmailAddress("member@test.com")
+  def individualEmailAddress: EmailAddress = EmailAddress("member@test.com")
 
   def telephoneNumber: TelephoneNumber = TelephoneNumber("(+44) 10794554342")
   def crn: Crn = Crn("1234567890")
@@ -124,7 +124,7 @@ trait TdBase:
 
   def agentApplicationId: AgentApplicationId = AgentApplicationId("agent-application-id-12345")
 
-  def memberProvidedDetailsId: MemberProvidedDetailsId = MemberProvidedDetailsId("member-provided-details-id-12345")
+  def individualProvidedDetailsId: IndividualProvidedDetailsId = IndividualProvidedDetailsId("member-provided-details-id-12345")
   def bprPrimaryTelephoneNumber: String = "(+44) 78714743399"
   def newTelephoneNumber: String = "+44 (0) 7000000000"
   def bprEmailAddress: String = "bpr@example.com"
@@ -171,8 +171,8 @@ trait TdBase:
     emailAddress = Some(bprEmailAddress)
   )
 
-  val memberProvidedDetails: MemberProvidedDetails = MemberProvidedDetails(
-    _id = memberProvidedDetailsId,
+  val individualProvidedDetails: IndividualProvidedDetails = IndividualProvidedDetails(
+    _id = individualProvidedDetailsId,
     internalUserId = internalUserId,
     createdAt = nowAsInstant,
     agentApplicationId = agentApplicationId,

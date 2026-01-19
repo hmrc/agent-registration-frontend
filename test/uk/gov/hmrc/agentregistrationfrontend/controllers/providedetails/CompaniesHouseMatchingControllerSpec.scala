@@ -21,13 +21,13 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
-import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CompaniesHouseStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationMemberProvidedDetailsStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
 class CompaniesHouseMatchingControllerSpec
 extends ControllerSpec:
@@ -49,17 +49,17 @@ extends ControllerSpec:
 
   private object memberProvidedDetails:
 
-    val afterStarted: MemberProvidedDetails =
+    val afterStarted: IndividualProvidedDetails =
       tdAll
         .providedDetailsLlp
         .afterStarted
 
-    val afterNameQueryProvided: MemberProvidedDetails =
+    val afterNameQueryProvided: IndividualProvidedDetails =
       tdAll
         .providedDetailsLlp
         .afterNameQueryProvided
 
-    val afterOfficerChosen: MemberProvidedDetails =
+    val afterOfficerChosen: IndividualProvidedDetails =
       tdAll
         .providedDetailsLlp
         .afterOfficerChosen
@@ -79,7 +79,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page when there is a single match" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse = get(path)
@@ -89,7 +89,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page when there are multiple matches" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
     val response: WSResponse = get(path)
@@ -99,18 +99,18 @@ extends ControllerSpec:
 
   s"GET $path should redirect to name query page when name query is missing" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterStarted))
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(memberProvidedDetails.afterStarted))
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.providedetails.CompaniesHouseNameQueryController.show.url
     AuthStubs.verifyAuthorise()
-    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyFind()
 
   s"POST $path for single match without a valid selection should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
     val response: WSResponse =
@@ -123,16 +123,16 @@ extends ControllerSpec:
     doc.title() shouldBe "Error: Are these your details? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#companiesHouseOfficer-error").text() shouldBe "Error: Select yes if these are your details"
     AuthStubs.verifyAuthorise()
-    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyFind()
     AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
     CompaniesHouseStubs.verifySingleMatchCalls(lastName = lastName)
 
   s"POST $path for single match with valid inputs should save officer and redirect to telephone page" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     CompaniesHouseStubs.stubSingleMatch(lastName = lastName)
-    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvidedDetails.afterOfficerChosen)
+    AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(memberProvidedDetails.afterOfficerChosen)
     val response: WSResponse =
       post(path)(Map(
         "ChOfficerSelectionFormType" -> Seq("YesNoForm"),
@@ -143,13 +143,13 @@ extends ControllerSpec:
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
     AuthStubs.verifyAuthorise()
-    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyFind()
     AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
     CompaniesHouseStubs.verifySingleMatchCalls(lastName = lastName)
 
   s"POST $path for multiple matches without a valid selection should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
     val response: WSResponse =
@@ -162,16 +162,16 @@ extends ControllerSpec:
     doc.title() shouldBe "Error: 2 records match this name - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#companiesHouseOfficer-error").text() shouldBe "Error: Select the name and date of birth that matches your details"
     AuthStubs.verifyAuthorise()
-    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyFind()
     AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
     CompaniesHouseStubs.verifyMultipleMatchCalls(lastName = lastName)
 
   s"POST $path for multiple matches with valid inputs should save officer and redirect to telephone page" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindAllMemberProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
     AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
     CompaniesHouseStubs.stubMultipleMatches(lastName = lastName)
-    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvidedDetails.afterOfficerChosen)
+    AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(memberProvidedDetails.afterOfficerChosen)
     val response: WSResponse =
       post(path)(Map(
         "ChOfficerSelectionFormType" -> Seq("OfficerSelectionForm"),
@@ -182,7 +182,7 @@ extends ControllerSpec:
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
     AuthStubs.verifyAuthorise()
-    AgentRegistrationMemberProvidedDetailsStubs.verifyFind()
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyFind()
     AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
     CompaniesHouseStubs.verifyMultipleMatchCalls(lastName = lastName)
-    AgentRegistrationMemberProvidedDetailsStubs.verifyUpsert()
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyUpsert()
