@@ -354,7 +354,7 @@ extends FrontendController(mcc, actions):
     ),
     fullName = if businessType === SoleTrader then Some(FullName("Test", "User")) else None,
     dateOfBirth = if businessType === SoleTrader then Some(LocalDate.now().minusYears(20)) else None,
-    nino = if businessType === SoleTrader then Some(Nino("AB123456C")) else None,
+    nino = if businessType === SoleTrader then Some(randomNino()) else None,
     trn = None,
     sautr =
       if Seq(
