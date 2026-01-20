@@ -66,6 +66,8 @@ import uk.gov.hmrc.domain.SaUtrGenerator
 import uk.gov.voa.play.form.ConditionalMappings.isEqual
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 import uk.gov.voa.play.form.conditionOpts
+import uk.gov.hmrc.domain.NinoGenerator
+import scala.concurrent.Future
 
 import java.time.LocalDate
 import java.util.UUID
@@ -117,49 +119,70 @@ extends FrontendController(mcc, actions):
       implicit request: (AuthorisedRequest[AnyContent] & FormValue[JourneyData]) =>
         val journeyData: JourneyData = request.formValue
         val json: JsValue = Json.toJson(journeyData)
-        val utr = journeyData.sautr.map(_.value).getOrElse(journeyData.ctutr.map(_.value).getOrElse(""))
-        // to get BPR fetches working we need to store a BPR in stubs using GRS data
-        agentsExternalStubsConnector.storeBusinessPartnerRecord(
-          BusinessPartnerRecord(
-            businessPartnerExists = true,
-            uniqueTaxReference = Some(utr),
-            utr = Some(utr),
-            safeId = journeyData.registration.registeredBusinessPartnerId.map(_.value).getOrElse(""),
-            isAnIndividual = businessType === SoleTrader,
-            individual =
-              if businessType === SoleTrader then
-                Some(
-                  uk.gov.hmrc.agentregistrationfrontend.testonly.model.Individual(
-                    firstName = journeyData.fullName.map(_.firstName).getOrElse("Test"),
-                    lastName = journeyData.fullName.map(_.lastName).getOrElse("User"),
-                    dateOfBirth = journeyData.dateOfBirth.map(_.toString).getOrElse("1990-01-01")
-                  )
-                )
-              else None,
-            organisation =
-              businessType match
-                case BusinessType.Partnership.LimitedLiabilityPartnership | BusinessType.LimitedCompany | BusinessType.Partnership.LimitedPartnership | BusinessType.Partnership.ScottishLimitedPartnership =>
-                  Some(Organisation(
-                    organisationName = journeyData.companyProfile.map(_.companyName).getOrElse("BPR Test Org"),
-                    organisationType = "5T"
-                  ))
-                case _ => None,
-            addressDetails = AddressDetails(
-              addressLine1 = "1 Test Street",
-              addressLine2 = Some("Test Area"),
-              addressLine3 = None,
-              addressLine4 = None,
-              postalCode = journeyData.postcode.getOrElse("TE1 1ST"),
-              countryCode = "GB"
-            ),
-            contactDetails = Some(ContactDetails(
-              primaryPhoneNumber = Some("01234567890"),
-              emailAddress = Some("test@example.com")
-            ))
-          )
-        ).map: _ =>
+
+        for {
+          _ <- storeStubsData(businessType, journeyData)
+        } yield {
           Redirect(AppRoutes.apply.internal.GrsController.journeyCallback(Some(journeyId)))
             .addingToSession(journeyId.value -> json.toString)
+        }
+
+  private def storeStubsData(
+    businessType: BusinessType,
+    journeyData: JourneyData
+  )(using Request[?]): Future[Unit] =
+    val soleTraderIndividualRecord =
+      (businessType, journeyData.nino) match {
+        case (SoleTrader, Some(nino: Nino)) => agentsExternalStubsConnector.storeIndividualUserRecord(nino, Seq("HMRC-MTD-IT"))
+        case _ => Future.successful(())
+      }
+
+    val utr = journeyData.sautr.map(_.value).getOrElse(journeyData.ctutr.map(_.value).getOrElse(""))
+    // to get BPR fetches working we need to store a BPR in stubs using GRS data
+    val businessPartnerRecord = agentsExternalStubsConnector.storeBusinessPartnerRecord(
+      BusinessPartnerRecord(
+        businessPartnerExists = true,
+        uniqueTaxReference = Some(utr),
+        utr = Some(utr),
+        safeId = journeyData.registration.registeredBusinessPartnerId.map(_.value).getOrElse(""),
+        isAnIndividual = businessType === SoleTrader,
+        individual =
+          if businessType === SoleTrader then
+            Some(
+              uk.gov.hmrc.agentregistrationfrontend.testonly.model.Individual(
+                firstName = journeyData.fullName.map(_.firstName).getOrElse("Test"),
+                lastName = journeyData.fullName.map(_.lastName).getOrElse("User"),
+                dateOfBirth = journeyData.dateOfBirth.map(_.toString).getOrElse("1990-01-01")
+              )
+            )
+          else None,
+        organisation =
+          businessType match
+            case BusinessType.Partnership.LimitedLiabilityPartnership | BusinessType.LimitedCompany | BusinessType.Partnership.LimitedPartnership | BusinessType.Partnership.ScottishLimitedPartnership =>
+              Some(Organisation(
+                organisationName = journeyData.companyProfile.map(_.companyName).getOrElse("BPR Test Org"),
+                organisationType = "5T"
+              ))
+            case _ => None,
+        addressDetails = AddressDetails(
+          addressLine1 = "1 Test Street",
+          addressLine2 = Some("Test Area"),
+          addressLine3 = None,
+          addressLine4 = None,
+          postalCode = journeyData.postcode.getOrElse("TE1 1ST"),
+          countryCode = "GB"
+        ),
+        contactDetails = Some(ContactDetails(
+          primaryPhoneNumber = Some("01234567890"),
+          emailAddress = Some("test@example.com")
+        ))
+      )
+    )
+
+    for {
+      _ <- soleTraderIndividualRecord
+      _ <- businessPartnerRecord
+    } yield ()
 
   def retrieveGrsData(journeyId: JourneyId): Action[AnyContent] = Action: request =>
     request.session.get(journeyId.value) match {
@@ -175,9 +198,11 @@ extends FrontendController(mcc, actions):
 
   val seed = 123456
   val utrGenerator = SaUtrGenerator(seed) // for our test-only purposes we can use SaUtrGenerator to generate both SA UTRs and CT UTRs
+  val ninoGenerator = NinoGenerator(seed)
   def randomSaUtr(): SaUtr = SaUtr(utrGenerator.nextSaUtr.utr)
   def randomCtUtr(): CtUtr = CtUtr(utrGenerator.nextSaUtr.utr)
   def randomJourneyId(): JourneyId = JourneyId(UUID.randomUUID().toString)
+  def randomNino(): Nino = Nino(ninoGenerator.nextNino.nino)
 
   private def form(businessType: BusinessType): Form[JourneyData] =
     val registrationStatusMapping: FieldMapping[RegistrationStatus] = Forms.of(FormatterFactory.makeEnumFormatter[RegistrationStatus](
