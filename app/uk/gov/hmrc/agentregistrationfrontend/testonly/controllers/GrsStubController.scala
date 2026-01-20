@@ -149,9 +149,9 @@ extends FrontendController(mcc, actions):
     val soleTraderIndividualRecord =
       (businessType, journeyData.nino) match {
         case (SoleTrader, Some(nino: Nino)) =>
-          agentsExternalStubsConnector.storeIndividualUserRecord(
-            nino,
-            Seq("HMRC-MTD-IT"),
+          agentsExternalStubsConnector.journeyData.registration.registeredBusinessPartnerId(
+            nino = nino,
+            assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
             deceased = deceased
           )
         case _ => Future.successful(())
