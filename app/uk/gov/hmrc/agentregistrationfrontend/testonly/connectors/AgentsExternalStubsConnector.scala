@@ -16,10 +16,15 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.connectors
 
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User.EnrolmentKey
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.BusinessPartnerRecord
+import play.api.libs.json.JsValue
+import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.http.client.HttpClientV2
+import java.util.UUID
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -55,5 +60,47 @@ extends Connector:
               response = response
             )
       .andLogOnFailure("Failed to store business partner record")
+
+  def storeIndividualUserRecord(
+    nino: Nino,
+    assignedPrincipalEnrolments: Seq[String]
+  )(using
+    request: RequestHeader
+  ): Future[Unit] =
+    val user = User(
+      userId = UUID.randomUUID().toString,
+      nino = Some(nino),
+      assignedPrincipalEnrolments = assignedPrincipalEnrolments.map(EnrolmentKey(_))
+    )
+    postUser(user, affinityGroup = Some("Individual"))
+
+  private def postUser(
+    user: User,
+    affinityGroup: Option[String] = None,
+    planetId: Option[String] = None
+  )(using request: RequestHeader): Future[Unit] =
+    val queryParams =
+      Seq(
+        affinityGroup.map("affinityGroup" -> _),
+        planetId.orElse(user.planetId).map("planetId" -> _)
+      ).flatten
+
+    val url = if queryParams.isEmpty then url"$baseUrl/users" else url"$baseUrl/users?$queryParams"
+
+    httpClient
+      .post(url)
+      .withBody(Json.toJson(user))
+      .execute[HttpResponse]
+      .map { response =>
+        response.status match
+          case Status.CREATED | Status.OK => ()
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = status,
+              response = response
+            )
+      }
 
   private val baseUrl: String = appConfig.agentsExternalStubsBaseUrl + "/agents-external-stubs"
