@@ -104,18 +104,18 @@ object AppRoutes:
     val CompaniesHouseNameQueryController = providedetailsRoutes.CompaniesHouseNameQueryController
     val CompaniesHouseMatchingController = providedetailsRoutes.CompaniesHouseMatchingController
     val ExitController = providedetailsRoutes.ExitController
-    val MemberTelephoneNumberController = providedetailsRoutes.MemberTelephoneNumberController
-    val MemberEmailAddressController = providedetailsRoutes.MemberEmailAddressController
-    val MemberNinoController = providedetailsRoutes.MemberNinoController
-    val MemberSaUtrController = providedetailsRoutes.MemberSaUtrController
-    val MemberApproveApplicantController = providedetailsRoutes.MemberApproveApplicantController
-    val MemberHmrcStandardForAgentsController = providedetailsRoutes.MemberHmrcStandardForAgentsController
-    val MemberConfirmStopController = providedetailsRoutes.MemberConfirmStopController
+    val IndividualTelephoneNumberController = providedetailsRoutes.IndividualTelephoneNumberController
+    val IndividualEmailAddressController = providedetailsRoutes.IndividualEmailAddressController
+    val IndividualNinoController = providedetailsRoutes.IndividualNinoController
+    val IndividualSaUtrController = providedetailsRoutes.IndividualSaUtrController
+    val IndividualApproveApplicantController = providedetailsRoutes.IndividualApproveApplicantController
+    val IndividualHmrcStandardForAgentsController = providedetailsRoutes.IndividualHmrcStandardForAgentsController
+    val IndividualConfirmStopController = providedetailsRoutes.IndividualConfirmStopController
     val CheckYourAnswersController = providedetailsRoutes.CheckYourAnswersController
-    val MemberConfirmationController = providedetailsRoutes.MemberConfirmationController
+    val IndividualConfirmationController = providedetailsRoutes.IndividualConfirmationController
 
     object internal:
-      val InitiateMemberProvideDetailsController = internalProviDedetailsRoutes.InitiateMemberProvideDetailsController
+      val InitiateIndividualProvideDetailsController = internalProviDedetailsRoutes.InitiateIndividualProvideDetailsController
 
   object testOnly:
 

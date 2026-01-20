@@ -29,8 +29,8 @@ import play.api.test.DefaultTestServerFactory
 import play.api.test.TestServerFactory
 import play.core.server.ServerConfig
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsId
-import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetailsIdGenerator
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsIdGenerator
 import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.CsvLoader
@@ -106,8 +106,8 @@ extends AnyWordSpecLike,
         bind(classOf[UploadIdGenerator]).toInstance(new UploadIdGenerator {
           override def nextUploadId(): UploadId = tdAll.uploadId
         })
-        bind(classOf[MemberProvidedDetailsIdGenerator]).toInstance(new MemberProvidedDetailsIdGenerator {
-          override def nextMemberProvidedDetailsId(): MemberProvidedDetailsId = tdAll.memberProvidedDetailsId
+        bind(classOf[IndividualProvidedDetailsIdGenerator]).toInstance(new IndividualProvidedDetailsIdGenerator {
+          override def nextIndividualProvidedDetailsId(): IndividualProvidedDetailsId = tdAll.individualProvidedDetailsId
         })
 //        bind(classOf[ObjectStoreClientConfig]).toInstance(objectStoreConfig)
 //        bind(classOf[PlayObjectStoreClient]).toProvider(classOf[StubPlayObjectStoreClientProvider]).asEagerSingleton()

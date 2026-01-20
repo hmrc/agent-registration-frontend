@@ -19,24 +19,24 @@ package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistration.shared.llp.MemberSaUtr
-import uk.gov.hmrc.agentregistration.shared.llp.MemberNino
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.memberconfirmation.CheckYourAnswersPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.CheckYourAnswersPage
 
 class CheckYourAnswersPageSpec
 extends ViewSpec:
 
   val viewTemplate: CheckYourAnswersPage = app.injector.instanceOf[CheckYourAnswersPage]
 
-  private object memberProvideDetails:
+  private object individualProvideDetails:
 
     val complete = tdAll.providedDetailsLlp.afterApproveAgentApplication
     val completeWithNinoAndSaUtrNotProvided = tdAll.providedDetailsLlp.afterApproveAgentApplication
-      .copy(memberNino = Some(MemberNino.NotProvided), memberSaUtr = Some(MemberSaUtr.NotProvided))
+      .copy(individualNino = Some(IndividualNino.NotProvided), individualSaUtr = Some(IndividualSaUtr.NotProvided))
     val completeWithNinoAndSaUtrFromHmrc = tdAll.providedDetailsLlp.afterApproveAgentApplication
-      .copy(memberNino = Some(tdAll.ninoFromAuth), memberSaUtr = Some(tdAll.saUtrFromAuth))
+      .copy(individualNino = Some(tdAll.ninoFromAuth), individualSaUtr = Some(tdAll.saUtrFromAuth))
 
   private val heading: String = "Check your answers"
   private val serviceTitleSuffix: String = "Apply for an agent services account - GOV.UK"
@@ -44,7 +44,7 @@ extends ViewSpec:
 
   private def pageTitle: String = s"$heading - $serviceTitleSuffix"
 
-  private def renderDoc()(using MemberProvideDetailsRequest[AnyContent]): Document = Jsoup.parse(viewTemplate().body)
+  private def renderDoc()(using IndividualProvideDetailsRequest[AnyContent]): Document = Jsoup.parse(viewTemplate().body)
 
   private def summaryRow(
     key: String,
@@ -57,8 +57,8 @@ extends ViewSpec:
     changeLinkAccessibleContent = s"Change $key"
   )
 
-  "CheckYourAnswersPage for complete Member Provided Details" should:
-    given memberProvideDetailsRequest: MemberProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(memberProvideDetails.complete)
+  "CheckYourAnswersPage for complete Individual Provided Details" should:
+    given individualProvideDetailsRequest: IndividualProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(individualProvideDetails.complete)
 
     val doc: Document = renderDoc()
 
@@ -106,32 +106,32 @@ extends ViewSpec:
           summaryRow(
             key = "Telephone number",
             value = "(+44) 10794554342",
-            action = AppRoutes.providedetails.MemberTelephoneNumberController.show.url
+            action = AppRoutes.providedetails.IndividualTelephoneNumberController.show.url
           ),
           summaryRow(
             key = "Email address",
             value = "member@test.com",
-            action = AppRoutes.providedetails.MemberEmailAddressController.show.url
+            action = AppRoutes.providedetails.IndividualEmailAddressController.show.url
           ),
           summaryRow(
             key = "Do you have a National Insurance number?",
             value = "Yes",
-            action = AppRoutes.providedetails.MemberNinoController.show.url
+            action = AppRoutes.providedetails.IndividualNinoController.show.url
           ),
           summaryRow(
             key = "National Insurance number",
             value = "AB123456C",
-            action = AppRoutes.providedetails.MemberNinoController.show.url
+            action = AppRoutes.providedetails.IndividualNinoController.show.url
           ),
           summaryRow(
             key = "Do you have a Self Assessment Unique Taxpayer Reference?",
             value = "Yes",
-            action = AppRoutes.providedetails.MemberSaUtrController.show.url
+            action = AppRoutes.providedetails.IndividualSaUtrController.show.url
           ),
           summaryRow(
             key = "Self Assessment Unique Taxpayer Reference",
             value = "1234567895",
-            action = AppRoutes.providedetails.MemberSaUtrController.show.url
+            action = AppRoutes.providedetails.IndividualSaUtrController.show.url
           )
         )
       )
@@ -140,9 +140,9 @@ extends ViewSpec:
     "render a confirm and continue button" in:
       doc.extractSubmitButtonText shouldBe confirmAndContinueText
 
-  "CheckYourAnswersPage for incomplete Member Provided Details - when Nino and SaUtr coming from HMRC systems" should:
-    given memberProvideDetailsRequest: MemberProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(
-      memberProvideDetails.completeWithNinoAndSaUtrFromHmrc
+  "CheckYourAnswersPage for incomplete individual Provided Details - when Nino and SaUtr coming from HMRC systems" should:
+    given individualProvideDetailsRequest: IndividualProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(
+      individualProvideDetails.completeWithNinoAndSaUtrFromHmrc
     )
 
     val doc: Document = renderDoc()
@@ -179,12 +179,12 @@ extends ViewSpec:
           summaryRow(
             key = "Telephone number",
             value = "(+44) 10794554342",
-            action = AppRoutes.providedetails.MemberTelephoneNumberController.show.url
+            action = AppRoutes.providedetails.IndividualTelephoneNumberController.show.url
           ),
           summaryRow(
             key = "Email address",
             value = "member@test.com",
-            action = AppRoutes.providedetails.MemberEmailAddressController.show.url
+            action = AppRoutes.providedetails.IndividualEmailAddressController.show.url
           )
         )
       )
@@ -193,9 +193,9 @@ extends ViewSpec:
     "render a confirm and continue button" in:
       doc.extractSubmitButtonText shouldBe confirmAndContinueText
 
-  "CheckYourAnswersPage for incomplete Member Provided Details - when Nino and SaUtr not provided" should:
-    given memberProvideDetailsRequest: MemberProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(
-      memberProvideDetails.completeWithNinoAndSaUtrNotProvided
+  "CheckYourAnswersPage for incomplete individual Provided Details - when Nino and SaUtr not provided" should:
+    given individualProvideDetailsRequest: IndividualProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(
+      individualProvideDetails.completeWithNinoAndSaUtrNotProvided
     )
 
     val doc: Document = renderDoc()
@@ -238,22 +238,22 @@ extends ViewSpec:
           summaryRow(
             key = "Telephone number",
             value = "(+44) 10794554342",
-            action = AppRoutes.providedetails.MemberTelephoneNumberController.show.url
+            action = AppRoutes.providedetails.IndividualTelephoneNumberController.show.url
           ),
           summaryRow(
             key = "Email address",
             value = "member@test.com",
-            action = AppRoutes.providedetails.MemberEmailAddressController.show.url
+            action = AppRoutes.providedetails.IndividualEmailAddressController.show.url
           ),
           summaryRow(
             key = "Do you have a National Insurance number?",
             value = "No",
-            action = AppRoutes.providedetails.MemberNinoController.show.url
+            action = AppRoutes.providedetails.IndividualNinoController.show.url
           ),
           summaryRow(
             key = "Do you have a Self Assessment Unique Taxpayer Reference?",
             value = "No",
-            action = AppRoutes.providedetails.MemberSaUtrController.show.url
+            action = AppRoutes.providedetails.IndividualSaUtrController.show.url
           )
         )
       )

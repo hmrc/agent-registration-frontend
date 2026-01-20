@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.MemberProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionFormType
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
@@ -36,11 +36,11 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms.toOff
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.CompaniesHouseService
-import uk.gov.hmrc.agentregistrationfrontend.services.llp.MemberProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.MatchedMemberPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.MatchedMembersPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.MatchedIndividualPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.MatchedIndividualsPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -52,49 +52,49 @@ class CompaniesHouseMatchingController @Inject() (
   actions: Actions,
   agentApplicationService: AgentApplicationService,
   companiesHouseService: CompaniesHouseService,
-  memberProvideDetailsService: MemberProvideDetailsService,
-  matchedMemberView: MatchedMemberPage,
-  matchedMembersView: MatchedMembersPage,
-  noMemberNameMatchesView: SimplePage
+  individualProvideDetailsService: IndividualProvideDetailsService,
+  matchedIndividualView: MatchedIndividualPage,
+  matchedIndividualsView: MatchedIndividualsPage,
+  noIndividualNameMatchesView: SimplePage
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[MemberProvideDetailsRequest, AnyContent] = actions
-    .Member
+  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions
+    .Individual
     .getProvideDetailsInProgress
     .ensure(
-      _.memberProvidedDetails.companiesHouseMatch.isDefined,
+      _.individualProvidedDetails.companiesHouseMatch.isDefined,
       implicit request =>
-        logger.info("Redirecting to member name page due to missing memberNameQuery value")
+        logger.info("Redirecting to individual name page due to missing memberNameQuery value")
         Redirect(AppRoutes.providedetails.CompaniesHouseNameQueryController.show)
     )
 
   def show: Action[AnyContent] = baseAction
     .async:
-      implicit request: MemberProvideDetailsRequest[AnyContent] =>
+      implicit request: IndividualProvideDetailsRequest[AnyContent] =>
         fetchOfficers.map:
           case Nil =>
-            logger.info("No Companies House officers found matching member name query, rendering noMemberNameMatchesView")
-            Ok(noMemberNameMatchesView(
+            logger.info("No Companies House officers found matching individual name query, rendering noMemberNameMatchesView")
+            Ok(noIndividualNameMatchesView(
               h1 = "No member name matches",
               bodyText = Some("placeholder for no matches")
             ))
 
           case officer :: Nil =>
-            logger.info(s"Found one Companies House officer matching member name query, rendering matchedMemberView")
+            logger.info(s"Found one Companies House officer matching individual name query, rendering matchedMemberView")
             val form = ChOfficerSelectionForms.yesNoForm
-              .fill(request.memberProvidedDetails
+              .fill(request.individualProvidedDetails
                 .getCompaniesHouseMatch
                 .companiesHouseOfficer
                 .filter(_ === officer).map(_ => YesNo.Yes))
-            Ok(matchedMemberView(form, officer))
+            Ok(matchedIndividualView(form, officer))
 
           case officers: Seq[CompaniesHouseOfficer] =>
-            logger.info(s"Found ${officers.size} Companies House officers matching member name query, rendering matchedMembersView")
-            Ok(matchedMembersView(
+            logger.info(s"Found ${officers.size} Companies House officers matching individual name query, rendering matchedMembersView")
+            Ok(matchedIndividualsView(
               form = ChOfficerSelectionForms
                 .officerSelectionForm(officers)
-                .fill(request.memberProvidedDetails
+                .fill(request.individualProvidedDetails
                   .getCompaniesHouseMatch
                   .companiesHouseOfficer
                   .map(_.toOfficerSelection)),
@@ -107,20 +107,20 @@ extends FrontendController(mcc, actions):
       implicit request => formWithErrors => Errors.throwBadRequestException(s"Unexpected errors in the FormType: $formWithErrors")
     )
     .async:
-      implicit request: (MemberProvideDetailsRequest[AnyContent] & FormValue[ChOfficerSelectionFormType]) =>
+      implicit request: (IndividualProvideDetailsRequest[AnyContent] & FormValue[ChOfficerSelectionFormType]) =>
         request.formValue match {
           case ChOfficerSelectionFormType.YesNoForm => handleYesNoForm
           case ChOfficerSelectionFormType.OfficerSelectionForm => handleOfficerSelectionForm
         }
 
-  def handleYesNoForm(using request: MemberProvideDetailsRequest[?]): Future[Result] = fetchOfficers.flatMap: officers =>
+  def handleYesNoForm(using request: IndividualProvideDetailsRequest[?]): Future[Result] = fetchOfficers.flatMap: officers =>
     val officer: CompaniesHouseOfficer = officers
       .headOption
       .getOrThrowExpectedDataMissing(
         s"Unexpected response from companies house, expected one officer but got: ${officers.size}"
       )
     ChOfficerSelectionForms.yesNoForm.bindFromRequest().fold(
-      hasErrors = (formWithErrors: Form[YesNo]) => Future.successful(BadRequest(matchedMemberView(formWithErrors, officer))),
+      hasErrors = (formWithErrors: Form[YesNo]) => Future.successful(BadRequest(matchedIndividualView(formWithErrors, officer))),
       success =
         case YesNo.Yes => updateProvidedDetails(officer)
         case YesNo.No =>
@@ -130,14 +130,14 @@ extends FrontendController(mcc, actions):
           )
     )
 
-  def handleOfficerSelectionForm(using request: MemberProvideDetailsRequest[?]): Future[Result] = fetchOfficers.flatMap: officers =>
+  def handleOfficerSelectionForm(using request: IndividualProvideDetailsRequest[?]): Future[Result] = fetchOfficers.flatMap: officers =>
     Errors.require(officers.size > 1, s"Unexpected response from companies house, expected more then 1 officer but got: ${officers.size}")
 
     ChOfficerSelectionForms
       .officerSelectionForm(officers)
       .bindFromRequest()
       .fold(
-        hasErrors = formWithErrors => Future.successful(BadRequest(matchedMembersView(formWithErrors, officers))),
+        hasErrors = formWithErrors => Future.successful(BadRequest(matchedIndividualsView(formWithErrors, officers))),
         success =
           officerSelection =>
             val officer: CompaniesHouseOfficer = officers
@@ -146,10 +146,10 @@ extends FrontendController(mcc, actions):
             updateProvidedDetails(officer)
       )
 
-  private def fetchOfficers(using request: MemberProvideDetailsRequest[?]): Future[Seq[CompaniesHouseOfficer]] =
+  private def fetchOfficers(using request: IndividualProvideDetailsRequest[?]): Future[Seq[CompaniesHouseOfficer]] =
     for {
       agentApplication <- agentApplicationService
-        .find(request.memberProvidedDetails.agentApplicationId) // starting to think it may be better to have the application in the request
+        .find(request.individualProvidedDetails.agentApplicationId) // starting to think it may be better to have the application in the request
       officers <- companiesHouseService.getLlpOfficers(
         companyRegistrationNumber =
           agentApplication
@@ -157,7 +157,7 @@ extends FrontendController(mcc, actions):
             .asLlpApplication
             .getCrn,
         lastName =
-          request.memberProvidedDetails.companiesHouseMatch
+          request.individualProvidedDetails.companiesHouseMatch
             .getOrThrowExpectedDataMissing("Companies House match is not defined")
             .memberNameQuery
             .lastName
@@ -166,9 +166,9 @@ extends FrontendController(mcc, actions):
 
   private def updateProvidedDetails(
     officer: CompaniesHouseOfficer
-  )(using request: MemberProvideDetailsRequest[?]): Future[Result] = memberProvideDetailsService
+  )(using request: IndividualProvideDetailsRequest[?]): Future[Result] = individualProvideDetailsService
     .upsert(
-      memberProvidedDetails = request.memberProvidedDetails
+      individualProvidedDetails = request.individualProvidedDetails
         .modify(_.companiesHouseMatch.each.companiesHouseOfficer)
         .setTo(Some(officer))
     )

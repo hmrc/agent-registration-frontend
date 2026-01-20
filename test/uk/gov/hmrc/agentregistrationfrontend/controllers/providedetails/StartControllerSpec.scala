@@ -22,11 +22,11 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.LinkId
-import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll.agentApplicationId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationMemberProvidedDetailsStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
 class StartControllerSpec
 extends ControllerSpec:
@@ -47,7 +47,7 @@ extends ControllerSpec:
       .setTo(ApplicationState.Submitted)
 
   object providedDetails:
-    val newProvidedDetails: MemberProvidedDetails =
+    val newProvidedDetails: IndividualProvidedDetails =
       tdAll
         .providedDetailsLlp
         .afterStarted
@@ -60,7 +60,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render the start page" in:
     AgentRegistrationStubs.stubFindApplicationByLinkId(linkId = linkId, agentApplication = agentApplication.complete)
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindMemberProvidedDetailsNoContent(agentApplicationId)
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindIndividualProvidedDetailsNoContent(agentApplicationId)
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Sign in and confirm your details - Apply for an agent services account - GOV.UK"

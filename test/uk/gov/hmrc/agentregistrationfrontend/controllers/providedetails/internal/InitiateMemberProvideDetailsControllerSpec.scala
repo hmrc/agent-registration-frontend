@@ -20,9 +20,9 @@ import com.softwaremill.quicklens.modify
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CitizenDetailsStub
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationMemberProvidedDetailsStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 import play.api.mvc.Call
-import uk.gov.hmrc.agentregistration.shared.llp.MemberProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.LinkId
@@ -47,25 +47,25 @@ extends ControllerSpec:
 
   object memberProvidedDetails:
 
-    val afterStarted: MemberProvidedDetails =
+    val afterStarted: IndividualProvidedDetails =
       tdAll
         .providedDetailsLlp
         .afterStarted
 
-    val afterStartedWithNinoAndSaUtrFromAuth: MemberProvidedDetails = tdAll
+    val afterStartedWithNinoAndSaUtrFromAuth: IndividualProvidedDetails = tdAll
       .providedDetailsLlp
       .afterStarted
-      .modify(_.memberNino)
+      .modify(_.individualNino)
       .setTo(Some(tdAll.ninoFromAuth))
-      .modify(_.memberSaUtr)
+      .modify(_.individualSaUtr)
       .setTo(Some(tdAll.saUtrFromAuth))
 
-    val afterStartedWithNinoAndSaUtrAndDoBFromCitizenDetails: MemberProvidedDetails = tdAll
+    val afterStartedWithNinoAndSaUtrAndDoBFromCitizenDetails: IndividualProvidedDetails = tdAll
       .providedDetailsLlp
       .afterStarted
-      .modify(_.memberNino)
+      .modify(_.individualNino)
       .setTo(Some(tdAll.ninoFromAuth))
-      .modify(_.memberSaUtr)
+      .modify(_.individualSaUtr)
       .setTo(Some(tdAll.saUtrFromCitizenDetails))
       .modify(_.dateOfBirth)
       .setTo(Some(tdAll.dateOfBirth))
@@ -73,16 +73,18 @@ extends ControllerSpec:
   private def path(linkId: LinkId) = s"/agent-registration/provide-details/internal/initiate-member-provide-details/${linkId.value}"
 
   "routes should have correct paths and methods" in:
-    AppRoutes.providedetails.internal.InitiateMemberProvideDetailsController.initiateMemberProvideDetails(tdAll.linkId) shouldBe Call(
+    AppRoutes.providedetails.internal.InitiateIndividualProvideDetailsController.initiateMemberProvideDetails(tdAll.linkId) shouldBe Call(
       method = "GET",
       url = path(tdAll.linkId)
     )
 
-  "GET initiateMemberProvideDetails should create memberProvidedDetails and redirect to member name page when application exists and memberProvidedDetails do not exist (nino only, saUtr, DoB from citizen details)" in:
+  "GET initiateMemberProvideDetails should create memberProvidedDetails and redirect to individual name page when application exists and memberProvidedDetails do not exist (nino only, saUtr, DoB from citizen details)" in:
     IndividualAuthStubs.stubAuthoriseWithNino()
     AgentRegistrationStubs.stubFindApplicationByLinkId(tdAll.linkId, agentApplication.applicationSubmitted)
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindMemberProvidedDetailsNoContent(agentApplication.applicationSubmitted.agentApplicationId)
-    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvidedDetails.afterStartedWithNinoAndSaUtrAndDoBFromCitizenDetails)
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindIndividualProvidedDetailsNoContent(agentApplication.applicationSubmitted.agentApplicationId)
+    AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(
+      memberProvidedDetails.afterStartedWithNinoAndSaUtrAndDoBFromCitizenDetails
+    )
     CitizenDetailsStub.stubFindSaUtr(tdAll.nino, tdAll.saUtr)
 
     val response: WSResponse = get(path(tdAll.linkId))
@@ -92,15 +94,15 @@ extends ControllerSpec:
       AppRoutes.providedetails.CompaniesHouseNameQueryController.show.url
 
     AgentRegistrationStubs.verifyFindApplicationByLinkId(tdAll.linkId)
-    AgentRegistrationMemberProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplication.applicationSubmitted.agentApplicationId)
-    AgentRegistrationMemberProvidedDetailsStubs.verifyUpsert()
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplication.applicationSubmitted.agentApplicationId)
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyUpsert()
     CitizenDetailsStub.verifyFind(tdAll.nino)
 
-  "GET initiateMemberProvideDetails should create memberProvidedDetails and redirect to member name page when application exists and memberProvidedDetails do not exist (nino only, saUtr from Enrolments, no DoB)" in:
+  "GET initiateMemberProvideDetails should create memberProvidedDetails and redirect to individual name page when application exists and memberProvidedDetails do not exist (nino only, saUtr from Enrolments, no DoB)" in:
     IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
     AgentRegistrationStubs.stubFindApplicationByLinkId(tdAll.linkId, agentApplication.applicationSubmitted)
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindMemberProvidedDetailsNoContent(agentApplication.applicationSubmitted.agentApplicationId)
-    AgentRegistrationMemberProvidedDetailsStubs.stubUpsertMemberProvidedDetails(memberProvidedDetails.afterStartedWithNinoAndSaUtrFromAuth)
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindIndividualProvidedDetailsNoContent(agentApplication.applicationSubmitted.agentApplicationId)
+    AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(memberProvidedDetails.afterStartedWithNinoAndSaUtrFromAuth)
 
     val response: WSResponse = get(path(tdAll.linkId))
 
@@ -109,14 +111,14 @@ extends ControllerSpec:
       AppRoutes.providedetails.CompaniesHouseNameQueryController.show.url
 
     AgentRegistrationStubs.verifyFindApplicationByLinkId(tdAll.linkId)
-    AgentRegistrationMemberProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplication.applicationSubmitted.agentApplicationId)
-    AgentRegistrationMemberProvidedDetailsStubs.verifyUpsert()
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplication.applicationSubmitted.agentApplicationId)
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyUpsert()
     CitizenDetailsStub.verifyFind(tdAll.nino, 0)
 
-  "GET initiateMemberProvideDetails should not create new memberProvidedDetails and should redirect to member name page when memberProvidedDetails already exist" in:
+  "GET initiateMemberProvideDetails should not create new memberProvidedDetails and should redirect to individual name page when memberProvidedDetails already exist" in:
     IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
     AgentRegistrationStubs.stubFindApplicationByLinkId(tdAll.linkId, agentApplication.applicationSubmitted)
-    AgentRegistrationMemberProvidedDetailsStubs.stubFindMemberProvidedDetails(memberProvidedDetails.afterStartedWithNinoAndSaUtrFromAuth)
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindIndividualProvidedDetails(memberProvidedDetails.afterStartedWithNinoAndSaUtrFromAuth)
 
     val response: WSResponse = get(path(tdAll.linkId))
 
@@ -125,8 +127,8 @@ extends ControllerSpec:
       AppRoutes.providedetails.CompaniesHouseNameQueryController.show.url
 
     AgentRegistrationStubs.verifyFindApplicationByLinkId(tdAll.linkId)
-    AgentRegistrationMemberProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplication.applicationSubmitted.agentApplicationId)
-    AgentRegistrationMemberProvidedDetailsStubs.verifyUpsert(0)
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplication.applicationSubmitted.agentApplicationId)
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyUpsert(0)
     CitizenDetailsStub.verifyFind(tdAll.nino, 0)
 
   "GET initiateMemberProvideDetails should redirect to generic exit page when application is not found" in:
@@ -140,6 +142,6 @@ extends ControllerSpec:
       AppRoutes.apply.AgentApplicationController.genericExitPage.url
 
     AgentRegistrationStubs.verifyFindApplicationByLinkId(tdAll.linkId)
-    AgentRegistrationMemberProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplication.applicationSubmitted.agentApplicationId, 0)
-    AgentRegistrationMemberProvidedDetailsStubs.verifyUpsert(0)
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplication.applicationSubmitted.agentApplicationId, 0)
+    AgentRegistrationIndividualProvidedDetailsStubs.verifyUpsert(0)
     CitizenDetailsStub.verifyFind(tdAll.nino, 0)
