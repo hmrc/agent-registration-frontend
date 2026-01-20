@@ -26,13 +26,15 @@
 @import java.util.UUID
 @import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 @import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.*
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
 
 @this(
         layout: Layout,
         formWithCSRF: FormWithCSRF,
         govukRadios: GovukRadios,
         govukInput: GovukInput,
-        govukButton: GovukButton
+        govukButton: GovukButton,
+        govukCheckboxes: GovukCheckboxes
 )
 
 @(
@@ -64,6 +66,7 @@
             @dateOfBirthInput
             @ninoInput
             @trnInput
+            @deceasedCheckbox
         }
         @if(businessType === LimitedCompany) {
             @ctutrInput
@@ -164,6 +167,26 @@
         classes = "govuk-label--m"
     )
 ).withFormField(form("trn")))
+}
+
+
+@deceasedCheckbox = {
+    @govukCheckboxes(Checkboxes(
+        fieldset = Some(Fieldset(
+            legend = Some(Legend(
+                content = Text("Mark the individual as deceased (test-only)"),
+                classes = "govuk-fieldset__legend--s"
+            ))
+        )),
+        items = Seq(
+            CheckboxItem(
+                id = Some("deceased"),
+                name = Some("deceased"), // <-- IMPORTANT: name must be "deceased"
+                value = "true",          // <-- the controller treats "true"/"on" as true
+                content = Text("Deceased")
+            )
+        )
+    ).withFormField(form("deceased")))
 }
 
 @sautrInput = {
