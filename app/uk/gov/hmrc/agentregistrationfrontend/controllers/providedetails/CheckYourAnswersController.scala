@@ -61,6 +61,11 @@ extends FrontendController(mcc, actions):
         Redirect(AppRoutes.providedetails.IndividualEmailAddressController.show)
     )
     .ensure(
+      _.individualProvidedDetails.individualDateOfBirth.nonEmpty,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.IndividualDateOfBirthController.show)
+    )
+    .ensure(
       _.individualProvidedDetails.individualNino.nonEmpty,
       implicit request =>
         Redirect(AppRoutes.providedetails.IndividualNinoController.show)

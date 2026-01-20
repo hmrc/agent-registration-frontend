@@ -15,8 +15,12 @@
  *@
 
 @import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
 @import uk.gov.hmrc.agentregistration.shared.llp.{IndividualNino, IndividualSaUtr}
 @import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
+@import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
+
+@import java.time.LocalDate
 
 @this(
         govukSummaryList: GovukSummaryList
@@ -25,7 +29,7 @@
 @(
         key: String,
         individualProvidedDetails: IndividualProvidedDetails
-)(implicit messages: Messages)
+)(implicit request: Request[?], messages: Messages)
 
 @makeSummaryListRow(labelKey: String, valueText: String, changeHref: String) = @{
     SummaryListRow(
@@ -72,6 +76,14 @@
     )
 }
 
+@dateOfBirthRow(dob: LocalDate) = @{
+    makeSummaryListRow(
+        labelKey = s"$key.dateOfBirth.label",
+        valueText = displayDateForLang(Some(dob)),
+        changeHref = AppRoutes.providedetails.IndividualDateOfBirthController.show.toString
+    )
+}
+
 @hasNinoRow(hasNino: String) = @{
     makeSummaryListRow(
         labelKey = s"$key.hasNino.label",
@@ -107,6 +119,11 @@
 @rows = @{
     val base = Seq(memberNameRow, telephoneRow, emailRow)
 
+  val dateOfBirthRows = individualProvidedDetails.getDateOfBirth match {
+        case IndividualDateOfBirth.Provided(dob) => Seq(dateOfBirthRow(dob))
+        case _ => Seq.empty[SummaryListRow]
+    }
+
     val ninoRows = individualProvidedDetails.getNino match {
         case IndividualNino.Provided(nino) => Seq(hasNinoRow("Yes"), ninoRow(nino.value))
         case IndividualNino.NotProvided => Seq(hasNinoRow("No"))
@@ -120,7 +137,7 @@
         case _: IndividualSaUtr.FromCitizenDetails => Seq.empty[SummaryListRow]
     }
 
-    base ++ ninoRows ++ saUtrRows
+    base ++ dateOfBirthRows ++ ninoRows ++ saUtrRows
 }
 
 @govukSummaryList(SummaryList(rows = rows))

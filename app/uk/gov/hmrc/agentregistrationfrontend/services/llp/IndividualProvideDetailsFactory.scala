@@ -17,15 +17,15 @@
 package uk.gov.hmrc.agentregistrationfrontend.services.llp
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsIdGenerator
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Started
 
 import java.time.Clock
 import java.time.Instant
-import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -40,7 +40,7 @@ class IndividualProvideDetailsFactory @Inject() (
     agentApplicationId: AgentApplicationId,
     individualNino: Option[IndividualNino],
     individualSaUtr: Option[IndividualSaUtr],
-    individualDateOfBirth: Option[LocalDate]
+    individualDateOfBirth: Option[IndividualDateOfBirth]
   ): IndividualProvidedDetails = IndividualProvidedDetails(
     _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
     internalUserId = internalUserId,
@@ -49,5 +49,5 @@ class IndividualProvideDetailsFactory @Inject() (
     providedDetailsState = Started,
     individualNino = individualNino,
     individualSaUtr = individualSaUtr,
-    dateOfBirth = individualDateOfBirth
+    individualDateOfBirth = individualDateOfBirth
   )

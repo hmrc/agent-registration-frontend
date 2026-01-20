@@ -17,8 +17,9 @@
 package uk.gov.hmrc.agentregistrationfrontend.services.llp
 
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
@@ -27,7 +28,6 @@ import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetail
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
-import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
@@ -42,17 +42,17 @@ extends RequestAwareLogging:
   def createNewIndividualProvidedDetails(
     internalUserId: InternalUserId,
     agentApplicationId: AgentApplicationId,
-    memberNino: Option[IndividualNino],
-    memberSaUtr: Option[IndividualSaUtr],
-    memberDateOfBirth: Option[LocalDate] = None
+    maybeIndividualNino: Option[IndividualNino],
+    maybeIndividualSaUtr: Option[IndividualSaUtr],
+    maybeIndividualDateOfBirth: Option[IndividualDateOfBirth] = None
   )(using request: IndividualAuthorisedWithIdentifiersRequest[?]): IndividualProvidedDetails =
     logger.info(s"creating new provided details for user:[${internalUserId.value}] and applicationId:[${agentApplicationId.value}] ")
     provideDetailsFactory.makeNewIndividualProvidedDetails(
       internalUserId,
       agentApplicationId,
-      memberNino,
-      memberSaUtr,
-      memberDateOfBirth
+      maybeIndividualNino,
+      maybeIndividualSaUtr,
+      maybeIndividualDateOfBirth
     )
 
   def findByApplicationId(applicationId: AgentApplicationId)(using request: IndividualAuthorisedRequest[?]): Future[Option[IndividualProvidedDetails]] =

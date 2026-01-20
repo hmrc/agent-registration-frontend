@@ -97,7 +97,7 @@ GET         /provide-details/start/:linkId                          uk.gov.hmrc.
 
 ## Internal Routes for provide-details
 #  These routes are for internal navigation and should not be accessed directly through the browser URL and meant to be accessed via redirects from other routes.
-GET        /provide-details/internal/initiate-member-provide-details/:linkId  uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.InitiateIndividualProvideDetailsController.initiateMemberProvideDetails(linkId: LinkId)
+GET        /provide-details/internal/initiate-member-provide-details/:linkId  uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.InitiateIndividualProvideDetailsController.initiateIndividualProvideDetails(linkId: LinkId)
 
 
 GET         /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CompaniesHouseNameQueryController.show
@@ -109,6 +109,8 @@ POST        /provide-details/telephone-number                       uk.gov.hmrc.
 GET         /provide-details/email-address                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualEmailAddressController.show
 POST        /provide-details/email-address                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualEmailAddressController.submit
 GET         /provide-details/verify-email-address                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualEmailAddressController.verify
+GET         /provide-details/date-of-birth                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualDateOfBirthController.show
+POST        /provide-details/date-of-birth                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualDateOfBirthController.submit
 GET         /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualNinoController.show
 POST        /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualNinoController.submit
 GET         /provide-details/utr                                    uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualSaUtrController.show

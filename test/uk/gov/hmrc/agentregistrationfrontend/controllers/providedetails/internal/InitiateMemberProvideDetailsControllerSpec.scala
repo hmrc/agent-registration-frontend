@@ -67,13 +67,13 @@ extends ControllerSpec:
       .setTo(Some(tdAll.ninoFromAuth))
       .modify(_.individualSaUtr)
       .setTo(Some(tdAll.saUtrFromCitizenDetails))
-      .modify(_.dateOfBirth)
-      .setTo(Some(tdAll.dateOfBirth))
+      .modify(_.individualDateOfBirth)
+      .setTo(Some(tdAll.dateOfBirthFromCitizenDetails))
 
   private def path(linkId: LinkId) = s"/agent-registration/provide-details/internal/initiate-member-provide-details/${linkId.value}"
 
   "routes should have correct paths and methods" in:
-    AppRoutes.providedetails.internal.InitiateIndividualProvideDetailsController.initiateMemberProvideDetails(tdAll.linkId) shouldBe Call(
+    AppRoutes.providedetails.internal.InitiateIndividualProvideDetailsController.initiateIndividualProvideDetails(tdAll.linkId) shouldBe Call(
       method = "GET",
       url = path(tdAll.linkId)
     )

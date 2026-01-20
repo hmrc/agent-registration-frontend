@@ -106,6 +106,7 @@ object AppRoutes:
     val ExitController = providedetailsRoutes.ExitController
     val IndividualTelephoneNumberController = providedetailsRoutes.IndividualTelephoneNumberController
     val IndividualEmailAddressController = providedetailsRoutes.IndividualEmailAddressController
+    val IndividualDateOfBirthController = providedetailsRoutes.IndividualDateOfBirthController
     val IndividualNinoController = providedetailsRoutes.IndividualNinoController
     val IndividualSaUtrController = providedetailsRoutes.IndividualSaUtrController
     val IndividualApproveApplicantController = providedetailsRoutes.IndividualApproveApplicantController

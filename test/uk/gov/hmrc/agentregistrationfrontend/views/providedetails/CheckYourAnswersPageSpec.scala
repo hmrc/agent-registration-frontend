@@ -34,9 +34,17 @@ extends ViewSpec:
 
     val complete = tdAll.providedDetailsLlp.afterApproveAgentApplication
     val completeWithNinoAndSaUtrNotProvided = tdAll.providedDetailsLlp.afterApproveAgentApplication
-      .copy(individualNino = Some(IndividualNino.NotProvided), individualSaUtr = Some(IndividualSaUtr.NotProvided))
+      .copy(
+        individualDateOfBirth = Some(tdAll.dateOfBirthFromCitizenDetails),
+        individualNino = Some(IndividualNino.NotProvided),
+        individualSaUtr = Some(IndividualSaUtr.NotProvided)
+      )
     val completeWithNinoAndSaUtrFromHmrc = tdAll.providedDetailsLlp.afterApproveAgentApplication
-      .copy(individualNino = Some(tdAll.ninoFromAuth), individualSaUtr = Some(tdAll.saUtrFromAuth))
+      .copy(
+        individualDateOfBirth = Some(tdAll.dateOfBirthFromCitizenDetails),
+        individualNino = Some(tdAll.ninoFromAuth),
+        individualSaUtr = Some(tdAll.saUtrFromAuth)
+      )
 
   private val heading: String = "Check your answers"
   private val serviceTitleSuffix: String = "Apply for an agent services account - GOV.UK"
@@ -76,6 +84,9 @@ extends ViewSpec:
           |Email address
           |member@test.com
           |Change Email address
+          |Date of birth
+          |1 January 2000
+          |Change Date of birth
           |Do you have a National Insurance number?
           |Yes
           |Change Do you have a National Insurance number?
@@ -112,6 +123,11 @@ extends ViewSpec:
             key = "Email address",
             value = "member@test.com",
             action = AppRoutes.providedetails.IndividualEmailAddressController.show.url
+          ),
+          summaryRow(
+            key = "Date of birth",
+            value = "1 January 2000",
+            action = AppRoutes.providedetails.IndividualDateOfBirthController.show.url
           ),
           summaryRow(
             key = "Do you have a National Insurance number?",

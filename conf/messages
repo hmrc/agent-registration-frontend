@@ -573,6 +573,7 @@ individualDetailsCheckYourAnswers.nino.label = National Insurance number
 individualDetailsCheckYourAnswers.change = Change
 individualDetailsCheckYourAnswers.hasSaUtr.label = Do you have a Self Assessment Unique Taxpayer Reference?
 individualDetailsCheckYourAnswers.hasNino.label = Do you have a National Insurance number?
+individualDetailsCheckYourAnswers.dateOfBirth.label = Date of birth
 
 
 # Individual Confirmation of submission
@@ -583,3 +584,16 @@ individualConfirmation.whatNext.p2 = When we have the information we need, we’
 individualConfirmation.whatNext.p3 = If we need any further information from you, we will contact you by email or telephone.
 individualConfirmation.whatNext.p4 = When we have finished our checks, we’ll email {0} with a decision about the application.
 individualConfirmation.signOutLink = Finish and sign out
+
+# Individual date of birth
+dateOfBirth.title = What is your date of birth?
+dateOfBirth.hint = For example, 31 3 1980
+dateOfBirth.error.required = Enter your date of birth
+dateOfBirth.error.month-year.required = Your date of birth must include a month and year
+dateOfBirth.error.day-month.required = Your date of birth must include a day and month
+dateOfBirth.error.day-year.required = Your date of birth must include a day and year
+dateOfBirth.error.day.required = Your date of birth must include a day
+dateOfBirth.error.month.required = Your date of birth must include a month
+dateOfBirth.error.year.required = Your date of birth must include a year
+dateOfBirth.error.invalid = Your date of birth must be a real date
+dateOfBirth.error.future = Your date of birth must be in the past

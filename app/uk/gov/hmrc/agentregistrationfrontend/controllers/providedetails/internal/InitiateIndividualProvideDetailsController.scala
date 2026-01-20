@@ -21,6 +21,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
@@ -49,7 +50,7 @@ extends FrontendController(mcc, actions):
 
   /** This endpoint is called by resolve upon successful login.
     */
-  def initiateMemberProvideDetails(
+  def initiateIndividualProvideDetails(
     linkId: LinkId
   ): Action[AnyContent] = actions
     .Individual
@@ -75,41 +76,59 @@ extends FrontendController(mcc, actions):
                 .flatMap:
                   case None =>
                     for {
-                      memberProvidedDetails <- createMemberProvidedDetailsFor(agentApplication.agentApplicationId)
-                      _ <- individualProvideDetailsService.upsert(memberProvidedDetails)
+                      individualProvidedDetails <- createIndividualProvidedDetailsFor(agentApplication.agentApplicationId)
+                      _ <- individualProvideDetailsService.upsert(individualProvidedDetails)
                     } yield Redirect(nextEndpoint).addToSession(agentApplication.agentApplicationId)
 
-                  case Some(memberProvideDetails) =>
+                  case Some(individualProvidedDetails) =>
                     logger.info("Individual provided details already exists, redirecting to individual name page")
-                    Future.successful(Redirect(nextEndpoint).addToSession(memberProvideDetails.agentApplicationId))
+                    Future.successful(Redirect(nextEndpoint).addToSession(individualProvidedDetails.agentApplicationId))
 
             case None =>
               logger.info(s"Application for linkId $linkId not found, redirecting to $applicationGenericExitPageUrl")
               Future.successful(Redirect(applicationGenericExitPageUrl))
 
-  private def createMemberProvidedDetailsFor(
+  private def createIndividualProvidedDetailsFor(
     applicationId: AgentApplicationId
   )(using request: IndividualAuthorisedWithIdentifiersRequest[AnyContent]): Future[IndividualProvidedDetails] =
     (request.nino, request.saUtr) match
+
       case (Some(nino), None) =>
+        logger.debug(s"Creating individual provided details with NINO only for applicationId: ${applicationId.value}")
         citizenDetailsConnector
           .getCitizenDetails(nino)
           .map { citizenDetails =>
             individualProvideDetailsService.createNewIndividualProvidedDetails(
               internalUserId = request.internalUserId,
               agentApplicationId = applicationId,
-              memberNino = request.nino.map(IndividualNino.FromAuth.apply),
-              memberSaUtr = citizenDetails.saUtr.map(IndividualSaUtr.FromCitizenDetails.apply),
-              memberDateOfBirth = citizenDetails.dateOfBirth
+              maybeIndividualNino = Some(IndividualNino.FromAuth(nino)),
+              maybeIndividualSaUtr = citizenDetails.saUtr.map(IndividualSaUtr.FromCitizenDetails.apply),
+              maybeIndividualDateOfBirth = citizenDetails.dateOfBirth.map(IndividualDateOfBirth.FromCitizensDetails.apply)
             )
           }
 
-      case _ =>
+      case (Some(nino), Some(saUtr)) =>
+        logger.debug(s"Creating individual provided details with NINO AND SAUTR for applicationId: ${applicationId.value}")
+        citizenDetailsConnector
+          .getCitizenDetails(nino)
+          .map { citizenDetails =>
+            individualProvideDetailsService.createNewIndividualProvidedDetails(
+              internalUserId = request.internalUserId,
+              agentApplicationId = applicationId,
+              maybeIndividualNino = Some(IndividualNino.FromAuth(nino)),
+              maybeIndividualSaUtr = Some(IndividualSaUtr.FromAuth(saUtr)),
+              maybeIndividualDateOfBirth = citizenDetails.dateOfBirth.map(IndividualDateOfBirth.FromCitizensDetails.apply)
+            )
+          }
+
+      case (None, _) =>
+        logger.debug(s"Creating individual provided details with no NINO or DoB for applicationId: ${applicationId.value}")
         Future.successful(
           individualProvideDetailsService.createNewIndividualProvidedDetails(
             internalUserId = request.internalUserId,
             agentApplicationId = applicationId,
-            memberNino = request.nino.map(IndividualNino.FromAuth.apply),
-            memberSaUtr = request.saUtr.map(IndividualSaUtr.FromAuth.apply)
+            maybeIndividualNino = None,
+            maybeIndividualSaUtr = request.saUtr.map(IndividualSaUtr.FromAuth.apply),
+            maybeIndividualDateOfBirth = None // cannot get DOB without NINO to call citizen details
           )
         )

@@ -89,9 +89,9 @@ with RequestAwareLogging:
     val mpdGenericExitPage: Call = AppRoutes.providedetails.ExitController.genericExitPage
     val appGenericExitPageUrl: Call = AppRoutes.apply.AgentApplicationController.genericExitPage
     val multipleMpd: Call = AppRoutes.providedetails.ExitController.multipleProvidedDetailsPage
-    def initiateMpd(linkId: LinkId): Call = AppRoutes.providedetails.internal.InitiateIndividualProvideDetailsController.initiateMemberProvideDetails(linkId =
-      linkId
-    )
+    def initiateMpd(
+      linkId: LinkId
+    ): Call = AppRoutes.providedetails.internal.InitiateIndividualProvideDetailsController.initiateIndividualProvideDetails(linkId = linkId)
 
     request.readAgentApplicationId match
       case None =>
