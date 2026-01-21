@@ -132,14 +132,9 @@ extends FrontendController(mcc, actions):
             .addingToSession(journeyId.value -> json.toString)
         }
 
-  private def extractDeceasedFlag(using request: Request[AnyContent]): Boolean =
-    val fromForm: Boolean = request.body.asFormUrlEncoded
-      .flatMap(_.get("deceased").flatMap(_.headOption))
-      .exists(v => v.equalsIgnoreCase("true") || v.equalsIgnoreCase("on"))
-
-    val fromQuery: Boolean = request.getQueryString("deceased").exists(_.equalsIgnoreCase("true"))
-
-    fromForm || fromQuery
+  private def extractDeceasedFlag(using request: Request[AnyContent]): Boolean = request.body.asFormUrlEncoded
+    .flatMap(_.get("deceased").flatMap(_.headOption))
+    .exists(v => v.equalsIgnoreCase("true") || v.equalsIgnoreCase("on"))
 
   private def storeStubsData(
     businessType: BusinessType,
