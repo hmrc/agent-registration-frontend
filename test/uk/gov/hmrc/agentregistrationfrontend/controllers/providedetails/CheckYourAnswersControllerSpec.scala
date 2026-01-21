@@ -38,10 +38,11 @@ extends ControllerSpec:
     val complete = tdAll.providedDetailsLlp.afterHmrcStandardforAgentsAgreed
     val completeAndConfirmed = tdAll.providedDetailsLlp.afterProvidedDetailsConfirmed
 
-    val missingAgreeStandarts = tdAll.providedDetailsLlp.afterApproveAgentApplication
+    val missingAgreeStandards = tdAll.providedDetailsLlp.afterApproveAgentApplication
     val missingApproveApplication = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrProvided
     val missingSaUtr = tdAll.providedDetailsLlp.AfterNino.afterNinoProvided
-    val missingNino = tdAll.providedDetailsLlp.afterEmailAddressVerified
+    val missingDateOfBirth = tdAll.providedDetailsLlp.afterEmailAddressVerified
+    val missingNino = tdAll.providedDetailsLlp.AfterDateOfBirth.afterDateOfBirthProvided
     val missingEmail = tdAll.providedDetailsLlp.afterTelephoneNumberProvided
     val missingEmailValidation = tdAll.providedDetailsLlp.afterEmailAddressProvided
     val missingTelephone = tdAll.providedDetailsLlp.afterOfficerChosen
@@ -65,7 +66,7 @@ extends ControllerSpec:
       name = "complete agent details"
     ),
     TestCaseForCya(
-      providedDetails = individualProvideDetails.missingAgreeStandarts,
+      providedDetails = individualProvideDetails.missingAgreeStandards,
       name = "agree to standards of agents",
       expectedRedirect = Some(AppRoutes.providedetails.IndividualHmrcStandardForAgentsController.show.url)
     ),
@@ -83,6 +84,11 @@ extends ControllerSpec:
       providedDetails = individualProvideDetails.missingNino,
       name = "nino",
       expectedRedirect = Some(AppRoutes.providedetails.IndividualNinoController.show.url)
+    ),
+    TestCaseForCya(
+      providedDetails = individualProvideDetails.missingDateOfBirth,
+      name = "date of birth",
+      expectedRedirect = Some(AppRoutes.providedetails.IndividualDateOfBirthController.show.url)
     ),
     TestCaseForCya(
       providedDetails = individualProvideDetails.missingEmailValidation,

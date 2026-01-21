@@ -35,7 +35,7 @@ extends ViewSpec:
     val complete = tdAll.providedDetailsLlp.afterApproveAgentApplication
     val completeWithNinoAndSaUtrNotProvided = tdAll.providedDetailsLlp.afterApproveAgentApplication
       .copy(
-        individualDateOfBirth = Some(tdAll.dateOfBirthFromCitizenDetails),
+        individualDateOfBirth = Some(tdAll.dateOfBirthProvided),
         individualNino = Some(IndividualNino.NotProvided),
         individualSaUtr = Some(IndividualSaUtr.NotProvided)
       )
@@ -230,6 +230,9 @@ extends ViewSpec:
           |Email address
           |member@test.com
           |Change Email address
+          |Date of birth
+          |1 January 2000
+          |Change Date of birth
           |Do you have a National Insurance number?
           |No
           |Change Do you have a National Insurance number?
@@ -260,6 +263,11 @@ extends ViewSpec:
             key = "Email address",
             value = "member@test.com",
             action = AppRoutes.providedetails.IndividualEmailAddressController.show.url
+          ),
+          summaryRow(
+            key = "Date of birth",
+            value = "1 January 2000",
+            action = AppRoutes.providedetails.IndividualDateOfBirthController.show.url
           ),
           summaryRow(
             key = "Do you have a National Insurance number?",

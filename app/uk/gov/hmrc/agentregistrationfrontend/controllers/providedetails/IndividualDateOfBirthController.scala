@@ -47,6 +47,12 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.Individual.getProvideDetailsInProgress
     .ensure(
+      _.individualProvidedDetails.emailAddress.isDefined,
+      implicit request =>
+        logger.info("Email address not yet provided. Redirecting to email page.")
+        Redirect(AppRoutes.providedetails.IndividualEmailAddressController.show.url)
+    )
+    .ensure(
       _.individualProvidedDetails.individualDateOfBirth.fold(true) {
         case IndividualDateOfBirth.FromCitizensDetails(_) => false
         case _ => true

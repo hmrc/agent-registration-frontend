@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object CitizenDetailsStub:
 
-  def stubFindSaUtr(
+  def stubFindSaUtrAndDateOfBirth(
     nino: Nino,
     saUtr: SaUtr
   ): StubMapping = StubMaker.make(
