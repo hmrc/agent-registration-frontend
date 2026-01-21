@@ -63,14 +63,16 @@ extends Connector:
 
   def storeIndividualUserRecord(
     nino: Nino,
-    assignedPrincipalEnrolments: Seq[String]
+    assignedPrincipalEnrolments: Seq[String],
+    deceased: Boolean = false
   )(using
     request: RequestHeader
   ): Future[Unit] =
     val user = User(
       userId = UUID.randomUUID().toString,
       nino = Some(nino),
-      assignedPrincipalEnrolments = assignedPrincipalEnrolments.map(EnrolmentKey(_))
+      assignedPrincipalEnrolments = assignedPrincipalEnrolments.map(EnrolmentKey(_)),
+      deceased = Some(deceased)
     )
     postUser(user, affinityGroup = Some("Individual"))
 

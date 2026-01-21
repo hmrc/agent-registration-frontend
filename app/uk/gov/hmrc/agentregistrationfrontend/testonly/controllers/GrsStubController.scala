@@ -119,21 +119,36 @@ extends FrontendController(mcc, actions):
       implicit request: (AuthorisedRequest[AnyContent] & FormValue[JourneyData]) =>
         val journeyData: JourneyData = request.formValue
         val json: JsValue = Json.toJson(journeyData)
+        val deceasedFlag: Boolean = extractDeceasedFlag
 
         for {
-          _ <- storeStubsData(businessType, journeyData)
+          _ <- storeStubsData(
+            businessType,
+            journeyData,
+            deceasedFlag
+          )
         } yield {
           Redirect(AppRoutes.apply.internal.GrsController.journeyCallback(Some(journeyId)))
             .addingToSession(journeyId.value -> json.toString)
         }
 
+  private def extractDeceasedFlag(using request: Request[AnyContent]): Boolean = request.body.asFormUrlEncoded
+    .flatMap(_.get("deceased").flatMap(_.headOption))
+    .exists(v => v.equalsIgnoreCase("true") || v.equalsIgnoreCase("on"))
+
   private def storeStubsData(
     businessType: BusinessType,
-    journeyData: JourneyData
+    journeyData: JourneyData,
+    deceased: Boolean
   )(using Request[?]): Future[Unit] =
     val soleTraderIndividualRecord =
       (businessType, journeyData.nino) match {
-        case (SoleTrader, Some(nino: Nino)) => agentsExternalStubsConnector.storeIndividualUserRecord(nino, Seq("HMRC-MTD-IT"))
+        case (SoleTrader, Some(nino: Nino)) =>
+          agentsExternalStubsConnector.storeIndividualUserRecord(
+            nino = nino,
+            assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
+            deceased = deceased
+          )
         case _ => Future.successful(())
       }
 
