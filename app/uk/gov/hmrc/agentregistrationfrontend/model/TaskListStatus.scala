@@ -21,6 +21,9 @@ final case class TaskListStatus(
   agentDetails: TaskStatus,
   amlsDetails: TaskStatus,
   hmrcStandardForAgents: TaskStatus,
+  listDetails: TaskStatus,
+  listShare: TaskStatus,
+  listTracking: TaskStatus,
   declaration: TaskStatus
 )
 

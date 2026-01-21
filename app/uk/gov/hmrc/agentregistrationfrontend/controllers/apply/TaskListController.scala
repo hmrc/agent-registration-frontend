@@ -97,6 +97,18 @@ extends FrontendController(mcc, actions):
           canStart = true, // HMRC Standard for Agents can be started at any time
           isComplete = hmrcStandardForAgentsAgreed
         ),
+        listDetails = TaskStatus(
+          canStart = true, // List details can be started any time
+          isComplete = false // TODO: implement list details so completion check can be done
+        ),
+        listShare = TaskStatus(
+          canStart = false, // List sharing cannot be started until list details are completed
+          isComplete = false // TODO: implement list share so completion check can be done
+        ),
+        listTracking = TaskStatus(
+          canStart = false, // List tracking cannot be started until list share is complete
+          isComplete = false // TODO: implement list details so completion check can be done
+        ),
         declaration = TaskStatus(
           canStart =
             contactIsComplete

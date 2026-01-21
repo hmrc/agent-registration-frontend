@@ -14,11 +14,13 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
-@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 @import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 
 @this(
         layout: Layout,
@@ -35,6 +37,14 @@
 
 @key = @{"taskList"}
 @title = @{messages(s"$key.title", entityName)}
+@businessTypeKey = @{
+    request.agentApplication match {
+        case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
+        case _: AgentApplicationLimitedCompany => "LimitedCompany"
+        case _: AgentApplicationSoleTrader => "SoleTrader"
+        case _ => "Partnership" // TODO: while design is still coming in let's see if this is sufficient
+    }
+}
 @incomplete = @{
     TaskListItemStatus(
         tag = Some(Tag(
@@ -58,7 +68,16 @@
 }
 @amlsStatus = @{if(taskListStatus.amlsDetails.isComplete) complete else incomplete}
 @agentsStandardStatus = @{if(taskListStatus.hmrcStandardForAgents.isComplete) complete else incomplete}
-@declarationStatus = @{if(taskListStatus.declaration.canStart) incomplete else cannotStart}
+@listShareStatus = @{
+    if(taskListStatus.listShare.isComplete) complete
+    else if(taskListStatus.listShare.canStart) incomplete
+    else cannotStart
+}
+@listTrackingStatus = @{
+    if(taskListStatus.listTracking.isComplete) complete
+    else if(taskListStatus.listTracking.canStart) incomplete
+    else cannotStart
+}
 
 @layout(
     pageTitle = title,
@@ -129,6 +148,36 @@
         idPrefix = "hmrcStandards"
     ))
 
+  @if(businessTypeKey =!= "SoleTrader") {
+      <h2 class="govuk-heading-m">@messages(s"$key.lists.heading")</h2>
+      @govukTaskList(TaskList(
+          items = Seq(
+              TaskListItem(
+                  title = TaskListItemTitle(
+                      content = Text(messages(s"$key.lists.details.linkText.$businessTypeKey"))
+                  ),
+                  status = if(taskListStatus.listDetails.isComplete) complete else incomplete,
+                  href = Some(AppRoutes.apply.listdetails.ListDetailsController.show.url)
+              ),
+              TaskListItem(
+                  title = TaskListItemTitle(
+                      content = Text(messages(s"$key.lists.share.linkText.$businessTypeKey"))
+                  ),
+                  status = listShareStatus,
+                  href = if(taskListStatus.listShare.canStart) Some("#") else None
+              ),
+              TaskListItem(
+                  title = TaskListItemTitle(
+                      content = Text(messages(s"$key.lists.tracking.linkText"))
+                  ),
+                  status = listTrackingStatus,
+                  href = if(taskListStatus.listTracking.canStart) Some("#") else None
+              )
+          ),
+          idPrefix = "lists"
+      ))
+  }
+
     <h2 class="govuk-heading-m">@messages(s"$key.declaration.heading")</h2>
     @govukTaskList(TaskList(
         items = Seq(
@@ -136,7 +185,7 @@
                 title = TaskListItemTitle(
                     content = Text(messages(s"$key.declaration.linkText"))
                 ),
-                status = declarationStatus,
+                status = if(taskListStatus.declaration.canStart) incomplete else cannotStart,
                 href = if(taskListStatus.declaration.canStart) Some(AppRoutes.apply.DeclarationController.show.url) else None
             )
         ),
