@@ -32,6 +32,7 @@ extends ControllerSpec:
   private object individualProvideDetails:
 
     val afterEmailProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.afterEmailAddressVerified
+    val afterDateOfBirthProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterDateOfBirth.afterDateOfBirthProvided
     val afterNinoNotProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoNotProvided
     val afterNinoFromAuth: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoFromAuth
     val afterNinoProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoProvided
@@ -49,7 +50,7 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page when Nino is not provided in HMRC systems" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.afterEmailProvided))
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.afterDateOfBirthProvided))
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -75,7 +76,7 @@ extends ControllerSpec:
 
   s"POST $path with selected Yes and valid name should save data and redirect to check your answers" in:
     AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.afterEmailProvided))
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.afterDateOfBirthProvided))
     AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(individualProvideDetails.afterNinoProvided)
 
     val response: WSResponse =

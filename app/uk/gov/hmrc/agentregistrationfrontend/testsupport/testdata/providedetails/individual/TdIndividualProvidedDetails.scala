@@ -75,13 +75,23 @@ trait TdIndividualProvidedDetails { dependencies: (TdBase) =>
         isVerified = true
       )))
 
+    object AfterDateOfBirth:
+
+      val afterDateOfBirthProvided: IndividualProvidedDetails = afterEmailAddressVerified
+        .modify(_.individualDateOfBirth)
+        .setTo(Some(dependencies.dateOfBirthProvided))
+
+      val afterDateOfBirthFromCitizenDetails: IndividualProvidedDetails = afterEmailAddressVerified
+        .modify(_.individualDateOfBirth)
+        .setTo(Some(dependencies.dateOfBirthFromCitizenDetails))
+
     object AfterNino:
 
-      val afterNinoProvided: IndividualProvidedDetails = afterEmailAddressVerified
+      val afterNinoProvided: IndividualProvidedDetails = AfterDateOfBirth.afterDateOfBirthProvided
         .modify(_.individualNino)
         .setTo(Some(dependencies.ninoProvided))
 
-      val afterNinoFromAuth: IndividualProvidedDetails = afterEmailAddressVerified
+      val afterNinoFromAuth: IndividualProvidedDetails = AfterDateOfBirth.afterDateOfBirthFromCitizenDetails
         .modify(_.individualNino)
         .setTo(Some(dependencies.ninoFromAuth))
 

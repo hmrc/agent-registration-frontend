@@ -71,6 +71,9 @@ trait TdBase:
   def saUtrProvided = IndividualSaUtr.Provided(saUtr)
   def safeId: SafeId = SafeId("XA0001234512345")
   def dateOfBirth: LocalDate = LocalDate.of(2000, 1, 1)
+  def dateOfBirthFromCitizenDetails: IndividualDateOfBirth.FromCitizensDetails = IndividualDateOfBirth.FromCitizensDetails(dateOfBirth)
+  def dateOfBirthProvided = IndividualDateOfBirth.Provided(dateOfBirth)
+
   def applicantEmailAddress: EmailAddress = EmailAddress("user@test.com")
   def individualEmailAddress: EmailAddress = EmailAddress("member@test.com")
 

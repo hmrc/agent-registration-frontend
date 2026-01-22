@@ -41,7 +41,7 @@ extends Connector:
   def getCitizenDetails(
     nino: Nino
   )(using RequestHeader): Future[CitizenDetails] = httpClient
-    .get(url"${baseUrl}/citizen-details/nino/${nino.value}")
+    .get(url"${baseUrl}/citizen-details/nino/${nino.value.replaceAll(" ", "")}")
     .execute[CitizenDetails]
 
   /** See https://github.com/hmrc/citizen-details?tab=readme-ov-file#get-citizen-detailsninodesignatory-details
