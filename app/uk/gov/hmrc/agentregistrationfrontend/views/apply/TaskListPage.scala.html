@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 @import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 @import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
@@ -42,7 +43,7 @@
         case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
         case _: AgentApplicationLimitedCompany => "LimitedCompany"
         case _: AgentApplicationSoleTrader => "SoleTrader"
-        case _ => "Partnership" // TODO: while design is still coming in let's see if this is sufficient
+        case _: AgentApplication.IsPartnership => "Partnership" // TODO: while design is still coming in let's see if this is sufficient
     }
 }
 @incomplete = @{
