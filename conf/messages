@@ -437,8 +437,16 @@ taskList.accountDetails.linkText = Agent services account details
 taskList.hmrcStandards.heading = Meet the HMRC standard for agents
 taskList.hmrcStandards.amls.linkText = Anti-money laundering supervision details
 taskList.hmrcStandards.agreement.linkText = HMRC standard for agents
-taskList.declaration.heading = Finish this stage of the process
-taskList.declaration.linkText = Declaration
+taskList.lists.heading = Other people who need to support this application
+taskList.lists.details.linkText.Partnership = Partner and tax adviser information
+taskList.lists.details.linkText.LimitedCompany = Director and tax adviser information
+taskList.lists.details.linkText.LimitedLiabilityPartnership = LLP member and tax adviser information
+taskList.lists.share.linkText.Partnership = Ask the partners and tax advisers to sign in
+taskList.lists.share.linkText.LimitedCompany = Ask the directors and tax advisers to sign in
+taskList.lists.share.linkText.LimitedLiabilityPartnership = Ask the LLP members and tax advisers to sign in
+taskList.lists.tracking.linkText = Check who has provided their details
+taskList.declaration.heading = Review and submit application
+taskList.declaration.linkText = Declare and submit
 
 # Apply / View application
 viewApplication.title = Application for {0}

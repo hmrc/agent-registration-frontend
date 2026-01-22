@@ -26,6 +26,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.checkfailed.route
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.routes as applicantcontactdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.routes as agentdetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.routes as listdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes as internalRoutes
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.routes as providedetailsRoutes
@@ -82,6 +83,10 @@ object AppRoutes:
       val AgentEmailAddressController = agentdetailsRoutes.AgentEmailAddressController
       val AgentCorrespondenceAddressController = agentdetailsRoutes.AgentCorrespondenceAddressController
       val CheckYourAnswersController = agentdetailsRoutes.CheckYourAnswersController
+
+    object listdetails:
+
+      val ListDetailsController = listdetailsRoutes.ListDetailsController
 
     object checkfailed:
 

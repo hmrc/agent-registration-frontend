@@ -87,6 +87,9 @@ GET         /apply/anti-money-laundering/check-your-answers         uk.gov.hmrc.
 GET         /apply/agent-standard/accept-agent-standard             uk.gov.hmrc.agentregistrationfrontend.controllers.apply.HmrcStandardForAgentsController.show
 POST        /apply/agent-standard/accept-agent-standard             uk.gov.hmrc.agentregistrationfrontend.controllers.apply.HmrcStandardForAgentsController.submit
 
+# Lists of key individuals
+GET         /apply/list-details/how-many-key-individuals            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.ListDetailsController.show
+
 # Apply declaration
 GET         /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.DeclarationController.show
 POST        /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.DeclarationController.submit
