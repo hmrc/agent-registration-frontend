@@ -20,8 +20,8 @@ import play.api.libs.functional.syntax.*
 import uk.gov.hmrc.agentregistration.shared.Crn
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.CompanyHouseStatus
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.CompanyHouseStatus
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Inject

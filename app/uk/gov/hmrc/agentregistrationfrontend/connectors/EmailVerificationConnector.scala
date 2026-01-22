@@ -17,7 +17,9 @@
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
+import uk.gov.hmrc.agentregistrationfrontend.shared.model.emailverification.VerificationStatusResponse
+import uk.gov.hmrc.agentregistrationfrontend.shared.model.emailverification.VerifyEmailRequest
+import uk.gov.hmrc.agentregistrationfrontend.shared.model.emailverification.VerifyEmailResponse
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Inject

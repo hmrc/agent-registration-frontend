@@ -17,9 +17,9 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness
 
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.BusinessTypeAnswer
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.TypeOfSignIn
 import uk.gov.hmrc.agentregistrationfrontend.forms.TypeOfSignInForm
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
-import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
 class TypeOfSignInControllerSpec

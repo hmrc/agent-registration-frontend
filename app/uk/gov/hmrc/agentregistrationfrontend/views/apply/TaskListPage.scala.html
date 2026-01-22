@@ -16,14 +16,15 @@
 
 @import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 @import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-@import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
+@import uk.gov.hmrc.agentregistrationfrontend.applicant.action.AgentApplicationRequest
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.applicant.model.TaskListStatus
 
 @this(
         layout: Layout,
         govukTaskList: GovukTaskList
 )
+
 
 @(
         taskListStatus: TaskListStatus,

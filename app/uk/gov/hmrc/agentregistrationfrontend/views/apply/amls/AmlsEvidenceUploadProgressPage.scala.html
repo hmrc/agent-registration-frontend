@@ -16,12 +16,12 @@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadStatus
-
+@import uk.gov.hmrc.agentregistrationfrontend.applicant.model.upscan.UploadStatus
 @this(
     layout: Layout,
     govukButton: GovukButton
 )
+
 
 @(status: UploadStatus)(implicit messages: Messages, request: RequestHeader)
 

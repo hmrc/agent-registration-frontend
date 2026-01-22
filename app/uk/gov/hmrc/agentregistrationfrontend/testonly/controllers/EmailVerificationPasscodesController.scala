@@ -21,9 +21,9 @@ import play.api.libs.json.OFormat
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.shared.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.EmailVerificationPasscodesController.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.EmailVerificationPasscodesPage
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.isSignedIn

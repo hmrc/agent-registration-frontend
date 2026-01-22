@@ -22,12 +22,12 @@ import play.api.libs.json.Json
 import sttp.model.Uri
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.upload.UploadId
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.ErrorDetails
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadEventDetails
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadNotificationRequest
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadStatus
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.upscan.ErrorDetails
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.upscan.FileUploadReference
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.upscan.Upload
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.upscan.UploadEventDetails
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.upscan.UploadNotificationRequest
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
 trait TdUpload { dependencies: TdBase =>

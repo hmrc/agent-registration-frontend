@@ -23,7 +23,9 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EmailVerificationConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
-import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
+import uk.gov.hmrc.agentregistrationfrontend.shared.model.emailverification.Email
+import uk.gov.hmrc.agentregistrationfrontend.shared.model.emailverification.EmailVerificationStatus
+import uk.gov.hmrc.agentregistrationfrontend.shared.model.emailverification.VerifyEmailRequest
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject

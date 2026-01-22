@@ -21,7 +21,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.util.EnumExtensions.*
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.BusinessTypeAnswer
 
 class ControllerSpec
 extends ISpec,

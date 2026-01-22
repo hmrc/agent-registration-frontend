@@ -21,7 +21,8 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.EmailVerificationStubs
-import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
+import uk.gov.hmrc.agentregistrationfrontend.shared.model.emailverification.Email
+import uk.gov.hmrc.agentregistrationfrontend.shared.model.emailverification.VerifyEmailRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs

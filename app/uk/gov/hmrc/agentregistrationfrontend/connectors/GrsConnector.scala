@@ -17,12 +17,12 @@
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.applicant.action.AuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.grs.JourneyConfig
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.grs.JourneyData
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.grs.JourneyId
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.grs.JourneyStartUrl
 import uk.gov.hmrc.agentregistrationfrontend.config.GrsConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyStartUrl
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.HttpClientV2
 

@@ -20,7 +20,7 @@ import play.api.data.FieldMapping
 import play.api.data.Form
 import play.api.data.Forms
 import play.api.data.Forms.mapping
-import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.TypeOfSignIn
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 

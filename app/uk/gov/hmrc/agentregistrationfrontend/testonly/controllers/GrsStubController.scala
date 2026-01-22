@@ -40,21 +40,21 @@ import uk.gov.hmrc.agentregistration.shared.businessdetails.CompanyProfile
 import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
 import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
+import uk.gov.hmrc.agentregistrationfrontend.applicant.action.AuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.grs.RegistrationStatus.GrsNotCalled
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.grs.RegistrationStatus.GrsRegistered
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.grs.JourneyConfig
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.grs.JourneyData
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.grs.JourneyId
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.grs.Registration
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.grs.RegistrationStatus
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.Registration
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsNotCalled
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsRegistered
+import uk.gov.hmrc.agentregistrationfrontend.shared.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.shared.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.AddressDetails
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.BusinessPartnerRecord
@@ -67,8 +67,8 @@ import uk.gov.voa.play.form.ConditionalMappings.isEqual
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 import uk.gov.voa.play.form.conditionOpts
 import uk.gov.hmrc.domain.NinoGenerator
-import scala.concurrent.Future
 
+import scala.concurrent.Future
 import java.time.LocalDate
 import java.util.UUID
 

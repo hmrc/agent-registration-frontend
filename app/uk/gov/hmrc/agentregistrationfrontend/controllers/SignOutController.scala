@@ -21,8 +21,8 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
 import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.shared.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.views.html.TimedOutPage
 
 import javax.inject.Inject

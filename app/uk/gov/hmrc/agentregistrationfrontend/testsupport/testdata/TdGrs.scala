@@ -20,7 +20,10 @@ import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLlp
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsSoleTrader
 import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.*
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.grs.JourneyData
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.grs.JourneyId
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.grs.Registration
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.grs.RegistrationStatus
 
 import java.time.LocalDate
 

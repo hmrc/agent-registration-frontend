@@ -25,8 +25,8 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
-import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.BusinessTypeAnswer
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.TypeOfSignIn
 
 object SessionService:
 

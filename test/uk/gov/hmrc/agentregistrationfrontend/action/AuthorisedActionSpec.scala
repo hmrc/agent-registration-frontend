@@ -21,6 +21,8 @@ import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Results.*
 import play.api.test.Helpers.*
+import uk.gov.hmrc.agentregistrationfrontend.applicant.action.AuthorisedAction
+import uk.gov.hmrc.agentregistrationfrontend.applicant.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 

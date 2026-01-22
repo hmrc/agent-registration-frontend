@@ -20,10 +20,10 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.applicant.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
+import uk.gov.hmrc.agentregistrationfrontend.shared.model.SubmitAction.SaveAndComeBackLater
+import uk.gov.hmrc.agentregistrationfrontend.shared.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.EmailAddressPage
 

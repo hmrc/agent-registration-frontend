@@ -21,11 +21,11 @@ import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.applicant.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.AddressOptions
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
-import uk.gov.hmrc.agentregistrationfrontend.model.AddressOptions
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
+import uk.gov.hmrc.agentregistrationfrontend.shared.model.SubmitAction.SaveAndComeBackLater
+import uk.gov.hmrc.agentregistrationfrontend.shared.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.AgentCorrespondenceAddressPage
 

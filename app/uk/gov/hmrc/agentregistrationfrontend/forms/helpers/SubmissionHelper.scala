@@ -21,7 +21,7 @@ import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction
+import uk.gov.hmrc.agentregistrationfrontend.shared.model.SubmitAction
 
 object SubmissionHelper:
 

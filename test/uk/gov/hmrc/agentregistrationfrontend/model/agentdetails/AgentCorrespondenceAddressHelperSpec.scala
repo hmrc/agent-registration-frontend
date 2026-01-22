@@ -17,9 +17,10 @@
 package uk.gov.hmrc.agentregistrationfrontend.model.agentdetails
 
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
-import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.Country
-import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
-import uk.gov.hmrc.agentregistrationfrontend.model.agentdetails.AgentCorrespondenceAddressHelper.toValueString
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.addresslookup.Country
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.addresslookup.GetConfirmedAddressResponse
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.agentdetails.AgentCorrespondenceAddressHelper
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.agentdetails.AgentCorrespondenceAddressHelper.toValueString
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 
 class AgentCorrespondenceAddressHelperSpec

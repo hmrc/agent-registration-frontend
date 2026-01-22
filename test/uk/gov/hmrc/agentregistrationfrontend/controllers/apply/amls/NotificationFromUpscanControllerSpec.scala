@@ -16,14 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls
 
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadNotificationRequest
 import uk.gov.hmrc.agentregistrationfrontend.repository.UploadRepo
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.StringContextOps
 import uk.gov.hmrc.http.client.HttpClientV2
 import play.api.libs.ws.JsonBodyWritables.writeableOf_JsValue
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.upscan.Upload
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.upscan.UploadNotificationRequest
 import uk.gov.hmrc.http.HttpReads.Implicits.readRaw
 
 class NotificationFromUpscanControllerSpec

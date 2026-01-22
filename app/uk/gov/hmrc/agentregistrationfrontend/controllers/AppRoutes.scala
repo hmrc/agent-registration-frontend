@@ -18,18 +18,18 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers
 // scalafix:off DisableSyntax
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as rootRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.routes as aboutyourbusinessRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.routes as amlsRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.api.routes as amlsApiRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.checkfailed.routes as entitycheckfailedRoutes
+import uk.gov.hmrc.agentregistrationfrontend.applicant.controllers.routes as applyRoutes
+import uk.gov.hmrc.agentregistrationfrontend.applicant.controllers.aboutyourbusiness.routes as aboutyourbusinessRoutes
+import uk.gov.hmrc.agentregistrationfrontend.applicant.controllers.amls.routes as amlsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.applicant.controllers.amls.api.routes as amlsApiRoutes
+import uk.gov.hmrc.agentregistrationfrontend.applicant.controllers.checkfailed.routes as entitycheckfailedRoutes
 
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.routes as applicantcontactdetailsRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.routes as agentdetailsRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes as internalRoutes
+import uk.gov.hmrc.agentregistrationfrontend.applicant.controllers.applicantcontactdetails.routes as applicantcontactdetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.applicant.controllers.agentdetails.routes as agentdetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.applicant.controllers.internal.routes as internalRoutes
 
-import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.routes as providedetailsRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.routes as internalProviDedetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.individual.controllers.routes as providedetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.individual.controllers.internal.routes as internalProviDedetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.routes as testOnlyRoutes
 
 /** All application routes centralized in one place for convenience and clarity. It helps avoid naming conflicts and makes route management easier.

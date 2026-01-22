@@ -25,7 +25,7 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll

@@ -27,8 +27,8 @@ import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetai
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.llp.*
-import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
-import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.Country
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.addresslookup.GetConfirmedAddressResponse
+import uk.gov.hmrc.agentregistrationfrontend.applicant.model.addresslookup.Country
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import java.time.*

@@ -14,10 +14,10 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 @import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeSessionForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
+@import uk.gov.hmrc.agentregistrationfrontend.applicant.model.BusinessTypeAnswer
 
 @this(
         layout: Layout,
@@ -25,6 +25,7 @@
         formWithCSRF: FormWithCSRF,
         govukButton: GovukButton
 )
+
 
 @(form: Form[BusinessTypeAnswer])(implicit request: Request[?], messages: Messages)
 

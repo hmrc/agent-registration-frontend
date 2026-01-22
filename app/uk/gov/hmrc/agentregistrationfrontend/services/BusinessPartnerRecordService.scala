@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.services
 
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.applicant.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
