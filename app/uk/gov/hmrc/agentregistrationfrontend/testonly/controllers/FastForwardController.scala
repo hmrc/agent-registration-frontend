@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection.CompletedSectionLlp
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection.CompletedSectionSoleTrader
+import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
@@ -36,7 +37,6 @@ import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
-import scala.util.chaining.scalaUtilChainingOps
 
 object FastForwardController:
 
@@ -123,7 +123,8 @@ class FastForwardController @Inject() (
   fastForwardPage: FastForwardPage,
   agentApplicationIdGenerator: AgentApplicationIdGenerator,
   linkIdGenerator: LinkIdGenerator,
-  simplePage: SimplePage
+  simplePage: SimplePage,
+  grsStubService: GrsStubService
 )(using clock: Clock)
 extends FrontendController(mcc, actions):
 
@@ -149,17 +150,25 @@ extends FrontendController(mcc, actions):
     r: AuthorisedRequest[AnyContent],
     clock: Clock
   ): Future[Result] =
-    (completedSection match
-      case CompletedSectionLlp.LlpAboutYourBusiness => TestOnlyData.agentApplicationLlp.afterGrsDataReceived
-      case CompletedSectionLlp.LlpApplicantContactDetails => TestOnlyData.agentApplicationLlp.afterContactDetailsComplete
-      case CompletedSectionLlp.LlpAgentServicesAccountDetails => TestOnlyData.agentApplicationLlp.afterAgentDetailsComplete
-      case CompletedSectionLlp.LlpAntiMoneyLaunderingSupervisionDetails => TestOnlyData.agentApplicationLlp.afterAmlsComplete
-      case CompletedSectionLlp.LlpHmrcStandardForAgents => TestOnlyData.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
-      case CompletedSectionLlp.LlpDeclaration => TestOnlyData.agentApplicationLlp.afterDeclarationSubmitted
-    )
-      .pipe(updateIdentifiers(_))
-      .flatMap(applicationService.upsert)
-      .map(_ => Redirect(AppRoutes.apply.TaskListController.show))
+    val application =
+      (completedSection match
+        case CompletedSectionLlp.LlpAboutYourBusiness => TestOnlyData.agentApplicationLlp.afterCompaniesHouseStatusCheckPass
+        case CompletedSectionLlp.LlpApplicantContactDetails => TestOnlyData.agentApplicationLlp.afterContactDetailsComplete
+        case CompletedSectionLlp.LlpAgentServicesAccountDetails => TestOnlyData.agentApplicationLlp.afterAgentDetailsComplete
+        case CompletedSectionLlp.LlpAntiMoneyLaunderingSupervisionDetails => TestOnlyData.agentApplicationLlp.afterAmlsComplete
+        case CompletedSectionLlp.LlpHmrcStandardForAgents => TestOnlyData.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
+        case CompletedSectionLlp.LlpDeclaration => TestOnlyData.agentApplicationLlp.afterDeclarationSubmitted
+      )
+
+    for {
+      _ <- grsStubService.storeStubsData(
+        application.businessType,
+        TestOnlyData.grs.llp.journeyData,
+        false
+      )
+      updatedApp <- updateIdentifiers(application)
+      _ <- applicationService.upsert(updatedApp)
+    } yield Redirect(AppRoutes.apply.TaskListController.show)
 
   private def updateIdentifiers(agentApplication: AgentApplicationLlp)(using
     r: AuthorisedRequest[AnyContent],
