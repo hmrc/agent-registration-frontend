@@ -162,9 +162,9 @@ extends FrontendController(mcc, actions):
 
     for {
       _ <- grsStubService.storeStubsData(
-        application.businessType,
-        TestOnlyData.grs.llp.journeyData,
-        false
+        businessType = application.businessType,
+        journeyData = TestOnlyData.grs.llp.journeyData,
+        deceased = false
       )
       updatedApp <- updateIdentifiers(application)
       _ <- applicationService.upsert(updatedApp)
