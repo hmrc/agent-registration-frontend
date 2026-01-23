@@ -35,3 +35,4 @@ GET        /agent-registration/test-only/fast-forward                           
 GET        /agent-registration/test-only/fast-forward-to/:completedSection        uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.fastForward(completedSection: CompletedSection)
 
 GET        /agent-registration/test-only/email-verification-pass-codes        uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.EmailVerificationPasscodesController.showEmailVerificationPassCodes(emailVerificationLink: String)
+GET        /agent-registration/test-only/remove-nino-and-dob                  uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.removeNinoAndDobFromIndividual()
