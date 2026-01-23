@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontact
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
@@ -35,37 +35,37 @@ extends ControllerSpec:
 
   object agentApplication:
 
-    val complete: AgentApplicationLlp =
+    val complete: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
         .afterEmailAddressVerified
 
-    val missingVerifiedEmail: AgentApplicationLlp =
+    val missingVerifiedEmail: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
         .afterEmailAddressProvided
 
-    val missingEmail: AgentApplicationLlp =
+    val missingEmail: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
         .afterTelephoneNumberProvided
 
-    val missingTelephone: AgentApplicationLlp =
+    val missingTelephone: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
         .afterNameDeclared
 
-    val noContactDetails: AgentApplicationLlp =
+    val noContactDetails: AgentApplication =
       tdAll
         .agentApplicationLlp
         .afterGrsDataReceived
 
   private final case class TestCaseForCya(
-    application: AgentApplicationLlp,
+    application: AgentApplication,
     name: String,
     expectedRedirect: Option[String] = None
   )

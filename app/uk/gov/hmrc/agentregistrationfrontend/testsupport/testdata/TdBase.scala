@@ -26,6 +26,9 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
+import uk.gov.hmrc.agentregistration.shared.lists.FromFiveOrFewer
+import uk.gov.hmrc.agentregistration.shared.lists.FromSixOrMore
+import uk.gov.hmrc.agentregistration.shared.lists.KeyIndividualListSource.FromApplicant
 import uk.gov.hmrc.agentregistration.shared.llp.*
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.Country
@@ -175,6 +178,16 @@ trait TdBase:
     address = bprRegisteredAddress,
     primaryPhoneNumber = Some(bprPrimaryTelephoneNumber),
     emailAddress = Some(bprEmailAddress)
+  )
+
+  def fiveOrFewerKeyIndividuals: FromFiveOrFewer = FromFiveOrFewer(
+    numberToProvideDetails = 3,
+    source = FromApplicant
+  )
+
+  def sixOrMoreKeyIndividuals: FromSixOrMore = FromSixOrMore(
+    numberToProvideDetails = 3,
+    source = FromApplicant
   )
 
   val individualProvidedDetails: IndividualProvidedDetails = IndividualProvidedDetails(

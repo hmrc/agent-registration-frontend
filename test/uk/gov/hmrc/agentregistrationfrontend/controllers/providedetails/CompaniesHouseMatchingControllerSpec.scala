@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 import com.softwaremill.quicklens.modify
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
@@ -36,14 +36,14 @@ extends ControllerSpec:
 
   object agentApplication:
 
-    val inComplete: AgentApplicationLlp =
+    val inComplete: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterContactTelephoneSelected
 
-    val applicationSubmitted: AgentApplicationLlp = inComplete
+    val applicationSubmitted: AgentApplication = inComplete
       .modify(_.applicationState)
       .setTo(ApplicationState.Submitted)
 

@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -30,28 +30,28 @@ extends ControllerSpec:
 
   private object agentApplication:
 
-    val hmrcAfterSupervisoryBodySelected: AgentApplicationLlp =
+    val hmrcAfterSupervisoryBodySelected: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
         .whenSupervisorBodyIsHmrc
         .afterSupervisoryBodySelected
 
-    val hmrcAfterRegistrationNumberProvided: AgentApplicationLlp =
+    val hmrcAfterRegistrationNumberProvided: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
         .whenSupervisorBodyIsHmrc
         .afterRegistrationNumberProvided
 
-    val nonHmrcAfterSupervisoryBodySelected: AgentApplicationLlp =
+    val nonHmrcAfterSupervisoryBodySelected: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
         .afterSupervisoryBodySelected
 
-    val nonHmrcAfterRegistrationNumberProvided: AgentApplicationLlp =
+    val nonHmrcAfterRegistrationNumberProvided: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
@@ -79,8 +79,8 @@ extends ControllerSpec:
     AppRoutes.apply.amls.AmlsRegistrationNumberController.submit.url shouldBe AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url
 
   private final case class TestCaseForAmlsRegistrationNumber(
-    application: AgentApplicationLlp,
-    updatedApplication: AgentApplicationLlp,
+    application: AgentApplication,
+    updatedApplication: AgentApplication,
     amlsType: String,
     validInput: String,
     invalidInput: String,

@@ -1,0 +1,114 @@
+/*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication
+
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.ApplicationState.GrsDataReceived
+import uk.gov.hmrc.agentregistration.shared.CheckResult
+import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
+import uk.gov.hmrc.agentregistration.shared.UserRole
+import uk.gov.hmrc.agentregistration.shared.lists.FromFiveOrFewer
+import uk.gov.hmrc.agentregistration.shared.lists.KeyIndividualListSource.FromApplicant
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAgentDetails
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAmls
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionContactDetails
+
+trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAmls & TdSectionContactDetails & TdGrs & TdSectionAgentDetails) =>
+
+  object agentApplicationGeneralPartnership:
+
+    val afterStarted: AgentApplicationGeneralPartnership = AgentApplicationGeneralPartnership(
+      _id = dependencies.agentApplicationId,
+      internalUserId = dependencies.internalUserId,
+      linkId = dependencies.linkId,
+      groupId = dependencies.groupId,
+      createdAt = dependencies.nowAsInstant,
+      applicationState = ApplicationState.Started,
+      userRole = Some(UserRole.Authorised),
+      businessDetails = None,
+      applicantContactDetails = None,
+      amlsDetails = None,
+      agentDetails = None,
+      refusalToDealWithCheckResult = None,
+      hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
+      requiredKeyIndividuals = None
+    )
+
+    val afterGrsDataReceived: AgentApplicationGeneralPartnership = afterStarted.copy(
+      businessDetails = Some(
+        dependencies.grs.generalPartnership.businessDetails
+      ),
+      applicationState = GrsDataReceived
+    )
+
+    val afterRefusalToDealWithCheckPass: AgentApplicationGeneralPartnership = afterGrsDataReceived.copy(
+      refusalToDealWithCheckResult = Some(CheckResult.Pass)
+    )
+
+    val afterRefusalToDealWithCheckFail: AgentApplicationGeneralPartnership = afterGrsDataReceived.copy(
+      refusalToDealWithCheckResult = Some(CheckResult.Fail)
+    )
+
+    val afterContactDetailsComplete: AgentApplicationGeneralPartnership = afterRefusalToDealWithCheckPass.copy(
+      applicantContactDetails = Some(dependencies.applicantContactDetails),
+      agentDetails = None
+    )
+
+    val afterAgentDetailsComplete: AgentApplicationGeneralPartnership = afterContactDetailsComplete.copy(
+      agentDetails = Some(dependencies.completeAgentDetails)
+    )
+
+    val afterAmlsComplete: AgentApplicationGeneralPartnership = afterAgentDetailsComplete.copy(
+      amlsDetails = Some(dependencies.completeAmlsDetails)
+    )
+
+    val afterHmrcStandardForAgentsAgreed: AgentApplicationGeneralPartnership = afterAmlsComplete.copy(
+      hmrcStandardForAgentsAgreed = StateOfAgreement.Agreed
+    )
+
+    val afterHowManyKeyIndividuals: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
+      requiredKeyIndividuals = Some(
+        FromFiveOrFewer(
+          numberToProvideDetails = 3,
+          source = FromApplicant
+        )
+      )
+    )
+
+    val afterDeclarationSubmitted: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
+      applicationState = ApplicationState.Submitted
+    )
+
+    val baseForSectionAmls: AgentApplicationGeneralPartnership = afterGrsDataReceived
+    protected val agentApplicationWithSectionAmls = new AgentApplicationWithSectionAmls(baseForSectionAmls = baseForSectionAmls)
+    export agentApplicationWithSectionAmls.sectionAmls
+
+    val baseForSectionContactDetails: AgentApplicationGeneralPartnership = afterGrsDataReceived
+    protected val tdAgentApplicationLlpWithSectionContactDetails =
+      new TdAgentApplicationWithSectionContactDetails(baseForSectionContactDetails = baseForSectionContactDetails)
+
+    export tdAgentApplicationLlpWithSectionContactDetails.sectionContactDetails
+
+    protected val tdAgentApplicationLlpWithSectionAgentDetails =
+      new TdAgentApplicationWithSectionAgentDetails(baseForSectionAgentDetails = afterContactDetailsComplete)
+
+    export tdAgentApplicationLlpWithSectionAgentDetails.sectionAgentDetails
+
+}

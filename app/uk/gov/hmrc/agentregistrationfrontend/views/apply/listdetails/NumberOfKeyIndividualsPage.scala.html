@@ -1,0 +1,107 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+@import uk.gov.hmrc.agentregistration.shared.lists.RequiredKeyIndividuals
+@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+@import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
+
+@this(
+        layout: Layout,
+        govukRadios: GovukRadios,
+        govukInput: GovukInput,
+        formWithCSRF: FormWithCSRF,
+        govukButton: GovukButton,
+        continueOrSaveForLater: ContinueOrSaveForLater
+)
+
+@(
+        form: Form[RequiredKeyIndividuals],
+        entityName: String
+)(implicit request: AgentApplicationRequest[?], messages: Messages)
+
+@key = @{NumberOfKeyIndividualsForm.key}
+@fiveOrFewerAmountKey = @{NumberOfKeyIndividualsForm.fiveOrFewerAmountKey}
+@sixOrMoreAmountKey = @{NumberOfKeyIndividualsForm.sixOrMoreAmountKey}
+@title = @{messages(s"$key.title.$businessTypeKey", entityName)}
+@fiveOrFewerAmountInput = {
+    @govukInput(Input(
+      label = Label(
+        content = Text(messages(s"$fiveOrFewerAmountKey.label"))
+      ),
+      classes = "govuk-input--width-5"
+    ).withFormField(form(fiveOrFewerAmountKey)))
+}
+@sixOrMoreAmountInput = {
+  @govukInput(Input(
+    label = Label(
+      content = Text(messages(s"$sixOrMoreAmountKey.label"))
+    ),
+    hint = Some(Hint(
+      content = Text(messages(s"$sixOrMoreAmountKey.hint"))
+    )),
+    classes = "govuk-input--width-5"
+  ).withFormField(form(sixOrMoreAmountKey)))
+}
+@businessTypeKey = @{
+  request.agentApplication match {
+    case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
+    case _: AgentApplicationLimitedCompany => "LimitedCompany"
+    case _: AgentApplicationSoleTrader => "SoleTrader"
+    case _: AgentApplication.IsPartnership => "Partnership"
+  }
+}
+@layout(
+    pageTitle = title,
+    maybeForm = Some(form)
+) {
+    <h2 class="govuk-caption-l">@messages(s"lists.caption.title.$businessTypeKey")</h2>
+    @formWithCSRF(action = AppRoutes.apply.listdetails.NumberOfKeyIndividualsController.submit) {
+        @govukRadios(Radios(
+          fieldset = Some(Fieldset(
+            legend = Some(Legend(
+              content = Text(title),
+              isPageHeading = true,
+              classes = "govuk-fieldset__legend--l"
+            ))
+          )),
+          hint = Some(Hint(
+            content = Text(messages(s"$key.hint.$businessTypeKey"))
+          )),
+          items = Seq(
+            RadioItem(
+              content = Text(messages(s"$key.fiveOrFewer")),
+              value = Some("FromFiveOrFewer"),
+              conditionalHtml = Some(fiveOrFewerAmountInput)
+            ),
+            RadioItem(
+              content = Text(messages(s"$key.sixOrMore")),
+              value = Some("FromSixOrMore"),
+              conditionalHtml = Some(sixOrMoreAmountInput)
+            )
+          )
+        ).withFormField(form(key)))
+
+        @continueOrSaveForLater()
+    }
+}
