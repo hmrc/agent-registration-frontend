@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers
 
+import com.softwaremill.quicklens.modify
 import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
@@ -26,6 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
+import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
@@ -41,7 +43,8 @@ class TestOnlyController @Inject() (
   actions: Actions,
   testApplicationService: TestApplicationService,
   testLinkPage: TestLinkPage,
-  testOnlyHubPage: TestOnlyHubPage
+  testOnlyHubPage: TestOnlyHubPage,
+  individualProvideDetailsService: IndividualProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
@@ -104,3 +107,15 @@ extends FrontendController(mcc, actions):
           .map((linkId: TestOnlyLink) =>
             Ok(testLinkPage(linkId))
           )
+
+  def removeNinoAndDobFromIndividual(): Action[AnyContent] = actions
+    .Individual
+    .getProvidedDetails
+    .async:
+      implicit request =>
+        val updatedDetails = request.individualProvidedDetails
+          .modify(_.individualNino).setTo(None)
+          .modify(_.individualDateOfBirth).setTo(None)
+        individualProvideDetailsService
+          .upsert(updatedDetails)
+          .map(_ => Ok("NINO and DOB removed from Individual Provided Details"))
