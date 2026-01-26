@@ -28,14 +28,9 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Request
-import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.Crn
-import uk.gov.hmrc.agentregistration.shared.CtUtr
-import uk.gov.hmrc.agentregistration.shared.Nino
-import uk.gov.hmrc.agentregistration.shared.SaUtr
-import uk.gov.hmrc.agentregistration.shared.SafeId
 import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.*
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.businessdetails.CompanyProfile
 import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
 import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
@@ -44,40 +39,29 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-
-import javax.inject.Inject
-import javax.inject.Singleton
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.Registration
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.*
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsNotCalled
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsRegistered
-import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.AddressDetails
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.BusinessPartnerRecord
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.ContactDetails
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.Individual
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.Organisation
+import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.GrsStub
+import uk.gov.hmrc.domain.NinoGenerator
 import uk.gov.hmrc.domain.SaUtrGenerator
 import uk.gov.voa.play.form.ConditionalMappings.isEqual
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 import uk.gov.voa.play.form.conditionOpts
-import uk.gov.hmrc.domain.NinoGenerator
-import scala.concurrent.Future
 
 import java.time.LocalDate
 import java.util.UUID
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
 class GrsStubController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: GrsStub,
-  agentsExternalStubsConnector: AgentsExternalStubsConnector
+  grsStubService: GrsStubService
 )
 extends FrontendController(mcc, actions):
 
@@ -122,7 +106,7 @@ extends FrontendController(mcc, actions):
         val deceasedFlag: Boolean = extractDeceasedFlag
 
         for {
-          _ <- storeStubsData(
+          _ <- grsStubService.storeStubsData(
             businessType,
             journeyData,
             deceasedFlag
@@ -135,69 +119,6 @@ extends FrontendController(mcc, actions):
   private def extractDeceasedFlag(using request: Request[AnyContent]): Boolean = request.body.asFormUrlEncoded
     .flatMap(_.get("deceased").flatMap(_.headOption))
     .exists(v => v.equalsIgnoreCase("true") || v.equalsIgnoreCase("on"))
-
-  private def storeStubsData(
-    businessType: BusinessType,
-    journeyData: JourneyData,
-    deceased: Boolean
-  )(using Request[?]): Future[Unit] =
-    val soleTraderIndividualRecord =
-      (businessType, journeyData.nino) match {
-        case (SoleTrader, Some(nino: Nino)) =>
-          agentsExternalStubsConnector.storeIndividualUserRecord(
-            nino = nino,
-            assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
-            deceased = deceased
-          )
-        case _ => Future.successful(())
-      }
-
-    val utr = journeyData.sautr.map(_.value).getOrElse(journeyData.ctutr.map(_.value).getOrElse(""))
-    // to get BPR fetches working we need to store a BPR in stubs using GRS data
-    val businessPartnerRecord = agentsExternalStubsConnector.storeBusinessPartnerRecord(
-      BusinessPartnerRecord(
-        businessPartnerExists = true,
-        uniqueTaxReference = Some(utr),
-        utr = Some(utr),
-        safeId = journeyData.registration.registeredBusinessPartnerId.map(_.value).getOrElse(""),
-        isAnIndividual = businessType === SoleTrader,
-        individual =
-          if businessType === SoleTrader then
-            Some(
-              uk.gov.hmrc.agentregistrationfrontend.testonly.model.Individual(
-                firstName = journeyData.fullName.map(_.firstName).getOrElse("Test"),
-                lastName = journeyData.fullName.map(_.lastName).getOrElse("User"),
-                dateOfBirth = journeyData.dateOfBirth.map(_.toString).getOrElse("1990-01-01")
-              )
-            )
-          else None,
-        organisation =
-          businessType match
-            case BusinessType.Partnership.LimitedLiabilityPartnership | BusinessType.LimitedCompany | BusinessType.Partnership.LimitedPartnership | BusinessType.Partnership.ScottishLimitedPartnership =>
-              Some(Organisation(
-                organisationName = journeyData.companyProfile.map(_.companyName).getOrElse("BPR Test Org"),
-                organisationType = "5T"
-              ))
-            case _ => None,
-        addressDetails = AddressDetails(
-          addressLine1 = "1 Test Street",
-          addressLine2 = Some("Test Area"),
-          addressLine3 = None,
-          addressLine4 = None,
-          postalCode = journeyData.postcode.getOrElse("TE1 1ST"),
-          countryCode = "GB"
-        ),
-        contactDetails = Some(ContactDetails(
-          primaryPhoneNumber = Some("01234567890"),
-          emailAddress = Some("test@example.com")
-        ))
-      )
-    )
-
-    for {
-      _ <- soleTraderIndividualRecord
-      _ <- businessPartnerRecord
-    } yield ()
 
   def retrieveGrsData(journeyId: JourneyId): Action[AnyContent] = Action: request =>
     request.session.get(journeyId.value) match {
