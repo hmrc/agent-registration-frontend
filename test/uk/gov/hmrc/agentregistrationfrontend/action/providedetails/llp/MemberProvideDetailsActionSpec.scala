@@ -20,6 +20,7 @@ import org.scalatest.matchers.should.Matchers.*
 import com.softwaremill.quicklens.modify
 import play.api.mvc.Result
 import play.api.mvc.Results.*
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
@@ -38,14 +39,14 @@ extends ISpec:
 
   def fakeResultF: Future[Result] = fail("this should not be executed if test works correctly")
 
-  val submittedAgentApplication: AgentApplicationLlp = tdAll
+  val submittedAgentApplication: AgentApplication = tdAll
     .agentApplicationLlp
     .sectionContactDetails
     .afterEmailAddressVerified
     .modify(_.applicationState)
     .setTo(ApplicationState.Submitted)
 
-  val inProgressAgentApplication: AgentApplicationLlp = tdAll
+  val inProgressAgentApplication: AgentApplication = tdAll
     .agentApplicationLlp
     .sectionContactDetails
     .afterEmailAddressVerified

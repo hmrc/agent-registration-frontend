@@ -20,7 +20,7 @@ import com.google.inject.AbstractModule
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -39,7 +39,7 @@ extends ViewSpec:
   private val tdAll: TdAll = TdAll()
 
   object agentApplication:
-    val complete: AgentApplicationLlp =
+    val complete: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails

@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls
 
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
@@ -28,14 +28,14 @@ extends ControllerSpec:
 
   private object agentApplication:
 
-    val afterAmlsExpiryDateProvided: AgentApplicationLlp =
+    val afterAmlsExpiryDateProvided: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
         .afterAmlsExpiryDateProvided
 
-    val afterUploadFailed: AgentApplicationLlp = afterAmlsExpiryDateProvided
+    val afterUploadFailed: AgentApplication = afterAmlsExpiryDateProvided
 
   "routes should have correct paths and methods" in:
     AppRoutes.apply.amls.AmlsEvidenceUploadController.showError(

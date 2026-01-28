@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -30,23 +30,23 @@ extends ControllerSpec:
 
   private object agentApplication:
 
-    val baseForSectionAmls: AgentApplicationLlp = tdAll.agentApplicationLlp.baseForSectionAmls
+    val baseForSectionAmls: AgentApplication = tdAll.agentApplicationLlp.baseForSectionAmls
 
-    val afterSupervisoryBodySelected: AgentApplicationLlp =
+    val afterSupervisoryBodySelected: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
         .afterSupervisoryBodySelected
 
-    val afterHmrcSelected: AgentApplicationLlp =
+    val afterHmrcSelected: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
         .whenSupervisorBodyIsHmrc
         .afterSupervisoryBodySelected
 
-    val afterHmrcRegistrationNumberStored: AgentApplicationLlp =
+    val afterHmrcRegistrationNumberStored: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls

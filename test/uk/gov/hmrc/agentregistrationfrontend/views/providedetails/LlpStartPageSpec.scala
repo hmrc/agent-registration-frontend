@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
 import com.softwaremill.quicklens.modify
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -29,7 +30,7 @@ extends ViewSpec:
 
   val viewTemplate: LlpStartPage = app.injector.instanceOf[LlpStartPage]
 
-  val submittedAgentApplication: AgentApplicationLlp = tdAll
+  val submittedAgentApplication: AgentApplication = tdAll
     .agentApplicationLlp
     .sectionContactDetails
     .afterEmailAddressVerified

@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls
 
 import play.api.libs.ws.WSResponse
 import play.api.libs.ws.readableAsString
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
 import uk.gov.hmrc.agentregistrationfrontend.repository.UploadRepo
@@ -34,35 +34,35 @@ extends ControllerSpec:
 
   private object agentApplication:
 
-    val whenSupervisorBodyIsHmrc: AgentApplicationLlp =
+    val whenSupervisorBodyIsHmrc: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
         .whenSupervisorBodyIsHmrc
         .afterRegistrationNumberProvided
 
-    val beforeAmlsExpiryDateProvided: AgentApplicationLlp =
+    val beforeAmlsExpiryDateProvided: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
         .afterRegistrationNumberProvided
 
-    val afterAmlsExpiryDateProvided: AgentApplicationLlp =
+    val afterAmlsExpiryDateProvided: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
         .afterAmlsExpiryDateProvided
 
-    val afterUploadSucceeded: AgentApplicationLlp =
+    val afterUploadSucceeded: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
         .afterUploadSucceeded
 
-    val afterUploadFailed: AgentApplicationLlp = afterAmlsExpiryDateProvided
+    val afterUploadFailed: AgentApplication = afterAmlsExpiryDateProvided
 
   "routes should have correct paths and methods" in:
     AppRoutes.apply.amls.AmlsEvidenceUploadController.showAmlsEvidenceUploadPage shouldBe Call(

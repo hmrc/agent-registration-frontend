@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -30,28 +30,28 @@ extends ControllerSpec:
 
   private object agentApplication:
 
-    val hmrcAmls: AgentApplicationLlp =
+    val hmrcAmls: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
         .whenSupervisorBodyIsHmrc
         .afterRegistrationNumberProvided
 
-    val beforeRegistrationNumberProvided: AgentApplicationLlp =
+    val beforeRegistrationNumberProvided: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
         .whenSupervisorBodyIsHmrc
         .afterSupervisoryBodySelected
 
-    val afterRegistrationNumberProvided: AgentApplicationLlp =
+    val afterRegistrationNumberProvided: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
         .afterRegistrationNumberProvided
 
-    val afterAmlsExpiryDateProvided: AgentApplicationLlp =
+    val afterAmlsExpiryDateProvided: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAmls

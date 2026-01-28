@@ -19,9 +19,9 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 import com.softwaremill.quicklens.modify
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
@@ -33,7 +33,7 @@ extends ControllerSpec:
   private val path: String = s"/agent-registration/provide-details/confirmation"
 
   object agentApplication:
-    val applicationSubmitted: AgentApplicationLlp = tdAll
+    val applicationSubmitted: AgentApplication = tdAll
       .agentApplicationLlp
       .sectionAgentDetails
       .whenUsingExistingCompanyName

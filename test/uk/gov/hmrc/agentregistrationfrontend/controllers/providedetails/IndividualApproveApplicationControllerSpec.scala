@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
-import play.api.libs.ws.DefaultBodyReadables.*
 import com.softwaremill.quicklens.modify
+import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualApproveApplicationForm
@@ -34,7 +34,7 @@ extends ControllerSpec:
   private val path = "/agent-registration/provide-details/approve-applicant"
 
   object agentApplication:
-    val applicationSubmitted: AgentApplicationLlp = tdAll
+    val applicationSubmitted: AgentApplication = tdAll
       .agentApplicationLlp
       .sectionAgentDetails
       .whenUsingExistingCompanyName

@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -47,7 +46,7 @@ object ApplyStubHelper:
 
   private val utr: Utr = Utr(tdAll.saUtr.value)
 
-  def stubsToSupplyBprToPage(application: AgentApplicationLlp): StubMapping =
+  def stubsToSupplyBprToPage(application: AgentApplication): StubMapping =
     stubsForAuthAction(application)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
       utr = utr,

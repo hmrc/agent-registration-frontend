@@ -16,6 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationGeneralPartnership
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationLlp
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationSoleTrader
+
 object TdAll:
 
   def apply(): TdAll = new TdAll {}
@@ -41,11 +45,12 @@ extends TdBase,
   TdRequest,
   TdGrs,
   agentapplication.TdAgentApplicationRequest,
-  agentapplication.llp.TdAgentApplicationLlp,
-  agentapplication.llp.TdSectionContactDetails,
-  agentapplication.llp.TdSectionAgentDetails,
-  agentapplication.llp.TdUpload,
-  agentapplication.llp.TdSectionAmls,
-  agentapplication.soletrader.TdAgentApplicationSoleTrader,
+  TdAgentApplicationLlp,
+  TdAgentApplicationGeneralPartnership,
+  TdAgentApplicationSoleTrader,
+  agentapplication.sections.TdSectionContactDetails,
+  agentapplication.sections.TdSectionAgentDetails,
+  agentapplication.sections.TdUpload,
+  agentapplication.sections.TdSectionAmls,
   providedetails.individual.TdIndividualProvidedDetails,
   providedetails.TdProvideDetailsRequest

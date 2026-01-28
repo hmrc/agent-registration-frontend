@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.EmailAddress
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentEmailAddressForm
@@ -46,42 +46,42 @@ extends ControllerSpec:
 
   private object agentApplication:
 
-    val beforeTelephoneProvided: AgentApplicationLlp =
+    val beforeTelephoneProvided: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterBusinessNameProvided
 
-    val beforeEmailAddressProvided: AgentApplicationLlp =
+    val beforeEmailAddressProvided: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterContactTelephoneSelected
 
-    val afterContactEmailAddressSelected: AgentApplicationLlp =
+    val afterContactEmailAddressSelected: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterContactEmailAddressSelected
 
-    val afterBprEmailAddressSelected: AgentApplicationLlp =
+    val afterBprEmailAddressSelected: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterBprEmailAddressSelected
 
-    val afterOtherEmailAddressSelected: AgentApplicationLlp =
+    val afterOtherEmailAddressSelected: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterOtherEmailAddressSelected
 
-    val afterEmailAddressVerified: AgentApplicationLlp =
+    val afterEmailAddressVerified: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAgentDetails
