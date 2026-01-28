@@ -67,7 +67,7 @@ extends ControllerSpec:
     val response: WSResponse =
       post(path)(Map(
         NumberOfKeyIndividualsForm.key -> Seq("FromFiveOrFewer"),
-        NumberOfKeyIndividualsForm.fiveOrFewerAmountKey -> Seq("3")
+        NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey -> Seq("3")
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -95,14 +95,14 @@ extends ControllerSpec:
     val response: WSResponse =
       post(path)(Map(
         NumberOfKeyIndividualsForm.key -> Seq("FromFiveOrFewer"),
-        NumberOfKeyIndividualsForm.fiveOrFewerAmountKey -> Seq(Constants.EMPTY_STRING)
+        NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey -> Seq(Constants.EMPTY_STRING)
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: How many partners are there at Test Company Name? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
-      s"#${NumberOfKeyIndividualsForm.fiveOrFewerAmountKey}-error"
+      s"#${NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey}-error"
     ).text() shouldBe "Error: Enter a number between 1 and 5, for example 3"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
@@ -111,14 +111,14 @@ extends ControllerSpec:
     val response: WSResponse =
       post(path)(Map(
         NumberOfKeyIndividualsForm.key -> Seq("FromFiveOrFewer"),
-        NumberOfKeyIndividualsForm.fiveOrFewerAmountKey -> Seq("[[)(*%")
+        NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey -> Seq("[[)(*%")
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: How many partners are there at Test Company Name? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
-      s"#${NumberOfKeyIndividualsForm.fiveOrFewerAmountKey}-error"
+      s"#${NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey}-error"
     ).text() shouldBe "Error: Enter a number between 1 and 5, for example 3"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
@@ -127,14 +127,14 @@ extends ControllerSpec:
     val response: WSResponse =
       post(path)(Map(
         NumberOfKeyIndividualsForm.key -> Seq("FromFiveOrFewer"),
-        NumberOfKeyIndividualsForm.fiveOrFewerAmountKey -> Seq("25")
+        NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey -> Seq("25")
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: How many partners are there at Test Company Name? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
-      s"#${NumberOfKeyIndividualsForm.fiveOrFewerAmountKey}-error"
+      s"#${NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey}-error"
     ).text() shouldBe "Error: Enter a number between 1 and 5, for example 3"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
@@ -146,7 +146,7 @@ extends ControllerSpec:
     val response: WSResponse =
       post(path)(Map(
         NumberOfKeyIndividualsForm.key -> Seq("FromFiveOrFewer"),
-        NumberOfKeyIndividualsForm.fiveOrFewerAmountKey -> Seq("3"),
+        NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey -> Seq("3"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
@@ -160,7 +160,7 @@ extends ControllerSpec:
     val response: WSResponse =
       post(path)(Map(
         NumberOfKeyIndividualsForm.key -> Seq("FromFiveOrFewer"),
-        NumberOfKeyIndividualsForm.fiveOrFewerAmountKey -> Seq("[[)(*%"),
+        NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey -> Seq("[[)(*%"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 

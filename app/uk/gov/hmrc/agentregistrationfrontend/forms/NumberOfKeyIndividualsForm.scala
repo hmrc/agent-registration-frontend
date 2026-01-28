@@ -31,8 +31,8 @@ import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 object NumberOfKeyIndividualsForm:
 
   val key: String = "numberOfKeyIndividuals"
-  val fiveOrFewerAmountKey: String = "fiveOrFewerAmount"
-  val sixOrMoreAmountKey: String = "sixOrMoreAmount"
+  val exactNumberOfOfficialsKey: String = "exactNumberOfOfficials"
+  val numberOfOfficialsWhoDealWithTaxKey: String = "numberOfOfficialsWhoDealWithTax"
 
   private val intToFromFiveOrFewer: Int => RequiredKeyIndividuals =
     n =>
@@ -83,19 +83,19 @@ object NumberOfKeyIndividualsForm:
             ErrorKeys.requiredFieldErrorMessage(key),
             _.nonEmpty
           ),
-        fiveOrFewerAmountKey -> mandatoryIf(
+        exactNumberOfOfficialsKey -> mandatoryIf(
           isEqual(key, "FromFiveOrFewer"),
-          numberFromString(fiveOrFewerAmountKey)
+          numberFromString(exactNumberOfOfficialsKey)
             .verifying(
-              ErrorKeys.invalidInputErrorMessage(fiveOrFewerAmountKey),
+              ErrorKeys.invalidInputErrorMessage(exactNumberOfOfficialsKey),
               n => n >= 1 && n <= 5
             )
         ),
-        sixOrMoreAmountKey -> mandatoryIf(
+        numberOfOfficialsWhoDealWithTaxKey -> mandatoryIf(
           isEqual(key, "FromSixOrMore"),
-          numberFromString(sixOrMoreAmountKey)
+          numberFromString(numberOfOfficialsWhoDealWithTaxKey)
             .verifying(
-              ErrorKeys.invalidInputErrorMessage(sixOrMoreAmountKey),
+              ErrorKeys.invalidInputErrorMessage(numberOfOfficialsWhoDealWithTaxKey),
               n => n >= 1 && n <= 30
             )
         )

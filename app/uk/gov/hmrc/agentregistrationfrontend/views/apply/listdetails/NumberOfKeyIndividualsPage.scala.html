@@ -41,27 +41,27 @@
 )(implicit request: AgentApplicationRequest[?], messages: Messages)
 
 @key = @{NumberOfKeyIndividualsForm.key}
-@fiveOrFewerAmountKey = @{NumberOfKeyIndividualsForm.fiveOrFewerAmountKey}
-@sixOrMoreAmountKey = @{NumberOfKeyIndividualsForm.sixOrMoreAmountKey}
+@exactNumberOfOfficialsKey = @{NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey}
+@numberOfOfficialsWhoDealWithTaxKey = @{NumberOfKeyIndividualsForm.numberOfOfficialsWhoDealWithTaxKey}
 @title = @{messages(s"$key.title.$businessTypeKey", entityName)}
-@fiveOrFewerAmountInput = {
+@exactNumberOfOfficialsInput = {
     @govukInput(Input(
       label = Label(
-        content = Text(messages(s"$fiveOrFewerAmountKey.label"))
+        content = Text(messages(s"$exactNumberOfOfficialsKey.label"))
       ),
       classes = "govuk-input--width-5"
-    ).withFormField(form(fiveOrFewerAmountKey)))
+    ).withFormField(form(exactNumberOfOfficialsKey)))
 }
-@sixOrMoreAmountInput = {
+@numberOfOfficialsWhoDealWithTaxInput = {
   @govukInput(Input(
     label = Label(
-      content = Text(messages(s"$sixOrMoreAmountKey.label"))
+      content = Text(messages(s"$numberOfOfficialsWhoDealWithTaxKey.label"))
     ),
     hint = Some(Hint(
-      content = Text(messages(s"$sixOrMoreAmountKey.hint"))
+      content = Text(messages(s"$numberOfOfficialsWhoDealWithTaxKey.hint"))
     )),
     classes = "govuk-input--width-5"
-  ).withFormField(form(sixOrMoreAmountKey)))
+  ).withFormField(form(numberOfOfficialsWhoDealWithTaxKey)))
 }
 @businessTypeKey = @{
   request.agentApplication match {
@@ -92,12 +92,12 @@
             RadioItem(
               content = Text(messages(s"$key.fiveOrFewer")),
               value = Some("FromFiveOrFewer"),
-              conditionalHtml = Some(fiveOrFewerAmountInput)
+              conditionalHtml = Some(exactNumberOfOfficialsInput)
             ),
             RadioItem(
               content = Text(messages(s"$key.sixOrMore")),
               value = Some("FromSixOrMore"),
-              conditionalHtml = Some(sixOrMoreAmountInput)
+              conditionalHtml = Some(numberOfOfficialsWhoDealWithTaxInput)
             )
           )
         ).withFormField(form(key)))
