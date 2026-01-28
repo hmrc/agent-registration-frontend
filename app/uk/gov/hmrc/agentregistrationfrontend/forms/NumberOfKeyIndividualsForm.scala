@@ -23,6 +23,8 @@ import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 import uk.gov.hmrc.agentregistrationfrontend.forms.mappings.Mappings.numberFromString
+import uk.gov.voa.play.form.ConditionalMappings.isEqual
+import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 
 object NumberOfKeyIndividualsForm:
 
@@ -40,8 +42,11 @@ object NumberOfKeyIndividualsForm:
 
   val form: Form[NumberOfRequiredKeyIndividuals] = Form(
     mapping = (mapping(
-      howManyIndividualsOption -> Forms.of(FormatterFactory.makeEnumFormatter[HowManyIndividualsOption]()),
-      howManyIndividuals -> optional(
+      howManyIndividualsOption -> Forms.of(FormatterFactory.makeEnumFormatter[HowManyIndividualsOption](
+        errorMessageIfMissing = ErrorKeys.requiredFieldErrorMessage(howManyIndividualsOption)
+      )),
+      howManyIndividuals -> mandatoryIf(
+        isEqual(howManyIndividualsOption, HowManyIndividualsOption.FiveOrLess.toString),
         numberFromString(howManyIndividuals)
           .transform[FiveOrFewer](FiveOrFewer.apply, _.numberOfKeyIndividuals)
           .verifying(
@@ -49,7 +54,8 @@ object NumberOfKeyIndividualsForm:
             _.isValid
           )
       ),
-      howManyIndividualsResponsibleForTaxMatters -> optional(
+      howManyIndividualsResponsibleForTaxMatters -> mandatoryIf(
+        isEqual(howManyIndividualsOption, HowManyIndividualsOption.SixOrMore.toString),
         numberFromString(howManyIndividualsResponsibleForTaxMatters)
           .transform[SixOrMore](SixOrMore.apply, _.numberOfKeyIndividualsResponsibleForTaxMatters)
           .verifying(

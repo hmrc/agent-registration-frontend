@@ -66,7 +66,7 @@ extends ControllerSpec:
     )
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FromFiveOrFewer"),
+        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FiveOrLess"),
         NumberOfKeyIndividualsForm.howManyIndividuals -> Seq("3")
       ))
 
@@ -77,10 +77,7 @@ extends ControllerSpec:
 
   s"POST $path with blank inputs should return 400" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeHowManyKeyIndividuals)
-    val response: WSResponse =
-      post(path)(Map(
-        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq(Constants.EMPTY_STRING)
-      ))
+    val response: WSResponse = post(path)(Map.empty)
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
@@ -90,12 +87,11 @@ extends ControllerSpec:
     ).text() shouldBe "Error: Select how many partners there are"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
-  s"POST $path with selection of FromFiveOrFewer and blank field for amount should return 400" in:
+  s"POST $path with selection of FiveOrLess and blank field for amount should return 400" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeHowManyKeyIndividuals)
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FromFiveOrFewer"),
-        NumberOfKeyIndividualsForm.howManyIndividuals -> Seq(Constants.EMPTY_STRING)
+        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FiveOrLess")
       ))
 
     response.status shouldBe Status.BAD_REQUEST
@@ -110,7 +106,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeHowManyKeyIndividuals)
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FromFiveOrFewer"),
+        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FiveOrLess"),
         NumberOfKeyIndividualsForm.howManyIndividuals -> Seq("[[)(*%")
       ))
 
@@ -122,11 +118,11 @@ extends ControllerSpec:
     ).text() shouldBe "Error: Enter a number between 1 and 5, for example 3"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
-  s"POST $path with selection of FromFiveOrFewer and a value higher than 5 should return 400" in:
+  s"POST $path with selection of FiveOrLess and a value higher than 5 should return 400" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeHowManyKeyIndividuals)
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FromFiveOrFewer"),
+        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FiveOrLess"),
         NumberOfKeyIndividualsForm.howManyIndividuals -> Seq("25")
       ))
 
@@ -145,7 +141,7 @@ extends ControllerSpec:
     )
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FromFiveOrFewer"),
+        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FiveOrLess"),
         NumberOfKeyIndividualsForm.howManyIndividuals -> Seq("3"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
@@ -159,7 +155,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeHowManyKeyIndividuals)
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FromFiveOrFewer"),
+        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FiveOrLess"),
         NumberOfKeyIndividualsForm.howManyIndividuals -> Seq("[[)(*%"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))

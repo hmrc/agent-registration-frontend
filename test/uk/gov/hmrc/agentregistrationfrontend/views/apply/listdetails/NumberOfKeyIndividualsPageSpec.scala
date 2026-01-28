@@ -69,8 +69,8 @@ extends ViewSpec:
       val expectedRadioGroup: TestRadioGroup = TestRadioGroup(
         legend = heading,
         options = List(
-          "5 or fewer" -> "FromFiveOrFewer",
-          "6 or more" -> "FromSixOrMore"
+          "5 or fewer" -> "FiveOrLess",
+          "6 or more" -> "SixOrMore"
         ),
         hint = Some(
           "Only tell us about people with the title ‘partner’. Do not include partner organisations."
