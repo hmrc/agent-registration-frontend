@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.lists.KeyIndividualListSource
 import uk.gov.hmrc.agentregistration.shared.lists.RequiredKeyIndividuals
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.TextFormatter
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
+import uk.gov.hmrc.agentregistrationfrontend.forms.mappings.Mappings.numberFromString
 import uk.gov.voa.play.form.ConditionalMappings.isEqual
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 
@@ -93,11 +94,7 @@ object NumberOfKeyIndividualsForm:
           ),
         fiveOrFewerAmountKey -> mandatoryIf(
           isEqual(key, "FromFiveOrFewer"),
-          Forms.of(TextFormatter(ErrorKeys.requiredFieldErrorMessage(fiveOrFewerAmountKey)))
-            .transform[Int](
-              str => str.toIntOption.getOrElse(0),
-              int => int.toString
-            )
+          numberFromString(fiveOrFewerAmountKey)
             .verifying(
               ErrorKeys.invalidInputErrorMessage(fiveOrFewerAmountKey),
               n => n >= 1 && n <= 5
@@ -105,11 +102,7 @@ object NumberOfKeyIndividualsForm:
         ),
         sixOrMoreAmountKey -> mandatoryIf(
           isEqual(key, "FromSixOrMore"),
-          Forms.of(TextFormatter(ErrorKeys.requiredFieldErrorMessage(sixOrMoreAmountKey)))
-            .transform[Int](
-              str => str.toIntOption.getOrElse(0),
-              int => int.toString
-            )
+          numberFromString(sixOrMoreAmountKey)
             .verifying(
               ErrorKeys.invalidInputErrorMessage(sixOrMoreAmountKey),
               n => n >= 1 && n <= 30
