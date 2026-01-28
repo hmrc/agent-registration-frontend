@@ -93,7 +93,7 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render a form error when the form contains an error" in:
-      val field = NumberOfKeyIndividualsForm.key
+      val field = NumberOfKeyIndividualsForm.howManyIndividualsOption
       val errorMessage = "Select how many partners there are"
       val formWithError = NumberOfKeyIndividualsForm.form
         .withError(field, errorMessage)

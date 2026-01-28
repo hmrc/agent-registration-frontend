@@ -66,8 +66,8 @@ extends ControllerSpec:
     )
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.key -> Seq("FromFiveOrFewer"),
-        NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey -> Seq("3")
+        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FromFiveOrFewer"),
+        NumberOfKeyIndividualsForm.howManyIndividuals -> Seq("3")
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -79,14 +79,14 @@ extends ControllerSpec:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeHowManyKeyIndividuals)
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.key -> Seq(Constants.EMPTY_STRING)
+        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq(Constants.EMPTY_STRING)
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: How many partners are there at Test Company Name? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
-      s"#${NumberOfKeyIndividualsForm.key}-error"
+      s"#${NumberOfKeyIndividualsForm.howManyIndividualsOption}-error"
     ).text() shouldBe "Error: Select how many partners there are"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
@@ -94,15 +94,15 @@ extends ControllerSpec:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeHowManyKeyIndividuals)
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.key -> Seq("FromFiveOrFewer"),
-        NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey -> Seq(Constants.EMPTY_STRING)
+        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FromFiveOrFewer"),
+        NumberOfKeyIndividualsForm.howManyIndividuals -> Seq(Constants.EMPTY_STRING)
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: How many partners are there at Test Company Name? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
-      s"#${NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey}-error"
+      s"#${NumberOfKeyIndividualsForm.howManyIndividuals}-error"
     ).text() shouldBe "Error: Enter a number between 1 and 5, for example 3"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
@@ -110,15 +110,15 @@ extends ControllerSpec:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeHowManyKeyIndividuals)
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.key -> Seq("FromFiveOrFewer"),
-        NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey -> Seq("[[)(*%")
+        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FromFiveOrFewer"),
+        NumberOfKeyIndividualsForm.howManyIndividuals -> Seq("[[)(*%")
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: How many partners are there at Test Company Name? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
-      s"#${NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey}-error"
+      s"#${NumberOfKeyIndividualsForm.howManyIndividuals}-error"
     ).text() shouldBe "Error: Enter a number between 1 and 5, for example 3"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
@@ -126,15 +126,15 @@ extends ControllerSpec:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeHowManyKeyIndividuals)
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.key -> Seq("FromFiveOrFewer"),
-        NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey -> Seq("25")
+        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FromFiveOrFewer"),
+        NumberOfKeyIndividualsForm.howManyIndividuals -> Seq("25")
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: How many partners are there at Test Company Name? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
-      s"#${NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey}-error"
+      s"#${NumberOfKeyIndividualsForm.howManyIndividuals}-error"
     ).text() shouldBe "Error: Enter a number between 1 and 5, for example 3"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
@@ -145,8 +145,8 @@ extends ControllerSpec:
     )
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.key -> Seq("FromFiveOrFewer"),
-        NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey -> Seq("3"),
+        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FromFiveOrFewer"),
+        NumberOfKeyIndividualsForm.howManyIndividuals -> Seq("3"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
@@ -159,8 +159,8 @@ extends ControllerSpec:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeHowManyKeyIndividuals)
     val response: WSResponse =
       post(path)(Map(
-        NumberOfKeyIndividualsForm.key -> Seq("FromFiveOrFewer"),
-        NumberOfKeyIndividualsForm.exactNumberOfOfficialsKey -> Seq("[[)(*%"),
+        NumberOfKeyIndividualsForm.howManyIndividualsOption -> Seq("FromFiveOrFewer"),
+        NumberOfKeyIndividualsForm.howManyIndividuals -> Seq("[[)(*%"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 

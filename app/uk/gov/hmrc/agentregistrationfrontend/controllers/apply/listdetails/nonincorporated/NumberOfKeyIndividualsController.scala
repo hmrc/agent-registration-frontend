@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.noni
 import com.softwaremill.quicklens.modify
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.lists.RequiredKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
@@ -66,7 +66,7 @@ extends FrontendController(mcc, actions):
     actions
       .Applicant
       .getApplicationInProgress
-      .ensureValidFormAndRedirectIfSaveForLaterAsync[RequiredKeyIndividuals](
+      .ensureValidFormAndRedirectIfSaveForLaterAsync[NumberOfRequiredKeyIndividuals](
         form = NumberOfKeyIndividualsForm.form,
         viewToServeWhenFormHasErrors =
           implicit request =>
@@ -84,8 +84,8 @@ extends FrontendController(mcc, actions):
                   )
       )
       .async:
-        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[RequiredKeyIndividuals]) =>
-          val requiredKeyIndividuals: RequiredKeyIndividuals = request.formValue
+        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[NumberOfRequiredKeyIndividuals]) =>
+          val requiredKeyIndividuals: NumberOfRequiredKeyIndividuals = request.formValue
           logger.warn(s"Number of key individuals selected: $requiredKeyIndividuals")
           val updatedApplication: AgentApplication = request
             .agentApplication

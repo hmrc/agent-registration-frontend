@@ -44,6 +44,13 @@ object Mappings:
       )
     )
 
+  def number(formMessageKey: String): Mapping[Int] = text(formMessageKey)
+    .verifying(
+      ErrorKeys.invalidInputErrorMessage(formMessageKey),
+      str => str.toIntOption.isDefined
+    )
+    .transform[Int](_.toInt, _.toString)
+
   def numberFromString(formMessageKey: String): Mapping[Int] = text(formMessageKey)
     .verifying(
       ErrorKeys.invalidInputErrorMessage(formMessageKey),
