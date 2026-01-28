@@ -28,10 +28,9 @@ import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.lists.FromFiveOrFewer
 import uk.gov.hmrc.agentregistration.shared.lists.FromSixOrMore
-import uk.gov.hmrc.agentregistration.shared.lists.KeyIndividualListSource.FromApplicant
 import uk.gov.hmrc.agentregistration.shared.llp.*
-import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.Country
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import java.time.*
@@ -181,13 +180,11 @@ trait TdBase:
   )
 
   def fiveOrFewerKeyIndividuals: FromFiveOrFewer = FromFiveOrFewer(
-    numberToProvideDetails = 3,
-    source = FromApplicant
+    numberToProvideDetails = 3
   )
 
   def sixOrMoreKeyIndividuals: FromSixOrMore = FromSixOrMore(
-    numberToProvideDetails = 3,
-    source = FromApplicant
+    numberToProvideDetails = 3
   )
 
   val individualProvidedDetails: IndividualProvidedDetails = IndividualProvidedDetails(

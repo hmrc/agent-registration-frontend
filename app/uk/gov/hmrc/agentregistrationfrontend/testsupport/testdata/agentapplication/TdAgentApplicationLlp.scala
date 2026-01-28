@@ -23,7 +23,6 @@ import uk.gov.hmrc.agentregistration.shared.CheckResult
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistration.shared.lists.FromFiveOrFewer
-import uk.gov.hmrc.agentregistration.shared.lists.KeyIndividualListSource.FromApplicant
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAgentDetails
@@ -95,8 +94,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
     val afterHowManyKeyIndividuals: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       requiredKeyIndividuals = Some(
         FromFiveOrFewer(
-          numberToProvideDetails = 3,
-          source = FromApplicant
+          numberToProvideDetails = 3
         )
       )
     )

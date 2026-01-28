@@ -21,7 +21,6 @@ import play.api.data.Forms
 import play.api.data.Forms.mapping
 import uk.gov.hmrc.agentregistration.shared.lists.FromFiveOrFewer
 import uk.gov.hmrc.agentregistration.shared.lists.FromSixOrMore
-import uk.gov.hmrc.agentregistration.shared.lists.KeyIndividualListSource
 import uk.gov.hmrc.agentregistration.shared.lists.RequiredKeyIndividuals
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.TextFormatter
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
@@ -38,15 +37,13 @@ object NumberOfKeyIndividualsForm:
   private val intToFromFiveOrFewer: Int => RequiredKeyIndividuals =
     n =>
       FromFiveOrFewer(
-        numberToProvideDetails = n,
-        source = KeyIndividualListSource.FromApplicant
+        numberToProvideDetails = n
       )
 
   private val intToFromSixOrMore: Int => RequiredKeyIndividuals =
     n =>
       FromSixOrMore(
-        numberToProvideDetails = n,
-        source = KeyIndividualListSource.FromApplicant
+        numberToProvideDetails = n
       )
 
   private val tupleToRequiredKeyIndividuals: (
@@ -64,19 +61,13 @@ object NumberOfKeyIndividualsForm:
         case "FromSixOrMore" => intToFromSixOrMore(sixOpt.getOrElse(0))
 
   private val requiredKeyIndividualsToTuple: RequiredKeyIndividuals => Option[(String, Option[Int], Option[Int])] = {
-    case f @ FromFiveOrFewer(
-          n,
-          _
-        ) =>
+    case f @ FromFiveOrFewer(n) =>
       Some(
         FromFiveOrFewer.toString,
         Some(n),
         None
       )
-    case s @ FromSixOrMore(
-          n,
-          _
-        ) =>
+    case s @ FromSixOrMore(n) =>
       Some(
         FromSixOrMore.toString,
         None,
