@@ -56,7 +56,9 @@ object TupleTool:
 
     inline def addByType[T](value: T)(using T AbsentIn Data): T *: Data = value *: data
 
-    inline def get[T](using T PresentIn Data): T = getImpl[Data, T](data)
+    inline def get[T](using T PresentIn Data): T =
+      ensureUnique
+      getImpl[Data, T](data)
 
     inline def updateByType[T](value: T)(using T PresentIn Data): Data = replace[Data, T](data, value)
 
@@ -130,23 +132,14 @@ object TupleTool:
         cons.head *: deleteType[tail, T](cons.tail)
       case _ => ???
 
-  private inline def failDuplicateTuple[Data]: Nothing = ${ failDuplicateTupleImpl[Data] }
-
   private def cleanType(s: String): String = s
     .replaceAll("\\bscala\\.Predef\\.", "")
     .replaceAll("\\bscala\\.", "")
     .replaceAll("\\bjava\\.lang\\.", "")
 
-  def failDuplicateImpl[
-    T: Type,
-    Data: Type
-  ](using Quotes): Expr[Nothing] =
-    import quotes.reflect.*
-    val targetName: String = cleanType(TypeRepr.of[T].show)
-    val msg = s"Type '$targetName' is already present in the tuple."
-    '{ scala.compiletime.error(${ Expr(msg) }) }
+  private inline def failDuplicateTuple[Data]: Nothing = ${ failDuplicateTupleImpl[Data] }
 
-  def failDuplicateTupleImpl[Data: Type](using Quotes): Expr[Nothing] =
+  private def failDuplicateTupleImpl[Data: Type](using Quotes): Expr[Nothing] =
     import quotes.reflect.*
 
     @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
@@ -170,10 +163,14 @@ object TupleTool:
           if seen.exists(s => s =:= h) then Some(h)
           else findFirstDuplicate(tail, h :: seen)
 
-    val duplicate = findFirstDuplicate(types, Nil)
-    val targetName = duplicate.map(t => cleanType(t.show)).getOrElse("Unknown")
+    val duplicate: Option[TypeRepr] = findFirstDuplicate(types, Nil)
+    val targetName: String = duplicate.map(t => cleanType(t.show)).getOrElse("Unknown")
 
-    val msg = s"Type '$targetName' is already present in the tuple."
+    val formattedList =
+      if types.isEmpty then "  (Empty Tuple)"
+      else types.map(t => s"  * ${cleanType(t.show)}").mkString("\n")
+
+    val msg = s"Tuple isn't unique. Type '$targetName' occurs more more then once:\n$formattedList"
     '{ scala.compiletime.error(${ Expr(msg) }) }
 
   private def makeAbsentInOrFailImpl[

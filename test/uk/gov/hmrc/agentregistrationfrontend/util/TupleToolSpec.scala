@@ -34,13 +34,14 @@ extends UnitSpec:
   type CanSwim = Animal & (Fish | Frog)
 
   "tuple.get" in:
+//    EmptyTuple.get[Boolean]
     val kermit: Frog = Frog("Kermit")
-    val t = (1, "string", true, kermit, false)
+    val t = (1, "string", true, kermit)
     t.get[Int] shouldBe 1
     t.get[String] shouldBe "string"
     t.get[Boolean] shouldBe true
-//    t.getByType[Any]
-//    t.getByType[Animal] shouldBe Frog("kermit")
+//    t.get[Any]
+//    t.get[Animal] shouldBe Frog("kermit")
     t.get[Frog] shouldBe kermit
 
   "TupleTool" should:
@@ -59,7 +60,7 @@ extends UnitSpec:
         """)
         errors.map(_.message) shouldBe List("Type 'String' is already present in the tuple.")
 
-    "getByType" should:
+    "get" should:
       "retrieve an existing element" in:
         val t: (Int, String, Boolean) = (1, "string", true)
         t.get[Int] shouldBe 1
@@ -70,7 +71,7 @@ extends UnitSpec:
         val errors = typeCheckErrors("""
           import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
           val t = (1, "string", true)
-          t.getByType[Double]
+          t.get[Double]
         """)
         errors.map(_.message) shouldBe List(
           """Type 'Double' is not present in the tuple.
@@ -151,4 +152,9 @@ extends UnitSpec:
           val t = (1, "string", 1)
           t.ensureUnique
         """)
-        errors.map(_.message) shouldBe List("Type 'Int' is already present in the tuple.")
+        errors.map(_.message) shouldBe List(
+          """Tuple isn't unique. Type 'Int' occurs more more then once:
+            |  * Int
+            |  * String
+            |  * Int""".stripMargin
+        )
