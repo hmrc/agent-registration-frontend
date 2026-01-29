@@ -47,20 +47,20 @@ class AuthorisedAction2 @Inject() (
 extends RequestAwareLogging:
 
   def refine[
-    A, // ContentType
+    ContentType,
     Data <: Tuple
   ](
-    request: RequestWithData[A, Data]
+    request: RequestWithData[ContentType, Data]
   )(
     using
     Credentials AbsentIn Data,
     GroupId AbsentIn Data,
     InternalUserId AbsentIn Data
   ): Future[Either[Result, RequestWithData[
-    A,
+    ContentType,
     InternalUserId *: GroupId *: Credentials *: Data
   ]]] = {
-    given RequestWithData[A, Data] = request
+    given RequestWithData[ContentType, Data] = request
     af.authorised(
       AuthProviders(GovernmentGateway)
         and AffinityGroup.Agent

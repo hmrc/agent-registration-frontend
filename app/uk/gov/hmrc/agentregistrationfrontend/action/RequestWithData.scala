@@ -22,41 +22,41 @@ import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
 import uk.gov.hmrc.agentregistrationfrontend.util.TupleToolMacros
 
 class RequestWithData[
-  A,
+  ContentType,
   Data <: Tuple
 ] private (
-            val request: Request[A],
+            val request: Request[ContentType],
             val data: Data
 )
-extends WrappedRequest[A](request):
+extends WrappedRequest[ContentType](request):
 
-  inline def add[T](value: T)(using T AbsentIn Data): RequestWithData[A, T *: Data] = RequestWithData.create(request, data.addByType(value))
+  inline def add[T](value: T)(using T AbsentIn Data): RequestWithData[ContentType, T *: Data] = RequestWithData.create(request, data.addByType(value))
 
   inline def get[T]: T = data.getByType[T]
 
-  inline def update[T](value: T): RequestWithData[A, Data] = RequestWithData.create(request, data.updateByType(value))
+  inline def update[T](value: T): RequestWithData[ContentType, Data] = RequestWithData.create(request, data.updateByType(value))
 
-  inline def replace[Old, New](value: New): RequestWithData[A, TupleToolMacros.Replace[Data, Old, New]] = RequestWithData.create(
+  inline def replace[Old, New](value: New): RequestWithData[ContentType, TupleToolMacros.Replace[Data, Old, New]] = RequestWithData.create(
     request,
     data.replaceByType[Old, New](value)
   )
 
-  inline def delete[T]: RequestWithData[A, TupleToolMacros.Delete[Data, T]] = RequestWithData.create(request, data.deleteByType[T])
+  inline def delete[T]: RequestWithData[ContentType, TupleToolMacros.Delete[Data, T]] = RequestWithData.create(request, data.deleteByType[T])
 
 object RequestWithData:
 
   inline def apply[
-    A,
+    ContentType,
     Data <: Tuple
   ](
-    request: Request[A],
-    data: Data
-  ): RequestWithData[A, Data] = create(request, data.ensureUnique)
+     request: Request[ContentType],
+     data: Data
+  ): RequestWithData[ContentType, Data] = create(request, data.ensureUnique)
 
   private def create[
-    A,
+    ContentType,
     Data <: Tuple
   ](
-    request: Request[A],
-    data: Data
-  ): RequestWithData[A, Data] = new RequestWithData(request, data)
+     request: Request[ContentType],
+     data: Data
+  ): RequestWithData[ContentType, Data] = new RequestWithData(request, data)

@@ -32,26 +32,26 @@ extends RequestAwareLogging:
 
   extension [
     R <: [X] =>> Request[X],
-    B // B Represents Play Framework's Content Type parameter, commonly denoted as B
-  ](ab: ActionBuilder[R, B])(using ec: ExecutionContext)
+    ContentType // ContentType Represents Play Framework's Content Type parameter, commonly denoted as B
+  ](ab: ActionBuilder[R, ContentType])(using ec: ExecutionContext)
 
     def ensure(
-      condition: R[B] => Boolean,
-      resultWhenConditionNotMet: => Result
-    ): ActionBuilder[R, B] = ensure(condition, _ => resultWhenConditionNotMet)
+                condition: R[ContentType] => Boolean,
+                resultWhenConditionNotMet: => Result
+    ): ActionBuilder[R, ContentType] = ensure(condition, _ => resultWhenConditionNotMet)
 
     def ensure(
-      condition: R[B] => Boolean,
-      resultWhenConditionNotMet: R[B] => Result
-    ): ActionBuilder[R, B] = ensureAsync(
+                condition: R[ContentType] => Boolean,
+                resultWhenConditionNotMet: R[ContentType] => Result
+    ): ActionBuilder[R, ContentType] = ensureAsync(
       request => Future.successful(condition(request)),
       request => Future.successful(resultWhenConditionNotMet(request))
     )
 
     def ensureAsync(
-      condition: R[B] => Future[Boolean],
-      resultWhenConditionNotMet: R[B] => Future[Result]
-    ): ActionBuilder[R, B] = genericFilterAsync(
+                     condition: R[ContentType] => Future[Boolean],
+                     resultWhenConditionNotMet: R[ContentType] => Future[Result]
+    ): ActionBuilder[R, ContentType] = genericFilterAsync(
       condition,
       implicit request =>
         resultWhenConditionNotMet(request).map: result =>
@@ -60,16 +60,16 @@ extends RequestAwareLogging:
     )
 
     def ensureValidFormGenericAsync[T](
-      form: R[B] => Form[T],
-      resultToServeWhenFormHasErrors: R[B] => Form[T] => Future[Result]
+                                        form: R[ContentType] => Form[T],
+                                        resultToServeWhenFormHasErrors: R[ContentType] => Form[T] => Future[Result]
     )(using
       fb: FormBinding,
-      merge: MergeFormValue[R[B], T]
-    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ab.andThen(new ActionRefiner[R, [X] =>> R[X] & FormValue[T]] {
+      merge: MergeFormValue[R[ContentType], T]
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], ContentType] = ab.andThen(new ActionRefiner[R, [X] =>> R[X] & FormValue[T]] {
 
       @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
       override protected def refine[A](rA: R[A]): Future[Either[Result, R[A] & FormValue[T]]] = {
-        val rB: R[B] = rA.asInstanceOf[R[B]]
+        val rB: R[ContentType] = rA.asInstanceOf[R[ContentType]]
         form(rB).bindFromRequest()(using rB, fb).fold(
           hasErrors = formWithErrors => resultToServeWhenFormHasErrors(rB)(formWithErrors).map(Left(_)),
           success =
@@ -82,50 +82,50 @@ extends RequestAwareLogging:
     })
 
     def ensureValidFormGeneric[T](
-      form: R[B] => Form[T],
-      resultToServeWhenFormHasErrors: R[B] => Form[T] => Result
+                                   form: R[ContentType] => Form[T],
+                                   resultToServeWhenFormHasErrors: R[ContentType] => Form[T] => Result
     )(using
       fb: FormBinding,
-      merge: MergeFormValue[R[B], T]
-    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ensureValidFormGenericAsync(
+      merge: MergeFormValue[R[ContentType], T]
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], ContentType] = ensureValidFormGenericAsync(
       form,
       request => form => Future.successful(resultToServeWhenFormHasErrors(request)(form))
     )
 
     def ensureValidFormAsync[T](
       form: Form[T],
-      viewToServeWhenFormHasErrors: R[B] => Form[T] => Future[HtmlFormat.Appendable]
+      viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => Future[HtmlFormat.Appendable]
     )(using
       fb: FormBinding,
-      merge: MergeFormValue[R[B], T]
-    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ab
+      merge: MergeFormValue[R[ContentType], T]
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], ContentType] = ab
       .ensureValidFormGenericAsync[T](
         _ => form,
-        (r: R[B]) => (f: Form[T]) => viewToServeWhenFormHasErrors(r)(f).map(BadRequest.apply)
+        (r: R[ContentType]) => (f: Form[T]) => viewToServeWhenFormHasErrors(r)(f).map(BadRequest.apply)
       )
 
     def ensureValidForm[T](
       form: Form[T],
-      viewToServeWhenFormHasErrors: R[B] => Form[T] => HtmlFormat.Appendable
+      viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => HtmlFormat.Appendable
     )(using
       fb: FormBinding,
-      merge: MergeFormValue[R[B], T]
-    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ensureValidFormAsync(
+      merge: MergeFormValue[R[ContentType], T]
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], ContentType] = ensureValidFormAsync(
       form,
       request => form => Future.successful(viewToServeWhenFormHasErrors(request)(form))
     )
 
     def ensureValidFormAndRedirectIfSaveForLaterAsync[T](
-      form: R[B] => Form[T],
-      viewToServeWhenFormHasErrors: R[B] => Form[T] => Future[HtmlFormat.Appendable]
+                                                          form: R[ContentType] => Form[T],
+                                                          viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => Future[HtmlFormat.Appendable]
     )(using
       fb: FormBinding,
-      merge: MergeFormValue[R[B], T],
-      ev: B =:= AnyContent
-    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ab
+      merge: MergeFormValue[R[ContentType], T],
+      ev: ContentType =:= AnyContent
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], ContentType] = ab
       .ensureValidFormGenericAsync[T](
         form,
-        (r: R[B]) =>
+        (r: R[ContentType]) =>
           (f: Form[T]) =>
             viewToServeWhenFormHasErrors(r)(f)
               .map(BadRequest.apply)
@@ -133,64 +133,64 @@ extends RequestAwareLogging:
       )
 
     def ensureValidFormAndRedirectIfSaveForLater[T](
-      form: R[B] => Form[T],
-      viewToServeWhenFormHasErrors: R[B] => Form[T] => HtmlFormat.Appendable
+                                                     form: R[ContentType] => Form[T],
+                                                     viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => HtmlFormat.Appendable
     )(using
       fb: FormBinding,
-      merge: MergeFormValue[R[B], T],
-      ev: B =:= AnyContent
-    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ensureValidFormAndRedirectIfSaveForLaterAsync(
+      merge: MergeFormValue[R[ContentType], T],
+      ev: ContentType =:= AnyContent
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], ContentType] = ensureValidFormAndRedirectIfSaveForLaterAsync(
       form,
       request => form => Future.successful(viewToServeWhenFormHasErrors(request)(form))
     )
 
     def ensureValidFormAndRedirectIfSaveForLaterAsync[T](
       form: Form[T],
-      viewToServeWhenFormHasErrors: R[B] => Form[T] => Future[HtmlFormat.Appendable]
+      viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => Future[HtmlFormat.Appendable]
     )(using
       fb: FormBinding,
-      merge: MergeFormValue[R[B], T],
-      ev: B =:= AnyContent
-    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ab.ensureValidFormAndRedirectIfSaveForLaterAsync(
+      merge: MergeFormValue[R[ContentType], T],
+      ev: ContentType =:= AnyContent
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], ContentType] = ab.ensureValidFormAndRedirectIfSaveForLaterAsync(
       _ => form,
       viewToServeWhenFormHasErrors
     )
 
     def ensureValidFormAndRedirectIfSaveForLater[T](
       form: Form[T],
-      viewToServeWhenFormHasErrors: R[B] => Form[T] => HtmlFormat.Appendable
+      viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => HtmlFormat.Appendable
     )(using
       fb: FormBinding,
-      merge: MergeFormValue[R[B], T],
-      ev: B =:= AnyContent
-    ): ActionBuilder[[X] =>> R[X] & FormValue[T], B] = ab.ensureValidFormAndRedirectIfSaveForLater(
+      merge: MergeFormValue[R[ContentType], T],
+      ev: ContentType =:= AnyContent
+    ): ActionBuilder[[X] =>> R[X] & FormValue[T], ContentType] = ab.ensureValidFormAndRedirectIfSaveForLater(
       _ => form,
       viewToServeWhenFormHasErrors
     )
 
     def genericFilter(
-      condition: R[B] => Boolean,
-      resultWhenConditionNotMet: R[B] => Result
-    ): ActionBuilder[R, B] = genericFilterAsync(
+                       condition: R[ContentType] => Boolean,
+                       resultWhenConditionNotMet: R[ContentType] => Result
+    ): ActionBuilder[R, ContentType] = genericFilterAsync(
       request => Future.successful(condition(request)),
       request => Future.successful(resultWhenConditionNotMet(request))
     )
 
     def genericFilterAsync(
-      condition: R[B] => Future[Boolean],
-      resultWhenConditionNotMet: R[B] => Future[Result]
-    ): ActionBuilder[R, B] = ab.andThen(new ActionFilter[R]:
+                            condition: R[ContentType] => Future[Boolean],
+                            resultWhenConditionNotMet: R[ContentType] => Future[Result]
+    ): ActionBuilder[R, ContentType] = ab.andThen(new ActionFilter[R]:
       protected def executionContext: ExecutionContext = ec
 
       @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
       def filter[A](rA: R[A]): Future[Option[Result]] =
-        val rB: R[B] = rA.asInstanceOf[R[B]]
+        val rB: R[ContentType] = rA.asInstanceOf[R[ContentType]]
         for
           ok <- condition(rB)
           result <- if ok then Future.successful(None) else resultWhenConditionNotMet(rB).map(Some(_))
         yield result)
 
-    def genericActionFunction[P[_]](f: R[B] => P[B]): ActionBuilder[P, B] = ab.andThen(new ActionFunction[R, P] {
+    def genericActionFunction[P[_]](f: R[ContentType] => P[ContentType]): ActionBuilder[P, ContentType] = ab.andThen(new ActionFunction[R, P] {
       protected def executionContext: ExecutionContext = ec
 
       @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
@@ -200,7 +200,7 @@ extends RequestAwareLogging:
       ): Future[Result] = block(f.asInstanceOf[R[A] => P[A]](request))
     })
 
-    def refine[P[_]](refineF: R[B] => Either[Result, P[B]]): ActionBuilder[P, B] = ab.andThen(new ActionRefiner[R, P] {
+    def refine[P[_]](refineF: R[ContentType] => Either[Result, P[ContentType]]): ActionBuilder[P, ContentType] = ab.andThen(new ActionRefiner[R, P] {
       protected def executionContext: ExecutionContext = ec
 
       @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
@@ -209,7 +209,7 @@ extends RequestAwareLogging:
       )
     })
 
-    def refineAsync[P[_]](refineF: R[B] => Future[Either[Result, P[B]]]): ActionBuilder[P, B] = ab.andThen(new ActionRefiner[R, P] {
+    def refineAsync[P[_]](refineF: R[ContentType] => Future[Either[Result, P[ContentType]]]): ActionBuilder[P, ContentType] = ab.andThen(new ActionRefiner[R, P] {
       protected def executionContext: ExecutionContext = ec
 
       @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
