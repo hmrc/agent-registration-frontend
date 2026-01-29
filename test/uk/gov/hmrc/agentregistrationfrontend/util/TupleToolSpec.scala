@@ -42,7 +42,7 @@ extends UnitSpec:
 
     "getByType" should:
       "retrieve an existing element" in:
-        val t = (1, "string", true)
+        val t: (Int, String, Boolean) = (1, "string", true)
         t.getByType[Int] shouldBe 1
         t.getByType[String] shouldBe "string"
         t.getByType[Boolean] shouldBe true
