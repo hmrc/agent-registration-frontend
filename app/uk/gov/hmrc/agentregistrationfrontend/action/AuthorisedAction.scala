@@ -25,7 +25,6 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-import uk.gov.hmrc.agentregistrationfrontend.util.TupleMacros
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
 import uk.gov.hmrc.agentregistrationfrontend.views.ErrorResults
 import uk.gov.hmrc.auth.core.*
@@ -35,33 +34,8 @@ import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 
 import scala.annotation.nowarn
-import scala.compiletime.*
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-
-class RequestWithData[
-  A,
-  Data <: Tuple
-](
-  val request: Request[A],
-  val data: Data // Data is a tuple
-)
-extends WrappedRequest[A](request):
-
-  inline def get[T]: T =
-    inline if constValue[TupleMacros.IsMember[Data, T]] then
-      find[Data, T](data)
-    else
-      fail[Data, T]
-
-  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
-  private inline def find[Tup, E](t: Any): E =
-    inline erasedValue[Tup] match
-      case _: (E *: tail) => t.asInstanceOf[E *: tail].head
-      case _: (h *: tail) => find[tail, E](t.asInstanceOf[h *: tail].tail)
-      case _ => error("Type not found in tuple")
-
-  private inline def fail[Data, T]: Nothing = ${ TupleMacros.failImpl[Data, T] }
 
 class AuthorisedRequest[A](
   val internalUserId: InternalUserId,
