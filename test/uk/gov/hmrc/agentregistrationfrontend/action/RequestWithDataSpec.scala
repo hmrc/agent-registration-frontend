@@ -43,6 +43,20 @@ extends UnitSpec:
 //      data = ("foo", 42, "boo")
 //    )
 
+  type IsExotic = (Orange | Banana.type) & Fruit
+  type IsNotExotic = (Apple | Pear) & Fruit
+
+  sealed trait Fruit
+
+  final case class Apple(smell: Int)
+  extends Fruit
+  final case class Pear(smell: Int)
+  extends Fruit
+  final case class Orange(smell: Int)
+  extends Fruit
+  case object Banana
+  extends Fruit
+
   "showcase" in:
     val r: RequestX[AnyContentAsEmpty.type] = RequestWithData(
       request = FakeRequest(),
@@ -57,3 +71,33 @@ extends UnitSpec:
     val r2 = r.add(Results.BadRequest)
     r2.get[Status] shouldBe Results.BadRequest
     r2.update(Results.NotFound).get[Status] shouldBe Results.NotFound
+    val r3: RequestWithData[AnyContentAsEmpty.type, (Fruit, Status, String, Int, Option[AgentApplication], (Int, Float))] = r2.add(Banana)
+
+    r3.get[Fruit] shouldBe Banana
+    r3.update[Fruit](Apple(1)).get[Fruit] shouldBe Apple(1)
+
+    val r4: RequestWithData[
+      AnyContentAsEmpty.type,
+      (
+        Fruit,
+        Status,
+        String,
+        Int,
+        Option[AgentApplication],
+        (Int, Float)
+      )
+    ] = r3.update[Fruit](Apple(1))
+
+    val r5: RequestWithData[
+      AnyContentAsEmpty.type,
+      (
+        IsNotExotic,
+        Status,
+        String,
+        Int,
+        Option[AgentApplication],
+        (Int, Float)
+      )
+    ] = r4.replace[Fruit, IsNotExotic](Apple(2))
+
+    println(r5)

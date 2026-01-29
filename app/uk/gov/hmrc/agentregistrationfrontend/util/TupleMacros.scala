@@ -36,6 +36,16 @@ object TupleMacros:
           case true => true
           case false => HasDuplicates[t]
 
+  type Replace[
+    Tup <: Tuple,
+    Old,
+    New
+  ] <: Tuple =
+    Tup match
+      case Old *: tail => New *: tail
+      case h *: tail => h *: Replace[tail, Old, New]
+      case EmptyTuple => EmptyTuple
+
   private def cleanType(s: String): String = s.replaceAll("\\bscala\\.Predef\\.", "")
     .replaceAll("\\bscala\\.", "")
 

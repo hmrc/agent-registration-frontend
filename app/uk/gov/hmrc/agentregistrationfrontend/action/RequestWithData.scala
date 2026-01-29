@@ -48,6 +48,13 @@ extends WrappedRequest[A](request):
     else
       fail[Data, T]
 
+  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+  inline def replace[Old, New](value: New): RequestWithData[A, TupleMacros.Replace[Data, Old, New]] =
+    inline if constValue[TupleMacros.IsMember[Data, Old]] then
+      new RequestWithData(request, replaceType[Data, Old, New](data, value).asInstanceOf[TupleMacros.Replace[Data, Old, New]])
+    else
+      fail[Data, Old]
+
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
   private inline def find[Tup, E](t: Any): E =
     inline erasedValue[Tup] match
@@ -64,6 +71,21 @@ extends WrappedRequest[A](request):
       case _: (h *: tail) =>
         val cons = t.asInstanceOf[h *: tail]
         (cons.head *: replace[tail, E](cons.tail, v)).asInstanceOf[Tup]
+      case _ => error("Type not found in tuple")
+
+  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
+  private inline def replaceType[
+    Tup <: Tuple,
+    Old,
+    New
+  ](t: Tup, v: New): Tuple =
+    inline erasedValue[Tup] match
+      case _: (Old *: tail) =>
+        val cons = t.asInstanceOf[Old *: tail]
+        v *: cons.tail
+      case _: (h *: tail) =>
+        val cons = t.asInstanceOf[h *: tail]
+        cons.head *: replaceType[tail, Old, New](cons.tail, v)
       case _ => error("Type not found in tuple")
 
   private inline def fail[Data, T]: Nothing = ${ TupleMacros.failImpl[Data, T] }
