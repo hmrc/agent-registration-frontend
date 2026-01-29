@@ -30,7 +30,7 @@ object TupleTool:
   object AbsentIn:
     transparent inline given [T, Tup <: Tuple]: AbsentIn[T, Tup] = ${ absentInImpl[T, Tup] }
 
-  @implicitNotFound("Type ${T} is not present in the tuple ${Tup}")
+//  @implicitNotFound("Type ${T} is not present in the tuple ${Tup}")
   infix trait PresentIn[T, Tup <: Tuple]
 
   object PresentIn:
@@ -73,21 +73,34 @@ object TupleTool:
 
     inline def addByType[T](value: T)(using T AbsentIn Data): T *: Data = value *: data
 
-    inline def getByType[T](using T PresentIn Data): T = find[Data, T](data)
+    inline def getByType[T](using T PresentIn Data): T =
+      inline if constValue[IsMember[T, Data]] then
+        find[Data, T](data)
+      else
+        ???
 
-    inline def updateByType[T](value: T)(using T PresentIn Data): Data = replace[Data, T](data, value)
+    inline def updateByType[T](value: T)(using T PresentIn Data): Data =
+      inline if constValue[IsMember[T, Data]] then
+        replace[Data, T](data, value)
+      else
+        ???
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     inline def replaceByType[Old, New](value: New)(using
       Old PresentIn Data,
       New AbsentIn Data
-    ): Replace[Old, New, Data] = replaceType[Data, Old, New](
-      data,
-      value
-    ).asInstanceOf[Replace[Old, New, Data]]
+    ): Replace[Old, New, Data] =
+      inline if constValue[IsMember[Old, Data]] then
+        replaceType[Data, Old, New](data, value).asInstanceOf[Replace[Old, New, Data]]
+      else
+        ???
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    inline def deleteByType[T](using T PresentIn Data): Delete[T, Data] = deleteType[Data, T](data).asInstanceOf[Delete[T, Data]]
+    inline def deleteByType[T](using T PresentIn Data): Delete[T, Data] =
+      inline if constValue[IsMember[T, Data]] then
+        deleteType[Data, T](data).asInstanceOf[Delete[T, Data]]
+      else
+        ???
 
     inline def ensureUnique: Data =
       inline if constValue[HasDuplicates[Data]] then
