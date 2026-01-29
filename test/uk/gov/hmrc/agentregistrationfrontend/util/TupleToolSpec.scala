@@ -24,6 +24,25 @@ import scala.compiletime.testing.typeCheckErrors
 class TupleToolSpec
 extends UnitSpec:
 
+  trait Animal
+  case class Fish(name: String)
+  extends Animal
+  case class Chicken(name: String)
+  extends Animal
+  case class Frog(name: String)
+  extends Animal
+  type CanSwim = Animal & (Fish | Frog)
+
+  "tuple.get" in:
+    val kermit: Frog = Frog("Kermit")
+    val t = (1, "string", true, kermit, false)
+    t.get[Int] shouldBe 1
+    t.get[String] shouldBe "string"
+    t.get[Boolean] shouldBe true
+//    t.getByType[Any]
+//    t.getByType[Animal] shouldBe Frog("kermit")
+    t.get[Frog] shouldBe kermit
+
   "TupleTool" should:
 
     "addByType" should:
@@ -43,9 +62,9 @@ extends UnitSpec:
     "getByType" should:
       "retrieve an existing element" in:
         val t: (Int, String, Boolean) = (1, "string", true)
-        t.getByType[Int] shouldBe 1
-        t.getByType[String] shouldBe "string"
-        t.getByType[Boolean] shouldBe true
+        t.get[Int] shouldBe 1
+        t.get[String] shouldBe "string"
+        t.get[Boolean] shouldBe true
 
       "fail to compile when type is missing" in:
         val errors = typeCheckErrors("""

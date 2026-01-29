@@ -56,7 +56,7 @@ object TupleTool:
 
     inline def addByType[T](value: T)(using T AbsentIn Data): T *: Data = value *: data
 
-    inline def getByType[T](using T PresentIn Data): T = find[Data, T](data)
+    inline def get[T](using T PresentIn Data): T = getImpl[Data, T](data)
 
     inline def updateByType[T](value: T)(using T PresentIn Data): Data = replace[Data, T](data, value)
 
@@ -89,10 +89,10 @@ object TupleTool:
           case false => HasDuplicates[t]
 
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
-  private inline def find[Tup, E](t: Any): E =
+  private inline def getImpl[Tup <: Tuple, E](t: Tup): E =
     inline erasedValue[Tup] match
       case _: (E *: tail) => t.asInstanceOf[E *: tail].head
-      case _: (h *: tail) => find[tail, E](t.asInstanceOf[h *: tail].tail)
+      case _: (h *: tail) => getImpl[tail, E](t.asInstanceOf[h *: tail].tail)
       case _ => ???
 
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
