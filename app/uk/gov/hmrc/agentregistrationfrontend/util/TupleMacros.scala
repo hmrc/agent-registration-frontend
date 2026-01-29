@@ -55,8 +55,10 @@ object TupleMacros:
       case h *: tail => h *: Delete[tail, T]
       case EmptyTuple => EmptyTuple
 
-  private def cleanType(s: String): String = s.replaceAll("\\bscala\\.Predef\\.", "")
+  private def cleanType(s: String): String = s
+    .replaceAll("\\bscala\\.Predef\\.", "")
     .replaceAll("\\bscala\\.", "")
+    .replaceAll("\\bjava\\.lang\\.", "")
 
   /** Fail compilation if type T is not part of the Data tuple. Print readable compiler error message.
     */
