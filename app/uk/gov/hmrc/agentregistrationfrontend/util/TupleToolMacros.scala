@@ -140,13 +140,14 @@ object TupleToolMacros:
 
     val target = TypeRepr.of[T]
 
+    @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
     def check(tup: TypeRepr): List[Expr[Any]] =
       tup.dealias match
         case AppliedType(base, List(head, tail)) if base.typeSymbol === TypeRepr.of[*:].typeSymbol =>
           if head =:= target then
             val name = cleanType(target.show)
             val msg = s"Type '$name' is already present in the tuple."
-            List('{ scala.compiletime.error(${Expr(msg)}) })
+            List('{ scala.compiletime.error(${ Expr(msg) }) })
           else
             val headCheck =
               if head.typeSymbol.isTypeParam || head.typeSymbol.isAbstractType then
@@ -161,7 +162,7 @@ object TupleToolMacros:
             if arg =:= target then
               val name = cleanType(target.show)
               val msg = s"Type '$name' is already present in the tuple."
-              List('{ scala.compiletime.error(${Expr(msg)}) })
+              List('{ scala.compiletime.error(${ Expr(msg) }) })
             else if arg.typeSymbol.isTypeParam || arg.typeSymbol.isAbstractType then
               arg.asType match
                 case '[a] => List('{ scala.compiletime.summonInline[scala.util.NotGiven[a =:= T]] })
@@ -171,7 +172,7 @@ object TupleToolMacros:
         case t =>
           if t =:= TypeRepr.of[Tup] then
             val msg = s"Cannot prove absence of ${cleanType(target.show)} in generic tuple ${cleanType(t.show)}"
-            List('{ scala.compiletime.error(${Expr(msg)}) })
+            List('{ scala.compiletime.error(${ Expr(msg) }) })
           else
             t.asType match
               case '[t] => List('{ scala.compiletime.summonInline[TupleTool.AbsentIn[T, t & Tuple]] })
