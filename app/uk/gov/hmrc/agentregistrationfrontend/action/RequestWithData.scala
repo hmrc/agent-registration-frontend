@@ -38,7 +38,7 @@ extends WrappedRequest[ContentType](request):
 
   inline def replace[Old, New](value: New): RequestWithData[ContentType, TupleTool.Replace[Old, New, Data]] = RequestWithData.create(
     request,
-    data.replaceByType[Old, New](value)
+    data.replace[Old, New](value)
   )
 
   inline def delete[T]: RequestWithData[ContentType, TupleTool.Delete[T, Data]] = RequestWithData.create(request, data.deleteByType[T])

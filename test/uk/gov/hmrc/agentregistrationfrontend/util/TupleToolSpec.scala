@@ -101,17 +101,17 @@ extends UnitSpec:
             |  * Boolean""".stripMargin
         )
 
-    "replaceByType" should:
+    "replace" should:
       "replace an existing type with a new type" in:
         val t = (1, "string", true)
-        val result = t.replaceByType[String, Double](2.0)
+        val result = t.replace[String, Double](2.0)
         result shouldBe (1, 2.0, true)
 
       "fail to compile when old type is missing" in:
         val errors = typeCheckErrors("""
           import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
           val t = (1, "string", true)
-          t.replaceByType[Double, Char]('c')
+          t.replace[Double, Char]('c')
         """)
         errors.map(_.message) shouldBe List(
           """Type 'Double' is not present in the tuple.
