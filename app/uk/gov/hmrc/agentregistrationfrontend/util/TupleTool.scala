@@ -18,24 +18,18 @@ package uk.gov.hmrc.agentregistrationfrontend.util
 
 import scala.annotation.implicitNotFound
 import scala.compiletime.*
-import scala.util.NotGiven
 
 object TupleTool:
 
   @implicitNotFound("Type ${T} is already present in the tuple ${Tup}")
-  trait Absent[Tup <: Tuple, T]
+  infix trait AbsentIn[T, Tup <: Tuple]
 
-  object Absent:
-
-    given empty[T]: Absent[EmptyTuple, T] = new Absent[EmptyTuple, T] {}
-    given nonEmpty[H, T <: Tuple, E](using
-      NotGiven[H =:= E],
-      Absent[T, E]
-    ): Absent[H *: T, E] = new Absent[H *: T, E] {}
+  object AbsentIn:
+    transparent inline given [T, Tup <: Tuple]: AbsentIn[T, Tup] = ${ TupleToolMacros.absentInImpl[T, Tup] }
 
   extension [Data <: Tuple](data: Data)
 
-    inline def addByType[T](value: T)(using Absent[Data, T]): T *: Data = value *: data
+    inline def addByType[T](value: T)(using T AbsentIn Data): T *: Data = value *: data
 
     inline def getByType[T]: T =
       inline if constValue[TupleToolMacros.IsMember[Data, T]] then

@@ -33,7 +33,7 @@ import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 
-import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.Absent
+import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.AbsentIn
 import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -49,16 +49,18 @@ extends RequestAwareLogging:
   def refine[
     A, // ContentType
     Data <: Tuple
-  ](using
-    RequestWithData[A, Data],
-    Absent[Data, Credentials],
-    Absent[Data, GroupId],
-    Absent[Data, InternalUserId]
+  ](
+    request: RequestWithData[A, Data]
+  )(
+    using
+    Credentials AbsentIn Data,
+    GroupId AbsentIn Data,
+    InternalUserId AbsentIn Data
   ): Future[Either[Result, RequestWithData[
     A,
     InternalUserId *: GroupId *: Credentials *: Data
   ]]] = {
-    val request: RequestWithData[A, Data] = summon[RequestWithData[A, Data]]
+    given RequestWithData[A, Data] = request
     af.authorised(
       AuthProviders(GovernmentGateway)
         and AffinityGroup.Agent

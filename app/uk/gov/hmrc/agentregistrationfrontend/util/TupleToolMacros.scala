@@ -131,3 +131,50 @@ object TupleToolMacros:
 
     val msg = s"Type '$targetName' is already present in the tuple."
     '{ scala.compiletime.error(${ Expr(msg) }) }
+
+  def absentInImpl[
+    T: Type,
+    Tup <: Tuple: Type
+  ](using Quotes): Expr[TupleTool.AbsentIn[T, Tup]] =
+    import quotes.reflect.*
+
+    val target = TypeRepr.of[T]
+
+    def check(tup: TypeRepr): List[Expr[Any]] =
+      tup.dealias match
+        case AppliedType(base, List(head, tail)) if base.typeSymbol === TypeRepr.of[*:].typeSymbol =>
+          if head =:= target then
+            val name = cleanType(target.show)
+            val msg = s"Type '$name' is already present in the tuple."
+            List('{ scala.compiletime.error(${Expr(msg)}) })
+          else
+            val headCheck =
+              if head.typeSymbol.isTypeParam || head.typeSymbol.isAbstractType then
+                head.asType match
+                  case '[h] => List('{ scala.compiletime.summonInline[scala.util.NotGiven[h =:= T]] })
+              else
+                Nil
+            headCheck ++ check(tail)
+        case t if t.typeSymbol === TypeRepr.of[EmptyTuple].typeSymbol => Nil
+        case AppliedType(base, args) if base.typeSymbol.name.startsWith("Tuple") && base.typeSymbol.owner.fullName === "scala" =>
+          args.flatMap { arg =>
+            if arg =:= target then
+              val name = cleanType(target.show)
+              val msg = s"Type '$name' is already present in the tuple."
+              List('{ scala.compiletime.error(${Expr(msg)}) })
+            else if arg.typeSymbol.isTypeParam || arg.typeSymbol.isAbstractType then
+              arg.asType match
+                case '[a] => List('{ scala.compiletime.summonInline[scala.util.NotGiven[a =:= T]] })
+            else
+              Nil
+          }
+        case t =>
+          if t =:= TypeRepr.of[Tup] then
+            val msg = s"Cannot prove absence of ${cleanType(target.show)} in generic tuple ${cleanType(t.show)}"
+            List('{ scala.compiletime.error(${Expr(msg)}) })
+          else
+            t.asType match
+              case '[t] => List('{ scala.compiletime.summonInline[TupleTool.AbsentIn[T, t & Tuple]] })
+
+    val checks = check(TypeRepr.of[Tup])
+    Expr.block(checks, '{ new TupleTool.AbsentIn[T, Tup] {} })

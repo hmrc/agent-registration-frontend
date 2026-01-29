@@ -31,7 +31,7 @@ class RequestWithData[
 )
 extends WrappedRequest[A](request):
 
-  inline def add[T](value: T)(using TupleTool.Absent[Data, T]): RequestWithData[A, T *: Data] = new RequestWithData(request, data.addByType(value))
+  inline def add[T](value: T)(using T AbsentIn Data): RequestWithData[A, T *: Data] = new RequestWithData(request, data.addByType(value))
 
   inline def get[T]: T = data.getByType[T]
 

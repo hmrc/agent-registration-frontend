@@ -200,12 +200,12 @@ extends RequestAwareLogging:
       ): Future[Result] = block(f.asInstanceOf[R[A] => P[A]](request))
     })
 
-    def genericActionRefiner[P[_]](f: R[B] => Either[Result, P[B]]): ActionBuilder[P, B] = ab.andThen(new ActionRefiner[R, P] {
+    def refine[P[_]](refineF: R[B] => Either[Result, P[B]]): ActionBuilder[P, B] = ab.andThen(new ActionRefiner[R, P] {
       protected def executionContext: ExecutionContext = ec
 
       @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
       protected def refine[A](request: R[A]): Future[Either[Result, P[A]]] = Future.successful(
-        f.asInstanceOf[R[A] => Either[Result, P[A]]](request)
+        refineF.asInstanceOf[R[A] => Either[Result, P[A]]](request)
       )
     })
 

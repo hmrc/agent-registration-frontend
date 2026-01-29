@@ -37,12 +37,6 @@ extends UnitSpec:
     (String, Int, Option[AgentApplication], (Int, Float))
   ]
 
-//  "duplicate test" in:
-//    RequestWithData(
-//      request = FakeRequest(),
-//      data = ("foo", 42, "boo")
-//    )
-
   type IsExotic = (Orange | Banana.type) & Fruit
   type IsNotExotic = (Apple | Pear) & Fruit
 

@@ -59,7 +59,7 @@ extends RequestAwareLogging:
   object Applicant:
 
     val authorised2: ActionBuilder[AuthorisedRequest2, AnyContent] = action2
-      .refineAsync(implicit request => authorisedAction2.refine)
+      .refineAsync(authorisedAction2.refine)
 
     val authorised: ActionBuilder[AuthorisedRequest, AnyContent] = action
       .andThen(authorisedAction)
