@@ -37,11 +37,11 @@ extends UnitSpec:
     (String, Int, Option[AgentApplication], (Int, Float))
   ]
 
-  "duplicate test" in:
-    RequestWithData(
-      request = FakeRequest(),
-      data = ("foo", 42, "boo")
-    )
+//  "duplicate test" in:
+//    RequestWithData(
+//      request = FakeRequest(),
+//      data = ("foo", 42, "boo")
+//    )
 
   "showcase" in:
     val r: RequestX[AnyContentAsEmpty.type] = RequestWithData(
@@ -53,5 +53,7 @@ extends UnitSpec:
     r.get[Int] shouldBe 42
 //    r.get[Float] won't compile
     r.get[Option[AgentApplication]] shouldBe None
-    val r2 = r.add(Results.BadRequest).add(Results.NotFound)
+    // r.add(Results.BadRequest).add(Results.NotFound)
+    val r2 = r.add(Results.BadRequest)
     r2.get[Status] shouldBe Results.BadRequest
+    r2.update(Results.NotFound).get[Status] shouldBe Results.NotFound

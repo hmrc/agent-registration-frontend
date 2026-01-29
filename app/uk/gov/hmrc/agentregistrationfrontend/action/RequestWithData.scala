@@ -42,11 +42,28 @@ extends WrappedRequest[A](request):
     else
       fail[Data, T]
 
+  inline def update[T](value: T): RequestWithData[A, Data] =
+    inline if constValue[TupleMacros.IsMember[Data, T]] then
+      new RequestWithData(request, replace[Data, T](data, value))
+    else
+      fail[Data, T]
+
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
   private inline def find[Tup, E](t: Any): E =
     inline erasedValue[Tup] match
       case _: (E *: tail) => t.asInstanceOf[E *: tail].head
       case _: (h *: tail) => find[tail, E](t.asInstanceOf[h *: tail].tail)
+      case _ => error("Type not found in tuple")
+
+  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
+  private inline def replace[Tup <: Tuple, E](t: Tup, v: E): Tup =
+    inline erasedValue[Tup] match
+      case _: (E *: tail) =>
+        val cons = t.asInstanceOf[E *: tail]
+        (v *: cons.tail).asInstanceOf[Tup]
+      case _: (h *: tail) =>
+        val cons = t.asInstanceOf[h *: tail]
+        (cons.head *: replace[tail, E](cons.tail, v)).asInstanceOf[Tup]
       case _ => error("Type not found in tuple")
 
   private inline def fail[Data, T]: Nothing = ${ TupleMacros.failImpl[Data, T] }
