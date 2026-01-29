@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.action
 
 import uk.gov.hmrc.agentregistrationfrontend.util.TupleMacros
-import scala.compiletime.*
+import uk.gov.hmrc.agentregistrationfrontend.util.TupleExtensions.*
 import play.api.mvc.Request
 import play.api.mvc.WrappedRequest
 
@@ -26,90 +26,20 @@ class RequestWithData[
   Data <: Tuple
 ](
   val request: Request[A],
-  val data: Data // Data is a tuple
+  val data: Data
 )
 extends WrappedRequest[A](request):
 
-  inline def add[T](value: T): RequestWithData[A, T *: Data] =
-    inline if constValue[TupleMacros.IsMember[Data, T]] then
-      failDuplicate[Data, T]
-    else
-      new RequestWithData(request, value *: data)
+  inline def add[T](value: T): RequestWithData[A, T *: Data] = new RequestWithData(request, data.addByType(value))
 
-  inline def get[T]: T =
-    inline if constValue[TupleMacros.IsMember[Data, T]] then
-      find[Data, T](data)
-    else
-      fail[Data, T]
+  inline def get[T]: T = data.getByType[T]
 
-  inline def update[T](value: T): RequestWithData[A, Data] =
-    inline if constValue[TupleMacros.IsMember[Data, T]] then
-      new RequestWithData(request, replace[Data, T](data, value))
-    else
-      fail[Data, T]
+  inline def update[T](value: T): RequestWithData[A, Data] = new RequestWithData(request, data.updateByType(value))
 
-  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
   inline def replace[Old, New](value: New): RequestWithData[A, TupleMacros.Replace[Data, Old, New]] =
-    inline if constValue[TupleMacros.IsMember[Data, Old]] then
-      new RequestWithData(request, replaceType[Data, Old, New](data, value).asInstanceOf[TupleMacros.Replace[Data, Old, New]])
-    else
-      fail[Data, Old]
+    new RequestWithData(request, data.replaceByType[Old, New](value))
 
-  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-  inline def delete[T]: RequestWithData[A, TupleMacros.Delete[Data, T]] =
-    inline if constValue[TupleMacros.IsMember[Data, T]] then
-      new RequestWithData(request, deleteType[Data, T](data).asInstanceOf[TupleMacros.Delete[Data, T]])
-    else
-      fail[Data, T]
-
-  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
-  private inline def find[Tup, E](t: Any): E =
-    inline erasedValue[Tup] match
-      case _: (E *: tail) => t.asInstanceOf[E *: tail].head
-      case _: (h *: tail) => find[tail, E](t.asInstanceOf[h *: tail].tail)
-      case _ => error("Type not found in tuple")
-
-  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
-  private inline def replace[Tup <: Tuple, E](t: Tup, v: E): Tup =
-    inline erasedValue[Tup] match
-      case _: (E *: tail) =>
-        val cons = t.asInstanceOf[E *: tail]
-        (v *: cons.tail).asInstanceOf[Tup]
-      case _: (h *: tail) =>
-        val cons = t.asInstanceOf[h *: tail]
-        (cons.head *: replace[tail, E](cons.tail, v)).asInstanceOf[Tup]
-      case _ => error("Type not found in tuple")
-
-  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
-  private inline def replaceType[
-    Tup <: Tuple,
-    Old,
-    New
-  ](t: Tup, v: New): Tuple =
-    inline erasedValue[Tup] match
-      case _: (Old *: tail) =>
-        val cons = t.asInstanceOf[Old *: tail]
-        v *: cons.tail
-      case _: (h *: tail) =>
-        val cons = t.asInstanceOf[h *: tail]
-        cons.head *: replaceType[tail, Old, New](cons.tail, v)
-      case _ => error("Type not found in tuple")
-
-  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
-  private inline def deleteType[
-    Tup <: Tuple,
-    T
-  ](t: Tup): Tuple =
-    inline erasedValue[Tup] match
-      case _: (T *: tail) => t.asInstanceOf[T *: tail].tail
-      case _: (h *: tail) =>
-        val cons = t.asInstanceOf[h *: tail]
-        cons.head *: deleteType[tail, T](cons.tail)
-      case _ => error("Type not found in tuple")
-
-  private inline def fail[Data, T]: Nothing = ${ TupleMacros.failImpl[Data, T] }
-
-  private inline def failDuplicate[Data, T]: Nothing = ${ TupleMacros.failDuplicateImpl[Data, T] }
+  inline def delete[T]: RequestWithData[A, TupleMacros.Delete[Data, T]] = new RequestWithData(request, data.deleteByType[T])
 
 object RequestWithData:
 
@@ -119,10 +49,4 @@ object RequestWithData:
   ](
     request: Request[A],
     data: Data
-  ): RequestWithData[A, Data] =
-    inline if constValue[TupleMacros.HasDuplicates[Data]] then
-      failDuplicateTuple[Data]
-    else
-      new RequestWithData(request, data)
-
-  private inline def failDuplicateTuple[Data]: Nothing = ${ TupleMacros.failDuplicateTupleImpl[Data] }
+  ): RequestWithData[A, Data] = new RequestWithData(request, data.ensureUnique)
