@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.util
 
-import scala.annotation.implicitNotFound
 import scala.compiletime.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
@@ -24,17 +23,15 @@ import scala.quoted.*
 
 object TupleTool:
 
-  @implicitNotFound("Type ${T} is already present in the tuple ${Tup}")
   infix trait AbsentIn[T, Tup <: Tuple]
 
   object AbsentIn:
-    transparent inline given [T, Tup <: Tuple]: AbsentIn[T, Tup] = ${ absentInImpl[T, Tup] }
+    transparent inline given [T, Tup <: Tuple]: AbsentIn[T, Tup] = ${ makeAbsentInOrFailImpl[T, Tup] }
 
-//  @implicitNotFound("Type ${T} is not present in the tuple ${Tup}")
   infix trait PresentIn[T, Tup <: Tuple]
 
   object PresentIn:
-    transparent inline given [T, Tup <: Tuple]: PresentIn[T, Tup] = ${ presentInImpl[T, Tup] }
+    transparent inline given [T, Tup <: Tuple]: PresentIn[T, Tup] = ${ makePresentInOrFailImpl[T, Tup] }
 
   type Replace[
     Old,
@@ -179,7 +176,7 @@ object TupleTool:
     val msg = s"Type '$targetName' is already present in the tuple."
     '{ scala.compiletime.error(${ Expr(msg) }) }
 
-  def absentInImpl[
+  private def makeAbsentInOrFailImpl[
     T: Type,
     Tup <: Tuple: Type
   ](using Quotes): Expr[TupleTool.AbsentIn[T, Tup]] =
@@ -227,7 +224,7 @@ object TupleTool:
     val checks = check(TypeRepr.of[Tup])
     Expr.block(checks, '{ new TupleTool.AbsentIn[T, Tup] {} })
 
-  def presentInImpl[
+  private def makePresentInOrFailImpl[
     T: Type,
     Tup <: Tuple: Type
   ](using Quotes): Expr[TupleTool.PresentIn[T, Tup]] =
