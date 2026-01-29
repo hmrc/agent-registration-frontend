@@ -34,7 +34,6 @@ import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 
 import scala.annotation.nowarn
-import scala.annotation.implicitNotFound
 import scala.compiletime.*
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -48,7 +47,11 @@ class RequestWithData[
 )
 extends WrappedRequest[A](request):
 
-  inline def get[T](using ev: RequestWithData.HasType[Data, T]): T = find[Data, T](data)
+  inline def get[T]: T =
+    inline if constValue[RequestWithData.IsMember[Data, T]] then
+      find[Data, T](data)
+    else
+      RequestWithData.fail[Data, T]
 
   private inline def find[Tup, E](t: Any): E =
     inline erasedValue[Tup] match
@@ -58,13 +61,13 @@ extends WrappedRequest[A](request):
 
 object RequestWithData:
 
-  @implicitNotFound("Type ${T} is not present in the data tuple: ${Data}")
-  trait HasType[Data, T]
+  type IsMember[Tup <: Tuple, T] <: Boolean =
+    Tup match
+      case T *: _ => true
+      case _ *: tail => IsMember[tail, T]
+      case EmptyTuple => false
 
-  object HasType:
-
-    given head[H, T <: Tuple]: HasType[H *: T, H] = new HasType[H *: T, H] {}
-    given tail[H, T <: Tuple, E](using HasType[T, E]): HasType[H *: T, E] = new HasType[H *: T, E] {}
+  inline def fail[Data, T]: Nothing = ${ RequestWithDataMacros.failImpl[Data, T] }
 
 class AuthorisedRequest[A](
   val internalUserId: InternalUserId,
