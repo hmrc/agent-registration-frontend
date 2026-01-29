@@ -19,6 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.noni
 import com.softwaremill.quicklens.modify
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
@@ -42,9 +44,31 @@ class NumberOfKeyIndividualsController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions
+  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
     .Applicant
     .getApplicationInProgress
+    .ensure(
+      _.agentApplication match
+        case _: AgentApplication.IsNotSoleTrader => true
+        case _: AgentApplication.IsSoleTrader => false
+      ,
+      implicit request =>
+        logger.warn("Sole traders cannot specify number of key individuals, redirecting to task list for the correct links")
+        Redirect(AppRoutes.apply.TaskListController.show.url)
+    )
+    .ensure(
+      _.agentApplication match
+        case _: AgentApplication.IsNotIncorporated => true
+        case _: AgentApplication.IsIncorporated => false
+      ,
+      implicit request =>
+        logger.warn(
+          "Incorporated businesses should have the number of key individuals determined by Companies House results, redirecting to task list for the correct links"
+        )
+        Redirect(AppRoutes.apply.TaskListController.show.url)
+    )
+
+  def show: Action[AnyContent] = baseAction
     .async:
       implicit request =>
         businessPartnerRecordService
@@ -53,7 +77,7 @@ extends FrontendController(mcc, actions):
             Ok(view(
               form = NumberOfKeyIndividualsForm.form
                 .fill:
-                  request.agentApplication.requiredKeyIndividuals
+                  request.agentApplication.numberOfRequiredKeyIndividuals
               ,
               entityName = bprOpt
                 .map(_.getEntityName)
@@ -63,9 +87,7 @@ extends FrontendController(mcc, actions):
             ))
 
   def submit: Action[AnyContent] =
-    actions
-      .Applicant
-      .getApplicationInProgress
+    baseAction
       .ensureValidFormAndRedirectIfSaveForLaterAsync[NumberOfRequiredKeyIndividuals](
         form = NumberOfKeyIndividualsForm.form,
         viewToServeWhenFormHasErrors =
@@ -85,15 +107,28 @@ extends FrontendController(mcc, actions):
       )
       .async:
         implicit request: (AgentApplicationRequest[AnyContent] & FormValue[NumberOfRequiredKeyIndividuals]) =>
-          val requiredKeyIndividuals: NumberOfRequiredKeyIndividuals = request.formValue
-          logger.warn(s"Number of key individuals selected: $requiredKeyIndividuals")
-          val updatedApplication: AgentApplication = request
-            .agentApplication
-            .modify(_.requiredKeyIndividuals)
-            .setTo(Some(requiredKeyIndividuals)) // TODO: work out how to preserve/copy any existing lists when changing number/type
+          request.agentApplication match
+            case _: AgentApplication.IsSoleTrader =>
+              // this should never happen because of the baseAction guard
+              throw new IllegalStateException("Sole traders cannot specify number of key individuals")
+            case _: AgentApplication.IsIncorporated =>
+              // this should never happen because of the baseAction guard
+              throw new IllegalStateException("Incorporated businesses should have the number of key individuals determined by Companies House results")
+            case application: (AgentApplication.IsNotSoleTrader & AgentApplication.IsNotIncorporated) =>
+              val numberOfRequiredKeyIndividuals: NumberOfRequiredKeyIndividuals = request.formValue
+              val updatedApplication =
+                application match
+                  case application: AgentApplicationScottishPartnership =>
+                    application
+                      .modify(_.numberOfRequiredKeyIndividuals)
+                      .setTo(Some(numberOfRequiredKeyIndividuals))
+                  case application: AgentApplicationGeneralPartnership =>
+                    application
+                      .modify(_.numberOfRequiredKeyIndividuals)
+                      .setTo(Some(numberOfRequiredKeyIndividuals))
 
-          agentApplicationService
-            .upsert(updatedApplication)
-            .map: _ =>
-              Redirect(AppRoutes.apply.listdetails.EnterKeyIndividualController.show.url)
+              agentApplicationService
+                .upsert(updatedApplication)
+                .map: _ =>
+                  Redirect(AppRoutes.apply.listdetails.EnterKeyIndividualController.show.url)
       .redirectIfSaveForLater

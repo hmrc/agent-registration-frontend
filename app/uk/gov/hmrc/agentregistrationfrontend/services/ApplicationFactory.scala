@@ -48,8 +48,7 @@ class ApplicationFactory @Inject() (
     agentDetails = None,
     refusalToDealWithCheckResult = None,
     deceasedCheckResult = None,
-    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    requiredKeyIndividuals = None
+    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
   )
 
   def makeNewAgentApplicationLlp(
@@ -71,7 +70,7 @@ class ApplicationFactory @Inject() (
     refusalToDealWithCheckResult = None,
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    requiredKeyIndividuals = None
+    numberOfRequiredKeyIndividuals = None
   )
 
   def makeNewAgentApplicationLimitedCompany(
@@ -93,7 +92,7 @@ class ApplicationFactory @Inject() (
     refusalToDealWithCheckResult = None,
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    requiredKeyIndividuals = None
+    numberOfRequiredKeyIndividuals = None
   )
 
   def makeNewAgentApplicationGeneralPartnership(
@@ -114,7 +113,7 @@ class ApplicationFactory @Inject() (
     agentDetails = None,
     refusalToDealWithCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    requiredKeyIndividuals = None
+    numberOfRequiredKeyIndividuals = None
   )
 
   def makeNewAgentApplicationLimitedPartnership(
@@ -136,7 +135,7 @@ class ApplicationFactory @Inject() (
     refusalToDealWithCheckResult = None,
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    requiredKeyIndividuals = None
+    numberOfRequiredKeyIndividuals = None
   )
 
   def makeNewAgentApplicationScottishLimitedPartnership(
@@ -158,7 +157,7 @@ class ApplicationFactory @Inject() (
     refusalToDealWithCheckResult = None,
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    requiredKeyIndividuals = None
+    numberOfRequiredKeyIndividuals = None
   )
 
   def makeNewAgentApplicationScottishPartnership(
@@ -179,5 +178,5 @@ class ApplicationFactory @Inject() (
     agentDetails = None,
     refusalToDealWithCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    requiredKeyIndividuals = None
+    numberOfRequiredKeyIndividuals = None
   )

@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
-import uk.gov.hmrc.agentregistration.shared.lists.FiveOrFewer
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistration.shared.llp.*
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.Country
@@ -179,7 +179,7 @@ trait TdBase:
     emailAddress = Some(bprEmailAddress)
   )
 
-  def fiveOrFewerKeyIndividuals: FiveOrFewer = FiveOrFewer(
+  def fiveOrFewerKeyIndividuals: FiveOrLess = FiveOrLess(
     numberOfKeyIndividuals = 3
   )
 

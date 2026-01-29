@@ -38,7 +38,7 @@ extends ViewSpec:
     .setTo(ApplicationState.Submitted)
 
   val doc: Document = Jsoup.parse(
-    viewTemplate(submittedAgentApplication).body
+    viewTemplate(submittedAgentApplication.asLlpApplication).body
   )
 
   "ProvideDetailsStartPage" should:

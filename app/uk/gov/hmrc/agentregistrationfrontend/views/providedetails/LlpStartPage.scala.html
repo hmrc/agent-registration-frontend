@@ -24,7 +24,7 @@
 )
 
 @(
-        agentApplication: AgentApplication
+        agentApplication: AgentApplicationLlp
 )(implicit
         request: RequestHeader,
         messages: Messages
@@ -33,12 +33,7 @@
 @key = @{"llpProvideDetailsStart"}
 @pageTitle = @{messages(s"$key.title")}
 @applicantName = @{agentApplication.getApplicantContactDetails.applicantName.value}
-@applicantBusinessName = @{
-  agentApplication match {
-    case llp: AgentApplicationLlp => llp.getBusinessDetails.companyProfile.companyName
-    case _ => ""
-  }
-}
+@applicantBusinessName = @{agentApplication.getBusinessDetails.companyProfile.companyName}
 
 @layout(pageTitle = pageTitle, suppressBackLink = true) {
     <h1 class="govuk-heading-l">@pageTitle</h1>

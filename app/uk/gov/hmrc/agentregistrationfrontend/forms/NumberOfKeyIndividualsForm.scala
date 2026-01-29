@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.forms
 
 import play.api.data.Forms
-import uk.gov.hmrc.agentregistration.shared.lists.FiveOrFewer
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
@@ -48,7 +48,7 @@ object NumberOfKeyIndividualsForm:
       howManyIndividuals -> mandatoryIf(
         isEqual(howManyIndividualsOption, HowManyIndividualsOption.FiveOrLess.toString),
         numberFromString(howManyIndividuals)
-          .transform[FiveOrFewer](FiveOrFewer.apply, _.numberOfKeyIndividuals)
+          .transform[FiveOrLess](FiveOrLess.apply, _.numberOfKeyIndividuals)
           .verifying(
             ErrorKeys.invalidInputErrorMessage(howManyIndividuals),
             _.isValid
@@ -79,7 +79,7 @@ object NumberOfKeyIndividualsForm:
           case culprit => throw new IllegalStateException(s"Form validation failed: $culprit")
         },
         {
-          case n: FiveOrFewer => (HowManyIndividualsOption.FiveOrLess, Some(n), None)
+          case n: FiveOrLess => (HowManyIndividualsOption.FiveOrLess, Some(n), None)
           case n: SixOrMore => (HowManyIndividualsOption.SixOrMore, None, Some(n))
         }
       )
