@@ -36,20 +36,6 @@ object TupleTool:
   object PresentIn:
     transparent inline given [T, Tup <: Tuple]: PresentIn[T, Tup] = ${ presentInImpl[T, Tup] }
 
-  private type IsMember[T, Tup <: Tuple] <: Boolean =
-    Tup match
-      case T *: _ => true
-      case _ *: tail => IsMember[T, tail]
-      case EmptyTuple => false
-
-  private type HasDuplicates[Tup <: Tuple] <: Boolean =
-    Tup match
-      case EmptyTuple => false
-      case h *: t =>
-        IsMember[h, t] match
-          case true => true
-          case false => HasDuplicates[t]
-
   type Replace[
     Old,
     New,
@@ -87,10 +73,23 @@ object TupleTool:
     inline def deleteByType[T](using T PresentIn Data): Delete[T, Data] = deleteType[Data, T](data).asInstanceOf[Delete[T, Data]]
 
     inline def ensureUnique: Data =
-      inline if constValue[HasDuplicates[Data]] then
-        failDuplicateTuple[Data]
-      else
-        data
+      if constValue[HasDuplicates[Data]]
+      then failDuplicateTuple[Data]
+      else data
+
+  private type IsMember[T, Tup <: Tuple] <: Boolean =
+    Tup match
+      case T *: _ => true
+      case _ *: tail => IsMember[T, tail]
+      case EmptyTuple => false
+
+  private type HasDuplicates[Tup <: Tuple] <: Boolean =
+    Tup match
+      case EmptyTuple => false
+      case h *: t =>
+        IsMember[h, t] match
+          case true => true
+          case false => HasDuplicates[t]
 
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
   private inline def find[Tup, E](t: Any): E =
