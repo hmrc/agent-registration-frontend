@@ -73,34 +73,18 @@ object TupleTool:
 
     inline def addByType[T](value: T)(using T AbsentIn Data): T *: Data = value *: data
 
-    inline def getByType[T](using T PresentIn Data): T =
-      inline if constValue[IsMember[T, Data]] then
-        find[Data, T](data)
-      else
-        ???
+    inline def getByType[T](using T PresentIn Data): T = find[Data, T](data)
 
-    inline def updateByType[T](value: T)(using T PresentIn Data): Data =
-      inline if constValue[IsMember[T, Data]] then
-        replace[Data, T](data, value)
-      else
-        ???
+    inline def updateByType[T](value: T)(using T PresentIn Data): Data = replace[Data, T](data, value)
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     inline def replaceByType[Old, New](value: New)(using
       Old PresentIn Data,
       New AbsentIn Data
-    ): Replace[Old, New, Data] =
-      inline if constValue[IsMember[Old, Data]] then
-        replaceType[Data, Old, New](data, value).asInstanceOf[Replace[Old, New, Data]]
-      else
-        ???
+    ): Replace[Old, New, Data] = replaceType[Data, Old, New](data, value).asInstanceOf[Replace[Old, New, Data]]
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    inline def deleteByType[T](using T PresentIn Data): Delete[T, Data] =
-      inline if constValue[IsMember[T, Data]] then
-        deleteType[Data, T](data).asInstanceOf[Delete[T, Data]]
-      else
-        ???
+    inline def deleteByType[T](using T PresentIn Data): Delete[T, Data] = deleteType[Data, T](data).asInstanceOf[Delete[T, Data]]
 
     inline def ensureUnique: Data =
       inline if constValue[HasDuplicates[Data]] then
@@ -113,7 +97,7 @@ object TupleTool:
     inline erasedValue[Tup] match
       case _: (E *: tail) => t.asInstanceOf[E *: tail].head
       case _: (h *: tail) => find[tail, E](t.asInstanceOf[h *: tail].tail)
-      case _ => error("Type not found in tuple")
+      case _ => ???
 
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
   private inline def replace[Tup <: Tuple, E](t: Tup, v: E): Tup =
@@ -124,7 +108,7 @@ object TupleTool:
       case _: (h *: tail) =>
         val cons = t.asInstanceOf[h *: tail]
         (cons.head *: replace[tail, E](cons.tail, v)).asInstanceOf[Tup]
-      case _ => error("Type not found in tuple")
+      case _ => ???
 
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
   private inline def replaceType[
@@ -139,7 +123,7 @@ object TupleTool:
       case _: (h *: tail) =>
         val cons = t.asInstanceOf[h *: tail]
         cons.head *: replaceType[tail, Old, New](cons.tail, v)
-      case _ => error("Type not found in tuple")
+      case _ => ???
 
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
   private inline def deleteType[Tup <: Tuple, T](t: Tup): Tuple =
@@ -148,7 +132,7 @@ object TupleTool:
       case _: (h *: tail) =>
         val cons = t.asInstanceOf[h *: tail]
         cons.head *: deleteType[tail, T](cons.tail)
-      case _ => error("Type not found in tuple")
+      case _ => ???
 
   private inline def failDuplicateTuple[Data]: Nothing = ${ failDuplicateTupleImpl[Data] }
 
