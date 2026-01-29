@@ -30,17 +30,17 @@ object TupleTool:
   object AbsentIn:
     transparent inline given [T, Tup <: Tuple]: AbsentIn[T, Tup] = ${ absentInImpl[T, Tup] }
 
-  type IsMember[T, Tup <: Tuple] <: Boolean =
+  infix type PresentIn[T, Tup <: Tuple] <: Boolean =
     Tup match
       case T *: _ => true
-      case _ *: tail => IsMember[T, tail]
+      case _ *: tail => T PresentIn tail
       case EmptyTuple => false
 
   type HasDuplicates[Tup <: Tuple] <: Boolean =
     Tup match
       case EmptyTuple => false
       case h *: t =>
-        IsMember[h, t] match
+        PresentIn[h, t] match
           case true => true
           case false => HasDuplicates[t]
 
@@ -68,27 +68,27 @@ object TupleTool:
     inline def addByType[T](value: T)(using T AbsentIn Data): T *: Data = value *: data
 
     inline def getByType[T]: T =
-      inline if constValue[IsMember[T, Data]] then
+      inline if constValue[PresentIn[T, Data]] then
         find[Data, T](data)
       else
         fail[T, Data]
 
     inline def updateByType[T](value: T): Data =
-      inline if constValue[IsMember[T, Data]] then
+      inline if constValue[PresentIn[T, Data]] then
         replace[Data, T](data, value)
       else
         fail[T, Data]
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     inline def replaceByType[Old, New](value: New): Replace[Old, New, Data] =
-      inline if constValue[IsMember[Old, Data]] then
+      inline if constValue[PresentIn[Old, Data]] then
         replaceType[Data, Old, New](data, value).asInstanceOf[Replace[Old, New, Data]]
       else
         fail[Old, Data]
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     inline def deleteByType[T]: Delete[T, Data] =
-      inline if constValue[IsMember[T, Data]] then
+      inline if constValue[PresentIn[T, Data]] then
         deleteType[Data, T](data).asInstanceOf[Delete[T, Data]]
       else
         fail[T, Data]
