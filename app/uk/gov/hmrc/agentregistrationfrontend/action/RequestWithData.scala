@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 import play.api.mvc.Request
 import play.api.mvc.WrappedRequest
 import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
-import uk.gov.hmrc.agentregistrationfrontend.util.TupleToolMacros
+import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool
 
 class RequestWithData[
   ContentType,
@@ -36,12 +36,12 @@ extends WrappedRequest[ContentType](request):
 
   inline def update[T](value: T): RequestWithData[ContentType, Data] = RequestWithData.create(request, data.updateByType(value))
 
-  inline def replace[Old, New](value: New): RequestWithData[ContentType, TupleToolMacros.Replace[Data, Old, New]] = RequestWithData.create(
+  inline def replace[Old, New](value: New): RequestWithData[ContentType, TupleTool.Replace[Data, Old, New]] = RequestWithData.create(
     request,
     data.replaceByType[Old, New](value)
   )
 
-  inline def delete[T]: RequestWithData[ContentType, TupleToolMacros.Delete[Data, T]] = RequestWithData.create(request, data.deleteByType[T])
+  inline def delete[T]: RequestWithData[ContentType, TupleTool.Delete[Data, T]] = RequestWithData.create(request, data.deleteByType[T])
 
 object RequestWithData:
 

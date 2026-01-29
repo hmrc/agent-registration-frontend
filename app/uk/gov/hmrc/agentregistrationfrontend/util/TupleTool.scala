@@ -18,6 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.util
 
 import scala.annotation.implicitNotFound
 import scala.compiletime.*
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+
+import scala.quoted.*
 
 object TupleTool:
 
@@ -25,40 +28,73 @@ object TupleTool:
   infix trait AbsentIn[T, Tup <: Tuple]
 
   object AbsentIn:
-    transparent inline given [T, Tup <: Tuple]: AbsentIn[T, Tup] = ${ TupleToolMacros.absentInImpl[T, Tup] }
+    transparent inline given [T, Tup <: Tuple]: AbsentIn[T, Tup] = ${ absentInImpl[T, Tup] }
+
+  type IsMember[Tup <: Tuple, T] <: Boolean =
+    Tup match
+      case T *: _ => true
+      case _ *: tail => IsMember[tail, T]
+      case EmptyTuple => false
+
+  type HasDuplicates[Tup <: Tuple] <: Boolean =
+    Tup match
+      case EmptyTuple => false
+      case h *: t =>
+        IsMember[t, h] match
+          case true => true
+          case false => HasDuplicates[t]
+
+  type Replace[
+    Tup <: Tuple,
+    Old,
+    New
+  ] <: Tuple =
+    Tup match
+      case Old *: tail => New *: tail
+      case h *: tail => h *: Replace[tail, Old, New]
+      case EmptyTuple => EmptyTuple
+
+  type Delete[
+    Tup <: Tuple,
+    T
+  ] <: Tuple =
+    Tup match
+      case T *: tail => tail
+      case h *: tail => h *: Delete[tail, T]
+      case EmptyTuple => EmptyTuple
 
   extension [Data <: Tuple](data: Data)
 
     inline def addByType[T](value: T)(using T AbsentIn Data): T *: Data = value *: data
 
     inline def getByType[T]: T =
-      inline if constValue[TupleToolMacros.IsMember[Data, T]] then
+      inline if constValue[IsMember[Data, T]] then
         find[Data, T](data)
       else
         fail[Data, T]
 
     inline def updateByType[T](value: T): Data =
-      inline if constValue[TupleToolMacros.IsMember[Data, T]] then
+      inline if constValue[IsMember[Data, T]] then
         replace[Data, T](data, value)
       else
         fail[Data, T]
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    inline def replaceByType[Old, New](value: New): TupleToolMacros.Replace[Data, Old, New] =
-      inline if constValue[TupleToolMacros.IsMember[Data, Old]] then
-        replaceType[Data, Old, New](data, value).asInstanceOf[TupleToolMacros.Replace[Data, Old, New]]
+    inline def replaceByType[Old, New](value: New): Replace[Data, Old, New] =
+      inline if constValue[IsMember[Data, Old]] then
+        replaceType[Data, Old, New](data, value).asInstanceOf[Replace[Data, Old, New]]
       else
         fail[Data, Old]
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    inline def deleteByType[T]: TupleToolMacros.Delete[Data, T] =
-      inline if constValue[TupleToolMacros.IsMember[Data, T]] then
-        deleteType[Data, T](data).asInstanceOf[TupleToolMacros.Delete[Data, T]]
+    inline def deleteByType[T]: Delete[Data, T] =
+      inline if constValue[IsMember[Data, T]] then
+        deleteType[Data, T](data).asInstanceOf[Delete[Data, T]]
       else
         fail[Data, T]
 
     inline def ensureUnique: Data =
-      inline if constValue[TupleToolMacros.HasDuplicates[Data]] then
+      inline if constValue[HasDuplicates[Data]] then
         failDuplicateTuple[Data]
       else
         data
@@ -105,6 +141,131 @@ object TupleTool:
         cons.head *: deleteType[tail, T](cons.tail)
       case _ => error("Type not found in tuple")
 
-  private inline def fail[Data, T]: Nothing = ${ TupleToolMacros.failImpl[Data, T] }
+  private inline def fail[Data, T]: Nothing = ${ failImpl[Data, T] }
 
-  private inline def failDuplicateTuple[Data]: Nothing = ${ TupleToolMacros.failDuplicateTupleImpl[Data] }
+  private inline def failDuplicateTuple[Data]: Nothing = ${ failDuplicateTupleImpl[Data] }
+
+  private def cleanType(s: String): String = s
+    .replaceAll("\\bscala\\.Predef\\.", "")
+    .replaceAll("\\bscala\\.", "")
+    .replaceAll("\\bjava\\.lang\\.", "")
+
+  /** Fail compilation if type T is not part of the Data tuple. Print readable compiler error message.
+    */
+  def failImpl[
+    Data: Type,
+    T: Type
+  ](using Quotes): Expr[Nothing] =
+    import quotes.reflect.*
+
+    val consSymbol: Symbol = TypeRepr.of[*:].typeSymbol
+    val emptyTupleSymbol: Symbol = TypeRepr.of[EmptyTuple].typeSymbol
+
+    def formatType(t: TypeRepr): String = cleanType(t.show)
+
+    @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+    def getTupleElements(t: TypeRepr): List[String] =
+      t.dealias match
+        case AppliedType(base, List(head, tail)) if base.typeSymbol === consSymbol => formatType(head) :: getTupleElements(tail)
+        case t if t.typeSymbol === emptyTupleSymbol => Nil
+        case AppliedType(base, args) if base.typeSymbol.name.startsWith("Tuple") && base.typeSymbol.owner.fullName === "scala" => args.map(formatType)
+        case other => List(formatType(other))
+
+    val dataElements: List[String] = getTupleElements(TypeRepr.of[Data])
+    val targetName: String = formatType(TypeRepr.of[T])
+
+    val formattedList: String =
+      if dataElements.isEmpty then
+        "  (Empty Tuple)"
+      else
+        dataElements.map(s => s"  * $s").mkString("\n")
+
+    val msg = s"Type '$targetName' is not present in the tuple.\nAvailable types:\n$formattedList"
+    '{ scala.compiletime.error(${ Expr(msg) }) }
+
+  def failDuplicateImpl[
+    Data: Type,
+    T: Type
+  ](using Quotes): Expr[Nothing] =
+    import quotes.reflect.*
+    val targetName: String = cleanType(TypeRepr.of[T].show)
+    val msg = s"Type '$targetName' is already present in the tuple."
+    '{ scala.compiletime.error(${ Expr(msg) }) }
+
+  def failDuplicateTupleImpl[Data: Type](using Quotes): Expr[Nothing] =
+    import quotes.reflect.*
+
+    @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+    def getTypes(t: TypeRepr): List[TypeRepr] =
+      t.dealias match
+        case AppliedType(base, List(head, tail)) if base.typeSymbol === TypeRepr.of[*:].typeSymbol => head :: getTypes(tail)
+        case t if t.typeSymbol === TypeRepr.of[EmptyTuple].typeSymbol => Nil
+        case AppliedType(base, args) if base.typeSymbol.name.startsWith("Tuple") && base.typeSymbol.owner.fullName === "scala" => args
+        case other => List(other)
+
+    val types = getTypes(TypeRepr.of[Data])
+
+    @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+    def findFirstDuplicate(
+      ts: List[TypeRepr],
+      seen: List[TypeRepr]
+    ): Option[TypeRepr] =
+      ts match
+        case Nil => None
+        case h :: tail =>
+          if seen.exists(s => s =:= h) then Some(h)
+          else findFirstDuplicate(tail, h :: seen)
+
+    val duplicate = findFirstDuplicate(types, Nil)
+    val targetName = duplicate.map(t => cleanType(t.show)).getOrElse("Unknown")
+
+    val msg = s"Type '$targetName' is already present in the tuple."
+    '{ scala.compiletime.error(${ Expr(msg) }) }
+
+  def absentInImpl[
+    T: Type,
+    Tup <: Tuple: Type
+  ](using Quotes): Expr[TupleTool.AbsentIn[T, Tup]] =
+    import quotes.reflect.*
+
+    val target = TypeRepr.of[T]
+
+    @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+    def check(tup: TypeRepr): List[Expr[Any]] =
+      tup.dealias match
+        case AppliedType(base, List(head, tail)) if base.typeSymbol === TypeRepr.of[*:].typeSymbol =>
+          if head =:= target then
+            val name = cleanType(target.show)
+            val msg = s"Type '$name' is already present in the tuple."
+            List('{ scala.compiletime.error(${ Expr(msg) }) })
+          else
+            val headCheck =
+              if head.typeSymbol.isTypeParam || head.typeSymbol.isAbstractType then
+                head.asType match
+                  case '[h] => List('{ scala.compiletime.summonInline[scala.util.NotGiven[h =:= T]] })
+              else
+                Nil
+            headCheck ++ check(tail)
+        case t if t.typeSymbol === TypeRepr.of[EmptyTuple].typeSymbol => Nil
+        case AppliedType(base, args) if base.typeSymbol.name.startsWith("Tuple") && base.typeSymbol.owner.fullName === "scala" =>
+          args.flatMap { arg =>
+            if arg =:= target then
+              val name = cleanType(target.show)
+              val msg = s"Type '$name' is already present in the tuple."
+              List('{ scala.compiletime.error(${ Expr(msg) }) })
+            else if arg.typeSymbol.isTypeParam || arg.typeSymbol.isAbstractType then
+              arg.asType match
+                case '[a] => List('{ scala.compiletime.summonInline[scala.util.NotGiven[a =:= T]] })
+            else
+              Nil
+          }
+        case t =>
+          if t =:= TypeRepr.of[Tup] then
+            val msg = s"Cannot prove absence of ${cleanType(target.show)} in generic tuple ${cleanType(t.show)}"
+            List('{ scala.compiletime.error(${ Expr(msg) }) })
+          else
+            t.asType match
+              case '[t] => List('{ scala.compiletime.summonInline[TupleTool.AbsentIn[T, t & Tuple]] })
+
+    val checks = check(TypeRepr.of[Tup])
+    Expr.block(checks, '{ new TupleTool.AbsentIn[T, Tup] {} })
