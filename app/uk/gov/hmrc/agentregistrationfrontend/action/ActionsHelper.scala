@@ -16,16 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action
 
-import play.api.data.Form
-import play.api.data.FormBinding
+import play.api.data.{Form, FormBinding}
 import play.api.mvc.*
 import play.api.mvc.Results.BadRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 object ActionsHelper
 extends RequestAwareLogging:
@@ -190,7 +188,7 @@ extends RequestAwareLogging:
           result <- if ok then Future.successful(None) else resultWhenConditionNotMet(rB).map(Some(_))
         yield result)
 
-    def genericActionFunction[P[_]](f: R[B] => P[B]): ActionFunction[R, P] = ab.andThen(new ActionFunction[R, P] {
+    def genericActionFunction[P[_]](f: R[B] => P[B]): ActionBuilder[P, B] = ab.andThen(new ActionFunction[R, P] {
       protected def executionContext: ExecutionContext = ec
 
       @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
