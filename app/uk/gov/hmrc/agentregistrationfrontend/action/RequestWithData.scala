@@ -30,7 +30,7 @@ class RequestWithData[
 )
 extends WrappedRequest[ContentType](request):
 
-  inline def add[T](value: T)(using T AbsentIn Data): RequestWithData[ContentType, T *: Data] = RequestWithData.create(request, data.addByType(value))
+  inline def add[T](value: T)(using T AbsentIn Data): RequestWithData[ContentType, T *: Data] = RequestWithData.create(request, data.add(value))
 
   inline def get[T]: T = data.get[T]
 

@@ -49,14 +49,14 @@ extends UnitSpec:
     "addByType" should:
       "add a new element to the tuple" in:
         val t = (1, "string")
-        val result = t.addByType(true)
+        val result = t.add(true)
         result shouldBe (true, 1, "string")
 
       "fail to compile when adding a duplicate type" in:
         val errors = typeCheckErrors("""
           import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
           val t = (1, "string")
-          t.addByType("duplicate")
+          t.add("duplicate")
         """)
         errors.map(_.message) shouldBe List("Type 'String' is already present in the tuple.")
 

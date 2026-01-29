@@ -23,6 +23,28 @@ import scala.quoted.*
 
 object TupleTool:
 
+  extension [Data <: Tuple](data: Data)
+
+    inline def add[T](value: T)(using T AbsentIn Data): T *: Data = value *: data
+
+    inline def get[T](using T PresentIn Data): T = getImpl[Data, T](data)
+
+    inline def update[T](value: T)(using T PresentIn Data): Data = updateImpl[Data, T](data, value)
+
+    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+    inline def replace[Old, New](value: New)(using
+      Old PresentIn Data,
+      New AbsentIn Data
+    ): Replace[Old, New, Data] = replaceImpl[Data, Old, New](data, value).asInstanceOf[Replace[Old, New, Data]]
+
+    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+    inline def delete[T](using T PresentIn Data): Delete[T, Data] = deleteImpl[Data, T](data).asInstanceOf[Delete[T, Data]]
+
+    inline def ensureUnique: Data =
+      if constValue[HasDuplicates[Data]]
+      then failDuplicateTuple[Data]
+      else data
+
   infix trait AbsentIn[T, Tup <: Tuple]
 
   object AbsentIn:
@@ -51,36 +73,6 @@ object TupleTool:
       case T *: tail => tail
       case h *: tail => h *: Delete[T, tail]
       case EmptyTuple => EmptyTuple
-
-  extension [Data <: Tuple](data: Data)
-
-    inline def addByType[T](value: T)(using T AbsentIn Data): T *: Data = value *: data
-
-    inline def get[T](using T PresentIn Data): T =
-      ensureUnique
-      getImpl[Data, T](data)
-
-    inline def update[T](value: T)(using T PresentIn Data): Data =
-      ensureUnique
-      updateImpl[Data, T](data, value)
-
-    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    inline def replace[Old, New](value: New)(using
-      Old PresentIn Data,
-      New AbsentIn Data
-    ): Replace[Old, New, Data] =
-      ensureUnique
-      replaceImpl[Data, Old, New](data, value).asInstanceOf[Replace[Old, New, Data]]
-
-    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    inline def delete[T](using T PresentIn Data): Delete[T, Data] =
-      ensureUnique
-      deleteImpl[Data, T](data).asInstanceOf[Delete[T, Data]]
-
-    inline def ensureUnique: Data =
-      if constValue[HasDuplicates[Data]]
-      then failDuplicateTuple[Data]
-      else data
 
   private type IsMember[T, Tup <: Tuple] <: Boolean =
     Tup match
