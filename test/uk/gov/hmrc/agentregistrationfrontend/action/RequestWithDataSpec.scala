@@ -26,19 +26,15 @@ extends UnitSpec:
 
   type RequestX[A] = RequestWithData[
     A,
-    (String, Int, Option[AgentApplication])
+    (String, Int, Option[AgentApplication], (Int, Float))
   ]
   "showcase" in:
-    val r: RequestX[AnyContentAsEmpty.type] =
-      RequestWithData[
-        AnyContentAsEmpty.type,
-        (String, Int, Option[AgentApplication])
-      ](
-        request = FakeRequest(),
-        data = ("foo", 42, None)
-      )
+    val r: RequestX[AnyContentAsEmpty.type] = RequestWithData(
+      request = FakeRequest(),
+      data = ("foo", 42, None, (11, 3.14f))
+    )
 
     r.get[String] shouldBe "foo"
     r.get[Int] shouldBe 42
     r.get[Float]
-    r.get[Option[AgentApplication]]
+    r.get[Option[AgentApplication]] shouldBe None

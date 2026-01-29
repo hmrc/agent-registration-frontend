@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
+import uk.gov.hmrc.agentregistrationfrontend.util.TupleMacros
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
 import uk.gov.hmrc.agentregistrationfrontend.views.ErrorResults
 import uk.gov.hmrc.auth.core.*
@@ -47,27 +48,16 @@ class RequestWithData[
 )
 extends WrappedRequest[A](request):
 
-  inline def get[T]: T =
-    inline if constValue[RequestWithData.IsMember[Data, T]] then
-      find[Data, T](data)
-    else
-      RequestWithData.fail[Data, T]
+  inline def get[T]: T = find[Data, T](data)
 
+  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
   private inline def find[Tup, E](t: Any): E =
     inline erasedValue[Tup] match
       case _: (E *: tail) => t.asInstanceOf[E *: tail].head
       case _: (h *: tail) => find[tail, E](t.asInstanceOf[h *: tail].tail)
-      case _ => error("Type not found in tuple")
+      case _ => fail[Tup, E]
 
-object RequestWithData:
-
-  type IsMember[Tup <: Tuple, T] <: Boolean =
-    Tup match
-      case T *: _ => true
-      case _ *: tail => IsMember[tail, T]
-      case EmptyTuple => false
-
-  inline def fail[Data, T]: Nothing = ${ RequestWithDataMacros.failImpl[Data, T] }
+  private inline def fail[Data, T]: Nothing = ${ TupleMacros.failImpl[Data, T] }
 
 class AuthorisedRequest[A](
   val internalUserId: InternalUserId,
