@@ -16,14 +16,16 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action
 
-import play.api.data.{Form, FormBinding}
+import play.api.data.Form
+import play.api.data.FormBinding
 import play.api.mvc.*
 import play.api.mvc.Results.BadRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 object ActionsHelper
 extends RequestAwareLogging:
@@ -207,11 +209,11 @@ extends RequestAwareLogging:
       )
     })
 
-    def genericActionRefinerAsync[P[_]](f: R[B] => Future[Either[Result, P[B]]]): ActionBuilder[P, B] = ab.andThen(new ActionRefiner[R, P] {
+    def refineAsync[P[_]](refineF: R[B] => Future[Either[Result, P[B]]]): ActionBuilder[P, B] = ab.andThen(new ActionRefiner[R, P] {
       protected def executionContext: ExecutionContext = ec
 
       @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-      protected def refine[A](request: R[A]): Future[Either[Result, P[A]]] = f.asInstanceOf[R[A] => Future[Either[Result, P[A]]]](request)
+      protected def refine[A](request: R[A]): Future[Either[Result, P[A]]] = refineF.asInstanceOf[R[A] => Future[Either[Result, P[A]]]](request)
     })
 
   extension [

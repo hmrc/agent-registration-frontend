@@ -16,13 +16,15 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action
 
-import com.google.inject.{Inject, Singleton}
+import com.google.inject.Inject
+import com.google.inject.Singleton
 import play.api.mvc.*
 import play.api.mvc.Results.*
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.util.{Errors, RequestAwareLogging}
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
 import uk.gov.hmrc.agentregistrationfrontend.views.ErrorResults
 import uk.gov.hmrc.auth.core.*
@@ -31,8 +33,10 @@ import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 
+import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.Absent
 import scala.annotation.nowarn
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class AuthorisedAction2 @Inject() (
@@ -46,12 +50,15 @@ extends RequestAwareLogging:
     A, // ContentType
     Data <: Tuple
   ](using
-    request: RequestWithData[A, Data]
+    RequestWithData[A, Data],
+    Absent[Data, Credentials],
+    Absent[Data, GroupId],
+    Absent[Data, InternalUserId]
   ): Future[Either[Result, RequestWithData[
     A,
     InternalUserId *: GroupId *: Credentials *: Data
-  ]]] =
-
+  ]]] = {
+    val request: RequestWithData[A, Data] = summon[RequestWithData[A, Data]]
     af.authorised(
       AuthProviders(GovernmentGateway)
         and AffinityGroup.Agent
@@ -119,6 +126,7 @@ extends RequestAwareLogging:
             message = e.toString
           )
         ))
+  }
 
   private def isHmrcAsAgentEnrolmentAssignedToUser[A](allEnrolments: Enrolments) = allEnrolments
     .getEnrolment(appConfig.hmrcAsAgentEnrolment.key)

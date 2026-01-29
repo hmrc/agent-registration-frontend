@@ -16,8 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action
 
-import play.api.mvc.{Request, WrappedRequest}
+import play.api.mvc.Request
+import play.api.mvc.WrappedRequest
 import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
+import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool
 import uk.gov.hmrc.agentregistrationfrontend.util.TupleToolMacros
 
 class RequestWithData[
@@ -29,7 +31,7 @@ class RequestWithData[
 )
 extends WrappedRequest[A](request):
 
-  inline def add[T](value: T): RequestWithData[A, T *: Data] = new RequestWithData(request, data.addByType(value))
+  inline def add[T](value: T)(using TupleTool.Absent[Data, T]): RequestWithData[A, T *: Data] = new RequestWithData(request, data.addByType(value))
 
   inline def get[T]: T = data.getByType[T]
 

@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action
 
-import uk.gov.hmrc.agentregistration.shared.{GroupId, InternalUserId}
+import uk.gov.hmrc.agentregistration.shared.GroupId
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 object Requests:

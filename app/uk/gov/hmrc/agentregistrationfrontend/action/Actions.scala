@@ -18,14 +18,22 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.{AuthorisedRequest2, DefaultRequest}
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.{IndividualAuthorisedAction, IndividualAuthorisedRequest, IndividualAuthorisedWithIdentifiersAction, IndividualAuthorisedWithIdentifiersRequest}
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.{EnrichWithAgentApplicationAction, IndividualProvideDetailsRequest, IndividualProvideDetailsWithApplicationRequest, ProvideDetailsAction}
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.AuthorisedRequest2
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DefaultRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedAction
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersAction
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.EnrichWithAgentApplicationAction
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsWithApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.ProvideDetailsAction
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -51,7 +59,7 @@ extends RequestAwareLogging:
   object Applicant:
 
     val authorised2: ActionBuilder[AuthorisedRequest2, AnyContent] = action2
-      .genericActionRefinerAsync(implicit request => authorisedAction2.refine)
+      .refineAsync(implicit request => authorisedAction2.refine)
 
     val authorised: ActionBuilder[AuthorisedRequest, AnyContent] = action
       .andThen(authorisedAction)
