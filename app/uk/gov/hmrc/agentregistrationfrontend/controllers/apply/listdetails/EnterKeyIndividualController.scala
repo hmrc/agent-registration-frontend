@@ -25,18 +25,20 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ListDetailsController @Inject() (
+class EnterKeyIndividualController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: SimplePage
 )
 extends FrontendController(mcc, actions):
 
+  // TODO: this is a placeholder controller - these methods need to be implemented properly
+
   def show: Action[AnyContent] = actions
     .Applicant
     .getApplicationInProgress:
       implicit request =>
         Ok(view(
-          h1 = "Placeholder for list details page",
-          bodyText = Some("This page is a placeholder until we build the list building UI...")
+          h1 = "Placeholder for enter key individual",
+          bodyText = Some("This page will allow the user to enter the name of a key individual.")
         ))

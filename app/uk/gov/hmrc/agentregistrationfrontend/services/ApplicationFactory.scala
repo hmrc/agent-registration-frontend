@@ -69,7 +69,8 @@ class ApplicationFactory @Inject() (
     agentDetails = None,
     refusalToDealWithCheckResult = None,
     companyStatusCheckResult = None,
-    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
+    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
+    numberOfRequiredKeyIndividuals = None
   )
 
   def makeNewAgentApplicationLimitedCompany(
@@ -90,7 +91,8 @@ class ApplicationFactory @Inject() (
     agentDetails = None,
     refusalToDealWithCheckResult = None,
     companyStatusCheckResult = None,
-    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
+    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
+    numberOfRequiredKeyIndividuals = None
   )
 
   def makeNewAgentApplicationGeneralPartnership(
@@ -110,7 +112,8 @@ class ApplicationFactory @Inject() (
     amlsDetails = None,
     agentDetails = None,
     refusalToDealWithCheckResult = None,
-    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
+    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
+    numberOfRequiredKeyIndividuals = None
   )
 
   def makeNewAgentApplicationLimitedPartnership(
@@ -131,7 +134,8 @@ class ApplicationFactory @Inject() (
     agentDetails = None,
     refusalToDealWithCheckResult = None,
     companyStatusCheckResult = None,
-    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
+    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
+    numberOfRequiredKeyIndividuals = None
   )
 
   def makeNewAgentApplicationScottishLimitedPartnership(
@@ -152,7 +156,8 @@ class ApplicationFactory @Inject() (
     agentDetails = None,
     refusalToDealWithCheckResult = None,
     companyStatusCheckResult = None,
-    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
+    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
+    numberOfRequiredKeyIndividuals = None
   )
 
   def makeNewAgentApplicationScottishPartnership(
@@ -172,5 +177,6 @@ class ApplicationFactory @Inject() (
     amlsDetails = None,
     agentDetails = None,
     refusalToDealWithCheckResult = None,
-    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
+    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
+    numberOfRequiredKeyIndividuals = None
   )

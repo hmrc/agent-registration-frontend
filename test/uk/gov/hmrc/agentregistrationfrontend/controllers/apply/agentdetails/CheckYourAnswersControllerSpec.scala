@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
@@ -34,49 +34,49 @@ extends ControllerSpec:
 
   object agentApplication:
 
-    val complete: AgentApplicationLlp =
+    val complete: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterBprAddressSelected
 
-    val missingVerifiedEmail: AgentApplicationLlp =
+    val missingVerifiedEmail: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterContactTelephoneSelected
 
-    val missingAddress: AgentApplicationLlp =
+    val missingAddress: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterVerifiedEmailAddressSelected
 
-    val missingEmail: AgentApplicationLlp =
+    val missingEmail: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterBprTelephoneNumberSelected
 
-    val missingTelephone: AgentApplicationLlp =
+    val missingTelephone: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterBusinessNameProvided
 
-    val missingBusinessName: AgentApplicationLlp =
+    val missingBusinessName: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
         .afterEmailAddressVerified
 
   private final case class TestCaseForCya(
-    application: AgentApplicationLlp,
+    application: AgentApplication,
     name: String,
     expectedRedirect: Option[String] = None
   )

@@ -307,6 +307,26 @@ amlsCheckYourAnswers.notApplicable = n/a
 amlsCheckYourAnswers.evidence.label = Evidence of anti-money laundering supervision
 amlsCheckYourAnswers.change = Change
 
+# Lists
+lists.caption.title.Partnership = Partner and tax adviser information
+lists.caption.title.LimitedCompany = Director and tax adviser information
+numberOfKeyIndividuals.title.Partnership = How many partners are there at {0}?
+numberOfKeyIndividuals.title.LimitedCompany = How many directors are there at {0}?
+numberOfKeyIndividuals.title.LimitedLiabilityPartnership = How many LLP members are there at {0}?
+numberOfKeyIndividuals.hint.Partnership = Only tell us about people with the title ‘partner’. Do not include partner organisations.
+numberOfKeyIndividuals.hint.LimitedLiabilityPartnership = Only tell us about people listed as LLP members on Companies House. Do not include partner organisations.
+numberOfKeyIndividuals.hint.LimitedCompany = Only tell us about people with the title ‘director’.
+numberOfKeyIndividuals.FiveOrLess = 5 or fewer
+numberOfKeyIndividuals.SixOrMore = 6 or more
+numberOfKeyIndividuals.error.required = Select how many partners there are
+exactNumberOfOfficials.label = What is the exact number?
+exactNumberOfOfficials.error.required = Enter a number between 1 and 5, for example 3
+exactNumberOfOfficials.error.invalid = Enter a number between 1 and 5, for example 3
+numberOfOfficialsWhoDealWithTax.error.required = Enter the number who are responsible for tax matters, for example 12 or 3
+numberOfOfficialsWhoDealWithTax.error.invalid = Enter the number who are responsible for tax matters, for example 12 or 3
+numberOfOfficialsWhoDealWithTax.label = How many are responsible for tax matters?
+numberOfOfficialsWhoDealWithTax.hint = This means material responsibility for tax advice activities or significant authority over HMRC interactions.
+
 # Apply / Declaration
 declaration.title = Declaration
 declaration.p1 = I am authorised by {0} to apply for an agent services account with HMRC.

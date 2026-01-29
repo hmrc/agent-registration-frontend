@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontact
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
@@ -42,25 +42,25 @@ extends ControllerSpec:
 
   private object agentApplication:
 
-    val beforeTelephoneProvided: AgentApplicationLlp =
+    val beforeTelephoneProvided: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
         .afterNameDeclared
 
-    val beforeEmailAddressProvided: AgentApplicationLlp =
+    val beforeEmailAddressProvided: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
         .afterTelephoneNumberProvided
 
-    val afterEmailAddressProvided: AgentApplicationLlp =
+    val afterEmailAddressProvided: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
         .afterEmailAddressProvided
 
-    val afterEmailAddressVerified: AgentApplicationLlp =
+    val afterEmailAddressVerified: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionContactDetails
