@@ -30,6 +30,12 @@ class RequestWithData[
 )
 extends WrappedRequest[A](request):
 
+  inline def add[T](value: T): RequestWithData[A, T *: Data] =
+    inline if constValue[TupleMacros.IsMember[Data, T]] then
+      failDuplicate[Data, T]
+    else
+      new RequestWithData(request, value *: data)
+
   inline def get[T]: T =
     inline if constValue[TupleMacros.IsMember[Data, T]] then
       find[Data, T](data)
@@ -44,3 +50,21 @@ extends WrappedRequest[A](request):
       case _ => error("Type not found in tuple")
 
   private inline def fail[Data, T]: Nothing = ${ TupleMacros.failImpl[Data, T] }
+
+  private inline def failDuplicate[Data, T]: Nothing = ${ TupleMacros.failDuplicateImpl[Data, T] }
+
+object RequestWithData:
+
+  inline def apply[
+    A,
+    Data <: Tuple
+  ](
+    request: Request[A],
+    data: Data
+  ): RequestWithData[A, Data] =
+    inline if constValue[TupleMacros.HasDuplicates[Data]] then
+      failDuplicateTuple[Data]
+    else
+      new RequestWithData(request, data)
+
+  private inline def failDuplicateTuple[Data]: Nothing = ${ TupleMacros.failDuplicateTupleImpl[Data] }

@@ -28,6 +28,17 @@ object TupleMacros:
       case _ *: tail => IsMember[tail, T]
       case EmptyTuple => false
 
+  type HasDuplicates[Tup <: Tuple] <: Boolean =
+    Tup match
+      case EmptyTuple => false
+      case h *: t =>
+        IsMember[t, h] match
+          case true => true
+          case false => HasDuplicates[t]
+
+  private def cleanType(s: String): String = s.replaceAll("\\bscala\\.Predef\\.", "")
+    .replaceAll("\\bscala\\.", "")
+
   /** Fail compilation if type T is not part of the Data tuple. Print readable compiler error message.
     */
   def failImpl[
@@ -39,9 +50,7 @@ object TupleMacros:
     val consSymbol: Symbol = TypeRepr.of[*:].typeSymbol
     val emptyTupleSymbol: Symbol = TypeRepr.of[EmptyTuple].typeSymbol
 
-    def formatType(t: TypeRepr): String = t.show
-      .replaceAll("\\bscala\\.Predef\\.", "")
-      .replaceAll("\\bscala\\.", "")
+    def formatType(t: TypeRepr): String = cleanType(t.show)
 
     @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
     def getTupleElements(t: TypeRepr): List[String] =
@@ -61,4 +70,43 @@ object TupleMacros:
         dataElements.map(s => s"  * $s").mkString("\n")
 
     val msg = s"Type '$targetName' is not present in the tuple.\nAvailable types:\n$formattedList"
+    '{ scala.compiletime.error(${ Expr(msg) }) }
+
+  def failDuplicateImpl[
+    Data: Type,
+    T: Type
+  ](using Quotes): Expr[Nothing] =
+    import quotes.reflect.*
+    val targetName: String = cleanType(TypeRepr.of[T].show)
+    val msg = s"Type '$targetName' is already present in the tuple."
+    '{ scala.compiletime.error(${ Expr(msg) }) }
+
+  def failDuplicateTupleImpl[Data: Type](using Quotes): Expr[Nothing] =
+    import quotes.reflect.*
+
+    @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+    def getTypes(t: TypeRepr): List[TypeRepr] =
+      t.dealias match
+        case AppliedType(base, List(head, tail)) if base.typeSymbol === TypeRepr.of[*:].typeSymbol => head :: getTypes(tail)
+        case t if t.typeSymbol === TypeRepr.of[EmptyTuple].typeSymbol => Nil
+        case AppliedType(base, args) if base.typeSymbol.name.startsWith("Tuple") && base.typeSymbol.owner.fullName === "scala" => args
+        case other => List(other)
+
+    val types = getTypes(TypeRepr.of[Data])
+
+    @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+    def findFirstDuplicate(
+      ts: List[TypeRepr],
+      seen: List[TypeRepr]
+    ): Option[TypeRepr] =
+      ts match
+        case Nil => None
+        case h :: tail =>
+          if seen.exists(s => s =:= h) then Some(h)
+          else findFirstDuplicate(tail, h :: seen)
+
+    val duplicate = findFirstDuplicate(types, Nil)
+    val targetName = duplicate.map(t => cleanType(t.show)).getOrElse("Unknown")
+
+    val msg = s"Type '$targetName' is already present in the tuple."
     '{ scala.compiletime.error(${ Expr(msg) }) }
