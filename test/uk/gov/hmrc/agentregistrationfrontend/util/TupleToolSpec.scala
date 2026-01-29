@@ -121,17 +121,17 @@ extends UnitSpec:
             |  * Boolean""".stripMargin
         )
 
-    "deleteByType" should:
+    "delete" should:
       "remove an existing element" in:
         val t = (1, "string", true)
-        val result = t.deleteByType[String]
+        val result = t.delete[String]
         result shouldBe (1, true)
 
       "fail to compile when type is missing" in:
         val errors = typeCheckErrors("""
           import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
           val t = (1, "string", true)
-          t.deleteByType[Double]
+          t.delete[Double]
         """)
         errors.map(_.message) shouldBe List(
           """Type 'Double' is not present in the tuple.

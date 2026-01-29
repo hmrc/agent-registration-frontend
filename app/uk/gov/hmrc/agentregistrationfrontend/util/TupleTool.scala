@@ -68,13 +68,14 @@ object TupleTool:
     inline def replace[Old, New](value: New)(using
       Old PresentIn Data,
       New AbsentIn Data
-    ): Replace[Old, New, Data] = {
+    ): Replace[Old, New, Data] =
       ensureUnique
       replaceImpl[Data, Old, New](data, value).asInstanceOf[Replace[Old, New, Data]]
-    }
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    inline def deleteByType[T](using T PresentIn Data): Delete[T, Data] = deleteType[Data, T](data).asInstanceOf[Delete[T, Data]]
+    inline def delete[T](using T PresentIn Data): Delete[T, Data] =
+      ensureUnique
+      deleteImpl[Data, T](data).asInstanceOf[Delete[T, Data]]
 
     inline def ensureUnique: Data =
       if constValue[HasDuplicates[Data]]
@@ -129,12 +130,12 @@ object TupleTool:
       case _ => ???
 
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
-  private inline def deleteType[Tup <: Tuple, T](t: Tup): Tuple =
+  private inline def deleteImpl[Tup <: Tuple, T](t: Tup): Tuple =
     inline erasedValue[Tup] match
       case _: (T *: tail) => t.asInstanceOf[T *: tail].tail
       case _: (h *: tail) =>
         val cons = t.asInstanceOf[h *: tail]
-        cons.head *: deleteType[tail, T](cons.tail)
+        cons.head *: deleteImpl[tail, T](cons.tail)
       case _ => ???
 
   private def cleanType(s: String): String = s

@@ -41,7 +41,7 @@ extends WrappedRequest[ContentType](request):
     data.replace[Old, New](value)
   )
 
-  inline def delete[T]: RequestWithData[ContentType, TupleTool.Delete[T, Data]] = RequestWithData.create(request, data.deleteByType[T])
+  inline def delete[T]: RequestWithData[ContentType, TupleTool.Delete[T, Data]] = RequestWithData.create(request, data.delete[T])
 
 object RequestWithData:
 
