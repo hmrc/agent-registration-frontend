@@ -23,6 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.CheckResult
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
+import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAgentDetails
@@ -88,6 +89,28 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
           numberOfKeyIndividuals = 3
         )
       )
+    )
+
+    val afterOnlyOneKeyIndividual: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
+      numberOfRequiredKeyIndividuals = Some(
+        FiveOrLess(
+          numberOfKeyIndividuals = 1
+        )
+      )
+    )
+
+    val afterHowManyKeyIndividualsNeedsNoPadding: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
+      numberOfRequiredKeyIndividuals = Some(
+        SixOrMore(
+          numberOfKeyIndividualsResponsibleForTaxMatters = 6
+        )
+      )
+    )
+
+    // when the number of key individuals is of type SixOrMore and padding is required because the number of
+    // key individuals responsible for tax matters is less than minimum list size(5)
+    val afterHowManyKeyIndividualsNeedsPadding: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
+      numberOfRequiredKeyIndividuals = Some(dependencies.sixOrMoreKeyIndividuals)
     )
 
     val afterDeclarationSubmitted: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
