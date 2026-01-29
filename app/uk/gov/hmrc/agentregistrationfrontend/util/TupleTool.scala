@@ -30,37 +30,37 @@ object TupleTool:
   object AbsentIn:
     transparent inline given [T, Tup <: Tuple]: AbsentIn[T, Tup] = ${ absentInImpl[T, Tup] }
 
-  type IsMember[Tup <: Tuple, T] <: Boolean =
+  type IsMember[T, Tup <: Tuple] <: Boolean =
     Tup match
       case T *: _ => true
-      case _ *: tail => IsMember[tail, T]
+      case _ *: tail => IsMember[T, tail]
       case EmptyTuple => false
 
   type HasDuplicates[Tup <: Tuple] <: Boolean =
     Tup match
       case EmptyTuple => false
       case h *: t =>
-        IsMember[t, h] match
+        IsMember[h, t] match
           case true => true
           case false => HasDuplicates[t]
 
   type Replace[
-    Tup <: Tuple,
     Old,
-    New
+    New,
+    Tup <: Tuple
   ] <: Tuple =
     Tup match
       case Old *: tail => New *: tail
-      case h *: tail => h *: Replace[tail, Old, New]
+      case h *: tail => h *: Replace[Old, New, tail]
       case EmptyTuple => EmptyTuple
 
   type Delete[
-    Tup <: Tuple,
-    T
+    T,
+    Tup <: Tuple
   ] <: Tuple =
     Tup match
       case T *: tail => tail
-      case h *: tail => h *: Delete[tail, T]
+      case h *: tail => h *: Delete[T, tail]
       case EmptyTuple => EmptyTuple
 
   extension [Data <: Tuple](data: Data)
@@ -68,30 +68,30 @@ object TupleTool:
     inline def addByType[T](value: T)(using T AbsentIn Data): T *: Data = value *: data
 
     inline def getByType[T]: T =
-      inline if constValue[IsMember[Data, T]] then
+      inline if constValue[IsMember[T, Data]] then
         find[Data, T](data)
       else
-        fail[Data, T]
+        fail[T, Data]
 
     inline def updateByType[T](value: T): Data =
-      inline if constValue[IsMember[Data, T]] then
+      inline if constValue[IsMember[T, Data]] then
         replace[Data, T](data, value)
       else
-        fail[Data, T]
+        fail[T, Data]
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    inline def replaceByType[Old, New](value: New): Replace[Data, Old, New] =
-      inline if constValue[IsMember[Data, Old]] then
-        replaceType[Data, Old, New](data, value).asInstanceOf[Replace[Data, Old, New]]
+    inline def replaceByType[Old, New](value: New): Replace[Old, New, Data] =
+      inline if constValue[IsMember[Old, Data]] then
+        replaceType[Data, Old, New](data, value).asInstanceOf[Replace[Old, New, Data]]
       else
-        fail[Data, Old]
+        fail[Old, Data]
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    inline def deleteByType[T]: Delete[Data, T] =
-      inline if constValue[IsMember[Data, T]] then
-        deleteType[Data, T](data).asInstanceOf[Delete[Data, T]]
+    inline def deleteByType[T]: Delete[T, Data] =
+      inline if constValue[IsMember[T, Data]] then
+        deleteType[Data, T](data).asInstanceOf[Delete[T, Data]]
       else
-        fail[Data, T]
+        fail[T, Data]
 
     inline def ensureUnique: Data =
       inline if constValue[HasDuplicates[Data]] then
@@ -141,7 +141,7 @@ object TupleTool:
         cons.head *: deleteType[tail, T](cons.tail)
       case _ => error("Type not found in tuple")
 
-  private inline def fail[Data, T]: Nothing = ${ failImpl[Data, T] }
+  private inline def fail[T, Data]: Nothing = ${ failImpl[T, Data] }
 
   private inline def failDuplicateTuple[Data]: Nothing = ${ failDuplicateTupleImpl[Data] }
 
@@ -153,8 +153,8 @@ object TupleTool:
   /** Fail compilation if type T is not part of the Data tuple. Print readable compiler error message.
     */
   def failImpl[
-    Data: Type,
-    T: Type
+    T: Type,
+    Data: Type
   ](using Quotes): Expr[Nothing] =
     import quotes.reflect.*
 
@@ -184,8 +184,8 @@ object TupleTool:
     '{ scala.compiletime.error(${ Expr(msg) }) }
 
   def failDuplicateImpl[
-    Data: Type,
-    T: Type
+    T: Type,
+    Data: Type
   ](using Quotes): Expr[Nothing] =
     import quotes.reflect.*
     val targetName: String = cleanType(TypeRepr.of[T].show)
