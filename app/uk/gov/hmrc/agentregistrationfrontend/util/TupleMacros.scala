@@ -22,6 +22,12 @@ import scala.quoted.*
 
 object TupleMacros:
 
+  type IsMember[Tup <: Tuple, T] <: Boolean =
+    Tup match
+      case T *: _ => true
+      case _ *: tail => IsMember[tail, T]
+      case EmptyTuple => false
+
   /** Fail compilation if type T is not part of the Data tuple. Print readable compiler error message.
     */
   def failImpl[
@@ -52,7 +58,7 @@ object TupleMacros:
       if dataElements.isEmpty then
         "  (Empty Tuple)"
       else
-        dataElements.map(s => s"* $s").mkString("\n")
+        dataElements.map(s => s"  * $s").mkString("\n")
 
-    val msg = s"Type $targetName is not present in the tuple:\n$formattedList"
+    val msg = s"Type '$targetName' is not present in the tuple.\nAvailable types:\n$formattedList"
     '{ scala.compiletime.error(${ Expr(msg) }) }

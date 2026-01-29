@@ -48,14 +48,18 @@ class RequestWithData[
 )
 extends WrappedRequest[A](request):
 
-  inline def get[T]: T = find[Data, T](data)
+  inline def get[T]: T =
+    inline if constValue[TupleMacros.IsMember[Data, T]] then
+      find[Data, T](data)
+    else
+      fail[Data, T]
 
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
   private inline def find[Tup, E](t: Any): E =
     inline erasedValue[Tup] match
       case _: (E *: tail) => t.asInstanceOf[E *: tail].head
       case _: (h *: tail) => find[tail, E](t.asInstanceOf[h *: tail].tail)
-      case _ => fail[Tup, E]
+      case _ => error("Type not found in tuple")
 
   private inline def fail[Data, T]: Nothing = ${ TupleMacros.failImpl[Data, T] }
 
