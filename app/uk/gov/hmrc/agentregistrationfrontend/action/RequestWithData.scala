@@ -55,6 +55,13 @@ extends WrappedRequest[A](request):
     else
       fail[Data, Old]
 
+  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+  inline def delete[T]: RequestWithData[A, TupleMacros.Delete[Data, T]] =
+    inline if constValue[TupleMacros.IsMember[Data, T]] then
+      new RequestWithData(request, deleteType[Data, T](data).asInstanceOf[TupleMacros.Delete[Data, T]])
+    else
+      fail[Data, T]
+
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
   private inline def find[Tup, E](t: Any): E =
     inline erasedValue[Tup] match
@@ -86,6 +93,18 @@ extends WrappedRequest[A](request):
       case _: (h *: tail) =>
         val cons = t.asInstanceOf[h *: tail]
         cons.head *: replaceType[tail, Old, New](cons.tail, v)
+      case _ => error("Type not found in tuple")
+
+  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
+  private inline def deleteType[
+    Tup <: Tuple,
+    T
+  ](t: Tup): Tuple =
+    inline erasedValue[Tup] match
+      case _: (T *: tail) => t.asInstanceOf[T *: tail].tail
+      case _: (h *: tail) =>
+        val cons = t.asInstanceOf[h *: tail]
+        cons.head *: deleteType[tail, T](cons.tail)
       case _ => error("Type not found in tuple")
 
   private inline def fail[Data, T]: Nothing = ${ TupleMacros.failImpl[Data, T] }

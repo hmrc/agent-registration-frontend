@@ -46,6 +46,15 @@ object TupleMacros:
       case h *: tail => h *: Replace[tail, Old, New]
       case EmptyTuple => EmptyTuple
 
+  type Delete[
+    Tup <: Tuple,
+    T
+  ] <: Tuple =
+    Tup match
+      case T *: tail => tail
+      case h *: tail => h *: Delete[tail, T]
+      case EmptyTuple => EmptyTuple
+
   private def cleanType(s: String): String = s.replaceAll("\\bscala\\.Predef\\.", "")
     .replaceAll("\\bscala\\.", "")
 

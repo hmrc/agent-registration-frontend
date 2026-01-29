@@ -100,4 +100,15 @@ extends UnitSpec:
       )
     ] = r4.replace[Fruit, IsNotExotic](Apple(2))
 
-    println(r5)
+    val r6: RequestWithData[
+      AnyContentAsEmpty.type,
+      (
+        IsNotExotic,
+        Status,
+        String,
+        Int,
+        Option[AgentApplication]
+      )
+    ] = r5.delete[(Int, Float)]
+
+    println(r6)
