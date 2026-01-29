@@ -18,44 +18,44 @@ package uk.gov.hmrc.agentregistrationfrontend.util
 
 import scala.compiletime.*
 
-object TupleExtensions:
+object TupleTool:
 
   extension [Data <: Tuple](data: Data)
 
     inline def addByType[T](value: T): T *: Data =
-      inline if constValue[TupleMacros.IsMember[Data, T]] then
+      inline if constValue[TupleToolMacros.IsMember[Data, T]] then
         failDuplicate[Data, T]
       else
         value *: data
 
     inline def getByType[T]: T =
-      inline if constValue[TupleMacros.IsMember[Data, T]] then
+      inline if constValue[TupleToolMacros.IsMember[Data, T]] then
         find[Data, T](data)
       else
         fail[Data, T]
 
     inline def updateByType[T](value: T): Data =
-      inline if constValue[TupleMacros.IsMember[Data, T]] then
+      inline if constValue[TupleToolMacros.IsMember[Data, T]] then
         replace[Data, T](data, value)
       else
         fail[Data, T]
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    inline def replaceByType[Old, New](value: New): TupleMacros.Replace[Data, Old, New] =
-      inline if constValue[TupleMacros.IsMember[Data, Old]] then
-        replaceType[Data, Old, New](data, value).asInstanceOf[TupleMacros.Replace[Data, Old, New]]
+    inline def replaceByType[Old, New](value: New): TupleToolMacros.Replace[Data, Old, New] =
+      inline if constValue[TupleToolMacros.IsMember[Data, Old]] then
+        replaceType[Data, Old, New](data, value).asInstanceOf[TupleToolMacros.Replace[Data, Old, New]]
       else
         fail[Data, Old]
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    inline def deleteByType[T]: TupleMacros.Delete[Data, T] =
-      inline if constValue[TupleMacros.IsMember[Data, T]] then
-        deleteType[Data, T](data).asInstanceOf[TupleMacros.Delete[Data, T]]
+    inline def deleteByType[T]: TupleToolMacros.Delete[Data, T] =
+      inline if constValue[TupleToolMacros.IsMember[Data, T]] then
+        deleteType[Data, T](data).asInstanceOf[TupleToolMacros.Delete[Data, T]]
       else
         fail[Data, T]
 
     inline def ensureUnique: Data =
-      inline if constValue[TupleMacros.HasDuplicates[Data]] then
+      inline if constValue[TupleToolMacros.HasDuplicates[Data]] then
         failDuplicateTuple[Data]
       else
         data
@@ -102,8 +102,8 @@ object TupleExtensions:
         cons.head *: deleteType[tail, T](cons.tail)
       case _ => error("Type not found in tuple")
 
-  private inline def fail[Data, T]: Nothing = ${ TupleMacros.failImpl[Data, T] }
+  private inline def fail[Data, T]: Nothing = ${ TupleToolMacros.failImpl[Data, T] }
 
-  private inline def failDuplicate[Data, T]: Nothing = ${ TupleMacros.failDuplicateImpl[Data, T] }
+  private inline def failDuplicate[Data, T]: Nothing = ${ TupleToolMacros.failDuplicateImpl[Data, T] }
 
-  private inline def failDuplicateTuple[Data]: Nothing = ${ TupleMacros.failDuplicateTupleImpl[Data] }
+  private inline def failDuplicateTuple[Data]: Nothing = ${ TupleToolMacros.failDuplicateTupleImpl[Data] }

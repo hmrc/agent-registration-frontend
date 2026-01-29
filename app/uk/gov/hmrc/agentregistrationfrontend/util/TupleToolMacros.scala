@@ -20,7 +20,7 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import scala.quoted.*
 
-object TupleMacros:
+object TupleToolMacros:
 
   type IsMember[Tup <: Tuple, T] <: Boolean =
     Tup match

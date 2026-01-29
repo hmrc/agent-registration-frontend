@@ -17,14 +17,14 @@
 package uk.gov.hmrc.agentregistrationfrontend.util
 
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
-import uk.gov.hmrc.agentregistrationfrontend.util.TupleExtensions.*
+import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
 
 import scala.compiletime.testing.typeCheckErrors
 
-class TupleExtensionsSpec
+class TupleToolSpec
 extends UnitSpec:
 
-  "TupleExtensions" should:
+  "TupleTool" should:
 
     "addByType" should:
       "add a new element to the tuple" in:
@@ -34,7 +34,7 @@ extends UnitSpec:
 
       "fail to compile when adding a duplicate type" in:
         val errors = typeCheckErrors("""
-          import uk.gov.hmrc.agentregistrationfrontend.util.TupleExtensions.*
+          import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
           val t = (1, "string")
           t.addByType("duplicate")
         """)
@@ -49,7 +49,7 @@ extends UnitSpec:
 
       "fail to compile when type is missing" in:
         val errors = typeCheckErrors("""
-          import uk.gov.hmrc.agentregistrationfrontend.util.TupleExtensions.*
+          import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
           val t = (1, "string", true)
           t.getByType[Double]
         """)
@@ -69,7 +69,7 @@ extends UnitSpec:
 
       "fail to compile when type is missing" in:
         val errors = typeCheckErrors("""
-          import uk.gov.hmrc.agentregistrationfrontend.util.TupleExtensions.*
+          import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
           val t = (1, "string", true)
           t.updateByType(2.0)
         """)
@@ -89,7 +89,7 @@ extends UnitSpec:
 
       "fail to compile when old type is missing" in:
         val errors = typeCheckErrors("""
-          import uk.gov.hmrc.agentregistrationfrontend.util.TupleExtensions.*
+          import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
           val t = (1, "string", true)
           t.replaceByType[Double, Char]('c')
         """)
@@ -109,7 +109,7 @@ extends UnitSpec:
 
       "fail to compile when type is missing" in:
         val errors = typeCheckErrors("""
-          import uk.gov.hmrc.agentregistrationfrontend.util.TupleExtensions.*
+          import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
           val t = (1, "string", true)
           t.deleteByType[Double]
         """)
@@ -128,7 +128,7 @@ extends UnitSpec:
 
       "fail to compile for a tuple with duplicate types" in:
         val errors = typeCheckErrors("""
-          import uk.gov.hmrc.agentregistrationfrontend.util.TupleExtensions.*
+          import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
           val t = (1, "string", 1)
           t.ensureUnique
         """)
