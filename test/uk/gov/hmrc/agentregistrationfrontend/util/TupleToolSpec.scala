@@ -81,17 +81,17 @@ extends UnitSpec:
             |  * Boolean""".stripMargin
         )
 
-    "updateByType" should:
+    "update" should:
       "update an existing element" in:
         val t = (1, "string", true)
-        val result = t.updateByType("new string")
+        val result = t.update("new string")
         result shouldBe (1, "new string", true)
 
       "fail to compile when type is missing" in:
         val errors = typeCheckErrors("""
           import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
           val t = (1, "string", true)
-          t.updateByType(2.0)
+          t.update(2.0)
         """)
         errors.map(_.message) shouldBe List(
           """Type 'Double' is not present in the tuple.

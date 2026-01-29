@@ -60,7 +60,9 @@ object TupleTool:
       ensureUnique
       getImpl[Data, T](data)
 
-    inline def updateByType[T](value: T)(using T PresentIn Data): Data = replace[Data, T](data, value)
+    inline def update[T](value: T)(using T PresentIn Data): Data =
+      ensureUnique
+      updateImpl[Data, T](data, value)
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     inline def replaceByType[Old, New](value: New)(using
@@ -98,14 +100,14 @@ object TupleTool:
       case _ => ???
 
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
-  private inline def replace[Tup <: Tuple, E](t: Tup, v: E): Tup =
+  private inline def updateImpl[Tup <: Tuple, E](t: Tup, v: E): Tup =
     inline erasedValue[Tup] match
       case _: (E *: tail) =>
         val cons = t.asInstanceOf[E *: tail]
         (v *: cons.tail).asInstanceOf[Tup]
       case _: (h *: tail) =>
         val cons = t.asInstanceOf[h *: tail]
-        (cons.head *: replace[tail, E](cons.tail, v)).asInstanceOf[Tup]
+        (cons.head *: updateImpl[tail, E](cons.tail, v)).asInstanceOf[Tup]
       case _ => ???
 
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))

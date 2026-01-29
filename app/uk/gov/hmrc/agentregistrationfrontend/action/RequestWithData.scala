@@ -34,7 +34,7 @@ extends WrappedRequest[ContentType](request):
 
   inline def get[T]: T = data.get[T]
 
-  inline def update[T](value: T): RequestWithData[ContentType, Data] = RequestWithData.create(request, data.updateByType(value))
+  inline def update[T](value: T): RequestWithData[ContentType, Data] = RequestWithData.create(request, data.update(value))
 
   inline def replace[Old, New](value: New): RequestWithData[ContentType, TupleTool.Replace[Old, New, Data]] = RequestWithData.create(
     request,
