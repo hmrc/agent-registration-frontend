@@ -34,8 +34,37 @@ import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 
 import scala.annotation.nowarn
+import scala.annotation.implicitNotFound
+import scala.compiletime.*
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+
+class RequestWithData[
+  A,
+  Data <: Tuple
+](
+  val request: Request[A],
+  val data: Data // Data is a tuple
+)
+extends WrappedRequest[A](request):
+
+  inline def get[T](using ev: RequestWithData.HasType[Data, T]): T = find[Data, T](data)
+
+  private inline def find[Tup, E](t: Any): E =
+    inline erasedValue[Tup] match
+      case _: (E *: tail) => t.asInstanceOf[E *: tail].head
+      case _: (h *: tail) => find[tail, E](t.asInstanceOf[h *: tail].tail)
+      case _ => error("Type not found in tuple")
+
+object RequestWithData:
+
+  @implicitNotFound("Type ${T} is not present in the data tuple: ${Data}")
+  trait HasType[Data, T]
+
+  object HasType:
+
+    given head[H, T <: Tuple]: HasType[H *: T, H] = new HasType[H *: T, H] {}
+    given tail[H, T <: Tuple, E](using HasType[T, E]): HasType[H *: T, E] = new HasType[H *: T, E] {}
 
 class AuthorisedRequest[A](
   val internalUserId: InternalUserId,
