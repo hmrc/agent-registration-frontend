@@ -33,38 +33,23 @@ object TupleTool:
       else t
 
     extension [T <: Tuple](ut: UniqueTuple[T])
-      inline def add[A](value: A)(using A AbsentIn T): UniqueTuple[A *: T] = UniqueTuple(value *: ut)
 
-//      inline def get[A](using A PresentIn T): A = find[T, A](ut)
-//      inline def update[A](value: A)(using A PresentIn T): UniqueTuple[T] = UniqueTuple(replace[T, A](ut, value))
-//      inline def replace[Old, New](value: New)(using Old PresentIn T, New AbsentIn T): UniqueTuple[Replace[Old, New, T]] =
-//        UniqueTuple(replaceType[T, Old, New](ut, value).asInstanceOf[Replace[Old, New, T]])
-//      inline def delete[A](using A PresentIn T): UniqueTuple[Delete[A, T]] =
-//        UniqueTuple(deleteType[T, A](ut).asInstanceOf[Delete[A, T]])
-//      // Expose underlying tuple if needed
-//      inline def toTuple: T = ut
+      inline def add[A](value: A)(using A AbsentIn T): UniqueTuple[A *: T] = value *: ut
 
-  extension [Data <: Tuple](data: Data)
+      inline def get[A](using A PresentIn T): A = getImpl[T, A](ut)
 
-    inline def add[T](value: T)(using T AbsentIn Data): T *: Data = value *: data
+      inline def update[A](value: A)(using A PresentIn T): UniqueTuple[T] = updateImpl[T, A](ut, value)
 
-    inline def get[T](using T PresentIn Data): T = getImpl[Data, T](data)
+      @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+      inline def replace[Old, New](value: New)(using
+        Old PresentIn T,
+        New AbsentIn T
+      ): UniqueTuple[Replace[Old, New, T]] = replaceImpl[T, Old, New](ut, value).asInstanceOf[UniqueTuple[Replace[Old, New, T]]]
 
-    inline def update[T](value: T)(using T PresentIn Data): Data = updateImpl[Data, T](data, value)
+      @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+      inline def delete[A](using A PresentIn T): UniqueTuple[Delete[A, T]] = deleteImpl[T, A](ut).asInstanceOf[UniqueTuple[Delete[A, T]]]
 
-    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    inline def replace[Old, New](value: New)(using
-      Old PresentIn Data,
-      New AbsentIn Data
-    ): Replace[Old, New, Data] = replaceImpl[Data, Old, New](data, value).asInstanceOf[Replace[Old, New, Data]]
-
-    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    inline def delete[T](using T PresentIn Data): Delete[T, Data] = deleteImpl[Data, T](data).asInstanceOf[Delete[T, Data]]
-
-    inline def ensureUniqueTypes: Data =
-      if constValue[HasDuplicates[Data]]
-      then failDuplicateTuple[Data]
-      else data
+      inline def toTuple: T = ut
 
   infix trait AbsentIn[T, Tup <: Tuple]
 
@@ -189,6 +174,7 @@ object TupleTool:
     import quotes.reflect.*
 
     val target = TypeRepr.of[T]
+    val uniqueTupleSymbol = TypeRepr.of[TupleTool.type].typeSymbol.typeMember("UniqueTuple")
 
     @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
     def check(tup: TypeRepr): List[Expr[Any]] =
@@ -221,6 +207,7 @@ object TupleTool:
             else
               Nil
           }
+        case AppliedType(base, List(inner)) if base.typeSymbol === uniqueTupleSymbol => check(inner)
         case t =>
           if t =:= TypeRepr.of[Tup] then
             val msg = s"Cannot prove absence of ${cleanType(target.show)} in generic tuple ${cleanType(t.show)}"
@@ -241,6 +228,7 @@ object TupleTool:
     val target = TypeRepr.of[T]
     val consSymbol = TypeRepr.of[*:].typeSymbol
     val emptyTupleSymbol = TypeRepr.of[EmptyTuple].typeSymbol
+    val uniqueTupleSymbol = TypeRepr.of[TupleTool.type].typeSymbol.typeMember("UniqueTuple")
 
     def formatType(t: TypeRepr): String = cleanType(t.show)
 
@@ -261,6 +249,7 @@ object TupleTool:
         case t if t.typeSymbol === emptyTupleSymbol => notFoundError
         case AppliedType(base, args) if base.typeSymbol.name.startsWith("Tuple") && base.typeSymbol.owner.fullName === "scala" =>
           if args.exists(_ =:= target) then '{ new TupleTool.PresentIn[T, Tup] {} } else notFoundError
+        case AppliedType(base, List(inner)) if base.typeSymbol === uniqueTupleSymbol => check(inner).asExprOf[TupleTool.PresentIn[T, Tup]]
         case t =>
           if t =:= target then '{ new TupleTool.PresentIn[T, Tup] {} }
           else
@@ -272,10 +261,12 @@ object TupleTool:
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   private def getTypes(using q: Quotes)(t: q.reflect.TypeRepr): List[q.reflect.TypeRepr] =
     import q.reflect.*
+    val uniqueTupleSymbol = TypeRepr.of[TupleTool.type].typeSymbol.typeMember("UniqueTuple")
     t.dealias match
       case AppliedType(base, List(head, tail)) if base.typeSymbol === TypeRepr.of[*:].typeSymbol => head :: getTypes(tail)
       case t if t.typeSymbol === TypeRepr.of[EmptyTuple].typeSymbol => Nil
       case AppliedType(base, args) if base.typeSymbol.name.startsWith("Tuple") && base.typeSymbol.owner.fullName === "scala" => args
+      case AppliedType(base, List(inner)) if base.typeSymbol === uniqueTupleSymbol => getTypes(inner)
       case other => List(other)
 
   private def formatTupleContent(using q: Quotes)(t: q.reflect.TypeRepr): String =

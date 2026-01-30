@@ -26,7 +26,7 @@ class RequestWithData[
   Data <: Tuple
 ] private (
   val request: Request[ContentType],
-  val data: Data
+  val data: TupleTool.UniqueTuple[Data]
 )
 extends WrappedRequest[ContentType](request):
 
@@ -51,12 +51,12 @@ object RequestWithData:
   ](
     request: Request[ContentType],
     data: Data
-  ): RequestWithData[ContentType, Data] = create(request, data.ensureUniqueTypes)
+  ): RequestWithData[ContentType, Data] = create(request, UniqueTuple(data))
 
   private def create[
     ContentType,
     Data <: Tuple
   ](
     request: Request[ContentType],
-    data: Data
+    data: UniqueTuple[Data]
   ): RequestWithData[ContentType, Data] = new RequestWithData(request, data)

@@ -33,41 +33,36 @@ extends UnitSpec:
   extends Animal
   type CanSwim = Animal & (Fish | Frog)
 
-  "UniqueTuple" in:
-    val t: UniqueTuple[(Int, Double)] = UniqueTuple((1, 2.0))
-    t.add(1)
-    (1, 2).add(123)
+//  "UniqueTuple" in:
+//    val t: UniqueTuple[(Int, Double)] = UniqueTuple((1, 2.0))
+//    t.add(1)
+//    UniqueTuple((1, 2.0)).add(123)
 
   "showcase" in:
+
     //    EmptyTuple.get[Boolean]
     val kermit: Frog = Frog("Kermit")
-    val t = (1, "string", true, kermit)
+    val t = UniqueTuple((1, "string", true, kermit))
     t.get[Int] shouldBe 1
     t.get[String] shouldBe "string"
     t.get[Boolean] shouldBe true
     //    t.get[Any]
     //    t.get[Animal] shouldBe Frog("kermit")
     t.get[Frog] shouldBe kermit
-    val t2: (Int, Int) = (1, 2)
-    t2.add(2.0) // Should not compile because t2 has duplicates
-//    (1, "string").add[]
-
-//    (1, 2).ensureUnique
-//    (1, 2).update(123) shouldBe (123, 2)
-  // (1, 2).replace[Int, Long](123) shouldBe (123, 2) // Should not compile because (1, 2) has duplicates
+    // UniqueTuple((1, 2)) // Should not compile because duplicates
 
   "TupleTool" should:
 
     "add" should:
       "add a new element to the tuple" in:
-        val t = (1, "string")
+        val t = UniqueTuple((1, "string"))
         val result = t.add(true)
-        result shouldBe (true, 1, "string")
+        result.toTuple shouldBe (true, 1, "string")
 
       "fail to compile when adding a duplicate type" in:
         val errors = typeCheckErrors("""
           import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
-          val t = (1, "string")
+          val t = UniqueTuple((1, "string"))
           t.add("duplicate")
         """)
         errors.map(_.message) shouldBe List(
@@ -79,7 +74,7 @@ extends UnitSpec:
 
     "get" should:
       "retrieve an existing element" in:
-        val t: (Int, String, Boolean) = (1, "string", true)
+        val t = UniqueTuple((1, "string", true))
         t.get[Int] shouldBe 1
         t.get[String] shouldBe "string"
         t.get[Boolean] shouldBe true
@@ -87,7 +82,7 @@ extends UnitSpec:
       "fail to compile when type is missing" in:
         val errors = typeCheckErrors("""
           import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
-          val t = (1, "string", true)
+          val t = UniqueTuple((1, "string", true))
           t.get[Double]
         """)
         errors.map(_.message) shouldBe List(
@@ -100,14 +95,14 @@ extends UnitSpec:
 
     "update" should:
       "update an existing element" in:
-        val t = (1, "string", true)
+        val t = UniqueTuple((1, "string", true))
         val result = t.update("new string")
-        result shouldBe (1, "new string", true)
+        result.toTuple shouldBe (1, "new string", true)
 
       "fail to compile when type is missing" in:
         val errors = typeCheckErrors("""
           import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
-          val t = (1, "string", true)
+          val t = UniqueTuple((1, "string", true))
           t.update(2.0)
         """)
         errors.map(_.message) shouldBe List(
@@ -120,14 +115,14 @@ extends UnitSpec:
 
     "replace" should:
       "replace an existing type with a new type" in:
-        val t = (1, "string", true)
+        val t = UniqueTuple((1, "string", true))
         val result = t.replace[String, Double](2.0)
-        result shouldBe (1, 2.0, true)
+        result.toTuple shouldBe (1, 2.0, true)
 
       "fail to compile when old type is missing" in:
         val errors = typeCheckErrors("""
           import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
-          val t = (1, "string", true)
+          val t = UniqueTuple((1, "string", true))
           t.replace[Double, Char]('c')
         """)
         errors.map(_.message) shouldBe List(
@@ -140,14 +135,14 @@ extends UnitSpec:
 
     "delete" should:
       "remove an existing element" in:
-        val t = (1, "string", true)
+        val t = UniqueTuple((1, "string", true))
         val result = t.delete[String]
-        result shouldBe (1, true)
+        result.toTuple shouldBe (1, true)
 
       "fail to compile when type is missing" in:
         val errors = typeCheckErrors("""
           import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
-          val t = (1, "string", true)
+          val t = UniqueTuple((1, "string", true))
           t.delete[Double]
         """)
         errors.map(_.message) shouldBe List(
@@ -160,14 +155,13 @@ extends UnitSpec:
 
     "ensureUnique" should:
       "pass for a tuple with unique types" in:
-        val t = (1, "string", true)
-        t.ensureUniqueTypes shouldBe t
+        val t = UniqueTuple((1, "string", true))
+        t.toTuple shouldBe (1, "string", true)
 
       "fail to compile for a tuple with duplicate types" in:
         val errors = typeCheckErrors("""
           import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
-          val t = (1, "string", 1)
-          t.ensureUnique
+          val t = UniqueTuple((1, "string", 1))
         """)
         errors.map(_.message) shouldBe List(
           """Tuple isn't unique. Type 'Int' occurs more more then once:
