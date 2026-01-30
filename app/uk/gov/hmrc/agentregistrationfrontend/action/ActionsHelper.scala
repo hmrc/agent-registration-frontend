@@ -34,7 +34,7 @@ extends RequestAwareLogging:
   extension [
     Data <: Tuple,
     R <: [X] =>> RequestWithData[X, Data],
-    ContentType // ContentType Represents Play Framework's Content Type parameter, commonly denoted as B
+    ContentType
   ](ab: ActionBuilder[R, ContentType])(using ec: ExecutionContext)
 
     def ensureValidFormGeneric2[T](
@@ -48,7 +48,7 @@ extends RequestAwareLogging:
       request => form => Future.successful(resultToServeWhenFormHasErrors(request)(form))
     )
 
-    def ensureValidFormAsync[T](
+    def ensureValidFormAsync2[T](
       form: Form[T],
       viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => Future[HtmlFormat.Appendable]
     )(using
@@ -59,71 +59,70 @@ extends RequestAwareLogging:
         _ => form,
         (r: R[ContentType]) => (f: Form[T]) => viewToServeWhenFormHasErrors(r)(f).map(BadRequest.apply)
       )
-//
-//def ensureValidForm[T](
-//                        form: Form[T],
-//                        viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => HtmlFormat.Appendable
-//                      )(using
-//                        fb: FormBinding,
-//                        merge: MergeFormValue[R[ContentType], T]
-//                      ): ActionBuilder[[X] =>> R[X] & FormValue[T], ContentType] = ensureValidFormAsync(
-//  form,
-//  request => form => Future.successful(viewToServeWhenFormHasErrors(request)(form))
-//)
-//
-//def ensureValidFormAndRedirectIfSaveForLaterAsync[T](
-//                                                      form: R[ContentType] => Form[T],
-//                                                      viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => Future[HtmlFormat.Appendable]
-//                                                    )(using
-//                                                      fb: FormBinding,
-//                                                      merge: MergeFormValue[R[ContentType], T],
-//                                                      ev: ContentType =:= AnyContent
-//                                                    ): ActionBuilder[[X] =>> R[X] & FormValue[T], ContentType] = ab
-//  .ensureValidFormGenericAsync[T](
-//    form,
-//    (r: R[ContentType]) =>
-//      (f: Form[T]) =>
-//        viewToServeWhenFormHasErrors(r)(f)
-//          .map(BadRequest.apply)
-//          .map(SubmissionHelper.redirectIfSaveForLater(ev.substituteCo(r), _))
-//  )
-//
-//def ensureValidFormAndRedirectIfSaveForLater[T](
-//                                                 form: R[ContentType] => Form[T],
-//                                                 viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => HtmlFormat.Appendable
-//                                               )(using
-//                                                 fb: FormBinding,
-//                                                 merge: MergeFormValue[R[ContentType], T],
-//                                                 ev: ContentType =:= AnyContent
-//                                               ): ActionBuilder[[X] =>> R[X] & FormValue[T], ContentType] = ensureValidFormAndRedirectIfSaveForLaterAsync(
-//  form,
-//  request => form => Future.successful(viewToServeWhenFormHasErrors(request)(form))
-//)
-//
-//def ensureValidFormAndRedirectIfSaveForLaterAsync[T](
-//                                                      form: Form[T],
-//                                                      viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => Future[HtmlFormat.Appendable]
-//                                                    )(using
-//                                                      fb: FormBinding,
-//                                                      merge: MergeFormValue[R[ContentType], T],
-//                                                      ev: ContentType =:= AnyContent
-//                                                    ): ActionBuilder[[X] =>> R[X] & FormValue[T], ContentType] = ab.ensureValidFormAndRedirectIfSaveForLaterAsync(
-//  _ => form,
-//  viewToServeWhenFormHasErrors
-//)
-//
-//def ensureValidFormAndRedirectIfSaveForLater[T](
-//                                                 form: Form[T],
-//                                                 viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => HtmlFormat.Appendable
-//                                               )(using
-//                                                 fb: FormBinding,
-//                                                 merge: MergeFormValue[R[ContentType], T],
-//                                                 ev: ContentType =:= AnyContent
-//                                               ): ActionBuilder[[X] =>> R[X] & FormValue[T], ContentType] = ab.ensureValidFormAndRedirectIfSaveForLater(
-//  _ => form,
-//  viewToServeWhenFormHasErrors
-//)
-//
+
+    def ensureValidForm2[T](
+      form: Form[T],
+      viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => HtmlFormat.Appendable
+    )(using
+      FormBinding,
+      T AbsentIn Data
+    ): ActionBuilder[[X] =>> RequestWithData[X, T *: Data], ContentType] = ensureValidFormAsync2(
+      form,
+      request => form => Future.successful(viewToServeWhenFormHasErrors(request)(form))
+    )
+
+    def ensureValidFormAndRedirectIfSaveForLaterAsync2[T](
+      form: R[ContentType] => Form[T],
+      viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => Future[HtmlFormat.Appendable]
+    )(using
+      fb: FormBinding,
+      ev: ContentType =:= AnyContent,
+      ev2: T AbsentIn Data
+    ): ActionBuilder[[X] =>> RequestWithData[X, T *: Data], ContentType] = ab
+      .ensureValidFormGenericAsync2[T](
+        form,
+        (r: R[ContentType]) =>
+          (f: Form[T]) =>
+            viewToServeWhenFormHasErrors(r)(f)
+              .map(BadRequest.apply)
+              .map(SubmissionHelper.redirectIfSaveForLater(ev.substituteCo(r), _))
+      )
+
+    def ensureValidFormAndRedirectIfSaveForLater2[T](
+      form: R[ContentType] => Form[T],
+      viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => HtmlFormat.Appendable
+    )(using
+      fb: FormBinding,
+      ev: ContentType =:= AnyContent,
+      ev2: T AbsentIn Data
+    ): ActionBuilder[[X] =>> RequestWithData[X, T *: Data], ContentType] = ensureValidFormAndRedirectIfSaveForLaterAsync2(
+      form,
+      request => form => Future.successful(viewToServeWhenFormHasErrors(request)(form))
+    )
+
+    def ensureValidFormAndRedirectIfSaveForLaterAsync2[T](
+      form: Form[T],
+      viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => Future[HtmlFormat.Appendable]
+    )(using
+      fb: FormBinding,
+      ev: ContentType =:= AnyContent,
+      ev2: T AbsentIn Data
+    ): ActionBuilder[[X] =>> RequestWithData[X, T *: Data], ContentType] = ab.ensureValidFormAndRedirectIfSaveForLaterAsync2(
+      _ => form,
+      viewToServeWhenFormHasErrors
+    )
+
+    def ensureValidFormAndRedirectIfSaveForLater2[T](
+      form: Form[T],
+      viewToServeWhenFormHasErrors: R[ContentType] => Form[T] => HtmlFormat.Appendable
+    )(using
+      fb: FormBinding,
+      ev: ContentType =:= AnyContent,
+      ev2: T AbsentIn Data
+    ): ActionBuilder[[X] =>> RequestWithData[X, T *: Data], ContentType] = ab.ensureValidFormAndRedirectIfSaveForLater2(
+      _ => form,
+      viewToServeWhenFormHasErrors
+    )
 
     def ensureValidFormGenericAsync2[T](
       form: R[ContentType] => Form[T],
