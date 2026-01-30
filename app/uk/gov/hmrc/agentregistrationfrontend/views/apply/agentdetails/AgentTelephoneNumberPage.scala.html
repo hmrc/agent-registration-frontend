@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentTelephoneNumber
-@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTelephoneNumberForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
@@ -33,8 +33,11 @@
 
 @(
         form: Form[AgentTelephoneNumber],
-        bprTelephoneNumber: Option[String]
-)(implicit request: AgentApplicationRequest[?], messages: Messages)
+        bprTelephoneNumber: Option[String],
+        agentApplication: AgentApplication)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{
     AgentTelephoneNumberForm.key
@@ -43,8 +46,7 @@
     AgentTelephoneNumberForm.otherKey
 }
 @contactTelephone = @{
-    request
-    .agentApplication
+    agentApplication
     .getApplicantContactDetails
     .getTelephoneNumber
 }

@@ -29,7 +29,7 @@
 @(
         form: Form[UserRole],
         userRoleOption: UserRole
-)(implicit request: Request[?], messages: Messages)
+)(implicit request: RequestHeader, messages: Messages)
 
 @key = @{
     UserRoleForm.key

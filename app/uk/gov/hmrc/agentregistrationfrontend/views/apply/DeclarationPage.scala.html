@@ -16,7 +16,7 @@
 
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistration.shared.UserRole
 @import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 @import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
@@ -29,17 +29,17 @@
 )
 
 @(
-        entityName: String
-)(implicit
-        request: AgentApplicationRequest[?],
+        entityName: String,
+        agentApplication: AgentApplication)(implicit
+        request: RequestHeader,
         messages: Messages
 )
 
 @key = @{"declaration"}
 @pageTitle = @{messages(s"$key.title")}
 @isSoleTraderOwner = @{
-  request.agentApplication.businessType === SoleTrader &&
-    request.agentApplication.asSoleTraderApplication.userRole.contains(UserRole.Owner)
+  agentApplication.businessType === SoleTrader &&
+    agentApplication.asSoleTraderApplication.userRole.contains(UserRole.Owner)
 }
 
 @layout(pageTitle = pageTitle) {

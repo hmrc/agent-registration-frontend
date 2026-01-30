@@ -23,7 +23,11 @@
     govukButton: GovukButton
 )
 
-@(status: UploadStatus)(implicit messages: Messages, request: RequestHeader)
+@(
+        status: UploadStatus)(implicit
+        messages: Messages,
+        request: RequestHeader
+)
 
 
 @pageTitle =  @{status match {

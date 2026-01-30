@@ -38,8 +38,11 @@
         maybeForm: Option[Form[?]] = None,
         suppressBackLink: Boolean = false,
         templateScripts: Option[Html] = None,
-        templateStyles: Option[Html] = None
-)(contentBlock: Html)(implicit request: RequestHeader, messages: Messages)
+        templateStyles: Option[Html] = None)(
+        contentBlock: Html)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @head = {
     @if(isSignedIn) {

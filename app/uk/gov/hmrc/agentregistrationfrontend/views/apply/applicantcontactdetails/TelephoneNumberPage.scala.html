@@ -29,7 +29,11 @@
         continueOrSaveForLater: ContinueOrSaveForLater
 )
 
-@(form: Form[TelephoneNumber])(implicit request: AgentApplicationRequest[AnyContent], messages: Messages)
+@(
+        form: Form[TelephoneNumber])(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{
     TelephoneNumberForm.key

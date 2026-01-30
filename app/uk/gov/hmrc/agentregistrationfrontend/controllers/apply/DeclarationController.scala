@@ -66,7 +66,8 @@ extends FrontendController(mcc, actions):
                 .map(_.getEntityName)
                 .getOrThrowExpectedDataMissing(
                   "Business Partner Record is missing"
-                )
+                ),
+              agentApplication = request.agentApplication
             ))
 
   def submit: Action[AnyContent] = baseAction

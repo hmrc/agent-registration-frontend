@@ -45,7 +45,7 @@ extends ViewSpec:
   "CheckYourAnswersPage for complete GRS details received" should:
     given agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(agentApplication.complete)
     val bpr: BusinessPartnerRecordResponse = tdAll.businessPartnerRecordResponse
-    val doc: Document = Jsoup.parse(viewTemplate(bpr).body)
+    val doc: Document = Jsoup.parse(viewTemplate(bpr, agentApplicationHmrcRequest.agentApplication).body)
     "contain content" in:
       doc.mainContent shouldContainContent
         """

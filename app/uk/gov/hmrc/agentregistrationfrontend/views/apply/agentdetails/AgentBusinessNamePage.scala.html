@@ -33,8 +33,10 @@
 
 @(
         form: Form[AgentBusinessName],
-        bprBusinessName: Option[String]
-)(implicit request: AgentApplicationRequest[?], messages: Messages)
+        bprBusinessName: Option[String])(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{
     AgentBusinessNameForm.key

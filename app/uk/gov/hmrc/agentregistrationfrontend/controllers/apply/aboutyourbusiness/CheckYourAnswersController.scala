@@ -60,7 +60,8 @@ extends FrontendController(mcc, actions):
               view(
                 bprOpt.getOrThrowExpectedDataMissing(
                   s"Business Partner Record for UTR ${request.agentApplication.getUtr.value}"
-                )
+                ),
+                request.agentApplication
               )
             )
           }

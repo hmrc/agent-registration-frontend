@@ -23,7 +23,11 @@
     govukButton: GovukButton
 )
 
-@(signInLink: Uri)(implicit request: Request[?], messages: Messages)
+@(
+        signInLink: Uri)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{"signInWithAgentDetails"}
 @title = @{messages(s"$key.title")}

@@ -62,4 +62,4 @@ extends FrontendController(mcc, actions):
             case _ => Redirect(AppRoutes.apply.amls.AmlsSupervisorController.show)
           }
       ):
-        implicit request => Ok(view())
+        implicit request => Ok(view(request.agentApplication))

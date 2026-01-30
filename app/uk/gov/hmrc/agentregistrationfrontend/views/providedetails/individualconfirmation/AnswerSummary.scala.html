@@ -28,8 +28,10 @@
 
 @(
         key: String,
-        individualProvidedDetails: IndividualProvidedDetails
-)(implicit request: Request[?], messages: Messages)
+        individualProvidedDetails: IndividualProvidedDetails)(implicit
+        request: Request[?],
+        messages: Messages
+)
 
 @makeSummaryListRow(labelKey: String, valueText: String, changeHref: String) = @{
     SummaryListRow(

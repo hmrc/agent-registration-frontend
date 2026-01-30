@@ -40,7 +40,8 @@ extends ViewSpec:
   )
   val doc: Document = Jsoup.parse(viewTemplate(
     form = AgentTelephoneNumberForm.form,
-    bprTelephoneNumber = Some(tdAll.bprPrimaryTelephoneNumber)
+    bprTelephoneNumber = Some(tdAll.bprPrimaryTelephoneNumber),
+    agentApplication = agentApplicationRequest.agentApplication
   ).body)
   private val heading: String = "What telephone number should we use for your agent services account?"
 
@@ -101,6 +102,10 @@ extends ViewSpec:
       behavesLikePageWithErrorHandling(
         field = field,
         errorMessage = errorMessage,
-        errorDoc = Jsoup.parse(viewTemplate(formWithError, Some(tdAll.bprPrimaryTelephoneNumber)).body),
+        errorDoc = Jsoup.parse(viewTemplate(
+          form = formWithError,
+          bprTelephoneNumber = Some(tdAll.bprPrimaryTelephoneNumber),
+          agentApplication = agentApplicationRequest.agentApplication
+        ).body),
         heading = heading
       )

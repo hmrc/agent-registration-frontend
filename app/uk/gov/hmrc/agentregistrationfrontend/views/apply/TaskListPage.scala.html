@@ -16,7 +16,6 @@
 
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
-@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 @import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
@@ -30,16 +29,16 @@
 
 @(
         taskListStatus: TaskListStatus,
-        entityName: String
-)(implicit
-        request: AgentApplicationRequest[?],
+        entityName: String,
+        agentApplication: AgentApplication)(implicit
+        request: RequestHeader,
         messages: Messages
 )
 
 @key = @{"taskList"}
 @title = @{messages(s"$key.title", entityName)}
 @businessTypeKey = @{
-    request.agentApplication match {
+    agentApplication match {
         case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
         case _: AgentApplicationLimitedCompany => "LimitedCompany"
         case _: AgentApplicationSoleTrader => "SoleTrader"

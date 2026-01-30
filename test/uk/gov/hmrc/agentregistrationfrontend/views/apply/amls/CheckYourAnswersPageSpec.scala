@@ -56,7 +56,7 @@ extends ViewSpec:
   "CheckYourAnswersPage for complete Hmrc Amls Details" should:
     implicit val agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(agentApplication.completeHmrcApplication)
 
-    val doc: Document = Jsoup.parse(viewTemplate().body)
+    val doc: Document = Jsoup.parse(viewTemplate(agentApplicationHmrcRequest.agentApplication).body)
     "contain content" in:
       doc.mainContent shouldContainContent
         """
@@ -100,7 +100,7 @@ extends ViewSpec:
       agentApplication.completeNonHmrcApplication
     )
 
-    val doc: Document = Jsoup.parse(viewTemplate().body)
+    val doc: Document = Jsoup.parse(viewTemplate(agentApplicationHmrcRequest.agentApplication).body)
     "contain content" in:
       doc.mainContent shouldContainContent
         """

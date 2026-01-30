@@ -28,8 +28,10 @@
 @(
         key: String,
         amlsDetails: AmlsDetails,
-        canChange: Boolean = true
-)(implicit request: Request[?], messages: Messages)
+        canChange: Boolean = true)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @supervisorRow = @{
   SummaryListRow(

@@ -24,8 +24,9 @@
 @(
         key: String,
         answers: AgentDetails,
-        canChange: Boolean = true
-)(implicit messages: Messages)
+        canChange: Boolean = true)(implicit
+        messages: Messages
+)
 
 @businessNameRow = @{
   SummaryListRow(

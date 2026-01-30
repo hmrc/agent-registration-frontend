@@ -26,8 +26,9 @@
         answers: BusinessDetailsGeneralPartnership,
         userRole: UserRole,
         canChange: Boolean = true,
-        entityName: String
-)(implicit messages: Messages)
+        entityName: String)(implicit
+        messages: Messages
+)
 
 @agentTypeRow = @{
   SummaryListRow(

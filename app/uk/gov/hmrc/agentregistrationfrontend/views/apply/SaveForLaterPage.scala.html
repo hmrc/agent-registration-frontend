@@ -27,7 +27,10 @@
     appConfig: AppConfig
 )
 
-@()(implicit request: Request[?], messages: Messages)
+@()(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{"saveForLater"}
 @title = @{messages(s"$key.title")}
