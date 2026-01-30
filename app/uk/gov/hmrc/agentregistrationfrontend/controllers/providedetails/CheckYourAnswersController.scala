@@ -87,7 +87,7 @@ extends FrontendController(mcc, actions):
     )
 
   def show: Action[AnyContent] = baseAction:
-    implicit request => Ok(view())
+    implicit request => Ok(view(request.individualProvidedDetails))
 
   def submit: Action[AnyContent] = baseAction.async:
     implicit request =>

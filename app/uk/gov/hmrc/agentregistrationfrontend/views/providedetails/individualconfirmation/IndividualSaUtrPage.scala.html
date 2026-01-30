@@ -34,8 +34,10 @@
 )
 
 @(
-        form: Form[UserProvidedSaUtr]
-)(implicit request: IndividualProvideDetailsRequest[?], messages: Messages)
+        form: Form[UserProvidedSaUtr])(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{
     IndividualSaUtrForm.hasSaUtrKey
