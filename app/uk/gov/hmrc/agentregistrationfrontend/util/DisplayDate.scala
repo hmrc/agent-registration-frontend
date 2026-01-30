@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.util
 
 import play.api.i18n.Lang
 import play.api.mvc.Request
+import play.api.mvc.RequestHeader
 
 import java.time.format.DateTimeFormatter
 import java.time.Instant
@@ -27,7 +28,7 @@ import scala.util.Try
 
 object DisplayDate {
 
-  def displayDateForLang(date: Option[LocalDate])(implicit request: Request[?]): String = {
+  def displayDateForLang(date: Option[LocalDate])(implicit request: RequestHeader): String = {
     val lang = request.cookies
       .get("PLAY_LANG")
       .map(_.value)

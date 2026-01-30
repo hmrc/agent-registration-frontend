@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.agentregistration.shared.BusinessType
-@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.components.CopyButton
@@ -29,19 +29,19 @@
 )
 
 @(
-        entityName: String
-)(implicit
-        request: AgentApplicationRequest[?],
+        entityName: String,
+        agentApplication: AgentApplication)(implicit
+        request: RequestHeader,
         messages: Messages
 )
 
 @key = @{"confirmation"}
 @pageTitle = @{messages(s"$key.title")}
-@provideDetailsLink = @{appConfig.applicationLink(request.agentApplication.linkId.value).toString}
+@provideDetailsLink = @{appConfig.applicationLink(agentApplication.linkId.value).toString}
 @templateScripts = {
   <script src="@{controllers.routes.Assets.versioned("javascripts/copy-button.js")}" @{CSPNonce.attr}></script>
 }
-@businessType = @{request.agentApplication.businessType match {
+@businessTypeKey = @{agentApplication.businessType match {
   case BusinessType.SoleTrader => "SoleTrader"
   case BusinessType.Partnership.LimitedLiabilityPartnership => "Llp"
   case BusinessType.LimitedCompany => "LimitedCompany"
@@ -49,7 +49,6 @@
   case BusinessType.Partnership.LimitedPartnership => "LimitedPartnership"
   case BusinessType.Partnership.ScottishLimitedPartnership => "ScottishLimitedPartnership"
   case BusinessType.Partnership.ScottishPartnership => "ScottishPartnership"
-  case _ => "other"
 }}
 @templateStyles = {
   <link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/copy-button.css")}" @{CSPNonce.attr}>
@@ -76,10 +75,10 @@
     @{messages(s"$key.whatNext.h2")}
   </h2>
   <p class="govuk-body">
-    @{messages(s"$key.whatNext.p1.$businessType.${request.agentApplication.getUserRole.toString}", entityName)}
+    @{messages(s"$key.whatNext.p1.$businessTypeKey.${agentApplication.getUserRole.toString}", entityName)}
   </p>
   <p class="govuk-body">
-    @{messages(s"$key.whatNext.p2.$businessType.${request.agentApplication.getUserRole.toString}")}
+    @{messages(s"$key.whatNext.p2.$businessTypeKey.${agentApplication.getUserRole.toString}")}
   </p>
   <p class="govuk-body govuk-!-font-weight-bold">@provideDetailsLink</p>
   @copyButton(clip = provideDetailsLink)
@@ -96,7 +95,7 @@
   </p>
   <ul class="govuk-list govuk-list--bullet">
     <li>@{messages(s"$key.checkProgress.bullet1")}</li>
-    <li>@{Html(messages(s"$key.checkProgress.bullet2", request.agentApplication.getApplicantContactDetails.getVerifiedEmail.value))}</li>
+    <li>@{Html(messages(s"$key.checkProgress.bullet2", agentApplication.getApplicantContactDetails.getVerifiedEmail.value))}</li>
   </ul>
 
   <p class="govuk-body govuk-!-display-none-print">

@@ -50,7 +50,7 @@ extends ViewSpec:
   "CheckYourAnswersPage for complete Applicant Contact Details" should:
     given agentApplicationHmrcRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(agentApplication.complete)
 
-    val doc: Document = Jsoup.parse(viewTemplate().body)
+    val doc: Document = Jsoup.parse(viewTemplate(agentApplicationHmrcRequest.agentApplication).body)
     "contain content" in:
       doc.mainContent shouldContainContent
         """

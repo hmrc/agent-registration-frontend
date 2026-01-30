@@ -18,15 +18,16 @@
 @import uk.gov.hmrc.agentregistration.shared.UserRole
 
 @this(
-  govukSummaryList: GovukSummaryList
+        govukSummaryList: GovukSummaryList
 )
 
 @(
         key: String,
         answers: BusinessDetailsSoleTrader,
         userRole: UserRole,
-        canChange: Boolean = true
-)(implicit messages: Messages)
+        canChange: Boolean = true)(implicit
+        messages: Messages
+)
 
 @agentTypeRow = @{
   SummaryListRow(

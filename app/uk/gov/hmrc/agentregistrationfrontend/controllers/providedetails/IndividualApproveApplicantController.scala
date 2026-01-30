@@ -72,9 +72,9 @@ extends FrontendController(mcc, actions):
       Future.successful(
         Ok(
           view(
-            filledForm,
-            applicantName.value,
-            companyName
+            form = filledForm,
+            officerName = applicantName.value,
+            companyName = companyName
           )
         )
       )
@@ -91,8 +91,8 @@ extends FrontendController(mcc, actions):
           val companyName = r.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
           view(
             _,
-            applicantName.value,
-            companyName
+            officerName = applicantName.value,
+            companyName = companyName
           )
       )
       .async:

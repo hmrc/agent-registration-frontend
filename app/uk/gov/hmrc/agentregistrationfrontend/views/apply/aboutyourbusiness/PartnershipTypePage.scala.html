@@ -26,7 +26,11 @@
         govukButton: GovukButton
 )
 
-@(form: Form[BusinessType.Partnership])(implicit request: Request[?], messages: Messages)
+@(
+        form: Form[BusinessType.Partnership])(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{
     PartnershipTypeForm.key

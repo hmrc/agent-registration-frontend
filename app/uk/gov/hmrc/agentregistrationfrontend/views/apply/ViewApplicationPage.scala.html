@@ -27,7 +27,7 @@
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.{AnswerSummary as ContactAnswers}
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.{AnswerSummary as AgentDetailsAnswers}
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.{AnswerSummary as AmlsAnswers}
-@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+@import uk.gov.hmrc.agentregistration.shared.*
 @import views.html.helper.CSPNonce
 
 @this(
@@ -48,9 +48,9 @@
 )
 
 @(
-        entityName: String
-)(implicit
-        request: AgentApplicationRequest[?],
+        entityName: String,
+        agentApplication: AgentApplication)(implicit
+        request: RequestHeader,
         messages: Messages
 )
 
@@ -60,64 +60,64 @@
 @title = @{
     messages(s"$key.title", entityName)
 }
-@provideDetailsLink = @{appConfig.applicationLink(request.agentApplication.linkId.value).toString}
+@provideDetailsLink = @{appConfig.applicationLink(agentApplication.linkId.value).toString}
 @aboutYourBusinessAnswers =  @{
-  request.agentApplication.businessType match {
-    case BusinessType.SoleTrader =>
+  agentApplication match {
+    case agentApplication: AgentApplicationSoleTrader =>
       answerSummarySoleTrader(
         key = "aboutYourBusinessCheckYourAnswers",
-        answers = request.agentApplication.asSoleTraderApplication.getBusinessDetails,
-        userRole = request.agentApplication.getUserRole,
+        answers = agentApplication.getBusinessDetails,
+        userRole = agentApplication.getUserRole,
         canChange = false
       )
-    case BusinessType.Partnership.LimitedLiabilityPartnership =>
+    case agentApplication: AgentApplicationLlp =>
       answerSummaryLlp(
         key = "aboutYourBusinessCheckYourAnswers",
-        answers = request.agentApplication.asLlpApplication.getBusinessDetails,
-        userRole = request.agentApplication.getUserRole,
+        answers = agentApplication.getBusinessDetails,
+        userRole = agentApplication.getUserRole,
         canChange = false
       )
-    case BusinessType.LimitedCompany =>
+    case agentApplication: AgentApplicationLimitedCompany =>
       answerSummaryLimitedCompany(
         key = "aboutYourBusinessCheckYourAnswers",
-        answers = request.agentApplication.asLimitedCompanyApplication.getBusinessDetails,
-        userRole = request.agentApplication.getUserRole,
+        answers = agentApplication.asLimitedCompanyApplication.getBusinessDetails,
+        userRole = agentApplication.getUserRole,
         canChange = false
       )
-    case BusinessType.Partnership.GeneralPartnership =>
+    case agentApplication: AgentApplicationGeneralPartnership =>
       answerSummaryGeneralPartnership(
         key = "aboutYourBusinessCheckYourAnswers",
-        answers = request.agentApplication.asGeneralPartnershipApplication.getBusinessDetails,
-        userRole = request.agentApplication.getUserRole,
+        answers = agentApplication.getBusinessDetails,
+        userRole = agentApplication.getUserRole,
         canChange = false,
         entityName = entityName
       )
-    case BusinessType.Partnership.LimitedPartnership =>
+    case agentApplication: AgentApplicationLimitedPartnership =>
       answerSummaryLimitedPartnership(
         key = "aboutYourBusinessCheckYourAnswers",
-        answers = request.agentApplication.asLimitedPartnershipApplication.getBusinessDetails,
-        userRole = request.agentApplication.getUserRole,
+        answers = agentApplication.getBusinessDetails,
+        userRole = agentApplication.getUserRole,
         canChange = false,
         entityName = entityName
       )
-    case BusinessType.Partnership.ScottishLimitedPartnership =>
+    case agentApplication: AgentApplicationScottishLimitedPartnership =>
       answerSummaryScottishLimitedPartnership(
         key = "aboutYourBusinessCheckYourAnswers",
-        answers = request.agentApplication.asScottishLimitedPartnershipApplication.getBusinessDetails,
-        userRole = request.agentApplication.getUserRole,
+        answers = agentApplication.getBusinessDetails,
+        userRole = agentApplication.getUserRole,
         canChange = false,
         entityName = entityName
       )
-    case BusinessType.Partnership.ScottishPartnership =>
+    case agentApplication: AgentApplicationScottishPartnership =>
       answerSummaryScottishPartnership(
         key = "aboutYourBusinessCheckYourAnswers",
-        answers = request.agentApplication.asScottishPartnershipApplication.getBusinessDetails,
-        userRole = request.agentApplication.getUserRole,
+        answers = agentApplication.getBusinessDetails,
+        userRole = agentApplication.getUserRole,
         canChange = false,
         entityName = entityName
       )
     case _ =>
-      throw new IllegalArgumentException(s"Unsupported business type for Check Your Answers page: ${request.agentApplication.businessType}")
+      throw new IllegalArgumentException(s"Unsupported business type for Check Your Answers page: ${agentApplication.businessType}")
   }
 }
 @templateScripts = {
@@ -140,21 +140,21 @@
   <h2 class="govuk-heading-m">@{messages(s"$key.contact.h2")}</h2>
   @contactAnswers(
     key = "contactCheckYourAnswers",
-    answers = request.agentApplication.getApplicantContactDetails,
+    answers = agentApplication.getApplicantContactDetails,
     canChange = false
   )
 
   <h2 class="govuk-heading-m">@{messages(s"$key.agentdetails.h2")}</h2>
   @agentDetailsAnswers(
     key = "agentDetailsCheckYourAnswers",
-    answers = request.agentApplication.getAgentDetails,
+    answers = agentApplication.getAgentDetails,
     canChange = false
   )
 
   <h2 class="govuk-heading-m">@{messages(s"$key.amls.h2")}</h2>
   @amlsAnswers(
     key = "amlsCheckYourAnswers",
-    amlsDetails = request.agentApplication.getAmlsDetails,
+    amlsDetails = agentApplication.getAmlsDetails,
     canChange = false
   )
 

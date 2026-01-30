@@ -26,7 +26,11 @@
         govukButton: GovukButton
 )
 
-@(form: Form[AgentType])(implicit request: Request[?], messages: Messages)
+@(
+        form: Form[AgentType])(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{
     AgentTypeForm.key

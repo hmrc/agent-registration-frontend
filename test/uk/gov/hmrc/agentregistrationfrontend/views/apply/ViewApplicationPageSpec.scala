@@ -34,7 +34,10 @@ extends ViewSpec:
         .afterDeclarationSubmitted
   )
   val doc: Document = Jsoup.parse(
-    viewTemplate(entityName = "Test Company Name").body
+    viewTemplate(
+      entityName = "Test Company Name",
+      agentApplication = agentApplicationRequest.agentApplication
+    ).body
   )
 
   "ViewApplicationPage" should:

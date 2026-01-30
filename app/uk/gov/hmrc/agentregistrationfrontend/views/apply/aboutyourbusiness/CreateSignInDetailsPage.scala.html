@@ -20,11 +20,15 @@
 
 
 @this(
-    layout: Layout,
-    govukButton: GovukButton
+        layout: Layout,
+        govukButton: GovukButton
 )
 
-@(signInLink: Uri)(implicit request: Request[?], messages: Messages)
+@(
+        signInLink: Uri)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{"createSignInDetails"}
 @title = @{messages(s"$key.title")}

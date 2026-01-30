@@ -14,19 +14,18 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-@import uk.gov.hmrc.agentregistration.shared.ApplicantRoleInLlp
 @import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 
 @this(
-  govukSummaryList: GovukSummaryList
+        govukSummaryList: GovukSummaryList
 )
 
 @(
         key: String,
         answers: ApplicantContactDetails,
-        canChange: Boolean = true
-)(implicit messages: Messages)
+        canChange: Boolean = true)(implicit
+        messages: Messages
+)
 
 @nameRow = @{
   SummaryListRow(

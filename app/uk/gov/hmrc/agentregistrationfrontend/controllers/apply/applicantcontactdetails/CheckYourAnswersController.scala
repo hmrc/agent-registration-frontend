@@ -51,4 +51,4 @@ extends FrontendController(mcc, actions):
     )
 
   def show: Action[AnyContent] = baseAction:
-    implicit request => Ok(view())
+    implicit request => Ok(view(request.agentApplication))

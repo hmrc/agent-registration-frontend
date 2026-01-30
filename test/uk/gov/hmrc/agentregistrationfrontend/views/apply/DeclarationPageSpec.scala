@@ -29,7 +29,10 @@ extends ViewSpec:
   given agentApplicationRequest: AgentApplicationRequest[?] = tdAll.makeAgentApplicationRequest(tdAll.agentApplicationLlp.afterDeclarationSubmitted)
 
   val doc: Document = Jsoup.parse(
-    viewTemplate(entityName = "Test Company Name").body
+    viewTemplate(
+      entityName = "Test Company Name",
+      agentApplication = agentApplicationRequest.agentApplication
+    ).body
   )
 
   "DeclarationPage" should:

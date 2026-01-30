@@ -40,7 +40,8 @@ extends ViewSpec:
   )
   val doc: Document = Jsoup.parse(viewTemplate(
     form = NumberOfKeyIndividualsForm.form,
-    entityName = tdAll.companyName
+    entityName = tdAll.companyName,
+    agentApplication = agentApplicationRequest.agentApplication
   ).body)
   private val heading: String = "How many partners are there at Test Company Name?"
 
@@ -100,6 +101,10 @@ extends ViewSpec:
       behavesLikePageWithErrorHandling(
         field = field,
         errorMessage = errorMessage,
-        errorDoc = Jsoup.parse(viewTemplate(formWithError, tdAll.companyName).body),
+        errorDoc = Jsoup.parse(viewTemplate(
+          form = formWithError,
+          entityName = tdAll.companyName,
+          agentApplication = agentApplicationRequest.agentApplication
+        ).body),
         heading = heading
       )

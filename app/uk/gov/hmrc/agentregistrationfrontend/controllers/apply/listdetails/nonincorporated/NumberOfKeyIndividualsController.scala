@@ -38,7 +38,7 @@ import javax.inject.Singleton
 class NumberOfKeyIndividualsController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  view: NumberOfKeyIndividualsPage,
+  numberOfKeyIndividualsPage: NumberOfKeyIndividualsPage,
   agentApplicationService: AgentApplicationService,
   businessPartnerRecordService: BusinessPartnerRecordService
 )
@@ -74,7 +74,7 @@ extends FrontendController(mcc, actions):
         businessPartnerRecordService
           .getBusinessPartnerRecord(request.agentApplication.getUtr)
           .map: bprOpt =>
-            Ok(view(
+            Ok(numberOfKeyIndividualsPage(
               form = NumberOfKeyIndividualsForm.form
                 .fill:
                   request.agentApplication.numberOfRequiredKeyIndividuals
@@ -83,7 +83,8 @@ extends FrontendController(mcc, actions):
                 .map(_.getEntityName)
                 .getOrThrowExpectedDataMissing(
                   "Business Partner Record is missing"
-                )
+                ),
+              agentApplication = request.agentApplication
             ))
 
   def submit: Action[AnyContent] =
@@ -96,13 +97,14 @@ extends FrontendController(mcc, actions):
               businessPartnerRecordService
                 .getBusinessPartnerRecord(request.agentApplication.getUtr)
                 .map: bprOpt =>
-                  view(
+                  numberOfKeyIndividualsPage(
                     form = formWithErrors,
                     entityName = bprOpt
                       .map(_.getEntityName)
                       .getOrThrowExpectedDataMissing(
                         "Business Partner Record is missing"
-                      )
+                      ),
+                    agentApplication = request.agentApplication
                   )
       )
       .async:
