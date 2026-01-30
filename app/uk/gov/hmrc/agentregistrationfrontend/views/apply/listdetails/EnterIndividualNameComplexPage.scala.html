@@ -1,0 +1,83 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+@import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
+@import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
+@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+@import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
+@import uk.gov.hmrc.agentregistrationfrontend.util.MessageKeys.singularOrPlural
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
+
+@this(
+        layout: Layout,
+        govukInput: GovukInput,
+        formWithCSRF: FormWithCSRF,
+        govukButton: GovukButton,
+        govukDetails: GovukDetails,
+        continueOrSaveForLater: ContinueOrSaveForLater
+)
+
+@(
+        form: Form[IndividualName],
+        ordinalKey: String,
+        numberOfRequiredKeyIndividuals: SixOrMore,
+        entityName: String
+)(implicit request: AgentApplicationRequest[?], messages: Messages)
+
+@key = @{
+  IndividualNameForm.key
+}
+@title = @{messages(s"$key.complex.title", entityName)}
+@detailsContent = {
+  <p class="govuk-body">@messages(s"$key.complex.details.p1")</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>@messages(s"$key.complex.details.bullet1")</li>
+    <li>@messages(s"$key.complex.details.bullet2")</li>
+  </ul>
+}
+@numberOfKeyIndividuals = @{numberOfRequiredKeyIndividuals.numberOfKeyIndividualsResponsibleForTaxMatters}
+@paddingRequired = @{numberOfRequiredKeyIndividuals.paddingRequired}
+
+@layout(
+    pageTitle = title,
+    maybeForm = Some(form)
+) {
+  <h2 class="govuk-caption-l">@messages(s"lists.caption.title.Partnership")</h2>
+  <h1 class="govuk-heading-l">@title</h1>
+  <p class="govuk-body">@messages(s"$key.complex.intro")</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>@messages(s"$key.complex.bullet1.${singularOrPlural(numberOfKeyIndividuals)}", numberOfKeyIndividuals)</li>
+    <li>@messages(s"$key.complex.bullet2.${singularOrPlural(paddingRequired)}", paddingRequired)</li>
+  </ul>
+  @govukDetails(Details(
+    summary = Text(messages(s"$key.complex.details")),
+    content = HtmlContent(detailsContent)
+  ))
+  @formWithCSRF(action = AppRoutes.apply.listdetails.EnterKeyIndividualController.submit) {
+    @govukInput(Input(
+      label = Label(
+        content = Text(messages(s"$key.label.$ordinalKey")),
+        isPageHeading = false,
+        classes = "govuk-label--m"
+      )
+    ).withFormField(form(key)))
+
+    @continueOrSaveForLater()
+  }
+}
