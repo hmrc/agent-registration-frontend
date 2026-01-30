@@ -40,7 +40,7 @@ object TupleTool:
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     inline def delete[T](using T PresentIn Data): Delete[T, Data] = deleteImpl[Data, T](data).asInstanceOf[Delete[T, Data]]
 
-    inline def ensureUnique: Data =
+    inline def ensureUniqueTypes: Data =
       if constValue[HasDuplicates[Data]]
       then failDuplicateTuple[Data]
       else data
@@ -74,13 +74,13 @@ object TupleTool:
       case h *: tail => h *: Delete[T, tail]
       case EmptyTuple => EmptyTuple
 
-  private type IsMember[T, Tup <: Tuple] <: Boolean =
+  type IsMember[T, Tup <: Tuple] <: Boolean =
     Tup match
       case T *: _ => true
       case _ *: tail => IsMember[T, tail]
       case EmptyTuple => false
 
-  private type HasDuplicates[Tup <: Tuple] <: Boolean =
+  type HasDuplicates[Tup <: Tuple] <: Boolean =
     Tup match
       case EmptyTuple => false
       case h *: t =>
@@ -140,14 +140,6 @@ object TupleTool:
   private def failDuplicateTupleImpl[Data: Type](using Quotes): Expr[Nothing] =
     import quotes.reflect.*
 
-    @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
-    def getTypes(t: TypeRepr): List[TypeRepr] =
-      t.dealias match
-        case AppliedType(base, List(head, tail)) if base.typeSymbol === TypeRepr.of[*:].typeSymbol => head :: getTypes(tail)
-        case t if t.typeSymbol === TypeRepr.of[EmptyTuple].typeSymbol => Nil
-        case AppliedType(base, args) if base.typeSymbol.name.startsWith("Tuple") && base.typeSymbol.owner.fullName === "scala" => args
-        case other => List(other)
-
     val types = getTypes(TypeRepr.of[Data])
 
     @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
@@ -164,9 +156,7 @@ object TupleTool:
     val duplicate: Option[TypeRepr] = findFirstDuplicate(types, Nil)
     val targetName: String = duplicate.map(t => cleanType(t.show)).getOrElse("Unknown")
 
-    val formattedList =
-      if types.isEmpty then "  (Empty Tuple)"
-      else types.map(t => s"  * ${cleanType(t.show)}").mkString("\n")
+    val formattedList = formatTupleContent(TypeRepr.of[Data])
 
     val msg = s"Tuple isn't unique. Type '$targetName' occurs more more then once:\n$formattedList"
     '{ scala.compiletime.error(${ Expr(msg) }) }
@@ -185,7 +175,8 @@ object TupleTool:
         case AppliedType(base, List(head, tail)) if base.typeSymbol === TypeRepr.of[*:].typeSymbol =>
           if head =:= target then
             val name = cleanType(target.show)
-            val msg = s"Type '$name' is already present in the tuple."
+            val formattedList = formatTupleContent(TypeRepr.of[Tup])
+            val msg = s"Type '$name' is already present in the tuple.\nAvailable types:\n$formattedList"
             List('{ scala.compiletime.error(${ Expr(msg) }) })
           else
             val headCheck =
@@ -200,7 +191,8 @@ object TupleTool:
           args.flatMap { arg =>
             if arg =:= target then
               val name = cleanType(target.show)
-              val msg = s"Type '$name' is already present in the tuple."
+              val formattedList = formatTupleContent(TypeRepr.of[Tup])
+              val msg = s"Type '$name' is already present in the tuple.\nAvailable types:\n$formattedList"
               List('{ scala.compiletime.error(${ Expr(msg) }) })
             else if arg.typeSymbol.isTypeParam || arg.typeSymbol.isAbstractType then
               arg.asType match
@@ -231,20 +223,9 @@ object TupleTool:
 
     def formatType(t: TypeRepr): String = cleanType(t.show)
 
-    @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
-    def getTupleElements(t: TypeRepr): List[String] =
-      t.dealias match
-        case AppliedType(base, List(head, tail)) if base.typeSymbol === consSymbol => formatType(head) :: getTupleElements(tail)
-        case t if t.typeSymbol === emptyTupleSymbol => Nil
-        case AppliedType(base, args) if base.typeSymbol.name.startsWith("Tuple") && base.typeSymbol.owner.fullName === "scala" => args.map(formatType)
-        case other => List(formatType(other))
-
     def notFoundError: Expr[Nothing] =
-      val dataElements = getTupleElements(TypeRepr.of[Tup])
       val targetName = formatType(target)
-      val formattedList =
-        if dataElements.isEmpty then "  (Empty Tuple)"
-        else dataElements.map(s => s"  * $s").mkString("\n")
+      val formattedList = formatTupleContent(TypeRepr.of[Tup])
       val msg = s"Type '$targetName' is not present in the tuple.\nAvailable types:\n$formattedList"
       '{ scala.compiletime.error(${ Expr(msg) }) }
 
@@ -266,3 +247,17 @@ object TupleTool:
               case '[t] => Expr.block(List('{ scala.compiletime.summonInline[TupleTool.PresentIn[T, t & Tuple]] }), '{ new TupleTool.PresentIn[T, Tup] {} })
 
     check(TypeRepr.of[Tup])
+
+  @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+  private def getTypes(using q: Quotes)(t: q.reflect.TypeRepr): List[q.reflect.TypeRepr] =
+    import q.reflect.*
+    t.dealias match
+      case AppliedType(base, List(head, tail)) if base.typeSymbol === TypeRepr.of[*:].typeSymbol => head :: getTypes(tail)
+      case t if t.typeSymbol === TypeRepr.of[EmptyTuple].typeSymbol => Nil
+      case AppliedType(base, args) if base.typeSymbol.name.startsWith("Tuple") && base.typeSymbol.owner.fullName === "scala" => args
+      case other => List(other)
+
+  private def formatTupleContent(using q: Quotes)(t: q.reflect.TypeRepr): String =
+    val types = getTypes(t)
+    if types.isEmpty then "  (Empty Tuple)"
+    else types.map(t => s"  * ${cleanType(t.show)}").mkString("\n")

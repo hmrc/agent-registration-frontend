@@ -51,7 +51,7 @@ object RequestWithData:
   ](
     request: Request[ContentType],
     data: Data
-  ): RequestWithData[ContentType, Data] = create(request, data.ensureUnique)
+  ): RequestWithData[ContentType, Data] = create(request, data.ensureUniqueTypes)
 
   private def create[
     ContentType,

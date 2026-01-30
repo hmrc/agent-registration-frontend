@@ -33,16 +33,24 @@ extends UnitSpec:
   extends Animal
   type CanSwim = Animal & (Fish | Frog)
 
-  "tuple.get" in:
-//    EmptyTuple.get[Boolean]
+  "showcase" in:
+    //    EmptyTuple.get[Boolean]
     val kermit: Frog = Frog("Kermit")
     val t = (1, "string", true, kermit)
     t.get[Int] shouldBe 1
     t.get[String] shouldBe "string"
     t.get[Boolean] shouldBe true
-//    t.get[Any]
-//    t.get[Animal] shouldBe Frog("kermit")
+    //    t.get[Any]
+    //    t.get[Animal] shouldBe Frog("kermit")
     t.get[Frog] shouldBe kermit
+    val t2: (Int, Int) = (1, 2)
+    t2.add(2.0)
+
+//    case class UniqueTuple[Data <: Tuple](t: Data)(using HasDuplicates[Data] =:= false)
+
+//    (1, 2).ensureUniqueTypes
+//    (1, 2).update(123) shouldBe (123, 2)
+    (1, 2).replace[Int, Long](123) shouldBe (123, 2)
 
   "TupleTool" should:
 
@@ -58,7 +66,12 @@ extends UnitSpec:
           val t = (1, "string")
           t.add("duplicate")
         """)
-        errors.map(_.message) shouldBe List("Type 'String' is already present in the tuple.")
+        errors.map(_.message) shouldBe List(
+          """Type 'String' is already present in the tuple.
+            |Available types:
+            |  * Int
+            |  * String""".stripMargin
+        )
 
     "get" should:
       "retrieve an existing element" in:
@@ -144,7 +157,7 @@ extends UnitSpec:
     "ensureUnique" should:
       "pass for a tuple with unique types" in:
         val t = (1, "string", true)
-        t.ensureUnique shouldBe t
+        t.ensureUniqueTypes shouldBe t
 
       "fail to compile for a tuple with duplicate types" in:
         val errors = typeCheckErrors("""
