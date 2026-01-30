@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.PresentIn
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 object Requests:
@@ -44,5 +45,8 @@ object Requests:
     )
   ]
 
-  extension [A](r: AgentApplicationRequest2[A])
-    def agentApplication = r.get[AgentApplication]
+  extension [
+    A,
+    Data <: Tuple
+  ](r: RequestWithData[A, Data])
+    inline def agentApplication(using AgentApplication PresentIn Data): AgentApplication = r.get[AgentApplication]

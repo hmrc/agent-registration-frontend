@@ -19,12 +19,19 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.GroupId
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.AgentApplicationRequest2
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.agentApplication
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.ConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.ViewApplicationPage
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -65,10 +72,10 @@ extends FrontendController(mcc, actions):
 
   def applicationSubmitted: Action[AnyContent] = actions
     .Applicant
-    .getApplicationSubmitted.async:
-      implicit request =>
+    .getApplicationSubmitted2.async:
+      implicit request: (AgentApplicationRequest2[AnyContent]) =>
         businessPartnerRecordService
-          .getBusinessPartnerRecord(request.agentApplication.getUtr)
+          .getBusinessPartnerRecord2(request.get[AgentApplication].getUtr)
           .map: bprOpt =>
             Ok(confirmationPage(
               entityName = bprOpt
@@ -76,15 +83,15 @@ extends FrontendController(mcc, actions):
                 .getOrThrowExpectedDataMissing(
                   "Business Partner Record is missing for confirmation page"
                 ),
-              agentApplication = request.agentApplication
+              agentApplication = request.get[AgentApplication]
             ))
 
   def viewSubmittedApplication: Action[AnyContent] = actions
     .Applicant
-    .getApplicationSubmitted.async:
-      implicit request =>
+    .getApplicationSubmitted2.async:
+      implicit request: (AgentApplicationRequest2[AnyContent]) =>
         businessPartnerRecordService
-          .getBusinessPartnerRecord(request.agentApplication.getUtr)
+          .getBusinessPartnerRecord2(request.agentApplication.getUtr)
           .map: bprOpt =>
             Ok(viewApplicationPage(
               entityName = bprOpt
@@ -92,7 +99,7 @@ extends FrontendController(mcc, actions):
                 .getOrThrowExpectedDataMissing(
                   "Business Partner Record is missing for View Application page"
                 ),
-              agentApplication = request.agentApplication
+              agentApplication = request.get[AgentApplication]
             ))
 
   def startRegistration: Action[AnyContent] = action:

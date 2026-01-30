@@ -23,12 +23,43 @@ import play.api.mvc.Results.BadRequest
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.AbsentIn
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 object ActionsHelper
 extends RequestAwareLogging:
+
+  extension [
+    Data <: Tuple,
+    R <: [X] =>> RequestWithData[X, Data],
+    ContentType // ContentType Represents Play Framework's Content Type parameter, commonly denoted as B
+  ](ab: ActionBuilder[R, ContentType])(using ec: ExecutionContext)
+
+    def ensureValidFormGenericAsync2[T](
+      form: R[ContentType] => Form[T],
+      resultToServeWhenFormHasErrors: R[ContentType] => Form[T] => Future[Result]
+    )(using
+      fb: FormBinding,
+      ev: T AbsentIn Data
+    ): ActionBuilder[[X] =>> RequestWithData[X, T *: Data], ContentType] = ab.andThen(new ActionRefiner[R, [X] =>> RequestWithData[X, T *: Data]] {
+
+      @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+      override protected def refine[A](rA: R[A]): Future[Either[Result, RequestWithData[A, T *: Data]]] = {
+        val rB: R[ContentType] = rA.asInstanceOf[R[ContentType]]
+        form(rB).bindFromRequest()(using rB, fb).fold(
+          hasErrors = formWithErrors => resultToServeWhenFormHasErrors(rB)(formWithErrors).map(Left(_)),
+          success =
+            (formValue: T) =>
+//              val x: R[A, T *: Data] = merge.mergeFormValue(rB, formValue).asInstanceOf[R[A] & FormValue[T]]
+              val x: RequestWithData[A, T *: Data] = rB.add(formValue).asInstanceOf[RequestWithData[A, T *: Data]]
+              Future.successful(Right(x))
+        )
+      }
+
+      override protected def executionContext: ExecutionContext = ec
+    })
 
   extension [
     R <: [X] =>> Request[X],
