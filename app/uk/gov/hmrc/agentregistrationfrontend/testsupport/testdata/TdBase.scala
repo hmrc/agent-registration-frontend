@@ -189,7 +189,7 @@ trait TdBase:
 
   val individualProvidedDetails: IndividualProvidedDetails = IndividualProvidedDetails(
     _id = individualProvidedDetailsId,
-    internalUserId = internalUserId,
+    internalUserId = Some(internalUserId),
     createdAt = nowAsInstant,
     agentApplicationId = agentApplicationId,
     providedDetailsState = ProvidedDetailsState.Started

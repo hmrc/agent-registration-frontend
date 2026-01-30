@@ -33,7 +33,7 @@ trait TdIndividualProvidedDetails { dependencies: (TdBase) =>
 
     val afterStarted: IndividualProvidedDetails = IndividualProvidedDetails(
       _id = dependencies.individualProvidedDetailsId,
-      internalUserId = dependencies.internalUserId,
+      internalUserId = Some(dependencies.internalUserId),
       createdAt = dependencies.nowAsInstant,
       agentApplicationId = dependencies.agentApplicationId,
       providedDetailsState = Started

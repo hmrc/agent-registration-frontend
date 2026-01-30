@@ -53,7 +53,7 @@ extends IndividualProvideDetailsRequest[A](
     requirement = individualProvidedDetails.agentApplicationId === agentApplication._id,
     message =
       s"Sanity Check: ApplicationId from the request (${agentApplication._id.value}) must match the provided details " +
-        s"retrieved from backend (${individualProvidedDetails.internalUserId.value}) (this should never happen)"
+        s"retrieved from backend (${individualProvidedDetails.getInternalUserId.value}) (this should never happen)"
   )(using this)
 
 object IndividualProvideDetailsWithApplicationRequest:

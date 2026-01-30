@@ -32,7 +32,7 @@ import java.time.Instant
   */
 final case class IndividualProvidedDetails(
   _id: IndividualProvidedDetailsId,
-  internalUserId: InternalUserId,
+  internalUserId: Option[InternalUserId],
   createdAt: Instant,
   providedDetailsState: ProvidedDetailsState,
   agentApplicationId: AgentApplicationId,
@@ -50,6 +50,8 @@ final case class IndividualProvidedDetails(
 
   val hasFinished: Boolean = providedDetailsState === Finished
   val isInProgress: Boolean = !hasFinished
+
+  def getInternalUserId: InternalUserId = internalUserId.getOrThrowExpectedDataMissing("Internal user ID")
 
   def getCompaniesHouseMatch: CompaniesHouseMatch = companiesHouseMatch.getOrThrowExpectedDataMissing(
     "Companies house query is missing for individual provided details"

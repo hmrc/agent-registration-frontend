@@ -43,7 +43,7 @@ class IndividualProvideDetailsFactory @Inject() (
     individualDateOfBirth: Option[IndividualDateOfBirth]
   ): IndividualProvidedDetails = IndividualProvidedDetails(
     _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
-    internalUserId = internalUserId,
+    internalUserId = Some(internalUserId),
     agentApplicationId = agentApplicationId,
     createdAt = Instant.now(clock),
     providedDetailsState = Started,

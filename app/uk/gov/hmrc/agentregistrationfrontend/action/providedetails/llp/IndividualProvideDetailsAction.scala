@@ -52,10 +52,10 @@ extends IndividualAuthorisedRequest[A](
   credentials
 ):
   Errors.require(
-    requirement = individualProvidedDetails.internalUserId === internalUserId,
+    requirement = individualProvidedDetails.getInternalUserId === internalUserId,
     message =
       s"Sanity Check: InternalUserId from the request (${internalUserId.value}) must match the provided details " +
-        s"retrieved from backend (${individualProvidedDetails.internalUserId.value}) (this should never happen)"
+        s"retrieved from backend (${individualProvidedDetails.getInternalUserId.value}) (this should never happen)"
   )(using this)
 
 object IndividualProvideDetailsRequest:
