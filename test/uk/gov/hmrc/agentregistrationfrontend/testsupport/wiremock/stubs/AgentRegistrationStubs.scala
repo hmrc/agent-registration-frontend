@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.Utr
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AgentRegistrationStubs:
@@ -118,6 +119,16 @@ object AgentRegistrationStubs:
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/by-agent-application-id/${agentApplicationId.value}"),
     responseStatus = Status.NO_CONTENT,
     responseBody = ""
+  )
+
+  def stubFindIndividualsForApplication(
+    agentApplicationId: AgentApplicationId,
+    individuals: List[IndividualProvidedDetails] = List.empty
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/individual-provided-details/for-application/${agentApplicationId.value}"),
+    responseStatus = 200,
+    responseBody = Json.toJson(individuals).toString
   )
 
   def verifyFindApplicationByAgentApplicationId(

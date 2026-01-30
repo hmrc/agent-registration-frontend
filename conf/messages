@@ -327,6 +327,22 @@ numberOfOfficialsWhoDealWithTax.error.invalid = Enter the number who are respons
 numberOfOfficialsWhoDealWithTax.label = How many are responsible for tax matters?
 numberOfOfficialsWhoDealWithTax.hint = This means material responsibility for tax advice activities or significant authority over HMRC interactions.
 
+individualName.label.first = What is the full name of the first partner?
+individualName.label.subsequent = What is the full name of the next partner?
+individualName.label.only = What is the full name of the partner?
+individualName.complex.title = Tell us about the partners of {0}
+individualName.complex.intro = We need the names of:
+individualName.complex.bullet1.plural = the {0} partners responsible for tax advice
+individualName.complex.bullet1.singular = the partner responsible for tax advice
+individualName.complex.bullet2.plural = {0} other partners
+individualName.complex.bullet2.singular = 1 other partner
+individualName.complex.details = What we mean by ‘responsible for tax advice’
+individualName.complex.details.p1 = A partner is responsible for tax advice if they have:
+individualName.complex.details.bullet1 = material responsibility for tax advice activities
+individualName.complex.details.bullet2 = significant authority over HMRC interactions
+individualName.error.required = Enter the full name of the partner
+individualName.error.invalid = The partner’s name must only include letters a to z, hyphens, apostrophes and spaces
+
 # Apply / Declaration
 declaration.title = Declaration
 declaration.p1 = I am authorised by {0} to apply for an agent services account with HMRC.

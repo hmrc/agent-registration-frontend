@@ -26,7 +26,6 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.checkfailed.route
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.routes as applicantcontactdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.routes as agentdetailsRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.routes as listdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.nonincorporated.routes as listdetailsNonIncorporatedRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes as internalRoutes
 
@@ -88,7 +87,7 @@ object AppRoutes:
     object listdetails:
 
       val NumberOfKeyIndividualsController = listdetailsNonIncorporatedRoutes.NumberOfKeyIndividualsController
-      val EnterKeyIndividualController = listdetailsRoutes.EnterKeyIndividualController
+      val EnterKeyIndividualController = listdetailsNonIncorporatedRoutes.EnterKeyIndividualController
 
     object checkfailed:
 
