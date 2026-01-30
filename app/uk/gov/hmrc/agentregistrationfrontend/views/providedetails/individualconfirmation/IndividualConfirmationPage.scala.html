@@ -16,7 +16,6 @@
 
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
 
 @this(
         appConfig: AppConfig,
@@ -26,8 +25,10 @@
 
 @(
         applicantName: String,
-        companyName: String
-)(implicit request: IndividualProvideDetailsRequest[?], messages: Messages)
+        companyName: String)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{
     "individualConfirmation"

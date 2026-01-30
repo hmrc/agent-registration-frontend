@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.AnswerSummary
-@import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
+@import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 
 @this(
         layout: Layout,
@@ -26,8 +26,10 @@
         formWithCSRF: FormWithCSRF
 )
 
-@(implicit
-        request: IndividualProvideDetailsRequest[?],
+
+@(
+        individualProvidedDetails: IndividualProvidedDetails)(implicit
+        request: RequestHeader,
         messages: Messages
 )
 
@@ -37,16 +39,13 @@
 @title = @{
     messages(s"$key.title")
 }
-@individualDetails = @{
-    request.individualProvidedDetails
-}
 
 @layout(pageTitle = title) {
     <h2 class="govuk-caption-l">@messages("provide-details.llp.title")</h2>
     <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
     @answerSummary(
         key,
-        individualProvidedDetails = individualDetails
+        individualProvidedDetails = individualProvidedDetails
     )
     <p class="govuk-body">
     @formWithCSRF(action = AppRoutes.providedetails.CheckYourAnswersController.submit) {

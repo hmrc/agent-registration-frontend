@@ -22,6 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
+import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
@@ -67,3 +68,8 @@ extends RequestAwareLogging:
     Errors.require(individualProvidedDetails.internalUserId === request.internalUserId, "Cannot modify provided details - you must be the user who created it")
     individualProvideDetailsConnector
       .upsertMemberProvidedDetails(individualProvidedDetails)
+
+  // for use by agent applicants when building lists of individuals
+  def findByApplicationId(using request: AgentApplicationRequest[?]): Future[List[IndividualProvidedDetails]] =
+    individualProvideDetailsConnector
+      .find

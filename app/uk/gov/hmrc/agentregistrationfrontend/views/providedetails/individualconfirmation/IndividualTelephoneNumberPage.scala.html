@@ -29,7 +29,11 @@
         saveAndContinue: SaveAndContinue
 )
 
-@(form: Form[TelephoneNumber])(implicit request: IndividualProvideDetailsRequest[AnyContent], messages: Messages)
+@(
+        form: Form[TelephoneNumber])(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{
     IndividualTelephoneNumberForm.key

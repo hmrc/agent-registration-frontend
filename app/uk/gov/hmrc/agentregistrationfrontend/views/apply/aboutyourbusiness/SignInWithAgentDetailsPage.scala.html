@@ -19,11 +19,15 @@
 @import sttp.model.Uri
 
 @this(
-    layout: Layout,
-    govukButton: GovukButton
+        layout: Layout,
+        govukButton: GovukButton
 )
 
-@(signInLink: Uri)(implicit request: Request[?], messages: Messages)
+@(
+        signInLink: Uri)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{"signInWithAgentDetails"}
 @title = @{messages(s"$key.title")}

@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls
 import com.google.inject.AbstractModule
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -40,7 +40,7 @@ extends ControllerSpec:
     )
 
   private final case class TestCaseForCya(
-    application: AgentApplicationLlp,
+    application: AgentApplication,
     amlsType: String,
     expectedRedirect: Option[String] = None
   )

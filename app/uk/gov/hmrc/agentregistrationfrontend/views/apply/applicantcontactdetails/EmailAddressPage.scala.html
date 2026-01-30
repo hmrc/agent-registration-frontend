@@ -15,7 +15,6 @@
  *@
 
 @import uk.gov.hmrc.agentregistration.shared.EmailAddress
-@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 @import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
@@ -29,7 +28,11 @@
         continueOrSaveForLater: ContinueOrSaveForLater
 )
 
-@(form: Form[EmailAddress])(implicit request: AgentApplicationRequest[AnyContent], messages: Messages)
+@(
+        form: Form[EmailAddress])(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{
     EmailAddressForm.key

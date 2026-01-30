@@ -17,14 +17,15 @@
 @import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLlp
 
 @this(
-  govukSummaryList: GovukSummaryList
+        govukSummaryList: GovukSummaryList
 )
 
 @(
         key: String,
         answers: BusinessDetailsLlp,
-        canChange: Boolean = true
-)(implicit messages: Messages)
+        canChange: Boolean = true)(implicit
+        messages: Messages
+)
 
 @agentTypeRow = @{
   SummaryListRow(

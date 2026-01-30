@@ -87,7 +87,8 @@ extends FrontendController(mcc, actions):
                 .flatMap(_.agentEmailAddress)
                 .map(_.emailAddress)
             ,
-            bprEmailAddress = bprOpt.flatMap(_.emailAddress)
+            bprEmailAddress = bprOpt.flatMap(_.emailAddress),
+            agentApplication = request.agentApplication
           ))
 
   def submit: Action[AnyContent] = baseAction
@@ -108,7 +109,8 @@ extends FrontendController(mcc, actions):
               .map: (bprOpt: Option[BusinessPartnerRecordResponse]) =>
                 view(
                   form = formWithErrors,
-                  bprEmailAddress = bprOpt.flatMap(_.emailAddress)
+                  bprEmailAddress = bprOpt.flatMap(_.emailAddress),
+                  agentApplication = request.agentApplication
                 )
     )
     .async:

@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.AnswerSummary
-@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
 
 @this(
         layout: Layout,
@@ -26,8 +26,9 @@
         answerSummary: AnswerSummary
 )
 
-@(implicit
-        request: AgentApplicationRequest[?],
+@(
+        agentApplication: AgentApplication)(implicit
+        request: RequestHeader,
         messages: Messages
 )
 
@@ -43,7 +44,7 @@
     <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
     @answerSummary(
       key = key,
-      answers = request.agentApplication.getApplicantContactDetails
+      answers = agentApplication.getApplicantContactDetails
     )
     <p class="govuk-body">
       @govukButton(Button(

@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -31,14 +31,14 @@ extends ControllerSpec:
 
   object agentApplication:
 
-    val afterEmailAddressSelected: AgentApplicationLlp =
+    val afterEmailAddressSelected: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterVerifiedEmailAddressSelected
 
-    val afterOtherAddressProvided: AgentApplicationLlp =
+    val afterOtherAddressProvided: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAgentDetails

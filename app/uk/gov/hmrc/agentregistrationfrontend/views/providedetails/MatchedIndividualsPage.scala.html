@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
 @import uk.gov.hmrc.agentregistrationfrontend.forms.OfficerSelection
@@ -34,8 +33,10 @@
 
 @(
         form: Form[OfficerSelection],
-        officers: Seq[CompaniesHouseOfficer]
-)(implicit request: Request[?], messages: Messages)
+        officers: Seq[CompaniesHouseOfficer])(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{ChOfficerSelectionForms.key}
 @makeDateOfBirth(dob: Option[CompaniesHouseDateOfBirth]) = {

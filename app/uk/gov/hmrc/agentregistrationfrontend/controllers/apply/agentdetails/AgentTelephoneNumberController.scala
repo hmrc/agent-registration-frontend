@@ -71,7 +71,8 @@ extends FrontendController(mcc, actions):
                 .agentApplication
                 .agentDetails.flatMap(_.telephoneNumber)
             ,
-            bprTelephoneNumber = bprOpt.flatMap(_.primaryPhoneNumber)
+            bprTelephoneNumber = bprOpt.flatMap(_.primaryPhoneNumber),
+            agentApplication = request.agentApplication
           ))
 
   def submit: Action[AnyContent] =
@@ -86,7 +87,8 @@ extends FrontendController(mcc, actions):
                 .map: bprOpt =>
                   view(
                     form = formWithErrors,
-                    bprTelephoneNumber = bprOpt.flatMap(_.primaryPhoneNumber)
+                    bprTelephoneNumber = bprOpt.flatMap(_.primaryPhoneNumber),
+                    agentApplication = request.agentApplication
                   )
       )
       .async:

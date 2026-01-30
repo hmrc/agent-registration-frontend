@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.llp
+package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections
 
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import com.softwaremill.quicklens.modify
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
@@ -30,16 +31,16 @@ import scala.util.chaining.scalaUtilChainingOps
 trait TdSectionAmls {
   dependencies: TdBase & TdUpload =>
 
-  final def amlsCodeHmrc: AmlsCode = AmlsCode("HMRC")
-  def amlsCodeNonHmrc: AmlsCode = AmlsCode("ATT") /// Association of TaxationTechnicians
+  private final def amlsCodeHmrc: AmlsCode = AmlsCode("HMRC")
+  private def amlsCodeNonHmrc: AmlsCode = AmlsCode("ATT") /// Association of TaxationTechnicians
 
-  def amlsRegistrationNumberHmrc = AmlsRegistrationNumber("XAML00000123456")
-  def amlsRegistrationNumberNonHmrc = AmlsRegistrationNumber("NONHMRC-REF-AMLS-NUMBER-00001")
+  private def amlsRegistrationNumberHmrc = AmlsRegistrationNumber("XAML00000123456")
+  private def amlsRegistrationNumberNonHmrc = AmlsRegistrationNumber("NONHMRC-REF-AMLS-NUMBER-00001")
 
   def amlsExpiryDateValid: LocalDate = dependencies.nowPlus6mAsLocalDateTime.toLocalDate
   def amlsExpiryDateInvalid: LocalDate = dependencies.nowPlus13mAsLocalDateTime.toLocalDate
 
-  class AgentApplicationLlpWithSectionAmls(baseForSectionAmls: AgentApplicationLlp):
+  class AgentApplicationWithSectionAmls(baseForSectionAmls: AgentApplication):
 
     /** when the supervisory body is HMRC, the registration number has a different format to non-HMRC bodies and no evidence or expiry date is required to be
       * considered complete
@@ -64,13 +65,15 @@ trait TdSectionAmls {
             amlsRegistrationNumber = Some(amlsRegistrationNumber)
           ).tap(x => require(x.isComplete, "when HMRC - no evidence or expiry date is required to be considered complete"))
 
-        def afterSupervisoryBodySelected: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterSupervisoryBodySelected))
+        def afterSupervisoryBodySelected: AgentApplication = baseForSectionAmls
+          .modify(_.amlsDetails)
+          .setTo(Some(amlsDetailsHelper.afterSupervisoryBodySelected))
 
-        def afterRegistrationNumberProvided: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails =
-          Some(amlsDetailsHelper.afterRegistrationNumberProvided)
-        )
+        def afterRegistrationNumberProvided: AgentApplication = baseForSectionAmls
+          .modify(_.amlsDetails)
+          .setTo(Some(amlsDetailsHelper.afterRegistrationNumberProvided))
 
-        def complete: AgentApplicationLlp = afterRegistrationNumberProvided.tap(x => require(x.amlsDetails.exists(_.isComplete), "sanity check"))
+        def complete: AgentApplication = afterRegistrationNumberProvided.tap(x => require(x.amlsDetails.exists(_.isComplete), "sanity check"))
 
       object whenSupervisorBodyIsNonHmrc:
 
@@ -104,20 +107,22 @@ trait TdSectionAmls {
             )
           }
 
-        def afterSupervisoryBodySelected: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails = Some(amlsDetailsHelper.afterSupervisoryBodySelected))
+        def afterSupervisoryBodySelected: AgentApplication = baseForSectionAmls
+          .modify(_.amlsDetails)
+          .setTo(Some(amlsDetailsHelper.afterSupervisoryBodySelected))
 
-        def afterRegistrationNumberProvided: AgentApplicationLlp = baseForSectionAmls.copy(amlsDetails =
-          Some(amlsDetailsHelper.afterRegistrationNumberProvided)
-        )
+        def afterRegistrationNumberProvided: AgentApplication = baseForSectionAmls
+          .modify(_.amlsDetails)
+          .setTo(Some(amlsDetailsHelper.afterRegistrationNumberProvided))
 
-        def afterAmlsExpiryDateProvided: AgentApplicationLlp = baseForSectionAmls.copy(
-          amlsDetails = Some(amlsDetailsHelper.afterAmlsExpiryDateProvided)
-        )
+        def afterAmlsExpiryDateProvided: AgentApplication = baseForSectionAmls
+          .modify(_.amlsDetails)
+          .setTo(Some(amlsDetailsHelper.afterAmlsExpiryDateProvided))
 
-        def afterUploadSucceeded: AgentApplicationLlp = baseForSectionAmls.copy(
-          amlsDetails = Some(amlsDetailsHelper.afterUploadedAmlsEvidence)
-        )
+        def afterUploadSucceeded: AgentApplication = baseForSectionAmls
+          .modify(_.amlsDetails)
+          .setTo(Some(amlsDetailsHelper.afterUploadedAmlsEvidence))
 
-        def complete: AgentApplicationLlp = afterUploadSucceeded.tap(x => require(x.amlsDetails.exists(_.isComplete), "sanity check"))
+        def complete: AgentApplication = afterUploadSucceeded.tap(x => require(x.amlsDetails.exists(_.isComplete), "sanity check"))
 
 }

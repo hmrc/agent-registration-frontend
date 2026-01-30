@@ -33,8 +33,10 @@
 )
 
 @(
-        form: Form[UserProvidedNino]
-)(implicit request: IndividualProvideDetailsRequest[?], messages: Messages)
+        form: Form[UserProvidedNino])(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{
     IndividualNinoForm.hasNinoKey

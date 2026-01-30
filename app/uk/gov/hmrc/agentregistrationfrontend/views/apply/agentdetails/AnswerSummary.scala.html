@@ -18,14 +18,15 @@
 @import uk.gov.hmrc.agentregistrationfrontend.model.agentdetails.AgentCorrespondenceAddressHelper.*
 
 @this(
-  govukSummaryList: GovukSummaryList
+        govukSummaryList: GovukSummaryList
 )
 
 @(
         key: String,
         answers: AgentDetails,
-        canChange: Boolean = true
-)(implicit messages: Messages)
+        canChange: Boolean = true)(implicit
+        messages: Messages
+)
 
 @businessNameRow = @{
   SummaryListRow(

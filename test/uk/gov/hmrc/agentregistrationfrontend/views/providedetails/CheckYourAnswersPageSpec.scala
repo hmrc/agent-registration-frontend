@@ -19,8 +19,9 @@ package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.CheckYourAnswersPage
@@ -32,7 +33,7 @@ extends ViewSpec:
 
   private object individualProvideDetails:
 
-    val complete = tdAll.providedDetailsLlp.afterApproveAgentApplication
+    val complete: IndividualProvidedDetails = tdAll.providedDetailsLlp.afterApproveAgentApplication
     val completeWithNinoAndSaUtrNotProvided = tdAll.providedDetailsLlp.afterApproveAgentApplication
       .copy(
         individualDateOfBirth = Some(tdAll.dateOfBirthProvided),
@@ -52,7 +53,9 @@ extends ViewSpec:
 
   private def pageTitle: String = s"$heading - $serviceTitleSuffix"
 
-  private def renderDoc()(using IndividualProvideDetailsRequest[AnyContent]): Document = Jsoup.parse(viewTemplate().body)
+  private def renderDoc()(using request: IndividualProvideDetailsRequest[AnyContent]): Document = Jsoup.parse(
+    viewTemplate(request.individualProvidedDetails).body
+  )
 
   private def summaryRow(
     key: String,

@@ -40,7 +40,8 @@ extends ViewSpec:
   )
   val doc: Document = Jsoup.parse(viewTemplate(
     form = AgentEmailAddressForm.form,
-    bprEmailAddress = Some(tdAll.bprEmailAddress)
+    bprEmailAddress = Some(tdAll.bprEmailAddress),
+    agentApplication = agentApplicationRequest.agentApplication
   ).body)
   private val heading: String = "What email address should we use for your agent services account?"
 
@@ -101,6 +102,10 @@ extends ViewSpec:
       behavesLikePageWithErrorHandling(
         field = field,
         errorMessage = errorMessage,
-        errorDoc = Jsoup.parse(viewTemplate(formWithError, Some(tdAll.bprEmailAddress)).body),
+        errorDoc = Jsoup.parse(viewTemplate(
+          form = formWithError,
+          bprEmailAddress = Some(tdAll.bprEmailAddress),
+          agentApplication = agentApplicationRequest.agentApplication
+        ).body),
         heading = heading
       )

@@ -15,12 +15,10 @@
  *@
 
 @import uk.gov.hmrc.govukfrontend.views.html.components._
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichRadios
 @import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AnswerSummary
-@import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
-@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
 
 @this(
         layout: Layout,
@@ -30,9 +28,9 @@
         answerSummary: AnswerSummary
 )
 
-
-@(implicit
-        request: AgentApplicationRequest[?],
+@(
+        agentApplication: AgentApplication)(implicit
+        request: RequestHeader,
         messages: Messages
 )
 
@@ -48,7 +46,7 @@
     <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
     @answerSummary(
         key,
-        amlsDetails = request.agentApplication.getAmlsDetails
+        amlsDetails = agentApplication.getAmlsDetails
     )
     <p class="govuk-body">
       @govukButton(Button(

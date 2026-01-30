@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLlp
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsSoleTrader
 import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
@@ -104,6 +105,7 @@ trait TdGrs {
 //      val businessDetails: BusinessDetailsLlp = to be defined
 
     object generalPartnership:
+
       val journeyData: JourneyData = JourneyData(
         fullName = None,
         dateOfBirth = None,
@@ -120,6 +122,10 @@ trait TdGrs {
         )
       )
 
-//      val businessDetails: BusinessDetailsGeneralPartnership = to be defined
+      val businessDetails: BusinessDetailsGeneralPartnership = BusinessDetailsGeneralPartnership(
+        safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+        saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
+        postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode")
+      )
 
 }

@@ -19,11 +19,15 @@
 @import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadStatus
 
 @this(
-    layout: Layout,
-    govukButton: GovukButton
+        layout: Layout,
+        govukButton: GovukButton
 )
 
-@(status: UploadStatus)(implicit messages: Messages, request: RequestHeader)
+@(
+        status: UploadStatus)(implicit
+        messages: Messages,
+        request: RequestHeader
+)
 
 
 @pageTitle =  @{status match {

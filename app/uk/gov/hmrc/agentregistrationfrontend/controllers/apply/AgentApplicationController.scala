@@ -75,7 +75,8 @@ extends FrontendController(mcc, actions):
                 .map(_.getEntityName)
                 .getOrThrowExpectedDataMissing(
                   "Business Partner Record is missing for confirmation page"
-                )
+                ),
+              agentApplication = request.agentApplication
             ))
 
   def viewSubmittedApplication: Action[AnyContent] = actions
@@ -90,7 +91,8 @@ extends FrontendController(mcc, actions):
                 .map(_.getEntityName)
                 .getOrThrowExpectedDataMissing(
                   "Business Partner Record is missing for View Application page"
-                )
+                ),
+              agentApplication = request.agentApplication
             ))
 
   def startRegistration: Action[AnyContent] = action:

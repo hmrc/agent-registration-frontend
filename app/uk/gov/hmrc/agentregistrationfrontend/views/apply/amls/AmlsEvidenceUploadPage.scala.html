@@ -14,14 +14,11 @@
  * limitations under the License.
  *@
 
-@import play.twirl.api.Html
 @import uk.gov.hmrc.agentregistration.shared.AmlsName
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector.UpscanInitiateResponse
-@import uk.gov.hmrc.agentregistrationfrontend.views.html._
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import views.html.helper.CSPNonce
-@import java.net.URI
 
 @this(
         layout: Layout,
@@ -34,8 +31,10 @@
 
 @(
         upscanInitiateResponse: UpscanInitiateResponse,
-        supervisoryBodyName: AmlsName
-)(implicit request: Request[?], messages: Messages)
+        supervisoryBodyName: AmlsName)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{"amlsEvidenceUpload"}
 @title = @{messages(s"$key.title")}

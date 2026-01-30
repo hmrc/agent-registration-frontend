@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.llp
+package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections
 
 import com.softwaremill.quicklens.*
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.agentdetails.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors.*
@@ -25,13 +25,13 @@ import uk.gov.hmrc.agentregistrationfrontend.util.Errors.*
 trait TdSectionAgentDetails {
   dependencies: TdBase =>
 
-  class TdAgentApplicationLlpWithSectionAgentDetails(baseForSectionAgentDetails: AgentApplicationLlp):
+  class TdAgentApplicationWithSectionAgentDetails(baseForSectionAgentDetails: AgentApplication):
 
     object sectionAgentDetails:
 
       object whenUsingExistingCompanyName:
 
-        val afterBusinessNameProvided: AgentApplicationLlp = baseForSectionAgentDetails
+        val afterBusinessNameProvided: AgentApplication = baseForSectionAgentDetails
           .modify(_.agentDetails)
           .setTo(Some(AgentDetails(
             businessName = AgentBusinessName(
@@ -39,31 +39,31 @@ trait TdSectionAgentDetails {
               otherAgentBusinessName = None
             )
           )))
-        val afterBprTelephoneNumberSelected: AgentApplicationLlp = afterBusinessNameProvided
+        val afterBprTelephoneNumberSelected: AgentApplication = afterBusinessNameProvided
           .modify(_.agentDetails.each.telephoneNumber)
           .setTo(Some(AgentTelephoneNumberHelper.afterBprTelephoneNumberSelected))
-        val afterContactTelephoneSelected: AgentApplicationLlp = afterBusinessNameProvided
+        val afterContactTelephoneSelected: AgentApplication = afterBusinessNameProvided
           .modify(_.agentDetails.each.telephoneNumber)
           .setTo(Some(AgentTelephoneNumberHelper.afterContactTelephoneSelected))
-        val afterOtherTelephoneNumberProvided: AgentApplicationLlp = afterBusinessNameProvided
+        val afterOtherTelephoneNumberProvided: AgentApplication = afterBusinessNameProvided
           .modify(_.agentDetails.each.telephoneNumber)
           .setTo(Some(AgentTelephoneNumberHelper.afterOtherTelephoneNumberProvided))
-        val afterContactEmailAddressSelected: AgentApplicationLlp = afterContactTelephoneSelected
+        val afterContactEmailAddressSelected: AgentApplication = afterContactTelephoneSelected
           .modify(_.agentDetails.each.agentEmailAddress)
           .setTo(Some(AgentEmailAddressHelper.afterContactEmailAddressSelected))
-        val afterBprEmailAddressSelected: AgentApplicationLlp = afterContactTelephoneSelected
+        val afterBprEmailAddressSelected: AgentApplication = afterContactTelephoneSelected
           .modify(_.agentDetails.each.agentEmailAddress)
           .setTo(Some(AgentEmailAddressHelper.afterBprEmailAddressSelected))
-        val afterOtherEmailAddressSelected: AgentApplicationLlp = afterContactTelephoneSelected
+        val afterOtherEmailAddressSelected: AgentApplication = afterContactTelephoneSelected
           .modify(_.agentDetails.each.agentEmailAddress)
           .setTo(Some(AgentEmailAddressHelper.afterOtherEmailAddressSelected))
-        val afterVerifiedEmailAddressSelected: AgentApplicationLlp = afterContactTelephoneSelected
+        val afterVerifiedEmailAddressSelected: AgentApplication = afterContactTelephoneSelected
           .modify(_.agentDetails.each.agentEmailAddress)
           .setTo(Some(AgentEmailAddressHelper.afterVerifiedEmailAddressSelected))
-        val afterChroAddressSelected: AgentApplicationLlp = afterVerifiedEmailAddressSelected
+        val afterChroAddressSelected: AgentApplication = afterVerifiedEmailAddressSelected
           .modify(_.agentDetails.each.agentCorrespondenceAddress)
           .setTo(Some(dependencies.chroAddress))
-        val afterBprAddressSelected: AgentApplicationLlp = afterVerifiedEmailAddressSelected
+        val afterBprAddressSelected: AgentApplication = afterVerifiedEmailAddressSelected
           .modify(_.agentDetails.each.agentCorrespondenceAddress)
           .setTo(Some(
             AgentCorrespondenceAddress(
@@ -75,7 +75,7 @@ trait TdSectionAgentDetails {
               countryCode = dependencies.bprRegisteredAddress.countryCode
             )
           ))
-        val afterOtherAddressProvided: AgentApplicationLlp = afterVerifiedEmailAddressSelected
+        val afterOtherAddressProvided: AgentApplication = afterVerifiedEmailAddressSelected
           .modify(_.agentDetails.each.agentCorrespondenceAddress)
           .setTo(Some(
             AgentCorrespondenceAddress(
@@ -91,7 +91,7 @@ trait TdSectionAgentDetails {
       object whenProvidingNewBusinessName:
 
         val newBusinessName: String = "New Agent Business Llp"
-        val afterBusinessNameProvided: AgentApplicationLlp = baseForSectionAgentDetails
+        val afterBusinessNameProvided: AgentApplication = baseForSectionAgentDetails
           .modify(_.agentDetails)
           .setTo(Some(AgentDetails(
             businessName = AgentBusinessName(
@@ -99,13 +99,13 @@ trait TdSectionAgentDetails {
               otherAgentBusinessName = Some(newBusinessName)
             )
           )))
-        val afterBprTelephoneNumberSelected: AgentApplicationLlp = afterBusinessNameProvided
+        val afterBprTelephoneNumberSelected: AgentApplication = afterBusinessNameProvided
           .modify(_.agentDetails.each.telephoneNumber)
           .setTo(Some(AgentTelephoneNumberHelper.afterBprTelephoneNumberSelected))
-        val afterContactTelephoneSelected: AgentApplicationLlp = afterBusinessNameProvided
+        val afterContactTelephoneSelected: AgentApplication = afterBusinessNameProvided
           .modify(_.agentDetails.each.telephoneNumber)
           .setTo(Some(AgentTelephoneNumberHelper.afterContactTelephoneSelected))
-        val afterOtherTelephoneNumberProvided: AgentApplicationLlp = afterBusinessNameProvided
+        val afterOtherTelephoneNumberProvided: AgentApplication = afterBusinessNameProvided
           .modify(_.agentDetails.each.telephoneNumber)
           .setTo(Some(AgentTelephoneNumberHelper.afterOtherTelephoneNumberProvided))
 

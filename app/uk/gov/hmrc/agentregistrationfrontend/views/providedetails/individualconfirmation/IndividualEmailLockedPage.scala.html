@@ -22,7 +22,10 @@
         govukInput: GovukInput
 )
 
-@()(implicit request: IndividualProvideDetailsRequest[AnyContent], messages: Messages)
+@()(
+        implicit request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{
     "individualEmailLocked"

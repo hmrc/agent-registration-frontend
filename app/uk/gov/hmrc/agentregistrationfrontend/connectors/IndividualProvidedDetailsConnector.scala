@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -76,6 +77,16 @@ extends Connector:
               response = response
             )
       .andLogOnFailure(s"Failed to find IndividualProvidedDetails by agent application id: $agentApplicationId")
+
+  // for use by agent applicants when building lists of individuals
+  def find(using
+    request: AgentApplicationRequest[?]
+  ): Future[List[IndividualProvidedDetails]] =
+    val url: URL = url"$baseUrl/individual-provided-details/for-application/${request.agentApplication.agentApplicationId.value}"
+    httpClient
+      .get(url)
+      .execute[List[IndividualProvidedDetails]]
+      .andLogOnFailure(s"Failed to find IndividualProvidedDetails by agent application id: ${request.agentApplication.agentApplicationId.value}")
 
   def findAll()(using
     IndividualAuthorisedRequest[?]

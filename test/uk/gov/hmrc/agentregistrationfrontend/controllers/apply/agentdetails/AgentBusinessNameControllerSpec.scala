@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentBusinessNameForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -30,19 +30,19 @@ extends ControllerSpec:
 
   object agentApplication:
 
-    val beforeBusinessNameProvided: AgentApplicationLlp =
+    val beforeBusinessNameProvided: AgentApplication =
       tdAll
         .agentApplicationLlp
         .afterContactDetailsComplete
 
-    val afterBusinessNameReused: AgentApplicationLlp =
+    val afterBusinessNameReused: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterBusinessNameProvided
 
-    val afterNewBusinessNameProvided: AgentApplicationLlp =
+    val afterNewBusinessNameProvided: AgentApplication =
       tdAll
         .agentApplicationLlp
         .sectionAgentDetails

@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.soletrader
+package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication
 
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.ApplicationState.GrsDataReceived
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.llp.TdSectionAgentDetails
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.llp.TdSectionAmls
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.llp.TdSectionContactDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAgentDetails
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAmls
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionContactDetails
 
 trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdSectionAmls & TdSectionContactDetails & TdGrs & TdSectionAgentDetails) =>
 

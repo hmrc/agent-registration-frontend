@@ -1,0 +1,111 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+@import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
+@import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm
+@import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm.HowManyIndividualsOption
+@import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm.HowManyIndividualsOption.*
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
+
+@this(
+        layout: Layout,
+        govukRadios: GovukRadios,
+        govukInput: GovukInput,
+        formWithCSRF: FormWithCSRF,
+        govukButton: GovukButton,
+        continueOrSaveForLater: ContinueOrSaveForLater
+)
+
+@(
+        form: Form[NumberOfRequiredKeyIndividuals],
+        entityName: String,
+        agentApplication: AgentApplication
+        )(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{NumberOfKeyIndividualsForm.howManyIndividualsOption}
+@exactNumberOfOfficialsKey = @{NumberOfKeyIndividualsForm.howManyIndividuals}
+@numberOfOfficialsWhoDealWithTaxKey = @{NumberOfKeyIndividualsForm.howManyIndividualsResponsibleForTaxMatters}
+@title = @{messages(s"$key.title.$businessTypeKey", entityName)}
+@exactNumberOfOfficialsInput = {
+@govukInput(Input(
+    label = Label(
+        content = Text(messages(s"$exactNumberOfOfficialsKey.label"))
+    ),
+    classes = "govuk-input--width-5"
+).withFormField(form(exactNumberOfOfficialsKey)))
+}
+@numberOfOfficialsWhoDealWithTaxInput = {
+@govukInput(Input(
+    label = Label(
+        content = Text(messages(s"$numberOfOfficialsWhoDealWithTaxKey.label"))
+    ),
+    hint = Some(Hint(
+        content = Text(messages(s"$numberOfOfficialsWhoDealWithTaxKey.hint"))
+    )),
+    classes = "govuk-input--width-5"
+).withFormField(form(numberOfOfficialsWhoDealWithTaxKey)))
+}
+@businessTypeKey = @{
+    agentApplication match {
+        case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
+        case _: AgentApplicationLimitedCompany => "LimitedCompany"
+        case _: AgentApplicationSoleTrader => "SoleTrader"
+        case _: AgentApplication.IsPartnership => "Partnership"
+    }
+}
+@layout(
+    pageTitle = title,
+    maybeForm = Some(form)
+) {
+    <h2 class="govuk-caption-l">@messages(s"lists.caption.title.$businessTypeKey")</h2>
+    @formWithCSRF(action = AppRoutes.apply.listdetails.NumberOfKeyIndividualsController.submit) {
+        @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(title),
+                    isPageHeading = true,
+                    classes = "govuk-fieldset__legend--l"
+                ))
+            )),
+            hint = Some(Hint(
+                content = Text(messages(s"$key.hint.$businessTypeKey"))
+            )),
+            items = HowManyIndividualsOption.values.toSeq.map: option =>
+                RadioItem(
+                    content = Text(messages(s"$key.$option")),
+                    value = Some(option.toString),
+                    conditionalHtml = Some({
+                        option match
+                        case FiveOrLess => exactNumberOfOfficialsInput
+                        case SixOrMore => numberOfOfficialsWhoDealWithTaxInput
+                    }
+                    )
+                )
+        ).withFormField(form(key)))
+
+        @continueOrSaveForLater()
+    }
+}
