@@ -23,6 +23,27 @@ import scala.quoted.*
 
 object TupleTool:
 
+  opaque type UniqueTuple[T <: Tuple] <: Tuple = T
+
+  object UniqueTuple:
+
+    inline def apply[T <: Tuple](t: T): UniqueTuple[T] =
+      inline if constValue[HasDuplicates[T]]
+      then failDuplicateTuple[T]
+      else t
+
+    extension [T <: Tuple](ut: UniqueTuple[T])
+      inline def add[A](value: A)(using A AbsentIn T): UniqueTuple[A *: T] = UniqueTuple(value *: ut)
+
+//      inline def get[A](using A PresentIn T): A = find[T, A](ut)
+//      inline def update[A](value: A)(using A PresentIn T): UniqueTuple[T] = UniqueTuple(replace[T, A](ut, value))
+//      inline def replace[Old, New](value: New)(using Old PresentIn T, New AbsentIn T): UniqueTuple[Replace[Old, New, T]] =
+//        UniqueTuple(replaceType[T, Old, New](ut, value).asInstanceOf[Replace[Old, New, T]])
+//      inline def delete[A](using A PresentIn T): UniqueTuple[Delete[A, T]] =
+//        UniqueTuple(deleteType[T, A](ut).asInstanceOf[Delete[A, T]])
+//      // Expose underlying tuple if needed
+//      inline def toTuple: T = ut
+
   extension [Data <: Tuple](data: Data)
 
     inline def add[T](value: T)(using T AbsentIn Data): T *: Data = value *: data

@@ -33,6 +33,11 @@ extends UnitSpec:
   extends Animal
   type CanSwim = Animal & (Fish | Frog)
 
+  "UniqueTuple" in:
+    val t: UniqueTuple[(Int, Double)] = UniqueTuple((1, 2.0))
+    t.add(1)
+    (1, 2).add(123)
+
   "showcase" in:
     //    EmptyTuple.get[Boolean]
     val kermit: Frog = Frog("Kermit")
@@ -44,17 +49,16 @@ extends UnitSpec:
     //    t.get[Animal] shouldBe Frog("kermit")
     t.get[Frog] shouldBe kermit
     val t2: (Int, Int) = (1, 2)
-    t2.add(2.0)
+    t2.add(2.0) // Should not compile because t2 has duplicates
+//    (1, "string").add[]
 
-//    case class UniqueTuple[Data <: Tuple](t: Data)(using HasDuplicates[Data] =:= false)
-
-//    (1, 2).ensureUniqueTypes
+//    (1, 2).ensureUnique
 //    (1, 2).update(123) shouldBe (123, 2)
-    (1, 2).replace[Int, Long](123) shouldBe (123, 2)
+  // (1, 2).replace[Int, Long](123) shouldBe (123, 2) // Should not compile because (1, 2) has duplicates
 
   "TupleTool" should:
 
-    "addByType" should:
+    "add" should:
       "add a new element to the tuple" in:
         val t = (1, "string")
         val result = t.add(true)
