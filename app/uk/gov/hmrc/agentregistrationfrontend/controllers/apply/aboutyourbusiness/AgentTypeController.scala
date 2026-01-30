@@ -37,8 +37,8 @@ class AgentTypeController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[?] = action2:
-    implicit request: Request[?] =>
+  def show: Action[AnyContent] = action2:
+    implicit request: Request[AnyContent] =>
       val form: Form[AgentType] =
         request.readAgentType match
           case Some(value: AgentType) => AgentTypeForm.form.fill(value)
