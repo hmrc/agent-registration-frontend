@@ -21,38 +21,36 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 import scala.quoted.*
 
-object TupleTool:
+opaque type UniqueTuple[T <: Tuple] <: Tuple = T
 
-  opaque type UniqueTuple[T <: Tuple] <: Tuple = T
-
-  object UniqueTuple:
-
-    inline def apply[T <: Tuple](t: T): UniqueTuple[T] =
-      inline if constValue[HasDuplicates[T]]
-      then failDuplicateTuple[T]
-      else t
-
-    extension [T <: Tuple](ut: UniqueTuple[T])
-
-      inline def add[A](value: A)(using A AbsentIn T): UniqueTuple[A *: T] = value *: ut
-
-      inline def get[A](using A PresentIn T): A = getImpl[T, A](ut)
-
-      inline def update[A](value: A)(using A PresentIn T): UniqueTuple[T] = updateImpl[T, A](ut, value)
-
-      @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-      inline def replace[Old, New](value: New)(using
-        Old PresentIn T,
-        New AbsentIn T
-      ): UniqueTuple[Replace[Old, New, T]] = replaceImpl[T, Old, New](ut, value).asInstanceOf[UniqueTuple[Replace[Old, New, T]]]
-
-      @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-      inline def delete[A](using A PresentIn T): UniqueTuple[Delete[A, T]] = deleteImpl[T, A](ut).asInstanceOf[UniqueTuple[Delete[A, T]]]
-
-      inline def toTuple: T = ut
+object UniqueTuple:
 
   extension [T <: Tuple](t: T)
     inline def unique: UniqueTuple[T] = UniqueTuple(t)
+
+  inline def apply[T <: Tuple](t: T): UniqueTuple[T] =
+    inline if constValue[HasDuplicates[T]]
+    then failDuplicateTuple[T]
+    else t
+
+  extension [T <: Tuple](ut: UniqueTuple[T])
+
+    inline def add[A](value: A)(using A AbsentIn T): UniqueTuple[A *: T] = value *: ut
+
+    inline def get[A](using A PresentIn T): A = getImpl[T, A](ut)
+
+    inline def update[A](value: A)(using A PresentIn T): UniqueTuple[T] = updateImpl[T, A](ut, value)
+
+    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+    inline def replace[Old, New](value: New)(using
+      Old PresentIn T,
+      New AbsentIn T
+    ): UniqueTuple[Replace[Old, New, T]] = replaceImpl[T, Old, New](ut, value).asInstanceOf[UniqueTuple[Replace[Old, New, T]]]
+
+    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+    inline def delete[A](using A PresentIn T): UniqueTuple[Delete[A, T]] = deleteImpl[T, A](ut).asInstanceOf[UniqueTuple[Delete[A, T]]]
+
+    inline def toTuple: T = ut
 
   infix trait AbsentIn[T, Tup <: Tuple]
 
@@ -83,13 +81,13 @@ object TupleTool:
       case h *: tail => h *: Delete[T, tail]
       case EmptyTuple => EmptyTuple
 
-  type IsMember[T, Tup <: Tuple] <: Boolean =
+  private type IsMember[T, Tup <: Tuple] <: Boolean =
     Tup match
       case T *: _ => true
       case _ *: tail => IsMember[T, tail]
       case EmptyTuple => false
 
-  type HasDuplicates[Tup <: Tuple] <: Boolean =
+  private type HasDuplicates[Tup <: Tuple] <: Boolean =
     Tup match
       case EmptyTuple => false
       case h *: t =>
@@ -173,11 +171,11 @@ object TupleTool:
   private def makeAbsentInOrFailImpl[
     T: Type,
     Tup <: Tuple: Type
-  ](using Quotes): Expr[TupleTool.AbsentIn[T, Tup]] =
+  ](using Quotes): Expr[UniqueTuple.AbsentIn[T, Tup]] =
     import quotes.reflect.*
 
     val target = TypeRepr.of[T]
-    val uniqueTupleSymbol = TypeRepr.of[TupleTool.type].typeSymbol.typeMember("UniqueTuple")
+    val uniqueTupleSymbol = TypeRepr.of[UniqueTuple.type].typeSymbol.typeMember("UniqueTuple")
 
     @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
     def check(tup: TypeRepr): List[Expr[Any]] =
@@ -217,21 +215,21 @@ object TupleTool:
             List('{ scala.compiletime.error(${ Expr(msg) }) })
           else
             t.asType match
-              case '[t] => List('{ scala.compiletime.summonInline[TupleTool.AbsentIn[T, t & Tuple]] })
+              case '[t] => List('{ scala.compiletime.summonInline[UniqueTuple.AbsentIn[T, t & Tuple]] })
 
     val checks = check(TypeRepr.of[Tup])
-    Expr.block(checks, '{ new TupleTool.AbsentIn[T, Tup] {} })
+    Expr.block(checks, '{ new UniqueTuple.AbsentIn[T, Tup] {} })
 
   private def makePresentInOrFailImpl[
     T: Type,
     Tup <: Tuple: Type
-  ](using Quotes): Expr[TupleTool.PresentIn[T, Tup]] =
+  ](using Quotes): Expr[UniqueTuple.PresentIn[T, Tup]] =
     import quotes.reflect.*
 
     val target = TypeRepr.of[T]
     val consSymbol = TypeRepr.of[*:].typeSymbol
     val emptyTupleSymbol = TypeRepr.of[EmptyTuple].typeSymbol
-    val uniqueTupleSymbol = TypeRepr.of[TupleTool.type].typeSymbol.typeMember("UniqueTuple")
+    val uniqueTupleSymbol = TypeRepr.of[UniqueTuple.type].typeSymbol.typeMember("UniqueTuple")
 
     def formatType(t: TypeRepr): String = cleanType(t.show)
 
@@ -242,29 +240,29 @@ object TupleTool:
       '{ scala.compiletime.error(${ Expr(msg) }) }
 
     @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
-    def check(tup: TypeRepr): Expr[TupleTool.PresentIn[T, Tup]] =
+    def check(tup: TypeRepr): Expr[UniqueTuple.PresentIn[T, Tup]] =
       tup.dealias match
         case AppliedType(base, List(head, tail)) if base.typeSymbol === consSymbol =>
           if head =:= target then
-            '{ new TupleTool.PresentIn[T, Tup] {} }
+            '{ new UniqueTuple.PresentIn[T, Tup] {} }
           else
             check(tail)
         case t if t.typeSymbol === emptyTupleSymbol => notFoundError
         case AppliedType(base, args) if base.typeSymbol.name.startsWith("Tuple") && base.typeSymbol.owner.fullName === "scala" =>
-          if args.exists(_ =:= target) then '{ new TupleTool.PresentIn[T, Tup] {} } else notFoundError
-        case AppliedType(base, List(inner)) if base.typeSymbol === uniqueTupleSymbol => check(inner).asExprOf[TupleTool.PresentIn[T, Tup]]
+          if args.exists(_ =:= target) then '{ new UniqueTuple.PresentIn[T, Tup] {} } else notFoundError
+        case AppliedType(base, List(inner)) if base.typeSymbol === uniqueTupleSymbol => check(inner).asExprOf[UniqueTuple.PresentIn[T, Tup]]
         case t =>
-          if t =:= target then '{ new TupleTool.PresentIn[T, Tup] {} }
+          if t =:= target then '{ new UniqueTuple.PresentIn[T, Tup] {} }
           else
             t.asType match
-              case '[t] => Expr.block(List('{ scala.compiletime.summonInline[TupleTool.PresentIn[T, t & Tuple]] }), '{ new TupleTool.PresentIn[T, Tup] {} })
+              case '[t] => Expr.block(List('{ scala.compiletime.summonInline[UniqueTuple.PresentIn[T, t & Tuple]] }), '{ new UniqueTuple.PresentIn[T, Tup] {} })
 
     check(TypeRepr.of[Tup])
 
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   private def getTypes(using q: Quotes)(t: q.reflect.TypeRepr): List[q.reflect.TypeRepr] =
     import q.reflect.*
-    val uniqueTupleSymbol = TypeRepr.of[TupleTool.type].typeSymbol.typeMember("UniqueTuple")
+    val uniqueTupleSymbol = TypeRepr.of[UniqueTuple.type].typeSymbol.typeMember("UniqueTuple")
     t.dealias match
       case AppliedType(base, List(head, tail)) if base.typeSymbol === TypeRepr.of[*:].typeSymbol => head :: getTypes(tail)
       case t if t.typeSymbol === TypeRepr.of[EmptyTuple].typeSymbol => Nil

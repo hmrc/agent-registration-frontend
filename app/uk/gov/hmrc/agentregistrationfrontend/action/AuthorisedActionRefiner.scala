@@ -32,14 +32,14 @@ import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.AbsentIn
 
-import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.AbsentIn
 import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class AuthorisedAction2 @Inject() (
+class AuthorisedActionRefiner @Inject() (
   af: AuthorisedFunctions,
   errorResults: ErrorResults,
   appConfig: AppConfig
@@ -59,7 +59,7 @@ extends RequestAwareLogging:
   ): Future[Either[Result, RequestWithData[
     ContentType,
     InternalUserId *: GroupId *: Credentials *: Data
-  ]]] = {
+  ]]] =
     given RequestWithData[ContentType, Data] = request
     af.authorised(
       AuthProviders(GovernmentGateway)
@@ -128,7 +128,6 @@ extends RequestAwareLogging:
             message = e.toString
           )
         ))
-  }
 
   private def isHmrcAsAgentEnrolmentAssignedToUser[A](allEnrolments: Enrolments) = allEnrolments
     .getEnrolment(appConfig.hmrcAsAgentEnrolment.key)

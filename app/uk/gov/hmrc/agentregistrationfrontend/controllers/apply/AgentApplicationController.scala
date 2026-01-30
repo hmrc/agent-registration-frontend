@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
@@ -44,7 +45,7 @@ extends FrontendController(mcc, actions):
   // TODO: is this endpoint really needed?
   def landing: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress:
+    .getApplicationInProgress2:
       implicit request =>
         // until we have more than the registration journey just go to the task list
         // which will redirect to the start of registration if needed
@@ -53,7 +54,7 @@ extends FrontendController(mcc, actions):
   // TODO: is this endpoint really needed?
   def applicationDashboard: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress
+    .getApplicationInProgress2
     .async { implicit request =>
       Future.successful(Ok(simplePage(
         h1 = "Application Dashboard page...",
@@ -65,10 +66,10 @@ extends FrontendController(mcc, actions):
 
   def applicationSubmitted: Action[AnyContent] = actions
     .Applicant
-    .getApplicationSubmitted.async:
+    .getApplicationSubmitted2.async:
       implicit request =>
         businessPartnerRecordService
-          .getBusinessPartnerRecord(request.agentApplication.getUtr)
+          .getBusinessPartnerRecord2(request.get[AgentApplication].getUtr)
           .map: bprOpt =>
             Ok(confirmationPage(
               entityName = bprOpt
@@ -80,10 +81,10 @@ extends FrontendController(mcc, actions):
 
   def viewSubmittedApplication: Action[AnyContent] = actions
     .Applicant
-    .getApplicationSubmitted.async:
+    .getApplicationSubmitted2.async:
       implicit request =>
         businessPartnerRecordService
-          .getBusinessPartnerRecord(request.agentApplication.getUtr)
+          .getBusinessPartnerRecord2(request.get[AgentApplication].getUtr)
           .map: bprOpt =>
             Ok(viewApplicationPage(
               entityName = bprOpt

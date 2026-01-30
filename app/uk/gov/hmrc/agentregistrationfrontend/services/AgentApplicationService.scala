@@ -20,6 +20,7 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.AuthorisedRequest2
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
@@ -37,6 +38,9 @@ extends RequestAwareLogging:
 
   def find()(using request: AuthorisedRequest[?]): Future[Option[AgentApplication]] = agentRegistrationConnector
     .findApplication()
+
+  def find2()(using request: AuthorisedRequest2[?]): Future[Option[AgentApplication]] = agentRegistrationConnector
+    .findApplication2()
 
   def find(linkId: LinkId)(using request: RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector.findApplication(linkId)
 

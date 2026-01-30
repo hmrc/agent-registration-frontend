@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.AgentApplicationRequest2
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.AuthorisedRequest2
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DefaultRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedAction
@@ -40,7 +42,7 @@ import scala.concurrent.ExecutionContext
 class Actions @Inject() (
   actionBuilder: DefaultActionBuilder,
   authorisedAction: AuthorisedAction,
-  authorisedAction2: AuthorisedAction2,
+  authorisedActionRefiner: AuthorisedActionRefiner,
   agentApplicationAction: AgentApplicationAction,
   individualAuthorisedAction: IndividualAuthorisedAction,
   individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction,
@@ -59,13 +61,16 @@ extends RequestAwareLogging:
   object Applicant:
 
     val authorised2: ActionBuilder[AuthorisedRequest2, AnyContent] = action2
-      .refineAsync(authorisedAction2.refine)
+      .refineAsync(authorisedActionRefiner.refine)
 
     val authorised: ActionBuilder[AuthorisedRequest, AnyContent] = action
       .andThen(authorisedAction)
 
     val getApplication: ActionBuilder[AgentApplicationRequest, AnyContent] = authorised
       .andThen(agentApplicationAction)
+
+    val getApplication2: ActionBuilder[AgentApplicationRequest2, AnyContent] = authorised2
+      .refineAsync(agentApplicationAction.refineRequest)
 
     val getApplicationInProgress: ActionBuilder[AgentApplicationRequest, AnyContent] = getApplication
       .ensure(
@@ -82,6 +87,21 @@ extends RequestAwareLogging:
             Redirect(call.url)
       )
 
+    val getApplicationInProgress2: ActionBuilder[AgentApplicationRequest2, AnyContent] = getApplication2
+      .ensure(
+        condition = _.get[AgentApplication].isInProgress,
+        resultWhenConditionNotMet =
+          implicit request =>
+            // TODO: this is a temporary solution and should be revisited once we have full journey implemented
+            val call = AppRoutes.apply.AgentApplicationController.applicationSubmitted
+            logger.warn(
+              s"The application is not in the final state" +
+                s" (current application state: ${request.get[AgentApplication].applicationState.toString}), " +
+                s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
+            )
+            Redirect(call.url)
+      )
+
     val getApplicationSubmitted: ActionBuilder[AgentApplicationRequest, AnyContent] = getApplication
       .ensure(
         condition = (r: AgentApplicationRequest[?]) => r.agentApplication.hasFinished,
@@ -92,6 +112,21 @@ extends RequestAwareLogging:
             logger.warn(
               s"The application is not in the final state" +
                 s" (current application state: ${request.agentApplication.applicationState.toString}), " +
+                s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
+            )
+            Redirect(call.url)
+      )
+
+    val getApplicationSubmitted2: ActionBuilder[AgentApplicationRequest2, AnyContent] = getApplication2
+      .ensure(
+        condition = (r: AgentApplicationRequest2[?]) => r.get[AgentApplication].hasFinished,
+        resultWhenConditionNotMet =
+          implicit request =>
+            // TODO: this is a temporary solution and should be revisited once we have full journey implemented
+            val call = AppRoutes.apply.AgentApplicationController.landing // or task list
+            logger.warn(
+              s"The application is not in the final state" +
+                s" (current application state: ${request.get[AgentApplication].applicationState.toString}), " +
                 s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
             )
             Redirect(call.url)

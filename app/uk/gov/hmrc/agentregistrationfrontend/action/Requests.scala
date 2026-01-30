@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action
 
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.auth.core.retrieve.Credentials
@@ -32,3 +33,16 @@ object Requests:
       Credentials
     )
   ]
+
+  type AgentApplicationRequest2[A] = RequestWithData[
+    A,
+    (
+      AgentApplication,
+      InternalUserId,
+      GroupId,
+      Credentials
+    )
+  ]
+
+  extension [A](r: AgentApplicationRequest2[A])
+    def agentApplication = r.get[AgentApplication]

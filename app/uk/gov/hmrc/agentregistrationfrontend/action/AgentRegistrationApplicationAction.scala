@@ -20,6 +20,7 @@ import play.api.mvc.ActionRefiner
 import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
+import uk.gov.hmrc.agentregistration.shared
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
@@ -27,6 +28,8 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.AbsentIn
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.PresentIn
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -75,6 +78,22 @@ class AgentApplicationAction @Inject() (
 )(using ec: ExecutionContext)
 extends ActionRefiner[AuthorisedRequest, AgentApplicationRequest]
 with RequestAwareLogging:
+
+  def refineRequest[
+    ContentType,
+    Data <: Tuple
+  ](
+    request: Requests.AuthorisedRequest2[ContentType]
+  ): Future[Either[Result, Requests.AgentApplicationRequest2[ContentType]]] =
+    given Requests.AuthorisedRequest2[ContentType] = request
+    agentApplicationService
+      .find2()
+      .map:
+        case Some(application) => Right(request.add(application))
+        case None =>
+          val redirect = AppRoutes.apply.AgentApplicationController.startRegistration
+          logger.error(s"[Unexpected State] No agent application found for authenticated user ${request.get[InternalUserId].value}. Redirecting to startRegistration page ($redirect)")
+          Left(Redirect(redirect))
 
   override protected def refine[A](request: AuthorisedRequest[A]): Future[Either[Result, AgentApplicationRequest[A]]] =
     given r: AuthorisedRequest[A] = request

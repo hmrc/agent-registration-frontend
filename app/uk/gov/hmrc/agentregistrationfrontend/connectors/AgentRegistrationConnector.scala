@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.AuthorisedRequest2
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.http.client.HttpClientV2
 
@@ -38,6 +39,27 @@ extends Connector:
 
   def findApplication()(using
     AuthorisedRequest[?]
+  ): Future[Option[AgentApplication]] =
+    val url: URL = url"$baseUrl/application"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => Some(response.json.as[AgentApplication])
+          case Status.NO_CONTENT => None
+          case other =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = other,
+              response = response,
+              info = "findApplication problem"
+            )
+      .andLogOnFailure(s"Failed to find Agent Application")
+
+  def findApplication2()(using
+    AuthorisedRequest2[?]
   ): Future[Option[AgentApplication]] =
     val url: URL = url"$baseUrl/application"
     httpClient

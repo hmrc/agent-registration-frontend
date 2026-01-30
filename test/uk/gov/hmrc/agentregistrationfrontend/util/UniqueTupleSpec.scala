@@ -17,11 +17,11 @@
 package uk.gov.hmrc.agentregistrationfrontend.util
 
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
-import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.*
 
 import scala.compiletime.testing.typeCheckErrors
 
-class TupleToolSpec
+class UniqueTupleSpec
 extends UnitSpec:
 
   trait Animal
@@ -32,13 +32,15 @@ extends UnitSpec:
   case class Frog(name: String)
   extends Animal
   type CanSwim = Animal & (Fish | Frog)
+  val kermit: Frog = Frog("Kermit")
 
-//  "UniqueTuple" in:
+  //  "UniqueTuple" in:
 //    val t: UniqueTuple[(Int, Double)] = UniqueTuple((1, 2.0))
 //    t.add(1)
 //    UniqueTuple((1, 2.0)).add(123)
 
   "showcase" in:
+
     val ut: UniqueTuple[(
       Int,
       Double,
@@ -46,12 +48,18 @@ extends UnitSpec:
     )] = (1, 2.0, "3").unique
 
     val ut2: UniqueTuple[(Option[String], Int, Double, String)] = ut.add(Some("x"))
-    val ut3: UniqueTuple[Delete[Int, (Option[String], Int, Double, String)]] = ut2.delete[Int]
     val ut3: UniqueTuple[(Option[String], Double, String)] = ut2.delete[Int]
 
+    val x: UniqueTuple[(Animal, Option[String], Double, String)] = ut3.add(kermit)
+
+    val y: UniqueTuple[(
+      CanSwim,
+      Option[String],
+      Double,
+      String
+    )] = x.replace[Animal, CanSwim](kermit)
 
     //    EmptyTuple.get[Boolean]
-    val kermit: Frog = Frog("Kermit")
     val t = UniqueTuple((1, "string", true, kermit))
     t.get[Int] shouldBe 1
     t.get[String] shouldBe "string"

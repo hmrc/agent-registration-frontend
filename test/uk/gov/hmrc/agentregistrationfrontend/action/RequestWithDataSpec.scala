@@ -26,15 +26,14 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 class RequestWithDataSpec
 extends UnitSpec:
 
-//  extension [
-//    A,
-//    Data <: Tuple
-//  ](r: RequestWithData[A, Data])
-//    def getString = r.get[String]
-
   type RequestX[A] = RequestWithData[
     A,
-    (String, Int, Option[AgentApplication], (Int, Float))
+    (
+      String,
+      Int,
+      Option[AgentApplication],
+      (Int, Float)
+    )
   ]
 
   type IsExotic = (Orange | Banana.type) & Fruit

@@ -18,30 +18,30 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.mvc.Request
 import play.api.mvc.WrappedRequest
-import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
-import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.*
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple
 
 class RequestWithData[
   ContentType,
   Data <: Tuple
 ] private (
-  val request: Request[ContentType],
-  val data: TupleTool.UniqueTuple[Data]
+  request: Request[ContentType],
+  val data: UniqueTuple[Data]
 )
 extends WrappedRequest[ContentType](request):
 
-  inline def add[T](value: T)(using T AbsentIn Data): RequestWithData[ContentType, T *: Data] = RequestWithData.create(request, data.add(value))
-
   inline def get[T]: T = data.get[T]
+
+  inline def add[T](value: T)(using T AbsentIn Data): RequestWithData[ContentType, T *: Data] = RequestWithData.create(request, data.add(value))
 
   inline def update[T](value: T): RequestWithData[ContentType, Data] = RequestWithData.create(request, data.update(value))
 
-  inline def replace[Old, New](value: New): RequestWithData[ContentType, TupleTool.Replace[Old, New, Data]] = RequestWithData.create(
+  inline def delete[T]: RequestWithData[ContentType, UniqueTuple.Delete[T, Data]] = RequestWithData.create(request, data.delete[T])
+
+  inline def replace[Old, New](value: New): RequestWithData[ContentType, UniqueTuple.Replace[Old, New, Data]] = RequestWithData.create(
     request,
     data.replace[Old, New](value)
   )
-
-  inline def delete[T]: RequestWithData[ContentType, TupleTool.Delete[T, Data]] = RequestWithData.create(request, data.delete[T])
 
 object RequestWithData:
 
