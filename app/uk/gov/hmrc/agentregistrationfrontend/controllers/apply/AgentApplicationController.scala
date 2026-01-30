@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
@@ -66,10 +65,10 @@ extends FrontendController(mcc, actions):
 
   def applicationSubmitted: Action[AnyContent] = actions
     .Applicant
-    .getApplicationSubmitted2.async:
+    .getApplicationSubmitted.async:
       implicit request =>
         businessPartnerRecordService
-          .getBusinessPartnerRecord2(request.get[AgentApplication].getUtr)
+          .getBusinessPartnerRecord(request.agentApplication.getUtr)
           .map: bprOpt =>
             Ok(confirmationPage(
               entityName = bprOpt
@@ -81,10 +80,10 @@ extends FrontendController(mcc, actions):
 
   def viewSubmittedApplication: Action[AnyContent] = actions
     .Applicant
-    .getApplicationSubmitted2.async:
+    .getApplicationSubmitted.async:
       implicit request =>
         businessPartnerRecordService
-          .getBusinessPartnerRecord2(request.get[AgentApplication].getUtr)
+          .getBusinessPartnerRecord(request.agentApplication.getUtr)
           .map: bprOpt =>
             Ok(viewApplicationPage(
               entityName = bprOpt

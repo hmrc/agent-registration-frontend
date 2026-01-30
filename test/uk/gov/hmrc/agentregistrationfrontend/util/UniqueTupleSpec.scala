@@ -51,14 +51,7 @@ extends UnitSpec:
     val ut3: UniqueTuple[(Option[String], Double, String)] = ut2.delete[Int]
 
     val x: UniqueTuple[(Animal, Option[String], Double, String)] = ut3.add(kermit)
-
-    val y: UniqueTuple[(
-      CanSwim,
-      Option[String],
-      Double,
-      String
-    )] = x.replace[Animal, CanSwim](kermit)
-
+    println(x)
     //    EmptyTuple.get[Boolean]
     val t = UniqueTuple((1, "string", true, kermit))
     t.get[Int] shouldBe 1
