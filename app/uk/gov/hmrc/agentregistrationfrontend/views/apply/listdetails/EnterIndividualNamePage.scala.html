@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 @import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 @import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
@@ -31,8 +30,10 @@
 
 @(
         form: Form[IndividualName],
-        ordinalKey: String
-)(implicit request: AgentApplicationRequest[?], messages: Messages)
+        ordinalKey: String)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{
   IndividualNameForm.key

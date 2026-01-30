@@ -14,10 +14,8 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 @import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 @import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
-@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 @import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
 @import uk.gov.hmrc.agentregistrationfrontend.util.MessageKeys.singularOrPlural
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
@@ -37,8 +35,10 @@
         form: Form[IndividualName],
         ordinalKey: String,
         numberOfRequiredKeyIndividuals: SixOrMore,
-        entityName: String
-)(implicit request: AgentApplicationRequest[?], messages: Messages)
+        entityName: String)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
 
 @key = @{
   IndividualNameForm.key
