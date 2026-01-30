@@ -51,6 +51,9 @@ object TupleTool:
 
       inline def toTuple: T = ut
 
+  extension [T <: Tuple](t: T)
+    inline def unique: UniqueTuple[T] = UniqueTuple(t)
+
   infix trait AbsentIn[T, Tup <: Tuple]
 
   object AbsentIn:
@@ -164,7 +167,7 @@ object TupleTool:
 
     val formattedList = formatTupleContent(TypeRepr.of[Data])
 
-    val msg = s"Tuple isn't unique. Type '$targetName' occurs more more then once:\n$formattedList"
+    val msg = s"Tuple isn't unique. Type '$targetName' occurs more than once:\n$formattedList"
     '{ scala.compiletime.error(${ Expr(msg) }) }
 
   private def makeAbsentInOrFailImpl[

@@ -39,6 +39,16 @@ extends UnitSpec:
 //    UniqueTuple((1, 2.0)).add(123)
 
   "showcase" in:
+    val ut: UniqueTuple[(
+      Int,
+      Double,
+      String
+    )] = (1, 2.0, "3").unique
+
+    val ut2: UniqueTuple[(Option[String], Int, Double, String)] = ut.add(Some("x"))
+    val ut3: UniqueTuple[Delete[Int, (Option[String], Int, Double, String)]] = ut2.delete[Int]
+    val ut3: UniqueTuple[(Option[String], Double, String)] = ut2.delete[Int]
+
 
     //    EmptyTuple.get[Boolean]
     val kermit: Frog = Frog("Kermit")
@@ -153,6 +163,18 @@ extends UnitSpec:
             |  * Boolean""".stripMargin
         )
 
+    "unique" should:
+      "create a UniqueTuple from a tuple" in:
+        val t = (1, "string").unique
+        t.toTuple shouldBe (1, "string")
+
+      "fail to compile for duplicates" in:
+        val errors = typeCheckErrors("""
+          import uk.gov.hmrc.agentregistrationfrontend.util.TupleTool.*
+          (1, 1).unique
+        """)
+        errors.map(_.message) shouldBe List("Tuple isn't unique. Type 'Int' occurs more than once")
+
     "ensureUnique" should:
       "pass for a tuple with unique types" in:
         val t = UniqueTuple((1, "string", true))
@@ -164,7 +186,7 @@ extends UnitSpec:
           val t = UniqueTuple((1, "string", 1))
         """)
         errors.map(_.message) shouldBe List(
-          """Tuple isn't unique. Type 'Int' occurs more more then once:
+          """Tuple isn't unique. Type 'Int' occurs more than once:
             |  * Int
             |  * String
             |  * Int""".stripMargin
