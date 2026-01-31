@@ -22,13 +22,20 @@ import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
+import uk.gov.hmrc.agentregistration.shared.GroupId
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithData
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.AgentApplicationRequest2
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.CheckYourAnswersPage
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 @Singleton
 class CheckYourAnswersController @Inject() (
@@ -40,28 +47,36 @@ class CheckYourAnswersController @Inject() (
 extends FrontendController(mcc, actions):
 
   // this CYA page is only viewable once business details have been captured from GRS, the task list provides a link
-  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+  private val baseAction: ActionBuilder[AgentApplicationRequest2, AnyContent] = actions
     .Applicant
-    .getApplicationInProgress
+    .getApplicationInProgress2
     .ensure(
-      _.agentApplication.applicationState === ApplicationState.GrsDataReceived,
+      _.get[AgentApplication].applicationState === ApplicationState.GrsDataReceived,
       implicit request =>
         logger.warn("Because we don't have business details we are redirecting to where they can be captured")
         Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show)
     )
 
+  type RequestWithBusinessPartnerRecordResponse[ContentType] = RequestWithData[
+    ContentType,
+    BusinessPartnerRecordResponse *: AgentApplicationRequest2[ContentType]#Data
+  ]
+
   def show: Action[AnyContent] = baseAction
-    .async:
-      implicit request =>
+    .refine2[RequestWithBusinessPartnerRecordResponse]:
+      implicit request: (AgentApplicationRequest2[AnyContent]) =>
         businessPartnerRecordService
-          .getBusinessPartnerRecord(request.agentApplication.getUtr)
-          .map { bprOpt =>
-            Ok(
-              view(
-                bprOpt.getOrThrowExpectedDataMissing(
-                  s"Business Partner Record for UTR ${request.agentApplication.getUtr.value}"
-                ),
-                request.agentApplication
-              )
-            )
-          }
+          .getBusinessPartnerRecord2(request.get[AgentApplication].getUtr)
+          .map((bprOpt: Option[BusinessPartnerRecordResponse]) =>
+            request.add(bprOpt.getOrThrowExpectedDataMissing(
+              s"Business Partner Record for UTR ${request.get[AgentApplication].getUtr.value}"
+            ))
+          )
+    .apply:
+      implicit request =>
+        Ok(
+          view(
+            request.get[BusinessPartnerRecordResponse],
+            request.get[AgentApplication]
+          )
+        )

@@ -40,7 +40,7 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] = action2:
     implicit request: Request[AnyContent] =>
       val form: Form[AgentType] =
-        request.readAgentType match
+        request.readFromSessionAgentType match
           case Some(value: AgentType) => AgentTypeForm.form.fill(value)
           case _ => AgentTypeForm.form
       Ok(view(form))
@@ -51,7 +51,7 @@ extends FrontendController(mcc, actions):
         AgentTypeForm.form,
         implicit request => view(_)
       ):
-        implicit request: (RequestWithData[AnyContent, AgentType *: EmptyTuple]) =>
+        implicit request =>
           val agentType: AgentType = request.get[AgentType]
           val call: Call =
             agentType match

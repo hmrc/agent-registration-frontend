@@ -64,7 +64,7 @@ extends FrontendController(mcc, actions):
 
   def showSignInPage: Action[AnyContent] =
     action
-      .ensure(_.readAgentType.isDefined, Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url))
+      .ensure(_.readFromSessionAgentType.isDefined, Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url))
       .ensure(_.readBusinessType.isDefined, Redirect(AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show.url))
       .ensure(_.readTypeOfSignIn.isDefined, Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show.url)):
         implicit request =>

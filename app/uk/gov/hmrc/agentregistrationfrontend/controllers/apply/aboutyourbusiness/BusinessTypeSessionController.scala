@@ -18,9 +18,12 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusines
 
 import play.api.data.Form
 import play.api.mvc.Action
+import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeSessionForm
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
@@ -38,13 +41,16 @@ class BusinessTypeSessionController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction = action
-    .ensure(
-      _.readAgentType.isDefined,
+  private type RequestWithAgentType[ContentType] = RequestWithData[ContentType, AgentType *: EmptyTuple]
+
+  private val baseAction: ActionBuilder[RequestWithAgentType, AnyContent] = action2
+    .refine2:
       implicit request =>
-        logger.warn("Agent type not selected - redirecting to agent type selection page")
-        Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show)
-    )
+        request.readFromSessionAgentType match
+          case Some(agentType: AgentType) => request.add[AgentType](agentType)
+          case None =>
+            logger.warn("Agent type not selected - redirecting to agent type selection page")
+            Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show)
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
@@ -56,9 +62,9 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidForm(BusinessTypeSessionForm.form, implicit r => businessTypeSessionPage(_)):
+      .ensureValidForm2(BusinessTypeSessionForm.form, implicit r => businessTypeSessionPage(_)):
         implicit request =>
-          request.formValue match
+          request.get[BusinessTypeAnswer] match
             case businessType @ BusinessTypeAnswer.LimitedCompany =>
               Redirect(AppRoutes.apply.aboutyourbusiness.UserRoleController.show.url)
                 .addToSession(businessType)

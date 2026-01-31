@@ -118,7 +118,7 @@ extends UnitSpec:
 
         newResult
           .asRequest
-          .readAgentType shouldBe Some(bt)
+          .readFromSessionAgentType shouldBe Some(bt)
 
         newResult.newSession.value.get(
           "agent-registration-frontend.agentType"
@@ -132,12 +132,12 @@ extends UnitSpec:
       val throwable: RuntimeException = intercept[RuntimeException]:
         request
           .withSession("agent-registration-frontend.agentType" -> "garbage")
-          .readAgentType
+          .readFromSessionAgentType
 
       throwable.getMessage shouldBe "Invalid AgentType type in session: 'garbage'"
 
     "readAgentType should return None when business type is not present in session" in:
-      request.readAgentType shouldBe None
+      request.readFromSessionAgentType shouldBe None
 
   "AgentApplicationId" should:
     s"Agent applicationId can be added to the Result and read back from the Request" in:

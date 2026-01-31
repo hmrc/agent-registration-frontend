@@ -57,12 +57,6 @@ extends RequestAwareLogging:
 
   export ActionsHelper.*
 
-  def f(a: String | Int | Future[String] | Future[Int]): String = "sialala"
-
-  val a: String | Future[Int] = ":asdfa"
-
-  f(a)
-
   val action2: ActionBuilder[DefaultRequest, AnyContent] = actionBuilder
     .refine2(request => RequestWithData.empty(request))
 
