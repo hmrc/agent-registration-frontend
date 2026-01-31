@@ -54,7 +54,7 @@ extends RequestAwareLogging:
   export ActionsHelper.*
 
   val action2: ActionBuilder[DefaultRequest, AnyContent] = actionBuilder
-    .genericActionFunction(request => RequestWithData(request, EmptyTuple))
+    .genericActionFunction(request => RequestWithData.empty(request))
 
   val action: ActionBuilder[Request, AnyContent] = actionBuilder
 

@@ -20,6 +20,7 @@ import play.api.data.Form
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
@@ -27,7 +28,6 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.Future
 
 @Singleton
 class AgentTypeController @Inject() (
@@ -47,11 +47,11 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     action2
-      .ensureValidFormGenericAsync2(
-        _ => AgentTypeForm.form,
-        implicit request => form => Future.successful(BadRequest(view(form)))
+      .ensureValidForm2(
+        AgentTypeForm.form,
+        implicit request => view(_)
       ):
-        implicit request =>
+        implicit request: (RequestWithData[AnyContent, AgentType *: EmptyTuple]) =>
           val agentType: AgentType = request.get[AgentType]
           val call: Call =
             agentType match
