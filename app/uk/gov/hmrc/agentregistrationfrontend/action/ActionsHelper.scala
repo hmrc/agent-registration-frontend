@@ -515,7 +515,7 @@ extends RequestAwareLogging:
       protected def refine[A](request: R[A]): Future[Either[Result, P[A]]] = refineF.asInstanceOf[R[A] => Future[Either[Result, P[A]]]](request)
     })
 
-    def refine2[P[_]](refineF: R[ContentType] => Result | Future[Result] | P[ContentType] | Future[P[ContentType]]): ActionBuilder[
+    def refine2[P[_]](refineF: R[ContentType] => Result | P[ContentType] | Future[Result | P[ContentType]]): ActionBuilder[
       P,
       ContentType
     ] = ab.andThen(new ActionRefiner[R, P] {
@@ -526,10 +526,12 @@ extends RequestAwareLogging:
         val rB: R[ContentType] = request.asInstanceOf[R[ContentType]]
         refineF(rB) match
           case r: Result => Future.successful(Left[Result, P[A]](r))
-          case r: Future[Result] => r.map(Left[Result, P[A]](_))
-          case r: P[ContentType] => Future.successful(Right[Result, P[A]](r.asInstanceOf[P[A]]))
-          case r: Future[P[ContentType]] => r.map(r => Right[Result, P[A]](r.asInstanceOf[P[A]]))
-
+          case f: Future[_] =>
+            f.asInstanceOf[Future[Result | P[ContentType]]].map {
+              case r: Result => Left[Result, P[A]](r)
+              case p => Right[Result, P[A]](p.asInstanceOf[P[A]])
+            }
+          case p => Future.successful(Right[Result, P[A]](p.asInstanceOf[P[A]]))
       }
     })
 

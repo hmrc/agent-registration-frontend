@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.AgentApplicationRequest2
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.AuthorisedRequest2
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DefaultRequest
@@ -32,11 +33,13 @@ import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.Individua
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.ProvideDetailsAction
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
+import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class Actions @Inject() (
@@ -47,14 +50,21 @@ class Actions @Inject() (
   individualAuthorisedAction: IndividualAuthorisedAction,
   individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction,
   provideDetailsAction: ProvideDetailsAction,
-  enrichWithAgentApplicationAction: EnrichWithAgentApplicationAction
+  enrichWithAgentApplicationAction: EnrichWithAgentApplicationAction,
+  agentApplicationService: AgentApplicationService
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
   export ActionsHelper.*
 
+  def f(a: String | Int | Future[String] | Future[Int]): String = "sialala"
+
+  val a: String | Future[Int] = ":asdfa"
+
+  f(a)
+
   val action2: ActionBuilder[DefaultRequest, AnyContent] = actionBuilder
-    .genericActionFunction(request => RequestWithData.empty(request))
+    .refine2(request => RequestWithData.empty(request))
 
   val action: ActionBuilder[Request, AnyContent] = actionBuilder
 
@@ -69,8 +79,20 @@ extends RequestAwareLogging:
     val getApplication: ActionBuilder[AgentApplicationRequest, AnyContent] = authorised
       .andThen(agentApplicationAction)
 
-    val getApplication2: ActionBuilder[AgentApplicationRequest2, AnyContent] = authorised2
+    val getApplication2Old: ActionBuilder[AgentApplicationRequest2, AnyContent] = authorised2
       .refineAsync(agentApplicationAction.refineRequest)
+
+    val getApplication2: ActionBuilder[AgentApplicationRequest2, AnyContent] = authorised2
+      .refine2:
+        implicit request: (AuthorisedRequest2[AnyContent]) =>
+          agentApplicationService
+            .find2()
+            .map[Result | AgentApplicationRequest2[AnyContent]]:
+              case Some(agentApplication) => request.add(agentApplication)
+              case None =>
+                val redirect = AppRoutes.apply.AgentApplicationController.startRegistration
+                logger.error(s"[Unexpected State] No agent application found for authenticated user ${request.get[InternalUserId].value}. Redirecting to startRegistration page ($redirect)")
+                Redirect(redirect)
 
     val getApplicationInProgress: ActionBuilder[AgentApplicationRequest, AnyContent] = getApplication
       .ensure(
