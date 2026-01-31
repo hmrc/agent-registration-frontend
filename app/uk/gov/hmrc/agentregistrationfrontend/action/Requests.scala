@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.action
 
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.PresentIn
@@ -49,4 +50,7 @@ object Requests:
     A,
     Data <: Tuple
   ](r: RequestWithData[A, Data])
+
     inline def agentApplication(using AgentApplication PresentIn Data): AgentApplication = r.get[AgentApplication]
+    inline def credentials(using Credentials PresentIn Data): Credentials = r.get[Credentials]
+    inline def businessPartnerRecordResponse(using Credentials PresentIn Data): BusinessPartnerRecordResponse = r.get[BusinessPartnerRecordResponse]

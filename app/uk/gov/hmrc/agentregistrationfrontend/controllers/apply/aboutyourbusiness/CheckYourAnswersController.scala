@@ -29,9 +29,7 @@ import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithData
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.AgentApplicationRequest2
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.CheckYourAnswersPage
@@ -57,14 +55,9 @@ extends FrontendController(mcc, actions):
         Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show)
     )
 
-  type RequestWithBusinessPartnerRecordResponse[ContentType] = RequestWithData[
-    ContentType,
-    BusinessPartnerRecordResponse *: AgentApplicationRequest2[ContentType]#Data
-  ]
-
   def show: Action[AnyContent] = baseAction
-    .refine2[RequestWithBusinessPartnerRecordResponse]:
-      implicit request: (AgentApplicationRequest2[AnyContent]) =>
+    .refine3:
+      implicit request =>
         businessPartnerRecordService
           .getBusinessPartnerRecord2(request.get[AgentApplication].getUtr)
           .map((bprOpt: Option[BusinessPartnerRecordResponse]) =>
@@ -76,7 +69,7 @@ extends FrontendController(mcc, actions):
       implicit request =>
         Ok(
           view(
-            request.get[BusinessPartnerRecordResponse],
-            request.get[AgentApplication]
+            request.businessPartnerRecordResponse,
+            request.agentApplication
           )
         )

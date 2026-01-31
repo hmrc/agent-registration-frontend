@@ -25,8 +25,6 @@ opaque type UniqueTuple[T <: Tuple] <: Tuple = T
 
 object UniqueTuple:
 
-//  def empty[T <: Tuple]: UniqueTuple[T] = UniqueTuple(EmptyTuple)
-
   extension [T <: Tuple](t: T)
     inline def unique: UniqueTuple[T] = UniqueTuple(t)
 

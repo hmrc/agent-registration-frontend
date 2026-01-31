@@ -515,6 +515,25 @@ extends RequestAwareLogging:
       protected def refine[A](request: R[A]): Future[Either[Result, P[A]]] = refineF.asInstanceOf[R[A] => Future[Either[Result, P[A]]]](request)
     })
 
+    def refine3[NewData <: Tuple](
+      refineF: R[ContentType] => Result | RequestWithData[ContentType, NewData] | Future[Result | RequestWithData[ContentType, NewData]]
+    ): ActionBuilder[[X] =>> RequestWithData[X, NewData], ContentType] = ab.andThen(new ActionRefiner[R, [X] =>> RequestWithData[X, NewData]] {
+      protected def executionContext: ExecutionContext = ec
+
+      @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+      protected def refine[A](request: R[A]): Future[Either[Result, RequestWithData[A, NewData]]] = {
+        val rB: R[ContentType] = request.asInstanceOf[R[ContentType]]
+        refineF(rB) match
+          case r: Result => Future.successful(Left(r))
+          case f: Future[_] =>
+            f.asInstanceOf[Future[Result | RequestWithData[ContentType, NewData]]].map {
+              case r: Result => Left(r)
+              case p => Right(p.asInstanceOf[RequestWithData[A, NewData]])
+            }
+          case p => Future.successful(Right(p.asInstanceOf[RequestWithData[A, NewData]]))
+      }
+    })
+
     def refine2[P[_]](refineF: R[ContentType] => Result | P[ContentType] | Future[Result | P[ContentType]]): ActionBuilder[
       P,
       ContentType
