@@ -33,9 +33,14 @@ object ActionsHelper
 extends RequestAwareLogging:
 
   extension [
-    Data <: Tuple,
-    R <: [X] =>> RequestWithData[X, Data]
+    Data <: Tuple
   ](ab: ActionBuilder4[Data])(using ec: ExecutionContext)
+
+    def ensure4(
+      condition: RequestWithData4[Data] => Boolean,
+      resultWhenConditionNotMet: RequestWithData4[Data] => Result
+    ): ActionBuilder4[Data] = refine4: request =>
+      if condition(request) then request else resultWhenConditionNotMet(request)
 
     def refine4[NewData <: Tuple](
       refineF: RequestWithData4[Data] => Result | RequestWithData4[NewData] | Future[Result | RequestWithData4[NewData]]
