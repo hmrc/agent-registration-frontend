@@ -114,6 +114,11 @@ extends RequestAwareLogging:
 
     def ensure4(
       condition: RequestWithData4[Data] => Boolean,
+      resultWhenConditionNotMet: Result
+    ): ActionBuilder4[Data] = ensure4(condition, _ => resultWhenConditionNotMet)
+
+    def ensure4(
+      condition: RequestWithData4[Data] => Boolean,
       resultWhenConditionNotMet: RequestWithData4[Data] => Result
     ): ActionBuilder4[Data] = refine4: request =>
       if condition(request) then request else resultWhenConditionNotMet(request)
