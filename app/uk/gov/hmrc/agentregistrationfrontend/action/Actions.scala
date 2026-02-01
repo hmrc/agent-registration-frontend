@@ -20,9 +20,7 @@ import play.api.mvc.*
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.AgentApplicationRequest2
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.AuthorisedRequest2
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DefaultRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.*
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedAction
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersAction
@@ -60,11 +58,16 @@ extends RequestAwareLogging:
   val action2: ActionBuilder[DefaultRequest, AnyContent] = actionBuilder
     .refine2(request => RequestWithData.empty(request))
 
+  val action4: ActionBuilder4[EmptyTuple] = action2
+
   val action: ActionBuilder[Request, AnyContent] = actionBuilder
 
   object Applicant:
 
     val authorised2: ActionBuilder[AuthorisedRequest2, AnyContent] = action2
+      .refineAsync(authorisedActionRefiner.refine)
+
+    val authorised4: ActionBuilder4[DataWithAuth] = action4
       .refineAsync(authorisedActionRefiner.refine)
 
     val authorised: ActionBuilder[AuthorisedRequest, AnyContent] = action
@@ -79,6 +82,18 @@ extends RequestAwareLogging:
     val getApplication2: ActionBuilder[AgentApplicationRequest2, AnyContent] = authorised2
       .refine2:
         implicit request: (AuthorisedRequest2[AnyContent]) =>
+          agentApplicationService
+            .find2()
+            .map[Result | AgentApplicationRequest2[AnyContent]]:
+              case Some(agentApplication) => request.add(agentApplication)
+              case None =>
+                val redirect = AppRoutes.apply.AgentApplicationController.startRegistration
+                logger.error(s"[Unexpected State] No agent application found for authenticated user ${request.get[InternalUserId].value}. Redirecting to startRegistration page ($redirect)")
+                Redirect(redirect)
+
+    val getApplication4: ActionBuilder4[DataWithApplication] = authorised4
+      .refine4:
+        implicit request: RequestWithData4[DataWithAuth] =>
           agentApplicationService
             .find2()
             .map[Result | AgentApplicationRequest2[AnyContent]]:

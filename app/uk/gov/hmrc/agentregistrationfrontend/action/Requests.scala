@@ -16,6 +16,9 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action
 
+import play.api.mvc.ActionBuilder
+import play.api.mvc.ActionRefiner
+import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
@@ -24,6 +27,25 @@ import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.PresentIn
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 object Requests:
+
+  type ActionBuilder4[Data <: Tuple] = ActionBuilder[[X] =>> RequestWithData[X, Data], AnyContent]
+  type ActionRefiner4[
+    Data <: Tuple,
+    NewData <: Tuple
+  ] = ActionRefiner[[X] =>> RequestWithData[X, Data], [X] =>> RequestWithData[X, NewData]]
+
+  type RequestWithData4[Data <: Tuple] = RequestWithData[AnyContent, Data]
+  type DefaultRequest4[A] = RequestWithData4[EmptyTuple]
+
+  type DataWithAuth =
+    (
+      InternalUserId,
+      GroupId,
+      Credentials
+    )
+  type DataWithApplication = AgentApplication *: DataWithAuth
+  type RequestWithAuth4 = RequestWithData4[DataWithAuth]
+  type RequestWithApplication4 = RequestWithData4[DataWithApplication]
 
   type DefaultRequest[A] = RequestWithData[A, EmptyTuple]
 

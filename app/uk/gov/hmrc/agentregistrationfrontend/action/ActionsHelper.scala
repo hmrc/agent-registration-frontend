@@ -21,6 +21,7 @@ import play.api.data.FormBinding
 import play.api.mvc.*
 import play.api.mvc.Results.BadRequest
 import play.twirl.api.HtmlFormat
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.*
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.AbsentIn
@@ -30,6 +31,35 @@ import scala.concurrent.Future
 
 object ActionsHelper
 extends RequestAwareLogging:
+
+  extension [
+    Data <: Tuple,
+    R <: [X] =>> RequestWithData[X, Data]
+  ](ab: ActionBuilder4[Data])(using ec: ExecutionContext)
+
+    def refine4[NewData <: Tuple](
+      refineF: RequestWithData4[Data] => Result | RequestWithData4[NewData] | Future[Result | RequestWithData4[NewData]]
+    ): ActionBuilder4[
+      NewData
+    ] = ab.andThen(new ActionRefiner4[Data, NewData] {
+      protected def executionContext: ExecutionContext = ec
+
+      @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+      override protected def refine[A](request: RequestWithData[
+        A,
+        Data
+      ]): Future[Either[Result, RequestWithData[A, NewData]]] = {
+        val rB: RequestWithData4[Data] = request.asInstanceOf[RequestWithData4[Data]]
+        refineF(rB) match
+          case r: Result => Future.successful(Left(r))
+          case f: Future[_] =>
+            f.asInstanceOf[Future[Result | RequestWithData4[NewData]]].map {
+              case r: Result => Left(r)
+              case p => Right(p.asInstanceOf[RequestWithData[A, NewData]])
+            }
+          case p => Future.successful(Right(p.asInstanceOf[RequestWithData[A, NewData]]))
+      }
+    })
 
   extension [
     Data <: Tuple,
