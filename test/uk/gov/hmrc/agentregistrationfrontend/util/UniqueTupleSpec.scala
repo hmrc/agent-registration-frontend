@@ -39,6 +39,49 @@ extends UnitSpec:
 //    t.add(1)
 //    UniqueTuple((1, 2.0)).add(123)
 
+  "PresentIn" in:
+    summon[String PresentIn Tuple1[String]]
+    summon[String PresentIn (String, Int)]
+    summon[String PresentIn (String, Int)]
+//    summon[String PresentIn (Boolean, Int)]
+//    val t = UniqueTuple((1, "string", true))
+//    t.get[Double]
+
+  "compilation safety" should:
+    "fail to compile get when used with generic types" in:
+      val errors = typeCheckErrors("""
+        import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple
+        import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.*
+        def f[Data <: Tuple](data: UniqueTuple[Data])(using Boolean PresentIn Data) = data.get[Boolean]
+      """)
+      errors.map(_.message) shouldBe List(
+        "Cannot extract value from generic tuple. The method calling this must be 'inline' to preserve the tuple structure, or the value must be passed explicitly."
+      )
+
+    "fail to compile update when used with generic types" in:
+      val errors = typeCheckErrors("""
+        import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple
+        import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.*
+        def f[Data <: Tuple](data: UniqueTuple[Data])(using Boolean PresentIn Data) = data.update(true)
+      """)
+      errors.map(_.message) shouldBe List("Cannot update value in generic tuple. The method calling this must be 'inline' to preserve the tuple structure.")
+
+    "fail to compile replace when used with generic types" in:
+      val errors = typeCheckErrors("""
+        import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple
+        import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.*
+        def f[Data <: Tuple](data: UniqueTuple[Data])(using Boolean PresentIn Data, Int AbsentIn Data) = data.replace[Boolean, Int](1)
+      """)
+      errors.map(_.message) shouldBe List("Cannot replace value in generic tuple. The method calling this must be 'inline' to preserve the tuple structure.")
+
+    "fail to compile delete when used with generic types" in:
+      val errors = typeCheckErrors("""
+        import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple
+        import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.*
+        def f[Data <: Tuple](data: UniqueTuple[Data])(using Boolean PresentIn Data) = data.delete[Boolean]
+      """)
+      errors.map(_.message) shouldBe List("Cannot delete value from generic tuple. The method calling this must be 'inline' to preserve the tuple structure.")
+
   "showcase" in:
 
 //    f((1, "string").unique)

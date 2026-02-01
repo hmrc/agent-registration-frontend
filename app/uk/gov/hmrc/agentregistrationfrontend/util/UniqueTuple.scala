@@ -97,7 +97,10 @@ object UniqueTuple:
     inline erasedValue[Tup] match
       case _: (E *: tail) => t.asInstanceOf[E *: tail].head
       case _: (h *: tail) => getImpl[tail, E](t.asInstanceOf[h *: tail].tail)
-      case _ => ???
+      case _ =>
+        error(
+          "Cannot extract value from generic tuple. The method calling this must be 'inline' to preserve the tuple structure, or the value must be passed explicitly."
+        )
 
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
   private inline def updateImpl[Tup <: Tuple, E](t: Tup, v: E): Tup =
@@ -108,7 +111,7 @@ object UniqueTuple:
       case _: (h *: tail) =>
         val cons = t.asInstanceOf[h *: tail]
         (cons.head *: updateImpl[tail, E](cons.tail, v)).asInstanceOf[Tup]
-      case _ => ???
+      case _ => error("Cannot update value in generic tuple. The method calling this must be 'inline' to preserve the tuple structure.")
 
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
   private inline def replaceImpl[
@@ -123,7 +126,7 @@ object UniqueTuple:
       case _: (h *: tail) =>
         val cons = t.asInstanceOf[h *: tail]
         cons.head *: replaceImpl[tail, Old, New](cons.tail, v)
-      case _ => ???
+      case _ => error("Cannot replace value in generic tuple. The method calling this must be 'inline' to preserve the tuple structure.")
 
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
   private inline def deleteImpl[Tup <: Tuple, T](t: Tup): Tuple =
@@ -132,6 +135,6 @@ object UniqueTuple:
       case _: (h *: tail) =>
         val cons = t.asInstanceOf[h *: tail]
         cons.head *: deleteImpl[tail, T](cons.tail)
-      case _ => ???
+      case _ => error("Cannot delete value from generic tuple. The method calling this must be 'inline' to preserve the tuple structure.")
 
   private inline def failDuplicateTuple[T]: Nothing = ${ UniqueTupleMacros.failDuplicateTupleImpl[T] }
