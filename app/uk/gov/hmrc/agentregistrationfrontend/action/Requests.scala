@@ -35,7 +35,7 @@ object Requests:
   ] = ActionRefiner[[X] =>> RequestWithData[X, Data], [X] =>> RequestWithData[X, NewData]]
 
   type RequestWithData4[Data <: Tuple] = RequestWithData[AnyContent, Data]
-  type DefaultRequest4[A] = RequestWithData4[EmptyTuple]
+  type DefaultRequest4[A] = RequestWithData4[DataEmpty]
 
   type DataWithAuth =
     (
@@ -43,11 +43,12 @@ object Requests:
       GroupId,
       Credentials
     )
+  type DataEmpty = EmptyTuple
   type DataWithApplication = AgentApplication *: DataWithAuth
   type RequestWithAuth4 = RequestWithData4[DataWithAuth]
   type RequestWithApplication4 = RequestWithData4[DataWithApplication]
 
-  type DefaultRequest[A] = RequestWithData[A, EmptyTuple]
+  type DefaultRequest[A] = RequestWithData[A, DataEmpty]
 
   type AuthorisedRequest2[A] = RequestWithData[
     A,
