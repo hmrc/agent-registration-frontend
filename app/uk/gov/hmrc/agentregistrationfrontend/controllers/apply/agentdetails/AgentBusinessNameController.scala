@@ -22,11 +22,10 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentBusinessName
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentBusinessNameForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -49,33 +48,30 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress
-    .async:
+    .getApplicationInProgress4
+    .getMaybeBusinessPartnerRecord
+    .apply:
       implicit request =>
-        businessPartnerRecordService
-          .getBusinessPartnerRecord(
-            request.agentApplication.getUtr
-          ).map: bprOpt =>
-            Ok(view(
-              form = AgentBusinessNameForm.form.fill:
-                request
-                  .agentApplication
-                  .agentDetails.map(_.businessName)
-              ,
-              bprBusinessName = bprOpt.map(_.getEntityName)
-            ))
+        Ok(view(
+          form = AgentBusinessNameForm.form.fill:
+            request
+              .agentApplication
+              .agentDetails.map(_.businessName)
+          ,
+          bprBusinessName = request.get[Option[BusinessPartnerRecordResponse]].map(_.getEntityName)
+        ))
 
   def submit: Action[AnyContent] =
     actions
       .Applicant
-      .getApplicationInProgress
-      .ensureValidFormAndRedirectIfSaveForLaterAsync[AgentBusinessName](
+      .getApplicationInProgress4
+      .ensureValidFormAndRedirectIfSaveForLater4[AgentBusinessName](
         form = AgentBusinessNameForm.form,
-        viewToServeWhenFormHasErrors =
+        resultToServeWhenFormHasErrors =
           implicit request =>
             (formWithErrors: Form[AgentBusinessName]) =>
               businessPartnerRecordService
-                .getBusinessPartnerRecord(
+                .getBusinessPartnerRecord2(
                   request.agentApplication.getUtr
                 ).map: bprOpt =>
                   view(
@@ -84,8 +80,8 @@ extends FrontendController(mcc, actions):
                   )
       )
       .async:
-        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[AgentBusinessName]) =>
-          val businessNameFromForm = request.formValue
+        implicit request =>
+          val businessNameFromForm: AgentBusinessName = request.get
           val updatedApplication: AgentApplication = request
             .agentApplication
             .modify(_.agentDetails)
@@ -99,7 +95,7 @@ extends FrontendController(mcc, actions):
                   .modify(_.businessName)
                   .setTo(businessNameFromForm))
           agentApplicationService
-            .upsert(updatedApplication)
+            .upsert2(updatedApplication)
             .map: _ =>
               Redirect(AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater

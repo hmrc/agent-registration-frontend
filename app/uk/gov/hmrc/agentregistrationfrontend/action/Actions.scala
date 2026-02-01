@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.*
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedAction
@@ -32,12 +33,14 @@ import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.ProvideDe
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.AbsentIn
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.PresentIn
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors.*
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
 @Singleton
 class Actions @Inject() (
@@ -49,11 +52,33 @@ class Actions @Inject() (
   individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction,
   provideDetailsAction: ProvideDetailsAction,
   enrichWithAgentApplicationAction: EnrichWithAgentApplicationAction,
-  agentApplicationService: AgentApplicationService
+  agentApplicationService: AgentApplicationService,
+  businessPartnerRecordService: BusinessPartnerRecordService
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
   export ActionsHelper.*
+
+  extension [Data <: Tuple](ab: ActionBuilder4[Data])
+
+    inline def getBusinessPartnerRecord(using
+      AgentApplication PresentIn Data,
+      BusinessPartnerRecordResponse AbsentIn Data
+    ): ActionBuilder4[BusinessPartnerRecordResponse *: Data] = ab.refine4:
+      implicit request =>
+        businessPartnerRecordService
+          .getBusinessPartnerRecord2(request.get[AgentApplication].getUtr)
+          .map(_.getOrThrowExpectedDataMissing(s"Business Partner Record for UTR ${request.get[AgentApplication].getUtr.value}"))
+          .map(request.add)
+
+    inline def getMaybeBusinessPartnerRecord(using
+      AgentApplication PresentIn Data,
+      Option[BusinessPartnerRecordResponse] AbsentIn Data
+    ): ActionBuilder4[Option[BusinessPartnerRecordResponse] *: Data] = ab.refine4:
+      implicit request =>
+        businessPartnerRecordService
+          .getBusinessPartnerRecord2(request.get[AgentApplication].getUtr)
+          .map(request.add)
 
   val action2: ActionBuilder[DefaultRequest, AnyContent] = actionBuilder
     .refine2(request => RequestWithData.empty(request))

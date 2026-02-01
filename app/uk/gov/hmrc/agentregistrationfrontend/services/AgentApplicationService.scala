@@ -20,9 +20,12 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.AuthorisedRequest2
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData4
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.PresentIn
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
@@ -54,6 +57,15 @@ extends RequestAwareLogging:
     }
 
   def upsert(agentApplication: AgentApplication)(using request: AuthorisedRequest[?]): Future[Unit] =
+    logger.debug(s"Upserting application [${request.internalUserId}]")
+    Errors.require(agentApplication.internalUserId === request.internalUserId, "Cannot modify application - you must be the user who created it")
+    agentRegistrationConnector
+      .upsertApplication(agentApplication)
+
+  inline def upsert2[Data <: Tuple](agentApplication: AgentApplication)(using
+    request: RequestWithData4[Data],
+    ev: InternalUserId PresentIn Data
+  ): Future[Unit] =
     logger.debug(s"Upserting application [${request.internalUserId}]")
     Errors.require(agentApplication.internalUserId === request.internalUserId, "Cannot modify application - you must be the user who created it")
     agentRegistrationConnector

@@ -75,9 +75,8 @@ object Requests:
     Data <: Tuple
   ](r: RequestWithData[A, Data])
 
-    inline def agentApplication(using AgentApplication PresentIn Data): AgentApplication = r.get[AgentApplication]
-    inline def credentials(using Credentials PresentIn Data): Credentials = r.get[Credentials]
-    inline def businessPartnerRecordResponse(using Credentials PresentIn Data): BusinessPartnerRecordResponse = r.get[BusinessPartnerRecordResponse]
-    inline def agentType(using AgentType PresentIn Data): AgentType = r.get[AgentType]
-
-    inline def getOption(using Option[String] PresentIn Data): Option[String] = r.get[Option[String]]
+    inline def agentApplication(using AgentApplication PresentIn Data): AgentApplication = r.get
+    inline def credentials(using Credentials PresentIn Data): Credentials = r.get
+    inline def internalUserId(using InternalUserId PresentIn Data): InternalUserId = r.get
+    inline def businessPartnerRecordResponse(using Credentials PresentIn Data): BusinessPartnerRecordResponse = r.get
+    inline def agentType(using AgentType PresentIn Data): AgentType = r.get
