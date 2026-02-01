@@ -133,9 +133,39 @@ extends RequestAwareLogging:
             Redirect(call.url)
       )
 
+    val getApplicationInProgress4: ActionBuilder4[DataWithApplication] = getApplication4
+      .ensure(
+        condition = _.get[AgentApplication].isInProgress,
+        resultWhenConditionNotMet =
+          implicit request =>
+            // TODO: this is a temporary solution and should be revisited once we have full journey implemented
+            val call = AppRoutes.apply.AgentApplicationController.applicationSubmitted
+            logger.warn(
+              s"The application is not in the final state" +
+                s" (current application state: ${request.get[AgentApplication].applicationState.toString}), " +
+                s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
+            )
+            Redirect(call.url)
+      )
+
     val getApplicationSubmitted: ActionBuilder[AgentApplicationRequest, AnyContent] = getApplication
       .ensure(
         condition = (r: AgentApplicationRequest[?]) => r.agentApplication.hasFinished,
+        resultWhenConditionNotMet =
+          implicit request =>
+            // TODO: this is a temporary solution and should be revisited once we have full journey implemented
+            val call = AppRoutes.apply.AgentApplicationController.landing // or task list
+            logger.warn(
+              s"The application is not in the final state" +
+                s" (current application state: ${request.agentApplication.applicationState.toString}), " +
+                s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
+            )
+            Redirect(call.url)
+      )
+
+    val getApplicationSubmitted4: ActionBuilder4[DataWithApplication] = getApplication4
+      .ensure(
+        condition = _.agentApplication.hasFinished,
         resultWhenConditionNotMet =
           implicit request =>
             // TODO: this is a temporary solution and should be revisited once we have full journey implemented
