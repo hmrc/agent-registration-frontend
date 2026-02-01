@@ -20,7 +20,6 @@ import play.api.data.Form
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*

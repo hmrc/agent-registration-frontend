@@ -65,7 +65,7 @@ extends UnitSpec:
     t.get[Frog] shouldBe kermit
     // UniqueTuple((1, 2)) // Should not compile because duplicates
 
-  "TupleTool" should:
+  "UniqueTuple" should:
 
     "add" should:
       "add a new element to the tuple" in:
