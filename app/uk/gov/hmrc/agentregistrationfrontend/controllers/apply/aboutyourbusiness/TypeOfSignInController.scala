@@ -50,28 +50,29 @@ class TypeOfSignInController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = action:
+  def show: Action[AnyContent] = action4:
     implicit request =>
       Ok(view(TypeOfSignInForm.form.fill(request.readTypeOfSignIn)))
 
   def submit: Action[AnyContent] =
-    action
-      .ensureValidForm(TypeOfSignInForm.form, implicit request => view(_)):
+    action4
+      .ensureValidForm4(TypeOfSignInForm.form, implicit request => view(_)):
         implicit request =>
-          val typeOfSignIn: TypeOfSignIn = request.formValue
+          val typeOfSignIn: TypeOfSignIn = request.get
           Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.showSignInPage)
             .addToSession(typeOfSignIn)
 
   def showSignInPage: Action[AnyContent] =
-    action
-      .ensure(_.readFromSessionAgentType.isDefined, Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url))
-      .ensure(_.readBusinessType.isDefined, Redirect(AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show.url))
-      .ensure(_.readTypeOfSignIn.isDefined, Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show.url)):
+    action4
+      .refine4(r => r.readFromSessionAgentType.fold(Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url))(r.add))
+      .refine4(r => r.readBusinessType.fold(Redirect(AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show.url))(r.add))
+      .refine4(r => r.readTypeOfSignIn.fold(Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show.url))(r.add))
+      .refine4(r => r.readUserRole.fold(Redirect(AppRoutes.apply.aboutyourbusiness.UserRoleController.show.url))(r.add)):
         implicit request =>
-          val agentType: AgentType = request.getAgentType
-          val businessType: BusinessType = request.getBusinessType
-          val typeOfSignIn: TypeOfSignIn = request.getTypeOfSignIn
-          val userRole: UserRole = request.readUserRole.getOrThrowExpectedDataMissing("UserRole is required to initiate agent application")
+          val agentType: AgentType = request.get
+          val businessType: BusinessType = request.get
+          val typeOfSignIn: TypeOfSignIn = request.get
+          val userRole: UserRole = request.get
 
           val signInLink: Uri = AppRoutes
             .apply

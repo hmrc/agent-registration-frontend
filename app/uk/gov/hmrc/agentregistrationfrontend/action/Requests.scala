@@ -20,6 +20,7 @@ import play.api.mvc.ActionBuilder
 import play.api.mvc.ActionRefiner
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
@@ -77,3 +78,6 @@ object Requests:
     inline def agentApplication(using AgentApplication PresentIn Data): AgentApplication = r.get[AgentApplication]
     inline def credentials(using Credentials PresentIn Data): Credentials = r.get[Credentials]
     inline def businessPartnerRecordResponse(using Credentials PresentIn Data): BusinessPartnerRecordResponse = r.get[BusinessPartnerRecordResponse]
+    inline def agentType(using AgentType PresentIn Data): AgentType = r.get[AgentType]
+
+    inline def getOption(using Option[String] PresentIn Data): Option[String] = r.get[Option[String]]
