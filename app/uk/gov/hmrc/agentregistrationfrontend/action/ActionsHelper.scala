@@ -36,6 +36,25 @@ extends RequestAwareLogging:
     Data <: Tuple
   ](ab: ActionBuilder4[Data])(using ec: ExecutionContext)
 
+    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+    def ensureValidFormAndRedirectIfSaveForLater4[T](
+      form: RequestWithData4[Data] => Form[T] | Future[Form[T]],
+      resultToServeWhenFormHasErrors: RequestWithData4[Data] => Form[T] => Result | HtmlFormat.Appendable | Future[Result | HtmlFormat.Appendable]
+    )(using
+      FormBinding,
+      T AbsentIn Data
+    ): ActionBuilder4[T *: Data] = ensureValidForm4(
+      form,
+      request =>
+        form =>
+          resultToServeWhenFormHasErrors(request)(form) match
+            case r: Result => SubmissionHelper.redirectIfSaveForLater(request, r)
+            case r: HtmlFormat.Appendable => SubmissionHelper.redirectIfSaveForLater(request, BadRequest(r))
+            case r: Future[_] =>
+              r.asInstanceOf[Future[Result | HtmlFormat.Appendable]].map:
+                case r: Result => SubmissionHelper.redirectIfSaveForLater(request, r)
+                case r: HtmlFormat.Appendable => SubmissionHelper.redirectIfSaveForLater(request, BadRequest(r))
+    )
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     def ensureValidForm4[T](
