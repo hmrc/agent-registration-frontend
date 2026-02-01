@@ -36,39 +36,6 @@ extends RequestAwareLogging:
     Data <: Tuple
   ](ab: ActionBuilder4[Data])(using ec: ExecutionContext)
 
-//    def ensureValidForm4[T](
-//      form: Form[T],
-//      resultToServeWhenFormHasErrors: RequestWithData4[Data] => Form[T] => Future[Result]
-//    )(using
-//      FormBinding,
-//      T AbsentIn Data
-//    ): ActionBuilder4[T *: Data] = ensureValidForm4(_ => form, resultToServeWhenFormHasErrors)
-
-//    def ensureValidForm4[T](
-//      form: RequestWithData4[Data] => Form[T],
-//      resultToServeWhenFormHasErrors: RequestWithData4[Data] => Form[T] => Future[Result]
-//    )(using
-//      FormBinding,
-//      T AbsentIn Data
-//    ): ActionBuilder4[T *: Data] = refine4:
-//      implicit request =>
-//        form(request).bindFromRequest().fold(
-//          hasErrors = formWithErrors => resultToServeWhenFormHasErrors(request)(formWithErrors),
-//          success = (formValue: T) => request.add(formValue)
-//        )
-//
-//    def ensureValidForm4Async[T](
-//      form: RequestWithData4[Data] => Future[Form[T]],
-//      resultToServeWhenFormHasErrors: RequestWithData4[Data] => Form[T] => Future[Result]
-//    )(using
-//      FormBinding,
-//      T AbsentIn Data
-//    ): ActionBuilder4[T *: Data] = refine4:
-//      implicit request =>
-//        form(request).flatMap(_.bindFromRequest().fold(
-//          hasErrors = formWithErrors => resultToServeWhenFormHasErrors(request)(formWithErrors),
-//          success = (formValue: T) => Future.successful(request.add(formValue))
-//        ))
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     def ensureValidForm4[T](
@@ -79,34 +46,26 @@ extends RequestAwareLogging:
       T AbsentIn Data
     ): ActionBuilder4[T *: Data] = refine4:
       implicit request =>
+
+        def handleErrors(formWithErrors: Form[T]): Future[Result] =
+          resultToServeWhenFormHasErrors(request)(formWithErrors) match
+            case r: Result => Future.successful(r)
+            case r: HtmlFormat.Appendable => Future.successful(BadRequest(r))
+            case f: Future[_] =>
+              f.asInstanceOf[Future[Result | HtmlFormat.Appendable]].map {
+                case r: Result => r
+                case r: HtmlFormat.Appendable => BadRequest(r)
+              }
+
+        def bind(f: Form[T]): Future[Result | RequestWithData4[T *: Data]] = f.bindFromRequest().fold(
+          hasErrors = handleErrors,
+          success = t => Future.successful(request.add(t))
+        )
+
         form(request) match
-          case f: Future[_] =>
-            f.asInstanceOf[Future[Form[T]]].flatMap: (formInstance: Form[T]) =>
-              formInstance.bindFromRequest().fold(
-                hasErrors =
-                  formWithErrors =>
-                    resultToServeWhenFormHasErrors(request)(formWithErrors) match
-                      case r: Result => Future.successful(r)
-                      case r: HtmlFormat.Appendable => Future.successful(BadRequest(r))
-                      case r: Future[_] =>
-                        r.asInstanceOf[Future[Result | HtmlFormat.Appendable]].map:
-                          case r: Result => r
-                          case r: HtmlFormat.Appendable => BadRequest(r),
-                success = (formValue: T) => Future.successful(request.add(formValue))
-              )
-          case f: Form[_] =>
-            f.asInstanceOf[Form[T]].bindFromRequest().fold(
-              hasErrors =
-                formWithErrors =>
-                  resultToServeWhenFormHasErrors(request)(formWithErrors) match
-                    case r: Result => Future.successful(r)
-                    case r: HtmlFormat.Appendable => Future.successful(BadRequest(r))
-                    case r: Future[_] =>
-                      r.asInstanceOf[Future[Result | HtmlFormat.Appendable]].map:
-                        case r: Result => r
-                        case r: HtmlFormat.Appendable => BadRequest(r),
-              success = (formValue: T) => request.add(formValue)
-            )
+          case f: Future[_] => f.asInstanceOf[Future[Form[T]]].flatMap(bind)
+          case f: Form[_] => bind(f.asInstanceOf[Form[T]])
+
 //
 //    def ensureValidForm[T](
 //      form: (RequestWithData4[Data] => Form[T]) | Form[T],
