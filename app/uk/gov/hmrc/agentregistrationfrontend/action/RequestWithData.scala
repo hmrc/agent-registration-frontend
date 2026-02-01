@@ -26,22 +26,20 @@ import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple
 
 class RequestWithData[
   ContentType,
-  Data_ <: Tuple
+  Data <: Tuple
 ] private (
   request: Request[ContentType],
-  val data: UniqueTuple[Data_]
+  val data: UniqueTuple[Data]
 )
 extends WrappedRequest[ContentType](request):
 
-  type Data = Data_
-
   inline def get[T](using T PresentIn Data): T = data.get[T]
 
-  inline def add[T](value: T)(using T AbsentIn Data_): RequestWithData[ContentType, T *: Data_] = RequestWithData.create(request, data.add(value))
+  inline def add[T](value: T)(using T AbsentIn Data): RequestWithData[ContentType, T *: Data] = RequestWithData.create(request, data.add(value))
 
-  inline def update[T](value: T)(using T PresentIn Data): RequestWithData[ContentType, Data_] = RequestWithData.create(request, data.update(value))
+  inline def update[T](value: T)(using T PresentIn Data): RequestWithData[ContentType, Data] = RequestWithData.create(request, data.update(value))
 
-  inline def delete[T](using T PresentIn Data): RequestWithData[ContentType, UniqueTuple.Delete[T, Data_]] = RequestWithData.create(request, data.delete[T])
+  inline def delete[T](using T PresentIn Data): RequestWithData[ContentType, UniqueTuple.Delete[T, Data]] = RequestWithData.create(request, data.delete[T])
 
   inline def replace[Old, New](value: New)(using
     Old PresentIn Data,
@@ -49,7 +47,7 @@ extends WrappedRequest[ContentType](request):
   ): RequestWithData[ContentType, UniqueTuple.Replace[
     Old,
     New,
-    Data_
+    Data
   ]] = RequestWithData.create(
     request,
     data.replace[Old, New](value)
