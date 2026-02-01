@@ -36,6 +36,45 @@ extends RequestAwareLogging:
     Data <: Tuple
   ](ab: ActionBuilder4[Data])(using ec: ExecutionContext)
 
+    def ensureValidForm4[T](
+      form: Form[T],
+      resultToServeWhenFormHasErrors: RequestWithData4[Data] => Form[T] => Future[Result]
+    )(using
+      FormBinding,
+      T AbsentIn Data
+    ): ActionBuilder4[T *: Data] = ensureValidForm4(_ => form, resultToServeWhenFormHasErrors)
+
+    def ensureValidForm4[T](
+      form: RequestWithData4[Data] => Form[T],
+      resultToServeWhenFormHasErrors: RequestWithData4[Data] => Form[T] => Future[Result]
+    )(using
+      FormBinding,
+      T AbsentIn Data
+    ): ActionBuilder4[T *: Data] = refine4:
+      implicit request =>
+        form(request).bindFromRequest().fold(
+          hasErrors = formWithErrors => resultToServeWhenFormHasErrors(request)(formWithErrors),
+          success = (formValue: T) => request.add(formValue)
+        )
+
+//
+//    def ensureValidForm[T](
+//      form: (RequestWithData4[Data] => Form[T]) | Form[T],
+//      resultToServeWhenFormHasErrors: RequestWithData4[Data] => Form[T] => Future[Result]
+//    )(using
+//      FormBinding,
+//      T AbsentIn Data
+//    ): ActionBuilder4[T *: Data] = refine4:
+//      implicit request =>
+//        (form match
+//          case a: (RequestWithData4[Data] => Form[T]) => a(request)
+//          case b: Form[T] => b
+//        )
+//          .bindFromRequest().fold(
+//            hasErrors = formWithErrors => resultToServeWhenFormHasErrors(request)(formWithErrors),
+//            success = (formValue: T) => request.add(formValue)
+//          )
+
     def ensure4(
       condition: RequestWithData4[Data] => Boolean,
       resultWhenConditionNotMet: RequestWithData4[Data] => Result
