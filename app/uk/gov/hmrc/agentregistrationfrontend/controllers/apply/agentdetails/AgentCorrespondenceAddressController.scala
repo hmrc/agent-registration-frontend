@@ -19,18 +19,15 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 import com.softwaremill.quicklens.each
 import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.getCompanyProfile
-import uk.gov.hmrc.agentregistration.shared.DesBusinessAddress
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
 import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.DesBusinessAddress
+import uk.gov.hmrc.agentregistration.shared.getCompanyProfile
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AddressLookupFrontendConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
@@ -56,9 +53,9 @@ class AgentCorrespondenceAddressController @Inject() (
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+  private val baseAction: ActionBuilder4[DataWithApplication] = actions
     .Applicant
-    .getApplicationInProgress
+    .getApplicationInProgress4
     .ensure(
       _
         .agentApplication
@@ -70,36 +67,34 @@ extends FrontendController(mcc, actions):
         Redirect(AppRoutes.apply.agentdetails.AgentEmailAddressController.show)
     )
 
-  def show: Action[AnyContent] = baseAction.async:
-    implicit request =>
-      businessPartnerRecordService
-        .getBusinessPartnerRecord(
-          request.agentApplication.getUtr
-        ).map: bprOpt =>
-          val existingAddress = request.agentApplication
-            .agentDetails
-            .flatMap(
-              _.agentCorrespondenceAddress
-            )
-          Ok(view(
-            form = AgentCorrespondenceAddressForm.form.fill:
-              existingAddress.map(_.toValueString)
-            ,
-            addressOptions = makeAddressOptions(
-              agentApplication = request.agentApplication,
-              bprOption = bprOpt.map(_.address)
-            )
-          ))
+  def show: Action[AnyContent] = baseAction
+    .getMaybeBusinessPartnerRecord
+    .apply:
+      implicit request =>
+        val existingAddress: Option[AgentCorrespondenceAddress] = request.agentApplication
+          .agentDetails
+          .flatMap(
+            _.agentCorrespondenceAddress
+          )
+        Ok(view(
+          form = AgentCorrespondenceAddressForm.form.fill:
+            existingAddress.map(_.toValueString)
+          ,
+          addressOptions = makeAddressOptions(
+            agentApplication = request.agentApplication,
+            bprOption = request.maybeBusinessPartnerRecordResponse.map(_.address)
+          )
+        ))
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLaterAsync[String](
+      .ensureValidFormAndRedirectIfSaveForLater4[String](
         form = AgentCorrespondenceAddressForm.form,
-        viewToServeWhenFormHasErrors =
+        resultToServeWhenFormHasErrors =
           implicit request =>
             formWithErrors =>
               businessPartnerRecordService
-                .getBusinessPartnerRecord(request.agentApplication.getUtr).map: bprOpt =>
+                .getBusinessPartnerRecord2(request.agentApplication.getUtr).map: bprOpt =>
                   view(
                     form = formWithErrors,
                     addressOptions = makeAddressOptions(
@@ -109,8 +104,8 @@ extends FrontendController(mcc, actions):
                   )
       )
       .async:
-        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[String]) =>
-          val addressOption = request.formValue
+        implicit request =>
+          val addressOption: String = request.get[String]
           if addressOption.matches("other")
           then
             addressLookUpConnector
@@ -122,7 +117,7 @@ extends FrontendController(mcc, actions):
               .modify(_.agentDetails.each.agentCorrespondenceAddress)
               .setTo(Some(AgentCorrespondenceAddressHelper.fromValueString(addressOption)))
             agentApplicationService
-              .upsert(updatedApplication)
+              .upsert2(updatedApplication)
               .map: _ =>
                 Redirect(AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater

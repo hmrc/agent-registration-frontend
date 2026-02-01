@@ -78,5 +78,6 @@ object Requests:
     inline def agentApplication(using AgentApplication PresentIn Data): AgentApplication = r.get
     inline def credentials(using Credentials PresentIn Data): Credentials = r.get
     inline def internalUserId(using InternalUserId PresentIn Data): InternalUserId = r.get
-    inline def businessPartnerRecordResponse(using Credentials PresentIn Data): BusinessPartnerRecordResponse = r.get
+    inline def businessPartnerRecordResponse(using BusinessPartnerRecordResponse PresentIn Data): BusinessPartnerRecordResponse = r.get
+    inline def maybeBusinessPartnerRecordResponse(using Option[BusinessPartnerRecordResponse] PresentIn Data): Option[BusinessPartnerRecordResponse] = r.get
     inline def agentType(using AgentType PresentIn Data): AgentType = r.get
