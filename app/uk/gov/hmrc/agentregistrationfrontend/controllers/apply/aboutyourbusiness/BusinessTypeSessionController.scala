@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusines
 
 import play.api.data.Form
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentType
@@ -41,10 +40,8 @@ class BusinessTypeSessionController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private type RequestWithAgentType[ContentType] = RequestWithData[ContentType, AgentType *: EmptyTuple]
-
-  private val baseAction: ActionBuilder[RequestWithAgentType, AnyContent] = action2
-    .refine2:
+  private val baseAction: ActionBuilder4[AgentType *: EmptyTuple] = action4
+    .refine4:
       implicit request =>
         request.readFromSessionAgentType match
           case Some(agentType: AgentType) => request.add[AgentType](agentType)
@@ -62,7 +59,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidForm2(BusinessTypeSessionForm.form, implicit r => businessTypeSessionPage(_)):
+      .ensureValidForm4(BusinessTypeSessionForm.form, implicit r => businessTypeSessionPage(_)):
         implicit request =>
           request.get[BusinessTypeAnswer] match
             case businessType @ BusinessTypeAnswer.LimitedCompany =>
