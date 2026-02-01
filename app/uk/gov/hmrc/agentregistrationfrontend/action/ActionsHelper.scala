@@ -58,6 +58,15 @@ extends RequestAwareLogging:
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     def ensureValidForm4[T](
+      form: Form[T] | Future[Form[T]],
+      resultToServeWhenFormHasErrors: RequestWithData4[Data] => Form[T] => Result | HtmlFormat.Appendable | Future[Result | HtmlFormat.Appendable]
+    )(using
+      FormBinding,
+      T AbsentIn Data
+    ): ActionBuilder4[T *: Data] = ensureValidForm4(_ => form, resultToServeWhenFormHasErrors)
+
+    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+    def ensureValidForm4[T](
       form: RequestWithData4[Data] => Form[T] | Future[Form[T]],
       resultToServeWhenFormHasErrors: RequestWithData4[Data] => Form[T] => Result | HtmlFormat.Appendable | Future[Result | HtmlFormat.Appendable]
     )(using
