@@ -128,7 +128,7 @@ class FastForwardController @Inject() (
 )(using clock: Clock)
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.action { implicit request =>
+  def show: Action[AnyContent] = actions.deleteMeAction { implicit request =>
     Ok(fastForwardPage())
   }
 
@@ -136,9 +136,9 @@ extends FrontendController(mcc, actions):
     completedSection: CompletedSection
   ): Action[AnyContent] =
     completedSection match
-      case c: CompletedSectionLlp => actions.Applicant.authorised.async(handleCompletedSectionLlp(c)(using _, summon))
+      case c: CompletedSectionLlp => actions.Applicant.deleteMeAuthorised.async(handleCompletedSectionLlp(c)(using _, summon))
       case c: CompletedSectionSoleTrader =>
-        actions.action { implicit request =>
+        actions.deleteMeAction { implicit request =>
           Ok(simplePage(
             h1 = "Sole Trader Task List Page",
             bodyText = Some("Fast Forwarding to Sole Trader Task List Page isn't implemented yet")

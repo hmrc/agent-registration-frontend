@@ -47,7 +47,7 @@ extends FrontendController(mcc, actions):
 
   def journeyCallback(id: Option[JourneyId]): Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress
+    .deleteMeGetApplicationInProgress
     .ensure(
       _ => id.isDefined,
       implicit r =>

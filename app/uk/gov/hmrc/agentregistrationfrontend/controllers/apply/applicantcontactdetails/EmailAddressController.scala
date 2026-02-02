@@ -59,7 +59,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
     .Applicant
-    .getApplicationInProgress
+    .deleteMeGetApplicationInProgress
     .ensure(
       _
         .agentApplication
@@ -124,7 +124,7 @@ extends FrontendController(mcc, actions):
 
   def verify: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress
+    .deleteMeGetApplicationInProgress
     .ensure(
       _.agentApplication
         .applicantContactDetails

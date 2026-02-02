@@ -70,7 +70,7 @@ extends FrontendController(mcc, actions):
 
   val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
     .Applicant
-    .getApplicationInProgress
+    .deleteMeGetApplicationInProgress
     .ensure(
       _.agentApplication.amlsDetails.exists(!_.isHmrc),
       implicit r =>
@@ -179,7 +179,7 @@ extends FrontendController(mcc, actions):
     */
   def checkUploadStatusJs: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress
+    .deleteMeGetApplicationInProgress
     .async:
       implicit request: AgentApplicationRequest[AnyContent] =>
 

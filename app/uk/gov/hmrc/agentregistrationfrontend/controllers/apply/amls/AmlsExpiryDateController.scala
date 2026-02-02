@@ -47,7 +47,7 @@ extends FrontendController(mcc, actions):
 
   val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
     .Applicant
-    .getApplicationInProgress
+    .deleteMeGetApplicationInProgress
     .ensure(
       _.agentApplication.amlsDetails.exists(_.amlsRegistrationNumber.isDefined),
       implicit r =>

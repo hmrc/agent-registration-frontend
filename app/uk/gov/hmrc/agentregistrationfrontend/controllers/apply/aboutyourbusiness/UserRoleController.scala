@@ -37,7 +37,7 @@ class UserRoleController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[?] = action:
+  def show: Action[?] = actions.deleteMeAction:
     implicit request: Request[?] =>
       Ok(view(
         form = UserRoleForm.form.fill(request.readUserRole),
@@ -45,7 +45,7 @@ extends FrontendController(mcc, actions):
       ))
 
   def submit: Action[AnyContent] =
-    action
+    actions.deleteMeAction
       .ensureValidForm(UserRoleForm.form, implicit request => view(_, userRoleOptionForBusinessType(request.getBusinessType))):
         implicit request =>
           val userRole: UserRole = request.formValue

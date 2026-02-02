@@ -54,7 +54,7 @@ extends FrontendController(mcc, actions):
     userRole: UserRole
   ): Action[AnyContent] = actions
     .Applicant
-    .authorised
+    .deleteMeAuthorised
     .ensureAsync(
       condition =
         implicit request =>

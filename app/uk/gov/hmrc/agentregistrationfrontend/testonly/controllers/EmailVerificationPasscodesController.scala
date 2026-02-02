@@ -63,7 +63,7 @@ class EmailVerificationPasscodesController @Inject() (
 extends FrontendController(mcc, actions):
 
   def showEmailVerificationPassCodes(emailVerificationLink: String): Action[AnyContent] = actions
-    .action
+    .deleteMeAction
     .async:
       implicit request =>
         if isSignedIn // hint: Using simple auth check since this is a test-only controller (avoiding custom auth action in production code)

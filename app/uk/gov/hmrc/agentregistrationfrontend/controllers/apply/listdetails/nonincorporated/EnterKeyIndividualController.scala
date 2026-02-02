@@ -51,7 +51,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
     .Applicant
-    .getApplicationInProgress
+    .deleteMeGetApplicationInProgress
     .ensure(
       _.agentApplication match
         case _: AgentApplication.IsNotSoleTrader => true

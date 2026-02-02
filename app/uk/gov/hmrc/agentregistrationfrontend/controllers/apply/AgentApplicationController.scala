@@ -45,7 +45,7 @@ extends FrontendController(mcc, actions):
   // TODO: is this endpoint really needed?
   def landing: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress2:
+    .deleteMeGetApplicationInProgress2:
       implicit request =>
         // until we have more than the registration journey just go to the task list
         // which will redirect to the start of registration if needed
@@ -54,7 +54,7 @@ extends FrontendController(mcc, actions):
   // TODO: is this endpoint really needed?
   def applicationDashboard: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress2
+    .deleteMeGetApplicationInProgress2
     .async { implicit request =>
       Future.successful(Ok(simplePage(
         h1 = "Application Dashboard page...",
@@ -66,7 +66,7 @@ extends FrontendController(mcc, actions):
 
   def applicationSubmitted: Action[AnyContent] = actions
     .Applicant
-    .getApplicationSubmitted2.async:
+    .deleteMeGetApplicationSubmitted2.async:
       implicit request: (AgentApplicationRequest2[AnyContent]) =>
         businessPartnerRecordService
           .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
@@ -82,7 +82,7 @@ extends FrontendController(mcc, actions):
 
   def viewSubmittedApplication: Action[AnyContent] = actions
     .Applicant
-    .getApplicationSubmitted2.async:
+    .deleteMeGetApplicationSubmitted2.async:
       implicit request: (AgentApplicationRequest2[AnyContent]) =>
         businessPartnerRecordService
           .getBusinessPartnerRecord(request.agentApplication.getUtr)
@@ -96,12 +96,12 @@ extends FrontendController(mcc, actions):
               agentApplication = request.get[AgentApplication]
             ))
 
-  def startRegistration: Action[AnyContent] = action:
+  def startRegistration: Action[AnyContent] = actions.deleteMeAction:
     implicit request =>
       // if we use an endpoint like this, we can later change the flow without changing the URL
       Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show)
 
-  def genericExitPage: Action[AnyContent] = action:
+  def genericExitPage: Action[AnyContent] = actions.deleteMeAction:
     implicit request =>
       Ok(simplePage(
         h1 = "You cannot use this service...",

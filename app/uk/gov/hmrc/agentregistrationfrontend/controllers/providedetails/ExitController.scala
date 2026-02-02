@@ -33,7 +33,7 @@ class ExitController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def genericExitPage: Action[AnyContent] = action:
+  def genericExitPage: Action[AnyContent] = actions.deleteMeAction:
     implicit request =>
       Ok(placeholderExitPage(
         h1 = "You cannot use this service...",
@@ -42,7 +42,7 @@ extends FrontendController(mcc, actions):
         )
       ))
 
-  def multipleProvidedDetailsPage: Action[AnyContent] = action:
+  def multipleProvidedDetailsPage: Action[AnyContent] = actions.deleteMeAction:
     implicit request =>
       Ok(multipleMemberProvidedDetailsPage(
         h1 = "You cannot use this service...",

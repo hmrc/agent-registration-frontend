@@ -42,7 +42,7 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress
+    .deleteMeGetApplicationInProgress
     .async:
       implicit request =>
         businessPartnerRecordService
@@ -59,7 +59,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress
+    .deleteMeGetApplicationInProgress
     .async:
       implicit request =>
         agentApplicationService

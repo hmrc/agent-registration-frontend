@@ -46,7 +46,7 @@ extends FrontendController(mcc, actions):
     */
   def processNotificationFromUpscan(uploadId: UploadId): Action[JsValue] =
     actions
-      .action
+      .deleteMeAction
       .async(parse.json):
         implicit request =>
           val notificationRequestJson: JsValue = request.body

@@ -46,7 +46,7 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress:
+    .deleteMeGetApplicationInProgress:
       implicit request =>
         val form: Form[AmlsCode] = amlsCodeForm.form.fill(request
           .agentApplication
@@ -57,7 +57,7 @@ extends FrontendController(mcc, actions):
   def submit: Action[AnyContent] =
     actions
       .Applicant
-      .getApplicationInProgress
+      .deleteMeGetApplicationInProgress
       .ensureValidFormAndRedirectIfSaveForLater(amlsCodeForm.form, implicit r => view(_))
       .async:
         implicit request: (AgentApplicationRequest[AnyContent] & FormValue[AmlsCode]) =>

@@ -47,7 +47,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction = actions
     .Applicant
-    .getApplicationInProgress
+    .deleteMeGetApplicationInProgress
     .ensure(
       _.agentApplication.taskListStatus.declaration.canStart,
       implicit request =>

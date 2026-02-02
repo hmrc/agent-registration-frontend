@@ -44,7 +44,7 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress
+    .deleteMeGetApplicationInProgress
     .ensure(
       _.agentApplication
         .isGrsDataReceived,

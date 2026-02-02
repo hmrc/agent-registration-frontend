@@ -45,7 +45,7 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress:
+    .deleteMeGetApplicationInProgress:
       implicit request =>
         Ok(view(
           ApplicantNameForm.form
@@ -59,7 +59,7 @@ extends FrontendController(mcc, actions):
   def submit: Action[AnyContent] =
     actions
       .Applicant
-      .getApplicationInProgress
+      .deleteMeGetApplicationInProgress
       .ensureValidFormAndRedirectIfSaveForLater(ApplicantNameForm.form, implicit r => view(_))
       .async:
         implicit request: (AgentApplicationRequest[AnyContent] & FormValue[ApplicantName]) =>

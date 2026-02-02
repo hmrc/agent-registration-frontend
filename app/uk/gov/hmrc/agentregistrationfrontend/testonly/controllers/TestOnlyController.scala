@@ -49,13 +49,13 @@ class TestOnlyController @Inject() (
 extends FrontendController(mcc, actions):
 
   def showTestOnlyHub: Action[AnyContent] = actions
-    .action:
+    .deleteMeAction:
       implicit request =>
         Ok(testOnlyHubPage())
 
   def showAgentApplication: Action[AnyContent] = actions
     .Applicant
-    .getApplication: request =>
+    .deleteMeGetApplication: request =>
       Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))
 
   def showProvidedDetails: Action[AnyContent] = actions
@@ -63,7 +63,7 @@ extends FrontendController(mcc, actions):
     .getProvidedDetails: request =>
       Ok(Json.prettyPrint(Json.toJson(request.individualProvidedDetails)))
 
-  def showPlaySession: Action[AnyContent] = actions.action: request =>
+  def showPlaySession: Action[AnyContent] = actions.deleteMeAction: request =>
     Ok(Json.prettyPrint(Json.toJson(request.session.data)))
 
   def addAgentTypeToSession(

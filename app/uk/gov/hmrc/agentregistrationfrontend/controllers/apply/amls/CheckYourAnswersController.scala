@@ -38,7 +38,7 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] =
     actions
       .Applicant
-      .getApplicationInProgress
+      .deleteMeGetApplicationInProgress
       .ensure(
         r => r.agentApplication.amlsDetails.exists(_.isComplete),
         implicit request =>

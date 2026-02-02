@@ -46,7 +46,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
     .Applicant
-    .getApplicationInProgress
+    .deleteMeGetApplicationInProgress
     .ensure(
       _.agentApplication.applicantContactDetails.map(_.applicantName).nonEmpty,
       implicit request =>

@@ -80,31 +80,31 @@ extends RequestAwareLogging:
           .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
           .map(request.add)
 
-  val action2: ActionBuilder[DefaultRequest, AnyContent] = actionBuilder
+  val deleteMeAction2: ActionBuilder[DefaultRequest, AnyContent] = actionBuilder
     .refine2(request => RequestWithData.empty(request))
 
-  val action4: ActionBuilder4[EmptyTuple] = action2
+  val action4: ActionBuilder4[EmptyTuple] = deleteMeAction2
 
-  val action: ActionBuilder[Request, AnyContent] = actionBuilder
+  val deleteMeAction: ActionBuilder[Request, AnyContent] = actionBuilder
 
   object Applicant:
 
-    val authorised2: ActionBuilder[AuthorisedRequest2, AnyContent] = action2
+    val deleteMeAuthorised2: ActionBuilder[AuthorisedRequest2, AnyContent] = deleteMeAction2
       .refineAsync(authorisedActionRefiner.refine)
 
     val authorised4: ActionBuilder4[DataWithAuth] = action4
       .refineAsync(authorisedActionRefiner.refine)
 
-    val authorised: ActionBuilder[AuthorisedRequest, AnyContent] = action
+    val deleteMeAuthorised: ActionBuilder[AuthorisedRequest, AnyContent] = deleteMeAction
       .andThen(authorisedAction)
 
-    val getApplication: ActionBuilder[AgentApplicationRequest, AnyContent] = authorised
+    val deleteMeGetApplication: ActionBuilder[AgentApplicationRequest, AnyContent] = deleteMeAuthorised
       .andThen(agentApplicationAction)
 
-    val getApplication2Old: ActionBuilder[AgentApplicationRequest2, AnyContent] = authorised2
+    val deleteMeGetApplication2Old: ActionBuilder[AgentApplicationRequest2, AnyContent] = deleteMeAuthorised2
       .refineAsync(agentApplicationAction.refineRequest)
 
-    val getApplication2: ActionBuilder[AgentApplicationRequest2, AnyContent] = authorised2
+    val deleteMeGetApplication2: ActionBuilder[AgentApplicationRequest2, AnyContent] = deleteMeAuthorised2
       .refine2:
         implicit request: (AuthorisedRequest2[AnyContent]) =>
           agentApplicationService
@@ -128,7 +128,7 @@ extends RequestAwareLogging:
                 logger.error(s"[Unexpected State] No agent application found for authenticated user ${request.get[InternalUserId].value}. Redirecting to startRegistration page ($redirect)")
                 Redirect(redirect)
 
-    val getApplicationInProgress: ActionBuilder[AgentApplicationRequest, AnyContent] = getApplication
+    val deleteMeGetApplicationInProgress: ActionBuilder[AgentApplicationRequest, AnyContent] = deleteMeGetApplication
       .ensure(
         condition = _.agentApplication.isInProgress,
         resultWhenConditionNotMet =
@@ -143,7 +143,7 @@ extends RequestAwareLogging:
             Redirect(call.url)
       )
 
-    val getApplicationInProgress2: ActionBuilder[AgentApplicationRequest2, AnyContent] = getApplication2
+    val deleteMeGetApplicationInProgress2: ActionBuilder[AgentApplicationRequest2, AnyContent] = deleteMeGetApplication2
       .ensure(
         condition = _.get[AgentApplication].isInProgress,
         resultWhenConditionNotMet =
@@ -173,7 +173,7 @@ extends RequestAwareLogging:
             Redirect(call.url)
       )
 
-    val getApplicationSubmitted: ActionBuilder[AgentApplicationRequest, AnyContent] = getApplication
+    val deleteMeGetApplicationSubmitted: ActionBuilder[AgentApplicationRequest, AnyContent] = deleteMeGetApplication
       .ensure(
         condition = (r: AgentApplicationRequest[?]) => r.agentApplication.hasFinished,
         resultWhenConditionNotMet =
@@ -203,7 +203,7 @@ extends RequestAwareLogging:
             Redirect(call.url)
       )
 
-    val getApplicationSubmitted2: ActionBuilder[AgentApplicationRequest2, AnyContent] = getApplication2
+    val deleteMeGetApplicationSubmitted2: ActionBuilder[AgentApplicationRequest2, AnyContent] = deleteMeGetApplication2
       .ensure(
         condition = (r: AgentApplicationRequest2[?]) => r.get[AgentApplication].hasFinished,
         resultWhenConditionNotMet =
@@ -220,10 +220,10 @@ extends RequestAwareLogging:
 
   object Individual:
 
-    val authorised: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
+    val authorised: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = deleteMeAction
       .andThen(individualAuthorisedAction)
 
-    val authorisedWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = action
+    val authorisedWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = deleteMeAction
       .andThen(individualAuthorisedWithIdentifiersAction)
 
     val getProvidedDetails: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = authorised
