@@ -21,7 +21,7 @@ import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Results
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.MergeFormValue
@@ -38,7 +38,7 @@ import scala.concurrent.Future
 
 class IndividualProvideDetailsWithApplicationRequest[A](
   val agentApplication: AgentApplication,
-  override val individualProvidedDetails: IndividualProvidedDetails,
+  override val individualProvidedDetails: IndividualProvidedDetailsToBeDeleted,
   override val internalUserId: InternalUserId,
   override val request: Request[A],
   override val credentials: Credentials

@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.services.llp
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsIdGenerator
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Started
@@ -41,7 +41,7 @@ class IndividualProvideDetailsFactory @Inject() (
     individualNino: Option[IndividualNino],
     individualSaUtr: Option[IndividualSaUtr],
     individualDateOfBirth: Option[IndividualDateOfBirth]
-  ): IndividualProvidedDetails = IndividualProvidedDetails(
+  ): IndividualProvidedDetailsToBeDeleted = IndividualProvidedDetailsToBeDeleted(
     _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
     internalUserId = internalUserId,
     agentApplicationId = agentApplicationId,

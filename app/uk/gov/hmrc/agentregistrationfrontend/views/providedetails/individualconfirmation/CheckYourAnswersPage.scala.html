@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.AnswerSummary
-@import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 
 @this(
         layout: Layout,
@@ -28,7 +28,7 @@
 
 
 @(
-        individualProvidedDetails: IndividualProvidedDetails)(implicit
+        individualProvidedDetails: IndividualProvidedDetailsToBeDeleted)(implicit
         request: RequestHeader,
         messages: Messages
 )

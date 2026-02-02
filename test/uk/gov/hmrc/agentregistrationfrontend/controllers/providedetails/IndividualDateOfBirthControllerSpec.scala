@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualDateOfBirthForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
@@ -31,10 +31,10 @@ extends ControllerSpec:
 
   private object individualProvideDetails:
 
-    val beforeEmailProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.afterTelephoneNumberProvided
-    val afterEmailProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.afterEmailAddressVerified
-    val afterDateOfBirthProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterDateOfBirth.afterDateOfBirthProvided
-    val afterDateOfBirthFromCitizensDetails: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterDateOfBirth.afterDateOfBirthFromCitizenDetails
+    val beforeEmailProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterTelephoneNumberProvided
+    val afterEmailProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterEmailAddressVerified
+    val afterDateOfBirthProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterDateOfBirth.afterDateOfBirthProvided
+    val afterDateOfBirthFromCitizensDetails: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterDateOfBirth.afterDateOfBirthFromCitizenDetails
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.IndividualDateOfBirthController.show shouldBe Call(

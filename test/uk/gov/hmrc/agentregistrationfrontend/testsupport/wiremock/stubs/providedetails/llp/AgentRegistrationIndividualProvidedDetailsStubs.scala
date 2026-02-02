@@ -23,7 +23,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AgentRegistrationIndividualProvidedDetailsStubs {
@@ -31,7 +31,7 @@ object AgentRegistrationIndividualProvidedDetailsStubs {
   private val base = "/agent-registration/member-provided-details"
 
   def stubFindIndividualProvidedDetails(
-    providedDetails: IndividualProvidedDetails
+    providedDetails: IndividualProvidedDetailsToBeDeleted
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = urlMatching(s"$base/by-agent-applicationId/${providedDetails.agentApplicationId.value}"),
@@ -46,7 +46,7 @@ object AgentRegistrationIndividualProvidedDetailsStubs {
   )
 
   def stubFindAllIndividualProvidedDetails(
-    providedDetailsList: List[IndividualProvidedDetails]
+    providedDetailsList: List[IndividualProvidedDetailsToBeDeleted]
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = urlMatching(s"$base"),
@@ -60,7 +60,7 @@ object AgentRegistrationIndividualProvidedDetailsStubs {
     responseStatus = Status.NO_CONTENT
   )
 
-  def stubUpsertIndividualProvidedDetails(individualProvidedDetails: IndividualProvidedDetails): StubMapping = StubMaker.make(
+  def stubUpsertIndividualProvidedDetails(individualProvidedDetails: IndividualProvidedDetailsToBeDeleted): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = urlMatching(base),
     responseStatus = Status.OK,

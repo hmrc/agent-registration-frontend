@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualTelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
@@ -31,9 +31,9 @@ extends ControllerSpec:
 
   private object individualProvideDetails:
 
-    val beforeTelephoneUpdate: IndividualProvidedDetails = tdAll.providedDetailsLlp.afterOfficerChosen
+    val beforeTelephoneUpdate: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterOfficerChosen
 
-    val afterTelephoneNumberProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.afterTelephoneNumberProvided
+    val afterTelephoneNumberProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterTelephoneNumberProvided
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.IndividualTelephoneNumberController.show shouldBe Call(

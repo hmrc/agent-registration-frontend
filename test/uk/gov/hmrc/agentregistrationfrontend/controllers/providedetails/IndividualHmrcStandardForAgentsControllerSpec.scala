@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
@@ -41,9 +41,9 @@ extends ControllerSpec:
 
   object individualProvidedDetails:
 
-    val beforeTermsAgreed: IndividualProvidedDetails = tdAll.providedDetailsLlp.afterApproveAgentApplication
+    val beforeTermsAgreed: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterApproveAgentApplication
 
-    val afterTermsAgreed: IndividualProvidedDetails = tdAll.providedDetailsLlp.afterHmrcStandardforAgentsAgreed
+    val afterTermsAgreed: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterHmrcStandardforAgentsAgreed
 
   s"GET $path before agreeing terms should return 200 and render page" in:
     AuthStubs.stubAuthoriseIndividual()

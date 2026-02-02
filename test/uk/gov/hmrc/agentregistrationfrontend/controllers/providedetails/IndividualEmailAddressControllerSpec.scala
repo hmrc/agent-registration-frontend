@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.EmailVerificationStubs
 import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
@@ -43,13 +43,13 @@ extends ControllerSpec:
 
   private object individualProvidedDetails:
 
-    val beforeTelephoneProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.afterOfficerChosen
+    val beforeTelephoneProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterOfficerChosen
 
-    val beforeEmailAddressProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.afterTelephoneNumberProvided
+    val beforeEmailAddressProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterTelephoneNumberProvided
 
-    val afterEmailAddressProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.afterEmailAddressProvided
+    val afterEmailAddressProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterEmailAddressProvided
 
-    val afterEmailAddressVerified: IndividualProvidedDetails = tdAll.providedDetailsLlp.afterEmailAddressVerified
+    val afterEmailAddressVerified: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterEmailAddressVerified
 
   private val individualEmailVerificationRequest: VerifyEmailRequest = VerifyEmailRequest(
     credId = tdAll.credentials.providerId,

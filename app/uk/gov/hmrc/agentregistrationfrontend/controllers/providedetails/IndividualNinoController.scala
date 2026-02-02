@@ -23,7 +23,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino.FromAuth
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.llp.UserProvidedNino
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
@@ -81,7 +81,7 @@ extends FrontendController(mcc, actions):
       .async:
         implicit request: (IndividualProvideDetailsRequest[AnyContent] & FormValue[UserProvidedNino]) =>
           val validFormData: IndividualNino = request.formValue
-          val updatedApplication: IndividualProvidedDetails = request
+          val updatedApplication: IndividualProvidedDetailsToBeDeleted = request
             .individualProvidedDetails
             .modify(_.individualNino)
             .setTo(Some(validFormData))
