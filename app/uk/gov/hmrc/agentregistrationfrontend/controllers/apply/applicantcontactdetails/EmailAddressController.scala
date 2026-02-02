@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontact
 import com.softwaremill.quicklens.each
 import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
@@ -29,7 +28,6 @@ import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
@@ -57,10 +55,10 @@ class EmailAddressController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+  private val baseAction: ActionBuilder4[DataWithApplication] = actions
     .Applicant
-    .deleteMeGetApplicationInProgress
-    .ensure(
+    .getApplicationInProgress
+    .ensure4(
       _
         .agentApplication
         .applicantContactDetails
@@ -81,20 +79,20 @@ extends FrontendController(mcc, actions):
       )))
 
   def submit: Action[AnyContent] = baseAction
-    .ensure(
+    .ensure4(
       // because we cannot store any submitted email without checking it's verified status first
       // if user is saving and continuing then handle the submission normally else redirect to save for later
       SubmissionHelper.getSubmitAction(_) === SaveAndContinue,
       implicit request =>
         Redirect(AppRoutes.apply.SaveForLaterController.show)
     )
-    .ensureValidForm[EmailAddress](
+    .ensureValidForm4[EmailAddress](
       form = EmailAddressForm.form,
-      viewToServeWhenFormHasErrors = implicit r => view(_)
+      resultToServeWhenFormHasErrors = implicit r => view(_)
     )
     .async:
-      implicit request: (AgentApplicationRequest[AnyContent] & FormValue[EmailAddress]) =>
-        val emailAddress: EmailAddress = request.formValue
+      implicit request =>
+        val emailAddress: EmailAddress = request.get
         val updatedApplication: AgentApplication = request
           .agentApplication
           .modify(_.applicantContactDetails.each.applicantEmailAddress)
@@ -115,7 +113,7 @@ extends FrontendController(mcc, actions):
           }
 
         agentApplicationService
-          .deleteMeUpsert(updatedApplication)
+          .upsert(updatedApplication)
           .map(_ =>
             Redirect(
               AppRoutes.apply.applicantcontactdetails.EmailAddressController.verify
