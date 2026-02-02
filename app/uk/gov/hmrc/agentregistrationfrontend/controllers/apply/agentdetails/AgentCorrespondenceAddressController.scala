@@ -71,7 +71,8 @@ extends FrontendController(mcc, actions):
     .getMaybeBusinessPartnerRecord
     .apply:
       implicit request =>
-        val existingAddress: Option[AgentCorrespondenceAddress] = request.agentApplication
+        val existingAddress: Option[AgentCorrespondenceAddress] = request
+          .agentApplication
           .agentDetails
           .flatMap(
             _.agentCorrespondenceAddress

@@ -44,16 +44,17 @@ extends RequestAwareLogging:
       FormBinding,
       T AbsentIn Data
     ): ActionBuilder4[T *: Data] = ensureValidForm4(
-      form,
-      request =>
-        form =>
-          resultToServeWhenFormHasErrors(request)(form) match
-            case r: Result => SubmissionHelper.redirectIfSaveForLater(request, r)
-            case r: HtmlFormat.Appendable => SubmissionHelper.redirectIfSaveForLater(request, BadRequest(r))
-            case r: Future[_] =>
-              r.asInstanceOf[Future[Result | HtmlFormat.Appendable]].map:
-                case r: Result => SubmissionHelper.redirectIfSaveForLater(request, r)
-                case r: HtmlFormat.Appendable => SubmissionHelper.redirectIfSaveForLater(request, BadRequest(r))
+      form = form,
+      resultToServeWhenFormHasErrors =
+        request =>
+          form =>
+            resultToServeWhenFormHasErrors(request)(form) match
+              case r: Result => SubmissionHelper.redirectIfSaveForLater(request, r)
+              case r: HtmlFormat.Appendable => SubmissionHelper.redirectIfSaveForLater(request, BadRequest(r))
+              case r: Future[_] =>
+                r.asInstanceOf[Future[Result | HtmlFormat.Appendable]].map:
+                  case r: Result => SubmissionHelper.redirectIfSaveForLater(request, r)
+                  case r: HtmlFormat.Appendable => SubmissionHelper.redirectIfSaveForLater(request, BadRequest(r))
     )
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
