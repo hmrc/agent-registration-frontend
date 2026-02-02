@@ -38,8 +38,8 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] =
     actions
       .Applicant
-      .deleteMeGetApplicationInProgress
-      .ensure(
+      .getApplicationInProgress
+      .ensure4(
         r => r.agentApplication.amlsDetails.exists(_.isComplete),
         implicit request =>
           logger.warn(s"Cannot display Check Your Answers page - incomplete AMLS details.")
