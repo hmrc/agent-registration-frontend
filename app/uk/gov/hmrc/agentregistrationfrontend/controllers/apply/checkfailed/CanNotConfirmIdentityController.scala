@@ -38,8 +38,8 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] =
     actions
       .Applicant
-      .deleteMeGetApplicationInProgress
-      .ensure(
+      .getApplicationInProgress
+      .ensure4(
         condition =
           _.agentApplication match
             case a: AgentApplicationSoleTrader => a.deceasedCheckResult === Some(CheckResult.Fail)
