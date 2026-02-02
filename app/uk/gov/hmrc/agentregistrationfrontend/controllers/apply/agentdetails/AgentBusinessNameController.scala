@@ -72,7 +72,7 @@ extends FrontendController(mcc, actions):
           implicit request =>
             (formWithErrors: Form[AgentBusinessName]) =>
               businessPartnerRecordService
-                .getBusinessPartnerRecord2(
+                .getBusinessPartnerRecord(
                   request.agentApplication.getUtr
                 ).map: bprOpt =>
                   view(
@@ -96,7 +96,7 @@ extends FrontendController(mcc, actions):
                   .modify(_.businessName)
                   .setTo(businessNameFromForm))
           agentApplicationService
-            .upsert2(updatedApplication)
+            .upsert(updatedApplication)
             .map: _ =>
               Redirect(AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater

@@ -66,7 +66,7 @@ extends FrontendController(mcc, actions):
           checkResult <- agentAssuranceConnector
             .checkForRefusalToDealWith(request.agentApplication.getUtr)
           _ <- agentApplicationService
-            .upsert(request.agentApplication
+            .deleteMeUpsert(request.agentApplication
               .modify(_.refusalToDealWithCheckResult)
               .setTo(Some(checkResult)))
         yield checkResult match

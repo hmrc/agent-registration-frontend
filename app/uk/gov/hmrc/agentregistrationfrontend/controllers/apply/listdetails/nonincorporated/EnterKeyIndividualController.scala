@@ -91,7 +91,7 @@ extends FrontendController(mcc, actions):
           request.agentApplication.numberOfRequiredKeyIndividuals match
             case Some(n @ SixOrMore(_)) if n.paddingRequired > 0 =>
               businessPartnerRecordService
-                .getBusinessPartnerRecord(request.agentApplication.getUtr)
+                .deleteMeGetBusinessPartnerRecord(request.agentApplication.getUtr)
                 .map: bprOpt =>
                   Ok(enterIndividualNameComplexPage(
                     form = IndividualNameForm.form,
@@ -135,7 +135,7 @@ extends FrontendController(mcc, actions):
               request.agentApplication.numberOfRequiredKeyIndividuals match
                 case Some(n @ SixOrMore(_)) if n.paddingRequired > 0 =>
                   businessPartnerRecordService
-                    .getBusinessPartnerRecord(request.agentApplication.getUtr)
+                    .deleteMeGetBusinessPartnerRecord(request.agentApplication.getUtr)
                     .map: bprOpt =>
                       enterIndividualNameComplexPage(
                         formWithErrors,

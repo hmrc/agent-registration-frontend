@@ -115,7 +115,7 @@ extends FrontendController(mcc, actions):
           }
 
         agentApplicationService
-          .upsert(updatedApplication)
+          .deleteMeUpsert(updatedApplication)
           .map(_ =>
             Redirect(
               AppRoutes.apply.applicantcontactdetails.EmailAddressController.verify
@@ -179,7 +179,7 @@ extends FrontendController(mcc, actions):
           .each.isVerified
       )
       .setTo(true)
-    agentApplicationService.upsert(updatedApplication).map { _ =>
+    agentApplicationService.deleteMeUpsert(updatedApplication).map { _ =>
       logger.info("Applicant email status reported as verified, redirecting to check your answers page")
       Redirect(AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show)
     }

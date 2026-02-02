@@ -80,7 +80,7 @@ extends FrontendController(mcc, actions):
         .getCompanyHouseStatus(agentApplication.dontCallMe_getCompanyProfile.companyNumber)
         .map(_.toCheckResult)
       _ <- agentApplicationService
-        .upsert:
+        .deleteMeUpsert:
           agentApplication match
             case a: AgentApplicationLimitedCompany => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))
             case a: AgentApplicationLimitedPartnership => a.modify(_.companyStatusCheckResult).setTo(Some(companyStatusCheckResult))

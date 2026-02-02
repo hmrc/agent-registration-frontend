@@ -56,13 +56,13 @@ extends RequestAwareLogging:
       maybeApplication.getOrElse(Errors.throwServerErrorException("Expected application to be found"))
     }
 
-  def upsert(agentApplication: AgentApplication)(using request: AuthorisedRequest[?]): Future[Unit] =
+  def deleteMeUpsert(agentApplication: AgentApplication)(using request: AuthorisedRequest[?]): Future[Unit] =
     logger.debug(s"Upserting application [${request.internalUserId}]")
     Errors.require(agentApplication.internalUserId === request.internalUserId, "Cannot modify application - you must be the user who created it")
     agentRegistrationConnector
       .upsertApplication(agentApplication)
 
-  inline def upsert2[Data <: Tuple](agentApplication: AgentApplication)(using
+  inline def upsert[Data <: Tuple](agentApplication: AgentApplication)(using
     request: RequestWithData4[Data],
     ev: InternalUserId PresentIn Data
   ): Future[Unit] =

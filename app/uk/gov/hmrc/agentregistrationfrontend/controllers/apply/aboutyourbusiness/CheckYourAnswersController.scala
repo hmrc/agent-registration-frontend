@@ -54,7 +54,7 @@ extends FrontendController(mcc, actions):
     .refine4:
       implicit request =>
         businessPartnerRecordService
-          .getBusinessPartnerRecord2(request.get[AgentApplication].getUtr)
+          .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
           .map((bprOpt: Option[BusinessPartnerRecordResponse]) =>
             request.add(bprOpt.getOrThrowExpectedDataMissing(
               s"Business Partner Record for UTR ${request.get[AgentApplication].getUtr.value}"

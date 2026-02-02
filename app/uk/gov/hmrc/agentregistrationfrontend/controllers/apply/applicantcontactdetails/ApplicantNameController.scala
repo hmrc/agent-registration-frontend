@@ -80,6 +80,6 @@ extends FrontendController(mcc, actions):
                     .setTo(validFormData)
                 )
 
-          applicationService.upsert(updatedApplication).map: _ =>
+          applicationService.deleteMeUpsert(updatedApplication).map: _ =>
             Redirect(AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater

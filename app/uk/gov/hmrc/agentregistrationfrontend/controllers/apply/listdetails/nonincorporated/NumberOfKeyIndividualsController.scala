@@ -72,7 +72,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         businessPartnerRecordService
-          .getBusinessPartnerRecord(request.agentApplication.getUtr)
+          .deleteMeGetBusinessPartnerRecord(request.agentApplication.getUtr)
           .map: bprOpt =>
             Ok(numberOfKeyIndividualsPage(
               form = NumberOfKeyIndividualsForm.form
@@ -95,7 +95,7 @@ extends FrontendController(mcc, actions):
           implicit request =>
             formWithErrors =>
               businessPartnerRecordService
-                .getBusinessPartnerRecord(request.agentApplication.getUtr)
+                .deleteMeGetBusinessPartnerRecord(request.agentApplication.getUtr)
                 .map: bprOpt =>
                   numberOfKeyIndividualsPage(
                     form = formWithErrors,
@@ -130,7 +130,7 @@ extends FrontendController(mcc, actions):
                       .setTo(Some(numberOfRequiredKeyIndividuals))
 
               agentApplicationService
-                .upsert(updatedApplication)
+                .deleteMeUpsert(updatedApplication)
                 .map: _ =>
                   Redirect(AppRoutes.apply.listdetails.EnterKeyIndividualController.show.url)
       .redirectIfSaveForLater

@@ -67,7 +67,7 @@ extends RequestAwareLogging:
     ): ActionBuilder4[BusinessPartnerRecordResponse *: Data] = ab.refine4:
       implicit request =>
         businessPartnerRecordService
-          .getBusinessPartnerRecord2(request.get[AgentApplication].getUtr)
+          .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
           .map(_.getOrThrowExpectedDataMissing(s"Business Partner Record for UTR ${request.get[AgentApplication].getUtr.value}"))
           .map(request.add)
 
@@ -77,7 +77,7 @@ extends RequestAwareLogging:
     ): ActionBuilder4[Option[BusinessPartnerRecordResponse] *: Data] = ab.refine4:
       implicit request =>
         businessPartnerRecordService
-          .getBusinessPartnerRecord2(request.get[AgentApplication].getUtr)
+          .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
           .map(request.add)
 
   val action2: ActionBuilder[DefaultRequest, AnyContent] = actionBuilder

@@ -173,7 +173,7 @@ extends FrontendController(mcc, actions):
           )
 
     agentApplicationService
-      .upsert(updatedApplication)
+      .deleteMeUpsert(updatedApplication)
       .map: _ =>
         Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
 

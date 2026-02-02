@@ -62,7 +62,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         businessPartnerRecordService
-          .getBusinessPartnerRecord(request.agentApplication.getUtr)
+          .deleteMeGetBusinessPartnerRecord(request.agentApplication.getUtr)
           .map: bprOpt =>
             Ok(taskListPage(
               taskListStatus = request.agentApplication.taskListStatus,

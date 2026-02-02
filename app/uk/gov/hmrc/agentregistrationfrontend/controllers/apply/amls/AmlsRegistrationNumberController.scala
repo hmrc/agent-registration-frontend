@@ -74,7 +74,7 @@ extends FrontendController(mcc, actions):
           val amlsRegistrationNumber: AmlsRegistrationNumber = request.formValue
 
           applicationService
-            .upsert(
+            .deleteMeUpsert(
               request.agentApplication
                 .modify(_.amlsDetails.each.amlsRegistrationNumber)
                 .setTo(Some(amlsRegistrationNumber))

@@ -46,7 +46,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         businessPartnerRecordService
-          .getBusinessPartnerRecord(request.agentApplication.getUtr)
+          .deleteMeGetBusinessPartnerRecord(request.agentApplication.getUtr)
           .map: bprOpt =>
             Ok(view(
               entityName = bprOpt
@@ -63,7 +63,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         agentApplicationService
-          .upsert(
+          .deleteMeUpsert(
             request
               .agentApplication
               .modify(_.hmrcStandardForAgentsAgreed)

@@ -83,7 +83,7 @@ extends FrontendController(mcc, actions):
             businessType match
               case BusinessType.Partnership.LimitedLiabilityPartnership =>
                 agentApplicationService
-                  .upsert(applicationFactory.makeNewAgentApplicationLlp(
+                  .deleteMeUpsert(applicationFactory.makeNewAgentApplicationLlp(
                     internalUserId = request.internalUserId,
                     groupId = request.groupId,
                     userRole = userRole
@@ -91,7 +91,7 @@ extends FrontendController(mcc, actions):
                   .map(_ => Redirect(nextEndpoint))
               case BusinessType.SoleTrader =>
                 agentApplicationService
-                  .upsert(applicationFactory.makeNewAgentApplicationSoleTrader(
+                  .deleteMeUpsert(applicationFactory.makeNewAgentApplicationSoleTrader(
                     internalUserId = request.internalUserId,
                     groupId = request.groupId,
                     userRole = userRole
@@ -99,7 +99,7 @@ extends FrontendController(mcc, actions):
                   .map(_ => Redirect(nextEndpoint))
               case BusinessType.LimitedCompany =>
                 agentApplicationService
-                  .upsert(applicationFactory.makeNewAgentApplicationLimitedCompany(
+                  .deleteMeUpsert(applicationFactory.makeNewAgentApplicationLimitedCompany(
                     internalUserId = request.internalUserId,
                     groupId = request.groupId,
                     userRole = userRole
@@ -107,7 +107,7 @@ extends FrontendController(mcc, actions):
                   .map(_ => Redirect(nextEndpoint))
               case BusinessType.Partnership.GeneralPartnership =>
                 agentApplicationService
-                  .upsert(applicationFactory.makeNewAgentApplicationGeneralPartnership(
+                  .deleteMeUpsert(applicationFactory.makeNewAgentApplicationGeneralPartnership(
                     internalUserId = request.internalUserId,
                     groupId = request.groupId,
                     userRole = userRole
@@ -115,7 +115,7 @@ extends FrontendController(mcc, actions):
                   .map(_ => Redirect(nextEndpoint))
               case BusinessType.Partnership.LimitedPartnership =>
                 agentApplicationService
-                  .upsert(applicationFactory.makeNewAgentApplicationLimitedPartnership(
+                  .deleteMeUpsert(applicationFactory.makeNewAgentApplicationLimitedPartnership(
                     internalUserId = request.internalUserId,
                     groupId = request.groupId,
                     userRole = userRole
@@ -123,7 +123,7 @@ extends FrontendController(mcc, actions):
                   .map(_ => Redirect(nextEndpoint))
               case BusinessType.Partnership.ScottishLimitedPartnership =>
                 agentApplicationService
-                  .upsert(applicationFactory.makeNewAgentApplicationScottishLimitedPartnership(
+                  .deleteMeUpsert(applicationFactory.makeNewAgentApplicationScottishLimitedPartnership(
                     internalUserId = request.internalUserId,
                     groupId = request.groupId,
                     userRole = userRole
@@ -131,7 +131,7 @@ extends FrontendController(mcc, actions):
                   .map(_ => Redirect(nextEndpoint))
               case BusinessType.Partnership.ScottishPartnership =>
                 agentApplicationService
-                  .upsert(applicationFactory.makeNewAgentApplicationScottishPartnership(
+                  .deleteMeUpsert(applicationFactory.makeNewAgentApplicationScottishPartnership(
                     internalUserId = request.internalUserId,
                     groupId = request.groupId,
                     userRole = userRole

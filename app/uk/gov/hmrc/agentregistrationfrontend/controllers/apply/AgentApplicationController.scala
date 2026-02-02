@@ -69,7 +69,7 @@ extends FrontendController(mcc, actions):
     .getApplicationSubmitted2.async:
       implicit request: (AgentApplicationRequest2[AnyContent]) =>
         businessPartnerRecordService
-          .getBusinessPartnerRecord2(request.get[AgentApplication].getUtr)
+          .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
           .map: bprOpt =>
             Ok(confirmationPage(
               entityName = bprOpt
@@ -85,7 +85,7 @@ extends FrontendController(mcc, actions):
     .getApplicationSubmitted2.async:
       implicit request: (AgentApplicationRequest2[AnyContent]) =>
         businessPartnerRecordService
-          .getBusinessPartnerRecord2(request.agentApplication.getUtr)
+          .getBusinessPartnerRecord(request.agentApplication.getUtr)
           .map: bprOpt =>
             Ok(viewApplicationPage(
               entityName = bprOpt

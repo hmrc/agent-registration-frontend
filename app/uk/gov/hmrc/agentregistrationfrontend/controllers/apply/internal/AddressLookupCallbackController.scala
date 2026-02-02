@@ -65,6 +65,6 @@ extends FrontendController(mcc, actions):
               .modify(_.agentDetails.each.agentCorrespondenceAddress)
               .setTo(Some(AgentCorrespondenceAddressHelper.fromAddressLookupAddress(address)))
             agentApplicationService
-              .upsert(updatedApplication)
+              .deleteMeUpsert(updatedApplication)
               .map: _ =>
                 Redirect(AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url)

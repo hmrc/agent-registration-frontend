@@ -64,7 +64,7 @@ extends FrontendController(mcc, actions):
           val supervisoryBody = request.formValue
 
           applicationService
-            .upsert(
+            .deleteMeUpsert(
               request.agentApplication
                 .modify(_.amlsDetails)
                 .using {

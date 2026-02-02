@@ -76,7 +76,7 @@ extends FrontendController(mcc, actions):
         implicit request: (AgentApplicationRequest[AnyContent] & FormValue[LocalDate]) =>
           val amlsExpiryDate = request.formValue
           applicationService
-            .upsert(
+            .deleteMeUpsert(
               request.agentApplication
                 .modify(_.amlsDetails.each.amlsExpiryDate)
                 .setTo(Some(amlsExpiryDate))

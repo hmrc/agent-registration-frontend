@@ -167,7 +167,7 @@ extends FrontendController(mcc, actions):
         deceased = false
       )
       updatedApp <- updateIdentifiers(application)
-      _ <- applicationService.upsert(updatedApp)
+      _ <- applicationService.deleteMeUpsert(updatedApp)
     } yield Redirect(AppRoutes.apply.TaskListController.show)
 
   private def updateIdentifiers(agentApplication: AgentApplicationLlp)(using

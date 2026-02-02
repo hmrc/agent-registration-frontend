@@ -95,7 +95,7 @@ extends FrontendController(mcc, actions):
           implicit request =>
             formWithErrors =>
               businessPartnerRecordService
-                .getBusinessPartnerRecord2(request.agentApplication.getUtr).map: bprOpt =>
+                .getBusinessPartnerRecord(request.agentApplication.getUtr).map: bprOpt =>
                   view(
                     form = formWithErrors,
                     addressOptions = makeAddressOptions(
@@ -118,7 +118,7 @@ extends FrontendController(mcc, actions):
               .modify(_.agentDetails.each.agentCorrespondenceAddress)
               .setTo(Some(AgentCorrespondenceAddressHelper.fromValueString(addressOption)))
             agentApplicationService
-              .upsert2(updatedApplication)
+              .upsert(updatedApplication)
               .map: _ =>
                 Redirect(AppRoutes.apply.agentdetails.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater

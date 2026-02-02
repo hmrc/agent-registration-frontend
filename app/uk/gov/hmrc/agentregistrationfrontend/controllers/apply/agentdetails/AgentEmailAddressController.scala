@@ -98,7 +98,7 @@ extends FrontendController(mcc, actions):
         implicit request =>
           formWithErrors =>
             businessPartnerRecordService
-              .getBusinessPartnerRecord2(request.agentApplication.getUtr)
+              .getBusinessPartnerRecord(request.agentApplication.getUtr)
               .map: (bprOpt: Option[BusinessPartnerRecordResponse]) =>
                 view(
                   form = formWithErrors,
@@ -129,7 +129,7 @@ extends FrontendController(mcc, actions):
               ))
           }
         agentApplicationService
-          .upsert2(updatedApplication)
+          .upsert(updatedApplication)
           .map: _ =>
             Redirect(
               AppRoutes.apply.agentdetails.AgentEmailAddressController.verify
@@ -191,7 +191,7 @@ extends FrontendController(mcc, actions):
           .each.isVerified
       )
       .setTo(true)
-    agentApplicationService.upsert2(updatedApplication).map { _ =>
+    agentApplicationService.upsert(updatedApplication).map { _ =>
       logger.info("Applicant email status reported as verified, redirecting to check your answers page")
       Redirect(AppRoutes.apply.agentdetails.CheckYourAnswersController.show)
     }

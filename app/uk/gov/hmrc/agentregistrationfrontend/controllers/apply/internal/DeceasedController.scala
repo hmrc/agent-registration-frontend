@@ -79,7 +79,7 @@ extends FrontendController(mcc, actions):
               case None => Future.successful(CheckResult.Pass) // TODO - confirm this is correct
 
           _ <- agentApplicationService
-            .upsert(request.agentApplication
+            .deleteMeUpsert(request.agentApplication
               .asSoleTraderApplication
               .modify(_.deceasedCheckResult)
               .setTo(Some(checkResult)))

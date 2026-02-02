@@ -74,6 +74,6 @@ extends FrontendController(mcc, actions):
           val updatedApplication: AgentApplication = request.agentApplication
             .modify(_.applicantContactDetails.each.telephoneNumber)
             .setTo(Some(validFormData))
-          agentApplicationService.upsert(updatedApplication).map: _ =>
+          agentApplicationService.deleteMeUpsert(updatedApplication).map: _ =>
             Redirect(AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater
