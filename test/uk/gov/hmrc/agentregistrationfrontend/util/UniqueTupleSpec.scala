@@ -143,6 +143,7 @@ extends UnitSpec:
           t.get[Double]
         """)
         errors.map(_.message) shouldBe List(
+          "Cannot extract value from generic tuple. The method calling this must be 'inline' to preserve the tuple structure, or the value must be passed explicitly.",
           """Type 'Double' is not present in the tuple.
             |Available types:
             |  * Int
@@ -163,6 +164,7 @@ extends UnitSpec:
           t.update(2.0)
         """)
         errors.map(_.message) shouldBe List(
+          "Cannot update value in generic tuple. The method calling this must be 'inline' to preserve the tuple structure.",
           """Type 'Double' is not present in the tuple.
             |Available types:
             |  * Int
@@ -183,6 +185,7 @@ extends UnitSpec:
           t.replace[Double, Char]('c')
         """)
         errors.map(_.message) shouldBe List(
+          "Cannot replace value in generic tuple. The method calling this must be 'inline' to preserve the tuple structure.",
           """Type 'Double' is not present in the tuple.
             |Available types:
             |  * Int
@@ -203,6 +206,7 @@ extends UnitSpec:
           t.delete[Double]
         """)
         errors.map(_.message) shouldBe List(
+          "Cannot delete value from generic tuple. The method calling this must be 'inline' to preserve the tuple structure.",
           """Type 'Double' is not present in the tuple.
             |Available types:
             |  * Int
