@@ -49,7 +49,7 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress4
+    .getApplicationInProgress
     .getMaybeBusinessPartnerRecord
     .apply:
       implicit request =>
@@ -65,7 +65,7 @@ extends FrontendController(mcc, actions):
   def submit: Action[AnyContent] =
     actions
       .Applicant
-      .getApplicationInProgress4
+      .getApplicationInProgress
       .ensureValidFormAndRedirectIfSaveForLater4[AgentBusinessName](
         form = AgentBusinessNameForm.form,
         resultToServeWhenFormHasErrors =

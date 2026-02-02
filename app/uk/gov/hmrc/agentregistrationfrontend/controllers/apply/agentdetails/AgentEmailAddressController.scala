@@ -56,7 +56,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder4[DataWithApplication] = actions
     .Applicant
-    .getApplicationInProgress4
+    .getApplicationInProgress
     .ensure4(
       _
         .agentApplication
@@ -137,7 +137,7 @@ extends FrontendController(mcc, actions):
 
   def verify: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress4
+    .getApplicationInProgress
     .ensure4(
       _.agentApplication
         .agentDetails

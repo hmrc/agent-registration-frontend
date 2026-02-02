@@ -116,7 +116,7 @@ extends RequestAwareLogging:
                 logger.error(s"[Unexpected State] No agent application found for authenticated user ${request.get[InternalUserId].value}. Redirecting to startRegistration page ($redirect)")
                 Redirect(redirect)
 
-    val getApplication4: ActionBuilder4[DataWithApplication] = authorised4
+    val getApplication: ActionBuilder4[DataWithApplication] = authorised4
       .refine4:
         implicit request: RequestWithData4[DataWithAuth] =>
           agentApplicationService
@@ -158,7 +158,7 @@ extends RequestAwareLogging:
             Redirect(call.url)
       )
 
-    val getApplicationInProgress4: ActionBuilder4[DataWithApplication] = getApplication4
+    val getApplicationInProgress: ActionBuilder4[DataWithApplication] = getApplication
       .ensure(
         condition = _.get[AgentApplication].isInProgress,
         resultWhenConditionNotMet =
@@ -188,7 +188,7 @@ extends RequestAwareLogging:
             Redirect(call.url)
       )
 
-    val getApplicationSubmitted4: ActionBuilder4[DataWithApplication] = getApplication4
+    val getApplicationSubmitted4: ActionBuilder4[DataWithApplication] = getApplication
       .ensure(
         condition = _.agentApplication.hasFinished,
         resultWhenConditionNotMet =
