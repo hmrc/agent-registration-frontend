@@ -50,12 +50,12 @@ class TypeOfSignInController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = action4:
+  def show: Action[AnyContent] = action:
     implicit request =>
       Ok(view(TypeOfSignInForm.form.fill(request.readTypeOfSignIn)))
 
   def submit: Action[AnyContent] =
-    action4
+    action
       .ensureValidForm4(TypeOfSignInForm.form, implicit request => view(_)):
         implicit request =>
           val typeOfSignIn: TypeOfSignIn = request.get
@@ -63,7 +63,7 @@ extends FrontendController(mcc, actions):
             .addToSession(typeOfSignIn)
 
   def showSignInPage: Action[AnyContent] =
-    action4
+    action
       .refine4(r => r.readFromSessionAgentType.fold(Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url))(r.add))
       .refine4(r => r.readBusinessType.fold(Redirect(AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show.url))(r.add))
       .refine4(r => r.readTypeOfSignIn.fold(Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show.url))(r.add))

@@ -19,12 +19,10 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.CheckYourAnswersPage
 
@@ -36,10 +34,10 @@ class CheckYourAnswersController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+  private val baseAction: ActionBuilder4[DataWithApplication] = actions
     .Applicant
     .getApplicationInProgress
-    .ensure(
+    .ensure4(
       _.agentApplication.agentDetails.exists(_.isComplete),
       implicit request =>
         logger.warn("Because we don't have complete agent details we are redirecting to where data is missing")

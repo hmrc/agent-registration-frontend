@@ -83,7 +83,7 @@ extends RequestAwareLogging:
   val deleteMeAction2: ActionBuilder[DefaultRequest, AnyContent] = actionBuilder
     .refine2(request => RequestWithData.empty(request))
 
-  val action4: ActionBuilder4[EmptyTuple] = deleteMeAction2
+  val action: ActionBuilder4[EmptyTuple] = deleteMeAction2
 
   val deleteMeAction: ActionBuilder[Request, AnyContent] = actionBuilder
 
@@ -92,7 +92,7 @@ extends RequestAwareLogging:
     val deleteMeAuthorised2: ActionBuilder[AuthorisedRequest2, AnyContent] = deleteMeAction2
       .refineAsync(authorisedActionRefiner.refine)
 
-    val authorised4: ActionBuilder4[DataWithAuth] = action4
+    val authorised4: ActionBuilder4[DataWithAuth] = action
       .refineAsync(authorisedActionRefiner.refine)
 
     val deleteMeAuthorised: ActionBuilder[AuthorisedRequest, AnyContent] = deleteMeAction
