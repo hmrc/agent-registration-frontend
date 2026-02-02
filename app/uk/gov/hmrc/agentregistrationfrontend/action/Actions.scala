@@ -158,7 +158,7 @@ extends RequestAwareLogging:
             Redirect(call.url)
       )
 
-    val getApplicationInProgress: ActionBuilder4[DataWithApplication] = getApplication
+    def getApplicationInProgress: ActionBuilder4[DataWithApplication] = getApplication
       .ensure(
         condition = _.get[AgentApplication].isInProgress,
         resultWhenConditionNotMet =

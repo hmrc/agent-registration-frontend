@@ -16,8 +16,11 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal
 
+import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.CheckResult
 import uk.gov.hmrc.agentregistrationfrontend.model.CompanyHouseStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData.crn
@@ -91,9 +94,12 @@ extends ControllerSpec:
     AgentRegistrationStubs.verifyUpdateAgentApplication()
     CompaniesHouseStubs.verifyGetCompanyHouse(crn = crn)
 
-  s"GET $path should redirect to task list page when entity verification already done" in:
+  s"GET path should redirect to task list page when entity verification already done" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterCompaniesHouseStatusCheckPass)
+    val aa: AgentApplicationLlp = agentApplication.afterCompaniesHouseStatusCheckPass
+    aa.companyStatusCheckResult shouldBe Some(CheckResult.Pass)
+    println(Json.prettyPrint(Json.toJson(aa: AgentApplication)))
+    AgentRegistrationStubs.stubGetAgentApplication(aa)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe nextUrl
