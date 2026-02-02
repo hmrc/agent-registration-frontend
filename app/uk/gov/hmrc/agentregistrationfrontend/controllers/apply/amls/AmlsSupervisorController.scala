@@ -24,8 +24,6 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -46,7 +44,7 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
     .Applicant
-    .deleteMeGetApplicationInProgress:
+    .getApplicationInProgress:
       implicit request =>
         val form: Form[AmlsCode] = amlsCodeForm.form.fill(request
           .agentApplication
@@ -57,14 +55,14 @@ extends FrontendController(mcc, actions):
   def submit: Action[AnyContent] =
     actions
       .Applicant
-      .deleteMeGetApplicationInProgress
-      .ensureValidFormAndRedirectIfSaveForLater(amlsCodeForm.form, implicit r => view(_))
+      .getApplicationInProgress
+      .ensureValidFormAndRedirectIfSaveForLater4(amlsCodeForm.form, implicit r => view(_))
       .async:
-        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[AmlsCode]) =>
-          val supervisoryBody = request.formValue
+        implicit request =>
+          val supervisoryBody: AmlsCode = request.get
 
           applicationService
-            .deleteMeUpsert(
+            .upsert(
               request.agentApplication
                 .modify(_.amlsDetails)
                 .using {
