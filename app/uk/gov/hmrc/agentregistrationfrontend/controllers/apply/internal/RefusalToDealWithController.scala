@@ -43,8 +43,8 @@ extends FrontendController(mcc, actions):
 
   def check(): Action[AnyContent] = actions
     .Applicant
-    .deleteMeGetApplicationInProgress
-    .ensure(
+    .getApplicationInProgress
+    .ensure4(
       condition =
         _.agentApplication
           .applicationState === ApplicationState.GrsDataReceived,
@@ -53,7 +53,7 @@ extends FrontendController(mcc, actions):
           logger.warn("Missing data from GRS, redirecting to start GRS registration")
           Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
     )
-    .ensure(
+    .ensure4(
       condition = _.agentApplication.isRefusalToDealWithCheckRequired,
       resultWhenConditionNotMet =
         implicit request =>
@@ -66,7 +66,7 @@ extends FrontendController(mcc, actions):
           checkResult <- agentAssuranceConnector
             .checkForRefusalToDealWith(request.agentApplication.getUtr)
           _ <- agentApplicationService
-            .deleteMeUpsert(request.agentApplication
+            .upsert(request.agentApplication
               .modify(_.refusalToDealWithCheckResult)
               .setTo(Some(checkResult)))
         yield checkResult match
