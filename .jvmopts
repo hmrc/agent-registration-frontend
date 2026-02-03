@@ -1,3 +1,3 @@
--Xmx8g
--Xms2g
--XX:MaxMetaspaceSize=2g
+-Xmx4g
+-Xms1g
+-XX:MaxMetaspaceSize=1g

@@ -20,9 +20,7 @@ import play.api.Logger
 
 trait RequestAwareLogging:
 
-  protected val logger: RequestAwareLogger =
+  protected implicit val logger: RequestAwareLogger =
     new RequestAwareLogger(
       delegateLogger = Logger(getClass)
     )
-
-  given RequestAwareLogger = logger
