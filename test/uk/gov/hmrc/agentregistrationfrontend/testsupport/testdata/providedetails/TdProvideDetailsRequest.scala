@@ -27,7 +27,7 @@ trait TdProvideDetailsRequest {
 
   def makeProvideDetailsRequest(individualProvidedDetails: IndividualProvidedDetailsToBeDeleted): IndividualProvideDetailsRequest[AnyContent] =
     new IndividualProvideDetailsRequest(
-      request = dependencies.requestLoggedIn,
+      request = dependencies.deleteMerequestLoggedIn,
       individualProvidedDetails = individualProvidedDetails,
       internalUserId = dependencies.internalUserId,
       credentials = dependencies.credentials

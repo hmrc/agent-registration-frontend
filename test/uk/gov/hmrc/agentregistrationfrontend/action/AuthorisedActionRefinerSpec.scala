@@ -17,30 +17,31 @@
 package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.http.Status
-import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Results.*
 import play.api.test.Helpers.*
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithAuth
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData4
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
 import scala.concurrent.Future
 
-class AuthorisedActionSpec
+class AuthorisedActionRefinerSpec
 extends ISpec:
 
   "when User is not logged in (request comes without authorisation in the session) action redirects to login url" in:
-    val authorisedAction: AuthorisedAction = app.injector.instanceOf[AuthorisedAction]
-    val notLoggedInRequest: Request[?] = tdAll.requestNotLoggedIn
-    authorisedAction
-      .invokeBlock(notLoggedInRequest, _ => fakeResultF)
+    val authorisedActionRefiner: AuthorisedActionRefiner = app.injector.instanceOf[AuthorisedActionRefiner]
+    val notLoggedInRequest: RequestWithData4[EmptyTuple] = tdAll.requestNotLoggedIn
+    authorisedActionRefiner
+      .refine(notLoggedInRequest)
       .futureValue shouldBe Redirect(
       s"""http://localhost:9099/bas-gateway/sign-in?continue_url=$thisFrontendBaseUrl/&origin=agent-registration-frontend&affinityGroup=agent"""
     )
     AuthStubs.verifyAuthorise(0)
 
   "Credential role must be User or Admin or else the action returns Unahtorised View" in:
-    val authorisedAction: AuthorisedAction = app.injector.instanceOf[AuthorisedAction]
+    val authorisedActionRefiner: AuthorisedActionRefiner = app.injector.instanceOf[AuthorisedActionRefiner]
     val credentialRoleNotUserNorAdmin = "Assistant"
     AuthStubs.stubAuthorise(
       responseBody =
@@ -57,13 +58,18 @@ extends ISpec:
            |""".stripMargin
     )
 
-    val resultF = authorisedAction.invokeBlock(tdAll.requestLoggedIn, _ => fakeResultF)
-    contentAsString(resultF) should include("unauthorised.heading")
-    status(resultF) shouldBe Status.UNAUTHORIZED
+    val result: Result =
+      authorisedActionRefiner
+        .refine(tdAll.requestNotLoggedIn)
+        .futureValue
+        .left
+        .value
+    contentAsString(Future.successful(result)) should include("unauthorised.heading")
+    result.header.status shouldBe Status.UNAUTHORIZED
     AuthStubs.verifyAuthorise()
 
   "active HMRC-AS-AGENT enrolment MUST NOT be assigned to user or else the action redirects to ASA Dashboard" in:
-    val authorisedAction: AuthorisedAction = app.injector.instanceOf[AuthorisedAction]
+    val authorisedActionRefiner: AuthorisedActionRefiner = app.injector.instanceOf[AuthorisedActionRefiner]
     AuthStubs.stubAuthorise(
       responseBody =
         // language=JSON
@@ -90,25 +96,17 @@ extends ISpec:
            |""".stripMargin
     )
 
-    val result = authorisedAction.invokeBlock(tdAll.requestLoggedIn, _ => fakeResultF).futureValue
+    val result: Result = authorisedActionRefiner.refine(tdAll.requestNotLoggedIn).futureValue.left.value
     result shouldBe Redirect("http://localhost:9437/agent-services-account/home")
     AuthStubs.verifyAuthorise()
 
   "successfully authorise when user is logged in, credentialRole is User/Admin, and no active HMRC-AS-AGENT enrolment" in:
-    val authorisedAction: AuthorisedAction = app.injector.instanceOf[AuthorisedAction]
+    val authorisedActionRefiner: AuthorisedActionRefiner = app.injector.instanceOf[AuthorisedActionRefiner]
     AuthStubs.stubAuthorise()
-    val result: Result = Ok("AllGood")
-    authorisedAction
-      .invokeBlock(
-        tdAll.requestLoggedIn,
-        (r: AuthorisedRequest[?]) =>
-          Future.successful {
-            r.internalUserId shouldBe tdAll.internalUserId
-            r.groupId shouldBe tdAll.groupId
-            result
-          }
-      )
-      .futureValue shouldBe result
+    val requestWithAuth: RequestWithData4[DataWithAuth] =
+      authorisedActionRefiner
+        .refine(tdAll.requestNotLoggedIn)
+        .futureValue
+        .value
+    requestWithAuth.data shouldBe tdAll.requestLoggedIn.data
     AuthStubs.verifyAuthorise()
-
-  def fakeResultF: Future[Result] = fail("this should not be executed if test works fine")

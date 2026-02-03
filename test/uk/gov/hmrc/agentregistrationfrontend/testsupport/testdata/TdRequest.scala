@@ -16,9 +16,12 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-import play.api.mvc.AnyContentAsEmpty
+import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import play.api.test.FakeRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithData
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithAuth
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData4
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withAuthTokenInSession
@@ -39,7 +42,7 @@ trait TdRequest {
   def trueClientPort: String = "client-port-123"
   def deviceIdInRequest: String = "device-id-123"
 
-  def baseRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  def baseRequest: FakeRequest[AnyContent] = FakeRequest()
     .withRequestId()
     .withTrueClientIp()
     .withTrueClientPort()
@@ -47,27 +50,39 @@ trait TdRequest {
 
   def headerCarrier: HeaderCarrier = HeaderCarrier()
 
-  def requestNotLoggedIn: Request[AnyContentAsEmpty.type] = baseRequest
-  def requestLoggedIn: Request[AnyContentAsEmpty.type] = baseRequest.withAuthTokenInSession()
+  def deleteMeRequestNotLoggedIn: Request[AnyContent] = baseRequest
 
-  def requestLoggedInWithAgentApplicationId: Request[AnyContentAsEmpty.type] = baseRequest
+  def requestNotLoggedIn: RequestWithData4[EmptyTuple] = RequestWithData.empty(baseRequest)
+
+  def deleteMerequestLoggedIn: Request[AnyContent] = baseRequest.withAuthTokenInSession()
+
+  def requestLoggedIn: RequestWithData4[DataWithAuth] = RequestWithData.apply[AnyContent, DataWithAuth](
+    baseRequest.withAuthTokenInSession(),
+    (
+      dependencies.internalUserId,
+      dependencies.groupId,
+      dependencies.credentials
+    )
+  )
+
+  def requestLoggedInWithAgentApplicationId: Request[AnyContent] = baseRequest
     .withAuthTokenInSession()
     .withAgentApplicationId(agentApplicationId.value)
 
-  def individualAuthorisedRequestLoggedInWithAgentApplicationId: IndividualAuthorisedRequest[AnyContentAsEmpty.type] =
+  def individualAuthorisedRequestLoggedInWithAgentApplicationId: IndividualAuthorisedRequest[AnyContent] =
     new IndividualAuthorisedRequest(
       internalUserId = internalUserId,
       request = requestLoggedInWithAgentApplicationId,
       credentials = credentials
     )
-  def individualAuthorisedRequestLoggedInWithOutAgentApplicationId: IndividualAuthorisedRequest[AnyContentAsEmpty.type] =
+  def individualAuthorisedRequestLoggedInWithOutAgentApplicationId: IndividualAuthorisedRequest[AnyContent] =
     new IndividualAuthorisedRequest(
       internalUserId = internalUserId,
-      request = requestNotLoggedIn,
+      request = deleteMeRequestNotLoggedIn,
       credentials = credentials
     )
 
-  def individualAuthorisedRequestLoggedInWithAgentApplicationIdAndIdentifiers: IndividualAuthorisedWithIdentifiersRequest[AnyContentAsEmpty.type] =
+  def individualAuthorisedRequestLoggedInWithAgentApplicationIdAndIdentifiers: IndividualAuthorisedWithIdentifiersRequest[AnyContent] =
     new IndividualAuthorisedWithIdentifiersRequest(
       internalUserId = internalUserId,
       request = requestLoggedInWithAgentApplicationId,
@@ -76,7 +91,7 @@ trait TdRequest {
       saUtr = Some(saUtr)
     )
 
-  def individualAuthorisedRequestLoggedInWithAgentApplicationIdNinoAndNoUtr: IndividualAuthorisedWithIdentifiersRequest[AnyContentAsEmpty.type] =
+  def individualAuthorisedRequestLoggedInWithAgentApplicationIdNinoAndNoUtr: IndividualAuthorisedWithIdentifiersRequest[AnyContent] =
     new IndividualAuthorisedWithIdentifiersRequest(
       internalUserId = internalUserId,
       request = requestLoggedInWithAgentApplicationId,
@@ -85,10 +100,10 @@ trait TdRequest {
       saUtr = Some(saUtr)
     )
 
-  def individualAuthorisedRequestLoggedInWithOutAgentApplicationIdAndIdentifiers: IndividualAuthorisedWithIdentifiersRequest[AnyContentAsEmpty.type] =
+  def individualAuthorisedRequestLoggedInWithOutAgentApplicationIdAndIdentifiers: IndividualAuthorisedWithIdentifiersRequest[AnyContent] =
     new IndividualAuthorisedWithIdentifiersRequest(
       internalUserId = internalUserId,
-      request = requestNotLoggedIn,
+      request = deleteMeRequestNotLoggedIn,
       credentials = credentials,
       nino = Some(nino),
       saUtr = Some(saUtr)

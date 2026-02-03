@@ -27,7 +27,7 @@ trait TdAgentApplicationRequest {
 
   def makeAgentApplicationRequest(agentApplication: AgentApplication): AgentApplicationRequest[AnyContent] =
     new AgentApplicationRequest(
-      request = dependencies.requestLoggedIn,
+      request = dependencies.deleteMerequestLoggedIn,
       agentApplication = agentApplication,
       internalUserId = dependencies.internalUserId,
       groupId = dependencies.groupId,

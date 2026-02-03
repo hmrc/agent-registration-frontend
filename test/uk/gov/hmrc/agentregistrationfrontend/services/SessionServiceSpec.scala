@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.mvc.Results.Ok
-import play.api.mvc.AnyContentAsEmpty
+import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Session
@@ -33,7 +33,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 class SessionServiceSpec
 extends UnitSpec:
 
-  implicit val request: FakeRequest[AnyContentAsEmpty.type] = TdAll.tdAll.baseRequest
+  implicit val request: FakeRequest[AnyContent] = TdAll.tdAll.baseRequest
   val result: Result = Ok("").withSession("some-preexisting-key" -> "some-value")
 
   "PartnershipType" should:
