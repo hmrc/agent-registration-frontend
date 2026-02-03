@@ -78,14 +78,14 @@ extends Connector:
       .andLogOnFailure(s"Failed to find IndividualProvidedDetails by agent application id: $agentApplicationId")
 
   // for use by agent applicants when building lists of individuals
-  def find(using
+  def findAll(agentApplicationId: AgentApplicationId)(using
     request: RequestHeader
   ): Future[List[IndividualProvidedDetailsToBeDeleted]] =
-    val url: URL = url"$baseUrl/individual-provided-details/for-application/${request.agentApplication.agentApplicationId.value}"
+    val url: URL = url"$baseUrl/individual-provided-details/for-application/${agentApplicationId.value}"
     httpClient
       .get(url)
       .execute[List[IndividualProvidedDetailsToBeDeleted]]
-      .andLogOnFailure(s"Failed to find IndividualProvidedDetails by agent application id: ${request.agentApplication.agentApplicationId.value}")
+      .andLogOnFailure(s"Failed to find IndividualProvidedDetails by agent application id: ${agentApplicationId.value}")
 
   def findAll()(using
     IndividualAuthorisedRequest[?]
