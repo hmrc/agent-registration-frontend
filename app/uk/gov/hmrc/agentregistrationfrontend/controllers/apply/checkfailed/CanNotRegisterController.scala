@@ -38,7 +38,7 @@ extends FrontendController(mcc, actions):
     actions
       .Applicant
       .getApplicationInProgress
-      .ensure(
+      .ensure4(
         condition =
           _.agentApplication
             .refusalToDealWithCheckResult === Some(Fail),

@@ -19,9 +19,10 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.RequestHeader
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLimitedCompany
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLlp
@@ -31,7 +32,7 @@ import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsSoleT
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.GrsController.*
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
@@ -41,6 +42,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.GrsService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -56,10 +58,10 @@ class GrsController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction = actions
+  private val baseAction: ActionBuilder4[DataWithApplication] = actions
     .Applicant
-    .deleteMeGetApplicationInProgress
-    .ensure(
+    .getApplicationInProgress
+    .ensure4(
       condition = !_.agentApplication.isGrsDataReceived,
       resultWhenConditionNotMet =
         implicit request =>
@@ -74,7 +76,9 @@ extends FrontendController(mcc, actions):
           .createGrsJourney(
             businessType = request.agentApplication.businessType,
             includeNamePageLabel =
-              request.agentApplication.businessType === SoleTrader && request.agentApplication.asSoleTraderApplication.userRole.contains(UserRole.Authorised)
+              request.agentApplication match
+                case a: AgentApplicationSoleTrader => a.userRole.contains(UserRole.Authorised)
+                case a: IsNotSoleTrader => false
           )
           .map(journeyStartUrl => Redirect(journeyStartUrl.value))
 
@@ -84,21 +88,21 @@ extends FrontendController(mcc, actions):
   def journeyCallback(
     journeyId: Option[JourneyId]
   ): Action[AnyContent] = baseAction
-    .ensure(
-      _ => journeyId.isDefined,
-      implicit r =>
+    .refine4(implicit request =>
+      journeyId.fold {
         logger.error("Missing JourneyId in the request.")
-        Errors.throwBadRequestException("Missing JourneyId in the request.")
+        BadRequest("Missing JourneyId in the request.")
+      }(journeyId => request.add(journeyId))
     )
     .async:
-      implicit request: AgentApplicationRequest[AnyContent] =>
+      implicit request: (RequestWithData4[JourneyId *: DataWithApplication]) =>
         for
-          journeyData <- grsService.getJourneyData(request.agentApplication.businessType, journeyId.getOrThrowExpectedDataMissing("grsJourneyId"))
+          journeyData <- grsService.getJourneyData(request.agentApplication.businessType, request.get[JourneyId])
           result <-
             journeyData.registration.registrationStatus match
               case RegistrationStatus.GrsRegistered =>
                 if journeyData.identifiersMatch
-                then onGrsRegisteredAndIdentifiersMatch(journeyData)
+                then onGrsRegisteredAndIdentifiersMatch(request.agentApplication, journeyData)
                 else
                   Future.successful(Ok(simplePage(
                     h1 = "Identifiers did not match...",
@@ -123,8 +127,9 @@ extends FrontendController(mcc, actions):
         yield result
 
   private def onGrsRegisteredAndIdentifiersMatch(
+    agentApplication: AgentApplication,
     journeyData: JourneyData
-  )(using request: AgentApplicationRequest[AnyContent]): Future[Result] =
+  )(using request: RequestHeader): Future[Result] =
     Errors.require(
       journeyData.registration.registrationStatus === RegistrationStatus.GrsRegistered,
       "this function is meant to be called for GrsRegistered case"
@@ -134,7 +139,7 @@ extends FrontendController(mcc, actions):
       "this function is meant to be called when identifiers match"
     )
     val updatedApplication: AgentApplication =
-      request.agentApplication match
+      agentApplication match
         case aa: AgentApplicationSoleTrader =>
           aa
             .copy(
@@ -173,7 +178,7 @@ extends FrontendController(mcc, actions):
           )
 
     agentApplicationService
-      .deleteMeUpsert(updatedApplication)
+      .upsert(updatedApplication)
       .map: _ =>
         Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
 

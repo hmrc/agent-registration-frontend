@@ -22,8 +22,8 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CitizenDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
@@ -45,16 +45,16 @@ extends FrontendController(mcc, actions):
 
   def check(): Action[AnyContent] = actions
     .Applicant
-    .deleteMeGetApplicationInProgress
-    .ensure(
-      condition = _.agentApplication.businessType === BusinessType.SoleTrader,
-      resultWhenConditionNotMet =
-        implicit request =>
+    .getApplicationInProgress
+    .refine4(implicit request =>
+      request.agentApplication match
+        case a: AgentApplicationSoleTrader => request.add(a)
+        case a: IsNotSoleTrader =>
           logger.debug(s"Deceased verification is required only for SoleTrader, this business type is ${request.agentApplication.businessType}. Redirecting to company status check.")
           Redirect(nextCheckEndpoint)
     )
-    .ensure(
-      condition = _.agentApplication.asSoleTraderApplication.isDeceasedCheckRequired,
+    .ensure4(
+      condition = _.agentApplicationSoleTrader.isDeceasedCheckRequired,
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Deceased verification already done. Redirecting to company status check.")
@@ -65,8 +65,7 @@ extends FrontendController(mcc, actions):
         for
           checkResult <-
             request
-              .agentApplication
-              .asSoleTraderApplication
+              .agentApplicationSoleTrader
               .getBusinessDetails
               .nino match
               case Some(nino) =>
@@ -79,8 +78,7 @@ extends FrontendController(mcc, actions):
               case None => Future.successful(CheckResult.Pass) // TODO - confirm this is correct
 
           _ <- agentApplicationService
-            .deleteMeUpsert(request.agentApplication
-              .asSoleTraderApplication
+            .upsert(request.agentApplicationSoleTrader
               .modify(_.deceasedCheckResult)
               .setTo(Some(checkResult)))
         yield checkResult match

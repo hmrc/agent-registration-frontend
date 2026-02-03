@@ -20,6 +20,13 @@ import play.api.mvc.ActionBuilder
 import play.api.mvc.ActionRefiner
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
@@ -76,6 +83,16 @@ object Requests:
   ](r: RequestWithData[A, Data])
 
     inline def agentApplication(using AgentApplication PresentIn Data): AgentApplication = r.get
+    inline def agentApplicationGeneralPartnership(using AgentApplicationGeneralPartnership PresentIn Data): AgentApplicationGeneralPartnership = r.get
+    inline def agentApplicationLimitedCompany(using AgentApplicationLimitedCompany PresentIn Data): AgentApplicationLimitedCompany = r.get
+    inline def agentApplicationLimitedPartnership(using AgentApplicationLimitedPartnership PresentIn Data): AgentApplicationLimitedPartnership = r.get
+    inline def agentApplicationLlp(using AgentApplicationLlp PresentIn Data): AgentApplicationLlp = r.get
+    inline def agentApplicationScottishLimitedPartnership(using
+      AgentApplicationScottishLimitedPartnership PresentIn Data
+    ): AgentApplicationScottishLimitedPartnership = r.get
+    inline def agentApplicationScottishPartnership(using AgentApplicationScottishPartnership PresentIn Data): AgentApplicationScottishPartnership = r.get
+    inline def agentApplicationSoleTrader(using AgentApplicationSoleTrader PresentIn Data): AgentApplicationSoleTrader = r.get
+
     inline def credentials(using Credentials PresentIn Data): Credentials = r.get
     inline def internalUserId(using InternalUserId PresentIn Data): InternalUserId = r.get
     inline def businessPartnerRecordResponse(using BusinessPartnerRecordResponse PresentIn Data): BusinessPartnerRecordResponse = r.get
