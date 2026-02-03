@@ -23,7 +23,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualTelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualTelephoneNumberPage
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
@@ -60,7 +60,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request: (IndividualProvideDetailsRequest[AnyContent] & FormValue[TelephoneNumber]) =>
         val telephoneNumberFromForm: TelephoneNumber = request.formValue
-        val updatedProvidedDetails: IndividualProvidedDetails = request
+        val updatedProvidedDetails: IndividualProvidedDetailsToBeDeleted = request
           .individualProvidedDetails
           .modify(_.telephoneNumber)
           .setTo(Some(telephoneNumberFromForm))

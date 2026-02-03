@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
@@ -50,7 +50,7 @@ extends ControllerSpec:
     val missingName = tdAll.providedDetailsLlp.afterStarted
 
   private final case class TestCaseForCya(
-    providedDetails: IndividualProvidedDetails,
+    providedDetails: IndividualProvidedDetailsToBeDeleted,
     name: String,
     expectedRedirect: Option[String] = None
   )

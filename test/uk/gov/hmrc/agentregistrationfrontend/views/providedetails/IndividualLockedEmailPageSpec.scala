@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualEmailLockedPage
@@ -31,7 +31,7 @@ extends ViewSpec:
 
   private object individualProvidedDetails:
 
-    val afterEmailAddressProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.afterEmailAddressProvided
+    val afterEmailAddressProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterEmailAddressProvided
 
   given individualProvideDetailsRequest: IndividualProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(
     individualProvidedDetails.afterEmailAddressProvided

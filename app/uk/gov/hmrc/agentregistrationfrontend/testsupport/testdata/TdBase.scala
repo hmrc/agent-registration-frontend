@@ -187,7 +187,7 @@ trait TdBase:
     numberOfKeyIndividualsResponsibleForTaxMatters = 3
   )
 
-  val individualProvidedDetails: IndividualProvidedDetails = IndividualProvidedDetails(
+  val individualProvidedDetails: IndividualProvidedDetailsToBeDeleted = IndividualProvidedDetailsToBeDeleted(
     _id = individualProvidedDetailsId,
     internalUserId = internalUserId,
     createdAt = nowAsInstant,

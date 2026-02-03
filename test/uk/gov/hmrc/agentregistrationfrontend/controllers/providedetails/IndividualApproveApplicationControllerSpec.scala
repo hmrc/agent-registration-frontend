@@ -21,7 +21,7 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualApproveApplicationForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -44,9 +44,9 @@ extends ControllerSpec:
 
   private object individualProvideDetails:
 
-    val afterSaUtrProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrProvided
-    val withSaUtrNotProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoProvided
-    val withNinoAndSaUtrFromAuthButEmailNotProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrFromAuth.copy(
+    val afterSaUtrProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrProvided
+    val withSaUtrNotProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterNino.afterNinoProvided
+    val withNinoAndSaUtrFromAuthButEmailNotProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrFromAuth.copy(
       emailAddress = None
     )
     val afterApproveAgentApplication = tdAll.providedDetailsLlp.afterApproveAgentApplication

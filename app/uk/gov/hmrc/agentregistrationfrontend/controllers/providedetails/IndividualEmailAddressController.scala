@@ -35,7 +35,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individua
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import com.softwaremill.quicklens.*
 import uk.gov.hmrc.agentregistration.shared.EmailAddress
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualVerifiedEmailAddress
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 
@@ -81,7 +81,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request: (IndividualProvideDetailsRequest[AnyContent] & FormValue[EmailAddress]) =>
         val emailAddressFromForm: EmailAddress = request.formValue
-        val updatedProvidedDetails: IndividualProvidedDetails = request
+        val updatedProvidedDetails: IndividualProvidedDetailsToBeDeleted = request
           .individualProvidedDetails
           .modify(_.emailAddress)
           .using {

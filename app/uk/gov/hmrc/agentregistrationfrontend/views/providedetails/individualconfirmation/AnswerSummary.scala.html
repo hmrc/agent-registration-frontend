@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 @import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
 @import uk.gov.hmrc.agentregistration.shared.llp.{IndividualNino, IndividualSaUtr}
 @import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
@@ -28,7 +28,7 @@
 
 @(
         key: String,
-        individualProvidedDetails: IndividualProvidedDetails)(implicit
+        individualProvidedDetails: IndividualProvidedDetailsToBeDeleted)(implicit
         request: RequestHeader,
         messages: Messages
 )

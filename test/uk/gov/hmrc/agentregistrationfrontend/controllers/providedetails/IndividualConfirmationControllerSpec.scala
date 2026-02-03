@@ -21,7 +21,7 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
@@ -43,12 +43,12 @@ extends ControllerSpec:
 
   object individualProvidedDetails:
 
-    val incompleteProvidedDetails: IndividualProvidedDetails =
+    val incompleteProvidedDetails: IndividualProvidedDetailsToBeDeleted =
       tdAll
         .providedDetailsLlp
         .afterHmrcStandardforAgentsAgreed
 
-    val completedProvidedDetails: IndividualProvidedDetails =
+    val completedProvidedDetails: IndividualProvidedDetailsToBeDeleted =
       tdAll
         .providedDetailsLlp
         .afterProvidedDetailsConfirmed
