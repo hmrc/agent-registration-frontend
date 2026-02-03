@@ -16,92 +16,127 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action
 
-import play.api.mvc.AnyContentAsEmpty
-import play.api.mvc.Results
-import play.api.mvc.Results.Status
+import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
+import uk.gov.hmrc.agentregistration.shared.GroupId
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 class RequestWithDataSpec
 extends UnitSpec:
 
-  type RequestX[A] = RequestWithData[
-    A,
-    (
-      String,
-      Int,
-      Option[AgentApplication],
-      (Int, Float)
-    )
-  ]
+  "RequestWithData" should:
 
-  type IsExotic = (Orange | Banana.type) & Fruit
-  type IsNotExotic = (Apple | Pear) & Fruit
+    val agentApplication: AgentApplication = TdAll.tdAll.agentApplicationLlp.afterStarted
+    val internalUserId: InternalUserId = TdAll.tdAll.internalUserId
+    val groupId: GroupId = TdAll.tdAll.groupId
+    val credentials: Credentials = TdAll.tdAll.credentials
+    val businessPartnerRecordResponse: BusinessPartnerRecordResponse = TdAll.tdAll.businessPartnerRecordResponse
+    val maybeBusinessPartnerRecordResponse: Option[BusinessPartnerRecordResponse] = Some(businessPartnerRecordResponse)
 
-  sealed trait Fruit
+    type ExampleData =
+      (
+        AgentApplication,
+        InternalUserId,
+        GroupId,
+        Credentials
+      )
 
-  final case class Apple(smell: Int)
-  extends Fruit
-  final case class Pear(smell: Int)
-  extends Fruit
-  final case class Orange(smell: Int)
-  extends Fruit
-  case object Banana
-  extends Fruit
-
-  "showcase" in:
-    val r: RequestX[AnyContentAsEmpty.type] = RequestWithData(
+    val request: RequestWithData[
+      AnyContent,
+      ExampleData
+    ] = RequestWithData(
       request = FakeRequest(),
-      data = ("foo", 42, None, (11, 3.14f))
+      data =
+        (
+          agentApplication,
+          internalUserId,
+          groupId,
+          credentials
+        )
     )
 
-    r.get[String] shouldBe "foo"
-    r.get[Int] shouldBe 42
-//    r.get[Float] won't compile
-    r.get[Option[AgentApplication]] shouldBe None
-    // r.add(Results.BadRequest).add(Results.NotFound)
-    val r2 = r.add(Results.BadRequest)
-    r2.get[Status] shouldBe Results.BadRequest
-    r2.update(Results.NotFound).get[Status] shouldBe Results.NotFound
-    val r3: RequestWithData[AnyContentAsEmpty.type, (Fruit, Status, String, Int, Option[AgentApplication], (Int, Float))] = r2.add(Banana)
+    "can get elements from data structure by type" in:
+      request.get[AgentApplication] shouldBe agentApplication
+      request.get[InternalUserId] shouldBe internalUserId
+      request.get[GroupId] shouldBe groupId
+      request.get[Credentials] shouldBe credentials
 
-    r3.get[Fruit] shouldBe Banana
-    r3.update[Fruit](Apple(1)).get[Fruit] shouldBe Apple(1)
+    "can add elements by data type" in:
+      val r2: RequestWithData[
+        AnyContent,
+        (
+          BusinessPartnerRecordResponse,
+          AgentApplication,
+          InternalUserId,
+          GroupId,
+          Credentials
+        )
+      ] = request.add(businessPartnerRecordResponse)
 
-    val r4: RequestWithData[
-      AnyContentAsEmpty.type,
-      (
-        Fruit,
-        Status,
-        String,
-        Int,
-        Option[AgentApplication],
-        (Int, Float)
+      r2.get[BusinessPartnerRecordResponse] shouldBe businessPartnerRecordResponse
+      r2.data.tuple shouldBe (
+        businessPartnerRecordResponse,
+        agentApplication,
+        internalUserId,
+        groupId,
+        credentials
       )
-    ] = r3.update[Fruit](Apple(1))
 
-    val r5: RequestWithData[
-      AnyContentAsEmpty.type,
-      (
-        IsNotExotic,
-        Status,
-        String,
-        Int,
-        Option[AgentApplication],
-        (Int, Float)
+      val r3: RequestWithData[
+        AnyContent,
+        (
+          Option[BusinessPartnerRecordResponse],
+          BusinessPartnerRecordResponse,
+          AgentApplication,
+          InternalUserId,
+          GroupId,
+          Credentials
+        )
+      ] = r2.add(maybeBusinessPartnerRecordResponse)
+      r3.get[Option[BusinessPartnerRecordResponse]] shouldBe maybeBusinessPartnerRecordResponse
+      r3.data.tuple shouldBe (
+        maybeBusinessPartnerRecordResponse,
+        businessPartnerRecordResponse,
+        agentApplication,
+        internalUserId,
+        groupId,
+        credentials
       )
-    ] = r4.replace[Fruit, IsNotExotic](Apple(2))
 
-    val r6: RequestWithData[
-      AnyContentAsEmpty.type,
-      (
-        IsNotExotic,
-        Status,
-        String,
-        Int,
-        Option[AgentApplication]
+    "can update elements" in:
+      val newAgentApplication: AgentApplication = TdAll.tdAll.agentApplicationLlp.afterGrsDataReceived
+      val r2 = request.update(newAgentApplication)
+      r2.get[AgentApplication] shouldBe newAgentApplication
+      r2.get[InternalUserId] shouldBe internalUserId
+      r2.data.tuple shouldBe (
+        newAgentApplication,
+        internalUserId,
+        groupId,
+        credentials
       )
-    ] = r5.delete[(Int, Float)]
 
-    println(r6)
+    "can replace element types" in:
+      val llp: AgentApplicationLlp = TdAll.tdAll.agentApplicationLlp.afterStarted
+      val r2: RequestWithData[
+        AnyContent,
+        (AgentApplicationLlp, InternalUserId, GroupId, Credentials)
+      ] = request.replace[AgentApplication, AgentApplicationLlp](llp)
+      r2.get[AgentApplicationLlp] shouldBe llp
+      r2.data.tuple shouldBe (
+        llp,
+        internalUserId,
+        groupId,
+        credentials
+      )
+
+    "can delete elements by type" in:
+      val r2 = request.delete[Credentials]
+      r2.data.tuple shouldBe (agentApplication, internalUserId, groupId)
+
+//      r2.get[Credentials] // should not compile

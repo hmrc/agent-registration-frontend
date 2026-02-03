@@ -32,6 +32,8 @@ object UniqueTuple:
 
   extension [Data <: Tuple](ut: UniqueTuple[Data])
 
+    inline def tuple: Data = ut
+
     inline def add[A](value: A)(using A AbsentIn Data): UniqueTuple[A *: Data] = value *: ut
 
     inline def get[A](using A PresentIn Data): A = getImpl[Data, A](ut)
