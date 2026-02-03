@@ -74,7 +74,7 @@ extends FrontendController(mcc, actions):
         if agentType =!= AgentType.UkTaxAgent then Errors.notImplemented("only UkTaxAgent is supported for now") else ()
         val nextEndpoint: Call = AppRoutes.apply.internal.GrsController.startJourney()
 
-        agentApplicationService.find2().flatMap:
+        agentApplicationService.find().flatMap:
           case Some(agentApplication) =>
             logger.info("Application already exists, redirecting to task list")
             Future.successful(Redirect(nextEndpoint))

@@ -69,8 +69,8 @@ extends RequestAwareLogging:
       .refine4:
         implicit request: RequestWithData4[DataWithAuth] =>
           agentApplicationService
-            .find2()
-            .map[Result | AgentApplicationRequest2[AnyContent]]:
+            .find()
+            .map[Result | RequestWithApplication]:
               case Some(agentApplication) => request.add(agentApplication)
               case None =>
                 val redirect = AppRoutes.apply.AgentApplicationController.startRegistration

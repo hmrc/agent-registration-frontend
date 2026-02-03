@@ -36,47 +36,19 @@ import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 object Requests:
 
-  type ActionBuilder4[Data <: Tuple] = ActionBuilder[[X] =>> RequestWithData[X, Data], AnyContent]
-  type ActionRefiner4[
-    Data <: Tuple,
-    NewData <: Tuple
-  ] = ActionRefiner[[X] =>> RequestWithData[X, Data], [X] =>> RequestWithData[X, NewData]]
-
   type RequestWithData4[Data <: Tuple] = RequestWithData[AnyContent, Data]
 
-  type DefaultRequest4[A] = RequestWithData4[DataEmpty]
-
-  type DataWithAuth =
-    (
-      InternalUserId,
-      GroupId,
-      Credentials
-    )
   type DataEmpty = EmptyTuple
+  type DefaultRequest = RequestWithData4[DataEmpty]
+  type DefaultRequestCt[ContentType] = RequestWithData[ContentType, DataEmpty]
+
+  type DataWithAuth = (InternalUserId, GroupId, Credentials)
+  type RequestWithAuth = RequestWithData4[DataWithAuth]
+  type RequestWithAuthCt[ContentType] = RequestWithData[ContentType, DataWithAuth]
+
   type DataWithApplication = AgentApplication *: DataWithAuth
-  type RequestWithAuth4 = RequestWithData4[DataWithAuth]
-  type RequestWithApplication4 = RequestWithData4[DataWithApplication]
-
-  type DefaultRequest[A] = RequestWithData[A, DataEmpty]
-
-  type AuthorisedRequest2[A] = RequestWithData[
-    A,
-    (
-      InternalUserId,
-      GroupId,
-      Credentials
-    )
-  ]
-
-  type AgentApplicationRequest2[A] = RequestWithData[
-    A,
-    (
-      AgentApplication,
-      InternalUserId,
-      GroupId,
-      Credentials
-    )
-  ]
+  type RequestWithApplication = RequestWithData4[DataWithApplication]
+  type RequestWithApplicationCt[A] = RequestWithData[A, DataWithApplication]
 
   extension [
     A,
@@ -93,10 +65,16 @@ object Requests:
     ): AgentApplicationScottishLimitedPartnership = r.get
     inline def agentApplicationScottishPartnership(using AgentApplicationScottishPartnership PresentIn Data): AgentApplicationScottishPartnership = r.get
     inline def agentApplicationSoleTrader(using AgentApplicationSoleTrader PresentIn Data): AgentApplicationSoleTrader = r.get
-
     inline def credentials(using Credentials PresentIn Data): Credentials = r.get
     inline def internalUserId(using InternalUserId PresentIn Data): InternalUserId = r.get
     inline def groupId(using GroupId PresentIn Data): GroupId = r.get
     inline def businessPartnerRecordResponse(using BusinessPartnerRecordResponse PresentIn Data): BusinessPartnerRecordResponse = r.get
     inline def maybeBusinessPartnerRecordResponse(using Option[BusinessPartnerRecordResponse] PresentIn Data): Option[BusinessPartnerRecordResponse] = r.get
     inline def agentType(using AgentType PresentIn Data): AgentType = r.get
+
+  type ActionBuilder4[Data <: Tuple] = ActionBuilder[[X] =>> RequestWithData[X, Data], AnyContent]
+
+  type ActionRefiner4[
+    Data <: Tuple,
+    NewData <: Tuple
+  ] = ActionRefiner[[X] =>> RequestWithData[X, Data], [X] =>> RequestWithData[X, NewData]]

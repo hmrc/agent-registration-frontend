@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.AuthorisedRequest2
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
@@ -33,15 +32,15 @@ class AgentApplicationService @Inject() (
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
-  def find2()(using request: AuthorisedRequest2[?]): Future[Option[AgentApplication]] = agentRegistrationConnector
-    .findApplication2()
+  def find()(using request: RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector
+    .findApplication()
 
   def find(linkId: LinkId)(using request: RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector.findApplication(linkId)
 
   def find(
     agentApplicationId: AgentApplicationId
-  )(using request: RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector.findApplication(agentApplicationId)
+  )(using RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector.findApplication(agentApplicationId)
 
   inline def upsert(
     agentApplication: AgentApplication
-  )(using request: RequestHeader): Future[Unit] = agentRegistrationConnector.upsertApplication(agentApplication)
+  )(using RequestHeader): Future[Unit] = agentRegistrationConnector.upsertApplication(agentApplication)

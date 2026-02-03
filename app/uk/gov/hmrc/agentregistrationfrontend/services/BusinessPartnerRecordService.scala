@@ -31,8 +31,5 @@ class BusinessPartnerRecordService @Inject() (
 )
 extends RequestAwareLogging:
 
-  def deleteMeGetBusinessPartnerRecord(utr: Utr)(using request: RequestHeader): Future[Option[BusinessPartnerRecordResponse]] =
-    agentRegistrationConnector.getBusinessPartnerRecord(utr)
-
   def getBusinessPartnerRecord(utr: Utr)(using request: RequestHeader): Future[Option[BusinessPartnerRecordResponse]] =
     agentRegistrationConnector.getBusinessPartnerRecord(utr)

@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.AuthorisedRequest2
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.http.client.HttpClientV2
 
@@ -36,9 +35,7 @@ class AgentRegistrationConnector @Inject() (
 )
 extends Connector:
 
-  def findApplication2()(using
-    AuthorisedRequest2[?]
-  ): Future[Option[AgentApplication]] =
+  def findApplication()(using RequestHeader): Future[Option[AgentApplication]] =
     val url: URL = url"$baseUrl/application"
     httpClient
       .get(url)
@@ -57,9 +54,7 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to find Agent Application")
 
-  def upsertApplication(application: AgentApplication)(using
-    RequestHeader
-  ): Future[Unit] =
+  def upsertApplication(application: AgentApplication)(using RequestHeader): Future[Unit] =
     val url: URL = url"$baseUrl/application"
     httpClient
       .post(url)
@@ -78,9 +73,7 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to upsert Agent Application: ${application.agentApplicationId}")
 
-  def findApplication(linkId: LinkId)(using
-    RequestHeader
-  ): Future[Option[AgentApplication]] =
+  def findApplication(linkId: LinkId)(using RequestHeader): Future[Option[AgentApplication]] =
     val url: URL = url"$baseUrl/application/linkId/${linkId.value}"
     httpClient
       .get(url)
@@ -98,9 +91,7 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to find Agent Application by link-id: $linkId")
 
-  def findApplication(agentApplicationId: AgentApplicationId)(using
-    request: RequestHeader
-  ): Future[Option[AgentApplication]] =
+  def findApplication(agentApplicationId: AgentApplicationId)(using RequestHeader): Future[Option[AgentApplication]] =
     val url: URL = url"$baseUrl/application/by-agent-application-id/${agentApplicationId.value}"
     httpClient
       .get(url)
@@ -118,9 +109,7 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to find Agent Application by agentApplicationId: $agentApplicationId")
 
-  def getBusinessPartnerRecord(utr: Utr)(using
-    request: RequestHeader
-  ): Future[Option[BusinessPartnerRecordResponse]] =
+  def getBusinessPartnerRecord(utr: Utr)(using RequestHeader): Future[Option[BusinessPartnerRecordResponse]] =
     val url: URL = url"$baseUrl/business-partner-record/utr/${utr.value}"
     httpClient
       .get(url)

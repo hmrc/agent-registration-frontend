@@ -146,7 +146,7 @@ extends FrontendController(mcc, actions):
       // TODO: other business types
 
   private def handleCompletedSectionLlp(completedSection: CompletedSectionLlp)(using
-    r: AuthorisedRequest2[AnyContent],
+    r: RequestWithAuth,
     clock: Clock
   ): Future[Result] =
     val application =
@@ -170,10 +170,10 @@ extends FrontendController(mcc, actions):
     } yield Redirect(AppRoutes.apply.TaskListController.show)
 
   private def updateIdentifiers(agentApplication: AgentApplicationLlp)(using
-    r: AuthorisedRequest2[AnyContent],
+    r: RequestWithAuth,
     clock: Clock
   ): Future[AgentApplicationLlp] =
-    val identifiers: Future[(AgentApplicationId, LinkId)] = applicationService.find2().map:
+    val identifiers: Future[(AgentApplicationId, LinkId)] = applicationService.find().map:
       case Some(existingApplication) => (existingApplication.agentApplicationId, existingApplication.linkId)
       case None => (agentApplicationIdGenerator.nextApplicationId(), linkIdGenerator.nextLinkId())
     identifiers.map: t =>
