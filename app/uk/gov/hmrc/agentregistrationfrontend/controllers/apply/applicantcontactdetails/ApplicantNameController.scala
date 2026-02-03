@@ -24,8 +24,6 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantNameForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -45,7 +43,7 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
     .Applicant
-    .deleteMeGetApplicationInProgress:
+    .getApplicationInProgress.apply:
       implicit request =>
         Ok(view(
           ApplicantNameForm.form
@@ -56,30 +54,33 @@ extends FrontendController(mcc, actions):
                 .map(_.applicantName)
         ))
 
-  def submit: Action[AnyContent] =
-    actions
-      .Applicant
-      .deleteMeGetApplicationInProgress
-      .ensureValidFormAndRedirectIfSaveForLater(ApplicantNameForm.form, implicit r => view(_))
-      .async:
-        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[ApplicantName]) =>
-          val validFormData: ApplicantName = request.formValue
-          val updatedApplication: AgentApplication = request.agentApplication
-            .modify(_.applicantContactDetails)
-            .using:
-              case None => // applicant enters
-                Some(
-                  ApplicantContactDetails(
-                    applicantName = validFormData
-                  )
+  def submit: Action[AnyContent] = actions
+    .Applicant
+    .getApplicationInProgress
+    .ensureValidFormAndRedirectIfSaveForLater4(
+      form = ApplicantNameForm.form,
+      resultToServeWhenFormHasErrors = implicit r => view(_)
+    )
+    .async:
+      implicit request =>
+        val validFormData: ApplicantName = request.get
+        val updatedApplication: AgentApplication = request.agentApplication
+          .modify(_.applicantContactDetails)
+          .using:
+            case None => // applicant enters
+              Some(
+                ApplicantContactDetails(
+                  applicantName = validFormData
                 )
-              case Some(details) => // applicant updates
-                Some(
-                  details
-                    .modify(_.applicantName)
-                    .setTo(validFormData)
-                )
+              )
+            case Some(details) => // applicant updates
+              Some(
+                details
+                  .modify(_.applicantName)
+                  .setTo(validFormData)
+              )
 
-          applicationService.deleteMeUpsert(updatedApplication).map: _ =>
+        applicationService
+          .upsert(updatedApplication)
+          .map: _ =>
             Redirect(AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show.url)
-      .redirectIfSaveForLater
