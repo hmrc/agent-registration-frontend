@@ -34,7 +34,7 @@ class CheckYourAnswersController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder4[DataWithApplication] = actions
+  private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .Applicant
     .getApplicationInProgress
     .ensure4(

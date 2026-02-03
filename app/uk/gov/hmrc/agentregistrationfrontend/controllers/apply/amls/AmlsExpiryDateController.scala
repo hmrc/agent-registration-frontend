@@ -41,7 +41,7 @@ class AmlsExpiryDateController @Inject() (
 )(using clock: Clock)
 extends FrontendController(mcc, actions):
 
-  val baseAction: ActionBuilder4[DataWithApplication] = actions
+  val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .Applicant
     .getApplicationInProgress
     .ensure4(

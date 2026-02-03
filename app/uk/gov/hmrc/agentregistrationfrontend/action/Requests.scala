@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.action
 
-import play.api.mvc.ActionBuilder
-import play.api.mvc.ActionRefiner
 import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
@@ -71,10 +69,3 @@ object Requests:
     inline def businessPartnerRecordResponse(using BusinessPartnerRecordResponse PresentIn Data): BusinessPartnerRecordResponse = r.get
     inline def maybeBusinessPartnerRecordResponse(using Option[BusinessPartnerRecordResponse] PresentIn Data): Option[BusinessPartnerRecordResponse] = r.get
     inline def agentType(using AgentType PresentIn Data): AgentType = r.get
-
-  type ActionBuilder4[Data <: Tuple] = ActionBuilder[[X] =>> RequestWithDataCt[X, Data], AnyContent]
-
-  type ActionRefiner4[
-    Data <: Tuple,
-    NewData <: Tuple
-  ] = ActionRefiner[[X] =>> RequestWithDataCt[X, Data], [X] =>> RequestWithDataCt[X, NewData]]

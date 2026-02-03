@@ -40,7 +40,7 @@ class CheckYourAnswersController @Inject() (
 extends FrontendController(mcc, actions):
 
   // this CYA page is only viewable once business details have been captured from GRS, the task list provides a link
-  private val baseAction: ActionBuilder4[DataWithApplication] = actions
+  private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .Applicant
     .getApplicationInProgress
     .ensure4(

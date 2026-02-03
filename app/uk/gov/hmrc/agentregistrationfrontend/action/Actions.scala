@@ -57,15 +57,15 @@ extends RequestAwareLogging:
 
   export ActionsHelper.*
 
-  val action: ActionBuilder4[EmptyTuple] = defaultActionBuilder
+  val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
     .refine2(request => RequestWithDataCt.empty(request))
 
   object Applicant:
 
-    val authorised: ActionBuilder4[DataWithAuth] = action
+    val authorised: ActionBuilderWithData[DataWithAuth] = action
       .refineAsync(authorisedActionRefiner.refine)
 
-    val getApplication: ActionBuilder4[DataWithApplication] = authorised
+    val getApplication: ActionBuilderWithData[DataWithApplication] = authorised
       .refine4:
         implicit request: RequestWithData[DataWithAuth] =>
           agentApplicationService
@@ -77,7 +77,7 @@ extends RequestAwareLogging:
                 logger.error(s"[Unexpected State] No agent application found for authenticated user ${request.get[InternalUserId].value}. Redirecting to startRegistration page ($redirect)")
                 Redirect(redirect)
 
-    def getApplicationInProgress: ActionBuilder4[DataWithApplication] = getApplication
+    def getApplicationInProgress: ActionBuilderWithData[DataWithApplication] = getApplication
       .ensure(
         condition = _.get[AgentApplication].isInProgress,
         resultWhenConditionNotMet =
@@ -92,7 +92,7 @@ extends RequestAwareLogging:
             Redirect(call.url)
       )
 
-    val getApplicationSubmitted: ActionBuilder4[DataWithApplication] = getApplication
+    val getApplicationSubmitted: ActionBuilderWithData[DataWithApplication] = getApplication
       .ensure(
         condition = _.agentApplication.hasFinished,
         resultWhenConditionNotMet =
@@ -150,12 +150,12 @@ extends RequestAwareLogging:
             Redirect(mdpCyaPage.url)
       ).andThen(enrichWithAgentApplicationAction)
 
-  extension [Data <: Tuple](ab: ActionBuilder4[Data])
+  extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
 
     inline def getBusinessPartnerRecord(using
       AgentApplication PresentIn Data,
       BusinessPartnerRecordResponse AbsentIn Data
-    ): ActionBuilder4[BusinessPartnerRecordResponse *: Data] = ab.refine4:
+    ): ActionBuilderWithData[BusinessPartnerRecordResponse *: Data] = ab.refine4:
       implicit request =>
         businessPartnerRecordService
           .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
@@ -165,7 +165,7 @@ extends RequestAwareLogging:
     inline def getMaybeBusinessPartnerRecord(using
       AgentApplication PresentIn Data,
       Option[BusinessPartnerRecordResponse] AbsentIn Data
-    ): ActionBuilder4[Option[BusinessPartnerRecordResponse] *: Data] = ab.refine4:
+    ): ActionBuilderWithData[Option[BusinessPartnerRecordResponse] *: Data] = ab.refine4:
       implicit request =>
         businessPartnerRecordService
           .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
