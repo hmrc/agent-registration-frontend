@@ -18,8 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.views.apply
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithApplication
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData4
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.agentApplication
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.ViewApplicationPage
 
@@ -27,7 +28,7 @@ class ViewApplicationPageSpec
 extends ViewSpec:
 
   val viewTemplate: ViewApplicationPage = app.injector.instanceOf[ViewApplicationPage]
-  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(
+  implicit val agentApplicationRequest: RequestWithData4[DataWithApplication] = tdAll.makeAgentApplicationRequest(
     agentApplication =
       tdAll
         .agentApplicationLlp

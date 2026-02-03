@@ -21,7 +21,6 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
 import uk.gov.hmrc.agentregistration.shared.util.SealedObjects
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection
@@ -136,7 +135,7 @@ extends FrontendController(mcc, actions):
     completedSection: CompletedSection
   ): Action[AnyContent] =
     completedSection match
-      case c: CompletedSectionLlp => actions.Applicant.deleteMeAuthorised.async(handleCompletedSectionLlp(c)(using _, summon))
+      case c: CompletedSectionLlp => actions.Applicant.authorised4.async(handleCompletedSectionLlp(c)(using _, summon))
       case c: CompletedSectionSoleTrader =>
         actions.deleteMeAction { implicit request =>
           Ok(simplePage(
@@ -147,7 +146,7 @@ extends FrontendController(mcc, actions):
       // TODO: other business types
 
   private def handleCompletedSectionLlp(completedSection: CompletedSectionLlp)(using
-    r: AuthorisedRequest[AnyContent],
+    r: AuthorisedRequest2[AnyContent],
     clock: Clock
   ): Future[Result] =
     val application =
@@ -167,14 +166,14 @@ extends FrontendController(mcc, actions):
         deceased = false
       )
       updatedApp <- updateIdentifiers(application)
-      _ <- applicationService.deleteMeUpsert(updatedApp)
+      _ <- applicationService.upsert(updatedApp)
     } yield Redirect(AppRoutes.apply.TaskListController.show)
 
   private def updateIdentifiers(agentApplication: AgentApplicationLlp)(using
-    r: AuthorisedRequest[AnyContent],
+    r: AuthorisedRequest2[AnyContent],
     clock: Clock
   ): Future[AgentApplicationLlp] =
-    val identifiers: Future[(AgentApplicationId, LinkId)] = applicationService.find().map:
+    val identifiers: Future[(AgentApplicationId, LinkId)] = applicationService.find2().map:
       case Some(existingApplication) => (existingApplication.agentApplicationId, existingApplication.linkId)
       case None => (agentApplicationIdGenerator.nextApplicationId(), linkIdGenerator.nextLinkId())
     identifiers.map: t =>

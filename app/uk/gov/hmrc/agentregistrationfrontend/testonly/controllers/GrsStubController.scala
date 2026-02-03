@@ -36,8 +36,6 @@ import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
 import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.*
@@ -70,7 +68,7 @@ extends FrontendController(mcc, actions):
     journeyId: JourneyId
   ): Action[AnyContent] = actions
     .Applicant
-    .deleteMeAuthorised:
+    .authorised4:
       implicit request =>
         val prefilledForm =
           request.session.get(journeyId.value).map(data => Json.parse(data).as[JourneyData]) match {
@@ -88,10 +86,10 @@ extends FrontendController(mcc, actions):
     journeyId: JourneyId
   ): Action[AnyContent] = actions
     .Applicant
-    .deleteMeAuthorised
-    .ensureValidForm(
+    .authorised4
+    .ensureValidForm4(
       form = form(businessType),
-      viewToServeWhenFormHasErrors =
+      resultToServeWhenFormHasErrors =
         implicit request =>
           view(
             _,
@@ -100,21 +98,19 @@ extends FrontendController(mcc, actions):
           )
     )
     .async:
-      implicit request: (AuthorisedRequest[AnyContent] & FormValue[JourneyData]) =>
-        val journeyData: JourneyData = request.formValue
+      implicit request =>
+        val journeyData: JourneyData = request.get
         val json: JsValue = Json.toJson(journeyData)
         val deceasedFlag: Boolean = extractDeceasedFlag
 
-        for {
+        for
           _ <- grsStubService.storeStubsData(
             businessType,
             journeyData,
             deceasedFlag
           )
-        } yield {
-          Redirect(AppRoutes.apply.internal.GrsController.journeyCallback(Some(journeyId)))
-            .addingToSession(journeyId.value -> json.toString)
-        }
+        yield Redirect(AppRoutes.apply.internal.GrsController.journeyCallback(Some(journeyId)))
+          .addingToSession(journeyId.value -> json.toString)
 
   private def extractDeceasedFlag(using request: Request[AnyContent]): Boolean = request.body.asFormUrlEncoded
     .flatMap(_.get("deceased").flatMap(_.headOption))

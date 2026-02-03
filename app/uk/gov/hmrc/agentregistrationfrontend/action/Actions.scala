@@ -45,9 +45,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class Actions @Inject() (
   actionBuilder: DefaultActionBuilder,
-  authorisedAction: AuthorisedAction,
   authorisedActionRefiner: AuthorisedActionRefiner,
-  agentApplicationAction: AgentApplicationAction,
   individualAuthorisedAction: IndividualAuthorisedAction,
   individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction,
   provideDetailsAction: ProvideDetailsAction,
@@ -95,15 +93,6 @@ extends RequestAwareLogging:
     val authorised4: ActionBuilder4[DataWithAuth] = action
       .refineAsync(authorisedActionRefiner.refine)
 
-    val deleteMeAuthorised: ActionBuilder[AuthorisedRequest, AnyContent] = deleteMeAction
-      .andThen(authorisedAction)
-
-    val deleteMeGetApplication: ActionBuilder[AgentApplicationRequest, AnyContent] = deleteMeAuthorised
-      .andThen(agentApplicationAction)
-
-    val deleteMeGetApplication2Old: ActionBuilder[AgentApplicationRequest2, AnyContent] = deleteMeAuthorised2
-      .refineAsync(agentApplicationAction.refineRequest)
-
     val deleteMeGetApplication2: ActionBuilder[AgentApplicationRequest2, AnyContent] = deleteMeAuthorised2
       .refine2:
         implicit request: (AuthorisedRequest2[AnyContent]) =>
@@ -127,21 +116,6 @@ extends RequestAwareLogging:
                 val redirect = AppRoutes.apply.AgentApplicationController.startRegistration
                 logger.error(s"[Unexpected State] No agent application found for authenticated user ${request.get[InternalUserId].value}. Redirecting to startRegistration page ($redirect)")
                 Redirect(redirect)
-
-    val deleteMeGetApplicationInProgress: ActionBuilder[AgentApplicationRequest, AnyContent] = deleteMeGetApplication
-      .ensure(
-        condition = _.agentApplication.isInProgress,
-        resultWhenConditionNotMet =
-          implicit request =>
-            // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-            val call = AppRoutes.apply.AgentApplicationController.applicationSubmitted
-            logger.warn(
-              s"The application is not in the final state" +
-                s" (current application state: ${request.agentApplication.applicationState.toString}), " +
-                s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
-            )
-            Redirect(call.url)
-      )
 
     val deleteMeGetApplicationInProgress2: ActionBuilder[AgentApplicationRequest2, AnyContent] = deleteMeGetApplication2
       .ensure(
@@ -168,21 +142,6 @@ extends RequestAwareLogging:
             logger.warn(
               s"The application is not in the final state" +
                 s" (current application state: ${request.get[AgentApplication].applicationState.toString}), " +
-                s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
-            )
-            Redirect(call.url)
-      )
-
-    val deleteMeGetApplicationSubmitted: ActionBuilder[AgentApplicationRequest, AnyContent] = deleteMeGetApplication
-      .ensure(
-        condition = (r: AgentApplicationRequest[?]) => r.agentApplication.hasFinished,
-        resultWhenConditionNotMet =
-          implicit request =>
-            // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-            val call = AppRoutes.apply.AgentApplicationController.landing // or task list
-            logger.warn(
-              s"The application is not in the final state" +
-                s" (current application state: ${request.agentApplication.applicationState.toString}), " +
                 s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
             )
             Redirect(call.url)

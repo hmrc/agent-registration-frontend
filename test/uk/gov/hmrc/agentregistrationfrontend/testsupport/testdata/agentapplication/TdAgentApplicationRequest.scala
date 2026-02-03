@@ -16,22 +16,17 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication
 
-import play.api.mvc.AnyContent
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithApplication
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData4
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdRequest
 
 trait TdAgentApplicationRequest {
   dependencies: (TdBase & TdRequest) =>
 
-  def makeAgentApplicationRequest(agentApplication: AgentApplication): AgentApplicationRequest[AnyContent] =
-    new AgentApplicationRequest(
-      request = dependencies.deleteMerequestLoggedIn,
-      agentApplication = agentApplication,
-      internalUserId = dependencies.internalUserId,
-      groupId = dependencies.groupId,
-      credentials = dependencies.credentials
-    )
+  def makeAgentApplicationRequest(
+    agentApplication: AgentApplication
+  ): RequestWithData4[DataWithApplication] = dependencies.requestWithAuthData.add(agentApplication)
 
 }

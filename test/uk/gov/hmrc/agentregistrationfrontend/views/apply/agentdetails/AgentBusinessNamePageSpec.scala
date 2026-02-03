@@ -18,8 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.views.apply.agentdetails
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithApplication
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData4
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentBusinessNameForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -30,7 +30,7 @@ class AgentBusinessNamePageSpec
 extends ViewSpec:
 
   val viewTemplate: AgentBusinessNamePage = app.injector.instanceOf[AgentBusinessNamePage]
-  implicit val agentApplicationRequest: AgentApplicationRequest[AnyContent] = tdAll.makeAgentApplicationRequest(
+  implicit val agentApplicationRequest: RequestWithData4[DataWithApplication] = tdAll.makeAgentApplicationRequest(
     agentApplication =
       tdAll
         .agentApplicationLlp

@@ -55,7 +55,7 @@ extends FrontendController(mcc, actions):
 
   def showAgentApplication: Action[AnyContent] = actions
     .Applicant
-    .deleteMeGetApplication: request =>
+    .getApplication: request =>
       Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))
 
   def showProvidedDetails: Action[AnyContent] = actions

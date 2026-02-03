@@ -60,11 +60,7 @@ trait TdRequest {
 
   def requestWithAuthData: RequestWithData4[DataWithAuth] = RequestWithData.apply[AnyContent, DataWithAuth](
     rawRequestLoggedIn,
-    (
-      dependencies.internalUserId,
-      dependencies.groupId,
-      dependencies.credentials
-    )
+    dependencies.dataWithAuth
   )
 
   def requestLoggedInWithAgentApplicationId: Request[AnyContent] = baseRequest

@@ -29,6 +29,7 @@ import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistration.shared.llp.*
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithAuth
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.Country
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.auth.core.retrieve.Credentials
@@ -65,6 +66,12 @@ trait TdBase:
     providerId = "cred-id-12345",
     providerType = "GovernmentGateway"
   )
+  def dataWithAuth: DataWithAuth =
+    (
+      internalUserId,
+      groupId,
+      credentials
+    )
   def nino = Nino("AB123456C")
   def ninoFromAuth = IndividualNino.FromAuth(nino)
   def ninoProvided = IndividualNino.Provided(nino)

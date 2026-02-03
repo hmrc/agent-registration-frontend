@@ -27,7 +27,6 @@ import uk.gov.hmrc.agentregistration.shared.EmailAddress
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
@@ -122,8 +121,8 @@ extends FrontendController(mcc, actions):
 
   def verify: Action[AnyContent] = actions
     .Applicant
-    .deleteMeGetApplicationInProgress
-    .ensure(
+    .getApplicationInProgress
+    .ensure4(
       _.agentApplication
         .applicantContactDetails
         .map(_.applicantEmailAddress).isDefined,
@@ -131,7 +130,7 @@ extends FrontendController(mcc, actions):
         logger.info("Applicant email has not been provided, redirecting to email address page")
         Redirect(AppRoutes.apply.applicantcontactdetails.EmailAddressController.show)
     )
-    .ensure(
+    .ensure4(
       _.agentApplication
         .getApplicantContactDetails
         .getApplicantEmailAddress
@@ -168,7 +167,7 @@ extends FrontendController(mcc, actions):
             onEmailError()
         }
 
-  private def onEmailVerified()(implicit request: AgentApplicationRequest[AnyContent]): Future[Result] =
+  private def onEmailVerified()(implicit request: AgentApplicationRequest2[AnyContent]): Future[Result] =
     val updatedApplication = request
       .agentApplication
       .modify(
@@ -177,7 +176,7 @@ extends FrontendController(mcc, actions):
           .each.isVerified
       )
       .setTo(true)
-    agentApplicationService.deleteMeUpsert(updatedApplication).map { _ =>
+    agentApplicationService.upsert(updatedApplication).map { _ =>
       logger.info("Applicant email status reported as verified, redirecting to check your answers page")
       Redirect(AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show)
     }
@@ -185,7 +184,7 @@ extends FrontendController(mcc, actions):
   private def onEmailUnverified(
     credId: String,
     emailToVerify: String
-  )(implicit request: AgentApplicationRequest[AnyContent]): Future[Result] = emailVerificationService.verifyEmail(
+  )(implicit request: AgentApplicationRequest2[AnyContent]): Future[Result] = emailVerificationService.verifyEmail(
     credId = credId,
     maybeEmail = Some(
       Email(
@@ -199,10 +198,10 @@ extends FrontendController(mcc, actions):
     lang = messagesApi.preferred(request).lang.code
   )
 
-  private def onEmailLocked()(implicit request: AgentApplicationRequest[AnyContent]): Future[Result] = Future.successful(
+  private def onEmailLocked()(implicit request: AgentApplicationRequest2[AnyContent]): Future[Result] = Future.successful(
     Ok(placeholder(h1 = "Email address locked", bodyText = Some("placeholder for Your email address has been locked")))
   )
 
-  private def onEmailError()(implicit request: AgentApplicationRequest[AnyContent]): Future[Result] = Future.successful(
+  private def onEmailError()(implicit request: AgentApplicationRequest2[AnyContent]): Future[Result] = Future.successful(
     Ok(placeholder(h1 = "Email address verification error", bodyText = Some("placeholder for error during email verification")))
   )
