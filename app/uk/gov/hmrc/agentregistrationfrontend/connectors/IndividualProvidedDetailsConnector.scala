@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
@@ -38,7 +38,7 @@ class IndividualProvidedDetailsConnector @Inject() (
 )
 extends Connector:
 
-  def upsertMemberProvidedDetails(individualProvidedDetails: IndividualProvidedDetails)(using
+  def upsertMemberProvidedDetails(individualProvidedDetails: IndividualProvidedDetailsToBeDeleted)(using
     request: IndividualAuthorisedRequest[?]
   ): Future[Unit] =
     val url: URL = url"$baseUrl/member-provided-details"
@@ -60,14 +60,14 @@ extends Connector:
 
   def find(agentApplicationId: AgentApplicationId)(using
     IndividualAuthorisedRequest[?]
-  ): Future[Option[IndividualProvidedDetails]] =
+  ): Future[Option[IndividualProvidedDetailsToBeDeleted]] =
     val url: URL = url"$baseUrl/member-provided-details/by-agent-applicationId/${agentApplicationId.value}"
     httpClient
       .get(url)
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => Some(response.json.as[IndividualProvidedDetails])
+          case Status.OK => Some(response.json.as[IndividualProvidedDetailsToBeDeleted])
           case Status.NO_CONTENT => None
           case status =>
             Errors.throwUpstreamErrorResponse(
@@ -81,24 +81,24 @@ extends Connector:
   // for use by agent applicants when building lists of individuals
   def find(using
     request: AgentApplicationRequest[?]
-  ): Future[List[IndividualProvidedDetails]] =
+  ): Future[List[IndividualProvidedDetailsToBeDeleted]] =
     val url: URL = url"$baseUrl/individual-provided-details/for-application/${request.agentApplication.agentApplicationId.value}"
     httpClient
       .get(url)
-      .execute[List[IndividualProvidedDetails]]
+      .execute[List[IndividualProvidedDetailsToBeDeleted]]
       .andLogOnFailure(s"Failed to find IndividualProvidedDetails by agent application id: ${request.agentApplication.agentApplicationId.value}")
 
   def findAll()(using
     IndividualAuthorisedRequest[?]
-  ): Future[List[IndividualProvidedDetails]] =
+  ): Future[List[IndividualProvidedDetailsToBeDeleted]] =
     val url: URL = url"$baseUrl/member-provided-details"
     httpClient
       .get(url)
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => response.json.as[List[IndividualProvidedDetails]]
-          case Status.NO_CONTENT => List.empty[IndividualProvidedDetails]
+          case Status.OK => response.json.as[List[IndividualProvidedDetailsToBeDeleted]]
+          case Status.NO_CONTENT => List.empty[IndividualProvidedDetailsToBeDeleted]
           case status =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "GET",

@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualSaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
@@ -31,11 +31,11 @@ extends ControllerSpec:
 
   private object individualProvideDetails:
 
-    val afterNinoProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoProvided
-    val afterSaUtrNotProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrNotProvided
-    val afterSaUtrFromAuth: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrFromAuth
-    val afterSaUtrFromCitizenDetails: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrFromCitizenDetails
-    val afterSaUtrProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrProvided
+    val afterNinoProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterNino.afterNinoProvided
+    val afterSaUtrNotProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrNotProvided
+    val afterSaUtrFromAuth: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrFromAuth
+    val afterSaUtrFromCitizenDetails: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrFromCitizenDetails
+    val afterSaUtrProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrProvided
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.IndividualSaUtrController.show shouldBe Call(

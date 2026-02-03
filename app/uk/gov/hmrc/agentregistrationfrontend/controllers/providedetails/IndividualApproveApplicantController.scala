@@ -21,7 +21,7 @@ import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import com.softwaremill.quicklens.modify
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsWithApplicationRequest
@@ -99,7 +99,7 @@ extends FrontendController(mcc, actions):
         implicit r: (IndividualProvideDetailsWithApplicationRequest[AnyContent] & FormValue[YesNo]) =>
           val approved: Boolean = r.formValue.toBoolean
 
-          val updatedApplication: IndividualProvidedDetails = r.individualProvidedDetails
+          val updatedApplication: IndividualProvidedDetailsToBeDeleted = r.individualProvidedDetails
             .modify(_.hasApprovedApplication)
             .setTo(Some(approved))
 

@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
@@ -31,11 +31,11 @@ extends ControllerSpec:
 
   private object individualProvideDetails:
 
-    val afterEmailProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.afterEmailAddressVerified
-    val afterDateOfBirthProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterDateOfBirth.afterDateOfBirthProvided
-    val afterNinoNotProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoNotProvided
-    val afterNinoFromAuth: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoFromAuth
-    val afterNinoProvided: IndividualProvidedDetails = tdAll.providedDetailsLlp.AfterNino.afterNinoProvided
+    val afterEmailProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterEmailAddressVerified
+    val afterDateOfBirthProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterDateOfBirth.afterDateOfBirthProvided
+    val afterNinoNotProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterNino.afterNinoNotProvided
+    val afterNinoFromAuth: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterNino.afterNinoFromAuth
+    val afterNinoProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterNino.afterNinoProvided
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.IndividualNinoController.show shouldBe Call(

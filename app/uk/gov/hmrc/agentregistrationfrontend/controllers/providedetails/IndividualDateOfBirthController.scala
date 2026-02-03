@@ -22,7 +22,7 @@ import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.llp.UserProvidedDateOfBirth
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
@@ -81,7 +81,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request: (IndividualProvideDetailsRequest[AnyContent] & FormValue[UserProvidedDateOfBirth]) =>
         val validFormData: IndividualDateOfBirth = request.formValue
-        val updatedApplication: IndividualProvidedDetails = request
+        val updatedApplication: IndividualProvidedDetailsToBeDeleted = request
           .individualProvidedDetails
           .modify(_.individualDateOfBirth)
           .setTo(Some(validFormData))

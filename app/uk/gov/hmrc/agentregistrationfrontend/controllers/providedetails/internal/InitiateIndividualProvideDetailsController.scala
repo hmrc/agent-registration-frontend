@@ -22,7 +22,7 @@ import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
@@ -90,7 +90,7 @@ extends FrontendController(mcc, actions):
 
   private def createIndividualProvidedDetailsFor(
     applicationId: AgentApplicationId
-  )(using request: IndividualAuthorisedWithIdentifiersRequest[AnyContent]): Future[IndividualProvidedDetails] =
+  )(using request: IndividualAuthorisedWithIdentifiersRequest[AnyContent]): Future[IndividualProvidedDetailsToBeDeleted] =
     (request.nino, request.saUtr) match
 
       case (Some(nino), None) =>

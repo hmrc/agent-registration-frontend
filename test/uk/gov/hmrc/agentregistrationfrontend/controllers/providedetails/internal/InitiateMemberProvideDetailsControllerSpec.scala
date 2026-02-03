@@ -21,7 +21,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.LinkId
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CitizenDetailsStub
@@ -46,12 +46,12 @@ extends ControllerSpec:
 
   object memberProvidedDetails:
 
-    val afterStarted: IndividualProvidedDetails =
+    val afterStarted: IndividualProvidedDetailsToBeDeleted =
       tdAll
         .providedDetailsLlp
         .afterStarted
 
-    val afterStartedWithNinoAndSaUtrFromAuth: IndividualProvidedDetails = tdAll
+    val afterStartedWithNinoAndSaUtrFromAuth: IndividualProvidedDetailsToBeDeleted = tdAll
       .providedDetailsLlp
       .afterStarted
       .modify(_.individualDateOfBirth)
@@ -61,7 +61,7 @@ extends ControllerSpec:
       .modify(_.individualSaUtr)
       .setTo(Some(tdAll.saUtrFromAuth))
 
-    val afterStartedWithNinoAndSaUtrAndDoBFromCitizenDetails: IndividualProvidedDetails = tdAll
+    val afterStartedWithNinoAndSaUtrAndDoBFromCitizenDetails: IndividualProvidedDetailsToBeDeleted = tdAll
       .providedDetailsLlp
       .afterStarted
       .modify(_.individualNino)
