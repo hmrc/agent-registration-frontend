@@ -19,12 +19,11 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.noni
 import com.softwaremill.quicklens.modify
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationForKeyIndividuals
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -44,58 +43,52 @@ class NumberOfKeyIndividualsController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+  private val baseAction: ActionBuilder4[IsAgentApplicationForKeyIndividuals *: DataWithAuth] = actions
     .Applicant
-    .deleteMeGetApplicationInProgress
-    .ensure(
-      _.agentApplication match
-        case _: AgentApplication.IsNotSoleTrader => true
-        case _: AgentApplication.IsSoleTrader => false
-      ,
+    .getApplicationInProgress
+    .refine4:
       implicit request =>
-        logger.warn("Sole traders cannot specify number of key individuals, redirecting to task list for the correct links")
-        Redirect(AppRoutes.apply.TaskListController.show.url)
-    )
-    .ensure(
-      _.agentApplication match
-        case _: AgentApplication.IsNotIncorporated => true
-        case _: AgentApplication.IsIncorporated => false
-      ,
-      implicit request =>
-        logger.warn(
-          "Incorporated businesses should have the number of key individuals determined by Companies House results, redirecting to task list for the correct links"
-        )
-        Redirect(AppRoutes.apply.TaskListController.show.url)
-    )
+        request.agentApplication match
+          case _: AgentApplication.IsIncorporated =>
+            logger.warn(
+              "Incorporated businesses should have the number of key individuals determined by Companies House results, redirecting to task list for the correct links"
+            )
+            Redirect(AppRoutes.apply.TaskListController.show.url)
+          case _: AgentApplication.IsSoleTrader =>
+            logger.warn("Sole traders cannot specify number of key individuals, redirecting to task list for the correct links")
+            Redirect(AppRoutes.apply.TaskListController.show.url)
+          case aa: IsAgentApplicationForKeyIndividuals => request.replace[AgentApplication, IsAgentApplicationForKeyIndividuals](aa)
 
   def show: Action[AnyContent] = baseAction
     .async:
       implicit request =>
+        val agentApplication: IsAgentApplicationForKeyIndividuals = request.get[IsAgentApplicationForKeyIndividuals]
         businessPartnerRecordService
-          .deleteMeGetBusinessPartnerRecord(request.agentApplication.getUtr)
+          .getBusinessPartnerRecord(agentApplication.getUtr)
           .map: bprOpt =>
             Ok(numberOfKeyIndividualsPage(
               form = NumberOfKeyIndividualsForm.form
                 .fill:
-                  request.agentApplication.numberOfRequiredKeyIndividuals
+                  agentApplication.numberOfRequiredKeyIndividuals
               ,
               entityName = bprOpt
                 .map(_.getEntityName)
                 .getOrThrowExpectedDataMissing(
                   "Business Partner Record is missing"
                 ),
-              agentApplication = request.agentApplication
+              agentApplication = agentApplication
             ))
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLaterAsync[NumberOfRequiredKeyIndividuals](
+      .ensureValidFormAndRedirectIfSaveForLater4[NumberOfRequiredKeyIndividuals](
         form = NumberOfKeyIndividualsForm.form,
-        viewToServeWhenFormHasErrors =
+        resultToServeWhenFormHasErrors =
           implicit request =>
-            formWithErrors =>
+            formWithErrors => {
+              val agentApplication: IsAgentApplicationForKeyIndividuals = request.get[IsAgentApplicationForKeyIndividuals]
               businessPartnerRecordService
-                .deleteMeGetBusinessPartnerRecord(request.agentApplication.getUtr)
+                .getBusinessPartnerRecord(agentApplication.getUtr)
                 .map: bprOpt =>
                   numberOfKeyIndividualsPage(
                     form = formWithErrors,
@@ -104,33 +97,26 @@ extends FrontendController(mcc, actions):
                       .getOrThrowExpectedDataMissing(
                         "Business Partner Record is missing"
                       ),
-                    agentApplication = request.agentApplication
+                    agentApplication = agentApplication
                   )
+            }
       )
       .async:
-        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[NumberOfRequiredKeyIndividuals]) =>
-          request.agentApplication match
-            case _: AgentApplication.IsSoleTrader =>
-              // this should never happen because of the baseAction guard
-              throw new IllegalStateException("Sole traders cannot specify number of key individuals")
-            case _: AgentApplication.IsIncorporated =>
-              // this should never happen because of the baseAction guard
-              throw new IllegalStateException("Incorporated businesses should have the number of key individuals determined by Companies House results")
-            case application: (AgentApplication.IsNotSoleTrader & AgentApplication.IsNotIncorporated) =>
-              val numberOfRequiredKeyIndividuals: NumberOfRequiredKeyIndividuals = request.formValue
-              val updatedApplication =
-                application match
-                  case application: AgentApplicationScottishPartnership =>
-                    application
-                      .modify(_.numberOfRequiredKeyIndividuals)
-                      .setTo(Some(numberOfRequiredKeyIndividuals))
-                  case application: AgentApplicationGeneralPartnership =>
-                    application
-                      .modify(_.numberOfRequiredKeyIndividuals)
-                      .setTo(Some(numberOfRequiredKeyIndividuals))
+        implicit request =>
+          val numberOfRequiredKeyIndividuals: NumberOfRequiredKeyIndividuals = request.get
+          val updatedApplication: IsAgentApplicationForKeyIndividuals =
+            request.get[IsAgentApplicationForKeyIndividuals] match
+              case application: AgentApplicationScottishPartnership =>
+                application
+                  .modify(_.numberOfRequiredKeyIndividuals)
+                  .setTo(Some(numberOfRequiredKeyIndividuals))
+              case application: AgentApplicationGeneralPartnership =>
+                application
+                  .modify(_.numberOfRequiredKeyIndividuals)
+                  .setTo(Some(numberOfRequiredKeyIndividuals))
 
-              agentApplicationService
-                .deleteMeUpsert(updatedApplication)
-                .map: _ =>
-                  Redirect(AppRoutes.apply.listdetails.EnterKeyIndividualController.show.url)
+          agentApplicationService
+            .upsert(updatedApplication)
+            .map: _ =>
+              Redirect(AppRoutes.apply.listdetails.EnterKeyIndividualController.show.url)
       .redirectIfSaveForLater

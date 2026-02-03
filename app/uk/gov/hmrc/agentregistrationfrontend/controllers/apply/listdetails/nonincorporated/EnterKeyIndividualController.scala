@@ -23,6 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationForKeyIndividuals
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
@@ -53,11 +54,7 @@ class EnterKeyIndividualController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  type ApplicationOfInterest = AgentApplicationGeneralPartnership | AgentApplicationScottishPartnership
-
-//  summon[ApplicationOfInterest =:= IsNotIncorporated & IsNotPartnership]
-
-  private val baseAction: ActionBuilder4[NumberOfRequiredKeyIndividuals *: ApplicationOfInterest *: DataWithAuth] = actions
+  private val baseAction: ActionBuilder4[NumberOfRequiredKeyIndividuals *: IsAgentApplicationForKeyIndividuals *: DataWithAuth] = actions
     .Applicant
     .getApplicationInProgress
     .refine4:
@@ -71,10 +68,10 @@ extends FrontendController(mcc, actions):
           case _: AgentApplicationSoleTrader =>
             logger.warn("Sole traders do not add individuals to a list, redirecting to task list for the correct links")
             Redirect(AppRoutes.apply.TaskListController.show.url)
-          case aa: ApplicationOfInterest => request.replace[AgentApplication, ApplicationOfInterest](aa)
+          case aa: IsAgentApplicationForKeyIndividuals => request.replace[AgentApplication, IsAgentApplicationForKeyIndividuals](aa)
     .refine4:
       implicit request =>
-        request.get[ApplicationOfInterest].numberOfRequiredKeyIndividuals match
+        request.get[IsAgentApplicationForKeyIndividuals].numberOfRequiredKeyIndividuals match
           case Some(n: NumberOfRequiredKeyIndividuals) => request.add(n)
           case None =>
             logger.warn(
@@ -87,11 +84,11 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] = baseAction
     .async:
       implicit request =>
-        individualProvideDetailsService.findAllByApplicationId(request.get[ApplicationOfInterest].agentApplicationId).flatMap: existingList =>
+        individualProvideDetailsService.findAllByApplicationId(request.get[IsAgentApplicationForKeyIndividuals].agentApplicationId).flatMap: existingList =>
           request.get[NumberOfRequiredKeyIndividuals] match
             case n: SixOrMore if n.paddingRequired > 0 =>
               businessPartnerRecordService
-                .getBusinessPartnerRecord(request.get[ApplicationOfInterest].getUtr)
+                .getBusinessPartnerRecord(request.get[IsAgentApplicationForKeyIndividuals].getUtr)
                 .map: (bprOpt: Option[BusinessPartnerRecordResponse]) =>
                   Ok(enterIndividualNameComplexPage(
                     form = IndividualNameForm.form,
@@ -130,11 +127,11 @@ extends FrontendController(mcc, actions):
       resultToServeWhenFormHasErrors =
         implicit request =>
           (formWithErrors: Form[IndividualName]) =>
-            individualProvideDetailsService.findAllByApplicationId(request.get[ApplicationOfInterest].agentApplicationId).flatMap: existingList =>
+            individualProvideDetailsService.findAllByApplicationId(request.get[IsAgentApplicationForKeyIndividuals].agentApplicationId).flatMap: existingList =>
               request.get[NumberOfRequiredKeyIndividuals] match
                 case n: SixOrMore if n.paddingRequired > 0 =>
                   businessPartnerRecordService
-                    .getBusinessPartnerRecord(request.get[ApplicationOfInterest].getUtr)
+                    .getBusinessPartnerRecord(request.get[IsAgentApplicationForKeyIndividuals].getUtr)
                     .map: bprOpt =>
                       enterIndividualNameComplexPage(
                         form = formWithErrors,
