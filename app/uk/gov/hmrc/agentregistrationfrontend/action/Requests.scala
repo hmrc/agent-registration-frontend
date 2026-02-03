@@ -43,6 +43,7 @@ object Requests:
   ] = ActionRefiner[[X] =>> RequestWithData[X, Data], [X] =>> RequestWithData[X, NewData]]
 
   type RequestWithData4[Data <: Tuple] = RequestWithData[AnyContent, Data]
+
   type DefaultRequest4[A] = RequestWithData4[DataEmpty]
 
   type DataWithAuth =

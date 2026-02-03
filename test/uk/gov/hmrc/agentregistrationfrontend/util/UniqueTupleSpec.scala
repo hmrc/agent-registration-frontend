@@ -29,10 +29,18 @@ extends UnitSpec:
   extends Animal
   case class Chicken(name: String)
   extends Animal
+  case class Fox(name: String)
+  extends Animal
   case class Frog(name: String)
   extends Animal
   type CanSwim = Animal & (Fish | Frog)
+  type CanJump = Animal & (Fox | Frog)
   val kermit: Frog = Frog("Kermit")
+
+  val t: UniqueTuple[(Animal, Int, Boolean)] = (kermit: Animal, 1, true).unique
+
+  val t2 = t.replace[Animal, CanSwim & CanJump](kermit: CanSwim & CanJump)
+  val t3 = t.delete[Animal].add[CanSwim & CanJump](kermit: CanSwim & CanJump)
 
   //  "UniqueTuple" in:
 //    val t: UniqueTuple[(Int, Double)] = UniqueTuple((1, 2.0))

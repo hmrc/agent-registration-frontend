@@ -16,13 +16,13 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.services.llp
 
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
@@ -56,7 +56,7 @@ extends RequestAwareLogging:
       maybeIndividualDateOfBirth
     )
 
-  def findByApplicationId(applicationId: AgentApplicationId)(using request: IndividualAuthorisedRequest[?]): Future[Option[IndividualProvidedDetails]] =
+  def findByApplicationId(applicationId: AgentApplicationId)(using request: RequestHeader): Future[Option[IndividualProvidedDetails]] =
     individualProvideDetailsConnector
       .find(applicationId)
 
@@ -70,6 +70,5 @@ extends RequestAwareLogging:
       .upsertMemberProvidedDetails(individualProvidedDetails)
 
   // for use by agent applicants when building lists of individuals
-  def findByApplicationId(using request: AgentApplicationRequest[?]): Future[List[IndividualProvidedDetails]] =
-    individualProvideDetailsConnector
-      .find
+  def findAllByApplicationId(agentApplicationId: AgentApplicationId)(using request: RequestHeader): Future[List[IndividualProvidedDetails]] =
+    individualProvideDetailsConnector.findAll(agentApplicationId)
