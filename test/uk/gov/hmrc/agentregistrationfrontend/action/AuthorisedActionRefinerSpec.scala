@@ -35,7 +35,9 @@ extends ISpec:
     val notLoggedInRequest: RequestWithData4[EmptyTuple] = tdAll.requestNotLoggedIn
     authorisedActionRefiner
       .refine(notLoggedInRequest)
-      .futureValue shouldBe Redirect(
+      .futureValue
+      .left
+      .value shouldBe Redirect(
       s"""http://localhost:9099/bas-gateway/sign-in?continue_url=$thisFrontendBaseUrl/&origin=agent-registration-frontend&affinityGroup=agent"""
     )
     AuthStubs.verifyAuthorise(0)
@@ -60,7 +62,7 @@ extends ISpec:
 
     val result: Result =
       authorisedActionRefiner
-        .refine(tdAll.requestNotLoggedIn)
+        .refine(tdAll.requestLoggedInEmptyData)
         .futureValue
         .left
         .value
@@ -96,7 +98,7 @@ extends ISpec:
            |""".stripMargin
     )
 
-    val result: Result = authorisedActionRefiner.refine(tdAll.requestNotLoggedIn).futureValue.left.value
+    val result: Result = authorisedActionRefiner.refine(tdAll.requestLoggedInEmptyData).futureValue.left.value
     result shouldBe Redirect("http://localhost:9437/agent-services-account/home")
     AuthStubs.verifyAuthorise()
 
@@ -105,8 +107,8 @@ extends ISpec:
     AuthStubs.stubAuthorise()
     val requestWithAuth: RequestWithData4[DataWithAuth] =
       authorisedActionRefiner
-        .refine(tdAll.requestNotLoggedIn)
+        .refine(tdAll.requestLoggedInEmptyData)
         .futureValue
         .value
-    requestWithAuth.data shouldBe tdAll.requestLoggedIn.data
+    requestWithAuth.data shouldBe tdAll.requestWithAuthData.data
     AuthStubs.verifyAuthorise()

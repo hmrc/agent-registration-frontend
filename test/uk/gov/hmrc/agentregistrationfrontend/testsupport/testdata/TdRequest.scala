@@ -50,14 +50,16 @@ trait TdRequest {
 
   def headerCarrier: HeaderCarrier = HeaderCarrier()
 
-  def deleteMeRequestNotLoggedIn: Request[AnyContent] = baseRequest
+  def rawRequestNotLoggedIn: Request[AnyContent] = baseRequest
+  def rawRequestLoggedIn: Request[AnyContent] = baseRequest.withAuthTokenInSession()
 
-  def requestNotLoggedIn: RequestWithData4[EmptyTuple] = RequestWithData.empty(baseRequest)
+  def requestNotLoggedIn: RequestWithData4[EmptyTuple] = RequestWithData.empty(rawRequestNotLoggedIn)
+  def requestLoggedInEmptyData: RequestWithData4[EmptyTuple] = RequestWithData.empty(rawRequestLoggedIn)
 
   def deleteMerequestLoggedIn: Request[AnyContent] = baseRequest.withAuthTokenInSession()
 
-  def requestLoggedIn: RequestWithData4[DataWithAuth] = RequestWithData.apply[AnyContent, DataWithAuth](
-    baseRequest.withAuthTokenInSession(),
+  def requestWithAuthData: RequestWithData4[DataWithAuth] = RequestWithData.apply[AnyContent, DataWithAuth](
+    rawRequestLoggedIn,
     (
       dependencies.internalUserId,
       dependencies.groupId,
@@ -78,7 +80,7 @@ trait TdRequest {
   def individualAuthorisedRequestLoggedInWithOutAgentApplicationId: IndividualAuthorisedRequest[AnyContent] =
     new IndividualAuthorisedRequest(
       internalUserId = internalUserId,
-      request = deleteMeRequestNotLoggedIn,
+      request = rawRequestNotLoggedIn,
       credentials = credentials
     )
 
@@ -103,7 +105,7 @@ trait TdRequest {
   def individualAuthorisedRequestLoggedInWithOutAgentApplicationIdAndIdentifiers: IndividualAuthorisedWithIdentifiersRequest[AnyContent] =
     new IndividualAuthorisedWithIdentifiersRequest(
       internalUserId = internalUserId,
-      request = deleteMeRequestNotLoggedIn,
+      request = rawRequestNotLoggedIn,
       credentials = credentials,
       nino = Some(nino),
       saUtr = Some(saUtr)

@@ -31,7 +31,7 @@ extends ISpec:
     val individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction = app.injector.instanceOf[
       IndividualAuthorisedWithIdentifiersAction
     ]
-    val notLoggedInRequest: Request[?] = tdAll.deleteMeRequestNotLoggedIn
+    val notLoggedInRequest: Request[?] = tdAll.rawRequestNotLoggedIn
     individualAuthorisedWithIdentifiersAction
       .invokeBlock(notLoggedInRequest, _ => fakeResultF)
       .futureValue shouldBe Redirect(

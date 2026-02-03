@@ -29,7 +29,7 @@ extends ISpec:
 
   "when User is not logged in (request comes without authorisation in the session) action redirects to login url" in:
     val individualAuthorisedAction: IndividualAuthorisedAction = app.injector.instanceOf[IndividualAuthorisedAction]
-    val notLoggedInRequest: Request[?] = tdAll.deleteMeRequestNotLoggedIn
+    val notLoggedInRequest: Request[?] = tdAll.rawRequestNotLoggedIn
     individualAuthorisedAction
       .invokeBlock(notLoggedInRequest, _ => fakeResultF)
       .futureValue shouldBe Redirect(
