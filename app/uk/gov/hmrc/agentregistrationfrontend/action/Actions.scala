@@ -44,7 +44,7 @@ import scala.concurrent.ExecutionContext
 
 @Singleton
 class Actions @Inject() (
-  actionBuilder: DefaultActionBuilder,
+  defaultActionBuilder: DefaultActionBuilder,
   authorisedActionRefiner: AuthorisedActionRefiner,
   individualAuthorisedAction: IndividualAuthorisedAction,
   individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction,
@@ -57,55 +57,15 @@ extends RequestAwareLogging:
 
   export ActionsHelper.*
 
-  extension [Data <: Tuple](ab: ActionBuilder4[Data])
-
-    inline def getBusinessPartnerRecord(using
-      AgentApplication PresentIn Data,
-      BusinessPartnerRecordResponse AbsentIn Data
-    ): ActionBuilder4[BusinessPartnerRecordResponse *: Data] = ab.refine4:
-      implicit request =>
-        businessPartnerRecordService
-          .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
-          .map(_.getOrThrowExpectedDataMissing(s"Business Partner Record for UTR ${request.get[AgentApplication].getUtr.value}"))
-          .map(request.add)
-
-    inline def getMaybeBusinessPartnerRecord(using
-      AgentApplication PresentIn Data,
-      Option[BusinessPartnerRecordResponse] AbsentIn Data
-    ): ActionBuilder4[Option[BusinessPartnerRecordResponse] *: Data] = ab.refine4:
-      implicit request =>
-        businessPartnerRecordService
-          .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
-          .map(request.add)
-
-  val deleteMeAction2: ActionBuilder[DefaultRequest, AnyContent] = actionBuilder
+  val action: ActionBuilder4[EmptyTuple] = defaultActionBuilder
     .refine2(request => RequestWithData.empty(request))
-
-  val action: ActionBuilder4[EmptyTuple] = deleteMeAction2
-
-  val deleteMeAction: ActionBuilder[Request, AnyContent] = actionBuilder
 
   object Applicant:
 
-    val deleteMeAuthorised2: ActionBuilder[AuthorisedRequest2, AnyContent] = deleteMeAction2
+    val authorised: ActionBuilder4[DataWithAuth] = action
       .refineAsync(authorisedActionRefiner.refine)
 
-    val authorised4: ActionBuilder4[DataWithAuth] = action
-      .refineAsync(authorisedActionRefiner.refine)
-
-    val deleteMeGetApplication2: ActionBuilder[AgentApplicationRequest2, AnyContent] = deleteMeAuthorised2
-      .refine2:
-        implicit request: (AuthorisedRequest2[AnyContent]) =>
-          agentApplicationService
-            .find2()
-            .map[Result | AgentApplicationRequest2[AnyContent]]:
-              case Some(agentApplication) => request.add(agentApplication)
-              case None =>
-                val redirect = AppRoutes.apply.AgentApplicationController.startRegistration
-                logger.error(s"[Unexpected State] No agent application found for authenticated user ${request.get[InternalUserId].value}. Redirecting to startRegistration page ($redirect)")
-                Redirect(redirect)
-
-    val getApplication: ActionBuilder4[DataWithApplication] = authorised4
+    val getApplication: ActionBuilder4[DataWithApplication] = authorised
       .refine4:
         implicit request: RequestWithData4[DataWithAuth] =>
           agentApplicationService
@@ -116,21 +76,6 @@ extends RequestAwareLogging:
                 val redirect = AppRoutes.apply.AgentApplicationController.startRegistration
                 logger.error(s"[Unexpected State] No agent application found for authenticated user ${request.get[InternalUserId].value}. Redirecting to startRegistration page ($redirect)")
                 Redirect(redirect)
-
-    val deleteMeGetApplicationInProgress2: ActionBuilder[AgentApplicationRequest2, AnyContent] = deleteMeGetApplication2
-      .ensure(
-        condition = _.get[AgentApplication].isInProgress,
-        resultWhenConditionNotMet =
-          implicit request =>
-            // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-            val call = AppRoutes.apply.AgentApplicationController.applicationSubmitted
-            logger.warn(
-              s"The application is not in the final state" +
-                s" (current application state: ${request.get[AgentApplication].applicationState.toString}), " +
-                s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
-            )
-            Redirect(call.url)
-      )
 
     def getApplicationInProgress: ActionBuilder4[DataWithApplication] = getApplication
       .ensure(
@@ -147,7 +92,7 @@ extends RequestAwareLogging:
             Redirect(call.url)
       )
 
-    val getApplicationSubmitted4: ActionBuilder4[DataWithApplication] = getApplication
+    val getApplicationSubmitted: ActionBuilder4[DataWithApplication] = getApplication
       .ensure(
         condition = _.agentApplication.hasFinished,
         resultWhenConditionNotMet =
@@ -162,27 +107,12 @@ extends RequestAwareLogging:
             Redirect(call.url)
       )
 
-    val deleteMeGetApplicationSubmitted2: ActionBuilder[AgentApplicationRequest2, AnyContent] = deleteMeGetApplication2
-      .ensure(
-        condition = (r: AgentApplicationRequest2[?]) => r.get[AgentApplication].hasFinished,
-        resultWhenConditionNotMet =
-          implicit request =>
-            // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-            val call = AppRoutes.apply.AgentApplicationController.landing // or task list
-            logger.warn(
-              s"The application is not in the final state" +
-                s" (current application state: ${request.get[AgentApplication].applicationState.toString}), " +
-                s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
-            )
-            Redirect(call.url)
-      )
-
   object Individual:
 
-    val authorised: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = deleteMeAction
+    val authorised: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
       .andThen(individualAuthorisedAction)
 
-    val authorisedWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = deleteMeAction
+    val authorisedWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = action
       .andThen(individualAuthorisedWithIdentifiersAction)
 
     val getProvidedDetails: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = authorised
@@ -219,6 +149,27 @@ extends RequestAwareLogging:
             )
             Redirect(mdpCyaPage.url)
       ).andThen(enrichWithAgentApplicationAction)
+
+  extension [Data <: Tuple](ab: ActionBuilder4[Data])
+
+    inline def getBusinessPartnerRecord(using
+      AgentApplication PresentIn Data,
+      BusinessPartnerRecordResponse AbsentIn Data
+    ): ActionBuilder4[BusinessPartnerRecordResponse *: Data] = ab.refine4:
+      implicit request =>
+        businessPartnerRecordService
+          .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
+          .map(_.getOrThrowExpectedDataMissing(s"Business Partner Record for UTR ${request.get[AgentApplication].getUtr.value}"))
+          .map(request.add)
+
+    inline def getMaybeBusinessPartnerRecord(using
+      AgentApplication PresentIn Data,
+      Option[BusinessPartnerRecordResponse] AbsentIn Data
+    ): ActionBuilder4[Option[BusinessPartnerRecordResponse] *: Data] = ab.refine4:
+      implicit request =>
+        businessPartnerRecordService
+          .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
+          .map(request.add)
 
   extension (a: Action[AnyContent])
     /** Modifies the action result to handle "Save and Come Back Later" functionality. If the form submission contains a "Save and Come Back Later" action,

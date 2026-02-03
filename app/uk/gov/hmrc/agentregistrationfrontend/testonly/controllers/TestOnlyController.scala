@@ -63,7 +63,7 @@ extends FrontendController(mcc, actions):
     .getProvidedDetails: request =>
       Ok(Json.prettyPrint(Json.toJson(request.individualProvidedDetails)))
 
-  def showPlaySession: Action[AnyContent] = actions.deleteMeAction: request =>
+  def showPlaySession: Action[AnyContent] = actions.action: request =>
     Ok(Json.prettyPrint(Json.toJson(request.session.data)))
 
   def addAgentTypeToSession(

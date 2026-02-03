@@ -62,7 +62,7 @@ extends FrontendController(mcc, actions):
 
   def applicationSubmitted: Action[AnyContent] = actions
     .Applicant
-    .getApplicationSubmitted4
+    .getApplicationSubmitted
     .getBusinessPartnerRecord:
       implicit request =>
         Ok(confirmationPage(
@@ -72,7 +72,7 @@ extends FrontendController(mcc, actions):
 
   def viewSubmittedApplication: Action[AnyContent] = actions
     .Applicant
-    .getApplicationSubmitted4
+    .getApplicationSubmitted
     .getBusinessPartnerRecord:
       implicit request =>
         Ok(viewApplicationPage(

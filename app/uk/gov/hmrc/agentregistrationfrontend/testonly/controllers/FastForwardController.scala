@@ -135,9 +135,9 @@ extends FrontendController(mcc, actions):
     completedSection: CompletedSection
   ): Action[AnyContent] =
     completedSection match
-      case c: CompletedSectionLlp => actions.Applicant.authorised4.async(handleCompletedSectionLlp(c)(using _, summon))
+      case c: CompletedSectionLlp => actions.Applicant.authorised.async(handleCompletedSectionLlp(c)(using _, summon))
       case c: CompletedSectionSoleTrader =>
-        actions.deleteMeAction { implicit request =>
+        actions.action { implicit request =>
           Ok(simplePage(
             h1 = "Sole Trader Task List Page",
             bodyText = Some("Fast Forwarding to Sole Trader Task List Page isn't implemented yet")

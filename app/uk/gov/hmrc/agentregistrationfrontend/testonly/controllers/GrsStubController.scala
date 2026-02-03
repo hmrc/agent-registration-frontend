@@ -68,7 +68,7 @@ extends FrontendController(mcc, actions):
     journeyId: JourneyId
   ): Action[AnyContent] = actions
     .Applicant
-    .authorised4:
+    .authorised:
       implicit request =>
         val prefilledForm =
           request.session.get(journeyId.value).map(data => Json.parse(data).as[JourneyData]) match {
@@ -86,7 +86,7 @@ extends FrontendController(mcc, actions):
     journeyId: JourneyId
   ): Action[AnyContent] = actions
     .Applicant
-    .authorised4
+    .authorised
     .ensureValidForm4(
       form = form(businessType),
       resultToServeWhenFormHasErrors =
