@@ -127,11 +127,23 @@ extends RequestAwareLogging:
       resultWhenConditionNotMet: Result
     ): ActionBuilder4[Data] = ensure4(condition, _ => resultWhenConditionNotMet)
 
+    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     def ensure4(
-      condition: RequestWithData4[Data] => Boolean,
-      resultWhenConditionNotMet: RequestWithData4[Data] => Result
+      condition: RequestWithData4[Data] => Boolean | Future[Boolean],
+      resultWhenConditionNotMet: RequestWithData4[Data] => Result | Future[Result]
     ): ActionBuilder4[Data] = refine4: request =>
-      if condition(request) then request else resultWhenConditionNotMet(request)
+
+      def computeResult(condition: Boolean): Result | RequestWithData4[Data] | Future[Result | RequestWithData4[Data]] =
+        if condition then request else resultWhenConditionNotMet(request)
+
+      condition(request) match
+        case c: Boolean => computeResult(c)
+        case f: Future[_] =>
+          f.asInstanceOf[Future[Boolean]].flatMap: c =>
+            computeResult(c) match
+              case result: Result => Future.successful(result)
+              case request: RequestWithData[_, _] => Future.successful(request.asInstanceOf[RequestWithData4[Data]])
+              case f: Future[_] => f.asInstanceOf[Future[Result | RequestWithData4[Data]]]
 
     def refine4[NewData <: Tuple](
       refineF: RequestWithData4[Data] => Result | RequestWithData4[NewData] | Future[Result | RequestWithData4[NewData]]

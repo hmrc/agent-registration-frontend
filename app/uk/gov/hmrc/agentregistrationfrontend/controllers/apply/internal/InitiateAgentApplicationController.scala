@@ -54,8 +54,8 @@ extends FrontendController(mcc, actions):
     userRole: UserRole
   ): Action[AnyContent] = actions
     .Applicant
-    .deleteMeAuthorised
-    .ensureAsync(
+    .authorised4
+    .ensure4(
       condition =
         implicit request =>
           val isHmrcAsAgentEnrolmentAllocatedToGroup: Future[Boolean] = enrolmentStoreProxyConnector
@@ -67,14 +67,14 @@ extends FrontendController(mcc, actions):
         implicit request =>
           val redirectUrl: String = appConfig.taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment
           logger.info(s"No Application can be created. ${appConfig.hmrcAsAgentEnrolment} is already assigned to group ${request.groupId}. Redirecting to taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment ($redirectUrl)")
-          Future.successful(Redirect(redirectUrl))
+          Redirect(redirectUrl)
     )
     .async:
       implicit request =>
         if agentType =!= AgentType.UkTaxAgent then Errors.notImplemented("only UkTaxAgent is supported for now") else ()
         val nextEndpoint: Call = AppRoutes.apply.internal.GrsController.startJourney()
 
-        agentApplicationService.find().flatMap:
+        agentApplicationService.find2().flatMap:
           case Some(agentApplication) =>
             logger.info("Application already exists, redirecting to task list")
             Future.successful(Redirect(nextEndpoint))
@@ -83,7 +83,7 @@ extends FrontendController(mcc, actions):
             businessType match
               case BusinessType.Partnership.LimitedLiabilityPartnership =>
                 agentApplicationService
-                  .deleteMeUpsert(applicationFactory.makeNewAgentApplicationLlp(
+                  .upsert(applicationFactory.makeNewAgentApplicationLlp(
                     internalUserId = request.internalUserId,
                     groupId = request.groupId,
                     userRole = userRole
@@ -91,7 +91,7 @@ extends FrontendController(mcc, actions):
                   .map(_ => Redirect(nextEndpoint))
               case BusinessType.SoleTrader =>
                 agentApplicationService
-                  .deleteMeUpsert(applicationFactory.makeNewAgentApplicationSoleTrader(
+                  .upsert(applicationFactory.makeNewAgentApplicationSoleTrader(
                     internalUserId = request.internalUserId,
                     groupId = request.groupId,
                     userRole = userRole
@@ -99,7 +99,7 @@ extends FrontendController(mcc, actions):
                   .map(_ => Redirect(nextEndpoint))
               case BusinessType.LimitedCompany =>
                 agentApplicationService
-                  .deleteMeUpsert(applicationFactory.makeNewAgentApplicationLimitedCompany(
+                  .upsert(applicationFactory.makeNewAgentApplicationLimitedCompany(
                     internalUserId = request.internalUserId,
                     groupId = request.groupId,
                     userRole = userRole
@@ -107,7 +107,7 @@ extends FrontendController(mcc, actions):
                   .map(_ => Redirect(nextEndpoint))
               case BusinessType.Partnership.GeneralPartnership =>
                 agentApplicationService
-                  .deleteMeUpsert(applicationFactory.makeNewAgentApplicationGeneralPartnership(
+                  .upsert(applicationFactory.makeNewAgentApplicationGeneralPartnership(
                     internalUserId = request.internalUserId,
                     groupId = request.groupId,
                     userRole = userRole
@@ -115,7 +115,7 @@ extends FrontendController(mcc, actions):
                   .map(_ => Redirect(nextEndpoint))
               case BusinessType.Partnership.LimitedPartnership =>
                 agentApplicationService
-                  .deleteMeUpsert(applicationFactory.makeNewAgentApplicationLimitedPartnership(
+                  .upsert(applicationFactory.makeNewAgentApplicationLimitedPartnership(
                     internalUserId = request.internalUserId,
                     groupId = request.groupId,
                     userRole = userRole
@@ -123,7 +123,7 @@ extends FrontendController(mcc, actions):
                   .map(_ => Redirect(nextEndpoint))
               case BusinessType.Partnership.ScottishLimitedPartnership =>
                 agentApplicationService
-                  .deleteMeUpsert(applicationFactory.makeNewAgentApplicationScottishLimitedPartnership(
+                  .upsert(applicationFactory.makeNewAgentApplicationScottishLimitedPartnership(
                     internalUserId = request.internalUserId,
                     groupId = request.groupId,
                     userRole = userRole
@@ -131,7 +131,7 @@ extends FrontendController(mcc, actions):
                   .map(_ => Redirect(nextEndpoint))
               case BusinessType.Partnership.ScottishPartnership =>
                 agentApplicationService
-                  .deleteMeUpsert(applicationFactory.makeNewAgentApplicationScottishPartnership(
+                  .upsert(applicationFactory.makeNewAgentApplicationScottishPartnership(
                     internalUserId = request.internalUserId,
                     groupId = request.groupId,
                     userRole = userRole

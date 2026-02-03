@@ -95,6 +95,7 @@ object Requests:
 
     inline def credentials(using Credentials PresentIn Data): Credentials = r.get
     inline def internalUserId(using InternalUserId PresentIn Data): InternalUserId = r.get
+    inline def groupId(using GroupId PresentIn Data): GroupId = r.get
     inline def businessPartnerRecordResponse(using BusinessPartnerRecordResponse PresentIn Data): BusinessPartnerRecordResponse = r.get
     inline def maybeBusinessPartnerRecordResponse(using Option[BusinessPartnerRecordResponse] PresentIn Data): Option[BusinessPartnerRecordResponse] = r.get
     inline def agentType(using AgentType PresentIn Data): AgentType = r.get
