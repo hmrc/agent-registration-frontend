@@ -324,7 +324,7 @@ object AgentApplication:
     (AgentApplicationSoleTrader
       | AgentApplicationLimitedCompany) & AgentApplication
 
-  type IsAgentApplicationForKeyIndividuals = (AgentApplicationGeneralPartnership | AgentApplicationScottishPartnership) & AgentApplication
+  type IsAgentApplicationForDeclaringNumberOfKeyIndividuals = (AgentApplicationGeneralPartnership | AgentApplicationScottishPartnership) & AgentApplication
 
   type IsNotAgentApplicationForKeyIndividuals =
     (AgentApplicationSoleTrader
@@ -352,7 +352,7 @@ object AgentApplication:
     ]
     DisjointUnions.prove[
       AgentApplication,
-      IsAgentApplicationForKeyIndividuals,
+      IsAgentApplicationForDeclaringNumberOfKeyIndividuals,
       IsNotAgentApplicationForKeyIndividuals
     ]
 

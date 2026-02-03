@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationForKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
@@ -54,7 +54,9 @@ class EnterKeyIndividualController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder4[NumberOfRequiredKeyIndividuals *: IsAgentApplicationForKeyIndividuals *: DataWithAuth] = actions
+  private val baseAction: ActionBuilder4[
+    NumberOfRequiredKeyIndividuals *: IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
+  ] = actions
     .Applicant
     .getApplicationInProgress
     .refine4:
@@ -68,10 +70,11 @@ extends FrontendController(mcc, actions):
           case _: AgentApplicationSoleTrader =>
             logger.warn("Sole traders do not add individuals to a list, redirecting to task list for the correct links")
             Redirect(AppRoutes.apply.TaskListController.show.url)
-          case aa: IsAgentApplicationForKeyIndividuals => request.replace[AgentApplication, IsAgentApplicationForKeyIndividuals](aa)
+          case aa: IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
+            request.replace[AgentApplication, IsAgentApplicationForDeclaringNumberOfKeyIndividuals](aa)
     .refine4:
       implicit request =>
-        request.get[IsAgentApplicationForKeyIndividuals].numberOfRequiredKeyIndividuals match
+        request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].numberOfRequiredKeyIndividuals match
           case Some(n: NumberOfRequiredKeyIndividuals) => request.add(n)
           case None =>
             logger.warn(
@@ -84,42 +87,43 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] = baseAction
     .async:
       implicit request =>
-        individualProvideDetailsService.findAllByApplicationId(request.get[IsAgentApplicationForKeyIndividuals].agentApplicationId).flatMap: existingList =>
-          request.get[NumberOfRequiredKeyIndividuals] match
-            case n: SixOrMore if n.paddingRequired > 0 =>
-              businessPartnerRecordService
-                .getBusinessPartnerRecord(request.get[IsAgentApplicationForKeyIndividuals].getUtr)
-                .map: (bprOpt: Option[BusinessPartnerRecordResponse]) =>
-                  Ok(enterIndividualNameComplexPage(
-                    form = IndividualNameForm.form,
-                    ordinalKey = MessageKeys.ordinalKey(
-                      existingSize = existingList.size,
-                      isOnlyOne = false // list size here can never be 1
-                    ),
-                    numberOfRequiredKeyIndividuals = n,
-                    entityName = bprOpt
-                      .map(_.getEntityName)
-                      .getOrThrowExpectedDataMissing(
-                        "Business Partner Record is missing"
-                      )
-                  ))
-            case n: FiveOrLess =>
-              Future.successful(Ok(enterIndividualNameSimplePage(
-                form = IndividualNameForm.form,
-                ordinalKey = MessageKeys.ordinalKey(
-                  existingSize = existingList.size,
-                  isOnlyOne = n.numberOfKeyIndividuals === 1
-                )
-              )))
-            case n: SixOrMore =>
-              // no padding required, so we can use the simple page
-              Future.successful(Ok(enterIndividualNameSimplePage(
-                form = IndividualNameForm.form,
-                ordinalKey = MessageKeys.ordinalKey(
-                  existingSize = existingList.size,
-                  isOnlyOne = n.numberOfKeyIndividualsResponsibleForTaxMatters === 1
-                )
-              )))
+        individualProvideDetailsService.findAllByApplicationId(request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].agentApplicationId).flatMap:
+          existingList =>
+            request.get[NumberOfRequiredKeyIndividuals] match
+              case n: SixOrMore if n.paddingRequired > 0 =>
+                businessPartnerRecordService
+                  .getBusinessPartnerRecord(request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].getUtr)
+                  .map: (bprOpt: Option[BusinessPartnerRecordResponse]) =>
+                    Ok(enterIndividualNameComplexPage(
+                      form = IndividualNameForm.form,
+                      ordinalKey = MessageKeys.ordinalKey(
+                        existingSize = existingList.size,
+                        isOnlyOne = false // list size here can never be 1
+                      ),
+                      numberOfRequiredKeyIndividuals = n,
+                      entityName = bprOpt
+                        .map(_.getEntityName)
+                        .getOrThrowExpectedDataMissing(
+                          "Business Partner Record is missing"
+                        )
+                    ))
+              case n: FiveOrLess =>
+                Future.successful(Ok(enterIndividualNameSimplePage(
+                  form = IndividualNameForm.form,
+                  ordinalKey = MessageKeys.ordinalKey(
+                    existingSize = existingList.size,
+                    isOnlyOne = n.numberOfKeyIndividuals === 1
+                  )
+                )))
+              case n: SixOrMore =>
+                // no padding required, so we can use the simple page
+                Future.successful(Ok(enterIndividualNameSimplePage(
+                  form = IndividualNameForm.form,
+                  ordinalKey = MessageKeys.ordinalKey(
+                    existingSize = existingList.size,
+                    isOnlyOne = n.numberOfKeyIndividualsResponsibleForTaxMatters === 1
+                  )
+                )))
 
   def submit: Action[AnyContent] = baseAction
     .ensureValidFormAndRedirectIfSaveForLater4[IndividualName](
@@ -127,11 +131,13 @@ extends FrontendController(mcc, actions):
       resultToServeWhenFormHasErrors =
         implicit request =>
           (formWithErrors: Form[IndividualName]) =>
-            individualProvideDetailsService.findAllByApplicationId(request.get[IsAgentApplicationForKeyIndividuals].agentApplicationId).flatMap: existingList =>
+            individualProvideDetailsService.findAllByApplicationId(
+              request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].agentApplicationId
+            ).flatMap: existingList =>
               request.get[NumberOfRequiredKeyIndividuals] match
                 case n: SixOrMore if n.paddingRequired > 0 =>
                   businessPartnerRecordService
-                    .getBusinessPartnerRecord(request.get[IsAgentApplicationForKeyIndividuals].getUtr)
+                    .getBusinessPartnerRecord(request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].getUtr)
                     .map: bprOpt =>
                       enterIndividualNameComplexPage(
                         form = formWithErrors,
