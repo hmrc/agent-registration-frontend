@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.apply.agentdetails
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithApplication
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData4
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.agentApplication
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
@@ -31,7 +31,7 @@ class AgentEmailAddressPageSpec
 extends ViewSpec:
 
   val viewTemplate: AgentEmailAddressPage = app.injector.instanceOf[AgentEmailAddressPage]
-  implicit val agentApplicationRequest: RequestWithData4[DataWithApplication] = tdAll.makeAgentApplicationRequest(
+  implicit val agentApplicationRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(
     agentApplication =
       tdAll
         .agentApplicationLlp

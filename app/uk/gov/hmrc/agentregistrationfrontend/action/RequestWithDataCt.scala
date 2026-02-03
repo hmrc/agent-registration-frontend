@@ -21,7 +21,7 @@ import play.api.mvc.WrappedRequest
 import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.*
 import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple
 
-class RequestWithData[
+class RequestWithDataCt[
   ContentType,
   Data <: Tuple
 ] private (
@@ -32,27 +32,27 @@ extends WrappedRequest[ContentType](request):
 
   inline def get[T](using T PresentIn Data): T = data.get[T]
 
-  inline def add[T](value: T)(using T AbsentIn Data): RequestWithData[ContentType, T *: Data] = RequestWithData.create(request, data.add(value))
+  inline def add[T](value: T)(using T AbsentIn Data): RequestWithDataCt[ContentType, T *: Data] = RequestWithDataCt.create(request, data.add(value))
 
-  inline def update[T](value: T)(using T PresentIn Data): RequestWithData[ContentType, Data] = RequestWithData.create(request, data.update(value))
+  inline def update[T](value: T)(using T PresentIn Data): RequestWithDataCt[ContentType, Data] = RequestWithDataCt.create(request, data.update(value))
 
-  inline def delete[T](using T PresentIn Data): RequestWithData[ContentType, UniqueTuple.Delete[T, Data]] = RequestWithData.create(request, data.delete[T])
+  inline def delete[T](using T PresentIn Data): RequestWithDataCt[ContentType, UniqueTuple.Delete[T, Data]] = RequestWithDataCt.create(request, data.delete[T])
 
   inline def replace[Old, New](value: New)(using
     Old PresentIn Data,
     New AbsentIn Data
-  ): RequestWithData[ContentType, UniqueTuple.Replace[
+  ): RequestWithDataCt[ContentType, UniqueTuple.Replace[
     Old,
     New,
     Data
-  ]] = RequestWithData.create(
+  ]] = RequestWithDataCt.create(
     request,
     data.replace[Old, New](value)
   )
 
-object RequestWithData:
+object RequestWithDataCt:
 
-  def empty[ContentType](request: Request[ContentType]): RequestWithData[ContentType, EmptyTuple] = apply(
+  def empty[ContentType](request: Request[ContentType]): RequestWithDataCt[ContentType, EmptyTuple] = apply(
     request = request,
     data = EmptyTuple
   )
@@ -63,7 +63,7 @@ object RequestWithData:
   ](
     request: Request[ContentType],
     data: Data
-  ): RequestWithData[ContentType, Data] = create(request, UniqueTuple(data))
+  ): RequestWithDataCt[ContentType, Data] = create(request, UniqueTuple(data))
 
   private def create[
     ContentType,
@@ -71,4 +71,4 @@ object RequestWithData:
   ](
     request: Request[ContentType],
     data: UniqueTuple[Data]
-  ): RequestWithData[ContentType, Data] = new RequestWithData(request, data)
+  ): RequestWithDataCt[ContentType, Data] = new RequestWithDataCt(request, data)

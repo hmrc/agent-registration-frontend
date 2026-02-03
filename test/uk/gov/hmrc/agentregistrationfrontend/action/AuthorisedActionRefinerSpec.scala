@@ -21,7 +21,7 @@ import play.api.mvc.Result
 import play.api.mvc.Results.*
 import play.api.test.Helpers.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithAuth
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData4
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
@@ -32,7 +32,7 @@ extends ISpec:
 
   "when User is not logged in (request comes without authorisation in the session) action redirects to login url" in:
     val authorisedActionRefiner: AuthorisedActionRefiner = app.injector.instanceOf[AuthorisedActionRefiner]
-    val notLoggedInRequest: RequestWithData4[EmptyTuple] = tdAll.requestNotLoggedIn
+    val notLoggedInRequest: RequestWithData[EmptyTuple] = tdAll.requestNotLoggedIn
     authorisedActionRefiner
       .refine(notLoggedInRequest)
       .futureValue
@@ -105,7 +105,7 @@ extends ISpec:
   "successfully authorise when user is logged in, credentialRole is User/Admin, and no active HMRC-AS-AGENT enrolment" in:
     val authorisedActionRefiner: AuthorisedActionRefiner = app.injector.instanceOf[AuthorisedActionRefiner]
     AuthStubs.stubAuthorise()
-    val requestWithAuth: RequestWithData4[DataWithAuth] =
+    val requestWithAuth: RequestWithData[DataWithAuth] =
       authorisedActionRefiner
         .refine(tdAll.requestLoggedInEmptyData)
         .futureValue

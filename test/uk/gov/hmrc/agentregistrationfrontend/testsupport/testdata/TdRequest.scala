@@ -19,9 +19,9 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithData
+import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithAuth
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData4
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withAuthTokenInSession
@@ -53,12 +53,12 @@ trait TdRequest {
   def rawRequestNotLoggedIn: Request[AnyContent] = baseRequest
   def rawRequestLoggedIn: Request[AnyContent] = baseRequest.withAuthTokenInSession()
 
-  def requestNotLoggedIn: RequestWithData4[EmptyTuple] = RequestWithData.empty(rawRequestNotLoggedIn)
-  def requestLoggedInEmptyData: RequestWithData4[EmptyTuple] = RequestWithData.empty(rawRequestLoggedIn)
+  def requestNotLoggedIn: RequestWithData[EmptyTuple] = RequestWithDataCt.empty(rawRequestNotLoggedIn)
+  def requestLoggedInEmptyData: RequestWithData[EmptyTuple] = RequestWithDataCt.empty(rawRequestLoggedIn)
 
   def deleteMerequestLoggedIn: Request[AnyContent] = baseRequest.withAuthTokenInSession()
 
-  def requestWithAuthData: RequestWithData4[DataWithAuth] = RequestWithData.apply[AnyContent, DataWithAuth](
+  def requestWithAuthData: RequestWithData[DataWithAuth] = RequestWithDataCt.apply[AnyContent, DataWithAuth](
     rawRequestLoggedIn,
     dependencies.dataWithAuth
   )

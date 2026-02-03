@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
-class RequestWithDataSpec
+class RequestWithDataCtSpec
 extends UnitSpec:
 
   "RequestWithData" should:
@@ -47,10 +47,10 @@ extends UnitSpec:
         Credentials
       )
 
-    val request: RequestWithData[
+    val request: RequestWithDataCt[
       AnyContent,
       ExampleData
-    ] = RequestWithData(
+    ] = RequestWithDataCt(
       request = FakeRequest(),
       data =
         (
@@ -68,7 +68,7 @@ extends UnitSpec:
       request.get[Credentials] shouldBe credentials
 
     "can add elements by data type" in:
-      val r2: RequestWithData[
+      val r2: RequestWithDataCt[
         AnyContent,
         (
           BusinessPartnerRecordResponse,
@@ -88,7 +88,7 @@ extends UnitSpec:
         credentials
       )
 
-      val r3: RequestWithData[
+      val r3: RequestWithDataCt[
         AnyContent,
         (
           Option[BusinessPartnerRecordResponse],
@@ -123,7 +123,7 @@ extends UnitSpec:
 
     "can replace element types" in:
       val llp: AgentApplicationLlp = TdAll.tdAll.agentApplicationLlp.afterStarted
-      val r2: RequestWithData[
+      val r2: RequestWithDataCt[
         AnyContent,
         (AgentApplicationLlp, InternalUserId, GroupId, Credentials)
       ] = request.replace[AgentApplication, AgentApplicationLlp](llp)

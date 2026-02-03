@@ -21,7 +21,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithApplication
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData4
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.agentApplication
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -55,7 +55,7 @@ extends ViewSpec:
   private val heading: String = "Check your answers"
 
   "CheckYourAnswersPage for complete Hmrc Amls Details" should:
-    implicit val agentApplicationHmrcRequest: RequestWithData4[DataWithApplication] = tdAll.makeAgentApplicationRequest(
+    implicit val agentApplicationHmrcRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(
       agentApplication.completeHmrcApplication
     )
 
@@ -99,7 +99,7 @@ extends ViewSpec:
       doc.extractLinkButton(1).text shouldBe "Confirm and continue"
 
   "CheckYourAnswersPage for complete non-Hmrc Amls Details" should:
-    implicit val agentApplicationHmrcRequest: RequestWithData4[DataWithApplication] = tdAll.makeAgentApplicationRequest(
+    implicit val agentApplicationHmrcRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(
       agentApplication.completeNonHmrcApplication
     )
 

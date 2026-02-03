@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplicat
 
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithApplication
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData4
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdRequest
 
@@ -27,6 +27,6 @@ trait TdAgentApplicationRequest {
 
   def makeAgentApplicationRequest(
     agentApplication: AgentApplication
-  ): RequestWithData4[DataWithApplication] = dependencies.requestWithAuthData.add(agentApplication)
+  ): RequestWithData[DataWithApplication] = dependencies.requestWithAuthData.add(agentApplication)
 
 }

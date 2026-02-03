@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.apply.applicantcontactdetail
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithApplication
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData4
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.forms.TelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -30,7 +30,7 @@ class TelephoneNumberPageSpec
 extends ViewSpec:
 
   val viewTemplate: TelephoneNumberPage = app.injector.instanceOf[TelephoneNumberPage]
-  implicit val agentApplicationRequest: RequestWithData4[DataWithApplication] = tdAll
+  implicit val agentApplicationRequest: RequestWithData[DataWithApplication] = tdAll
     .makeAgentApplicationRequest(
       agentApplication =
         tdAll

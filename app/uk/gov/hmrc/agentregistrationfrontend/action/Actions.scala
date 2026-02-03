@@ -58,7 +58,7 @@ extends RequestAwareLogging:
   export ActionsHelper.*
 
   val action: ActionBuilder4[EmptyTuple] = defaultActionBuilder
-    .refine2(request => RequestWithData.empty(request))
+    .refine2(request => RequestWithDataCt.empty(request))
 
   object Applicant:
 
@@ -67,7 +67,7 @@ extends RequestAwareLogging:
 
     val getApplication: ActionBuilder4[DataWithApplication] = authorised
       .refine4:
-        implicit request: RequestWithData4[DataWithAuth] =>
+        implicit request: RequestWithData[DataWithAuth] =>
           agentApplicationService
             .find()
             .map[Result | RequestWithApplication]:

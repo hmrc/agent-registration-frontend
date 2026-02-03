@@ -36,24 +36,24 @@ import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 object Requests:
 
-  type RequestWithData4[Data <: Tuple] = RequestWithData[AnyContent, Data]
+  type RequestWithData[Data <: Tuple] = RequestWithDataCt[AnyContent, Data]
 
   type DataEmpty = EmptyTuple
-  type DefaultRequest = RequestWithData4[DataEmpty]
-  type DefaultRequestCt[ContentType] = RequestWithData[ContentType, DataEmpty]
+  type DefaultRequest = RequestWithData[DataEmpty]
+  type DefaultRequestCt[ContentType] = RequestWithDataCt[ContentType, DataEmpty]
 
   type DataWithAuth = (InternalUserId, GroupId, Credentials)
-  type RequestWithAuth = RequestWithData4[DataWithAuth]
-  type RequestWithAuthCt[ContentType] = RequestWithData[ContentType, DataWithAuth]
+  type RequestWithAuth = RequestWithData[DataWithAuth]
+  type RequestWithAuthCt[ContentType] = RequestWithDataCt[ContentType, DataWithAuth]
 
   type DataWithApplication = AgentApplication *: DataWithAuth
-  type RequestWithApplication = RequestWithData4[DataWithApplication]
-  type RequestWithApplicationCt[A] = RequestWithData[A, DataWithApplication]
+  type RequestWithApplication = RequestWithData[DataWithApplication]
+  type RequestWithApplicationCt[A] = RequestWithDataCt[A, DataWithApplication]
 
   extension [
-    A,
+    ContentType,
     Data <: Tuple
-  ](r: RequestWithData[A, Data])
+  ](r: RequestWithDataCt[ContentType, Data])
 
     inline def agentApplication(using AgentApplication PresentIn Data): AgentApplication = r.get
     inline def agentApplicationGeneralPartnership(using AgentApplicationGeneralPartnership PresentIn Data): AgentApplicationGeneralPartnership = r.get
@@ -72,9 +72,9 @@ object Requests:
     inline def maybeBusinessPartnerRecordResponse(using Option[BusinessPartnerRecordResponse] PresentIn Data): Option[BusinessPartnerRecordResponse] = r.get
     inline def agentType(using AgentType PresentIn Data): AgentType = r.get
 
-  type ActionBuilder4[Data <: Tuple] = ActionBuilder[[X] =>> RequestWithData[X, Data], AnyContent]
+  type ActionBuilder4[Data <: Tuple] = ActionBuilder[[X] =>> RequestWithDataCt[X, Data], AnyContent]
 
   type ActionRefiner4[
     Data <: Tuple,
     NewData <: Tuple
-  ] = ActionRefiner[[X] =>> RequestWithData[X, Data], [X] =>> RequestWithData[X, NewData]]
+  ] = ActionRefiner[[X] =>> RequestWithDataCt[X, Data], [X] =>> RequestWithDataCt[X, NewData]]

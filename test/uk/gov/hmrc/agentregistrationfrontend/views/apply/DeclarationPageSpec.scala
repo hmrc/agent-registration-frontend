@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.apply
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithApplication
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData4
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.agentApplication
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.DeclarationPage
@@ -28,7 +28,7 @@ class DeclarationPageSpec
 extends ViewSpec:
 
   val viewTemplate: DeclarationPage = app.injector.instanceOf[DeclarationPage]
-  given agentApplicationRequest: RequestWithData4[DataWithApplication] = tdAll.makeAgentApplicationRequest(tdAll.agentApplicationLlp.afterDeclarationSubmitted)
+  given agentApplicationRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(tdAll.agentApplicationLlp.afterDeclarationSubmitted)
 
   val doc: Document = Jsoup.parse(
     viewTemplate(

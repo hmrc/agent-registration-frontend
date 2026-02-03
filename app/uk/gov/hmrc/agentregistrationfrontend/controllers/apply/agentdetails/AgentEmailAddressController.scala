@@ -156,7 +156,7 @@ extends FrontendController(mcc, actions):
         Redirect(AppRoutes.apply.agentdetails.CheckYourAnswersController.show)
     )
     .async:
-      implicit request: (RequestWithData4[DataWithApplication]) =>
+      implicit request: (RequestWithData[DataWithApplication]) =>
         val emailToVerify =
           request
             .agentApplication
@@ -182,7 +182,7 @@ extends FrontendController(mcc, actions):
             onEmailError()
         }
 
-  private def onEmailVerified()(implicit request: RequestWithData4[DataWithApplication]): Future[Result] =
+  private def onEmailVerified()(implicit request: RequestWithData[DataWithApplication]): Future[Result] =
     val updatedApplication = request
       .agentApplication
       .modify(

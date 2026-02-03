@@ -50,17 +50,17 @@ extends RequestAwareLogging:
     ContentType,
     Data <: Tuple
   ](
-    request: RequestWithData[ContentType, Data]
+    request: RequestWithDataCt[ContentType, Data]
   )(
     using
     Credentials AbsentIn Data,
     GroupId AbsentIn Data,
     InternalUserId AbsentIn Data
-  ): Future[Either[Result, RequestWithData[
+  ): Future[Either[Result, RequestWithDataCt[
     ContentType,
     InternalUserId *: GroupId *: Credentials *: Data
   ]]] =
-    given RequestWithData[ContentType, Data] = request
+    given RequestWithDataCt[ContentType, Data] = request
     af.authorised(
       AuthProviders(GovernmentGateway)
         and AffinityGroup.Agent

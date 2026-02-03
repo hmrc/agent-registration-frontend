@@ -38,8 +38,8 @@ extends RequestAwareLogging:
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     def ensureValidFormAndRedirectIfSaveForLater4[T](
-      form: RequestWithData4[Data] => Form[T] | Future[Form[T]],
-      resultToServeWhenFormHasErrors: RequestWithData4[Data] => Form[T] => Result | HtmlFormat.Appendable | Future[Result | HtmlFormat.Appendable]
+      form: RequestWithData[Data] => Form[T] | Future[Form[T]],
+      resultToServeWhenFormHasErrors: RequestWithData[Data] => Form[T] => Result | HtmlFormat.Appendable | Future[Result | HtmlFormat.Appendable]
     )(using
       FormBinding,
       T AbsentIn Data
@@ -60,7 +60,7 @@ extends RequestAwareLogging:
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     def ensureValidFormAndRedirectIfSaveForLater4[T](
       form: Form[T] | Future[Form[T]],
-      resultToServeWhenFormHasErrors: RequestWithData4[Data] => Form[T] => Result | HtmlFormat.Appendable | Future[Result | HtmlFormat.Appendable]
+      resultToServeWhenFormHasErrors: RequestWithData[Data] => Form[T] => Result | HtmlFormat.Appendable | Future[Result | HtmlFormat.Appendable]
     )(using
       FormBinding,
       T AbsentIn Data
@@ -69,7 +69,7 @@ extends RequestAwareLogging:
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     def ensureValidForm4[T](
       form: Form[T] | Future[Form[T]],
-      resultToServeWhenFormHasErrors: RequestWithData4[Data] => Form[T] => Result | HtmlFormat.Appendable | Future[Result | HtmlFormat.Appendable]
+      resultToServeWhenFormHasErrors: RequestWithData[Data] => Form[T] => Result | HtmlFormat.Appendable | Future[Result | HtmlFormat.Appendable]
     )(using
       FormBinding,
       T AbsentIn Data
@@ -77,8 +77,8 @@ extends RequestAwareLogging:
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     def ensureValidForm4[T](
-      form: RequestWithData4[Data] => Form[T] | Future[Form[T]],
-      resultToServeWhenFormHasErrors: RequestWithData4[Data] => Form[T] => Result | HtmlFormat.Appendable | Future[Result | HtmlFormat.Appendable]
+      form: RequestWithData[Data] => Form[T] | Future[Form[T]],
+      resultToServeWhenFormHasErrors: RequestWithData[Data] => Form[T] => Result | HtmlFormat.Appendable | Future[Result | HtmlFormat.Appendable]
     )(using
       FormBinding,
       T AbsentIn Data
@@ -95,7 +95,7 @@ extends RequestAwareLogging:
                 case r: HtmlFormat.Appendable => BadRequest(r)
               }
 
-        def bind(f: Form[T]): Future[Result | RequestWithData4[T *: Data]] = f.bindFromRequest().fold(
+        def bind(f: Form[T]): Future[Result | RequestWithData[T *: Data]] = f.bindFromRequest().fold(
           hasErrors = handleErrors,
           success = t => Future.successful(request.add(t))
         )
@@ -123,17 +123,17 @@ extends RequestAwareLogging:
 //          )
 
     def ensure4(
-      condition: RequestWithData4[Data] => Boolean,
+      condition: RequestWithData[Data] => Boolean,
       resultWhenConditionNotMet: Result
     ): ActionBuilder4[Data] = ensure4(condition, _ => resultWhenConditionNotMet)
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     def ensure4(
-      condition: RequestWithData4[Data] => Boolean | Future[Boolean],
-      resultWhenConditionNotMet: RequestWithData4[Data] => Result | Future[Result]
+      condition: RequestWithData[Data] => Boolean | Future[Boolean],
+      resultWhenConditionNotMet: RequestWithData[Data] => Result | Future[Result]
     ): ActionBuilder4[Data] = refine4: request =>
 
-      def computeResult(condition: Boolean): Result | RequestWithData4[Data] | Future[Result | RequestWithData4[Data]] =
+      def computeResult(condition: Boolean): Result | RequestWithData[Data] | Future[Result | RequestWithData[Data]] =
         if condition then request else resultWhenConditionNotMet(request)
 
       condition(request) match
@@ -142,36 +142,36 @@ extends RequestAwareLogging:
           f.asInstanceOf[Future[Boolean]].flatMap: c =>
             computeResult(c) match
               case result: Result => Future.successful(result)
-              case request: RequestWithData[_, _] => Future.successful(request.asInstanceOf[RequestWithData4[Data]])
-              case f: Future[_] => f.asInstanceOf[Future[Result | RequestWithData4[Data]]]
+              case request: RequestWithDataCt[_, _] => Future.successful(request.asInstanceOf[RequestWithData[Data]])
+              case f: Future[_] => f.asInstanceOf[Future[Result | RequestWithData[Data]]]
 
     def refine4[NewData <: Tuple](
-      refineF: RequestWithData4[Data] => Result | RequestWithData4[NewData] | Future[Result | RequestWithData4[NewData]]
+      refineF: RequestWithData[Data] => Result | RequestWithData[NewData] | Future[Result | RequestWithData[NewData]]
     ): ActionBuilder4[
       NewData
     ] = ab.andThen(new ActionRefiner4[Data, NewData] {
       protected def executionContext: ExecutionContext = ec
 
       @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-      override protected def refine[A](request: RequestWithData[
+      override protected def refine[A](request: RequestWithDataCt[
         A,
         Data
-      ]): Future[Either[Result, RequestWithData[A, NewData]]] = {
-        val rB: RequestWithData4[Data] = request.asInstanceOf[RequestWithData4[Data]]
+      ]): Future[Either[Result, RequestWithDataCt[A, NewData]]] = {
+        val rB: RequestWithData[Data] = request.asInstanceOf[RequestWithData[Data]]
         refineF(rB) match
           case r: Result => Future.successful(Left(r))
           case f: Future[_] =>
-            f.asInstanceOf[Future[Result | RequestWithData4[NewData]]].map {
+            f.asInstanceOf[Future[Result | RequestWithData[NewData]]].map {
               case r: Result => Left(r)
-              case p => Right(p.asInstanceOf[RequestWithData[A, NewData]])
+              case p => Right(p.asInstanceOf[RequestWithDataCt[A, NewData]])
             }
-          case p => Future.successful(Right(p.asInstanceOf[RequestWithData[A, NewData]]))
+          case p => Future.successful(Right(p.asInstanceOf[RequestWithDataCt[A, NewData]]))
       }
     })
 
   extension [
     Data <: Tuple,
-    R <: [X] =>> RequestWithData[X, Data],
+    R <: [X] =>> RequestWithDataCt[X, Data],
     ContentType
   ](ab: ActionBuilder[R, ContentType])(using ec: ExecutionContext)
 
@@ -181,7 +181,7 @@ extends RequestAwareLogging:
     )(using
       FormBinding,
       T AbsentIn Data
-    ): ActionBuilder[[X] =>> RequestWithData[X, T *: Data], ContentType] = ensureValidFormGenericAsync2[T](
+    ): ActionBuilder[[X] =>> RequestWithDataCt[X, T *: Data], ContentType] = ensureValidFormGenericAsync2[T](
       form,
       request => form => Future.successful(resultToServeWhenFormHasErrors(request)(form))
     )
@@ -192,7 +192,7 @@ extends RequestAwareLogging:
     )(using
       FormBinding,
       T AbsentIn Data
-    ): ActionBuilder[[X] =>> RequestWithData[X, T *: Data], ContentType] = ab
+    ): ActionBuilder[[X] =>> RequestWithDataCt[X, T *: Data], ContentType] = ab
       .ensureValidFormGenericAsync2[T](
         _ => form,
         (r: R[ContentType]) => (f: Form[T]) => viewToServeWhenFormHasErrors(r)(f).map(BadRequest.apply)
@@ -204,7 +204,7 @@ extends RequestAwareLogging:
     )(using
       FormBinding,
       T AbsentIn Data
-    ): ActionBuilder[[X] =>> RequestWithData[X, T *: Data], ContentType] = ensureValidFormAsync2(
+    ): ActionBuilder[[X] =>> RequestWithDataCt[X, T *: Data], ContentType] = ensureValidFormAsync2(
       form,
       request => form => Future.successful(viewToServeWhenFormHasErrors(request)(form))
     )
@@ -216,7 +216,7 @@ extends RequestAwareLogging:
       fb: FormBinding,
       ev: ContentType =:= AnyContent,
       ev2: T AbsentIn Data
-    ): ActionBuilder[[X] =>> RequestWithData[X, T *: Data], ContentType] = ab
+    ): ActionBuilder[[X] =>> RequestWithDataCt[X, T *: Data], ContentType] = ab
       .ensureValidFormGenericAsync2[T](
         form,
         (r: R[ContentType]) =>
@@ -233,7 +233,7 @@ extends RequestAwareLogging:
       fb: FormBinding,
       ev: ContentType =:= AnyContent,
       ev2: T AbsentIn Data
-    ): ActionBuilder[[X] =>> RequestWithData[X, T *: Data], ContentType] = ensureValidFormAndRedirectIfSaveForLaterAsync2(
+    ): ActionBuilder[[X] =>> RequestWithDataCt[X, T *: Data], ContentType] = ensureValidFormAndRedirectIfSaveForLaterAsync2(
       form,
       request => form => Future.successful(viewToServeWhenFormHasErrors(request)(form))
     )
@@ -245,7 +245,7 @@ extends RequestAwareLogging:
       fb: FormBinding,
       ev: ContentType =:= AnyContent,
       ev2: T AbsentIn Data
-    ): ActionBuilder[[X] =>> RequestWithData[X, T *: Data], ContentType] = ab.ensureValidFormAndRedirectIfSaveForLaterAsync2(
+    ): ActionBuilder[[X] =>> RequestWithDataCt[X, T *: Data], ContentType] = ab.ensureValidFormAndRedirectIfSaveForLaterAsync2(
       _ => form,
       viewToServeWhenFormHasErrors
     )
@@ -257,7 +257,7 @@ extends RequestAwareLogging:
       fb: FormBinding,
       ev: ContentType =:= AnyContent,
       ev2: T AbsentIn Data
-    ): ActionBuilder[[X] =>> RequestWithData[X, T *: Data], ContentType] = ab.ensureValidFormAndRedirectIfSaveForLater2(
+    ): ActionBuilder[[X] =>> RequestWithDataCt[X, T *: Data], ContentType] = ab.ensureValidFormAndRedirectIfSaveForLater2(
       _ => form,
       viewToServeWhenFormHasErrors
     )
@@ -268,16 +268,16 @@ extends RequestAwareLogging:
     )(using
       fb: FormBinding,
       ev: T AbsentIn Data
-    ): ActionBuilder[[X] =>> RequestWithData[X, T *: Data], ContentType] = ab.andThen(new ActionRefiner[R, [X] =>> RequestWithData[X, T *: Data]] {
+    ): ActionBuilder[[X] =>> RequestWithDataCt[X, T *: Data], ContentType] = ab.andThen(new ActionRefiner[R, [X] =>> RequestWithDataCt[X, T *: Data]] {
 
       @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-      override protected def refine[A](rA: R[A]): Future[Either[Result, RequestWithData[A, T *: Data]]] = {
+      override protected def refine[A](rA: R[A]): Future[Either[Result, RequestWithDataCt[A, T *: Data]]] = {
         val rB: R[ContentType] = rA.asInstanceOf[R[ContentType]]
         form(rB).bindFromRequest()(using rB, fb).fold(
           hasErrors = formWithErrors => resultToServeWhenFormHasErrors(rB)(formWithErrors).map(Left(_)),
           success =
             (formValue: T) =>
-              val x: RequestWithData[A, T *: Data] = rB.add(formValue).asInstanceOf[RequestWithData[A, T *: Data]]
+              val x: RequestWithDataCt[A, T *: Data] = rB.add(formValue).asInstanceOf[RequestWithDataCt[A, T *: Data]]
               Future.successful(Right(x))
         )
       }
@@ -654,21 +654,21 @@ extends RequestAwareLogging:
     })
 
     def refine3[NewData <: Tuple](
-      refineF: R[ContentType] => Result | RequestWithData[ContentType, NewData] | Future[Result | RequestWithData[ContentType, NewData]]
-    ): ActionBuilder[[X] =>> RequestWithData[X, NewData], ContentType] = ab.andThen(new ActionRefiner[R, [X] =>> RequestWithData[X, NewData]] {
+      refineF: R[ContentType] => Result | RequestWithDataCt[ContentType, NewData] | Future[Result | RequestWithDataCt[ContentType, NewData]]
+    ): ActionBuilder[[X] =>> RequestWithDataCt[X, NewData], ContentType] = ab.andThen(new ActionRefiner[R, [X] =>> RequestWithDataCt[X, NewData]] {
       protected def executionContext: ExecutionContext = ec
 
       @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-      protected def refine[A](request: R[A]): Future[Either[Result, RequestWithData[A, NewData]]] = {
+      protected def refine[A](request: R[A]): Future[Either[Result, RequestWithDataCt[A, NewData]]] = {
         val rB: R[ContentType] = request.asInstanceOf[R[ContentType]]
         refineF(rB) match
           case r: Result => Future.successful(Left(r))
           case f: Future[_] =>
-            f.asInstanceOf[Future[Result | RequestWithData[ContentType, NewData]]].map {
+            f.asInstanceOf[Future[Result | RequestWithDataCt[ContentType, NewData]]].map {
               case r: Result => Left(r)
-              case p => Right(p.asInstanceOf[RequestWithData[A, NewData]])
+              case p => Right(p.asInstanceOf[RequestWithDataCt[A, NewData]])
             }
-          case p => Future.successful(Right(p.asInstanceOf[RequestWithData[A, NewData]]))
+          case p => Future.successful(Right(p.asInstanceOf[RequestWithDataCt[A, NewData]]))
       }
     })
 
