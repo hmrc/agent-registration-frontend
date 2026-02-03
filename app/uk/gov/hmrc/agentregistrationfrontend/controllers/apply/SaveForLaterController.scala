@@ -36,6 +36,6 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
     .Applicant
-    .deleteMeGetApplicationInProgress:
+    .getApplicationInProgress:
       implicit request =>
         Ok(saveForLaterPage())

@@ -24,7 +24,6 @@ import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.HmrcStandardForAgentsPage
 
 import javax.inject.Inject
@@ -35,35 +34,27 @@ class HmrcStandardForAgentsController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: HmrcStandardForAgentsPage,
-  agentApplicationService: AgentApplicationService,
-  businessPartnerRecordService: BusinessPartnerRecordService
+  agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
     .Applicant
-    .deleteMeGetApplicationInProgress
-    .async:
+    .getApplicationInProgress
+    .getBusinessPartnerRecord:
       implicit request =>
-        businessPartnerRecordService
-          .deleteMeGetBusinessPartnerRecord(request.agentApplication.getUtr)
-          .map: bprOpt =>
-            Ok(view(
-              entityName = bprOpt
-                .map(_.getEntityName)
-                .getOrThrowExpectedDataMissing(
-                  "Business Partner Record is missing"
-                ),
-              agentApplication = request.agentApplication
-            ))
+        Ok(view(
+          entityName = request.businessPartnerRecordResponse.getEntityName,
+          agentApplication = request.agentApplication
+        ))
 
   def submit: Action[AnyContent] = actions
     .Applicant
-    .deleteMeGetApplicationInProgress
+    .getApplicationInProgress
     .async:
       implicit request =>
         agentApplicationService
-          .deleteMeUpsert(
+          .upsert(
             request
               .agentApplication
               .modify(_.hmrcStandardForAgentsAgreed)

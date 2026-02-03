@@ -20,6 +20,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.hasCheckPassed
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
@@ -27,7 +28,6 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskStatus
-import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.TaskListPage
 
 import javax.inject.Inject
@@ -37,42 +37,34 @@ import javax.inject.Singleton
 class TaskListController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  taskListPage: TaskListPage,
-  businessPartnerRecordService: BusinessPartnerRecordService
+  taskListPage: TaskListPage
 )
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
     .Applicant
-    .deleteMeGetApplicationInProgress
-    .ensure(
-      _.agentApplication
-        .isGrsDataReceived,
-      implicit request =>
-        logger.warn("Missing data from GRS, redirecting to start GRS registration")
-        Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
+    .getApplicationInProgress
+    .ensure4(
+      condition = _.agentApplication.isGrsDataReceived,
+      resultWhenConditionNotMet =
+        implicit request =>
+          logger.warn("Missing data from GRS, redirecting to start GRS registration")
+          Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
     )
-    .ensure(
-      _.agentApplication
-        .hasCheckPassed,
-      implicit request =>
-        logger.warn("Entity failed or has not been completed, redirecting to entity check.")
-        Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
+    .ensure4(
+      condition = _.agentApplication.hasCheckPassed,
+      resultWhenConditionNotMet =
+        implicit request =>
+          logger.warn("Entity failed or has not been completed, redirecting to entity check.")
+          Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
     )
-    .async:
+    .getBusinessPartnerRecord:
       implicit request =>
-        businessPartnerRecordService
-          .deleteMeGetBusinessPartnerRecord(request.agentApplication.getUtr)
-          .map: bprOpt =>
-            Ok(taskListPage(
-              taskListStatus = request.agentApplication.taskListStatus,
-              entityName = bprOpt
-                .map(_.getEntityName)
-                .getOrThrowExpectedDataMissing(
-                  "Business Partner Record is missing"
-                ),
-              agentApplication = request.agentApplication
-            ))
+        Ok(taskListPage(
+          taskListStatus = request.agentApplication.taskListStatus,
+          entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+          agentApplication = request.agentApplication
+        ))
 
   extension (agentApplication: AgentApplication)
 

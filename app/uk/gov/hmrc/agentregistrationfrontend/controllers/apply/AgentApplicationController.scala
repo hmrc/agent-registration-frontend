@@ -22,14 +22,12 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.ConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.ViewApplicationPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.Future
 
 @Singleton
 class AgentApplicationController @Inject() (
@@ -37,15 +35,14 @@ class AgentApplicationController @Inject() (
   mcc: MessagesControllerComponents,
   simplePage: SimplePage,
   confirmationPage: ConfirmationPage,
-  viewApplicationPage: ViewApplicationPage,
-  businessPartnerRecordService: BusinessPartnerRecordService
+  viewApplicationPage: ViewApplicationPage
 )
 extends FrontendController(mcc, actions):
 
   // TODO: is this endpoint really needed?
   def landing: Action[AnyContent] = actions
     .Applicant
-    .deleteMeGetApplicationInProgress2:
+    .getApplicationInProgress:
       implicit request =>
         // until we have more than the registration journey just go to the task list
         // which will redirect to the start of registration if needed
@@ -54,54 +51,41 @@ extends FrontendController(mcc, actions):
   // TODO: is this endpoint really needed?
   def applicationDashboard: Action[AnyContent] = actions
     .Applicant
-    .deleteMeGetApplicationInProgress2
-    .async { implicit request =>
-      Future.successful(Ok(simplePage(
-        h1 = "Application Dashboard page...",
-        bodyText = Some(
-          "Placeholder for the Application Dashboard page..."
-        )
-      )))
-    }
+    .getApplicationInProgress:
+      implicit request =>
+        Ok(simplePage(
+          h1 = "Application Dashboard page...",
+          bodyText = Some(
+            "Placeholder for the Application Dashboard page..."
+          )
+        ))
 
   def applicationSubmitted: Action[AnyContent] = actions
     .Applicant
-    .deleteMeGetApplicationSubmitted2.async:
-      implicit request: (AgentApplicationRequest2[AnyContent]) =>
-        businessPartnerRecordService
-          .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
-          .map: bprOpt =>
-            Ok(confirmationPage(
-              entityName = bprOpt
-                .map(_.getEntityName)
-                .getOrThrowExpectedDataMissing(
-                  "Business Partner Record is missing for confirmation page"
-                ),
-              agentApplication = request.get[AgentApplication]
-            ))
+    .getApplicationSubmitted4
+    .getBusinessPartnerRecord:
+      implicit request =>
+        Ok(confirmationPage(
+          entityName = request.businessPartnerRecordResponse.getEntityName,
+          agentApplication = request.get[AgentApplication]
+        ))
 
   def viewSubmittedApplication: Action[AnyContent] = actions
     .Applicant
-    .deleteMeGetApplicationSubmitted2.async:
-      implicit request: (AgentApplicationRequest2[AnyContent]) =>
-        businessPartnerRecordService
-          .getBusinessPartnerRecord(request.agentApplication.getUtr)
-          .map: bprOpt =>
-            Ok(viewApplicationPage(
-              entityName = bprOpt
-                .map(_.getEntityName)
-                .getOrThrowExpectedDataMissing(
-                  "Business Partner Record is missing for View Application page"
-                ),
-              agentApplication = request.get[AgentApplication]
-            ))
+    .getApplicationSubmitted4
+    .getBusinessPartnerRecord:
+      implicit request =>
+        Ok(viewApplicationPage(
+          entityName = request.businessPartnerRecordResponse.getEntityName,
+          agentApplication = request.get[AgentApplication]
+        ))
 
-  def startRegistration: Action[AnyContent] = actions.deleteMeAction:
+  def startRegistration: Action[AnyContent] = actions.action:
     implicit request =>
       // if we use an endpoint like this, we can later change the flow without changing the URL
       Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show)
 
-  def genericExitPage: Action[AnyContent] = actions.deleteMeAction:
+  def genericExitPage: Action[AnyContent] = actions.action:
     implicit request =>
       Ok(simplePage(
         h1 = "You cannot use this service...",
