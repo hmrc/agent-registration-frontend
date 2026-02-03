@@ -21,9 +21,6 @@ import play.api.mvc.WrappedRequest
 import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.*
 import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple
 
-//TODO hardcode ContentType
-//opaque type ReqWithData[Data <: Tuple] = RequestWithData[AnyContent, Data]
-
 class RequestWithData[
   ContentType,
   Data <: Tuple

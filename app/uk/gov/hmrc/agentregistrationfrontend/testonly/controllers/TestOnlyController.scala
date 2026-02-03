@@ -49,7 +49,7 @@ class TestOnlyController @Inject() (
 extends FrontendController(mcc, actions):
 
   def showTestOnlyHub: Action[AnyContent] = actions
-    .deleteMeAction:
+    .action:
       implicit request =>
         Ok(testOnlyHubPage())
 

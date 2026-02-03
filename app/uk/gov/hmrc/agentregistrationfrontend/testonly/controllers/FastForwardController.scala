@@ -127,9 +127,9 @@ class FastForwardController @Inject() (
 )(using clock: Clock)
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.deleteMeAction { implicit request =>
-    Ok(fastForwardPage())
-  }
+  def show: Action[AnyContent] = actions.action:
+    implicit request =>
+      Ok(fastForwardPage())
 
   def fastForward(
     completedSection: CompletedSection
