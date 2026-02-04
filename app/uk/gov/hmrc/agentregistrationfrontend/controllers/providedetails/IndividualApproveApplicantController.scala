@@ -24,7 +24,7 @@ import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsWithApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsWithApplicationRequest
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualApproveApplicationForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService

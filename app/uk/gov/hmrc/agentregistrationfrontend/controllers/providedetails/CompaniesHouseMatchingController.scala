@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionFormType
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms

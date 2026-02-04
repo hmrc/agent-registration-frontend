@@ -23,7 +23,7 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*

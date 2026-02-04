@@ -20,7 +20,7 @@ import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsWithApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsWithApplicationRequest
 
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualConfirmationPage
 

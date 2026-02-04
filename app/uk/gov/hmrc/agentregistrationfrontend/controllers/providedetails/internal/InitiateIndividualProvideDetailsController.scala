@@ -23,8 +23,8 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualAuthorisedWithIdentifiersRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*

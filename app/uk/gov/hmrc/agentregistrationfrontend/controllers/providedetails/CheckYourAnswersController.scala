@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDel
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
 
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.CheckYourAnswersPage

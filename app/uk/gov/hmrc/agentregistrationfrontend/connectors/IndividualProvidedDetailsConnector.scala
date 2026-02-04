@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.http.client.HttpClientV2
 

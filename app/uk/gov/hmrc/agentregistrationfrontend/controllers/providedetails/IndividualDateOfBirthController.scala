@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDel
 import uk.gov.hmrc.agentregistration.shared.llp.UserProvidedDateOfBirth
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualDateOfBirthForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService

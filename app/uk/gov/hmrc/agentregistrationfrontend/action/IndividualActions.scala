@@ -19,11 +19,11 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.*
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.EnrichWithAgentApplicationAction
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsWithApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.ProvideDetailsAction
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.*
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.EnrichWithAgentApplicationAction
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsWithApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.ProvideDetailsAction
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.retrieve.Credentials

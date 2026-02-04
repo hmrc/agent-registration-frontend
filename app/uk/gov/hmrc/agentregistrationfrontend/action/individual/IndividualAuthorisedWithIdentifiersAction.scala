@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.action.providedetails
+package uk.gov.hmrc.agentregistrationfrontend.action.individual
 
 import com.google.inject.Inject
 import com.google.inject.Singleton

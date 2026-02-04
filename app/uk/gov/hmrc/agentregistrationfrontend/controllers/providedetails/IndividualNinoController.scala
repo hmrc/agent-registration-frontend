@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDel
 import uk.gov.hmrc.agentregistration.shared.llp.UserProvidedNino
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService

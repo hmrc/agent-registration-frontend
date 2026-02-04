@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.llp.UserProvidedSaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualSaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService

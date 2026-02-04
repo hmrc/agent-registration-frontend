@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp
+package uk.gov.hmrc.agentregistrationfrontend.action.individual.llp
 
 import org.scalatest.matchers.should.Matchers.*
 import com.softwaremill.quicklens.modify

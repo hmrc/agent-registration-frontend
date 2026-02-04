@@ -21,8 +21,8 @@ import play.api.mvc.Request
 import play.api.test.FakeRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualAuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualAuthorisedWithIdentifiersRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withAuthTokenInSession
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withDeviceId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withRequestId
