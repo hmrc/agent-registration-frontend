@@ -26,7 +26,9 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.checkfailed.route
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.routes as applicantcontactdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.routes as agentdetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.routes as listdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.nonincorporated.routes as listdetailsNonIncorporatedRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.otherrelevantindividuals.routes as listdetailsOthersRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes as internalRoutes
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.routes as providedetailsRoutes
@@ -88,8 +90,18 @@ object AppRoutes:
 
     object listdetails:
 
-      val NumberOfKeyIndividualsController = listdetailsNonIncorporatedRoutes.NumberOfKeyIndividualsController
-      val EnterKeyIndividualController = listdetailsNonIncorporatedRoutes.EnterKeyIndividualController
+      val CheckYourAnswersController = listdetailsRoutes.CheckYourAnswersController
+
+      object nonincorporated:
+
+        val NumberOfKeyIndividualsController = listdetailsNonIncorporatedRoutes.NumberOfKeyIndividualsController
+        val EnterKeyIndividualController = listdetailsNonIncorporatedRoutes.EnterKeyIndividualController
+        val ChangeKeyIndividualController = listdetailsNonIncorporatedRoutes.ChangeKeyIndividualController
+        val RemoveKeyIndividualController = listdetailsNonIncorporatedRoutes.RemoveKeyIndividualController
+        val CheckYourAnswersController = listdetailsNonIncorporatedRoutes.CheckYourAnswersController
+
+      object otherrelevantindividuals:
+        val NumberOfOtherRelevantIndividualsController = listdetailsOthersRoutes.NumberOfOtherRelevantIndividualsController
 
     object checkfailed:
 

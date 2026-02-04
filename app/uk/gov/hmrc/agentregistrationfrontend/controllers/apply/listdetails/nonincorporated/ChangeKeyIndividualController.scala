@@ -1,0 +1,217 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.nonincorporated
+
+import com.softwaremill.quicklens.modify
+import play.api.data.Form
+import play.api.mvc.*
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
+import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
+import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.util.MessageKeys
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.nonincorporated.EnterIndividualNameComplexPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.nonincorporated.EnterIndividualNamePage
+
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.Future
+
+@Singleton
+class ChangeKeyIndividualController @Inject() (
+  mcc: MessagesControllerComponents,
+  actions: ApplicantActions,
+  enterIndividualNameSimplePage: EnterIndividualNamePage,
+  enterIndividualNameComplexPage: EnterIndividualNameComplexPage,
+  businessPartnerRecordService: BusinessPartnerRecordService,
+  individualProvideDetailsService: IndividualProvideDetailsService
+)
+extends FrontendController(mcc, actions):
+
+  private val baseAction: ActionBuilderWithData[
+    List[IndividualProvidedDetails] *: NumberOfRequiredKeyIndividuals *: IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
+  ] = actions
+    .getApplicationInProgress
+    .refine4:
+      implicit request =>
+        request.get[AgentApplication] match
+          case _: IsIncorporated =>
+            logger.warn(
+              "Incorporated businesses should be name matching key individuals against Companies House results, redirecting to task list for the correct links"
+            )
+            Redirect(AppRoutes.apply.TaskListController.show.url)
+          case _: AgentApplicationSoleTrader =>
+            logger.warn("Sole traders do not add individuals to a list, redirecting to task list for the correct links")
+            Redirect(AppRoutes.apply.TaskListController.show.url)
+          case aa: IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
+            request.replace[AgentApplication, IsAgentApplicationForDeclaringNumberOfKeyIndividuals](aa)
+    .refine4:
+      implicit request =>
+        request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].numberOfRequiredKeyIndividuals match
+          case Some(n: NumberOfRequiredKeyIndividuals) => request.add(n)
+          case None =>
+            logger.warn(
+              "Number of required key individuals not specified in application, redirecting to number of key individuals page"
+            )
+            Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url)
+    .refine4:
+      implicit request =>
+        val agentApplicationId = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].agentApplicationId
+        individualProvideDetailsService.findAllByApplicationId(agentApplicationId).map: individualsList =>
+          request.add[List[IndividualProvidedDetails]](individualsList)
+
+  def show(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction
+    .async:
+      implicit request =>
+        val agentApplication = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals]
+        val existingList = request.get[List[IndividualProvidedDetails]]
+        val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.ChangeKeyIndividualController.submit(
+          individualProvidedDetailsId
+        )
+        val nameToChange: IndividualName =
+          existingList
+            .find(_._id === individualProvidedDetailsId)
+            .getOrThrowExpectedDataMissing(
+              s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
+            )
+            .individualName
+        agentApplication.numberOfRequiredKeyIndividuals match
+          case Some(n @ SixOrMore(_)) if existingList.isEmpty && n.paddingRequired > 0 =>
+            businessPartnerRecordService
+              .getBusinessPartnerRecord(agentApplication.getUtr)
+              .map: bprOpt =>
+                Ok(enterIndividualNameComplexPage(
+                  form = IndividualNameForm.form.fill:
+                    nameToChange
+                  ,
+                  ordinalKey = MessageKeys.ordinalKey(
+                    existingSize = existingList.size,
+                    isOnlyOne = false // list size here can never be 1
+                  ),
+                  numberOfRequiredKeyIndividuals = n,
+                  entityName = bprOpt
+                    .map(_.getEntityName)
+                    .getOrThrowExpectedDataMissing(
+                      "Business Partner Record is missing"
+                    ),
+                  formAction = formAction
+                ))
+          case Some(n @ FiveOrLess(_)) =>
+            Future.successful(Ok(enterIndividualNameSimplePage(
+              form = IndividualNameForm.form.fill:
+                nameToChange
+              ,
+              ordinalKey = MessageKeys.ordinalKey(
+                existingSize = existingList.size,
+                isOnlyOne = n.numberOfKeyIndividuals === 1
+              ),
+              formAction = formAction
+            )))
+          case Some(n @ SixOrMore(_)) =>
+            // no padding required, so we can use the simple page
+            Future.successful(Ok(enterIndividualNameSimplePage(
+              form = IndividualNameForm.form.fill:
+                nameToChange
+              ,
+              ordinalKey = MessageKeys.ordinalKey(
+                existingSize = existingList.size,
+                isOnlyOne = n.numberOfKeyIndividualsResponsibleForTaxMatters === 1
+              ),
+              formAction = formAction
+            )))
+          case None => throw IllegalStateException("Required key individuals not specified in application")
+
+  def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction
+    .ensureValidFormAndRedirectIfSaveForLater4[IndividualName](
+      form = IndividualNameForm.form,
+      resultToServeWhenFormHasErrors =
+        implicit request =>
+          (formWithErrors: Form[IndividualName]) =>
+            val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.ChangeKeyIndividualController.submit(
+              individualProvidedDetailsId
+            )
+            val existingList = request.get[List[IndividualProvidedDetails]]
+            val agentApplication = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals]
+            agentApplication.numberOfRequiredKeyIndividuals match
+              case Some(n @ SixOrMore(_)) if existingList.isEmpty && n.paddingRequired > 0 =>
+                // we only ever show the complex input page when padding is required, and it's the first entry
+                businessPartnerRecordService
+                  .getBusinessPartnerRecord(agentApplication.getUtr)
+                  .map: bprOpt =>
+                    enterIndividualNameComplexPage(
+                      formWithErrors,
+                      ordinalKey = MessageKeys.ordinalKey(
+                        existingSize = existingList.size,
+                        isOnlyOne = false // list size here can never be 1
+                      ),
+                      numberOfRequiredKeyIndividuals = n,
+                      entityName = bprOpt
+                        .map(_.getEntityName)
+                        .getOrThrowExpectedDataMissing(
+                          "Business Partner Record is missing"
+                        ),
+                      formAction = formAction
+                    )
+              case Some(n @ FiveOrLess(_)) =>
+                Future.successful(enterIndividualNameSimplePage(
+                  form = formWithErrors,
+                  ordinalKey = MessageKeys.ordinalKey(
+                    existingSize = existingList.size,
+                    isOnlyOne = n.numberOfKeyIndividuals === 1
+                  ),
+                  formAction = formAction
+                ))
+              case Some(n @ SixOrMore(_)) =>
+                // no padding required, so we can use the simple page
+                Future.successful(enterIndividualNameSimplePage(
+                  form = formWithErrors,
+                  ordinalKey = MessageKeys.ordinalKey(
+                    existingSize = existingList.size,
+                    isOnlyOne = n.numberOfKeyIndividualsResponsibleForTaxMatters === 1
+                  ),
+                  formAction = formAction
+                ))
+              case None => throw IllegalStateException("Required key individuals not specified in application")
+    )
+    .async:
+      implicit request =>
+        val individualNameFromForm: IndividualName = request.get[IndividualName]
+        val existingList = request.get[List[IndividualProvidedDetails]]
+        val individualToChange: IndividualProvidedDetails = existingList
+          .find(_._id === individualProvidedDetailsId)
+          .getOrThrowExpectedDataMissing(
+            s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
+          )
+        individualProvideDetailsService.upsertPreCreatedProvidedDetails(
+          individualToChange
+            .modify(_.individualName)
+            .setTo(individualNameFromForm)
+        )
+          .map: _ =>
+            Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)

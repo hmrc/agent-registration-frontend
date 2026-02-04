@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetai
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistration.shared.llp.*
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.Country
@@ -188,10 +189,20 @@ trait TdBase:
     numberOfKeyIndividualsResponsibleForTaxMatters = 3
   )
 
-  val individualProvidedDetails: IndividualProvidedDetailsToBeDeleted = IndividualProvidedDetailsToBeDeleted(
+  val individualProvidedDetailsToBeDeleted: IndividualProvidedDetailsToBeDeleted = IndividualProvidedDetailsToBeDeleted(
     _id = individualProvidedDetailsId,
     internalUserId = internalUserId,
     createdAt = nowAsInstant,
     agentApplicationId = agentApplicationId,
     providedDetailsState = ProvidedDetailsState.Started
+  )
+
+  val individualProvidedDetails: IndividualProvidedDetails = IndividualProvidedDetails(
+    _id = individualProvidedDetailsId,
+    internalUserId = None,
+    createdAt = nowAsInstant,
+    agentApplicationId = agentApplicationId,
+    providedDetailsState = ProvidedDetailsState.Precreated,
+    individualName = IndividualName("Test Name"),
+    isPersonOfControl = true
   )

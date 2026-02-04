@@ -19,12 +19,10 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.noni
 import play.api.data.Form
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
-import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
@@ -36,8 +34,8 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.MessageKeys
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.EnterIndividualNameComplexPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.EnterIndividualNamePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.nonincorporated.EnterIndividualNameComplexPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.nonincorporated.EnterIndividualNamePage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -79,17 +77,18 @@ extends FrontendController(mcc, actions):
             logger.warn(
               "Number of required key individuals not specified in application, redirecting to number of key individuals page"
             )
-            Redirect(AppRoutes.apply.listdetails.NumberOfKeyIndividualsController.show.url)
+            Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url)
 
   // TODO: extract logic of choosing view and rendering it based on NumberOfRequiredKeyIndividuals, Form[] and businessPartnerRecord
 
   def show: Action[AnyContent] = baseAction
     .async:
       implicit request =>
+        val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.EnterKeyIndividualController.submit
         individualProvideDetailsService.findAllByApplicationId(request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].agentApplicationId).flatMap:
           existingList =>
             request.get[NumberOfRequiredKeyIndividuals] match
-              case n: SixOrMore if n.paddingRequired > 0 =>
+              case n: SixOrMore if existingList.isEmpty && n.paddingRequired > 0 =>
                 businessPartnerRecordService
                   .getBusinessPartnerRecord(request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].getUtr)
                   .map: (bprOpt: Option[BusinessPartnerRecordResponse]) =>
@@ -104,7 +103,8 @@ extends FrontendController(mcc, actions):
                         .map(_.getEntityName)
                         .getOrThrowExpectedDataMissing(
                           "Business Partner Record is missing"
-                        )
+                        ),
+                      formAction = formAction
                     ))
               case n: FiveOrLess =>
                 Future.successful(Ok(enterIndividualNameSimplePage(
@@ -112,7 +112,8 @@ extends FrontendController(mcc, actions):
                   ordinalKey = MessageKeys.ordinalKey(
                     existingSize = existingList.size,
                     isOnlyOne = n.numberOfKeyIndividuals === 1
-                  )
+                  ),
+                  formAction = formAction
                 )))
               case n: SixOrMore =>
                 // no padding required, so we can use the simple page
@@ -121,7 +122,8 @@ extends FrontendController(mcc, actions):
                   ordinalKey = MessageKeys.ordinalKey(
                     existingSize = existingList.size,
                     isOnlyOne = n.numberOfKeyIndividualsResponsibleForTaxMatters === 1
-                  )
+                  ),
+                  formAction = formAction
                 )))
 
   def submit: Action[AnyContent] = baseAction
@@ -130,11 +132,12 @@ extends FrontendController(mcc, actions):
       resultToServeWhenFormHasErrors =
         implicit request =>
           (formWithErrors: Form[IndividualName]) =>
+            val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.EnterKeyIndividualController.submit
             individualProvideDetailsService.findAllByApplicationId(
               request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].agentApplicationId
             ).flatMap: existingList =>
               request.get[NumberOfRequiredKeyIndividuals] match
-                case n: SixOrMore if n.paddingRequired > 0 =>
+                case n: SixOrMore if existingList.isEmpty && n.paddingRequired > 0 =>
                   businessPartnerRecordService
                     .getBusinessPartnerRecord(request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].getUtr)
                     .map: bprOpt =>
@@ -149,7 +152,8 @@ extends FrontendController(mcc, actions):
                           .map(_.getEntityName)
                           .getOrThrowExpectedDataMissing(
                             "Business Partner Record is missing"
-                          )
+                          ),
+                        formAction = formAction
                       )
                 case n: FiveOrLess =>
                   Future.successful(enterIndividualNameSimplePage(
@@ -157,7 +161,8 @@ extends FrontendController(mcc, actions):
                     ordinalKey = MessageKeys.ordinalKey(
                       existingSize = existingList.size,
                       isOnlyOne = n.numberOfKeyIndividuals === 1
-                    )
+                    ),
+                    formAction = formAction
                   ))
                 case n: SixOrMore =>
                   // no padding required, so we can use the simple page
@@ -166,14 +171,17 @@ extends FrontendController(mcc, actions):
                     ordinalKey = MessageKeys.ordinalKey(
                       existingSize = existingList.size,
                       isOnlyOne = n.numberOfKeyIndividualsResponsibleForTaxMatters === 1
-                    )
+                    ),
+                    formAction = formAction
                   ))
     )
     .async:
       implicit request =>
         val individualName: IndividualName = request.get
-        // we need to create a new IndividualProvidedDetails record with a new Precreated status and new field for the name
-        // we have a slight problem right now because these records require an internalUserId, we don't know the internalUserId of
-        // the intended credentials user yet, using a placeholder could be confusing, maybe we need to make internalUserId
-        // optional in IndividualProvidedDetails? Would also serve to know who has not yet signed in.
-        Future.successful(Ok(s"Creation of person record not yet implemented, but received name: ${individualName.value}"))
+        individualProvideDetailsService.upsertPreCreatedProvidedDetails(individualProvideDetailsService.preCreateIndividualProvidedDetails(
+          individualName = individualName,
+          isPersonOfControl = true, // from this page we are only adding partners, who are persons of control
+          agentApplicationId = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].agentApplicationId
+        ))
+          .map: _ =>
+            Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)

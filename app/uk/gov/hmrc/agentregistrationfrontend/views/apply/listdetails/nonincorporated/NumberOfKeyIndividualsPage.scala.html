@@ -81,7 +81,7 @@
     maybeForm = Some(form)
 ) {
     <h2 class="govuk-caption-l">@messages(s"lists.caption.title.$businessTypeKey")</h2>
-    @formWithCSRF(action = AppRoutes.apply.listdetails.NumberOfKeyIndividualsController.submit) {
+    @formWithCSRF(action = AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.submit) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(

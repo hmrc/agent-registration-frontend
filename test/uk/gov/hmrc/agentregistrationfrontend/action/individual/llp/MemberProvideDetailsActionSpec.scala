@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll.agentApplicationId
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll.individualProvidedDetails
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll.individualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
@@ -54,7 +54,7 @@ extends ISpec:
 //TODO: explain how it can come that we have agentApplicationId in session?
   "when agentApplicationId in session and individual provided details found than redirects to name page" in:
     AgentRegistrationIndividualProvidedDetailsStubs
-      .stubFindIndividualProvidedDetails(individualProvidedDetails)
+      .stubFindIndividualProvidedDetails(individualProvidedDetailsToBeDeleted)
 
     val result: Result = Ok("AllGood")
     val provideDetailsAction = app.injector.instanceOf[ProvideDetailsAction]
@@ -65,7 +65,7 @@ extends ISpec:
         (r: IndividualProvideDetailsRequest[?]) =>
           Future.successful {
             r.internalUserId shouldBe tdAll.internalUserId
-            r.individualProvidedDetails shouldBe individualProvidedDetails
+            r.individualProvidedDetails shouldBe individualProvidedDetailsToBeDeleted
             result
           }
       ).futureValue shouldBe result
@@ -124,7 +124,7 @@ extends ISpec:
     AgentRegistrationIndividualProvidedDetailsStubs.verifyFind()
 
   "when agentApplicationId in session and one individual provided details found - try recover - success - redirect next page" in:
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvidedDetails))
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvidedDetailsToBeDeleted))
 
     val result: Result = Ok("AllGood")
     val provideDetailsAction = app.injector.instanceOf[ProvideDetailsAction]
@@ -135,7 +135,7 @@ extends ISpec:
         (r: IndividualProvideDetailsRequest[?]) =>
           Future.successful {
             r.internalUserId shouldBe tdAll.internalUserId
-            r.individualProvidedDetails shouldBe individualProvidedDetails
+            r.individualProvidedDetails shouldBe individualProvidedDetailsToBeDeleted
             result
           }
       ).futureValue shouldBe result
@@ -146,8 +146,8 @@ extends ISpec:
     AgentRegistrationIndividualProvidedDetailsStubs
       .stubFindAllIndividualProvidedDetails(
         List(
-          individualProvidedDetails,
-          individualProvidedDetails.copy(
+          individualProvidedDetailsToBeDeleted,
+          individualProvidedDetailsToBeDeleted.copy(
             _id = IndividualProvidedDetailsId("member-provided-details-id-67890"),
             agentApplicationId = AgentApplicationId(value = "another-agent-application-id")
           )

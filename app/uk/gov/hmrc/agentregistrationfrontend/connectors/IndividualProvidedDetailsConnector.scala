@@ -17,6 +17,8 @@
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -35,6 +37,26 @@ class IndividualProvidedDetailsConnector @Inject() (
   ExecutionContext
 )
 extends Connector:
+
+  def upsertPreCreatedProvidedDetails(individualProvidedDetails: IndividualProvidedDetails)(using
+    request: RequestHeader
+  ): Future[Unit] =
+    val url: URL = url"$baseUrl/individual-provided-details/for-application"
+    httpClient
+      .post(url)
+      .withBody(Json.toJson(individualProvidedDetails))
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => ()
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to upsert preCreated IndividualProvidedDetails")
 
   def upsertMemberProvidedDetails(individualProvidedDetails: IndividualProvidedDetailsToBeDeleted)(using
     request: RequestHeader
@@ -79,11 +101,11 @@ extends Connector:
   // for use by agent applicants when building lists of individuals
   def findAll(agentApplicationId: AgentApplicationId)(using
     request: RequestHeader
-  ): Future[List[IndividualProvidedDetailsToBeDeleted]] =
+  ): Future[List[IndividualProvidedDetails]] =
     val url: URL = url"$baseUrl/individual-provided-details/for-application/${agentApplicationId.value}"
     httpClient
       .get(url)
-      .execute[List[IndividualProvidedDetailsToBeDeleted]]
+      .execute[List[IndividualProvidedDetails]]
       .andLogOnFailure(s"Failed to find IndividualProvidedDetails by agent application id: ${agentApplicationId.value}")
 
   def findAll()(using RequestHeader): Future[List[IndividualProvidedDetailsToBeDeleted]] =
@@ -103,5 +125,44 @@ extends Connector:
               response = response
             )
       .andLogOnFailure(s"Failed to find IndividualProvidedDetails")
+
+  def findById(individualProvidedDetailsId: IndividualProvidedDetailsId)(using
+    RequestHeader
+  ): Future[Option[IndividualProvidedDetails]] =
+    val url: URL = url"$baseUrl/individual-provided-details/by-id/${individualProvidedDetailsId.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => Some(response.json.as[IndividualProvidedDetails])
+          case Status.NO_CONTENT => None
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to find IndividualProvidedDetails by id: ${individualProvidedDetailsId.value}")
+
+  def delete(individualProvidedDetailsId: IndividualProvidedDetailsId)(using
+    request: RequestHeader
+  ): Future[Unit] =
+    val url: URL = url"$baseUrl/individual-provided-details/delete-by-id/${individualProvidedDetailsId.value}"
+    httpClient
+      .delete(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => ()
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "DELETE",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to delete IndividualProvidedDetails by id: ${individualProvidedDetailsId.value}")
 
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration"
