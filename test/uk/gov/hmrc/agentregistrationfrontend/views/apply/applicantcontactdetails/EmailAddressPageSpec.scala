@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.apply.applicantcontactdetail
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions.DataWithApplication
 import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
