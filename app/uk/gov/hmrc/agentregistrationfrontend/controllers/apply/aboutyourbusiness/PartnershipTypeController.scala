@@ -39,6 +39,8 @@ class PartnershipTypeController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
+  import actions.Applicant.*
+
   private val baseAction: ActionBuilderWithData[EmptyTuple] = action
     .ensure4(
       _.readBusinessTypeAnswer match {

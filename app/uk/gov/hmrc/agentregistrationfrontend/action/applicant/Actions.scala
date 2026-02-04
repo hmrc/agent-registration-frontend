@@ -21,10 +21,10 @@ import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions.*
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionsHelper
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedActionRefiner
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.*
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
@@ -53,6 +53,7 @@ class Actions @Inject() (
 extends RequestAwareLogging:
 
   import ActionsHelper.*
+  export Actions.*
 
   private val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
     .refine2(request => RequestWithDataCt.empty(request))

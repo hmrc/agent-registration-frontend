@@ -46,6 +46,8 @@ class InitiateAgentApplicationController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
+  import actions.Applicant.*
+
   /** This endpoint is called by Government Gateway upon successful login.
     */
   def initiateAgentApplication(

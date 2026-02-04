@@ -48,6 +48,8 @@ class TestOnlyController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
+  import actions.Applicant.*
+
   def showTestOnlyHub: Action[AnyContent] = actions
     .action:
       implicit request =>

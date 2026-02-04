@@ -34,6 +34,8 @@ class CanNotRegisterController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
+  import actions.Applicant.*
+
   def show: Action[AnyContent] =
     actions
       .Applicant

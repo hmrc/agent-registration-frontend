@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentBusinessName
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.*
+
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentBusinessNameForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -46,6 +46,8 @@ class AgentBusinessNameController @Inject() (
   businessPartnerRecordService: BusinessPartnerRecordService
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
+
+  import actions.Applicant.*
 
   def show: Action[AnyContent] = actions
     .Applicant

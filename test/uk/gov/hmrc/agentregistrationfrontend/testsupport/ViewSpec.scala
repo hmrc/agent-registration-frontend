@@ -28,6 +28,7 @@ trait ViewSpec
 extends ISpec:
 
   export JsoupSupport.*
+  export uk.gov.hmrc.agentregistrationfrontend.action.Actions.*
 
   implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   implicit val messages: Messages = app.injector.instanceOf[MessagesApi].preferred(request)

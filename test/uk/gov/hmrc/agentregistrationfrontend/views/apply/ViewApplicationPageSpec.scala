@@ -18,9 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.apply
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithApplication
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.agentApplication
+
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.ViewApplicationPage
 

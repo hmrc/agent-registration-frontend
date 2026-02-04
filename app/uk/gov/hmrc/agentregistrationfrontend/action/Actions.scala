@@ -18,10 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
-import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.*
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedAction
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersAction
@@ -32,82 +29,72 @@ import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.Individua
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.ProvideDetailsAction
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors.*
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.AbsentIn
 import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.PresentIn
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors.*
+import uk.gov.hmrc.auth.core.retrieve.Credentials
+
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 
+object Actions:
+
+  type RequestWithData[Data <: Tuple] = RequestWithDataCt[AnyContent, Data]
+
+  type DataEmpty = EmptyTuple
+  type DefaultRequest = RequestWithData[DataEmpty]
+  type DefaultRequestCt[ContentType] = RequestWithDataCt[ContentType, DataEmpty]
+
+  extension [
+    ContentType,
+    Data <: Tuple
+  ](r: RequestWithDataCt[ContentType, Data])
+
+    inline def agentApplication(using AgentApplication PresentIn Data): AgentApplication = r.get
+    inline def agentApplicationGeneralPartnership(using AgentApplicationGeneralPartnership PresentIn Data): AgentApplicationGeneralPartnership = r.get
+    inline def agentApplicationLimitedCompany(using AgentApplicationLimitedCompany PresentIn Data): AgentApplicationLimitedCompany = r.get
+    inline def agentApplicationLimitedPartnership(using AgentApplicationLimitedPartnership PresentIn Data): AgentApplicationLimitedPartnership = r.get
+    inline def agentApplicationLlp(using AgentApplicationLlp PresentIn Data): AgentApplicationLlp = r.get
+    inline def agentApplicationScottishLimitedPartnership(using
+      AgentApplicationScottishLimitedPartnership PresentIn Data
+    ): AgentApplicationScottishLimitedPartnership = r.get
+    inline def agentApplicationScottishPartnership(using AgentApplicationScottishPartnership PresentIn Data): AgentApplicationScottishPartnership = r.get
+    inline def agentApplicationSoleTrader(using AgentApplicationSoleTrader PresentIn Data): AgentApplicationSoleTrader = r.get
+    inline def credentials(using Credentials PresentIn Data): Credentials = r.get
+    inline def internalUserId(using InternalUserId PresentIn Data): InternalUserId = r.get
+    inline def groupId(using GroupId PresentIn Data): GroupId = r.get
+    inline def businessPartnerRecordResponse(using BusinessPartnerRecordResponse PresentIn Data): BusinessPartnerRecordResponse = r.get
+    inline def maybeBusinessPartnerRecordResponse(using Option[BusinessPartnerRecordResponse] PresentIn Data): Option[BusinessPartnerRecordResponse] = r.get
+    inline def agentType(using AgentType PresentIn Data): AgentType = r.get
+
 @Singleton
 class Actions @Inject() (
   defaultActionBuilder: DefaultActionBuilder,
-  authorisedActionRefiner: AuthorisedActionRefiner,
   individualAuthorisedAction: IndividualAuthorisedAction,
   individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction,
   provideDetailsAction: ProvideDetailsAction,
   enrichWithAgentApplicationAction: EnrichWithAgentApplicationAction,
-  agentApplicationService: AgentApplicationService,
-  businessPartnerRecordService: BusinessPartnerRecordService
+  businessPartnerRecordService: BusinessPartnerRecordService,
+  applicantActions: applicant.Actions,
+  individualActions: individual.Actions
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
+  export Actions.*
   export ActionsHelper.*
 
   val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
     .refine2(request => RequestWithDataCt.empty(request))
 
   object Applicant:
-
-    val authorised: ActionBuilderWithData[DataWithAuth] = action
-      .refineAsync(authorisedActionRefiner.refine)
-
-    val getApplication: ActionBuilderWithData[DataWithApplication] = authorised
-      .refine4:
-        implicit request: RequestWithData[DataWithAuth] =>
-          agentApplicationService
-            .find()
-            .map[Result | RequestWithApplication]:
-              case Some(agentApplication) => request.add(agentApplication)
-              case None =>
-                val redirect = AppRoutes.apply.AgentApplicationController.startRegistration
-                logger.error(s"[Unexpected State] No agent application found for authenticated user ${request.get[InternalUserId].value}. Redirecting to startRegistration page ($redirect)")
-                Redirect(redirect)
-
-    def getApplicationInProgress: ActionBuilderWithData[DataWithApplication] = getApplication
-      .ensure(
-        condition = _.get[AgentApplication].isInProgress,
-        resultWhenConditionNotMet =
-          implicit request =>
-            // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-            val call = AppRoutes.apply.AgentApplicationController.applicationSubmitted
-            logger.warn(
-              s"The application is not in the final state" +
-                s" (current application state: ${request.get[AgentApplication].applicationState.toString}), " +
-                s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
-            )
-            Redirect(call.url)
-      )
-
-    val getApplicationSubmitted: ActionBuilderWithData[DataWithApplication] = getApplication
-      .ensure(
-        condition = _.agentApplication.hasFinished,
-        resultWhenConditionNotMet =
-          implicit request =>
-            // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-            val call = AppRoutes.apply.AgentApplicationController.landing // or task list
-            logger.warn(
-              s"The application is not in the final state" +
-                s" (current application state: ${request.agentApplication.applicationState.toString}), " +
-                s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
-            )
-            Redirect(call.url)
-      )
+    export applicantActions.*
 
   object Individual:
+
+    export individualActions.*
 
     val authorised: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
       .andThen(individualAuthorisedAction)

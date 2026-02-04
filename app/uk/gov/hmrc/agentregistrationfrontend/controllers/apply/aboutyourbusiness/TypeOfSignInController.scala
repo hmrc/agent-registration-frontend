@@ -50,6 +50,8 @@ class TypeOfSignInController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
+  import actions.Applicant.*
+
   def show: Action[AnyContent] = action:
     implicit request =>
       Ok(view(TypeOfSignInForm.form.fill(request.readTypeOfSignIn)))

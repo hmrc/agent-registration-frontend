@@ -18,9 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.action.individual
 
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions.*
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionsHelper
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.*
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.*
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.retrieve.Credentials
@@ -54,5 +54,5 @@ extends RequestAwareLogging:
   private val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
     .refine2(request => RequestWithDataCt.empty(request))
 
-  val authorised: ActionBuilderWithData[DataWithAuth] = action
+  val authorisedNew: ActionBuilderWithData[DataWithAuth] = action
     .refineAsync(individualAuthorisedRefiner.refine)

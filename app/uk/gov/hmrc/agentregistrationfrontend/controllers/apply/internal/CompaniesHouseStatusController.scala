@@ -42,6 +42,8 @@ class CompaniesHouseStatusController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
+  import actions.Applicant.*
+
   def check(): Action[AnyContent] = actions
     .Applicant
     .getApplicationInProgress

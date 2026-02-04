@@ -37,6 +37,8 @@ class UserRoleController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
+  import actions.Applicant.*
+
   def show: Action[?] = actions.action:
     implicit request =>
       Ok(view(
