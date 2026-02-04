@@ -56,6 +56,8 @@ class GrsController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
+  import actions.Applicant.*
+
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .Applicant
     .getApplicationInProgress

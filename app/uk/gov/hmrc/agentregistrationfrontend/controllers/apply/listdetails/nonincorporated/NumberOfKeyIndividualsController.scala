@@ -43,6 +43,8 @@ class NumberOfKeyIndividualsController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
+  export actions.Applicant.*
+
   private val baseAction: ActionBuilderWithData[
     IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
   ] = actions

@@ -20,9 +20,7 @@ import com.google.inject.AbstractModule
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithApplication
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.agentApplication
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions.DataWithApplication
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.CheckYourAnswersPage

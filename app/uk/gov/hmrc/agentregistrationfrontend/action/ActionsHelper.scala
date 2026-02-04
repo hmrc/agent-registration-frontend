@@ -21,7 +21,7 @@ import play.api.data.FormBinding
 import play.api.mvc.*
 import play.api.mvc.Results.BadRequest
 import play.twirl.api.HtmlFormat
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.*
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions.*
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.AbsentIn

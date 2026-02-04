@@ -20,8 +20,8 @@ import play.api.http.Status
 import play.api.mvc.Result
 import play.api.mvc.Results.*
 import play.api.test.Helpers.*
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithAuth
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions.RequestWithData
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions.DataWithAuth
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 

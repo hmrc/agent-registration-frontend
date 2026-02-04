@@ -39,6 +39,8 @@ class AgentApplicationController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
+  import actions.Applicant.*
+
   // TODO: is this endpoint really needed?
   def landing: Action[AnyContent] = actions
     .Applicant

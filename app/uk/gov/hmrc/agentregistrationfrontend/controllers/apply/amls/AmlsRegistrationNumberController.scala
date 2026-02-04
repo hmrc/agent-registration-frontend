@@ -40,6 +40,8 @@ class AmlsRegistrationNumberController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
+  import actions.Applicant.*
+
   val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .Applicant
     .getApplicationInProgress

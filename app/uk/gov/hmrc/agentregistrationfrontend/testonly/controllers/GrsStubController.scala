@@ -63,6 +63,8 @@ class GrsStubController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
+  import actions.Applicant.*
+
   def showGrsData(
     businessType: BusinessType,
     journeyId: JourneyId

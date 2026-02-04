@@ -43,6 +43,8 @@ class AddressLookupCallbackController @Inject() (
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
+  import actions.Applicant.*
+
   def journeyCallback(id: Option[JourneyId]): Action[AnyContent] = actions
     .Applicant
     .getApplicationInProgress

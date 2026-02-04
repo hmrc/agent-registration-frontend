@@ -44,6 +44,8 @@ class AgentTelephoneNumberController @Inject() (
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
+  import actions.Applicant.*
+
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .Applicant
     .getApplicationInProgress
