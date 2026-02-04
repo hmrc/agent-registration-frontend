@@ -24,9 +24,9 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotIncorporated
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CompaniesHouseApiProxyConnector
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 
@@ -42,10 +42,7 @@ class CompaniesHouseStatusController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   def check(): Action[AnyContent] = actions
-    .Applicant
     .getApplicationInProgress
     .refine4(implicit request =>
       request.agentApplication match

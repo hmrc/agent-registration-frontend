@@ -16,26 +16,29 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
-import play.api.mvc.Action
-import play.api.mvc.AnyContent
+import play.api.data.Form
+import play.api.i18n.I18nSupport
+import play.api.i18n.MessagesApi
 import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
-
-import javax.inject.Inject
-
-class IndividualConfirmStopController @Inject() (
-  actions: Actions,
+abstract class FrontendController(
   mcc: MessagesControllerComponents,
-  placeholder: SimplePage
+  val actions: Actions
 )
-extends FrontendController(mcc, actions):
+extends uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController(mcc),
+  I18nSupport,
+  RequestAwareLogging:
 
-  def show: Action[AnyContent] = actions.getProvideDetailsInProgress:
-    implicit request: RequestHeader =>
-      Ok(placeholder(
-        h1 = "Confirm Stop Page",
-        bodyText = Some("This is a placeholder for stop apllication  page.")
-      ))
+  export actions.*
+  export Errors.*
+
+  protected final val AppRoutes = uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes // alias so no need to import it in each controller
+
+  extension [T](form: Form[T])
+    def fill(data: Option[T]): Form[T] = data.fold(form)(form.fill)
+
+  override def messagesApi: MessagesApi = mcc.messagesApi
+  implicit val executionContext: scala.concurrent.ExecutionContext = mcc.executionContext

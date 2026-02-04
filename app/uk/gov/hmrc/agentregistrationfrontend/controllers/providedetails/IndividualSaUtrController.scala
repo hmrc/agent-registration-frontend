@@ -24,10 +24,10 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.UserProvidedSaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualSaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualSaUtrPage
@@ -44,7 +44,7 @@ class IndividualSaUtrController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.Individual.getProvideDetailsInProgress
+  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.individualNino.nonEmpty,
       implicit request =>

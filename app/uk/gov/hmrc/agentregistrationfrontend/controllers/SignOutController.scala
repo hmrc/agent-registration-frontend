@@ -35,7 +35,7 @@ class SignOutController @Inject() (
   timedOutPage: TimedOutPage,
   appConfig: AppConfig
 )
-extends FrontendController(mcc, actions):
+extends DeleteMeFrontendController(mcc, actions):
 
   private def signOutWithContinue(continue: String): Result =
     val signOutAndRedirectUrl: String = uri"""${appConfig.basFrontendSignOutUrlBase}?${Map("continue" -> continue)}""".toString

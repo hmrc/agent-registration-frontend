@@ -27,9 +27,9 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.DesBusinessAddress
 import uk.gov.hmrc.agentregistration.shared.getCompanyProfile
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AddressLookupFrontendConnector
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.AddressOptions
 import uk.gov.hmrc.agentregistrationfrontend.model.agentdetails.AgentCorrespondenceAddressHelper
@@ -53,10 +53,7 @@ class AgentCorrespondenceAddressController @Inject() (
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
-    .Applicant
     .getApplicationInProgress
     .ensure(
       _

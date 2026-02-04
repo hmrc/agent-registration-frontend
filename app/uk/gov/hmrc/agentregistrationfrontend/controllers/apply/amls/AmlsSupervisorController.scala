@@ -23,8 +23,8 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsSupervisoryBodyPage
@@ -42,10 +42,7 @@ class AmlsSupervisorController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   def show: Action[AnyContent] = actions
-    .Applicant
     .getApplicationInProgress:
       implicit request =>
         val form: Form[AmlsCode] = amlsCodeForm.form.fill(request

@@ -31,9 +31,9 @@ import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsScott
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsSoleTrader
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.GrsController.*
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus
@@ -56,10 +56,7 @@ class GrsController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
-    .Applicant
     .getApplicationInProgress
     .ensure4(
       condition = !_.agentApplication.isGrsDataReceived,

@@ -23,8 +23,8 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationF
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
@@ -43,12 +43,9 @@ class NumberOfKeyIndividualsController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  export actions.Applicant.*
-
   private val baseAction: ActionBuilderWithData[
     IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
   ] = actions
-    .Applicant
     .getApplicationInProgress
     .refine4:
       implicit request =>

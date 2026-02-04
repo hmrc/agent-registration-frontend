@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers
+package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 
 import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.i18n.MessagesApi
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 

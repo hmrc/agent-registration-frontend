@@ -23,16 +23,16 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CitizenDetailsConnector
+import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.FrontendController
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -53,7 +53,6 @@ extends FrontendController(mcc, actions):
   def initiateIndividualProvideDetails(
     linkId: LinkId
   ): Action[AnyContent] = actions
-    .Individual
     .authorisedWithIdentifiers
     .async:
       implicit request: IndividualAuthorisedWithIdentifiersRequest[AnyContent] =>

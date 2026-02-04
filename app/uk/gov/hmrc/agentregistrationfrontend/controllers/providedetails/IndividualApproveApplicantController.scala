@@ -22,10 +22,10 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsWithApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualApproveApplicationForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualApproveApplicationPage
@@ -44,18 +44,17 @@ class IndividualApproveApplicantController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] =
-    actions.Individual.getProvideDetailsWithApplicationInProgress
-      .ensure(
-        _.individualProvidedDetails.individualSaUtr.nonEmpty,
-        implicit request =>
-          Redirect(AppRoutes.providedetails.IndividualSaUtrController.show.url)
-      )
-      .ensure(
-        _.individualProvidedDetails.emailAddress.nonEmpty,
-        implicit request =>
-          Redirect(AppRoutes.providedetails.IndividualEmailAddressController.show.url)
-      )
+  private val baseAction: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] = actions.getProvideDetailsWithApplicationInProgress
+    .ensure(
+      _.individualProvidedDetails.individualSaUtr.nonEmpty,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.IndividualSaUtrController.show.url)
+    )
+    .ensure(
+      _.individualProvidedDetails.emailAddress.nonEmpty,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.IndividualEmailAddressController.show.url)
+    )
 
   def show: Action[AnyContent] = baseAction.async:
     implicit request =>

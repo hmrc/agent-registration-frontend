@@ -19,8 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.checkfailed
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.CheckResult.Fail
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.checkfailed.CanNotRegisterPage
 
 import javax.inject.Inject
@@ -33,8 +33,6 @@ class CanNotRegisterController @Inject() (
   canNotRegisterPage: CanNotRegisterPage
 )
 extends FrontendController(mcc, actions):
-
-  import actions.Applicant.*
 
   def show: Action[AnyContent] =
     actions

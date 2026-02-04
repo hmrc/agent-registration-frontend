@@ -36,7 +36,7 @@ import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
 import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.DeleteMeFrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.*
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsNotCalled
@@ -61,15 +61,12 @@ class GrsStubController @Inject() (
   view: GrsStub,
   grsStubService: GrsStubService
 )
-extends FrontendController(mcc, actions):
-
-  import actions.Applicant.*
+extends DeleteMeFrontendController(mcc, actions):
 
   def showGrsData(
     businessType: BusinessType,
     journeyId: JourneyId
   ): Action[AnyContent] = actions
-    .Applicant
     .authorised:
       implicit request =>
         val prefilledForm =
@@ -87,7 +84,6 @@ extends FrontendController(mcc, actions):
     businessType: BusinessType,
     journeyId: JourneyId
   ): Action[AnyContent] = actions
-    .Applicant
     .authorised
     .ensureValidForm4(
       form = form(businessType),

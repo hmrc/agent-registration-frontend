@@ -26,9 +26,9 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.EmailAddress
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -54,10 +54,7 @@ class EmailAddressController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
-    .Applicant
     .getApplicationInProgress
     .ensure4(
       _
@@ -122,7 +119,6 @@ extends FrontendController(mcc, actions):
           )
 
   def verify: Action[AnyContent] = actions
-    .Applicant
     .getApplicationInProgress
     .ensure4(
       _.agentApplication

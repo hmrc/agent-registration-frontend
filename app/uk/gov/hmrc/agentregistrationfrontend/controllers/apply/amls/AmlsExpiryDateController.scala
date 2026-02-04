@@ -21,8 +21,8 @@ import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsExpiryDatePage
@@ -41,10 +41,7 @@ class AmlsExpiryDateController @Inject() (
 )(using clock: Clock)
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   val baseAction: ActionBuilderWithData[DataWithApplication] = actions
-    .Applicant
     .getApplicationInProgress
     .ensure4(
       _.agentApplication.amlsDetails.exists(_.amlsRegistrationNumber.isDefined),

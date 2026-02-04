@@ -21,10 +21,10 @@ import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
 import uk.gov.hmrc.agentregistrationfrontend.services.EmailVerificationService
@@ -56,7 +56,7 @@ class IndividualEmailAddressController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.Individual.getProvideDetailsInProgress
+  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.telephoneNumber.isDefined,
       implicit request =>
@@ -106,7 +106,7 @@ extends FrontendController(mcc, actions):
               AppRoutes.providedetails.IndividualEmailAddressController.verify
             )
 
-  def verify: Action[AnyContent] = actions.Individual.getProvideDetailsInProgress
+  def verify: Action[AnyContent] = actions.getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.emailAddress.isDefined,
       implicit request =>

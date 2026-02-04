@@ -30,8 +30,8 @@ import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
@@ -54,12 +54,9 @@ class EnterKeyIndividualController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   private val baseAction: ActionBuilderWithData[
     NumberOfRequiredKeyIndividuals *: IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
   ] = actions
-    .Applicant
     .getApplicationInProgress
     .refine4:
       implicit request =>

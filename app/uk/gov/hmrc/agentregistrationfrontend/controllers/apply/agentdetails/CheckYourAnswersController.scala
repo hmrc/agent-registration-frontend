@@ -22,8 +22,8 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.CheckYourAnswersPage
 
 @Singleton
@@ -34,10 +34,7 @@ class CheckYourAnswersController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
-    .Applicant
     .getApplicationInProgress
     .ensure4(
       _.agentApplication.agentDetails.exists(_.isComplete),

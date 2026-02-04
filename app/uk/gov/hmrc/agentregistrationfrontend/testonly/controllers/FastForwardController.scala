@@ -20,8 +20,8 @@ import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
 import uk.gov.hmrc.agentregistration.shared.util.SealedObjects
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection.CompletedSectionLlp
@@ -127,8 +127,6 @@ class FastForwardController @Inject() (
 )(using clock: Clock)
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   def show: Action[AnyContent] = actions.action:
     implicit request =>
       Ok(fastForwardPage())
@@ -137,7 +135,7 @@ extends FrontendController(mcc, actions):
     completedSection: CompletedSection
   ): Action[AnyContent] =
     completedSection match
-      case c: CompletedSectionLlp => actions.Applicant.authorised.async(handleCompletedSectionLlp(c)(using _, summon))
+      case c: CompletedSectionLlp => actions.authorised.async(handleCompletedSectionLlp(c)(using _, summon))
       case c: CompletedSectionSoleTrader =>
         actions.action { implicit request =>
           Ok(simplePage(

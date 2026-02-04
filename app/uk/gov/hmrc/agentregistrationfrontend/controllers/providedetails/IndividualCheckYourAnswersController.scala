@@ -22,9 +22,9 @@ import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 @Singleton
@@ -35,7 +35,7 @@ class IndividualCheckYourAnswersController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.Individual.getProvideDetailsInProgress
+  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.individualSaUtr.isDefined,
       implicit request =>

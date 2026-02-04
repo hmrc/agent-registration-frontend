@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.DeleteMeFrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
@@ -46,9 +46,7 @@ class TestOnlyController @Inject() (
   testOnlyHubPage: TestOnlyHubPage,
   individualProvideDetailsService: IndividualProvideDetailsService
 )
-extends FrontendController(mcc, actions):
-
-  import actions.Applicant.*
+extends DeleteMeFrontendController(mcc, actions):
 
   def showTestOnlyHub: Action[AnyContent] = actions
     .action:
@@ -56,12 +54,10 @@ extends FrontendController(mcc, actions):
         Ok(testOnlyHubPage())
 
   def showAgentApplication: Action[AnyContent] = actions
-    .Applicant
     .getApplication: request =>
       Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))
 
   def showProvidedDetails: Action[AnyContent] = actions
-    .Individual
     .getProvidedDetails: request =>
       Ok(Json.prettyPrint(Json.toJson(request.individualProvidedDetails)))
 
@@ -111,7 +107,6 @@ extends FrontendController(mcc, actions):
           )
 
   def removeNinoAndDobFromIndividual(): Action[AnyContent] = actions
-    .Individual
     .getProvidedDetails
     .async:
       implicit request =>

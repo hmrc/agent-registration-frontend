@@ -19,8 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusines
 import play.api.data.Form
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentType
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.AgentTypePage
@@ -35,8 +35,6 @@ class AgentTypeController @Inject() (
   view: AgentTypePage
 )
 extends FrontendController(mcc, actions):
-
-  import actions.Applicant.*
 
   def show: Action[AnyContent] = action:
     implicit request =>

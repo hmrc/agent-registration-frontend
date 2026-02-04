@@ -23,10 +23,10 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseMatch
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsWithApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
@@ -47,7 +47,6 @@ class CompaniesHouseNameQueryController @Inject() (
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
-    .Individual
     .getProvideDetailsInProgress
     .async:
       implicit request =>
@@ -73,7 +72,6 @@ extends FrontendController(mcc, actions):
               Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
 
   def submit: Action[AnyContent] = actions
-    .Individual
     .getProvideDetailsWithApplicationInProgress
     .ensureValidForm[CompaniesHouseNameQuery](
       form = CompaniesHouseNameQueryForm.form,

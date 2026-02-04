@@ -26,10 +26,10 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.companieshouse.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionFormType
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms.toOfficerSelection
@@ -60,7 +60,6 @@ class CompaniesHouseMatchingController @Inject() (
 extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions
-    .Individual
     .getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.companiesHouseMatch.isDefined,

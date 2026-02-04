@@ -22,9 +22,9 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AddressLookupFrontendConnector
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.agentdetails.AgentCorrespondenceAddressHelper
@@ -43,10 +43,7 @@ class AddressLookupCallbackController @Inject() (
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   def journeyCallback(id: Option[JourneyId]): Action[AnyContent] = actions
-    .Applicant
     .getApplicationInProgress
     .refine4(request => id.fold(BadRequest("Missing JourneyId in the request from address-lookup-frontend."))(request.add))
     .async:

@@ -77,65 +77,14 @@ class Actions @Inject() (
   individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction,
   provideDetailsAction: ProvideDetailsAction,
   enrichWithAgentApplicationAction: EnrichWithAgentApplicationAction,
-  businessPartnerRecordService: BusinessPartnerRecordService,
-  applicantActions: applicant.Actions,
-  individualActions: individual.Actions
+  businessPartnerRecordService: BusinessPartnerRecordService
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
-  export Actions.*
-  export ActionsHelper.*
+  import ActionsHelper.*
 
   val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
     .refine2(request => RequestWithDataCt.empty(request))
-
-  object Applicant:
-    export applicantActions.*
-
-  object Individual:
-
-    export individualActions.*
-
-    val authorised: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
-      .andThen(individualAuthorisedAction)
-
-    val authorisedWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = action
-      .andThen(individualAuthorisedWithIdentifiersAction)
-
-    val getProvidedDetails: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = authorised
-      .andThen(provideDetailsAction)
-    val getProvideDetailsInProgress: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = getProvidedDetails
-      .ensure(
-        condition = _.individualProvidedDetails.isInProgress,
-        resultWhenConditionNotMet =
-          implicit request =>
-            val mpdConfirmationPage = AppRoutes.providedetails.IndividualConfirmationController.show
-            logger.warn(
-              s"The provided details have already been confirmed" +
-                s" (current provided details: ${request.individualProvidedDetails.providedDetailsState.toString}), " +
-                s"redirecting to [${mpdConfirmationPage.url}]."
-            )
-            Redirect(mpdConfirmationPage.url)
-      )
-
-    val getProvideDetailsWithApplicationInProgress: ActionBuilder[
-      IndividualProvideDetailsWithApplicationRequest,
-      AnyContent
-    ] = getProvideDetailsInProgress.andThen(enrichWithAgentApplicationAction)
-
-    val getSubmitedDetailsWithApplicationInProgress: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] = getProvidedDetails
-      .ensure(
-        condition = _.individualProvidedDetails.hasFinished,
-        resultWhenConditionNotMet =
-          implicit request =>
-            val mdpCyaPage = AppRoutes.providedetails.CheckYourAnswersController.show
-            logger.warn(
-              s"The provided details are not in the final state" +
-                s" (current provided details: ${request.individualProvidedDetails.providedDetailsState.toString}), " +
-                s"redirecting to [${mdpCyaPage.url}]."
-            )
-            Redirect(mdpCyaPage.url)
-      ).andThen(enrichWithAgentApplicationAction)
 
   extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
 

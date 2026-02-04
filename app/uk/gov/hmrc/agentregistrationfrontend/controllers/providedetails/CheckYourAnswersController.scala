@@ -28,8 +28,8 @@ import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDel
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
+
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.CheckYourAnswersPage
 
@@ -43,7 +43,6 @@ class CheckYourAnswersController @Inject() (
 extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions
-    .Individual
     .getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.companiesHouseMatch.flatMap(_.companiesHouseOfficer).isDefined,

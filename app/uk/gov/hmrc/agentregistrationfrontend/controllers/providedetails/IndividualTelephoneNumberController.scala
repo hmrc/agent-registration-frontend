@@ -24,10 +24,10 @@ import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualTelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualTelephoneNumberPage
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 
@@ -44,7 +44,6 @@ class IndividualTelephoneNumberController @Inject() (
 extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions
-    .Individual
     .getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.companiesHouseMatch.nonEmpty, // TODO: Add check for companies house details

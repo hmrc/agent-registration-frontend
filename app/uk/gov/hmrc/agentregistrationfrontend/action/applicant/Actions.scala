@@ -21,7 +21,7 @@ import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions.*
+
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionsHelper
 import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedActionRefiner
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
@@ -35,6 +35,8 @@ import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 
 object Actions:
+
+  export uk.gov.hmrc.agentregistrationfrontend.action.Actions.*
 
   type DataWithAuth = (InternalUserId, GroupId, Credentials)
   type RequestWithAuth = RequestWithData[DataWithAuth]
@@ -52,10 +54,10 @@ class Actions @Inject() (
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
-  import ActionsHelper.*
+  export ActionsHelper.*
   export Actions.*
 
-  private val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
+  val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
     .refine2(request => RequestWithDataCt.empty(request))
 
   val authorised: ActionBuilderWithData[DataWithAuth] = action

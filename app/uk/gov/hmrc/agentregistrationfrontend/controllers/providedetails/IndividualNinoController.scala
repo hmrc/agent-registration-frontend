@@ -25,10 +25,10 @@ import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino.FromAuth
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.llp.UserProvidedNino
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualNinoPage
@@ -45,7 +45,7 @@ class IndividualNinoController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.Individual.getProvideDetailsInProgress
+  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.emailAddress.nonEmpty,
       implicit request =>

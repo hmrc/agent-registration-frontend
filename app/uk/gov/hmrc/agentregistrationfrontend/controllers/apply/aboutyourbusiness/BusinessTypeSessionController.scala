@@ -21,8 +21,8 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentType
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.BusinessTypeSessionForm
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
@@ -38,8 +38,6 @@ class BusinessTypeSessionController @Inject() (
   businessTypeSessionPage: BusinessTypeSessionPage
 )
 extends FrontendController(mcc, actions):
-
-  import actions.Applicant.*
 
   private val baseAction: ActionBuilderWithData[AgentType *: EmptyTuple] = action
     .refine4:
