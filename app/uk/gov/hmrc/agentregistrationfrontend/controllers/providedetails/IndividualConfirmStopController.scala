@@ -33,7 +33,7 @@ class IndividualConfirmStopController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getProvideDetailsInProgress:
+  def show: Action[AnyContent] = actions.DELETEMEgetProvideDetailsInProgress:
     implicit request: RequestHeader =>
       Ok(placeholder(
         h1 = "Confirm Stop Page",

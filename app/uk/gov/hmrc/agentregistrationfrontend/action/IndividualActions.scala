@@ -54,22 +54,21 @@ extends RequestAwareLogging:
   export ActionsHelper.*
   export IndividualActions.*
 
-  // TODO move it to common actions
   val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
     .refine2(request => RequestWithDataCt.empty(request))
 
-  val authorisedNew: ActionBuilderWithData[DataWithAuth] = action
+  val authorised: ActionBuilderWithData[DataWithAuth] = action
     .refineAsync(individualAuthorisedRefiner.refine)
 
-  val authorised: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
+  val DELETEMEauthorised: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
     .andThen(individualAuthorisedAction)
 
-  val authorisedWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = action
+  val DELETEMEauthorisedWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = action
     .andThen(individualAuthorisedWithIdentifiersAction)
 
-  val getProvidedDetails: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = authorised
+  val DELETEMEgetProvidedDetails: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = DELETEMEauthorised
     .andThen(provideDetailsAction)
-  val getProvideDetailsInProgress: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = getProvidedDetails
+  val DELETEMEgetProvideDetailsInProgress: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = DELETEMEgetProvidedDetails
     .ensure(
       condition = _.individualProvidedDetails.isInProgress,
       resultWhenConditionNotMet =
@@ -83,12 +82,12 @@ extends RequestAwareLogging:
           Redirect(mpdConfirmationPage.url)
     )
 
-  val getProvideDetailsWithApplicationInProgress: ActionBuilder[
+  val DELETEMEgetProvideDetailsWithApplicationInProgress: ActionBuilder[
     IndividualProvideDetailsWithApplicationRequest,
     AnyContent
-  ] = getProvideDetailsInProgress.andThen(enrichWithAgentApplicationAction)
+  ] = DELETEMEgetProvideDetailsInProgress.andThen(enrichWithAgentApplicationAction)
 
-  val getSubmitedDetailsWithApplicationInProgress: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] = getProvidedDetails
+  val DELETEMEgetSubmitedDetailsWithApplicationInProgress: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] = DELETEMEgetProvidedDetails
     .ensure(
       condition = _.individualProvidedDetails.hasFinished,
       resultWhenConditionNotMet =

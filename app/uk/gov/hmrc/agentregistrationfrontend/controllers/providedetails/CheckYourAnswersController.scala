@@ -43,7 +43,7 @@ class CheckYourAnswersController @Inject() (
 extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions
-    .getProvideDetailsInProgress
+    .DELETEMEgetProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.companiesHouseMatch.flatMap(_.companiesHouseOfficer).isDefined,
       implicit request =>

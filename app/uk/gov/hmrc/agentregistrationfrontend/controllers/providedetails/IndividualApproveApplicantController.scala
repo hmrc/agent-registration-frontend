@@ -44,7 +44,7 @@ class IndividualApproveApplicantController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] = actions.getProvideDetailsWithApplicationInProgress
+  private val baseAction: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] = actions.DELETEMEgetProvideDetailsWithApplicationInProgress
     .ensure(
       _.individualProvidedDetails.individualSaUtr.nonEmpty,
       implicit request =>

@@ -44,7 +44,7 @@ class IndividualTelephoneNumberController @Inject() (
 extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions
-    .getProvideDetailsInProgress
+    .DELETEMEgetProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.companiesHouseMatch.nonEmpty, // TODO: Add check for companies house details
       implicit request =>

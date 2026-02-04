@@ -53,7 +53,7 @@ extends FrontendController(mcc, actions):
   def initiateIndividualProvideDetails(
     linkId: LinkId
   ): Action[AnyContent] = actions
-    .authorisedWithIdentifiers
+    .DELETEMEauthorisedWithIdentifiers
     .async:
       implicit request: IndividualAuthorisedWithIdentifiersRequest[AnyContent] =>
 

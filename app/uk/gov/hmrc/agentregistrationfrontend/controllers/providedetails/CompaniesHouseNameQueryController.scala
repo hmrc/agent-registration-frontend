@@ -47,7 +47,7 @@ class CompaniesHouseNameQueryController @Inject() (
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
-    .getProvideDetailsInProgress
+    .DELETEMEgetProvideDetailsInProgress
     .async:
       implicit request =>
         agentApplicationService
@@ -72,7 +72,7 @@ extends FrontendController(mcc, actions):
               Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
 
   def submit: Action[AnyContent] = actions
-    .getProvideDetailsWithApplicationInProgress
+    .DELETEMEgetProvideDetailsWithApplicationInProgress
     .ensureValidForm[CompaniesHouseNameQuery](
       form = CompaniesHouseNameQueryForm.form,
       viewToServeWhenFormHasErrors =

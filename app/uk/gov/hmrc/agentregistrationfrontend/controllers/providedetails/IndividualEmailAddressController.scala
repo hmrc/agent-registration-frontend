@@ -56,7 +56,7 @@ class IndividualEmailAddressController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.getProvideDetailsInProgress
+  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.DELETEMEgetProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.telephoneNumber.isDefined,
       implicit request =>
@@ -106,7 +106,7 @@ extends FrontendController(mcc, actions):
               AppRoutes.providedetails.IndividualEmailAddressController.verify
             )
 
-  def verify: Action[AnyContent] = actions.getProvideDetailsInProgress
+  def verify: Action[AnyContent] = actions.DELETEMEgetProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.emailAddress.isDefined,
       implicit request =>

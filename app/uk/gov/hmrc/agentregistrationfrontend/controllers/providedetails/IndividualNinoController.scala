@@ -45,7 +45,7 @@ class IndividualNinoController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.getProvideDetailsInProgress
+  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.DELETEMEgetProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.emailAddress.nonEmpty,
       implicit request =>
