@@ -36,12 +36,13 @@ class IndividualConfirmationController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] = actions.DELETEMEgetSubmitedDetailsWithApplicationInProgress
-    .ensure(
-      _.individualProvidedDetails.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed,
-      implicit request =>
-        Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url)
-    )
+  private val baseAction: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] =
+    actions.DELETEMEgetSubmitedDetailsWithApplicationInProgress
+      .ensure(
+        _.individualProvidedDetails.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed,
+        implicit request =>
+          Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url)
+      )
 
   def show: Action[AnyContent] = baseAction.async:
     implicit request =>

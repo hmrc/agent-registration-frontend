@@ -33,9 +33,9 @@ object Actions:
 
   type RequestWithData[Data <: Tuple] = RequestWithDataCt[AnyContent, Data]
 
-  type DataEmpty = EmptyTuple
-  type DefaultRequest = RequestWithData[DataEmpty]
-  type DefaultRequestCt[ContentType] = RequestWithDataCt[ContentType, DataEmpty]
+  type EmptyData = EmptyTuple
+  type DefaultRequest = RequestWithData[EmptyData]
+  type DefaultRequestCt[ContentType] = RequestWithDataCt[ContentType, EmptyData]
 
   extension [
     ContentType,

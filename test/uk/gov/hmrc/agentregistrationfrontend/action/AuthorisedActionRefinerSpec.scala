@@ -63,7 +63,7 @@ extends ISpec:
 
     val result: Result =
       authorisedActionRefiner
-        .refine(tdAll.requestLoggedInEmptyData)
+        .refine(tdAll.requestLoggedIn)
         .futureValue
         .left
         .value
@@ -99,7 +99,7 @@ extends ISpec:
            |""".stripMargin
     )
 
-    val result: Result = authorisedActionRefiner.refine(tdAll.requestLoggedInEmptyData).futureValue.left.value
+    val result: Result = authorisedActionRefiner.refine(tdAll.requestLoggedIn).futureValue.left.value
     result shouldBe Redirect("http://localhost:9437/agent-services-account/home")
     AuthStubs.verifyAuthorise()
 
@@ -108,7 +108,7 @@ extends ISpec:
     AuthStubs.stubAuthorise()
     val requestWithAuth: RequestWithData[DataWithAuth] =
       authorisedActionRefiner
-        .refine(tdAll.requestLoggedInEmptyData)
+        .refine(tdAll.requestLoggedIn)
         .futureValue
         .value
     requestWithAuth.data shouldBe tdAll.ApplicantRequests.requestWithAuthData.data
