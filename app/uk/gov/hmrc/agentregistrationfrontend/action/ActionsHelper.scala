@@ -491,14 +491,3 @@ extends RequestAwareLogging:
           case p => Future.successful(Right[Result, P[A]](p.asInstanceOf[P[A]]))
       }
     })
-
-  extension [
-    B // B Represents Play Framework's Content Type parameter, commonly denoted as B
-  ](a: Action[B])(using ec: ExecutionContext)
-
-    def mapResult(f: Request[B] => Result => Result): Action[B] =
-      new Action[B] {
-        override def apply(request: Request[B]): Future[Result] = a(request).map(f(request))
-        override def parser: BodyParser[B] = a.parser
-        override def executionContext: ExecutionContext = a.executionContext
-      }

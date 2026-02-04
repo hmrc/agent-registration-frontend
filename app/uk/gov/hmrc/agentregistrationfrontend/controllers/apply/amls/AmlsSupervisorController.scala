@@ -53,7 +53,6 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     actions
-      .Applicant
       .getApplicationInProgress
       .ensureValidFormAndRedirectIfSaveForLater4(amlsCodeForm.form, implicit r => view(_))
       .async:

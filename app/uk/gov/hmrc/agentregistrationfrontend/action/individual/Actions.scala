@@ -22,11 +22,11 @@ import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionsHelper
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.*
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.EnrichWithAgentApplicationAction
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsWithApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.ProvideDetailsAction
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
@@ -42,15 +42,14 @@ object Actions:
   type RequestWithAuth = RequestWithData[DataWithAuth]
   type RequestWithAuthCt[ContentType] = RequestWithDataCt[ContentType, DataWithAuth]
 
-//  object Applicant:
-
 @Singleton
 class Actions @Inject() (
   defaultActionBuilder: DefaultActionBuilder,
   individualAuthorisedRefiner: IndividualAuthorisedRefiner,
+  individualAuthorisedAction: IndividualAuthorisedAction,
   individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction,
-  agentApplicationService: AgentApplicationService,
-  businessPartnerRecordService: BusinessPartnerRecordService
+  provideDetailsAction: ProvideDetailsAction,
+  enrichWithAgentApplicationAction: EnrichWithAgentApplicationAction
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
@@ -58,7 +57,7 @@ extends RequestAwareLogging:
   export Actions.*
 
   // TODO move it to common actions
-  private val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
+  val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
     .refine2(request => RequestWithDataCt.empty(request))
 
   val authorisedNew: ActionBuilderWithData[DataWithAuth] = action

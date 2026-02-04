@@ -16,29 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
-import play.api.data.Form
-import play.api.i18n.I18nSupport
-import play.api.i18n.MessagesApi
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendControllerBase
 
 abstract class FrontendController(
   mcc: MessagesControllerComponents,
   val actions: Actions
 )
-extends uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController(mcc),
-  I18nSupport,
-  RequestAwareLogging:
+extends FrontendControllerBase(mcc):
 
   export actions.*
-  export Errors.*
-
-  protected final val AppRoutes = uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes // alias so no need to import it in each controller
-
-  extension [T](form: Form[T])
-    def fill(data: Option[T]): Form[T] = data.fold(form)(form.fill)
-
-  override def messagesApi: MessagesApi = mcc.messagesApi
-  implicit val executionContext: scala.concurrent.ExecutionContext = mcc.executionContext

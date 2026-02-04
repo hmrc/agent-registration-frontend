@@ -32,6 +32,8 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes a
 import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.routes as providedetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.routes as internalProviDedetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.routes as testOnlyRoutes
+import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.routes as testOnlyApplicantRoutes
+import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.routes as testOnlyIndividualRoutes
 
 /** All application routes centralized in one place for convenience and clarity. It helps avoid naming conflicts and makes route management easier.
   *
@@ -127,6 +129,13 @@ object AppRoutes:
   object testOnly:
 
     val TestOnlyController = testOnlyRoutes.TestOnlyController
-    val GrsStubController = testOnlyRoutes.GrsStubController
-    val FastForwardController = testOnlyRoutes.FastForwardController
     val EmailVerificationPasscodesController = testOnlyRoutes.EmailVerificationPasscodesController
+
+    object applicant:
+
+      val TestOnlyController = testOnlyApplicantRoutes.TestOnlyController
+      val GrsStubController = testOnlyApplicantRoutes.GrsStubController
+      val FastForwardController = testOnlyApplicantRoutes.FastForwardController
+
+    object individual:
+      val TestOnlyController = testOnlyIndividualRoutes.TestOnlyController

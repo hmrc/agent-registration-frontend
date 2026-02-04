@@ -49,7 +49,7 @@
 @layout(pageTitle = "GRS Test Data Setup") {
     <h2 class="govuk-heading-xl">GRS Test Data Setup</h2>
 
-    @formWithCSRF(action = AppRoutes.testOnly.GrsStubController.submitGrsData(businessType, journeyId)) {
+    @formWithCSRF(action = AppRoutes.testOnly.applicant.GrsStubController.submitGrsData(businessType, journeyId)) {
         <h3 class="govuk-heading-l">Registration Details</h3>
         @govukButton(Button(
             content = Text(messages("Save Test Data"))
@@ -57,7 +57,7 @@
 
         @govukButton(Button(
             content = Text(messages("Reset Test Data")),
-            href = Some(AppRoutes.testOnly.GrsStubController.showGrsData(businessType, JourneyId(UUID.randomUUID().toString)).url)
+            href = Some(AppRoutes.testOnly.applicant.GrsStubController.showGrsData(businessType, JourneyId(UUID.randomUUID().toString)).url)
         ))
         @registrationInput
         @if(businessType === SoleTrader) {
@@ -90,7 +90,7 @@
 
         @govukButton(Button(
             content = Text(messages("Reset Test Data")),
-            href = Some(AppRoutes.testOnly.GrsStubController.showGrsData(businessType, JourneyId(UUID.randomUUID().toString)).url)
+            href = Some(AppRoutes.testOnly.applicant.GrsStubController.showGrsData(businessType, JourneyId(UUID.randomUUID().toString)).url)
         ))
     }
 }

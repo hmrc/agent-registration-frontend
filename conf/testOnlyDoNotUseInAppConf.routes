@@ -13,26 +13,24 @@
 ->          /                                                                 prod.Routes
 
 
-GET         /agent-registration/test-only                                     uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.showTestOnlyHub
-GET         /agent-registration/test-only/show-agent-application              uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.showAgentApplication
-GET         /agent-registration/test-only/show-provided-details               uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.showProvidedDetails
-GET         /agent-registration/test-only/show-play-session                   uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.showPlaySession
+GET         /agent-registration/test-only                                      uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.showTestOnlyHub
+GET         /agent-registration/test-only/show-play-session                    uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.showPlaySession
+GET         /agent-registration/test-only/email-verification-pass-codes        uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.EmailVerificationPasscodesController.showEmailVerificationPassCodes(emailVerificationLink: String)
 
-GET         /agent-registration/test-only/grs-stub/:businessType              uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.GrsStubController.showGrsData(businessType: BusinessType, journeyId: grs.JourneyId)
-POST        /agent-registration/test-only/grs-stub/:businessType              uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.GrsStubController.submitGrsData(businessType: BusinessType, journeyId: grs.JourneyId)
-GET         /agent-registration/test-only/grs-stub-retrieve                   uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.GrsStubController.retrieveGrsData(journeyId: grs.JourneyId)
+GET         /agent-registration/test-only/show-agent-application                             uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.TestOnlyController.showAgentApplication
+GET         /agent-registration/test-only/grs-stub/:businessType                             uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.GrsStubController.showGrsData(businessType: BusinessType, journeyId: grs.JourneyId)
+POST        /agent-registration/test-only/grs-stub/:businessType                             uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.GrsStubController.submitGrsData(businessType: BusinessType, journeyId: grs.JourneyId)
+GET         /agent-registration/test-only/grs-stub-retrieve                                  uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.GrsStubController.retrieveGrsData(journeyId: grs.JourneyId)
 + nocsrf
-POST        /agent-registration/test-only/grs-stub-setup/:businessType        uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.GrsStubController.setupGrsJourney(businessType: BusinessType)
+POST        /agent-registration/test-only/grs-stub-setup/:businessType                       uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.GrsStubController.setupGrsJourney(businessType: BusinessType)
+GET         /agent-registration/test-only/add-agent-type/:agentType                          uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.TestOnlyController.addAgentTypeToSession(agentType: AgentType)
+GET         /agent-registration/test-only/add-business-type/:businessTypeAnswer              uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.TestOnlyController.addBusinessTypeToSession(businessTypeAnswer: BusinessTypeAnswer)
+GET         /agent-registration/test-only/add-partnership-type/:partnershipType              uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.TestOnlyController.addPartnershipTypeToSession(partnershipType: BusinessType.Partnership)
+GET         /agent-registration/test-only/add-agent-applicationId/:agentApplicationId        uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.TestOnlyController.addAgentApplicationIdToSession(agentApplicationId: AgentApplicationId)
+GET         /agent-registration/test-only/get-link-id                                        uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.TestOnlyController.makeTestSubmittedApplication()
+GET         /agent-registration/test-only/fast-forward                                       uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.show
+GET         /agent-registration/test-only/fast-forward-to/:completedSection                  uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.fastForward(completedSection: CompletedSection)
 
-GET         /agent-registration/test-only/add-agent-type/:agentType           uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.addAgentTypeToSession(agentType: AgentType)
-GET         /agent-registration/test-only/add-business-type/:businessTypeAnswer     uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.addBusinessTypeToSession(businessTypeAnswer: BusinessTypeAnswer)
-GET         /agent-registration/test-only/add-partnership-type/:partnershipType   uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.addPartnershipTypeToSession(partnershipType: BusinessType.Partnership)
-GET         /agent-registration/test-only/add-agent-applicationId/:agentApplicationId  uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.addAgentApplicationIdToSession(agentApplicationId: AgentApplicationId)
 
-GET         /agent-registration/test-only/get-link-id                uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.makeTestSubmittedApplication()
-
-GET        /agent-registration/test-only/fast-forward                             uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.show
-GET        /agent-registration/test-only/fast-forward-to/:completedSection        uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.fastForward(completedSection: CompletedSection)
-
-GET        /agent-registration/test-only/email-verification-pass-codes        uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.EmailVerificationPasscodesController.showEmailVerificationPassCodes(emailVerificationLink: String)
-GET        /agent-registration/test-only/remove-nino-and-dob                  uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.removeNinoAndDobFromIndividual()
+GET        /agent-registration/test-only/show-provided-details        uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.showProvidedDetails
+GET        /agent-registration/test-only/remove-nino-and-dob          uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.removeNinoAndDobFromIndividual()

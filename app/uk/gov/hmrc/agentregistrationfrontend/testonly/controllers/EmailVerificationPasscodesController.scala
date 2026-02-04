@@ -20,10 +20,10 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
+import play.api.mvc.DefaultActionBuilder
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.controllers.DeleteMeFrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendControllerBase
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.EmailVerificationPasscodesController.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.EmailVerificationPasscodesPage
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.isSignedIn
@@ -54,16 +54,15 @@ object EmailVerificationPasscodesController:
 @Singleton
 class EmailVerificationPasscodesController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  defaultActionBuilder: DefaultActionBuilder,
   appConfig: AppConfig,
   httpClient: HttpClientV2,
   emailVerificationPasscodesPage: EmailVerificationPasscodesPage,
   simplePage: SimplePage
 )
-extends DeleteMeFrontendController(mcc, actions):
+extends FrontendControllerBase(mcc):
 
-  def showEmailVerificationPassCodes(emailVerificationLink: String): Action[AnyContent] = actions
-    .action
+  def showEmailVerificationPassCodes(emailVerificationLink: String): Action[AnyContent] = defaultActionBuilder
     .async:
       implicit request =>
         if isSignedIn // hint: Using simple auth check since this is a test-only controller (avoiding custom auth action in production code)

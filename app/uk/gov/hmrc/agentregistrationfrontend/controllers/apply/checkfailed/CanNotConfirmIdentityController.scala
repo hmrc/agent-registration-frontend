@@ -37,7 +37,6 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] =
     actions
-      .Applicant
       .getApplicationInProgress
       .ensure4(
         condition =
