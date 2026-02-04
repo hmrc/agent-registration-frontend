@@ -22,8 +22,8 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
+import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsWithApplicationRequest
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualApproveApplicationForm
@@ -37,7 +37,7 @@ import scala.concurrent.Future
 import javax.inject.Inject
 
 class IndividualApproveApplicantController @Inject() (
-  actions: Actions,
+  actions: IndividualActions,
   mcc: MessagesControllerComponents,
   view: IndividualApproveApplicationPage,
   individualProvideDetailsService: IndividualProvideDetailsService

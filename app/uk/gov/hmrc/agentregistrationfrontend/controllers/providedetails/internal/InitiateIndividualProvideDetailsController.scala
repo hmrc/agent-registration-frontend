@@ -23,7 +23,6 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -31,6 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetai
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
+import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CitizenDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.FrontendController
 
@@ -41,7 +41,7 @@ import scala.concurrent.Future
 @Singleton
 class InitiateIndividualProvideDetailsController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: IndividualActions,
   individualProvideDetailsService: IndividualProvideDetailsService,
   agentApplicationService: AgentApplicationService,
   citizenDetailsConnector: CitizenDetailsConnector

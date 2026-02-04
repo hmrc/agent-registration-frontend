@@ -26,8 +26,8 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.companieshouse.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
+import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionFormType
@@ -49,7 +49,7 @@ import scala.concurrent.Future
 @Singleton
 class CompaniesHouseMatchingController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: IndividualActions,
   agentApplicationService: AgentApplicationService,
   companiesHouseService: CompaniesHouseService,
   individualProvideDetailsService: IndividualProvideDetailsService,

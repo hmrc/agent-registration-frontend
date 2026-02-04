@@ -23,8 +23,8 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseMatch
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
+import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsWithApplicationRequest
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
@@ -38,7 +38,7 @@ import scala.concurrent.Future
 
 @Singleton
 class CompaniesHouseNameQueryController @Inject() (
-  actions: Actions,
+  actions: IndividualActions,
   mcc: MessagesControllerComponents,
   view: CompaniesHouseNameQueryPage,
   individualProvideDetailsService: IndividualProvideDetailsService,

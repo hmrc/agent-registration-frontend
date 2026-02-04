@@ -14,30 +14,26 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.action.applicant
+package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
-import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistrationfrontend.action.ActionsHelper
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedActionRefiner
-import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
+import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.PresentIn
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 
-object Actions:
+object ApplicantActions:
 
   export uk.gov.hmrc.agentregistrationfrontend.action.Actions.*
 
@@ -50,7 +46,7 @@ object Actions:
   type RequestWithApplicationCt[A] = RequestWithDataCt[A, DataWithApplication]
 
 @Singleton
-class Actions @Inject() (
+class ApplicantActions @Inject() (
   defaultActionBuilder: DefaultActionBuilder,
   authorisedActionRefiner: AuthorisedActionRefiner,
   agentApplicationService: AgentApplicationService,
@@ -59,7 +55,7 @@ class Actions @Inject() (
 extends RequestAwareLogging:
 
   export ActionsHelper.*
-  export Actions.*
+  export ApplicantActions.*
 
   val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
     .refine2(request => RequestWithDataCt.empty(request))

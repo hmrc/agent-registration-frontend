@@ -24,7 +24,7 @@ import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.LinkId
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
 
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
@@ -35,7 +35,7 @@ import javax.inject.Singleton
 
 @Singleton
 class StartController @Inject() (
-  actions: Actions,
+  actions: IndividualActions,
   mcc: MessagesControllerComponents,
   llpStartPage: LlpStartPage,
   placeholderStartPage: SimplePage,

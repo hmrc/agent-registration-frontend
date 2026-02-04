@@ -20,14 +20,14 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
 
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import javax.inject.Inject
 
 class IndividualConfirmStopController @Inject() (
-  actions: Actions,
+  actions: IndividualActions,
   mcc: MessagesControllerComponents,
   placeholder: SimplePage
 )

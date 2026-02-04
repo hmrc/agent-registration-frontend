@@ -21,8 +21,8 @@ import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
+import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualEmailAddressForm
@@ -46,7 +46,7 @@ import scala.concurrent.Future
 @Singleton
 class IndividualEmailAddressController @Inject() (
   appConfig: AppConfig,
-  actions: Actions,
+  actions: IndividualActions,
   mcc: MessagesControllerComponents,
   individualEmailAddressView: IndividualEmailAddressPage,
   individualEmailLockedView: IndividualEmailLockedPage,

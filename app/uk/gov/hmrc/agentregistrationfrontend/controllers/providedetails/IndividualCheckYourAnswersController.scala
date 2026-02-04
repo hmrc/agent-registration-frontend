@@ -22,7 +22,7 @@ import play.api.mvc.Action
 import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
 
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
@@ -30,7 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 @Singleton
 class IndividualCheckYourAnswersController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: IndividualActions,
   placeholderStartPage: SimplePage
 )
 extends FrontendController(mcc, actions):

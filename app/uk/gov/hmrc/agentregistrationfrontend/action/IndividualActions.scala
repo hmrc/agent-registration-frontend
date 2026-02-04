@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.action.individual
+package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistrationfrontend.action.ActionsHelper
-import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.*
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.EnrichWithAgentApplicationAction
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
@@ -34,7 +32,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 
-object Actions:
+object IndividualActions:
 
   export uk.gov.hmrc.agentregistrationfrontend.action.Actions.*
 
@@ -43,7 +41,7 @@ object Actions:
   type RequestWithAuthCt[ContentType] = RequestWithDataCt[ContentType, DataWithAuth]
 
 @Singleton
-class Actions @Inject() (
+class IndividualActions @Inject() (
   defaultActionBuilder: DefaultActionBuilder,
   individualAuthorisedRefiner: IndividualAuthorisedRefiner,
   individualAuthorisedAction: IndividualAuthorisedAction,
@@ -54,7 +52,7 @@ class Actions @Inject() (
 extends RequestAwareLogging:
 
   export ActionsHelper.*
-  export Actions.*
+  export IndividualActions.*
 
   // TODO move it to common actions
   val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder

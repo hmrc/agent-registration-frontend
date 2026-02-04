@@ -17,12 +17,12 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendControllerBase
 
 abstract class FrontendController(
   mcc: MessagesControllerComponents,
-  val actions: Actions
+  val actions: ApplicantActions
 )
 extends FrontendControllerBase(mcc):
 

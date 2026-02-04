@@ -24,7 +24,7 @@ import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.UserRole
-import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.TypeOfSignInForm
@@ -42,7 +42,7 @@ import scala.util.chaining.scalaUtilChainingOps
 @Singleton
 class TypeOfSignInController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: ApplicantActions,
   view: TypeOfSignInPage,
   signInWithAgentDetailsPage: SignInWithAgentDetailsPage,
   createSignInDetailsPage: CreateSignInDetailsPage,
