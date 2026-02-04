@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant
+package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers
 
+import play.api.http.Status.SEE_OTHER
 import play.api.mvc.*
+import uk.gov.hmrc.agentregistration.shared.util.SealedObjects
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
-import uk.gov.hmrc.agentregistration.shared.util.SealedObjects
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection
-import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection.CompletedSectionLlp
-import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection.CompletedSectionSoleTrader
+import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection
+import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection.CompletedSectionLlp
+import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection.CompletedSectionSoleTrader
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
+import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
@@ -35,6 +38,9 @@ import java.time.Clock
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
+import uk.gov.hmrc.agentregistrationfrontend.testonly.action.TestOnlyAuthorisedAction
+import uk.gov.hmrc.http.SessionKeys
+
 import scala.concurrent.Future
 
 object FastForwardController:
@@ -117,13 +123,15 @@ object FastForwardController:
 @Singleton
 class FastForwardController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: ApplicantActions,
+  actions: Actions,
+  authorisedAction: TestOnlyAuthorisedAction,
   applicationService: AgentApplicationService,
   fastForwardPage: FastForwardPage,
   agentApplicationIdGenerator: AgentApplicationIdGenerator,
   linkIdGenerator: LinkIdGenerator,
   simplePage: SimplePage,
-  grsStubService: GrsStubService
+  grsStubService: GrsStubService,
+  stubUserService: StubUserService
 )(using clock: Clock)
 extends FrontendController(mcc, actions):
 
@@ -131,19 +139,57 @@ extends FrontendController(mcc, actions):
     implicit request =>
       Ok(fastForwardPage())
 
+  private def authorisedOrCreateAndLoginAgent(
+    block: RequestWithAuth ?=> Future[Result]
+  ): Action[AnyContent] = actions.action.async { implicit request =>
+
+    def runIfAuthorised(): Future[Result] = authorisedAction.refinePublic(request).flatMap {
+      case Right(authorisedRequest) =>
+        given RequestWithAuth = authorisedRequest
+        block
+
+      case Left(result) if result.header.status === SEE_OTHER => loginAndRetry
+
+      case Left(result) => Future.successful(result)
+    }
+
+    runIfAuthorised()
+  }
+
+  private def loginAndRetry(using request: Request[AnyContent]): Future[Result] = stubUserService.createAndLoginAgent.map { stubsHc =>
+    val bearerToken: String = stubsHc.authorization
+      .map(_.value)
+      .getOrElse(throw new RuntimeException("Expected auth token in stubs HeaderCarrier"))
+
+    val sessionId: String = stubsHc.sessionId
+      .map(_.value)
+      .getOrElse(throw new RuntimeException("Expected sessionId in stubs HeaderCarrier"))
+
+    Redirect(request.uri)
+      .addingToSession(
+        SessionKeys.authToken -> bearerToken,
+        SessionKeys.sessionId -> sessionId
+      )
+  }
+
   def fastForward(
     completedSection: CompletedSection
   ): Action[AnyContent] =
     completedSection match
-      case c: CompletedSectionLlp => actions.authorised.async(handleCompletedSectionLlp(c)(using _, summon))
-      case c: CompletedSectionSoleTrader =>
-        actions.action { implicit request =>
-          Ok(simplePage(
-            h1 = "Sole Trader Task List Page",
-            bodyText = Some("Fast Forwarding to Sole Trader Task List Page isn't implemented yet")
-          ))
+      case c: CompletedSectionLlp =>
+        authorisedOrCreateAndLoginAgent {
+          handleCompletedSectionLlp(c)
         }
-      // TODO: other business types
+
+      case _: CompletedSectionSoleTrader =>
+        actions.action { implicit request =>
+          Ok(
+            simplePage(
+              h1 = "Sole Trader Task List Page",
+              bodyText = Some("Fast Forwarding to Sole Trader Task List Page isn't implemented yet")
+            )
+          )
+        }
 
   private def handleCompletedSectionLlp(completedSection: CompletedSectionLlp)(using
     r: RequestWithAuth,
