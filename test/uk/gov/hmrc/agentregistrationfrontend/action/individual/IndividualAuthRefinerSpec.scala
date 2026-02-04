@@ -39,7 +39,7 @@ extends ISpec:
       )
       IndividualAuthStubs.verifyAuthorise(0)
 
-    "successfully authorise when user is logged in" in:
+    "successfully authorise and enrich request with InternalUserId and Credentials when no Nino or Utr are present" in:
       val individualAuthRefiner: IndividualAuthRefiner = app.injector.instanceOf[IndividualAuthRefiner]
       IndividualAuthStubs.stubAuthorise()
       individualAuthRefiner
@@ -55,7 +55,7 @@ extends ISpec:
       )
       IndividualAuthStubs.verifyAuthorise()
 
-    "successfully authorise with Nino when user is logged in" in:
+    "successfully authorise and enrich request with Nino, InternalUserId and Credentials" in:
       val individualAuthorisedRefiner: IndividualAuthRefiner = app.injector.instanceOf[
         IndividualAuthRefiner
       ]
@@ -74,7 +74,7 @@ extends ISpec:
       )
       IndividualAuthStubs.verifyAuthorise()
 
-    "successfully authorise with Utr when user is logged in" in:
+    "successfully authorise and enrich request with Utr, InternalUserId and Credentials" in:
       val individualAuthorisedRefiner: IndividualAuthRefiner = app.injector.instanceOf[IndividualAuthRefiner]
 
       IndividualAuthStubs.stubAuthoriseWithSaUtr()
@@ -95,9 +95,8 @@ extends ISpec:
 
     "when User is not logged in (request comes without authorisation in the session) action redirects to login url" in:
       val individualAuthorisedRefiner: IndividualAuthRefiner = app.injector.instanceOf[IndividualAuthRefiner]
-      val notLoggedInRequest: RequestWithData[EmptyTuple] = tdAll.requestNotLoggedIn
       individualAuthorisedRefiner
-        .refineIntoRequestWithAuth(tdAll.requestLoggedIn)
+        .refineIntoRequestWithAuth(tdAll.requestNotLoggedIn)
         .futureValue
         .left
         .value shouldBe Redirect(
@@ -105,7 +104,7 @@ extends ISpec:
       )
       IndividualAuthStubs.verifyAuthorise(0)
 
-    "successfully authorise when user is logged in" in:
+    "successfully authorise and enrich request with InternalUserId and Credentials" in:
       val individualAuthorisedRefiner: IndividualAuthRefiner = app.injector.instanceOf[IndividualAuthRefiner]
       IndividualAuthStubs.stubAuthorise()
       val request: RequestWithAuth =
