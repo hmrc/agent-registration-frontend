@@ -141,22 +141,19 @@ extends FrontendController(mcc, actions):
 
   private def authorisedOrCreateAndLoginAgent(
     block: RequestWithAuth ?=> Future[Result]
-  ): Action[AnyContent] = actions.action.async { implicit request =>
+  ): Action[AnyContent] = actions.action.async:
+    implicit request =>
 
-    def runIfAuthorised(): Future[Result] = authorisedAction.refinePublic(request).flatMap {
-      case Right(authorisedRequest) =>
-        given RequestWithAuth = authorisedRequest
-        block
+      def runIfAuthorised(): Future[Result] = authorisedAction.refinePublic(request).flatMap:
+        case Right(authorisedRequest) =>
+          given RequestWithAuth = authorisedRequest
+          block
+        case Left(result) if result.header.status === SEE_OTHER => loginAndRetry
+        case Left(result) => Future.successful(result)
 
-      case Left(result) if result.header.status === SEE_OTHER => loginAndRetry
+      runIfAuthorised()
 
-      case Left(result) => Future.successful(result)
-    }
-
-    runIfAuthorised()
-  }
-
-  private def loginAndRetry(using request: Request[AnyContent]): Future[Result] = stubUserService.createAndLoginAgent.map { stubsHc =>
+  private def loginAndRetry(using request: Request[AnyContent]): Future[Result] = stubUserService.createAndLoginAgent.map: stubsHc =>
     val bearerToken: String = stubsHc.authorization
       .map(_.value)
       .getOrElse(throw new RuntimeException("Expected auth token in stubs HeaderCarrier"))
@@ -170,7 +167,6 @@ extends FrontendController(mcc, actions):
         SessionKeys.authToken -> bearerToken,
         SessionKeys.sessionId -> sessionId
       )
-  }
 
   def fastForward(
     completedSection: CompletedSection

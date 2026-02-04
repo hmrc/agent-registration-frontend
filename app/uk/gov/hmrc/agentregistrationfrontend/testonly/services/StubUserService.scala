@@ -37,9 +37,9 @@ import scala.concurrent.Future
 @Singleton
 final class StubUserService @Inject() (
   agentsExternalStubsConnector: AgentsExternalStubsConnector
-)(implicit ec: ExecutionContext) {
+)(implicit ec: ExecutionContext):
 
-  def createAndLoginAgent[A](using request: Request[A]): Future[HeaderCarrier] = {
+  def createAndLoginAgent[A](using request: Request[A]): Future[HeaderCarrier] =
     for {
       initialLoginResponse <- agentsExternalStubsConnector.signIn()
 
@@ -65,8 +65,6 @@ final class StubUserService @Inject() (
       authorization = loginResponse.authorization
     )
 
-  }
-
   def createAgentUser()(using hc: HeaderCarrier): Future[String] =
     val user = User(
       userId = UUID.randomUUID().toString,
@@ -86,5 +84,3 @@ final class StubUserService @Inject() (
     val trimmed = authToken.trim
     if trimmed.toLowerCase.startsWith("bearer ") then trimmed
     else s"Bearer $trimmed"
-
-}
