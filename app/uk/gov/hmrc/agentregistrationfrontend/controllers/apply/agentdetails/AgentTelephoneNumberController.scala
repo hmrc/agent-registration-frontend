@@ -18,14 +18,12 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails
 
 import com.softwaremill.quicklens.*
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentTelephoneNumber
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -46,10 +44,10 @@ class AgentTelephoneNumberController @Inject() (
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+  private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .Applicant
     .getApplicationInProgress
-    .ensure(
+    .ensure4(
       _
         .agentApplication
         .agentDetails
@@ -59,27 +57,26 @@ extends FrontendController(mcc, actions):
         Redirect(AppRoutes.apply.agentdetails.AgentBusinessNameController.show)
     )
 
-  def show: Action[AnyContent] = baseAction.async:
-    implicit request =>
-      businessPartnerRecordService
-        .getBusinessPartnerRecord(
-          request.agentApplication.getUtr
-        ).map: bprOpt =>
-          Ok(view(
-            form = AgentTelephoneNumberForm.form.fill:
-              request
-                .agentApplication
-                .agentDetails.flatMap(_.telephoneNumber)
-            ,
-            bprTelephoneNumber = bprOpt.flatMap(_.primaryPhoneNumber),
-            agentApplication = request.agentApplication
-          ))
+  def show: Action[AnyContent] = baseAction
+    .getMaybeBusinessPartnerRecord
+    .apply:
+      implicit request =>
+        val bprOpt: Option[BusinessPartnerRecordResponse] = request.get
+        Ok(view(
+          form = AgentTelephoneNumberForm.form.fill:
+            request
+              .agentApplication
+              .agentDetails.flatMap(_.telephoneNumber)
+          ,
+          bprTelephoneNumber = bprOpt.flatMap(_.primaryPhoneNumber),
+          agentApplication = request.agentApplication
+        ))
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLaterAsync[AgentTelephoneNumber](
+      .ensureValidFormAndRedirectIfSaveForLater4[AgentTelephoneNumber](
         form = AgentTelephoneNumberForm.form,
-        viewToServeWhenFormHasErrors =
+        resultToServeWhenFormHasErrors =
           implicit request =>
             formWithErrors =>
               businessPartnerRecordService
@@ -92,8 +89,8 @@ extends FrontendController(mcc, actions):
                   )
       )
       .async:
-        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[AgentTelephoneNumber]) =>
-          val agentTelephoneNumber: AgentTelephoneNumber = request.formValue
+        implicit request =>
+          val agentTelephoneNumber: AgentTelephoneNumber = request.get
           val updatedApplication: AgentApplication = request
             .agentApplication
             .modify(_.agentDetails.each.telephoneNumber)

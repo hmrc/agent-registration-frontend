@@ -21,7 +21,6 @@ import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.AgentTypePage
@@ -37,19 +36,22 @@ class AgentTypeController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[?] = action:
-    implicit request: Request[?] =>
+  def show: Action[AnyContent] = action:
+    implicit request =>
       val form: Form[AgentType] =
-        request.readAgentType match
+        request.readFromSessionAgentType match
           case Some(value: AgentType) => AgentTypeForm.form.fill(value)
           case _ => AgentTypeForm.form
       Ok(view(form))
 
   def submit: Action[AnyContent] =
     action
-      .ensureValidForm(AgentTypeForm.form, implicit request => view(_)):
+      .ensureValidForm4(
+        AgentTypeForm.form,
+        implicit request => view(_)
+      ):
         implicit request =>
-          val agentType: AgentType = request.formValue
+          val agentType: AgentType = request.get[AgentType]
           val call: Call =
             agentType match
               case AgentType.UkTaxAgent => AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show

@@ -31,7 +31,7 @@ extends ISpec:
     val individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction = app.injector.instanceOf[
       IndividualAuthorisedWithIdentifiersAction
     ]
-    val notLoggedInRequest: Request[?] = tdAll.requestNotLoggedIn
+    val notLoggedInRequest: Request[?] = tdAll.rawRequestNotLoggedIn
     individualAuthorisedWithIdentifiersAction
       .invokeBlock(notLoggedInRequest, _ => fakeResultF)
       .futureValue shouldBe Redirect(
@@ -47,7 +47,7 @@ extends ISpec:
     val result: Result = Ok("AllGood")
     individualAuthorisedWithIdentifiersAction
       .invokeBlock(
-        tdAll.requestLoggedIn,
+        tdAll.deleteMerequestLoggedIn,
         (r: IndividualAuthorisedWithIdentifiersRequest[?]) =>
           Future.successful {
             r.internalUserId shouldBe tdAll.internalUserId
@@ -67,7 +67,7 @@ extends ISpec:
     val result: Result = Ok("AllGood")
     individualAuthorisedWithIdentifiersAction
       .invokeBlock(
-        tdAll.requestLoggedIn,
+        tdAll.deleteMerequestLoggedIn,
         (r: IndividualAuthorisedWithIdentifiersRequest[?]) =>
           Future.successful {
             r.internalUserId shouldBe tdAll.internalUserId
@@ -87,7 +87,7 @@ extends ISpec:
     val result: Result = Ok("AllGood")
     individualAuthorisedWithIdentifiersAction
       .invokeBlock(
-        tdAll.requestLoggedIn,
+        tdAll.deleteMerequestLoggedIn,
         (r: IndividualAuthorisedWithIdentifiersRequest[?]) =>
           Future.successful {
             r.internalUserId shouldBe tdAll.internalUserId

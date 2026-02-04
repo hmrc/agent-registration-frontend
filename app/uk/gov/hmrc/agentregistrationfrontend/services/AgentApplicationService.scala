@@ -18,10 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
@@ -32,25 +29,18 @@ import scala.concurrent.Future
 @Singleton
 class AgentApplicationService @Inject() (
   agentRegistrationConnector: AgentRegistrationConnector
-)(using ec: ExecutionContext)
+)(using ExecutionContext)
 extends RequestAwareLogging:
 
-  def find()(using request: AuthorisedRequest[?]): Future[Option[AgentApplication]] = agentRegistrationConnector
+  def find()(using request: RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector
     .findApplication()
 
   def find(linkId: LinkId)(using request: RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector.findApplication(linkId)
 
   def find(
     agentApplicationId: AgentApplicationId
-  )(using request: RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector.findApplication(agentApplicationId)
+  )(using RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector.findApplication(agentApplicationId)
 
-  def get()(using request: AuthorisedRequest[?]): Future[AgentApplication] = find()
-    .map { maybeApplication =>
-      maybeApplication.getOrElse(Errors.throwServerErrorException("Expected application to be found"))
-    }
-
-  def upsert(agentApplication: AgentApplication)(using request: AuthorisedRequest[?]): Future[Unit] =
-    logger.debug(s"Upserting application [${request.internalUserId}]")
-    Errors.require(agentApplication.internalUserId === request.internalUserId, "Cannot modify application - you must be the user who created it")
-    agentRegistrationConnector
-      .upsertApplication(agentApplication)
+  inline def upsert(
+    agentApplication: AgentApplication
+  )(using RequestHeader): Future[Unit] = agentRegistrationConnector.upsertApplication(agentApplication)

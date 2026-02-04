@@ -21,7 +21,6 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
 import uk.gov.hmrc.agentregistration.shared.util.SealedObjects
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection
@@ -128,9 +127,9 @@ class FastForwardController @Inject() (
 )(using clock: Clock)
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.action { implicit request =>
-    Ok(fastForwardPage())
-  }
+  def show: Action[AnyContent] = actions.action:
+    implicit request =>
+      Ok(fastForwardPage())
 
   def fastForward(
     completedSection: CompletedSection
@@ -147,7 +146,7 @@ extends FrontendController(mcc, actions):
       // TODO: other business types
 
   private def handleCompletedSectionLlp(completedSection: CompletedSectionLlp)(using
-    r: AuthorisedRequest[AnyContent],
+    r: RequestWithAuth,
     clock: Clock
   ): Future[Result] =
     val application =
@@ -171,7 +170,7 @@ extends FrontendController(mcc, actions):
     } yield Redirect(AppRoutes.apply.TaskListController.show)
 
   private def updateIdentifiers(agentApplication: AgentApplicationLlp)(using
-    r: AuthorisedRequest[AnyContent],
+    r: RequestWithAuth,
     clock: Clock
   ): Future[AgentApplicationLlp] =
     val identifiers: Future[(AgentApplicationId, LinkId)] = applicationService.find().map:

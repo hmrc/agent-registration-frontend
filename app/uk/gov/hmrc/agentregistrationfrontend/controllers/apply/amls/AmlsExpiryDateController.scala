@@ -19,13 +19,9 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls
 import com.softwaremill.quicklens.*
 import play.api.data.Form
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -45,16 +41,16 @@ class AmlsExpiryDateController @Inject() (
 )(using clock: Clock)
 extends FrontendController(mcc, actions):
 
-  val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+  val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .Applicant
     .getApplicationInProgress
-    .ensure(
+    .ensure4(
       _.agentApplication.amlsDetails.exists(_.amlsRegistrationNumber.isDefined),
       implicit r =>
         logger.warn("Missing AmlsRegistrationNumber, redirecting to registration number page")
         Redirect(AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url)
     )
-    .ensure(
+    .ensure4(
       !_.agentApplication.getAmlsDetails.isHmrc, // safe to getAmlsDetails as ensured above
       implicit r =>
         logger.warn("Expiry date is not required as supervisor is HMRC, redirecting to Check Your Answers")
@@ -71,10 +67,10 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater[LocalDate](AmlsExpiryDateForm.form(), implicit request => view(_))
+      .ensureValidFormAndRedirectIfSaveForLater4[LocalDate](AmlsExpiryDateForm.form(), implicit request => view(_))
       .async:
-        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[LocalDate]) =>
-          val amlsExpiryDate = request.formValue
+        implicit request =>
+          val amlsExpiryDate: LocalDate = request.get
           applicationService
             .upsert(
               request.agentApplication

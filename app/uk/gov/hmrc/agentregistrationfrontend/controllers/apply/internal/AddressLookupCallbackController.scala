@@ -23,14 +23,12 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AddressLookupFrontendConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.agentdetails.AgentCorrespondenceAddressHelper
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -48,18 +46,11 @@ extends FrontendController(mcc, actions):
   def journeyCallback(id: Option[JourneyId]): Action[AnyContent] = actions
     .Applicant
     .getApplicationInProgress
-    .ensure(
-      _ => id.isDefined,
-      implicit r =>
-        logger.error("Missing JourneyId in the request from address-lookup-frontend.")
-        Errors.throwBadRequestException("Missing JourneyId in the request from address-lookup-frontend.")
-    )
+    .refine4(request => id.fold(BadRequest("Missing JourneyId in the request from address-lookup-frontend."))(request.add))
     .async:
-      implicit request: AgentApplicationRequest[AnyContent] =>
+      implicit request =>
         addressLookUpConnector
-          .getConfirmedAddress(
-            id.getOrThrowExpectedDataMissing("addressLookupJourneyId")
-          ).flatMap: (address: GetConfirmedAddressResponse) =>
+          .getConfirmedAddress(request.get[JourneyId]).flatMap: (address: GetConfirmedAddressResponse) =>
             val updatedApplication: AgentApplication = request
               .agentApplication
               .modify(_.agentDetails.each.agentCorrespondenceAddress)

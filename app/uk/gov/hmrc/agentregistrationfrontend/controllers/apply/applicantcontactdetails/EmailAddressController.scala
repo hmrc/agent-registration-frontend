@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontact
 import com.softwaremill.quicklens.each
 import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
@@ -28,8 +27,6 @@ import uk.gov.hmrc.agentregistration.shared.EmailAddress
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
@@ -57,10 +54,10 @@ class EmailAddressController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+  private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .Applicant
     .getApplicationInProgress
-    .ensure(
+    .ensure4(
       _
         .agentApplication
         .applicantContactDetails
@@ -81,20 +78,20 @@ extends FrontendController(mcc, actions):
       )))
 
   def submit: Action[AnyContent] = baseAction
-    .ensure(
+    .ensure4(
       // because we cannot store any submitted email without checking it's verified status first
       // if user is saving and continuing then handle the submission normally else redirect to save for later
       SubmissionHelper.getSubmitAction(_) === SaveAndContinue,
       implicit request =>
         Redirect(AppRoutes.apply.SaveForLaterController.show)
     )
-    .ensureValidForm[EmailAddress](
+    .ensureValidForm4[EmailAddress](
       form = EmailAddressForm.form,
-      viewToServeWhenFormHasErrors = implicit r => view(_)
+      resultToServeWhenFormHasErrors = implicit r => view(_)
     )
     .async:
-      implicit request: (AgentApplicationRequest[AnyContent] & FormValue[EmailAddress]) =>
-        val emailAddress: EmailAddress = request.formValue
+      implicit request =>
+        val emailAddress: EmailAddress = request.get
         val updatedApplication: AgentApplication = request
           .agentApplication
           .modify(_.applicantContactDetails.each.applicantEmailAddress)
@@ -125,7 +122,7 @@ extends FrontendController(mcc, actions):
   def verify: Action[AnyContent] = actions
     .Applicant
     .getApplicationInProgress
-    .ensure(
+    .ensure4(
       _.agentApplication
         .applicantContactDetails
         .map(_.applicantEmailAddress).isDefined,
@@ -133,7 +130,7 @@ extends FrontendController(mcc, actions):
         logger.info("Applicant email has not been provided, redirecting to email address page")
         Redirect(AppRoutes.apply.applicantcontactdetails.EmailAddressController.show)
     )
-    .ensure(
+    .ensure4(
       _.agentApplication
         .getApplicantContactDetails
         .getApplicantEmailAddress
@@ -170,7 +167,7 @@ extends FrontendController(mcc, actions):
             onEmailError()
         }
 
-  private def onEmailVerified()(implicit request: AgentApplicationRequest[AnyContent]): Future[Result] =
+  private def onEmailVerified()(implicit request: RequestWithApplication): Future[Result] =
     val updatedApplication = request
       .agentApplication
       .modify(
@@ -187,7 +184,7 @@ extends FrontendController(mcc, actions):
   private def onEmailUnverified(
     credId: String,
     emailToVerify: String
-  )(implicit request: AgentApplicationRequest[AnyContent]): Future[Result] = emailVerificationService.verifyEmail(
+  )(implicit request: RequestWithApplication): Future[Result] = emailVerificationService.verifyEmail(
     credId = credId,
     maybeEmail = Some(
       Email(
@@ -201,10 +198,10 @@ extends FrontendController(mcc, actions):
     lang = messagesApi.preferred(request).lang.code
   )
 
-  private def onEmailLocked()(implicit request: AgentApplicationRequest[AnyContent]): Future[Result] = Future.successful(
+  private def onEmailLocked()(implicit request: RequestWithApplication): Future[Result] = Future.successful(
     Ok(placeholder(h1 = "Email address locked", bodyText = Some("placeholder for Your email address has been locked")))
   )
 
-  private def onEmailError()(implicit request: AgentApplicationRequest[AnyContent]): Future[Result] = Future.successful(
+  private def onEmailError()(implicit request: RequestWithApplication): Future[Result] = Future.successful(
     Ok(placeholder(h1 = "Email address verification error", bodyText = Some("placeholder for error during email verification")))
   )

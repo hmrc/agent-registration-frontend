@@ -65,6 +65,7 @@ trait TdBase:
     providerId = "cred-id-12345",
     providerType = "GovernmentGateway"
   )
+
   def nino = Nino("AB123456C")
   def ninoFromAuth = IndividualNino.FromAuth(nino)
   def ninoProvided = IndividualNino.Provided(nino)

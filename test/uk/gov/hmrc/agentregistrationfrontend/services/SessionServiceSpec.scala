@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.mvc.Results.Ok
-import play.api.mvc.AnyContentAsEmpty
+import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import play.api.mvc.Result
 import play.api.mvc.Session
@@ -33,7 +33,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 class SessionServiceSpec
 extends UnitSpec:
 
-  implicit val request: FakeRequest[AnyContentAsEmpty.type] = TdAll.tdAll.baseRequest
+  implicit val request: FakeRequest[AnyContent] = TdAll.tdAll.baseRequest
   val result: Result = Ok("").withSession("some-preexisting-key" -> "some-value")
 
   "PartnershipType" should:
@@ -118,7 +118,7 @@ extends UnitSpec:
 
         newResult
           .asRequest
-          .readAgentType shouldBe Some(bt)
+          .readFromSessionAgentType shouldBe Some(bt)
 
         newResult.newSession.value.get(
           "agent-registration-frontend.agentType"
@@ -132,12 +132,12 @@ extends UnitSpec:
       val throwable: RuntimeException = intercept[RuntimeException]:
         request
           .withSession("agent-registration-frontend.agentType" -> "garbage")
-          .readAgentType
+          .readFromSessionAgentType
 
       throwable.getMessage shouldBe "Invalid AgentType type in session: 'garbage'"
 
     "readAgentType should return None when business type is not present in session" in:
-      request.readAgentType shouldBe None
+      request.readFromSessionAgentType shouldBe None
 
   "AgentApplicationId" should:
     s"Agent applicationId can be added to the Result and read back from the Request" in:

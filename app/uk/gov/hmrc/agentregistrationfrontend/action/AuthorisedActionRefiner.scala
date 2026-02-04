@@ -18,8 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import play.api.mvc.Results.*
 import play.api.mvc.*
+import play.api.mvc.Results.*
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
@@ -32,47 +32,35 @@ import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.AbsentIn
 
 import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-class AuthorisedRequest[A](
-  val internalUserId: InternalUserId,
-  val groupId: GroupId,
-  val request: Request[A],
-  val credentials: Credentials
-)
-extends WrappedRequest[A](request)
-
-object AuthorisedRequest:
-
-  given [T, A]: MergeFormValue[AuthorisedRequest[A], T] =
-    (
-      r: AuthorisedRequest[A],
-      t: T
-    ) =>
-      new AuthorisedRequest[A](
-        r.internalUserId,
-        r.groupId,
-        r.request,
-        r.credentials
-      ) with FormValue[T]:
-        val formValue: T = t
-
 @Singleton
-class AuthorisedAction @Inject() (
+class AuthorisedActionRefiner @Inject() (
   af: AuthorisedFunctions,
   errorResults: ErrorResults,
-  appConfig: AppConfig,
-  cc: MessagesControllerComponents
-)
-extends ActionRefiner[Request, AuthorisedRequest]
-with RequestAwareLogging:
+  appConfig: AppConfig
+)(using ExecutionContext)
+extends RequestAwareLogging:
 
-  override protected def refine[A](request: Request[A]): Future[Either[Result, AuthorisedRequest[A]]] =
-    given r: Request[A] = request
-
+  def refine[
+    ContentType,
+    Data <: Tuple
+  ](
+    request: RequestWithDataCt[ContentType, Data]
+  )(
+    using
+    Credentials AbsentIn Data,
+    GroupId AbsentIn Data,
+    InternalUserId AbsentIn Data
+  ): Future[Either[Result, RequestWithDataCt[
+    ContentType,
+    InternalUserId *: GroupId *: Credentials *: Data
+  ]]] =
+    given RequestWithDataCt[ContentType, Data] = request
     af.authorised(
       AuthProviders(GovernmentGateway)
         and AffinityGroup.Agent
@@ -83,7 +71,7 @@ with RequestAwareLogging:
         and Retrievals.internalId
         and Retrievals.credentials
     ).apply:
-      case allEnrolments ~ maybeGroupIdentifier ~ credentialRole ~ maybeInternalId ~ credentials =>
+      case allEnrolments ~ maybeGroupIdentifier ~ credentialRole ~ maybeInternalId ~ maybeCredentials =>
         if isUnsupportedCredentialRole(credentialRole) then
           logger.info(s"Unauthorised because of 'UnsupportedCredentialRole'")
           Future.successful(Left(errorResults.unauthorised(message = "UnsupportedCredentialRole")))
@@ -91,17 +79,21 @@ with RequestAwareLogging:
           val redirectUrl: String = appConfig.asaDashboardUrl
           logger.info(s"Enrolment ${appConfig.hmrcAsAgentEnrolment} is assigned to user, redirecting to ASA Dashboard ($redirectUrl)")
           Future.successful(Left(Redirect(redirectUrl)))
-        else
-          Future.successful(Right(new AuthorisedRequest(
-            internalUserId = maybeInternalId
-              .map(InternalUserId.apply)
-              .getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing")),
-            groupId = maybeGroupIdentifier
-              .map(GroupId.apply)
-              .getOrElse(Errors.throwServerErrorException("Retrievals for group identifier is missing")),
-            request = request,
-            credentials = credentials.getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing"))
-          )))
+        else {
+          val credentials: Credentials = maybeCredentials.getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing"))
+          Future.successful(Right(
+            request
+              .add(credentials)
+              .add(maybeGroupIdentifier
+                .map(GroupId.apply)
+                .getOrElse(Errors.throwServerErrorException("Retrievals for group identifier is missing")))
+              .add(
+                maybeInternalId
+                  .map(InternalUserId.apply)
+                  .getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing"))
+              )
+          ))
+        }
     .recoverWith:
       case _: NoActiveSession =>
         logger.info(s"Unauthorised because of 'NoActiveSession', redirecting to sign in page")
@@ -137,8 +129,6 @@ with RequestAwareLogging:
           )
         ))
 
-  override protected def executionContext: ExecutionContext = cc.executionContext
-
   private def isHmrcAsAgentEnrolmentAssignedToUser[A](allEnrolments: Enrolments) = allEnrolments
     .getEnrolment(appConfig.hmrcAsAgentEnrolment.key)
     .exists(_.isActivated)
@@ -151,5 +141,3 @@ with RequestAwareLogging:
 
   @nowarn
   private val credentialRoleAdmin: Predicate = User.or(Admin) // Admin and User are equivalent, Admin is deprecated
-
-  private given ExecutionContext = cc.executionContext

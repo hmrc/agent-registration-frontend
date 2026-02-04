@@ -39,7 +39,7 @@ extends FrontendController(mcc, actions):
     actions
       .Applicant
       .getApplicationInProgress
-      .ensure(
+      .ensure4(
         r => r.agentApplication.amlsDetails.exists(_.isComplete),
         implicit request =>
           logger.warn(s"Cannot display Check Your Answers page - incomplete AMLS details.")

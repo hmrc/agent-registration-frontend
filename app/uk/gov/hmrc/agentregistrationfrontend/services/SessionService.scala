@@ -50,13 +50,13 @@ object SessionService:
 
   extension (r: Request[?])
 
-    def readAgentType: Option[AgentType] = r.session.get(agentTypeKey).map: value =>
+    def readFromSessionAgentType: Option[AgentType] = r.session.get(agentTypeKey).map: value =>
       AgentType
         .values
         .find(_.toString === value)
         .getOrElse(throw new RuntimeException(s"Invalid AgentType type in session: '$value'"))
 
-    def getAgentType: AgentType = readAgentType.getOrThrowExpectedDataMissing("AgentType")
+    def getAgentType: AgentType = readFromSessionAgentType.getOrThrowExpectedDataMissing("AgentType")
 
     def readBusinessTypeAnswer: Option[BusinessTypeAnswer] = r.session.get(businessTypeKey).map: value =>
       BusinessTypeAnswer

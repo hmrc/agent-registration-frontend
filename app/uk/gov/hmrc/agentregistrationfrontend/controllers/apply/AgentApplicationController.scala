@@ -19,16 +19,15 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.ConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.ViewApplicationPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.Future
 
 @Singleton
 class AgentApplicationController @Inject() (
@@ -36,8 +35,7 @@ class AgentApplicationController @Inject() (
   mcc: MessagesControllerComponents,
   simplePage: SimplePage,
   confirmationPage: ConfirmationPage,
-  viewApplicationPage: ViewApplicationPage,
-  businessPartnerRecordService: BusinessPartnerRecordService
+  viewApplicationPage: ViewApplicationPage
 )
 extends FrontendController(mcc, actions):
 
@@ -53,54 +51,41 @@ extends FrontendController(mcc, actions):
   // TODO: is this endpoint really needed?
   def applicationDashboard: Action[AnyContent] = actions
     .Applicant
-    .getApplicationInProgress
-    .async { implicit request =>
-      Future.successful(Ok(simplePage(
-        h1 = "Application Dashboard page...",
-        bodyText = Some(
-          "Placeholder for the Application Dashboard page..."
-        )
-      )))
-    }
+    .getApplicationInProgress:
+      implicit request =>
+        Ok(simplePage(
+          h1 = "Application Dashboard page...",
+          bodyText = Some(
+            "Placeholder for the Application Dashboard page..."
+          )
+        ))
 
   def applicationSubmitted: Action[AnyContent] = actions
     .Applicant
-    .getApplicationSubmitted.async:
+    .getApplicationSubmitted
+    .getBusinessPartnerRecord:
       implicit request =>
-        businessPartnerRecordService
-          .getBusinessPartnerRecord(request.agentApplication.getUtr)
-          .map: bprOpt =>
-            Ok(confirmationPage(
-              entityName = bprOpt
-                .map(_.getEntityName)
-                .getOrThrowExpectedDataMissing(
-                  "Business Partner Record is missing for confirmation page"
-                ),
-              agentApplication = request.agentApplication
-            ))
+        Ok(confirmationPage(
+          entityName = request.businessPartnerRecordResponse.getEntityName,
+          agentApplication = request.get[AgentApplication]
+        ))
 
   def viewSubmittedApplication: Action[AnyContent] = actions
     .Applicant
-    .getApplicationSubmitted.async:
+    .getApplicationSubmitted
+    .getBusinessPartnerRecord:
       implicit request =>
-        businessPartnerRecordService
-          .getBusinessPartnerRecord(request.agentApplication.getUtr)
-          .map: bprOpt =>
-            Ok(viewApplicationPage(
-              entityName = bprOpt
-                .map(_.getEntityName)
-                .getOrThrowExpectedDataMissing(
-                  "Business Partner Record is missing for View Application page"
-                ),
-              agentApplication = request.agentApplication
-            ))
+        Ok(viewApplicationPage(
+          entityName = request.businessPartnerRecordResponse.getEntityName,
+          agentApplication = request.get[AgentApplication]
+        ))
 
-  def startRegistration: Action[AnyContent] = action:
+  def startRegistration: Action[AnyContent] = actions.action:
     implicit request =>
       // if we use an endpoint like this, we can later change the flow without changing the URL
       Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show)
 
-  def genericExitPage: Action[AnyContent] = action:
+  def genericExitPage: Action[AnyContent] = actions.action:
     implicit request =>
       Ok(simplePage(
         h1 = "You cannot use this service...",

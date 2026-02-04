@@ -25,7 +25,6 @@ import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
 import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
@@ -68,16 +67,16 @@ class AmlsEvidenceUploadController @Inject() (
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
-  val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+  val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .Applicant
     .getApplicationInProgress
-    .ensure(
+    .ensure4(
       _.agentApplication.amlsDetails.exists(!_.isHmrc),
       implicit r =>
         logger.warn("Uploaded evidence is not required as supervisor is HMRC, redirecting to Check Your Answers")
         Redirect(AppRoutes.apply.amls.CheckYourAnswersController.show.url)
     )
-    .ensure(
+    .ensure4(
       _.agentApplication.getAmlsDetails.amlsExpiryDate.isDefined, // safe to getAmlsDetails as ensured above
       implicit r =>
         logger.warn("Missing AmlsExpiryDate, redirecting to AmlsExpiryDate page")
@@ -129,7 +128,7 @@ extends FrontendController(mcc, actions):
 
   def showUploadResult: Action[AnyContent] = baseAction
     .async:
-      implicit request: AgentApplicationRequest[AnyContent] =>
+      implicit request =>
         for
           upload: Upload <- uploadRepo.findLatestByInternalUserId(request.internalUserId).map(_.getOrThrowExpectedDataMissing("upload"))
           _ <- updateRecordsIfNeeded(upload, request.agentApplication)
@@ -181,7 +180,7 @@ extends FrontendController(mcc, actions):
     .Applicant
     .getApplicationInProgress
     .async:
-      implicit request: AgentApplicationRequest[AnyContent] =>
+      implicit request =>
 
         extension (r: Result)
           private def withCorsHeaders: Result = r.withHeaders(

@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.GrsConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
@@ -49,7 +48,7 @@ extends Connector:
   def createJourney(
     journeyConfig: JourneyConfig,
     businessType: BusinessType
-  )(using AuthorisedRequest[?]): Future[JourneyStartUrl] =
+  )(using RequestHeader): Future[JourneyStartUrl] =
     val url: URL = url"${grsConfig.createJourneyUrl(businessType)}"
     httpClient
       .post(url)
@@ -70,7 +69,7 @@ extends Connector:
   def getJourneyData(
     businessType: BusinessType,
     journeyId: JourneyId
-  )(using AuthorisedRequest[?]): Future[JourneyData] =
+  )(using RequestHeader): Future[JourneyData] =
     // HC override is needed because the GRS stub data is stored in the session cookie
     // By default the header carrier drops the session cookie
     given headerCarrier: HeaderCarrier =

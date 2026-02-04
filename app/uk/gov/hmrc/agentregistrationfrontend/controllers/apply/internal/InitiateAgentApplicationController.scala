@@ -55,7 +55,7 @@ extends FrontendController(mcc, actions):
   ): Action[AnyContent] = actions
     .Applicant
     .authorised
-    .ensureAsync(
+    .ensure4(
       condition =
         implicit request =>
           val isHmrcAsAgentEnrolmentAllocatedToGroup: Future[Boolean] = enrolmentStoreProxyConnector
@@ -67,7 +67,7 @@ extends FrontendController(mcc, actions):
         implicit request =>
           val redirectUrl: String = appConfig.taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment
           logger.info(s"No Application can be created. ${appConfig.hmrcAsAgentEnrolment} is already assigned to group ${request.groupId}. Redirecting to taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment ($redirectUrl)")
-          Future.successful(Redirect(redirectUrl))
+          Redirect(redirectUrl)
     )
     .async:
       implicit request =>

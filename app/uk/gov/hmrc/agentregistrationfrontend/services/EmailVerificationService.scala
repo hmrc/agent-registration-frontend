@@ -45,7 +45,7 @@ extends RequestAwareLogging:
     maybeBackUrl: Option[String],
     accessibilityStatementUrl: String,
     lang: String
-  )(using rh: RequestHeader): Future[Result] =
+  )(using RequestHeader): Future[Result] =
     for {
       verifyEmailResponse <- emailVerificationConnector.verifyEmail(
         VerifyEmailRequest(
@@ -74,7 +74,7 @@ extends RequestAwareLogging:
   def checkEmailVerificationStatus(
     credId: String,
     email: String
-  )(using rh: RequestHeader): Future[EmailVerificationStatus] = emailVerificationConnector
+  )(using RequestHeader): Future[EmailVerificationStatus] = emailVerificationConnector
     .checkEmailVerificationStatus(credId)
     .map(
       _.emails.find(_.emailAddress === email.toLowerCase)

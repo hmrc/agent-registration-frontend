@@ -19,7 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.util
 import play.api.Logger
 
 trait RequestAwareLogging:
-  given logger: RequestAwareLogger =
+
+  protected implicit val logger: RequestAwareLogger =
     new RequestAwareLogger(
       delegateLogger = Logger(getClass)
     )

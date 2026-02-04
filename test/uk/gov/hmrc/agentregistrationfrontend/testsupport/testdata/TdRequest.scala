@@ -16,9 +16,11 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-import play.api.mvc.AnyContentAsEmpty
+import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import play.api.test.FakeRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
+import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withAuthTokenInSession
@@ -39,7 +41,7 @@ trait TdRequest {
   def trueClientPort: String = "client-port-123"
   def deviceIdInRequest: String = "device-id-123"
 
-  def baseRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  def baseRequest: FakeRequest[AnyContent] = FakeRequest()
     .withRequestId()
     .withTrueClientIp()
     .withTrueClientPort()
@@ -47,27 +49,60 @@ trait TdRequest {
 
   def headerCarrier: HeaderCarrier = HeaderCarrier()
 
-  def requestNotLoggedIn: Request[AnyContentAsEmpty.type] = baseRequest
-  def requestLoggedIn: Request[AnyContentAsEmpty.type] = baseRequest.withAuthTokenInSession()
+  def rawRequestNotLoggedIn: Request[AnyContent] = baseRequest
+  def rawRequestLoggedIn: Request[AnyContent] = baseRequest.withAuthTokenInSession()
 
-  def requestLoggedInWithAgentApplicationId: Request[AnyContentAsEmpty.type] = baseRequest
+  def requestNotLoggedIn: RequestWithData[EmptyTuple] = RequestWithDataCt.empty(rawRequestNotLoggedIn)
+  def requestLoggedInEmptyData: RequestWithData[EmptyTuple] = RequestWithDataCt.empty(rawRequestLoggedIn)
+
+  def deleteMerequestLoggedIn: Request[AnyContent] = baseRequest.withAuthTokenInSession()
+
+  object ApplicantRequests:
+
+    import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions.*
+
+    def requestWithAuthData: RequestWithData[DataWithAuth] = RequestWithDataCt.apply[AnyContent, DataWithAuth](
+      rawRequestLoggedIn,
+      (
+        dependencies.internalUserId,
+        dependencies.groupId,
+        dependencies.credentials
+      )
+    )
+
+  object IndividualRequests:
+
+    import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions.*
+
+    def dataWithAuth: DataWithAuth =
+      (
+        dependencies.internalUserId,
+        dependencies.credentials
+      )
+
+    def requestWithAuthData: RequestWithData[DataWithAuth] = RequestWithDataCt.apply[AnyContent, DataWithAuth](
+      rawRequestLoggedIn,
+      dataWithAuth
+    )
+
+  def requestLoggedInWithAgentApplicationId: Request[AnyContent] = baseRequest
     .withAuthTokenInSession()
     .withAgentApplicationId(agentApplicationId.value)
 
-  def individualAuthorisedRequestLoggedInWithAgentApplicationId: IndividualAuthorisedRequest[AnyContentAsEmpty.type] =
+  def individualAuthorisedRequestLoggedInWithAgentApplicationId: IndividualAuthorisedRequest[AnyContent] =
     new IndividualAuthorisedRequest(
       internalUserId = internalUserId,
       request = requestLoggedInWithAgentApplicationId,
       credentials = credentials
     )
-  def individualAuthorisedRequestLoggedInWithOutAgentApplicationId: IndividualAuthorisedRequest[AnyContentAsEmpty.type] =
+  def individualAuthorisedRequestLoggedInWithOutAgentApplicationId: IndividualAuthorisedRequest[AnyContent] =
     new IndividualAuthorisedRequest(
       internalUserId = internalUserId,
-      request = requestNotLoggedIn,
+      request = rawRequestNotLoggedIn,
       credentials = credentials
     )
 
-  def individualAuthorisedRequestLoggedInWithAgentApplicationIdAndIdentifiers: IndividualAuthorisedWithIdentifiersRequest[AnyContentAsEmpty.type] =
+  def individualAuthorisedRequestLoggedInWithAgentApplicationIdAndIdentifiers: IndividualAuthorisedWithIdentifiersRequest[AnyContent] =
     new IndividualAuthorisedWithIdentifiersRequest(
       internalUserId = internalUserId,
       request = requestLoggedInWithAgentApplicationId,
@@ -76,7 +111,7 @@ trait TdRequest {
       saUtr = Some(saUtr)
     )
 
-  def individualAuthorisedRequestLoggedInWithAgentApplicationIdNinoAndNoUtr: IndividualAuthorisedWithIdentifiersRequest[AnyContentAsEmpty.type] =
+  def individualAuthorisedRequestLoggedInWithAgentApplicationIdNinoAndNoUtr: IndividualAuthorisedWithIdentifiersRequest[AnyContent] =
     new IndividualAuthorisedWithIdentifiersRequest(
       internalUserId = internalUserId,
       request = requestLoggedInWithAgentApplicationId,
@@ -85,10 +120,10 @@ trait TdRequest {
       saUtr = Some(saUtr)
     )
 
-  def individualAuthorisedRequestLoggedInWithOutAgentApplicationIdAndIdentifiers: IndividualAuthorisedWithIdentifiersRequest[AnyContentAsEmpty.type] =
+  def individualAuthorisedRequestLoggedInWithOutAgentApplicationIdAndIdentifiers: IndividualAuthorisedWithIdentifiersRequest[AnyContent] =
     new IndividualAuthorisedWithIdentifiersRequest(
       internalUserId = internalUserId,
-      request = requestNotLoggedIn,
+      request = rawRequestNotLoggedIn,
       credentials = credentials,
       nino = Some(nino),
       saUtr = Some(saUtr)

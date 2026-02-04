@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.services
 
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
@@ -31,5 +31,5 @@ class BusinessPartnerRecordService @Inject() (
 )
 extends RequestAwareLogging:
 
-  def getBusinessPartnerRecord(utr: Utr)(using request: AuthorisedRequest[?]): Future[Option[BusinessPartnerRecordResponse]] =
+  def getBusinessPartnerRecord(utr: Utr)(using request: RequestHeader): Future[Option[BusinessPartnerRecordResponse]] =
     agentRegistrationConnector.getBusinessPartnerRecord(utr)

@@ -19,14 +19,11 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontact
 import com.softwaremill.quicklens.each
 import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.TelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -44,10 +41,10 @@ class TelephoneNumberController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[AgentApplicationRequest, AnyContent] = actions
+  private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .Applicant
     .getApplicationInProgress
-    .ensure(
+    .ensure4(
       _.agentApplication.applicantContactDetails.map(_.applicantName).nonEmpty,
       implicit request =>
         logger.warn("Because we don't have name details we are redirecting to that page")
@@ -67,10 +64,10 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater(TelephoneNumberForm.form, implicit r => view(_))
+      .ensureValidFormAndRedirectIfSaveForLater4(TelephoneNumberForm.form, implicit r => view(_))
       .async:
-        implicit request: (AgentApplicationRequest[AnyContent] & FormValue[TelephoneNumber]) =>
-          val validFormData: TelephoneNumber = request.formValue
+        implicit request =>
+          val validFormData: TelephoneNumber = request.get
           val updatedApplication: AgentApplication = request.agentApplication
             .modify(_.applicantContactDetails.each.telephoneNumber)
             .setTo(Some(validFormData))

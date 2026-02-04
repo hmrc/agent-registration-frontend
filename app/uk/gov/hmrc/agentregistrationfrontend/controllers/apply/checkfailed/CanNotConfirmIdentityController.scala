@@ -39,7 +39,7 @@ extends FrontendController(mcc, actions):
     actions
       .Applicant
       .getApplicationInProgress
-      .ensure(
+      .ensure4(
         condition =
           _.agentApplication match
             case a: AgentApplicationSoleTrader => a.deceasedCheckResult === Some(CheckResult.Fail)

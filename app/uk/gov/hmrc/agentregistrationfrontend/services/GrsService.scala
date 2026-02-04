@@ -18,8 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.services
 
 import play.api.i18n.Lang
 import play.api.i18n.MessagesApi
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppLangs
 import uk.gov.hmrc.agentregistrationfrontend.config.GrsConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.GrsConnector
@@ -46,7 +46,7 @@ class GrsService @Inject() (
     businessType: BusinessType,
     includeNamePageLabel: Boolean
   )(using
-    request: AuthorisedRequest[?]
+    request: RequestHeader
   ): Future[JourneyStartUrl] = grsConnector.createJourney(
     journeyConfig = createJourneyConfig(includeNamePageLabel),
     businessType = businessType
@@ -55,7 +55,7 @@ class GrsService @Inject() (
   def getJourneyData(
     businessType: BusinessType,
     journeyId: JourneyId
-  )(using request: AuthorisedRequest[?]): Future[JourneyData] = grsConnector.getJourneyData(businessType, journeyId)
+  )(using request: RequestHeader): Future[JourneyData] = grsConnector.getJourneyData(businessType, journeyId)
 
   private def createJourneyConfig(
     includeNamePageLabel: Boolean

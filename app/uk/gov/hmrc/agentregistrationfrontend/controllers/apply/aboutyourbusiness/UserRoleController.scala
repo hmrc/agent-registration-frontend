@@ -37,18 +37,18 @@ class UserRoleController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[?] = action:
-    implicit request: Request[?] =>
+  def show: Action[?] = actions.action:
+    implicit request =>
       Ok(view(
         form = UserRoleForm.form.fill(request.readUserRole),
         userRoleOption = userRoleOptionForBusinessType(request.getBusinessType)
       ))
 
   def submit: Action[AnyContent] =
-    action
-      .ensureValidForm(UserRoleForm.form, implicit request => view(_, userRoleOptionForBusinessType(request.getBusinessType))):
+    actions.action
+      .ensureValidForm4(UserRoleForm.form, implicit request => view(_, userRoleOptionForBusinessType(request.getBusinessType))):
         implicit request =>
-          val userRole: UserRole = request.formValue
+          val userRole: UserRole = request.get
           Redirect(
             AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show.url
           ).addToSession(userRole)

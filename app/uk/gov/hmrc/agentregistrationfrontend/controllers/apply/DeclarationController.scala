@@ -29,7 +29,6 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskStatus
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.DeclarationPage
 
 import javax.inject.Inject
@@ -40,15 +39,14 @@ class DeclarationController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
   view: DeclarationPage,
-  agentApplicationService: AgentApplicationService,
-  businessPartnerRecordService: BusinessPartnerRecordService
+  agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction = actions
+  private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .Applicant
     .getApplicationInProgress
-    .ensure(
+    .ensure4(
       _.agentApplication.taskListStatus.declaration.canStart,
       implicit request =>
         logger.warn("Cannot start declaration whilst tasks are outstanding, redirecting to task list")
@@ -56,19 +54,12 @@ extends FrontendController(mcc, actions):
     )
 
   def show: Action[AnyContent] = baseAction
-    .async:
+    .getBusinessPartnerRecord:
       implicit request =>
-        businessPartnerRecordService
-          .getBusinessPartnerRecord(request.agentApplication.getUtr)
-          .map: bprOpt =>
-            Ok(view(
-              entityName = bprOpt
-                .map(_.getEntityName)
-                .getOrThrowExpectedDataMissing(
-                  "Business Partner Record is missing"
-                ),
-              agentApplication = request.agentApplication
-            ))
+        Ok(view(
+          entityName = request.businessPartnerRecordResponse.getEntityName,
+          agentApplication = request.agentApplication
+        ))
 
   def submit: Action[AnyContent] = baseAction
     .async:

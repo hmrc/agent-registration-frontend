@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.AgentApplicationRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -59,7 +58,7 @@ extends Connector:
       .andLogOnFailure("Failed to upsert IndividualProvidedDetails")
 
   def find(agentApplicationId: AgentApplicationId)(using
-    IndividualAuthorisedRequest[?]
+    RequestHeader
   ): Future[Option[IndividualProvidedDetailsToBeDeleted]] =
     val url: URL = url"$baseUrl/member-provided-details/by-agent-applicationId/${agentApplicationId.value}"
     httpClient
@@ -79,14 +78,14 @@ extends Connector:
       .andLogOnFailure(s"Failed to find IndividualProvidedDetails by agent application id: $agentApplicationId")
 
   // for use by agent applicants when building lists of individuals
-  def find(using
-    request: AgentApplicationRequest[?]
+  def findAll(agentApplicationId: AgentApplicationId)(using
+    request: RequestHeader
   ): Future[List[IndividualProvidedDetailsToBeDeleted]] =
-    val url: URL = url"$baseUrl/individual-provided-details/for-application/${request.agentApplication.agentApplicationId.value}"
+    val url: URL = url"$baseUrl/individual-provided-details/for-application/${agentApplicationId.value}"
     httpClient
       .get(url)
       .execute[List[IndividualProvidedDetailsToBeDeleted]]
-      .andLogOnFailure(s"Failed to find IndividualProvidedDetails by agent application id: ${request.agentApplication.agentApplicationId.value}")
+      .andLogOnFailure(s"Failed to find IndividualProvidedDetails by agent application id: ${agentApplicationId.value}")
 
   def findAll()(using
     IndividualAuthorisedRequest[?]
