@@ -20,7 +20,6 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import play.api.test.FakeRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
-import uk.gov.hmrc.agentregistrationfrontend.action.Requests.DataWithAuth
 import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
@@ -58,10 +57,33 @@ trait TdRequest {
 
   def deleteMerequestLoggedIn: Request[AnyContent] = baseRequest.withAuthTokenInSession()
 
-  def requestWithAuthData: RequestWithData[DataWithAuth] = RequestWithDataCt.apply[AnyContent, DataWithAuth](
-    rawRequestLoggedIn,
-    dependencies.dataWithAuth
-  )
+  object ApplicantRequests:
+
+    import uk.gov.hmrc.agentregistrationfrontend.action.applicant.Actions.*
+
+    def requestWithAuthData: RequestWithData[DataWithAuth] = RequestWithDataCt.apply[AnyContent, DataWithAuth](
+      rawRequestLoggedIn,
+      (
+        dependencies.internalUserId,
+        dependencies.groupId,
+        dependencies.credentials
+      )
+    )
+
+  object IndividualRequests:
+
+    import uk.gov.hmrc.agentregistrationfrontend.action.individual.Actions.*
+
+    def dataWithAuth: DataWithAuth =
+      (
+        dependencies.internalUserId,
+        dependencies.credentials
+      )
+
+    def requestWithAuthData: RequestWithData[DataWithAuth] = RequestWithDataCt.apply[AnyContent, DataWithAuth](
+      rawRequestLoggedIn,
+      dataWithAuth
+    )
 
   def requestLoggedInWithAgentApplicationId: Request[AnyContent] = baseRequest
     .withAuthTokenInSession()

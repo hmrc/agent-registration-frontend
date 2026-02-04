@@ -110,5 +110,5 @@ extends ISpec:
         .refine(tdAll.requestLoggedInEmptyData)
         .futureValue
         .value
-    requestWithAuth.data shouldBe tdAll.requestWithAuthData.data
+    requestWithAuth.data shouldBe tdAll.ApplicantRequests.requestWithAuthData.data
     AuthStubs.verifyAuthorise()

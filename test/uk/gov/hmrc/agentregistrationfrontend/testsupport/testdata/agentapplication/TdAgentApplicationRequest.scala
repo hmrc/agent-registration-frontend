@@ -27,6 +27,6 @@ trait TdAgentApplicationRequest {
 
   def makeAgentApplicationRequest(
     agentApplication: AgentApplication
-  ): RequestWithData[DataWithApplication] = dependencies.requestWithAuthData.add(agentApplication)
+  ): RequestWithData[DataWithApplication] = dependencies.ApplicantRequests.requestWithAuthData.add(agentApplication)
 
 }
