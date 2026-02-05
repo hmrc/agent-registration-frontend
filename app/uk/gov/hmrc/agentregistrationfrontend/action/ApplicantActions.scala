@@ -62,7 +62,7 @@ extends RequestAwareLogging:
     .refine2(request => RequestWithDataCt.empty(request))
 
   val authorised: ActionBuilderWithData[DataWithAuth] = action
-    .refineAsync(authorisedActionRefiner.refine)
+    .refineFutureEither(authorisedActionRefiner.refine)
 
   val getApplication: ActionBuilderWithData[DataWithApplication] = authorised
     .refine4:

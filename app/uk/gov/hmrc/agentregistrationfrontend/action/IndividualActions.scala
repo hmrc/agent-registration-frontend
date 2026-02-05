@@ -76,19 +76,19 @@ extends RequestAwareLogging:
     .refine2(request => RequestWithDataCt.empty(request))
 
   val authorised: ActionBuilderWithData[DataWithAuth] = action
-    .refineAsync(individualAuthorisedRefiner.refineIntoRequestWithAuth)
+    .refineFutureEither(individualAuthorisedRefiner.refineIntoRequestWithAuth)
 
   val DELETEMEauthorised: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
     .andThen(individualAuthorisedAction)
 
   val authorisedWithAdditionalIdentifiers: ActionBuilderWithData[DataWithAdditionalIdentifiers] = action
-    .refineAsync(individualAuthorisedRefiner.refineIntoRequestWithAdditionalIdentifiers)
+    .refineFutureEither(individualAuthorisedRefiner.refineIntoRequestWithAdditionalIdentifiers)
 
   val DELETEMEauthorisedWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = action
     .andThen(individualAuthorisedWithIdentifiersAction)
 
   val getProvidedDetails: ActionBuilderWithData[DataWithIndividualProvidedDetails] = authorised
-    .refineAsync:
+    .refineFutureEither:
       individualProvideDetailsRefiner.refineIntoRequestWithIndividualProvidedDetails
 
   val DELETEMEgetProvidedDetails: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = DELETEMEauthorised
