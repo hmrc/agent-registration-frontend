@@ -20,16 +20,15 @@ import com.softwaremill.quicklens.each
 import com.softwaremill.quicklens.modify
 import play.api.data.Form
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Request
+import play.api.mvc.RequestHeader
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.companieshouse.*
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
-
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionFormType
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms.toOfficerSelection
@@ -59,8 +58,8 @@ class CompaniesHouseMatchingController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions
-    .DELETEMEgetProvideDetailsInProgress
+  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions
+    .getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.companiesHouseMatch.isDefined,
       implicit request =>
@@ -70,8 +69,8 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = baseAction
     .async:
-      implicit request: IndividualProvideDetailsRequest[AnyContent] =>
-        fetchOfficers.map:
+      implicit request =>
+        fetchOfficers(request.individualProvidedDetails).map:
           case Nil =>
             logger.info("No Companies House officers found matching individual name query, rendering noMemberNameMatchesView")
             Ok(noIndividualNameMatchesView(
@@ -101,18 +100,21 @@ extends FrontendController(mcc, actions):
             ))
 
   def submit: Action[AnyContent] = baseAction
-    .ensureValidForm[ChOfficerSelectionFormType](
+    .ensureValidForm4[ChOfficerSelectionFormType](
       ChOfficerSelectionForms.formType,
       implicit request => formWithErrors => Errors.throwBadRequestException(s"Unexpected errors in the FormType: $formWithErrors")
     )
     .async:
-      implicit request: (IndividualProvideDetailsRequest[AnyContent] & FormValue[ChOfficerSelectionFormType]) =>
-        request.formValue match {
-          case ChOfficerSelectionFormType.YesNoForm => handleYesNoForm
-          case ChOfficerSelectionFormType.OfficerSelectionForm => handleOfficerSelectionForm
-        }
+      implicit request =>
+        val chOfficerSelectionFormType: ChOfficerSelectionFormType = request.get
+        val individualProvidedDetails = request.individualProvidedDetails
+        chOfficerSelectionFormType match
+          case ChOfficerSelectionFormType.YesNoForm => handleYesNoForm(individualProvidedDetails)
+          case ChOfficerSelectionFormType.OfficerSelectionForm => handleOfficerSelectionForm(individualProvidedDetails)
 
-  def handleYesNoForm(using request: IndividualProvideDetailsRequest[?]): Future[Result] = fetchOfficers.flatMap: officers =>
+  def handleYesNoForm(
+    individualProvidedDetails: IndividualProvidedDetailsToBeDeleted
+  )(using request: Request[?]): Future[Result] = fetchOfficers(individualProvidedDetails).flatMap: officers =>
     val officer: CompaniesHouseOfficer = officers
       .headOption
       .getOrThrowExpectedDataMissing(
@@ -121,7 +123,7 @@ extends FrontendController(mcc, actions):
     ChOfficerSelectionForms.yesNoForm.bindFromRequest().fold(
       hasErrors = (formWithErrors: Form[YesNo]) => Future.successful(BadRequest(matchedIndividualView(formWithErrors, officer))),
       success =
-        case YesNo.Yes => updateProvidedDetails(officer)
+        case YesNo.Yes => updateProvidedDetails(individualProvidedDetails, officer)
         case YesNo.No =>
           // TODO: do we need to reset data here?
           Future.successful(
@@ -129,26 +131,29 @@ extends FrontendController(mcc, actions):
           )
     )
 
-  def handleOfficerSelectionForm(using request: IndividualProvideDetailsRequest[?]): Future[Result] = fetchOfficers.flatMap: officers =>
-    Errors.require(officers.size > 1, s"Unexpected response from companies house, expected more then 1 officer but got: ${officers.size}")
+  def handleOfficerSelectionForm(
+    individualProvidedDetails: IndividualProvidedDetailsToBeDeleted
+  )(using request: Request[?]): Future[Result] = fetchOfficers(individualProvidedDetails)
+    .flatMap: officers =>
+      Errors.require(officers.size > 1, s"Unexpected response from companies house, expected more then 1 officer but got: ${officers.size}")
 
-    ChOfficerSelectionForms
-      .officerSelectionForm(officers)
-      .bindFromRequest()
-      .fold(
-        hasErrors = formWithErrors => Future.successful(BadRequest(matchedIndividualsView(formWithErrors, officers))),
-        success =
-          officerSelection =>
-            val officer: CompaniesHouseOfficer = officers
-              .find(_.toOfficerSelection === officerSelection)
-              .getOrThrowExpectedDataMissing("Unexpected response from companies house, could not find selected officer")
-            updateProvidedDetails(officer)
-      )
+      ChOfficerSelectionForms
+        .officerSelectionForm(officers)
+        .bindFromRequest()
+        .fold(
+          hasErrors = formWithErrors => Future.successful(BadRequest(matchedIndividualsView(formWithErrors, officers))),
+          success =
+            officerSelection =>
+              val officer: CompaniesHouseOfficer = officers
+                .find(_.toOfficerSelection === officerSelection)
+                .getOrThrowExpectedDataMissing("Unexpected response from companies house, could not find selected officer")
+              updateProvidedDetails(individualProvidedDetails, officer)
+        )
 
-  private def fetchOfficers(using request: IndividualProvideDetailsRequest[?]): Future[Seq[CompaniesHouseOfficer]] =
+  private def fetchOfficers(individualProvidedDetails: IndividualProvidedDetailsToBeDeleted)(using request: RequestHeader): Future[Seq[CompaniesHouseOfficer]] =
     for {
       agentApplication <- agentApplicationService
-        .find(request.individualProvidedDetails.agentApplicationId) // starting to think it may be better to have the application in the request
+        .find(individualProvidedDetails.agentApplicationId) // starting to think it may be better to have the application in the request
       officers <- companiesHouseService.getLlpOfficers(
         companyRegistrationNumber =
           agentApplication
@@ -156,7 +161,7 @@ extends FrontendController(mcc, actions):
             .asLlpApplication
             .getCrn,
         lastName =
-          request.individualProvidedDetails.companiesHouseMatch
+          individualProvidedDetails.companiesHouseMatch
             .getOrThrowExpectedDataMissing("Companies House match is not defined")
             .memberNameQuery
             .lastName
@@ -164,10 +169,11 @@ extends FrontendController(mcc, actions):
     } yield officers
 
   private def updateProvidedDetails(
+    individualProvidedDetails: IndividualProvidedDetailsToBeDeleted,
     officer: CompaniesHouseOfficer
-  )(using request: IndividualProvideDetailsRequest[?]): Future[Result] = individualProvideDetailsService
+  )(using request: RequestHeader): Future[Result] = individualProvideDetailsService
     .upsert(
-      individualProvidedDetails = request.individualProvidedDetails
+      individualProvidedDetails = individualProvidedDetails
         .modify(_.companiesHouseMatch.each.companiesHouseOfficer)
         .setTo(Some(officer))
     )
