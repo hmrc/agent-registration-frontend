@@ -23,10 +23,7 @@ import play.api.mvc.Results.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualProvideDetailsRefiner
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll.agentApplicationId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll.individualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec

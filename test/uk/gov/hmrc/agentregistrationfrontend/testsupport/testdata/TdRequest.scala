@@ -85,18 +85,18 @@ trait TdRequest {
       )
     )
 
-//    def requestWithAdditionalIdentifiers(
-//      maybeBino: Option[Nino] = Some(dependencies.nino),
-//      maybeSaUtr: Option[SaUtr] = Some(dependencies.saUtr)
-//    ): RequestWithData[DataWithAdditionalIdentifiers] = RequestWithDataCt.apply(
-//      rawRequestLoggedIn,
-//      (
-//        maybeBino,
-//        maybeSaUtr,
-//        dependencies.internalUserId,
-//        dependencies.credentials
-//      )
-//    )
+    def requestWithAdditionalIdentifiers(
+      maybeBino: Option[Nino] = Some(dependencies.nino),
+      maybeSaUtr: Option[SaUtr] = Some(dependencies.saUtr)
+    ): RequestWithData[DataWithAdditionalIdentifiers] = RequestWithDataCt.apply(
+      rawRequestLoggedIn,
+      (
+        maybeBino,
+        maybeSaUtr,
+        dependencies.internalUserId,
+        dependencies.credentials
+      )
+    )
 
     def requestWithIndividualProvidedDetails: RequestWithData[DataWithIndividualProvidedDetails] = RequestWithDataCt.apply(
       rawRequestLoggedIn,

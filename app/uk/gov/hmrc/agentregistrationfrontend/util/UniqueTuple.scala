@@ -26,7 +26,7 @@ object UniqueTuple:
     inline def unique: UniqueTuple[T] = UniqueTuple(t)
 
   inline def apply[T <: Tuple](t: T): UniqueTuple[T] =
-    inline if constValue[HasDuplicates[T]]
+    inline if hasDuplicates[T]
     then failDuplicateTuple[T]
     else t
 
@@ -80,20 +80,6 @@ object UniqueTuple:
       case h *: tail => h *: Delete[T, tail]
       case EmptyTuple => EmptyTuple
 
-  private type IsMember[T, Tup <: Tuple] <: Boolean =
-    Tup match
-      case T *: _ => true
-      case _ *: tail => IsMember[T, tail]
-      case EmptyTuple => false
-
-  private type HasDuplicates[Tup <: Tuple] <: Boolean =
-    Tup match
-      case EmptyTuple => false
-      case h *: t =>
-        IsMember[h, t] match
-          case true => true
-          case false => HasDuplicates[t]
-
   @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf", "org.wartremover.warts.Recursion"))
   private inline def getImpl[Tup <: Tuple, E](t: Tup): E =
     inline erasedValue[Tup] match
@@ -140,3 +126,5 @@ object UniqueTuple:
       case _ => error("Cannot delete value from generic tuple. The method calling this must be 'inline' to preserve the tuple structure.")
 
   private inline def failDuplicateTuple[T]: Nothing = ${ UniqueTupleMacros.failDuplicateTupleImpl[T] }
+
+  private transparent inline def hasDuplicates[T <: Tuple]: Boolean = ${ UniqueTupleMacros.hasDuplicatesImpl[T] }
