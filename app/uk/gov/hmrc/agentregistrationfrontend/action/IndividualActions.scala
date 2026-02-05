@@ -18,9 +18,10 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.*
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.EnrichWithAgentApplicationAction
@@ -51,6 +52,10 @@ object IndividualActions:
   type RequestWithIndividualProvidedDetailsToBeDeleted = RequestWithData[DataWithIndividualProvidedDetails]
   type RequestWithIndividualProvidedDetailsToBeDeletedCt[ContentType] = RequestWithDataCt[ContentType, DataWithIndividualProvidedDetails]
 
+  type DataWithAgentApplication = AgentApplication *: DataWithIndividualProvidedDetails
+  type RequestWithAgentApplication = RequestWithData[DataWithAgentApplication]
+  type RequestWithAgentApplicationCt[ContentType] = RequestWithDataCt[ContentType, DataWithAgentApplication]
+
 @Singleton
 class IndividualActions @Inject() (
   defaultActionBuilder: DefaultActionBuilder,
@@ -59,7 +64,8 @@ class IndividualActions @Inject() (
   individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction,
   individualProvideDetailsRefiner: IndividualProvideDetailsRefiner,
   provideDetailsAction: ProvideDetailsAction,
-  enrichWithAgentApplicationAction: EnrichWithAgentApplicationAction
+  enrichWithAgentApplicationAction: EnrichWithAgentApplicationAction,
+  enricherAgentApplication: EnricherAgentApplication
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
@@ -88,6 +94,20 @@ extends RequestAwareLogging:
   val DELETEMEgetProvidedDetails: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = DELETEMEauthorised
     .andThen(provideDetailsAction)
 
+  val getProvideDetailsInProgress: ActionBuilderWithData[DataWithIndividualProvidedDetails] = getProvidedDetails
+    .ensure4(
+      condition = _.individualProvidedDetails.isInProgress,
+      resultWhenConditionNotMet =
+        implicit request =>
+          val mpdConfirmationPage = AppRoutes.providedetails.IndividualConfirmationController.show
+          logger.warn(
+            s"The provided details have already been confirmed" +
+              s" (current provided details: ${request.individualProvidedDetails.providedDetailsState.toString}), " +
+              s"redirecting to [${mpdConfirmationPage.url}]."
+          )
+          Redirect(mpdConfirmationPage.url)
+    )
+
   val DELETEMEgetProvideDetailsInProgress: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = DELETEMEgetProvidedDetails
     .ensure(
       condition = _.individualProvidedDetails.isInProgress,
@@ -102,10 +122,28 @@ extends RequestAwareLogging:
           Redirect(mpdConfirmationPage.url)
     )
 
+  val getProvideDetailsWithApplicationInProgress: ActionBuilderWithData[DataWithAgentApplication] = getProvideDetailsInProgress
+    .refine4(enricherAgentApplication.enrichRequest)
+
   val DELETEMEgetProvideDetailsWithApplicationInProgress: ActionBuilder[
     IndividualProvideDetailsWithApplicationRequest,
     AnyContent
   ] = DELETEMEgetProvideDetailsInProgress.andThen(enrichWithAgentApplicationAction)
+
+  val getSubmittedDetailsWithApplicationInProgress: ActionBuilderWithData[DataWithAgentApplication] = getProvidedDetails
+    .ensure4(
+      condition = _.individualProvidedDetails.hasFinished,
+      resultWhenConditionNotMet =
+        implicit request =>
+          val mdpCyaPage = AppRoutes.providedetails.CheckYourAnswersController.show
+          logger.warn(
+            s"The provided details are not in the final state" +
+              s" (current provided details: ${request.individualProvidedDetails.providedDetailsState.toString}), " +
+              s"redirecting to [${mdpCyaPage.url}]."
+          )
+          Redirect(mdpCyaPage.url)
+    )
+    .refine4(enricherAgentApplication.enrichRequest)
 
   val DELETEMEgetSubmitedDetailsWithApplicationInProgress: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] =
     DELETEMEgetProvidedDetails
