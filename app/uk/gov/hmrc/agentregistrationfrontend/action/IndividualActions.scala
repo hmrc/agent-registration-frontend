@@ -74,6 +74,9 @@ extends RequestAwareLogging:
   val DELETEMEauthorised: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
     .andThen(individualAuthorisedAction)
 
+  val authorisedWithAdditionalIdentifiers: ActionBuilderWithData[DataWithAdditionalIdentifiers] = action
+    .refineAsync(individualAuthorisedRefiner.refineIntoRequestWithAdditionalIdentifiers)
+
   val DELETEMEauthorisedWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = action
     .andThen(individualAuthorisedWithIdentifiersAction)
 
