@@ -18,15 +18,12 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.UserProvidedSaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualSaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
@@ -44,7 +41,7 @@ class IndividualSaUtrController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.DELETEMEgetProvideDetailsInProgress
+  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions.getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.individualNino.nonEmpty,
       implicit request =>
@@ -73,13 +70,13 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater[UserProvidedSaUtr](
+      .ensureValidFormAndRedirectIfSaveForLater4[UserProvidedSaUtr](
         IndividualSaUtrForm.form,
         implicit r => view(_)
       )
       .async:
-        implicit request: (IndividualProvideDetailsRequest[AnyContent] & FormValue[UserProvidedSaUtr]) =>
-          val validFormData: IndividualSaUtr = request.formValue
+        implicit request =>
+          val validFormData: UserProvidedSaUtr = request.get
           val updatedApplication: IndividualProvidedDetailsToBeDeleted = request
             .individualProvidedDetails
             .modify(_.individualSaUtr)
