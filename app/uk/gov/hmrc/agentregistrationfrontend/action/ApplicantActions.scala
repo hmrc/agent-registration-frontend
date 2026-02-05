@@ -59,7 +59,7 @@ extends RequestAwareLogging:
   export ApplicantActions.*
 
   val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
-    .refine(request => RequestWithDataCt.empty(request))
+    .refineUnion(request => RequestWithDataCt.empty(request))
 
   val authorised: ActionBuilderWithData[DataWithAuth] = action
     .refineFutureEither(authorisedActionRefiner.refine)

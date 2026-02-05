@@ -36,12 +36,10 @@ class TestOnlyController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def showProvidedDetails: Action[AnyContent] = actions
-    .DELETEMEgetProvidedDetails: request =>
-      Ok(Json.prettyPrint(Json.toJson(request.individualProvidedDetails)))
+  def showProvidedDetails: Action[AnyContent] = getProvidedDetails: request =>
+    Ok(Json.prettyPrint(Json.toJson(request.individualProvidedDetails)))
 
-  def removeNinoAndDobFromIndividual(): Action[AnyContent] = actions
-    .DELETEMEgetProvidedDetails
+  def removeNinoAndDobFromIndividual(): Action[AnyContent] = getProvidedDetails
     .async:
       implicit request =>
         val updatedDetails = request.individualProvidedDetails

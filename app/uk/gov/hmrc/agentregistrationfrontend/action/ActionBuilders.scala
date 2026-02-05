@@ -116,23 +116,23 @@ extends RequestAwareLogging:
 //      resultWhenConditionNotMet: Result
 //    ): ActionBuilderWithData[Data] = ensure4(condition, _ => resultWhenConditionNotMet)
 
-//    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-//    def ensure(
-//      condition: RequestWithData[Data] => Boolean | Future[Boolean],
-//      resultWhenConditionNotMet: RequestWithData[Data] => Result | Future[Result]
-//    ): ActionBuilderWithData[Data] = refineWithData: request =>
-//
-//      def computeResult(condition: Boolean): Result | RequestWithData[Data] | Future[Result | RequestWithData[Data]] =
-//        if condition then request else resultWhenConditionNotMet(request)
-//
-//      condition(request) match
-//        case c: Boolean => computeResult(c)
-//        case f: Future[_] =>
-//          f.asInstanceOf[Future[Boolean]].flatMap: c =>
-//            computeResult(c) match
-//              case result: Result => Future.successful(result)
-//              case request: RequestWithDataCt[_, _] => Future.successful(request.asInstanceOf[RequestWithData[Data]])
-//              case f: Future[_] => f.asInstanceOf[Future[Result | RequestWithData[Data]]]
+    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+    def ensure(
+      condition: RequestWithData[Data] => Boolean | Future[Boolean],
+      resultWhenConditionNotMet: RequestWithData[Data] => Result | Future[Result]
+    ): ActionBuilderWithData[Data] = refineWithData: request =>
+
+      def computeResult(condition: Boolean): Result | RequestWithData[Data] | Future[Result | RequestWithData[Data]] =
+        if condition then request else resultWhenConditionNotMet(request)
+
+      condition(request) match
+        case c: Boolean => computeResult(c)
+        case f: Future[_] =>
+          f.asInstanceOf[Future[Boolean]].flatMap: c =>
+            computeResult(c) match
+              case result: Result => Future.successful(result)
+              case request: RequestWithDataCt[_, _] => Future.successful(request.asInstanceOf[RequestWithData[Data]])
+              case f: Future[_] => f.asInstanceOf[Future[Result | RequestWithData[Data]]]
 
     def refineWithData[NewData <: Tuple](
       refineF: RequestWithData[Data] => Result | RequestWithData[NewData] | Future[Result | RequestWithData[NewData]]
@@ -163,27 +163,20 @@ extends RequestAwareLogging:
     ContentType // ContentType Represents Play Framework's Content Type parameter, commonly denoted as B
   ](ab: ActionBuilder[R, ContentType])(using ec: ExecutionContext)
 
-    def filter(
-      condition: R[ContentType] => Boolean,
-      resultWhenConditionNotMet: R[ContentType] => Result
-    ): ActionBuilder[R, ContentType] = filterFuture(
-      request => Future.successful(condition(request)),
-      request => Future.successful(resultWhenConditionNotMet(request))
-    )
-
-    def filterFuture(
-      condition: R[ContentType] => Future[Boolean],
-      resultWhenConditionNotMet: R[ContentType] => Future[Result]
-    ): ActionBuilder[R, ContentType] = ab.andThen(new ActionFilter[R]:
-      protected def executionContext: ExecutionContext = ec
-
-      @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-      def filter[A](rA: R[A]): Future[Option[Result]] =
-        val rB: R[ContentType] = rA.asInstanceOf[R[ContentType]]
-        for
-          ok <- condition(rB)
-          result <- if ok then Future.successful(None) else resultWhenConditionNotMet(rB).map(Some(_))
-        yield result)
+//    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+//    def ensure(
+//      condition: R[ContentType] => Boolean | Future[Boolean],
+//      resultWhenConditionNotMet: R[ContentType] => Result
+//    ): ActionBuilder[R, ContentType] = refineUnion: (request: R[ContentType]) =>
+//
+//      def process(c: Boolean): R[ContentType] | Result =
+//        if c
+//        then request
+//        else resultWhenConditionNotMet(request)
+//
+//      condition(request) match
+//        case c: Boolean => process(c)
+//        case f: Future[_] => f.asInstanceOf[Future[Boolean]].map(process)
 
     def refineEither[P[_]](refineF: R[ContentType] => Either[Result, P[ContentType]]): ActionBuilder[P, ContentType] = ab.andThen(new ActionRefiner[R, P] {
       protected def executionContext: ExecutionContext = ec
@@ -204,22 +197,7 @@ extends RequestAwareLogging:
       protected def refine[A](request: R[A]): Future[Either[Result, P[A]]] = refineF.asInstanceOf[R[A] => Future[Either[Result, P[A]]]](request)
     })
 
-    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    def ensure(
-      condition: R[ContentType] => Boolean | Future[Boolean],
-      resultWhenConditionNotMet: R[ContentType] => Result
-    ): ActionBuilder[R, ContentType] = refine: (request: R[ContentType]) =>
-
-      def process(c: Boolean): R[ContentType] | Result =
-        if c
-        then request
-        else resultWhenConditionNotMet(request)
-
-      condition(request) match
-        case c: Boolean => process(c)
-        case f: Future[_] => f.asInstanceOf[Future[Boolean]].map(process)
-
-    def refine[P[_]](refineF: R[ContentType] => Result | P[ContentType] | Future[Result | P[ContentType]]): ActionBuilder[
+    def refineUnion[P[_]](refineF: R[ContentType] => Result | P[ContentType] | Future[Result | P[ContentType]]): ActionBuilder[
       P,
       ContentType
     ] = ab.andThen(new ActionRefiner[R, P] {

@@ -24,10 +24,6 @@ import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.*
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.EnrichWithAgentApplicationAction
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsWithApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.ProvideDetailsAction
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.retrieve.Credentials
@@ -60,11 +56,7 @@ object IndividualActions:
 class IndividualActions @Inject() (
   defaultActionBuilder: DefaultActionBuilder,
   individualAuthorisedRefiner: IndividualAuthRefiner,
-  individualAuthorisedAction: IndividualAuthorisedAction,
-  individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction,
   individualProvideDetailsRefiner: IndividualProvideDetailsRefiner,
-  provideDetailsAction: ProvideDetailsAction,
-  enrichWithAgentApplicationAction: EnrichWithAgentApplicationAction,
   enricherAgentApplication: EnricherAgentApplication
 )(using ExecutionContext)
 extends RequestAwareLogging:
@@ -73,42 +65,19 @@ extends RequestAwareLogging:
   export IndividualActions.*
 
   val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
-    .refine(request => RequestWithDataCt.empty(request))
+    .refineUnion(request => RequestWithDataCt.empty(request))
 
   val authorised: ActionBuilderWithData[DataWithAuth] = action
     .refineFutureEither(individualAuthorisedRefiner.refineIntoRequestWithAuth)
 
-  val DELETEMEauthorised: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
-    .andThen(individualAuthorisedAction)
-
   val authorisedWithAdditionalIdentifiers: ActionBuilderWithData[DataWithAdditionalIdentifiers] = action
     .refineFutureEither(individualAuthorisedRefiner.refineIntoRequestWithAdditionalIdentifiers)
-
-  val DELETEMEauthorisedWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = action
-    .andThen(individualAuthorisedWithIdentifiersAction)
 
   val getProvidedDetails: ActionBuilderWithData[DataWithIndividualProvidedDetails] = authorised
     .refineFutureEither:
       individualProvideDetailsRefiner.refineIntoRequestWithIndividualProvidedDetails
 
-  val DELETEMEgetProvidedDetails: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = DELETEMEauthorised
-    .andThen(provideDetailsAction)
-
   val getProvideDetailsInProgress: ActionBuilderWithData[DataWithIndividualProvidedDetails] = getProvidedDetails
-    .ensure(
-      condition = _.individualProvidedDetails.isInProgress,
-      resultWhenConditionNotMet =
-        implicit request =>
-          val mpdConfirmationPage = AppRoutes.providedetails.IndividualConfirmationController.show
-          logger.warn(
-            s"The provided details have already been confirmed" +
-              s" (current provided details: ${request.individualProvidedDetails.providedDetailsState.toString}), " +
-              s"redirecting to [${mpdConfirmationPage.url}]."
-          )
-          Redirect(mpdConfirmationPage.url)
-    )
-
-  val DELETEMEgetProvideDetailsInProgress: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = DELETEMEgetProvidedDetails
     .ensure(
       condition = _.individualProvidedDetails.isInProgress,
       resultWhenConditionNotMet =
@@ -126,11 +95,6 @@ extends RequestAwareLogging:
     getProvideDetailsInProgress
       .enrichWithAgentApplicationAction
 
-  val DELETEMEgetProvideDetailsWithApplicationInProgress: ActionBuilder[
-    IndividualProvideDetailsWithApplicationRequest,
-    AnyContent
-  ] = DELETEMEgetProvideDetailsInProgress.andThen(enrichWithAgentApplicationAction)
-
   val getSubmittedDetailsWithApplicationInProgress: ActionBuilderWithData[DataWithAgentApplication] = getProvidedDetails
     .ensure(
       condition = _.individualProvidedDetails.hasFinished,
@@ -145,21 +109,6 @@ extends RequestAwareLogging:
           Redirect(mdpCyaPage.url)
     )
     .refineWithData(enricherAgentApplication.enrichRequest)
-
-  val DELETEMEgetSubmitedDetailsWithApplicationInProgress: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] =
-    DELETEMEgetProvidedDetails
-      .ensure(
-        condition = _.individualProvidedDetails.hasFinished,
-        resultWhenConditionNotMet =
-          implicit request =>
-            val mdpCyaPage = AppRoutes.providedetails.CheckYourAnswersController.show
-            logger.warn(
-              s"The provided details are not in the final state" +
-                s" (current provided details: ${request.individualProvidedDetails.providedDetailsState.toString}), " +
-                s"redirecting to [${mdpCyaPage.url}]."
-            )
-            Redirect(mdpCyaPage.url)
-      ).andThen(enrichWithAgentApplicationAction)
 
   extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
 
