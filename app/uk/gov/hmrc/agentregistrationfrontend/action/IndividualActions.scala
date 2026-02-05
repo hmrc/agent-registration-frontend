@@ -57,6 +57,7 @@ class IndividualActions @Inject() (
   individualAuthorisedRefiner: IndividualAuthRefiner,
   individualAuthorisedAction: IndividualAuthorisedAction,
   individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction,
+  individualProvideDetailsRefiner: IndividualProvideDetailsRefiner,
   provideDetailsAction: ProvideDetailsAction,
   enrichWithAgentApplicationAction: EnrichWithAgentApplicationAction
 )(using ExecutionContext)
@@ -79,6 +80,10 @@ extends RequestAwareLogging:
 
   val DELETEMEauthorisedWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = action
     .andThen(individualAuthorisedWithIdentifiersAction)
+
+  val getProvidedDetails: ActionBuilderWithData[DataWithIndividualProvidedDetails] = authorised
+    .refineAsync:
+      individualProvideDetailsRefiner.refineIntoRequestWithIndividualProvidedDetails
 
   val DELETEMEgetProvidedDetails: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = DELETEMEauthorised
     .andThen(provideDetailsAction)
