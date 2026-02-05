@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
+import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
@@ -28,7 +29,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.SignInRequest
 
 import java.util.UUID
-
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
@@ -39,11 +39,11 @@ final class StubUserService @Inject() (
   agentsExternalStubsConnector: AgentsExternalStubsConnector
 )(implicit ec: ExecutionContext):
 
-  def createAndLoginAgent[A](using request: Request[A]): Future[HeaderCarrier] =
+  def createAndLoginAgent(using request: Request[AnyContent]): Future[HeaderCarrier] =
     for {
       initialLoginResponse <- agentsExternalStubsConnector.signIn()
 
-      hc = headerCarrierFrom(
+      hc = makeHeaderCarrier(
         sessionId = initialLoginResponse.sessionId,
         authorization = initialLoginResponse.authorization
       )
@@ -60,7 +60,7 @@ final class StubUserService @Inject() (
         )
       )
 
-    } yield headerCarrierFrom(
+    } yield makeHeaderCarrier(
       sessionId = loginResponse.sessionId,
       authorization = loginResponse.authorization
     )
@@ -72,7 +72,7 @@ final class StubUserService @Inject() (
     )
     agentsExternalStubsConnector.createUser(user, affinityGroup = Some("Agent"))
 
-  private def headerCarrierFrom(
+  private def makeHeaderCarrier(
     sessionId: String,
     authorization: String
   ): HeaderCarrier = HeaderCarrier(

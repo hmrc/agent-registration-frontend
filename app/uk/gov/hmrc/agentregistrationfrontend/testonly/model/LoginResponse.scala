@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
 import play.api.http.HeaderNames
 import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 
 final case class LoginResponse(
   authorization: String,
@@ -42,6 +43,4 @@ object LoginResponse:
     name: String
   ): String = response
     .header(name)
-    .getOrElse {
-      throw new RuntimeException("\"Missing required header: $name")
-    }
+    .getOrThrowExpectedDataMissing(s"$name")

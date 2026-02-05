@@ -23,6 +23,8 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedActionRefiner
+//import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithAuth
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection
@@ -38,7 +40,6 @@ import java.time.Clock
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
-import uk.gov.hmrc.agentregistrationfrontend.testonly.action.TestOnlyAuthorisedAction
 import uk.gov.hmrc.http.SessionKeys
 
 import scala.concurrent.Future
@@ -124,7 +125,7 @@ object FastForwardController:
 class FastForwardController @Inject() (
   mcc: MessagesControllerComponents,
   actions: Actions,
-  authorisedAction: TestOnlyAuthorisedAction,
+  authorisedActionRefiner: AuthorisedActionRefiner,
   applicationService: AgentApplicationService,
   fastForwardPage: FastForwardPage,
   agentApplicationIdGenerator: AgentApplicationIdGenerator,
@@ -139,43 +140,39 @@ extends FrontendController(mcc, actions):
     implicit request =>
       Ok(fastForwardPage())
 
-  private def authorisedOrCreateAndLoginAgent(
-    block: RequestWithAuth ?=> Future[Result]
-  ): Action[AnyContent] = actions.action.async:
-    implicit request =>
-
-      def runIfAuthorised(): Future[Result] = authorisedAction.refinePublic(request).flatMap:
-        case Right(authorisedRequest) =>
-          given RequestWithAuth = authorisedRequest
-          block
-        case Left(result) if result.header.status === SEE_OTHER => loginAndRetry
-        case Left(result) => Future.successful(result)
-
-      runIfAuthorised()
-
-  private def loginAndRetry(using request: Request[AnyContent]): Future[Result] = stubUserService.createAndLoginAgent.map: stubsHc =>
+  private def loginAndRetry(using request: Request[AnyContent]): Future[Either[Result, RequestWithAuth]] = stubUserService.createAndLoginAgent.map: stubsHc =>
     val bearerToken: String = stubsHc.authorization
       .map(_.value)
-      .getOrElse(throw new RuntimeException("Expected auth token in stubs HeaderCarrier"))
+      .getOrThrowExpectedDataMissing("Expected auth token in stubs HeaderCarrier")
 
     val sessionId: String = stubsHc.sessionId
       .map(_.value)
-      .getOrElse(throw new RuntimeException("Expected sessionId in stubs HeaderCarrier"))
+      .getOrThrowExpectedDataMissing("Expected sessionId in stubs HeaderCarrier")
 
-    Redirect(request.uri)
-      .addingToSession(
+    Left(
+      Redirect(request.uri).addingToSession(
         SessionKeys.authToken -> bearerToken,
         SessionKeys.sessionId -> sessionId
       )
+    )
+
+  private val authorisedOrCreateAndLoginAgent: ActionBuilderWithData[DataWithAuth] = actions.action.refineAsync:
+    implicit request =>
+      authorisedActionRefiner.refine(request).flatMap:
+        case Right(authorisedRequest) => Future.successful(Right(authorisedRequest))
+
+        case Left(result) if result.header.status === SEE_OTHER => loginAndRetry
+
+        case Left(result) => Future.successful(Left(result))
 
   def fastForward(
     completedSection: CompletedSection
   ): Action[AnyContent] =
     completedSection match
       case c: CompletedSectionLlp =>
-        authorisedOrCreateAndLoginAgent {
+        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
+          given RequestWithAuth = req
           handleCompletedSectionLlp(c)
-        }
 
       case _: CompletedSectionSoleTrader =>
         actions.action { implicit request =>
