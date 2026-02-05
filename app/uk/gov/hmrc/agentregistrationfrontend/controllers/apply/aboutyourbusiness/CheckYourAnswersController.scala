@@ -25,25 +25,22 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.CheckYourAnswersPage
 
 @Singleton
 class CheckYourAnswersController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: ApplicantActions,
   view: CheckYourAnswersPage,
   businessPartnerRecordService: BusinessPartnerRecordService
 )
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   // this CYA page is only viewable once business details have been captured from GRS, the task list provides a link
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
-    .Applicant
     .getApplicationInProgress
     .ensure4(
       _.get[AgentApplication].applicationState === ApplicationState.GrsDataReceived,

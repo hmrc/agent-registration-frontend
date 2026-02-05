@@ -158,6 +158,22 @@ extends RequestAwareLogging:
       }
     })
 
+    def refineFutureEither[NewData <: Tuple](
+      refineF: RequestWithData[Data] => Future[Either[Result, RequestWithData[NewData]]]
+    ): ActionBuilderWithData[
+      NewData
+    ] = ab.andThen(new ActionRefinerWithData[Data, NewData] {
+      protected def executionContext: ExecutionContext = ec
+
+      @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+      override protected def refine[A](request: RequestWithDataCt[
+        A,
+        Data
+      ]): Future[Either[Result, RequestWithDataCt[A, NewData]]] =
+        val rB: RequestWithData[Data] = request.asInstanceOf[RequestWithData[Data]]
+        refineF(rB).map(_.asInstanceOf[Either[Result, RequestWithDataCt[A, NewData]]])
+    })
+
   extension [
     Data <: Tuple,
     R <: [X] =>> RequestWithDataCt[X, Data],
@@ -491,14 +507,3 @@ extends RequestAwareLogging:
           case p => Future.successful(Right[Result, P[A]](p.asInstanceOf[P[A]]))
       }
     })
-
-  extension [
-    B // B Represents Play Framework's Content Type parameter, commonly denoted as B
-  ](a: Action[B])(using ec: ExecutionContext)
-
-    def mapResult(f: Request[B] => Result => Result): Action[B] =
-      new Action[B] {
-        override def apply(request: Request[B]): Future[Result] = a(request).map(f(request))
-        override def parser: BodyParser[B] = a.parser
-        override def executionContext: ExecutionContext = a.executionContext
-      }

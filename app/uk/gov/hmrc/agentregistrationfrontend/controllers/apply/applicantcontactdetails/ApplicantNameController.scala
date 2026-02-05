@@ -23,8 +23,8 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.ApplicantNameForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.applicantcontactdetails.ApplicantNamePage
@@ -35,16 +35,13 @@ import javax.inject.Singleton
 @Singleton
 class ApplicantNameController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: ApplicantActions,
   view: ApplicantNamePage,
   applicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   def show: Action[AnyContent] = actions
-    .Applicant
     .getApplicationInProgress.apply:
       implicit request =>
         Ok(view(
@@ -57,7 +54,6 @@ extends FrontendController(mcc, actions):
         ))
 
   def submit: Action[AnyContent] = actions
-    .Applicant
     .getApplicationInProgress
     .ensureValidFormAndRedirectIfSaveForLater4(
       form = ApplicantNameForm.form,

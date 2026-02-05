@@ -22,11 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
@@ -46,7 +42,7 @@ extends RequestAwareLogging:
     maybeIndividualNino: Option[IndividualNino],
     maybeIndividualSaUtr: Option[IndividualSaUtr],
     maybeIndividualDateOfBirth: Option[IndividualDateOfBirth] = None
-  )(using request: IndividualAuthorisedWithIdentifiersRequest[?]): IndividualProvidedDetailsToBeDeleted =
+  )(using request: RequestHeader): IndividualProvidedDetailsToBeDeleted =
     logger.info(s"creating new provided details for user:[${internalUserId.value}] and applicationId:[${agentApplicationId.value}] ")
     provideDetailsFactory.makeNewIndividualProvidedDetails(
       internalUserId,
@@ -60,12 +56,11 @@ extends RequestAwareLogging:
     individualProvideDetailsConnector
       .find(applicationId)
 
-  def findAll()(using request: IndividualAuthorisedRequest[?]): Future[List[IndividualProvidedDetailsToBeDeleted]] = individualProvideDetailsConnector
+  def findAll()(using request: RequestHeader): Future[List[IndividualProvidedDetailsToBeDeleted]] = individualProvideDetailsConnector
     .findAll()
 
-  def upsert(individualProvidedDetails: IndividualProvidedDetailsToBeDeleted)(using request: IndividualAuthorisedRequest[?]): Future[Unit] =
+  def upsert(individualProvidedDetails: IndividualProvidedDetailsToBeDeleted)(using request: RequestHeader): Future[Unit] =
     logger.debug(s"Upserting providedDetails for user:[${individualProvidedDetails.internalUserId}] and applicationId:[${individualProvidedDetails.agentApplicationId}]")
-    Errors.require(individualProvidedDetails.internalUserId === request.internalUserId, "Cannot modify provided details - you must be the user who created it")
     individualProvideDetailsConnector
       .upsertMemberProvidedDetails(individualProvidedDetails)
 

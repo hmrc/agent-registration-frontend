@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.http.client.HttpClientV2
 
@@ -38,7 +37,7 @@ class IndividualProvidedDetailsConnector @Inject() (
 extends Connector:
 
   def upsertMemberProvidedDetails(individualProvidedDetails: IndividualProvidedDetailsToBeDeleted)(using
-    request: IndividualAuthorisedRequest[?]
+    request: RequestHeader
   ): Future[Unit] =
     val url: URL = url"$baseUrl/member-provided-details"
     httpClient
@@ -87,9 +86,7 @@ extends Connector:
       .execute[List[IndividualProvidedDetailsToBeDeleted]]
       .andLogOnFailure(s"Failed to find IndividualProvidedDetails by agent application id: ${agentApplicationId.value}")
 
-  def findAll()(using
-    IndividualAuthorisedRequest[?]
-  ): Future[List[IndividualProvidedDetailsToBeDeleted]] =
+  def findAll()(using RequestHeader): Future[List[IndividualProvidedDetailsToBeDeleted]] =
     val url: URL = url"$baseUrl/member-provided-details"
     httpClient
       .get(url)

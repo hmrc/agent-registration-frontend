@@ -16,6 +16,9 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.util
 
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.*
 
@@ -117,6 +120,19 @@ extends UnitSpec:
     // UniqueTuple((1, 2)) // Should not compile because duplicates
 
   "UniqueTuple" should:
+
+    "construct" in:
+      val maybeNino: Option[Nino] = Some(Nino("AA123456A"))
+      val maybeSaUtr: Option[SaUtr] = Some(SaUtr("1234567890"))
+      val internalUserId = InternalUserId("123")
+
+      val tuple: (Option[Nino], Option[SaUtr], InternalUserId) = (maybeNino, maybeSaUtr, internalUserId)
+      val data: UniqueTuple[(Option[Nino], Option[SaUtr], InternalUserId)] = tuple.unique
+      data shouldBe tuple
+
+      val tuple2: (Option[Nino], Option[SaUtr], InternalUserId) = (maybeNino, None, internalUserId)
+      val data2: UniqueTuple[(Option[Nino], Option[SaUtr], InternalUserId)] = tuple2.unique
+      data2 shouldBe tuple2
 
     "add" should:
       "add a new element to the tuple" in:

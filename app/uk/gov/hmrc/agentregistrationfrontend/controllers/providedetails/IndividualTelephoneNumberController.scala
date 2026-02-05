@@ -24,10 +24,10 @@ import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualTelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualTelephoneNumberPage
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
+
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 
@@ -36,7 +36,7 @@ import javax.inject.Singleton
 
 @Singleton
 class IndividualTelephoneNumberController @Inject() (
-  actions: Actions,
+  actions: IndividualActions,
   mcc: MessagesControllerComponents,
   view: IndividualTelephoneNumberPage,
   individualProvideDetailsService: IndividualProvideDetailsService
@@ -44,8 +44,7 @@ class IndividualTelephoneNumberController @Inject() (
 extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions
-    .Individual
-    .getProvideDetailsInProgress
+    .DELETEMEgetProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.companiesHouseMatch.nonEmpty, // TODO: Add check for companies house details
       implicit request =>

@@ -1,0 +1,119 @@
+/*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.agentregistrationfrontend.action.individual
+
+import play.api.mvc.Results.*
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions.RequestWithData
+import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions.RequestWithAuth
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
+
+class IndividualAuthRefinerSpec
+extends ISpec:
+
+  "refineIntoRequestWithAdditionalIdentifiers" should:
+
+    "when User is not logged in (request comes without authorisation in the session) action redirects to login url" in:
+      val individualAuthorisedRefiner: IndividualAuthRefiner = app.injector.instanceOf[IndividualAuthRefiner]
+      val notLoggedInRequest: RequestWithData[EmptyTuple] = tdAll.requestNotLoggedIn
+      individualAuthorisedRefiner
+        .refineIntoRequestWithAdditionalIdentifiers(notLoggedInRequest)
+        .futureValue
+        .left
+        .value shouldBe Redirect(
+        s"""http://localhost:9099/bas-gateway/sign-in?continue_url=$thisFrontendBaseUrl/&origin=agent-registration-frontend&affinityGroup=individual"""
+      )
+      IndividualAuthStubs.verifyAuthorise(0)
+
+    "successfully authorise and enrich request with InternalUserId and Credentials when no Nino or Utr are present" in:
+      val individualAuthRefiner: IndividualAuthRefiner = app.injector.instanceOf[IndividualAuthRefiner]
+      IndividualAuthStubs.stubAuthorise()
+      individualAuthRefiner
+        .refineIntoRequestWithAdditionalIdentifiers(tdAll.requestLoggedIn)
+        .futureValue
+        .value
+        .data
+        .tuple shouldBe (
+        None,
+        None,
+        tdAll.internalUserId,
+        tdAll.credentials
+      )
+      IndividualAuthStubs.verifyAuthorise()
+
+    "successfully authorise and enrich request with Nino, InternalUserId and Credentials" in:
+      val individualAuthorisedRefiner: IndividualAuthRefiner = app.injector.instanceOf[
+        IndividualAuthRefiner
+      ]
+
+      IndividualAuthStubs.stubAuthoriseWithNino()
+      individualAuthorisedRefiner
+        .refineIntoRequestWithAdditionalIdentifiers(tdAll.requestLoggedIn)
+        .futureValue
+        .value
+        .data
+        .tuple shouldBe (
+        Some(tdAll.nino),
+        None,
+        tdAll.internalUserId,
+        tdAll.credentials
+      )
+      IndividualAuthStubs.verifyAuthorise()
+
+    "successfully authorise and enrich request with Utr, InternalUserId and Credentials" in:
+      val individualAuthorisedRefiner: IndividualAuthRefiner = app.injector.instanceOf[IndividualAuthRefiner]
+
+      IndividualAuthStubs.stubAuthoriseWithSaUtr()
+      individualAuthorisedRefiner
+        .refineIntoRequestWithAdditionalIdentifiers(tdAll.requestLoggedIn)
+        .futureValue
+        .value
+        .data
+        .tuple shouldBe (
+        None,
+        Some(tdAll.saUtr),
+        tdAll.internalUserId,
+        tdAll.credentials
+      )
+      IndividualAuthStubs.verifyAuthorise()
+
+  "refineIntoRequestWithAuth" should:
+
+    "when User is not logged in (request comes without authorisation in the session) action redirects to login url" in:
+      val individualAuthorisedRefiner: IndividualAuthRefiner = app.injector.instanceOf[IndividualAuthRefiner]
+      individualAuthorisedRefiner
+        .refineIntoRequestWithAuth(tdAll.requestNotLoggedIn)
+        .futureValue
+        .left
+        .value shouldBe Redirect(
+        s"""http://localhost:9099/bas-gateway/sign-in?continue_url=$thisFrontendBaseUrl/&origin=agent-registration-frontend&affinityGroup=individual"""
+      )
+      IndividualAuthStubs.verifyAuthorise(0)
+
+    "successfully authorise and enrich request with InternalUserId and Credentials" in:
+      val individualAuthorisedRefiner: IndividualAuthRefiner = app.injector.instanceOf[IndividualAuthRefiner]
+      IndividualAuthStubs.stubAuthorise()
+      val request: RequestWithAuth =
+        individualAuthorisedRefiner
+          .refineIntoRequestWithAuth(tdAll.requestLoggedIn)
+          .futureValue
+          .value
+      request.data.tuple shouldBe tdAll.IndividualRequests.requestWithAuthData.data.tuple
+
+      IndividualAuthStubs.verifyAuthorise()
+
+  // TODO: here are some missing test cases, see AuthorisedActionRefinerSpec for full coverage

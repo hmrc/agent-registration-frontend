@@ -21,10 +21,10 @@ import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
 import uk.gov.hmrc.agentregistrationfrontend.services.EmailVerificationService
@@ -46,7 +46,7 @@ import scala.concurrent.Future
 @Singleton
 class IndividualEmailAddressController @Inject() (
   appConfig: AppConfig,
-  actions: Actions,
+  actions: IndividualActions,
   mcc: MessagesControllerComponents,
   individualEmailAddressView: IndividualEmailAddressPage,
   individualEmailLockedView: IndividualEmailLockedPage,
@@ -56,7 +56,7 @@ class IndividualEmailAddressController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.Individual.getProvideDetailsInProgress
+  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.DELETEMEgetProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.telephoneNumber.isDefined,
       implicit request =>
@@ -106,7 +106,7 @@ extends FrontendController(mcc, actions):
               AppRoutes.providedetails.IndividualEmailAddressController.verify
             )
 
-  def verify: Action[AnyContent] = actions.Individual.getProvideDetailsInProgress
+  def verify: Action[AnyContent] = actions.DELETEMEgetProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.emailAddress.isDefined,
       implicit request =>

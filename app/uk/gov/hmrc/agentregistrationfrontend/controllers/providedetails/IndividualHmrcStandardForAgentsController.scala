@@ -22,9 +22,9 @@ import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
+
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualHmrcStandardForAgentsPage
 
@@ -34,13 +34,13 @@ import javax.inject.Singleton
 @Singleton
 class IndividualHmrcStandardForAgentsController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: IndividualActions,
   view: IndividualHmrcStandardForAgentsPage,
   individualProvideDetailsService: IndividualProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.Individual.getProvideDetailsInProgress
+  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.DELETEMEgetProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.individualSaUtr.isDefined,
       implicit request =>

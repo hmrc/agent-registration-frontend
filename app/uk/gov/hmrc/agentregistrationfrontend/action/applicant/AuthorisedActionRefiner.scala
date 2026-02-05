@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.action
+package uk.gov.hmrc.agentregistrationfrontend.action.applicant
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
@@ -22,17 +22,18 @@ import play.api.mvc.*
 import play.api.mvc.Results.*
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.AbsentIn
 import uk.gov.hmrc.agentregistrationfrontend.views.ErrorResults
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.AbsentIn
 
 import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext

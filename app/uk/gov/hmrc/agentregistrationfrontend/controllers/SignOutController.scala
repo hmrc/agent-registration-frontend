@@ -18,10 +18,10 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers
 
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
+import play.api.mvc.DefaultActionBuilder
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
 import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.views.html.TimedOutPage
 
@@ -31,24 +31,24 @@ import javax.inject.Singleton
 @Singleton
 class SignOutController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  defaultActionBuilder: DefaultActionBuilder,
   timedOutPage: TimedOutPage,
   appConfig: AppConfig
 )
-extends FrontendController(mcc, actions):
+extends FrontendControllerBase(mcc):
 
   private def signOutWithContinue(continue: String): Result =
     val signOutAndRedirectUrl: String = uri"""${appConfig.basFrontendSignOutUrlBase}?${Map("continue" -> continue)}""".toString
     Redirect(signOutAndRedirectUrl)
 
-  def signOut: Action[AnyContent] = actions.action:
+  def signOut: Action[AnyContent] = defaultActionBuilder:
     val continueUrl = uri"${appConfig.thisFrontendBaseUrl + AppRoutes.apply.AgentApplicationController.landing.url}"
     signOutWithContinue(continueUrl.toString)
 
-  def timeOut: Action[AnyContent] = actions.action:
+  def timeOut: Action[AnyContent] = defaultActionBuilder:
     val continueUrl = uri"${appConfig.thisFrontendBaseUrl + AppRoutes.SignOutController.timedOut.url}"
     signOutWithContinue(continueUrl.toString)
 
-  def timedOut: Action[AnyContent] = actions.action:
+  def timedOut: Action[AnyContent] = defaultActionBuilder:
     implicit request =>
       Ok(timedOutPage())

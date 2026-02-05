@@ -23,23 +23,20 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.CheckYourAnswersPage
 
 @Singleton
 class CheckYourAnswersController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: ApplicantActions,
   view: CheckYourAnswersPage
 )
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   def show: Action[AnyContent] =
     actions
-      .Applicant
       .getApplicationInProgress
       .ensure4(
         r => r.agentApplication.amlsDetails.exists(_.isComplete),

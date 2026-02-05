@@ -14,74 +14,44 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.action.providedetails
+package uk.gov.hmrc.agentregistrationfrontend.action.individual
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import play.api.mvc.*
 import play.api.mvc.Results.*
 import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistration.shared.SaUtr
-import uk.gov.hmrc.agentregistration.shared.Nino as ModelNino
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
-import uk.gov.hmrc.agentregistrationfrontend.action.MergeFormValue
+import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.AbsentIn
 import uk.gov.hmrc.agentregistrationfrontend.views.ErrorResults
 import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions.*
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistration.shared.SaUtr
+import uk.gov.hmrc.agentregistration.shared.Nino as ModelNino
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-class IndividualAuthorisedWithIdentifiersRequest[A](
-  override val internalUserId: InternalUserId,
-  override val request: Request[A],
-  override val credentials: Credentials,
-  val nino: Option[ModelNino],
-  val saUtr: Option[SaUtr]
-)
-extends IndividualAuthorisedRequest[A](
-  internalUserId = internalUserId,
-  request = request,
-  credentials = credentials
-)
-
-object IndividualAuthorisedWithIdentifiersRequest:
-
-  given [T, A]: MergeFormValue[IndividualAuthorisedWithIdentifiersRequest[A], T] =
-    (
-      r: IndividualAuthorisedWithIdentifiersRequest[A],
-      t: T
-    ) =>
-      new IndividualAuthorisedWithIdentifiersRequest[A](
-        r.internalUserId,
-        r.request,
-        r.credentials,
-        r.nino,
-        r.saUtr
-      ) with FormValue[T]:
-        val formValue: T = t
-
 @Singleton
-class IndividualAuthorisedWithIdentifiersAction @Inject() (
+class IndividualAuthRefiner @Inject() (
   af: AuthorisedFunctions,
   errorResults: ErrorResults,
-  appConfig: AppConfig,
-  cc: MessagesControllerComponents
-)
-extends ActionRefiner[Request, IndividualAuthorisedWithIdentifiersRequest]
-with RequestAwareLogging:
+  appConfig: AppConfig
+)(using ExecutionContext)
+extends RequestAwareLogging:
 
-  override protected def executionContext: ExecutionContext = cc.executionContext
-
-  override protected def refine[A](request: Request[A]): Future[Either[Result, IndividualAuthorisedWithIdentifiersRequest[A]]] =
-    given r: Request[A] = request
+  def refineIntoRequestWithAuth(
+    request: RequestWithData[EmptyData]
+  ): Future[Either[Result, RequestWithData[DataWithAuth]]] =
+    given RequestWithData[EmptyData] = request
 
     af.authorised(
       AuthProviders(GovernmentGateway)
@@ -91,43 +61,61 @@ with RequestAwareLogging:
         and Retrievals.internalId
         and Retrievals.credentials
     ).apply:
-      case allEnrolments ~ maybeInternalId ~ credentials =>
-        Future.successful(Right(new IndividualAuthorisedWithIdentifiersRequest(
-          internalUserId = maybeInternalId
-            .map(InternalUserId.apply)
-            .getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing")),
-          request = request,
-          credentials = credentials.getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing")),
-          nino = getNino(allEnrolments),
-          saUtr = getUtr(allEnrolments)
-        )))
-    .recoverWith:
+      case allEnrolments ~ maybeInternalId ~ maybeCredentials =>
+        val internalUserId: InternalUserId = maybeInternalId.map(
+          InternalUserId.apply
+        ).getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing"))
+        val credentials: Credentials = maybeCredentials.getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing"))
+        Future.successful(Right(
+          request
+            .add(credentials)
+            .add(internalUserId)
+        ))
+    .recoverWith: e =>
+      Future.successful(Left(recover(e)))
+
+  def refineIntoRequestWithAdditionalIdentifiers(
+    request: RequestWithData[EmptyData]
+  ): Future[Either[Result, RequestWithData[DataWithAdditionalIdentifiers]]] =
+    given RequestWithData[EmptyData] = request
+    af.authorised(
+      AuthProviders(GovernmentGateway)
+        and AffinityGroup.Individual
+    ).retrieve(
+      Retrievals.allEnrolments
+        and Retrievals.internalId
+        and Retrievals.credentials
+    ).apply:
+      case allEnrolments ~ maybeInternalId ~ maybeCredentials =>
+        val internalUserId: InternalUserId = maybeInternalId
+          .map(InternalUserId.apply)
+          .getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing"))
+        val credentials: Credentials = maybeCredentials
+          .getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing"))
+        Future.successful(Right(
+          request
+            .add(credentials)
+            .add(internalUserId)
+            .add(getUtr(allEnrolments))
+            .add(getNino(allEnrolments))
+        ))
+    .recoverWith: e =>
+      Future.successful(Left(recover(e)))
+
+  private def recover(e: Throwable)(using request: RequestHeader): Result =
+    e match
       case _: NoActiveSession =>
         logger.info(s"Unauthorised because of 'NoActiveSession', redirecting to sign in page")
-        Future.successful(Left(Redirect(
-          url = appConfig.signInUri(uri"""${appConfig.thisFrontendBaseUrl + request.uri}""", AffinityGroup.Individual).toString()
-        )))
+        Redirect(url = appConfig.signInUri(uri"""${appConfig.thisFrontendBaseUrl + request.uri}""", AffinityGroup.Individual).toString())
       case e: UnsupportedAuthProvider =>
         logger.info(s"Unauthorised because of '${e.reason}', ${e.toString}")
-        Future.successful(Left(
-          errorResults.unauthorised(
-            message = e.reason
-          )
-        ))
+        errorResults.unauthorised(message = e.reason)
       case e: UnsupportedAffinityGroup =>
         logger.info(s"Unauthorised because of '${e.reason}', ${e.toString}")
-        Future.successful(Left(
-          errorResults.unauthorised(
-            message = e.reason
-          )
-        ))
+        errorResults.unauthorised(message = e.reason)
       case e: AuthorisationException =>
         logger.info(s"Unauthorised because of '${e.reason}', ${e.toString}")
-        Future.successful(Left(
-          errorResults.unauthorised(
-            message = e.toString
-          )
-        ))
+        errorResults.unauthorised(message = e.toString)
 
   private def getIdentifierForEnrolmentKey(
     enrolmentKey: String,
@@ -140,6 +128,7 @@ with RequestAwareLogging:
 
   private def getNino(enrolments: Enrolments): Option[ModelNino] =
     given enr: Enrolments = enrolments
+
     val hmrcPtEnrolmentKey = "HMRC-PT"
     val hmrcNiEnrolmentKey = "HMRC-NI"
     val ninoIdentifierKey = "NINO"
@@ -150,10 +139,9 @@ with RequestAwareLogging:
 
   private def getUtr(enrolments: Enrolments): Option[SaUtr] =
     given enr: Enrolments = enrolments
+
     val hmrcPtEnrolmentKey = "IR-SA"
     val utrIdentifierKey = "UTR"
 
     getIdentifierForEnrolmentKey(hmrcPtEnrolmentKey, utrIdentifierKey)
       .map(x => SaUtr(x.value))
-
-  private given ExecutionContext = cc.executionContext

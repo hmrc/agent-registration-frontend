@@ -23,9 +23,9 @@ import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentEmailAddress
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentVerifiedEmailAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -45,7 +45,7 @@ import scala.concurrent.Future
 class AgentEmailAddressController @Inject() (
   appConfig: AppConfig,
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: ApplicantActions,
   view: AgentEmailAddressPage,
   placeholder: SimplePage,
   agentApplicationService: AgentApplicationService,
@@ -54,10 +54,7 @@ class AgentEmailAddressController @Inject() (
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
-    .Applicant
     .getApplicationInProgress
     .ensure4(
       _
@@ -138,7 +135,6 @@ extends FrontendController(mcc, actions):
             )
 
   def verify: Action[AnyContent] = actions
-    .Applicant
     .getApplicationInProgress
     .ensure4(
       _.agentApplication

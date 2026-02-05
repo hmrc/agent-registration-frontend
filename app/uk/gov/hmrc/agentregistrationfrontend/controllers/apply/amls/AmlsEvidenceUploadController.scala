@@ -24,12 +24,12 @@ import uk.gov.hmrc.agentregistration.shared.AmlsName
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
 import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadIdGenerator
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadStatus
@@ -52,7 +52,7 @@ import scala.concurrent.Future
 @Singleton
 class AmlsEvidenceUploadController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: ApplicantActions,
   amlsEvidenceUploadPage: AmlsEvidenceUploadPage,
   progressView: AmlsEvidenceUploadProgressPage,
   upscanErrorPage: UpscanErrorPage,
@@ -67,10 +67,7 @@ class AmlsEvidenceUploadController @Inject() (
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   val baseAction: ActionBuilderWithData[DataWithApplication] = actions
-    .Applicant
     .getApplicationInProgress
     .ensure4(
       _.agentApplication.amlsDetails.exists(!_.isHmrc),
@@ -179,7 +176,6 @@ extends FrontendController(mcc, actions):
   /** This endpoint is called via JavaScript in a poll loop to check the status of the file upload. The upload status is encoded in the HTTP status response:
     */
   def checkUploadStatusJs: Action[AnyContent] = actions
-    .Applicant
     .getApplicationInProgress
     .async:
       implicit request =>

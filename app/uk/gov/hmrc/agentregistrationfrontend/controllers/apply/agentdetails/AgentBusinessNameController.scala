@@ -25,9 +25,9 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentBusinessName
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
 
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentBusinessNameForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
@@ -40,17 +40,14 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class AgentBusinessNameController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: ApplicantActions,
   view: AgentBusinessNamePage,
   agentApplicationService: AgentApplicationService,
   businessPartnerRecordService: BusinessPartnerRecordService
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   def show: Action[AnyContent] = actions
-    .Applicant
     .getApplicationInProgress
     .getMaybeBusinessPartnerRecord
     .apply:
@@ -66,7 +63,6 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     actions
-      .Applicant
       .getApplicationInProgress
       .ensureValidFormAndRedirectIfSaveForLater4[AgentBusinessName](
         form = AgentBusinessNameForm.form,

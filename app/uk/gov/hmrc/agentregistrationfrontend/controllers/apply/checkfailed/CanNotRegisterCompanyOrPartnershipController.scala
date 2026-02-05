@@ -21,8 +21,8 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.companyStatusCheck
 import uk.gov.hmrc.agentregistration.shared.CheckResult
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.checkfailed.CompanyStatusBlockPage
 
 import javax.inject.Inject
@@ -31,16 +31,13 @@ import javax.inject.Singleton
 @Singleton
 class CanNotRegisterCompanyOrPartnershipController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: ApplicantActions,
   companyStatusBlockPage: CompanyStatusBlockPage
 )
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   def show: Action[AnyContent] =
     actions
-      .Applicant
       .getApplicationInProgress
       .ensure4(
         condition =

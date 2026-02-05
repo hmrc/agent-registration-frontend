@@ -44,7 +44,7 @@ class GrsConfig @Inject() (appConfig: AppConfig):
           s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/scottish-limited-partnership-journey"
         case BusinessType.Partnership.LimitedPartnership => s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/limited-partnership-journey"
 
-    val stubUrl: String = s"${appConfig.selfBaseUrl}${AppRoutes.testOnly.GrsStubController.setupGrsJourney(businessType).url}"
+    val stubUrl: String = s"${appConfig.selfBaseUrl}${AppRoutes.testOnly.applicant.GrsStubController.setupGrsJourney(businessType).url}"
     if enableGrsStub then stubUrl else grsUrl
 
   def retrieveJourneyDataUrl(
@@ -57,5 +57,5 @@ class GrsConfig @Inject() (appConfig: AppConfig):
         case BusinessType.LimitedCompany => s"${appConfig.incorpIdBaseUrl}/incorporated-entity-identification/api/journey/${journeyId.value}"
         case _: BusinessType.Partnership => s"${appConfig.partnershipIdBaseUrl}/partnership-identification/api/journey/${journeyId.value}"
 
-    val stubUrl: String = s"${appConfig.selfBaseUrl}${AppRoutes.testOnly.GrsStubController.retrieveGrsData(journeyId).url}"
+    val stubUrl: String = s"${appConfig.selfBaseUrl}${AppRoutes.testOnly.applicant.GrsStubController.retrieveGrsData(journeyId).url}"
     if enableGrsStub then stubUrl else grsUrl

@@ -22,10 +22,10 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsWithApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsWithApplicationRequest
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualApproveApplicationForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualApproveApplicationPage
@@ -37,25 +37,24 @@ import scala.concurrent.Future
 import javax.inject.Inject
 
 class IndividualApproveApplicantController @Inject() (
-  actions: Actions,
+  actions: IndividualActions,
   mcc: MessagesControllerComponents,
   view: IndividualApproveApplicationPage,
   individualProvideDetailsService: IndividualProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] =
-    actions.Individual.getProvideDetailsWithApplicationInProgress
-      .ensure(
-        _.individualProvidedDetails.individualSaUtr.nonEmpty,
-        implicit request =>
-          Redirect(AppRoutes.providedetails.IndividualSaUtrController.show.url)
-      )
-      .ensure(
-        _.individualProvidedDetails.emailAddress.nonEmpty,
-        implicit request =>
-          Redirect(AppRoutes.providedetails.IndividualEmailAddressController.show.url)
-      )
+  private val baseAction: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] = actions.DELETEMEgetProvideDetailsWithApplicationInProgress
+    .ensure(
+      _.individualProvidedDetails.individualSaUtr.nonEmpty,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.IndividualSaUtrController.show.url)
+    )
+    .ensure(
+      _.individualProvidedDetails.emailAddress.nonEmpty,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.IndividualEmailAddressController.show.url)
+    )
 
   def show: Action[AnyContent] = baseAction.async:
     implicit request =>

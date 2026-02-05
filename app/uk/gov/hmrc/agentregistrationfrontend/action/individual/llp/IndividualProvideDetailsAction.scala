@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp
+package uk.gov.hmrc.agentregistrationfrontend.action.individual.llp
 
 import play.api.mvc.ActionRefiner
 import play.api.mvc.Call
@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDel
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.MergeFormValue
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService

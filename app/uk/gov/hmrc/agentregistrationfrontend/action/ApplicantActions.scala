@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.action.applicant
+package uk.gov.hmrc.agentregistrationfrontend.action
 
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions.*
-import uk.gov.hmrc.agentregistrationfrontend.action.ActionsHelper
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedActionRefiner
-import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
+import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.AuthorisedActionRefiner
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
@@ -34,7 +34,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 
-object Actions:
+object ApplicantActions:
+
+  export uk.gov.hmrc.agentregistrationfrontend.action.Actions.*
 
   type DataWithAuth = (InternalUserId, GroupId, Credentials)
   type RequestWithAuth = RequestWithData[DataWithAuth]
@@ -45,17 +47,18 @@ object Actions:
   type RequestWithApplicationCt[A] = RequestWithDataCt[A, DataWithApplication]
 
 @Singleton
-class Actions @Inject() (
+class ApplicantActions @Inject() (
   defaultActionBuilder: DefaultActionBuilder,
   authorisedActionRefiner: AuthorisedActionRefiner,
-  agentApplicationService: AgentApplicationService
+  agentApplicationService: AgentApplicationService,
+  businessPartnerRecordService: BusinessPartnerRecordService
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
-  import ActionsHelper.*
-  export Actions.*
+  export ActionsHelper.*
+  export ApplicantActions.*
 
-  private val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
+  val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
     .refine2(request => RequestWithDataCt.empty(request))
 
   val authorised: ActionBuilderWithData[DataWithAuth] = action
@@ -102,3 +105,24 @@ extends RequestAwareLogging:
           )
           Redirect(call.url)
     )
+
+  extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
+
+    inline def getBusinessPartnerRecord(using
+      AgentApplication PresentIn Data,
+      BusinessPartnerRecordResponse AbsentIn Data
+    ): ActionBuilderWithData[BusinessPartnerRecordResponse *: Data] = ab.refine4:
+      implicit request =>
+        businessPartnerRecordService
+          .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
+          .map(_.getOrThrowExpectedDataMissing(s"Business Partner Record for UTR ${request.get[AgentApplication].getUtr.value}"))
+          .map(request.add)
+
+    inline def getMaybeBusinessPartnerRecord(using
+      AgentApplication PresentIn Data,
+      Option[BusinessPartnerRecordResponse] AbsentIn Data
+    ): ActionBuilderWithData[Option[BusinessPartnerRecordResponse] *: Data] = ab.refine4:
+      implicit request =>
+        businessPartnerRecordService
+          .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
+          .map(request.add)

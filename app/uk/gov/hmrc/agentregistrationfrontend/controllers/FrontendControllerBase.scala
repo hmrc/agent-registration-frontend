@@ -20,20 +20,17 @@ import play.api.data.Form
 import play.api.i18n.I18nSupport
 import play.api.i18n.MessagesApi
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
-abstract class FrontendController(
-  mcc: MessagesControllerComponents,
-  val actions: Actions
+abstract class FrontendControllerBase(
+  mcc: MessagesControllerComponents
 )
 extends uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendController(mcc),
   I18nSupport,
   RequestAwareLogging:
 
-  export actions.*
   export Errors.*
 
   protected final val AppRoutes = uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes // alias so no need to import it in each controller

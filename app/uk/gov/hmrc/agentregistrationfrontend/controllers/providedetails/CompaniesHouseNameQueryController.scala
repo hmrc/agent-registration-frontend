@@ -23,10 +23,10 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseMatch
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsWithApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsWithApplicationRequest
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
@@ -38,7 +38,7 @@ import scala.concurrent.Future
 
 @Singleton
 class CompaniesHouseNameQueryController @Inject() (
-  actions: Actions,
+  actions: IndividualActions,
   mcc: MessagesControllerComponents,
   view: CompaniesHouseNameQueryPage,
   individualProvideDetailsService: IndividualProvideDetailsService,
@@ -47,8 +47,7 @@ class CompaniesHouseNameQueryController @Inject() (
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
-    .Individual
-    .getProvideDetailsInProgress
+    .DELETEMEgetProvideDetailsInProgress
     .async:
       implicit request =>
         agentApplicationService
@@ -73,8 +72,7 @@ extends FrontendController(mcc, actions):
               Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
 
   def submit: Action[AnyContent] = actions
-    .Individual
-    .getProvideDetailsWithApplicationInProgress
+    .DELETEMEgetProvideDetailsWithApplicationInProgress
     .ensureValidForm[CompaniesHouseNameQuery](
       form = CompaniesHouseNameQueryForm.form,
       viewToServeWhenFormHasErrors =

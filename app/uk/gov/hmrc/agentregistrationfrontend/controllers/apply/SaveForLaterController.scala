@@ -19,8 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.SaveForLaterPage
 
 import javax.inject.Inject
@@ -29,13 +28,12 @@ import javax.inject.Singleton
 @Singleton
 class SaveForLaterController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: ApplicantActions,
   saveForLaterPage: SaveForLaterPage
 )
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
-    .Applicant
     .getApplicationInProgress:
       implicit request =>
         Ok(saveForLaterPage())

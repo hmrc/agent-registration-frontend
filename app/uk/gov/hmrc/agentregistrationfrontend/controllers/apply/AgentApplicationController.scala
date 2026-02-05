@@ -20,8 +20,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.ConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.ViewApplicationPage
@@ -31,7 +30,7 @@ import javax.inject.Singleton
 
 @Singleton
 class AgentApplicationController @Inject() (
-  actions: Actions,
+  actions: ApplicantActions,
   mcc: MessagesControllerComponents,
   simplePage: SimplePage,
   confirmationPage: ConfirmationPage,
@@ -39,11 +38,8 @@ class AgentApplicationController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   // TODO: is this endpoint really needed?
   def landing: Action[AnyContent] = actions
-    .Applicant
     .getApplicationInProgress:
       implicit request =>
         // until we have more than the registration journey just go to the task list
@@ -52,7 +48,6 @@ extends FrontendController(mcc, actions):
 
   // TODO: is this endpoint really needed?
   def applicationDashboard: Action[AnyContent] = actions
-    .Applicant
     .getApplicationInProgress:
       implicit request =>
         Ok(simplePage(
@@ -63,7 +58,6 @@ extends FrontendController(mcc, actions):
         ))
 
   def applicationSubmitted: Action[AnyContent] = actions
-    .Applicant
     .getApplicationSubmitted
     .getBusinessPartnerRecord:
       implicit request =>
@@ -73,7 +67,6 @@ extends FrontendController(mcc, actions):
         ))
 
   def viewSubmittedApplication: Action[AnyContent] = actions
-    .Applicant
     .getApplicationSubmitted
     .getBusinessPartnerRecord:
       implicit request =>

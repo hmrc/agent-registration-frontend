@@ -24,9 +24,9 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentAssuranceConnector
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 
 import javax.inject.Inject
@@ -35,16 +35,13 @@ import javax.inject.Singleton
 @Singleton
 class RefusalToDealWithController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: ApplicantActions,
   agentAssuranceConnector: AgentAssuranceConnector,
   agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   def check(): Action[AnyContent] = actions
-    .Applicant
     .getApplicationInProgress
     .ensure4(
       condition =

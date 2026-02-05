@@ -19,34 +19,24 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedAction
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersAction
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAuthorisedWithIdentifiersRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.EnrichWithAgentApplicationAction
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsWithApplicationRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.ProvideDetailsAction
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
-import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors.*
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.AbsentIn
-import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.PresentIn
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
-import javax.inject.Inject
-import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 object Actions:
 
+  export uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.PresentIn
+  export uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.AbsentIn
+
   type RequestWithData[Data <: Tuple] = RequestWithDataCt[AnyContent, Data]
 
-  type DataEmpty = EmptyTuple
-  type DefaultRequest = RequestWithData[DataEmpty]
-  type DefaultRequestCt[ContentType] = RequestWithDataCt[ContentType, DataEmpty]
+  type EmptyData = EmptyTuple
+  type DefaultRequest = RequestWithData[EmptyData]
+  type DefaultRequestCt[ContentType] = RequestWithDataCt[ContentType, EmptyData]
 
   extension [
     ContentType,
@@ -70,95 +60,22 @@ object Actions:
     inline def maybeBusinessPartnerRecordResponse(using Option[BusinessPartnerRecordResponse] PresentIn Data): Option[BusinessPartnerRecordResponse] = r.get
     inline def agentType(using AgentType PresentIn Data): AgentType = r.get
 
-@Singleton
-class Actions @Inject() (
-  defaultActionBuilder: DefaultActionBuilder,
-  individualAuthorisedAction: IndividualAuthorisedAction,
-  individualAuthorisedWithIdentifiersAction: IndividualAuthorisedWithIdentifiersAction,
-  provideDetailsAction: ProvideDetailsAction,
-  enrichWithAgentApplicationAction: EnrichWithAgentApplicationAction,
-  businessPartnerRecordService: BusinessPartnerRecordService,
-  applicantActions: applicant.Actions,
-  individualActions: individual.Actions
-)(using ExecutionContext)
-extends RequestAwareLogging:
+    inline def individualProvidedDetails(using IndividualProvidedDetailsToBeDeleted PresentIn Data): IndividualProvidedDetailsToBeDeleted = r.get
 
-  export Actions.*
-  export ActionsHelper.*
+  extension [
+    ContentType // B Represents Play Framework's Content Type parameter, commonly denoted as B
+  ](a: Action[ContentType])(using ec: ExecutionContext)
 
-  val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
-    .refine2(request => RequestWithDataCt.empty(request))
+    def mapResult(f: Request[ContentType] => Result => Result): Action[ContentType] =
+      new Action[ContentType] {
+        override def apply(request: Request[ContentType]): Future[Result] = a(request).map(f(request))
 
-  object Applicant:
-    export applicantActions.*
+        override def parser: BodyParser[ContentType] = a.parser
 
-  object Individual:
+        override def executionContext: ExecutionContext = a.executionContext
+      }
 
-    export individualActions.*
-
-    val authorised: ActionBuilder[IndividualAuthorisedRequest, AnyContent] = action
-      .andThen(individualAuthorisedAction)
-
-    val authorisedWithIdentifiers: ActionBuilder[IndividualAuthorisedWithIdentifiersRequest, AnyContent] = action
-      .andThen(individualAuthorisedWithIdentifiersAction)
-
-    val getProvidedDetails: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = authorised
-      .andThen(provideDetailsAction)
-    val getProvideDetailsInProgress: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = getProvidedDetails
-      .ensure(
-        condition = _.individualProvidedDetails.isInProgress,
-        resultWhenConditionNotMet =
-          implicit request =>
-            val mpdConfirmationPage = AppRoutes.providedetails.IndividualConfirmationController.show
-            logger.warn(
-              s"The provided details have already been confirmed" +
-                s" (current provided details: ${request.individualProvidedDetails.providedDetailsState.toString}), " +
-                s"redirecting to [${mpdConfirmationPage.url}]."
-            )
-            Redirect(mpdConfirmationPage.url)
-      )
-
-    val getProvideDetailsWithApplicationInProgress: ActionBuilder[
-      IndividualProvideDetailsWithApplicationRequest,
-      AnyContent
-    ] = getProvideDetailsInProgress.andThen(enrichWithAgentApplicationAction)
-
-    val getSubmitedDetailsWithApplicationInProgress: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] = getProvidedDetails
-      .ensure(
-        condition = _.individualProvidedDetails.hasFinished,
-        resultWhenConditionNotMet =
-          implicit request =>
-            val mdpCyaPage = AppRoutes.providedetails.CheckYourAnswersController.show
-            logger.warn(
-              s"The provided details are not in the final state" +
-                s" (current provided details: ${request.individualProvidedDetails.providedDetailsState.toString}), " +
-                s"redirecting to [${mdpCyaPage.url}]."
-            )
-            Redirect(mdpCyaPage.url)
-      ).andThen(enrichWithAgentApplicationAction)
-
-  extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
-
-    inline def getBusinessPartnerRecord(using
-      AgentApplication PresentIn Data,
-      BusinessPartnerRecordResponse AbsentIn Data
-    ): ActionBuilderWithData[BusinessPartnerRecordResponse *: Data] = ab.refine4:
-      implicit request =>
-        businessPartnerRecordService
-          .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
-          .map(_.getOrThrowExpectedDataMissing(s"Business Partner Record for UTR ${request.get[AgentApplication].getUtr.value}"))
-          .map(request.add)
-
-    inline def getMaybeBusinessPartnerRecord(using
-      AgentApplication PresentIn Data,
-      Option[BusinessPartnerRecordResponse] AbsentIn Data
-    ): ActionBuilderWithData[Option[BusinessPartnerRecordResponse] *: Data] = ab.refine4:
-      implicit request =>
-        businessPartnerRecordService
-          .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
-          .map(request.add)
-
-  extension (a: Action[AnyContent])
+  extension (a: Action[AnyContent])(using ec: ExecutionContext)
     /** Modifies the action result to handle "Save and Come Back Later" functionality. If the form submission contains a "Save and Come Back Later" action,
       * redirects to the Save and Come Back Later page. Otherwise, returns the original result unchanged.
       */

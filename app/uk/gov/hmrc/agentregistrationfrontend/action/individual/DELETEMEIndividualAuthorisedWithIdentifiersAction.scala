@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.action.providedetails
+package uk.gov.hmrc.agentregistrationfrontend.action.individual
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import play.api.mvc.*
 import play.api.mvc.Results.*
 import sttp.model.Uri.UriContext
-import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistration.shared.SaUtr
+import uk.gov.hmrc.agentregistration.shared.Nino as ModelNino
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
 import uk.gov.hmrc.agentregistrationfrontend.action.MergeFormValue
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
@@ -37,40 +39,48 @@ import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-class IndividualAuthorisedRequest[A](
-  val internalUserId: InternalUserId,
-  val request: Request[A],
-  val credentials: Credentials
+class IndividualAuthorisedWithIdentifiersRequest[A](
+  override val internalUserId: InternalUserId,
+  override val request: Request[A],
+  override val credentials: Credentials,
+  val nino: Option[ModelNino],
+  val saUtr: Option[SaUtr]
 )
-extends WrappedRequest[A](request)
+extends IndividualAuthorisedRequest[A](
+  internalUserId = internalUserId,
+  request = request,
+  credentials = credentials
+)
 
-object IndividualAuthorisedRequest:
+object IndividualAuthorisedWithIdentifiersRequest:
 
-  given [T, A]: MergeFormValue[IndividualAuthorisedRequest[A], T] =
+  given [T, A]: MergeFormValue[IndividualAuthorisedWithIdentifiersRequest[A], T] =
     (
-      r: IndividualAuthorisedRequest[A],
+      r: IndividualAuthorisedWithIdentifiersRequest[A],
       t: T
     ) =>
-      new IndividualAuthorisedRequest[A](
+      new IndividualAuthorisedWithIdentifiersRequest[A](
         r.internalUserId,
         r.request,
-        r.credentials
+        r.credentials,
+        r.nino,
+        r.saUtr
       ) with FormValue[T]:
         val formValue: T = t
 
 @Singleton
-class IndividualAuthorisedAction @Inject() (
+class IndividualAuthorisedWithIdentifiersAction @Inject() (
   af: AuthorisedFunctions,
   errorResults: ErrorResults,
   appConfig: AppConfig,
   cc: MessagesControllerComponents
 )
-extends ActionRefiner[Request, IndividualAuthorisedRequest]
+extends ActionRefiner[Request, IndividualAuthorisedWithIdentifiersRequest]
 with RequestAwareLogging:
 
   override protected def executionContext: ExecutionContext = cc.executionContext
 
-  override protected def refine[A](request: Request[A]): Future[Either[Result, IndividualAuthorisedRequest[A]]] =
+  override protected def refine[A](request: Request[A]): Future[Either[Result, IndividualAuthorisedWithIdentifiersRequest[A]]] =
     given r: Request[A] = request
 
     af.authorised(
@@ -82,12 +92,14 @@ with RequestAwareLogging:
         and Retrievals.credentials
     ).apply:
       case allEnrolments ~ maybeInternalId ~ credentials =>
-        Future.successful(Right(new IndividualAuthorisedRequest(
+        Future.successful(Right(new IndividualAuthorisedWithIdentifiersRequest(
           internalUserId = maybeInternalId
             .map(InternalUserId.apply)
             .getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing")),
           request = request,
-          credentials = credentials.getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing"))
+          credentials = credentials.getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing")),
+          nino = getNino(allEnrolments),
+          saUtr = getUtr(allEnrolments)
         )))
     .recoverWith:
       case _: NoActiveSession =>
@@ -116,5 +128,32 @@ with RequestAwareLogging:
             message = e.toString
           )
         ))
+
+  private def getIdentifierForEnrolmentKey(
+    enrolmentKey: String,
+    identifierKey: String
+  )(using enrolments: Enrolments): Option[EnrolmentIdentifier] =
+    for {
+      enrolment <- enrolments.getEnrolment(enrolmentKey)
+      identifier <- enrolment.getIdentifier(identifierKey)
+    } yield identifier
+
+  private def getNino(enrolments: Enrolments): Option[ModelNino] =
+    given enr: Enrolments = enrolments
+    val hmrcPtEnrolmentKey = "HMRC-PT"
+    val hmrcNiEnrolmentKey = "HMRC-NI"
+    val ninoIdentifierKey = "NINO"
+
+    getIdentifierForEnrolmentKey(hmrcPtEnrolmentKey, ninoIdentifierKey)
+      .orElse(getIdentifierForEnrolmentKey(hmrcNiEnrolmentKey, ninoIdentifierKey))
+      .map(x => ModelNino(x.value))
+
+  private def getUtr(enrolments: Enrolments): Option[SaUtr] =
+    given enr: Enrolments = enrolments
+    val hmrcPtEnrolmentKey = "IR-SA"
+    val utrIdentifierKey = "UTR"
+
+    getIdentifierForEnrolmentKey(hmrcPtEnrolmentKey, utrIdentifierKey)
+      .map(x => SaUtr(x.value))
 
   private given ExecutionContext = cc.executionContext

@@ -16,22 +16,12 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers
 
-import com.softwaremill.quicklens.modify
 import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
+import play.api.mvc.DefaultActionBuilder
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
-import uk.gov.hmrc.agentregistration.shared.AgentType
-import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
-import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
-import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestLinkPage
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendControllerBase
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyHubPage
 
 import javax.inject.Inject
@@ -40,84 +30,14 @@ import javax.inject.Singleton
 @Singleton
 class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
-  testApplicationService: TestApplicationService,
-  testLinkPage: TestLinkPage,
-  testOnlyHubPage: TestOnlyHubPage,
-  individualProvideDetailsService: IndividualProvideDetailsService
+  defaultActionBuilder: DefaultActionBuilder,
+  testOnlyHubPage: TestOnlyHubPage
 )
-extends FrontendController(mcc, actions):
+extends FrontendControllerBase(mcc):
 
-  import actions.Applicant.*
+  def showTestOnlyHub: Action[AnyContent] = defaultActionBuilder:
+    implicit request =>
+      Ok(testOnlyHubPage())
 
-  def showTestOnlyHub: Action[AnyContent] = actions
-    .action:
-      implicit request =>
-        Ok(testOnlyHubPage())
-
-  def showAgentApplication: Action[AnyContent] = actions
-    .Applicant
-    .getApplication: request =>
-      Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))
-
-  def showProvidedDetails: Action[AnyContent] = actions
-    .Individual
-    .getProvidedDetails: request =>
-      Ok(Json.prettyPrint(Json.toJson(request.individualProvidedDetails)))
-
-  def showPlaySession: Action[AnyContent] = actions.action: request =>
+  def showPlaySession: Action[AnyContent] = defaultActionBuilder: request =>
     Ok(Json.prettyPrint(Json.toJson(request.session.data)))
-
-  def addAgentTypeToSession(
-    agentType: AgentType
-  ): Action[AnyContent] = Action:
-    implicit request =>
-      Ok("agent type added to session")
-        .addToSession(agentType)
-
-  def addBusinessTypeToSession(
-    businessType: BusinessTypeAnswer
-  ): Action[AnyContent] = Action:
-    implicit request =>
-      Ok("business type added to session")
-        .addToSession(AgentType.UkTaxAgent)
-        .addToSession(businessType)
-
-  def addPartnershipTypeToSession(
-    partnershipType: BusinessType.Partnership
-  ): Action[AnyContent] = Action:
-    implicit request =>
-      Ok("partnership type added to session")
-        .addToSession(AgentType.UkTaxAgent)
-        .addToSession(BusinessTypeAnswer.PartnershipType)
-        .addSession(partnershipType)
-
-  def addAgentApplicationIdToSession(
-    agentApplicationId: AgentApplicationId
-  ): Action[AnyContent] = Action:
-    implicit request =>
-      Ok("agent applicationId added to session")
-        .addToSession(agentApplicationId)
-
-  // as we add more types of entity support we may want to specify which business type to create
-  // possibly as part of the url, for now we only create an LLP application
-  def makeTestSubmittedApplication(): Action[AnyContent] = Action
-    .async:
-      implicit request =>
-        testApplicationService
-          .makeTestApplication()
-          .map((linkId: TestOnlyLink) =>
-            Ok(testLinkPage(linkId))
-          )
-
-  def removeNinoAndDobFromIndividual(): Action[AnyContent] = actions
-    .Individual
-    .getProvidedDetails
-    .async:
-      implicit request =>
-        val updatedDetails = request.individualProvidedDetails
-          .modify(_.individualNino).setTo(None)
-          .modify(_.individualDateOfBirth).setTo(None)
-        individualProvideDetailsService
-          .upsert(updatedDetails)
-          .map(_ => Ok("NINO and DOB removed from Individual Provided Details"))

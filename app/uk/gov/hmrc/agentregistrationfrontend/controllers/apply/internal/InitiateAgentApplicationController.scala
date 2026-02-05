@@ -23,10 +23,10 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
@@ -38,15 +38,13 @@ import scala.concurrent.Future
 @Singleton
 class InitiateAgentApplicationController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: ApplicantActions,
   agentApplicationService: AgentApplicationService,
   enrolmentStoreProxyConnector: EnrolmentStoreProxyConnector,
   appConfig: AppConfig,
   applicationFactory: ApplicationFactory
 )
 extends FrontendController(mcc, actions):
-
-  import actions.Applicant.*
 
   /** This endpoint is called by Government Gateway upon successful login.
     */
@@ -55,7 +53,6 @@ extends FrontendController(mcc, actions):
     businessType: BusinessType,
     userRole: UserRole
   ): Action[AnyContent] = actions
-    .Applicant
     .authorised
     .ensure4(
       condition =

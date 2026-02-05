@@ -26,10 +26,10 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.companieshouse.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
 import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
-import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.llp.IndividualProvideDetailsRequest
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionFormType
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms.toOfficerSelection
@@ -49,7 +49,7 @@ import scala.concurrent.Future
 @Singleton
 class CompaniesHouseMatchingController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: IndividualActions,
   agentApplicationService: AgentApplicationService,
   companiesHouseService: CompaniesHouseService,
   individualProvideDetailsService: IndividualProvideDetailsService,
@@ -60,8 +60,7 @@ class CompaniesHouseMatchingController @Inject() (
 extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions
-    .Individual
-    .getProvideDetailsInProgress
+    .DELETEMEgetProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.companiesHouseMatch.isDefined,
       implicit request =>

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers
+package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant
 
 import play.api.data.FieldMapping
 import play.api.data.Form
@@ -28,15 +28,15 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Request
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.*
-import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.businessdetails.CompanyProfile
 import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
 import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.*
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.GrsNotCalled
@@ -57,19 +57,16 @@ import javax.inject.Singleton
 @Singleton
 class GrsStubController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: ApplicantActions,
   view: GrsStub,
   grsStubService: GrsStubService
 )
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   def showGrsData(
     businessType: BusinessType,
     journeyId: JourneyId
   ): Action[AnyContent] = actions
-    .Applicant
     .authorised:
       implicit request =>
         val prefilledForm =
@@ -87,7 +84,6 @@ extends FrontendController(mcc, actions):
     businessType: BusinessType,
     journeyId: JourneyId
   ): Action[AnyContent] = actions
-    .Applicant
     .authorised
     .ensureValidForm4(
       form = form(businessType),
@@ -127,7 +123,7 @@ extends FrontendController(mcc, actions):
   def setupGrsJourney(businessType: BusinessType): Action[JourneyConfig] =
     Action(parse.json[JourneyConfig]): (_: Request[JourneyConfig]) =>
       Created(Json.obj(
-        "journeyStartUrl" -> routes.GrsStubController.showGrsData(businessType, randomJourneyId()).url // scalafix:ok DisableSyntax
+        "journeyStartUrl" -> AppRoutes.testOnly.applicant.GrsStubController.showGrsData(businessType, randomJourneyId()).url
       ))
 
   val seed = 123456

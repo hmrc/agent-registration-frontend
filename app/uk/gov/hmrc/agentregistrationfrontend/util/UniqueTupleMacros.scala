@@ -50,6 +50,23 @@ object UniqueTupleMacros:
     val msg = s"Tuple isn't unique. Type '$targetName' occurs more than once:\n$formattedList"
     '{ scala.compiletime.error(${ Expr(msg) }) }
 
+  def hasDuplicatesImpl[Data: Type](using Quotes): Expr[Boolean] =
+    import quotes.reflect.*
+    val types = getTypes(TypeRepr.of[Data])
+
+    @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+    def check(
+      ts: List[TypeRepr],
+      seen: List[TypeRepr]
+    ): Boolean =
+      ts match
+        case Nil => false
+        case h :: tail =>
+          if seen.exists(s => s =:= h) then true
+          else check(tail, h :: seen)
+
+    Expr(check(types, Nil))
+
   def makeAbsentInOrFailImpl[
     T: Type,
     Tup <: Tuple: Type

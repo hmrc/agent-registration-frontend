@@ -23,8 +23,8 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsSupervisoryBodyPage
@@ -35,17 +35,14 @@ import javax.inject.Singleton
 @Singleton
 class AmlsSupervisorController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  actions: ApplicantActions,
   view: AmlsSupervisoryBodyPage,
   applicationService: AgentApplicationService,
   amlsCodeForm: AmlsCodeForm
 )
 extends FrontendController(mcc, actions):
 
-  import actions.Applicant.*
-
   def show: Action[AnyContent] = actions
-    .Applicant
     .getApplicationInProgress:
       implicit request =>
         val form: Form[AmlsCode] = amlsCodeForm.form.fill(request
@@ -56,7 +53,6 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     actions
-      .Applicant
       .getApplicationInProgress
       .ensureValidFormAndRedirectIfSaveForLater4(amlsCodeForm.form, implicit r => view(_))
       .async:
