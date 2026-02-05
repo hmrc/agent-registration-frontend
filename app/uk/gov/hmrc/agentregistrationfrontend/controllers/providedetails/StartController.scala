@@ -43,9 +43,10 @@ class StartController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def start(linkId: LinkId): Action[AnyContent] = Action
+  def start(linkId: LinkId): Action[AnyContent] = actions
+    .action
     .async:
-      implicit request: RequestHeader =>
+      implicit request =>
         val genericExitPageUrl: String = AppRoutes.apply.AgentApplicationController.genericExitPage.url
         applicationService.find(linkId).map {
           case Some(app) if app.hasFinished => startPageForApplicationType(app)
