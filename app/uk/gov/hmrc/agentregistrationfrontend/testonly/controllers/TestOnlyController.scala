@@ -97,7 +97,6 @@ extends FrontendController(mcc, actions):
   ): Action[AnyContent] = Action:
     implicit request =>
       Ok("agent applicationId added to session")
-        .addToSession(agentApplicationId)
 
   // as we add more types of entity support we may want to specify which business type to create
   // possibly as part of the url, for now we only create an LLP application

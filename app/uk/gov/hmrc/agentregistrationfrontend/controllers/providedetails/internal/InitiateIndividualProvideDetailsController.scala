@@ -29,7 +29,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.providedetails.IndividualAut
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
+//import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CitizenDetailsConnector
@@ -78,11 +78,11 @@ extends FrontendController(mcc, actions):
                     for {
                       individualProvidedDetails <- createIndividualProvidedDetailsFor(agentApplication.agentApplicationId)
                       _ <- individualProvideDetailsService.upsert(individualProvidedDetails)
-                    } yield Redirect(nextEndpoint).addToSession(agentApplication.agentApplicationId)
+                    } yield Redirect(nextEndpoint)
 
                   case Some(individualProvidedDetails) =>
                     logger.info("Individual provided details already exists, redirecting to individual name page")
-                    Future.successful(Redirect(nextEndpoint).addToSession(individualProvidedDetails.agentApplicationId))
+                    Future.successful(Redirect(nextEndpoint))
 
             case None =>
               logger.info(s"Application for linkId $linkId not found, redirecting to $applicationGenericExitPageUrl")

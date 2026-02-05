@@ -44,7 +44,6 @@ object SessionService:
     def addToSession(bt: BusinessTypeAnswer)(using request: RequestHeader): Result = r.addingToSession(businessTypeKey -> bt.toString)
     def addSession(pt: BusinessType.Partnership)(using request: RequestHeader): Result = r.addingToSession(partnershipTypeKey -> pt.toString)
     def addToSession(tos: TypeOfSignIn)(using request: RequestHeader): Result = r.addingToSession(typeOfSignInKey -> tos.toString)
-    def addToSession(aid: AgentApplicationId)(using request: RequestHeader): Result = r.addingToSession(agentApplicationId -> aid.value)
     def addToSession(ur: UserRole)(using request: RequestHeader): Result = r.addingToSession(userRoleKey -> ur.toString)
     def removePartnershipTypeFromSession(using request: RequestHeader): Result = r.removingFromSession(partnershipTypeKey)
 
