@@ -16,8 +16,12 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.util
 
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.*
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import scala.compiletime.testing.typeCheckErrors
 
@@ -54,6 +58,12 @@ extends UnitSpec:
 //    summon[String PresentIn (Boolean, Int)]
 //    val t = UniqueTuple((1, "string", true))
 //    t.get[Double]
+
+  "construct" in:
+  val maybeNino: Option[Nino] = Some(Nino("AA123456A"))
+  val maybeSaUtr: Option[SaUtr] = Some(SaUtr("1234567890"))
+
+  val data: UniqueTuple[(Option[Nino], Option[SaUtr], InternalUserId)] = (maybeNino, maybeSaUtr, InternalUserId("123")).unique
 
   "compilation safety" should:
     "fail to compile get when used with generic types" in:

@@ -60,7 +60,7 @@ extends RequestAwareLogging:
     individualProvideDetailsConnector
       .find(applicationId)
 
-  def findAll()(using request: IndividualAuthorisedRequest[?]): Future[List[IndividualProvidedDetailsToBeDeleted]] = individualProvideDetailsConnector
+  def findAll()(using request: RequestHeader): Future[List[IndividualProvidedDetailsToBeDeleted]] = individualProvideDetailsConnector
     .findAll()
 
   def upsert(individualProvidedDetails: IndividualProvidedDetailsToBeDeleted)(using request: IndividualAuthorisedRequest[?]): Future[Unit] =

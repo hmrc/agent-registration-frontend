@@ -21,6 +21,7 @@ import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.*
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.EnrichWithAgentApplicationAction
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
@@ -45,6 +46,10 @@ object IndividualActions:
   type DataWithAdditionalIdentifiers = Option[Nino] *: Option[SaUtr] *: DataWithAuth
   type RequestWithAdditionalIdentifiers = RequestWithData[DataWithAdditionalIdentifiers]
   type RequestWithAdditionalIdentifiersCt[ContentType] = RequestWithDataCt[ContentType, DataWithAdditionalIdentifiers]
+
+  type DataWithIndividualProvidedDetails = IndividualProvidedDetailsToBeDeleted *: DataWithAuth
+  type RequestWithIndividualProvidedDetailsToBeDeleted = RequestWithData[DataWithIndividualProvidedDetails]
+  type RequestWithIndividualProvidedDetailsToBeDeletedCt[ContentType] = RequestWithDataCt[ContentType, DataWithIndividualProvidedDetails]
 
 @Singleton
 class IndividualActions @Inject() (
@@ -74,6 +79,7 @@ extends RequestAwareLogging:
 
   val DELETEMEgetProvidedDetails: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = DELETEMEauthorised
     .andThen(provideDetailsAction)
+
   val DELETEMEgetProvideDetailsInProgress: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = DELETEMEgetProvidedDetails
     .ensure(
       condition = _.individualProvidedDetails.isInProgress,

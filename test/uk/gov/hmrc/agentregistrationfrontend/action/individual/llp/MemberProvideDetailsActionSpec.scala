@@ -26,6 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualProvideDetailsRefiner
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll.agentApplicationId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll.individualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
@@ -53,6 +54,7 @@ extends ISpec:
     .modify(_.applicationState)
     .setTo(ApplicationState.Started)
 
+//TODO: explain how it can come that we have agentApplicationId in session?
   "when agentApplicationId in session and individual provided details found than redirects to name page" in:
     AgentRegistrationIndividualProvidedDetailsStubs
       .stubFindIndividualProvidedDetails(individualProvidedDetails)
@@ -73,6 +75,7 @@ extends ISpec:
 
     AgentRegistrationIndividualProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplicationId)
 
+  // TODO: explain how it can come that we have agentApplicationId in session?
   "when agentApplicationId in session but no individual provided details found but application found - try to recover - find linkId and start journey" in:
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindIndividualProvidedDetailsNoContent(agentApplicationId)
     AgentRegistrationStubs.stubFindApplicationByAgentApplicationId(submittedAgentApplication.agentApplicationId, submittedAgentApplication)
@@ -90,6 +93,7 @@ extends ISpec:
     AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(submittedAgentApplication.agentApplicationId)
     AgentRegistrationIndividualProvidedDetailsStubs.verifyFindByAgentApplicationID(agentApplicationId)
 
+  // TODO: explain how it can come that we have agentApplicationId in session?
   "when agentApplicationId in session but no individual provided details found and no application found - try to recover will fail with error page" in:
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindIndividualProvidedDetailsNoContent(agentApplicationId)
     AgentRegistrationStubs.stubFindApplicationByAgentApplicationIdNoContent(submittedAgentApplication.agentApplicationId)

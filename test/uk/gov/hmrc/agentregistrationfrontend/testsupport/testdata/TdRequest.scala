@@ -19,6 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import play.api.test.FakeRequest
+import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions.EmptyData
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
@@ -62,7 +64,7 @@ trait TdRequest {
 
     import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions.*
 
-    def requestWithAuthData: RequestWithData[DataWithAuth] = RequestWithDataCt.apply[AnyContent, DataWithAuth](
+    def requestWithAuthData: RequestWithData[DataWithAuth] = RequestWithDataCt.apply(
       rawRequestLoggedIn,
       (
         dependencies.internalUserId,
@@ -75,15 +77,34 @@ trait TdRequest {
 
     import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions.*
 
-    def dataWithAuth: DataWithAuth =
+    def requestWithAuthData: RequestWithData[DataWithAuth] = RequestWithDataCt.apply(
+      rawRequestLoggedIn,
       (
         dependencies.internalUserId,
         dependencies.credentials
       )
+    )
 
-    def requestWithAuthData: RequestWithData[DataWithAuth] = RequestWithDataCt.apply[AnyContent, DataWithAuth](
+//    def requestWithAdditionalIdentifiers(
+//      maybeBino: Option[Nino] = Some(dependencies.nino),
+//      maybeSaUtr: Option[SaUtr] = Some(dependencies.saUtr)
+//    ): RequestWithData[DataWithAdditionalIdentifiers] = RequestWithDataCt.apply(
+//      rawRequestLoggedIn,
+//      (
+//        maybeBino,
+//        maybeSaUtr,
+//        dependencies.internalUserId,
+//        dependencies.credentials
+//      )
+//    )
+
+    def requestWithIndividualProvidedDetails: RequestWithData[DataWithIndividualProvidedDetails] = RequestWithDataCt.apply(
       rawRequestLoggedIn,
-      dataWithAuth
+      (
+        dependencies.individualProvidedDetails,
+        dependencies.internalUserId,
+        dependencies.credentials
+      )
     )
 
   def requestLoggedInWithAgentApplicationId: Request[AnyContent] = baseRequest
@@ -96,6 +117,7 @@ trait TdRequest {
       request = requestLoggedInWithAgentApplicationId,
       credentials = credentials
     )
+
   def individualAuthorisedRequestLoggedInWithOutAgentApplicationId: IndividualAuthorisedRequest[AnyContent] =
     new IndividualAuthorisedRequest(
       internalUserId = internalUserId,

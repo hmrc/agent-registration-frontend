@@ -75,7 +75,7 @@ extends FrontendController(mcc, actions):
                 .flatMap:
                   case None =>
                     for {
-                      individualProvidedDetails <- createIndividualProvidedDetailsFor(agentApplication.agentApplicationId)
+                      individualProvidedDetails: IndividualProvidedDetailsToBeDeleted <- createIndividualProvidedDetailsFor(agentApplication.agentApplicationId)
                       _ <- individualProvideDetailsService.upsert(individualProvidedDetails)
                     } yield Redirect(nextEndpoint).addToSession(agentApplication.agentApplicationId)
 
