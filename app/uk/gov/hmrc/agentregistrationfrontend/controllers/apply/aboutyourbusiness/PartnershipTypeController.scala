@@ -40,7 +40,7 @@ class PartnershipTypeController @Inject() (
 extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilderWithData[EmptyTuple] = action
-    .ensure4(
+    .ensure(
       _.readBusinessTypeAnswer match {
         case Some(BusinessTypeAnswer.PartnershipType) => true
         case _ => false

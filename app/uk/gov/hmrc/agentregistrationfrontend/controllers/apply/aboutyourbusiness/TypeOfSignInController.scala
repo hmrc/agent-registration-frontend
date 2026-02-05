@@ -64,10 +64,10 @@ extends FrontendController(mcc, actions):
 
   def showSignInPage: Action[AnyContent] =
     action
-      .refine4(r => r.readFromSessionAgentType.fold(Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url))(r.add))
-      .refine4(r => r.readBusinessType.fold(Redirect(AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show.url))(r.add))
-      .refine4(r => r.readTypeOfSignIn.fold(Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show.url))(r.add))
-      .refine4(r => r.readUserRole.fold(Redirect(AppRoutes.apply.aboutyourbusiness.UserRoleController.show.url))(r.add)):
+      .refineWithData(r => r.readFromSessionAgentType.fold(Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url))(r.add))
+      .refineWithData(r => r.readBusinessType.fold(Redirect(AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show.url))(r.add))
+      .refineWithData(r => r.readTypeOfSignIn.fold(Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show.url))(r.add))
+      .refineWithData(r => r.readUserRole.fold(Redirect(AppRoutes.apply.aboutyourbusiness.UserRoleController.show.url))(r.add)):
         implicit request =>
           val agentType: AgentType = request.get
           val businessType: BusinessType = request.get

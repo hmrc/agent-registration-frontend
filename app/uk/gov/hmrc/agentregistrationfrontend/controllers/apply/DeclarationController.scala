@@ -44,7 +44,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .getApplicationInProgress
-    .ensure4(
+    .ensure(
       _.agentApplication.taskListStatus.declaration.canStart,
       implicit request =>
         logger.warn("Cannot start declaration whilst tasks are outstanding, redirecting to task list")

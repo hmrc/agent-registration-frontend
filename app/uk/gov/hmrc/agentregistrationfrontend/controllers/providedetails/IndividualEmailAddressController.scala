@@ -119,7 +119,7 @@ extends FrontendController(mcc, actions):
         // Individual email has already been provided and verified, redirecting to nino page
         Redirect(AppRoutes.providedetails.CheckYourAnswersController.show)
     )
-    .refine4:
+    .refineWithData:
       implicit request =>
         emailVerificationService
           .checkEmailVerificationStatus(

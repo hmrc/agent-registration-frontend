@@ -54,7 +54,7 @@ extends FrontendController(mcc, actions):
     userRole: UserRole
   ): Action[AnyContent] = actions
     .authorised
-    .ensure4(
+    .ensure(
       condition =
         implicit request =>
           val isHmrcAsAgentEnrolmentAllocatedToGroup: Future[Boolean] = enrolmentStoreProxyConnector

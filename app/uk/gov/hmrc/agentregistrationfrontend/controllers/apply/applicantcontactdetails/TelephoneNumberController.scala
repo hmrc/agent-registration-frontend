@@ -43,7 +43,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .getApplicationInProgress
-    .ensure4(
+    .ensure(
       _.agentApplication.applicantContactDetails.map(_.applicantName).nonEmpty,
       implicit request =>
         logger.warn("Because we don't have name details we are redirecting to that page")

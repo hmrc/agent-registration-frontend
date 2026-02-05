@@ -40,7 +40,7 @@ class BusinessTypeSessionController @Inject() (
 extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilderWithData[AgentType *: EmptyTuple] = action
-    .refine4:
+    .refineWithData:
       implicit request =>
         request.readFromSessionAgentType match
           case Some(agentType: AgentType) => request.add[AgentType](agentType)

@@ -38,7 +38,7 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] =
     actions
       .getApplicationInProgress
-      .ensure4(
+      .ensure(
         r => r.agentApplication.amlsDetails.exists(_.isComplete),
         implicit request =>
           logger.warn(s"Cannot display Check Your Answers page - incomplete AMLS details.")

@@ -56,7 +56,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .getApplicationInProgress
-    .ensure4(
+    .ensure(
       _
         .agentApplication
         .applicantContactDetails
@@ -77,7 +77,7 @@ extends FrontendController(mcc, actions):
       )))
 
   def submit: Action[AnyContent] = baseAction
-    .ensure4(
+    .ensure(
       // because we cannot store any submitted email without checking it's verified status first
       // if user is saving and continuing then handle the submission normally else redirect to save for later
       SubmissionHelper.getSubmitAction(_) === SaveAndContinue,
@@ -120,7 +120,7 @@ extends FrontendController(mcc, actions):
 
   def verify: Action[AnyContent] = actions
     .getApplicationInProgress
-    .ensure4(
+    .ensure(
       _.agentApplication
         .applicantContactDetails
         .map(_.applicantEmailAddress).isDefined,
@@ -128,7 +128,7 @@ extends FrontendController(mcc, actions):
         logger.info("Applicant email has not been provided, redirecting to email address page")
         Redirect(AppRoutes.apply.applicantcontactdetails.EmailAddressController.show)
     )
-    .ensure4(
+    .ensure(
       _.agentApplication
         .getApplicantContactDetails
         .getApplicantEmailAddress

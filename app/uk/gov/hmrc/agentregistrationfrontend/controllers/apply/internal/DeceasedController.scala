@@ -45,14 +45,14 @@ extends FrontendController(mcc, actions):
 
   def check(): Action[AnyContent] = actions
     .getApplicationInProgress
-    .refine4(implicit request =>
+    .refineWithData(implicit request =>
       request.agentApplication match
         case a: AgentApplicationSoleTrader => request.add(a)
         case a: IsNotSoleTrader =>
           logger.debug(s"Deceased verification is required only for SoleTrader, this business type is ${request.agentApplication.businessType}. Redirecting to company status check.")
           Redirect(nextCheckEndpoint)
     )
-    .ensure4(
+    .ensure(
       condition = _.agentApplicationSoleTrader.isDeceasedCheckRequired,
       resultWhenConditionNotMet =
         implicit request =>

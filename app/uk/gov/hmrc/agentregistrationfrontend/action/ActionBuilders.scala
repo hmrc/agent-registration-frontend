@@ -89,7 +89,7 @@ extends RequestAwareLogging:
     )(using
       FormBinding,
       T AbsentIn Data
-    ): ActionBuilderWithData[T *: Data] = refine4:
+    ): ActionBuilderWithData[T *: Data] = refineWithData:
       implicit request =>
 
         def handleErrors(formWithErrors: Form[T]): Future[Result] =
@@ -116,25 +116,25 @@ extends RequestAwareLogging:
 //      resultWhenConditionNotMet: Result
 //    ): ActionBuilderWithData[Data] = ensure4(condition, _ => resultWhenConditionNotMet)
 
-    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    def ensure4(
-      condition: RequestWithData[Data] => Boolean | Future[Boolean],
-      resultWhenConditionNotMet: RequestWithData[Data] => Result | Future[Result]
-    ): ActionBuilderWithData[Data] = refine4: request =>
+//    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+//    def ensure(
+//      condition: RequestWithData[Data] => Boolean | Future[Boolean],
+//      resultWhenConditionNotMet: RequestWithData[Data] => Result | Future[Result]
+//    ): ActionBuilderWithData[Data] = refineWithData: request =>
+//
+//      def computeResult(condition: Boolean): Result | RequestWithData[Data] | Future[Result | RequestWithData[Data]] =
+//        if condition then request else resultWhenConditionNotMet(request)
+//
+//      condition(request) match
+//        case c: Boolean => computeResult(c)
+//        case f: Future[_] =>
+//          f.asInstanceOf[Future[Boolean]].flatMap: c =>
+//            computeResult(c) match
+//              case result: Result => Future.successful(result)
+//              case request: RequestWithDataCt[_, _] => Future.successful(request.asInstanceOf[RequestWithData[Data]])
+//              case f: Future[_] => f.asInstanceOf[Future[Result | RequestWithData[Data]]]
 
-      def computeResult(condition: Boolean): Result | RequestWithData[Data] | Future[Result | RequestWithData[Data]] =
-        if condition then request else resultWhenConditionNotMet(request)
-
-      condition(request) match
-        case c: Boolean => computeResult(c)
-        case f: Future[_] =>
-          f.asInstanceOf[Future[Boolean]].flatMap: c =>
-            computeResult(c) match
-              case result: Result => Future.successful(result)
-              case request: RequestWithDataCt[_, _] => Future.successful(request.asInstanceOf[RequestWithData[Data]])
-              case f: Future[_] => f.asInstanceOf[Future[Result | RequestWithData[Data]]]
-
-    def refine4[NewData <: Tuple](
+    def refineWithData[NewData <: Tuple](
       refineF: RequestWithData[Data] => Result | RequestWithData[NewData] | Future[Result | RequestWithData[NewData]]
     ): ActionBuilderWithData[
       NewData

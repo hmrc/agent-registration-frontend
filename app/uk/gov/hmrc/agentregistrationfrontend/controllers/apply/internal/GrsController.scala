@@ -58,7 +58,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .getApplicationInProgress
-    .ensure4(
+    .ensure(
       condition = !_.agentApplication.isGrsDataReceived,
       resultWhenConditionNotMet =
         implicit request =>
@@ -85,7 +85,7 @@ extends FrontendController(mcc, actions):
   def journeyCallback(
     journeyId: Option[JourneyId]
   ): Action[AnyContent] = baseAction
-    .refine4(implicit request =>
+    .refineWithData(implicit request =>
       journeyId.fold {
         logger.error("Missing JourneyId in the request.")
         BadRequest("Missing JourneyId in the request.")

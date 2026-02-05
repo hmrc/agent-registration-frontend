@@ -37,7 +37,7 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] =
     actions
       .getApplicationInProgress
-      .ensure4(
+      .ensure(
         condition =
           _.agentApplication
             .refusalToDealWithCheckResult === Some(Fail),

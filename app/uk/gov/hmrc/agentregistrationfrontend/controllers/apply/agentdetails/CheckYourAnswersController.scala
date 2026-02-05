@@ -36,7 +36,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .getApplicationInProgress
-    .ensure4(
+    .ensure(
       _.agentApplication.agentDetails.exists(_.isComplete),
       implicit request =>
         logger.warn("Because we don't have complete agent details we are redirecting to where data is missing")

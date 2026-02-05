@@ -42,14 +42,14 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
     .getApplicationInProgress
-    .ensure4(
+    .ensure(
       condition = _.agentApplication.isGrsDataReceived,
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Missing data from GRS, redirecting to start GRS registration")
           Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
     )
-    .ensure4(
+    .ensure(
       condition = _.agentApplication.hasCheckPassed,
       resultWhenConditionNotMet =
         implicit request =>

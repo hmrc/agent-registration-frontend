@@ -39,7 +39,7 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] =
     actions
       .getApplicationInProgress
-      .ensure4(
+      .ensure(
         condition =
           _.agentApplication match
             case a: AgentApplication.IsIncorporated => a.companyStatusCheck === Some(CheckResult.Fail)

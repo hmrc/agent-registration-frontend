@@ -43,13 +43,13 @@ extends FrontendController(mcc, actions):
 
   val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .getApplicationInProgress
-    .ensure4(
+    .ensure(
       _.agentApplication.amlsDetails.exists(_.amlsRegistrationNumber.isDefined),
       implicit r =>
         logger.warn("Missing AmlsRegistrationNumber, redirecting to registration number page")
         Redirect(AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url)
     )
-    .ensure4(
+    .ensure(
       !_.agentApplication.getAmlsDetails.isHmrc, // safe to getAmlsDetails as ensured above
       implicit r =>
         logger.warn("Expiry date is not required as supervisor is HMRC, redirecting to Check Your Answers")

@@ -95,7 +95,7 @@ extends RequestAwareLogging:
     .andThen(provideDetailsAction)
 
   val getProvideDetailsInProgress: ActionBuilderWithData[DataWithIndividualProvidedDetails] = getProvidedDetails
-    .ensure4(
+    .ensure(
       condition = _.individualProvidedDetails.isInProgress,
       resultWhenConditionNotMet =
         implicit request =>
@@ -132,7 +132,7 @@ extends RequestAwareLogging:
   ] = DELETEMEgetProvideDetailsInProgress.andThen(enrichWithAgentApplicationAction)
 
   val getSubmittedDetailsWithApplicationInProgress: ActionBuilderWithData[DataWithAgentApplication] = getProvidedDetails
-    .ensure4(
+    .ensure(
       condition = _.individualProvidedDetails.hasFinished,
       resultWhenConditionNotMet =
         implicit request =>
@@ -144,7 +144,7 @@ extends RequestAwareLogging:
           )
           Redirect(mdpCyaPage.url)
     )
-    .refine4(enricherAgentApplication.enrichRequest)
+    .refineWithData(enricherAgentApplication.enrichRequest)
 
   val DELETEMEgetSubmitedDetailsWithApplicationInProgress: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] =
     DELETEMEgetProvidedDetails
@@ -167,5 +167,5 @@ extends RequestAwareLogging:
       AgentApplication AbsentIn Data,
       IndividualProvidedDetailsToBeDeleted PresentIn Data
     ): ActionBuilderWithData[AgentApplication *: Data] = ab
-      .refine4:
+      .refineWithData:
         enricherAgentApplication.enrichRequest

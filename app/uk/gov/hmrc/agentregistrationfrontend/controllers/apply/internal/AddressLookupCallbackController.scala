@@ -45,7 +45,7 @@ extends FrontendController(mcc, actions):
 
   def journeyCallback(id: Option[JourneyId]): Action[AnyContent] = actions
     .getApplicationInProgress
-    .refine4(request => id.fold(BadRequest("Missing JourneyId in the request from address-lookup-frontend."))(request.add))
+    .refineWithData(request => id.fold(BadRequest("Missing JourneyId in the request from address-lookup-frontend."))(request.add))
     .async:
       implicit request =>
         addressLookUpConnector

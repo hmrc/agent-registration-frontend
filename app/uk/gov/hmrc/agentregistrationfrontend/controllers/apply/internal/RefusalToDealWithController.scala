@@ -43,7 +43,7 @@ extends FrontendController(mcc, actions):
 
   def check(): Action[AnyContent] = actions
     .getApplicationInProgress
-    .ensure4(
+    .ensure(
       condition =
         _.agentApplication
           .applicationState === ApplicationState.GrsDataReceived,
@@ -52,7 +52,7 @@ extends FrontendController(mcc, actions):
           logger.warn("Missing data from GRS, redirecting to start GRS registration")
           Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
     )
-    .ensure4(
+    .ensure(
       condition = _.agentApplication.isRefusalToDealWithCheckRequired,
       resultWhenConditionNotMet =
         implicit request =>
