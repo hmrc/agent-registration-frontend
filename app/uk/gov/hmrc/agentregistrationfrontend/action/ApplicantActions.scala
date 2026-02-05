@@ -67,7 +67,7 @@ extends RequestAwareLogging:
     .refineFutureEither(authorisedActionRefiner.refine)
 
   val getApplication: ActionBuilderWithData[DataWithApplication] = authorised
-    .refineWithData:
+    .refine:
       implicit request: RequestWithData[DataWithAuth] =>
         agentApplicationService
           .find()
@@ -113,7 +113,7 @@ extends RequestAwareLogging:
     inline def getBusinessPartnerRecord(using
       AgentApplication PresentIn Data,
       BusinessPartnerRecordResponse AbsentIn Data
-    ): ActionBuilderWithData[BusinessPartnerRecordResponse *: Data] = ab.refineWithData:
+    ): ActionBuilderWithData[BusinessPartnerRecordResponse *: Data] = ab.refine:
       implicit request =>
         businessPartnerRecordService
           .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
@@ -123,7 +123,7 @@ extends RequestAwareLogging:
     inline def getMaybeBusinessPartnerRecord(using
       AgentApplication PresentIn Data,
       Option[BusinessPartnerRecordResponse] AbsentIn Data
-    ): ActionBuilderWithData[Option[BusinessPartnerRecordResponse] *: Data] = ab.refineWithData:
+    ): ActionBuilderWithData[Option[BusinessPartnerRecordResponse] *: Data] = ab.refine:
       implicit request =>
         businessPartnerRecordService
           .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)

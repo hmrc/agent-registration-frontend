@@ -76,7 +76,7 @@ extends FrontendController(mcc, actions):
         logger.info("Redirecting to individual name page due to missing memberNameQuery value")
         Redirect(AppRoutes.providedetails.CompaniesHouseNameQueryController.show)
     )
-    .refineWithData:
+    .refine:
       implicit request =>
         fetchOfficers(request.individualProvidedDetails).map(request.add)
 

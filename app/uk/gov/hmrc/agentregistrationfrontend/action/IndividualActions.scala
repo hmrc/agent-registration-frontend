@@ -110,7 +110,7 @@ extends RequestAwareLogging:
           )
           Redirect(mdpCyaPage.url)
     )
-    .refineWithData(enricherAgentApplication.enrichRequest)
+    .refine(enricherAgentApplication.enrichRequest)
 
   extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
 
@@ -118,5 +118,5 @@ extends RequestAwareLogging:
       AgentApplication AbsentIn Data,
       IndividualProvidedDetailsToBeDeleted PresentIn Data
     ): ActionBuilderWithData[AgentApplication *: Data] = ab
-      .refineWithData:
+      .refine:
         enricherAgentApplication.enrichRequest

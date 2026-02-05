@@ -58,7 +58,7 @@ extends FrontendController(mcc, actions):
     NumberOfRequiredKeyIndividuals *: IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
   ] = actions
     .getApplicationInProgress
-    .refineWithData:
+    .refine:
       implicit request =>
         request.get[AgentApplication] match
           case _: IsIncorporated =>
@@ -71,7 +71,7 @@ extends FrontendController(mcc, actions):
             Redirect(AppRoutes.apply.TaskListController.show.url)
           case aa: IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
             request.replace[AgentApplication, IsAgentApplicationForDeclaringNumberOfKeyIndividuals](aa)
-    .refineWithData:
+    .refine:
       implicit request =>
         request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].numberOfRequiredKeyIndividuals match
           case Some(n: NumberOfRequiredKeyIndividuals) => request.add(n)

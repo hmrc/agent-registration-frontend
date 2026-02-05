@@ -50,7 +50,7 @@ extends FrontendController(mcc, actions):
     )
 
   def show: Action[AnyContent] = baseAction
-    .refineWithData:
+    .refine:
       implicit request =>
         businessPartnerRecordService
           .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)

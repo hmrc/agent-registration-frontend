@@ -85,7 +85,7 @@ extends FrontendController(mcc, actions):
   def journeyCallback(
     journeyId: Option[JourneyId]
   ): Action[AnyContent] = baseAction
-    .refineWithData(implicit request =>
+    .refine(implicit request =>
       journeyId.fold {
         logger.error("Missing JourneyId in the request.")
         BadRequest("Missing JourneyId in the request.")

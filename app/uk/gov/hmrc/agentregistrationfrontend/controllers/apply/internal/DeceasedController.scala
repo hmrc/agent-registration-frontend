@@ -45,7 +45,7 @@ extends FrontendController(mcc, actions):
 
   def check(): Action[AnyContent] = actions
     .getApplicationInProgress
-    .refineWithData(implicit request =>
+    .refine(implicit request =>
       request.agentApplication match
         case a: AgentApplicationSoleTrader => request.add(a)
         case a: IsNotSoleTrader =>

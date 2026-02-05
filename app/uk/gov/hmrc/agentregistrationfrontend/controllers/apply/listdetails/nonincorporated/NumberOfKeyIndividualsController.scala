@@ -47,7 +47,7 @@ extends FrontendController(mcc, actions):
     IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
   ] = actions
     .getApplicationInProgress
-    .refineWithData:
+    .refine:
       implicit request =>
         request.agentApplication match
           case _: AgentApplication.IsIncorporated =>

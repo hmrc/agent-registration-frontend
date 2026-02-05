@@ -91,7 +91,7 @@ extends RequestAwareLogging:
     )(using
       FormBinding,
       T AbsentIn Data
-    ): ActionBuilderWithData[T *: Data] = refineWithData:
+    ): ActionBuilderWithData[T *: Data] = refine:
       implicit request =>
 
         def handleErrors(formWithErrors: Form[T]): Future[Result] =
@@ -117,7 +117,7 @@ extends RequestAwareLogging:
     def ensure(
       condition: RequestWithData[Data] => Boolean | Future[Boolean],
       resultWhenConditionNotMet: RequestWithData[Data] => Result | Future[Result]
-    ): ActionBuilderWithData[Data] = refineWithData: request =>
+    ): ActionBuilderWithData[Data] = refine: request =>
 
       def computeResult(condition: Boolean): Result | RequestWithData[Data] | Future[Result | RequestWithData[Data]] =
         if condition then request else resultWhenConditionNotMet(request)
@@ -131,7 +131,7 @@ extends RequestAwareLogging:
               case request: RequestWithDataCt[_, _] => Future.successful(request.asInstanceOf[RequestWithData[Data]])
               case f: Future[_] => f.asInstanceOf[Future[Result | RequestWithData[Data]]]
 
-    def refineWithData[NewData <: Tuple](
+    def refine[NewData <: Tuple](
       refineF: RequestWithData[Data] => Result | RequestWithData[NewData] | Future[Result | RequestWithData[NewData]]
     ): ActionBuilderWithData[
       NewData
