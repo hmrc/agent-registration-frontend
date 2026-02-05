@@ -32,7 +32,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class EnricherAgentApplication @Inject() (
+class AgentApplicationEnricher @Inject() (
   agentApplicationService: AgentApplicationService
 )(using ec: ExecutionContext)
 extends RequestAwareLogging:

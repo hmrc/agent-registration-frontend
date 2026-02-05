@@ -60,7 +60,7 @@ class IndividualActions @Inject() (
   defaultActionBuilder: DefaultActionBuilder,
   individualAuthorisedRefiner: IndividualAuthRefiner,
   individualProvideDetailsRefiner: IndividualProvideDetailsRefiner,
-  enricherAgentApplication: EnricherAgentApplication
+  enricherAgentApplication: AgentApplicationEnricher
 )(using ExecutionContext)
 extends RequestAwareLogging:
 

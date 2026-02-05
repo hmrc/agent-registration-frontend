@@ -52,7 +52,7 @@ object ApplicantActions:
 @Singleton
 class ApplicantActions @Inject() (
   defaultActionBuilder: DefaultActionBuilder,
-  authorisedActionRefiner: AuthorisedActionRefiner,
+  authorisedActionRefiner: ApplicantAuthRefiner,
   agentApplicationService: AgentApplicationService,
   businessPartnerRecordService: BusinessPartnerRecordService
 )(using ExecutionContext)
