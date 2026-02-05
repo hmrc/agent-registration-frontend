@@ -122,8 +122,9 @@ extends RequestAwareLogging:
           Redirect(mpdConfirmationPage.url)
     )
 
-  val getProvideDetailsWithApplicationInProgress: ActionBuilderWithData[DataWithAgentApplication] = getProvideDetailsInProgress
-    .refine4(enricherAgentApplication.enrichRequest)
+  val getProvideDetailsWithApplicationInProgress: ActionBuilderWithData[DataWithAgentApplication] =
+    getProvideDetailsInProgress
+      .enrichWithAgentApplicationAction
 
   val DELETEMEgetProvideDetailsWithApplicationInProgress: ActionBuilder[
     IndividualProvideDetailsWithApplicationRequest,
@@ -159,3 +160,12 @@ extends RequestAwareLogging:
             )
             Redirect(mdpCyaPage.url)
       ).andThen(enrichWithAgentApplicationAction)
+
+  extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
+
+    inline def enrichWithAgentApplicationAction(using
+      AgentApplication AbsentIn Data,
+      IndividualProvidedDetailsToBeDeleted PresentIn Data
+    ): ActionBuilderWithData[AgentApplication *: Data] = ab
+      .refine4:
+        enricherAgentApplication.enrichRequest

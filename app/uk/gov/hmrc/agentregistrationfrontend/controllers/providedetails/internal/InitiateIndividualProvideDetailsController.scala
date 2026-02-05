@@ -20,11 +20,10 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualAuthorisedWithIdentifiersRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualAuthorisedRequest
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
@@ -53,16 +52,9 @@ extends FrontendController(mcc, actions):
   def initiateIndividualProvideDetails(
     linkId: LinkId
   ): Action[AnyContent] = actions
-    .DELETEMEauthorisedWithIdentifiers
+    .authorisedWithAdditionalIdentifiers
     .async:
-      implicit request: IndividualAuthorisedWithIdentifiersRequest[AnyContent] =>
-
-        implicit val individualAuthorisedRequest: IndividualAuthorisedRequest[AnyContent] =
-          new IndividualAuthorisedRequest[AnyContent](
-            request.internalUserId,
-            request.request,
-            request.credentials
-          )
+      implicit request =>
 
         val nextEndpoint: Call = AppRoutes.providedetails.CompaniesHouseNameQueryController.show
         val applicationGenericExitPageUrl: String = AppRoutes.apply.AgentApplicationController.genericExitPage.url
@@ -75,7 +67,12 @@ extends FrontendController(mcc, actions):
                 .flatMap:
                   case None =>
                     for {
-                      individualProvidedDetails: IndividualProvidedDetailsToBeDeleted <- createIndividualProvidedDetailsFor(agentApplication.agentApplicationId)
+                      individualProvidedDetails: IndividualProvidedDetailsToBeDeleted <- createIndividualProvidedDetailsFor(
+                        applicationId = agentApplication.agentApplicationId,
+                        internalUserId = request.internalUserId,
+                        nino = request.get[Option[Nino]],
+                        saUtr = request.get[Option[SaUtr]]
+                      )
                       _ <- individualProvideDetailsService.upsert(individualProvidedDetails)
                     } yield Redirect(nextEndpoint).addToSession(agentApplication.agentApplicationId)
 
@@ -88,9 +85,12 @@ extends FrontendController(mcc, actions):
               Future.successful(Redirect(applicationGenericExitPageUrl))
 
   private def createIndividualProvidedDetailsFor(
-    applicationId: AgentApplicationId
-  )(using request: IndividualAuthorisedWithIdentifiersRequest[AnyContent]): Future[IndividualProvidedDetailsToBeDeleted] =
-    (request.nino, request.saUtr) match
+    applicationId: AgentApplicationId,
+    internalUserId: InternalUserId,
+    nino: Option[Nino],
+    saUtr: Option[SaUtr]
+  )(using RequestHeader): Future[IndividualProvidedDetailsToBeDeleted] =
+    (nino, saUtr) match
 
       case (Some(nino), None) =>
         logger.debug(s"Creating individual provided details with NINO only for applicationId: ${applicationId.value}")
@@ -98,7 +98,7 @@ extends FrontendController(mcc, actions):
           .getCitizenDetails(nino)
           .map { citizenDetails =>
             individualProvideDetailsService.createNewIndividualProvidedDetails(
-              internalUserId = request.internalUserId,
+              internalUserId = internalUserId,
               agentApplicationId = applicationId,
               maybeIndividualNino = Some(IndividualNino.FromAuth(nino)),
               maybeIndividualSaUtr = citizenDetails.saUtr.map(IndividualSaUtr.FromCitizenDetails.apply),
@@ -112,7 +112,7 @@ extends FrontendController(mcc, actions):
           .getCitizenDetails(nino)
           .map { citizenDetails =>
             individualProvideDetailsService.createNewIndividualProvidedDetails(
-              internalUserId = request.internalUserId,
+              internalUserId = internalUserId,
               agentApplicationId = applicationId,
               maybeIndividualNino = Some(IndividualNino.FromAuth(nino)),
               maybeIndividualSaUtr = Some(IndividualSaUtr.FromAuth(saUtr)),
@@ -124,10 +124,10 @@ extends FrontendController(mcc, actions):
         logger.debug(s"Creating individual provided details with no NINO or DoB for applicationId: ${applicationId.value}")
         Future.successful(
           individualProvideDetailsService.createNewIndividualProvidedDetails(
-            internalUserId = request.internalUserId,
+            internalUserId = internalUserId,
             agentApplicationId = applicationId,
             maybeIndividualNino = None,
-            maybeIndividualSaUtr = request.saUtr.map(IndividualSaUtr.FromAuth.apply),
+            maybeIndividualSaUtr = saUtr.map(IndividualSaUtr.FromAuth.apply),
             maybeIndividualDateOfBirth = None // cannot get DOB without NINO to call citizen details
           )
         )
