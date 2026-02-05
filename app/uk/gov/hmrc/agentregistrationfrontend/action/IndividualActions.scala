@@ -23,6 +23,8 @@ import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineFutureEither
+import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineUnion
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.*
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
@@ -61,7 +63,7 @@ class IndividualActions @Inject() (
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
-  export ActionBuilders.*
+  export ActionBuildersWithData.*
   export IndividualActions.*
 
   val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder

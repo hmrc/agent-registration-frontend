@@ -23,6 +23,8 @@ import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
+import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineFutureEither
+import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineUnion
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.AuthorisedActionRefiner
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -55,7 +57,7 @@ class ApplicantActions @Inject() (
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
-  export ActionBuilders.*
+  export ActionBuildersWithData.*
   export ApplicantActions.*
 
   val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder

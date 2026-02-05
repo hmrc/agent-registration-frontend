@@ -40,7 +40,9 @@ extends RequestAwareLogging:
   inline def enrichRequest[Data <: Tuple](request: RequestWithData[Data])(using
     AgentApplication AbsentIn Data,
     IndividualProvidedDetailsToBeDeleted PresentIn Data
-  ): Future[Result | RequestWithData[AgentApplication *: Data]] =
+  ): Future[
+    Result | RequestWithData[AgentApplication *: Data]
+  ] =
     given RequestHeader = request
     agentApplicationService
       .find(request.individualProvidedDetails.agentApplicationId)
