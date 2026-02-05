@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers
+package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant
 
 import play.api.http.Status.SEE_OTHER
 import play.api.mvc.*
-import uk.gov.hmrc.agentregistration.shared.util.SealedObjects
+
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
+import uk.gov.hmrc.agentregistration.shared.util.SealedObjects
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions
-import uk.gov.hmrc.agentregistrationfrontend.action.AuthorisedActionRefiner
-//import uk.gov.hmrc.agentregistrationfrontend.action.Requests.RequestWithAuth
-import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions.DataWithAuth
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.AuthorisedActionRefiner
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection
-import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection.CompletedSectionLlp
-import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.FastForwardController.CompletedSection.CompletedSectionSoleTrader
+import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection
+import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection.CompletedSectionLlp
+import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection.CompletedSectionSoleTrader
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
@@ -124,7 +125,7 @@ object FastForwardController:
 @Singleton
 class FastForwardController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: Actions,
+  applicantActions: ApplicantActions,
   authorisedActionRefiner: AuthorisedActionRefiner,
   applicationService: AgentApplicationService,
   fastForwardPage: FastForwardPage,
@@ -134,9 +135,9 @@ class FastForwardController @Inject() (
   grsStubService: GrsStubService,
   stubUserService: StubUserService
 )(using clock: Clock)
-extends FrontendController(mcc, actions):
+extends FrontendController(mcc, applicantActions):
 
-  def show: Action[AnyContent] = actions.action:
+  def show: Action[AnyContent] = applicantActions.action:
     implicit request =>
       Ok(fastForwardPage())
 
@@ -156,13 +157,11 @@ extends FrontendController(mcc, actions):
       )
     )
 
-  private val authorisedOrCreateAndLoginAgent: ActionBuilderWithData[DataWithAuth] = actions.action.refineAsync:
+  private val authorisedOrCreateAndLoginAgent: ActionBuilderWithData[DataWithAuth] = applicantActions.action.refineAsync:
     implicit request =>
       authorisedActionRefiner.refine(request).flatMap:
         case Right(authorisedRequest) => Future.successful(Right(authorisedRequest))
-
         case Left(result) if result.header.status === SEE_OTHER => loginAndRetry
-
         case Left(result) => Future.successful(Left(result))
 
   def fastForward(
@@ -175,7 +174,7 @@ extends FrontendController(mcc, actions):
           handleCompletedSectionLlp(c)
 
       case _: CompletedSectionSoleTrader =>
-        actions.action { implicit request =>
+        applicantActions.action { implicit request =>
           Ok(
             simplePage(
               h1 = "Sole Trader Task List Page",
