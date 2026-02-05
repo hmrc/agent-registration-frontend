@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualTelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualTelephoneNumberPage
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService

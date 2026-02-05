@@ -32,7 +32,7 @@ import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions.*
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions.*
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistration.shared.Nino as ModelNino

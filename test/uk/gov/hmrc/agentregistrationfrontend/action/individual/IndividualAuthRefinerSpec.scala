@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.action.individual
 
 import play.api.mvc.Results.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions.RequestWithData
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions.RequestWithAuth
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions.RequestWithAuth
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
 

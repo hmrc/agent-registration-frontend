@@ -23,7 +23,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.llp.UserProvidedNino
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService

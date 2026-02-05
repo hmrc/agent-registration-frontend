@@ -21,7 +21,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
 import uk.gov.hmrc.agentregistrationfrontend.services.EmailVerificationService

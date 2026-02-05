@@ -25,7 +25,7 @@ import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.CheckYourAnswersPage

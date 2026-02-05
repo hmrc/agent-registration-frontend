@@ -75,7 +75,7 @@ trait TdRequest {
 
   object IndividualRequests:
 
-    import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions.*
+    import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions.*
 
     def requestWithAuthData: RequestWithData[DataWithAuth] = RequestWithDataCt.apply(
       rawRequestLoggedIn,
