@@ -18,11 +18,11 @@ package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.api.mvc.AnyContent
+
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
+
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.CheckYourAnswersPage
 
@@ -34,7 +34,7 @@ extends ViewSpec:
   private object individualProvideDetails:
 
     val complete: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterApproveAgentApplication
-    val completeWithNinoAndSaUtrNotProvided = tdAll.providedDetailsLlp.afterApproveAgentApplication
+    val completeWithNinoAndSaUtrNotProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterApproveAgentApplication
       .copy(
         individualDateOfBirth = Some(tdAll.dateOfBirthProvided),
         individualNino = Some(IndividualNino.NotProvided),
@@ -53,8 +53,8 @@ extends ViewSpec:
 
   private def pageTitle: String = s"$heading - $serviceTitleSuffix"
 
-  private def renderDoc()(using request: IndividualProvideDetailsRequest[AnyContent]): Document = Jsoup.parse(
-    viewTemplate(request.individualProvidedDetails).body
+  private def renderDoc(individualProvideDetails: IndividualProvidedDetailsToBeDeleted): Document = Jsoup.parse(
+    viewTemplate(individualProvideDetails).body
   )
 
   private def summaryRow(
@@ -69,9 +69,8 @@ extends ViewSpec:
   )
 
   "CheckYourAnswersPage for complete Individual Provided Details" should:
-    given individualProvideDetailsRequest: IndividualProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(individualProvideDetails.complete)
 
-    val doc: Document = renderDoc()
+    val doc: Document = renderDoc(individualProvideDetails.complete)
 
     "contain content" in:
       doc.mainContent shouldContainContent
@@ -160,11 +159,8 @@ extends ViewSpec:
       doc.extractSubmitButtonText shouldBe confirmAndContinueText
 
   "CheckYourAnswersPage for incomplete individual Provided Details - when Nino and SaUtr coming from HMRC systems" should:
-    given individualProvideDetailsRequest: IndividualProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(
-      individualProvideDetails.completeWithNinoAndSaUtrFromHmrc
-    )
 
-    val doc: Document = renderDoc()
+    val doc: Document = renderDoc(individualProvideDetails.completeWithNinoAndSaUtrFromHmrc)
 
     "contain content" in:
       doc.mainContent shouldContainContent
@@ -213,11 +209,8 @@ extends ViewSpec:
       doc.extractSubmitButtonText shouldBe confirmAndContinueText
 
   "CheckYourAnswersPage for incomplete individual Provided Details - when Nino and SaUtr not provided" should:
-    given individualProvideDetailsRequest: IndividualProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(
-      individualProvideDetails.completeWithNinoAndSaUtrNotProvided
-    )
 
-    val doc: Document = renderDoc()
+    val doc: Document = renderDoc(individualProvideDetails.completeWithNinoAndSaUtrNotProvided)
 
     "contain content" in:
       doc.mainContent shouldContainContent

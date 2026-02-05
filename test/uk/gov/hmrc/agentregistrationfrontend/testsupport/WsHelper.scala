@@ -22,7 +22,7 @@ import play.api.libs.ws.WSClient
 import play.api.libs.ws.WSCookie
 import play.api.libs.ws.WSRequest
 import play.api.libs.ws.WSResponse
-import play.api.mvc.AnyContentAsFormUrlEncoded
+import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import play.api.mvc.Session
 import play.api.mvc.SessionCookieBaker
@@ -100,7 +100,7 @@ trait WsHelper:
     SessionKeys.sessionId -> "mock-sessionid"
   )
 
-  implicit val request: Request[AnyContentAsFormUrlEncoded] = FakeRequest()
+  implicit val request: Request[AnyContent] = FakeRequest()
     .withSession(sessionHeaders.toSeq*)
     .withFormUrlEncodedBody()
 

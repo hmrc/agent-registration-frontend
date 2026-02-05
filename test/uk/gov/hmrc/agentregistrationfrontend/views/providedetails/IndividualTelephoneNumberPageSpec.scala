@@ -18,8 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualTelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -29,8 +28,6 @@ class IndividualTelephoneNumberPageSpec
 extends ViewSpec:
 
   val viewTemplate: IndividualTelephoneNumberPage = app.injector.instanceOf[IndividualTelephoneNumberPage]
-  implicit val individualProvideDetailsRequest: IndividualProvideDetailsRequest[AnyContent] = tdAll
-    .makeProvideDetailsRequest(individualProvidedDetails = tdAll.individualProvidedDetails)
   val doc: Document = Jsoup.parse(viewTemplate(IndividualTelephoneNumberForm.form).body)
   private val heading: String = "What is your telephone number?"
 

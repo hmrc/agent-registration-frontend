@@ -20,7 +20,7 @@ import org.jsoup.nodes.Document
 import org.scalatest.Assertion
 import play.api.i18n.Messages
 import play.api.i18n.MessagesApi
-import play.api.mvc.AnyContentAsEmpty
+import play.api.mvc.AnyContent
 import play.api.test.FakeRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.viewspecsupport.JsoupSupport
 
@@ -30,7 +30,7 @@ extends ISpec:
   export JsoupSupport.*
   export uk.gov.hmrc.agentregistrationfrontend.action.Actions.*
 
-  implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
+  implicit val request: FakeRequest[AnyContent] = FakeRequest()
   implicit val messages: Messages = app.injector.instanceOf[MessagesApi].preferred(request)
 
   /* Ensures that a page with form errors renders accessibly, with the expected
