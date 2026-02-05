@@ -58,7 +58,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidForm4(BusinessTypeSessionForm.form, implicit r => businessTypeSessionPage(_)):
+      .ensureValidForm(BusinessTypeSessionForm.form, implicit r => businessTypeSessionPage(_)):
         implicit request =>
           request.get[BusinessTypeAnswer] match
             case businessType @ BusinessTypeAnswer.LimitedCompany =>

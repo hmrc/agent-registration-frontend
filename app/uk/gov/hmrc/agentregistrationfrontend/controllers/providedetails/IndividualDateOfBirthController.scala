@@ -71,7 +71,7 @@ extends FrontendController(mcc, actions):
       ))
 
   def submit: Action[AnyContent] = baseAction
-    .ensureValidForm4[UserProvidedDateOfBirth](
+    .ensureValidForm[UserProvidedDateOfBirth](
       IndividualDateOfBirthForm.form,
       implicit r => view(_)
     )

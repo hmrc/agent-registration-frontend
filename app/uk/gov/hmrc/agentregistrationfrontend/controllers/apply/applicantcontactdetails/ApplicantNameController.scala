@@ -55,7 +55,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] = actions
     .getApplicationInProgress
-    .ensureValidFormAndRedirectIfSaveForLater4(
+    .ensureValidFormAndRedirectIfSaveForLater(
       form = ApplicantNameForm.form,
       resultToServeWhenFormHasErrors = implicit r => view(_)
     )

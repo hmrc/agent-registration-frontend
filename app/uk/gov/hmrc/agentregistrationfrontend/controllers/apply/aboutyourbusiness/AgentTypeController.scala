@@ -46,7 +46,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     action
-      .ensureValidForm4(
+      .ensureValidForm(
         AgentTypeForm.form,
         implicit request => view(_)
       ):

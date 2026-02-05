@@ -29,7 +29,7 @@ import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.AbsentIn
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
-object ActionsHelper
+object ActionBuilders
 extends RequestAwareLogging:
 
   type ActionBuilderWithData[Data <: Tuple] = ActionBuilder[[X] =>> RequestWithDataCt[X, Data], AnyContent]
@@ -44,13 +44,13 @@ extends RequestAwareLogging:
   ](ab: ActionBuilderWithData[Data])(using ec: ExecutionContext)
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    def ensureValidFormAndRedirectIfSaveForLater4[T](
+    def ensureValidFormAndRedirectIfSaveForLater[T](
       form: RequestWithData[Data] => Form[T] | Future[Form[T]],
       resultToServeWhenFormHasErrors: RequestWithData[Data] => Form[T] => Result | HtmlFormat.Appendable | Future[Result | HtmlFormat.Appendable]
     )(using
       FormBinding,
       T AbsentIn Data
-    ): ActionBuilderWithData[T *: Data] = ensureValidForm4(
+    ): ActionBuilderWithData[T *: Data] = ensureValidForm(
       form = form,
       resultToServeWhenFormHasErrors =
         request =>
@@ -65,25 +65,25 @@ extends RequestAwareLogging:
     )
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    def ensureValidFormAndRedirectIfSaveForLater4[T](
+    def ensureValidFormAndRedirectIfSaveForLater[T](
       form: Form[T] | Future[Form[T]],
       resultToServeWhenFormHasErrors: RequestWithData[Data] => Form[T] => Result | HtmlFormat.Appendable | Future[Result | HtmlFormat.Appendable]
     )(using
       FormBinding,
       T AbsentIn Data
-    ): ActionBuilderWithData[T *: Data] = ensureValidFormAndRedirectIfSaveForLater4(_ => form, resultToServeWhenFormHasErrors)
+    ): ActionBuilderWithData[T *: Data] = ensureValidFormAndRedirectIfSaveForLater(_ => form, resultToServeWhenFormHasErrors)
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    def ensureValidForm4[T](
+    def ensureValidForm[T](
       form: Form[T] | Future[Form[T]],
       resultToServeWhenFormHasErrors: RequestWithData[Data] => Form[T] => Result | HtmlFormat.Appendable | Future[Result | HtmlFormat.Appendable]
     )(using
       FormBinding,
       T AbsentIn Data
-    ): ActionBuilderWithData[T *: Data] = ensureValidForm4(_ => form, resultToServeWhenFormHasErrors)
+    ): ActionBuilderWithData[T *: Data] = ensureValidForm(_ => form, resultToServeWhenFormHasErrors)
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-    def ensureValidForm4[T](
+    def ensureValidForm[T](
       form: RequestWithData[Data] => Form[T] | Future[Form[T]],
       resultToServeWhenFormHasErrors: RequestWithData[Data] => Form[T] => Result | HtmlFormat.Appendable | Future[Result | HtmlFormat.Appendable]
     )(using
@@ -111,10 +111,10 @@ extends RequestAwareLogging:
           case f: Future[_] => f.asInstanceOf[Future[Form[T]]].flatMap(bind)
           case f: Form[_] => bind(f.asInstanceOf[Form[T]])
 
-    def ensure4(
-      condition: RequestWithData[Data] => Boolean,
-      resultWhenConditionNotMet: Result
-    ): ActionBuilderWithData[Data] = ensure4(condition, _ => resultWhenConditionNotMet)
+//    def ensure(
+//      condition: RequestWithData[Data] => Boolean,
+//      resultWhenConditionNotMet: Result
+//    ): ActionBuilderWithData[Data] = ensure4(condition, _ => resultWhenConditionNotMet)
 
     @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
     def ensure4(
@@ -163,30 +163,6 @@ extends RequestAwareLogging:
     ContentType // ContentType Represents Play Framework's Content Type parameter, commonly denoted as B
   ](ab: ActionBuilder[R, ContentType])(using ec: ExecutionContext)
 
-    def ensure(
-      condition: R[ContentType] => Boolean,
-      resultWhenConditionNotMet: => Result
-    ): ActionBuilder[R, ContentType] = ensure(condition, _ => resultWhenConditionNotMet)
-
-    def ensure(
-      condition: R[ContentType] => Boolean,
-      resultWhenConditionNotMet: R[ContentType] => Result
-    ): ActionBuilder[R, ContentType] = ensureAsync(
-      request => Future.successful(condition(request)),
-      request => Future.successful(resultWhenConditionNotMet(request))
-    )
-
-    def ensureAsync(
-      condition: R[ContentType] => Future[Boolean],
-      resultWhenConditionNotMet: R[ContentType] => Future[Result]
-    ): ActionBuilder[R, ContentType] = filterFuture(
-      condition,
-      implicit request =>
-        resultWhenConditionNotMet(request).map: result =>
-          logger.warn(s"Condition not met for the request, responding with ${result.header.status}")
-          result
-    )
-
     def filter(
       condition: R[ContentType] => Boolean,
       resultWhenConditionNotMet: R[ContentType] => Result
@@ -228,7 +204,22 @@ extends RequestAwareLogging:
       protected def refine[A](request: R[A]): Future[Either[Result, P[A]]] = refineF.asInstanceOf[R[A] => Future[Either[Result, P[A]]]](request)
     })
 
-    def refine2[P[_]](refineF: R[ContentType] => Result | P[ContentType] | Future[Result | P[ContentType]]): ActionBuilder[
+    @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
+    def ensure(
+      condition: R[ContentType] => Boolean | Future[Boolean],
+      resultWhenConditionNotMet: R[ContentType] => Result
+    ): ActionBuilder[R, ContentType] = refine: (request: R[ContentType]) =>
+
+      def process(c: Boolean): R[ContentType] | Result =
+        if c
+        then request
+        else resultWhenConditionNotMet(request)
+
+      condition(request) match
+        case c: Boolean => process(c)
+        case f: Future[_] => f.asInstanceOf[Future[Boolean]].map(process)
+
+    def refine[P[_]](refineF: R[ContentType] => Result | P[ContentType] | Future[Result | P[ContentType]]): ActionBuilder[
       P,
       ContentType
     ] = ab.andThen(new ActionRefiner[R, P] {

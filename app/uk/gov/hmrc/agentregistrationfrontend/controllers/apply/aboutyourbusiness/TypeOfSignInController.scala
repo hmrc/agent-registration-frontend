@@ -56,7 +56,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     action
-      .ensureValidForm4(TypeOfSignInForm.form, implicit request => view(_)):
+      .ensureValidForm(TypeOfSignInForm.form, implicit request => view(_)):
         implicit request =>
           val typeOfSignIn: TypeOfSignIn = request.get
           Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.showSignInPage)

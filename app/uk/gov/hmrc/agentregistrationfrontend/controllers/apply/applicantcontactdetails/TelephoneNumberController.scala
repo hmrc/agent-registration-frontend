@@ -63,7 +63,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater4(TelephoneNumberForm.form, implicit r => view(_))
+      .ensureValidFormAndRedirectIfSaveForLater(TelephoneNumberForm.form, implicit r => view(_))
       .async:
         implicit request =>
           val validFormData: TelephoneNumber = request.get

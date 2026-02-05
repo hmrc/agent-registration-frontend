@@ -46,7 +46,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     actions.action
-      .ensureValidForm4(UserRoleForm.form, implicit request => view(_, userRoleOptionForBusinessType(request.getBusinessType))):
+      .ensureValidForm(UserRoleForm.form, implicit request => view(_, userRoleOptionForBusinessType(request.getBusinessType))):
         implicit request =>
           val userRole: UserRole = request.get
           Redirect(

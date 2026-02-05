@@ -72,7 +72,7 @@ extends FrontendController(mcc, actions):
       ))
 
   def submit: Action[AnyContent] = baseAction
-    .ensureValidForm4[EmailAddress](
+    .ensureValidForm[EmailAddress](
       IndividualEmailAddressForm.form,
       implicit r => individualEmailAddressView(_)
     )

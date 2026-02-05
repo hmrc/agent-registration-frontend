@@ -69,11 +69,11 @@ class IndividualActions @Inject() (
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
-  export ActionsHelper.*
+  export ActionBuilders.*
   export IndividualActions.*
 
   val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
-    .refine2(request => RequestWithDataCt.empty(request))
+    .refine(request => RequestWithDataCt.empty(request))
 
   val authorised: ActionBuilderWithData[DataWithAuth] = action
     .refineFutureEither(individualAuthorisedRefiner.refineIntoRequestWithAuth)

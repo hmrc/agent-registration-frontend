@@ -73,7 +73,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater4[AgentTelephoneNumber](
+      .ensureValidFormAndRedirectIfSaveForLater[AgentTelephoneNumber](
         form = AgentTelephoneNumberForm.form,
         resultToServeWhenFormHasErrors =
           implicit request =>

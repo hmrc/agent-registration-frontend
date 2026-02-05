@@ -70,7 +70,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater4[UserProvidedNino](
+      .ensureValidFormAndRedirectIfSaveForLater[UserProvidedNino](
         IndividualNinoForm.form,
         implicit r => view(_)
       )

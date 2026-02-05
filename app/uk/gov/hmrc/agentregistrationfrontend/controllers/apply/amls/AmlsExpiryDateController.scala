@@ -66,7 +66,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater4[LocalDate](AmlsExpiryDateForm.form(), implicit request => view(_))
+      .ensureValidFormAndRedirectIfSaveForLater[LocalDate](AmlsExpiryDateForm.form(), implicit request => view(_))
       .async:
         implicit request =>
           val amlsExpiryDate: LocalDate = request.get

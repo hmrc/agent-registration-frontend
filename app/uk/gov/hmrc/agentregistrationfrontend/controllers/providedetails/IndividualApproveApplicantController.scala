@@ -78,7 +78,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater4[YesNo](
+      .ensureValidFormAndRedirectIfSaveForLater[YesNo](
         implicit r =>
           val applicantName: ApplicantName = r.agentApplication.asLlpApplication.getApplicantContactDetails.applicantName
           IndividualApproveApplicationForm.form(applicantName.value)

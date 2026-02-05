@@ -54,7 +54,7 @@ extends FrontendController(mcc, actions):
   def submit: Action[AnyContent] =
     actions
       .getApplicationInProgress
-      .ensureValidFormAndRedirectIfSaveForLater4(amlsCodeForm.form, implicit r => view(_))
+      .ensureValidFormAndRedirectIfSaveForLater(amlsCodeForm.form, implicit r => view(_))
       .async:
         implicit request =>
           val supervisoryBody: AmlsCode = request.get

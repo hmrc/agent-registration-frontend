@@ -91,7 +91,7 @@ extends FrontendController(mcc, actions):
       implicit request =>
         Redirect(AppRoutes.apply.SaveForLaterController.show)
     )
-    .ensureValidForm4[AgentEmailAddress](
+    .ensureValidForm[AgentEmailAddress](
       form = AgentEmailAddressForm.form,
       resultToServeWhenFormHasErrors =
         implicit request =>

@@ -85,7 +85,7 @@ extends FrontendController(mcc, actions):
     journeyId: JourneyId
   ): Action[AnyContent] = actions
     .authorised
-    .ensureValidForm4(
+    .ensureValidForm(
       form = form(businessType),
       resultToServeWhenFormHasErrors =
         implicit request =>

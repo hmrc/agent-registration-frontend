@@ -125,7 +125,7 @@ extends FrontendController(mcc, actions):
                 )))
 
   def submit: Action[AnyContent] = baseAction
-    .ensureValidFormAndRedirectIfSaveForLater4[IndividualName](
+    .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
       form = IndividualNameForm.form,
       resultToServeWhenFormHasErrors =
         implicit request =>

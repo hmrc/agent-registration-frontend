@@ -71,7 +71,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] = actions
     .getProvideDetailsWithApplicationInProgress
-    .ensureValidForm4[CompaniesHouseNameQuery](
+    .ensureValidForm[CompaniesHouseNameQuery](
       form = CompaniesHouseNameQueryForm.form,
       resultToServeWhenFormHasErrors =
         implicit request =>

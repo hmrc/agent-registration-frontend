@@ -60,7 +60,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater4(
+      .ensureValidFormAndRedirectIfSaveForLater(
         form = r => AmlsRegistrationNumberForm(r.agentApplication.getAmlsDetails.isHmrc).form,
         resultToServeWhenFormHasErrors = implicit r => view(_)
       )

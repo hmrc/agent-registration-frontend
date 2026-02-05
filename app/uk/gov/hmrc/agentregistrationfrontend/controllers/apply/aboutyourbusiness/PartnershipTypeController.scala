@@ -60,7 +60,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidForm4(PartnershipTypeForm.form, implicit r => view(_)):
+      .ensureValidForm(PartnershipTypeForm.form, implicit r => view(_)):
         implicit request =>
           val partnershipType: BusinessType.Partnership = request.get[BusinessType.Partnership]
           Redirect(

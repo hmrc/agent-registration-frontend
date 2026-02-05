@@ -49,7 +49,7 @@ extends FrontendController(mcc, actions):
     )
 
   def submit: Action[AnyContent] = baseAction
-    .ensureValidForm4[TelephoneNumber](
+    .ensureValidForm[TelephoneNumber](
       IndividualTelephoneNumberForm.form,
       implicit r => view(_)
     )

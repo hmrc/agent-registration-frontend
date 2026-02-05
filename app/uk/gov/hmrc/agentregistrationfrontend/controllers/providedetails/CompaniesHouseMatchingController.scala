@@ -112,7 +112,7 @@ extends FrontendController(mcc, actions):
           ))
 
   def submit: Action[AnyContent] = baseAction
-    .ensureValidForm4[ChOfficerSelectionFormType](
+    .ensureValidForm[ChOfficerSelectionFormType](
       ChOfficerSelectionForms.formType,
       implicit request => formWithErrors => Errors.throwBadRequestException(s"Unexpected errors in the FormType: $formWithErrors")
     )
