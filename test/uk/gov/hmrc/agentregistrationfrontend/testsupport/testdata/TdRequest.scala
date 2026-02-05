@@ -62,7 +62,7 @@ trait TdRequest {
 
   object ApplicantRequests:
 
-    import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions.*
+    import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.*
 
     def requestWithAuthData: RequestWithData[DataWithAuth] = RequestWithDataCt.apply(
       rawRequestLoggedIn,

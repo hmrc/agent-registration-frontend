@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.connectors.CompaniesHouseApiProxyCo
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 
 import javax.inject.Inject
 import javax.inject.Singleton
