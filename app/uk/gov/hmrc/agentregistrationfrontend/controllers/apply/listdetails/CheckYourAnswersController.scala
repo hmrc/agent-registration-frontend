@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.nonincorporated.CheckYourAnswersPage
@@ -45,12 +45,12 @@ extends FrontendController(mcc, actions):
     List[IndividualProvidedDetails] *: DataWithApplication
   ] = actions
     .getApplicationInProgress
-    .refine4(implicit request =>
+    .refine(implicit request =>
       val agentApplication: AgentApplication = request.get
       individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
         request.add[List[IndividualProvidedDetails]](individualsList)
     )
-    .ensure4(
+    .ensure(
       _.get[List[IndividualProvidedDetails]].nonEmpty,
       resultWhenConditionNotMet =
         implicit request =>

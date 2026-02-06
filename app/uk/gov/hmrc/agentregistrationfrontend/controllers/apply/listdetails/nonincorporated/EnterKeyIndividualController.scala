@@ -79,7 +79,7 @@ extends FrontendController(mcc, actions):
               "Number of required key individuals not specified in application, redirecting to number of key individuals page"
             )
             Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url)
-    .refine4:
+    .refine:
       implicit request =>
         val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
         individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>

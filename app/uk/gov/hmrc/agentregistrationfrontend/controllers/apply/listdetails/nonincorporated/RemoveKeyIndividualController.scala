@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsId
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.RemoveKeyIndividualForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
@@ -49,7 +49,7 @@ extends FrontendController(mcc, actions):
 
   private def baseAction(individualProvidedDetailsId: IndividualProvidedDetailsId): ActionBuilderWithData[DataWithIndividual] = actions
     .getApplicationInProgress
-    .refine4:
+    .refine:
       implicit request =>
         request.get[AgentApplication] match
           case _: IsIncorporated =>
@@ -62,7 +62,7 @@ extends FrontendController(mcc, actions):
             Redirect(AppRoutes.apply.TaskListController.show.url)
           case aa: IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
             request.replace[AgentApplication, IsAgentApplicationForDeclaringNumberOfKeyIndividuals](aa)
-    .refine4:
+    .refine:
       implicit request =>
         individualProvideDetailsService
           .findById(individualProvidedDetailsId)
@@ -84,7 +84,7 @@ extends FrontendController(mcc, actions):
         ))
 
   def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction(individualProvidedDetailsId)
-    .ensureValidFormAndRedirectIfSaveForLater4[YesNo](
+    .ensureValidFormAndRedirectIfSaveForLater[YesNo](
       form =
         (request: RequestWithData[DataWithIndividual]) =>
           RemoveKeyIndividualForm.form(request.get[IndividualProvidedDetails].individualName.value),

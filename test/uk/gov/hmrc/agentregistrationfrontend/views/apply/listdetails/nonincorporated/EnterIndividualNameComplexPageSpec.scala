@@ -20,7 +20,6 @@ import com.softwaremill.quicklens.modify
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
-import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithApplication
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
