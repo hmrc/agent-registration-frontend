@@ -44,7 +44,7 @@ extends RequestAwareLogging:
     isPersonOfControl: Boolean,
     agentApplicationId: AgentApplicationId
   )(using request: RequestHeader): IndividualProvidedDetails =
-    logger.info(s"pre-creating provided details for nominated person of control ${individualName.value} and applicationId:[${agentApplicationId.value}] ")
+    logger.info(s"creating provided details for individual with applicationId:[${agentApplicationId.value}] ")
     provideDetailsFactory.create(
       agentApplicationId,
       individualName,
@@ -52,7 +52,7 @@ extends RequestAwareLogging:
     )
 
   def upsert(individualProvidedDetails: IndividualProvidedDetails)(using request: RequestHeader): Future[Unit] =
-    logger.debug(s"Upserting precreated providedDetails for user:[${individualProvidedDetails.individualName.value}] and applicationId:[${individualProvidedDetails.agentApplicationId}]")
+    logger.debug(s"Upserting providedDetails for user:[${individualProvidedDetails._id}] and applicationId:[${individualProvidedDetails.agentApplicationId}]")
     individualProvideDetailsConnector
       .upsert(individualProvidedDetails)
 
