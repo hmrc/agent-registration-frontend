@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.Utr
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AgentRegistrationStubs:
@@ -121,9 +121,18 @@ object AgentRegistrationStubs:
     responseBody = ""
   )
 
+  def stubFindIndividualForApplication(
+    individual: IndividualProvidedDetails
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/individual-provided-details/by-id/${individual.individualProvidedDetailsId.value}"),
+    responseStatus = 200,
+    responseBody = Json.toJson(individual).toString
+  )
+
   def stubFindIndividualsForApplication(
     agentApplicationId: AgentApplicationId,
-    individuals: List[IndividualProvidedDetailsToBeDeleted] = List.empty
+    individuals: List[IndividualProvidedDetails] = List.empty
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/individual-provided-details/for-application/${agentApplicationId.value}"),
@@ -155,5 +164,14 @@ object AgentRegistrationStubs:
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/business-partner-record/utr/${utr.value}"),
+    count = count
+  )
+
+  def verifyFindIndividualsForApplication(
+    applicationId: AgentApplicationId,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/individual-provided-details/for-application/${applicationId.value}"),
     count = count
   )

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.nonincorporated
 
+import com.softwaremill.quicklens.modify
 import play.api.data.Form
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
@@ -27,8 +28,9 @@ import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
@@ -42,7 +44,7 @@ import javax.inject.Singleton
 import scala.concurrent.Future
 
 @Singleton
-class EnterKeyIndividualController @Inject() (
+class ChangeKeyIndividualController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   enterIndividualNameSimplePage: EnterIndividualNamePage,
@@ -57,7 +59,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilderWithData[DataWithList] = actions
     .getApplicationInProgress
-    .refine:
+    .refine4:
       implicit request =>
         request.get[AgentApplication] match
           case _: IsIncorporated =>
@@ -70,7 +72,7 @@ extends FrontendController(mcc, actions):
             Redirect(AppRoutes.apply.TaskListController.show.url)
           case aa: IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
             request.replace[AgentApplication, IsAgentApplicationForDeclaringNumberOfKeyIndividuals](aa)
-    .refine:
+    .refine4:
       implicit request =>
         request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].numberOfRequiredKeyIndividuals match
           case Some(n: NumberOfRequiredKeyIndividuals) => request.add(n)
@@ -85,18 +87,26 @@ extends FrontendController(mcc, actions):
         individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
           request.add[List[IndividualProvidedDetails]](individualsList)
 
-  // TODO: extract logic of choosing view and rendering it based on NumberOfRequiredKeyIndividuals, Form[] and businessPartnerRecord
-
-  def show: Action[AnyContent] = baseAction
+  def show(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction
     .async:
-      implicit request: RequestWithData[DataWithList] =>
-        val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.EnterKeyIndividualController.submit
+      implicit request =>
+        val existingList: List[IndividualProvidedDetails] = request.get
+        val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.ChangeKeyIndividualController.submit(
+          individualProvidedDetailsId
+        )
+        val nameToChange: IndividualName =
+          existingList
+            .find(_._id === individualProvidedDetailsId)
+            .getOrThrowExpectedDataMissing(
+              s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
+            )
+            .individualName
         request.get[NumberOfRequiredKeyIndividuals] match
           case n: SixOrMore =>
             whenSixOrMore(
               request = request,
               sixOrMore = n,
-              form = IndividualNameForm.form,
+              form = IndividualNameForm.form.fill(nameToChange),
               formAction = formAction,
               resultStatus = Ok
             )
@@ -104,18 +114,20 @@ extends FrontendController(mcc, actions):
             whenFiveOrLess(
               request = request,
               fiveOrLess = n,
-              form = IndividualNameForm.form,
+              form = IndividualNameForm.form.fill(nameToChange),
               formAction = formAction,
               resultStatus = Ok
             )
 
-  def submit: Action[AnyContent] = baseAction
-    .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
+  def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction
+    .ensureValidFormAndRedirectIfSaveForLater4[IndividualName](
       form = IndividualNameForm.form,
       resultToServeWhenFormHasErrors =
         implicit request =>
           (formWithErrors: Form[IndividualName]) =>
-            val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.EnterKeyIndividualController.submit
+            val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.ChangeKeyIndividualController.submit(
+              individualProvidedDetailsId
+            )
             request.get[NumberOfRequiredKeyIndividuals] match
               case n: SixOrMore =>
                 whenSixOrMore(
@@ -136,12 +148,18 @@ extends FrontendController(mcc, actions):
     )
     .async:
       implicit request =>
-        val individualName: IndividualName = request.get
-        individualProvideDetailsService.upsert(individualProvideDetailsService.create(
-          individualName = individualName,
-          isPersonOfControl = true, // from this page we are only adding partners, who are persons of control
-          agentApplicationId = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].agentApplicationId
-        ))
+        val individualNameFromForm: IndividualName = request.get
+        val existingList: List[IndividualProvidedDetails] = request.get
+        val individualToChange: IndividualProvidedDetails = existingList
+          .find(_._id === individualProvidedDetailsId)
+          .getOrThrowExpectedDataMissing(
+            s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
+          )
+        individualProvideDetailsService.upsert(
+          individualToChange
+            .modify(_.individualName)
+            .setTo(individualNameFromForm)
+        )
           .map: _ =>
             Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
 

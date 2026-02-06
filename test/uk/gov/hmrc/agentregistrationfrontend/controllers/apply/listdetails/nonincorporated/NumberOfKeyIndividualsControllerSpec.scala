@@ -41,15 +41,16 @@ extends ControllerSpec:
         .afterHowManyKeyIndividuals
 
   "routes should have correct paths and methods" in:
-    AppRoutes.apply.listdetails.NumberOfKeyIndividualsController.show shouldBe Call(
+    AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    AppRoutes.apply.listdetails.NumberOfKeyIndividualsController.submit shouldBe Call(
+    AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    AppRoutes.apply.listdetails.NumberOfKeyIndividualsController.submit.url shouldBe AppRoutes.apply.listdetails.NumberOfKeyIndividualsController.show.url
+    AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.submit.url shouldBe
+      AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url
 
   s"GET $path should return 200, fetch the BPR and render page" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterHowManyKeyIndividuals)
@@ -59,7 +60,7 @@ extends ControllerSpec:
     response.parseBodyAsJsoupDocument.title() shouldBe "How many partners are there at Test Company Name? - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
-  s"POST $path with valid amounts should save data and redirect to enter key individual page" in:
+  s"POST $path with valid amounts should save data and redirect to CYA for working out the next page" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(
       application = agentApplication.beforeHowManyKeyIndividuals,
       updatedApplication = agentApplication.afterHowManyKeyIndividuals
@@ -72,7 +73,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe AppRoutes.apply.listdetails.EnterKeyIndividualController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
 
   s"POST $path with blank inputs should return 400" in:

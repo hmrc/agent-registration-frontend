@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.apply.listdetails
+package uk.gov.hmrc.agentregistrationfrontend.views.apply.listdetails.nonincorporated
 
 import com.softwaremill.quicklens.modify
 import org.jsoup.Jsoup
@@ -25,13 +25,16 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.EnterIndividualNameComplexPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.nonincorporated.EnterIndividualNameComplexPage
 
 class EnterIndividualNameComplexPageSpec
 extends ViewSpec:
 
   private val firstPartnerKey = "first"
   private val nextPartnerKey = "subsequent"
+  // we have a variable form action for when the page is used for new entries or to edit existing ones,
+  // but for the purposes of this test we just need to use one of them
+  private val formAction = AppRoutes.apply.listdetails.nonincorporated.EnterKeyIndividualController.submit
 
   object ExpectedStrings:
 
@@ -40,12 +43,6 @@ extends ViewSpec:
     val nextPartnerLabel = "What is the full name of the next partner?"
 
   val viewTemplate: EnterIndividualNameComplexPage = app.injector.instanceOf[EnterIndividualNameComplexPage]
-  implicit val agentApplicationRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(
-    agentApplication =
-      tdAll
-        .agentApplicationGeneralPartnership
-        .afterHowManyKeyIndividualsNeedsPadding
-  )
 
   final case class TestCaseForComplexPage(
     ordinalKey: String,
@@ -82,7 +79,8 @@ extends ViewSpec:
         form = IndividualNameForm.form,
         ordinalKey = testCase.ordinalKey,
         numberOfRequiredKeyIndividuals = testCase.numberOfRequiredKeyIndividuals,
-        entityName = tdAll.companyName
+        entityName = tdAll.companyName,
+        formAction = formAction
       ).body)
 
       val expectedLabel: String =
@@ -118,6 +116,18 @@ extends ViewSpec:
           .selectOnlyOneElementOrFail()
           .text() shouldBe expectedLabel
 
+      s"render a form with an input of type text for '${testCase.ordinalKey}'" in:
+        val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
+        form.attr("method") shouldBe "POST"
+        form.attr("action") shouldBe formAction.url
+        form
+          .selectOrFail("label[for=individualName]")
+          .selectOnlyOneElementOrFail()
+          .text() shouldBe expectedLabel
+        form
+          .selectOrFail("input[name=individualName][type=text]")
+          .selectOnlyOneElementOrFail()
+
       s"render a save and continue button for $n individuals using ordinal '${testCase.ordinalKey}'" in:
         doc
           .mainContent
@@ -144,7 +154,8 @@ extends ViewSpec:
             form = formWithError,
             ordinalKey = testCase.ordinalKey,
             numberOfRequiredKeyIndividuals = testCase.numberOfRequiredKeyIndividuals,
-            entityName = tdAll.companyName
+            entityName = tdAll.companyName,
+            formAction = formAction
           ).body),
           heading = ExpectedStrings.heading
         )

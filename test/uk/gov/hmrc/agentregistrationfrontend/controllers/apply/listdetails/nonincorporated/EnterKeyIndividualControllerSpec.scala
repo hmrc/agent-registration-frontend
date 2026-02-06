@@ -58,15 +58,16 @@ extends ControllerSpec:
         .afterHowManyKeyIndividualsNeedsPadding
 
   "routes should have correct paths and methods" in:
-    AppRoutes.apply.listdetails.EnterKeyIndividualController.show shouldBe Call(
+    AppRoutes.apply.listdetails.nonincorporated.EnterKeyIndividualController.show shouldBe Call(
       method = "GET",
       url = path
     )
-    AppRoutes.apply.listdetails.EnterKeyIndividualController.submit shouldBe Call(
+    AppRoutes.apply.listdetails.nonincorporated.EnterKeyIndividualController.submit shouldBe Call(
       method = "POST",
       url = path
     )
-    AppRoutes.apply.listdetails.EnterKeyIndividualController.submit.url shouldBe AppRoutes.apply.listdetails.EnterKeyIndividualController.show.url
+    AppRoutes.apply.listdetails.nonincorporated.EnterKeyIndividualController.submit.url shouldBe
+      AppRoutes.apply.listdetails.nonincorporated.EnterKeyIndividualController.show.url
 
   s"GET $path should return 200, fetch the BPR and render page for entering first partner" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)

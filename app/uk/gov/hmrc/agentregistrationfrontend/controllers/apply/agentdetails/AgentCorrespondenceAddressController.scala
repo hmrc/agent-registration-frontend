@@ -105,7 +105,7 @@ extends FrontendController(mcc, actions):
       )
       .async:
         implicit request =>
-          val addressOption: String = request.get[String]
+          val addressOption: String = request.get
           if addressOption.matches("other")
           then
             addressLookUpConnector

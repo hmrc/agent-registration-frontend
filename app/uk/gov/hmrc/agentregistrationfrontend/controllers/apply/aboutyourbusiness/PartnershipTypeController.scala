@@ -62,7 +62,7 @@ extends FrontendController(mcc, actions):
     baseAction
       .ensureValidForm(PartnershipTypeForm.form, implicit r => view(_)):
         implicit request =>
-          val partnershipType: BusinessType.Partnership = request.get[BusinessType.Partnership]
+          val partnershipType: BusinessType.Partnership = request.get
           Redirect(
             AppRoutes.apply.aboutyourbusiness.UserRoleController.show
           ).addSession(partnershipType)

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.apply.listdetails
+package uk.gov.hmrc.agentregistrationfrontend.views.apply.listdetails.nonincorporated
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -23,24 +23,22 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.NumberOfKeyIndividualsPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.nonincorporated.NumberOfKeyIndividualsPage
 
 class NumberOfKeyIndividualsPageSpec
 extends ViewSpec:
 
   val viewTemplate: NumberOfKeyIndividualsPage = app.injector.instanceOf[NumberOfKeyIndividualsPage]
-  implicit val agentApplicationRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(
-    agentApplication =
-      tdAll
-        .agentApplicationGeneralPartnership
-        .sectionAgentDetails
-        .whenUsingExistingCompanyName
-        .afterBusinessNameProvided
-  )
+  val agentApplication: AgentApplication =
+    tdAll
+      .agentApplicationGeneralPartnership
+      .sectionAgentDetails
+      .whenUsingExistingCompanyName
+      .afterBusinessNameProvided
   val doc: Document = Jsoup.parse(viewTemplate(
     form = NumberOfKeyIndividualsForm.form,
     entityName = tdAll.companyName,
-    agentApplication = agentApplicationRequest.agentApplication
+    agentApplication = agentApplication
   ).body)
   private val heading: String = "How many partners are there at Test Company Name?"
 
@@ -103,7 +101,7 @@ extends ViewSpec:
         errorDoc = Jsoup.parse(viewTemplate(
           form = formWithError,
           entityName = tdAll.companyName,
-          agentApplication = agentApplicationRequest.agentApplication
+          agentApplication = agentApplication
         ).body),
         heading = heading
       )

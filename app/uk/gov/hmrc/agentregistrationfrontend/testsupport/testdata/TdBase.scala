@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetai
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistration.shared.llp.*
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.Country
@@ -132,7 +133,9 @@ trait TdBase:
 
   def agentApplicationId: AgentApplicationId = AgentApplicationId("agent-application-id-12345")
 
-  def individualProvidedDetailsId: IndividualProvidedDetailsId = IndividualProvidedDetailsId("member-provided-details-id-12345")
+  def individualProvidedDetailsId: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-12345")
+  def individualProvidedDetailsId2: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-22345")
+  def individualProvidedDetailsId3: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-32345")
   def bprPrimaryTelephoneNumber: String = "(+44) 78714743399"
   def newTelephoneNumber: String = "+44 (0) 7000000000"
   def bprEmailAddress: String = "bpr@example.com"
@@ -188,10 +191,40 @@ trait TdBase:
     numberOfKeyIndividualsResponsibleForTaxMatters = 3
   )
 
-  val individualProvidedDetails: IndividualProvidedDetailsToBeDeleted = IndividualProvidedDetailsToBeDeleted(
+  val individualProvidedDetailsToBeDeleted: IndividualProvidedDetailsToBeDeleted = IndividualProvidedDetailsToBeDeleted(
     _id = individualProvidedDetailsId,
     internalUserId = internalUserId,
     createdAt = nowAsInstant,
     agentApplicationId = agentApplicationId,
     providedDetailsState = ProvidedDetailsState.Started
+  )
+
+  val individualProvidedDetails: IndividualProvidedDetails = IndividualProvidedDetails(
+    _id = individualProvidedDetailsId,
+    internalUserId = None,
+    createdAt = nowAsInstant,
+    agentApplicationId = agentApplicationId,
+    providedDetailsState = ProvidedDetailsState.Precreated,
+    individualName = IndividualName("Test Name"),
+    isPersonOfControl = true
+  )
+
+  val individualProvidedDetails2: IndividualProvidedDetails = IndividualProvidedDetails(
+    _id = individualProvidedDetailsId2,
+    internalUserId = None,
+    createdAt = nowAsInstant,
+    agentApplicationId = agentApplicationId,
+    providedDetailsState = ProvidedDetailsState.Precreated,
+    individualName = IndividualName("Second Test Name"),
+    isPersonOfControl = true
+  )
+
+  val individualProvidedDetails3: IndividualProvidedDetails = IndividualProvidedDetails(
+    _id = individualProvidedDetailsId3,
+    internalUserId = None,
+    createdAt = nowAsInstant,
+    agentApplicationId = agentApplicationId,
+    providedDetailsState = ProvidedDetailsState.Precreated,
+    individualName = IndividualName("Third Test Name"),
+    isPersonOfControl = true
   )

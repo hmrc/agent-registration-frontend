@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendControlle
 import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.NumberOfKeyIndividualsPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.nonincorporated.NumberOfKeyIndividualsPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -105,7 +105,7 @@ extends FrontendController(mcc, actions):
       )
       .async:
         implicit request =>
-          val numberOfRequiredKeyIndividuals: NumberOfRequiredKeyIndividuals = request.get
+          val numberOfRequiredKeyIndividuals: NumberOfRequiredKeyIndividuals = request.get[NumberOfRequiredKeyIndividuals]
           val updatedApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals =
             request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals] match
               case application: AgentApplicationScottishPartnership =>
@@ -120,5 +120,5 @@ extends FrontendController(mcc, actions):
           agentApplicationService
             .upsert(updatedApplication)
             .map: _ =>
-              Redirect(AppRoutes.apply.listdetails.EnterKeyIndividualController.show.url)
+              Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater
