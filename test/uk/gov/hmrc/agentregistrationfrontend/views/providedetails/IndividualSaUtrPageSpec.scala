@@ -31,7 +31,7 @@ extends ViewSpec:
 
   val viewTemplate: IndividualSaUtrPage = app.injector.instanceOf[IndividualSaUtrPage]
   implicit val individualProvideDetailsRequest: IndividualProvideDetailsRequest[AnyContent] = tdAll
-    .makeProvideDetailsRequest(individualProvidedDetails = tdAll.individualProvidedDetails)
+    .makeProvideDetailsRequest(individualProvidedDetails = tdAll.individualProvidedDetailsToBeDeleted)
   val doc: Document = Jsoup.parse(viewTemplate(IndividualSaUtrForm.form).body)
   private val heading: String = "Do you have a Self Assessment Unique Taxpayer Reference?"
 

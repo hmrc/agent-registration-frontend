@@ -30,7 +30,9 @@
 
 @(
         form: Form[IndividualName],
-        ordinalKey: String)(implicit
+        ordinalKey: String,
+        formAction: Call
+)(implicit
         request: RequestHeader,
         messages: Messages
 )
@@ -45,7 +47,7 @@
     maybeForm = Some(form)
 ) {
     <h2 class="govuk-caption-l">@messages(s"lists.caption.title.Partnership")</h2>
-    @formWithCSRF(action = AppRoutes.apply.listdetails.EnterKeyIndividualController.submit) {
+    @formWithCSRF(action = formAction) {
         @govukInput(Input(
             label = Label(
               content = Text(title),

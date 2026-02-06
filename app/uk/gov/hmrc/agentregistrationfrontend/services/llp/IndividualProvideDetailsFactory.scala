@@ -17,11 +17,14 @@
 package uk.gov.hmrc.agentregistrationfrontend.services.llp
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsIdGenerator
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
+import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Precreated
 import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Started
 
 import java.time.Clock
@@ -50,4 +53,18 @@ class IndividualProvideDetailsFactory @Inject() (
     individualNino = individualNino,
     individualSaUtr = individualSaUtr,
     individualDateOfBirth = individualDateOfBirth
+  )
+
+  def create(
+    agentApplicationId: AgentApplicationId,
+    individualName: IndividualName,
+    isPersonOfControl: Boolean
+  ): IndividualProvidedDetails = IndividualProvidedDetails(
+    _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
+    agentApplicationId = agentApplicationId,
+    createdAt = Instant.now(clock),
+    providedDetailsState = Precreated,
+    individualName = individualName,
+    isPersonOfControl = isPersonOfControl,
+    internalUserId = None
   )

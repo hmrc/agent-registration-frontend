@@ -30,7 +30,7 @@ extends ViewSpec:
 
   val viewTemplate: IndividualTelephoneNumberPage = app.injector.instanceOf[IndividualTelephoneNumberPage]
   implicit val individualProvideDetailsRequest: IndividualProvideDetailsRequest[AnyContent] = tdAll
-    .makeProvideDetailsRequest(individualProvidedDetails = tdAll.individualProvidedDetails)
+    .makeProvideDetailsRequest(individualProvidedDetails = tdAll.individualProvidedDetailsToBeDeleted)
   val doc: Document = Jsoup.parse(viewTemplate(IndividualTelephoneNumberForm.form).body)
   private val heading: String = "What is your telephone number?"
 

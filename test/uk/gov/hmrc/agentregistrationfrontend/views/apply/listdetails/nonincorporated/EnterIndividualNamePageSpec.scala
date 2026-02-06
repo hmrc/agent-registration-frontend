@@ -14,19 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.apply.listdetails
+package uk.gov.hmrc.agentregistrationfrontend.views.apply.listdetails.nonincorporated
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions.DataWithApplication
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.EnterIndividualNamePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.nonincorporated.EnterIndividualNamePage
 
 class EnterIndividualNamePageSpec
 extends ViewSpec:
+
+  // we have a variable form action for when the page is used for new entries or to edit existing ones,
+  // but for the purposes of this test we just need to use one of them
+  private val formAction = AppRoutes.apply.listdetails.nonincorporated.EnterKeyIndividualController.submit
 
   private val firstPartnerKey = "first"
   private val nextPartnerKey = "subsequent"
@@ -39,12 +42,6 @@ extends ViewSpec:
     val onlyPartnerHeading = "What is the full name of the partner?"
 
   val viewTemplate: EnterIndividualNamePage = app.injector.instanceOf[EnterIndividualNamePage]
-  implicit val agentApplicationRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(
-    agentApplication =
-      tdAll
-        .agentApplicationGeneralPartnership
-        .afterHowManyKeyIndividuals
-  )
 
   List(
     firstPartnerKey,
@@ -54,7 +51,8 @@ extends ViewSpec:
     s"EnterIndividualNamePage for ordinal key '$ordinalKey'" should {
       val doc: Document = Jsoup.parse(viewTemplate(
         form = IndividualNameForm.form,
-        ordinalKey = ordinalKey
+        ordinalKey = ordinalKey,
+        formAction = formAction
       ).body)
 
       val expectedHeading =
@@ -65,6 +63,18 @@ extends ViewSpec:
 
       s"have the correct title for '$ordinalKey'" in:
         doc.title() shouldBe s"$expectedHeading - Apply for an agent services account - GOV.UK"
+
+      s"render a form with an input of type text for '$ordinalKey'" in:
+        val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
+        form.attr("method") shouldBe "POST"
+        form.attr("action") shouldBe formAction.url
+        form
+          .selectOrFail("label[for=individualName]")
+          .selectOnlyOneElementOrFail()
+          .text() shouldBe expectedHeading
+        form
+          .selectOrFail("input[name=individualName][type=text]")
+          .selectOnlyOneElementOrFail()
 
       s"render a save and continue button for '$ordinalKey'" in:
         doc
@@ -90,7 +100,8 @@ extends ViewSpec:
           errorMessage = errorMessage,
           errorDoc = Jsoup.parse(viewTemplate(
             form = formWithError,
-            ordinalKey = ordinalKey
+            ordinalKey = ordinalKey,
+            formAction = formAction
           ).body),
           heading = expectedHeading
         )

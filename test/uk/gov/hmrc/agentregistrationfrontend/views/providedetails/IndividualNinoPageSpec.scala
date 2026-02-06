@@ -31,7 +31,7 @@ extends ViewSpec:
 
   val viewTemplate: IndividualNinoPage = app.injector.instanceOf[IndividualNinoPage]
   implicit val individualProvideDetailsRequest: IndividualProvideDetailsRequest[AnyContent] = tdAll
-    .makeProvideDetailsRequest(individualProvidedDetails = tdAll.individualProvidedDetails)
+    .makeProvideDetailsRequest(individualProvidedDetails = tdAll.individualProvidedDetailsToBeDeleted)
   val doc: Document = Jsoup.parse(viewTemplate(IndividualNinoForm.form).body)
   private val heading: String = "Do you have a National Insurance number?"
 
