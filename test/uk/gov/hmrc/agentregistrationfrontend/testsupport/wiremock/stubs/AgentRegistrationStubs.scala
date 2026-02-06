@@ -166,3 +166,12 @@ object AgentRegistrationStubs:
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/business-partner-record/utr/${utr.value}"),
     count = count
   )
+
+  def verifyFindIndividualsForApplication(
+    applicationId: AgentApplicationId,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/individual-provided-details/for-application/${applicationId.value}"),
+    count = count
+  )

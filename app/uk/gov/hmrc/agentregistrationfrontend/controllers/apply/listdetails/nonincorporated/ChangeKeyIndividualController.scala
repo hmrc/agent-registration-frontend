@@ -90,7 +90,6 @@ extends FrontendController(mcc, actions):
   def show(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction
     .async:
       implicit request =>
-        val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
         val existingList: List[IndividualProvidedDetails] = request.get
         val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.ChangeKeyIndividualController.submit(
           individualProvidedDetailsId
@@ -102,8 +101,8 @@ extends FrontendController(mcc, actions):
               s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
             )
             .individualName
-        agentApplication.getNumberOfRequiredKeyIndividuals match
-          case n @ SixOrMore(_) =>
+        request.get[NumberOfRequiredKeyIndividuals] match
+          case n: SixOrMore =>
             whenSixOrMore(
               request = request,
               sixOrMore = n,
@@ -111,7 +110,7 @@ extends FrontendController(mcc, actions):
               formAction = formAction,
               resultStatus = Ok
             )
-          case n @ FiveOrLess(_) =>
+          case n: FiveOrLess =>
             whenFiveOrLess(
               request = request,
               fiveOrLess = n,
@@ -129,9 +128,8 @@ extends FrontendController(mcc, actions):
             val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.ChangeKeyIndividualController.submit(
               individualProvidedDetailsId
             )
-            val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
-            agentApplication.getNumberOfRequiredKeyIndividuals match
-              case n @ SixOrMore(_) =>
+            request.get[NumberOfRequiredKeyIndividuals] match
+              case n: SixOrMore =>
                 whenSixOrMore(
                   request = request,
                   sixOrMore = n,
@@ -139,7 +137,7 @@ extends FrontendController(mcc, actions):
                   formAction = formAction,
                   resultStatus = BadRequest
                 )
-              case n @ FiveOrLess(_) =>
+              case n: FiveOrLess =>
                 whenFiveOrLess(
                   request = request,
                   fiveOrLess = n,
