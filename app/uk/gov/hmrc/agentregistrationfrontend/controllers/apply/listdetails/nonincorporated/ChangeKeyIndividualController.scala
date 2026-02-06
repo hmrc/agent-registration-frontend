@@ -54,10 +54,10 @@ class ChangeKeyIndividualController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithIndividual =
+  private type DataWithList =
     List[IndividualProvidedDetails] *: NumberOfRequiredKeyIndividuals *: IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
 
-  private val baseAction: ActionBuilderWithData[DataWithIndividual] = actions
+  private val baseAction: ActionBuilderWithData[DataWithList] = actions
     .getApplicationInProgress
     .refine4:
       implicit request =>
@@ -166,13 +166,13 @@ extends FrontendController(mcc, actions):
             Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
 
   private def whenSixOrMore(
-    request: RequestWithData[DataWithIndividual],
+    request: RequestWithData[DataWithList],
     sixOrMore: SixOrMore,
     form: Form[IndividualName],
     formAction: Call,
     resultStatus: Status
   ): Future[Result] =
-    given RequestWithData[DataWithIndividual] = request
+    given RequestWithData[DataWithList] = request
     val existingList: List[IndividualProvidedDetails] = request.get
     val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
     if (existingList.isEmpty && (sixOrMore.numberOfKeyIndividualsResponsibleForTaxMatters > 0))
@@ -205,13 +205,13 @@ extends FrontendController(mcc, actions):
       )))
 
   private def whenFiveOrLess(
-    request: RequestWithData[DataWithIndividual],
+    request: RequestWithData[DataWithList],
     fiveOrLess: FiveOrLess,
     form: Form[IndividualName],
     formAction: Call,
     resultStatus: Status
   ): Future[Result] =
-    given RequestWithData[DataWithIndividual] = request
+    given RequestWithData[DataWithList] = request
     val existingList: List[IndividualProvidedDetails] = request.get
     Future.successful(resultStatus(enterIndividualNameSimplePage(
       form = form,
