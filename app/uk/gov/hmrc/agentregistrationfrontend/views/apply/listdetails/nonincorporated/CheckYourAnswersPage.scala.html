@@ -55,7 +55,7 @@
 
 @paddingNeeded = @{agentApplication.getNumberOfRequiredKeyIndividuals match {
   case a @ FiveOrLess(_) => 0
-  case a @ SixOrMore(_) => a.paddingRequired
+  case a @ SixOrMore(_) => a.requiredPadding
 }}
 
 @paddingInset = {

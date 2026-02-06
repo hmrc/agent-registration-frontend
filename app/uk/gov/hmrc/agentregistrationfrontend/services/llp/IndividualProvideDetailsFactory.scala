@@ -55,7 +55,7 @@ class IndividualProvideDetailsFactory @Inject() (
     individualDateOfBirth = individualDateOfBirth
   )
 
-  def preCreateIndividualProvidedDetails(
+  def create(
     agentApplicationId: AgentApplicationId,
     individualName: IndividualName,
     isPersonOfControl: Boolean

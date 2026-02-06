@@ -39,19 +39,19 @@ class IndividualProvideDetailsService @Inject() (
 )
 extends RequestAwareLogging:
 
-  def preCreateIndividualProvidedDetails(
+  def create(
     individualName: IndividualName,
     isPersonOfControl: Boolean,
     agentApplicationId: AgentApplicationId
   )(using request: RequestHeader): IndividualProvidedDetails =
     logger.info(s"pre-creating provided details for nominated person of control ${individualName.value} and applicationId:[${agentApplicationId.value}] ")
-    provideDetailsFactory.preCreateIndividualProvidedDetails(
+    provideDetailsFactory.create(
       agentApplicationId,
       individualName,
       isPersonOfControl
     )
 
-  def upsertPreCreatedProvidedDetails(individualProvidedDetails: IndividualProvidedDetails)(using request: RequestHeader): Future[Unit] =
+  def upsert(individualProvidedDetails: IndividualProvidedDetails)(using request: RequestHeader): Future[Unit] =
     logger.debug(s"Upserting precreated providedDetails for user:[${individualProvidedDetails.individualName.value}] and applicationId:[${individualProvidedDetails.agentApplicationId}]")
     individualProvideDetailsConnector
       .upsert(individualProvidedDetails)

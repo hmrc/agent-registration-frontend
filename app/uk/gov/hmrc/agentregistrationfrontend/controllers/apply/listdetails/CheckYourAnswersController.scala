@@ -83,5 +83,5 @@ extends FrontendController(mcc, actions):
     def listComplete(size: Int): Boolean =
       agentApplication.numberOfRequiredKeyIndividuals match
         case Some(FiveOrLess(a: Int)) => size === a
-        case Some(a @ SixOrMore(_)) => size === (a.numberOfKeyIndividualsResponsibleForTaxMatters + a.paddingRequired)
+        case Some(a @ SixOrMore(_)) => size === (a.numberOfKeyIndividualsResponsibleForTaxMatters + a.requiredPadding)
         case _ => false

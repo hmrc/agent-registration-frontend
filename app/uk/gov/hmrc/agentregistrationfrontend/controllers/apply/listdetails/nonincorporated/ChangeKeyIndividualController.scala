@@ -157,7 +157,7 @@ extends FrontendController(mcc, actions):
           .getOrThrowExpectedDataMissing(
             s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
           )
-        individualProvideDetailsService.upsertPreCreatedProvidedDetails(
+        individualProvideDetailsService.upsert(
           individualToChange
             .modify(_.individualName)
             .setTo(individualNameFromForm)
