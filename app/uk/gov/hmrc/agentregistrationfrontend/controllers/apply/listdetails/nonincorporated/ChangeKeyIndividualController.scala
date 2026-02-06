@@ -54,9 +54,10 @@ class ChangeKeyIndividualController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[
+  private type DataWithIndividual =
     List[IndividualProvidedDetails] *: NumberOfRequiredKeyIndividuals *: IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
-  ] = actions
+
+  private val baseAction: ActionBuilderWithData[DataWithIndividual] = actions
     .getApplicationInProgress
     .refine4:
       implicit request =>
@@ -82,15 +83,15 @@ extends FrontendController(mcc, actions):
             Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url)
     .refine4:
       implicit request =>
-        val agentApplicationId = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].agentApplicationId
-        individualProvideDetailsService.findAllByApplicationId(agentApplicationId).map: individualsList =>
+        val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
+        individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
           request.add[List[IndividualProvidedDetails]](individualsList)
 
   def show(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction
     .async:
       implicit request =>
-        val agentApplication = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals]
-        val existingList = request.get[List[IndividualProvidedDetails]]
+        val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
+        val existingList: List[IndividualProvidedDetails] = request.get
         val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.ChangeKeyIndividualController.submit(
           individualProvidedDetailsId
         )
@@ -101,51 +102,23 @@ extends FrontendController(mcc, actions):
               s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
             )
             .individualName
-        agentApplication.numberOfRequiredKeyIndividuals match
-          case Some(n @ SixOrMore(_)) if existingList.isEmpty && n.paddingRequired > 0 =>
-            businessPartnerRecordService
-              .getBusinessPartnerRecord(agentApplication.getUtr)
-              .map: bprOpt =>
-                Ok(enterIndividualNameComplexPage(
-                  form = IndividualNameForm.form.fill:
-                    nameToChange
-                  ,
-                  ordinalKey = MessageKeys.ordinalKey(
-                    existingSize = existingList.size,
-                    isOnlyOne = false // list size here can never be 1
-                  ),
-                  numberOfRequiredKeyIndividuals = n,
-                  entityName = bprOpt
-                    .map(_.getEntityName)
-                    .getOrThrowExpectedDataMissing(
-                      "Business Partner Record is missing"
-                    ),
-                  formAction = formAction
-                ))
-          case Some(n @ FiveOrLess(_)) =>
-            Future.successful(Ok(enterIndividualNameSimplePage(
-              form = IndividualNameForm.form.fill:
-                nameToChange
-              ,
-              ordinalKey = MessageKeys.ordinalKey(
-                existingSize = existingList.size,
-                isOnlyOne = n.numberOfKeyIndividuals === 1
-              ),
-              formAction = formAction
-            )))
-          case Some(n @ SixOrMore(_)) =>
-            // no padding required, so we can use the simple page
-            Future.successful(Ok(enterIndividualNameSimplePage(
-              form = IndividualNameForm.form.fill:
-                nameToChange
-              ,
-              ordinalKey = MessageKeys.ordinalKey(
-                existingSize = existingList.size,
-                isOnlyOne = n.numberOfKeyIndividualsResponsibleForTaxMatters === 1
-              ),
-              formAction = formAction
-            )))
-          case None => throw IllegalStateException("Required key individuals not specified in application")
+        agentApplication.getNumberOfRequiredKeyIndividuals match
+          case n @ SixOrMore(_) =>
+            whenSixOrMore(
+              request = request,
+              sixOrMore = n,
+              form = IndividualNameForm.form.fill(nameToChange),
+              formAction = formAction,
+              resultStatus = Ok
+            )
+          case n @ FiveOrLess(_) =>
+            whenFiveOrLess(
+              request = request,
+              fiveOrLess = n,
+              form = IndividualNameForm.form.fill(nameToChange),
+              formAction = formAction,
+              resultStatus = Ok
+            )
 
   def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction
     .ensureValidFormAndRedirectIfSaveForLater4[IndividualName](
@@ -156,53 +129,29 @@ extends FrontendController(mcc, actions):
             val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.ChangeKeyIndividualController.submit(
               individualProvidedDetailsId
             )
-            val existingList = request.get[List[IndividualProvidedDetails]]
-            val agentApplication = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals]
-            agentApplication.numberOfRequiredKeyIndividuals match
-              case Some(n @ SixOrMore(_)) if existingList.isEmpty && n.paddingRequired > 0 =>
-                // we only ever show the complex input page when padding is required, and it's the first entry
-                businessPartnerRecordService
-                  .getBusinessPartnerRecord(agentApplication.getUtr)
-                  .map: bprOpt =>
-                    enterIndividualNameComplexPage(
-                      formWithErrors,
-                      ordinalKey = MessageKeys.ordinalKey(
-                        existingSize = existingList.size,
-                        isOnlyOne = false // list size here can never be 1
-                      ),
-                      numberOfRequiredKeyIndividuals = n,
-                      entityName = bprOpt
-                        .map(_.getEntityName)
-                        .getOrThrowExpectedDataMissing(
-                          "Business Partner Record is missing"
-                        ),
-                      formAction = formAction
-                    )
-              case Some(n @ FiveOrLess(_)) =>
-                Future.successful(enterIndividualNameSimplePage(
+            val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
+            agentApplication.getNumberOfRequiredKeyIndividuals match
+              case n @ SixOrMore(_) =>
+                whenSixOrMore(
+                  request = request,
+                  sixOrMore = n,
                   form = formWithErrors,
-                  ordinalKey = MessageKeys.ordinalKey(
-                    existingSize = existingList.size,
-                    isOnlyOne = n.numberOfKeyIndividuals === 1
-                  ),
-                  formAction = formAction
-                ))
-              case Some(n @ SixOrMore(_)) =>
-                // no padding required, so we can use the simple page
-                Future.successful(enterIndividualNameSimplePage(
+                  formAction = formAction,
+                  resultStatus = BadRequest
+                )
+              case n @ FiveOrLess(_) =>
+                whenFiveOrLess(
+                  request = request,
+                  fiveOrLess = n,
                   form = formWithErrors,
-                  ordinalKey = MessageKeys.ordinalKey(
-                    existingSize = existingList.size,
-                    isOnlyOne = n.numberOfKeyIndividualsResponsibleForTaxMatters === 1
-                  ),
-                  formAction = formAction
-                ))
-              case None => throw IllegalStateException("Required key individuals not specified in application")
+                  formAction = formAction,
+                  resultStatus = BadRequest
+                )
     )
     .async:
       implicit request =>
-        val individualNameFromForm: IndividualName = request.get[IndividualName]
-        val existingList = request.get[List[IndividualProvidedDetails]]
+        val individualNameFromForm: IndividualName = request.get
+        val existingList: List[IndividualProvidedDetails] = request.get
         val individualToChange: IndividualProvidedDetails = existingList
           .find(_._id === individualProvidedDetailsId)
           .getOrThrowExpectedDataMissing(
@@ -215,3 +164,60 @@ extends FrontendController(mcc, actions):
         )
           .map: _ =>
             Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
+
+  private def whenSixOrMore(
+    request: RequestWithData[DataWithIndividual],
+    sixOrMore: SixOrMore,
+    form: Form[IndividualName],
+    formAction: Call,
+    resultStatus: Status
+  ): Future[Result] =
+    given RequestWithData[DataWithIndividual] = request
+    val existingList: List[IndividualProvidedDetails] = request.get
+    val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
+    if (existingList.isEmpty && (sixOrMore.numberOfKeyIndividualsResponsibleForTaxMatters > 0))
+    then
+      businessPartnerRecordService
+        .getBusinessPartnerRecord(agentApplication.getUtr)
+        .map: bprOpt =>
+          resultStatus(enterIndividualNameComplexPage(
+            form = form,
+            ordinalKey = MessageKeys.ordinalKey(
+              existingSize = existingList.size,
+              isOnlyOne = false // list size here can never be 1
+            ),
+            numberOfRequiredKeyIndividuals = sixOrMore,
+            entityName = bprOpt
+              .map(_.getEntityName)
+              .getOrThrowExpectedDataMissing(
+                "Business Partner Record is missing"
+              ),
+            formAction = formAction
+          ))
+    else
+      Future.successful(resultStatus(enterIndividualNameSimplePage(
+        form = form,
+        ordinalKey = MessageKeys.ordinalKey(
+          existingSize = existingList.size,
+          isOnlyOne = sixOrMore.numberOfKeyIndividualsResponsibleForTaxMatters === 1
+        ),
+        formAction = formAction
+      )))
+
+  private def whenFiveOrLess(
+    request: RequestWithData[DataWithIndividual],
+    fiveOrLess: FiveOrLess,
+    form: Form[IndividualName],
+    formAction: Call,
+    resultStatus: Status
+  ): Future[Result] =
+    given RequestWithData[DataWithIndividual] = request
+    val existingList: List[IndividualProvidedDetails] = request.get
+    Future.successful(resultStatus(enterIndividualNameSimplePage(
+      form = form,
+      ordinalKey = MessageKeys.ordinalKey(
+        existingSize = existingList.size,
+        isOnlyOne = fiveOrLess.numberOfKeyIndividuals === 1
+      ),
+      formAction = formAction
+    )))

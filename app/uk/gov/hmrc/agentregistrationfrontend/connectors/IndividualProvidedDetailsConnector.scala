@@ -38,7 +38,7 @@ class IndividualProvidedDetailsConnector @Inject() (
 )
 extends Connector:
 
-  def upsertPreCreatedProvidedDetails(individualProvidedDetails: IndividualProvidedDetails)(using
+  def upsert(individualProvidedDetails: IndividualProvidedDetails)(using
     request: RequestHeader
   ): Future[Unit] =
     val url: URL = url"$baseUrl/individual-provided-details/for-application"

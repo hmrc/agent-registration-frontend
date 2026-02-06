@@ -77,7 +77,7 @@ extends FrontendController(mcc, actions):
   def show(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] =
     baseAction(individualProvidedDetailsId):
       implicit request =>
-        val existingRecord = request.get[IndividualProvidedDetails]
+        val existingRecord: IndividualProvidedDetails = request.get
         Ok(view(
           form = RemoveKeyIndividualForm.form(existingRecord.individualName.value),
           individualProvidedDetails = existingRecord
@@ -98,8 +98,8 @@ extends FrontendController(mcc, actions):
     )
     .async:
       implicit request =>
-        val confirmRemoveIndividual = request.get[YesNo]
-        val individualProvidedDetails = request.get[IndividualProvidedDetails]
+        val confirmRemoveIndividual: YesNo = request.get
+        val individualProvidedDetails: IndividualProvidedDetails = request.get
         confirmRemoveIndividual match
           case YesNo.Yes =>
             individualProvideDetailsService

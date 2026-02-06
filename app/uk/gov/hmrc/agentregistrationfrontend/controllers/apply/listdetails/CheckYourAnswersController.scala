@@ -46,8 +46,8 @@ extends FrontendController(mcc, actions):
   ] = actions
     .getApplicationInProgress
     .refine4(implicit request =>
-      val agentApplicationId = request.get[AgentApplication].agentApplicationId
-      individualProvideDetailsService.findAllByApplicationId(agentApplicationId).map: individualsList =>
+      val agentApplication: AgentApplication = request.get
+      individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
         request.add[List[IndividualProvidedDetails]](individualsList)
     )
     .ensure4(
@@ -68,7 +68,7 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
-      val existingList = request.get[List[IndividualProvidedDetails]]
+      val existingList: List[IndividualProvidedDetails] = request.get
       request.get[AgentApplication] match
         case _: AgentApplicationSoleTrader => Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
         case b: AgentApplication.IsNotIncorporated =>

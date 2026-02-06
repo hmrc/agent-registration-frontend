@@ -71,7 +71,7 @@ extends FrontendController(mcc, actions):
             Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url)
     .refine4:
       implicit request =>
-        val agentApplication = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals]
+        val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
         individualProvideDetailsService
           .findAllByApplicationId(
             agentApplication.agentApplicationId

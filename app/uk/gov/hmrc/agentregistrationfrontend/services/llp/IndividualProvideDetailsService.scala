@@ -54,7 +54,7 @@ extends RequestAwareLogging:
   def upsertPreCreatedProvidedDetails(individualProvidedDetails: IndividualProvidedDetails)(using request: RequestHeader): Future[Unit] =
     logger.debug(s"Upserting precreated providedDetails for user:[${individualProvidedDetails.individualName.value}] and applicationId:[${individualProvidedDetails.agentApplicationId}]")
     individualProvideDetailsConnector
-      .upsertPreCreatedProvidedDetails(individualProvidedDetails)
+      .upsert(individualProvidedDetails)
 
   def findById(individualProvidedDetailsId: IndividualProvidedDetailsId)(using
     RequestHeader
