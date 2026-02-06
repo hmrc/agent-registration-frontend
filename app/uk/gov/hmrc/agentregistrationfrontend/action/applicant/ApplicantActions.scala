@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.action
+package uk.gov.hmrc.agentregistrationfrontend.action.applicant
 
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
@@ -23,7 +23,10 @@ import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
-import uk.gov.hmrc.agentregistrationfrontend.action.applicant.AuthorisedActionRefiner
+import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineFutureEither
+import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineUnion
+import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuildersWithData
+import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
@@ -49,23 +52,23 @@ object ApplicantActions:
 @Singleton
 class ApplicantActions @Inject() (
   defaultActionBuilder: DefaultActionBuilder,
-  authorisedActionRefiner: AuthorisedActionRefiner,
+  authorisedActionRefiner: ApplicantAuthRefiner,
   agentApplicationService: AgentApplicationService,
   businessPartnerRecordService: BusinessPartnerRecordService
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
-  export ActionsHelper.*
+  export ActionBuildersWithData.*
   export ApplicantActions.*
 
   val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
-    .refine2(request => RequestWithDataCt.empty(request))
+    .refineUnion(request => RequestWithDataCt.empty(request))
 
   val authorised: ActionBuilderWithData[DataWithAuth] = action
-    .refineAsync(authorisedActionRefiner.refine)
+    .refineFutureEither(authorisedActionRefiner.refine)
 
   val getApplication: ActionBuilderWithData[DataWithApplication] = authorised
-    .refine4:
+    .refine:
       implicit request: RequestWithData[DataWithAuth] =>
         agentApplicationService
           .find()
@@ -111,7 +114,7 @@ extends RequestAwareLogging:
     inline def getBusinessPartnerRecord(using
       AgentApplication PresentIn Data,
       BusinessPartnerRecordResponse AbsentIn Data
-    ): ActionBuilderWithData[BusinessPartnerRecordResponse *: Data] = ab.refine4:
+    ): ActionBuilderWithData[BusinessPartnerRecordResponse *: Data] = ab.refine:
       implicit request =>
         businessPartnerRecordService
           .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
@@ -121,7 +124,7 @@ extends RequestAwareLogging:
     inline def getMaybeBusinessPartnerRecord(using
       AgentApplication PresentIn Data,
       Option[BusinessPartnerRecordResponse] AbsentIn Data
-    ): ActionBuilderWithData[Option[BusinessPartnerRecordResponse] *: Data] = ab.refine4:
+    ): ActionBuilderWithData[Option[BusinessPartnerRecordResponse] *: Data] = ab.refine:
       implicit request =>
         businessPartnerRecordService
           .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)

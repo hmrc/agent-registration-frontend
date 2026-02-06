@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import play.api.mvc.*
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import javax.inject.Inject

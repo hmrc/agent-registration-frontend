@@ -17,14 +17,11 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.RequestHeader
 import play.api.mvc.Result
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
-
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
 import uk.gov.hmrc.agentregistrationfrontend.services.EmailVerificationService
@@ -56,7 +53,8 @@ class IndividualEmailAddressController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.DELETEMEgetProvideDetailsInProgress
+  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions
+    .getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.telephoneNumber.isDefined,
       implicit request =>
@@ -79,8 +77,8 @@ extends FrontendController(mcc, actions):
       implicit r => individualEmailAddressView(_)
     )
     .async:
-      implicit request: (IndividualProvideDetailsRequest[AnyContent] & FormValue[EmailAddress]) =>
-        val emailAddressFromForm: EmailAddress = request.formValue
+      implicit request =>
+        val emailAddressFromForm: EmailAddress = request.get
         val updatedProvidedDetails: IndividualProvidedDetailsToBeDeleted = request
           .individualProvidedDetails
           .modify(_.emailAddress)
@@ -106,7 +104,7 @@ extends FrontendController(mcc, actions):
               AppRoutes.providedetails.IndividualEmailAddressController.verify
             )
 
-  def verify: Action[AnyContent] = actions.DELETEMEgetProvideDetailsInProgress
+  def verify: Action[AnyContent] = actions.getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.emailAddress.isDefined,
       implicit request =>
@@ -121,20 +119,26 @@ extends FrontendController(mcc, actions):
         // Individual email has already been provided and verified, redirecting to nino page
         Redirect(AppRoutes.providedetails.CheckYourAnswersController.show)
     )
+    .refine:
+      implicit request =>
+        emailVerificationService
+          .checkEmailVerificationStatus(
+            credId = request.credentials.providerId,
+            email = request.individualProvidedDetails.getEmailAddress.emailAddress.value
+          )
+          .map(request.add[EmailVerificationStatus])
     .async:
       implicit request =>
-        val emailToVerify = request.individualProvidedDetails.getEmailAddress.emailAddress.value
-        val credId = request.credentials.providerId
-        emailVerificationService.checkEmailVerificationStatus(
-          credId = credId,
-          email = emailToVerify
-        ).flatMap:
+        request.get[EmailVerificationStatus] match
           case EmailVerificationStatus.Verified =>
             logger.info(s"[checkEmailVerificationStatus] Verified status received for individualEmail")
-            onEmailVerified()
+            onEmailVerified(request.individualProvidedDetails)
           case EmailVerificationStatus.Unverified =>
             logger.info(s"[checkEmailVerificationStatus] Unverified status received for individualEmail")
-            onEmailUnverified(credId, emailToVerify)
+            onEmailUnverified(
+              credId = request.credentials.providerId,
+              emailToVerify = request.individualProvidedDetails.getEmailAddress.emailAddress.value
+            )
           case EmailVerificationStatus.Locked =>
             logger.info(s"[checkEmailVerificationStatus] Locked status received for individualEmail")
             onEmailLocked()
@@ -142,9 +146,8 @@ extends FrontendController(mcc, actions):
             logger.info(s"[checkEmailVerificationStatus] Error received for individualEmail")
             onEmailError()
 
-  private def onEmailVerified()(implicit request: IndividualProvideDetailsRequest[AnyContent]): Future[Result] =
-    val updatedProvidedDetails = request
-      .individualProvidedDetails
+  private def onEmailVerified(individualProvidedDetails: IndividualProvidedDetailsToBeDeleted)(implicit request: RequestHeader): Future[Result] =
+    val updatedProvidedDetails = individualProvidedDetails
       .modify(
         _.emailAddress
           .each.isVerified
@@ -158,7 +161,7 @@ extends FrontendController(mcc, actions):
   private def onEmailUnverified(
     credId: String,
     emailToVerify: String
-  )(implicit request: IndividualProvideDetailsRequest[AnyContent]): Future[Result] = emailVerificationService.verifyEmail(
+  )(implicit request: RequestHeader): Future[Result] = emailVerificationService.verifyEmail(
     credId = credId,
     maybeEmail = Some(
       Email(
@@ -172,10 +175,10 @@ extends FrontendController(mcc, actions):
     lang = messagesApi.preferred(request).lang.code
   )
 
-  private def onEmailLocked()(implicit request: IndividualProvideDetailsRequest[AnyContent]): Future[Result] = Future.successful(
+  private def onEmailLocked()(implicit request: RequestHeader): Future[Result] = Future.successful(
     Ok(individualEmailLockedView())
   )
 
-  private def onEmailError()(implicit request: IndividualProvideDetailsRequest[AnyContent]): Future[Result] = Future.successful(
+  private def onEmailError()(implicit request: RequestHeader): Future[Result] = Future.successful(
     Ok(placeholder(h1 = "Email address verification error", bodyText = Some("placeholder for error during email verification")))
   )

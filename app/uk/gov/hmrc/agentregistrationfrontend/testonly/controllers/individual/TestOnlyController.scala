@@ -21,7 +21,7 @@ import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 
@@ -36,12 +36,10 @@ class TestOnlyController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def showProvidedDetails: Action[AnyContent] = actions
-    .DELETEMEgetProvidedDetails: request =>
-      Ok(Json.prettyPrint(Json.toJson(request.individualProvidedDetails)))
+  def showProvidedDetails: Action[AnyContent] = getProvidedDetails: request =>
+    Ok(Json.prettyPrint(Json.toJson(request.individualProvidedDetails)))
 
-  def removeNinoAndDobFromIndividual(): Action[AnyContent] = actions
-    .DELETEMEgetProvidedDetails
+  def removeNinoAndDobFromIndividual(): Action[AnyContent] = getProvidedDetails
     .async:
       implicit request =>
         val updatedDetails = request.individualProvidedDetails

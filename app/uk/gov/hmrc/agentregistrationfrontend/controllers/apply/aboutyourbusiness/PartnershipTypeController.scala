@@ -21,7 +21,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.PartnershipTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
@@ -40,7 +40,7 @@ class PartnershipTypeController @Inject() (
 extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilderWithData[EmptyTuple] = action
-    .ensure4(
+    .ensure(
       _.readBusinessTypeAnswer match {
         case Some(BusinessTypeAnswer.PartnershipType) => true
         case _ => false
@@ -60,7 +60,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidForm4(PartnershipTypeForm.form, implicit r => view(_)):
+      .ensureValidForm(PartnershipTypeForm.form, implicit r => view(_)):
         implicit request =>
           val partnershipType: BusinessType.Partnership = request.get
           Redirect(

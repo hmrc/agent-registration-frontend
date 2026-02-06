@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationF
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -47,7 +47,7 @@ extends FrontendController(mcc, actions):
     IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
   ] = actions
     .getApplicationInProgress
-    .refine4:
+    .refine:
       implicit request =>
         request.agentApplication match
           case _: AgentApplication.IsIncorporated =>
@@ -83,7 +83,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater4[NumberOfRequiredKeyIndividuals](
+      .ensureValidFormAndRedirectIfSaveForLater[NumberOfRequiredKeyIndividuals](
         form = NumberOfKeyIndividualsForm.form,
         resultToServeWhenFormHasErrors =
           implicit request =>

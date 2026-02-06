@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.nonincorporated.CheckYourAnswersPage
@@ -47,7 +47,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilderWithData[DataWithLists] = actions
     .getApplicationInProgress
-    .refine4:
+    .refine:
       implicit request =>
         request.get[AgentApplication] match
           case _: IsIncorporated =>
@@ -60,7 +60,7 @@ extends FrontendController(mcc, actions):
             Redirect(AppRoutes.apply.TaskListController.show.url)
           case aa: IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
             request.replace[AgentApplication, IsAgentApplicationForDeclaringNumberOfKeyIndividuals](aa)
-    .refine4:
+    .refine:
       implicit request =>
         request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].numberOfRequiredKeyIndividuals match
           case Some(n: NumberOfRequiredKeyIndividuals) => request.add(n)
@@ -69,7 +69,7 @@ extends FrontendController(mcc, actions):
               "Number of required key individuals not specified in application, redirecting to number of key individuals page"
             )
             Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url)
-    .refine4:
+    .refine:
       implicit request =>
         val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
         individualProvideDetailsService

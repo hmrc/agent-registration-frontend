@@ -29,7 +29,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetai
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CitizenDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.FrontendController
 

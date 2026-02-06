@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentEmailAddress
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentVerifiedEmailAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentEmailAddressForm
@@ -56,7 +56,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .getApplicationInProgress
-    .ensure4(
+    .ensure(
       _
         .agentApplication
         .agentDetails
@@ -84,14 +84,14 @@ extends FrontendController(mcc, actions):
         ))
 
   def submit: Action[AnyContent] = baseAction
-    .ensure4(
+    .ensure(
       // because we cannot store any submitted email without checking it's verified status first
       // if user is saving and continuing then handle the submission normally else redirect to save for later
       SubmissionHelper.getSubmitAction(_) === SaveAndContinue,
       implicit request =>
         Redirect(AppRoutes.apply.SaveForLaterController.show)
     )
-    .ensureValidForm4[AgentEmailAddress](
+    .ensureValidForm[AgentEmailAddress](
       form = AgentEmailAddressForm.form,
       resultToServeWhenFormHasErrors =
         implicit request =>
@@ -136,7 +136,7 @@ extends FrontendController(mcc, actions):
 
   def verify: Action[AnyContent] = actions
     .getApplicationInProgress
-    .ensure4(
+    .ensure(
       _.agentApplication
         .agentDetails
         .map(_.agentEmailAddress).isDefined,
@@ -144,7 +144,7 @@ extends FrontendController(mcc, actions):
         logger.info("Applicant email has not been provided, redirecting to email address page")
         Redirect(AppRoutes.apply.agentdetails.AgentEmailAddressController.show)
     )
-    .ensure4(
+    .ensure(
       _.agentApplication
         .getAgentDetails
         .getAgentEmailAddress

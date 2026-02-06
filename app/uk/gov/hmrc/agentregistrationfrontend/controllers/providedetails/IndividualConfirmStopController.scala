@@ -19,8 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
@@ -33,8 +32,8 @@ class IndividualConfirmStopController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.DELETEMEgetProvideDetailsInProgress:
-    implicit request: RequestHeader =>
+  def show: Action[AnyContent] = actions.getProvideDetailsInProgress:
+    implicit request =>
       Ok(placeholder(
         h1 = "Confirm Stop Page",
         bodyText = Some("This is a placeholder for stop apllication  page.")

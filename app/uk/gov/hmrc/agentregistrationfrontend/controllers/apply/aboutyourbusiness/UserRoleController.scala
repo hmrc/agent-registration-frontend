@@ -20,7 +20,7 @@ import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
 import uk.gov.hmrc.agentregistration.shared.UserRole
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.UserRoleForm
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
@@ -46,7 +46,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     actions.action
-      .ensureValidForm4(UserRoleForm.form, implicit request => view(_, userRoleOptionForBusinessType(request.getBusinessType))):
+      .ensureValidForm(UserRoleForm.form, implicit request => view(_, userRoleOptionForBusinessType(request.getBusinessType))):
         implicit request =>
           val userRole: UserRole = request.get
           Redirect(

@@ -21,7 +21,7 @@ import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsExpiryDateForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -43,13 +43,13 @@ extends FrontendController(mcc, actions):
 
   val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .getApplicationInProgress
-    .ensure4(
+    .ensure(
       _.agentApplication.amlsDetails.exists(_.amlsRegistrationNumber.isDefined),
       implicit r =>
         logger.warn("Missing AmlsRegistrationNumber, redirecting to registration number page")
         Redirect(AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url)
     )
-    .ensure4(
+    .ensure(
       !_.agentApplication.getAmlsDetails.isHmrc, // safe to getAmlsDetails as ensured above
       implicit r =>
         logger.warn("Expiry date is not required as supervisor is HMRC, redirecting to Check Your Answers")
@@ -66,7 +66,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater4[LocalDate](AmlsExpiryDateForm.form(), implicit request => view(_))
+      .ensureValidFormAndRedirectIfSaveForLater[LocalDate](AmlsExpiryDateForm.form(), implicit request => view(_))
       .async:
         implicit request =>
           val amlsExpiryDate: LocalDate = request.get

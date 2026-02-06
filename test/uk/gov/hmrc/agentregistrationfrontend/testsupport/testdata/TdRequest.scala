@@ -24,18 +24,12 @@ import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions.EmptyData
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualAuthorisedRequest
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualAuthorisedWithIdentifiersRequest
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withAuthTokenInSession
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withDeviceId
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withRequestId
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withTrueClientIp
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withTrueClientPort
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdSupport.withAgentApplicationId
 import uk.gov.hmrc.http.HeaderCarrier
 
 trait TdRequest {
   dependencies: TdBase =>
+
+  import TdSupport.*
 
   def authToken: String = "authorization-value-123"
   def akamaiReputationValue: String = "akamai-reputation-value-123"
@@ -62,7 +56,7 @@ trait TdRequest {
 
   object ApplicantRequests:
 
-    import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions.*
+    import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.*
 
     def requestWithAuthData: RequestWithData[DataWithAuth] = RequestWithDataCt.apply(
       rawRequestLoggedIn,
@@ -75,7 +69,7 @@ trait TdRequest {
 
   object IndividualRequests:
 
-    import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions.*
+    import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions.*
 
     def requestWithAuthData: RequestWithData[DataWithAuth] = RequestWithDataCt.apply(
       rawRequestLoggedIn,
@@ -105,51 +99,6 @@ trait TdRequest {
         dependencies.internalUserId,
         dependencies.credentials
       )
-    )
-
-  def requestLoggedInWithAgentApplicationId: Request[AnyContent] = baseRequest
-    .withAuthTokenInSession()
-    .withAgentApplicationId(agentApplicationId.value)
-
-  def individualAuthorisedRequestLoggedInWithAgentApplicationId: IndividualAuthorisedRequest[AnyContent] =
-    new IndividualAuthorisedRequest(
-      internalUserId = internalUserId,
-      request = requestLoggedInWithAgentApplicationId,
-      credentials = credentials
-    )
-
-  def individualAuthorisedRequestLoggedInWithOutAgentApplicationId: IndividualAuthorisedRequest[AnyContent] =
-    new IndividualAuthorisedRequest(
-      internalUserId = internalUserId,
-      request = rawRequestNotLoggedIn,
-      credentials = credentials
-    )
-
-  def individualAuthorisedRequestLoggedInWithAgentApplicationIdAndIdentifiers: IndividualAuthorisedWithIdentifiersRequest[AnyContent] =
-    new IndividualAuthorisedWithIdentifiersRequest(
-      internalUserId = internalUserId,
-      request = requestLoggedInWithAgentApplicationId,
-      credentials = credentials,
-      nino = Some(nino),
-      saUtr = Some(saUtr)
-    )
-
-  def individualAuthorisedRequestLoggedInWithAgentApplicationIdNinoAndNoUtr: IndividualAuthorisedWithIdentifiersRequest[AnyContent] =
-    new IndividualAuthorisedWithIdentifiersRequest(
-      internalUserId = internalUserId,
-      request = requestLoggedInWithAgentApplicationId,
-      credentials = credentials,
-      nino = Some(nino),
-      saUtr = Some(saUtr)
-    )
-
-  def individualAuthorisedRequestLoggedInWithOutAgentApplicationIdAndIdentifiers: IndividualAuthorisedWithIdentifiersRequest[AnyContent] =
-    new IndividualAuthorisedWithIdentifiersRequest(
-      internalUserId = internalUserId,
-      request = rawRequestNotLoggedIn,
-      credentials = credentials,
-      nino = Some(nino),
-      saUtr = Some(saUtr)
     )
 
 }

@@ -18,8 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -30,8 +29,6 @@ class IndividualNinoPageSpec
 extends ViewSpec:
 
   val viewTemplate: IndividualNinoPage = app.injector.instanceOf[IndividualNinoPage]
-  implicit val individualProvideDetailsRequest: IndividualProvideDetailsRequest[AnyContent] = tdAll
-    .makeProvideDetailsRequest(individualProvidedDetails = tdAll.individualProvidedDetailsToBeDeleted)
   val doc: Document = Jsoup.parse(viewTemplate(IndividualNinoForm.form).body)
   private val heading: String = "Do you have a National Insurance number?"
 

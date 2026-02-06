@@ -24,7 +24,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CitizenDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.llp.DesignatoryDetailsResponse
@@ -45,14 +45,14 @@ extends FrontendController(mcc, actions):
 
   def check(): Action[AnyContent] = actions
     .getApplicationInProgress
-    .refine4(implicit request =>
+    .refine(implicit request =>
       request.agentApplication match
         case a: AgentApplicationSoleTrader => request.add(a)
         case a: IsNotSoleTrader =>
           logger.debug(s"Deceased verification is required only for SoleTrader, this business type is ${request.agentApplication.businessType}. Redirecting to company status check.")
           Redirect(nextCheckEndpoint)
     )
-    .ensure4(
+    .ensure(
       condition = _.agentApplicationSoleTrader.isDeceasedCheckRequired,
       resultWhenConditionNotMet =
         implicit request =>

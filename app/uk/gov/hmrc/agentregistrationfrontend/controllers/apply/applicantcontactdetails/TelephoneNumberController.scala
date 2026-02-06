@@ -23,7 +23,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.TelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -43,7 +43,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .getApplicationInProgress
-    .ensure4(
+    .ensure(
       _.agentApplication.applicantContactDetails.map(_.applicantName).nonEmpty,
       implicit request =>
         logger.warn("Because we don't have name details we are redirecting to that page")
@@ -63,7 +63,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater4(TelephoneNumberForm.form, implicit r => view(_))
+      .ensureValidFormAndRedirectIfSaveForLater(TelephoneNumberForm.form, implicit r => view(_))
       .async:
         implicit request =>
           val validFormData: TelephoneNumber = request.get

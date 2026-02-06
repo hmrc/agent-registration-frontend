@@ -19,8 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsWithApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualConfirmationPage
 
@@ -36,13 +35,12 @@ class IndividualConfirmationController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] =
-    actions.DELETEMEgetSubmitedDetailsWithApplicationInProgress
-      .ensure(
-        _.individualProvidedDetails.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed,
-        implicit request =>
-          Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url)
-      )
+  private val baseAction: ActionBuilderWithData[DataWithAgentApplication] = actions.getSubmittedDetailsWithApplicationInProgress
+    .ensure(
+      _.individualProvidedDetails.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url)
+    )
 
   def show: Action[AnyContent] = baseAction.async:
     implicit request =>
