@@ -49,7 +49,7 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
       refusalToDealWithCheckResult = None,
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
       numberOfRequiredKeyIndividuals = None,
-      numberOfOtherRelevantIndividuals = None
+      otherRelevantIndividuals = None
     )
 
     val afterGrsDataReceived: AgentApplicationGeneralPartnership = afterStarted.copy(

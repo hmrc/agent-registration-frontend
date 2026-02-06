@@ -101,7 +101,7 @@ object AppRoutes:
         val CheckYourAnswersController = listdetailsNonIncorporatedRoutes.CheckYourAnswersController
 
       object otherrelevantindividuals:
-        val NumberOfOtherRelevantIndividualsController = listdetailsOthersRoutes.NumberOfOtherRelevantIndividualsController
+        val HasOtherRelevantIndividualsController = listdetailsOthersRoutes.HasOtherRelevantIndividualsController
 
     object checkfailed:
 

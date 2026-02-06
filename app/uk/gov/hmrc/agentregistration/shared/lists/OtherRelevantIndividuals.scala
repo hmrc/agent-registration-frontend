@@ -17,10 +17,11 @@
 package uk.gov.hmrc.agentregistration.shared.lists
 
 import play.api.libs.json.Format
-import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import play.api.libs.json.Json
 
-final case class NumberOfOtherRelevantIndividuals(
-  value: Int
+final case class OtherRelevantIndividuals(
+  hasMoreToAdd: Boolean
 )
-object NumberOfOtherRelevantIndividuals:
-  given Format[NumberOfOtherRelevantIndividuals] = JsonFormatsFactory.makeIntValueClassFormat
+
+object OtherRelevantIndividuals:
+  given Format[OtherRelevantIndividuals] = Json.format[OtherRelevantIndividuals]

@@ -25,7 +25,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class NumberOfOtherRelevantIndividualsController @Inject() (
+class HasOtherRelevantIndividualsController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   simplePage: SimplePage

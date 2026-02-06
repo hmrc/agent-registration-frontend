@@ -41,14 +41,22 @@ class CheckYourAnswersController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[
-    List[IndividualProvidedDetails] *: DataWithApplication
-  ] = actions
+  private type DataWithList = List[IndividualProvidedDetails] *: DataWithApplication
+
+  private val baseAction: ActionBuilderWithData[DataWithList] = actions
     .getApplicationInProgress
     .refine(implicit request =>
       val agentApplication: AgentApplication = request.get
       individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
         request.add[List[IndividualProvidedDetails]](individualsList)
+    )
+    .ensure(
+      implicit request =>
+        request.get[AgentApplication].otherRelevantIndividuals.isDefined,
+      resultWhenConditionNotMet =
+        implicit request =>
+          logger.warn("Because we have no other relevant individuals data, redirecting to where this can be set")
+          Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.HasOtherRelevantIndividualsController.show.url)
     )
     .ensure(
       _.get[List[IndividualProvidedDetails]].nonEmpty,
@@ -72,16 +80,24 @@ extends FrontendController(mcc, actions):
       request.get[AgentApplication] match
         case _: AgentApplicationSoleTrader => Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
         case b: AgentApplication.IsNotIncorporated =>
-          if b.listComplete(existingList.size)
+          if b.allListsComplete(keyIndividualListSize = existingList.count(_.isPersonOfControl))
           then Ok(view(b, existingList))
+          else if b.getOtherRelevantIndividuals.hasMoreToAdd
+          // TODO: this will become the other relevant individuals CYA page once that is developed, for now it will just ask if there are any other relevant individuals to add
+          then Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.HasOtherRelevantIndividualsController.show.url)
           else Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url)
         case _ =>
           logger.warn("Incorporated businesses have not been developed yet")
           Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
 
   extension (agentApplication: AgentApplication.IsNotIncorporated)
-    def listComplete(size: Int): Boolean =
+
+    private def keyIndividualListComplete(keyIndividualListSize: Int): Boolean =
       agentApplication.numberOfRequiredKeyIndividuals match
-        case Some(FiveOrLess(a: Int)) => size === a
-        case Some(a @ SixOrMore(_)) => size === (a.numberOfKeyIndividualsResponsibleForTaxMatters + a.requiredPadding)
+        case Some(FiveOrLess(a: Int)) => keyIndividualListSize === a
+        case Some(a @ SixOrMore(_)) => keyIndividualListSize === (a.numberOfKeyIndividualsResponsibleForTaxMatters + a.requiredPadding)
         case _ => false
+
+    private def allListsComplete(keyIndividualListSize: Int): Boolean =
+      keyIndividualListComplete(keyIndividualListSize) &&
+        agentApplication.otherRelevantIndividuals.exists(_.hasMoreToAdd === false)
