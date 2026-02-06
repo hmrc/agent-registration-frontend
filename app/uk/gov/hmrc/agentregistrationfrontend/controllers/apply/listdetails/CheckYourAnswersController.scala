@@ -72,9 +72,9 @@ extends FrontendController(mcc, actions):
       request.get[AgentApplication] match
         case _: AgentApplicationSoleTrader => Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
         case b: AgentApplication.IsNotIncorporated =>
-          if b.listComplete(existingList.size) then Ok(view(b, existingList))
-          else
-            Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url)
+          if b.listComplete(existingList.size)
+          then Ok(view(b, existingList))
+          else Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url)
         case _ =>
           logger.warn("Incorporated businesses have not been developed yet")
           Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
