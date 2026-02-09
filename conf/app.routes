@@ -109,35 +109,35 @@ GET         /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.
 POST        /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.agentregistrationfrontend.controllers.apply.DeclarationController.submit
 
 # Individuals (directors/partners/members/owners) providing details
-GET         /provide-details/exit                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.genericExitPage
-GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.StartController.start(linkId: LinkId)
+GET         /provide-details/exit                                   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ExitController.genericExitPage
+GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.individual.StartController.start(linkId: LinkId)
 
 ## Internal Routes for provide-details
 #  These routes are for internal navigation and should not be accessed directly through the browser URL and meant to be accessed via redirects from other routes.
-GET        /provide-details/internal/initiate-member-provide-details/:linkId  uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.InitiateIndividualProvideDetailsController.initiateIndividualProvideDetails(linkId: LinkId)
+GET        /provide-details/internal/initiate-member-provide-details/:linkId  uk.gov.hmrc.agentregistrationfrontend.controllers.individual.internal.InitiateIndividualProvideDetailsController.initiateIndividualProvideDetails(linkId: LinkId)
 
 
-GET         /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CompaniesHouseNameQueryController.show
-POST        /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CompaniesHouseNameQueryController.submit
-GET         /provide-details/name-match                             uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CompaniesHouseMatchingController.show
-POST        /provide-details/name-match                             uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CompaniesHouseMatchingController.submit
-GET         /provide-details/telephone-number                       uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualTelephoneNumberController.show
-POST        /provide-details/telephone-number                       uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualTelephoneNumberController.submit
-GET         /provide-details/email-address                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualEmailAddressController.show
-POST        /provide-details/email-address                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualEmailAddressController.submit
-GET         /provide-details/verify-email-address                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualEmailAddressController.verify
-GET         /provide-details/date-of-birth                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualDateOfBirthController.show
-POST        /provide-details/date-of-birth                          uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualDateOfBirthController.submit
-GET         /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualNinoController.show
-POST        /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualNinoController.submit
-GET         /provide-details/utr                                    uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualSaUtrController.show
-POST        /provide-details/utr                                    uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualSaUtrController.submit
-GET         /provide-details/approve-applicant                      uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualApproveApplicantController.show
-POST        /provide-details/approve-applicant                      uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualApproveApplicantController.submit
-GET         /provide-details/agree-standard                         uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualHmrcStandardForAgentsController.show
-POST        /provide-details/agree-standard                         uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualHmrcStandardForAgentsController.submit
-GET         /provide-details/confirm-stop                           uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualConfirmStopController.show
-GET         /provide-details/check-your-answers                     uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CheckYourAnswersController.show
-POST        /provide-details/check-your-answers                     uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.CheckYourAnswersController.submit
-GET         /provide-details/confirmation                           uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.IndividualConfirmationController.show
-GET         /provide-details/multiple-provided-details              uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.ExitController.multipleProvidedDetailsPage
+GET         /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.CompaniesHouseNameQueryController.show
+POST        /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.CompaniesHouseNameQueryController.submit
+GET         /provide-details/name-match                             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.CompaniesHouseMatchingController.show
+POST        /provide-details/name-match                             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.CompaniesHouseMatchingController.submit
+GET         /provide-details/telephone-number                       uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualTelephoneNumberController.show
+POST        /provide-details/telephone-number                       uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualTelephoneNumberController.submit
+GET         /provide-details/email-address                          uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualEmailAddressController.show
+POST        /provide-details/email-address                          uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualEmailAddressController.submit
+GET         /provide-details/verify-email-address                   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualEmailAddressController.verify
+GET         /provide-details/date-of-birth                          uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualDateOfBirthController.show
+POST        /provide-details/date-of-birth                          uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualDateOfBirthController.submit
+GET         /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualNinoController.show
+POST        /provide-details/nino                                   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualNinoController.submit
+GET         /provide-details/utr                                    uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualSaUtrController.show
+POST        /provide-details/utr                                    uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualSaUtrController.submit
+GET         /provide-details/approve-applicant                      uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualApproveApplicantController.show
+POST        /provide-details/approve-applicant                      uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualApproveApplicantController.submit
+GET         /provide-details/agree-standard                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualHmrcStandardForAgentsController.show
+POST        /provide-details/agree-standard                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualHmrcStandardForAgentsController.submit
+GET         /provide-details/confirm-stop                           uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualConfirmStopController.show
+GET         /provide-details/check-your-answers                     uk.gov.hmrc.agentregistrationfrontend.controllers.individual.CheckYourAnswersController.show
+POST        /provide-details/check-your-answers                     uk.gov.hmrc.agentregistrationfrontend.controllers.individual.CheckYourAnswersController.submit
+GET         /provide-details/confirmation                           uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualConfirmationController.show
+GET         /provide-details/multiple-provided-details              uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ExitController.multipleProvidedDetailsPage
