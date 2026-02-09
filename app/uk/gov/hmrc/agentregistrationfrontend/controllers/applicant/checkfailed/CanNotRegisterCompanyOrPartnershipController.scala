@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.CheckResult
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.checkfailed.CompanyStatusBlockPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.checkfailed.CompanyStatusBlockPage
 
 import javax.inject.Inject
 import javax.inject.Singleton

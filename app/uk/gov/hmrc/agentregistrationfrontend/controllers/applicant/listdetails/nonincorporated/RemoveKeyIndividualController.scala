@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendContr
 import uk.gov.hmrc.agentregistrationfrontend.forms.RemoveKeyIndividualForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.nonincorporated.RemoveKeyIndividualPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.nonincorporated.RemoveKeyIndividualPage
 
 import javax.inject.Inject
 import javax.inject.Singleton

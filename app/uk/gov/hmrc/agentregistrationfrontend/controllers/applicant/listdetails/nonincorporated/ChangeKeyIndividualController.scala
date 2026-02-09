@@ -36,8 +36,8 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.MessageKeys
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.nonincorporated.EnterIndividualNameComplexPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.nonincorporated.EnterIndividualNamePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.nonincorporated.EnterIndividualNameComplexPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.nonincorporated.EnterIndividualNamePage
 
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -38,9 +38,9 @@ import uk.gov.hmrc.agentregistrationfrontend.repository.UploadRepo
 import uk.gov.hmrc.agentregistrationfrontend.services.ObjectStoreService
 import uk.gov.hmrc.agentregistrationfrontend.services.UpscanInitiateService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsEvidenceUploadProgressPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.UpscanErrorPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.amls.AmlsEvidenceUploadPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.amls.AmlsEvidenceUploadProgressPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.amls.UpscanErrorPage
 
 import java.time.Clock
 import java.time.Instant

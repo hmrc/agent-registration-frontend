@@ -22,8 +22,8 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.ConfirmationPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.ViewApplicationPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ConfirmationPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ViewApplicationPage
 
 import javax.inject.Inject
 import javax.inject.Singleton

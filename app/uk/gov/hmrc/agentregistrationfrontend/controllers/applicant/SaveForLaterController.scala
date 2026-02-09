@@ -20,7 +20,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.SaveForLaterPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.SaveForLaterPage
 
 import javax.inject.Inject
 import javax.inject.Singleton

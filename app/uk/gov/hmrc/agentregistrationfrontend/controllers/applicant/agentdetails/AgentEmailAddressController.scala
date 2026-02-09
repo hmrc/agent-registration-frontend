@@ -34,7 +34,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordServi
 import uk.gov.hmrc.agentregistrationfrontend.services.EmailVerificationService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.AgentEmailAddressPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.agentdetails.AgentEmailAddressPage
 
 import javax.inject.Inject
 import javax.inject.Singleton

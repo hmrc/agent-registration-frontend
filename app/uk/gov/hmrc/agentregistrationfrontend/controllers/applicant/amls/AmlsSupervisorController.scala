@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.AmlsSupervisoryBodyPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.amls.AmlsSupervisoryBodyPage
 
 import javax.inject.Inject
 import javax.inject.Singleton

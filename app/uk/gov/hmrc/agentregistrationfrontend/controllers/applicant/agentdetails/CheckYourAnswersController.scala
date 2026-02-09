@@ -24,7 +24,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.CheckYourAnswersPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.agentdetails.CheckYourAnswersPage
 
 @Singleton
 class CheckYourAnswersController @Inject() (

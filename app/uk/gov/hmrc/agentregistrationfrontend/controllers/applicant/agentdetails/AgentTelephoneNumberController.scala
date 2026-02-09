@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendContr
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.AgentTelephoneNumberPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.agentdetails.AgentTelephoneNumberPage
 
 import javax.inject.Inject
 import javax.inject.Singleton

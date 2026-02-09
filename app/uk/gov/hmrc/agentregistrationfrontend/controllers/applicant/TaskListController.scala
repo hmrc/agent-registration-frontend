@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskStatus
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.TaskListPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.TaskListPage
 
 import javax.inject.Inject
 import javax.inject.Singleton

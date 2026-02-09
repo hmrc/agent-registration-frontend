@@ -31,9 +31,9 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.TypeOfSignInForm
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn.*
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.CreateSignInDetailsPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.SignInWithAgentDetailsPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.TypeOfSignInPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.CreateSignInDetailsPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.SignInWithAgentDetailsPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.TypeOfSignInPage
 
 import javax.inject.Inject
 import javax.inject.Singleton

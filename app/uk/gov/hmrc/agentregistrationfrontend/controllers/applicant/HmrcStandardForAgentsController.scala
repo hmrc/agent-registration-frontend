@@ -23,7 +23,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.HmrcStandardForAgentsPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.HmrcStandardForAgentsPage
 
 import javax.inject.Inject
 import javax.inject.Singleton

@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.CheckYourAnswersPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.amls.CheckYourAnswersPage
 
 @Singleton
 class CheckYourAnswersController @Inject() (

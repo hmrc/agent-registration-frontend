@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskStatus
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.DeclarationPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.DeclarationPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
