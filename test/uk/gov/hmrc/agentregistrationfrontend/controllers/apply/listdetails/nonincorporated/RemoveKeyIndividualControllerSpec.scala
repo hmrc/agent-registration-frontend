@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.noni
 
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.RemoveKeyIndividualForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec

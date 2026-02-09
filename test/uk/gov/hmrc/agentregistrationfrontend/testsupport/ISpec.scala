@@ -29,8 +29,8 @@ import play.api.test.DefaultTestServerFactory
 import play.api.test.TestServerFactory
 import play.core.server.ServerConfig
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsId
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsIdGenerator
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsIdGenerator
 import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.CsvLoader

@@ -25,7 +25,7 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.companieshouse.*
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionFormType

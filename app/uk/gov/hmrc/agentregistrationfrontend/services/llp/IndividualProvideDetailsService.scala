@@ -19,12 +19,12 @@ package uk.gov.hmrc.agentregistrationfrontend.services.llp
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsId
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualDateOfBirth
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 

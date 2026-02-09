@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
 
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualEmailLockedPage

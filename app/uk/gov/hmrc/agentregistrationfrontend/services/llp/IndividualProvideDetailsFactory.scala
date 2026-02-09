@@ -18,14 +18,14 @@ package uk.gov.hmrc.agentregistrationfrontend.services.llp
 
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsIdGenerator
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
-import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Precreated
-import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Started
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualDateOfBirth
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsIdGenerator
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Precreated
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Started
 
 import java.time.Clock
 import java.time.Instant

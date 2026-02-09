@@ -32,8 +32,8 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individua
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import com.softwaremill.quicklens.*
 import uk.gov.hmrc.agentregistration.shared.EmailAddress
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualVerifiedEmailAddress
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualVerifiedEmailAddress
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 
 import javax.inject.Inject
