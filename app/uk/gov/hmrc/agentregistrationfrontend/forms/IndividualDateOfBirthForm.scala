@@ -18,8 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.forms
 
 import play.api.data.Form
 import play.api.data.Forms.mapping
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
-import uk.gov.hmrc.agentregistration.shared.llp.UserProvidedDateOfBirth
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualDateOfBirth
+import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedDateOfBirth
 import uk.gov.hmrc.agentregistrationfrontend.forms.mappings.Mappings
 
 import java.time.Clock

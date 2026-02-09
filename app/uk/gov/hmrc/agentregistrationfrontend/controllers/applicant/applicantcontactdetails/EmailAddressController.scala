@@ -1,0 +1,205 @@
+/*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.applicantcontactdetails
+
+import com.softwaremill.quicklens.each
+import com.softwaremill.quicklens.modify
+import play.api.mvc.Action
+import play.api.mvc.AnyContent
+import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Result
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.EmailAddress
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.forms.EmailAddressForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
+import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
+import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
+import uk.gov.hmrc.agentregistrationfrontend.services.EmailVerificationService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.applicantcontactdetails.EmailAddressPage
+
+import javax.inject.Inject
+import javax.inject.Singleton
+import scala.concurrent.Future
+
+@Singleton
+class EmailAddressController @Inject() (
+  appConfig: AppConfig,
+  mcc: MessagesControllerComponents,
+  actions: ApplicantActions,
+  view: EmailAddressPage,
+  agentApplicationService: AgentApplicationService,
+  emailVerificationService: EmailVerificationService,
+  placeholder: SimplePage
+)
+extends FrontendController(mcc, actions):
+
+  private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
+    .getApplicationInProgress
+    .ensure(
+      _
+        .agentApplication
+        .applicantContactDetails
+        .exists(_.telephoneNumber.isDefined),
+      implicit request =>
+        logger.warn("Because we don't have a telephone number we are redirecting to the telephone number page")
+        Redirect(AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.show)
+    )
+
+  def show: Action[AnyContent] = baseAction:
+    implicit request =>
+      Ok(view(EmailAddressForm.form.fill(
+        request
+          .agentApplication
+          .getApplicantContactDetails
+          .applicantEmailAddress
+          .map(_.emailAddress)
+      )))
+
+  def submit: Action[AnyContent] = baseAction
+    .ensure(
+      // because we cannot store any submitted email without checking it's verified status first
+      // if user is saving and continuing then handle the submission normally else redirect to save for later
+      SubmissionHelper.getSubmitAction(_) === SaveAndContinue,
+      implicit request =>
+        Redirect(AppRoutes.apply.SaveForLaterController.show)
+    )
+    .ensureValidForm[EmailAddress](
+      form = EmailAddressForm.form,
+      resultToServeWhenFormHasErrors = implicit r => view(_)
+    )
+    .async:
+      implicit request =>
+        val emailAddress: EmailAddress = request.get
+        val updatedApplication: AgentApplication = request
+          .agentApplication
+          .modify(_.applicantContactDetails.each.applicantEmailAddress)
+          .using {
+            case Some(details) =>
+              Some(ApplicantEmailAddress(
+                emailAddress = emailAddress,
+                // avoid unsetting verified status of any unchanged email if we are not ignoring verification
+                isVerified =
+                  appConfig.ignoreEmailVerification ||
+                    (emailAddress === details.emailAddress && details.isVerified)
+              ))
+            case None =>
+              Some(ApplicantEmailAddress(
+                emailAddress = emailAddress,
+                isVerified = appConfig.ignoreEmailVerification
+              ))
+          }
+
+        agentApplicationService
+          .upsert(updatedApplication)
+          .map(_ =>
+            Redirect(
+              AppRoutes.apply.applicantcontactdetails.EmailAddressController.verify
+            )
+          )
+
+  def verify: Action[AnyContent] = actions
+    .getApplicationInProgress
+    .ensure(
+      _.agentApplication
+        .applicantContactDetails
+        .map(_.applicantEmailAddress).isDefined,
+      implicit request =>
+        logger.info("Applicant email has not been provided, redirecting to email address page")
+        Redirect(AppRoutes.apply.applicantcontactdetails.EmailAddressController.show)
+    )
+    .ensure(
+      _.agentApplication
+        .getApplicantContactDetails
+        .getApplicantEmailAddress
+        .isVerified === false,
+      implicit request =>
+        logger.info("Applicant email is already verified, redirecting to check your answers page")
+        Redirect(AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show)
+    )
+    .async:
+      implicit request =>
+        val emailToVerify =
+          request
+            .agentApplication
+            .getApplicantContactDetails
+            .getApplicantEmailAddress
+            .emailAddress
+            .value
+        val credId = request.credentials.providerId
+        emailVerificationService.checkEmailVerificationStatus(
+          credId = credId,
+          email = emailToVerify
+        ).flatMap {
+          case EmailVerificationStatus.Verified =>
+            logger.info(s"[checkEmailVerificationStatus] Verified status received for applicantEmail using credId $credId and email $emailToVerify")
+            onEmailVerified()
+          case EmailVerificationStatus.Unverified =>
+            logger.info(s"[checkEmailVerificationStatus] Unverified status received for applicantEmail using credId $credId and email $emailToVerify")
+            onEmailUnverified(credId, emailToVerify)
+          case EmailVerificationStatus.Locked =>
+            logger.info(s"[checkEmailVerificationStatus] Locked status received for applicantEmail using credId $credId and email $emailToVerify")
+            onEmailLocked()
+          case EmailVerificationStatus.Error =>
+            logger.info(s"[checkEmailVerificationStatus] Error received for applicantEmail using credId $credId and email $emailToVerify")
+            onEmailError()
+        }
+
+  private def onEmailVerified()(implicit request: RequestWithApplication): Future[Result] =
+    val updatedApplication = request
+      .agentApplication
+      .modify(
+        _.applicantContactDetails
+          .each.applicantEmailAddress
+          .each.isVerified
+      )
+      .setTo(true)
+    agentApplicationService.upsert(updatedApplication).map { _ =>
+      logger.info("Applicant email status reported as verified, redirecting to check your answers page")
+      Redirect(AppRoutes.apply.applicantcontactdetails.CheckYourAnswersController.show)
+    }
+
+  private def onEmailUnverified(
+    credId: String,
+    emailToVerify: String
+  )(implicit request: RequestWithApplication): Future[Result] = emailVerificationService.verifyEmail(
+    credId = credId,
+    maybeEmail = Some(
+      Email(
+        address = emailToVerify,
+        enterUrl = appConfig.thisFrontendBaseUrl + AppRoutes.apply.applicantcontactdetails.EmailAddressController.show.url
+      )
+    ),
+    continueUrl = appConfig.thisFrontendBaseUrl + AppRoutes.apply.applicantcontactdetails.EmailAddressController.verify.url,
+    maybeBackUrl = None,
+    accessibilityStatementUrl = appConfig.accessibilityStatementPath,
+    lang = messagesApi.preferred(request).lang.code
+  )
+
+  private def onEmailLocked()(implicit request: RequestWithApplication): Future[Result] = Future.successful(
+    Ok(placeholder(h1 = "Email address locked", bodyText = Some("placeholder for Your email address has been locked")))
+  )
+
+  private def onEmailError()(implicit request: RequestWithApplication): Future[Result] = Future.successful(
+    Ok(placeholder(h1 = "Email address verification error", bodyText = Some("placeholder for error during email verification")))
+  )

@@ -19,12 +19,12 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.providedetail
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseMatch
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualNino
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualVerifiedEmailAddress
-import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Finished
-import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState.Started
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualVerifiedEmailAddress
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Started
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
 trait TdIndividualProvidedDetails { dependencies: (TdBase) =>

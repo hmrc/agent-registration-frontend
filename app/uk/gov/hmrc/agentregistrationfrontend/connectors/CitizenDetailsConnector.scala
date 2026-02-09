@@ -20,7 +20,7 @@ import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.citizendetails.CitizenDetails
-import uk.gov.hmrc.agentregistrationfrontend.model.llp.DesignatoryDetailsResponse
+import uk.gov.hmrc.agentregistrationfrontend.model.citizendetails.DesignatoryDetailsResponse
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import java.time.LocalDate

@@ -52,5 +52,4 @@ extends TdBase,
   agentapplication.sections.TdSectionAgentDetails,
   agentapplication.sections.TdUpload,
   agentapplication.sections.TdSectionAmls,
-  providedetails.individual.TdIndividualProvidedDetails,
-  providedetails.TdProvideDetailsRequest
+  providedetails.individual.TdIndividualProvidedDetails
