@@ -23,9 +23,9 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
 import uk.gov.hmrc.agentregistration.shared.util.SealedObjects
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions.DataWithAuth
-import uk.gov.hmrc.agentregistrationfrontend.action.applicant.AuthorisedActionRefiner
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithAuth
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection
@@ -126,7 +126,7 @@ object FastForwardController:
 class FastForwardController @Inject() (
   mcc: MessagesControllerComponents,
   applicantActions: ApplicantActions,
-  authorisedActionRefiner: AuthorisedActionRefiner,
+  applicantAuthRefiner: ApplicantAuthRefiner,
   applicationService: AgentApplicationService,
   fastForwardPage: FastForwardPage,
   agentApplicationIdGenerator: AgentApplicationIdGenerator,
@@ -141,7 +141,7 @@ extends FrontendController(mcc, applicantActions):
     implicit request =>
       Ok(fastForwardPage())
 
-  private def loginAndRetry(using request: Request[AnyContent]): Future[Either[Result, RequestWithAuth]] = stubUserService.createAndLoginAgent.map: stubsHc =>
+  private def loginAndRetry(using request: Request[AnyContent]): Future[Result | RequestWithAuth] = stubUserService.createAndLoginAgent.map: stubsHc =>
     val bearerToken: String = stubsHc.authorization
       .map(_.value)
       .getOrThrowExpectedDataMissing("Expected auth token in stubs HeaderCarrier")
@@ -150,19 +150,19 @@ extends FrontendController(mcc, applicantActions):
       .map(_.value)
       .getOrThrowExpectedDataMissing("Expected sessionId in stubs HeaderCarrier")
 
-    Left(
-      Redirect(request.uri).addingToSession(
-        SessionKeys.authToken -> bearerToken,
-        SessionKeys.sessionId -> sessionId
-      )
+    Redirect(request.uri).addingToSession(
+      SessionKeys.authToken -> bearerToken,
+      SessionKeys.sessionId -> sessionId
     )
 
-  private val authorisedOrCreateAndLoginAgent: ActionBuilderWithData[DataWithAuth] = applicantActions.action.refineAsync:
+  private val authorisedOrCreateAndLoginAgent: ActionBuilderWithData[DataWithAuth] = applicantActions.action.refine:
     implicit request =>
-      authorisedActionRefiner.refine(request).flatMap:
-        case Right(authorisedRequest) => Future.successful(Right(authorisedRequest))
+      applicantAuthRefiner.refine(request).flatMap:
+        case Right(authorisedRequest) => Future.successful(authorisedRequest)
+
         case Left(result) if result.header.status === SEE_OTHER => loginAndRetry
-        case Left(result) => Future.successful(Left(result))
+
+        case Left(result) => Future.successful(result)
 
   def fastForward(
     completedSection: CompletedSection
