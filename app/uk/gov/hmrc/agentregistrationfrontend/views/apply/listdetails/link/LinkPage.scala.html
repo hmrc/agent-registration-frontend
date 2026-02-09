@@ -1,0 +1,97 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+@import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.components.CopyButton
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.partials.ContinueOrSaveForLater
+@import views.html.helper.CSPNonce
+
+@this(
+        appConfig: AppConfig,
+        layout: Layout,
+        govukPanel: GovukPanel,
+        copyButton: CopyButton,
+        govukDetails: GovukDetails,
+        continueOrSaveForLater: ContinueOrSaveForLater,
+        formWithCSRF: FormWithCSRF
+)
+
+@(
+        agentApplication: AgentApplication,
+        existingList: List[IndividualProvidedDetails])(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{"link"}
+@pageTitle = @{messages(s"$key.title")}
+@provideDetailsLink = @{appConfig.applicationLink(agentApplication.linkId.value).toString}
+@templateScripts = {
+  <script src="@{controllers.routes.Assets.versioned("javascripts/copy-button.js")}" @{CSPNonce.attr}></script>
+}
+@businessTypeKey = @{agentApplication match {
+  case _: AgentApplication.IsSoleTrader => "SoleTrader"
+  case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
+  case _: AgentApplication.IsPartnership => "Partnership"
+  case _: AgentApplication.IsIncorporated => "LimitedCompany"
+}}
+@templateStyles = {
+  <link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/copy-button.css")}" @{CSPNonce.attr}>
+}
+@detailsContent = {
+  <p class="govuk-body">@messages(s"$key.details.p1")</p>
+  <ul class="govuk-list govuk-list--bullet">
+    @existingList.map { individual =>
+      <li>@{individual.individualName.value}</li>
+    }
+  </ul>
+}
+@layout(
+    pageTitle = pageTitle,
+    templateScripts = Some(templateScripts),
+    templateStyles = Some(templateStyles)
+) {
+  <h2 class="govuk-caption-l">@messages(s"lists.caption.title.$businessTypeKey")</h2>
+  <h1 class="govuk-heading-l">@pageTitle</h1>
+  <p class="govuk-body">
+    @{messages(s"$key.p1")}
+  </p>
+  <p class="govuk-body">
+    @{messages(s"$key.p2")}
+  </p>
+  <p class="govuk-body govuk-!-font-weight-bold">@provideDetailsLink</p>
+  @copyButton(clip = provideDetailsLink)
+  @govukDetails(Details(
+    summary = Text(messages(s"$key.details.summary")),
+    content = HtmlContent(detailsContent)
+  ))
+  <p class="govuk-body">
+    @{messages(s"$key.p3")}
+  </p>
+
+  @formWithCSRF(action = AppRoutes.apply.listdetails.link.LinkController.submit) {
+
+    @continueOrSaveForLater(
+      continueLabel = Some(messages("common.confirmAndContinue"))
+    )
+
+  }
+
+}

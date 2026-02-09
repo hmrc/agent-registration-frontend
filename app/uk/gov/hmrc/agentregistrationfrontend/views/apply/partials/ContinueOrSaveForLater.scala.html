@@ -21,12 +21,12 @@
     govukButton: GovukButton
 )
 
-@()(implicit messages: Messages)
+@(continueLabel: Option[String] = None)(implicit messages: Messages)
 
 @govukButton(Button(
     name = Some("submit"),
     value = Some(SaveAndContinue.toString),
-    content = Text(messages("common.saveAndContinue")),
+    content = Text(continueLabel.getOrElse(messages("common.saveAndContinue"))),
     classes = "govuk-!-margin-right-3"
 ))
 

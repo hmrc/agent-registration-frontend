@@ -164,7 +164,7 @@
                       content = Text(messages(s"$key.lists.share.linkText.$businessTypeKey"))
                   ),
                   status = listShareStatus,
-                  href = if(taskListStatus.listShare.canStart) Some("#") else None
+                  href = if(taskListStatus.listShare.canStart) Some(AppRoutes.apply.listdetails.link.LinkController.show.url) else None
               ),
               TaskListItem(
                   title = TaskListItemTitle(
