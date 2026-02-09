@@ -14,37 +14,49 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual
+package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
-import com.softwaremill.quicklens.*
-import play.api.libs.json.Json
+import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.FrontendController
+
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualHmrcStandardForAgentsPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TestOnlyController @Inject() (
+class IndividualHmrcStandardForAgentsController @Inject() (
   mcc: MessagesControllerComponents,
   actions: IndividualActions,
+  view: IndividualHmrcStandardForAgentsPage,
   individualProvideDetailsService: IndividualProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
-  def showProvidedDetails: Action[AnyContent] = getProvidedDetails: request =>
-    Ok(Json.prettyPrint(Json.toJson(request.individualProvidedDetails)))
+  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions
+    .getProvideDetailsInProgress
+    .ensure(
+      _.individualProvidedDetails.individualSaUtr.isDefined,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.IndividualSaUtrController.show)
+    )
 
-  def removeNinoAndDobFromIndividual(): Action[AnyContent] = getProvidedDetails
+  def show: Action[AnyContent] = baseAction:
+    implicit request =>
+      Ok(view())
+
+  def submit: Action[AnyContent] = baseAction
     .async:
       implicit request =>
-        val updatedDetails = request.individualProvidedDetails
-          .modify(_.individualNino).setTo(None)
-          .modify(_.individualDateOfBirth).setTo(None)
         individualProvideDetailsService
-          .upsert(updatedDetails)
-          .map(_ => Ok("NINO and DOB removed from Individual Provided Details"))
+          .upsert(
+            request.individualProvidedDetails
+              .modify(_.hmrcStandardForAgentsAgreed)
+              .setTo(StateOfAgreement.Agreed)
+          ).map: _ =>
+            Redirect(AppRoutes.providedetails.CheckYourAnswersController.show)

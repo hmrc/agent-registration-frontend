@@ -31,8 +31,8 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.nonin
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.otherrelevantindividuals.routes as listdetailsOthersRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes as internalRoutes
 
-import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.routes as providedetailsRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.internal.routes as internalProviDedetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.routes as providedetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.internal.routes as internalProviDedetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.routes as testOnlyRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.routes as testOnlyApplicantRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.routes as testOnlyIndividualRoutes
