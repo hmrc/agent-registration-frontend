@@ -20,16 +20,14 @@ import com.softwaremill.quicklens.each
 import com.softwaremill.quicklens.modify
 import play.api.data.Form
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.RequestHeader
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.companieshouse.*
+import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
-
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionFormType
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms.toOfficerSelection
@@ -59,46 +57,59 @@ class CompaniesHouseMatchingController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions
-    .DELETEMEgetProvideDetailsInProgress
+  private type Officers = Seq[CompaniesHouseOfficer]
+  private type Data =
+    ChOfficerSelectionFormType
+      *: Officers
+      *: IndividualProvidedDetailsToBeDeleted
+      *: DataWithAuth
+
+  private val baseAction: ActionBuilderWithData[
+    Officers
+      *: IndividualProvidedDetailsToBeDeleted
+      *: DataWithAuth
+  ] = actions
+    .getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.companiesHouseMatch.isDefined,
       implicit request =>
         logger.info("Redirecting to individual name page due to missing memberNameQuery value")
         Redirect(AppRoutes.providedetails.CompaniesHouseNameQueryController.show)
     )
+    .refine:
+      implicit request =>
+        fetchOfficers(request.individualProvidedDetails).map(request.add)
 
-  def show: Action[AnyContent] = baseAction
-    .async:
-      implicit request: IndividualProvideDetailsRequest[AnyContent] =>
-        fetchOfficers.map:
-          case Nil =>
-            logger.info("No Companies House officers found matching individual name query, rendering noMemberNameMatchesView")
-            Ok(noIndividualNameMatchesView(
-              h1 = "No member name matches",
-              bodyText = Some("placeholder for no matches")
-            ))
+  def show: Action[AnyContent] = baseAction:
+    implicit request =>
+      request.get[Officers] match
+        case Nil =>
+          logger.info("No Companies House officers found matching individual name query, rendering noMemberNameMatchesView")
+          Ok(noIndividualNameMatchesView(
+            h1 = "No member name matches",
+            bodyText = Some("placeholder for no matches")
+          ))
 
-          case officer :: Nil =>
-            logger.info(s"Found one Companies House officer matching individual name query, rendering matchedMemberView")
-            val form = ChOfficerSelectionForms.yesNoForm
+        case officer :: Nil =>
+          logger.info(s"Found one Companies House officer matching individual name query, rendering matchedMemberView")
+          val form = ChOfficerSelectionForms.yesNoForm
+            .fill(request.individualProvidedDetails
+              .getCompaniesHouseMatch
+              .companiesHouseOfficer
+              .filter(_ === officer).map(_ => YesNo.Yes))
+          Ok(matchedIndividualView(form, officer))
+
+        case officers: Seq[CompaniesHouseOfficer] =>
+          logger.info(s"Found ${officers.size} Companies House officers matching individual name query, rendering matchedMembersView")
+          Ok(matchedIndividualsView(
+            form = ChOfficerSelectionForms
+              .officerSelectionForm(officers)
               .fill(request.individualProvidedDetails
                 .getCompaniesHouseMatch
                 .companiesHouseOfficer
-                .filter(_ === officer).map(_ => YesNo.Yes))
-            Ok(matchedIndividualView(form, officer))
-
-          case officers: Seq[CompaniesHouseOfficer] =>
-            logger.info(s"Found ${officers.size} Companies House officers matching individual name query, rendering matchedMembersView")
-            Ok(matchedIndividualsView(
-              form = ChOfficerSelectionForms
-                .officerSelectionForm(officers)
-                .fill(request.individualProvidedDetails
-                  .getCompaniesHouseMatch
-                  .companiesHouseOfficer
-                  .map(_.toOfficerSelection)),
-              officers = officers
-            ))
+                .map(_.toOfficerSelection)),
+            officers = officers
+          ))
 
   def submit: Action[AnyContent] = baseAction
     .ensureValidForm[ChOfficerSelectionFormType](
@@ -106,13 +117,13 @@ extends FrontendController(mcc, actions):
       implicit request => formWithErrors => Errors.throwBadRequestException(s"Unexpected errors in the FormType: $formWithErrors")
     )
     .async:
-      implicit request: (IndividualProvideDetailsRequest[AnyContent] & FormValue[ChOfficerSelectionFormType]) =>
-        request.formValue match {
-          case ChOfficerSelectionFormType.YesNoForm => handleYesNoForm
-          case ChOfficerSelectionFormType.OfficerSelectionForm => handleOfficerSelectionForm
-        }
+      implicit request: (RequestWithData[Data]) =>
+        request.get[ChOfficerSelectionFormType] match
+          case ChOfficerSelectionFormType.YesNoForm => handleYesNoForm()
+          case ChOfficerSelectionFormType.OfficerSelectionForm => handleOfficerSelectionForm()
 
-  def handleYesNoForm(using request: IndividualProvideDetailsRequest[?]): Future[Result] = fetchOfficers.flatMap: officers =>
+  private def handleYesNoForm()(using request: RequestWithData[Data]): Future[Result] =
+    val officers: Officers = request.get[Officers]
     val officer: CompaniesHouseOfficer = officers
       .headOption
       .getOrThrowExpectedDataMissing(
@@ -129,7 +140,8 @@ extends FrontendController(mcc, actions):
           )
     )
 
-  def handleOfficerSelectionForm(using request: IndividualProvideDetailsRequest[?]): Future[Result] = fetchOfficers.flatMap: officers =>
+  private def handleOfficerSelectionForm()(using request: RequestWithData[Data]): Future[Result] =
+    val officers = request.get[Officers]
     Errors.require(officers.size > 1, s"Unexpected response from companies house, expected more then 1 officer but got: ${officers.size}")
 
     ChOfficerSelectionForms
@@ -145,10 +157,10 @@ extends FrontendController(mcc, actions):
             updateProvidedDetails(officer)
       )
 
-  private def fetchOfficers(using request: IndividualProvideDetailsRequest[?]): Future[Seq[CompaniesHouseOfficer]] =
-    for {
+  private def fetchOfficers(individualProvidedDetails: IndividualProvidedDetailsToBeDeleted)(using request: RequestHeader): Future[Officers] =
+    for
       agentApplication <- agentApplicationService
-        .find(request.individualProvidedDetails.agentApplicationId) // starting to think it may be better to have the application in the request
+        .find(individualProvidedDetails.agentApplicationId) // starting to think it may be better to have the application in the request
       officers <- companiesHouseService.getLlpOfficers(
         companyRegistrationNumber =
           agentApplication
@@ -156,18 +168,17 @@ extends FrontendController(mcc, actions):
             .asLlpApplication
             .getCrn,
         lastName =
-          request.individualProvidedDetails.companiesHouseMatch
+          individualProvidedDetails.companiesHouseMatch
             .getOrThrowExpectedDataMissing("Companies House match is not defined")
             .memberNameQuery
             .lastName
       )
-    } yield officers
+    yield officers
 
-  private def updateProvidedDetails(
-    officer: CompaniesHouseOfficer
-  )(using request: IndividualProvideDetailsRequest[?]): Future[Result] = individualProvideDetailsService
+  private def updateProvidedDetails(officer: CompaniesHouseOfficer)(using request: RequestWithData[Data]): Future[Result] = individualProvideDetailsService
     .upsert(
-      individualProvidedDetails = request.individualProvidedDetails
+      individualProvidedDetails = request
+        .individualProvidedDetails
         .modify(_.companiesHouseMatch.each.companiesHouseOfficer)
         .setTo(Some(officer))
     )

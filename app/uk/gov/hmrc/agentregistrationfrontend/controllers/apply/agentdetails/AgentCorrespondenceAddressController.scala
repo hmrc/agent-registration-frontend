@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.DesBusinessAddress
 import uk.gov.hmrc.agentregistration.shared.getCompanyProfile
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AddressLookupFrontendConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
@@ -88,7 +88,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater4[String](
+      .ensureValidFormAndRedirectIfSaveForLater[String](
         form = AgentCorrespondenceAddressForm.form,
         resultToServeWhenFormHasErrors =
           implicit request =>
@@ -105,7 +105,7 @@ extends FrontendController(mcc, actions):
       )
       .async:
         implicit request =>
-          val addressOption: String = request.get[String]
+          val addressOption: String = request.get
           if addressOption.matches("other")
           then
             addressLookUpConnector

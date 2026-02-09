@@ -18,15 +18,12 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.llp.UserProvidedDateOfBirth
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualDateOfBirthForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
@@ -45,7 +42,7 @@ class IndividualDateOfBirthController @Inject() (
 )(using clock: Clock)
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions.DELETEMEgetProvideDetailsInProgress
+  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions.getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.emailAddress.isDefined,
       implicit request =>
@@ -79,8 +76,8 @@ extends FrontendController(mcc, actions):
       implicit r => view(_)
     )
     .async:
-      implicit request: (IndividualProvideDetailsRequest[AnyContent] & FormValue[UserProvidedDateOfBirth]) =>
-        val validFormData: IndividualDateOfBirth = request.formValue
+      implicit request =>
+        val validFormData: UserProvidedDateOfBirth = request.get
         val updatedApplication: IndividualProvidedDetailsToBeDeleted = request
           .individualProvidedDetails
           .modify(_.individualDateOfBirth)

@@ -11,6 +11,7 @@ common.errorPrefix = Error
 common.or = or
 common.dobPrefix = Date of birth
 common.change = Change
+common.remove = Remove
 common.warning = Warning
 common.yes = Yes
 common.no = No
@@ -342,6 +343,28 @@ individualName.complex.details.bullet1 = material responsibility for tax advice 
 individualName.complex.details.bullet2 = significant authority over HMRC interactions
 individualName.error.required = Enter the full name of the partner
 individualName.error.invalid = The partner’s name must only include letters a to z, hyphens, apostrophes and spaces
+
+addToListSummary.Partnership.title.plural = You have added {0} partners
+addToListSummary.Partnership.title.singular = You have added {0} partner
+addToListSummary.Partnership.changeNumber = Change number of partners
+addToListSummary.Partnership.insetText.singular = You need to tell us about 1 more partner
+addToListSummary.Partnership.insetText.plural = You need to tell us about {0} more partners
+
+removeKeyIndividual.title = Confirm that you want to remove {0} from the list of partners
+removeKeyIndividual.Yes = Yes
+removeKeyIndividual.No = No
+removeKeyIndividual.error.required = Select yes if you want to remove {0} from the list of partners
+
+addToListSummary.Partnership.addAnotherPartner = Add another partner
+addToListSummary.Partnership.removeExtra.span1.plural = You told us there are {0} partners.
+addToListSummary.Partnership.removeExtra.span1.singular = You told us there is 1 partner.
+addToListSummary.Partnership.removeExtra.span2.plural = Change the number of partners or remove {0} partners from the list before you continue.
+addToListSummary.Partnership.removeExtra.span2.singular = Change the number of partners or remove 1 partner from the list before you continue.
+addToListSummary.Partnership.complex.intro = We need the names of:
+addToListSummary.Partnership.complex.bullet1.plural = the {0} partners responsible for tax advice
+addToListSummary.Partnership.complex.bullet1.singular = the partner responsible for tax advice
+addToListSummary.Partnership.complex.bullet2.plural = {0} other partners
+addToListSummary.Partnership.complex.bullet2.singular = 1 other partner
 
 # Apply / Declaration
 declaration.title = Declaration

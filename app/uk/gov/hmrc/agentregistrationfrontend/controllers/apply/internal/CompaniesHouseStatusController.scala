@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.connectors.CompaniesHouseApiProxyCo
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -44,14 +44,14 @@ extends FrontendController(mcc, actions):
 
   def check(): Action[AnyContent] = actions
     .getApplicationInProgress
-    .refine4(implicit request =>
+    .refine(implicit request =>
       request.agentApplication match
         case a: IsIncorporated => request.replace[AgentApplication, IsIncorporated](a)
         case a: IsNotIncorporated =>
           logger.debug("No Companies House check required for non-incorporated business types, redirecting to task list.")
           Redirect(AppRoutes.apply.TaskListController.show)
     )
-    .ensure4(
+    .ensure(
       condition = _.get[IsIncorporated].isCompanyStatusCheckRequired,
       resultWhenConditionNotMet =
         implicit request =>

@@ -35,7 +35,8 @@
         form: Form[IndividualName],
         ordinalKey: String,
         numberOfRequiredKeyIndividuals: SixOrMore,
-        entityName: String)(implicit
+        entityName: String,
+        formAction: Call)(implicit
         request: RequestHeader,
         messages: Messages
 )
@@ -52,7 +53,7 @@
   </ul>
 }
 @numberOfKeyIndividuals = @{numberOfRequiredKeyIndividuals.numberOfKeyIndividualsResponsibleForTaxMatters}
-@paddingRequired = @{numberOfRequiredKeyIndividuals.paddingRequired}
+@paddingRequired = @{numberOfRequiredKeyIndividuals.requiredPadding}
 
 @layout(
     pageTitle = title,
@@ -69,7 +70,7 @@
     summary = Text(messages(s"$key.complex.details")),
     content = HtmlContent(detailsContent)
   ))
-  @formWithCSRF(action = AppRoutes.apply.listdetails.EnterKeyIndividualController.submit) {
+  @formWithCSRF(action = formAction) {
     @govukInput(Input(
       label = Label(
         content = Text(messages(s"$key.label.$ordinalKey")),

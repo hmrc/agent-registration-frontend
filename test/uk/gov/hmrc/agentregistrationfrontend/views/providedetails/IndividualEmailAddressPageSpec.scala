@@ -18,9 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.api.mvc.AnyContent
+
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
+
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -34,10 +34,6 @@ extends ViewSpec:
   private object memberProvidedDetails:
 
     val beforeEmailAddressProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterTelephoneNumberProvided
-
-  given individualProvideDetailsRequest: IndividualProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(
-    memberProvidedDetails.beforeEmailAddressProvided
-  )
 
   val doc: Document = Jsoup.parse(viewTemplate(IndividualEmailAddressForm.form).body)
   private val heading: String = "What is your email address?"

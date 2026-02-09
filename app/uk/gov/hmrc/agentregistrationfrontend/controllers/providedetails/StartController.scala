@@ -24,7 +24,7 @@ import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.LinkId
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
@@ -43,9 +43,10 @@ class StartController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def start(linkId: LinkId): Action[AnyContent] = Action
+  def start(linkId: LinkId): Action[AnyContent] = actions
+    .action
     .async:
-      implicit request: RequestHeader =>
+      implicit request =>
         val genericExitPageUrl: String = AppRoutes.apply.AgentApplicationController.genericExitPage.url
         applicationService.find(linkId).map {
           case Some(app) if app.hasFinished => startPageForApplicationType(app)

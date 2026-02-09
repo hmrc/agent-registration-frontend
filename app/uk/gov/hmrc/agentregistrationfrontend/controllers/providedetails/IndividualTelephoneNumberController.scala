@@ -17,16 +17,13 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualTelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualTelephoneNumberPage
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
@@ -43,8 +40,8 @@ class IndividualTelephoneNumberController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsRequest, AnyContent] = actions
-    .DELETEMEgetProvideDetailsInProgress
+  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions
+    .getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.companiesHouseMatch.nonEmpty, // TODO: Add check for companies house details
       implicit request =>
@@ -57,8 +54,8 @@ extends FrontendController(mcc, actions):
       implicit r => view(_)
     )
     .async:
-      implicit request: (IndividualProvideDetailsRequest[AnyContent] & FormValue[TelephoneNumber]) =>
-        val telephoneNumberFromForm: TelephoneNumber = request.formValue
+      implicit request =>
+        val telephoneNumberFromForm: TelephoneNumber = request.get
         val updatedProvidedDetails: IndividualProvidedDetailsToBeDeleted = request
           .individualProvidedDetails
           .modify(_.telephoneNumber)

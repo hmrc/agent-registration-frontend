@@ -21,20 +21,20 @@ import play.api.mvc.Result
 import play.api.mvc.Results.*
 import play.api.test.Helpers.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions.RequestWithData
-import ApplicantActions.DataWithAuth
-import uk.gov.hmrc.agentregistrationfrontend.action.applicant.AuthorisedActionRefiner
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithAuth
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
 import scala.concurrent.Future
 
-class AuthorisedActionRefinerSpec
+class ApplicantAuthRefinerSpec
 extends ISpec:
 
   "when User is not logged in (request comes without authorisation in the session) action redirects to login url" in:
-    val authorisedActionRefiner: AuthorisedActionRefiner = app.injector.instanceOf[AuthorisedActionRefiner]
+    val authRefiner: ApplicantAuthRefiner = app.injector.instanceOf[ApplicantAuthRefiner]
     val notLoggedInRequest: RequestWithData[EmptyTuple] = tdAll.requestNotLoggedIn
-    authorisedActionRefiner
+    authRefiner
       .refine(notLoggedInRequest)
       .futureValue
       .left
@@ -44,7 +44,7 @@ extends ISpec:
     AuthStubs.verifyAuthorise(0)
 
   "Credential role must be User or Admin or else the action returns Unahtorised View" in:
-    val authorisedActionRefiner: AuthorisedActionRefiner = app.injector.instanceOf[AuthorisedActionRefiner]
+    val authRefiner: ApplicantAuthRefiner = app.injector.instanceOf[ApplicantAuthRefiner]
     val credentialRoleNotUserNorAdmin = "Assistant"
     AuthStubs.stubAuthorise(
       responseBody =
@@ -62,7 +62,7 @@ extends ISpec:
     )
 
     val result: Result =
-      authorisedActionRefiner
+      authRefiner
         .refine(tdAll.requestLoggedIn)
         .futureValue
         .left
@@ -72,7 +72,7 @@ extends ISpec:
     AuthStubs.verifyAuthorise()
 
   "active HMRC-AS-AGENT enrolment MUST NOT be assigned to user or else the action redirects to ASA Dashboard" in:
-    val authorisedActionRefiner: AuthorisedActionRefiner = app.injector.instanceOf[AuthorisedActionRefiner]
+    val authRefiner: ApplicantAuthRefiner = app.injector.instanceOf[ApplicantAuthRefiner]
     AuthStubs.stubAuthorise(
       responseBody =
         // language=JSON
@@ -99,15 +99,15 @@ extends ISpec:
            |""".stripMargin
     )
 
-    val result: Result = authorisedActionRefiner.refine(tdAll.requestLoggedIn).futureValue.left.value
+    val result: Result = authRefiner.refine(tdAll.requestLoggedIn).futureValue.left.value
     result shouldBe Redirect("http://localhost:9437/agent-services-account/home")
     AuthStubs.verifyAuthorise()
 
   "successfully authorise when user is logged in, credentialRole is User/Admin, and no active HMRC-AS-AGENT enrolment" in:
-    val authorisedActionRefiner: AuthorisedActionRefiner = app.injector.instanceOf[AuthorisedActionRefiner]
+    val authRefiner: ApplicantAuthRefiner = app.injector.instanceOf[ApplicantAuthRefiner]
     AuthStubs.stubAuthorise()
     val requestWithAuth: RequestWithData[DataWithAuth] =
-      authorisedActionRefiner
+      authRefiner
         .refine(tdAll.requestLoggedIn)
         .futureValue
         .value

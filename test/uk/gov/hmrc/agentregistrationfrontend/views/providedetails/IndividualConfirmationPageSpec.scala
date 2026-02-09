@@ -18,8 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
+
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualConfirmationPage
 
@@ -27,9 +26,6 @@ class IndividualConfirmationPageSpec
 extends ViewSpec:
 
   val viewTemplate: IndividualConfirmationPage = app.injector.instanceOf[IndividualConfirmationPage]
-  implicit val individualProvideDetailsRequest: IndividualProvideDetailsRequest[AnyContent] = tdAll.makeProvideDetailsRequest(
-    individualProvidedDetails = tdAll.providedDetailsLlp.afterHmrcStandardforAgentsAgreed
-  )
   val doc: Document = Jsoup.parse(
     viewTemplate(applicantName = "Test Applicant", companyName = "Test Company Name").body
   )

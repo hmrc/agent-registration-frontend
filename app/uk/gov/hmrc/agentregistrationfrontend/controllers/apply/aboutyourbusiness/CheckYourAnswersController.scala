@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.aboutyourbusiness.CheckYourAnswersPage
@@ -42,7 +42,7 @@ extends FrontendController(mcc, actions):
   // this CYA page is only viewable once business details have been captured from GRS, the task list provides a link
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .getApplicationInProgress
-    .ensure4(
+    .ensure(
       _.get[AgentApplication].applicationState === ApplicationState.GrsDataReceived,
       implicit request =>
         logger.warn("Because we don't have business details we are redirecting to where they can be captured")
@@ -50,7 +50,7 @@ extends FrontendController(mcc, actions):
     )
 
   def show: Action[AnyContent] = baseAction
-    .refine4:
+    .refine:
       implicit request =>
         businessPartnerRecordService
           .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)

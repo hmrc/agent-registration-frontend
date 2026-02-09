@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.hasCheckPassed
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskStatus
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.TaskListPage
@@ -42,14 +42,14 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
     .getApplicationInProgress
-    .ensure4(
+    .ensure(
       condition = _.agentApplication.isGrsDataReceived,
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Missing data from GRS, redirecting to start GRS registration")
           Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
     )
-    .ensure4(
+    .ensure(
       condition = _.agentApplication.hasCheckPassed,
       resultWhenConditionNotMet =
         implicit request =>

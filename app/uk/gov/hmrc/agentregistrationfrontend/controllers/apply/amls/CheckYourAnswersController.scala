@@ -23,7 +23,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.amls.CheckYourAnswersPage
 
@@ -38,7 +38,7 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] =
     actions
       .getApplicationInProgress
-      .ensure4(
+      .ensure(
         r => r.agentApplication.amlsDetails.exists(_.isComplete),
         implicit request =>
           logger.warn(s"Cannot display Check Your Answers page - incomplete AMLS details.")

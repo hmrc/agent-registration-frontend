@@ -23,9 +23,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseMatch
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsWithApplicationRequest
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -47,7 +45,7 @@ class CompaniesHouseNameQueryController @Inject() (
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
-    .DELETEMEgetProvideDetailsInProgress
+    .getProvideDetailsInProgress
     .async:
       implicit request =>
         agentApplicationService
@@ -72,10 +70,10 @@ extends FrontendController(mcc, actions):
               Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
 
   def submit: Action[AnyContent] = actions
-    .DELETEMEgetProvideDetailsWithApplicationInProgress
+    .getProvideDetailsWithApplicationInProgress
     .ensureValidForm[CompaniesHouseNameQuery](
       form = CompaniesHouseNameQueryForm.form,
-      viewToServeWhenFormHasErrors =
+      resultToServeWhenFormHasErrors =
         implicit request =>
           formWithErrors =>
             view(
@@ -84,8 +82,8 @@ extends FrontendController(mcc, actions):
             )
     )
     .async:
-      implicit request: (IndividualProvideDetailsWithApplicationRequest[AnyContent] & FormValue[CompaniesHouseNameQuery]) =>
-        val companiesHouseNameQuery: CompaniesHouseNameQuery = request.formValue
+      implicit request =>
+        val companiesHouseNameQuery: CompaniesHouseNameQuery = request.get
         val hasChanged: Boolean =
           request.individualProvidedDetails
             .companiesHouseMatch

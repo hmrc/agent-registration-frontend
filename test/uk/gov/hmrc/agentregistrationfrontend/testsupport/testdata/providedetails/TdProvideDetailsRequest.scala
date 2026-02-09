@@ -16,21 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.providedetails
 
-import play.api.mvc.AnyContent
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdRequest
 
 trait TdProvideDetailsRequest {
   dependencies: (TdBase & TdRequest) =>
-
-  def makeProvideDetailsRequest(individualProvidedDetails: IndividualProvidedDetailsToBeDeleted): IndividualProvideDetailsRequest[AnyContent] =
-    new IndividualProvideDetailsRequest(
-      request = dependencies.deleteMerequestLoggedIn,
-      individualProvidedDetails = individualProvidedDetails,
-      internalUserId = dependencies.internalUserId,
-      credentials = dependencies.credentials
-    )
 
 }

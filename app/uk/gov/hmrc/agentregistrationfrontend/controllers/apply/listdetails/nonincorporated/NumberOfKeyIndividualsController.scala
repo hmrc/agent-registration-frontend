@@ -23,12 +23,12 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationF
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.NumberOfKeyIndividualsPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.nonincorporated.NumberOfKeyIndividualsPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -47,7 +47,7 @@ extends FrontendController(mcc, actions):
     IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
   ] = actions
     .getApplicationInProgress
-    .refine4:
+    .refine:
       implicit request =>
         request.agentApplication match
           case _: AgentApplication.IsIncorporated =>
@@ -83,7 +83,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater4[NumberOfRequiredKeyIndividuals](
+      .ensureValidFormAndRedirectIfSaveForLater[NumberOfRequiredKeyIndividuals](
         form = NumberOfKeyIndividualsForm.form,
         resultToServeWhenFormHasErrors =
           implicit request =>
@@ -105,7 +105,7 @@ extends FrontendController(mcc, actions):
       )
       .async:
         implicit request =>
-          val numberOfRequiredKeyIndividuals: NumberOfRequiredKeyIndividuals = request.get
+          val numberOfRequiredKeyIndividuals: NumberOfRequiredKeyIndividuals = request.get[NumberOfRequiredKeyIndividuals]
           val updatedApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals =
             request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals] match
               case application: AgentApplicationScottishPartnership =>
@@ -120,5 +120,5 @@ extends FrontendController(mcc, actions):
           agentApplicationService
             .upsert(updatedApplication)
             .map: _ =>
-              Redirect(AppRoutes.apply.listdetails.EnterKeyIndividualController.show.url)
+              Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater

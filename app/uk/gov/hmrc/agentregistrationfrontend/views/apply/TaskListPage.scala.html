@@ -157,7 +157,7 @@
                       content = Text(messages(s"$key.lists.details.linkText.$businessTypeKey"))
                   ),
                   status = if(taskListStatus.listDetails.isComplete) complete else incomplete,
-                  href = Some(AppRoutes.apply.listdetails.NumberOfKeyIndividualsController.show.url)
+                  href = Some(AppRoutes.apply.listdetails.CheckYourAnswersController.show.url)
               ),
               TaskListItem(
                   title = TaskListItemTitle(

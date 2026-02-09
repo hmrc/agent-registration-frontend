@@ -24,7 +24,7 @@ import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.UserRole
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.TypeOfSignInForm
@@ -56,7 +56,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     action
-      .ensureValidForm4(TypeOfSignInForm.form, implicit request => view(_)):
+      .ensureValidForm(TypeOfSignInForm.form, implicit request => view(_)):
         implicit request =>
           val typeOfSignIn: TypeOfSignIn = request.get
           Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.showSignInPage)
@@ -64,10 +64,10 @@ extends FrontendController(mcc, actions):
 
   def showSignInPage: Action[AnyContent] =
     action
-      .refine4(r => r.readFromSessionAgentType.fold(Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url))(r.add))
-      .refine4(r => r.readBusinessType.fold(Redirect(AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show.url))(r.add))
-      .refine4(r => r.readTypeOfSignIn.fold(Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show.url))(r.add))
-      .refine4(r => r.readUserRole.fold(Redirect(AppRoutes.apply.aboutyourbusiness.UserRoleController.show.url))(r.add)):
+      .refine(r => r.readFromSessionAgentType.fold(Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url))(r.add))
+      .refine(r => r.readBusinessType.fold(Redirect(AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show.url))(r.add))
+      .refine(r => r.readTypeOfSignIn.fold(Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show.url))(r.add))
+      .refine(r => r.readUserRole.fold(Redirect(AppRoutes.apply.aboutyourbusiness.UserRoleController.show.url))(r.add)):
         implicit request =>
           val agentType: AgentType = request.get
           val businessType: BusinessType = request.get

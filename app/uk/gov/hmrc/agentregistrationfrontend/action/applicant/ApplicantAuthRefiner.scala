@@ -40,7 +40,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class AuthorisedActionRefiner @Inject() (
+class ApplicantAuthRefiner @Inject() (
   af: AuthorisedFunctions,
   errorResults: ErrorResults,
   appConfig: AppConfig

@@ -23,7 +23,7 @@ import play.api.mvc.Result
 import play.api.mvc.Results
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions.*
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions.*
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
@@ -32,7 +32,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class EnricherAgentApplication @Inject() (
+class AgentApplicationEnricher @Inject() (
   agentApplicationService: AgentApplicationService
 )(using ec: ExecutionContext)
 extends RequestAwareLogging:
@@ -40,7 +40,9 @@ extends RequestAwareLogging:
   inline def enrichRequest[Data <: Tuple](request: RequestWithData[Data])(using
     AgentApplication AbsentIn Data,
     IndividualProvidedDetailsToBeDeleted PresentIn Data
-  ): Future[Result | RequestWithData[AgentApplication *: Data]] =
+  ): Future[
+    Result | RequestWithData[AgentApplication *: Data]
+  ] =
     given RequestHeader = request
     agentApplicationService
       .find(request.individualProvidedDetails.agentApplicationId)

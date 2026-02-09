@@ -23,7 +23,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentTelephoneNumber
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
@@ -46,7 +46,7 @@ extends FrontendController(mcc, actions):
 
   private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
     .getApplicationInProgress
-    .ensure4(
+    .ensure(
       _
         .agentApplication
         .agentDetails
@@ -73,7 +73,7 @@ extends FrontendController(mcc, actions):
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater4[AgentTelephoneNumber](
+      .ensureValidFormAndRedirectIfSaveForLater[AgentTelephoneNumber](
         form = AgentTelephoneNumberForm.form,
         resultToServeWhenFormHasErrors =
           implicit request =>

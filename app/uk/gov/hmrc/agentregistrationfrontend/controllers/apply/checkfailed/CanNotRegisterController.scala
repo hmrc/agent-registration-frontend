@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.checkfailed
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.CheckResult.Fail
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.checkfailed.CanNotRegisterPage
 
@@ -37,7 +37,7 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] =
     actions
       .getApplicationInProgress
-      .ensure4(
+      .ensure(
         condition =
           _.agentApplication
             .refusalToDealWithCheckResult === Some(Fail),

@@ -16,16 +16,13 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails
 
+import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
-import play.api.mvc.ActionBuilder
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import com.softwaremill.quicklens.modify
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.action.FormValue
-import uk.gov.hmrc.agentregistrationfrontend.action.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.llp.IndividualProvideDetailsWithApplicationRequest
-
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualApproveApplicationForm
 import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualApproveApplicationPage
@@ -44,7 +41,8 @@ class IndividualApproveApplicantController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilder[IndividualProvideDetailsWithApplicationRequest, AnyContent] = actions.DELETEMEgetProvideDetailsWithApplicationInProgress
+  private val baseAction: ActionBuilderWithData[DataWithAgentApplication] = actions
+    .getProvideDetailsWithApplicationInProgress
     .ensure(
       _.individualProvidedDetails.individualSaUtr.nonEmpty,
       implicit request =>
@@ -82,12 +80,12 @@ extends FrontendController(mcc, actions):
     baseAction
       .ensureValidFormAndRedirectIfSaveForLater[YesNo](
         implicit r =>
-          val applicantName = r.agentApplication.asLlpApplication.getApplicantContactDetails.applicantName
+          val applicantName: ApplicantName = r.agentApplication.asLlpApplication.getApplicantContactDetails.applicantName
           IndividualApproveApplicationForm.form(applicantName.value)
         ,
         implicit r =>
-          val applicantName = r.agentApplication.asLlpApplication.getApplicantContactDetails.applicantName
-          val companyName = r.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
+          val applicantName: ApplicantName = r.agentApplication.asLlpApplication.getApplicantContactDetails.applicantName
+          val companyName: String = r.agentApplication.asLlpApplication.getBusinessDetails.companyProfile.companyName
           view(
             _,
             officerName = applicantName.value,
@@ -95,8 +93,8 @@ extends FrontendController(mcc, actions):
           )
       )
       .async:
-        implicit r: (IndividualProvideDetailsWithApplicationRequest[AnyContent] & FormValue[YesNo]) =>
-          val approved: Boolean = r.formValue.toBoolean
+        implicit r =>
+          val approved: Boolean = r.get[YesNo].toBoolean
 
           val updatedApplication: IndividualProvidedDetailsToBeDeleted = r.individualProvidedDetails
             .modify(_.hasApprovedApplication)
