@@ -16,17 +16,23 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant
 
+import play.api.http.Status.SEE_OTHER
 import play.api.mvc.*
+
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
 import uk.gov.hmrc.agentregistration.shared.util.SealedObjects
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithAuth
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection.CompletedSectionLlp
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection.CompletedSectionSoleTrader
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
+import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
@@ -35,6 +41,8 @@ import java.time.Clock
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
+import uk.gov.hmrc.http.SessionKeys
+
 import scala.concurrent.Future
 
 object FastForwardController:
@@ -117,33 +125,63 @@ object FastForwardController:
 @Singleton
 class FastForwardController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: ApplicantActions,
+  applicantActions: ApplicantActions,
+  applicantAuthRefiner: ApplicantAuthRefiner,
   applicationService: AgentApplicationService,
   fastForwardPage: FastForwardPage,
   agentApplicationIdGenerator: AgentApplicationIdGenerator,
   linkIdGenerator: LinkIdGenerator,
   simplePage: SimplePage,
-  grsStubService: GrsStubService
+  grsStubService: GrsStubService,
+  stubUserService: StubUserService
 )(using clock: Clock)
-extends FrontendController(mcc, actions):
+extends FrontendController(mcc, applicantActions):
 
-  def show: Action[AnyContent] = actions.action:
+  def show: Action[AnyContent] = applicantActions.action:
     implicit request =>
       Ok(fastForwardPage())
+
+  private def loginAndRetry(using request: Request[AnyContent]): Future[Result | RequestWithAuth] = stubUserService.createAndLoginAgent.map: stubsHc =>
+    val bearerToken: String = stubsHc.authorization
+      .map(_.value)
+      .getOrThrowExpectedDataMissing("Expected auth token in stubs HeaderCarrier")
+
+    val sessionId: String = stubsHc.sessionId
+      .map(_.value)
+      .getOrThrowExpectedDataMissing("Expected sessionId in stubs HeaderCarrier")
+
+    Redirect(request.uri).addingToSession(
+      SessionKeys.authToken -> bearerToken,
+      SessionKeys.sessionId -> sessionId
+    )
+
+  private val authorisedOrCreateAndLoginAgent: ActionBuilderWithData[DataWithAuth] = applicantActions.action.refine:
+    implicit request =>
+      applicantAuthRefiner.refine(request).flatMap:
+        case Right(authorisedRequest) => Future.successful(authorisedRequest)
+
+        case Left(result) if result.header.status === SEE_OTHER => loginAndRetry
+
+        case Left(result) => Future.successful(result)
 
   def fastForward(
     completedSection: CompletedSection
   ): Action[AnyContent] =
     completedSection match
-      case c: CompletedSectionLlp => actions.authorised.async(handleCompletedSectionLlp(c)(using _, summon))
-      case c: CompletedSectionSoleTrader =>
-        actions.action { implicit request =>
-          Ok(simplePage(
-            h1 = "Sole Trader Task List Page",
-            bodyText = Some("Fast Forwarding to Sole Trader Task List Page isn't implemented yet")
-          ))
+      case c: CompletedSectionLlp =>
+        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
+          given RequestWithAuth = req
+          handleCompletedSectionLlp(c)
+
+      case _: CompletedSectionSoleTrader =>
+        applicantActions.action { implicit request =>
+          Ok(
+            simplePage(
+              h1 = "Sole Trader Task List Page",
+              bodyText = Some("Fast Forwarding to Sole Trader Task List Page isn't implemented yet")
+            )
+          )
         }
-      // TODO: other business types
 
   private def handleCompletedSectionLlp(completedSection: CompletedSectionLlp)(using
     r: RequestWithAuth,
