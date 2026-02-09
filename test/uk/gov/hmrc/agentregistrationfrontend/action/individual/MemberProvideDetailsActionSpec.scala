@@ -1,3 +1,5 @@
+package uk.gov.hmrc.agentregistrationfrontend.action.individual
+
 /*
  * Copyright 2026 HM Revenue & Customs
  *
