@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendContr
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.agentdetails.AgentCorrespondenceAddressHelper
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 
 import javax.inject.Inject
 import javax.inject.Singleton

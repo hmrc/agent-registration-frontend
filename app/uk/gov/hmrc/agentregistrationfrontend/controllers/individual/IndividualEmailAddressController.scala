@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
 import uk.gov.hmrc.agentregistrationfrontend.services.EmailVerificationService
-import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualEmailAddressPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualEmailLockedPage

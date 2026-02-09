@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions.*
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import scala.concurrent.ExecutionContext

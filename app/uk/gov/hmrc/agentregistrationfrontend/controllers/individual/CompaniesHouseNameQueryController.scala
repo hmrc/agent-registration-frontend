@@ -26,8 +26,8 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.CompaniesHouseNameQueryPage
 
 import javax.inject.Inject

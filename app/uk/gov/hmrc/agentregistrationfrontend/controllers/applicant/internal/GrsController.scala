@@ -37,8 +37,8 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendContr
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.GrsService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 

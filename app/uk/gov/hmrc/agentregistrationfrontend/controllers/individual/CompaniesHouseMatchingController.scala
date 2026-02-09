@@ -32,9 +32,9 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionFormType
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms.toOfficerSelection
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.CompaniesHouseService
-import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.MatchedIndividualPage

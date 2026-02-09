@@ -25,8 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
-
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.LlpStartPage
 

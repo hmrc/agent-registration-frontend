@@ -29,8 +29,8 @@ import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentBusinessNameForm
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.agentdetails.AgentBusinessNamePage
 
 import javax.inject.Inject

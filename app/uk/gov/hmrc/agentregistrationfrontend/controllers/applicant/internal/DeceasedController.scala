@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CitizenDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.citizendetails.DesignatoryDetailsResponse
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 
 import javax.inject.Inject
 import javax.inject.Singleton

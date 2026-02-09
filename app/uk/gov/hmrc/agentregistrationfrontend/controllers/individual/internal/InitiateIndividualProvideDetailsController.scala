@@ -24,14 +24,14 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CitizenDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 
 import javax.inject.Inject
 import javax.inject.Singleton

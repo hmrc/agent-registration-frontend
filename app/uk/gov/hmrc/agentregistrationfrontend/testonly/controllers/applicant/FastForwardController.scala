@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithAuth
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection.CompletedSectionLlp
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection.CompletedSectionSoleTrader

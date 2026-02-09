@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.services.llp
+package uk.gov.hmrc.agentregistrationfrontend.services.individual
 
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*

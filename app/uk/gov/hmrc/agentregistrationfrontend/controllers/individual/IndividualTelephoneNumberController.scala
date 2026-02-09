@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 
 import com.softwaremill.quicklens.modify
-import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 
 import javax.inject.Inject
 import javax.inject.Singleton

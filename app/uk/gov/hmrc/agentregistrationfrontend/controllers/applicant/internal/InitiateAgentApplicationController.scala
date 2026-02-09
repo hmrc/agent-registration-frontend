@@ -27,8 +27,8 @@ import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.services.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.services.ApplicationFactory
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 
 import javax.inject.Inject
