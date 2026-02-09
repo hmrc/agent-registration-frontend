@@ -105,8 +105,8 @@ POST        /apply/list-details/remove-key-individual/:individualProvidedDetails
 GET         /apply/list-details/how-many-other-individuals            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.NumberOfOtherRelevantIndividualsController.show
 
 # Lists share link
-GET        /apply/list-details/key-individuals/share-link             uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.link.LinkController.show
-POST       /apply/list-details/key-individuals/share-link             uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.link.LinkController.submit
+GET        /apply/list-details/key-individuals/share-link             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.link.LinkController.show
+POST       /apply/list-details/key-individuals/share-link             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.link.LinkController.submit
 # Apply declaration
 GET         /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.DeclarationController.show
 POST        /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.DeclarationController.submit

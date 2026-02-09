@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.apply.listdetails.link
+package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.link
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.link.LinkPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.link.LinkPage
 
 class LinkPageSpec
 extends ViewSpec:

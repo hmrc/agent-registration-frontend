@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.link
+package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.link
 
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.services.llp.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.apply.listdetails.link.LinkPage
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.link.LinkPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
