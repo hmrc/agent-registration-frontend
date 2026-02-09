@@ -311,6 +311,9 @@ amlsCheckYourAnswers.change = Change
 # Lists
 lists.caption.title.Partnership = Partner and tax adviser information
 lists.caption.title.LimitedCompany = Director and tax adviser information
+lists.caption.title.LimitedLiabilityPartnership = LLP member and tax adviser information
+lists.caption.title.SoleTrader = Business owner information
+
 numberOfKeyIndividuals.title.Partnership = How many partners are there at {0}?
 numberOfKeyIndividuals.title.LimitedCompany = How many directors are there at {0}?
 numberOfKeyIndividuals.title.LimitedLiabilityPartnership = How many LLP members are there at {0}?
@@ -365,6 +368,13 @@ addToListSummary.Partnership.complex.bullet1.plural = the {0} partners responsib
 addToListSummary.Partnership.complex.bullet1.singular = the partner responsible for tax advice
 addToListSummary.Partnership.complex.bullet2.plural = {0} other partners
 addToListSummary.Partnership.complex.bullet2.singular = 1 other partner
+
+link.title = Share this link with everyone on the list
+link.p1 = The people on your list need to sign in and provide their details to HMRC.
+link.p2 = Share this link with them:
+link.details.summary = See the list of people again
+link.details.p1 = This is the list of people you’ve told us about:
+link.p3 = Select ‘Confirm and continue’ when you have shared the link with everyone on the list.
 
 # Apply / Declaration
 declaration.title = Declaration

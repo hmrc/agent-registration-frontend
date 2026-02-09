@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock as wm
+import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.Json
@@ -140,6 +141,13 @@ object AgentRegistrationStubs:
     responseBody = Json.toJson(individuals).toString
   )
 
+  def stubUpsertIndividualProvidedDetails(individualProvidedDetails: IndividualProvidedDetails): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/individual-provided-details/for-application"),
+    responseStatus = Status.OK,
+    requestBody = Some(equalToJson(Json.toJson(individualProvidedDetails).toString))
+  )
+
   def verifyFindApplicationByAgentApplicationId(
     agentApplicationId: AgentApplicationId,
     count: Int = 1
@@ -173,5 +181,11 @@ object AgentRegistrationStubs:
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/individual-provided-details/for-application/${applicationId.value}"),
+    count = count
+  )
+
+  def verifyUpsertIndividualProvidedDetails(count: Int = 1): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/individual-provided-details/for-application"),
     count = count
   )

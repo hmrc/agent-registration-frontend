@@ -29,6 +29,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.rout
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.routes as listdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.nonincorporated.routes as listdetailsNonIncorporatedRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.otherrelevantindividuals.routes as listdetailsOthersRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.link.routes as listdetailsLinkRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes as internalRoutes
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.providedetails.routes as providedetailsRoutes
@@ -102,6 +103,10 @@ object AppRoutes:
 
       object otherrelevantindividuals:
         val NumberOfOtherRelevantIndividualsController = listdetailsOthersRoutes.NumberOfOtherRelevantIndividualsController
+
+      object link:
+
+        val LinkController = listdetailsLinkRoutes.LinkController
 
     object checkfailed:
 

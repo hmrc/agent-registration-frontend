@@ -25,18 +25,20 @@ import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.llp.IndividualSaUtr
+import uk.gov.hmrc.agentregistration.shared.llp.ProvidedDetailsState
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
 class IndividualProvideDetailsService @Inject() (
   individualProvideDetailsConnector: IndividualProvidedDetailsConnector,
   provideDetailsFactory: IndividualProvideDetailsFactory
-)
+)(using ec: ExecutionContext)
 extends RequestAwareLogging:
 
   def create(
@@ -99,3 +101,14 @@ extends RequestAwareLogging:
   // for use by agent applicants when building lists of individuals
   def findAllByApplicationId(agentApplicationId: AgentApplicationId)(using request: RequestHeader): Future[List[IndividualProvidedDetails]] =
     individualProvideDetailsConnector.findAll(agentApplicationId)
+
+  def markLinkSent(individualProvidedDetailsList: List[IndividualProvidedDetails])(using request: RequestHeader): Future[Unit] = {
+    val upsertFutures: List[Future[Unit]] = individualProvidedDetailsList.map: individualProvidedDetails =>
+      logger.debug(s"Marking link sent for providedDetails for user:[${individualProvidedDetails._id}] and applicationId:[${individualProvidedDetails.agentApplicationId}]")
+      individualProvideDetailsConnector.upsert(
+        individualProvidedDetails.copy(providedDetailsState = ProvidedDetailsState.AccessConfirmed)
+      )
+
+    Future.sequence(upsertFutures).map: _ =>
+      ()
+  }
