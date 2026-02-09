@@ -14,38 +14,45 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
+package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
-import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualTelephoneNumberForm
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+
+import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualTelephoneNumberPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualEmailAddressPage
 
-class IndividualTelephoneNumberPageSpec
+class IndividualEmailAddressPageSpec
 extends ViewSpec:
 
-  val viewTemplate: IndividualTelephoneNumberPage = app.injector.instanceOf[IndividualTelephoneNumberPage]
-  val doc: Document = Jsoup.parse(viewTemplate(IndividualTelephoneNumberForm.form).body)
-  private val heading: String = "What is your telephone number?"
+  private val viewTemplate: IndividualEmailAddressPage = app.injector.instanceOf[IndividualEmailAddressPage]
 
-  "MemberTelephoneNumberPage" should:
+  private object memberProvidedDetails:
+
+    val beforeEmailAddressProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterTelephoneNumberProvided
+
+  val doc: Document = Jsoup.parse(viewTemplate(IndividualEmailAddressForm.form).body)
+  private val heading: String = "What is your email address?"
+
+  "MemberEmailAddressPage" should:
 
     "have the correct title" in:
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
 
-    "render a form with an input of type tel for telephone number" in:
+    "render a form with an input of type email for email address" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe AppRoutes.providedetails.IndividualTelephoneNumberController.submit.url
+      form.attr("action") shouldBe AppRoutes.providedetails.IndividualEmailAddressController.submit.url
       form
-        .selectOrFail("label[for=individualTelephoneNumber]")
+        .selectOrFail("label[for=individualEmailAddress]")
         .selectOnlyOneElementOrFail()
         .text() shouldBe heading
       form
-        .selectOrFail("input[name=individualTelephoneNumber][type=tel]")
+        .selectOrFail("input[name=individualEmailAddress][type=email]")
         .selectOnlyOneElementOrFail()
 
     "render a save and continue button" in:
@@ -56,9 +63,9 @@ extends ViewSpec:
         .text() shouldBe "Save and continue"
 
     "render the form error correctly when the form contains an error" in:
-      val field = IndividualTelephoneNumberForm.key
-      val errorMessage = "Enter the number we should call to speak to you about this application"
-      val formWithError = IndividualTelephoneNumberForm.form
+      val field = IndividualEmailAddressForm.key
+      val errorMessage = "Enter your email address"
+      val formWithError = IndividualEmailAddressForm.form
         .withError(field, errorMessage)
       behavesLikePageWithErrorHandling(
         field = field,

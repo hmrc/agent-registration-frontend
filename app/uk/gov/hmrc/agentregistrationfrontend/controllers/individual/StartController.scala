@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.LlpStartPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.LlpStartPage
 
 import javax.inject.Inject
 import javax.inject.Singleton

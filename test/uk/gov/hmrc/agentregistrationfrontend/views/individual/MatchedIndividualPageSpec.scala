@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
+package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -22,7 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfB
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistrationfrontend.forms.ChOfficerSelectionForms
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.MatchedIndividualPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.MatchedIndividualPage
 
 class MatchedIndividualPageSpec
 extends ViewSpec:

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
+package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualConfirmationPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualConfirmationPage
 
 class IndividualConfirmationPageSpec
 extends ViewSpec:

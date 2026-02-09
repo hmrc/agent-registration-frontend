@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
+package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
-import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualSaUtrForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualSaUtrPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualNinoPage
 
-class IndividualSaUtrPageSpec
+class IndividualNinoPageSpec
 extends ViewSpec:
 
-  val viewTemplate: IndividualSaUtrPage = app.injector.instanceOf[IndividualSaUtrPage]
-  val doc: Document = Jsoup.parse(viewTemplate(IndividualSaUtrForm.form).body)
-  private val heading: String = "Do you have a Self Assessment Unique Taxpayer Reference?"
+  val viewTemplate: IndividualNinoPage = app.injector.instanceOf[IndividualNinoPage]
+  val doc: Document = Jsoup.parse(viewTemplate(IndividualNinoForm.form).body)
+  private val heading: String = "Do you have a National Insurance number?"
 
-  "MemberSaUtrPage" should:
+  "MemberNinoPage" should:
 
     "have the correct title" in:
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
@@ -56,9 +56,9 @@ extends ViewSpec:
       .text() shouldBe "Save and continue"
 
   "render the form error correctly when the form contains an error" in:
-    val field = IndividualSaUtrForm.saUtrKey
-    val errorMessage = "Enter your Self Assessment Unique Taxpayer Reference"
-    val formWithError = IndividualSaUtrForm.form
+    val field = IndividualNinoForm.ninoKey
+    val errorMessage = "Enter your National Insurance number"
+    val formWithError = IndividualNinoForm.form
       .withError(field, errorMessage)
     behavesLikePageWithErrorHandling(
       field = field,

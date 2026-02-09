@@ -14,12 +14,11 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
-@import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedSaUtr
+@import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedNino
 
-@import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualSaUtrForm
+@import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.partials.SaveAndContinue
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.partials.SaveAndContinue
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
 @import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
@@ -34,36 +33,36 @@
 )
 
 @(
-        form: Form[UserProvidedSaUtr])(implicit
+        form: Form[UserProvidedNino])(implicit
         request: RequestHeader,
         messages: Messages
 )
 
 @key = @{
-    IndividualSaUtrForm.hasSaUtrKey
+    IndividualNinoForm.hasNinoKey
 }
-@saUtrKey = @{
-    IndividualSaUtrForm.saUtrKey
+@ninoKey = @{
+    IndividualNinoForm.ninoKey
 }
 @title = @{messages(s"$key.title")}
 
-@saUtrInput = {
+@ninoInput = {
     @govukInput(Input(
         label = Label(
-            content = Text(messages(s"$saUtrKey.label"))
+            content = Text(messages(s"$ninoKey.label"))
         ),
         hint = Some(Hint(
-            content = Text(messages(s"$saUtrKey.hint"))
+            content = Text(messages(s"$ninoKey.hint"))
         )),
         spellcheck = Some(false)
-    ).withFormField(form(saUtrKey)))
+    ).withFormField(form(ninoKey)))
 }
 @layout(
     pageTitle = title,
     maybeForm = Some(form)
 ) {
     <h2 class="govuk-caption-l">@messages("provide-details.llp.title")</h2>
-    @formWithCSRF(action = AppRoutes.providedetails.IndividualSaUtrController.submit) {
+    @formWithCSRF(action = AppRoutes.providedetails.IndividualNinoController.submit) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(
@@ -76,7 +75,7 @@
                 case YesNo.Yes => RadioItem(
                     content = HtmlContent(messages(s"$key.yes")),
                     value = Some(YesNo.Yes.toString),
-                    conditionalHtml = Some(saUtrInput)
+                    conditionalHtml = Some(ninoInput)
                 )
                 case YesNo.No => RadioItem(
                     content = HtmlContent(messages(s"$key.no")),

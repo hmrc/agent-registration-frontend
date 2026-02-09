@@ -14,46 +14,49 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedDateOfBirth
-@import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualDateOfBirthForm
+@import uk.gov.hmrc.agentregistration.shared.EmailAddress
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.partials.SaveAndContinue
-@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
+@import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualEmailAddressForm
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.partials.SaveAndContinue
 
 @this(
         layout: Layout,
+        govukInput: GovukInput,
         formWithCSRF: FormWithCSRF,
-        govukDateInput: GovukDateInput,
+        govukButton: GovukButton,
         saveAndContinue: SaveAndContinue
 )
 
 @(
-        form: Form[UserProvidedDateOfBirth])(implicit
+        form: Form[EmailAddress])(implicit
         request: RequestHeader,
         messages: Messages
 )
 
-@key = @{IndividualDateOfBirthForm.key}
-@pageTitle = @{messages(s"$key.title")}
-    
+@key = @{
+    IndividualEmailAddressForm.key
+}
+@title = @{
+    messages(s"$key.title")
+}
 @layout(
-    pageTitle = pageTitle,
+    pageTitle = title,
     maybeForm = Some(form)
 ) {
-
     <h2 class="govuk-caption-l">@messages("provide-details.llp.title")</h2>
-    @formWithCSRF(action = AppRoutes.providedetails.IndividualDateOfBirthController.submit) {
-        @govukDateInput(DateInput(
-            id = key,
+    @formWithCSRF(action = AppRoutes.providedetails.IndividualEmailAddressController.submit) {
+        @govukInput(Input(
+            label = Label(
+                content = Text(title),
+                isPageHeading = true,
+                classes = "govuk-label--l"
+            ),
+            inputType = "email",
             hint = Some(Hint(content = Text(messages(s"$key.hint")))),
-            fieldset = Some(Fieldset(
-                legend = Some(Legend(
-                    content = Text(pageTitle),
-                    classes = "govuk-fieldset__legend--l",
-                    isPageHeading = true
-                ))
-            ))
-        ).withDayMonthYearFormField(form(key)))
+            autocomplete = Some("email"),
+            spellcheck = Some("false")
+        ).withFormField(form(key)))
 
         @saveAndContinue()
     }

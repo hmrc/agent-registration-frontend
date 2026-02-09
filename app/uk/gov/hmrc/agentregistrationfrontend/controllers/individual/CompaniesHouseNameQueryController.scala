@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.CompaniesHouseNameQueryPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.CompaniesHouseNameQueryPage
 
 import javax.inject.Inject
 import javax.inject.Singleton

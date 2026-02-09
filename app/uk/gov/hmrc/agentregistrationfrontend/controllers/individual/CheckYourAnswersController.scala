@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.CheckYourAnswersPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.CheckYourAnswersPage
 
 @Singleton
 class CheckYourAnswersController @Inject() (

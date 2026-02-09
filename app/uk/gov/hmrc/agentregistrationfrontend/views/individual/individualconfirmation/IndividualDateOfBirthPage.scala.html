@@ -14,50 +14,46 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
-
-@import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualTelephoneNumberForm
+@import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedDateOfBirth
+@import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualDateOfBirthForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.partials.SaveAndContinue
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.partials.SaveAndContinue
+@import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits.*
 
 @this(
         layout: Layout,
-        govukInput: GovukInput,
         formWithCSRF: FormWithCSRF,
-        govukButton: GovukButton,
+        govukDateInput: GovukDateInput,
         saveAndContinue: SaveAndContinue
 )
 
 @(
-        form: Form[TelephoneNumber])(implicit
+        form: Form[UserProvidedDateOfBirth])(implicit
         request: RequestHeader,
         messages: Messages
 )
 
-@key = @{
-    IndividualTelephoneNumberForm.key
-}
-@title = @{
-    messages(s"$key.title")
-}
+@key = @{IndividualDateOfBirthForm.key}
+@pageTitle = @{messages(s"$key.title")}
+    
 @layout(
-    pageTitle = title,
+    pageTitle = pageTitle,
     maybeForm = Some(form)
 ) {
+
     <h2 class="govuk-caption-l">@messages("provide-details.llp.title")</h2>
-    @formWithCSRF(action = AppRoutes.providedetails.IndividualTelephoneNumberController.submit) {
-        @govukInput(Input(
-            label = Label(
-                content = Text(title),
-                isPageHeading = true,
-                classes = "govuk-label--l"
-            ),
-            inputType = "tel",
+    @formWithCSRF(action = AppRoutes.providedetails.IndividualDateOfBirthController.submit) {
+        @govukDateInput(DateInput(
+            id = key,
             hint = Some(Hint(content = Text(messages(s"$key.hint")))),
-            autocomplete = Some("tel"),
-            classes = "govuk-input--width-20"
-        ).withFormField(form(key)))
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(pageTitle),
+                    classes = "govuk-fieldset__legend--l",
+                    isPageHeading = true
+                ))
+            ))
+        ).withDayMonthYearFormField(form(key)))
 
         @saveAndContinue()
     }

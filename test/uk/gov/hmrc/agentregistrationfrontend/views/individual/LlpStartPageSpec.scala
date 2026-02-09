@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
+package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
 import com.softwaremill.quicklens.modify
 import org.jsoup.Jsoup
@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.LlpStartPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.LlpStartPage
 
 class LlpStartPageSpec
 extends ViewSpec:

@@ -14,59 +14,69 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
+@import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedSaUtr
+
+@import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualSaUtrForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.partials.SaveAndContinue
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.partials.SaveAndContinue
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
 @import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
-@import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualApproveApplicationForm
 
 @this(
         layout: Layout,
         govukRadios: GovukRadios,
+        govukInput: GovukInput,
         formWithCSRF: FormWithCSRF,
         govukButton: GovukButton,
-        govukInsetText: GovukInsetText,
         saveAndContinue: SaveAndContinue
 )
 
-
 @(
-        form: Form[YesNo],
-        officerName: String,
-        companyName: String)(implicit
+        form: Form[UserProvidedSaUtr])(implicit
         request: RequestHeader,
         messages: Messages
 )
 
-@key: String = @{IndividualApproveApplicationForm.key}
-
+@key = @{
+    IndividualSaUtrForm.hasSaUtrKey
+}
+@saUtrKey = @{
+    IndividualSaUtrForm.saUtrKey
+}
 @title = @{messages(s"$key.title")}
-@question = @{messages(s"$key.question", officerName)}
 
+@saUtrInput = {
+    @govukInput(Input(
+        label = Label(
+            content = Text(messages(s"$saUtrKey.label"))
+        ),
+        hint = Some(Hint(
+            content = Text(messages(s"$saUtrKey.hint"))
+        )),
+        spellcheck = Some(false)
+    ).withFormField(form(saUtrKey)))
+}
 @layout(
     pageTitle = title,
     maybeForm = Some(form)
 ) {
     <h2 class="govuk-caption-l">@messages("provide-details.llp.title")</h2>
-
-    <h1 class="govuk-heading-l">@title</h1>
-
-    <p class="govuk-body">@messages(s"$key.info", officerName, companyName)</p>
-
-    @formWithCSRF(action = AppRoutes.providedetails.IndividualApproveApplicantController.submit) {
+    @formWithCSRF(action = AppRoutes.providedetails.IndividualSaUtrController.submit) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(
-                    content = Text(question),
-                    isPageHeading = false,
-                    classes = "govuk-fieldset__legend--m"
+                    content = Text(title),
+                    isPageHeading = true,
+                    classes = "govuk-fieldset__legend--l"
                 ))
             )),
             items = YesNo.values.toSeq.map:
                 case YesNo.Yes => RadioItem(
                     content = HtmlContent(messages(s"$key.yes")),
                     value = Some(YesNo.Yes.toString),
+                    conditionalHtml = Some(saUtrInput)
                 )
                 case YesNo.No => RadioItem(
                     content = HtmlContent(messages(s"$key.no")),

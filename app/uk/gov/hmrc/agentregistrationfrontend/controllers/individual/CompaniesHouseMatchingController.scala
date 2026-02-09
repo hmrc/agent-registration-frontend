@@ -37,8 +37,8 @@ import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.MatchedIndividualPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.MatchedIndividualsPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.MatchedIndividualPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.MatchedIndividualsPage
 
 import javax.inject.Inject
 import javax.inject.Singleton

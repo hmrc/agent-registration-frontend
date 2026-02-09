@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.providedetails
+package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -22,7 +22,7 @@ import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
 
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.providedetails.individualconfirmation.IndividualEmailLockedPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualEmailLockedPage
 
 class IndividualLockedEmailPageSpec
 extends ViewSpec:
