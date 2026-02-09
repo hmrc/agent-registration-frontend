@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualNinoPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualNinoPage
 
 class IndividualNinoPageSpec
 extends ViewSpec:

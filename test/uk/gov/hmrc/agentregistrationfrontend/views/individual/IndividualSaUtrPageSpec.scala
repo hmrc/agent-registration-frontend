@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualSaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualSaUtrPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualSaUtrPage
 
 class IndividualSaUtrPageSpec
 extends ViewSpec:

@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualSaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualSaUtrPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualSaUtrPage
 
 import javax.inject.Inject
 import javax.inject.Singleton

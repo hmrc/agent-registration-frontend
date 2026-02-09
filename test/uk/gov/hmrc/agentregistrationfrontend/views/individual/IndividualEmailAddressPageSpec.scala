@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualEmailAddressPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualEmailAddressPage
 
 class IndividualEmailAddressPageSpec
 extends ViewSpec:

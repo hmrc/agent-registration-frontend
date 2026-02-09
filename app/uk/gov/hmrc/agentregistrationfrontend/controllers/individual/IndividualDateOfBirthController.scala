@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualDateOfBirthForm
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualDateOfBirthPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualDateOfBirthPage
 
 import java.time.Clock
 import javax.inject.Inject

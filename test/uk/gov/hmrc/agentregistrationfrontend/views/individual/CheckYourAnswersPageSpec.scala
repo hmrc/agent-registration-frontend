@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.CheckYourAnswersPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.CheckYourAnswersPage
 
 class CheckYourAnswersPageSpec
 extends ViewSpec:

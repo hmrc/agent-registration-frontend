@@ -21,7 +21,7 @@ import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualConfirmationPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualConfirmationPage
 
 import javax.inject.Inject
 import javax.inject.Singleton

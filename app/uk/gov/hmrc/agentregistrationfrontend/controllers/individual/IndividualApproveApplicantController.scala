@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualApproveApplicationForm
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualApproveApplicationPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualApproveApplicationPage
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.toYesNo
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.toBoolean

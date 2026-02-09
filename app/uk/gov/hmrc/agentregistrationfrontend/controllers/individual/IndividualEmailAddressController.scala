@@ -27,8 +27,8 @@ import uk.gov.hmrc.agentregistrationfrontend.model.emailverification.*
 import uk.gov.hmrc.agentregistrationfrontend.services.EmailVerificationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualEmailAddressPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualEmailLockedPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualEmailAddressPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualEmailLockedPage
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import com.softwaremill.quicklens.*
 import uk.gov.hmrc.agentregistration.shared.EmailAddress

@@ -21,7 +21,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualTelephoneNumberForm
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualTelephoneNumberPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualTelephoneNumberPage
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 

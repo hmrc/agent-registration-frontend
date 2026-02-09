@@ -22,7 +22,7 @@ import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualTelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualTelephoneNumberPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualTelephoneNumberPage
 
 class IndividualTelephoneNumberPageSpec
 extends ViewSpec:

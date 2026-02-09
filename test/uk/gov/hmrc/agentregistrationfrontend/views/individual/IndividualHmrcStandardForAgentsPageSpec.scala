@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.individual
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualHmrcStandardForAgentsPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualHmrcStandardForAgentsPage
 
 class IndividualHmrcStandardForAgentsPageSpec
 extends ViewSpec:

@@ -22,7 +22,7 @@ import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
 
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.individualconfirmation.IndividualEmailLockedPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualEmailLockedPage
 
 class IndividualLockedEmailPageSpec
 extends ViewSpec:
