@@ -1,4 +1,4 @@
-@*
+/*
  * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,25 +12,18 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *@
+ */
 
-@import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
+package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant
 
-@this(layout: Layout)
+import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendControllerBase
 
-@()(implicit
-        request: RequestHeader,
-        messages: Messages
+abstract class FrontendController(
+  mcc: MessagesControllerComponents,
+  val actions: ApplicantActions
 )
+extends FrontendControllerBase(mcc):
 
-@title = @{messages("timed-out.header")}
-
-@layout(pageTitle = title) {
-
-    <h1 class="govuk-heading-xl">@title</h1>
-    <p class="govuk-body">@messages("timed-out.p1")</p>
-    <p class="govuk-body">
-        <a href="@{uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.routes.AgentApplicationController.landing.url}" class="govuk-link">@messages("timed-out.link")</a>
-    </p>
-
-}
+  export actions.*

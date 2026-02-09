@@ -18,18 +18,18 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers
 // scalafix:off DisableSyntax
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.routes as rootRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.routes as applyRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.aboutyourbusiness.routes as aboutyourbusinessRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.routes as amlsRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.amls.api.routes as amlsApiRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.checkfailed.routes as entitycheckfailedRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.routes as applyRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.routes as aboutyourbusinessRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls.routes as amlsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls.api.routes as amlsApiRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.routes as entitycheckfailedRoutes
 
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.applicantcontactdetails.routes as applicantcontactdetailsRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.agentdetails.routes as agentdetailsRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.routes as listdetailsRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.nonincorporated.routes as listdetailsNonIncorporatedRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.listdetails.otherrelevantindividuals.routes as listdetailsOthersRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.apply.internal.routes as internalRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.applicantcontactdetails.routes as applicantcontactdetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.agentdetails.routes as agentdetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.routes as listdetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.routes as listdetailsNonIncorporatedRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.routes as listdetailsOthersRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.routes as internalRoutes
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.routes as providedetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.internal.routes as internalProviDedetailsRoutes
