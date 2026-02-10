@@ -82,6 +82,7 @@ extends FrontendController(mcc, actions):
       val agentDetailsIsComplete = agentApplication.agentDetails.exists(_.isComplete)
       val hmrcStandardForAgentsAgreed = agentApplication.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed
       val listDetailsCompleted = existingList.nonEmpty // TODO: implement other relevant individuals list so completion check can be done
+      val listProgressComplete = existingList.forall(_.hasFinished)
       // any state other than Precreated indicates the link has been sent; require the list to be non-empty
       val listSharingComplete =
         listDetailsCompleted &&
@@ -113,14 +114,15 @@ extends FrontendController(mcc, actions):
         ),
         listTracking = TaskStatus(
           canStart = listSharingComplete, // List tracking cannot be started until list share is complete
-          isComplete = false // TODO: implement list details so completion check can be done
+          isComplete = listProgressComplete
         ),
         declaration = TaskStatus(
           canStart =
             contactIsComplete
               && amlsDetailsCompleted
               && agentDetailsIsComplete
-              && hmrcStandardForAgentsAgreed, // Declaration can be started only when all prior tasks are complete
+              && hmrcStandardForAgentsAgreed
+              && listProgressComplete, // Declaration can be started only when all prior tasks are complete
           isComplete = false // Declaration is never "complete" until submission
         )
       )

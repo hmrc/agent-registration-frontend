@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.services.individual
 
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
@@ -26,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
@@ -103,11 +103,13 @@ extends RequestAwareLogging:
     individualProvideDetailsConnector.findAll(agentApplicationId)
 
   def markLinkSent(individualProvidedDetailsList: List[IndividualProvidedDetails])(using request: RequestHeader): Future[Unit] = {
-    val upsertFutures: List[Future[Unit]] = individualProvidedDetailsList.map: individualProvidedDetails =>
-      logger.debug(s"Marking link sent for providedDetails for user:[${individualProvidedDetails._id}] and applicationId:[${individualProvidedDetails.agentApplicationId}]")
-      individualProvideDetailsConnector.upsert(
-        individualProvidedDetails.copy(providedDetailsState = ProvidedDetailsState.AccessConfirmed)
-      )
+    // we only want to mark the link sent for provided details that have been precreated
+    val upsertFutures: List[Future[Unit]] = individualProvidedDetailsList
+      .filter(_.isPrecreated).map: individualProvidedDetails =>
+        logger.debug(s"Marking link sent for providedDetails for user:[${individualProvidedDetails._id}] and applicationId:[${individualProvidedDetails.agentApplicationId}]")
+        individualProvideDetailsConnector.upsert(
+          individualProvidedDetails.copy(providedDetailsState = ProvidedDetailsState.AccessConfirmed)
+        )
 
     Future.sequence(upsertFutures).map: _ =>
       ()

@@ -30,6 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.r
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.routes as listdetailsNonIncorporatedRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.routes as listdetailsOthersRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.link.routes as listdetailsLinkRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.progress.routes as listdetailsProgressRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.routes as internalRoutes
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.routes as providedetailsRoutes
@@ -107,6 +108,10 @@ object AppRoutes:
       object link:
 
         val LinkController = listdetailsLinkRoutes.LinkController
+
+      object progress:
+
+        val CheckProgressController = listdetailsProgressRoutes.CheckProgressController
 
     object checkfailed:
 

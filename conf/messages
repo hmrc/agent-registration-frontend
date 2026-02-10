@@ -15,6 +15,7 @@ common.remove = Remove
 common.warning = Warning
 common.yes = Yes
 common.no = No
+common.returnToTaskList = Return to task list
 
 button.copy=Copy link to clipboard
 button.copied=Link copied
@@ -375,6 +376,15 @@ link.p2 = Share this link with them:
 link.details.summary = See the list of people again
 link.details.p1 = This is the list of people you’ve told us about:
 link.p3 = Select ‘Confirm and continue’ when you have shared the link with everyone on the list.
+
+listProgress.caption = Check who has provided their details
+
+listProgress.title = HMRC needs information from everyone on this list
+listProgress.h2 = Awaiting details for {0} of {1} people
+listProgress.th.name = Name
+listProgress.th.detailsProvided = Details provided
+listProgress.yes = Yes
+listProgress.no = No
 
 # Apply / Declaration
 declaration.title = Declaration

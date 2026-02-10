@@ -1,0 +1,78 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLaterLinks
+
+@this(
+        appConfig: AppConfig,
+        layout: Layout,
+        govukTable: GovukTable,
+        continueOrSaveForLaterLinks: ContinueOrSaveForLaterLinks
+)
+
+@(
+        agentApplication: AgentApplication,
+        existingList: List[IndividualProvidedDetails])(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{"listProgress"}
+@pageTitle = @{messages(s"$key.title")}
+
+@layout(
+    pageTitle = pageTitle
+) {
+  <h2 class="govuk-caption-l">@messages(s"$key.caption")</h2>
+  <h1 class="govuk-heading-l">@pageTitle</h1>
+  @govukTable(Table(
+    head = Some(Seq(
+      HeadCell(
+        content = Text(messages(s"$key.th.name"))
+      ),
+      HeadCell(
+        content = Text(messages(s"$key.th.detailsProvided"))
+      )
+    )),
+    caption = Some(messages(s"$key.h2", existingList.count(!_.hasFinished), existingList.size)),
+    captionClasses = "govuk-table__caption--m",
+    firstCellIsHeader = true,
+    rows = existingList.map { individual =>
+      Seq(
+        TableRow(
+          content = Text(individual.individualName.value)
+        ),
+        TableRow(
+          content = Text(
+            if(individual.hasFinished) messages(s"$key.yes") else messages(s"$key.no")
+          )
+        )
+      )
+    }
+  ))
+
+  <p class="govuk-body">
+    @continueOrSaveForLaterLinks(
+      continueHref = AppRoutes.apply.TaskListController.show.url,
+      continueLabel = Some(messages("common.returnToTaskList"))
+    )
+  </p>
+
+}
