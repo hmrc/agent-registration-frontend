@@ -16,29 +16,20 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
-import com.softwaremill.quicklens.modify
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.LlpStartPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.StartPage
 
-class LlpStartPageSpec
+class StartPageSpec
 extends ViewSpec:
 
-  val viewTemplate: LlpStartPage = app.injector.instanceOf[LlpStartPage]
-
-  val submittedAgentApplication: AgentApplication = tdAll
-    .agentApplicationLlp
-    .sectionContactDetails
-    .afterEmailAddressVerified
-    .modify(_.applicationState)
-    .setTo(ApplicationState.Submitted)
+  val viewTemplate: StartPage = app.injector.instanceOf[StartPage]
+  private val linkId = LinkId("test-link-id")
 
   val doc: Document = Jsoup.parse(
-    viewTemplate(submittedAgentApplication.asLlpApplication).body
+    viewTemplate(linkId).body
   )
 
   "ProvideDetailsStartPage" should:
@@ -47,8 +38,8 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         """
           |Sign in and confirm your details
-          |Miss Alexa Fantastic has started an application for an agent services account on behalf of Test Company Name.
-          |You are listed in Companies House as a current member of this limited liability partnership. That means we need some information from you before we can process the application.
+          |You have been nominated as a relevant individual that can support an application to HMRC for an agent services account.
+          |We need some information from you before we can process the application.
           |Why we need this information
           |We ask you to sign in so we can:
           |confirm who you are
@@ -76,5 +67,5 @@ extends ViewSpec:
 
       startLink shouldBe TestLink(
         text = "Start",
-        href = s"/agent-registration/provide-details/internal/initiate-member-provide-details/${submittedAgentApplication.linkId.value}"
+        href = s"/agent-registration/provide-details/internal/initiate-member-provide-details/${linkId.value}"
       )

@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+@import uk.gov.hmrc.agentregistration.shared.LinkId
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 
 @this(
@@ -23,20 +23,18 @@
 )
 
 @(
-        agentApplication: AgentApplicationLlp)(implicit
+        linkId: LinkId)(implicit
         request: RequestHeader,
         messages: Messages
 )
 
-@key = @{"llpProvideDetailsStart"}
+@key = @{"provideDetailsStart"}
 @pageTitle = @{messages(s"$key.title")}
-@applicantName = @{agentApplication.getApplicantContactDetails.applicantName.value}
-@applicantBusinessName = @{agentApplication.getBusinessDetails.companyProfile.companyName}
 
 @layout(pageTitle = pageTitle, suppressBackLink = true) {
     <h1 class="govuk-heading-l">@pageTitle</h1>
     <p class="govuk-body">
-        @{messages(s"$key.p1", applicantName, applicantBusinessName)}
+        @{messages(s"$key.p1")}
     </p>
     <p class="govuk-body">
         @{messages(s"$key.p2")}
@@ -63,7 +61,14 @@
     <p class="govuk-body">
         @govukButton(Button(
             content = Text(messages("common.start")),
-            href=Some(AppRoutes.providedetails.internal.InitiateIndividualProvideDetailsController.initiateIndividualProvideDetails(agentApplication.linkId).url),
+            href= Some(
+              AppRoutes
+                .providedetails
+                .internal
+                .InitiateIndividualProvideDetailsController
+                .initiateIndividualProvideDetails(linkId)
+                .url
+            ),
             isStartButton = true
         ))
     </p>

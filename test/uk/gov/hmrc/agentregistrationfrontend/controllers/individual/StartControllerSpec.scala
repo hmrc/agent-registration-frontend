@@ -59,14 +59,14 @@ extends ControllerSpec:
     )
 
   s"GET $path should return 200 and render the start page" in:
-    AgentRegistrationStubs.stubFindApplicationByLinkId(linkId = linkId, agentApplication = agentApplication.complete)
+    AgentRegistrationStubs.stubFindApplicationByLinkId(linkId = linkId, agentApplication = agentApplication.inComplete)
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindIndividualProvidedDetailsNoContent(agentApplicationId)
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Sign in and confirm your details - Apply for an agent services account - GOV.UK"
 
-  s"GET $path with incomplete application should return 303 and redirect to an exit page" in:
-    AgentRegistrationStubs.stubFindApplicationByLinkId(linkId = linkId, agentApplication = agentApplication.inComplete)
+  s"GET $path with complete application should return 303 and redirect to an exit page" in:
+    AgentRegistrationStubs.stubFindApplicationByLinkId(linkId = linkId, agentApplication = agentApplication.complete)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
