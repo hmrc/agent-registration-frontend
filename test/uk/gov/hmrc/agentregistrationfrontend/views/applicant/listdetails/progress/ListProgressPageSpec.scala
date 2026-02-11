@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.progre
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.progress.ListProgressPage
 
@@ -31,7 +32,7 @@ extends ViewSpec:
       existingList = List(
         tdAll.individualProvidedDetails,
         tdAll.individualProvidedDetails2,
-        tdAll.individualProvidedDetails3
+        tdAll.individualProvidedDetails3.copy(providedDetailsState = ProvidedDetailsState.Finished)
       )
     ).body
   )
@@ -43,7 +44,7 @@ extends ViewSpec:
         s"""
            |Check who has provided their details
            |HMRC needs information from everyone on this list
-           |Awaiting details for 3 of 3 people
+           |Awaiting details for 2 of 3 people
            |Name
            |Details provided
            |Test Name
@@ -51,7 +52,7 @@ extends ViewSpec:
            |Second Test Name
            |No
            |Third Test Name
-           |No
+           |Yes
            |Return to task list
            |Save and come back later
            |"""
