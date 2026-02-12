@@ -72,7 +72,7 @@ extends ControllerSpec:
   s"GET $path should return 200 and render page using company name from agent application" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(memberProvidedDetails.afterStarted))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.inComplete)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -90,7 +90,7 @@ extends ControllerSpec:
   s"GET $path when query already stored should return 200 and render page with previous answers filled in" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(memberProvidedDetails.afterNameQueryProvided))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.inComplete)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -114,7 +114,7 @@ extends ControllerSpec:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(memberProvidedDetails.afterStarted))
     AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(memberProvidedDetails.afterNameQueryProvided)
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.inComplete)
     val response: WSResponse =
       post(path)(Map(
         CompaniesHouseNameQueryForm.firstNameKey -> Seq("Jane"),
@@ -131,7 +131,7 @@ extends ControllerSpec:
   s"POST $path with blank inputs should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(memberProvidedDetails.afterStarted))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.inComplete)
     val response: WSResponse =
       post(path)(Map(
         CompaniesHouseNameQueryForm.firstNameKey -> Seq(""),
@@ -150,7 +150,7 @@ extends ControllerSpec:
   s"POST $path with invalid inputs should return 400" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(memberProvidedDetails.afterStarted))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
+    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.inComplete)
     val response: WSResponse =
       post(path)(Map(
         CompaniesHouseNameQueryForm.firstNameKey -> Seq("()))"),

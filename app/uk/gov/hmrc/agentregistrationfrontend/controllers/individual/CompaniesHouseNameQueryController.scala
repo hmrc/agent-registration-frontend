@@ -52,6 +52,9 @@ extends FrontendController(mcc, actions):
           .find(request.individualProvidedDetails.agentApplicationId)
           .map:
             case Some(app) if app.hasFinished =>
+              logger.warn(s"Attempt to access Companies House name query page for application that has status ${app.applicationState}")
+              Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
+            case Some(app) =>
               Ok(view(
                 CompaniesHouseNameQueryForm.form
                   .fill:
@@ -61,9 +64,6 @@ extends FrontendController(mcc, actions):
                 ,
                 app.dontCallMe_getCompanyProfile.companyName
               ))
-            case Some(app) =>
-              logger.warn(s"Attempt to access Companies House name query page for application that has status ${app.applicationState}")
-              Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
 
             case None =>
               logger.warn(s"Attempt to access Companies House name query page for application that does not exist")
