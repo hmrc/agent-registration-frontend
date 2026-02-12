@@ -19,15 +19,10 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.RequestHeader
-import play.api.mvc.Result
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.LlpStartPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.StartPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -36,8 +31,7 @@ import javax.inject.Singleton
 class StartController @Inject() (
   actions: IndividualActions,
   mcc: MessagesControllerComponents,
-  llpStartPage: LlpStartPage,
-  placeholderStartPage: SimplePage,
+  startPage: StartPage,
   applicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
@@ -48,21 +42,11 @@ extends FrontendController(mcc, actions):
       implicit request =>
         val genericExitPageUrl: String = AppRoutes.apply.AgentApplicationController.genericExitPage.url
         applicationService.find(linkId).map {
-          case Some(app) if app.hasFinished => startPageForApplicationType(app)
-          case Some(app) =>
-            logger.warn(s"Application ${app.agentApplicationId} has not finished, redirecting to $genericExitPageUrl.")
+          case Some(app) if app.hasFinished =>
+            logger.info(s"Individual details can no longer be provided on this link id, the application for linkId $linkId has already finished, redirecting to $genericExitPageUrl")
             Redirect(genericExitPageUrl)
+          case Some(app) => Ok(startPage(linkId: LinkId))
           case None =>
             logger.info(s"Application for linkId $linkId not found, redirecting to $genericExitPageUrl")
             Redirect(genericExitPageUrl)
         }
-
-  // for now this returns only the llp start page template until we build the rest
-  private def startPageForApplicationType(agentApplication: AgentApplication)(implicit request: RequestHeader): Result =
-    agentApplication.businessType match
-      case BusinessType.Partnership.LimitedLiabilityPartnership => Ok(llpStartPage(agentApplication.asLlpApplication))
-      case _ =>
-        Ok(placeholderStartPage(
-          h1 = "Start page for unsupported application type",
-          bodyText = Some("Placeholder for unbuilt start pages")
-        ))

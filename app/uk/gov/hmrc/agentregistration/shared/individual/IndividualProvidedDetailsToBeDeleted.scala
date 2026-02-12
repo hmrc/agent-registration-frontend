@@ -31,7 +31,7 @@ import java.time.Instant
 /** Individual provided details for Limited Liability Partnership (Llp). This final case class represents the data entered by a user for approving as an Llp.
   */
 /*
-@deprecated("Use `IndividualProvidedDetailsToBe` with optional internalUserId instead", "2026-02-02")
+@deprecated("Use `IndividualProvidedDetails` with optional internalUserId instead", "2026-02-02")
  */
 final case class IndividualProvidedDetailsToBeDeleted(
   _id: IndividualProvidedDetailsId,
