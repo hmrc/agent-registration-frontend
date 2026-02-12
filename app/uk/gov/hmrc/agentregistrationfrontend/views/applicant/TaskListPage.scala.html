@@ -171,7 +171,7 @@
                       content = Text(messages(s"$key.lists.tracking.linkText"))
                   ),
                   status = listTrackingStatus,
-                  href = if(taskListStatus.listTracking.canStart) Some("#") else None
+                  href = if(taskListStatus.listTracking.canStart) Some(AppRoutes.apply.listdetails.progress.CheckProgressController.show.url) else None
               )
           ),
           idPrefix = "lists"

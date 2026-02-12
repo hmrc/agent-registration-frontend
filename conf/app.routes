@@ -107,6 +107,10 @@ GET         /apply/list-details/how-many-other-individuals            uk.gov.hmr
 # Lists share link
 GET        /apply/list-details/key-individuals/share-link             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.link.LinkController.show
 POST       /apply/list-details/key-individuals/share-link             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.link.LinkController.submit
+
+# Lists check progress
+GET        /apply/list-details/check-progress                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.progress.CheckProgressController.show
+
 # Apply declaration
 GET         /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.DeclarationController.show
 POST        /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.DeclarationController.submit
