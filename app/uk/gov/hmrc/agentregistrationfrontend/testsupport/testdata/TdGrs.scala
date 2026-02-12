@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLlp
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsSoleTrader
 import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
@@ -123,6 +124,30 @@ trait TdGrs {
       )
 
       val businessDetails: BusinessDetailsGeneralPartnership = BusinessDetailsGeneralPartnership(
+        safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+        saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
+        postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode")
+      )
+
+    object scottishPartnership:
+
+      val journeyData: JourneyData = JourneyData(
+        fullName = None,
+        dateOfBirth = None,
+        nino = None,
+        trn = None,
+        sautr = Some(dependencies.saUtr),
+        companyProfile = None,
+        ctutr = None,
+        postcode = Some(dependencies.postcode),
+        identifiersMatch = true,
+        registration = Registration(
+          registrationStatus = RegistrationStatus.GrsRegistered,
+          registeredBusinessPartnerId = Some(dependencies.safeId)
+        )
+      )
+
+      val businessDetails: BusinessDetailsScottishPartnership = BusinessDetailsScottishPartnership(
         safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
         saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
         postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode")

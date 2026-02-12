@@ -13,9 +13,9 @@
 ->          /                                                                 prod.Routes
 
 
-GET         /agent-registration/test-only                                      uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.showTestOnlyHub
-GET         /agent-registration/test-only/show-play-session                    uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.showPlaySession
-GET         /agent-registration/test-only/email-verification-pass-codes        uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.EmailVerificationPasscodesController.showEmailVerificationPassCodes(emailVerificationLink: String)
+GET         /agent-registration/test-only                                                    uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.showTestOnlyHub
+GET         /agent-registration/test-only/show-play-session                                  uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.showPlaySession
+GET         /agent-registration/test-only/email-verification-pass-codes                      uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.EmailVerificationPasscodesController.showEmailVerificationPassCodes(emailVerificationLink: String)
 
 GET         /agent-registration/test-only/show-agent-application                             uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.TestOnlyController.showAgentApplication
 GET         /agent-registration/test-only/grs-stub/:businessType                             uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.GrsStubController.showGrsData(businessType: BusinessType, journeyId: grs.JourneyId)
@@ -32,5 +32,5 @@ GET         /agent-registration/test-only/fast-forward                          
 GET         /agent-registration/test-only/fast-forward-to/:completedSection                  uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.fastForward(completedSection: CompletedSection)
 
 
-GET        /agent-registration/test-only/show-provided-details        uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.showProvidedDetails
-GET        /agent-registration/test-only/remove-nino-and-dob          uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.removeNinoAndDobFromIndividual()
+GET        /agent-registration/test-only/show-provided-details                               uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.showProvidedDetails
+GET        /agent-registration/test-only/remove-nino-and-dob                                 uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.removeNinoAndDobFromIndividual()
