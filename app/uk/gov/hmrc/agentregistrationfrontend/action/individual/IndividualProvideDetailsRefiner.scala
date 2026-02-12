@@ -80,12 +80,12 @@ extends RequestAwareLogging:
                 .find(agentApplicationId)
                 .map:
                   case Some(app) if app.hasFinished =>
+                    logger.warn(s"Application ${app.agentApplicationId} has finished, no longer able to provide details, redirecting to ${appGenericExitPageUrl.url}")
+                    Left(Redirect(appGenericExitPageUrl))
+                  case Some(app) =>
                     val initiateMpdUrl: Call = initiateMpd(app.linkId)
                     logger.info(s"Missing individual provided details in DB. Recovering success. Recovered  LinkId: ${app.linkId} for user:${app.internalUserId} and redirecting to initiate journey ${initiateMpdUrl.url}.")
                     Left(Redirect(initiateMpdUrl))
-                  case Some(app) =>
-                    logger.warn(s"Missing individual provided details in DB. Recovering failed. Application ${app.agentApplicationId} has not finished, redirecting to ${appGenericExitPageUrl.url}")
-                    Left(Redirect(appGenericExitPageUrl))
                   case None =>
                     logger.info(s"Missing individual provided details in DB. Recovering failed. Agent application not found, redirecting to ${appGenericExitPageUrl.url}")
                     Left(Redirect(appGenericExitPageUrl))
