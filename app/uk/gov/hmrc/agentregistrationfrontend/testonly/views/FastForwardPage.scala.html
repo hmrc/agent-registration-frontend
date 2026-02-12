@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistration.shared.BusinessType
-@import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
 @import sttp.model.Uri.UriContext
 @import uk.gov.hmrc.auth.core.AffinityGroup
 
@@ -48,10 +48,32 @@
     <p class="govuk-body">
         <h2 class="govuk-caption-xl">Limited Liability Partnership</h2>
         <ul class="govuk-list govuk-list--bullet">
-            @FastForwardController.CompletedSection.CompletedSectionLlp.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
+            @CompletedSection.CompletedSectionLlp.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
               <li>
                   <a class="govuk-link" href="@{AppRoutes.testOnly.applicant.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
               </li>
+            }
+        </ul>
+    </p>
+
+    <p class="govuk-body">
+        <h2 class="govuk-caption-xl">General Partnership</h2>
+        <ul class="govuk-list govuk-list--bullet">
+            @CompletedSection.CompletedSectionGeneralPartnership.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
+                <li>
+                    <a class="govuk-link" href="@{AppRoutes.testOnly.applicant.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
+                </li>
+            }
+        </ul>
+    </p>
+
+    <p class="govuk-body">
+        <h2 class="govuk-caption-xl">Scottish Partnership</h2>
+        <ul class="govuk-list govuk-list--bullet">
+            @CompletedSection.CompletedSectionScottishPartnership.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
+                <li>
+                    <a class="govuk-link" href="@{AppRoutes.testOnly.applicant.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
+                </li>
             }
         </ul>
     </p>

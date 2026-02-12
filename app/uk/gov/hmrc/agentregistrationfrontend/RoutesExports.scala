@@ -26,4 +26,4 @@ object RoutesExports:
   export uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
   export uk.gov.hmrc.agentregistration.shared.upload.UploadId
   export uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
-  export uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection
+  export uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
