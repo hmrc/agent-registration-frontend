@@ -22,6 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.SaUtr
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineFutureEither
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineUnion
@@ -47,13 +48,23 @@ object IndividualActions:
   type RequestWithAdditionalIdentifiers = RequestWithData[DataWithAdditionalIdentifiers]
   type RequestWithAdditionalIdentifiersCt[ContentType] = RequestWithDataCt[ContentType, DataWithAdditionalIdentifiers]
 
-  type DataWithIndividualProvidedDetails = IndividualProvidedDetailsToBeDeleted *: DataWithAuth
-  type RequestWithIndividualProvidedDetailsToBeDeleted = RequestWithData[DataWithIndividualProvidedDetails]
-  type RequestWithIndividualProvidedDetailsToBeDeletedCt[ContentType] = RequestWithDataCt[ContentType, DataWithIndividualProvidedDetails]
+  type DataWithAgentApplicationFromLinkId = AgentApplication *: DataWithAdditionalIdentifiers
+  type RequestWithAgentApplication = RequestWithData[DataWithAgentApplicationFromLinkId]
+  type RequestWithAgentApplicationCt[ContentType] = RequestWithDataCt[ContentType, DataWithAgentApplicationFromLinkId]
 
-  type DataWithAgentApplication = AgentApplication *: DataWithIndividualProvidedDetails
-  type RequestWithAgentApplication = RequestWithData[DataWithAgentApplication]
-  type RequestWithAgentApplicationCt[ContentType] = RequestWithDataCt[ContentType, DataWithAgentApplication]
+  type DataWithIndividualProvidedDetails = IndividualProvidedDetails *: DataWithAgentApplicationFromLinkId
+  type RequestWithIndividualProvidedDetails = RequestWithData[DataWithIndividualProvidedDetails]
+  type RequestWithIndividualProvidedDetailsCt[ContentType] = RequestWithDataCt[ContentType, DataWithIndividualProvidedDetails]
+
+  // the request and data types below are renamed with "ToBeDeleted" are predicated on the deprecated model and pattern
+  // of generating new IndividualProvidedDetails records for users without one
+  type DataWithIndividualProvidedDetailsToBeDeleted = IndividualProvidedDetailsToBeDeleted *: DataWithAuth
+  type RequestWithIndividualProvidedDetailsToBeDeleted = RequestWithData[DataWithIndividualProvidedDetailsToBeDeleted]
+  type RequestWithIndividualProvidedDetailsToBeDeletedCt[ContentType] = RequestWithDataCt[ContentType, DataWithIndividualProvidedDetailsToBeDeleted]
+
+  type DataWithAgentApplicationToBeDeleted = AgentApplication *: DataWithIndividualProvidedDetailsToBeDeleted
+  type RequestWithAgentApplicationToBeDeleted = RequestWithData[DataWithAgentApplicationToBeDeleted]
+  type RequestWithAgentApplicationToBeDeletedCt[ContentType] = RequestWithDataCt[ContentType, DataWithAgentApplicationToBeDeleted]
 
 @Singleton
 class IndividualActions @Inject() (
@@ -76,11 +87,11 @@ extends RequestAwareLogging:
   val authorisedWithAdditionalIdentifiers: ActionBuilderWithData[DataWithAdditionalIdentifiers] = action
     .refineFutureEither(individualAuthorisedRefiner.refineIntoRequestWithAdditionalIdentifiers)
 
-  val getProvidedDetails: ActionBuilderWithData[DataWithIndividualProvidedDetails] = authorised
+  val getProvidedDetailsToBeDeleted: ActionBuilderWithData[DataWithIndividualProvidedDetailsToBeDeleted] = authorised
     .refineFutureEither:
-      individualProvideDetailsRefiner.refineIntoRequestWithIndividualProvidedDetails
+      individualProvideDetailsRefiner.refineIntoRequestWithIndividualProvidedDetailsToBeDeleted
 
-  val getProvideDetailsInProgress: ActionBuilderWithData[DataWithIndividualProvidedDetails] = getProvidedDetails
+  val getProvideDetailsInProgress: ActionBuilderWithData[DataWithIndividualProvidedDetailsToBeDeleted] = getProvidedDetailsToBeDeleted
     .ensure(
       condition = _.individualProvidedDetails.isInProgress,
       resultWhenConditionNotMet =
@@ -94,11 +105,11 @@ extends RequestAwareLogging:
           Redirect(mpdConfirmationPage.url)
     )
 
-  val getProvideDetailsWithApplicationInProgress: ActionBuilderWithData[DataWithAgentApplication] =
+  val getProvideDetailsWithApplicationInProgress: ActionBuilderWithData[DataWithAgentApplicationToBeDeleted] =
     getProvideDetailsInProgress
       .enrichWithAgentApplicationAction
 
-  val getSubmittedDetailsWithApplicationInProgress: ActionBuilderWithData[DataWithAgentApplication] = getProvidedDetails
+  val getSubmittedDetailsWithApplicationInProgress: ActionBuilderWithData[DataWithAgentApplicationToBeDeleted] = getProvidedDetailsToBeDeleted
     .ensure(
       condition = _.individualProvidedDetails.hasFinished,
       resultWhenConditionNotMet =

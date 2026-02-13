@@ -40,7 +40,7 @@ class IndividualTelephoneNumberController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions
+  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetailsToBeDeleted] = actions
     .getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.companiesHouseMatch.nonEmpty, // TODO: Add check for companies house details

@@ -39,7 +39,7 @@ class CheckYourAnswersController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions
+  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetailsToBeDeleted] = actions
     .getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.companiesHouseMatch.flatMap(_.companiesHouseOfficer).isDefined,

@@ -41,7 +41,7 @@ class IndividualProvideDetailsRefiner @Inject() (
 )(using ec: ExecutionContext)
 extends RequestAwareLogging:
 
-  def refineIntoRequestWithIndividualProvidedDetails[Data <: Tuple](
+  def refineIntoRequestWithIndividualProvidedDetailsToBeDeleted[Data <: Tuple](
     request: RequestWithData[Data]
   )(
     using IndividualProvidedDetailsToBeDeleted AbsentIn Data
@@ -72,7 +72,7 @@ extends RequestAwareLogging:
 
       case Some(agentApplicationId) =>
         individualProvideDetailsService
-          .findByApplicationId(agentApplicationId)
+          .findByApplicationIdToBeDeleted(agentApplicationId)
           .flatMap:
             case Some(individualProvidedDetails) => Future.successful(Right(request.add(individualProvidedDetails)))
             case None =>

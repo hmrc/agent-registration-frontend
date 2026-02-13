@@ -149,6 +149,7 @@ object AppRoutes:
     val IndividualConfirmStopController = providedetailsRoutes.IndividualConfirmStopController
     val CheckYourAnswersController = providedetailsRoutes.CheckYourAnswersController
     val IndividualConfirmationController = providedetailsRoutes.IndividualConfirmationController
+    val ConfirmMatchToIndividualProvidedDetailsController = providedetailsRoutes.ConfirmMatchToIndividualProvidedDetailsController
 
     object internal:
       val InitiateIndividualProvideDetailsController = internalProviDedetailsRoutes.InitiateIndividualProvideDetailsController

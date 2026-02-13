@@ -35,7 +35,7 @@ class IndividualConfirmationController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[DataWithAgentApplication] = actions.getSubmittedDetailsWithApplicationInProgress
+  private val baseAction: ActionBuilderWithData[DataWithAgentApplicationToBeDeleted] = actions.getSubmittedDetailsWithApplicationInProgress
     .ensure(
       _.individualProvidedDetails.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed,
       implicit request =>

@@ -134,6 +134,8 @@ GET         /provide-details/start/:linkId                          uk.gov.hmrc.
 #  These routes are for internal navigation and should not be accessed directly through the browser URL and meant to be accessed via redirects from other routes.
 GET        /provide-details/internal/initiate-member-provide-details/:linkId  uk.gov.hmrc.agentregistrationfrontend.controllers.individual.internal.InitiateIndividualProvideDetailsController.initiateIndividualProvideDetails(linkId: LinkId)
 
+GET         /provide-details/match-application/:linkId             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ConfirmMatchToIndividualProvidedDetailsController.show(linkId: LinkId)
+POST        /provide-details/match-application/:linkId             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ConfirmMatchToIndividualProvidedDetailsController.submit(linkId: LinkId)
 
 GET         /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.CompaniesHouseNameQueryController.show
 POST        /provide-details/name                                   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.CompaniesHouseNameQueryController.submit

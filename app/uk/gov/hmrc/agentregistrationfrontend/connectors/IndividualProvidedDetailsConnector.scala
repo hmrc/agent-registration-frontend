@@ -38,6 +38,28 @@ class IndividualProvidedDetailsConnector @Inject() (
 )
 extends Connector:
 
+  // different to upsert as used by individuals to update existing records as created by agent user when building their application,
+  // whereas upsertForIndividual is used by individuals to create or update their matched provided details record during the individual journey
+  def upsertForIndividual(individualProvidedDetails: IndividualProvidedDetails)(using
+    request: RequestHeader
+  ): Future[Unit] =
+    val url: URL = url"$baseUrl/individual-provided-details/for-individual"
+    httpClient
+      .put(url)
+      .withBody(Json.toJson(individualProvidedDetails))
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => ()
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to upsert IndividualProvidedDetails for individual")
+
   def upsert(individualProvidedDetails: IndividualProvidedDetails)(using
     request: RequestHeader
   ): Future[Unit] =
@@ -107,6 +129,15 @@ extends Connector:
       .get(url)
       .execute[List[IndividualProvidedDetails]]
       .andLogOnFailure(s"Failed to find IndividualProvidedDetails by agent application id: ${agentApplicationId.value}")
+
+  def findAllForMatching(agentApplicationId: AgentApplicationId)(using
+    request: RequestHeader
+  ): Future[List[IndividualProvidedDetails]] =
+    val url: URL = url"$baseUrl/individual-provided-details/for-matching-application/${agentApplicationId.value}"
+    httpClient
+      .get(url)
+      .execute[List[IndividualProvidedDetails]]
+      .andLogOnFailure(s"Failed to find IndividualProvidedDetails for matching by agent application id: ${agentApplicationId.value}")
 
   def findAll()(using RequestHeader): Future[List[IndividualProvidedDetailsToBeDeleted]] =
     val url: URL = url"$baseUrl/member-provided-details"

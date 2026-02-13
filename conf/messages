@@ -726,3 +726,20 @@ dateOfBirth.error.month.required = Your date of birth must include a month
 dateOfBirth.error.year.required = Your date of birth must include a year
 dateOfBirth.error.invalid = Your date of birth must be a real date
 dateOfBirth.error.future = Your date of birth must be in the past
+
+# Confirm match to individual provided details record
+confirmMatchToIndividualProvidedDetails.title = Confirm your details
+confirmMatchToIndividualProvidedDetails.p1 = Please confirm that these are your details.
+confirmMatchToIndividualProvidedDetails.role.Partnership = Partner name
+confirmMatchToIndividualProvidedDetails.role.LimitedCompany = Director name
+confirmMatchToIndividualProvidedDetails.role.LimitedLiabilityPartnership = LLP Member name
+confirmMatchToIndividualProvidedDetails.role.SoleTrader = Business owner name
+confirmMatchToIndividualProvidedDetails.role.otherRelevantIndividual = Tax adviser name
+confirmMatchToIndividualProvidedDetails.entityInApplication.Partnership = Partnership name
+confirmMatchToIndividualProvidedDetails.entityInApplication.LimitedCompany = Company name
+confirmMatchToIndividualProvidedDetails.entityInApplication.LimitedLiabilityPartnership = Partnership name
+confirmMatchToIndividualProvidedDetails.entityInApplication.SoleTrader = Trading name
+confirmMatchToIndividualProvidedDetails.label = Are these your details?
+confirmMatchToIndividualProvidedDetails.yes = Yes, these details are correct
+confirmMatchToIndividualProvidedDetails.no = No
+confirmMatchToIndividualProvidedDetails.error.required = Select yes if these details are correct

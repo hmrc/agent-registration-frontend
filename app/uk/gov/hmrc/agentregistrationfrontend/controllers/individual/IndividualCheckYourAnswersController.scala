@@ -33,7 +33,7 @@ class IndividualCheckYourAnswersController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions.getProvideDetailsInProgress
+  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetailsToBeDeleted] = actions.getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.individualSaUtr.isDefined,
       implicit request =>

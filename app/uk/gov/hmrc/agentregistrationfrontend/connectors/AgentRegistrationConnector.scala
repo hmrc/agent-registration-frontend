@@ -127,4 +127,22 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to get business partner record")
 
+  def getApplicationBusinessPartnerRecord(utr: Utr)(using RequestHeader): Future[Option[BusinessPartnerRecordResponse]] =
+    val url: URL = url"$baseUrl/application-business-partner-record/utr/${utr.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => Some(response.json.as[BusinessPartnerRecordResponse])
+          case Status.NO_CONTENT => None
+          case other =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = other,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to get business partner record")
+
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration"

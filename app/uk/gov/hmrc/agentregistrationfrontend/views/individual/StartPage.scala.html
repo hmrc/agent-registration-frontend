@@ -64,9 +64,8 @@
             href= Some(
               AppRoutes
                 .providedetails
-                .internal
-                .InitiateIndividualProvideDetailsController
-                .initiateIndividualProvideDetails(linkId)
+                .ConfirmMatchToIndividualProvidedDetailsController
+                .show(linkId)
                 .url
             ),
             isStartButton = true

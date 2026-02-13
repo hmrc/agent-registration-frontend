@@ -41,7 +41,7 @@ class IndividualApproveApplicantController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[DataWithAgentApplication] = actions
+  private val baseAction: ActionBuilderWithData[DataWithAgentApplicationToBeDeleted] = actions
     .getProvideDetailsWithApplicationInProgress
     .ensure(
       _.individualProvidedDetails.individualSaUtr.nonEmpty,

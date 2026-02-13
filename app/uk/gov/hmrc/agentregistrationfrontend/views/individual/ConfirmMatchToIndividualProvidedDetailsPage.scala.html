@@ -1,0 +1,95 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistration.shared.LinkId
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.partials.SaveAndContinue
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
+@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
+@import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmMatchToIndividualProvidedDetailsForm
+
+@this(
+        layout: Layout,
+        govukRadios: GovukRadios,
+        formWithCSRF: FormWithCSRF,
+        govukSummaryList: GovukSummaryList,
+        govukButton: GovukButton,
+        govukInsetText: GovukInsetText,
+        saveAndContinue: SaveAndContinue
+)
+
+@(
+        form: Form[YesNo],
+        individualProvidedDetails: IndividualProvidedDetails,
+        entityName: String,
+        businessTypeKey: String,
+        linkId: LinkId
+)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{ConfirmMatchToIndividualProvidedDetailsForm.key}
+@title = @{messages(s"$key.title")}
+@roleKey = @{
+  if(individualProvidedDetails.isPersonOfControl) businessTypeKey
+  else "otherRelevantIndividual"
+}
+
+@layout(
+    pageTitle = title,
+    maybeForm = Some(form)
+) {
+    <h1 class="govuk-heading-l">@title</h1>
+    <p class="govuk-body">@messages(s"$key.p1")</p>
+    @govukSummaryList(SummaryList(
+      rows = Seq(
+        SummaryListRow(
+          key = Key(content = Text(messages(s"$key.role.$roleKey"))),
+          value = Value(content = Text(individualProvidedDetails.individualName.value))
+        ),
+        SummaryListRow(
+          key = Key(content = Text(messages(s"$key.entityInApplication.$businessTypeKey"))),
+          value = Value(content = Text(entityName))
+        )
+      )
+    ))
+
+    @formWithCSRF(action = AppRoutes.providedetails.ConfirmMatchToIndividualProvidedDetailsController.submit(linkId)) {
+        @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(messages(s"$key.label")),
+                    isPageHeading = false,
+                    classes = "govuk-fieldset__legend--m"
+                ))
+            )),
+            items = Seq(
+              RadioItem(
+                content = HtmlContent(messages(s"$key.yes")),
+                value = Some(YesNo.Yes.toString),
+              ),
+              RadioItem(
+                content = HtmlContent(messages(s"$key.no")),
+                value = Some(YesNo.No.toString)
+              )
+            )
+        ).withFormField(form(key)))
+
+        @saveAndContinue()
+    }
+}

@@ -41,7 +41,7 @@ class IndividualSaUtrController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions.getProvideDetailsInProgress
+  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetailsToBeDeleted] = actions.getProvideDetailsInProgress
     .ensure(
       _.individualProvidedDetails.individualNino.nonEmpty,
       implicit request =>

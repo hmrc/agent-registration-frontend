@@ -63,7 +63,7 @@ extends FrontendController(mcc, actions):
           .flatMap:
             case Some(agentApplication) =>
               individualProvideDetailsService
-                .findByApplicationId(agentApplication.agentApplicationId)
+                .findByApplicationIdToBeDeleted(agentApplication.agentApplicationId)
                 .flatMap:
                   case None =>
                     for {
