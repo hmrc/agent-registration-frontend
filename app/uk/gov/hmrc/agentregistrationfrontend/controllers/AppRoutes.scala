@@ -103,7 +103,12 @@ object AppRoutes:
         val CheckYourAnswersController = listdetailsNonIncorporatedRoutes.CheckYourAnswersController
 
       object otherrelevantindividuals:
-        val NumberOfOtherRelevantIndividualsController = listdetailsOthersRoutes.NumberOfOtherRelevantIndividualsController
+
+        val ConfirmOtherRelevantIndividualsController = listdetailsOthersRoutes.ConfirmOtherRelevantIndividualsController
+        val EnterOtherRelevantIndividualController = listdetailsOthersRoutes.EnterOtherRelevantIndividualController
+        val ChangeOtherRelevantIndividualController = listdetailsOthersRoutes.ChangeOtherRelevantIndividualController
+        val RemoveOtherRelevantIndividualController = listdetailsOthersRoutes.RemoveOtherRelevantIndividualController
+        val CheckYourAnswersController = listdetailsOthersRoutes.CheckYourAnswersController
 
       object link:
 

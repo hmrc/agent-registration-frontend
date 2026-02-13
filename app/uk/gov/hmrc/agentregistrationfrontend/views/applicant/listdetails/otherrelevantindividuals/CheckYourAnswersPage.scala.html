@@ -1,0 +1,149 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
+@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.*
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistrationfrontend.util.MessageKeys
+@this(
+        layout: Layout,
+        govukSummaryList: GovukSummaryList,
+        govukRadios: GovukRadios,
+        formWithCSRF: FormWithCSRF,
+        continueOrSaveForLater: ContinueOrSaveForLater
+)
+@(
+        existingList: List[IndividualProvidedDetails],
+        form: Form[Boolean],
+        entityName: String
+)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@messageKeyPrefix = @{
+    "addToListSummary.relevant.individuals"
+}
+
+@title = @{
+    messages(s"$messageKeyPrefix.title", entityName)
+}
+
+@yesNoFieldKey = @{
+    "addOtherRelevantIndividuals"
+}
+
+@question = @{
+    messages(s"$messageKeyPrefix.more.question")
+}
+
+@hint = @{
+    messages(s"$messageKeyPrefix.more.hint")
+}
+
+@summaryRows = @{
+    existingList.map { individualDetails =>
+        val name = individualDetails.individualName.value
+        val removeHref =
+            AppRoutes.apply.listdetails.otherrelevantindividuals.RemoveOtherRelevantIndividualController
+            .show(individualDetails._id).url
+
+        val removeAction = ActionItem(
+            href = removeHref,
+            content = Text(messages("common.remove")),
+            visuallyHiddenText = Some(name)
+        )
+
+        val actions = {
+            val changeHref =
+                AppRoutes.apply.listdetails.otherrelevantindividuals.ChangeOtherRelevantIndividualController
+                .show(individualDetails._id).url
+
+            Some(
+                Actions(
+                    items = Seq(
+                        ActionItem(
+                            href = changeHref,
+                            content = Text(messages("common.change")),
+                            visuallyHiddenText = Some(name)
+                        ),
+                        removeAction
+                    ),
+                    classes = "hmrc-summary-list__actions"
+                )
+            )
+
+        }
+
+        SummaryListRow(
+            key = Key(
+                content = Text(name),
+                classes = "govuk-!-font-weight-regular hmrc-summary-list__key"
+            ),
+            actions = actions
+        )
+    }.toSeq
+}
+
+@layout(
+    pageTitle = title,
+    maybeForm = Some(form)
+) {
+    <h2 class="govuk-caption-l">@messages(s"$messageKeyPrefix.caption")</h2>
+    <h1 class="govuk-heading-l">@title</h1>
+
+    @govukSummaryList(
+        SummaryList(
+            rows = summaryRows,
+            classes = "hmrc-list-with-actions hmrc-list-with-actions--short"
+        )
+    )
+
+    @formWithCSRF(action = AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.submit) {
+        @govukRadios(
+            Radios(
+                fieldset = Some(
+                    Fieldset(
+                        legend = Some(
+                            Legend(
+                                content = Text(question),
+                                isPageHeading = false,
+                                classes = "govuk-fieldset__legend--m"
+                            )
+                        )
+                    )
+                ),
+                hint = Some(Hint(content = Text(hint))),
+                items = Seq(
+                    RadioItem(
+                        content = Text(messages("common.yes")),
+                        value = Some(Yes.toString)
+                    ),
+                    RadioItem(
+                        content = Text(messages("common.no")),
+                        value = Some(No.toString)
+                    )
+                )
+            ).withFormField(form(yesNoFieldKey))
+        )
+
+        @continueOrSaveForLater()
+    }
+}

@@ -102,7 +102,18 @@ GET         /apply/list-details/remove-key-individual/:individualProvidedDetails
 POST        /apply/list-details/remove-key-individual/:individualProvidedDetailsId    uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.RemoveKeyIndividualController.submit(individualProvidedDetailsId: IndividualProvidedDetailsId)
 
 # Lists of other relevant individuals ("unofficial" directors/partners/members)
-GET         /apply/list-details/how-many-other-individuals            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.NumberOfOtherRelevantIndividualsController.show
+GET         /apply/list-details/how-many-other-individuals            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show
+POST        /apply/list-details/how-many-other-individuals            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.submit
+GET         /apply/list-details/enter-other-relevant-individual       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.EnterOtherRelevantIndividualController.show
+POST        /apply/list-details/enter-other-relevant-individual       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.EnterOtherRelevantIndividualController.submit
+GET         /apply/list-details/other-relevant-individuals/check-your-answers  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.CheckYourAnswersController.show
+POST        /apply/list-details/other-relevant-individuals/check-your-answers  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.CheckYourAnswersController.submit
+GET         /apply/list-details/change-other-relevant-individual/:individualProvidedDetailsId    uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.ChangeOtherRelevantIndividualController.show(individualProvidedDetailsId: IndividualProvidedDetailsId)
+POST        /apply/list-details/change-other-relevant-individual/:individualProvidedDetailsId    uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.ChangeOtherRelevantIndividualController.submit(individualProvidedDetailsId: IndividualProvidedDetailsId)
+GET         /apply/list-details/remove-other-relevant-individual/:individualProvidedDetailsId    uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.RemoveOtherRelevantIndividualController.show(individualProvidedDetailsId: IndividualProvidedDetailsId)
+POST        /apply/list-details/remove-other-relevant-individual/:individualProvidedDetailsId    uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.RemoveOtherRelevantIndividualController.submit(individualProvidedDetailsId: IndividualProvidedDetailsId)
+
+
 
 # Lists share link
 GET        /apply/list-details/key-individuals/share-link             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.link.LinkController.show
