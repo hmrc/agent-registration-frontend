@@ -33,6 +33,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.http.SessionKeys
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifiers
 
 import java.time.Clock
 import java.time.Instant
@@ -137,7 +138,7 @@ extends FrontendController(mcc, applicantActions):
     clock: Clock
   ): Future[Result] =
     val application =
-      (completedSection match
+      completedSection match
         case CompletedSectionGeneralPartnership.GeneralPartnershipAboutYourBusiness =>
           TestOnlyData.agentApplicationGeneralPartnership.afterRefusalToDealWithCheckPass
         case CompletedSectionGeneralPartnership.GeneralPartnershipApplicantContactDetails =>
@@ -149,7 +150,6 @@ extends FrontendController(mcc, applicantActions):
         case CompletedSectionGeneralPartnership.GeneralPartnershipHmrcStandardForAgents =>
           TestOnlyData.agentApplicationGeneralPartnership.afterHmrcStandardForAgentsAgreed
         case CompletedSectionGeneralPartnership.GeneralPartnershipDeclaration => TestOnlyData.agentApplicationGeneralPartnership.afterDeclarationSubmitted
-      )
 
     for {
       _ <- grsStubService.storeStubsData(
@@ -190,50 +190,20 @@ extends FrontendController(mcc, applicantActions):
       _ <- applicationService.upsert(updatedApp)
     } yield Redirect(AppRoutes.apply.TaskListController.show)
 
-  private def updateIdentifiers(agentApplication: AgentApplicationLlp)(using
+  private def updateIdentifiers(agentApplication: AgentApplication)(using
     r: RequestWithAuth,
     clock: Clock
-  ): Future[AgentApplicationLlp] =
+  ): Future[AgentApplication] =
     val identifiers: Future[(AgentApplicationId, LinkId)] = applicationService.find().map:
       case Some(existingApplication) => (existingApplication.agentApplicationId, existingApplication.linkId)
       case None => (agentApplicationIdGenerator.nextApplicationId(), linkIdGenerator.nextLinkId())
-    identifiers.map: t =>
-      agentApplication.copy(
-        _id = t._1,
-        internalUserId = r.internalUserId,
-        linkId = t._2,
-        groupId = r.groupId,
-        createdAt = Instant.now(clock)
-      )
-
-  private def updateIdentifiers(agentApplication: AgentApplicationGeneralPartnership)(using
-    r: RequestWithAuth,
-    clock: Clock
-  ): Future[AgentApplicationGeneralPartnership] =
-    val identifiers: Future[(AgentApplicationId, LinkId)] = applicationService.find().map:
-      case Some(existingApplication) => (existingApplication.agentApplicationId, existingApplication.linkId)
-      case None => (agentApplicationIdGenerator.nextApplicationId(), linkIdGenerator.nextLinkId())
-    identifiers.map: t =>
-      agentApplication.copy(
-        _id = t._1,
-        internalUserId = r.internalUserId,
-        linkId = t._2,
-        groupId = r.groupId,
-        createdAt = Instant.now(clock)
-      )
-
-  private def updateIdentifiers(agentApplication: AgentApplicationScottishPartnership)(using
-    r: RequestWithAuth,
-    clock: Clock
-  ): Future[AgentApplicationScottishPartnership] =
-    val identifiers: Future[(AgentApplicationId, LinkId)] = applicationService.find().map:
-      case Some(existingApplication) => (existingApplication.agentApplicationId, existingApplication.linkId)
-      case None => (agentApplicationIdGenerator.nextApplicationId(), linkIdGenerator.nextLinkId())
-    identifiers.map: t =>
-      agentApplication.copy(
-        _id = t._1,
-        internalUserId = r.internalUserId,
-        linkId = t._2,
-        groupId = r.groupId,
-        createdAt = Instant.now(clock)
-      )
+    identifiers.map:
+      case (id, linkId) =>
+        agentApplication
+          .withUpdatedIdentifiers(
+            id,
+            r.internalUserId,
+            linkId,
+            r.groupId,
+            Instant.now(clock)
+          )
