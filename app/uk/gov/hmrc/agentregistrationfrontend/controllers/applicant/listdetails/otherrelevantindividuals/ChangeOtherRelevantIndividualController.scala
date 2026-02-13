@@ -109,10 +109,12 @@ extends FrontendController(mcc, actions):
               individualProvidedDetailsId
             )
 
-            Future.successful(BadRequest(enterIndividualNamePage(
-              form = formWithErrors,
-              formAction = formAction
-            )))
+            BadRequest(
+              enterIndividualNamePage(
+                form = formWithErrors,
+                formAction = formAction
+              )
+            )
     )
     .async:
       implicit request =>
