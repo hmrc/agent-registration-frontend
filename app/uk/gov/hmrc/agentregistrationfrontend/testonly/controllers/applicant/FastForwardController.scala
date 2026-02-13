@@ -16,29 +16,31 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant
 
+import org.apache.pekko.Done
 import play.api.http.Status.SEE_OTHER
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithAuth
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.*
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifiers
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.http.SessionKeys
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifiers
 
 import java.time.Clock
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
@@ -46,19 +48,48 @@ class FastForwardController @Inject() (
   mcc: MessagesControllerComponents,
   applicantActions: ApplicantActions,
   applicantAuthRefiner: ApplicantAuthRefiner,
-  applicationService: AgentApplicationService,
   fastForwardPage: FastForwardPage,
-  agentApplicationIdGenerator: AgentApplicationIdGenerator,
-  linkIdGenerator: LinkIdGenerator,
   simplePage: SimplePage,
+  stubUserService: StubUserService,
   grsStubService: GrsStubService,
-  stubUserService: StubUserService
-)(using clock: Clock)
+  applicationService: AgentApplicationService,
+  agentApplicationIdGenerator: AgentApplicationIdGenerator,
+  linkIdGenerator: LinkIdGenerator
+)(using
+  clock: Clock,
+  ex: ExecutionContext
+)
 extends FrontendController(mcc, applicantActions):
 
   def show: Action[AnyContent] = applicantActions.action:
     implicit request =>
       Ok(fastForwardPage())
+
+  def fastForward(
+    completedSection: CompletedSection
+  ): Action[AnyContent] =
+    completedSection match
+      case c: CompletedSectionLlp =>
+        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
+          given RequestWithAuth = req
+          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
+      case _: CompletedSectionSoleTrader =>
+        applicantActions.action { implicit request =>
+          Ok(
+            simplePage(
+              h1 = "Sole Trader Task List Page",
+              bodyText = Some("Fast Forwarding to Sole Trader Task List Page isn't implemented yet")
+            )
+          )
+        }
+      case c: CompletedSectionGeneralPartnership =>
+        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
+          given RequestWithAuth = req
+          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
+      case c: CompletedSectionScottishPartnership =>
+        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
+          given RequestWithAuth = req
+          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
 
   private def loginAndRetry(using request: Request[AnyContent]): Future[Result | RequestWithAuth] = stubUserService.createAndLoginAgent.map: stubsHc =>
     val bearerToken: String = stubsHc.authorization
@@ -83,112 +114,25 @@ extends FrontendController(mcc, applicantActions):
 
         case Left(result) => Future.successful(result)
 
-  def fastForward(
-    completedSection: CompletedSection
-  ): Action[AnyContent] =
-    completedSection match
-      case c: CompletedSectionLlp =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          handleCompletedSectionLlp(c)
-      case _: CompletedSectionSoleTrader =>
-        applicantActions.action { implicit request =>
-          Ok(
-            simplePage(
-              h1 = "Sole Trader Task List Page",
-              bodyText = Some("Fast Forwarding to Sole Trader Task List Page isn't implemented yet")
-            )
-          )
-        }
-      case c: CompletedSectionGeneralPartnership =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          handleCompletedSectionGeneralPartnership(c)
-      case c: CompletedSectionScottishPartnership =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          handleCompletedSectionScottishPartnership(c)
-
-  private def handleCompletedSectionLlp(completedSection: CompletedSectionLlp)(using
-    r: RequestWithAuth,
-    clock: Clock
-  ): Future[Result] =
-    val application =
-      (completedSection match
-        case CompletedSectionLlp.LlpAboutYourBusiness => TestOnlyData.agentApplicationLlp.afterCompaniesHouseStatusCheckPass
-        case CompletedSectionLlp.LlpApplicantContactDetails => TestOnlyData.agentApplicationLlp.afterContactDetailsComplete
-        case CompletedSectionLlp.LlpAgentServicesAccountDetails => TestOnlyData.agentApplicationLlp.afterAgentDetailsComplete
-        case CompletedSectionLlp.LlpAntiMoneyLaunderingSupervisionDetails => TestOnlyData.agentApplicationLlp.afterAmlsComplete
-        case CompletedSectionLlp.LlpHmrcStandardForAgents => TestOnlyData.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
-        case CompletedSectionLlp.LlpDeclaration => TestOnlyData.agentApplicationLlp.afterDeclarationSubmitted
-      )
+  private def fastForwardTo(section: CompletedSection)(using r: RequestWithAuth): Future[Done] =
+    val toAppState: AgentApplication = section.appState
 
     for {
       _ <- grsStubService.storeStubsData(
-        businessType = application.businessType,
-        journeyData = TestOnlyData.grs.llp.journeyData,
+        businessType = section.businessType,
+        journeyData = journeyDataFor(section.businessType),
         deceased = false
       )
-      updatedApp <- updateIdentifiers(application)
-      _ <- applicationService.upsert(updatedApp)
-    } yield Redirect(AppRoutes.apply.TaskListController.show)
+      updated <- updateIdentifiers(toAppState)
+      _ <- applicationService.upsert(updated)
+    } yield Done
 
-  private def handleCompletedSectionGeneralPartnership(completedSection: CompletedSectionGeneralPartnership)(using
-    r: RequestWithAuth,
-    clock: Clock
-  ): Future[Result] =
-    val application =
-      completedSection match
-        case CompletedSectionGeneralPartnership.GeneralPartnershipAboutYourBusiness =>
-          TestOnlyData.agentApplicationGeneralPartnership.afterRefusalToDealWithCheckPass
-        case CompletedSectionGeneralPartnership.GeneralPartnershipApplicantContactDetails =>
-          TestOnlyData.agentApplicationGeneralPartnership.afterContactDetailsComplete
-        case CompletedSectionGeneralPartnership.GeneralPartnershipAgentServicesAccountDetails =>
-          TestOnlyData.agentApplicationGeneralPartnership.afterAgentDetailsComplete
-        case CompletedSectionGeneralPartnership.GeneralPartnershipAntiMoneyLaunderingSupervisionDetails =>
-          TestOnlyData.agentApplicationGeneralPartnership.afterAmlsComplete
-        case CompletedSectionGeneralPartnership.GeneralPartnershipHmrcStandardForAgents =>
-          TestOnlyData.agentApplicationGeneralPartnership.afterHmrcStandardForAgentsAgreed
-        case CompletedSectionGeneralPartnership.GeneralPartnershipDeclaration => TestOnlyData.agentApplicationGeneralPartnership.afterDeclarationSubmitted
-
-    for {
-      _ <- grsStubService.storeStubsData(
-        businessType = application.businessType,
-        journeyData = TestOnlyData.grs.generalPartnership.journeyData,
-        deceased = false
-      )
-      updatedApp <- updateIdentifiers(application)
-      _ <- applicationService.upsert(updatedApp)
-    } yield Redirect(AppRoutes.apply.TaskListController.show)
-
-  private def handleCompletedSectionScottishPartnership(completedSection: CompletedSectionScottishPartnership)(using
-    r: RequestWithAuth,
-    clock: Clock
-  ): Future[Result] =
-    val application =
-      (completedSection match
-        case CompletedSectionScottishPartnership.ScottishPartnershipAboutYourBusiness =>
-          TestOnlyData.agentApplicationScottishPartnership.afterRefusalToDealWithCheckPass
-        case CompletedSectionScottishPartnership.ScottishPartnershipApplicantContactDetails =>
-          TestOnlyData.agentApplicationScottishPartnership.afterContactDetailsComplete
-        case CompletedSectionScottishPartnership.ScottishPartnershipAgentServicesAccountDetails =>
-          TestOnlyData.agentApplicationScottishPartnership.afterAgentDetailsComplete
-        case CompletedSectionScottishPartnership.ScottishPartnershipAntiMoneyLaunderingSupervisionDetails =>
-          TestOnlyData.agentApplicationScottishPartnership.afterAmlsComplete
-        case CompletedSectionScottishPartnership.ScottishPartnershipHmrcStandardForAgents =>
-          TestOnlyData.agentApplicationScottishPartnership.afterHmrcStandardForAgentsAgreed
-        case CompletedSectionScottishPartnership.ScottishPartnershipDeclaration => TestOnlyData.agentApplicationScottishPartnership.afterDeclarationSubmitted
-      )
-
-    for {
-      _ <- grsStubService.storeStubsData(
-        businessType = application.businessType,
-        journeyData = TestOnlyData.grs.scottishPartnership.journeyData,
-        deceased = false
-      )
-      updatedApp <- updateIdentifiers(application)
-      _ <- applicationService.upsert(updatedApp)
-    } yield Redirect(AppRoutes.apply.TaskListController.show)
+  private def journeyDataFor(bt: BusinessType): JourneyData =
+    bt match
+      case BusinessType.Partnership.LimitedLiabilityPartnership => TestOnlyData.grs.llp.journeyData
+      case BusinessType.Partnership.GeneralPartnership => TestOnlyData.grs.generalPartnership.journeyData
+      case BusinessType.Partnership.ScottishPartnership => TestOnlyData.grs.scottishPartnership.journeyData
+      case _ => throw new IllegalArgumentException(s"Add $bt journey data here")
 
   private def updateIdentifiers(agentApplication: AgentApplication)(using
     r: RequestWithAuth,

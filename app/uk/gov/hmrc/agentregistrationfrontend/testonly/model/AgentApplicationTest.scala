@@ -40,56 +40,56 @@ extension (a: AgentApplication)
     createdAt: Instant
   ): AgentApplication =
     a match
-      case st: AgentApplicationSoleTrader =>
-        st.copy(
+      case a: AgentApplicationSoleTrader =>
+        a.copy(
           _id = id,
           internalUserId = internalUserId,
           linkId = linkId,
           groupId = groupId,
           createdAt = createdAt
         )
-      case llp: AgentApplicationLlp =>
-        llp.copy(
+      case a: AgentApplicationLlp =>
+        a.copy(
           _id = id,
           internalUserId = internalUserId,
           linkId = linkId,
           groupId = groupId,
           createdAt = createdAt
         )
-      case lc: AgentApplicationLimitedCompany =>
-        lc.copy(
+      case a: AgentApplicationLimitedCompany =>
+        a.copy(
           _id = id,
           internalUserId = internalUserId,
           linkId = linkId,
           groupId = groupId,
           createdAt = createdAt
         )
-      case gp: AgentApplicationGeneralPartnership =>
-        gp.copy(
+      case a: AgentApplicationGeneralPartnership =>
+        a.copy(
           _id = id,
           internalUserId = internalUserId,
           linkId = linkId,
           groupId = groupId,
           createdAt = createdAt
         )
-      case lp: AgentApplicationLimitedPartnership =>
-        lp.copy(
+      case a: AgentApplicationLimitedPartnership =>
+        a.copy(
           _id = id,
           internalUserId = internalUserId,
           linkId = linkId,
           groupId = groupId,
           createdAt = createdAt
         )
-      case slp: AgentApplicationScottishLimitedPartnership =>
-        slp.copy(
+      case a: AgentApplicationScottishLimitedPartnership =>
+        a.copy(
           _id = id,
           internalUserId = internalUserId,
           linkId = linkId,
           groupId = groupId,
           createdAt = createdAt
         )
-      case sp: AgentApplicationScottishPartnership =>
-        sp.copy(
+      case a: AgentApplicationScottishPartnership =>
+        a.copy(
           _id = id,
           internalUserId = internalUserId,
           linkId = linkId,
