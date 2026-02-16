@@ -17,8 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals
 
 import play.api.mvc.*
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
@@ -43,23 +42,17 @@ class RemoveOtherRelevantIndividualController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithIndividual = IndividualProvidedDetails *: IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals *: DataWithAuth
+  private type DataWithIndividual = IndividualProvidedDetails *: IsNotSoleTrader *: DataWithAuth
 
   private def baseAction(individualProvidedDetailsId: IndividualProvidedDetailsId): ActionBuilderWithData[DataWithIndividual] = actions
     .getApplicationInProgress
     .refine:
       implicit request =>
         request.get[AgentApplication] match
-          case _: IsIncorporated =>
-            logger.warn(
-              "Incorporated businesses should be name matching key individuals against Companies House results, redirecting to task list for the correct links"
-            )
-            Redirect(AppRoutes.apply.TaskListController.show.url)
           case _: AgentApplicationSoleTrader =>
-            logger.warn("Sole traders do not add individuals to a list, redirecting to task list for the correct links")
+            logger.warn("Sole traders do not add other relevant individuals to a list, redirecting to task list for the correct links")
             Redirect(AppRoutes.apply.TaskListController.show.url)
-          case aa: IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals =>
-            request.replace[AgentApplication, IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals](aa)
+          case aa: IsNotSoleTrader => request.replace[AgentApplication, IsNotSoleTrader](aa)
     .refine:
       implicit request =>
         individualProvideDetailsService

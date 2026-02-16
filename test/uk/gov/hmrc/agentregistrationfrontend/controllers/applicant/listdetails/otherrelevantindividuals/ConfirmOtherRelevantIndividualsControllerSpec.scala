@@ -42,6 +42,11 @@ extends ControllerSpec:
         .agentApplicationGeneralPartnership
         .afterConfirmOtherRelevantIndividualsYes
 
+    val soleTraderInProgress =
+      tdAll
+        .agentApplicationSoleTrader
+        .afterGrsDataReceived
+
   "routes should have correct paths and methods" in:
     AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show shouldBe Call(
       method = "GET",
@@ -53,6 +58,25 @@ extends ControllerSpec:
     )
     AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.submit.url shouldBe
       AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show.url
+
+  s"GET $path should redirect to task list when application is a sole trader" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.soleTraderInProgress)
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.TaskListController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+
+  s"POST $path should redirect to task list when application is a sole trader" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.soleTraderInProgress)
+    val response: WSResponse =
+      post(path)(Map(
+        ConfirmOtherRelevantIndividualsForm.hasOtherRelevantIndividuals -> Seq("Yes")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.TaskListController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path should return 200, fetch the BPR and render page" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeConfirmOtherRelevantIndividuals)

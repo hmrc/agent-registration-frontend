@@ -22,8 +22,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
@@ -45,32 +44,26 @@ class CheckYourAnswersController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithLists = List[IndividualProvidedDetails] *: IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals *: DataWithAuth
+  private type DataWithLists = List[IndividualProvidedDetails] *: IsNotSoleTrader *: DataWithAuth
 
   private val baseAction: ActionBuilderWithData[DataWithLists] = actions
     .getApplicationInProgress
     .refine:
       implicit request =>
         request.get[AgentApplication] match
-          case _: IsIncorporated =>
-            logger.warn(
-              "Incorporated businesses should be name matching key individuals against Companies House results, redirecting to task list for the correct links"
-            )
-            Redirect(AppRoutes.apply.TaskListController.show.url)
           case _: AgentApplicationSoleTrader =>
-            logger.warn("Sole traders do not add individuals to a list, redirecting to task list for the correct links")
+            logger.warn("Sole traders do not add other relevant individuals to a list, redirecting to task list for the correct links")
             Redirect(AppRoutes.apply.TaskListController.show.url)
-          case aa: IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals =>
-            request.replace[AgentApplication, IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals](aa)
+          case aa: IsNotSoleTrader => request.replace[AgentApplication, IsNotSoleTrader](aa)
     .refine:
       implicit request =>
-        request.get[IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals].hasOtherRelevantIndividuals match
+        request.get[IsNotSoleTrader].hasOtherRelevantIndividuals match
           case Some(true) => request
           case Some(false) => Redirect(AppRoutes.apply.listdetails.CheckYourAnswersController.show.url)
           case None => Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show.url)
     .refine:
       implicit request =>
-        val agentApplication: IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals = request.get
+        val agentApplication: IsNotSoleTrader = request.get
         individualProvideDetailsService
           .findAllOtherRelevantIndividualsByApplicationId(
             agentApplication.agentApplicationId
@@ -87,8 +80,8 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] = baseAction
     .async:
       implicit request =>
-        val agentApplication: IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals = request.get[
-          IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals
+        val agentApplication: IsNotSoleTrader = request.get[
+          IsNotSoleTrader
         ]
         businessPartnerRecordService
           .getBusinessPartnerRecord(agentApplication.getUtr)
@@ -110,8 +103,8 @@ extends FrontendController(mcc, actions):
         resultToServeWhenFormHasErrors =
           implicit request =>
             formWithErrors => {
-              val agentApplication: IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals = request.get[
-                IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals
+              val agentApplication: IsNotSoleTrader = request.get[
+                IsNotSoleTrader
               ]
               businessPartnerRecordService
                 .getBusinessPartnerRecord(agentApplication.getUtr)

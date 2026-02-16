@@ -38,6 +38,11 @@ extends ControllerSpec:
         .agentApplicationGeneralPartnership
         .afterHowManyKeyIndividuals
 
+    val soleTraderInProgress =
+      tdAll
+        .agentApplicationSoleTrader
+        .afterGrsDataReceived
+
   "routes should have correct paths and methods" in:
     AppRoutes.apply.listdetails.otherrelevantindividuals.RemoveOtherRelevantIndividualController
       .show(individualProvidedDetailsId) shouldBe Call(
@@ -55,6 +60,27 @@ extends ControllerSpec:
       AppRoutes.apply.listdetails.otherrelevantindividuals.RemoveOtherRelevantIndividualController
         .show(individualProvidedDetailsId)
         .url
+
+  s"GET $path should redirect to task list when application is a sole trader" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.soleTraderInProgress)
+
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.TaskListController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+
+  s"POST $path should redirect to task list when application is a sole trader" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.soleTraderInProgress)
+
+    val response: WSResponse =
+      post(path)(Map(
+        RemoveKeyIndividualForm.key -> Seq("Yes")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.TaskListController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path should return 200 and render page for removing selected unofficial partner" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)

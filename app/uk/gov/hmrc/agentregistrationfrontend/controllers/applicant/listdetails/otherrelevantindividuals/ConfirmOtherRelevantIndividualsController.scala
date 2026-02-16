@@ -19,14 +19,18 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 import com.softwaremill.quicklens.modify
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmOtherRelevantIndividualsForm
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsPage
 
 import javax.inject.Inject
@@ -42,29 +46,21 @@ class ConfirmOtherRelevantIndividualsController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[
-    IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals *: DataWithAuth
-  ] = actions
+  private val baseAction: ActionBuilderWithData[IsNotSoleTrader *: DataWithAuth] = actions
     .getApplicationInProgress
     .refine:
       implicit request =>
         request.agentApplication match
-          case _: AgentApplication.IsIncorporated =>
-            logger.warn(
-              "Incorporated businesses should have the number of key individuals determined by Companies House results, redirecting to task list for the correct links"
-            )
-            Redirect(AppRoutes.apply.TaskListController.show.url)
           case _: AgentApplication.IsSoleTrader =>
-            logger.warn("Sole traders cannot specify number of key individuals, redirecting to task list for the correct links")
+            logger.warn("Sole traders cannot specify other relevant individuals, redirecting to task list for the correct links")
             Redirect(AppRoutes.apply.TaskListController.show.url)
-          case aa: IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals =>
-            request.replace[AgentApplication, IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals](aa)
+          case aa: IsNotSoleTrader => request.replace[AgentApplication, IsNotSoleTrader](aa)
 
   def show: Action[AnyContent] = baseAction
     .async:
       implicit request =>
-        val agentApplication: IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals = request.get[
-          IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals
+        val agentApplication: IsNotSoleTrader = request.get[
+          IsNotSoleTrader
         ]
 
         businessPartnerRecordService
@@ -90,9 +86,7 @@ extends FrontendController(mcc, actions):
         resultToServeWhenFormHasErrors =
           implicit request =>
             formWithErrors => {
-              val agentApplication: IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals = request.get[
-                IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals
-              ]
+              val agentApplication: IsNotSoleTrader = request.get[IsNotSoleTrader]
               businessPartnerRecordService
                 .getBusinessPartnerRecord(agentApplication.getUtr)
                 .map: bprOpt =>
@@ -111,9 +105,21 @@ extends FrontendController(mcc, actions):
         implicit request =>
           val hasOtherRelevantIndividuals: Boolean = request.get[Boolean]
 
-          val updatedApplication: IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals =
-            request.get[IsAgentApplicationForDeclaringNumberOfOtherRelevantIndividuals] match
-              case application: AgentApplicationScottishPartnership =>
+          val updatedApplication: IsNotSoleTrader = {
+            request.get[IsNotSoleTrader] match
+              case application: AgentApplicationLimitedCompany =>
+                application
+                  .modify(_.hasOtherRelevantIndividuals)
+                  .setTo(Some(hasOtherRelevantIndividuals))
+              case application: AgentApplicationLimitedPartnership =>
+                application
+                  .modify(_.hasOtherRelevantIndividuals)
+                  .setTo(Some(hasOtherRelevantIndividuals))
+              case application: AgentApplicationLlp =>
+                application
+                  .modify(_.hasOtherRelevantIndividuals)
+                  .setTo(Some(hasOtherRelevantIndividuals))
+              case application: AgentApplicationScottishLimitedPartnership =>
                 application
                   .modify(_.hasOtherRelevantIndividuals)
                   .setTo(Some(hasOtherRelevantIndividuals))
@@ -121,6 +127,11 @@ extends FrontendController(mcc, actions):
                 application
                   .modify(_.hasOtherRelevantIndividuals)
                   .setTo(Some(hasOtherRelevantIndividuals))
+              case application: AgentApplicationScottishPartnership =>
+                application
+                  .modify(_.hasOtherRelevantIndividuals)
+                  .setTo(Some(hasOtherRelevantIndividuals))
+          }
 
           agentApplicationService
             .upsert(updatedApplication)
