@@ -16,15 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationLlp
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationGeneralPartnership
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationSoleTrader
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.*
 
 object TestOnlyData
 extends TdBase,
   TdGrs,
   TdAgentApplicationLlp,
   TdAgentApplicationGeneralPartnership,
+  TdAgentApplicationScottishPartnership,
   agentapplication.sections.TdSectionContactDetails,
   agentapplication.sections.TdSectionAgentDetails,
   agentapplication.sections.TdUpload,

@@ -16,130 +16,80 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant
 
+import org.apache.pekko.Done
 import play.api.http.Status.SEE_OTHER
 import play.api.mvc.*
-
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
-import uk.gov.hmrc.agentregistration.shared.util.SealedObjects
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithAuth
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection
-import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection.CompletedSectionLlp
-import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.CompletedSection.CompletedSectionSoleTrader
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.*
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifiers
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.http.SessionKeys
 
 import java.time.Clock
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
-import uk.gov.hmrc.http.SessionKeys
-
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-
-object FastForwardController:
-
-  sealed trait CompletedSection:
-
-    def sectionName: String
-    def businessType: BusinessType
-    def alreadyDeveloped: Boolean = false
-    def displayOrder: Int
-
-  object CompletedSection:
-
-    sealed trait CompletedSectionLlp
-    extends CompletedSection:
-      override final def businessType: BusinessType = BusinessType.Partnership.LimitedLiabilityPartnership
-
-    object CompletedSectionLlp:
-
-      case object LlpAboutYourBusiness
-      extends CompletedSectionLlp:
-
-        override def sectionName: String = "About your business"
-        override def alreadyDeveloped: Boolean = true
-        override def displayOrder: Int = 1
-
-      case object LlpApplicantContactDetails
-      extends CompletedSectionLlp:
-
-        override def sectionName: String = "Applicant Contact Details"
-        override def alreadyDeveloped: Boolean = true
-        override def displayOrder: Int = 2
-
-      case object LlpAgentServicesAccountDetails
-      extends CompletedSectionLlp:
-
-        override def sectionName: String = "Agent services account details"
-        override def alreadyDeveloped: Boolean = true
-        override def displayOrder: Int = 3
-
-      case object LlpAntiMoneyLaunderingSupervisionDetails
-      extends CompletedSectionLlp:
-
-        override def sectionName: String = "Anti-money laundering supervision details"
-        override def alreadyDeveloped: Boolean = true
-        override def displayOrder: Int = 4
-
-      case object LlpHmrcStandardForAgents
-      extends CompletedSectionLlp:
-
-        override def sectionName: String = "HMRC standard for agents"
-        override def alreadyDeveloped: Boolean = true
-        override def displayOrder: Int = 5
-
-      case object LlpDeclaration
-      extends CompletedSectionLlp:
-
-        override def sectionName: String = "Declaration"
-        override def alreadyDeveloped: Boolean = true
-        override def displayOrder: Int = 6
-
-      val values: Seq[CompletedSectionLlp] = SealedObjects.all[CompletedSectionLlp]
-
-    sealed trait CompletedSectionSoleTrader
-    extends CompletedSection:
-      override def businessType: BusinessType = BusinessType.SoleTrader
-
-    object CompletedSectionSoleTrader:
-      // example:
-      case object SoleTraderAboutYourBusiness
-      extends CompletedSectionSoleTrader:
-
-        override def sectionName: String = "About your business"
-        override def alreadyDeveloped: Boolean = true
-        override def displayOrder: Int = 1
-
-    val values: Seq[CompletedSection] = SealedObjects.all[CompletedSection]
-    given PathBindable[CompletedSection] = PathBindableFactory.makeSealedObjectPathBindable[CompletedSection]
 
 @Singleton
 class FastForwardController @Inject() (
   mcc: MessagesControllerComponents,
   applicantActions: ApplicantActions,
   applicantAuthRefiner: ApplicantAuthRefiner,
-  applicationService: AgentApplicationService,
   fastForwardPage: FastForwardPage,
-  agentApplicationIdGenerator: AgentApplicationIdGenerator,
-  linkIdGenerator: LinkIdGenerator,
   simplePage: SimplePage,
+  stubUserService: StubUserService,
   grsStubService: GrsStubService,
-  stubUserService: StubUserService
-)(using clock: Clock)
+  applicationService: AgentApplicationService,
+  agentApplicationIdGenerator: AgentApplicationIdGenerator,
+  linkIdGenerator: LinkIdGenerator
+)(using
+  clock: Clock,
+  ex: ExecutionContext
+)
 extends FrontendController(mcc, applicantActions):
 
   def show: Action[AnyContent] = applicantActions.action:
     implicit request =>
       Ok(fastForwardPage())
+
+  def fastForward(
+    completedSection: CompletedSection
+  ): Action[AnyContent] =
+    completedSection match
+      case c: CompletedSectionLlp =>
+        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
+          given RequestWithAuth = req
+          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
+      case c: CompletedSectionGeneralPartnership =>
+        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
+          given RequestWithAuth = req
+          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
+      case c: CompletedSectionScottishPartnership =>
+        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
+          given RequestWithAuth = req
+          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
+      case other =>
+        applicantActions.action { implicit request =>
+          Ok(
+            simplePage(
+              h1 = s"${other.businessType} Task List Page",
+              bodyText = Some(s"Fast Forwarding to ${other.businessType} List Page isn't implemented yet")
+            )
+          )
+        }
 
   private def loginAndRetry(using request: Request[AnyContent]): Future[Result | RequestWithAuth] = stubUserService.createAndLoginAgent.map: stubsHc =>
     val bearerToken: String = stubsHc.authorization
@@ -164,61 +114,40 @@ extends FrontendController(mcc, applicantActions):
 
         case Left(result) => Future.successful(result)
 
-  def fastForward(
-    completedSection: CompletedSection
-  ): Action[AnyContent] =
-    completedSection match
-      case c: CompletedSectionLlp =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          handleCompletedSectionLlp(c)
-
-      case _: CompletedSectionSoleTrader =>
-        applicantActions.action { implicit request =>
-          Ok(
-            simplePage(
-              h1 = "Sole Trader Task List Page",
-              bodyText = Some("Fast Forwarding to Sole Trader Task List Page isn't implemented yet")
-            )
-          )
-        }
-
-  private def handleCompletedSectionLlp(completedSection: CompletedSectionLlp)(using
-    r: RequestWithAuth,
-    clock: Clock
-  ): Future[Result] =
-    val application =
-      (completedSection match
-        case CompletedSectionLlp.LlpAboutYourBusiness => TestOnlyData.agentApplicationLlp.afterCompaniesHouseStatusCheckPass
-        case CompletedSectionLlp.LlpApplicantContactDetails => TestOnlyData.agentApplicationLlp.afterContactDetailsComplete
-        case CompletedSectionLlp.LlpAgentServicesAccountDetails => TestOnlyData.agentApplicationLlp.afterAgentDetailsComplete
-        case CompletedSectionLlp.LlpAntiMoneyLaunderingSupervisionDetails => TestOnlyData.agentApplicationLlp.afterAmlsComplete
-        case CompletedSectionLlp.LlpHmrcStandardForAgents => TestOnlyData.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
-        case CompletedSectionLlp.LlpDeclaration => TestOnlyData.agentApplicationLlp.afterDeclarationSubmitted
-      )
+  private def fastForwardTo(section: CompletedSection)(using r: RequestWithAuth): Future[Done] =
+    val toAppState: AgentApplication = section.appState
 
     for {
       _ <- grsStubService.storeStubsData(
-        businessType = application.businessType,
-        journeyData = TestOnlyData.grs.llp.journeyData,
+        businessType = section.businessType,
+        journeyData = journeyDataFor(section.businessType),
         deceased = false
       )
-      updatedApp <- updateIdentifiers(application)
-      _ <- applicationService.upsert(updatedApp)
-    } yield Redirect(AppRoutes.apply.TaskListController.show)
+      updated <- updateIdentifiers(toAppState)
+      _ <- applicationService.upsert(updated)
+    } yield Done
 
-  private def updateIdentifiers(agentApplication: AgentApplicationLlp)(using
+  private def journeyDataFor(bt: BusinessType): JourneyData =
+    bt match
+      case BusinessType.Partnership.LimitedLiabilityPartnership => TestOnlyData.grs.llp.journeyData
+      case BusinessType.Partnership.GeneralPartnership => TestOnlyData.grs.generalPartnership.journeyData
+      case BusinessType.Partnership.ScottishPartnership => TestOnlyData.grs.scottishPartnership.journeyData
+      case _ => throw new IllegalArgumentException(s"Add $bt journey data here")
+
+  private def updateIdentifiers(agentApplication: AgentApplication)(using
     r: RequestWithAuth,
     clock: Clock
-  ): Future[AgentApplicationLlp] =
+  ): Future[AgentApplication] =
     val identifiers: Future[(AgentApplicationId, LinkId)] = applicationService.find().map:
       case Some(existingApplication) => (existingApplication.agentApplicationId, existingApplication.linkId)
       case None => (agentApplicationIdGenerator.nextApplicationId(), linkIdGenerator.nextLinkId())
-    identifiers.map: t =>
-      agentApplication.copy(
-        _id = t._1,
-        internalUserId = r.internalUserId,
-        linkId = t._2,
-        groupId = r.groupId,
-        createdAt = Instant.now(clock)
-      )
+    identifiers.map:
+      case (id, linkId) =>
+        agentApplication
+          .withUpdatedIdentifiers(
+            id,
+            r.internalUserId,
+            linkId,
+            r.groupId,
+            Instant.now(clock)
+          )
