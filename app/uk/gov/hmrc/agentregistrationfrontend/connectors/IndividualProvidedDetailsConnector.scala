@@ -101,7 +101,7 @@ extends Connector:
   // for use by agent applicants when building lists of individuals
   def findAll(agentApplicationId: AgentApplicationId)(using
     request: RequestHeader
-  ): Future[List[IndividualProvidedDetails]] =
+  ): Future[List[IndividualProvidedDetails]] = // TODO use this method from InitiateIndividualProvideDetailsController
     val url: URL = url"$baseUrl/individual-provided-details/for-application/${agentApplicationId.value}"
     httpClient
       .get(url)

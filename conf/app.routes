@@ -148,3 +148,4 @@ GET         /provide-details/check-your-answers                     uk.gov.hmrc.
 POST        /provide-details/check-your-answers                     uk.gov.hmrc.agentregistrationfrontend.controllers.individual.CheckYourAnswersController.submit
 GET         /provide-details/confirmation                           uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualConfirmationController.show
 GET         /provide-details/multiple-provided-details              uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ExitController.multipleProvidedDetailsPage
+GET         /provide-details/record-not-found-exit-page             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ContactApplicantController.show

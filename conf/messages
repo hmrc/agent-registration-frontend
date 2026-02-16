@@ -683,3 +683,7 @@ dateOfBirth.error.month.required = Your date of birth must include a month
 dateOfBirth.error.year.required = Your date of birth must include a year
 dateOfBirth.error.invalid = Your date of birth must be a real date
 dateOfBirth.error.future = Your date of birth must be in the past
+
+# Individual contact applicant
+noMatchContactApplicant.title = You need to contact the applicant
+noMatchContactApplicant.paragraph = You need to contact the applicant as we cannot match your details

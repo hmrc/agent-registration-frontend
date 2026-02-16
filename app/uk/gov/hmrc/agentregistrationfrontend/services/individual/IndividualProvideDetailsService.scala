@@ -98,7 +98,7 @@ extends RequestAwareLogging:
     individualProvideDetailsConnector
       .upsertMemberProvidedDetails(individualProvidedDetails)
 
-  // for use by agent applicants when building lists of individuals
+  // for use by agent applicants when building lists of individuals //TODO use this method instead of findByApplicationId
   def findAllByApplicationId(agentApplicationId: AgentApplicationId)(using request: RequestHeader): Future[List[IndividualProvidedDetails]] =
     individualProvideDetailsConnector.findAll(agentApplicationId)
 

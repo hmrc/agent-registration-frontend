@@ -55,17 +55,15 @@ extends FrontendController(mcc, actions):
     .authorisedWithAdditionalIdentifiers
     .async:
       implicit request =>
-
         val nextEndpoint: Call = AppRoutes.providedetails.CompaniesHouseNameQueryController.show
         val applicationGenericExitPageUrl: String = AppRoutes.apply.AgentApplicationController.genericExitPage.url
-
         agentApplicationService.find(linkId)
           .flatMap:
             case Some(agentApplication) =>
               individualProvideDetailsService
                 .findByApplicationId(agentApplication.agentApplicationId)
                 .flatMap:
-                  case None =>
+                  case None => // TODO change so details are no created. Redirect to exit page
                     for {
                       individualProvidedDetails: IndividualProvidedDetailsToBeDeleted <- createIndividualProvidedDetailsFor(
                         applicationId = agentApplication.agentApplicationId,
@@ -75,11 +73,9 @@ extends FrontendController(mcc, actions):
                       )
                       _ <- individualProvideDetailsService.upsert(individualProvidedDetails)
                     } yield Redirect(nextEndpoint).addToSession(agentApplication.agentApplicationId)
-
-                  case Some(individualProvidedDetails) =>
+                  case Some(individualProvidedDetails) => // TODO call citizen details
                     logger.info("Individual provided details already exists, redirecting to individual name page")
                     Future.successful(Redirect(nextEndpoint).addToSession(individualProvidedDetails.agentApplicationId))
-
             case None =>
               logger.info(s"Application for linkId $linkId not found, redirecting to $applicationGenericExitPageUrl")
               Future.successful(Redirect(applicationGenericExitPageUrl))
@@ -91,7 +87,6 @@ extends FrontendController(mcc, actions):
     saUtr: Option[SaUtr]
   )(using RequestHeader): Future[IndividualProvidedDetailsToBeDeleted] =
     (nino, saUtr) match
-
       case (Some(nino), None) =>
         logger.debug(s"Creating individual provided details with NINO only for applicationId: ${applicationId.value}")
         citizenDetailsConnector
@@ -105,7 +100,6 @@ extends FrontendController(mcc, actions):
               maybeIndividualDateOfBirth = citizenDetails.dateOfBirth.map(IndividualDateOfBirth.FromCitizensDetails.apply)
             )
           }
-
       case (Some(nino), Some(saUtr)) =>
         logger.debug(s"Creating individual provided details with NINO AND SAUTR for applicationId: ${applicationId.value}")
         citizenDetailsConnector
@@ -119,7 +113,6 @@ extends FrontendController(mcc, actions):
               maybeIndividualDateOfBirth = citizenDetails.dateOfBirth.map(IndividualDateOfBirth.FromCitizensDetails.apply)
             )
           }
-
       case (None, _) =>
         logger.debug(s"Creating individual provided details with no NINO or DoB for applicationId: ${applicationId.value}")
         Future.successful(
