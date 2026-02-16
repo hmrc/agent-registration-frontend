@@ -73,15 +73,6 @@ extends FrontendController(mcc, applicantActions):
         authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
           given RequestWithAuth = req
           fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
-      case _: CompletedSectionSoleTrader =>
-        applicantActions.action { implicit request =>
-          Ok(
-            simplePage(
-              h1 = "Sole Trader Task List Page",
-              bodyText = Some("Fast Forwarding to Sole Trader Task List Page isn't implemented yet")
-            )
-          )
-        }
       case c: CompletedSectionGeneralPartnership =>
         authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
           given RequestWithAuth = req
@@ -90,6 +81,15 @@ extends FrontendController(mcc, applicantActions):
         authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
           given RequestWithAuth = req
           fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
+      case other =>
+        applicantActions.action { implicit request =>
+          Ok(
+            simplePage(
+              h1 = s"${other.businessType} Task List Page",
+              bodyText = Some(s"Fast Forwarding to ${other.businessType} List Page isn't implemented yet")
+            )
+          )
+        }
 
   private def loginAndRetry(using request: Request[AnyContent]): Future[Result | RequestWithAuth] = stubUserService.createAndLoginAgent.map: stubsHc =>
     val bearerToken: String = stubsHc.authorization
