@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.action
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
 import uk.gov.hmrc.auth.core.retrieve.Credentials
@@ -60,7 +60,7 @@ object Actions:
     inline def maybeBusinessPartnerRecordResponse(using Option[BusinessPartnerRecordResponse] PresentIn Data): Option[BusinessPartnerRecordResponse] = r.get
     inline def agentType(using AgentType PresentIn Data): AgentType = r.get
 
-    inline def individualProvidedDetails(using IndividualProvidedDetailsToBeDeleted PresentIn Data): IndividualProvidedDetailsToBeDeleted = r.get
+    inline def individualProvidedDetails(using IndividualProvidedDetails PresentIn Data): IndividualProvidedDetails = r.get
 
   extension [
     ContentType // B Represents Play Framework's Content Type parameter, commonly denoted as B

@@ -15,6 +15,7 @@
  *@
 
 @import uk.gov.hmrc.agentregistration.shared.EmailAddress
+@import uk.gov.hmrc.agentregistration.shared.LinkId
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
 @import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualEmailAddressForm
@@ -29,7 +30,8 @@
 )
 
 @(
-        form: Form[EmailAddress])(implicit
+        form: Form[EmailAddress],
+        linkId: LinkId)(implicit
         request: RequestHeader,
         messages: Messages
 )
@@ -45,7 +47,7 @@
     maybeForm = Some(form)
 ) {
     <h2 class="govuk-caption-l">@messages("provide-details.llp.title")</h2>
-    @formWithCSRF(action = AppRoutes.providedetails.IndividualEmailAddressController.submit) {
+    @formWithCSRF(action = AppRoutes.providedetails.IndividualEmailAddressController.submit(linkId)) {
         @govukInput(Input(
             label = Label(
                 content = Text(title),

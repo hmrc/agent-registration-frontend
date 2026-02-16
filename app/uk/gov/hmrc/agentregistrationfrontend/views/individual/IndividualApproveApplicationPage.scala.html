@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+@import uk.gov.hmrc.agentregistration.shared.LinkId
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.partials.SaveAndContinue
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
@@ -34,7 +34,8 @@
 @(
         form: Form[YesNo],
         officerName: String,
-        companyName: String)(implicit
+        entityName: String,
+        linkId: LinkId)(implicit
         request: RequestHeader,
         messages: Messages
 )
@@ -52,9 +53,9 @@
 
     <h1 class="govuk-heading-l">@title</h1>
 
-    <p class="govuk-body">@messages(s"$key.info", officerName, companyName)</p>
+    <p class="govuk-body">@messages(s"$key.info", officerName, entityName)</p>
 
-    @formWithCSRF(action = AppRoutes.providedetails.IndividualApproveApplicantController.submit) {
+    @formWithCSRF(action = AppRoutes.providedetails.IndividualApproveApplicantController.submit(linkId)) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(

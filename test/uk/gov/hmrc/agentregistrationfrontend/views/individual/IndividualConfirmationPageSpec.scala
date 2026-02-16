@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualConfirmationPage
 
@@ -27,7 +26,10 @@ extends ViewSpec:
 
   val viewTemplate: IndividualConfirmationPage = app.injector.instanceOf[IndividualConfirmationPage]
   val doc: Document = Jsoup.parse(
-    viewTemplate(applicantName = "Test Applicant", companyName = "Test Company Name").body
+    viewTemplate(
+      applicantName = "Test Applicant",
+      entityName = "Test Company Name"
+    ).body
   )
 
   "IndividualConfirmationPage" should:

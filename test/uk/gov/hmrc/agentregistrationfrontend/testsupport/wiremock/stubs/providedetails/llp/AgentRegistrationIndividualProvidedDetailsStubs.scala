@@ -16,40 +16,44 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp
 
-import com.github.tomakehurst.wiremock.client.WireMock.equalToJson
 import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
+import uk.gov.hmrc.agentregistration.shared.LinkId
+import uk.gov.hmrc.agentregistration.shared.Utr
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AgentRegistrationIndividualProvidedDetailsStubs {
 
-  private val base = "/agent-registration/member-provided-details"
+  private val base = "/agent-registration/individual-provided-details"
 
   def stubFindIndividualProvidedDetails(
-    providedDetails: IndividualProvidedDetailsToBeDeleted
+    providedDetails: IndividualProvidedDetails
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"$base/by-agent-applicationId/${providedDetails.agentApplicationId.value}"),
+    urlPattern = urlMatching(s"$base/for-application/${providedDetails.agentApplicationId.value}"),
     responseStatus = Status.OK,
-    responseBody = Json.toJson(providedDetails).toString
+    responseBody = Json.toJson(List(providedDetails)).toString
   )
 
   def stubFindIndividualProvidedDetailsNoContent(agentApplicationId: AgentApplicationId): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"$base/by-agent-applicationId/${agentApplicationId.value}"),
-    responseStatus = Status.NO_CONTENT
+    urlPattern = urlMatching(s"$base/for-application/${agentApplicationId.value}"),
+    responseStatus = Status.OK,
+    responseBody = "[]"
   )
 
   def stubFindAllIndividualProvidedDetails(
-    providedDetailsList: List[IndividualProvidedDetailsToBeDeleted]
+    providedDetailsList: List[IndividualProvidedDetails],
+    agentApplicationId: AgentApplicationId
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"$base"),
+    urlPattern = urlMatching(s"$base/for-matching-application/${agentApplicationId.value}"),
     responseStatus = Status.OK,
     responseBody = Json.toJson(providedDetailsList).toString
   )
@@ -60,11 +64,20 @@ object AgentRegistrationIndividualProvidedDetailsStubs {
     responseStatus = Status.NO_CONTENT
   )
 
-  def stubUpsertIndividualProvidedDetails(individualProvidedDetails: IndividualProvidedDetailsToBeDeleted): StubMapping = StubMaker.make(
-    httpMethod = StubMaker.HttpMethod.POST,
-    urlPattern = urlMatching(base),
+  def stubUpsertIndividualProvidedDetails(individualProvidedDetails: IndividualProvidedDetails): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.PUT,
+    urlPattern = urlMatching(s"$base/for-individual"),
+    responseStatus = Status.OK
+  )
+
+  def stubGetBusinessPartnerRecord(
+    utr: Utr,
+    responseBody: BusinessPartnerRecordResponse
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"/agent-registration/application-business-partner-record/utr/${utr.value}"),
     responseStatus = Status.OK,
-    requestBody = Some(equalToJson(Json.toJson(individualProvidedDetails).toString))
+    responseBody = Json.toJson(responseBody).toString()
   )
 
   def verifyFind(count: Int = 1): Unit = StubMaker.verify(
@@ -73,18 +86,33 @@ object AgentRegistrationIndividualProvidedDetailsStubs {
     count = count
   )
 
-  def verifyFindByAgentApplicationID(
+  def verifyFindAllForApplicationId(
     agentApplicationId: AgentApplicationId,
     count: Int = 1
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlPathEqualTo(s"$base/by-agent-applicationId/${agentApplicationId.value}"),
+    urlPattern = urlPathEqualTo(s"$base/for-matching-application/${agentApplicationId.value}"),
+    count = count
+  )
+
+  def verifyFindApplicationByLinkId(
+    linkId: LinkId,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlPathEqualTo(s"agent-registration/application/linkId/${linkId.value}"),
     count = count
   )
 
   def verifyUpsert(count: Int = 1): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = urlPathEqualTo(base),
+    count = count
+  )
+
+  def verifyUpsertIndividualProvidedDetails(count: Int = 1): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.PUT,
+    urlPattern = urlPathEqualTo(s"$base/for-individual"),
     count = count
   )
 

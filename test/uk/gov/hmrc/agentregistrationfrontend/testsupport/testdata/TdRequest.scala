@@ -92,13 +92,4 @@ trait TdRequest {
       )
     )
 
-    def requestWithIndividualProvidedDetails: RequestWithData[DataWithIndividualProvidedDetailsToBeDeleted] = RequestWithDataCt.apply(
-      rawRequestLoggedIn,
-      (
-        dependencies.individualProvidedDetailsToBeDeleted,
-        dependencies.internalUserId,
-        dependencies.credentials
-      )
-    )
-
 }

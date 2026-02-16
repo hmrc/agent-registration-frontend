@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-
+import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualSaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -28,8 +28,9 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualSaU
 class IndividualSaUtrPageSpec
 extends ViewSpec:
 
+  val linkId: LinkId = tdAll.linkId
   val viewTemplate: IndividualSaUtrPage = app.injector.instanceOf[IndividualSaUtrPage]
-  val doc: Document = Jsoup.parse(viewTemplate(IndividualSaUtrForm.form).body)
+  val doc: Document = Jsoup.parse(viewTemplate(IndividualSaUtrForm.form, linkId).body)
   private val heading: String = "Do you have a Self Assessment Unique Taxpayer Reference?"
 
   "MemberSaUtrPage" should:
@@ -63,6 +64,6 @@ extends ViewSpec:
     behavesLikePageWithErrorHandling(
       field = field,
       errorMessage = errorMessage,
-      errorDoc = Jsoup.parse(viewTemplate(formWithError).body),
+      errorDoc = Jsoup.parse(viewTemplate(formWithError, linkId).body),
       heading = heading
     )

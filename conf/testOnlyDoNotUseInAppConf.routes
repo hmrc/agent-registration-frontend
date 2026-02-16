@@ -32,5 +32,4 @@ GET         /agent-registration/test-only/fast-forward                          
 GET         /agent-registration/test-only/fast-forward-to/:completedSection                  uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.fastForward(completedSection: CompletedSection)
 
 
-GET        /agent-registration/test-only/show-provided-details                               uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.showProvidedDetails
-GET        /agent-registration/test-only/remove-nino-and-dob                                 uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.removeNinoAndDobFromIndividual()
+GET        /agent-registration/test-only/show-provided-details/:linkId                       uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.showProvidedDetails(linkId: LinkId)

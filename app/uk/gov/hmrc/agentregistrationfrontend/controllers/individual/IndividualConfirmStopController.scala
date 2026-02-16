@@ -32,7 +32,11 @@ class IndividualConfirmStopController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getProvideDetailsInProgress:
+  // This page is almost certainly never going to be used, not deleting yet until we know how to resolve the No answer in the
+  // approve applicant form, it's most likely going to not have a YesNo form and instead just be a continue button to carry on instead of explicitly
+  // begin able to stop anyone from completing the application - users can just choose not to continue if they don't approve instead of
+  // being able to prevent others from completing their part of the application.
+  def show: Action[AnyContent] = action:
     implicit request =>
       Ok(placeholder(
         h1 = "Confirm Stop Page",

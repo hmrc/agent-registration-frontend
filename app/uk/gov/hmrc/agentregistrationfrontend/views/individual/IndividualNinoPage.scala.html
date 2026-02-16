@@ -14,14 +14,14 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.agentregistration.shared.LinkId
 @import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedNino
-
 @import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
+@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.partials.SaveAndContinue
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
-@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 
 @this(
         layout: Layout,
@@ -33,7 +33,8 @@
 )
 
 @(
-        form: Form[UserProvidedNino])(implicit
+        form: Form[UserProvidedNino],
+        linkId: LinkId)(implicit
         request: RequestHeader,
         messages: Messages
 )
@@ -62,7 +63,7 @@
     maybeForm = Some(form)
 ) {
     <h2 class="govuk-caption-l">@messages("provide-details.llp.title")</h2>
-    @formWithCSRF(action = AppRoutes.providedetails.IndividualNinoController.submit) {
+    @formWithCSRF(action = AppRoutes.providedetails.IndividualNinoController.submit(linkId)) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(

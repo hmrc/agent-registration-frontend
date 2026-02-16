@@ -71,7 +71,7 @@ extends FrontendController(mcc, actions):
         .findAllForMatchingWithApplication(request.get[AgentApplication].agentApplicationId)
         .map:
           case list: List[IndividualProvidedDetails] if list.exists(_.internalUserId.contains(request.get[InternalUserId])) =>
-            Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url)
+            Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url)
           case list: List[IndividualProvidedDetails] if !list.exists(_.internalUserId.isEmpty) =>
             logger.warn("No matching IndividualProvidedDetails record and there are no records left without an internalUserId, so we must exit the user")
             Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
@@ -116,7 +116,7 @@ extends FrontendController(mcc, actions):
               view(
                 form = ConfirmMatchToIndividualProvidedDetailsForm.form,
                 individualProvidedDetails = request.get[IndividualProvidedDetails],
-                entityName = optBpr.map(_.getEntityName).getOrThrowExpectedDataMissing("BPR is missing for application"), // TODO work out whether we call BPR or change to put it into application
+                entityName = optBpr.map(_.getEntityName).getOrThrowExpectedDataMissing("BPR is missing for application"),
                 businessTypeKey = businessTypeKey,
                 linkId = linkId
               )
@@ -154,13 +154,13 @@ extends FrontendController(mcc, actions):
         if confirmMatchToIndividualProvidedDetails.toBoolean then
           individualProvideDetailsService
             .claimIndividualProvidedDetails(
-              request.get[IndividualProvidedDetails],
-              request.get[InternalUserId],
-              request.get[Option[Nino]],
-              request.get[CitizenDetails]
+              individualProvidedDetails = request.get[IndividualProvidedDetails],
+              internalUserId = request.get[InternalUserId],
+              maybeNino = request.get[Option[Nino]],
+              citizenDetails = request.get[CitizenDetails]
             )
             .map: _ =>
-              Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url)
+              Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url)
         else
           logger.warn(s"User does not agree with the match to IndividualProvidedDetails record ${request.get[IndividualProvidedDetails]._id} for citizen details ${request.get[CitizenDetails]} and user ${request.get[InternalUserId].value}, redirecting to generic exit page")
           Future.successful(Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url))

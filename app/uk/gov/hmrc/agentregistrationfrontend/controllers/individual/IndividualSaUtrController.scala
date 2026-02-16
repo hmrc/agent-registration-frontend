@@ -16,16 +16,20 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
-import com.softwaremill.quicklens.modify
+import com.softwaremill.quicklens.*
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Result
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistration.shared.LinkId
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedSaUtr
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
-
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualSaUtrForm
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualSaUtrPage
 
@@ -37,52 +41,78 @@ class IndividualSaUtrController @Inject() (
   actions: IndividualActions,
   mcc: MessagesControllerComponents,
   view: IndividualSaUtrPage,
-  individualProvideDetailsService: IndividualProvideDetailsService
+  individualProvideDetailsService: IndividualProvideDetailsService,
+  agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetailsToBeDeleted] = actions.getProvideDetailsInProgress
-    .ensure(
-      _.individualProvidedDetails.individualNino.nonEmpty,
-      implicit request =>
-        Redirect(AppRoutes.providedetails.IndividualNinoController.show.url)
+  private type DataWithApplicationFromLinkId = AgentApplication *: DataWithAuth
+
+  private type DataWithIndividualProvidedDetails = IndividualProvidedDetails *: DataWithApplicationFromLinkId
+
+  private def baseAction(linkId: LinkId): ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions
+    .authorised
+    .refine(implicit request =>
+      agentApplicationService
+        .find(linkId)
+        .map:
+          case Some(agentApplication) => request.add(agentApplication)
+          case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
+    )
+    .refine(implicit request =>
+      individualProvideDetailsService
+        .findAllForMatchingWithApplication(request.get[AgentApplication].agentApplicationId)
+        .map[RequestWithData[DataWithIndividualProvidedDetails] | Result]:
+          case list: List[IndividualProvidedDetails] =>
+            list
+              .find(_.internalUserId.contains(request.get[InternalUserId]))
+              .map(request.add[IndividualProvidedDetails])
+              .getOrElse(
+                Redirect(AppRoutes.providedetails.ConfirmMatchToIndividualProvidedDetailsController.show(linkId))
+              )
     )
     .ensure(
-      _.individualProvidedDetails.individualSaUtr.fold(true) {
+      _.get[IndividualProvidedDetails].individualNino.nonEmpty,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.IndividualNinoController.show(linkId).url)
+    )
+    .ensure(
+      _.get[IndividualProvidedDetails].individualSaUtr.fold(true) {
         case IndividualSaUtr.FromAuth(_) | IndividualSaUtr.FromCitizenDetails(_) => false
         case _ => true
       },
       implicit request =>
         logger.info(s"SaUtr is already provided from auth or citizen details. Skipping page and moving to next page.")
-        Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url)
+        Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url)
     )
 
-  def show: Action[AnyContent] = baseAction:
-    implicit request =>
-      Ok(view(
-        IndividualSaUtrForm.form
-          .fill:
-            request
-              .individualProvidedDetails
-              .individualSaUtr
-              .map(_.toUserProvidedSaUtr)
-      ))
+  def show(linkId: LinkId): Action[AnyContent] =
+    baseAction(linkId):
+      implicit request =>
+        Ok(view(
+          form = IndividualSaUtrForm.form
+            .fill:
+              request.get[IndividualProvidedDetails]
+                .individualSaUtr
+                .map(_.toUserProvidedSaUtr)
+          ,
+          linkId = linkId
+        ))
 
-  def submit: Action[AnyContent] =
-    baseAction
+  def submit(linkId: LinkId): Action[AnyContent] =
+    baseAction(linkId)
       .ensureValidFormAndRedirectIfSaveForLater[UserProvidedSaUtr](
         IndividualSaUtrForm.form,
-        implicit r => view(_)
+        implicit r => view(_, linkId)
       )
       .async:
         implicit request =>
           val validFormData: UserProvidedSaUtr = request.get
-          val updatedApplication: IndividualProvidedDetailsToBeDeleted = request
-            .individualProvidedDetails
+          val updatedIndividualProvidedDetails: IndividualProvidedDetails = request.get[IndividualProvidedDetails]
             .modify(_.individualSaUtr)
             .setTo(Some(validFormData))
           individualProvideDetailsService
-            .upsert(updatedApplication)
+            .upsert(updatedIndividualProvidedDetails)
             .map: _ =>
-              Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url)
+              Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url)
       .redirectIfSaveForLater

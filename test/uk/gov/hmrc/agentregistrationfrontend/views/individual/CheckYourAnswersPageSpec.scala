@@ -18,11 +18,10 @@ package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-
+import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
-
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.CheckYourAnswersPage
 
@@ -30,17 +29,18 @@ class CheckYourAnswersPageSpec
 extends ViewSpec:
 
   val viewTemplate: CheckYourAnswersPage = app.injector.instanceOf[CheckYourAnswersPage]
+  private val linkId: LinkId = tdAll.linkId
 
   private object individualProvideDetails:
 
-    val complete: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterApproveAgentApplication
-    val completeWithNinoAndSaUtrNotProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.afterApproveAgentApplication
+    val complete: IndividualProvidedDetails = tdAll.providedDetails.afterApproveAgentApplication
+    val completeWithNinoAndSaUtrNotProvided: IndividualProvidedDetails = tdAll.providedDetails.afterApproveAgentApplication
       .copy(
         individualDateOfBirth = Some(tdAll.dateOfBirthProvided),
         individualNino = Some(IndividualNino.NotProvided),
         individualSaUtr = Some(IndividualSaUtr.NotProvided)
       )
-    val completeWithNinoAndSaUtrFromHmrc = tdAll.providedDetailsLlp.afterApproveAgentApplication
+    val completeWithNinoAndSaUtrFromHmrc = tdAll.providedDetails.afterApproveAgentApplication
       .copy(
         individualDateOfBirth = Some(tdAll.dateOfBirthFromCitizenDetails),
         individualNino = Some(tdAll.ninoFromAuth),
@@ -53,8 +53,8 @@ extends ViewSpec:
 
   private def pageTitle: String = s"$heading - $serviceTitleSuffix"
 
-  private def renderDoc(individualProvideDetails: IndividualProvidedDetailsToBeDeleted): Document = Jsoup.parse(
-    viewTemplate(individualProvideDetails).body
+  private def renderDoc(individualProvideDetails: IndividualProvidedDetails): Document = Jsoup.parse(
+    viewTemplate(individualProvideDetails, linkId).body
   )
 
   private def summaryRow(
@@ -77,9 +77,6 @@ extends ViewSpec:
         """
           |LLP member confirmation
           |Check your answers
-          |Name
-          |Taylor Leadenhall-Lane
-          |Change Name
           |Telephone number
           |(+44) 10794554342
           |Change Telephone number
@@ -112,44 +109,39 @@ extends ViewSpec:
       val expectedSummaryList: TestSummaryList = TestSummaryList(
         List(
           summaryRow(
-            key = "Name",
-            value = "Taylor Leadenhall-Lane",
-            action = AppRoutes.providedetails.CompaniesHouseNameQueryController.show.url
-          ),
-          summaryRow(
             key = "Telephone number",
             value = "(+44) 10794554342",
-            action = AppRoutes.providedetails.IndividualTelephoneNumberController.show.url
+            action = AppRoutes.providedetails.IndividualTelephoneNumberController.show(linkId).url
           ),
           summaryRow(
             key = "Email address",
             value = "member@test.com",
-            action = AppRoutes.providedetails.IndividualEmailAddressController.show.url
+            action = AppRoutes.providedetails.IndividualEmailAddressController.show(linkId).url
           ),
           summaryRow(
             key = "Date of birth",
             value = "1 January 2000",
-            action = AppRoutes.providedetails.IndividualDateOfBirthController.show.url
+            action = AppRoutes.providedetails.IndividualDateOfBirthController.show(linkId).url
           ),
           summaryRow(
             key = "Do you have a National Insurance number?",
             value = "Yes",
-            action = AppRoutes.providedetails.IndividualNinoController.show.url
+            action = AppRoutes.providedetails.IndividualNinoController.show(linkId).url
           ),
           summaryRow(
             key = "National Insurance number",
             value = "AB123456C",
-            action = AppRoutes.providedetails.IndividualNinoController.show.url
+            action = AppRoutes.providedetails.IndividualNinoController.show(linkId).url
           ),
           summaryRow(
             key = "Do you have a Self Assessment Unique Taxpayer Reference?",
             value = "Yes",
-            action = AppRoutes.providedetails.IndividualSaUtrController.show.url
+            action = AppRoutes.providedetails.IndividualSaUtrController.show(linkId).url
           ),
           summaryRow(
             key = "Self Assessment Unique Taxpayer Reference",
             value = "1234567895",
-            action = AppRoutes.providedetails.IndividualSaUtrController.show.url
+            action = AppRoutes.providedetails.IndividualSaUtrController.show(linkId).url
           )
         )
       )
@@ -167,9 +159,6 @@ extends ViewSpec:
         """
           |LLP member confirmation
           |Check your answers
-          |Name
-          |Taylor Leadenhall-Lane
-          |Change Name
           |Telephone number
           |(+44) 10794554342
           |Change Telephone number
@@ -187,19 +176,14 @@ extends ViewSpec:
       val expectedSummaryList: TestSummaryList = TestSummaryList(
         List(
           summaryRow(
-            key = "Name",
-            value = "Taylor Leadenhall-Lane",
-            action = AppRoutes.providedetails.CompaniesHouseNameQueryController.show.url
-          ),
-          summaryRow(
             key = "Telephone number",
             value = "(+44) 10794554342",
-            action = AppRoutes.providedetails.IndividualTelephoneNumberController.show.url
+            action = AppRoutes.providedetails.IndividualTelephoneNumberController.show(linkId).url
           ),
           summaryRow(
             key = "Email address",
             value = "member@test.com",
-            action = AppRoutes.providedetails.IndividualEmailAddressController.show.url
+            action = AppRoutes.providedetails.IndividualEmailAddressController.show(linkId).url
           )
         )
       )
@@ -217,9 +201,6 @@ extends ViewSpec:
         """
           |LLP member confirmation
           |Check your answers
-          |Name
-          |Taylor Leadenhall-Lane
-          |Change Name
           |Telephone number
           |(+44) 10794554342
           |Change Telephone number
@@ -246,34 +227,29 @@ extends ViewSpec:
       val expectedSummaryList: TestSummaryList = TestSummaryList(
         List(
           summaryRow(
-            key = "Name",
-            value = "Taylor Leadenhall-Lane",
-            action = AppRoutes.providedetails.CompaniesHouseNameQueryController.show.url
-          ),
-          summaryRow(
             key = "Telephone number",
             value = "(+44) 10794554342",
-            action = AppRoutes.providedetails.IndividualTelephoneNumberController.show.url
+            action = AppRoutes.providedetails.IndividualTelephoneNumberController.show(linkId).url
           ),
           summaryRow(
             key = "Email address",
             value = "member@test.com",
-            action = AppRoutes.providedetails.IndividualEmailAddressController.show.url
+            action = AppRoutes.providedetails.IndividualEmailAddressController.show(linkId).url
           ),
           summaryRow(
             key = "Date of birth",
             value = "1 January 2000",
-            action = AppRoutes.providedetails.IndividualDateOfBirthController.show.url
+            action = AppRoutes.providedetails.IndividualDateOfBirthController.show(linkId).url
           ),
           summaryRow(
             key = "Do you have a National Insurance number?",
             value = "No",
-            action = AppRoutes.providedetails.IndividualNinoController.show.url
+            action = AppRoutes.providedetails.IndividualNinoController.show(linkId).url
           ),
           summaryRow(
             key = "Do you have a Self Assessment Unique Taxpayer Reference?",
             value = "No",
-            action = AppRoutes.providedetails.IndividualSaUtrController.show.url
+            action = AppRoutes.providedetails.IndividualSaUtrController.show(linkId).url
           )
         )
       )

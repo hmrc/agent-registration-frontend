@@ -16,62 +16,64 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
-import com.softwaremill.quicklens.modify
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.ApplicationState
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
 class IndividualConfirmationControllerSpec
 extends ControllerSpec:
 
-  private val path: String = s"/agent-registration/provide-details/confirmation"
-
-  object agentApplication:
-    val applicationSubmitted: AgentApplication = tdAll
+  private val linkId = tdAll.linkId
+  private val agentApplication =
+    tdAll
       .agentApplicationLlp
-      .sectionAgentDetails
-      .whenUsingExistingCompanyName
-      .afterContactTelephoneSelected
-      .modify(_.applicationState)
-      .setTo(ApplicationState.Submitted)
+      .afterContactDetailsComplete
+  private val path: String = s"/agent-registration/provide-details/confirmation/${linkId.value}"
 
   object individualProvidedDetails:
 
-    val incompleteProvidedDetails: IndividualProvidedDetailsToBeDeleted =
+    val incompleteProvidedDetails: IndividualProvidedDetails =
       tdAll
-        .providedDetailsLlp
-        .afterHmrcStandardforAgentsAgreed
+        .providedDetails
+        .afterApproveAgentApplication
 
-    val completedProvidedDetails: IndividualProvidedDetailsToBeDeleted =
+    val completedProvidedDetails: IndividualProvidedDetails =
       tdAll
-        .providedDetailsLlp
+        .providedDetails
         .afterProvidedDetailsConfirmed
 
   "routes should have correct paths and methods" in:
-    AppRoutes.providedetails.IndividualConfirmationController.show shouldBe Call(
+    AppRoutes.providedetails.IndividualConfirmationController.show(linkId) shouldBe Call(
       method = "GET",
       url = path
     )
 
   s"GET $path should return 200 and render the confirmation page" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvidedDetails.completedProvidedDetails))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      agentApplication,
+      individualProvidedDetails.completedProvidedDetails,
+      withBpr = true
+    )
+    AgentRegistrationIndividualProvidedDetailsStubs.stubGetBusinessPartnerRecord(
+      utr = tdAll.saUtr.asUtr,
+      responseBody = tdAll.businessPartnerRecordResponse
+    )
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "You have finished this process - Apply for an agent services account - GOV.UK"
 
-  s"GET $path with incomplete application should return 303 and redirect to check your answers page" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvidedDetails.incompleteProvidedDetails))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
+  s"GET $path with incomplete details should return 303 and redirect to check your answers page" in:
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      agentApplication,
+      individualProvidedDetails.incompleteProvidedDetails
+    )
+    AgentRegistrationIndividualProvidedDetailsStubs.stubGetBusinessPartnerRecord(
+      utr = tdAll.saUtr.asUtr,
+      responseBody = tdAll.businessPartnerRecordResponse
+    )
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location") shouldBe Some(AppRoutes.providedetails.CheckYourAnswersController.show.url)
+    response.header("Location") shouldBe Some(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url)

@@ -18,16 +18,18 @@ package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualHmrcStandardForAgentsPage
 
 class IndividualHmrcStandardForAgentsPageSpec
 extends ViewSpec:
 
+  val linkId: LinkId = tdAll.linkId
   val viewTemplate: IndividualHmrcStandardForAgentsPage = app.injector.instanceOf[IndividualHmrcStandardForAgentsPage]
 
   val doc: Document = Jsoup.parse(
-    viewTemplate().body
+    viewTemplate(linkId).body
   )
 
   "HmrcStandardForAgentsPage" should:

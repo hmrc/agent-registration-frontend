@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-
+import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualTelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -27,8 +27,9 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualTel
 class IndividualTelephoneNumberPageSpec
 extends ViewSpec:
 
+  val linkId: LinkId = tdAll.linkId
   val viewTemplate: IndividualTelephoneNumberPage = app.injector.instanceOf[IndividualTelephoneNumberPage]
-  val doc: Document = Jsoup.parse(viewTemplate(IndividualTelephoneNumberForm.form).body)
+  val doc: Document = Jsoup.parse(viewTemplate(IndividualTelephoneNumberForm.form, linkId).body)
   private val heading: String = "What is your telephone number?"
 
   "MemberTelephoneNumberPage" should:
@@ -39,7 +40,7 @@ extends ViewSpec:
     "render a form with an input of type tel for telephone number" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe AppRoutes.providedetails.IndividualTelephoneNumberController.submit.url
+      form.attr("action") shouldBe AppRoutes.providedetails.IndividualTelephoneNumberController.submit(linkId).url
       form
         .selectOrFail("label[for=individualTelephoneNumber]")
         .selectOnlyOneElementOrFail()
@@ -63,6 +64,6 @@ extends ViewSpec:
       behavesLikePageWithErrorHandling(
         field = field,
         errorMessage = errorMessage,
-        errorDoc = Jsoup.parse(viewTemplate(formWithError).body),
+        errorDoc = Jsoup.parse(viewTemplate(formWithError, linkId).body),
         heading = heading
       )

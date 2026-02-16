@@ -16,41 +16,36 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
-import com.softwaremill.quicklens.modify
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.ApplicationState
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualApproveApplicationForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
 class IndividualApproveApplicationControllerSpec
 extends ControllerSpec:
 
-  private val path = "/agent-registration/provide-details/approve-applicant"
+  private val linkId = tdAll.linkId
+  private val path = s"/agent-registration/provide-details/approve-applicant/${linkId.value}"
 
-  object agentApplication:
-    val applicationSubmitted: AgentApplication = tdAll
+  val applicationInProgress: AgentApplication =
+    tdAll
       .agentApplicationLlp
       .sectionAgentDetails
       .whenUsingExistingCompanyName
       .afterContactTelephoneSelected
-      .modify(_.applicationState)
-      .setTo(ApplicationState.Submitted)
 
   private object individualProvideDetails:
 
-    val afterSaUtrProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrProvided
-    val withSaUtrNotProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterNino.afterNinoProvided
-    val withNinoAndSaUtrFromAuthButEmailNotProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrFromAuth.copy(
+    val afterSaUtrProvided: IndividualProvidedDetails = tdAll.providedDetails.AfterSaUtr.afterSaUtrProvided
+    val withSaUtrNotProvided: IndividualProvidedDetails = tdAll.providedDetails.AfterNino.afterNinoProvided
+    val withNinoAndSaUtrFromAuthButEmailNotProvided: IndividualProvidedDetails = tdAll.providedDetails.AfterSaUtr.afterSaUtrFromAuth.copy(
       emailAddress = None
     )
-    val afterApproveAgentApplication = tdAll.providedDetailsLlp.afterApproveAgentApplication
-    val afterDoNotApproveAgentApplication = tdAll.providedDetailsLlp.afterDoNotApproveAgentApplication
+    val afterApproveAgentApplication: IndividualProvidedDetails = tdAll.providedDetails.afterApproveAgentApplication
+    val afterDoNotApproveAgentApplication: IndividualProvidedDetails = tdAll.providedDetails.afterDoNotApproveAgentApplication
 
   private object ExpectedStrings:
 
@@ -60,104 +55,105 @@ extends ControllerSpec:
     def requiredError(applyOfficerName: String) = s"Error: Select yes if you agree that ${applyOfficerName} can apply for an account"
 
   "routes should have correct paths and methods" in:
-    AppRoutes.providedetails.IndividualApproveApplicantController.show shouldBe Call(
+    AppRoutes.providedetails.IndividualApproveApplicantController.show(linkId) shouldBe Call(
       method = "GET",
       url = path
     )
-    AppRoutes.providedetails.IndividualApproveApplicantController.submit shouldBe Call(
+    AppRoutes.providedetails.IndividualApproveApplicantController.submit(linkId) shouldBe Call(
       method = "POST",
       url = path
     )
-    AppRoutes.providedetails.IndividualApproveApplicantController.submit.url shouldBe AppRoutes.providedetails.IndividualApproveApplicantController.show.url
+    AppRoutes.providedetails.IndividualApproveApplicantController.submit(
+      linkId
+    ).url shouldBe AppRoutes.providedetails.IndividualApproveApplicantController.show(linkId).url
 
   s"GET $path should return 200 and render page" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.afterSaUtrProvided))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      applicationInProgress,
+      individualProvideDetails.afterSaUtrProvided
+    )
+    AgentRegistrationIndividualProvidedDetailsStubs.stubGetBusinessPartnerRecord(
+      utr = tdAll.saUtr.asUtr,
+      responseBody = tdAll.businessPartnerRecordResponse
+    )
     val response: WSResponse = get(path)
-
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe ExpectedStrings.title
-
-    AuthStubs.verifyAuthorise()
-    AgentRegistrationIndividualProvidedDetailsStubs.verifyFind()
-    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId)
+    ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
 
   s"GET $path should redirect to saUtr if is missing" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.withSaUtrNotProvided))
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
-
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      applicationInProgress,
+      individualProvideDetails.withSaUtrNotProvided
+    )
     val response: WSResponse = get(path)
-
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe AppRoutes.providedetails.IndividualSaUtrController.show.url
-
-    AuthStubs.verifyAuthorise()
-    AgentRegistrationIndividualProvidedDetailsStubs.verifyFind()
-    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId, 1)
+    response.header("Location").value shouldBe AppRoutes.providedetails.IndividualSaUtrController.show(linkId).url
+    ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
 
   s"GET $path should redirect to emailAddress if is missing" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
-      List(individualProvideDetails.withNinoAndSaUtrFromAuthButEmailNotProvided)
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      applicationInProgress,
+      individualProvideDetails.withNinoAndSaUtrFromAuthButEmailNotProvided
     )
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
-
     val response: WSResponse = get(path)
-
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe AppRoutes.providedetails.IndividualEmailAddressController.show.url
-
-    AuthStubs.verifyAuthorise()
-    AgentRegistrationIndividualProvidedDetailsStubs.verifyFind()
-    AgentRegistrationStubs.verifyFindApplicationByAgentApplicationId(tdAll.agentApplicationId, 1)
+    response.header("Location").value shouldBe AppRoutes.providedetails.IndividualEmailAddressController.show(linkId).url
+    ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
 
   s"POST $path with selected Yes should save data and redirect to agree standard" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.afterSaUtrProvided))
-    AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(individualProvideDetails.afterApproveAgentApplication)
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
-
+    ProvideDetailsStubHelper.stubAuthAndUpdateProvidedDetails(
+      agentApplication = applicationInProgress,
+      individualProvidedDetails = individualProvideDetails.afterApproveAgentApplication,
+      updatedIndividualProvidedDetails = individualProvideDetails.afterApproveAgentApplication
+    )
+    AgentRegistrationIndividualProvidedDetailsStubs.stubGetBusinessPartnerRecord(
+      utr = tdAll.saUtr.asUtr,
+      responseBody = tdAll.businessPartnerRecordResponse
+    )
     val response: WSResponse =
       post(path)(Map(
         IndividualApproveApplicationForm.key -> Seq("Yes")
       ))
-
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.providedetails.IndividualHmrcStandardForAgentsController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.IndividualHmrcStandardForAgentsController.show(linkId).url
 
   s"POST $path with selected No should save data and redirect to agree standard" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.afterSaUtrProvided))
-    AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(individualProvideDetails.afterDoNotApproveAgentApplication)
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
-
+    ProvideDetailsStubHelper.stubAuthAndUpdateProvidedDetails(
+      agentApplication = applicationInProgress,
+      individualProvidedDetails = individualProvideDetails.afterSaUtrProvided,
+      updatedIndividualProvidedDetails = individualProvideDetails.afterDoNotApproveAgentApplication
+    )
+    AgentRegistrationIndividualProvidedDetailsStubs.stubGetBusinessPartnerRecord(
+      utr = tdAll.saUtr.asUtr,
+      responseBody = tdAll.businessPartnerRecordResponse
+    )
     val response: WSResponse =
       post(path)(Map(
         IndividualApproveApplicationForm.key -> Seq("No")
       ))
-
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.providedetails.IndividualConfirmStopController.show.url
 
-  s"POST $path  without selecting and option should return 400" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.afterSaUtrProvided))
-    AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(individualProvideDetails.afterApproveAgentApplication)
-    AgentRegistrationStubs.stubFindApplication(tdAll.agentApplicationId, agentApplication.applicationSubmitted)
-
+  s"POST $path without selecting an option should return 400" in:
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      applicationInProgress,
+      individualProvideDetails.afterSaUtrProvided
+    )
+    AgentRegistrationIndividualProvidedDetailsStubs.stubGetBusinessPartnerRecord(
+      utr = tdAll.saUtr.asUtr,
+      responseBody = tdAll.businessPartnerRecordResponse
+    )
     val response: WSResponse =
       post(path)(Map(
         IndividualApproveApplicationForm.key -> Seq().empty
       ))
-
     response.status shouldBe Status.BAD_REQUEST
-
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe ExpectedStrings.errorTitle
     doc.mainContent.select("#individualApproveAgentApplication-error").text() shouldBe ExpectedStrings.requiredError(
-      agentApplication.applicationSubmitted.getApplicantContactDetails.applicantName.value
+      applicationInProgress.getApplicantContactDetails.applicantName.value
     )
+    ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
