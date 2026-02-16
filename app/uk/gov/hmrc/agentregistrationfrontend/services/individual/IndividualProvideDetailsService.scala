@@ -99,6 +99,13 @@ extends RequestAwareLogging:
       .upsertMemberProvidedDetails(individualProvidedDetails)
 
   // for use by agent applicants when building lists of individuals
+  def findAllKeyIndividualsByApplicationId(agentApplicationId: AgentApplicationId)(using request: RequestHeader): Future[List[IndividualProvidedDetails]] =
+    findAllByApplicationId(agentApplicationId).map(_.filter(_.isPersonOfControl))
+
+  def findAllOtherRelevantIndividualsByApplicationId(agentApplicationId: AgentApplicationId)(using
+    request: RequestHeader
+  ): Future[List[IndividualProvidedDetails]] = findAllByApplicationId(agentApplicationId).map(_.filterNot(_.isPersonOfControl))
+
   def findAllByApplicationId(agentApplicationId: AgentApplicationId)(using request: RequestHeader): Future[List[IndividualProvidedDetails]] =
     individualProvideDetailsConnector.findAll(agentApplicationId)
 

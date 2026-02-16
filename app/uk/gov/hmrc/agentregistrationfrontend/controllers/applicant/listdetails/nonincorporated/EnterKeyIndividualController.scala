@@ -82,7 +82,7 @@ extends FrontendController(mcc, actions):
     .refine:
       implicit request =>
         val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
-        individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
+        individualProvideDetailsService.findAllKeyIndividualsByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
           request.add[List[IndividualProvidedDetails]](individualsList)
 
   // TODO: extract logic of choosing view and rendering it based on NumberOfRequiredKeyIndividuals, Form[] and businessPartnerRecord

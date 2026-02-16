@@ -84,7 +84,7 @@ extends FrontendController(mcc, actions):
     .refine:
       implicit request =>
         val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
-        individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
+        individualProvideDetailsService.findAllKeyIndividualsByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
           request.add[List[IndividualProvidedDetails]](individualsList)
 
   def show(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction

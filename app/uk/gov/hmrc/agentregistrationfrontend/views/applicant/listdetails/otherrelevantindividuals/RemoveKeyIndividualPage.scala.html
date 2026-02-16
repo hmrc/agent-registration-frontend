@@ -1,0 +1,74 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistrationfrontend.forms.RemoveKeyIndividualForm
+@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.Yes
+@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.No
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
+@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
+@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
+
+@this(
+        layout: Layout,
+        govukRadios: GovukRadios,
+        govukInput: GovukInput,
+        formWithCSRF: FormWithCSRF,
+        govukButton: GovukButton,
+        continueOrSaveForLater: ContinueOrSaveForLater
+)
+
+@(
+        form: Form[YesNo],
+        individualProvidedDetails: IndividualProvidedDetails
+        )(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{RemoveKeyIndividualForm.key}
+@title = @{messages(s"$key.title", individualProvidedDetails.individualName.value)}
+
+@layout(
+    pageTitle = title,
+    maybeForm = Some(form)
+) {
+    <h2 class="govuk-caption-l">@messages(s"lists.caption.title.Partnership")</h2>
+    @formWithCSRF(action = AppRoutes.apply.listdetails.otherrelevantindividuals.RemoveOtherRelevantIndividualController.submit(individualProvidedDetails._id)) {
+        @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(title),
+                    isPageHeading = true,
+                    classes = "govuk-fieldset__legend--l"
+                ))
+            )),
+            items = Seq(
+                Yes.toString,
+                No.toString
+            ).map( option =>
+                RadioItem(
+                    content = Text(messages(s"$key.$option")),
+                    value = Some(option)
+                )
+            )
+        ).withFormField(form(key)))
+
+        @continueOrSaveForLater()
+    }
+}

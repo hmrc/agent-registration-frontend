@@ -73,7 +73,7 @@ extends FrontendController(mcc, actions):
       implicit request =>
         val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
         individualProvideDetailsService
-          .findAllByApplicationId(
+          .findAllKeyIndividualsByApplicationId(
             agentApplication.agentApplicationId
           ).map[RequestWithData[
             DataWithLists
@@ -87,7 +87,7 @@ extends FrontendController(mcc, actions):
               logger.warn(
                 "Number of required key individuals specified in application is zero, skipping CYA and redirecting to number of other relevant individuals page"
               )
-              Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.NumberOfOtherRelevantIndividualsController.show.url)
+              Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url)
             case list: List[IndividualProvidedDetails] => request.add[List[IndividualProvidedDetails]](list)
 
   def show: Action[AnyContent] = baseAction:

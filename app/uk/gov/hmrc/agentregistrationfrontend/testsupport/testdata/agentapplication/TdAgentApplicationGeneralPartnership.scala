@@ -49,7 +49,7 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
       refusalToDealWithCheckResult = None,
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
       numberOfRequiredKeyIndividuals = None,
-      numberOfOtherRelevantIndividuals = None
+      hasOtherRelevantIndividuals = None
     )
 
     val afterGrsDataReceived: AgentApplicationGeneralPartnership = afterStarted.copy(
@@ -113,6 +113,16 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
     val afterHowManyKeyIndividualsNeedsPadding: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
       numberOfRequiredKeyIndividuals = Some(dependencies.sixOrMoreKeyIndividuals)
     )
+
+    val afterConfirmOtherRelevantIndividualsYes: AgentApplicationGeneralPartnership = afterHowManyKeyIndividuals
+      .copy(
+        hasOtherRelevantIndividuals = Some(true)
+      )
+
+    val afterConfirmOtherRelevantIndividualsNo: AgentApplicationGeneralPartnership = afterHowManyKeyIndividuals
+      .copy(
+        hasOtherRelevantIndividuals = Some(false)
+      )
 
     val afterDeclarationSubmitted: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
       applicationState = ApplicationState.Submitted
