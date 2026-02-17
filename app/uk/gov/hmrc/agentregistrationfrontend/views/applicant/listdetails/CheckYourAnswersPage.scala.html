@@ -1,0 +1,179 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLaterLinks
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+
+@this(
+        layout: Layout,
+        govukSummaryList: GovukSummaryList,
+        continueOrSaveForLaterLinks: ContinueOrSaveForLaterLinks
+)
+
+@(
+        agentApplication: AgentApplication,
+        nonIncorporatedIndividualsList: List[IndividualProvidedDetails],
+        otherRelevantIndividualsList: List[IndividualProvidedDetails],
+)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{
+    "listDetailsCheckYourAnswers"
+}
+
+@title = @{
+    messages(s"$key.title")
+}
+
+@rows = @{
+    val partnerChangeNumberHref =
+        AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url
+
+    val partnerChangeListHref =
+        AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url
+
+    val hasOtherRelevantIndividualsChangeHref =
+        AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show.url
+
+    val otherRelevantIndividualsChangeListHref =
+        AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url
+
+    val noBorderRowClass = "govuk-summary-list__row--no-border"
+
+    val partnerRows: Seq[SummaryListRow] =
+        if (nonIncorporatedIndividualsList.nonEmpty) {
+            val partnerNames: List[String] = nonIncorporatedIndividualsList.map(_.individualName.value)
+
+            val numberRow =
+                SummaryListRow(
+                    key = Key(content = Text(messages(s"$key.numberOfPartners.label"))),
+                    value = Value(content = Text(nonIncorporatedIndividualsList.size.toString)),
+                    actions = Some(Actions(items = Seq(
+                        ActionItem(
+                            href = partnerChangeNumberHref,
+                            content = Text(messages("common.change")),
+                            visuallyHiddenText = Some(messages(s"$key.numberOfPartners.label"))
+                        )
+                    )))
+                )
+
+            val namesRows: Seq[SummaryListRow] =
+                partnerNames.zipWithIndex.map { (name, idx) =>
+                    val isLastNameRow = idx == (partnerNames.size - 1)
+                    SummaryListRow(
+                        key = Key(content = Text(if (idx == 0) messages(s"$key.partnerNames.label") else "")),
+                        value = Value(content = Text(name)),
+                        actions =
+                            if (idx == 0)
+                                Some(Actions(items = Seq(
+                                    ActionItem(
+                                        href = partnerChangeListHref,
+                                        content = Text(messages("common.change")),
+                                        visuallyHiddenText = Some(messages(s"$key.partnerNames.label"))
+                                    )
+                                )))
+                            else None,
+                        classes = if (!isLastNameRow) noBorderRowClass else ""
+                    )
+                }
+
+            numberRow +: namesRows
+        } else Seq.empty
+
+    val hasOtherRelevantIndividualsRow: Seq[SummaryListRow] =
+        agentApplication.hasOtherRelevantIndividuals match {
+            case Some(true) =>
+                Seq(
+                    SummaryListRow(
+                        key = Key(content = Text(messages(s"$key.hasOtherRelevantIndividuals.label"))),
+                        value = Value(content = Text(messages("common.yes"))),
+                        actions = Some(Actions(items = Seq(
+                            ActionItem(
+                                href = hasOtherRelevantIndividualsChangeHref,
+                                content = Text(messages("common.change")),
+                                visuallyHiddenText = Some(messages(s"$key.hasOtherRelevantIndividuals.label"))
+                            )
+                        )))
+                    )
+                )
+            case Some(false) =>
+                Seq(
+                    SummaryListRow(
+                        key = Key(content = Text(messages(s"$key.hasOtherRelevantIndividuals.label"))),
+                        value = Value(content = Text(messages("common.no"))),
+                        actions = Some(Actions(items = Seq(
+                            ActionItem(
+                                href = hasOtherRelevantIndividualsChangeHref,
+                                content = Text(messages("common.change")),
+                                visuallyHiddenText = Some(messages(s"$key.hasOtherRelevantIndividuals.label"))
+                            )
+                        )))
+                    )
+                )
+            case None =>
+                Seq.empty
+        }
+
+    val otherRelevantIndividualsRows: Seq[SummaryListRow] =
+        agentApplication.hasOtherRelevantIndividuals match {
+            case Some(true) if otherRelevantIndividualsList.nonEmpty =>
+                val names: List[String] = otherRelevantIndividualsList.map(_.individualName.value)
+
+                names.zipWithIndex.map { (name, idx) =>
+                    val isLastNameRow = idx == (names.size - 1)
+                    SummaryListRow(
+                        key = Key(content = Text(if (idx == 0) messages(s"$key.otherRelevantIndividualsNames.label") else "")),
+                        value = Value(content = Text(name)),
+                        actions =
+                            if (idx == 0)
+                                Some(Actions(items = Seq(
+                                    ActionItem(
+                                        href = otherRelevantIndividualsChangeListHref,
+                                        content = Text(messages("common.change")),
+                                        visuallyHiddenText = Some(messages(s"$key.otherRelevantIndividualsNames.label"))
+                                    )
+                                )))
+                            else None,
+                        classes = if (!isLastNameRow) noBorderRowClass else ""
+                    )
+                }
+            case _ =>
+                Seq.empty
+        }
+
+    partnerRows ++ hasOtherRelevantIndividualsRow ++ otherRelevantIndividualsRows
+}
+
+@layout(pageTitle = title) {
+    <h2 class="govuk-caption-l">@messages("lists.caption.title.Partnership")</h2>
+    <h1 class="govuk-heading-l">@title</h1>
+
+    @govukSummaryList(
+        SummaryList(rows = rows)
+    )
+
+    <p class="govuk-body">
+        @continueOrSaveForLaterLinks(
+            continueHref = AppRoutes.apply.TaskListController.show.url,
+            continueLabel = Some(messages("common.confirmAndContinue"))
+        )
+    </p>
+}

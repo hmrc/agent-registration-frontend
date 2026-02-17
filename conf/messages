@@ -405,6 +405,14 @@ addToListSummary.relevant.individuals.more.hint = We need to know everyone who h
 addToListSummary.relevant.individuals.more.error.required = Select yes if there are more unofficial partners
 addToListSummary.relevant.individuals.more.error.invalid = Select yes if there are more unofficial partners
 
+listDetailsCheckYourAnswers.title = Check your answers
+listDetailsCheckYourAnswers.numberOfPartners.label = Number of partners
+listDetailsCheckYourAnswers.partnerNames.label = Partner names
+listDetailsCheckYourAnswers.hasOtherRelevantIndividuals.label = Unofficial partners
+listDetailsCheckYourAnswers.otherRelevantIndividualsNames.label = Unofficial partner name
+
+
+
 link.title = Share this link with everyone on the list
 link.p1 = The people on your list need to sign in and provide their details to HMRC.
 link.p2 = Share this link with them:
