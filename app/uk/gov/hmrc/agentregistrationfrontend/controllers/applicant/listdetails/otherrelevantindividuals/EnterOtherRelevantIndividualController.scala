@@ -91,7 +91,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         val individualName: IndividualName = request.get
-        individualProvideDetailsService.upsert(individualProvideDetailsService.create(
+        individualProvideDetailsService.upsertForApplication(individualProvideDetailsService.create(
           individualName = individualName,
           isPersonOfControl = false, // from this page we are only adding other relevant people, who are not persons of control
           agentApplicationId = request.get[IsNotSoleTrader].agentApplicationId

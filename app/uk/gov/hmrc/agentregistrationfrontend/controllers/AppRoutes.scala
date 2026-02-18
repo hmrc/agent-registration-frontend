@@ -34,7 +34,6 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.p
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.routes as internalRoutes
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.routes as providedetailsRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.internal.routes as internalProviDedetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.routes as testOnlyRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.routes as testOnlyApplicantRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.routes as testOnlyIndividualRoutes
@@ -136,8 +135,6 @@ object AppRoutes:
   object providedetails:
 
     val StartController = providedetailsRoutes.StartController
-    val CompaniesHouseNameQueryController = providedetailsRoutes.CompaniesHouseNameQueryController
-    val CompaniesHouseMatchingController = providedetailsRoutes.CompaniesHouseMatchingController
     val ExitController = providedetailsRoutes.ExitController
     val IndividualTelephoneNumberController = providedetailsRoutes.IndividualTelephoneNumberController
     val IndividualEmailAddressController = providedetailsRoutes.IndividualEmailAddressController
@@ -149,9 +146,7 @@ object AppRoutes:
     val IndividualConfirmStopController = providedetailsRoutes.IndividualConfirmStopController
     val CheckYourAnswersController = providedetailsRoutes.CheckYourAnswersController
     val IndividualConfirmationController = providedetailsRoutes.IndividualConfirmationController
-
-    object internal:
-      val InitiateIndividualProvideDetailsController = internalProviDedetailsRoutes.InitiateIndividualProvideDetailsController
+    val ConfirmMatchToIndividualProvidedDetailsController = providedetailsRoutes.ConfirmMatchToIndividualProvidedDetailsController
 
   object testOnly:
 

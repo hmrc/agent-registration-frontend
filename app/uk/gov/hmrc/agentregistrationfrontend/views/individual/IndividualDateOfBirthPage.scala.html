@@ -15,6 +15,7 @@
  *@
 
 @import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedDateOfBirth
+@import uk.gov.hmrc.agentregistration.shared.LinkId
 @import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualDateOfBirthForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.partials.SaveAndContinue
@@ -28,7 +29,8 @@
 )
 
 @(
-        form: Form[UserProvidedDateOfBirth])(implicit
+        form: Form[UserProvidedDateOfBirth],
+        linkId: LinkId)(implicit
         request: RequestHeader,
         messages: Messages
 )
@@ -42,7 +44,7 @@
 ) {
 
     <h2 class="govuk-caption-l">@messages("provide-details.llp.title")</h2>
-    @formWithCSRF(action = AppRoutes.providedetails.IndividualDateOfBirthController.submit) {
+    @formWithCSRF(action = AppRoutes.providedetails.IndividualDateOfBirthController.submit(linkId)) {
         @govukDateInput(DateInput(
             id = key,
             hint = Some(Hint(content = Text(messages(s"$key.hint")))),

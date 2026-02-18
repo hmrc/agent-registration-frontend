@@ -18,67 +18,77 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualSaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
 class IndividualSaUtrControllerSpec
 extends ControllerSpec:
 
-  private val path = "/agent-registration/provide-details/utr"
+  private val linkId = tdAll.linkId
+  private val agentApplication =
+    tdAll
+      .agentApplicationLlp
+      .afterContactDetailsComplete
+  private val path = s"/agent-registration/provide-details/utr/${linkId.value}"
 
   private object individualProvideDetails:
 
-    val afterNinoProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterNino.afterNinoProvided
-    val afterSaUtrNotProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrNotProvided
-    val afterSaUtrFromAuth: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrFromAuth
-    val afterSaUtrFromCitizenDetails: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrFromCitizenDetails
-    val afterSaUtrProvided: IndividualProvidedDetailsToBeDeleted = tdAll.providedDetailsLlp.AfterSaUtr.afterSaUtrProvided
+    val afterNinoProvided: IndividualProvidedDetails = tdAll.providedDetails.AfterNino.afterNinoProvided
+    val afterSaUtrNotProvided: IndividualProvidedDetails = tdAll.providedDetails.AfterSaUtr.afterSaUtrNotProvided
+    val afterSaUtrFromAuth: IndividualProvidedDetails = tdAll.providedDetails.AfterSaUtr.afterSaUtrFromAuth
+    val afterSaUtrFromCitizenDetails: IndividualProvidedDetails = tdAll.providedDetails.AfterSaUtr.afterSaUtrFromCitizenDetails
+    val afterSaUtrProvided: IndividualProvidedDetails = tdAll.providedDetails.AfterSaUtr.afterSaUtrProvided
 
   "routes should have correct paths and methods" in:
-    AppRoutes.providedetails.IndividualSaUtrController.show shouldBe Call(
+    AppRoutes.providedetails.IndividualSaUtrController.show(linkId) shouldBe Call(
       method = "GET",
       url = path
     )
-    AppRoutes.providedetails.IndividualSaUtrController.submit shouldBe Call(
+    AppRoutes.providedetails.IndividualSaUtrController.submit(linkId) shouldBe Call(
       method = "POST",
       url = path
     )
-    AppRoutes.providedetails.IndividualSaUtrController.submit.url shouldBe AppRoutes.providedetails.IndividualSaUtrController.show.url
+    AppRoutes.providedetails.IndividualSaUtrController.submit(linkId).url shouldBe AppRoutes.providedetails.IndividualSaUtrController.show(linkId).url
 
   s"GET $path should return 200 and render page when SaUtr is not provided in HMRC systems" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.afterSaUtrNotProvided))
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      agentApplication,
+      individualProvideDetails.afterSaUtrNotProvided
+    )
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Do you have a Self Assessment Unique Taxpayer Reference? - Apply for an agent services account - GOV.UK"
 
   s"GET $path should redirect to next page when SaUtr is already provided from HMRC systems (Auth)" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.afterSaUtrFromAuth))
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      agentApplication,
+      individualProvideDetails.afterSaUtrFromAuth
+    )
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url
 
   s"GET $path should redirect to previous page when Nino is not provided from HMRC systems (Auth)" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.afterSaUtrFromAuth.copy(individualNino =
-      None
-    )))
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      agentApplication,
+      individualProvideDetails.afterSaUtrFromAuth.copy(
+        individualNino = None
+      )
+    )
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe AppRoutes.providedetails.IndividualNinoController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.IndividualNinoController.show(linkId).url
 
   s"POST $path with selected Yes and valid name should save data and redirect to check your answers" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.afterNinoProvided))
-    AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(individualProvideDetails.afterSaUtrProvided)
-
+    ProvideDetailsStubHelper.stubAuthAndUpdateProvidedDetails(
+      agentApplication = agentApplication,
+      individualProvidedDetails = individualProvideDetails.afterNinoProvided,
+      updatedIndividualProvidedDetails = individualProvideDetails.afterSaUtrProvided
+    )
     val response: WSResponse =
       post(path)(Map(
         IndividualSaUtrForm.hasSaUtrKey -> Seq("Yes"),
@@ -87,13 +97,14 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url
 
   s"POST $path with selected No should save data and redirect to check your answers" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.afterSaUtrNotProvided))
-    AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(individualProvideDetails.afterSaUtrNotProvided)
-
+    ProvideDetailsStubHelper.stubAuthAndUpdateProvidedDetails(
+      agentApplication = agentApplication,
+      individualProvidedDetails = individualProvideDetails.afterSaUtrNotProvided,
+      updatedIndividualProvidedDetails = individualProvideDetails.afterSaUtrNotProvided
+    )
     val response: WSResponse =
       post(path)(Map(
         IndividualSaUtrForm.hasSaUtrKey -> Seq("No")
@@ -101,11 +112,13 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url
 
   s"POST $path  without selecting and option should return 400" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.afterSaUtrNotProvided))
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      agentApplication,
+      individualProvideDetails.afterSaUtrNotProvided
+    )
     val response: WSResponse =
       post(path)(Map(
         IndividualSaUtrForm.hasSaUtrKey -> Seq(Constants.EMPTY_STRING),
@@ -119,8 +132,10 @@ extends ControllerSpec:
     doc.mainContent.select("#individualSaUtr\\.hasSaUtr-error").text() shouldBe "Error: Select yes if you have a Self Assessment Unique Taxpayer Reference"
 
   s"POST $path with selected Yes and blank inputs should return 400" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.afterSaUtrNotProvided))
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      agentApplication,
+      individualProvideDetails.afterSaUtrNotProvided
+    )
     val response: WSResponse =
       post(path)(Map(
         IndividualSaUtrForm.hasSaUtrKey -> Seq("Yes"),
@@ -134,16 +149,16 @@ extends ControllerSpec:
     doc.mainContent.select("#individualSaUtr\\.saUtr-error").text() shouldBe "Error: Enter your Self Assessment Unique Taxpayer Reference"
 
   s"POST $path with selected Yes and invalid characters should return 400" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails.afterSaUtrNotProvided))
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      agentApplication,
+      individualProvideDetails.afterSaUtrNotProvided
+    )
     val response: WSResponse =
       post(path)(Map(
         IndividualSaUtrForm.hasSaUtrKey -> Seq("Yes"),
         IndividualSaUtrForm.saUtrKey -> Seq("[[)(*%")
       ))
-
     response.status shouldBe Status.BAD_REQUEST
-
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Error: Do you have a Self Assessment Unique Taxpayer Reference? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("#individualSaUtr\\.saUtr-error").text() shouldBe "Error: Enter a Self Assessment Unique Taxpayer Reference in the correct format"

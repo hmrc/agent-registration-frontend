@@ -17,7 +17,8 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.AnswerSummary
-@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistration.shared.LinkId
 
 @this(
         layout: Layout,
@@ -28,7 +29,8 @@
 
 
 @(
-        individualProvidedDetails: IndividualProvidedDetailsToBeDeleted)(implicit
+        individualProvidedDetails: IndividualProvidedDetails,
+        linkId: LinkId)(implicit
         request: RequestHeader,
         messages: Messages
 )
@@ -44,11 +46,12 @@
     <h2 class="govuk-caption-l">@messages("provide-details.llp.title")</h2>
     <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
     @answerSummary(
-        key,
-        individualProvidedDetails = individualProvidedDetails
+      key,
+      individualProvidedDetails = individualProvidedDetails,
+      linkId = linkId
     )
     <p class="govuk-body">
-    @formWithCSRF(action = AppRoutes.providedetails.CheckYourAnswersController.submit) {
+    @formWithCSRF(action = AppRoutes.providedetails.CheckYourAnswersController.submit(linkId)) {
         @govukButton(Button(
             content = Text(messages("common.confirmAndContinue"))
         ))

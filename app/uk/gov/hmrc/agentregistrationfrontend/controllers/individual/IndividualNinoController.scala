@@ -16,15 +16,15 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
-import com.softwaremill.quicklens.modify
+import com.softwaremill.quicklens.*
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedNino
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
-
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualNinoPage
@@ -41,50 +41,52 @@ class IndividualNinoController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions.getProvideDetailsInProgress
+  private def baseAction(linkId: LinkId): ActionBuilderWithData[DataWithIndividualProvidedDetails] = authorisedWithIndividualProvidedDetails(linkId)
     .ensure(
-      _.individualProvidedDetails.emailAddress.nonEmpty,
+      _.get[IndividualProvidedDetails].emailAddress.nonEmpty,
       implicit request =>
-        Redirect(AppRoutes.providedetails.IndividualEmailAddressController.show.url)
+        Redirect(AppRoutes.providedetails.IndividualEmailAddressController.show(linkId).url)
     )
     .ensure(
-      _.individualProvidedDetails.individualNino.fold(true) {
+      _.get[IndividualProvidedDetails].individualNino.fold(true) {
         case IndividualNino.FromAuth(_) => false
         case _ => true
       },
       implicit request =>
         logger.info(s"Nino is already provided from auth or citizen details. Skipping page and moving to next page.")
-        Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url)
+        Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url)
     )
 
-  def show: Action[AnyContent] = baseAction:
-    implicit request =>
-      Ok(view(
-        IndividualNinoForm.form
-          .fill:
-            request
-              .individualProvidedDetails
-              .individualNino
-              .map(_.toUserProvidedNino)
-      ))
+  def show(linkId: LinkId): Action[AnyContent] =
+    baseAction(linkId):
+      implicit request =>
+        Ok(view(
+          form = IndividualNinoForm.form
+            .fill:
+              request
+                .get[IndividualProvidedDetails]
+                .individualNino
+                .map(_.toUserProvidedNino)
+          ,
+          linkId = linkId
+        ))
 
-  def submit: Action[AnyContent] =
-    baseAction
+  def submit(linkId: LinkId): Action[AnyContent] =
+    baseAction(linkId)
       .ensureValidFormAndRedirectIfSaveForLater[UserProvidedNino](
         IndividualNinoForm.form,
-        implicit r => view(_)
+        implicit r => view(_, linkId)
       )
       .async:
         implicit request =>
           val validFormData: UserProvidedNino = request.get
-          val updatedApplication: IndividualProvidedDetailsToBeDeleted = request
-            .individualProvidedDetails
+          val updatedIndividualProvidedDetails: IndividualProvidedDetails = request.get[IndividualProvidedDetails]
             .modify(_.individualNino)
             .setTo(Some(validFormData))
           individualProvideDetailsService
-            .upsert(updatedApplication)
+            .upsert(updatedIndividualProvidedDetails)
             .map: _ =>
-              Redirect(AppRoutes.providedetails.CheckYourAnswersController.show.url)
+              Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url)
       .redirectIfSaveForLater
 
   extension (individualNino: IndividualNino)

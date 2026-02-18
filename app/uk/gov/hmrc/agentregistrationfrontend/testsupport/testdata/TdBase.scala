@@ -67,6 +67,7 @@ trait TdBase:
     providerType = "GovernmentGateway"
   )
 
+  def individualName = IndividualName("Test Name")
   def nino = Nino("AB123456C")
   def ninoFromAuth = IndividualNino.FromAuth(nino)
   def ninoProvided = IndividualNino.Provided(nino)
@@ -189,14 +190,6 @@ trait TdBase:
 
   def sixOrMoreKeyIndividuals: SixOrMore = SixOrMore(
     numberOfKeyIndividualsResponsibleForTaxMatters = 3
-  )
-
-  val individualProvidedDetailsToBeDeleted: IndividualProvidedDetailsToBeDeleted = IndividualProvidedDetailsToBeDeleted(
-    _id = individualProvidedDetailsId,
-    internalUserId = internalUserId,
-    createdAt = nowAsInstant,
-    agentApplicationId = agentApplicationId,
-    providedDetailsState = ProvidedDetailsState.Started
   )
 
   val individualProvidedDetails: IndividualProvidedDetails = IndividualProvidedDetails(

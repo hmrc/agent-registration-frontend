@@ -20,14 +20,17 @@ import play.api.mvc.*
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.SaUtr
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineFutureEither
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineUnion
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuildersWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
@@ -47,20 +50,15 @@ object IndividualActions:
   type RequestWithAdditionalIdentifiers = RequestWithData[DataWithAdditionalIdentifiers]
   type RequestWithAdditionalIdentifiersCt[ContentType] = RequestWithDataCt[ContentType, DataWithAdditionalIdentifiers]
 
-  type DataWithIndividualProvidedDetails = IndividualProvidedDetailsToBeDeleted *: DataWithAuth
-  type RequestWithIndividualProvidedDetailsToBeDeleted = RequestWithData[DataWithIndividualProvidedDetails]
-  type RequestWithIndividualProvidedDetailsToBeDeletedCt[ContentType] = RequestWithDataCt[ContentType, DataWithIndividualProvidedDetails]
-
-  type DataWithAgentApplication = AgentApplication *: DataWithIndividualProvidedDetails
-  type RequestWithAgentApplication = RequestWithData[DataWithAgentApplication]
-  type RequestWithAgentApplicationCt[ContentType] = RequestWithDataCt[ContentType, DataWithAgentApplication]
+  type DataWithApplicationFromLinkId = AgentApplication *: DataWithAuth
+  type DataWithIndividualProvidedDetails = IndividualProvidedDetails *: DataWithApplicationFromLinkId
 
 @Singleton
 class IndividualActions @Inject() (
   defaultActionBuilder: DefaultActionBuilder,
   individualAuthorisedRefiner: IndividualAuthRefiner,
-  individualProvideDetailsRefiner: IndividualProvideDetailsRefiner,
-  enricherAgentApplication: AgentApplicationEnricher
+  agentApplicationService: AgentApplicationService,
+  individualProvideDetailsService: IndividualProvideDetailsService
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
@@ -76,48 +74,23 @@ extends RequestAwareLogging:
   val authorisedWithAdditionalIdentifiers: ActionBuilderWithData[DataWithAdditionalIdentifiers] = action
     .refineFutureEither(individualAuthorisedRefiner.refineIntoRequestWithAdditionalIdentifiers)
 
-  val getProvidedDetails: ActionBuilderWithData[DataWithIndividualProvidedDetails] = authorised
-    .refineFutureEither:
-      individualProvideDetailsRefiner.refineIntoRequestWithIndividualProvidedDetails
-
-  val getProvideDetailsInProgress: ActionBuilderWithData[DataWithIndividualProvidedDetails] = getProvidedDetails
-    .ensure(
-      condition = _.individualProvidedDetails.isInProgress,
-      resultWhenConditionNotMet =
-        implicit request =>
-          val mpdConfirmationPage = AppRoutes.providedetails.IndividualConfirmationController.show
-          logger.warn(
-            s"The provided details have already been confirmed" +
-              s" (current provided details: ${request.individualProvidedDetails.providedDetailsState.toString}), " +
-              s"redirecting to [${mpdConfirmationPage.url}]."
-          )
-          Redirect(mpdConfirmationPage.url)
+  def authorisedWithIndividualProvidedDetails(linkId: LinkId): ActionBuilderWithData[DataWithIndividualProvidedDetails] = authorised
+    .refine(implicit request =>
+      agentApplicationService
+        .find(linkId)
+        .map:
+          case Some(agentApplication) => request.add(agentApplication)
+          case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
     )
-
-  val getProvideDetailsWithApplicationInProgress: ActionBuilderWithData[DataWithAgentApplication] =
-    getProvideDetailsInProgress
-      .enrichWithAgentApplicationAction
-
-  val getSubmittedDetailsWithApplicationInProgress: ActionBuilderWithData[DataWithAgentApplication] = getProvidedDetails
-    .ensure(
-      condition = _.individualProvidedDetails.hasFinished,
-      resultWhenConditionNotMet =
-        implicit request =>
-          val mdpCyaPage = AppRoutes.providedetails.CheckYourAnswersController.show
-          logger.warn(
-            s"The provided details are not in the final state" +
-              s" (current provided details: ${request.individualProvidedDetails.providedDetailsState.toString}), " +
-              s"redirecting to [${mdpCyaPage.url}]."
-          )
-          Redirect(mdpCyaPage.url)
+    .refine(implicit request =>
+      individualProvideDetailsService
+        .findAllForMatchingWithApplication(request.get[AgentApplication].agentApplicationId)
+        .map[RequestWithData[DataWithIndividualProvidedDetails] | Result]:
+          case list: List[IndividualProvidedDetails] =>
+            list
+              .find(_.internalUserId.contains(request.get[InternalUserId]))
+              .map(request.add[IndividualProvidedDetails])
+              .getOrElse(
+                Redirect(AppRoutes.providedetails.ConfirmMatchToIndividualProvidedDetailsController.show(linkId))
+              )
     )
-    .refine(enricherAgentApplication.enrichRequest)
-
-  extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
-
-    inline def enrichWithAgentApplicationAction(using
-      AgentApplication AbsentIn Data,
-      IndividualProvidedDetailsToBeDeleted PresentIn Data
-    ): ActionBuilderWithData[AgentApplication *: Data] = ab
-      .refine:
-        enricherAgentApplication.enrichRequest

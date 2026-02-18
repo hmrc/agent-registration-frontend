@@ -17,15 +17,10 @@
 package uk.gov.hmrc.agentregistrationfrontend.services.individual
 
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualDateOfBirth
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsIdGenerator
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Precreated
-import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Started
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 
 import java.time.Clock
 import java.time.Instant
@@ -37,23 +32,6 @@ class IndividualProvideDetailsFactory @Inject() (
   clock: Clock,
   individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator
 ):
-
-  def makeNewIndividualProvidedDetails(
-    internalUserId: InternalUserId,
-    agentApplicationId: AgentApplicationId,
-    individualNino: Option[IndividualNino],
-    individualSaUtr: Option[IndividualSaUtr],
-    individualDateOfBirth: Option[IndividualDateOfBirth]
-  ): IndividualProvidedDetailsToBeDeleted = IndividualProvidedDetailsToBeDeleted(
-    _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
-    internalUserId = internalUserId,
-    agentApplicationId = agentApplicationId,
-    createdAt = Instant.now(clock),
-    providedDetailsState = Started,
-    individualNino = individualNino,
-    individualSaUtr = individualSaUtr,
-    individualDateOfBirth = individualDateOfBirth
-  )
 
   def create(
     agentApplicationId: AgentApplicationId,

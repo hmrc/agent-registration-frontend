@@ -14,9 +14,10 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualDateOfBirth
 @import uk.gov.hmrc.agentregistration.shared.individual.{IndividualNino, IndividualSaUtr}
+@import uk.gov.hmrc.agentregistration.shared.LinkId
 @import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 @import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 
@@ -28,7 +29,8 @@
 
 @(
         key: String,
-        individualProvidedDetails: IndividualProvidedDetailsToBeDeleted)(implicit
+        individualProvidedDetails: IndividualProvidedDetails,
+        linkId: LinkId)(implicit
         request: RequestHeader,
         messages: Messages
 )
@@ -51,22 +53,11 @@
     )
 }
 
-@memberNameRow = @{
-    makeSummaryListRow(
-        labelKey = s"$key.individualName.label",
-        valueText = individualProvidedDetails.getCompaniesHouseMatch
-        .companiesHouseOfficer
-        .map(_.name)
-        .getOrThrowExpectedDataMissing("Officer name"),
-        changeHref = AppRoutes.providedetails.CompaniesHouseNameQueryController.show.toString
-    )
-}
-
 @telephoneRow = @{
     makeSummaryListRow(
         labelKey = s"$key.telephone.label",
         valueText = individualProvidedDetails.getTelephoneNumber.value,
-        changeHref = AppRoutes.providedetails.IndividualTelephoneNumberController.show.toString
+        changeHref = AppRoutes.providedetails.IndividualTelephoneNumberController.show(linkId).toString
     )
 }
 
@@ -74,7 +65,7 @@
     makeSummaryListRow(
         labelKey = s"$key.email.label",
         valueText = individualProvidedDetails.getEmailAddress.emailAddress.value,
-        changeHref = AppRoutes.providedetails.IndividualEmailAddressController.show.toString
+        changeHref = AppRoutes.providedetails.IndividualEmailAddressController.show(linkId).toString
     )
 }
 
@@ -82,7 +73,7 @@
     makeSummaryListRow(
         labelKey = s"$key.dateOfBirth.label",
         valueText = displayDateForLang(Some(dob)),
-        changeHref = AppRoutes.providedetails.IndividualDateOfBirthController.show.toString
+        changeHref = AppRoutes.providedetails.IndividualDateOfBirthController.show(linkId).toString
     )
 }
 
@@ -90,7 +81,7 @@
     makeSummaryListRow(
         labelKey = s"$key.hasNino.label",
         valueText = hasNino,
-        changeHref = AppRoutes.providedetails.IndividualNinoController.show.toString
+        changeHref = AppRoutes.providedetails.IndividualNinoController.show(linkId).toString
     )
 }
 
@@ -98,7 +89,7 @@
     makeSummaryListRow(
         labelKey = s"$key.nino.label",
         valueText = ninoText,
-        changeHref = AppRoutes.providedetails.IndividualNinoController.show.toString
+        changeHref = AppRoutes.providedetails.IndividualNinoController.show(linkId).toString
     )
 }
 
@@ -106,7 +97,7 @@
     makeSummaryListRow(
         labelKey = s"$key.hasSaUtr.label",
         valueText = hasSaUtr,
-        changeHref = AppRoutes.providedetails.IndividualSaUtrController.show.toString
+        changeHref = AppRoutes.providedetails.IndividualSaUtrController.show(linkId).toString
     )
 }
 
@@ -114,12 +105,12 @@
     makeSummaryListRow(
         labelKey = s"$key.saUtr.label",
         valueText = saUtrText,
-        changeHref = AppRoutes.providedetails.IndividualSaUtrController.show.toString
+        changeHref = AppRoutes.providedetails.IndividualSaUtrController.show(linkId).toString
     )
 }
 
 @rows = @{
-    val base = Seq(memberNameRow, telephoneRow, emailRow)
+    val base = Seq(telephoneRow, emailRow)
 
   val dateOfBirthRows = individualProvidedDetails.getDateOfBirth match {
         case IndividualDateOfBirth.Provided(dob) => Seq(dateOfBirthRow(dob))

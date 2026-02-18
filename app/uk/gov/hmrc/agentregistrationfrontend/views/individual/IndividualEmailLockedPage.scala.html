@@ -15,14 +15,14 @@
  *@
 
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-
+@import uk.gov.hmrc.agentregistration.shared.LinkId
 
 @this(
         layout: Layout,
         govukInput: GovukInput
 )
 
-@()(
+@(linkId: LinkId)(
         implicit request: RequestHeader,
         messages: Messages
 )
@@ -58,7 +58,7 @@
     <p class="govuk-body">
         @{
             messages(s"$key.p4")
-        } <a href=@{AppRoutes.providedetails.IndividualEmailAddressController.show.url} class="govuk-link">@{
+        } <a href=@{AppRoutes.providedetails.IndividualEmailAddressController.show(linkId).url} class="govuk-link">@{
         messages(s"$key.linkText")
     }</a>.
     </p>

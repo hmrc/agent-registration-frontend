@@ -16,17 +16,19 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.services.individual
 
+import com.softwaremill.quicklens.*
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino.FromAuth
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
+import uk.gov.hmrc.agentregistrationfrontend.model.citizendetails.CitizenDetails
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
@@ -53,10 +55,15 @@ extends RequestAwareLogging:
       isPersonOfControl
     )
 
-  def upsert(individualProvidedDetails: IndividualProvidedDetails)(using request: RequestHeader): Future[Unit] =
+  def upsertForApplication(individualProvidedDetails: IndividualProvidedDetails)(using request: RequestHeader): Future[Unit] =
     logger.debug(s"Upserting providedDetails for user:[${individualProvidedDetails._id}] and applicationId:[${individualProvidedDetails.agentApplicationId}]")
     individualProvideDetailsConnector
       .upsert(individualProvidedDetails)
+
+  def upsert(individualProvidedDetails: IndividualProvidedDetails)(using request: RequestHeader): Future[Unit] =
+    logger.debug(s"Upserting providedDetails for user:[${individualProvidedDetails._id}] and applicationId:[${individualProvidedDetails.agentApplicationId}]")
+    individualProvideDetailsConnector
+      .upsertForIndividual(individualProvidedDetails)
 
   def findById(individualProvidedDetailsId: IndividualProvidedDetailsId)(using
     RequestHeader
@@ -70,34 +77,6 @@ extends RequestAwareLogging:
     individualProvideDetailsConnector
       .delete(individualProvidedDetailsId)
 
-  def createNewIndividualProvidedDetails(
-    internalUserId: InternalUserId,
-    agentApplicationId: AgentApplicationId,
-    maybeIndividualNino: Option[IndividualNino],
-    maybeIndividualSaUtr: Option[IndividualSaUtr],
-    maybeIndividualDateOfBirth: Option[IndividualDateOfBirth] = None
-  )(using request: RequestHeader): IndividualProvidedDetailsToBeDeleted =
-    logger.info(s"creating new provided details for user:[${internalUserId.value}] and applicationId:[${agentApplicationId.value}] ")
-    provideDetailsFactory.makeNewIndividualProvidedDetails(
-      internalUserId,
-      agentApplicationId,
-      maybeIndividualNino,
-      maybeIndividualSaUtr,
-      maybeIndividualDateOfBirth
-    )
-
-  def findByApplicationId(applicationId: AgentApplicationId)(using request: RequestHeader): Future[Option[IndividualProvidedDetailsToBeDeleted]] =
-    individualProvideDetailsConnector
-      .find(applicationId)
-
-  def findAll()(using request: RequestHeader): Future[List[IndividualProvidedDetailsToBeDeleted]] = individualProvideDetailsConnector
-    .findAll()
-
-  def upsert(individualProvidedDetails: IndividualProvidedDetailsToBeDeleted)(using request: RequestHeader): Future[Unit] =
-    logger.debug(s"Upserting providedDetails for user:[${individualProvidedDetails.internalUserId}] and applicationId:[${individualProvidedDetails.agentApplicationId}]")
-    individualProvideDetailsConnector
-      .upsertMemberProvidedDetails(individualProvidedDetails)
-
   // for use by agent applicants when building lists of individuals
   def findAllKeyIndividualsByApplicationId(agentApplicationId: AgentApplicationId)(using request: RequestHeader): Future[List[IndividualProvidedDetails]] =
     findAllByApplicationId(agentApplicationId).map(_.filter(_.isPersonOfControl))
@@ -108,6 +87,10 @@ extends RequestAwareLogging:
 
   def findAllByApplicationId(agentApplicationId: AgentApplicationId)(using request: RequestHeader): Future[List[IndividualProvidedDetails]] =
     individualProvideDetailsConnector.findAll(agentApplicationId)
+
+  //  for use by individuals when matching with an application - requires individual auth
+  def findAllForMatchingWithApplication(agentApplicationId: AgentApplicationId)(using request: RequestHeader): Future[List[IndividualProvidedDetails]] =
+    individualProvideDetailsConnector.findAllForMatching(agentApplicationId)
 
   def markLinkSent(individualProvidedDetailsList: List[IndividualProvidedDetails])(using request: RequestHeader): Future[Unit] = {
     // we only want to mark the link sent for provided details that have been precreated
@@ -120,4 +103,27 @@ extends RequestAwareLogging:
 
     Future.sequence(upsertFutures).map: _ =>
       ()
+  }
+
+  def claimIndividualProvidedDetails(
+    individualProvidedDetails: IndividualProvidedDetails,
+    internalUserId: InternalUserId,
+    maybeNino: Option[Nino],
+    citizenDetails: CitizenDetails
+  )(using request: RequestHeader): Future[Unit] = {
+    logger.debug(s"Claiming IndividualProvidedDetails for user:[${internalUserId.value}] and applicationId:[${individualProvidedDetails.agentApplicationId.value}]")
+    individualProvideDetailsConnector
+      .upsertForIndividual(
+        individualProvidedDetails
+          .modify(_.internalUserId)
+          .setTo(Some(internalUserId))
+          .modify(_.individualNino)
+          .setTo(maybeNino.map(FromAuth(_))) // TODO: Should probably use a concrete nino given we expect CitizenDetails
+          .modify(_.individualDateOfBirth)
+          .setTo(citizenDetails.dateOfBirth.map(IndividualDateOfBirth.FromCitizensDetails(_)))
+          .modify(_.individualSaUtr)
+          .setTo(citizenDetails.saUtr.map(IndividualSaUtr.FromCitizenDetails(_)))
+          .modify(_.providedDetailsState)
+          .setTo(ProvidedDetailsState.Started)
+      )
   }

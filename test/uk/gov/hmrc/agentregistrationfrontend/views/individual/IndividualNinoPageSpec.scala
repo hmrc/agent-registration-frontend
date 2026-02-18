@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-
+import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -28,8 +28,9 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualNin
 class IndividualNinoPageSpec
 extends ViewSpec:
 
+  val linkId: LinkId = tdAll.linkId
   val viewTemplate: IndividualNinoPage = app.injector.instanceOf[IndividualNinoPage]
-  val doc: Document = Jsoup.parse(viewTemplate(IndividualNinoForm.form).body)
+  val doc: Document = Jsoup.parse(viewTemplate(IndividualNinoForm.form, linkId).body)
   private val heading: String = "Do you have a National Insurance number?"
 
   "MemberNinoPage" should:
@@ -63,6 +64,6 @@ extends ViewSpec:
     behavesLikePageWithErrorHandling(
       field = field,
       errorMessage = errorMessage,
-      errorDoc = Jsoup.parse(viewTemplate(formWithError).body),
+      errorDoc = Jsoup.parse(viewTemplate(formWithError, linkId).body),
       heading = heading
     )

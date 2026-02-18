@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.agentregistration.shared.LinkId
 @import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
 
 @import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualTelephoneNumberForm
@@ -30,7 +31,8 @@
 )
 
 @(
-        form: Form[TelephoneNumber])(implicit
+        form: Form[TelephoneNumber],
+        linkId: LinkId)(implicit
         request: RequestHeader,
         messages: Messages
 )
@@ -46,7 +48,7 @@
     maybeForm = Some(form)
 ) {
     <h2 class="govuk-caption-l">@messages("provide-details.llp.title")</h2>
-    @formWithCSRF(action = AppRoutes.providedetails.IndividualTelephoneNumberController.submit) {
+    @formWithCSRF(action = AppRoutes.providedetails.IndividualTelephoneNumberController.submit(linkId)) {
         @govukInput(Input(
             label = Label(
                 content = Text(title),

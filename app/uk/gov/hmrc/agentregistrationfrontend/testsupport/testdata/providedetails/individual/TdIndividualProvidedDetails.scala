@@ -18,9 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.providedetail
 
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
-import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseMatch
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualVerifiedEmailAddress
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
@@ -29,46 +28,30 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
 trait TdIndividualProvidedDetails { dependencies: (TdBase) =>
 
-  object providedDetailsLlp:
+  object providedDetails:
 
-    val afterStarted: IndividualProvidedDetailsToBeDeleted = IndividualProvidedDetailsToBeDeleted(
+    val afterStarted: IndividualProvidedDetails = IndividualProvidedDetails(
       _id = dependencies.individualProvidedDetailsId,
-      internalUserId = dependencies.internalUserId,
+      internalUserId = Some(dependencies.internalUserId),
+      individualName = dependencies.individualName,
       createdAt = dependencies.nowAsInstant,
       agentApplicationId = dependencies.agentApplicationId,
-      providedDetailsState = Started
+      providedDetailsState = Started,
+      isPersonOfControl = true
     )
 
-    val afterNameQueryProvided: IndividualProvidedDetailsToBeDeleted = afterStarted
-      .modify(_.companiesHouseMatch)
-      .setTo(
-        Some(CompaniesHouseMatch(
-          memberNameQuery = dependencies.llpNameQuery,
-          companiesHouseOfficer = None
-        ))
-      )
-
-    val afterOfficerChosen: IndividualProvidedDetailsToBeDeleted = afterStarted
-      .modify(_.companiesHouseMatch)
-      .setTo(
-        Some(CompaniesHouseMatch(
-          memberNameQuery = dependencies.llpNameQuery,
-          companiesHouseOfficer = Some(dependencies.companiesHouseOfficer)
-        ))
-      )
-
-    val afterTelephoneNumberProvided: IndividualProvidedDetailsToBeDeleted = afterOfficerChosen
+    val afterTelephoneNumberProvided: IndividualProvidedDetails = afterStarted
       .modify(_.telephoneNumber)
       .setTo(Some(dependencies.telephoneNumber))
 
-    val afterEmailAddressProvided: IndividualProvidedDetailsToBeDeleted = afterTelephoneNumberProvided
+    val afterEmailAddressProvided: IndividualProvidedDetails = afterTelephoneNumberProvided
       .modify(_.emailAddress)
       .setTo(Some(IndividualVerifiedEmailAddress(
         emailAddress = dependencies.individualEmailAddress,
         isVerified = false
       )))
 
-    val afterEmailAddressVerified: IndividualProvidedDetailsToBeDeleted = afterTelephoneNumberProvided
+    val afterEmailAddressVerified: IndividualProvidedDetails = afterTelephoneNumberProvided
       .modify(_.emailAddress)
       .setTo(Some(IndividualVerifiedEmailAddress(
         emailAddress = dependencies.individualEmailAddress,
@@ -77,59 +60,59 @@ trait TdIndividualProvidedDetails { dependencies: (TdBase) =>
 
     object AfterDateOfBirth:
 
-      val afterDateOfBirthProvided: IndividualProvidedDetailsToBeDeleted = afterEmailAddressVerified
+      val afterDateOfBirthProvided: IndividualProvidedDetails = afterEmailAddressVerified
         .modify(_.individualDateOfBirth)
         .setTo(Some(dependencies.dateOfBirthProvided))
 
-      val afterDateOfBirthFromCitizenDetails: IndividualProvidedDetailsToBeDeleted = afterEmailAddressVerified
+      val afterDateOfBirthFromCitizenDetails: IndividualProvidedDetails = afterEmailAddressVerified
         .modify(_.individualDateOfBirth)
         .setTo(Some(dependencies.dateOfBirthFromCitizenDetails))
 
     object AfterNino:
 
-      val afterNinoProvided: IndividualProvidedDetailsToBeDeleted = AfterDateOfBirth.afterDateOfBirthProvided
+      val afterNinoProvided: IndividualProvidedDetails = AfterDateOfBirth.afterDateOfBirthProvided
         .modify(_.individualNino)
         .setTo(Some(dependencies.ninoProvided))
 
-      val afterNinoFromAuth: IndividualProvidedDetailsToBeDeleted = AfterDateOfBirth.afterDateOfBirthFromCitizenDetails
+      val afterNinoFromAuth: IndividualProvidedDetails = AfterDateOfBirth.afterDateOfBirthFromCitizenDetails
         .modify(_.individualNino)
         .setTo(Some(dependencies.ninoFromAuth))
 
-      val afterNinoNotProvided: IndividualProvidedDetailsToBeDeleted = afterEmailAddressVerified
+      val afterNinoNotProvided: IndividualProvidedDetails = afterEmailAddressVerified
         .modify(_.individualNino)
         .setTo(Some(IndividualNino.NotProvided))
 
     object AfterSaUtr:
 
-      val afterSaUtrProvided: IndividualProvidedDetailsToBeDeleted = AfterNino.afterNinoProvided
+      val afterSaUtrProvided: IndividualProvidedDetails = AfterNino.afterNinoProvided
         .modify(_.individualSaUtr)
         .setTo(Some(dependencies.saUtrProvided))
 
-      val afterSaUtrFromAuth: IndividualProvidedDetailsToBeDeleted = AfterNino.afterNinoFromAuth
+      val afterSaUtrFromAuth: IndividualProvidedDetails = AfterNino.afterNinoFromAuth
         .modify(_.individualSaUtr)
         .setTo(Some(dependencies.saUtrFromAuth))
 
-      val afterSaUtrFromCitizenDetails: IndividualProvidedDetailsToBeDeleted = AfterNino.afterNinoFromAuth
+      val afterSaUtrFromCitizenDetails: IndividualProvidedDetails = AfterNino.afterNinoFromAuth
         .modify(_.individualSaUtr)
         .setTo(Some(dependencies.saUtrFromCitizenDetails))
 
-      val afterSaUtrNotProvided: IndividualProvidedDetailsToBeDeleted = AfterNino.afterNinoNotProvided
+      val afterSaUtrNotProvided: IndividualProvidedDetails = AfterNino.afterNinoNotProvided
         .modify(_.individualSaUtr)
         .setTo(Some(IndividualSaUtr.NotProvided))
 
-    val afterApproveAgentApplication: IndividualProvidedDetailsToBeDeleted = AfterSaUtr.afterSaUtrProvided
+    val afterApproveAgentApplication: IndividualProvidedDetails = AfterSaUtr.afterSaUtrProvided
       .modify(_.hasApprovedApplication)
       .setTo(Some(true))
 
-    val afterDoNotApproveAgentApplication: IndividualProvidedDetailsToBeDeleted = AfterSaUtr.afterSaUtrProvided
+    val afterDoNotApproveAgentApplication: IndividualProvidedDetails = AfterSaUtr.afterSaUtrProvided
       .modify(_.hasApprovedApplication)
       .setTo(Some(false))
 
-    val afterHmrcStandardforAgentsAgreed: IndividualProvidedDetailsToBeDeleted = afterApproveAgentApplication
+    val afterHmrcStandardforAgentsAgreed: IndividualProvidedDetails = afterApproveAgentApplication
       .modify(_.hmrcStandardForAgentsAgreed)
       .setTo(StateOfAgreement.Agreed)
 
-    val afterProvidedDetailsConfirmed: IndividualProvidedDetailsToBeDeleted = afterHmrcStandardforAgentsAgreed
+    val afterProvidedDetailsConfirmed: IndividualProvidedDetails = afterHmrcStandardforAgentsAgreed
       .modify(_.providedDetailsState)
       .setTo(Finished)
 

@@ -22,7 +22,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.LinkId
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsToBeDeleted
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll.agentApplicationId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -31,8 +31,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.provided
 class StartControllerSpec
 extends ControllerSpec:
 
-  private val linkId = LinkId("test-link-id")
-
+  private val linkId: LinkId = tdAll.linkId
   private val path: String = s"/agent-registration/provide-details/start/${linkId.value}"
 
   object agentApplication:
@@ -47,9 +46,9 @@ extends ControllerSpec:
       .setTo(ApplicationState.Submitted)
 
   object providedDetails:
-    val newProvidedDetails: IndividualProvidedDetailsToBeDeleted =
+    val newProvidedDetails: IndividualProvidedDetails =
       tdAll
-        .providedDetailsLlp
+        .providedDetails
         .afterStarted
 
   "routes should have correct paths and methods" in:

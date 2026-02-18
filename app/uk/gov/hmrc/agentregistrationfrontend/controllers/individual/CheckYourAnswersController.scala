@@ -22,11 +22,12 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import com.softwaremill.quicklens.modify
+import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
-
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.CheckYourAnswersPage
 
@@ -39,58 +40,57 @@ class CheckYourAnswersController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions
-    .getProvideDetailsInProgress
+  private def baseAction(linkId: LinkId): ActionBuilderWithData[DataWithIndividualProvidedDetails] = authorisedWithIndividualProvidedDetails(linkId)
     .ensure(
-      _.individualProvidedDetails.companiesHouseMatch.flatMap(_.companiesHouseOfficer).isDefined,
+      _.get[IndividualProvidedDetails].telephoneNumber.isDefined,
       implicit request =>
-        Redirect(AppRoutes.providedetails.CompaniesHouseNameQueryController.show)
+        Redirect(AppRoutes.providedetails.IndividualTelephoneNumberController.show(linkId))
     )
     .ensure(
-      _.individualProvidedDetails.telephoneNumber.isDefined,
+      _.get[IndividualProvidedDetails].emailAddress.exists(_.isVerified),
       implicit request =>
-        Redirect(AppRoutes.providedetails.IndividualTelephoneNumberController.show)
+        Redirect(AppRoutes.providedetails.IndividualEmailAddressController.show(linkId))
     )
     .ensure(
-      _.individualProvidedDetails.emailAddress.exists(_.isVerified),
+      _.get[IndividualProvidedDetails].individualDateOfBirth.nonEmpty,
       implicit request =>
-        Redirect(AppRoutes.providedetails.IndividualEmailAddressController.show)
+        Redirect(AppRoutes.providedetails.IndividualDateOfBirthController.show(linkId))
     )
     .ensure(
-      _.individualProvidedDetails.individualDateOfBirth.nonEmpty,
+      _.get[IndividualProvidedDetails].individualNino.nonEmpty,
       implicit request =>
-        Redirect(AppRoutes.providedetails.IndividualDateOfBirthController.show)
+        Redirect(AppRoutes.providedetails.IndividualNinoController.show(linkId))
     )
     .ensure(
-      _.individualProvidedDetails.individualNino.nonEmpty,
+      _.get[IndividualProvidedDetails].individualSaUtr.nonEmpty,
       implicit request =>
-        Redirect(AppRoutes.providedetails.IndividualNinoController.show)
+        Redirect(AppRoutes.providedetails.IndividualSaUtrController.show(linkId))
     )
     .ensure(
-      _.individualProvidedDetails.individualSaUtr.nonEmpty,
+      _.get[IndividualProvidedDetails].hasApprovedApplication.getOrElse(false),
       implicit request =>
-        Redirect(AppRoutes.providedetails.IndividualSaUtrController.show)
+        Redirect(AppRoutes.providedetails.IndividualApproveApplicantController.show(linkId))
     )
     .ensure(
-      _.individualProvidedDetails.hasApprovedApplication.getOrElse(false),
+      _.get[IndividualProvidedDetails].hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed,
       implicit request =>
-        Redirect(AppRoutes.providedetails.IndividualApproveApplicantController.show)
-    )
-    .ensure(
-      _.individualProvidedDetails.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed,
-      implicit request =>
-        Redirect(AppRoutes.providedetails.IndividualHmrcStandardForAgentsController.show.url)
+        Redirect(AppRoutes.providedetails.IndividualHmrcStandardForAgentsController.show(linkId).url)
     )
 
-  def show: Action[AnyContent] = baseAction:
-    implicit request => Ok(view(request.individualProvidedDetails))
+  def show(linkId: LinkId): Action[AnyContent] =
+    baseAction(linkId):
+      implicit request =>
+        Ok(view(
+          individualProvidedDetails = request.get[IndividualProvidedDetails],
+          linkId = linkId
+        ))
 
-  def submit: Action[AnyContent] = baseAction.async:
+  def submit(linkId: LinkId): Action[AnyContent] = baseAction(linkId).async:
     implicit request =>
       individualProvideDetailsService
         .upsert(
-          request.individualProvidedDetails
+          request.get[IndividualProvidedDetails]
             .modify(_.providedDetailsState)
             .setTo(Finished)
         ).map: _ =>
-          Redirect(AppRoutes.providedetails.IndividualConfirmationController.show)
+          Redirect(AppRoutes.providedetails.IndividualConfirmationController.show(linkId))

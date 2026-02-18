@@ -33,3 +33,8 @@ extends RequestAwareLogging:
 
   def getBusinessPartnerRecord(utr: Utr)(using request: RequestHeader): Future[Option[BusinessPartnerRecordResponse]] =
     agentRegistrationConnector.getBusinessPartnerRecord(utr)
+
+  // for use in individual journeys where we want to surface the entity name from the BPR that matches the utr provided
+  // by the user in the application
+  def getApplicationBusinessPartnerRecord(utr: Utr)(using request: RequestHeader): Future[Option[BusinessPartnerRecordResponse]] =
+    agentRegistrationConnector.getApplicationBusinessPartnerRecord(utr)
