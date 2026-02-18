@@ -82,7 +82,7 @@ extends FrontendController(mcc, actions):
       val agentDetailsIsComplete = agentApplication.agentDetails.exists(_.isComplete)
       val hmrcStandardForAgentsAgreed = agentApplication.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed
       val listDetailsCompleted = existingList.nonEmpty // TODO: implement other relevant individuals list so completion check can be done
-      val listProgressComplete = existingList.forall(_.hasFinished)
+      val listProgressComplete = listDetailsCompleted && existingList.forall(_.hasFinished)
       // any state other than Precreated indicates the link has been sent; require the list to be non-empty
       val listSharingComplete =
         listDetailsCompleted &&

@@ -68,6 +68,11 @@
 }
 @amlsStatus = @{if(taskListStatus.amlsDetails.isComplete) complete else incomplete}
 @agentsStandardStatus = @{if(taskListStatus.hmrcStandardForAgents.isComplete) complete else incomplete}
+@listDetailsStatus = @{
+    if(taskListStatus.listDetails.isComplete) complete
+    else if(taskListStatus.listDetails.canStart) incomplete
+    else cannotStart
+}
 @listShareStatus = @{
     if(taskListStatus.listShare.isComplete) complete
     else if(taskListStatus.listShare.canStart) incomplete
@@ -156,8 +161,8 @@
                   title = TaskListItemTitle(
                       content = Text(messages(s"$key.lists.details.linkText.$businessTypeKey"))
                   ),
-                  status = if(taskListStatus.listDetails.isComplete) complete else incomplete,
-                  href = Some(AppRoutes.apply.listdetails.CheckYourAnswersController.show.url)
+                  status = listDetailsStatus,
+                  href = if(taskListStatus.listDetails.canStart) Some(AppRoutes.apply.listdetails.CheckYourAnswersController.show.url) else None
               ),
               TaskListItem(
                   title = TaskListItemTitle(
