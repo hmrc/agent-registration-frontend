@@ -55,6 +55,11 @@ extends RequestAwareLogging:
       isPersonOfControl
     )
 
+  def upsertForApplication(individualProvidedDetails: IndividualProvidedDetails)(using request: RequestHeader): Future[Unit] =
+    logger.debug(s"Upserting providedDetails for user:[${individualProvidedDetails._id}] and applicationId:[${individualProvidedDetails.agentApplicationId}]")
+    individualProvideDetailsConnector
+      .upsert(individualProvidedDetails)
+
   def upsert(individualProvidedDetails: IndividualProvidedDetails)(using request: RequestHeader): Future[Unit] =
     logger.debug(s"Upserting providedDetails for user:[${individualProvidedDetails._id}] and applicationId:[${individualProvidedDetails.agentApplicationId}]")
     individualProvideDetailsConnector

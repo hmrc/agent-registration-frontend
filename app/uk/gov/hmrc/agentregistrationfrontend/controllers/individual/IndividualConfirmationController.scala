@@ -18,15 +18,12 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
-import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualConfirmationPage
 
 import javax.inject.Inject
@@ -37,37 +34,11 @@ class IndividualConfirmationController @Inject() (
   actions: IndividualActions,
   mcc: MessagesControllerComponents,
   individualConfirmationPage: IndividualConfirmationPage,
-  individualProvideDetailsService: IndividualProvideDetailsService,
-  agentApplicationService: AgentApplicationService,
   businessPartnerRecordService: BusinessPartnerRecordService
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithApplicationFromLinkId = AgentApplication *: DataWithAuth
-
-  private type DataWithIndividualProvidedDetails = IndividualProvidedDetails *: DataWithApplicationFromLinkId
-
-  private def baseAction(linkId: LinkId): ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions
-    .authorised
-    .refine(implicit request =>
-      agentApplicationService
-        .find(linkId)
-        .map:
-          case Some(agentApplication) => request.add(agentApplication)
-          case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
-    )
-    .refine(implicit request =>
-      individualProvideDetailsService
-        .findAllForMatchingWithApplication(request.get[AgentApplication].agentApplicationId)
-        .map[RequestWithData[DataWithIndividualProvidedDetails] | Result]:
-          case list: List[IndividualProvidedDetails] =>
-            list
-              .find(_.internalUserId.contains(request.get[InternalUserId]))
-              .map(request.add[IndividualProvidedDetails])
-              .getOrElse(
-                Redirect(AppRoutes.providedetails.ConfirmMatchToIndividualProvidedDetailsController.show(linkId))
-              )
-    )
+  private def baseAction(linkId: LinkId): ActionBuilderWithData[DataWithIndividualProvidedDetails] = authorisedWithIndividualProvidedDetails(linkId)
     .ensure(
       _.get[IndividualProvidedDetails].hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed,
       implicit request =>

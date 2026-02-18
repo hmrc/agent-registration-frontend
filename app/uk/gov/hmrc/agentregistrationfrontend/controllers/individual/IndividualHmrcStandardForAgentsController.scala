@@ -20,14 +20,10 @@ import com.softwaremill.quicklens.*
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.Result
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualHmrcStandardForAgentsPage
 
@@ -39,36 +35,11 @@ class IndividualHmrcStandardForAgentsController @Inject() (
   mcc: MessagesControllerComponents,
   actions: IndividualActions,
   view: IndividualHmrcStandardForAgentsPage,
-  individualProvideDetailsService: IndividualProvideDetailsService,
-  agentApplicationService: AgentApplicationService
+  individualProvideDetailsService: IndividualProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithApplicationFromLinkId = AgentApplication *: DataWithAuth
-
-  private type DataWithIndividualProvidedDetails = IndividualProvidedDetails *: DataWithApplicationFromLinkId
-
-  private def baseAction(linkId: LinkId): ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions
-    .authorised
-    .refine(implicit request =>
-      agentApplicationService
-        .find(linkId)
-        .map:
-          case Some(agentApplication) => request.add(agentApplication)
-          case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
-    )
-    .refine(implicit request =>
-      individualProvideDetailsService
-        .findAllForMatchingWithApplication(request.get[AgentApplication].agentApplicationId)
-        .map[RequestWithData[DataWithIndividualProvidedDetails] | Result]:
-          case list: List[IndividualProvidedDetails] =>
-            list
-              .find(_.internalUserId.contains(request.get[InternalUserId]))
-              .map(request.add[IndividualProvidedDetails])
-              .getOrElse(
-                Redirect(AppRoutes.providedetails.ConfirmMatchToIndividualProvidedDetailsController.show(linkId))
-              )
-    )
+  private def baseAction(linkId: LinkId): ActionBuilderWithData[DataWithIndividualProvidedDetails] = authorisedWithIndividualProvidedDetails(linkId)
     .ensure(
       _.get[IndividualProvidedDetails].individualSaUtr.isDefined,
       implicit request =>

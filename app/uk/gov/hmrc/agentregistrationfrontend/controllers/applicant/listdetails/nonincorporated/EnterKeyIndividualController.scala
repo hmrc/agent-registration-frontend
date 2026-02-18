@@ -137,7 +137,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         val individualName: IndividualName = request.get
-        individualProvideDetailsService.upsert(individualProvideDetailsService.create(
+        individualProvideDetailsService.upsertForApplication(individualProvideDetailsService.create(
           individualName = individualName,
           isPersonOfControl = true, // from this page we are only adding partners, who are persons of control
           agentApplicationId = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].agentApplicationId

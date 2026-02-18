@@ -17,13 +17,20 @@
 package uk.gov.hmrc.agentregistrationfrontend.action.individual
 
 import play.api.mvc.*
+import play.api.mvc.Results.Redirect
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.SaUtr
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineFutureEither
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineUnion
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuildersWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
+import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
@@ -43,10 +50,15 @@ object IndividualActions:
   type RequestWithAdditionalIdentifiers = RequestWithData[DataWithAdditionalIdentifiers]
   type RequestWithAdditionalIdentifiersCt[ContentType] = RequestWithDataCt[ContentType, DataWithAdditionalIdentifiers]
 
+  type DataWithApplicationFromLinkId = AgentApplication *: DataWithAuth
+  type DataWithIndividualProvidedDetails = IndividualProvidedDetails *: DataWithApplicationFromLinkId
+
 @Singleton
 class IndividualActions @Inject() (
   defaultActionBuilder: DefaultActionBuilder,
-  individualAuthorisedRefiner: IndividualAuthRefiner
+  individualAuthorisedRefiner: IndividualAuthRefiner,
+  agentApplicationService: AgentApplicationService,
+  individualProvideDetailsService: IndividualProvideDetailsService
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
@@ -61,3 +73,24 @@ extends RequestAwareLogging:
 
   val authorisedWithAdditionalIdentifiers: ActionBuilderWithData[DataWithAdditionalIdentifiers] = action
     .refineFutureEither(individualAuthorisedRefiner.refineIntoRequestWithAdditionalIdentifiers)
+
+  def authorisedWithIndividualProvidedDetails(linkId: LinkId): ActionBuilderWithData[DataWithIndividualProvidedDetails] = authorised
+    .refine(implicit request =>
+      agentApplicationService
+        .find(linkId)
+        .map:
+          case Some(agentApplication) => request.add(agentApplication)
+          case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
+    )
+    .refine(implicit request =>
+      individualProvideDetailsService
+        .findAllForMatchingWithApplication(request.get[AgentApplication].agentApplicationId)
+        .map[RequestWithData[DataWithIndividualProvidedDetails] | Result]:
+          case list: List[IndividualProvidedDetails] =>
+            list
+              .find(_.internalUserId.contains(request.get[InternalUserId]))
+              .map(request.add[IndividualProvidedDetails])
+              .getOrElse(
+                Redirect(AppRoutes.providedetails.ConfirmMatchToIndividualProvidedDetailsController.show(linkId))
+              )
+    )
