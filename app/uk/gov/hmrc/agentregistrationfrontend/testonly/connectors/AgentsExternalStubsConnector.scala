@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.connectors
 
+import play.api.http.Status.CONFLICT
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.BusinessPartnerRecord
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.LoginResponse
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.SignInRequest
@@ -25,7 +26,9 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import java.util.UUID
@@ -76,7 +79,12 @@ extends Connector:
       assignedPrincipalEnrolments = assignedPrincipalEnrolments.map(EnrolmentKey(_)),
       deceased = Some(deceased)
     )
-    createUser(user, affinityGroup = Some("Individual")).map(_ => ())
+    createUser(user, affinityGroup = Some("Individual")).map(_ => ()).recover {
+      // ignore 409 errors (created user with duplicate ninos) from user stubs repo
+      case e: UpstreamErrorResponse if e.statusCode === CONFLICT =>
+        logger.info(s"[AgentsExternalStubsConnector][createIndividualUser] Recovered from ${e.message}")
+        ()
+    }
 
   def signIn()(using hc: HeaderCarrier): Future[LoginResponse] = signIn(SignInRequest.empty)
 
