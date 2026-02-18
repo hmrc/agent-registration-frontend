@@ -22,15 +22,17 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
-import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
-import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.nonincorporated.CheckYourAnswersPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.CheckYourAnswersPage
 
 @Singleton
 class CheckYourAnswersController @Inject() (
@@ -41,47 +43,61 @@ class CheckYourAnswersController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[
-    List[IndividualProvidedDetails] *: DataWithApplication
-  ] = actions
+  private type DataWithLists = List[IndividualProvidedDetails] *: IsNotSoleTrader *: DataWithAuth
+
+  private val baseAction: ActionBuilderWithData[DataWithLists] = actions
     .getApplicationInProgress
-    .refine(implicit request =>
-      val agentApplication: AgentApplication = request.get
-      individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
-        request.add[List[IndividualProvidedDetails]](individualsList)
-    )
+    .refine:
+      implicit request =>
+        request.get[AgentApplication] match
+          case _: AgentApplicationSoleTrader =>
+            logger.warn("Sole traders do not add other relevant individuals to a list, redirecting to task list for the correct links")
+            Redirect(AppRoutes.apply.TaskListController.show.url)
+          case aa: IsNotSoleTrader => request.replace[AgentApplication, IsNotSoleTrader](aa)
+    .refine:
+      implicit request =>
+        val agentApplication: IsNotSoleTrader = request.get[IsNotSoleTrader]
+        individualProvideDetailsService
+          .findAllByApplicationId(agentApplication.agentApplicationId)
+          .map: individualsList =>
+            request.add[List[IndividualProvidedDetails]](individualsList)
     .ensure(
-      _.get[List[IndividualProvidedDetails]].nonEmpty,
+      condition =
+        implicit request =>
+          request.get[IsNotSoleTrader] match
+            case a: AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
+              val partnersSize = request.get[List[IndividualProvidedDetails]].count(_.isPersonOfControl)
+              listComplete(partnersSize, a.numberOfRequiredKeyIndividuals)
+            case _ => true,
       resultWhenConditionNotMet =
         implicit request =>
-          request.get[AgentApplication] match
-            case _: AgentApplicationSoleTrader =>
-              logger.warn("Sole traders should not be able to access this page, redirecting to generic exit page.")
-              Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
-            case _: AgentApplication.IsNotIncorporated =>
-              logger.warn("Because we have no individuals added, redirecting to where this can be managed")
-              Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
-            case _: AgentApplication.IsIncorporated =>
-              logger.warn("Incorporated businesses have not been developed yet, redirecting to generic exit page.")
-              Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
+          Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
+    )
+    .ensure(
+      condition = _.get[IsNotSoleTrader].hasOtherRelevantIndividuals.isDefined,
+      resultWhenConditionNotMet =
+        implicit request =>
+          Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url)
     )
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
-      val existingList: List[IndividualProvidedDetails] = request.get
-      request.get[AgentApplication] match
-        case _: AgentApplicationSoleTrader => Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
-        case b: AgentApplication.IsNotIncorporated =>
-          if b.listComplete(existingList.size)
-          then Ok(view(b, existingList))
-          else Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url)
-        case _ =>
-          logger.warn("Incorporated businesses have not been developed yet")
-          Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
+      val allIndividualsList: List[IndividualProvidedDetails] = request.get
+      val partnersList = allIndividualsList.filter(_.isPersonOfControl)
+      val otherRelevantIndividualsList = allIndividualsList.filterNot(_.isPersonOfControl)
+      val agentApplication = request.get[IsNotSoleTrader]
 
-  extension (agentApplication: AgentApplication.IsNotIncorporated)
-    def listComplete(size: Int): Boolean =
-      agentApplication.numberOfRequiredKeyIndividuals match
-        case Some(FiveOrLess(a: Int)) => size === a
-        case Some(a @ SixOrMore(_)) => size === (a.numberOfKeyIndividualsResponsibleForTaxMatters + a.requiredPadding)
-        case _ => false
+      Ok(view(
+        agentApplication,
+        partnersList,
+        otherRelevantIndividualsList
+      ))
+
+  private def listComplete(
+    listSize: Int,
+    numberOfRequiredKeyIndividuals: Option[NumberOfRequiredKeyIndividuals]
+  ): Boolean =
+    numberOfRequiredKeyIndividuals match
+      case Some(FiveOrLess(a: Int)) => listSize === a
+      case Some(a @ SixOrMore(_)) => listSize === (a.numberOfKeyIndividualsResponsibleForTaxMatters + a.requiredPadding)
+      case _ => false

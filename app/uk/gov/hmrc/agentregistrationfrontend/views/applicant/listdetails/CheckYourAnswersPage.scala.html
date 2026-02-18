@@ -1,0 +1,140 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLaterLinks
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+
+@this(
+        layout: Layout,
+        govukSummaryList: GovukSummaryList,
+        continueOrSaveForLaterLinks: ContinueOrSaveForLaterLinks
+)
+
+@(
+        agentApplication: AgentApplication,
+        nonIncorporatedIndividualsList: List[IndividualProvidedDetails],
+        otherRelevantIndividualsList: List[IndividualProvidedDetails],
+)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{
+    "listDetailsCheckYourAnswers"
+}
+
+@title = @{
+    messages(s"$key.title")
+}
+@keyNumberRow = @{
+    Seq(
+        SummaryListRow(
+            key = Key(content = Text(messages(s"$key.numberOfPartners.label"))),
+            value = Value(content = Text(nonIncorporatedIndividualsList.size.toString)),
+            actions = Some(Actions(items = Seq(
+                ActionItem(
+                    href = AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url,
+                    content = Text(messages("common.change")),
+                    visuallyHiddenText = Some(messages(s"$key.numberOfPartners.label"))
+                )
+            )))
+        )
+   )
+}
+@keyNamesList = {
+    <ul class="govuk-list">
+    @{nonIncorporatedIndividualsList.map { partner => <li>{partner.individualName.value}</li>}}
+    </ul>
+}
+@keyNamesRow = @{
+  if (nonIncorporatedIndividualsList.nonEmpty)
+    Seq(
+        SummaryListRow(
+            key = Key(content = Text(messages(s"$key.partnerNames.label"))),
+            value = Value(content = HtmlContent(keyNamesList)),
+            actions = Some(Actions(items = Seq(
+                ActionItem(
+                    href = AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url,
+                    content = Text(messages("common.change")),
+                    visuallyHiddenText = Some(messages(s"$key.partnerNames.label"))
+                )
+            )))
+        )
+    )
+  else Seq.empty
+}
+@otherNamesList = {
+    <ul class="govuk-list">
+      @{otherRelevantIndividualsList.map { individual => <li>{individual.individualName.value}</li>}}
+    </ul>
+}
+@hasOthersRow = @{
+  Seq(
+    SummaryListRow(
+        key = Key(content = Text(messages(s"$key.hasOtherRelevantIndividuals.label"))),
+        value = Value(content = Text(agentApplication.hasOtherRelevantIndividuals match {
+            case Some(true) => messages("common.yes")
+            case Some(false) => messages("common.no")
+            case None => ""
+        })),
+        actions = Some(Actions(items = Seq(
+            ActionItem(
+                href = AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show.url,
+                content = Text(messages("common.change")),
+                visuallyHiddenText = Some(messages(s"$key.hasOtherRelevantIndividuals.label"))
+            )
+        )))
+    )
+  )
+}
+@otherNamesRow = @{
+  if (agentApplication.hasOtherRelevantIndividuals.contains(true) && otherRelevantIndividualsList.nonEmpty)
+    Seq(
+        SummaryListRow(
+            key = Key(content = Text(messages(s"$key.otherRelevantIndividualsNames.label"))),
+            value = Value(content = HtmlContent(otherNamesList)),
+            actions = Some(Actions(items = Seq(
+                ActionItem(
+                    href = AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url,
+                    content = Text(messages("common.change")),
+                    visuallyHiddenText = Some(messages(s"$key.otherRelevantIndividualsNames.label"))
+                )
+            )))
+        )
+    )
+  else Seq.empty
+}
+
+@rows = @{keyNumberRow ++ keyNamesRow ++ hasOthersRow ++ otherNamesRow}
+
+@layout(pageTitle = title) {
+    <h2 class="govuk-caption-l">@messages("lists.caption.title.Partnership")</h2>
+    <h1 class="govuk-heading-l">@title</h1>
+
+    @govukSummaryList(
+        SummaryList(rows = rows)
+    )
+
+    <p class="govuk-body">
+        @continueOrSaveForLaterLinks(
+            continueHref = AppRoutes.apply.TaskListController.show.url,
+            continueLabel = Some(messages("common.confirmAndContinue"))
+        )
+    </p>
+}

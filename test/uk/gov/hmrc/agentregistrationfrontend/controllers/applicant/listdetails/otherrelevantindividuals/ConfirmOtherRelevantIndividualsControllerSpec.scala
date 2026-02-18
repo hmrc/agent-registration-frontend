@@ -22,6 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmOtherRelevantIndividualsForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 
 class ConfirmOtherRelevantIndividualsControllerSpec
 extends ControllerSpec:
@@ -41,6 +42,11 @@ extends ControllerSpec:
       tdAll
         .agentApplicationGeneralPartnership
         .afterConfirmOtherRelevantIndividualsYes
+
+    val afterConfirmOtherRelevantIndividualsNo: AgentApplicationGeneralPartnership =
+      tdAll
+        .agentApplicationGeneralPartnership
+        .afterConfirmOtherRelevantIndividualsNo
 
     val soleTraderInProgress =
       tdAll
@@ -80,16 +86,25 @@ extends ControllerSpec:
 
   s"GET $path should return 200, fetch the BPR and render page" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeConfirmOtherRelevantIndividuals)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.beforeConfirmOtherRelevantIndividuals.agentApplicationId,
+      individuals = List.empty
+    )
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeConfirmOtherRelevantIndividuals.agentApplicationId)
 
   s"POST $path with valid selection should save data and redirect to other relevant individuals CYA" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(
       application = agentApplication.beforeConfirmOtherRelevantIndividuals,
       updatedApplication = agentApplication.afterConfirmOtherRelevantIndividualsYes
+    )
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.beforeConfirmOtherRelevantIndividuals.agentApplicationId,
+      individuals = List.empty
     )
 
     val response: WSResponse =
@@ -102,9 +117,15 @@ extends ControllerSpec:
     response.header("Location").value shouldBe
       AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeConfirmOtherRelevantIndividuals.agentApplicationId)
 
   s"POST $path with blank inputs should return 400" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeConfirmOtherRelevantIndividuals)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.beforeConfirmOtherRelevantIndividuals.agentApplicationId,
+      individuals = List.empty
+    )
+
     val response: WSResponse = post(path)(Map.empty)
 
     response.status shouldBe Status.BAD_REQUEST
@@ -114,12 +135,18 @@ extends ControllerSpec:
       .select(s"#${ConfirmOtherRelevantIndividualsForm.hasOtherRelevantIndividuals}-error")
       .text() shouldBe "Error: Select yes if there are any other relevant individuals"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeConfirmOtherRelevantIndividuals.agentApplicationId)
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(
       application = agentApplication.beforeConfirmOtherRelevantIndividuals,
       updatedApplication = agentApplication.afterConfirmOtherRelevantIndividualsYes
     )
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.beforeConfirmOtherRelevantIndividuals.agentApplicationId,
+      individuals = List.empty
+    )
+
     val response: WSResponse =
       post(path)(Map(
         ConfirmOtherRelevantIndividualsForm.hasOtherRelevantIndividuals -> Seq("Yes"),
@@ -130,9 +157,15 @@ extends ControllerSpec:
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeConfirmOtherRelevantIndividuals.agentApplicationId)
 
   s"POST $path with save for later and invalid inputs should not return errors and redirect to save for later page" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeConfirmOtherRelevantIndividuals)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.beforeConfirmOtherRelevantIndividuals.agentApplicationId,
+      individuals = List.empty
+    )
+
     val response: WSResponse =
       post(path)(Map(
         ConfirmOtherRelevantIndividualsForm.hasOtherRelevantIndividuals -> Seq("NOT_A_REAL_VALUE"),
@@ -143,3 +176,40 @@ extends ControllerSpec:
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeConfirmOtherRelevantIndividuals.agentApplicationId)
+
+  s"POST $path with save for later and No selection should delete other relevant individuals and save data and redirect to the saved for later page" in:
+    val existingOtherRelevantIndividuals = List(
+      tdAll.individualProvidedDetails.copy(isPersonOfControl = false),
+      tdAll.individualProvidedDetails2.copy(isPersonOfControl = false),
+      tdAll.individualProvidedDetails3.copy(isPersonOfControl = false)
+    )
+
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.beforeConfirmOtherRelevantIndividuals,
+      updatedApplication = agentApplication.afterConfirmOtherRelevantIndividualsNo
+    )
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterConfirmOtherRelevantIndividualsNo.agentApplicationId,
+      individuals = existingOtherRelevantIndividuals
+    )
+
+    existingOtherRelevantIndividuals.foreach { i =>
+      AgentRegistrationStubs.stubDeleteIndividualProvidedDetails(i.individualProvidedDetailsId)
+    }
+
+    val response: WSResponse =
+      post(path)(Map(
+        ConfirmOtherRelevantIndividualsForm.hasOtherRelevantIndividuals -> Seq("No"),
+        "submit" -> Seq("SaveAndComeBackLater")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterConfirmOtherRelevantIndividualsNo.agentApplicationId)
+
+    existingOtherRelevantIndividuals.foreach { i =>
+      AgentRegistrationStubs.verifyDeleteIndividualProvidedDetails(i.individualProvidedDetailsId)
+    }

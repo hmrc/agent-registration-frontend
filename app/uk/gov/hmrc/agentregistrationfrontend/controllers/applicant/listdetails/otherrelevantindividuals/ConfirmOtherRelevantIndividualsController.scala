@@ -26,15 +26,18 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmOtherRelevantIndividualsForm
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.Future
 
 @Singleton
 class ConfirmOtherRelevantIndividualsController @Inject() (
@@ -42,11 +45,12 @@ class ConfirmOtherRelevantIndividualsController @Inject() (
   actions: ApplicantActions,
   confirmOtherRelevantIndividualsPage: ConfirmOtherRelevantIndividualsPage,
   agentApplicationService: AgentApplicationService,
-  businessPartnerRecordService: BusinessPartnerRecordService
+  businessPartnerRecordService: BusinessPartnerRecordService,
+  individualProvideDetailsService: IndividualProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[IsNotSoleTrader *: DataWithAuth] = actions
+  private val baseAction: ActionBuilderWithData[List[IndividualProvidedDetails] *: IsNotSoleTrader *: DataWithAuth] = actions
     .getApplicationInProgress
     .refine:
       implicit request =>
@@ -55,6 +59,13 @@ extends FrontendController(mcc, actions):
             logger.warn("Sole traders cannot specify other relevant individuals, redirecting to task list for the correct links")
             Redirect(AppRoutes.apply.TaskListController.show.url)
           case aa: IsNotSoleTrader => request.replace[AgentApplication, IsNotSoleTrader](aa)
+    .refine:
+      implicit request =>
+        val agentApplication: IsNotSoleTrader = request.get[IsNotSoleTrader]
+        individualProvideDetailsService
+          .findAllOtherRelevantIndividualsByApplicationId(agentApplication.agentApplicationId)
+          .map: individualsList =>
+            request.add[List[IndividualProvidedDetails]](individualsList)
 
   def show: Action[AnyContent] = baseAction
     .async:
@@ -104,6 +115,7 @@ extends FrontendController(mcc, actions):
       .async:
         implicit request =>
           val hasOtherRelevantIndividuals: Boolean = request.get[Boolean]
+          val otherRelevantIndividuals: List[IndividualProvidedDetails] = request.get[List[IndividualProvidedDetails]]
 
           val updatedApplication: IsNotSoleTrader = {
             request.get[IsNotSoleTrader] match
@@ -133,8 +145,14 @@ extends FrontendController(mcc, actions):
                   .setTo(Some(hasOtherRelevantIndividuals))
           }
 
-          agentApplicationService
-            .upsert(updatedApplication)
-            .map: _ =>
-              Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url)
+          val deleteOtherRelevantIndividuals: Future[List[Unit]] = Future.sequence(
+            otherRelevantIndividuals.map(x =>
+              individualProvideDetailsService.delete(x.individualProvidedDetailsId)
+            )
+          )
+
+          for
+            _ <- deleteOtherRelevantIndividuals
+            _ <- agentApplicationService.upsert(updatedApplication)
+          yield (Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url))
       .redirectIfSaveForLater
