@@ -94,14 +94,56 @@ object CompletedSection:
     override def businessType: BusinessType = BusinessType.SoleTrader
 
   object CompletedSectionSoleTrader:
-    // example:
+
     case object SoleTraderAboutYourBusiness
     extends CompletedSectionSoleTrader:
 
       override def sectionName: String = "About your business"
       override def alreadyDeveloped: Boolean = true
       override def displayOrder: Int = 1
-      override def appState: AgentApplication = TestOnlyData.agentApplicationSoleTrader.afterStarted
+      override def appState: AgentApplication = TestOnlyData.agentApplicationSoleTrader.afterGrsDataReceived
+
+    case object SoleTraderApplicantContactDetails
+    extends CompletedSectionSoleTrader:
+
+      override def sectionName: String = "Applicant Contact Details"
+      override def alreadyDeveloped: Boolean = true
+      override def displayOrder: Int = 2
+      override def appState: AgentApplication = TestOnlyData.agentApplicationSoleTrader.afterContactDetailsComplete
+
+    case object SoleTraderAgentServicesAccountDetails
+    extends CompletedSectionSoleTrader:
+
+      override def sectionName: String = "Agent services account details"
+      override def alreadyDeveloped: Boolean = true
+      override def displayOrder: Int = 3
+      override def appState: AgentApplication = TestOnlyData.agentApplicationSoleTrader.afterAgentDetailsComplete
+
+    case object SoleTraderAntiMoneyLaunderingSupervisionDetails
+    extends CompletedSectionSoleTrader:
+
+      override def sectionName: String = "Anti-money laundering supervision details"
+      override def alreadyDeveloped: Boolean = true
+      override def displayOrder: Int = 4
+      override def appState: AgentApplication = TestOnlyData.agentApplicationSoleTrader.afterAmlsComplete
+
+    case object SoleTraderHmrcStandardForAgents
+    extends CompletedSectionSoleTrader:
+
+      override def sectionName: String = "HMRC standard for agents"
+      override def alreadyDeveloped: Boolean = true
+      override def displayOrder: Int = 5
+      override def appState: AgentApplication = TestOnlyData.agentApplicationSoleTrader.afterHmrcStandardForAgentsAgreed
+
+    case object SoleTraderDeclaration
+    extends CompletedSectionSoleTrader:
+
+      override def sectionName: String = "Declaration"
+      override def alreadyDeveloped: Boolean = true
+      override def displayOrder: Int = 6
+      override def appState: AgentApplication = TestOnlyData.agentApplicationSoleTrader.afterDeclarationSubmitted
+
+    val values: Seq[CompletedSectionSoleTrader] = SealedObjects.all[CompletedSectionSoleTrader]
 
   sealed trait CompletedSectionGeneralPartnership
   extends CompletedSection:

@@ -33,7 +33,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.http.SessionKeys
 
 import java.time.Clock
@@ -49,7 +48,6 @@ class FastForwardController @Inject() (
   applicantActions: ApplicantActions,
   applicantAuthRefiner: ApplicantAuthRefiner,
   fastForwardPage: FastForwardPage,
-  simplePage: SimplePage,
   stubUserService: StubUserService,
   grsStubService: GrsStubService,
   applicationService: AgentApplicationService,
@@ -81,15 +79,10 @@ extends FrontendController(mcc, applicantActions):
         authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
           given RequestWithAuth = req
           fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
-      case other =>
-        applicantActions.action { implicit request =>
-          Ok(
-            simplePage(
-              h1 = s"${other.businessType} Task List Page",
-              bodyText = Some(s"Fast Forwarding to ${other.businessType} List Page isn't implemented yet")
-            )
-          )
-        }
+      case c: CompletedSectionSoleTrader =>
+        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
+          given RequestWithAuth = req
+          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
 
   private def loginAndRetry(using request: Request[AnyContent]): Future[Result | RequestWithAuth] = stubUserService.createAndLoginAgent.map: stubsHc =>
     val bearerToken: String = stubsHc.authorization
@@ -132,6 +125,7 @@ extends FrontendController(mcc, applicantActions):
       case BusinessType.Partnership.LimitedLiabilityPartnership => TestOnlyData.grs.llp.journeyData
       case BusinessType.Partnership.GeneralPartnership => TestOnlyData.grs.generalPartnership.journeyData
       case BusinessType.Partnership.ScottishPartnership => TestOnlyData.grs.scottishPartnership.journeyData
+      case BusinessType.SoleTrader => TestOnlyData.grs.soleTrader.journeyData
       case _ => throw new IllegalArgumentException(s"Add $bt journey data here")
 
   private def updateIdentifiers(agentApplication: AgentApplication)(using

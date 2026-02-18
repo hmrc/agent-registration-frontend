@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
+import play.api.http.Status.CONFLICT
 import play.api.mvc.Request
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.BusinessType.*
@@ -24,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.*
+import uk.gov.hmrc.http.UpstreamErrorResponse
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -48,7 +50,10 @@ class GrsStubService @Inject() (
             nino = nino,
             assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
             deceased = deceased
-          )
+          ).recover {
+            // ignore 409 errors from user stubs repo (a quirk of agents-external-stubs)
+            case e: UpstreamErrorResponse if e.statusCode === CONFLICT => ()
+          }
         case _ => Future.successful(())
       }
 
