@@ -105,7 +105,7 @@ extends FrontendController(mcc, actions):
           isComplete = hmrcStandardForAgentsAgreed
         ),
         listDetails = TaskStatus(
-          canStart = true, // List details can be started any time
+          canStart = contactIsComplete, // List details can be started only once we have a contact name
           isComplete = listDetailsCompleted // TODO: implement other relevant individuals list details so completion check can be done
         ),
         listShare = TaskStatus(
