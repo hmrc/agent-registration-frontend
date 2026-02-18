@@ -121,8 +121,7 @@ extends FrontendController(mcc, actions):
             contactIsComplete
               && amlsDetailsCompleted
               && agentDetailsIsComplete
-              && hmrcStandardForAgentsAgreed
-              && listProgressComplete, // Declaration can be started only when all prior tasks are complete
+              && hmrcStandardForAgentsAgreed, // Declaration can be started only when all prior tasks are complete
           isComplete = false // Declaration is never "complete" until submission
         )
       )
