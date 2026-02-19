@@ -6,6 +6,7 @@ GET         /application-dashboard                                     uk.gov.hm
 
 # Sign out routes
 GET         /sign-out                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.signOut
+GET         /sign-out-with-continue                                    uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.signOutWithContinue(continueUrl: RedirectUrl)
 GET         /time-out                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timeOut
 GET         /timed-out                                                 uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timedOut
 
@@ -90,6 +91,7 @@ POST        /apply/agent-standard/accept-agent-standard             uk.gov.hmrc.
 # Lists of directors/partners/members top level
 GET         /apply/list-details/check-your-answers                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.CheckYourAnswersController.show
 
+GET         /apply/list-details/sole-trader                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.soletrader.ProveIdentityController.show
 # Lists of key individuals
 GET         /apply/list-details/how-many-key-individuals            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.NumberOfKeyIndividualsController.show
 POST        /apply/list-details/how-many-key-individuals            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.NumberOfKeyIndividualsController.submit

@@ -23,6 +23,11 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 extension (agentApplication: AgentApplication)
 
+  def isSoleTrader: Boolean =
+    agentApplication match
+      case _: AgentApplication.IsSoleTrader => true
+      case _ => false
+
   def hasCheckPassed: Boolean =
 
     val refusalToDealWithCheckResultPassed: Boolean =

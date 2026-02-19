@@ -14,9 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.LinkId
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 @this(
         appConfig: AppConfig,
@@ -26,7 +26,8 @@
 
 @(
         applicantName: String,
-        entityName: String)(implicit
+        entityName: String,
+        isSoleTrader: Boolean)(implicit
         request: RequestHeader,
         messages: Messages
 )
@@ -35,7 +36,7 @@
     "individualConfirmation"
 }
 @pageTitle = @{
-    messages(s"$key.title")
+    if(isSoleTrader) messages(s"$key.title.SoleTrader") else messages(s"$key.title")
 }
 @signOutLink = @{
   s"${appConfig.basFrontendSignOutUrlBase}?continueUrl=feedback/AGENT_REG_IND_DETAILS"
@@ -49,6 +50,18 @@
     @govukPanel(Panel(
         title = Text(pageTitle)
     ))
+
+  @if(isSoleTrader) {
+    <p class="govuk-body">@{
+        messages(s"$key.p1.SoleTrader")
+    }
+    </p>
+    <p class="govuk-body">
+      <a class="govuk-link" href="@{AppRoutes.SignOutController.signOutWithContinue(RedirectUrl(appConfig.thisFrontendBaseUrl + AppRoutes.apply.TaskListController.show.url))}">@{
+        messages(s"$key.signOutToTaskListLink")
+      }</a>
+    </p>
+  } else {
 
     <h2 class="govuk-heading-m">
     @{
@@ -77,7 +90,8 @@
     </p>
     <p class="govuk-body govuk-!-display-none-print">
         <a class="govuk-link" href=@signOutLink>@{
-            messages(s"$key.signOutLink")
+          messages(s"$key.signOutLink")
         }</a>
     </p>
+  }
 }

@@ -309,6 +309,14 @@ amlsCheckYourAnswers.notApplicable = n/a
 amlsCheckYourAnswers.evidence.label = Evidence of anti-money laundering supervision
 amlsCheckYourAnswers.change = Change
 
+# Sole trader identity
+soleTraderIdentity.caption = Prove your identity
+soleTraderIdentity.title.false = Sign in with your personal details
+soleTraderIdentity.title.true = You have proven your identity
+soleTraderIdentity.p1 = You are currently signed in as an agent.
+soleTraderIdentity.p2 = We need you to sign in using the details you created for your personal taxes, not the details you use to act as an agent.
+soleTraderIdentity.p3 = If you do not have personal sign in details, you can create some.
+
 # Lists
 lists.caption.title.Partnership = Partners and other relevant tax advisers
 lists.caption.title.LimitedCompany = Directors and other tax adviser information
@@ -406,8 +414,6 @@ listDetailsCheckYourAnswers.numberOfPartners.label = Number of partners
 listDetailsCheckYourAnswers.partnerNames.label = Partner names
 listDetailsCheckYourAnswers.hasOtherRelevantIndividuals.label = Other relevant tax advisers
 listDetailsCheckYourAnswers.otherRelevantIndividualsNames.label = Other relevant tax adviser names
-
-
 
 link.title = Share this link with everyone on the list
 link.p1 = The people on your list need to sign in and provide their details to HMRC.
@@ -507,9 +513,6 @@ cannotRegister.title=This {0} cannot be registered for an Agent Services Account
 cannotRegister.p1=If you wish to register a different Agent, use <a class="govuk-link" href={0} target="_blank" rel="noopener noreferrer">this link (opens in new tab)</a>.
 cannotRegister.tryAgain.button = Try again
 
-
-
-
 # About your application / user role
 userRole.Owner.title = Are you the owner of the business?
 userRole.Member.title = Are you a member of the limited liability partnership?
@@ -563,6 +566,8 @@ taskList.lists.share.linkText.Partnership = Ask the partners and tax advisers to
 taskList.lists.share.linkText.LimitedCompany = Ask the directors and tax advisers to sign in
 taskList.lists.share.linkText.LimitedLiabilityPartnership = Ask the LLP members and tax advisers to sign in
 taskList.lists.tracking.linkText = Check who has provided their details
+taskList.soleTraderId.heading = Confirm who you are
+taskList.soleTraderId.linkText.SoleTrader = Prove your identity
 taskList.declaration.heading = Review and submit application
 taskList.declaration.linkText = Declare and submit
 
@@ -703,12 +708,15 @@ individualDetailsCheckYourAnswers.dateOfBirth.label = Date of birth
 
 # Individual Confirmation of submission
 individualConfirmation.title = You have finished this process
+individualConfirmation.title.SoleTrader = You have proven your identity
 individualConfirmation.whatNext.h2 = What happens next
 individualConfirmation.whatNext.p1 = We need to collect information for all members of {0}.
+individualConfirmation.p1.SoleTrader = You have proven your identity, you can now use your agent credentials to sign back into your application and continue the application process.
 individualConfirmation.whatNext.p2 = When we have the information we need, we’ll automatically submit the application and begin our checks.
 individualConfirmation.whatNext.p3 = If we need any further information from you, we will contact you by email or telephone.
 individualConfirmation.whatNext.p4 = When we have finished our checks, we’ll email {0} with a decision about the application.
 individualConfirmation.signOutLink = Finish and sign out
+individualConfirmation.signOutToTaskListLink = Sign back into your application
 
 # Individual date of birth
 dateOfBirth.title = What is your date of birth?

@@ -20,6 +20,10 @@ import play.api.i18n.*
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.SessionKeys
+import uk.gov.hmrc.play.bootstrap.binders.AbsoluteWithHostnameFromAllowlist
+import uk.gov.hmrc.play.bootstrap.binders.OnlyRelative
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl.idFunctor
 import uk.gov.hmrc.play.bootstrap.frontend.controller.FrontendHeaderCarrierProvider
 
 import javax.inject.Inject
@@ -43,6 +47,17 @@ object RequestSupport:
   /** Naive way of checking if user is logged in. Use it in views only. For more real check see auth.AuthService
     */
   def isSignedIn(using request: RequestHeader): Boolean = request.session.get(SessionKeys.authToken).isDefined
+
+  def validateRedirectUrl(
+    redirectUrl: RedirectUrl,
+    allowedHosts: Set[String]
+  ): String =
+    if RedirectUrl.isRelativeUrl(redirectUrl.unsafeValue) then {
+      redirectUrl.get(OnlyRelative).url
+    }
+    else {
+      redirectUrl.get(AbsoluteWithHostnameFromAllowlist(allowedHosts)).url
+    }
 
   /** This is because we want to give responsibility of creation of HeaderCarrier to the platform code. If they refactor how hc is created our code will pick it
     * up automatically.

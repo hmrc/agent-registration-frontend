@@ -92,8 +92,9 @@ extends FrontendController(mcc, actions):
           case a: AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
             NumberOfRequiredKeyIndividuals.isKeyIndividualListComplete(existingList.count(_.isPersonOfControl), a.numberOfRequiredKeyIndividuals)
             && otherRelevantIndividualsComplete(existingList)
+          case a: AgentApplication.IsSoleTrader => true // Sole traders do not provide a list of individuals, so we consider this task complete by default
           case _ => true
-      val listProgressComplete = listDetailsCompleted(existingList) && existingList.forall(_.hasFinished)
+      val listProgressComplete = listDetailsCompleted(existingList) && existingList.nonEmpty && existingList.forall(_.hasFinished)
       // any state other than Precreated indicates the link has been sent; require the list to be non-empty
       val listSharingComplete =
         listDetailsCompleted(existingList) &&

@@ -54,5 +54,10 @@ extends FrontendController(mcc, actions):
         .map: optBpr =>
           Ok(individualConfirmationPage(
             applicantName = applicantName.value,
-            entityName = optBpr.map(_.getEntityName).getOrThrowExpectedDataMissing("BPR is missing")
+            entityName = optBpr.map(_.getEntityName).getOrThrowExpectedDataMissing("BPR is missing"),
+            isSoleTrader =
+              agentApplication match {
+                case _: AgentApplication.IsSoleTrader => true
+                case _ => false
+              }
           ))
