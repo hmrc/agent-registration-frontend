@@ -53,8 +53,7 @@ extends ControllerSpec:
   s"GET $path should return 200 and render the confirmation page" in:
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
       agentApplication,
-      individualProvidedDetails.completedProvidedDetails,
-      withBpr = true
+      individualProvidedDetails.completedProvidedDetails
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubGetBusinessPartnerRecord(
       utr = tdAll.saUtr.asUtr,

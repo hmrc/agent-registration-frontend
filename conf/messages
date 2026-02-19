@@ -743,3 +743,4 @@ confirmMatchToIndividualProvidedDetails.label = Are these your details?
 confirmMatchToIndividualProvidedDetails.yes = Yes, these details are correct
 confirmMatchToIndividualProvidedDetails.no = No
 confirmMatchToIndividualProvidedDetails.error.required = Select yes if these details are correct
+confirmMatchToIndividualProvidedDetails.error.invalid = Select yes if these details are correct

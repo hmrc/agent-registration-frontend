@@ -30,7 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 object IndividualAuthStubs {
 
   def stubAuthorise(
-    responseBody: String = responseBodyAsCleanAgent()
+    responseBody: String = responseBodyAsCleanIndividual()
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlMatching("/auth/authorise"),
@@ -40,7 +40,7 @@ object IndividualAuthStubs {
   )
 
   def stubAuthoriseWithNino(
-    responseBody: String = responseBodyAsAgentWithNino()
+    responseBody: String = responseBodyAsIndividualWithNino()
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlMatching("/auth/authorise"),
@@ -50,7 +50,7 @@ object IndividualAuthStubs {
   )
 
   def stubAuthoriseWithSaUtr(
-    responseBody: String = responseBodyAsAgentWithSaUtr()
+    responseBody: String = responseBodyAsIndividualWithSaUtr()
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlMatching("/auth/authorise"),
@@ -60,7 +60,7 @@ object IndividualAuthStubs {
   )
 
   def stubAuthoriseWithNinoAndSaUtr(
-    responseBody: String = responseBodyAsAgentWithNinoAndSaUtr()
+    responseBody: String = responseBodyAsIndividualWithNinoAndSaUtr()
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlMatching("/auth/authorise"),
@@ -75,7 +75,7 @@ object IndividualAuthStubs {
     count = count
   )
 
-  def responseBodyAsCleanAgent(
+  def responseBodyAsCleanIndividual(
     internalUserId: InternalUserId = TdAll.tdAll.internalUserId,
     groupId: GroupId = TdAll.tdAll.groupId
   ): String =
@@ -90,7 +90,7 @@ object IndividualAuthStubs {
        |}
        |""".stripMargin
 
-  def responseBodyAsAgentWithNino(
+  def responseBodyAsIndividualWithNino(
     internalUserId: InternalUserId = TdAll.tdAll.internalUserId,
     groupId: GroupId = TdAll.tdAll.groupId,
     nino: Nino = TdAll.tdAll.nino
@@ -118,7 +118,7 @@ object IndividualAuthStubs {
        |}
        |""".stripMargin
 
-  def responseBodyAsAgentWithSaUtr(
+  def responseBodyAsIndividualWithSaUtr(
     internalUserId: InternalUserId = TdAll.tdAll.internalUserId,
     groupId: GroupId = TdAll.tdAll.groupId,
     saUtr: SaUtr = TdAll.tdAll.saUtr
@@ -146,7 +146,7 @@ object IndividualAuthStubs {
        |}
        |""".stripMargin
 
-  def responseBodyAsAgentWithNinoAndSaUtr(
+  def responseBodyAsIndividualWithNinoAndSaUtr(
     internalUserId: InternalUserId = TdAll.tdAll.internalUserId,
     groupId: GroupId = TdAll.tdAll.groupId,
     nino: Nino = TdAll.tdAll.nino,

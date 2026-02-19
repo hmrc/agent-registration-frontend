@@ -69,7 +69,7 @@
       )
     ))
 
-    @formWithCSRF(action = AppRoutes.providedetails.ConfirmMatchToIndividualProvidedDetailsController.submit(linkId)) {
+    @formWithCSRF(action = AppRoutes.providedetails.MatchIndividualProvidedDetailsController.submit(linkId)) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(
