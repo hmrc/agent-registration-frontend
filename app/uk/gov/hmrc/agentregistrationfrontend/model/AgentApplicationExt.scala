@@ -45,9 +45,12 @@ extension (agentApplication: AgentApplication)
         case a: AgentApplication.IsIncorporated =>
           NumberOfIndividuals.isKeyIndividualListComplete(existingList.count(_.isPersonOfControl), a.numberOfIndividuals)
           && otherRelevantIndividualsComplete(existingList)
-        case _ => false
+        case _: AgentApplication.IsSoleTrader => true
 
-    val listProgressComplete = listDetailsCompleted(existingList) && existingList.forall(_.hasFinished)
+    val listProgressComplete =
+      existingList.nonEmpty
+        && listDetailsCompleted(existingList)
+        && existingList.forall(_.hasFinished)
     // any state other than Precreated indicates the link has been sent; require the list to be non-empty
     val listSharingComplete =
       listDetailsCompleted(existingList) &&

@@ -36,7 +36,7 @@ trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdSectionAmls & TdS
       createdAt = dependencies.nowAsInstant,
       submittedAt = None,
       applicationState = ApplicationState.Started,
-      userRole = Some(UserRole.Authorised),
+      userRole = Some(UserRole.Owner),
       businessDetails = None,
       applicantContactDetails = None,
       amlsDetails = None,

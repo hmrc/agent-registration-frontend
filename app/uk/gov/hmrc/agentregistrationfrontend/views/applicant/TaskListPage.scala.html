@@ -83,6 +83,12 @@
     else if(taskListStatus.listTracking.canStart) incomplete
     else cannotStart
 }
+@soleTraderIdStatus = @{
+    if(taskListStatus.listTracking.isComplete) complete
+    else if(taskListStatus.listTracking.canStart && taskListStatus.hmrcStandardForAgents.isComplete) incomplete
+    else cannotStart
+}
+
 
 @layout(
     pageTitle = title,
@@ -177,6 +183,20 @@
                   ),
                   status = listTrackingStatus,
                   href = if(taskListStatus.listTracking.canStart) Some(AppRoutes.apply.listdetails.progress.CheckProgressController.show.url) else None
+              )
+          ),
+          idPrefix = "lists"
+      ))
+  } else {
+      <h2 class="govuk-heading-m">@messages(s"$key.soleTraderId.heading")</h2>
+      @govukTaskList(TaskList(
+          items = Seq(
+              TaskListItem(
+                  title = TaskListItemTitle(
+                      content = Text(messages(s"$key.soleTraderId.linkText.$businessTypeKey"))
+                  ),
+                  status = soleTraderIdStatus,
+                  href = if(taskListStatus.listTracking.canStart && taskListStatus.hmrcStandardForAgents.isComplete) Some(AppRoutes.apply.listdetails.soletrader.ProveIdentityController.show.url) else None
               )
           ),
           idPrefix = "lists"
