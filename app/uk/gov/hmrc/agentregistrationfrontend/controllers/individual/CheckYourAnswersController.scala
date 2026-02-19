@@ -22,6 +22,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import com.softwaremill.quicklens.modify
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
@@ -76,6 +77,18 @@ extends FrontendController(mcc, actions):
       implicit request =>
         Redirect(AppRoutes.providedetails.IndividualHmrcStandardForAgentsController.show(linkId).url)
     )
+    .ensure(
+      // we now know all fields are populated so don't show Sole Traders the CYA page
+      // as the answers came from within the application
+      !_.get[AgentApplication].isSoleTrader,
+      implicit request =>
+        individualProvideDetailsService.upsert(
+          request.get[IndividualProvidedDetails]
+            .modify(_.providedDetailsState)
+            .setTo(Finished)
+        ).map: _ =>
+          Redirect(AppRoutes.providedetails.IndividualConfirmationController.show(linkId).url)
+    )
 
   def show(linkId: LinkId): Action[AnyContent] =
     baseAction(linkId):
@@ -94,3 +107,9 @@ extends FrontendController(mcc, actions):
             .setTo(Finished)
         ).map: _ =>
           Redirect(AppRoutes.providedetails.IndividualConfirmationController.show(linkId))
+
+  extension (agentApplication: AgentApplication)
+    def isSoleTrader: Boolean =
+      agentApplication match
+        case _: AgentApplication.IsSoleTrader => true
+        case _ => false
