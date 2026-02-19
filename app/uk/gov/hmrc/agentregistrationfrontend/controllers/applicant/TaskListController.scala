@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.hasCheckPassed
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
@@ -81,11 +82,16 @@ extends FrontendController(mcc, actions):
       val amlsDetailsCompleted = agentApplication.amlsDetails.exists(_.isComplete)
       val agentDetailsIsComplete = agentApplication.agentDetails.exists(_.isComplete)
       val hmrcStandardForAgentsAgreed = agentApplication.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed
-      val listDetailsCompleted = existingList.nonEmpty // TODO: implement other relevant individuals list so completion check can be done
-      val listProgressComplete = listDetailsCompleted && existingList.forall(_.hasFinished)
+      def listDetailsCompleted(existingList: List[IndividualProvidedDetails]): Boolean =
+        agentApplication match
+          case a: AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
+            NumberOfRequiredKeyIndividuals.isKeyIndividualListComplete(existingList.count(_.isPersonOfControl), a.numberOfRequiredKeyIndividuals)
+            && a.hasOtherRelevantIndividuals.isDefined
+          case _ => true
+      val listProgressComplete = listDetailsCompleted(existingList) && existingList.forall(_.hasFinished)
       // any state other than Precreated indicates the link has been sent; require the list to be non-empty
       val listSharingComplete =
-        listDetailsCompleted &&
+        listDetailsCompleted(existingList) &&
           existingList.forall(_.providedDetailsState =!= ProvidedDetailsState.Precreated)
       TaskListStatus(
         contactDetails = TaskStatus(
@@ -106,10 +112,10 @@ extends FrontendController(mcc, actions):
         ),
         listDetails = TaskStatus(
           canStart = contactIsComplete, // List details can be started only once we have a contact name
-          isComplete = listDetailsCompleted // TODO: implement other relevant individuals list details so completion check can be done
+          isComplete = listDetailsCompleted(existingList)
         ),
         listShare = TaskStatus(
-          canStart = listDetailsCompleted, // List sharing cannot be started until list details are completed
+          canStart = listDetailsCompleted(existingList), // List sharing cannot be started until list details are completed
           isComplete = listSharingComplete
         ),
         listTracking = TaskStatus(
