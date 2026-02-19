@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend
 
 object RoutesExports:
 
+  export uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
   export uk.gov.hmrc.agentregistration.shared.BusinessType
   export uk.gov.hmrc.agentregistration.shared.AgentType
   export uk.gov.hmrc.agentregistration.shared.LinkId

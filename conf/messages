@@ -309,6 +309,13 @@ amlsCheckYourAnswers.notApplicable = n/a
 amlsCheckYourAnswers.evidence.label = Evidence of anti-money laundering supervision
 amlsCheckYourAnswers.change = Change
 
+# Sole trader identity
+soleTraderIdentity.caption = Prove your identity
+soleTraderIdentity.title = Sign in with your personal details
+soleTraderIdentity.p1 = You are currently signed in as an agent.
+soleTraderIdentity.p2 = We need you to sign in using the details you created for your personal taxes, not the details you use to act as an agent.
+soleTraderIdentity.p3 = If you do not have personal sign in details, you can create some.
+
 # Lists
 lists.caption.title.Partnership = Partner and tax adviser information
 lists.caption.title.LimitedCompany = Director and tax adviser information
@@ -411,8 +418,6 @@ listDetailsCheckYourAnswers.partnerNames.label = Partner names
 listDetailsCheckYourAnswers.hasOtherRelevantIndividuals.label = Unofficial partners
 listDetailsCheckYourAnswers.otherRelevantIndividualsNames.label = Unofficial partner name
 
-
-
 link.title = Share this link with everyone on the list
 link.p1 = The people on your list need to sign in and provide their details to HMRC.
 link.p2 = Share this link with them:
@@ -510,9 +515,6 @@ cannotConfirmIdentity.tryAgain.button = Try again
 cannotRegister.title=This {0} cannot be registered for an Agent Services Account
 cannotRegister.p1=If you wish to register a different Agent, use <a class="govuk-link" href={0} target="_blank" rel="noopener noreferrer">this link (opens in new tab)</a>.
 cannotRegister.tryAgain.button = Try again
-
-
-
 
 # About your application / user role
 userRole.Owner.title = Are you the owner of the business?

@@ -181,6 +181,20 @@
           ),
           idPrefix = "lists"
       ))
+  } else {
+      <h2 class="govuk-heading-m">@messages(s"$key.soleTraderId.heading")</h2>
+      @govukTaskList(TaskList(
+          items = Seq(
+              TaskListItem(
+                  title = TaskListItemTitle(
+                      content = Text(messages(s"$key.soleTraderId.details.linkText.$businessTypeKey"))
+                  ),
+                  status = listDetailsStatus,
+                  href = if(taskListStatus.listDetails.canStart) Some(AppRoutes.apply.listdetails.CheckYourAnswersController.show.url) else None
+              )
+          ),
+          idPrefix = "lists"
+      ))
   }
 
     <h2 class="govuk-heading-m">@messages(s"$key.declaration.heading")</h2>

@@ -6,6 +6,7 @@ GET         /application-dashboard                                     uk.gov.hm
 
 # Sign out routes
 GET         /sign-out                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.signOut
+GET         /sign-out-with-continue                                    uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.signOutWithContinue(continueUrl: RedirectUrl)
 GET         /time-out                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timeOut
 GET         /timed-out                                                 uk.gov.hmrc.agentregistrationfrontend.controllers.SignOutController.timedOut
 
