@@ -17,27 +17,31 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
 import play.api.mvc.*
+import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
-import uk.gov.hmrc.agentregistration.shared.{AgentApplication, LinkId}
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.forms.individual.NameMatchingForm
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.NameMatchingPage
 
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
+import javax.inject.Singleton
 import scala.concurrent.Future
 
 @Singleton
-class NameMatchingController @Inject()(
-                                        actions: IndividualActions,
-                                        mcc: MessagesControllerComponents,
-                                        agentApplicationService: AgentApplicationService,
-                                        individualProvideDetailsService: IndividualProvideDetailsService,
-                                        view: NameMatchingPage
-                                      )
-  extends FrontendController(mcc, actions):
+class NameMatchingController @Inject() (
+  actions: IndividualActions,
+  mcc: MessagesControllerComponents,
+  agentApplicationService: AgentApplicationService,
+  individualProvideDetailsService: IndividualProvideDetailsService,
+  view: NameMatchingPage
+)
+extends FrontendController(mcc, actions):
 
   private type DataWithIndividualProvidedDetailsForSearch = List[IndividualProvidedDetails] *: AgentApplication *: DataWithAuth
 
@@ -52,8 +56,8 @@ class NameMatchingController @Inject()(
     }.refine { implicit request =>
       individualProvideDetailsService
         .findAllForMatchingWithApplication(request.get[AgentApplication].agentApplicationId)
-        .map:
-          listOfIndividuals => request.add[List[IndividualProvidedDetails]](listOfIndividuals)
+        .map: listOfIndividuals =>
+          request.add[List[IndividualProvidedDetails]](listOfIndividuals)
     }
 
   def show(linkId: LinkId): Action[AnyContent] = baseAction(linkId).async:
@@ -66,18 +70,31 @@ class NameMatchingController @Inject()(
   def submit(linkId: LinkId): Action[AnyContent] = baseAction(linkId).async:
     implicit request =>
       NameMatchingForm.form.bindFromRequest().fold(
-        formWithErrors => Future.successful(BadRequest(view(
-          form = formWithErrors,
-          linkId = linkId
-        ))),
+        formWithErrors =>
+          Future.successful(BadRequest(view(
+            form = formWithErrors,
+            linkId = linkId
+          ))),
         providedName =>
           val agentProvidedNamesList = request.get[List[IndividualProvidedDetails]]
-          if agentProvidedNamesList.isNamePresent(providedName) then
-            Future.successful(Redirect(AppRoutes.providedetails.IndividualConfirmationController.show(linkId)))
+          if agentProvidedNamesList.isNamePresent(providedName) then // TODO redirect to confirm name match controller
+            Future.successful(Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url))
           else
             Future.successful(Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url))
       )
 
-  extension (list: List[IndividualProvidedDetails])
-    private def isNamePresent(individualName: IndividualName): Boolean =
-      list.exists(_.individualName.value.equalsIgnoreCase(individualName.value))
+extension (details: List[IndividualProvidedDetails])
+  private def isNamePresent(individualName: IndividualName): Boolean =
+    val nameParts = individualName.splitByWhiteSpace
+    val submittedName = FullName(firstNameFromParts(nameParts), secondNameFromParts(nameParts))
+    details
+      .filter(_.internalUserId.isEmpty)
+      .exists: agentProvidedDetails =>
+        val providedNameParts = agentProvidedDetails.individualName.splitByWhiteSpace
+        val agentProvidedName = FullName(firstNameFromParts(providedNameParts), secondNameFromParts(providedNameParts))
+        agentProvidedName === submittedName
+
+extension (parts: List[String])
+
+  private def firstNameFromParts: String = parts.headOption.map(_.toLowerCase).getOrElse("")
+  private def secondNameFromParts: String = parts.lastOption.map(_.toLowerCase).getOrElse("")

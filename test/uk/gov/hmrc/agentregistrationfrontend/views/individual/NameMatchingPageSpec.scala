@@ -28,7 +28,7 @@ extends ViewSpec:
 
   private val viewTemplate: NameMatchingPage = app.injector.instanceOf[NameMatchingPage]
   private val linkId = tdAll.linkId
-  
+
   private val doc: Document = Jsoup.parse(viewTemplate(NameMatchingForm.form, linkId).body)
   private val heading: String = "Enter the name you provided to your agent for your application"
 
