@@ -24,7 +24,9 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsSoleTrader
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualVerifiedEmailAddress
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
@@ -62,6 +64,7 @@ extends FrontendController(mcc, actions):
           agentApplication match
             case agentApplication: AgentApplicationSoleTrader =>
               val soleTraderDetails: BusinessDetailsSoleTrader = agentApplication.getBusinessDetails
+              val applicantContactDetails: ApplicantContactDetails = agentApplication.getApplicantContactDetails
               val newRecord = individualProvideDetailsService.create(
                 agentApplicationId = agentApplication.agentApplicationId,
                 individualName = IndividualName(s"${soleTraderDetails.fullName.firstName} ${soleTraderDetails.fullName.lastName}"),
@@ -69,6 +72,17 @@ extends FrontendController(mcc, actions):
               )
                 .modify(_.providedDetailsState)
                 .setTo(ProvidedDetailsState.AccessConfirmed)
+                .modify(_.telephoneNumber)
+                .setTo(applicantContactDetails.telephoneNumber)
+                .modify(_.emailAddress)
+                .setTo(Some(IndividualVerifiedEmailAddress(
+                  emailAddress = applicantContactDetails.getVerifiedEmail,
+                  isVerified = true
+                )))
+                .modify(_.hasApprovedApplication)
+                .setTo(Some(true)) // Sole trader owners applicants are always approved as they are the same person
+                .modify(_.hmrcStandardForAgentsAgreed)
+                .setTo(agentApplication.hmrcStandardForAgentsAgreed)
               individualProvideDetailsService
                 .upsertForApplication(newRecord)
                 .map: _ =>
