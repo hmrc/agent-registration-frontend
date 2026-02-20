@@ -34,7 +34,7 @@ extends RequestAwareLogging:
 
   def find()(using request: RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector
     .findApplication()
-
+  
   def find(linkId: LinkId)(using request: RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector.findApplication(linkId)
 
   def find(
