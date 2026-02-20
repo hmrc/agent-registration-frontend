@@ -47,7 +47,6 @@
     pageTitle = title,
     maybeForm = Some(form)
 ) {
-    <h2 class="govuk-caption-l">@messages("provide-details.llp.title")</h2>
     @formWithCSRF(action = AppRoutes.providedetails.IndividualTelephoneNumberController.submit(linkId)) {
         @govukInput(Input(
             label = Label(
