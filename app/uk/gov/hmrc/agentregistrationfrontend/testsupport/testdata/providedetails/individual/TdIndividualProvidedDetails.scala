@@ -23,12 +23,23 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualVerifiedEmailAddress
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Precreated
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Started
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 
 trait TdIndividualProvidedDetails { dependencies: (TdBase) =>
 
   object providedDetails:
+
+    val unclaimed: IndividualProvidedDetails = IndividualProvidedDetails(
+      _id = dependencies.individualProvidedDetailsId,
+      internalUserId = None,
+      individualName = dependencies.individualName,
+      createdAt = dependencies.nowAsInstant,
+      agentApplicationId = dependencies.agentApplicationId,
+      providedDetailsState = Precreated,
+      isPersonOfControl = true
+    )
 
     val afterStarted: IndividualProvidedDetails = IndividualProvidedDetails(
       _id = dependencies.individualProvidedDetailsId,

@@ -42,7 +42,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.ConfirmMatchT
 import javax.inject.Inject
 import scala.concurrent.Future
 
-class ConfirmMatchToIndividualProvidedDetailsController @Inject() (
+class MatchIndividualProvidedDetailsController @Inject() (
   actions: IndividualActions,
   mcc: MessagesControllerComponents,
   view: ConfirmMatchToIndividualProvidedDetailsPage,
@@ -55,9 +55,9 @@ extends FrontendController(mcc, actions):
 
   private type DataWithCitizenDetails = CitizenDetails *: List[IndividualProvidedDetails] *: AgentApplication *: DataWithAdditionalIdentifiers
 
-  private type DataWithIndividualProvidedDetailsForMatching = IndividualProvidedDetails *: DataWithCitizenDetails
+  private type DataWithMatchedIndividualProvidedDetails = IndividualProvidedDetails *: DataWithCitizenDetails
 
-  private def baseAction(linkId: LinkId): ActionBuilderWithData[DataWithIndividualProvidedDetailsForMatching] = actions
+  private def baseAction(linkId: LinkId): ActionBuilderWithData[DataWithMatchedIndividualProvidedDetails] = actions
     .authorisedWithAdditionalIdentifiers
     .refine(implicit request =>
       agentApplicationService

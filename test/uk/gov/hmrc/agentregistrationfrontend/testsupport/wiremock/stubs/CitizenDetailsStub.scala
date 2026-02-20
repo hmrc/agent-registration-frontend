@@ -27,7 +27,9 @@ object CitizenDetailsStub:
 
   def stubFindSaUtrAndDateOfBirth(
     nino: Nino,
-    saUtr: SaUtr
+    saUtr: SaUtr,
+    firstName: Option[String] = None,
+    lastName: Option[String] = None
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = urlMatching(s"/citizen-details/nino/${nino.value}"),
@@ -36,8 +38,8 @@ object CitizenDetailsStub:
       Json.obj(
         "name" -> Json.obj(
           "current" -> Json.obj(
-            "firstName" -> "John",
-            "lastName" -> "Smith"
+            "firstName" -> firstName.getOrElse("John"),
+            "lastName" -> lastName.getOrElse("Smith")
           )
         ),
         "dateOfBirth" -> "01012000",

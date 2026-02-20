@@ -21,17 +21,17 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CitizenDetailsStub
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
 object ProvideDetailsStubHelper:
 
   def stubAuthAndFindApplicationAndProvidedDetails(
     agentApplication: AgentApplication,
-    individualProvideDetails: IndividualProvidedDetails,
-    withBpr: Boolean = false
+    individualProvideDetails: IndividualProvidedDetails
   ): StubMapping =
-    AuthStubs.stubAuthoriseIndividual()
+    IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails), agentApplication.agentApplicationId)
     AgentRegistrationStubs.stubFindApplicationByLinkId(tdAll.linkId, agentApplication)
 
@@ -43,8 +43,32 @@ object ProvideDetailsStubHelper:
     stubAuthAndFindApplicationAndProvidedDetails(agentApplication, individualProvidedDetails)
     AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(updatedIndividualProvidedDetails)
 
+  def stubAuthAndMatchIndividualProvidedDetails(
+    agentApplication: AgentApplication,
+    individualProvidedDetails: IndividualProvidedDetails
+  ): StubMapping =
+    stubAuthAndFindApplicationAndProvidedDetails(agentApplication, individualProvidedDetails)
+    CitizenDetailsStub.stubFindSaUtrAndDateOfBirth(
+      nino = tdAll.nino,
+      saUtr = tdAll.saUtr,
+      firstName = tdAll.individualName.value.split(" ").headOption,
+      lastName = tdAll.individualName.value.split(" ").lastOption
+    )
+    AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
+      utr = tdAll.saUtr.asUtr, // doesn't matter we are using same utr as provided details, there is no conflict
+      responseBody = tdAll.businessPartnerRecordResponse
+    )
+
+  def stubAuthAndClaimMatchedIndividualProvidedDetails(
+    agentApplication: AgentApplication,
+    individualProvidedDetails: IndividualProvidedDetails,
+    updatedIndividualProvidedDetails: IndividualProvidedDetails
+  ): StubMapping =
+    stubAuthAndMatchIndividualProvidedDetails(agentApplication, individualProvidedDetails)
+    AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(updatedIndividualProvidedDetails)
+
   def verifyAuthAndFindApplicationAndProvidedDetails(): Unit =
-    AuthStubs.verifyAuthorise()
+    IndividualAuthStubs.verifyAuthorise()
     AgentRegistrationIndividualProvidedDetailsStubs.verifyFindAllForApplicationId(tdAll.agentApplicationId)
     AgentRegistrationStubs.verifyFindApplicationByLinkId(tdAll.linkId)
 

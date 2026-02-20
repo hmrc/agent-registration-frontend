@@ -91,6 +91,6 @@ extends RequestAwareLogging:
               .find(_.internalUserId.contains(request.get[InternalUserId]))
               .map(request.add[IndividualProvidedDetails])
               .getOrElse(
-                Redirect(AppRoutes.providedetails.ConfirmMatchToIndividualProvidedDetailsController.show(linkId))
+                Redirect(AppRoutes.providedetails.MatchIndividualProvidedDetailsController.show(linkId))
               )
     )

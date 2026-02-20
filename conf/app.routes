@@ -130,8 +130,8 @@ POST        /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.
 GET         /provide-details/exit                                   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ExitController.genericExitPage
 GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.individual.StartController.start(linkId: LinkId)
 
-GET         /provide-details/match-application/:linkId             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ConfirmMatchToIndividualProvidedDetailsController.show(linkId: LinkId)
-POST        /provide-details/match-application/:linkId             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ConfirmMatchToIndividualProvidedDetailsController.submit(linkId: LinkId)
+GET         /provide-details/match-application/:linkId             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.MatchIndividualProvidedDetailsController.show(linkId: LinkId)
+POST        /provide-details/match-application/:linkId             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.MatchIndividualProvidedDetailsController.submit(linkId: LinkId)
 
 GET         /provide-details/telephone-number/:linkId               uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualTelephoneNumberController.show(linkId: LinkId)
 POST        /provide-details/telephone-number/:linkId                       uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualTelephoneNumberController.submit(linkId: LinkId)
