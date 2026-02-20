@@ -187,10 +187,10 @@
           items = Seq(
               TaskListItem(
                   title = TaskListItemTitle(
-                      content = Text(messages(s"$key.soleTraderId.details.linkText.$businessTypeKey"))
+                      content = Text(messages(s"$key.soleTraderId.linkText.$businessTypeKey"))
                   ),
-                  status = listDetailsStatus,
-                  href = if(taskListStatus.listDetails.canStart) Some(AppRoutes.apply.listdetails.CheckYourAnswersController.show.url) else None
+                  status = listTrackingStatus,
+                  href = if(taskListStatus.listTracking.canStart) Some(AppRoutes.apply.listdetails.soletrader.ProveIdentityController.show.url) else None
               )
           ),
           idPrefix = "lists"

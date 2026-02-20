@@ -74,6 +74,7 @@ class AppConfig @Inject() (
     .addParam("affinityGroup", affinityGroup.toString.toLowerCase)
 
   def applicationLink(linkId: String): Uri = uri"$thisFrontendBaseUrl/agent-registration/provide-details/start/$linkId"
+  def soleTraderProvideDetailsLink(linkId: String): Uri = uri"/agent-registration/provide-details/match-application/$linkId"
 
   val welshLanguageSupportEnabled: Boolean = configuration.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
   val contactFrontendId: String = configuration.get[String]("contact-frontend.serviceId") // TODO placeholder

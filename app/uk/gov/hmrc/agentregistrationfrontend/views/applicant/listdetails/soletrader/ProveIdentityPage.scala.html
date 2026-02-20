@@ -34,7 +34,7 @@
 
 @key = @{"soleTraderIdentity"}
 @pageTitle = @{messages(s"$key.title")}
-@provideDetailsLink = @{appConfig.applicationLink(agentApplication.linkId.value).toString}
+@provideDetailsLink = @{appConfig.soleTraderProvideDetailsLink(agentApplication.linkId.value).toString}
 @layout(
     pageTitle = pageTitle
 ) {
