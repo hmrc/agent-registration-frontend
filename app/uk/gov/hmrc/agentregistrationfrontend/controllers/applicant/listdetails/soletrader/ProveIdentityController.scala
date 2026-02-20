@@ -84,6 +84,8 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
+      val individualProvidedDetails: IndividualProvidedDetails = request.get
       Ok(view(
-        agentApplication = request.get[AgentApplication]
+        agentApplication = request.get[AgentApplication],
+        hasProvedIdentity = individualProvidedDetails.hasFinished
       ))

@@ -27,33 +27,44 @@
 )
 
 @(
-        agentApplication: AgentApplication)(implicit
+        agentApplication: AgentApplication,
+        hasProvedIdentity: Boolean)(implicit
         request: RequestHeader,
         messages: Messages
 )
 
 @key = @{"soleTraderIdentity"}
-@pageTitle = @{messages(s"$key.title")}
+@pageTitle = @{messages(s"$key.title.${hasProvedIdentity.toString}")}
 @provideDetailsLink = @{appConfig.soleTraderProvideDetailsLink(agentApplication.linkId.value).toString}
 @layout(
     pageTitle = pageTitle
 ) {
   <h2 class="govuk-caption-l">@messages(s"$key.caption")</h2>
   <h1 class="govuk-heading-l">@pageTitle</h1>
-  <p class="govuk-body">
-    @{messages(s"$key.p1")}
-  </p>
-  <p class="govuk-body">
-    @{messages(s"$key.p2")}
-  </p>
-  <p class="govuk-body">
-  @{messages(s"$key.p3")}
-  </p>
-  <p class="govuk-body">
-    @continueOrSaveForLaterLinks(
-      continueHref = AppRoutes.SignOutController.signOutWithContinue(RedirectUrl(provideDetailsLink)).url,
-      continueLabel = Some(messages("common.continue"))
-    )
-  </p>
+  @if(hasProvedIdentity) {
+    <p class="govuk-body">
+      @continueOrSaveForLaterLinks(
+        continueHref = AppRoutes.apply.TaskListController.show.url,
+        continueLabel = Some(messages("common.continue"))
+      )
+    </p>
+  } else {
+
+    <p class="govuk-body">
+      @{messages(s"$key.p1")}
+    </p>
+    <p class="govuk-body">
+      @{messages(s"$key.p2")}
+    </p>
+    <p class="govuk-body">
+      @{messages(s"$key.p3")}
+    </p>
+    <p class="govuk-body">
+      @continueOrSaveForLaterLinks(
+        continueHref = AppRoutes.SignOutController.signOutWithContinue(RedirectUrl(provideDetailsLink)).url,
+        continueLabel = Some(messages("common.continue"))
+      )
+    </p>
+  }
 
 }

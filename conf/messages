@@ -311,7 +311,8 @@ amlsCheckYourAnswers.change = Change
 
 # Sole trader identity
 soleTraderIdentity.caption = Prove your identity
-soleTraderIdentity.title = Sign in with your personal details
+soleTraderIdentity.title.false = Sign in with your personal details
+soleTraderIdentity.title.true = You have proven your identity
 soleTraderIdentity.p1 = You are currently signed in as an agent.
 soleTraderIdentity.p2 = We need you to sign in using the details you created for your personal taxes, not the details you use to act as an agent.
 soleTraderIdentity.p3 = If you do not have personal sign in details, you can create some.

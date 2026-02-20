@@ -22,6 +22,7 @@ import play.api.mvc.DefaultActionBuilder
 import play.api.mvc.MessagesControllerComponents
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.validateRedirectUrl
 import uk.gov.hmrc.agentregistrationfrontend.views.html.TimedOutPage
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
@@ -38,7 +39,8 @@ class SignOutController @Inject() (
 extends FrontendControllerBase(mcc):
 
   def signOutWithContinue(continue: RedirectUrl): Action[AnyContent] = defaultActionBuilder:
-    val signOutAndRedirectUrl: String = uri"""${appConfig.basFrontendSignOutUrlBase}?${Map("continue" -> continue)}""".toString
+    val validatedRedirect = validateRedirectUrl(continue, appConfig.allowedRedirectHosts)
+    val signOutAndRedirectUrl: String = uri"""${appConfig.basFrontendSignOutUrlBase}?${Map("continue" -> validatedRedirect)}""".toString
     Redirect(signOutAndRedirectUrl)
 
   def signOut: Action[AnyContent] = defaultActionBuilder:
