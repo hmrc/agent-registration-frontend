@@ -75,7 +75,6 @@ extends ViewSpec:
     "contain content" in:
       doc.mainContent shouldContainContent
         """
-          |LLP member confirmation
           |Check your answers
           |Telephone number
           |(+44) 10794554342
@@ -157,7 +156,6 @@ extends ViewSpec:
     "contain content" in:
       doc.mainContent shouldContainContent
         """
-          |LLP member confirmation
           |Check your answers
           |Telephone number
           |(+44) 10794554342
@@ -199,7 +197,6 @@ extends ViewSpec:
     "contain content" in:
       doc.mainContent shouldContainContent
         """
-          |LLP member confirmation
           |Check your answers
           |Telephone number
           |(+44) 10794554342
