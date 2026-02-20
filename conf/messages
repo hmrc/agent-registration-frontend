@@ -744,3 +744,7 @@ confirmMatchToIndividualProvidedDetails.yes = Yes, these details are correct
 confirmMatchToIndividualProvidedDetails.no = No
 confirmMatchToIndividualProvidedDetails.error.required = Select yes if these details are correct
 confirmMatchToIndividualProvidedDetails.error.invalid = Select yes if these details are correct
+
+# Individual name lookup
+individualNameForSearch.title = Enter the name you provided to your agent for your application
+individualNameForSearch.inputText = Enter the name you provided to your agent for your application
