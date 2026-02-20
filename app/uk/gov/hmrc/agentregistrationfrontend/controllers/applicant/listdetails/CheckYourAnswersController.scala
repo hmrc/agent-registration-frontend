@@ -25,10 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
-import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
@@ -67,7 +64,7 @@ extends FrontendController(mcc, actions):
           request.get[IsNotSoleTrader] match
             case a: AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
               val partnersSize = request.get[List[IndividualProvidedDetails]].count(_.isPersonOfControl)
-              listComplete(partnersSize, a.numberOfRequiredKeyIndividuals)
+              NumberOfRequiredKeyIndividuals.isKeyIndividualListComplete(partnersSize, a.numberOfRequiredKeyIndividuals)
             case _ => true,
       resultWhenConditionNotMet =
         implicit request =>
@@ -92,12 +89,3 @@ extends FrontendController(mcc, actions):
         partnersList,
         otherRelevantIndividualsList
       ))
-
-  private def listComplete(
-    listSize: Int,
-    numberOfRequiredKeyIndividuals: Option[NumberOfRequiredKeyIndividuals]
-  ): Boolean =
-    numberOfRequiredKeyIndividuals match
-      case Some(FiveOrLess(a: Int)) => listSize === a
-      case Some(a @ SixOrMore(_)) => listSize === (a.numberOfKeyIndividualsResponsibleForTaxMatters + a.requiredPadding)
-      case _ => false
