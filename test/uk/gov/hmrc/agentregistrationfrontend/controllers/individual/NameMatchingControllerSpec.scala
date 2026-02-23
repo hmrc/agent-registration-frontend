@@ -83,9 +83,9 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe "Enter the name you provided to your agent for your application - Apply for an agent services account - GOV.UK"
+    response.parseBodyAsJsoupDocument.title() shouldBe "Enter your full name - Apply for an agent services account - GOV.UK"
 
-  s"GET $path should redirect to the exit page when there is no application for the linkId" in:
+  s"GET $path should redirect to the contract applicant page when there is no application for the linkId" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationStubs.stubFindApplicationByLinkIdNoContent(
       linkId = linkId
@@ -97,9 +97,11 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe Constants.EMPTY_STRING
+    response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.genericExitPage.url
 
   s"POST $path with a agent provided name should send the user to the potential match confirmation page" in:
-    val testAgentProvidedName = "Test Name"
+    val testIndividualName = "Test Name"
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationStubs.stubFindApplicationByLinkId(
       linkId = linkId,
@@ -112,15 +114,15 @@ extends ControllerSpec:
 
     val response: WSResponse =
       post(path)(Map(
-        NameMatchingForm.nameSearchKey -> Seq(testAgentProvidedName)
+        NameMatchingForm.nameSearchKey -> Seq(testIndividualName)
       ))
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.genericExitPage.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.NameMatchConfrimationController.show.url
 
-  s"POST $path with an incorrectly formatted name should show the page with errors" in:
-    val testAgentProvidedName = "Test///Name"
+  s"POST $path with an incorrectly formatted name should show the page with the correct error" in:
+    val testIndividualName = ""
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationStubs.stubFindApplicationByLinkId(
       linkId = linkId,
@@ -133,12 +135,63 @@ extends ControllerSpec:
 
     val response: WSResponse =
       post(path)(Map(
-        NameMatchingForm.nameSearchKey -> Seq(testAgentProvidedName)
+        NameMatchingForm.nameSearchKey -> Seq(testIndividualName)
       ))
 
     response.status shouldBe Status.BAD_REQUEST
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "Error: Enter your full name - Apply for an agent services account - GOV.UK"
+    doc.mainContent.select(
+      s"#${NameMatchingForm.nameSearchKey}-error"
+    ).text() shouldBe s"Error: Enter your full name"
 
-  s"POST $path with a name which has not been provided by the agent should redirect to the contact page" in:
+  s"POST $path with invalid characters should return the relevant error" in:
+    val testName = "Bob///Stevenson"
+    AuthStubs.stubAuthoriseIndividual()
+    AgentRegistrationStubs.stubFindApplicationByLinkId(
+      linkId = linkId,
+      agentApplication = completeAgentApplication
+    )
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
+      listOfAgentProvidedDetails,
+      agentApplicationId
+    )
+    val response: WSResponse =
+      post(path)(Map(
+        NameMatchingForm.nameSearchKey -> Seq(testName)
+      ))
+
+    response.status shouldBe Status.BAD_REQUEST
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "Error: Enter your full name - Apply for an agent services account - GOV.UK"
+    doc.mainContent.select(
+      s"#${NameMatchingForm.nameSearchKey}-error"
+    ).text() shouldBe s"Error: Your full name must only include letters a to z, hyphens, apostrophes and spaces"
+
+  s"POST $path with more than 100 characters should return the correct error message" in:
+    val testName = s"Bob ${"A".repeat(100)} Boson"
+    AuthStubs.stubAuthoriseIndividual()
+    AgentRegistrationStubs.stubFindApplicationByLinkId(
+      linkId = linkId,
+      agentApplication = completeAgentApplication
+    )
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
+      listOfAgentProvidedDetails,
+      agentApplicationId
+    )
+    val response: WSResponse =
+      post(path)(Map(
+        NameMatchingForm.nameSearchKey -> Seq(testName)
+      ))
+
+    response.status shouldBe Status.BAD_REQUEST
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "Error: Enter your full name - Apply for an agent services account - GOV.UK"
+    doc.mainContent.select(
+      s"#${NameMatchingForm.nameSearchKey}-error"
+    ).text() shouldBe s"Error: Your full name must be 100 characters or fewer"
+
+  s"POST $path with an individuals name which has not been matched should redirect to the contact applicant page" in:
     val NotPresentName = "Bob Boson"
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationStubs.stubFindApplicationByLinkId(
@@ -157,4 +210,4 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.genericExitPage.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.ContactApplicantController.show.url

@@ -148,6 +148,8 @@ object AppRoutes:
     val IndividualConfirmationController = providedetailsRoutes.IndividualConfirmationController
     val MatchIndividualProvidedDetailsController = providedetailsRoutes.MatchIndividualProvidedDetailsController
     val NameMatchingController = providedetailsRoutes.NameMatchingController
+    val NameMatchConfrimationController = providedetailsRoutes.NameMatchConfirmationController
+    val ContactApplicantController = providedetailsRoutes.ContactApplicantController
 
   object testOnly:
 

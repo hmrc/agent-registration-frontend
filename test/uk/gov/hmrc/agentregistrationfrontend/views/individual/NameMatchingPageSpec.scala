@@ -30,7 +30,7 @@ extends ViewSpec:
   private val linkId = tdAll.linkId
 
   private val doc: Document = Jsoup.parse(viewTemplate(NameMatchingForm.form, linkId).body)
-  private val heading: String = "Enter the name you provided to your agent for your application"
+  private val heading: String = "Enter your full name"
 
   "NameMatchingPage" should:
     "have the correct title" in:
@@ -38,7 +38,7 @@ extends ViewSpec:
 
     "render an input box" in:
       val expectedInputField: TestInputField = TestInputField(
-        label = "Enter the name you provided to your agent for your application",
+        label = "Enter your full name",
         hint = None,
         inputName = "individualNameForSearch"
       )
@@ -49,7 +49,7 @@ extends ViewSpec:
       .mainContent
       .selectOrFail(s"form button[type='submit']")
       .selectOnlyOneElementOrFail()
-      .text() shouldBe "Save and continue"
+      .text() shouldBe "Continue"
 
   "render the form error correctly when the form contains an error" in:
     val field = NameMatchingForm.nameSearchKey

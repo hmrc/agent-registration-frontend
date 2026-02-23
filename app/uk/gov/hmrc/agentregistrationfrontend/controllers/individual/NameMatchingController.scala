@@ -77,10 +77,10 @@ extends FrontendController(mcc, actions):
           ))),
         providedName =>
           val agentProvidedNamesList = request.get[List[IndividualProvidedDetails]]
-          if agentProvidedNamesList.isNamePresent(providedName) then // TODO redirect to confirm name match controller
-            Future.successful(Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url))
+          if agentProvidedNamesList.isNamePresent(providedName) then
+            Future.successful(Redirect(AppRoutes.providedetails.NameMatchConfrimationController.show))
           else
-            Future.successful(Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url))
+            Future.successful(Redirect(AppRoutes.providedetails.ContactApplicantController.show))
       )
 
 extension (details: List[IndividualProvidedDetails])

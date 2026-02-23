@@ -746,5 +746,8 @@ confirmMatchToIndividualProvidedDetails.error.required = Select yes if these det
 confirmMatchToIndividualProvidedDetails.error.invalid = Select yes if these details are correct
 
 # Individual name lookup
-individualNameForSearch.title = Enter the name you provided to your agent for your application
-individualNameForSearch.inputText = Enter the name you provided to your agent for your application
+individualNameForSearch.title = Enter your full name
+individualNameForSearch.inputText = Enter your full name
+individualNameForSearch.error.required = Enter your full name
+individualNameForSearch.error.invalid = Your full name must only include letters a to z, hyphens, apostrophes and spaces
+individualNameForSearch.error.tooLong = Your full name must be 100 characters or fewer

@@ -154,3 +154,5 @@ POST        /provide-details/check-your-answers/:linkId                     uk.g
 GET         /provide-details/confirmation/:linkId                           uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualConfirmationController.show(linkId: LinkId)
 GET         /provide-details/individual-name-search/:linkId                 uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NameMatchingController.show(linkId: LinkId)
 POST        /provide-details/individual-name-search/:linkId                 uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NameMatchingController.submit(linkId: LinkId)
+GET         /provide-details/name-match-confirmation                        uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NameMatchConfirmationController.show
+GET         /provide-details/contact-applicant                              uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ContactApplicantController.show

@@ -38,42 +38,22 @@
     "individualNameForSearch"
 }
 
-@pageTitle = @{
-    if (form.hasErrors) s"Error: ${messages(s"$key.title")}"
-    else messages(s"$key.title")
-}
+@title = @{messages(s"$key.title")}
 
-
-@layout(pageTitle = pageTitle, suppressBackLink = true) {
-    <h1 class="govuk-heading-l">@pageTitle</h1>
-
-    @if(form.hasErrors) {
-        @govukErrorSummary(
-            ErrorSummary(
-                title = Text(messages("error.summary.title")),
-                errorList = form(key).error.toSeq.map { error =>
-                    ErrorLink(
-                        href = Some("#" + key),
-                        content = Text(messages(error.message, error.args:_*))
-                    )
-                },
-                attributes = Map("id" -> "error-summary-display", "tabindex" -> "-1")
-            )
-        )
-    }
+@layout(pageTitle = title, maybeForm = Some(form) ,suppressBackLink = true) {
 
     @formWithCSRF(action = AppRoutes.providedetails.NameMatchingController.submit(linkId)) {
         @govukInput(Input(
             label = Label(
-                content = Text(messages(s"$key.inputText")),
-                isPageHeading = false,
-                classes = "govuk-label--s"
+                content = Text(title),
+                isPageHeading = true,
+                classes = "govuk-label--l"
             ),
             autocomplete = Some("name")
         ).withFormField(form(key)))
 
         @govukButton(Button(
-            content = Text(messages("common.saveAndContinue"))
+            content = Text(messages("common.continue"))
         ))
     }
 }
