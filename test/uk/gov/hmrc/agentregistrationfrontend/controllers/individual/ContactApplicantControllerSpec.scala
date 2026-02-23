@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.lists
+package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
-import play.api.libs.json.Format
-import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
-final case class IndividualName(
-  value: String
-):
+class ContactApplicantControllerSpec
+extends ControllerSpec:
 
-  def isValidName: Boolean = value.matches("^[a-zA-Z\\-' ]+$")
+  private val path = s"/agent-registration/provide-details/contact-applicant"
 
-  def splitByWhiteSpace: List[String] = value.trim.split("\\s+").toList
-
-object IndividualName:
-  given format: Format[IndividualName] = JsonFormatsFactory.makeValueClassFormat
+  "NameMatchingController should have the correct routes" in:
+    AppRoutes.providedetails.ContactApplicantController.show shouldBe Call(
+      method = "GET",
+      url = path
+    )

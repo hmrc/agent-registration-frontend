@@ -80,8 +80,8 @@ extends FrontendController(mcc, actions):
     .refine(implicit request =>
       request.get[Option[Nino]] match
         case None =>
-          logger.warn("No NINO found in session, cannot match to citizen details, redirecting to generic exit page")
-          Future.successful(Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url))
+          logger.warn("No NINO found in session, cannot match to citizen details, redirecting to manual name matching page")
+          Future.successful(Redirect(AppRoutes.providedetails.NameMatchingController.show(linkId).url))
         case Some(nino) =>
           citizenDetailsConnector
             .getCitizenDetails(nino)

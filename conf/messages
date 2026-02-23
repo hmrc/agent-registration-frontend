@@ -744,3 +744,10 @@ confirmMatchToIndividualProvidedDetails.yes = Yes, these details are correct
 confirmMatchToIndividualProvidedDetails.no = No
 confirmMatchToIndividualProvidedDetails.error.required = Select yes if these details are correct
 confirmMatchToIndividualProvidedDetails.error.invalid = Select yes if these details are correct
+
+# Individual name lookup
+individualNameForSearch.title = Enter your full name
+individualNameForSearch.inputText = Enter your full name
+individualNameForSearch.error.required = Enter your full name
+individualNameForSearch.error.invalid = Your full name must only include letters a to z, hyphens, apostrophes and spaces
+individualNameForSearch.error.tooLong = Your full name must be 100 characters or fewer
