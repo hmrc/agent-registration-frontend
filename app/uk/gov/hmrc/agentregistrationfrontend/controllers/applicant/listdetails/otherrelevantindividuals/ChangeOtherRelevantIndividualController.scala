@@ -29,7 +29,7 @@ import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.OtherRelevantIndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.otherrelevantindividuals.EnterIndividualNamePage
 
@@ -89,13 +89,14 @@ extends FrontendController(mcc, actions):
             .individualName
 
         Future.successful(Ok(enterIndividualNamePage(
-          form = IndividualNameForm.form.fill(nameToChange),
-          formAction = formAction
+          form = OtherRelevantIndividualNameForm.form.fill(nameToChange),
+          formAction = formAction,
+          ordinalKey = "change"
         )))
 
   def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction
     .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
-      form = IndividualNameForm.form,
+      form = OtherRelevantIndividualNameForm.form,
       resultToServeWhenFormHasErrors =
         implicit request =>
           (formWithErrors: Form[IndividualName]) =>
@@ -106,7 +107,8 @@ extends FrontendController(mcc, actions):
             BadRequest(
               enterIndividualNamePage(
                 form = formWithErrors,
-                formAction = formAction
+                formAction = formAction,
+                ordinalKey = "change"
               )
             )
     )

@@ -21,7 +21,7 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
-import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.OtherRelevantIndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 
@@ -32,7 +32,7 @@ extends ControllerSpec:
 
   // In ControllerSpec we don't have the same `messages(...)` helper as ViewSpecs.
   // Keep this aligned with the rendered page title.
-  private val expectedHeading = "What is the full name of an unofficial partner?"
+  private val expectedHeading = "What is the full name of the first person?"
 
   object agentApplication:
 
@@ -75,7 +75,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.soleTraderInProgress)
     val response: WSResponse =
       post(path)(Map(
-        IndividualNameForm.key -> Seq("Any Name")
+        OtherRelevantIndividualNameForm.key -> Seq("Any Name")
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -121,8 +121,8 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe s"Error: $expectedHeading - Apply for an agent services account - GOV.UK"
     doc.mainContent
-      .select(s"#${IndividualNameForm.key}-error")
-      .text() shouldBe "Error: Enter the full name of the partner"
+      .select(s"#${OtherRelevantIndividualNameForm.key}-error")
+      .text() shouldBe "Error: Enter the full name of the person"
     ApplyStubHelper.verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterConfirmOtherRelevantIndividualsYes.agentApplicationId)
 
@@ -135,14 +135,14 @@ extends ControllerSpec:
 
     val response: WSResponse =
       post(path)(Map(
-        IndividualNameForm.key -> Seq("Invalid@@Name123")
+        OtherRelevantIndividualNameForm.key -> Seq("Invalid@@Name123")
       ))
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe s"Error: $expectedHeading - Apply for an agent services account - GOV.UK"
     doc.mainContent
-      .select(s"#${IndividualNameForm.key}-error")
-      .text() shouldBe "Error: The partner’s name must only include letters a to z, hyphens, apostrophes and spaces"
+      .select(s"#${OtherRelevantIndividualNameForm.key}-error")
+      .text() shouldBe "Error: The person’s name must only include letters a to z, hyphens, apostrophes and spaces"
     ApplyStubHelper.verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterConfirmOtherRelevantIndividualsYes.agentApplicationId)

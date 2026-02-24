@@ -38,8 +38,8 @@ extends ViewSpec:
       .afterBusinessNameProvided
 
   private val entityName: String = tdAll.companyName
-  private val heading: String = "Unofficial partners"
-  private val question: String = s"Does $entityName have any unofficial partners?"
+  private val heading: String = "Other people we need to know about"
+  private val question: String = s"Does $entityName have any other relevant tax advisers?"
 
   private def render(form: play.api.data.Form[Boolean]): Document = Jsoup.parse(viewTemplate(
     form = form,
@@ -54,17 +54,11 @@ extends ViewSpec:
     "contain expected content" in:
       doc.mainContent shouldContainContent (
         s"""
-           |Partner and tax adviser information
+           |Partners and other relevant tax advisers
            |$heading
-           |We now need to know about anyone who is not an official partner of $entityName, but who has:
-           |material responsibility for how tax advice is carried out
-           |significant authority over HMRC interactions
-           |How we define unofficial partners
-           |Unofficial partners are people who act as if they are partners, but do not have that title. They are sometimes called shadow partners.
-           |They can be:
-           |senior managers in the partnership
-           |external tax consultants or advisers
-           |anyone else who makes tax decisions at partnership level
+           |We also need to know about other relevant tax advisers.
+           |This means anyone responsible for tax advice at Test Company Name, who is not an official partner.
+           |Read the guidance about how HMRC defines ‘relevant tax advisers’ (opens in new tab)
            |$question
            |Yes
            |No

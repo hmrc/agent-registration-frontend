@@ -145,11 +145,17 @@ extends FrontendController(mcc, actions):
                   .setTo(Some(hasOtherRelevantIndividuals))
           }
 
-          val deleteOtherRelevantIndividuals: Future[List[Unit]] = Future.sequence(
-            otherRelevantIndividuals.map(x =>
-              individualProvideDetailsService.delete(x.individualProvidedDetailsId)
-            )
-          )
+          // we do not want to delete previous records (that may already be populated by signed in users)
+          // unless the user has selected that they do not have any
+          val deleteOtherRelevantIndividuals: Future[Unit] =
+            if hasOtherRelevantIndividuals
+            then Future.successful(())
+            else
+              Future.sequence(
+                otherRelevantIndividuals.map(x =>
+                  individualProvideDetailsService.delete(x.individualProvidedDetailsId)
+                )
+              ).map(_ => ())
 
           for
             _ <- deleteOtherRelevantIndividuals

@@ -90,7 +90,7 @@ extends ViewSpec:
       s"contain expected content for $n individuals using ordinal key '${testCase.ordinalKey}'" in:
         doc.mainContent shouldContainContent
           s"""
-             |Partner and tax adviser information
+             |Partners and other relevant tax advisers
              |Tell us about the partners of Test Company Name
              |We need the names of:
              |${testCase.expectedPaddingBullet1}

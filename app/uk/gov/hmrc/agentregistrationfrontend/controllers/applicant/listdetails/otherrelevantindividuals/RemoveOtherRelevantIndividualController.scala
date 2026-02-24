@@ -22,6 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.RemoveKeyIndividualForm
@@ -42,7 +43,7 @@ class RemoveOtherRelevantIndividualController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithIndividual = IndividualProvidedDetails *: IsNotSoleTrader *: DataWithAuth
+  private type DataWithIndividual = IndividualProvidedDetails *: List[IndividualProvidedDetails] *: IsNotSoleTrader *: DataWithAuth
 
   private def baseAction(individualProvidedDetailsId: IndividualProvidedDetailsId): ActionBuilderWithData[DataWithIndividual] = actions
     .getApplicationInProgress
@@ -55,15 +56,16 @@ extends FrontendController(mcc, actions):
           case aa: IsNotSoleTrader => request.replace[AgentApplication, IsNotSoleTrader](aa)
     .refine:
       implicit request =>
+        val agentApplication: IsNotSoleTrader = request.get
         individualProvideDetailsService
-          .findById(individualProvidedDetailsId)
-          .map[RequestWithData[DataWithIndividual] | Result]:
-            case Some(individualProvidedDetails) => request.add[IndividualProvidedDetails](individualProvidedDetails)
-            case None =>
-              logger.warn(
-                "Number of required key individuals not specified in application, redirecting to number of key individuals page"
-              )
-              Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
+          .findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
+            request.add[List[IndividualProvidedDetails]](individualsList.filterNot(_.isPersonOfControl))
+    .refine:
+      implicit request =>
+        val individualProvidedDetails: IndividualProvidedDetails = request.get[List[IndividualProvidedDetails]]
+          .find(_._id === individualProvidedDetailsId)
+          .getOrThrowExpectedDataMissing("Individual to remove is not in the list of other relevant individuals")
+        request.add[IndividualProvidedDetails](individualProvidedDetails)
 
   def show(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] =
     baseAction(individualProvidedDetailsId):
@@ -91,14 +93,15 @@ extends FrontendController(mcc, actions):
       implicit request =>
         val confirmRemoveIndividual: YesNo = request.get
         val individualProvidedDetails: IndividualProvidedDetails = request.get
+        val existingListBeforeDeletion: List[IndividualProvidedDetails] = request.get
         confirmRemoveIndividual match
           case YesNo.Yes =>
             individualProvideDetailsService
               .delete(individualProvidedDetails._id)
               .map: _ =>
-                Redirect(
-                  AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show
-                )
+                if existingListBeforeDeletion.size > 1
+                then Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show)
+                else Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show)
           case YesNo.No =>
             Future.successful(
               Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show)
