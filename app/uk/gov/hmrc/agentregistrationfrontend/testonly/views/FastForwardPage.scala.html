@@ -88,4 +88,15 @@
         }
         </ul>
     </p>
+
+    <p class="govuk-body">
+        <h2 class="govuk-caption-xl">Limited Company</h2>
+        <ul class="govuk-list govuk-list--bullet">
+        @CompletedSection.CompletedSectionLimitedCompany.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
+            <li>
+                <a class="govuk-link" href="@{AppRoutes.testOnly.applicant.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
+            </li>
+        }
+        </ul>
+    </p>
 }

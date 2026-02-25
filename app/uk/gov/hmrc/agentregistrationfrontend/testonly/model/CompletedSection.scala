@@ -257,6 +257,80 @@ object CompletedSection:
 
     val values: Seq[CompletedSectionScottishPartnership] = SealedObjects.all[CompletedSectionScottishPartnership]
 
+  sealed trait CompletedSectionLimitedCompany
+  extends CompletedSection:
+    override def businessType: BusinessType = BusinessType.LimitedCompany
+
+  object CompletedSectionLimitedCompany:
+
+    case object LimitedCompanyAboutYourBusiness
+    extends CompletedSectionLimitedCompany:
+
+      override def sectionName: String = "About your business"
+
+      override def alreadyDeveloped: Boolean = true
+
+      override def displayOrder: Int = 1
+
+      override def appState: AgentApplication = TestOnlyData.agentApplicationLimitedCompany.afterRefusalToDealWithCheckPass
+
+    case object LimitedCompanyApplicantContactDetails
+    extends CompletedSectionLimitedCompany:
+
+      override def sectionName: String = "Applicant Contact Details"
+
+      override def alreadyDeveloped: Boolean = true
+
+      override def displayOrder: Int = 2
+
+      override def appState: AgentApplication = TestOnlyData.agentApplicationLimitedCompany.afterContactDetailsComplete
+
+    case object LimitedCompanyAgentServicesAccountDetails
+    extends CompletedSectionLimitedCompany:
+
+      override def sectionName: String = "Agent services account details"
+
+      override def alreadyDeveloped: Boolean = true
+
+      override def displayOrder: Int = 3
+
+      override def appState: AgentApplication = TestOnlyData.agentApplicationLimitedCompany.afterAgentDetailsComplete
+
+    case object LimitedCompanyAntiMoneyLaunderingSupervisionDetails
+    extends CompletedSectionLimitedCompany:
+
+      override def sectionName: String = "Anti-money laundering supervision details"
+
+      override def alreadyDeveloped: Boolean = true
+
+      override def displayOrder: Int = 4
+
+      override def appState: AgentApplication = TestOnlyData.agentApplicationLimitedCompany.afterAmlsComplete
+
+    case object LimitedCompanyHmrcStandardForAgents
+    extends CompletedSectionLimitedCompany:
+
+      override def sectionName: String = "HMRC standard for agents"
+
+      override def alreadyDeveloped: Boolean = true
+
+      override def displayOrder: Int = 5
+
+      override def appState: AgentApplication = TestOnlyData.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed
+
+    case object LimitedCompanyDeclaration
+    extends CompletedSectionLimitedCompany:
+
+      override def sectionName: String = "Declaration"
+
+      override def alreadyDeveloped: Boolean = true
+
+      override def displayOrder: Int = 6
+
+      override def appState: AgentApplication = TestOnlyData.agentApplicationLimitedCompany.afterDeclarationSubmitted
+
+    val values: Seq[CompletedSectionLimitedCompany] = SealedObjects.all[CompletedSectionLimitedCompany]
+
   val values: Seq[CompletedSection] = SealedObjects.all[CompletedSection]
 
   given PathBindable[CompletedSection] = PathBindableFactory.makeSealedObjectPathBindable[CompletedSection]
