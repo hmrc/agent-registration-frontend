@@ -15,7 +15,7 @@
  *@
 
 @import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
-@import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
+@import uk.gov.hmrc.agentregistrationfrontend.forms.OtherRelevantIndividualNameForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
@@ -30,16 +30,17 @@
 
 @(
         form: Form[IndividualName],
-        formAction: Call
+        formAction: Call,
+        ordinalKey: String
 )(implicit
         request: RequestHeader,
         messages: Messages
 )
 
 @key = @{
-  IndividualNameForm.key
+  OtherRelevantIndividualNameForm.key
 }
-@title = @{messages(s"$key.label.otherRelevantIndividuals")}
+@title = @{messages(s"$key.label.$ordinalKey")}
 
 @layout(
     pageTitle = title,

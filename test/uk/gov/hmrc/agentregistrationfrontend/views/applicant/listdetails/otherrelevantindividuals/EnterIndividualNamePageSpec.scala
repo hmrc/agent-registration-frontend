@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.otherr
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.OtherRelevantIndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -34,11 +34,12 @@ extends ViewSpec:
   "EnterIndividualNamePage" should {
 
     val doc: Document = Jsoup.parse(viewTemplate(
-      form = IndividualNameForm.form,
-      formAction = formAction
+      form = OtherRelevantIndividualNameForm.form,
+      formAction = formAction,
+      ordinalKey = "first"
     ).body)
 
-    val expectedHeading = messages("individualName.label.otherRelevantIndividuals")
+    val expectedHeading = messages("otherRelevantIndividualName.label.first")
 
     "have the correct title" in:
       doc.title() shouldBe s"$expectedHeading - Apply for an agent services account - GOV.UK"
@@ -56,12 +57,12 @@ extends ViewSpec:
       form.attr("action") shouldBe formAction.url
 
       form
-        .selectOrFail("label[for=individualName]")
+        .selectOrFail("label[for=otherRelevantIndividualName]")
         .selectOnlyOneElementOrFail()
         .text() shouldBe expectedHeading
 
       form
-        .selectOrFail("input[name=individualName][type=text]")
+        .selectOrFail("input[name=otherRelevantIndividualName][type=text]")
         .selectOnlyOneElementOrFail()
 
     "render a save and continue button" in:
@@ -79,17 +80,18 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render a form error when the form contains an error" in:
-      val field = IndividualNameForm.key
-      val errorMessage = "Enter the full name of the partner"
+      val field = OtherRelevantIndividualNameForm.key
+      val errorMessage = "Enter the full name of the person"
 
-      val formWithError = IndividualNameForm.form.withError(field, errorMessage)
+      val formWithError = OtherRelevantIndividualNameForm.form.withError(field, errorMessage)
 
       behavesLikePageWithErrorHandling(
         field = field,
         errorMessage = errorMessage,
         errorDoc = Jsoup.parse(viewTemplate(
           form = formWithError,
-          formAction = formAction
+          formAction = formAction,
+          ordinalKey = "first"
         ).body),
         heading = expectedHeading
       )

@@ -101,15 +101,15 @@ extends ControllerSpec:
 
     val doc: Document = response.parseBodyAsJsoupDocument
 
-    doc.title() shouldBe "Unofficial partners for Test Company Name - Apply for an agent services account - GOV.UK"
-    doc.select("h1").text() shouldBe "Unofficial partners for Test Company Name"
+    doc.title() shouldBe "Other relevant tax advisers for Test Company Name - Apply for an agent services account - GOV.UK"
+    doc.select("h1").text() shouldBe "Other relevant tax advisers for Test Company Name"
     doc.select("main button.govuk-button").eachText().toArray.mkString(" ") shouldBe "Save and continue Save and come back later"
     doc.select("main .govuk-warning-text__text").text() shouldBe ""
 
     doc.select("main form").attr("action") shouldBe
       AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.submit.url
 
-    doc.select("main fieldset legend").text() shouldBe "Are there any more unofficial partners?"
+    doc.select("main fieldset legend").text() shouldBe "Are there any more relevant tax advisers?"
     doc.select("main #addOtherRelevantIndividuals-hint").text() shouldBe
       "We need to know everyone who has material responsibility for how tax advice is carried out, but is not an official partner."
 

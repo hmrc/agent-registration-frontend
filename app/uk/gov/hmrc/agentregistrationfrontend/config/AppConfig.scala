@@ -47,6 +47,7 @@ class AppConfig @Inject() (
     "urls.taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment",
     configuration
   )
+  val guidanceForWhatARelevantTaxAdviserIsUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.govuk-guidance-on-relevant-tax-advisers", configuration)
   val addressLookupFrontendBaseUrl: String = servicesConfig.baseUrl("address-lookup-frontend")
   val agentsExternalStubsBaseUrl: String = servicesConfig.baseUrl("agents-external-stubs")
   val companiesHouseApiProxyBaseUrl: String = servicesConfig.baseUrl("companies-house-api-proxy")
