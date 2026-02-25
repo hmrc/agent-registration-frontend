@@ -70,7 +70,7 @@ extends ControllerSpec:
     AppRoutes.providedetails.NameMatchingController.submit(linkId).url shouldBe
       AppRoutes.providedetails.NameMatchingController.show(linkId).url
 
-  s"GET $path should return 200 and render page when Nino is not provided in HMRC systems" in:
+  s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationStubs.stubFindApplicationByLinkId(
       linkId = linkId,
@@ -85,7 +85,7 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Enter your full name - Apply for an agent services account - GOV.UK"
 
-  s"GET $path should redirect to the contract applicant page when there is no application for the linkId" in:
+  s"GET $path should redirect to the contact applicant page when there is no application for the linkId" in:
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationStubs.stubFindApplicationByLinkIdNoContent(
       linkId = linkId
@@ -100,7 +100,7 @@ extends ControllerSpec:
     response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.genericExitPage.url
 
-  s"POST $path with a agent provided name should send the user to the potential match confirmation page" in:
+  s"POST $path with a matching name should send the user to the potential match confirmation page" in:
     val testIndividualName = "Test Name"
     AuthStubs.stubAuthoriseIndividual()
     AgentRegistrationStubs.stubFindApplicationByLinkId(

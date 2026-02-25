@@ -16,7 +16,9 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
+import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
 class ContactApplicantControllerSpec
 extends ControllerSpec:
@@ -28,3 +30,11 @@ extends ControllerSpec:
       method = "GET",
       url = path
     )
+
+  s"GET $path should return 200 and render the page name matching has failed" in:
+    AuthStubs.stubAuthoriseIndividual()
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe
+      "Name matching has failed contact the applicant - Apply for an agent services account - GOV.UK"

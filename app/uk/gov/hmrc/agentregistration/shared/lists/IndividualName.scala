@@ -25,7 +25,5 @@ final case class IndividualName(
 
   def isValidName: Boolean = value.matches("^[a-zA-Z\\-' ]+$")
 
-  def splitByWhiteSpace: List[String] = value.trim.split("\\s+").toList
-
 object IndividualName:
   given format: Format[IndividualName] = JsonFormatsFactory.makeValueClassFormat
