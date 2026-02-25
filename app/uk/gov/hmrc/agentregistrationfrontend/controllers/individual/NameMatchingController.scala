@@ -17,12 +17,11 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
 import play.api.mvc.*
-import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.forms.individual.NameMatchingForm
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
@@ -84,17 +83,7 @@ extends FrontendController(mcc, actions):
       )
 
 extension (details: List[IndividualProvidedDetails])
-  private def isNamePresent(individualName: IndividualName): Boolean =
-    val nameParts = individualName.splitByWhiteSpace
-    val submittedName = FullName(firstNameFromParts(nameParts), secondNameFromParts(nameParts))
-    details
-      .filter(_.internalUserId.isEmpty)
-      .exists: agentProvidedDetails =>
-        val providedNameParts = agentProvidedDetails.individualName.splitByWhiteSpace
-        val agentProvidedName = FullName(firstNameFromParts(providedNameParts), secondNameFromParts(providedNameParts))
-        agentProvidedName === submittedName
-
-extension (parts: List[String])
-
-  private def firstNameFromParts: String = parts.headOption.map(_.toLowerCase).getOrElse("")
-  private def secondNameFromParts: String = parts.lastOption.map(_.toLowerCase).getOrElse("")
+  private def isNamePresent(name: IndividualName): Boolean = details
+    .filter(_.internalUserId.isEmpty)
+    .exists: agentProvidedDetails =>
+      name === agentProvidedDetails.individualName

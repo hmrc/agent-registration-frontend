@@ -20,21 +20,16 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.ContactApplicantPage
 
 import javax.inject.Inject
 
 class ContactApplicantController @Inject() (
   actions: IndividualActions,
   mcc: MessagesControllerComponents,
-  placeholder: SimplePage
+  contactApplicantPage: ContactApplicantPage
 )
 extends FrontendController(mcc, actions):
 
-  // This a placeholder page for the "contact applicant" page.
-  def show: Action[AnyContent] = action:
-    implicit request =>
-      Ok(placeholder(
-        h1 = "Contact Applicant after failed matching page",
-        bodyText = Some("This is a placeholder for the contact applicant page.")
-      ))
+  def show: Action[AnyContent] = authorised:
+    implicit request => Ok(contactApplicantPage())

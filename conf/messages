@@ -751,3 +751,7 @@ individualNameForSearch.inputText = Enter your full name
 individualNameForSearch.error.required = Enter your full name
 individualNameForSearch.error.invalid = Your full name must only include letters a to z, hyphens, apostrophes and spaces
 individualNameForSearch.error.tooLong = Your full name must be 100 characters or fewer
+
+# Contact Applicant Page
+contactApplicant.title = Name matching has failed contact the applicant
+contactApplicant.p1 = We have been unable to match your name to the name on the application. Contact the applicant.
