@@ -86,6 +86,10 @@ extends FrontendController(mcc, applicantActions):
       case c: CompletedSectionLimitedCompany =>
         authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
           given RequestWithAuth = req
+          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
+      case c: CompletedSectionLimitedPartnership =>
+        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
+          given RequestWithAuth = req
 
           fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
 
@@ -130,6 +134,7 @@ extends FrontendController(mcc, applicantActions):
       case BusinessType.Partnership.LimitedLiabilityPartnership => TestOnlyData.grs.llp.journeyData
       case BusinessType.Partnership.GeneralPartnership => TestOnlyData.grs.generalPartnership.journeyData
       case BusinessType.Partnership.ScottishPartnership => TestOnlyData.grs.scottishPartnership.journeyData
+      case BusinessType.Partnership.LimitedPartnership => TestOnlyData.grs.ltdPartnership.journeyData
       case BusinessType.SoleTrader => TestOnlyData.grs.soleTrader.journeyData
       case BusinessType.LimitedCompany => TestOnlyData.grs.ltd.journeyData
       case _ => throw new IllegalArgumentException(s"Add $bt journey data here")

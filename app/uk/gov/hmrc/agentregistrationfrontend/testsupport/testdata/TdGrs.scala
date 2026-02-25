@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLimitedCompany
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLlp
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsPartnership
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsSoleTrader
 import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
@@ -108,6 +109,31 @@ trait TdGrs {
       val businessDetails: BusinessDetailsLimitedCompany = BusinessDetailsLimitedCompany(
         safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
         ctUtr = journeyData.ctutr.getOrThrowExpectedDataMissing("ctutr"),
+        companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
+      )
+
+    object ltdPartnership:
+
+      val journeyData: JourneyData = JourneyData(
+        fullName = None,
+        dateOfBirth = None,
+        nino = None,
+        trn = None,
+        sautr = Some(dependencies.saUtr),
+        companyProfile = Some(dependencies.companyProfile),
+        ctutr = None,
+        postcode = Some(dependencies.postcode),
+        identifiersMatch = true,
+        registration = Registration(
+          registrationStatus = RegistrationStatus.GrsRegistered,
+          registeredBusinessPartnerId = Some(dependencies.safeId)
+        )
+      )
+
+      val businessDetails: BusinessDetailsPartnership = BusinessDetailsPartnership(
+        safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+        saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("saUtr"),
+        postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode"),
         companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
       )
 
