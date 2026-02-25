@@ -39,7 +39,7 @@ extends ViewSpec:
 
   private val entityName: String = tdAll.companyName
 
-  private val caption: String = "LLP member and tax adviser information"
+  private val caption: String = "LLP members and other tax adviser information"
   private val heading: String = s"Check this list of members for $entityName"
   private val intro: String = s"These are the members listed in Companies House for $entityName:"
   private val question: String = "Is this list of members correct?"

@@ -39,7 +39,7 @@ extends ViewSpec:
   private val entityName: String = tdAll.companyName
   private val companiesHouseOfficersCount: Int = 6
 
-  private val caption: String = "LLP member and tax adviser information"
+  private val caption: String = "LLP members and other tax adviser information"
   private val heading: String = s"Members responsible for tax activities at $entityName"
   private val intro: String = s"There are $companiesHouseOfficersCount people listed in Companies House as members of $entityName."
   private val p1: String = "We need to know how many of these have:"
@@ -64,7 +64,7 @@ extends ViewSpec:
            |$heading
            |$intro
            |$p1
-           |material responsibility for how tax advice is carried out
+           |material responsibility for tax advice activities
            |significant authority over HMRC interactions
            |$question
            |$hint

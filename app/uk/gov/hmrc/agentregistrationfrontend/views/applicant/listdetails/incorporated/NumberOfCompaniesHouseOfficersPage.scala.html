@@ -72,8 +72,8 @@
     </p>
 
     <ul class="govuk-list govuk-list--bullet">
-        <li>@messages("hasOtherRelevantIndividuals.responsibilities.bullet1")</li>
-        <li>@messages("hasOtherRelevantIndividuals.responsibilities.bullet2")</li>
+        <li>@messages(s"$key.responsibilities.bullet1")</li>
+        <li>@messages(s"$key.responsibilities.bullet2")</li>
     </ul>
 
     @formWithCSRF(action = AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitSixOrMore) {

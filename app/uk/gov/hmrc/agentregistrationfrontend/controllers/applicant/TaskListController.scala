@@ -82,8 +82,6 @@ extends FrontendController(mcc, actions):
       val amlsDetailsCompleted = agentApplication.amlsDetails.exists(_.isComplete)
       val agentDetailsIsComplete = agentApplication.agentDetails.exists(_.isComplete)
       val hmrcStandardForAgentsAgreed = agentApplication.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed
-      def listDetailsCompleted(existingList: List[IndividualProvidedDetails]): Boolean = {
-        // TODO WG - interesting to check if Prove is trasitive and we do nto need match in match - check later
       def otherRelevantIndividualsComplete(existingList: List[IndividualProvidedDetails]): Boolean =
         agentApplication.hasOtherRelevantIndividuals match
           case Some(true) => existingList.exists(!_.isPersonOfControl)
@@ -91,19 +89,11 @@ extends FrontendController(mcc, actions):
           case None => false
       def listDetailsCompleted(existingList: List[IndividualProvidedDetails]): Boolean =
         agentApplication match
-          case a: AgentApplication.IsAgentApplicationForKeyIndividuals =>
-            NumberOfIndividuals.isKeyIndividualListComplete(
-              existingList.count(_.isPersonOfControl),
-              a.numberOfIndividuals
-            )
-            && a.hasOtherRelevantIndividuals.isDefined
-          case _: AgentApplication.IsNotAgentApplicationForKeyIndividuals => true
-      }
-
           case a: AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
-            NumberOfRequiredKeyIndividuals.isKeyIndividualListComplete(existingList.count(_.isPersonOfControl), a.numberOfRequiredKeyIndividuals)
+            NumberOfIndividuals.isKeyIndividualListComplete(existingList.count(_.isPersonOfControl), a.numberOfIndividuals)
             && otherRelevantIndividualsComplete(existingList)
           case _ => true
+
       val listProgressComplete = listDetailsCompleted(existingList) && existingList.forall(_.hasFinished)
       // any state other than Precreated indicates the link has been sent; require the list to be non-empty
       val listSharingComplete =

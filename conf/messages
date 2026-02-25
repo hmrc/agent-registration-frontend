@@ -793,6 +793,9 @@ numberOfOfficersResponsibleForTaxMatters.intro.ScottishLimitedPartnership = Ther
 numberOfOfficersResponsibleForTaxMatters.p1.ScottishLimitedPartnership = We need to know how many of these have:
 numberOfOfficersResponsibleForTaxMatters.question.LimitedPartnership = How many partners are responsible for tax advice?
 numberOfOfficersResponsibleForTaxMatters.hint.ScottishLimitedPartnership = Must be a number between 1 and {0}.
+numberOfOfficersResponsibleForTaxMatters.responsibilities.bullet1 = material responsibility for tax advice activities
+numberOfOfficersResponsibleForTaxMatters.responsibilities.bullet2 = significant authority over HMRC interactions
+
 
 # Incorporated: Update Companies House page
 updateCompaniesHousePage.heading = You need to update Companies House

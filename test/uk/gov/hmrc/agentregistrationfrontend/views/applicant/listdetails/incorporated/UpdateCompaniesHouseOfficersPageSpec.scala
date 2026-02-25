@@ -35,7 +35,7 @@ extends ViewSpec:
 
   private val entityName: String = tdAll.companyName
 
-  private val caption: String = "LLP member and tax adviser information"
+  private val caption: String = "LLP members and other tax adviser information"
   private val heading: String = "You need to update Companies House"
 
   private def render(): Document = Jsoup.parse(viewTemplate(
