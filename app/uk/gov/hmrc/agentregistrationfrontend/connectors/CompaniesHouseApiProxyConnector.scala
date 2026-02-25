@@ -17,16 +17,19 @@
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import play.api.libs.functional.syntax.*
+import play.api.libs.json.*
 import uk.gov.hmrc.agentregistration.shared.Crn
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseStatus
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.CompanyHouseStatus
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
+import java.time.LocalDate
 
 @Singleton
 class CompaniesHouseApiProxyConnector @Inject() (
@@ -38,42 +41,40 @@ extends Connector:
   private val baseUrl: String = appConfig.companiesHouseApiProxyBaseUrl
 
   def getCompaniesHouseOfficers(
+    crn: Crn
+  )(using RequestHeader): Future[Seq[CompaniesHouseOfficer]] =
+    val url: URL = url"$baseUrl/companies-house-api-proxy/company/${crn.value}/officers"
+    fetchCompaniesHouseOfficers(url)
+
+  def getCompaniesHouseOfficers(
     crn: Crn,
-    surname: String,
-    isLlp: Boolean = false
-  )(using
-    RequestHeader
-  ): Future[Seq[CompaniesHouseOfficer]] =
+    surname: String
+  )(using RequestHeader): Future[Seq[CompaniesHouseOfficer]] =
+    val url: URL = url"$baseUrl/companies-house-api-proxy/company/${crn.value}/officers?surname=$surname"
+    fetchCompaniesHouseOfficers(url)
 
-    val registerType: String = if isLlp then "llp_members" else "directors"
-    val params: Map[String, Any] = Map(
-      "surname" -> surname,
-      "register_view" -> true,
-      "register_type" -> registerType
-    )
-
-    val url: URL = url"$baseUrl/companies-house-api-proxy/company/${crn.value}/officers?$params"
-
-    http
-      .get(url)
-      .execute[HttpResponse]
-      .map: response =>
-        response.status match
-          case status if is2xx(status) => (response.json \ "items").as[Seq[CompaniesHouseOfficer]]
-          case status =>
-            Errors.throwUpstreamErrorResponse(
-              httpMethod = "GET",
-              url = url,
-              status = status,
-              response = response
-            )
-      .andLogOnFailure(s"Failed to retrieve officers from Companies House for ${crn.value}")
+  private def fetchCompaniesHouseOfficers(
+    url: URL
+  )(using RequestHeader): Future[Seq[CompaniesHouseOfficer]] = http
+    .get(url)
+    .execute[HttpResponse]
+    .map: response =>
+      response.status match
+        case status if is2xx(status) => (response.json \ "items").as[Seq[CompaniesHouseOfficer]]
+        case status =>
+          Errors.throwUpstreamErrorResponse(
+            httpMethod = "GET",
+            url = url,
+            status = status,
+            response = response
+          )
+    .andLogOnFailure(s"Failed to retrieve officers from Companies House for $url")
 
   def getCompanyHouseStatus(
     crn: Crn
   )(implicit
     rh: RequestHeader
-  ): Future[CompanyHouseStatus] =
+  ): Future[CompaniesHouseStatus] =
 
     val url = url"$baseUrl/companies-house-api-proxy/company/${crn.value}"
     http
@@ -81,7 +82,7 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case s if is2xx(s) => (response.json \ "company_status").as[CompanyHouseStatus]
+          case s if is2xx(s) => (response.json \ "company_status").as[CompaniesHouseStatus]
           case status =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "GET",
@@ -94,5 +95,7 @@ extends Connector:
   private given Reads[CompaniesHouseOfficer] =
     (
       (__ \ "name").read[String] and
-        (__ \ "date_of_birth").readNullable[CompaniesHouseDateOfBirth]
+        (__ \ "date_of_birth").readNullable[CompaniesHouseDateOfBirth] and
+        (__ \ "resigned_on").readNullable[LocalDate](Reads.localDateReads("yyyy-MM-dd")) and
+        (__ \ "officer_role").readNullable[CompaniesHouseOfficerRole]
     )(CompaniesHouseOfficer.apply)

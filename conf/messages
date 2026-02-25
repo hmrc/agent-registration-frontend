@@ -751,3 +751,51 @@ individualNameForSearch.error.tooLong = Your full name must be 100 characters or
 # Contact Applicant Page
 contactApplicant.title = Name matching has failed contact the applicant
 contactApplicant.p1 = We have been unable to match your name to the name on the application. Contact the applicant.
+
+# Confirm Companies House officers list (Incorporated)
+isCompaniesHouseOfficersListCorrect.heading.LimitedLiabilityPartnership = Check this list of members for {0}
+isCompaniesHouseOfficersListCorrect.intro.LimitedLiabilityPartnership = These are the members listed in Companies House for {0}:
+isCompaniesHouseOfficersListCorrect.question.LimitedLiabilityPartnership = Is this list of members correct?
+
+isCompaniesHouseOfficersListCorrect.heading.LimitedCompany = Check this list of directors for {0}
+isCompaniesHouseOfficersListCorrect.intro.LimitedCompany = These are the directors listed in Companies House for {0}:
+isCompaniesHouseOfficersListCorrect.question.LimitedCompany = Is this list of directors correct?
+
+isCompaniesHouseOfficersListCorrect.heading.LimitedPartnership = Check this list of partners for {0}
+isCompaniesHouseOfficersListCorrect.intro.LimitedPartnership = These are the partners listed in Companies House for {0}:
+isCompaniesHouseOfficersListCorrect.question.LimitedPartnership = Is this list of partners correct?
+
+isCompaniesHouseOfficersListCorrect.heading.ScottishLimitedPartnership = Check this list of partners for {0}
+isCompaniesHouseOfficersListCorrect.intro.ScottishLimitedPartnership = These are the partners listed in Companies House for {0}:
+isCompaniesHouseOfficersListCorrect.question.ScottishLimitedPartnership = Is this list of partners correct?
+
+# Incorporated: when Companies House returns 6+ officers/members/directors, ask how many are responsible for tax matters
+numberOfOfficersResponsibleForTaxMatters.title.LimitedLiabilityPartnership = Members responsible for tax activities at {0}
+numberOfOfficersResponsibleForTaxMatters.intro.LimitedLiabilityPartnership = There are {0} people listed in Companies House as members of {1}.
+numberOfOfficersResponsibleForTaxMatters.p1.LimitedLiabilityPartnership = We need to know how many of these have:
+numberOfOfficersResponsibleForTaxMatters.question.LimitedLiabilityPartnership = How many members are responsible for tax advice?
+numberOfOfficersResponsibleForTaxMatters.hint.LimitedLiabilityPartnership = Must be a number between 1 and {0}.
+
+numberOfOfficersResponsibleForTaxMatters.title.LimitedCompany = Directors responsible for tax activities at {0}
+numberOfOfficersResponsibleForTaxMatters.intro.LimitedCompany = There are {0} people listed in Companies House as directors of {1}.
+numberOfOfficersResponsibleForTaxMatters.p1.LimitedCompany = We need to know how many of these have:
+numberOfOfficersResponsibleForTaxMatters.question.LimitedCompany = How many directors are responsible for tax advice?
+numberOfOfficersResponsibleForTaxMatters.hint.LimitedCompany = Must be a number between 1 and {0}.
+
+numberOfOfficersResponsibleForTaxMatters.title.LimitedPartnership = Partners responsible for tax activities at {0}
+numberOfOfficersResponsibleForTaxMatters.intro.LimitedPartnership = There are {0} people listed in Companies House as partners of {1}.
+numberOfOfficersResponsibleForTaxMatters.p1.LimitedPartnership = We need to know how many of these have:
+numberOfOfficersResponsibleForTaxMatters.question.LimitedPartnership = How many partners are responsible for tax advice?
+numberOfOfficersResponsibleForTaxMatters.hint.LimitedPartnership = Must be a number between 1 and {0}.
+
+numberOfOfficersResponsibleForTaxMatters.title.ScottishLimitedPartnership = Partners responsible for tax activities at {0}
+numberOfOfficersResponsibleForTaxMatters.intro.ScottishLimitedPartnership = There are {0} people listed in Companies House as partners of {1}.
+numberOfOfficersResponsibleForTaxMatters.p1.ScottishLimitedPartnership = We need to know how many of these have:
+numberOfOfficersResponsibleForTaxMatters.question.LimitedPartnership = How many partners are responsible for tax advice?
+numberOfOfficersResponsibleForTaxMatters.hint.ScottishLimitedPartnership = Must be a number between 1 and {0}.
+
+# Incorporated: Update Companies House page
+updateCompaniesHousePage.heading = You need to update Companies House
+updateCompaniesHousePage.p1 = As part of this application process, we need a verifiable list of the current members of {0}.
+updateCompaniesHousePage.p2 = Update your Companies House so the correct details are showing on their website.
+updateCompaniesHousePage.p3 = You can then continue with your application for an agent services account.

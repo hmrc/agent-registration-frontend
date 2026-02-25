@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.hasCheckPassed
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
-import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfIndividuals
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
@@ -82,6 +82,8 @@ extends FrontendController(mcc, actions):
       val amlsDetailsCompleted = agentApplication.amlsDetails.exists(_.isComplete)
       val agentDetailsIsComplete = agentApplication.agentDetails.exists(_.isComplete)
       val hmrcStandardForAgentsAgreed = agentApplication.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed
+      def listDetailsCompleted(existingList: List[IndividualProvidedDetails]): Boolean = {
+        // TODO WG - interesting to check if Prove is trasitive and we do nto need match in match - check later
       def otherRelevantIndividualsComplete(existingList: List[IndividualProvidedDetails]): Boolean =
         agentApplication.hasOtherRelevantIndividuals match
           case Some(true) => existingList.exists(!_.isPersonOfControl)
@@ -89,6 +91,15 @@ extends FrontendController(mcc, actions):
           case None => false
       def listDetailsCompleted(existingList: List[IndividualProvidedDetails]): Boolean =
         agentApplication match
+          case a: AgentApplication.IsAgentApplicationForKeyIndividuals =>
+            NumberOfIndividuals.isKeyIndividualListComplete(
+              existingList.count(_.isPersonOfControl),
+              a.numberOfIndividuals
+            )
+            && a.hasOtherRelevantIndividuals.isDefined
+          case _: AgentApplication.IsNotAgentApplicationForKeyIndividuals => true
+      }
+
           case a: AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
             NumberOfRequiredKeyIndividuals.isKeyIndividualListComplete(existingList.count(_.isPersonOfControl), a.numberOfRequiredKeyIndividuals)
             && otherRelevantIndividualsComplete(existingList)

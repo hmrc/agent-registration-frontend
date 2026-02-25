@@ -28,6 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.applicantcont
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.agentdetails.routes as agentdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.routes as listdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.routes as listdetailsNonIncorporatedRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.incorporated.routes as listdetailsIncorporatedRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.routes as listdetailsOthersRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.link.routes as listdetailsLinkRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.progress.routes as listdetailsProgressRoutes
@@ -108,6 +109,11 @@ object AppRoutes:
         val ChangeOtherRelevantIndividualController = listdetailsOthersRoutes.ChangeOtherRelevantIndividualController
         val RemoveOtherRelevantIndividualController = listdetailsOthersRoutes.RemoveOtherRelevantIndividualController
         val CheckYourAnswersController = listdetailsOthersRoutes.CheckYourAnswersController
+
+      object incoporated:
+
+        val CompaniesHouseOfficersController = listdetailsIncorporatedRoutes.CompaniesHouseOfficersController
+        val CheckYourAnswersController = listdetailsIncorporatedRoutes.CheckYourAnswersController
 
       object link:
 

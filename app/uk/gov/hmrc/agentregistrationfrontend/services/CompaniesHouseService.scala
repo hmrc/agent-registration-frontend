@@ -19,35 +19,39 @@ package uk.gov.hmrc.agentregistrationfrontend.services
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CompaniesHouseApiProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
 class CompaniesHouseService @Inject() (
   companiesHouseApiProxyConnector: CompaniesHouseApiProxyConnector
-)
+)(using ExecutionContext)
 extends RequestAwareLogging:
 
-  def getCompaniesHouseOfficers(
+  def getActiveOfficers(
+    companyRegistrationNumber: Crn,
+    expectedRole: CompaniesHouseOfficerRole
+  )(using request: RequestHeader): Future[Seq[CompaniesHouseOfficer]] = companiesHouseApiProxyConnector
+    .getCompaniesHouseOfficers(companyRegistrationNumber)
+    .map(_.filter(isActiveOfficers(_, expectedRole)))
+
+  def getActiveOfficers(
     companyRegistrationNumber: Crn,
     lastName: String,
-    isLlp: Boolean = false
+    expectedRole: CompaniesHouseOfficerRole
   )(using request: RequestHeader): Future[Seq[CompaniesHouseOfficer]] = companiesHouseApiProxyConnector
-    .getCompaniesHouseOfficers(
-      crn = companyRegistrationNumber,
-      surname = lastName,
-      isLlp = isLlp
-    )
+    .getCompaniesHouseOfficers(companyRegistrationNumber, lastName)
+    .map(_.filter(isActiveOfficers(_, expectedRole)))
 
-  def getLlpOfficers(
-    companyRegistrationNumber: Crn,
-    lastName: String
-  )(using request: RequestHeader): Future[Seq[CompaniesHouseOfficer]] = getCompaniesHouseOfficers(
-    companyRegistrationNumber = companyRegistrationNumber,
-    lastName = lastName,
-    isLlp = true
-  )
+  private def isActiveOfficers(
+    officer: CompaniesHouseOfficer,
+    expectedRole: CompaniesHouseOfficerRole
+  ): Boolean =
+    officer.resignedOn.isEmpty &&
+      officer.officerRole.contains(expectedRole)
