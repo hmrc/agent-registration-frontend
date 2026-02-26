@@ -36,7 +36,7 @@ extends RequestAwareLogging:
 
   def getActiveOfficers(
     companyRegistrationNumber: Crn,
-    expectedRole: CompaniesHouseOfficerRole
+    expectedRole: Set[CompaniesHouseOfficerRole]
   )(using request: RequestHeader): Future[Seq[CompaniesHouseOfficer]] = companiesHouseApiProxyConnector
     .getCompaniesHouseOfficers(companyRegistrationNumber)
     .map(_.filter(isActiveOfficers(_, expectedRole)))
@@ -44,14 +44,14 @@ extends RequestAwareLogging:
   def getActiveOfficers(
     companyRegistrationNumber: Crn,
     lastName: String,
-    expectedRole: CompaniesHouseOfficerRole
+    expectedRole: Set[CompaniesHouseOfficerRole]
   )(using request: RequestHeader): Future[Seq[CompaniesHouseOfficer]] = companiesHouseApiProxyConnector
     .getCompaniesHouseOfficers(companyRegistrationNumber, lastName)
     .map(_.filter(isActiveOfficers(_, expectedRole)))
 
   private def isActiveOfficers(
     officer: CompaniesHouseOfficer,
-    expectedRole: CompaniesHouseOfficerRole
+    expectedRole: Set[CompaniesHouseOfficerRole]
   ): Boolean =
     officer.resignedOn.isEmpty &&
-      officer.officerRole.contains(expectedRole)
+      officer.officerRole.exists(expectedRole.contains)

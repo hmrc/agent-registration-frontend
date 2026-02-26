@@ -47,38 +47,38 @@ object CompaniesHouseStubs {
           Json.obj(
             "name" -> "Tester, John",
             "date_of_birth" -> Json.obj("month" -> 8, "year" -> 1967),
-            "officer_role" -> officerRole.value
+            "officer_role" -> officerRole.role
           ),
           Json.obj(
             "name" -> "Tester, John Ian",
             "date_of_birth" -> Json.obj("month" -> 4, "year" -> 1948),
-            "officer_role" -> officerRole.value
+            "officer_role" -> officerRole.role
           ),
           Json.obj(
             "name" -> "Tester, Alice",
             "date_of_birth" -> Json.obj("month" -> 1, "year" -> 1975),
-            "officer_role" -> officerRole.value
+            "officer_role" -> officerRole.role
           ),
           Json.obj(
             "name" -> "Tester, Bob",
             "date_of_birth" -> Json.obj("month" -> 12, "year" -> 1982),
-            "officer_role" -> officerRole.value
+            "officer_role" -> officerRole.role
           ),
           Json.obj(
             "name" -> "Tester, Carol",
             "date_of_birth" -> Json.obj("month" -> 6, "year" -> 1991),
-            "officer_role" -> officerRole.value
+            "officer_role" -> officerRole.role
           ),
           Json.obj(
             "name" -> "Tester, Carol",
             "date_of_birth" -> Json.obj("month" -> 6, "year" -> 1991),
-            "officer_role" -> officerRole.value
+            "officer_role" -> officerRole.role
           ),
           Json.obj(
             "name" -> "Tester, Dave (Resigned)",
             "date_of_birth" -> Json.obj("month" -> 2, "year" -> 1980),
             "resigned_on" -> "2024-01-01",
-            "officer_role" -> officerRole.value
+            "officer_role" -> officerRole.role
           )
         )
       ).toString
@@ -107,7 +107,7 @@ object CompaniesHouseStubs {
               "month" -> 11,
               "year" -> 1990
             ),
-            "officer_role" -> officerRole.value
+            "officer_role" -> officerRole.role
           )
         )
       ).toString
@@ -130,13 +130,13 @@ object CompaniesHouseStubs {
               "month" -> 11,
               "year" -> 1990
             ),
-            "officer_role" -> officerRole.value
+            "officer_role" -> officerRole.role
           ),
           Json.obj(
             "name" -> s"Resigned Alt $name",
             "date_of_birth" -> Json.obj("month" -> 2, "year" -> 1980),
             "resigned_on" -> "2024-01-01",
-            "officer_role" -> officerRole.value
+            "officer_role" -> officerRole.role
           )
         )
       ).toString
