@@ -89,7 +89,7 @@ trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdSectionAmls & TdS
     )
 
     val afterDeclarationSubmitted: AgentApplicationSoleTrader = afterHmrcStandardForAgentsAgreed.copy(
-      applicationState = ApplicationState.Submitted
+      applicationState = ApplicationState.SentForRisking
     )
 
 }

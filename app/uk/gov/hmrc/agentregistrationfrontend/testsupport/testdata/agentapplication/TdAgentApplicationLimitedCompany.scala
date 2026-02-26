@@ -99,7 +99,7 @@ trait TdAgentApplicationLimitedCompany { dependencies: (TdBase & TdSectionAmls &
     )
 
     val afterDeclarationSubmitted: AgentApplicationLimitedCompany = afterHmrcStandardForAgentsAgreed.copy(
-      applicationState = ApplicationState.Submitted
+      applicationState = ApplicationState.SentForRisking
     )
 
     val baseForSectionAmls: AgentApplicationLimitedCompany = afterGrsDataReceived

@@ -100,7 +100,7 @@ trait TdAgentApplicationLimitedPartnership {
     )
 
     val afterDeclarationSubmitted: AgentApplicationLimitedPartnership = afterHmrcStandardForAgentsAgreed.copy(
-      applicationState = ApplicationState.Submitted
+      applicationState = ApplicationState.SentForRisking
     )
 
     val baseForSectionAmls: AgentApplicationLimitedPartnership = afterGrsDataReceived
