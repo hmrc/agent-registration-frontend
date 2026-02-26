@@ -32,6 +32,25 @@ you may also need to initialise an internal auth token used for object-store tra
 ./setup-object-store.sh
 ```
 
+## Using the GRS stub and company numbers
+
+We have a stub (which is configured to be on in localhost by default) for the GRS service which allows us to specify 
+outcome data including Company Registration Numbers for incorporated business types. If we want to access predefined 
+company officer lists we can use company numbers from the following table:
+
+| Company Type                  | Number of active officers | Company Number |
+|-------------------------------|---------------------------|----------------|
+| Limited Company               | 2                         | 11111111       |
+| Limited Company               | 6                         | 11111116       |
+| Limited Liability Partnership | 2                         | 22222222       |
+| Limited Liability Partnership | 6                         | 22222226       |
+| Limited Partnership               | 2                         | 33333333       |
+| Limited Partnership               | 6                         | 33333336       |
+| Scottish Limited Partnership               | 2                         | 44444444       |
+| Scottish Limited Partnership               | 6                         | 44444446       |
+
+
+
 # Project Setup in IntelliJ
 
 When importing a project into IntelliJ IDEA, it is recommended to configure your setup as follows to optimize the development process:
