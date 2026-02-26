@@ -15,47 +15,45 @@
  *@
 
 @import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
-@import uk.gov.hmrc.agentregistrationfrontend.forms.OtherRelevantIndividualNameForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
+@import uk.gov.hmrc.govukfrontend.views.html.components.ErrorSummary
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
+@import uk.gov.hmrc.agentregistration.shared.LinkId
 
 @this(
         layout: Layout,
         govukInput: GovukInput,
         formWithCSRF: FormWithCSRF,
         govukButton: GovukButton,
-        continueOrSaveForLater: ContinueOrSaveForLater
+        govukErrorSummary: GovukErrorSummary
 )
 
-@(
-        form: Form[IndividualName],
-        formAction: Call,
-        ordinalKey: String
-)(implicit
+@(form: Form[IndividualName],
+        linkId: LinkId)(implicit
         request: RequestHeader,
         messages: Messages
 )
 
 @key = @{
-  OtherRelevantIndividualNameForm.key
+    "individualNameForSearch"
 }
-@title = @{messages(s"$key.label.$ordinalKey")}
 
-@layout(
-    pageTitle = title,
-    maybeForm = Some(form)
-) {
-    <h2 class="govuk-caption-l">@messages(s"lists.caption.title.Partnership")</h2>
-    @formWithCSRF(action = formAction) {
+@title = @{messages(s"$key.title")}
+
+@layout(pageTitle = title, maybeForm = Some(form) ,suppressBackLink = true) {
+
+    @formWithCSRF(action = AppRoutes.providedetails.NameMatchingController.submit(linkId)) {
         @govukInput(Input(
             label = Label(
-              content = Text(title),
-              isPageHeading = true,
-              classes = "govuk-label--l"
-            )
+                content = Text(title),
+                isPageHeading = true,
+                classes = "govuk-label--l"
+            ),
+            autocomplete = Some("name")
         ).withFormField(form(key)))
 
-        @continueOrSaveForLater()
+        @govukButton(Button(
+            content = Text(messages("common.continue"))
+        ))
     }
 }

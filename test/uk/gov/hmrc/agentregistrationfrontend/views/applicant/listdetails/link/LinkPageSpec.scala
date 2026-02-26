@@ -41,7 +41,7 @@ extends ViewSpec:
     "have expected content" in:
       doc.mainContent shouldContainContent
         s"""
-           |Partner and tax adviser information
+           |Partners and other relevant tax advisers
            |Share this link with everyone on the list
            |The people on your list need to sign in and provide their details to HMRC.
            |Share this link with them:

@@ -18,11 +18,13 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.RemoveKeyIndividualForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
 class RemoveOtherRelevantIndividualControllerSpec
 extends ControllerSpec:
@@ -42,6 +44,11 @@ extends ControllerSpec:
       tdAll
         .agentApplicationSoleTrader
         .afterGrsDataReceived
+
+  val listOfTwoIndividualProvidedDetails: List[IndividualProvidedDetails] = List(
+    tdAll.individualProvidedDetails.copy(isPersonOfControl = false),
+    tdAll.individualProvidedDetails2.copy(isPersonOfControl = false)
+  )
 
   "routes should have correct paths and methods" in:
     AppRoutes.apply.listdetails.otherrelevantindividuals.RemoveOtherRelevantIndividualController
@@ -72,7 +79,10 @@ extends ControllerSpec:
 
   s"POST $path should redirect to task list when application is a sole trader" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.soleTraderInProgress)
-
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.soleTraderInProgress.agentApplicationId,
+      individuals = listOfTwoIndividualProvidedDetails
+    )
     val response: WSResponse =
       post(path)(Map(
         RemoveKeyIndividualForm.key -> Seq("Yes")
@@ -84,8 +94,9 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page for removing selected unofficial partner" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
-    AgentRegistrationStubs.stubFindIndividualForApplication(
-      individual = tdAll.individualProvidedDetails
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterHowManyKeyIndividuals.agentApplicationId,
+      individuals = listOfTwoIndividualProvidedDetails
     )
 
     val response: WSResponse = get(path)
@@ -97,8 +108,9 @@ extends ControllerSpec:
 
   s"POST $path with blank inputs should return 400" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
-    AgentRegistrationStubs.stubFindIndividualForApplication(
-      individual = tdAll.individualProvidedDetails
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterHowManyKeyIndividuals.agentApplicationId,
+      individuals = listOfTwoIndividualProvidedDetails
     )
 
     val response: WSResponse = post(path)(Map.empty)
@@ -109,4 +121,36 @@ extends ControllerSpec:
     doc.mainContent.select(
       s"#${RemoveKeyIndividualForm.key}-error"
     ).text() shouldBe "Error: Select yes if you want to remove Test Name from the list of partners"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+
+  s"POST $path with valid inputs should redirect to check your answers page when there are more than 1 other relevant individuals in the list before deletion" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterHowManyKeyIndividuals.agentApplicationId,
+      individuals = listOfTwoIndividualProvidedDetails
+    )
+    AgentRegistrationIndividualProvidedDetailsStubs.stubDeleteIndividualProvidedDetails(individualProvidedDetailsId)
+
+    val response: WSResponse =
+      post(path)(Map(
+        RemoveKeyIndividualForm.key -> Seq("Yes")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+
+  s"POST $path with valid inputs should redirect to confirm other relevant individuals page when there is only 1 other relevant individual in the list before deletion" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterHowManyKeyIndividuals.agentApplicationId,
+      individuals = List(tdAll.individualProvidedDetails.copy(isPersonOfControl = false))
+    )
+    AgentRegistrationIndividualProvidedDetailsStubs.stubDeleteIndividualProvidedDetails(individualProvidedDetailsId)
+    val response: WSResponse =
+      post(path)(Map(
+        RemoveKeyIndividualForm.key -> Seq("Yes")
+      ))
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()

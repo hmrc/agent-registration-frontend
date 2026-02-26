@@ -25,8 +25,9 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.OtherRelevantIndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.util.MessageKeys
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.otherrelevantindividuals.EnterIndividualNamePage
 
 import javax.inject.Inject
@@ -65,27 +66,39 @@ extends FrontendController(mcc, actions):
         individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
           request.add[List[IndividualProvidedDetails]](individualsList)
 
-  // TODO: extract logic of choosing view and rendering it based on NumberOfRequiredKeyIndividuals, Form[] and businessPartnerRecord
-
   def show: Action[AnyContent] = baseAction
     .async:
       implicit request: RequestWithData[DataWithList] =>
         val formAction: Call = AppRoutes.apply.listdetails.otherrelevantindividuals.EnterOtherRelevantIndividualController.submit
         Future.successful(Ok(enterIndividualNameSimplePage(
-          form = IndividualNameForm.form,
-          formAction = formAction
+          form = OtherRelevantIndividualNameForm.form,
+          formAction = formAction,
+          ordinalKey = MessageKeys.ordinalKey(
+            existingSize =
+              request.get[List[IndividualProvidedDetails]]
+                .filterNot(_.isPersonOfControl)
+                .size,
+            isOnlyOne = false
+          )
         )))
 
   def submit: Action[AnyContent] = baseAction
     .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
-      form = IndividualNameForm.form,
+      form = OtherRelevantIndividualNameForm.form,
       resultToServeWhenFormHasErrors =
         implicit request =>
           (formWithErrors: Form[IndividualName]) =>
             val formAction: Call = AppRoutes.apply.listdetails.otherrelevantindividuals.EnterOtherRelevantIndividualController.submit
             Future.successful(BadRequest(enterIndividualNameSimplePage(
               form = formWithErrors,
-              formAction = formAction
+              formAction = formAction,
+              ordinalKey = MessageKeys.ordinalKey(
+                existingSize =
+                  request.get[List[IndividualProvidedDetails]]
+                    .filterNot(_.isPersonOfControl)
+                    .size,
+                isOnlyOne = false
+              )
             )))
     )
     .async:

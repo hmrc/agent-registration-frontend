@@ -1,0 +1,40 @@
+/*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
+
+import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
+
+class ContactApplicantControllerSpec
+extends ControllerSpec:
+
+  private val path = s"/agent-registration/provide-details/contact-applicant"
+
+  "NameMatchingController should have the correct routes" in:
+    AppRoutes.providedetails.ContactApplicantController.show shouldBe Call(
+      method = "GET",
+      url = path
+    )
+
+  s"GET $path should return 200 and render the page name matching has failed" in:
+    AuthStubs.stubAuthoriseIndividual()
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe
+      "Name matching has failed contact the applicant - Apply for an agent services account - GOV.UK"

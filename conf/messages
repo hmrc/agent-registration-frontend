@@ -310,9 +310,9 @@ amlsCheckYourAnswers.evidence.label = Evidence of anti-money laundering supervis
 amlsCheckYourAnswers.change = Change
 
 # Lists
-lists.caption.title.Partnership = Partner and tax adviser information
-lists.caption.title.LimitedCompany = Director and tax adviser information
-lists.caption.title.LimitedLiabilityPartnership = LLP member and tax adviser information
+lists.caption.title.Partnership = Partners and other relevant tax advisers
+lists.caption.title.LimitedCompany = Directors and other tax adviser information
+lists.caption.title.LimitedLiabilityPartnership = LLP members and other tax adviser information
 lists.caption.title.SoleTrader = Business owner information
 
 numberOfKeyIndividuals.title.Partnership = How many partners are there at {0}?
@@ -372,44 +372,40 @@ addToListSummary.Partnership.complex.bullet2.singular = 1 other partner
 
 
 # Lists of other relevant individuals ("unofficial" directors/partners/members)
-individualName.label.otherRelevantIndividuals = What is the full name of an unofficial partner?
+otherRelevantIndividualName.label.first = What is the full name of the first person?
+otherRelevantIndividualName.label.subsequent = What is the full name of the next person?
+otherRelevantIndividualName.label.change = What is the full name of the person?
+otherRelevantIndividualName.error.required = Enter the full name of the person
+otherRelevantIndividualName.error.invalid = The person’s name must only include letters a to z, hyphens, apostrophes and spaces
 
-hasOtherRelevantIndividuals.title.Partnership = Are there any other relevant individuals at {0}?
-hasOtherRelevantIndividuals.title.LimitedCompany = Are there any other relevant individuals at {0}?
-hasOtherRelevantIndividuals.title.LimitedLiabilityPartnership = Are there any other relevant individuals at {0}?
-hasOtherRelevantIndividuals.title.SoleTrader = Are there any other relevant individuals at {0}?
+hasOtherRelevantIndividuals.title.Partnership = Are there any other relevant tax advisers at {0}?
+hasOtherRelevantIndividuals.title.LimitedCompany = Are there any other relevant ax advisers at {0}?
+hasOtherRelevantIndividuals.title.LimitedLiabilityPartnership = Are there any other relevant ax advisers at {0}?
+hasOtherRelevantIndividuals.title.SoleTrader = Are there any other relevant tax advisers at {0}?
 
-hasOtherRelevantIndividuals.heading.Partnership = Unofficial partners
-hasOtherRelevantIndividuals.intro.Partnership = We now need to know about anyone who is not an official partner of {0}, but who has:
-hasOtherRelevantIndividuals.responsibilities.bullet1 = material responsibility for how tax advice is carried out
-hasOtherRelevantIndividuals.responsibilities.bullet2 = significant authority over HMRC interactions
+hasOtherRelevantIndividuals.heading = Other people we need to know about
+hasOtherRelevantIndividuals.p1 = We also need to know about other relevant tax advisers.
+hasOtherRelevantIndividuals.p2.Partnership = This means anyone responsible for tax advice at {0}, who is not an official partner.
+hasOtherRelevantIndividuals.p2.LimitedCompany = This means anyone responsible for tax advice at {0}, who is not an official director.
+hasOtherRelevantIndividuals.p2.LimitedLiabilityPartnership = This means anyone responsible for tax advice at {0}, who is not an official director.
+hasOtherRelevantIndividuals.guidanceLink = Read the guidance about how HMRC defines ‘relevant tax advisers’
+hasOtherRelevantIndividuals.label = Does {0} have any other relevant tax advisers?
 
-hasOtherRelevantIndividuals.definition.heading.Partnership = How we define unofficial partners
-hasOtherRelevantIndividuals.definition.p1.Partnership = Unofficial partners are people who act as if they are partners, but do not have that title. They are sometimes called 'shadow partners'.
-hasOtherRelevantIndividuals.definition.p2.Partnership = They can be:
-hasOtherRelevantIndividuals.definition.canBe.Partnership =
+hasOtherRelevantIndividuals.error.required = Select yes if there are any other relevant tax advisers
+hasOtherRelevantIndividuals.error.invalid = Select yes if there are any other relevant tax advisers
 
-hasOtherRelevantIndividuals.definition.bullet1.Partnership = senior managers in the partnership
-hasOtherRelevantIndividuals.definition.bullet2.Partnership = external tax consultants or advisers
-hasOtherRelevantIndividuals.definition.bullet3.Partnership = anyone else who makes tax decisions at partnership level
-
-hasOtherRelevantIndividuals.question.Partnership = Does {0} have any unofficial partners?
-
-hasOtherRelevantIndividuals.error.required = Select yes if there are any other relevant individuals
-hasOtherRelevantIndividuals.error.invalid = Select yes if there are any other relevant individuals
-
-addToListSummary.relevant.individuals.title = Unofficial partners for {0}
-addToListSummary.relevant.individuals.caption = Partner and tax adviser information
-addToListSummary.relevant.individuals.more.question = Are there any more unofficial partners?
+addToListSummary.relevant.individuals.title = Other relevant tax advisers for {0}
+addToListSummary.relevant.individuals.caption = Partners and relevant tax adviser information
+addToListSummary.relevant.individuals.more.question = Are there any more relevant tax advisers?
 addToListSummary.relevant.individuals.more.hint = We need to know everyone who has material responsibility for how tax advice is carried out, but is not an official partner.
-addToListSummary.relevant.individuals.more.error.required = Select yes if there are more unofficial partners
-addToListSummary.relevant.individuals.more.error.invalid = Select yes if there are more unofficial partners
+addToListSummary.relevant.individuals.more.error.required = Select yes if there are more relevant tax advisers
+addToListSummary.relevant.individuals.more.error.invalid = Select yes if there are more relevant tax advisers
 
 listDetailsCheckYourAnswers.title = Check your answers
 listDetailsCheckYourAnswers.numberOfPartners.label = Number of partners
 listDetailsCheckYourAnswers.partnerNames.label = Partner names
-listDetailsCheckYourAnswers.hasOtherRelevantIndividuals.label = Unofficial partners
-listDetailsCheckYourAnswers.otherRelevantIndividualsNames.label = Unofficial partner name
+listDetailsCheckYourAnswers.hasOtherRelevantIndividuals.label = Other relevant tax advisers
+listDetailsCheckYourAnswers.otherRelevantIndividualsNames.label = Other relevant tax adviser names
 
 
 
@@ -560,9 +556,9 @@ taskList.hmrcStandards.heading = Meet the HMRC standard for agents
 taskList.hmrcStandards.amls.linkText = Anti-money laundering supervision details
 taskList.hmrcStandards.agreement.linkText = HMRC standard for agents
 taskList.lists.heading = Other people who need to support this application
-taskList.lists.details.linkText.Partnership = Partner and tax adviser information
-taskList.lists.details.linkText.LimitedCompany = Director and tax adviser information
-taskList.lists.details.linkText.LimitedLiabilityPartnership = LLP member and tax adviser information
+taskList.lists.details.linkText.Partnership = Partners and other relevant tax advisers
+taskList.lists.details.linkText.LimitedCompany = Directors and other relevant tax advisers
+taskList.lists.details.linkText.LimitedLiabilityPartnership = LLP members and other relevant tax advisers
 taskList.lists.share.linkText.Partnership = Ask the partners and tax advisers to sign in
 taskList.lists.share.linkText.LimitedCompany = Ask the directors and tax advisers to sign in
 taskList.lists.share.linkText.LimitedLiabilityPartnership = Ask the LLP members and tax advisers to sign in
@@ -744,3 +740,14 @@ confirmMatchToIndividualProvidedDetails.yes = Yes, these details are correct
 confirmMatchToIndividualProvidedDetails.no = No
 confirmMatchToIndividualProvidedDetails.error.required = Select yes if these details are correct
 confirmMatchToIndividualProvidedDetails.error.invalid = Select yes if these details are correct
+
+# Individual name lookup
+individualNameForSearch.title = Enter your full name
+individualNameForSearch.inputText = Enter your full name
+individualNameForSearch.error.required = Enter your full name
+individualNameForSearch.error.invalid = Your full name must only include letters a to z, hyphens, apostrophes and spaces
+individualNameForSearch.error.tooLong = Your full name must be 100 characters or fewer
+
+# Contact Applicant Page
+contactApplicant.title = Name matching has failed contact the applicant
+contactApplicant.p1 = We have been unable to match your name to the name on the application. Contact the applicant.

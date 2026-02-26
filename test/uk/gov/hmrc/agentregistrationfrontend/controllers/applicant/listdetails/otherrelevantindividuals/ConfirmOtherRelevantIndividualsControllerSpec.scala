@@ -29,7 +29,7 @@ extends ControllerSpec:
 
   private val path = "/agent-registration/apply/list-details/how-many-other-individuals"
 
-  private val heading = "Unofficial partners"
+  private val heading = "Other people we need to know about"
 
   object agentApplication:
 
@@ -133,7 +133,7 @@ extends ControllerSpec:
     doc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
     doc.mainContent
       .select(s"#${ConfirmOtherRelevantIndividualsForm.hasOtherRelevantIndividuals}-error")
-      .text() shouldBe "Error: Select yes if there are any other relevant individuals"
+      .text() shouldBe "Error: Select yes if there are any other relevant tax advisers"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeConfirmOtherRelevantIndividuals.agentApplicationId)
 

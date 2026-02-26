@@ -26,6 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AgentRegistrationIndividualProvidedDetailsStubs {
@@ -46,6 +47,13 @@ object AgentRegistrationIndividualProvidedDetailsStubs {
     urlPattern = urlMatching(s"$base/for-application/${agentApplicationId.value}"),
     responseStatus = Status.OK,
     responseBody = "[]"
+  )
+
+  def stubDeleteIndividualProvidedDetails(individualProvidedDetailsId: IndividualProvidedDetailsId): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.DELETE,
+    urlPattern = urlMatching(s"/agent-registration/individual-provided-details/delete-by-id/${individualProvidedDetailsId.value}"),
+    responseStatus = Status.OK,
+    responseBody = ""
   )
 
   def stubFindAllIndividualProvidedDetails(
