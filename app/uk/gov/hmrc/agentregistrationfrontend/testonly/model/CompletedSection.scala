@@ -405,6 +405,80 @@ object CompletedSection:
 
     val values: Seq[CompletedSectionLimitedPartnership] = SealedObjects.all[CompletedSectionLimitedPartnership]
 
+  sealed trait CompletedSectionScottishLimitedPartnership
+  extends CompletedSection:
+    override def businessType: BusinessType = BusinessType.Partnership.ScottishLimitedPartnership
+
+  object CompletedSectionScottishLimitedPartnership:
+
+    case object ScottishLimitedPartnershipAboutYourBusiness
+    extends CompletedSectionScottishLimitedPartnership:
+
+      override def sectionName: String = "About your business"
+
+      override def alreadyDeveloped: Boolean = true
+
+      override def displayOrder: Int = 1
+
+      override def appState: AgentApplication = TestOnlyData.agentApplicationScottishLimitedPartnership.afterRefusalToDealWithCheckPass
+
+    case object ScottishLimitedPartnershipApplicantContactDetails
+    extends CompletedSectionScottishLimitedPartnership:
+
+      override def sectionName: String = "Applicant Contact Details"
+
+      override def alreadyDeveloped: Boolean = true
+
+      override def displayOrder: Int = 2
+
+      override def appState: AgentApplication = TestOnlyData.agentApplicationScottishLimitedPartnership.afterContactDetailsComplete
+
+    case object ScottishLimitedPartnershipAgentServicesAccountDetails
+    extends CompletedSectionScottishLimitedPartnership:
+
+      override def sectionName: String = "Agent services account details"
+
+      override def alreadyDeveloped: Boolean = true
+
+      override def displayOrder: Int = 3
+
+      override def appState: AgentApplication = TestOnlyData.agentApplicationScottishLimitedPartnership.afterAgentDetailsComplete
+
+    case object ScottishLimitedPartnershipAntiMoneyLaunderingSupervisionDetails
+    extends CompletedSectionScottishLimitedPartnership:
+
+      override def sectionName: String = "Anti-money laundering supervision details"
+
+      override def alreadyDeveloped: Boolean = true
+
+      override def displayOrder: Int = 4
+
+      override def appState: AgentApplication = TestOnlyData.agentApplicationScottishLimitedPartnership.afterAmlsComplete
+
+    case object ScottishLimitedPartnershipHmrcStandardForAgents
+    extends CompletedSectionScottishLimitedPartnership:
+
+      override def sectionName: String = "HMRC standard for agents"
+
+      override def alreadyDeveloped: Boolean = true
+
+      override def displayOrder: Int = 5
+
+      override def appState: AgentApplication = TestOnlyData.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed
+
+    case object ScottishLimitedPartnershipDeclaration
+    extends CompletedSectionScottishLimitedPartnership:
+
+      override def sectionName: String = "Declaration"
+
+      override def alreadyDeveloped: Boolean = true
+
+      override def displayOrder: Int = 6
+
+      override def appState: AgentApplication = TestOnlyData.agentApplicationScottishLimitedPartnership.afterDeclarationSubmitted
+
+    val values: Seq[CompletedSectionScottishLimitedPartnership] = SealedObjects.all[CompletedSectionScottishLimitedPartnership]
+
   val values: Seq[CompletedSection] = SealedObjects.all[CompletedSection]
 
   given PathBindable[CompletedSection] = PathBindableFactory.makeSealedObjectPathBindable[CompletedSection]

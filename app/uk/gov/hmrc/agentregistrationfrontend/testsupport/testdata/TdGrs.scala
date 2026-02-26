@@ -137,6 +137,31 @@ trait TdGrs {
         companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
       )
 
+    object scottishLtdPartnership:
+
+      val journeyData: JourneyData = JourneyData(
+        fullName = None,
+        dateOfBirth = None,
+        nino = None,
+        trn = None,
+        sautr = Some(dependencies.saUtr),
+        companyProfile = Some(dependencies.companyProfile),
+        ctutr = None,
+        postcode = Some(dependencies.postcode),
+        identifiersMatch = true,
+        registration = Registration(
+          registrationStatus = RegistrationStatus.GrsRegistered,
+          registeredBusinessPartnerId = Some(dependencies.safeId)
+        )
+      )
+
+      val businessDetails: BusinessDetailsPartnership = BusinessDetailsPartnership(
+        safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+        saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("saUtr"),
+        postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode"),
+        companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
+      )
+
     object generalPartnership:
 
       val journeyData: JourneyData = JourneyData(

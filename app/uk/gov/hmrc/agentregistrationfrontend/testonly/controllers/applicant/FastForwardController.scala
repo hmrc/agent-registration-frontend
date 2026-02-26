@@ -90,7 +90,10 @@ extends FrontendController(mcc, applicantActions):
       case c: CompletedSectionLimitedPartnership =>
         authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
           given RequestWithAuth = req
-
+          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
+      case c: CompletedSectionScottishLimitedPartnership =>
+        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
+          given RequestWithAuth = req
           fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
 
   private def loginAndRetry(using request: Request[AnyContent]): Future[Result | RequestWithAuth] = stubUserService.createAndLoginAgent.map: stubsHc =>
@@ -134,10 +137,10 @@ extends FrontendController(mcc, applicantActions):
       case BusinessType.Partnership.LimitedLiabilityPartnership => TestOnlyData.grs.llp.journeyData
       case BusinessType.Partnership.GeneralPartnership => TestOnlyData.grs.generalPartnership.journeyData
       case BusinessType.Partnership.ScottishPartnership => TestOnlyData.grs.scottishPartnership.journeyData
+      case BusinessType.Partnership.ScottishLimitedPartnership => TestOnlyData.grs.scottishLtdPartnership.journeyData
       case BusinessType.Partnership.LimitedPartnership => TestOnlyData.grs.ltdPartnership.journeyData
       case BusinessType.SoleTrader => TestOnlyData.grs.soleTrader.journeyData
       case BusinessType.LimitedCompany => TestOnlyData.grs.ltd.journeyData
-      case _ => throw new IllegalArgumentException(s"Add $bt journey data here")
 
   private def updateIdentifiers(agentApplication: AgentApplication)(using
     r: RequestWithAuth,
