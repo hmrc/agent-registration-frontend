@@ -125,7 +125,7 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
       )
 
     val afterDeclarationSubmitted: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
-      applicationState = ApplicationState.Submitted
+      applicationState = ApplicationState.SentForRisking
     )
 
     val baseForSectionAmls: AgentApplicationGeneralPartnership = afterGrsDataReceived

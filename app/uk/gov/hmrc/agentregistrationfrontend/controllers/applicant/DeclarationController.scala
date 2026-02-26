@@ -22,12 +22,13 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
-import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.taskListStatus
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
-import uk.gov.hmrc.agentregistrationfrontend.model.TaskStatus
+import uk.gov.hmrc.agentregistrationfrontend.model.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.DeclarationPage
 
 import javax.inject.Inject
@@ -38,14 +39,30 @@ class DeclarationController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   view: DeclarationPage,
-  agentApplicationService: AgentApplicationService
+  agentApplicationService: AgentApplicationService,
+  individualProvideDetailsService: IndividualProvideDetailsService,
+  agentRegistrationRiskingService: AgentRegistrationRiskingService
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
+  private type DataWithIndividuals = List[IndividualProvidedDetails] *: AgentApplication *: DataWithAuth
+
+  private val baseAction: ActionBuilderWithData[DataWithIndividuals] = actions
     .getApplicationInProgress
+    .refine:
+      implicit request =>
+        val agentApplication: AgentApplication = request.get
+        individualProvideDetailsService
+          .findAllByApplicationId(agentApplication.agentApplicationId)
+          .map: individualsList =>
+            request.add[List[IndividualProvidedDetails]](individualsList)
     .ensure(
-      _.agentApplication.taskListStatus.declaration.canStart,
+      condition =
+        implicit request =>
+          request.agentApplication
+            .taskListStatus(request.get[List[IndividualProvidedDetails]])
+            .declaration
+            .canStart,
       implicit request =>
         logger.warn("Cannot start declaration whilst tasks are outstanding, redirecting to task list")
         Redirect(AppRoutes.apply.TaskListController.show)
@@ -62,57 +79,17 @@ extends FrontendController(mcc, actions):
   def submit: Action[AnyContent] = baseAction
     .async:
       implicit request =>
-        agentApplicationService
-          .upsert(
-            request.agentApplication
-              .modify(_.applicationState)
-              .setTo(ApplicationState.Submitted)
-          ).map: _ =>
-            Redirect(AppRoutes.apply.AgentApplicationController.applicationSubmitted)
-
-  extension (agentApplication: AgentApplication)
-
-    def taskListStatus: TaskListStatus = {
-      val contactIsComplete = agentApplication.applicantContactDetails.exists(_.isComplete)
-      val amlsDetailsCompleted = agentApplication.amlsDetails.exists(_.isComplete)
-      val agentDetailsIsComplete = agentApplication.agentDetails.exists(_.isComplete)
-      val hmrcStandardForAgentsAgreed = agentApplication.hmrcStandardForAgentsAgreed === StateOfAgreement.Agreed
-      TaskListStatus(
-        contactDetails = TaskStatus(
-          canStart = true, // Contact details can be started at any time
-          isComplete = contactIsComplete
-        ),
-        amlsDetails = TaskStatus(
-          canStart = true, // AMLS details can be started at any time
-          isComplete = amlsDetailsCompleted
-        ),
-        agentDetails = TaskStatus(
-          canStart = contactIsComplete, // Agent details can be started only when contact details are complete
-          isComplete = agentDetailsIsComplete
-        ),
-        hmrcStandardForAgents = TaskStatus(
-          canStart = true, // HMRC Standard for Agents can be started at any time
-          isComplete = hmrcStandardForAgentsAgreed
-        ),
-        listDetails = TaskStatus(
-          canStart = true, // List details can be started any time
-          isComplete = false // TODO: implement list details so completion check can be done
-        ),
-        listShare = TaskStatus(
-          canStart = false, // List sharing cannot be started until list details are completed
-          isComplete = false // TODO: implement list share so completion check can be done
-        ),
-        listTracking = TaskStatus(
-          canStart = false, // List tracking cannot be started until list share is complete
-          isComplete = false // TODO: implement list details so completion check can be done
-        ),
-        declaration = TaskStatus(
-          canStart =
-            contactIsComplete
-              && amlsDetailsCompleted
-              && agentDetailsIsComplete
-              && hmrcStandardForAgentsAgreed, // Declaration can be started only when all prior tasks are complete
-          isComplete = false // Declaration is never "complete" until submission
-        )
-      )
-    }
+        for
+          _ <- agentRegistrationRiskingService.submitForRisking(
+            SubmitForRiskingRequest(
+              agentApplication = request.agentApplication,
+              individuals = request.get[List[IndividualProvidedDetails]]
+            )
+          )
+          _ <- agentApplicationService
+            .upsert(
+              request.agentApplication
+                .modify(_.applicationState)
+                .setTo(ApplicationState.SentForRisking)
+            )
+        yield Redirect(AppRoutes.apply.AgentApplicationController.applicationSubmitted)

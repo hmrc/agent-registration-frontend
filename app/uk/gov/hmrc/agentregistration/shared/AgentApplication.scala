@@ -59,7 +59,7 @@ sealed trait AgentApplication:
 
   val hasFinished: Boolean =
     applicationState match
-      case ApplicationState.Submitted => true
+      case ApplicationState.SentForRisking => true
       case ApplicationState.Started => false
       case ApplicationState.GrsDataReceived => false
 
@@ -69,7 +69,7 @@ sealed trait AgentApplication:
     applicationState match
       case ApplicationState.Started => false
       case ApplicationState.GrsDataReceived => true
-      case ApplicationState.Submitted => true
+      case ApplicationState.SentForRisking => true
 
   def getUserRole: UserRole = userRole.getOrElse(expectedDataNotDefinedError("userRole"))
 

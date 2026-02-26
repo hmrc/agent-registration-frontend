@@ -43,7 +43,7 @@ extends ControllerSpec:
         .afterEmailAddressVerified
     val complete: AgentApplication = inComplete
       .modify(_.applicationState)
-      .setTo(ApplicationState.Submitted)
+      .setTo(ApplicationState.SentForRisking)
 
   object providedDetails:
     val newProvidedDetails: IndividualProvidedDetails =

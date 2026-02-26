@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared
+package uk.gov.hmrc.agentregistrationfrontend.model
 
 import play.api.libs.json.Format
-import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import play.api.libs.json.Json
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 
-enum ApplicationState:
+// temp case class until shared model is merged
+final case class SubmitForRiskingRequest(
+  agentApplication: AgentApplication,
+  individuals: List[IndividualProvidedDetails]
+)
 
-  case Started
-  case GrsDataReceived
-  case SentForRisking
-
-object ApplicationState:
-  given Format[ApplicationState] = JsonFormatsFactory.makeEnumFormat[ApplicationState]
+object SubmitForRiskingRequest:
+  given Format[SubmitForRiskingRequest] = Json.format[SubmitForRiskingRequest]
