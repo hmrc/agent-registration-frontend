@@ -434,58 +434,16 @@ declaration.p4 = I understand that HMRC can suspend an agent services account if
 declaration.accept.button = Accept and send
 
 # Apply / Confirmation of submission
-confirmation.title = You’ve finished the first stage of the application
+confirmation.title = You’ve applied for an agent services account
 confirmation.subtitle = Application reference:
-confirmation.whatNext.h2 = What to do next
-
-confirmation.whatNext.p1.SoleTrader.Owner = As you have told us that you are the sole trader {0}, we now need to validate your identity and that you have the authority to make this application.
-confirmation.whatNext.p2.SoleTrader.Owner = First, sign out from the agent account you are currently signed in with and use the following link to read about how to sign in with the details you use to manage your Self Assessment:
-
-confirmation.whatNext.p1.SoleTrader.Authorised = As you have told us that you are not the sole trader {0} we now need to validate you have the authority to make this application.
-confirmation.whatNext.p2.SoleTrader.Authorised = Send this link to the business owner and ask them to sign in with the details they use to file their Self Assessment tax return:
-
-confirmation.whatNext.p1.Llp.Member = Everyone listed in Companies House as a current member of {0}, including yourself, needs to sign in and provide some personal details.
-confirmation.whatNext.p2.Llp.Member = Send this link to all members and use the same link to sign in yourself:
-
-confirmation.whatNext.p1.Llp.Authorised = Everyone listed in Companies House as a current member of {0} needs to sign in and provide some personal details.
-confirmation.whatNext.p2.Llp.Authorised = Send this link to all members:
-
-confirmation.whatNext.p1.LimitedCompany.Authorised = Everyone listed in Companies House as a current director of {0} needs to sign in and provide some personal details.
-confirmation.whatNext.p2.LimitedCompany.Authorised = Send this link to all directors:
-
-confirmation.whatNext.p1.LimitedCompany.Director = Everyone listed in Companies House as a current director of {0}, including yourself, needs to sign in and provide some personal details.
-confirmation.whatNext.p2.LimitedCompany.Director = Send this link to all directors and use the same link to sign in yourself:
-
-confirmation.whatNext.p1.GeneralPartnership.Authorised = Everyone who is a partner of {0} needs to sign in and provide some personal details.
-confirmation.whatNext.p2.GeneralPartnership.Authorised = Send this link to all partners:
-
-confirmation.whatNext.p1.GeneralPartnership.Partner = Everyone who is a partner of {0}, including yourself, needs to sign in and provide some personal details.
-confirmation.whatNext.p2.GeneralPartnership.Partner = Send this link to all partners and use the same link to sign in yourself:
-
-confirmation.whatNext.p1.LimitedPartnership.Authorised = Everyone who is a partner of {0} needs to sign in and provide some personal details.
-confirmation.whatNext.p2.LimitedPartnership.Authorised = Send this link to all partners:
-
-confirmation.whatNext.p1.LimitedPartnership.Partner = Everyone who is a partner of {0}, including yourself, needs to sign in and provide some personal details.
-confirmation.whatNext.p2.LimitedPartnership.Partner = Send this link to all partners and use the same link to sign in yourself:
-
-confirmation.whatNext.p1.ScottishLimitedPartnership.Authorised = Everyone who is a partner of {0} needs to sign in and provide some personal details.
-confirmation.whatNext.p2.ScottishLimitedPartnership.Authorised = Send this link to all partners:
-
-confirmation.whatNext.p1.ScottishLimitedPartnership.Partner = Everyone who is a partner of {0}, including yourself, needs to sign in and provide some personal details.
-confirmation.whatNext.p2.ScottishLimitedPartnership.Partner = Send this link to all partners and use the same link to sign in yourself:
-
-confirmation.whatNext.p1.ScottishPartnership.Authorised = Everyone who is a partner of {0} needs to sign in and provide some personal details.
-confirmation.whatNext.p2.ScottishPartnership.Authorised = Send this link to all partners:
-
-confirmation.whatNext.p1.ScottishPartnership.Partner = Everyone who is a partner of {0}, including yourself, needs to sign in and provide some personal details.
-confirmation.whatNext.p2.ScottishPartnership.Partner = Send this link to all partners and use the same link to sign in yourself:
-
-confirmation.checkProgress.h2 = How to check the progress of your application
-confirmation.checkProgress.p1 = You can click the link on the GOV.UK page “Apply for an agent services account”.
-confirmation.checkProgress.p2 = This will let you check who has provided their personal details.
-confirmation.checkProgress.p3 = When everyone has provided their personal details, we will:
-confirmation.checkProgress.bullet1 = automatically submit your application
-confirmation.checkProgress.bullet2 = email you at <strong>{0}</strong> to confirm this
+confirmation.whatNext.h2 = What happens next
+confirmation.p1 = We’ll carry out checks based on the information you’ve given us.
+confirmation.p2 = If we need any more information we’ll contact you.
+confirmation.p3 = We aim to make a decision by {0}
+confirmation.decision.h2 = Our decision
+confirmation.decision.p1 = We’ll send you an email to let you know of the outcome.
+confirmation.progress.h2 = How to check the progress of your application
+confirmation.progress.p1 = You can click the link on the GOV.UK page “Apply for an agent services account”.
 confirmation.viewLink = View or print your application
 confirmation.signOutLink = Finish and sign out
 
