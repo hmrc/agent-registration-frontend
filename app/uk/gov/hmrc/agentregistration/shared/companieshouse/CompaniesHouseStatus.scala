@@ -14,57 +14,57 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model
+package uk.gov.hmrc.agentregistration.shared.companieshouse
 
 import play.api.libs.json.*
 import uk.gov.hmrc.agentregistration.shared.CheckResult
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
-enum CompanyHouseStatus(val key: String):
+enum CompaniesHouseStatus(val key: String):
 
   case Active
-  extends CompanyHouseStatus("active")
+  extends CompaniesHouseStatus("active")
   case Dissolved
-  extends CompanyHouseStatus("dissolved")
+  extends CompaniesHouseStatus("dissolved")
   case Liquidation
-  extends CompanyHouseStatus("liquidation")
+  extends CompaniesHouseStatus("liquidation")
   case Receivership
-  extends CompanyHouseStatus("receivership")
+  extends CompaniesHouseStatus("receivership")
   case Administration
-  extends CompanyHouseStatus("administration")
+  extends CompaniesHouseStatus("administration")
   case VoluntaryArrangement
-  extends CompanyHouseStatus("voluntary-arrangement")
+  extends CompaniesHouseStatus("voluntary-arrangement")
   case ConvertedClosed
-  extends CompanyHouseStatus("converted-closed")
+  extends CompaniesHouseStatus("converted-closed")
   case InsolvencyProceedings
-  extends CompanyHouseStatus("insolvency-proceedings")
+  extends CompaniesHouseStatus("insolvency-proceedings")
   case Registered
-  extends CompanyHouseStatus("registered")
+  extends CompaniesHouseStatus("registered")
   case Removed
-  extends CompanyHouseStatus("removed")
+  extends CompaniesHouseStatus("removed")
   case Closed
-  extends CompanyHouseStatus("closed")
+  extends CompaniesHouseStatus("closed")
   case Open
-  extends CompanyHouseStatus("open")
+  extends CompaniesHouseStatus("open")
 
-object CompanyHouseStatus:
+object CompaniesHouseStatus:
 
-  given Format[CompanyHouseStatus] =
-    new Format[CompanyHouseStatus] {
-      override def reads(json: JsValue): JsResult[CompanyHouseStatus] =
+  given Format[CompaniesHouseStatus] =
+    new Format[CompaniesHouseStatus] {
+      override def reads(json: JsValue): JsResult[CompaniesHouseStatus] =
         json match {
           case JsString(s) =>
-            CompanyHouseStatus.values.find(_.key === s) match {
+            CompaniesHouseStatus.values.find(_.key === s) match {
               case Some(status) => JsSuccess(status)
               case None => JsError(s"Unknown company status: $s")
             }
           case _ => JsError("Expected a string for company status")
         }
 
-      override def writes(o: CompanyHouseStatus): JsValue = JsString(o.key)
+      override def writes(o: CompaniesHouseStatus): JsValue = JsString(o.key)
     }
 
-  extension (status: CompanyHouseStatus)
+  extension (status: CompaniesHouseStatus)
     def toCheckResult: CheckResult =
       status match
         case Active | Administration | VoluntaryArrangement | Registered | Open => CheckResult.Pass

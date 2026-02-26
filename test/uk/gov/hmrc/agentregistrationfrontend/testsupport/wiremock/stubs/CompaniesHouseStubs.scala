@@ -20,32 +20,82 @@ import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.Crn
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object CompaniesHouseStubs {
 
-  def stubSingleMatch(lastName: String): StubMapping = StubMaker.make(
+  def stubSixOfficers(
+    officerRole: CompaniesHouseOfficerRole = CompaniesHouseOfficerRole.LlpMember
+  ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=$lastName&register_view=true&register_type=llp_members"),
+    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers"),
     responseStatus = 200,
     responseBody =
       Json.obj(
+        "total_results" -> 6,
+        "items_per_page" -> 35,
+        "etag" -> "c3b8d15615b770cd4fcc27fdc1c959474ae4c03e",
+        "active_count" -> 6,
+        "kind" -> "officer-list",
+        "start_index" -> 0,
+        "resigned_count" -> 1,
+        "links" -> Json.obj(
+          "self" -> "/company/1234567890/appointments"
+        ),
         "items" -> Json.arr(
           Json.obj(
-            "name" -> s"Taylor $lastName",
-            "date_of_birth" -> Json.obj(
-              "day" -> 12,
-              "month" -> 11,
-              "year" -> 1990
-            )
+            "name" -> "Tester, John",
+            "date_of_birth" -> Json.obj("month" -> 8, "year" -> 1967),
+            "officer_role" -> officerRole.role
+          ),
+          Json.obj(
+            "name" -> "Tester, John Ian",
+            "date_of_birth" -> Json.obj("month" -> 4, "year" -> 1948),
+            "officer_role" -> officerRole.role
+          ),
+          Json.obj(
+            "name" -> "Tester, Alice",
+            "date_of_birth" -> Json.obj("month" -> 1, "year" -> 1975),
+            "officer_role" -> officerRole.role
+          ),
+          Json.obj(
+            "name" -> "Tester, Bob",
+            "date_of_birth" -> Json.obj("month" -> 12, "year" -> 1982),
+            "officer_role" -> officerRole.role
+          ),
+          Json.obj(
+            "name" -> "Tester, Carol",
+            "date_of_birth" -> Json.obj("month" -> 6, "year" -> 1991),
+            "officer_role" -> officerRole.role
+          ),
+          Json.obj(
+            "name" -> "Tester, Carol",
+            "date_of_birth" -> Json.obj("month" -> 6, "year" -> 1991),
+            "officer_role" -> officerRole.role
+          ),
+          Json.obj(
+            "name" -> "Tester, Dave (Resigned)",
+            "date_of_birth" -> Json.obj("month" -> 2, "year" -> 1980),
+            "resigned_on" -> "2024-01-01",
+            "officer_role" -> officerRole.role
           )
         )
       ).toString
   )
 
-  def stubMultipleMatches(lastName: String): StubMapping = StubMaker.make(
+  def verifySixOfficersCalls(count: Int = 1): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=$lastName&register_view=true&register_type=llp_members"),
+    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers"),
+    count = count
+  )
+
+  def stubSingleMatch(
+    lastName: String,
+    officerRole: CompaniesHouseOfficerRole = CompaniesHouseOfficerRole.LlpMember
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=$lastName"),
     responseStatus = 200,
     responseBody =
       Json.obj(
@@ -56,11 +106,37 @@ object CompaniesHouseStubs {
               "day" -> 12,
               "month" -> 11,
               "year" -> 1990
-            )
+            ),
+            "officer_role" -> officerRole.role
+          )
+        )
+      ).toString
+  )
+
+  def stubFiveOrLess(
+    name: String,
+    officerRole: CompaniesHouseOfficerRole = CompaniesHouseOfficerRole.LlpMember
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers"),
+    responseStatus = 200,
+    responseBody =
+      Json.obj(
+        "items" -> Json.arr(
+          Json.obj(
+            "name" -> s"$name",
+            "date_of_birth" -> Json.obj(
+              "day" -> 12,
+              "month" -> 11,
+              "year" -> 1990
+            ),
+            "officer_role" -> officerRole.role
           ),
           Json.obj(
-            "name" -> s"First Alt $lastName",
-            "date_of_birth" -> Json.obj("month" -> 2, "year" -> 1980)
+            "name" -> s"Resigned Alt $name",
+            "date_of_birth" -> Json.obj("month" -> 2, "year" -> 1980),
+            "resigned_on" -> "2024-01-01",
+            "officer_role" -> officerRole.role
           )
         )
       ).toString
@@ -71,7 +147,7 @@ object CompaniesHouseStubs {
     count: Int = 1
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=$lastName&register_view=true&register_type=llp_members"),
+    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=$lastName"),
     count = count
   )
 
@@ -80,7 +156,15 @@ object CompaniesHouseStubs {
     count: Int = 1
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=$lastName&register_view=true&register_type=llp_members"),
+    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=$lastName"),
+    count = count
+  )
+
+  def verifyMultipleMatchesWithResignedOfficerCalls(
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers"),
     count = count
   )
 

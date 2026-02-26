@@ -113,6 +113,11 @@ POST        /apply/list-details/change-other-relevant-individual/:individualProv
 GET         /apply/list-details/remove-other-relevant-individual/:individualProvidedDetailsId    uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.RemoveOtherRelevantIndividualController.show(individualProvidedDetailsId: IndividualProvidedDetailsId)
 POST        /apply/list-details/remove-other-relevant-individual/:individualProvidedDetailsId    uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.RemoveOtherRelevantIndividualController.submit(individualProvidedDetailsId: IndividualProvidedDetailsId)
 
+# Lists of incorporated individuals
+GET         /apply/list-details/companies-house-officers                uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.incorporated.CompaniesHouseOfficersController.show
+POST        /apply/list-details/confirm-companies-house-officers        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.incorporated.CompaniesHouseOfficersController.submitFiveOrLess
+POST        /apply/list-details/how-many-companies-house-officers       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.incorporated.CompaniesHouseOfficersController.submitSixOrMore
+GET         /apply/list-details/companies-house-officers/check-your-answers  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.incorporated.CheckYourAnswersController.show
 
 
 # Lists share link

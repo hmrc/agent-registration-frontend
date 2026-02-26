@@ -44,7 +44,7 @@ trait TdAgentApplicationScottishPartnership { dependencies: (TdBase & TdSectionA
       agentDetails = None,
       refusalToDealWithCheckResult = None,
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-      numberOfRequiredKeyIndividuals = None,
+      numberOfIndividuals = None,
       hasOtherRelevantIndividuals = None
     )
 
@@ -81,7 +81,7 @@ trait TdAgentApplicationScottishPartnership { dependencies: (TdBase & TdSectionA
     )
 
     val afterHowManyKeyIndividuals: AgentApplicationScottishPartnership = afterHmrcStandardForAgentsAgreed.copy(
-      numberOfRequiredKeyIndividuals = Some(
+      numberOfIndividuals = Some(
         FiveOrLess(
           numberOfKeyIndividuals = 3
         )
@@ -89,7 +89,7 @@ trait TdAgentApplicationScottishPartnership { dependencies: (TdBase & TdSectionA
     )
 
     val afterOnlyOneKeyIndividual: AgentApplicationScottishPartnership = afterHmrcStandardForAgentsAgreed.copy(
-      numberOfRequiredKeyIndividuals = Some(
+      numberOfIndividuals = Some(
         FiveOrLess(
           numberOfKeyIndividuals = 1
         )
@@ -97,7 +97,7 @@ trait TdAgentApplicationScottishPartnership { dependencies: (TdBase & TdSectionA
     )
 
     val afterHowManyKeyIndividualsNeedsNoPadding: AgentApplicationScottishPartnership = afterHmrcStandardForAgentsAgreed.copy(
-      numberOfRequiredKeyIndividuals = Some(
+      numberOfIndividuals = Some(
         SixOrMore(
           numberOfKeyIndividualsResponsibleForTaxMatters = 6
         )
@@ -107,7 +107,7 @@ trait TdAgentApplicationScottishPartnership { dependencies: (TdBase & TdSectionA
     // when the number of key individuals is of type SixOrMore and padding is required because the number of
     // key individuals responsible for tax matters is less than minimum list size(5)
     val afterHowManyKeyIndividualsNeedsPadding: AgentApplicationScottishPartnership = afterHmrcStandardForAgentsAgreed.copy(
-      numberOfRequiredKeyIndividuals = Some(dependencies.sixOrMoreKeyIndividuals)
+      numberOfIndividuals = Some(dependencies.sixOrMoreKeyIndividuals)
     )
 
     val afterDeclarationSubmitted: AgentApplicationScottishPartnership = afterHmrcStandardForAgentsAgreed.copy(

@@ -22,9 +22,11 @@ import uk.gov.hmrc.agentregistration.shared.ApplicationState.GrsDataReceived
 import uk.gov.hmrc.agentregistration.shared.CheckResult
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.UserRole
-import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
+import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAgentDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAmls
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionContactDetails
@@ -48,7 +50,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       refusalToDealWithCheckResult = None,
       companyStatusCheckResult = None,
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-      numberOfRequiredKeyIndividuals = None,
+      numberOfIndividuals = None,
       hasOtherRelevantIndividuals = None
     )
 
@@ -92,11 +94,21 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       hmrcStandardForAgentsAgreed = StateOfAgreement.Agreed
     )
 
-    val afterHowManyKeyIndividuals: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
-      numberOfRequiredKeyIndividuals = Some(
-        FiveOrLess(
-          numberOfKeyIndividuals = 3
-        )
+    val afterConfirmCompaniesHouseOfficersYes: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
+      numberOfIndividuals = Some(
+        TestOnlyData.fiveOrLessCompaniesHouseOfficers
+      )
+    )
+
+    val afterNumberOfConfirmCompaniesHouseOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
+      numberOfIndividuals = Some(
+        TestOnlyData.sixOrMoreCompaniesHouseOfficers
+      )
+    )
+
+    val afterConfirmCompaniesHouseOfficersNo: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
+      numberOfIndividuals = Some(
+        TestOnlyData.fiveOrLessCompaniesHouseOfficers.copy(isCompaniesHouseOfficersListCorrect = false)
       )
     )
 

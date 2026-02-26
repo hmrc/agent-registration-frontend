@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.hasCheckPassed
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
-import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfIndividuals
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.*
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskListStatus
@@ -90,9 +90,10 @@ extends FrontendController(mcc, actions):
       def listDetailsCompleted(existingList: List[IndividualProvidedDetails]): Boolean =
         agentApplication match
           case a: AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
-            NumberOfRequiredKeyIndividuals.isKeyIndividualListComplete(existingList.count(_.isPersonOfControl), a.numberOfRequiredKeyIndividuals)
+            NumberOfIndividuals.isKeyIndividualListComplete(existingList.count(_.isPersonOfControl), a.numberOfIndividuals)
             && otherRelevantIndividualsComplete(existingList)
           case _ => true
+
       val listProgressComplete = listDetailsCompleted(existingList) && existingList.forall(_.hasFinished)
       // any state other than Precreated indicates the link has been sent; require the list to be non-empty
       val listSharingComplete =
