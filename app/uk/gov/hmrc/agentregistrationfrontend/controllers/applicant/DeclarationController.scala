@@ -23,7 +23,7 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.taskListStatus
+import uk.gov.hmrc.agentregistrationfrontend.model.taskListStatus
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
