@@ -39,10 +39,6 @@
     <h1 class="govuk-heading-xl">Fast Forward to completed sections of applicant journey</h1>
     <p class="govuk-body">
         Use these links to fast forward through the journey to a specific section.
-        These links require you to log in using the correct credentials.
-    </p>
-    <p class="govuk-body">
-      <a class="govuk-link" href="@{appConfig.signInUri(uri"${appConfig.thisFrontendBaseUrl + AppRoutes.testOnly.applicant.FastForwardController.show.url}", AffinityGroup.Agent)}">Log In</a>
     </p>
 
     <p class="govuk-body">
@@ -82,6 +78,39 @@
         <h2 class="govuk-caption-xl">Sole trader</h2>
         <ul class="govuk-list govuk-list--bullet">
         @CompletedSection.CompletedSectionSoleTrader.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
+            <li>
+                <a class="govuk-link" href="@{AppRoutes.testOnly.applicant.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
+            </li>
+        }
+        </ul>
+    </p>
+
+    <p class="govuk-body">
+        <h2 class="govuk-caption-xl">Limited Company</h2>
+        <ul class="govuk-list govuk-list--bullet">
+        @CompletedSection.CompletedSectionLimitedCompany.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
+            <li>
+                <a class="govuk-link" href="@{AppRoutes.testOnly.applicant.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
+            </li>
+        }
+        </ul>
+    </p>
+
+    <p class="govuk-body">
+        <h2 class="govuk-caption-xl">Limited Partnership</h2>
+            <ul class="govuk-list govuk-list--bullet">
+            @CompletedSection.CompletedSectionLimitedPartnership.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
+                <li>
+                    <a class="govuk-link" href="@{AppRoutes.testOnly.applicant.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
+                </li>
+            }
+            </ul>
+    </p>
+
+    <p class="govuk-body">
+    <h2 class="govuk-caption-xl">Scottish Limited Partnership</h2>
+        <ul class="govuk-list govuk-list--bullet">
+        @CompletedSection.CompletedSectionScottishLimitedPartnership.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
             <li>
                 <a class="govuk-link" href="@{AppRoutes.testOnly.applicant.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
             </li>
