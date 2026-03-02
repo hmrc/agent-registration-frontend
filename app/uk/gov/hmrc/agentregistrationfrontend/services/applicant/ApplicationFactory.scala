@@ -48,7 +48,10 @@ class ApplicationFactory @Inject() (
     agentDetails = None,
     refusalToDealWithCheckResult = None,
     deceasedCheckResult = None,
-    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
+    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
+    hasOtherRelevantIndividuals = None,
+    vrns = None,
+    payeRefs = None
   )
 
   def makeNewAgentApplicationLlp(
@@ -71,7 +74,9 @@ class ApplicationFactory @Inject() (
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
     numberOfRequiredKeyIndividuals = None,
-    hasOtherRelevantIndividuals = None
+    hasOtherRelevantIndividuals = None,
+    vrns = None,
+    payeRefs = None
   )
 
   def makeNewAgentApplicationLimitedCompany(
@@ -94,7 +99,9 @@ class ApplicationFactory @Inject() (
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
     numberOfRequiredKeyIndividuals = None,
-    hasOtherRelevantIndividuals = None
+    hasOtherRelevantIndividuals = None,
+    vrns = None,
+    payeRefs = None
   )
 
   def makeNewAgentApplicationGeneralPartnership(
@@ -116,7 +123,9 @@ class ApplicationFactory @Inject() (
     refusalToDealWithCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
     numberOfRequiredKeyIndividuals = None,
-    hasOtherRelevantIndividuals = None
+    hasOtherRelevantIndividuals = None,
+    vrns = None,
+    payeRefs = None
   )
 
   def makeNewAgentApplicationLimitedPartnership(
@@ -139,7 +148,9 @@ class ApplicationFactory @Inject() (
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
     numberOfRequiredKeyIndividuals = None,
-    hasOtherRelevantIndividuals = None
+    hasOtherRelevantIndividuals = None,
+    vrns = None,
+    payeRefs = None
   )
 
   def makeNewAgentApplicationScottishLimitedPartnership(
@@ -162,7 +173,9 @@ class ApplicationFactory @Inject() (
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
     numberOfRequiredKeyIndividuals = None,
-    hasOtherRelevantIndividuals = None
+    hasOtherRelevantIndividuals = None,
+    vrns = None,
+    payeRefs = None
   )
 
   def makeNewAgentApplicationScottishPartnership(
@@ -184,5 +197,7 @@ class ApplicationFactory @Inject() (
     refusalToDealWithCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
     numberOfRequiredKeyIndividuals = None,
-    hasOtherRelevantIndividuals = None
+    hasOtherRelevantIndividuals = None,
+    vrns = None,
+    payeRefs = None
   )

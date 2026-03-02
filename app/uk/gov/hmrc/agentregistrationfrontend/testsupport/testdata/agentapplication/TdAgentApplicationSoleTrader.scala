@@ -42,7 +42,10 @@ trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdSectionAmls & TdS
       agentDetails = None,
       refusalToDealWithCheckResult = None,
       deceasedCheckResult = None,
-      hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet
+      hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
+      hasOtherRelevantIndividuals = None,
+      vrns = None,
+      payeRefs = None
     )
 
     val afterGrsDataReceived: AgentApplicationSoleTrader = afterStarted.copy(
