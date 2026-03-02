@@ -175,14 +175,18 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe
-      AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
+      AppRoutes.apply.listdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeCompaniesHouseOfficers.agentApplicationId)
     CompaniesHouseStubs.verifySixOfficersCalls()
 
-  // TODO WG - change that once page is done
+
   s"POST $postFiveOrLessPath with 'No' selection should display update Companies House advice page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeCompaniesHouseOfficers)
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.beforeCompaniesHouseOfficers,
+      updatedApplication = agentApplication.afterFiveOrLessCompaniesHouseOfficersNo
+    )
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.beforeCompaniesHouseOfficers.agentApplicationId,

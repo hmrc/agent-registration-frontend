@@ -38,3 +38,35 @@ object CompaniesHouseOfficer:
   )
 
   given Format[CompaniesHouseOfficer] = Json.format[CompaniesHouseOfficer]
+
+  def normaliseOfficerName(raw: String): String =
+    val trimmed = raw.trim
+
+    if trimmed.contains(",") then
+      // Format: SURNAME, Forename(s)
+      val parts = trimmed.split(",", 2).map(_.trim)
+      parts.toList match
+        case surname :: forenames :: Nil => s"${titleCase(forenames)} ${titleCase(surname)}"
+        case _ => trimmed
+    else
+      // Already likely "Forename Surname" or corporate name
+      titleCasePreserveAcronyms(trimmed)
+
+  private def titleCase(s: String): String = s.split("\\s+")
+    .filter(_.nonEmpty)
+    .map { word =>
+      if word.forall(_.isUpper) then
+        word.toLowerCase.capitalize
+      else
+        s"${word.head.toUpper}${word.tail.toLowerCase}"
+    }
+    .mkString(" ")
+
+  private def titleCasePreserveAcronyms(s: String): String = s.split("\\s+")
+    .filter(_.nonEmpty)
+    .map { word =>
+      // Preserve things like "LLP", "UK", "HMRC"
+      if word.forall(_.isUpper) && word.length <= 5 then word
+      else s"${word.head.toUpper}${word.tail.toLowerCase}"
+    }
+    .mkString(" ")

@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.incorp
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmCompaniesHouseOfficersForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -44,13 +44,13 @@ extends ViewSpec:
   private val intro: String = s"These are the members listed in Companies House for $entityName:"
   private val question: String = "Is this list of members correct?"
 
-  private val companiesHouseOfficers: Seq[CompaniesHouseOfficer] = Seq.empty
+  private val individualNameList: Seq[IndividualName] = Seq.empty
 
   private def render(form: play.api.data.Form[Boolean]): Document = Jsoup.parse(viewTemplate(
     form = form,
     entityName = entityName,
     agentApplication = agentApplication,
-    companiesHouseOfficers = companiesHouseOfficers
+    individualNameList = individualNameList
   ).body)
 
   "ConfirmCompaniesHouseOfficersPage" should:

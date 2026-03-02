@@ -39,7 +39,6 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.in
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.UpdateCompaniesHouseOfficersPage
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -59,7 +58,7 @@ class CompaniesHouseOfficersController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[Seq[CompaniesHouseOfficer] *: List[IndividualProvidedDetails] *: IsIncorporated *: DataWithAuth] = actions
+  private val baseAction: ActionBuilderWithData[Seq[IndividualName] *: List[IndividualProvidedDetails] *: IsIncorporated *: DataWithAuth] = actions
     .getApplicationInProgress
     .refine:
       implicit request =>
@@ -77,17 +76,24 @@ extends FrontendController(mcc, actions):
         for
           individualsList <- individualProvideDetailsService
             .findAllKeyIndividualsByApplicationId(agentApplication.agentApplicationId)
-          officers <- getActiveOfficersForApplication(agentApplication)
+
+          companiesHouseOfficers <- companiesHouseService
+            .getActiveOfficers(agentApplication.getCrn, agentApplication.getCompaniesHouseOfficerRole)
+
+          companiesHouseOfficersNames = companiesHouseOfficers
+            .map(x => CompaniesHouseOfficer.normaliseOfficerName(x.name))
+            .map(IndividualName(_))
+            .filter(_.isValidName)
         yield request
           .add[List[IndividualProvidedDetails]](individualsList)
-          .add[Seq[CompaniesHouseOfficer]](officers)
+          .add[Seq[IndividualName]](companiesHouseOfficersNames)
 
   def show: Action[AnyContent] = baseAction
     .async:
       implicit request =>
         val agentApplication = request.get[IsIncorporated]
         val individuals = request.get[List[IndividualProvidedDetails]]
-        val companiesHouseOfficers = request.get[Seq[CompaniesHouseOfficer]]
+        val companiesHouseOfficers = request.get[Seq[IndividualName]]
 
         getEntityName(agentApplication).map: entityName =>
           companiesHouseOfficers.size match
@@ -118,14 +124,19 @@ extends FrontendController(mcc, actions):
           implicit request =>
             formWithErrors =>
               val agentApplication = request.get[IsIncorporated]
-              val companiesHouseOfficers = request.get[Seq[CompaniesHouseOfficer]]
+              val companiesHouseOfficers = request.get[Seq[IndividualName]]
+              val individuals = request.get[List[IndividualProvidedDetails]]
 
               getEntityName(agentApplication).map: entityName =>
                 confirmCompaniesHouseOfficersPage(
                   form = formWithErrors,
                   entityName = entityName,
                   agentApplication = agentApplication,
-                  companiesHouseOfficers = companiesHouseOfficers
+                  individualNameList =
+                    if (individuals.nonEmpty)
+                      individuals.map(_.individualName)
+                    else
+                      companiesHouseOfficers
                 )
       )
       .async:
@@ -133,34 +144,72 @@ extends FrontendController(mcc, actions):
           val isCompaniesHouseOfficersListCorrect: Boolean = request.get[Boolean]
           val agentApplication: IsIncorporated = request.get[IsIncorporated]
           val individuals: List[IndividualProvidedDetails] = request.get[List[IndividualProvidedDetails]]
-          val companiesHouseOfficers: Seq[CompaniesHouseOfficer] = request.get[Seq[CompaniesHouseOfficer]]
+          val companiesHouseOfficers: Seq[IndividualName] = request.get[Seq[IndividualName]]
 
           isCompaniesHouseOfficersListCorrect match
             case false =>
-              getEntityName(agentApplication).map: entityName =>
-                Ok(updateCompaniesHouseOfficersPage(
-                  entityName = entityName,
-                  agentApplication = agentApplication
-                ))
-            case true =>
-              val numberOfCompaniesHouseOfficers = FiveOrLessOfficers(
-                companiesHouseOfficers.size,
-                isCompaniesHouseOfficersListCorrect
+              val updatedApplication = updateApplicationWithOfficerCount(
+                agentApplication = agentApplication,
+                numberOfCompaniesHouseOfficers = FiveOrLessOfficers(
+                  numberOfCompaniesHouseOfficers =
+                    if (individuals.nonEmpty)
+                      individuals.size
+                    else
+                      companiesHouseOfficers.size,
+                  isCompaniesHouseOfficersListCorrect = isCompaniesHouseOfficersListCorrect
+                )
               )
 
-              val updatedApplication = updateApplicationWithOfficerCount(
-                agentApplication,
-                numberOfCompaniesHouseOfficers
-              )
+              // TODO WG - should we delete if user say list is not correct ?? I presume yes but what is same name missing etc ?
+              val deleteIndividualProvideDetails =
+                if (individuals.isEmpty)
+                  Future.successful(())
+                else
+                  Future.traverse(individuals)(i =>
+                    individualProvideDetailsService.delete(i.individualProvidedDetailsId)
+                  )
 
               for
-                _ <- syncIndividualsWithCompaniesHouse(
-                  agentApplication,
-                  individuals,
-                  companiesHouseOfficers
-                )
+                _ <- deleteIndividualProvideDetails
                 _ <- agentApplicationService.upsert(updatedApplication)
-              yield Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url)
+                entityName <- getEntityName(agentApplication)
+              yield Ok(updateCompaniesHouseOfficersPage(
+                entityName = entityName,
+                agentApplication = agentApplication
+              ))
+
+            case true =>
+              val updatedApplication = updateApplicationWithOfficerCount(
+                agentApplication = agentApplication,
+                numberOfCompaniesHouseOfficers = FiveOrLessOfficers(
+                  numberOfCompaniesHouseOfficers =
+                    if (individuals.nonEmpty)
+                      individuals.size
+                    else
+                      companiesHouseOfficers.size,
+                  isCompaniesHouseOfficersListCorrect = isCompaniesHouseOfficersListCorrect
+                )
+              )
+
+              val insertIndividualProvideDetails =
+                if (individuals.nonEmpty)
+                  Future.successful(())
+                else
+                  Future.traverse(companiesHouseOfficers.toList)(valideName =>
+                    individualProvideDetailsService.upsertForApplication(
+                      individualProvideDetailsService.create(
+                        individualName = valideName,
+                        isPersonOfControl = true,
+                        agentApplicationId = agentApplication.agentApplicationId
+                      )
+                    )
+                  )
+
+              for
+                _ <- insertIndividualProvideDetails
+                _ <- agentApplicationService.upsert(updatedApplication)
+              // TODO WG - chnage back to Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url)
+              yield Redirect(AppRoutes.apply.listdetails.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater
 
   def submitSixOrMore: Action[AnyContent] =
@@ -168,7 +217,7 @@ extends FrontendController(mcc, actions):
       .ensureValidFormAndRedirectIfSaveForLater[Int](
         form =
           request =>
-            val companiesHouseOfficers = request.get[Seq[CompaniesHouseOfficer]]
+            val companiesHouseOfficers = request.get[Seq[IndividualName]]
             Future.successful(NumberCompaniesHouseOfficersForm.form(companiesHouseOfficers.size))
         ,
         resultToServeWhenFormHasErrors =
@@ -176,7 +225,7 @@ extends FrontendController(mcc, actions):
             given RequestHeader = request
             formWithErrors =>
               val agentApplication = request.get[IsIncorporated]
-              val companiesHouseOfficers = request.get[Seq[CompaniesHouseOfficer]]
+              val companiesHouseOfficers = request.get[Seq[IndividualName]]
 
               getEntityName(agentApplication).map: entityName =>
                 numberOfCompaniesHouseOfficersPage(
@@ -190,7 +239,7 @@ extends FrontendController(mcc, actions):
         implicit request =>
           val numberOfOfficersResponsibleForTaxMatters: Int = request.get[Int]
           val agentApplication: IsIncorporated = request.get[IsIncorporated]
-          val companiesHouseOfficers: Seq[CompaniesHouseOfficer] = request.get[Seq[CompaniesHouseOfficer]]
+          val companiesHouseOfficers: Seq[IndividualName] = request.get[Seq[IndividualName]]
 
           val numberOfCompaniesHouseOfficers = SixOrMoreOfficers(
             companiesHouseOfficers.size,
@@ -202,8 +251,7 @@ extends FrontendController(mcc, actions):
             numberOfCompaniesHouseOfficers
           )
 
-          for
-            _ <- agentApplicationService.upsert(updatedApplication)
+          for _ <- agentApplicationService.upsert(updatedApplication)
           yield Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater
 
@@ -213,89 +261,61 @@ extends FrontendController(mcc, actions):
     .getBusinessPartnerRecord(agentApplication.getUtr)
     .map(_.map(_.getEntityName).getOrThrowExpectedDataMissing("Business Partner Record is missing"))
 
-  private def getActiveOfficersForApplication(agentApplication: IsIncorporated)(using RequestHeader): Future[Seq[CompaniesHouseOfficer]] =
-    companiesHouseService.getActiveOfficers(
-      agentApplication.getCrn,
-      agentApplication.getCompaniesHouseOfficerRole
-    )
-
   private def renderFiveOrLessPage(
     agentApplication: IsIncorporated,
     entityName: String,
-    companiesHouseOfficers: Seq[CompaniesHouseOfficer],
+    companiesHouseOfficers: Seq[IndividualName],
     individuals: List[IndividualProvidedDetails]
-  )(using RequestWithData[?]): Result =
-    val companiesHouseListChanged = hasChangedCompaniesHouseOfficersList(
-      individuals,
-      companiesHouseOfficers.toList
-    )
+  )(using RequestWithData[?]): Result = {
 
-    val isCompaniesHouseOfficersListCorrect = agentApplication.getNumberOfCompaniesHouseOfficers.flatMap {
-      case FiveOrLessOfficers(_, isCorrect) => Some(isCorrect)
-      case _ => None
-    }
+    // If we present different list always confirm the list
+    val listConfirmation: Option[Boolean] =
+      if (individuals.nonEmpty)
+        agentApplication
+          .getNumberOfCompaniesHouseOfficers
+          .collect { case FiveOrLessOfficers(_, isCorrect) => isCorrect }
+      else
+        None
 
     Ok(confirmCompaniesHouseOfficersPage(
       form =
-        Option.when(!companiesHouseListChanged)(isCompaniesHouseOfficersListCorrect).flatten
+        listConfirmation
           .fold(ConfirmCompaniesHouseOfficersForm.form)(ConfirmCompaniesHouseOfficersForm.form.fill),
       entityName = entityName,
       agentApplication = agentApplication,
-      companiesHouseOfficers = companiesHouseOfficers
+      individualNameList =
+        if (individuals.nonEmpty)
+          individuals.map(_.individualName)
+        else
+          companiesHouseOfficers
     ))
+  }
 
   private def renderSixOrMorePage(
     agentApplication: IsIncorporated,
     entityName: String,
-    companiesHouseOfficers: Seq[CompaniesHouseOfficer]
-  )(using RequestWithData[?]): Result = Ok(numberOfCompaniesHouseOfficersPage(
-    form = NumberCompaniesHouseOfficersForm.form(companiesHouseOfficers.size),
-    entityName = entityName,
-    agentApplication = agentApplication,
-    companiesHouseOfficersCount = companiesHouseOfficers.size
-  ))
+    companiesHouseOfficers: Seq[IndividualName]
+  )(using RequestWithData[?]): Result = {
+
+    Ok(numberOfCompaniesHouseOfficersPage(
+      form =
+        agentApplication
+          .getNumberOfCompaniesHouseOfficers
+          .collect {
+            case SixOrMoreOfficers(_, x) => x
+          }.fold(NumberCompaniesHouseOfficersForm.form(companiesHouseOfficers.size))(NumberCompaniesHouseOfficersForm.form(companiesHouseOfficers.size).fill),
+      entityName = entityName,
+      agentApplication = agentApplication,
+      companiesHouseOfficersCount = companiesHouseOfficers.size
+    ))
+  }
 
   private def updateApplicationWithOfficerCount(
     agentApplication: IsIncorporated,
-    numberOfOfficers: NumberOfCompaniesHouseOfficers
+    numberOfCompaniesHouseOfficers: NumberOfCompaniesHouseOfficers
   ): IsIncorporated =
     agentApplication match
-      case application: AgentApplicationLimitedCompany => application.modify(_.numberOfIndividuals).setTo(Some(numberOfOfficers))
-      case application: AgentApplicationLimitedPartnership => application.modify(_.numberOfIndividuals).setTo(Some(numberOfOfficers))
-      case application: AgentApplicationLlp => application.modify(_.numberOfIndividuals).setTo(Some(numberOfOfficers))
-      case application: AgentApplicationScottishLimitedPartnership => application.modify(_.numberOfIndividuals).setTo(Some(numberOfOfficers))
-
-  private def syncIndividualsWithCompaniesHouse(
-    agentApplication: IsIncorporated,
-    existingIndividuals: List[IndividualProvidedDetails],
-    companiesHouseOfficers: Seq[CompaniesHouseOfficer]
-  )(using RequestHeader): Future[Unit] =
-    for
-      _ <-
-        Future.traverse(existingIndividuals)(i =>
-          individualProvideDetailsService.delete(i.individualProvidedDetailsId)
-        )
-      _ <-
-        Future.traverse(companiesHouseOfficers.toList)(officer =>
-          individualProvideDetailsService.upsertForApplication(
-            individualProvideDetailsService.create(
-              individualName = IndividualName(officer.name),
-              isPersonOfControl = true,
-              agentApplicationId = agentApplication.agentApplicationId
-            )
-          )
-        )
-    yield ()
-
-  private def hasChangedCompaniesHouseOfficersList(
-    individualProvidedDetailsList: List[IndividualProvidedDetails],
-    companiesHouseOfficersNames: List[CompaniesHouseOfficer]
-  ): Boolean =
-    if individualProvidedDetailsList.isEmpty then false
-    else
-      def normalise(s: String): String = s.trim.toLowerCase.replaceAll("\\s+", " ")
-
-      val provided = individualProvidedDetailsList.map(n => normalise(n.individualName.value)).toSet
-      val officers = companiesHouseOfficersNames.map(n => normalise(n.name)).toSet
-
-      provided =!= officers
+      case application: AgentApplicationLimitedCompany => application.modify(_.numberOfIndividuals).setTo(Some(numberOfCompaniesHouseOfficers))
+      case application: AgentApplicationLimitedPartnership => application.modify(_.numberOfIndividuals).setTo(Some(numberOfCompaniesHouseOfficers))
+      case application: AgentApplicationLlp => application.modify(_.numberOfIndividuals).setTo(Some(numberOfCompaniesHouseOfficers))
+      case application: AgentApplicationScottishLimitedPartnership => application.modify(_.numberOfIndividuals).setTo(Some(numberOfCompaniesHouseOfficers))

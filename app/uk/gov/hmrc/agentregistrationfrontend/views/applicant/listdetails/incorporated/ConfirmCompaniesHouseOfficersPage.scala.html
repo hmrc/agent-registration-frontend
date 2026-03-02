@@ -26,7 +26,7 @@
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
-@import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
+@import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 @this(
         layout: Layout,
         govukRadios: GovukRadios,
@@ -39,7 +39,7 @@
         form: Form[Boolean],
         entityName: String,
         agentApplication: AgentApplication,
-        companiesHouseOfficers: Seq[CompaniesHouseOfficer]
+        individualNameList: Seq[IndividualName]
         )(implicit
         request: RequestHeader,
         messages: Messages
@@ -72,8 +72,8 @@
         </p>
 
     <ul class="govuk-list govuk-list--bullet">
-        @for(officer <- companiesHouseOfficers) {
-            <li>@officer.name</li>
+        @for(name <- individualNameList) {
+            <li>@name.value</li>
         }
     </ul>
 
