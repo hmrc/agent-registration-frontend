@@ -44,7 +44,7 @@
     <p class="govuk-body">
         <h2 class="govuk-caption-xl">Limited Liability Partnership</h2>
         <ul class="govuk-list govuk-list--bullet">
-            @CompletedSection.CompletedSectionLlp.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
+            @CompletedSection.CompletedSectionLlp.values.sortBy(_.displayOrder).map { completedSection =>
               <li>
                   <a class="govuk-link" href="@{AppRoutes.testOnly.applicant.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
               </li>
@@ -55,7 +55,7 @@
     <p class="govuk-body">
         <h2 class="govuk-caption-xl">General Partnership</h2>
         <ul class="govuk-list govuk-list--bullet">
-            @CompletedSection.CompletedSectionGeneralPartnership.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
+            @CompletedSection.CompletedSectionGeneralPartnership.values.sortBy(_.displayOrder).map { completedSection =>
                 <li>
                     <a class="govuk-link" href="@{AppRoutes.testOnly.applicant.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
                 </li>
@@ -66,7 +66,7 @@
     <p class="govuk-body">
         <h2 class="govuk-caption-xl">Scottish Partnership</h2>
         <ul class="govuk-list govuk-list--bullet">
-            @CompletedSection.CompletedSectionScottishPartnership.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
+            @CompletedSection.CompletedSectionScottishPartnership.values.sortBy(_.displayOrder).map { completedSection =>
                 <li>
                     <a class="govuk-link" href="@{AppRoutes.testOnly.applicant.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
                 </li>
@@ -77,7 +77,7 @@
     <p class="govuk-body">
         <h2 class="govuk-caption-xl">Sole trader</h2>
         <ul class="govuk-list govuk-list--bullet">
-        @CompletedSection.CompletedSectionSoleTrader.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
+        @CompletedSection.CompletedSectionSoleTrader.values.sortBy(_.displayOrder).map { completedSection =>
             <li>
                 <a class="govuk-link" href="@{AppRoutes.testOnly.applicant.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
             </li>
@@ -88,7 +88,7 @@
     <p class="govuk-body">
         <h2 class="govuk-caption-xl">Limited Company</h2>
         <ul class="govuk-list govuk-list--bullet">
-        @CompletedSection.CompletedSectionLimitedCompany.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
+        @CompletedSection.CompletedSectionLimitedCompany.values.sortBy(_.displayOrder).map { completedSection =>
             <li>
                 <a class="govuk-link" href="@{AppRoutes.testOnly.applicant.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
             </li>
@@ -98,19 +98,19 @@
 
     <p class="govuk-body">
         <h2 class="govuk-caption-xl">Limited Partnership</h2>
-            <ul class="govuk-list govuk-list--bullet">
-            @CompletedSection.CompletedSectionLimitedPartnership.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
-                <li>
-                    <a class="govuk-link" href="@{AppRoutes.testOnly.applicant.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
-                </li>
-            }
-            </ul>
+        <ul class="govuk-list govuk-list--bullet">
+        @CompletedSection.CompletedSectionLimitedPartnership.values.sortBy(_.displayOrder).map { completedSection =>
+            <li>
+                <a class="govuk-link" href="@{AppRoutes.testOnly.applicant.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
+            </li>
+        }
+        </ul>
     </p>
 
     <p class="govuk-body">
-    <h2 class="govuk-caption-xl">Scottish Limited Partnership</h2>
+        <h2 class="govuk-caption-xl">Scottish Limited Partnership</h2>
         <ul class="govuk-list govuk-list--bullet">
-        @CompletedSection.CompletedSectionScottishLimitedPartnership.values.filter(_.alreadyDeveloped).sortBy(_.displayOrder).map { completedSection =>
+        @CompletedSection.CompletedSectionScottishLimitedPartnership.values.sortBy(_.displayOrder).map { completedSection =>
             <li>
                 <a class="govuk-link" href="@{AppRoutes.testOnly.applicant.FastForwardController.fastForward(completedSection)}">@completedSection.sectionName</a>
             </li>
