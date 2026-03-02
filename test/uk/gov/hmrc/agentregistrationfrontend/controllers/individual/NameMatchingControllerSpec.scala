@@ -55,9 +55,6 @@ extends ControllerSpec:
 
   private val path = s"/agent-registration/provide-details/individual-name-search/${linkId.value}"
 
-  private object individualProvideDetails:
-    val afterNinoNotProvided: IndividualProvidedDetails = tdAll.providedDetails.AfterNino.afterNinoNotProvided
-
   "NameMatchingController should have the correct routes" in:
     AppRoutes.providedetails.NameMatchingController.show(linkId) shouldBe Call(
       method = "GET",
@@ -119,7 +116,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.providedetails.NameMatchConfrimationController.show.url
+    response.header("Location").value shouldBe AppRoutes.providedetails.NameMatchConfrimationController.show(linkId).url
 
   s"POST $path with an incorrectly formatted name should show the page with the correct error" in:
     val testIndividualName = ""

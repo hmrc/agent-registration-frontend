@@ -751,3 +751,12 @@ individualNameForSearch.error.tooLong = Your full name must be 100 characters or
 # Contact Applicant Page
 contactApplicant.title = Name matching has failed contact the applicant
 contactApplicant.p1 = We have been unable to match your name to the name on the application. Contact the applicant.
+
+# Confirm matching name page
+nameMatchConfirmDetails.title = Are these details correct?
+nameMatchConfirmDetails.p1 = Confirm these are your details
+nameMatchConfirmDetails.label = Are these your details?
+nameMatchConfirmDetails.yes = Yes
+nameMatchConfirmDetails.no = No
+nameMatchConfirmDetails.error.required = Confirm whether or not these details are correct
+nameMatchConfirmDetails.name = Name

@@ -72,3 +72,9 @@ extends FrontendController(mcc, actions):
     baseAction(linkId):
       implicit request =>
         Ok(Json.prettyPrint(Json.toJson(request.get[IndividualProvidedDetails])))
+
+  def addIndividualNameToSession(individualName: String): Action[AnyContent] = Action:
+    implicit request =>
+      Ok("individual name added to session").addingToSession(
+        "agent-registration-frontend.individualName" -> individualName
+      )
