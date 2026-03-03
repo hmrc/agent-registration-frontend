@@ -19,7 +19,11 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
+import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationRiskingStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 
 class DeclarationControllerSpec
 extends ControllerSpec:
@@ -36,6 +40,11 @@ extends ControllerSpec:
       url = path
     )
   AppRoutes.apply.DeclarationController.submit.url shouldBe AppRoutes.apply.DeclarationController.show.url
+
+  private val individualsForSubmission = List(
+    tdAll.individualProvidedDetails.copy(providedDetailsState = Finished),
+    tdAll.individualProvidedDetails2.copy(providedDetailsState = Finished)
+  )
 
   object agentApplication:
 
@@ -56,6 +65,10 @@ extends ControllerSpec:
 
   s"GET $path before completing all other tasks should redirect to the tasklist" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeAllTasksComplete)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterAllOtherTasksComplete.agentApplicationId,
+      individuals = individualsForSubmission
+    )
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
@@ -65,6 +78,10 @@ extends ControllerSpec:
 
   s"GET $path after all tasks are complete should return 200 and render page" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterAllOtherTasksComplete)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterAllOtherTasksComplete.agentApplicationId,
+      individuals = individualsForSubmission
+    )
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -77,6 +94,16 @@ extends ControllerSpec:
       application = agentApplication.afterAllOtherTasksComplete,
       updatedApplication = agentApplication.afterDeclarationSubmitted
     )
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterAllOtherTasksComplete.agentApplicationId,
+      individuals = individualsForSubmission
+    )
+    AgentRegistrationRiskingStubs.stubSubmitAgentApplication(
+      SubmitForRiskingRequest(
+        agentApplication = agentApplication.afterDeclarationSubmitted,
+        individuals = individualsForSubmission
+      )
+    )
     val response: WSResponse =
       post(path)(
         Map("submit" -> Seq("AcceptAndSend"))
@@ -85,4 +112,5 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.AgentApplicationController.applicationSubmitted.url
+    AgentRegistrationRiskingStubs.verifySubmitAgentApplication(agentApplication.afterDeclarationSubmitted.agentApplicationId)
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()

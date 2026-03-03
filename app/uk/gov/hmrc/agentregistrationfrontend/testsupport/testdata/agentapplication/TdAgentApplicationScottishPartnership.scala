@@ -113,7 +113,7 @@ trait TdAgentApplicationScottishPartnership { dependencies: (TdBase & TdSectionA
     )
 
     val afterDeclarationSubmitted: AgentApplicationScottishPartnership = afterHmrcStandardForAgentsAgreed.copy(
-      applicationState = ApplicationState.Submitted
+      applicationState = ApplicationState.SentForRisking
     )
 
     val baseForSectionAmls: AgentApplicationScottishPartnership = afterGrsDataReceived

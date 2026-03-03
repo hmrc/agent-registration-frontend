@@ -39,7 +39,7 @@ extends ControllerSpec:
     .sectionContactDetails
     .afterEmailAddressVerified
     .modify(_.applicationState)
-    .setTo(ApplicationState.Submitted)
+    .setTo(ApplicationState.SentForRisking)
 
   object providedDetails:
     val providedDetails: IndividualProvidedDetails =
