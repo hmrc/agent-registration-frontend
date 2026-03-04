@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.connectors
 
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
@@ -36,6 +37,8 @@ class TestAgentRegistrationConnector @Inject() (
 )
 extends Connector:
 
+  private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration/test-only"
+
   def makeTestApplication()(using
     request: RequestHeader
   ): Future[TestOnlyLink] =
@@ -55,4 +58,21 @@ extends Connector:
             )
       .andLogOnFailure("Failed to created submitted application")
 
-  private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration/test-only"
+  def makeTestSmuIndividual()(using
+    request: RequestHeader
+  ): Future[IndividualProvidedDetailsId] =
+    val url: URL = url"$baseUrl/smu-viewer-individual"
+    httpClient
+      .post(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => response.json.as[IndividualProvidedDetailsId]
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to create smu viewer individual")

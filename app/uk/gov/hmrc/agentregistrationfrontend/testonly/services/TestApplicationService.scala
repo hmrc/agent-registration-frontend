@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
@@ -33,3 +34,6 @@ extends RequestAwareLogging:
 
   def makeTestApplication()(using request: RequestHeader): Future[TestOnlyLink] = testAgentRegistrationConnector
     .makeTestApplication()
+
+  def makeTestSmuIndividual()(using request: RequestHeader): Future[IndividualProvidedDetailsId] = testAgentRegistrationConnector
+    .makeTestSmuIndividual()

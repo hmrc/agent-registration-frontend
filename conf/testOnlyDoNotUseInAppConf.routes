@@ -31,5 +31,6 @@ GET         /agent-registration/test-only/get-link-id                           
 GET         /agent-registration/test-only/fast-forward                                       uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.show
 GET         /agent-registration/test-only/fast-forward-to/:completedSection                  uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.FastForwardController.fastForward(completedSection: CompletedSection)
 
+GET         /agent-registration/test-only/show-provided-details/:linkId                      uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.showProvidedDetails(linkId: LinkId)
 
-GET        /agent-registration/test-only/show-provided-details/:linkId                       uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.showProvidedDetails(linkId: LinkId)
+GET        /agent-registration/test-only/smu-viewer-create-individual                       uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.smuviewer.TestOnlyController.makeTestSmuViewerIndividual

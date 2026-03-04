@@ -37,6 +37,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.routes as pr
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.routes as testOnlyRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.routes as testOnlyApplicantRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.routes as testOnlyIndividualRoutes
+import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.smuviewer.routes as testOnlySmuViewerRoutes
 
 /** All application routes centralized in one place for convenience and clarity. It helps avoid naming conflicts and makes route management easier.
   *
@@ -164,3 +165,6 @@ object AppRoutes:
 
     object individual:
       val TestOnlyController = testOnlyIndividualRoutes.TestOnlyController
+
+    object smuviewer:
+      val TestOnlyController = testOnlySmuViewerRoutes.TestOnlyController
