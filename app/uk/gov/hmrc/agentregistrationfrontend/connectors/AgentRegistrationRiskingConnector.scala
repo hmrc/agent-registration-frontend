@@ -36,7 +36,7 @@ class AgentRegistrationRiskingConnector @Inject() (
 extends Connector:
 
   def submitForRisking(submitForRiskingRequest: SubmitForRiskingRequest)(using RequestHeader): Future[Unit] =
-    val url: URL = url"$baseUrl/submit-for-risking/${submitForRiskingRequest.agentApplication.agentApplicationId.value}"
+    val url: URL = url"$baseUrl/submit-for-risking"
     httpClient
       .post(url)
       .withBody(Json.toJson(submitForRiskingRequest))

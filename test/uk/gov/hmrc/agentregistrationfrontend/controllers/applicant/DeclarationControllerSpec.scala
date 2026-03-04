@@ -112,5 +112,5 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.AgentApplicationController.applicationSubmitted.url
-    AgentRegistrationRiskingStubs.verifySubmitAgentApplication(agentApplication.afterDeclarationSubmitted.agentApplicationId)
+    AgentRegistrationRiskingStubs.verifySubmitAgentApplication()
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
