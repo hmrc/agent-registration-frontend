@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplicat
 
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.ApplicationState.GrsDataReceived
-import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAgentDetails
@@ -45,7 +45,7 @@ trait TdAgentApplicationScottishLimitedPartnership {
       refusalToDealWithCheckResult = None,
       companyStatusCheckResult = None,
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-      numberOfRequiredKeyIndividuals = None,
+      numberOfIndividuals = None,
       hasOtherRelevantIndividuals = None,
       vrns = None,
       payeRefs = None
@@ -92,9 +92,10 @@ trait TdAgentApplicationScottishLimitedPartnership {
     )
 
     val afterHowManyKeyIndividuals: AgentApplicationScottishLimitedPartnership = afterHmrcStandardForAgentsAgreed.copy(
-      numberOfRequiredKeyIndividuals = Some(
-        FiveOrLess(
-          numberOfKeyIndividuals = 3
+      numberOfIndividuals = Some(
+        FiveOrLessOfficers(
+          numberOfCompaniesHouseOfficers = 3,
+          isCompaniesHouseOfficersListCorrect = true
         )
       )
     )

@@ -99,7 +99,9 @@ class ApplicationFactory @Inject() (
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
     numberOfIndividuals = None,
-    hasOtherRelevantIndividuals = None
+    hasOtherRelevantIndividuals = None,
+    vrns = None,
+    payeRefs = None
   )
 
   def makeNewAgentApplicationGeneralPartnership(
