@@ -43,7 +43,7 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.ACCEPTED => ()
+          case Status.CREATED => ()
           case other =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "POST",
