@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.incorp
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.UpdateCompaniesHouseOfficersPage
 
@@ -28,22 +27,22 @@ extends ViewSpec:
 
   val viewTemplate: UpdateCompaniesHouseOfficersPage = app.injector.instanceOf[UpdateCompaniesHouseOfficersPage]
 
-  val agentApplication: AgentApplication =
-    tdAll
-      .agentApplicationLlp
-      .afterHmrcStandardForAgentsAgreed
+  private val agentApplication: AgentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
 
   private val entityName: String = tdAll.companyName
 
   private val caption: String = "LLP members and other tax adviser information"
   private val heading: String = "You need to update Companies House"
+  private val p1: String = s"As part of this application process, we need a verifiable list of the current members of $entityName."
+  private val p2: String = "Update your Companies House so the correct details are showing on their website."
+  private val p3: String = "You can then continue with your application for an agent services account."
 
   private def render(): Document = Jsoup.parse(viewTemplate(
     entityName = entityName,
     agentApplication = agentApplication
   ).body)
 
-  "UpdateCompaniesHousePage" should:
+  "UpdateCompaniesHouseOfficersPage" should:
 
     val doc: Document = render()
 
@@ -52,20 +51,24 @@ extends ViewSpec:
         s"""
            |$caption
            |$heading
-           |As part of this application process, we need a verifiable list of the current members of $entityName.
-           |Update your Companies House so the correct details are showing on their website.
-           |You can then continue with your application for an agent services account.
+           |$p1
+           |$p2
+           |$p3
            |Save and come back later
            |Is this page not working properly? (opens in new tab)
            |""".stripMargin
       )
 
-    "render a save and come back later button" in:
-      doc
-        .mainContent
-        .selectOrFail(s"a.govuk-button, button[value=${SaveAndComeBackLater.toString}]")
-        .selectOnlyOneElementOrFail()
-        .text() shouldBe "Save and come back later"
-
     "have the correct title" in:
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
+
+    "contain the caption" in:
+      doc.mainContent.select("h2.govuk-caption-l").text() shouldBe caption
+
+    "contain the heading" in:
+      doc.mainContent.select("h1").text() shouldBe heading
+
+    "contain the save and come back later button" in:
+      val button = doc.mainContent.select("a.govuk-button, button.govuk-button").first()
+      button.text() shouldBe "Save and come back later"
+      button.attr("href") shouldBe AppRoutes.apply.SaveForLaterController.show.url

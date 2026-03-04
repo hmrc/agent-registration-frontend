@@ -19,52 +19,42 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.incorp
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
-import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmCompaniesHouseOfficersForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.RemoveKeyIndividualForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.ConfirmCompaniesHouseOfficersPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.RemoveKeyIndividualPage
 
-class ConfirmCompaniesHouseOfficersPageSpec
+class RemoveKeyIndividualPageSpec
 extends ViewSpec:
 
-  val viewTemplate: ConfirmCompaniesHouseOfficersPage = app.injector.instanceOf[ConfirmCompaniesHouseOfficersPage]
+  val viewTemplate: RemoveKeyIndividualPage = app.injector.instanceOf[RemoveKeyIndividualPage]
 
-  private val agentApplication: AgentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
+  private val agentApplication: AgentApplication = tdAll.agentApplicationLlp.afterNumberOfConfirmCompaniesHouseOfficers
 
-  private val entityName: String = tdAll.companyName
-  private val individualNameList: Seq[IndividualName] = Seq(
-    IndividualName("Tester, John"),
-    IndividualName("Tester, Alice")
-  )
+  private val individualProvidedDetails = tdAll.individualProvidedDetails
+  private val individualName: String = individualProvidedDetails.individualName.value
 
-  private val key: String = ConfirmCompaniesHouseOfficersForm.isCompaniesHouseOfficersListCorrect
+  private val key: String = RemoveKeyIndividualForm.key
   private val caption: String = "LLP members and other tax adviser information"
-  private val heading: String = s"Check this list of members for $entityName"
-  private val intro: String = s"These are the members listed in Companies House for $entityName:"
-  private val question: String = "Is this list of members correct?"
+  private val heading: String = s"Confirm that you want to remove $individualName from the list of partners"
 
-  private def render(form: play.api.data.Form[Boolean]): Document = Jsoup.parse(viewTemplate(
+  private def render(form: play.api.data.Form[YesNo]): Document = Jsoup.parse(viewTemplate(
     form = form,
-    entityName = entityName,
-    agentApplication = agentApplication,
-    individualNameList = individualNameList
+    individualProvidedDetails = individualProvidedDetails,
+    agentApplication = agentApplication
   ).body)
 
-  "ConfirmCompaniesHouseOfficersPage" should:
+  "RemoveKeyIndividualPage" should:
 
-    val doc: Document = render(ConfirmCompaniesHouseOfficersForm.form)
+    val doc: Document = render(RemoveKeyIndividualForm.form(individualName))
 
     "contain expected content" in:
       doc.mainContent shouldContainContent (
         s"""
            |$caption
            |$heading
-           |$intro
-           |Tester, John
-           |Tester, Alice
-           |$question
            |Yes
            |No
            |Save and continue
@@ -79,7 +69,7 @@ extends ViewSpec:
     "render a form with correct action" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitFiveOrLess.url
+      form.attr("action") shouldBe AppRoutes.apply.listdetails.incoporated.RemoveCompaniesHouseOfficerController.submit(individualProvidedDetails._id).url
 
     "render a save and continue button" in:
       doc
@@ -97,9 +87,9 @@ extends ViewSpec:
 
     "render a form error when the form contains an error" in:
       val field = key
-      val errorMessage = "Select yes if this list is correct"
-      val formWithError = ConfirmCompaniesHouseOfficersForm
-        .form
+      val errorMessage = "Select yes if you want to remove"
+      val formWithError = RemoveKeyIndividualForm
+        .form(individualName)
         .withError(field, errorMessage)
 
       behavesLikePageWithErrorHandling(

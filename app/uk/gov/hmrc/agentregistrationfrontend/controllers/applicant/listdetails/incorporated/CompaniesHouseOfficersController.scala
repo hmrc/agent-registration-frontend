@@ -160,7 +160,6 @@ extends FrontendController(mcc, actions):
                 )
               )
 
-              // TODO WG - should we delete if user say list is not correct ?? I presume yes but what is same name missing etc ?
               val deleteIndividualProvideDetails =
                 if (individuals.isEmpty)
                   Future.successful(())
@@ -208,7 +207,6 @@ extends FrontendController(mcc, actions):
               for
                 _ <- insertIndividualProvideDetails
                 _ <- agentApplicationService.upsert(updatedApplication)
-              // TODO WG - chnage back to Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url)
               yield Redirect(AppRoutes.apply.listdetails.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater
 
@@ -252,7 +250,7 @@ extends FrontendController(mcc, actions):
           )
 
           for _ <- agentApplicationService.upsert(updatedApplication)
-          yield Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url)
+          yield Redirect(AppRoutes.apply.listdetails.incoporated.EnterCompaniesHouseOfficerController.show.url)
       .redirectIfSaveForLater
 
   // Private helper methods

@@ -56,23 +56,23 @@
     <h1 class="govuk-heading-l">@h1</h1>
 
     <p class="govuk-body">
-        @messages(s"$key.p1", entityName)
+    @messages(s"$key.p1.$businessTypeKey", entityName)
     </p>
 
     <p class="govuk-body">
-        @messages(s"$key.p2")
+    @messages(s"$key.p2")
     </p>
 
     <p class="govuk-body">
-        @messages(s"$key.p3")
+    @messages(s"$key.p3")
     </p>
 
     <div>
-        @govukButton(Button(
-            name = Some("submit"),
-            value = Some(SaveAndComeBackLater.toString),
-            content = Text(messages("common.saveAndComeBackLater")),
-            href = Some(AppRoutes.apply.SaveForLaterController.show.url)
-        ))
+    @govukButton(Button(
+        name = Some("submit"),
+        value = Some(SaveAndComeBackLater.toString),
+        content = Text(messages("common.saveAndComeBackLater")),
+        href = Some(AppRoutes.apply.SaveForLaterController.show.url)
+    ))
     </div>
 }

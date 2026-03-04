@@ -16,33 +16,39 @@
 
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
-@import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedPartnership
-@import play.api.data.Form
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-@import uk.gov.hmrc.agentregistrationfrontend.forms.NumberCompaniesHouseOfficersForm
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistrationfrontend.forms.RemoveKeyIndividualForm
+@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
+@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.No
+@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.Yes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
 
 @this(
         layout: Layout,
+        govukRadios: GovukRadios,
         govukInput: GovukInput,
         formWithCSRF: FormWithCSRF,
+        govukButton: GovukButton,
         continueOrSaveForLater: ContinueOrSaveForLater
 )
 
 @(
-        form: Form[Int],
-        entityName: String,
-        agentApplication: AgentApplication,
-        companiesHouseOfficersCount: Int
-        )(implicit
+        form: Form[YesNo],
+        individualProvidedDetails: IndividualProvidedDetails,
+        agentApplication: AgentApplication
+)(implicit
         request: RequestHeader,
         messages: Messages
 )
 
-@key = @{ NumberCompaniesHouseOfficersForm.numberOfOfficersResponsibleForTaxMatters }
+@key = @{RemoveKeyIndividualForm.key}
+@title = @{messages(s"$key.title", individualProvidedDetails.individualName.value)}
 
 @businessTypeKey = @{
     agentApplication match {
@@ -53,40 +59,29 @@
     }
 }
 
-@title = @{ messages(s"$key.title.$businessTypeKey", entityName) }
-@question = @{ messages(s"$key.question.$businessTypeKey") }
-
 @layout(
     pageTitle = title,
     maybeForm = Some(form)
 ) {
     <h2 class="govuk-caption-l">@messages(s"lists.caption.title.$businessTypeKey")</h2>
-
-    <h1 class="govuk-heading-l">@title</h1>
-
-    <p class="govuk-body">
-        @messages(s"$key.intro.$businessTypeKey", companiesHouseOfficersCount, entityName)
-    </p>
-
-    <p class="govuk-body">
-        @messages(s"$key.p1.$businessTypeKey")
-    </p>
-
-    <ul class="govuk-list govuk-list--bullet">
-        <li>@messages(s"$key.responsibilities.bullet1")</li>
-        <li>@messages(s"$key.responsibilities.bullet2")</li>
-    </ul>
-
-    @formWithCSRF(action = AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitSixOrMore) {
-        @govukInput(Input(
-            label = Label(
-                content = Text(question),
-                classes = "govuk-label--m"
-            ),
-            hint = Some(Hint(
-                content = Text(messages(s"$key.hint.$businessTypeKey", companiesHouseOfficersCount))
+    @formWithCSRF(action = AppRoutes.apply.listdetails.incoporated.RemoveCompaniesHouseOfficerController.submit(individualProvidedDetails._id)) {
+        @govukRadios(Radios(
+            fieldset = Some(Fieldset(
+                legend = Some(Legend(
+                    content = Text(title),
+                    isPageHeading = true,
+                    classes = "govuk-fieldset__legend--l"
+                ))
             )),
-            classes = "govuk-input--width-5"
+            items = Seq(
+                Yes.toString,
+                No.toString
+            ).map( option =>
+                RadioItem(
+                    content = Text(messages(s"$key.$option")),
+                    value = Some(option)
+                )
+            )
         ).withFormField(form(key)))
 
         @continueOrSaveForLater()

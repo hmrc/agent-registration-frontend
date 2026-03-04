@@ -16,33 +16,37 @@
 
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
-@import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedPartnership
-@import play.api.data.Form
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-@import uk.gov.hmrc.agentregistrationfrontend.forms.NumberCompaniesHouseOfficersForm
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
+@import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
+@import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseIndividuaNameForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
-@import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
 
 @this(
         layout: Layout,
         govukInput: GovukInput,
+        govukDetails: GovukDetails,
         formWithCSRF: FormWithCSRF,
+        govukButton: GovukButton,
         continueOrSaveForLater: ContinueOrSaveForLater
 )
 
 @(
-        form: Form[Int],
+        form: Form[IndividualName],
         entityName: String,
-        agentApplication: AgentApplication,
-        companiesHouseOfficersCount: Int
-        )(implicit
+        numberOfMembers: Int,
+        ordinalKey: String,
+        formAction: Call,
+        agentApplication: AgentApplication
+)(implicit
         request: RequestHeader,
         messages: Messages
 )
 
-@key = @{ NumberCompaniesHouseOfficersForm.numberOfOfficersResponsibleForTaxMatters }
+@key = @{ CompaniesHouseIndividuaNameForm.key }
 
 @businessTypeKey = @{
     agentApplication match {
@@ -53,8 +57,7 @@
     }
 }
 
-@title = @{ messages(s"$key.title.$businessTypeKey", entityName) }
-@question = @{ messages(s"$key.question.$businessTypeKey") }
+@title = @{messages(s"$key.complex.title.$businessTypeKey", entityName)}
 
 @layout(
     pageTitle = title,
@@ -64,30 +67,37 @@
 
     <h1 class="govuk-heading-l">@title</h1>
 
-    <p class="govuk-body">
-        @messages(s"$key.intro.$businessTypeKey", companiesHouseOfficersCount, entityName)
-    </p>
+    <p class="govuk-body">@messages(s"$key.complex.p1")</p>
 
-    <p class="govuk-body">
-        @messages(s"$key.p1.$businessTypeKey")
-    </p>
+    <p class="govuk-body">@messages(s"$key.complex.p2.$businessTypeKey", numberOfMembers)</p>
 
-    <ul class="govuk-list govuk-list--bullet">
-        <li>@messages(s"$key.responsibilities.bullet1")</li>
-        <li>@messages(s"$key.responsibilities.bullet2")</li>
-    </ul>
+    @govukDetails(Details(
+        summary = Text(messages(s"$key.complex.details.summary")),
+        content = HtmlContent(
+            s"""<p class="govuk-body">${messages(s"$key.complex.details.p1.$businessTypeKey")}</p>
+               |<ul class="govuk-list govuk-list--bullet">
+               |    <li>${messages(s"$key.complex.details.bullet1")}</li>
+               |    <li>${messages(s"$key.complex.details.bullet2")}</li>
+               |</ul>""".stripMargin
+        )
+    ))
 
-    @formWithCSRF(action = AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitSixOrMore) {
+    <h2 class="govuk-heading-m">@messages(s"$key.question.$ordinalKey")</h2>
+
+    @formWithCSRF(action = formAction) {
         @govukInput(Input(
             label = Label(
-                content = Text(question),
-                classes = "govuk-label--m"
-            ),
-            hint = Some(Hint(
-                content = Text(messages(s"$key.hint.$businessTypeKey", companiesHouseOfficersCount))
-            )),
-            classes = "govuk-input--width-5"
-        ).withFormField(form(key)))
+                content = Text(messages(s"$key.firstName.label")),
+                classes = "govuk-label"
+            )
+        ).withFormField(form(CompaniesHouseIndividuaNameForm.firstNameKey)))
+
+        @govukInput(Input(
+            label = Label(
+                content = Text(messages(s"$key.lastName.label")),
+                classes = "govuk-label"
+            )
+        ).withFormField(form(CompaniesHouseIndividuaNameForm.lastNameKey)))
 
         @continueOrSaveForLater()
     }

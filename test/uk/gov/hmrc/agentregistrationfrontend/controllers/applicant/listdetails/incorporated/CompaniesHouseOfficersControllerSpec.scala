@@ -128,7 +128,6 @@ extends ControllerSpec:
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeCompaniesHouseOfficers.agentApplicationId)
     CompaniesHouseStubs.verifySixOfficersCalls()
 
-  // TODO WG - confirm and update that test
   s"GET $getPath when Companies House returns no officers should display update Companies House advice page" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
@@ -146,8 +145,8 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "You need to update Companies House - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("h1").text() shouldBe "You need to update Companies House"
-//    doc.mainContent.select("p").text() should include("There are no active officers recorded at Companies House for this company")
-//    doc.mainContent.select("p").text() should include("Please update your Companies House record before continuing")
+    //    doc.mainContent.select("p").text() should include("There are no active officers recorded at Companies House for this company")
+    //    doc.mainContent.select("p").text() should include("Please update your Companies House record before continuing")
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeCompaniesHouseOfficers.agentApplicationId)
     CompaniesHouseStubs.verifySixOfficersCalls()
@@ -179,7 +178,6 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeCompaniesHouseOfficers.agentApplicationId)
     CompaniesHouseStubs.verifySixOfficersCalls()
-
 
   s"POST $postFiveOrLessPath with 'No' selection should display update Companies House advice page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeCompaniesHouseOfficers)
@@ -242,7 +240,7 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe
-      AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
+      AppRoutes.apply.listdetails.incoporated.EnterCompaniesHouseOfficerController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeCompaniesHouseOfficers.agentApplicationId)
     CompaniesHouseStubs.verifySixOfficersCalls(1)

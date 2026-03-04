@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,53 +20,58 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
-import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmCompaniesHouseOfficersForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseIndividuaNameForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.ConfirmCompaniesHouseOfficersPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.EnterCompaniesHouseFirstIndividualNamePage
 
-class ConfirmCompaniesHouseOfficersPageSpec
+class EnterCompaniesHouseFirstIndividualNamePageSpec
 extends ViewSpec:
 
-  val viewTemplate: ConfirmCompaniesHouseOfficersPage = app.injector.instanceOf[ConfirmCompaniesHouseOfficersPage]
-
-  private val agentApplication: AgentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
+  val viewTemplate: EnterCompaniesHouseFirstIndividualNamePage = app.injector.instanceOf[EnterCompaniesHouseFirstIndividualNamePage]
 
   private val entityName: String = tdAll.companyName
-  private val individualNameList: Seq[IndividualName] = Seq(
-    IndividualName("Tester, John"),
-    IndividualName("Tester, Alice")
-  )
+  private val numberOfMembers: Int = 3
+  private val ordinalKey: String = "first"
+  private val formAction: play.api.mvc.Call = AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitSixOrMore
+  private val agentApplication: AgentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
 
-  private val key: String = ConfirmCompaniesHouseOfficersForm.isCompaniesHouseOfficersListCorrect
   private val caption: String = "LLP members and other tax adviser information"
-  private val heading: String = s"Check this list of members for $entityName"
-  private val intro: String = s"These are the members listed in Companies House for $entityName:"
-  private val question: String = "Is this list of members correct?"
+  private val heading: String = s"Tell us about the members of $entityName"
+  private val p1: String = "We'll check this against the business records in Companies House."
+  private val p2: String = s"We need the names of all $numberOfMembers LLP members responsible for tax advice activities."
+  private val detailsSummary: String = "What we mean by responsible for tax advice"
+  private val detailsContent: String = "An LLP member is responsible for tax advice if they have:"
+  private val question: String = "What is the name of the first person?"
 
-  private def render(form: play.api.data.Form[Boolean]): Document = Jsoup.parse(viewTemplate(
+  private def render(form: play.api.data.Form[IndividualName]): Document = Jsoup.parse(viewTemplate(
     form = form,
     entityName = entityName,
-    agentApplication = agentApplication,
-    individualNameList = individualNameList
+    numberOfMembers = numberOfMembers,
+    ordinalKey = ordinalKey,
+    formAction = formAction,
+    agentApplication = agentApplication
   ).body)
 
-  "ConfirmCompaniesHouseOfficersPage" should:
+  "EnterCompaniesHouseFirstIndividualNamePage" should:
 
-    val doc: Document = render(ConfirmCompaniesHouseOfficersForm.form)
+    val doc: Document = render(CompaniesHouseIndividuaNameForm.form)
 
     "contain expected content" in:
       doc.mainContent shouldContainContent (
         s"""
            |$caption
            |$heading
-           |$intro
-           |Tester, John
-           |Tester, Alice
+           |$p1
+           |$p2
+           |$detailsSummary
+           |$detailsContent
+           |material responsibility for tax advice activities
+           |significant authority over HMRC interactions
            |$question
-           |Yes
-           |No
+           |First names
+           |Last name
            |Save and continue
            |Save and come back later
            |Is this page not working properly? (opens in new tab)
@@ -79,7 +84,7 @@ extends ViewSpec:
     "render a form with correct action" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
       form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitFiveOrLess.url
+      form.attr("action") shouldBe formAction.url
 
     "render a save and continue button" in:
       doc
@@ -95,10 +100,24 @@ extends ViewSpec:
         .selectOnlyOneElementOrFail()
         .text() shouldBe "Save and come back later"
 
-    "render a form error when the form contains an error" in:
-      val field = key
-      val errorMessage = "Select yes if this list is correct"
-      val formWithError = ConfirmCompaniesHouseOfficersForm
+    "render a form error when the firstName field contains an error" in:
+      val field = CompaniesHouseIndividuaNameForm.firstNameKey
+      val errorMessage = "Enter first name"
+      val formWithError = CompaniesHouseIndividuaNameForm
+        .form
+        .withError(field, errorMessage)
+
+      behavesLikePageWithErrorHandling(
+        field = field,
+        errorMessage = errorMessage,
+        errorDoc = render(formWithError),
+        heading = heading
+      )
+
+    "render a form error when the lastName field contains an error" in:
+      val field = CompaniesHouseIndividuaNameForm.lastNameKey
+      val errorMessage = "Enter last name"
+      val formWithError = CompaniesHouseIndividuaNameForm
         .form
         .withError(field, errorMessage)
 
