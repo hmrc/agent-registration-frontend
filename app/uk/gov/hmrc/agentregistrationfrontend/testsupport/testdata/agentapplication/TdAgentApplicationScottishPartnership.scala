@@ -45,7 +45,9 @@ trait TdAgentApplicationScottishPartnership { dependencies: (TdBase & TdSectionA
       refusalToDealWithCheckResult = None,
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
       numberOfIndividuals = None,
-      hasOtherRelevantIndividuals = None
+      hasOtherRelevantIndividuals = None,
+      vrns = None,
+      payeRefs = None
     )
 
     val afterGrsDataReceived: AgentApplicationScottishPartnership = afterStarted.copy(
@@ -111,7 +113,7 @@ trait TdAgentApplicationScottishPartnership { dependencies: (TdBase & TdSectionA
     )
 
     val afterDeclarationSubmitted: AgentApplicationScottishPartnership = afterHmrcStandardForAgentsAgreed.copy(
-      applicationState = ApplicationState.Submitted
+      applicationState = ApplicationState.SentForRisking
     )
 
     val baseForSectionAmls: AgentApplicationScottishPartnership = afterGrsDataReceived

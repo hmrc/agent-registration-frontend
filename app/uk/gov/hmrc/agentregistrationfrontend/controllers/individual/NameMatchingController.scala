@@ -24,6 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.forms.individual.NameMatchingForm
+import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.addToSession
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.NameMatchingPage
@@ -46,18 +47,19 @@ extends FrontendController(mcc, actions):
 
   def baseAction(linkId: LinkId): ActionBuilderWithData[DataWithIndividualProvidedDetailsForSearch] = actions
     .authorised
-    .refine { implicit request =>
-      agentApplicationService
-        .find(linkId)
-        .map:
-          case Some(agentApplication) => request.add(agentApplication)
-          case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
-    }.refine { implicit request =>
-      individualProvideDetailsService
-        .findAllForMatchingWithApplication(request.get[AgentApplication].agentApplicationId)
-        .map: listOfIndividuals =>
-          request.add[List[IndividualProvidedDetails]](listOfIndividuals)
-    }
+    .refine:
+      implicit request =>
+        agentApplicationService
+          .find(linkId)
+          .map:
+            case Some(agentApplication) => request.add(agentApplication)
+            case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
+    .refine:
+      implicit request =>
+        individualProvideDetailsService
+          .findAllForMatchingWithApplication(request.get[AgentApplication].agentApplicationId)
+          .map: listOfIndividuals =>
+            request.add[List[IndividualProvidedDetails]](listOfIndividuals)
 
   def show(linkId: LinkId): Action[AnyContent] = baseAction(linkId).async:
     implicit request =>
@@ -77,7 +79,8 @@ extends FrontendController(mcc, actions):
         providedName =>
           val agentProvidedNamesList = request.get[List[IndividualProvidedDetails]]
           if agentProvidedNamesList.isNamePresent(providedName) then
-            Future.successful(Redirect(AppRoutes.providedetails.NameMatchConfrimationController.show))
+            Future.successful(Redirect(AppRoutes.providedetails.NameMatchConfrimationController.show(linkId))
+              .addToSession(providedName))
           else
             Future.successful(Redirect(AppRoutes.providedetails.ContactApplicantController.show))
       )

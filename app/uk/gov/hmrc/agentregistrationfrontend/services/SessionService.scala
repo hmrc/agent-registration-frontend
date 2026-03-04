@@ -23,6 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.UserRole
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
@@ -37,6 +38,7 @@ object SessionService:
   private val typeOfSignInKey: String = s"$microserviceName.typeOfSignIn"
   private val agentApplicationId: String = s"$microserviceName.agentApplicationId"
   private val userRoleKey: String = s"$microserviceName.userRole"
+  private val individualNameKey: String = s"$microserviceName.individualName"
 
   extension (r: Result)
 
@@ -47,6 +49,8 @@ object SessionService:
     def addToSession(aid: AgentApplicationId)(using request: RequestHeader): Result = r.addingToSession(agentApplicationId -> aid.value)
     def addToSession(ur: UserRole)(using request: RequestHeader): Result = r.addingToSession(userRoleKey -> ur.toString)
     def removePartnershipTypeFromSession(using request: RequestHeader): Result = r.removingFromSession(partnershipTypeKey)
+
+    def addToSession(in: IndividualName)(using request: RequestHeader): Result = r.addingToSession(individualNameKey -> in.value)
 
   extension (r: Request[?])
 
@@ -100,3 +104,8 @@ object SessionService:
 
     def readAgentApplicationId: Option[AgentApplicationId] = r.session.get(agentApplicationId)
       .map(value => AgentApplicationId(value))
+
+    def getIndividualName: IndividualName = readIndividualName.getOrThrowExpectedDataMissing("Individual Name")
+
+    def readIndividualName: Option[IndividualName] = r.session.get(individualNameKey)
+      .map(name => IndividualName(name))

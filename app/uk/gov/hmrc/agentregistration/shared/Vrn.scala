@@ -14,15 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.lists
+package uk.gov.hmrc.agentregistration.shared
 
 import play.api.libs.json.Format
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 
-final case class IndividualName(
-  value: String
-):
-  def isValidName: Boolean = value.matches("^[a-zA-Z\\-' ]+$")
+/** Vat Registration Number (Vrn)
+  */
+final case class Vrn(value: String)
 
-object IndividualName:
-  given format: Format[IndividualName] = JsonFormatsFactory.makeValueClassFormat
+object Vrn:
+  given format: Format[Vrn] = JsonFormatsFactory.makeValueClassFormat
