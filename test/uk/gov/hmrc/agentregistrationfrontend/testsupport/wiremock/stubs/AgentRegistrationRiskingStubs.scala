@@ -26,7 +26,7 @@ object AgentRegistrationRiskingStubs:
   def stubSubmitAgentApplication(submitForRiskingRequest: SubmitForRiskingRequest): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration-risking/submit-for-risking"),
-    responseStatus = 202
+    responseStatus = 201
   )
 
   def verifySubmitAgentApplication(
