@@ -51,3 +51,7 @@ extends ISpec,
   def addAgentApplicationIdToSession(agentApplicationId: AgentApplicationId): WSResponse = get(
     s"/agent-registration/test-only/add-agent-applicationId/${agentApplicationId.value}"
   )
+
+  def addIndividualNameToSession(individualName: String): WSResponse = get(
+    s"/agent-registration/test-only/add-individual-name/${individualName}"
+  )

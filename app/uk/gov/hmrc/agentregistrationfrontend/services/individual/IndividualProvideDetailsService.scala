@@ -127,3 +127,13 @@ extends RequestAwareLogging:
           .setTo(ProvidedDetailsState.Started)
       )
   }
+
+  def claimIndividualNonCiDProvidedDetails(
+    individualProvidedDetails: IndividualProvidedDetails,
+    internalUserId: InternalUserId
+  )(using request: RequestHeader): Future[Unit] = individualProvideDetailsConnector
+    .upsertForIndividual(
+      individualProvidedDetails
+        .modify(_.internalUserId)
+        .setTo(Some(internalUserId))
+    )

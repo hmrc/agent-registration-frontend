@@ -25,6 +25,7 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
@@ -159,6 +160,36 @@ extends UnitSpec:
 
     "readAgentApplicationId should return None when business type is not present in session" in:
       request.readAgentApplicationId shouldBe None
+
+  "Individual Name" should {
+    s"Be added to the session and read back from the request" in:
+      val individualName = IndividualName("John Doe")
+      val newResult = result
+        .addToSession(individualName)
+
+      newResult
+        .asRequest
+        .readIndividualName shouldBe Some(individualName)
+
+      newResult.newSession.value.get(
+        "agent-registration-frontend.individualName"
+      ).value shouldBe individualName.value withClue "data should be stored under 'agent-registration-frontend.individualName' session key"
+
+      newResult.newSession.value.get(
+        "some-preexisting-key"
+      ).value shouldBe "some-value" withClue "preexisting session data should not be affected"
+
+    "getIndividualName should throw exception if the name is not present in the session" in {
+      val throwable: RuntimeException = intercept[RuntimeException] {
+        request.withSession().getIndividualName
+      }
+      throwable.getMessage shouldBe "Expected data was missing: Individual Name"
+    }
+
+    "readIndividualName should return None when the name is not present in the session" in {
+      request.readIndividualName shouldBe None
+    }
+  }
 
   extension (result: Result)
     def asRequest: Request[?] = request.withSession(result.newSession.getOrElse(Session()).data.toSeq*)
