@@ -60,10 +60,21 @@
     messages(s"$key.title.${MessageKeys.singularOrPlural(existingList.size)}", existingList.size)
 }
 @requiredSize = @{
-    sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters
+    sixOrMoreOfficers.totalListSize
 }
 @diff = @{
     requiredSize - existingList.size
+}
+@paddingNeeded = @{
+    sixOrMoreOfficers.requiredPadding
+}
+
+@paddingInset = {
+    <p class="govuk-body">@messages(s"$key.complex.intro")</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@messages(s"$key.complex.bullet1.${MessageKeys.singularOrPlural(sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters)}", sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters)</li>
+        <li>@messages(s"$key.complex.bullet2.${MessageKeys.singularOrPlural(paddingNeeded)}", paddingNeeded)</li>
+    </ul>
 }
 
 @layout(pageTitle = title) {
@@ -97,9 +108,15 @@
     ))
 
     @if(diff > 0) {
-        @govukInsetText(InsetText(
-            content = Text(messages(s"$key.insetText.${MessageKeys.singularOrPlural(diff)}", diff))
-        ))
+        @if(paddingNeeded > 0) {
+            @govukInsetText(InsetText(
+                content = HtmlContent(paddingInset)
+            ))
+        } else {
+            @govukInsetText(InsetText(
+                content = Text(messages(s"$key.insetText.${MessageKeys.singularOrPlural(diff)}", diff))
+            ))
+        }
         <p class="govuk-body">
         @continueOrSaveForLaterLinks(
             continueHref = AppRoutes.apply.listdetails.incoporated.EnterCompaniesHouseOfficerController.show.url,

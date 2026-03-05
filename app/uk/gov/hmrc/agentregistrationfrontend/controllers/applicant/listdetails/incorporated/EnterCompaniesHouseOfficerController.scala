@@ -112,13 +112,13 @@ extends FrontendController(mcc, actions):
             enterCompaniesHouseFirstIndividualNamePage(
               form = form,
               entityName = entityName,
-              numberOfMembers = sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters,
+              sixOrMoreOfficers = request.get[SixOrMoreOfficers],
               ordinalKey = "first",
               formAction = formAction,
               agentApplication = agentApplication
             )
           )
-        case x if x.size < sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters =>
+        case x if x.size < sixOrMoreOfficers.totalListSize =>
           resultStatus(
             enterCompaniesHouseNextIndividualNamePage(
               form = form,

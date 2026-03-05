@@ -107,7 +107,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.mainContent.select(".govuk-inset-text").text() should include("more LLP member")
+    doc.mainContent.select(".govuk-inset-text").text() should include("LLP member")
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
 
   s"GET $getPath with no individuals entered should return 200 and show the CYA page with empty list" in:

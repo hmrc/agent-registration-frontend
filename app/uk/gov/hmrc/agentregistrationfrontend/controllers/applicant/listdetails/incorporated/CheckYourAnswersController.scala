@@ -70,7 +70,7 @@ extends FrontendController(mcc, actions):
             agentApplication.agentApplicationId
           ).map[RequestWithData[DataWithLists] | Result]:
             case Nil => request.add[List[IndividualProvidedDetails]](List.empty[IndividualProvidedDetails])
-            case list: List[IndividualProvidedDetails] if list.size <= request.get[SixOrMoreOfficers].numberOfOfficersResponsibleForTaxMatters =>
+            case list: List[IndividualProvidedDetails] if list.size <= request.get[SixOrMoreOfficers].totalListSize =>
               request.add[List[IndividualProvidedDetails]](list)
             case _ => Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url)
   def show: Action[AnyContent] = baseAction:

@@ -919,3 +919,59 @@ numberOfOfficersResponsibleForTaxMatters.error.required.LimitedPartnership = Ent
 numberOfOfficersResponsibleForTaxMatters.error.invalid.LimitedPartnership = Enter a number between 1 and {0}
 numberOfOfficersResponsibleForTaxMatters.error.required.ScottishLimitedPartnership = Enter how many partners are responsible for tax advice
 numberOfOfficersResponsibleForTaxMatters.error.invalid.ScottishLimitedPartnership = Enter a number between 1 and {0}
+
+companiesHouseIndividuaName.remaining.singular.LimitedLiabilityPartnership = You need to tell us about 1 more LLP member.
+companiesHouseIndividuaName.remaining.plural.LimitedLiabilityPartnership = You need to tell us about {0} more LLP members.
+companiesHouseIndividuaName.remaining.singular.LimitedCompany = You need to tell us about 1 more director.
+companiesHouseIndividuaName.remaining.plural.LimitedCompany = You need to tell us about {0} more directors.
+companiesHouseIndividuaName.remaining.singular.LimitedPartnership = You need to tell us about 1 more partner.
+companiesHouseIndividuaName.remaining.plural.LimitedPartnership = You need to tell us about {0} more partners.
+companiesHouseIndividuaName.remaining.singular.ScottishLimitedPartnership = You need to tell us about 1 more partner.
+companiesHouseIndividuaName.remaining.plural.ScottishLimitedPartnership = You need to tell us about {0} more partners.
+companiesHouseIndividuaName.complex.intro.LimitedLiabilityPartnership = We need the names of:
+companiesHouseIndividuaName.complex.bullet1.singular.LimitedLiabilityPartnership = the LLP member responsible for tax advice
+companiesHouseIndividuaName.complex.bullet1.plural.LimitedLiabilityPartnership = the {0} LLP members responsible for tax advice
+companiesHouseIndividuaName.complex.bullet2.singular.LimitedLiabilityPartnership = 1 other LLP member
+companiesHouseIndividuaName.complex.bullet2.plural.LimitedLiabilityPartnership = {0} other LLP members
+
+companiesHouseIndividuaName.complex.intro.LimitedCompany = We need the names of:
+companiesHouseIndividuaName.complex.bullet1.singular.LimitedCompany = the director responsible for tax advice
+companiesHouseIndividuaName.complex.bullet1.plural.LimitedCompany = the {0} directors responsible for tax advice
+companiesHouseIndividuaName.complex.bullet2.singular.LimitedCompany = 1 other director
+companiesHouseIndividuaName.complex.bullet2.plural.LimitedCompany = {0} other directors
+
+companiesHouseIndividuaName.complex.intro.LimitedPartnership = We need the names of:
+companiesHouseIndividuaName.complex.bullet1.singular.LimitedPartnership = the partner responsible for tax advice
+companiesHouseIndividuaName.complex.bullet1.plural.LimitedPartnership = the {0} partners responsible for tax advice
+companiesHouseIndividuaName.complex.bullet2.singular.LimitedPartnership = 1 other partner
+companiesHouseIndividuaName.complex.bullet2.plural.LimitedPartnership = {0} other partners
+
+companiesHouseIndividuaName.complex.intro.ScottishLimitedPartnership = We need the names of:
+companiesHouseIndividuaName.complex.bullet1.singular.ScottishLimitedPartnership = the partner responsible for tax advice
+companiesHouseIndividuaName.complex.bullet1.plural.ScottishLimitedPartnership = the {0} partners responsible for tax advice
+companiesHouseIndividuaName.complex.bullet2.singular.ScottishLimitedPartnership = 1 other partner
+companiesHouseIndividuaName.complex.bullet2.plural.ScottishLimitedPartnership = {0} other partners
+
+addToListSummary.LimitedLiabilityPartnership.complex.intro = We need the names of:
+addToListSummary.LimitedLiabilityPartnership.complex.bullet1.singular = the LLP member responsible for tax advice
+addToListSummary.LimitedLiabilityPartnership.complex.bullet1.plural = the {0} LLP members responsible for tax advice
+addToListSummary.LimitedLiabilityPartnership.complex.bullet2.singular = 1 other LLP member
+addToListSummary.LimitedLiabilityPartnership.complex.bullet2.plural = {0} other LLP members
+
+addToListSummary.LimitedCompany.complex.intro = We need the names of:
+addToListSummary.LimitedCompany.complex.bullet1.singular = the director responsible for tax advice
+addToListSummary.LimitedCompany.complex.bullet1.plural = the {0} directors responsible for tax advice
+addToListSummary.LimitedCompany.complex.bullet2.singular = 1 other director
+addToListSummary.LimitedCompany.complex.bullet2.plural = {0} other directors
+
+addToListSummary.LimitedPartnership.complex.intro = We need the names of:
+addToListSummary.LimitedPartnership.complex.bullet1.singular = the partner responsible for tax advice
+addToListSummary.LimitedPartnership.complex.bullet1.plural = the {0} partners responsible for tax advice
+addToListSummary.LimitedPartnership.complex.bullet2.singular = 1 other partner
+addToListSummary.LimitedPartnership.complex.bullet2.plural = {0} other partners
+
+addToListSummary.ScottishLimitedPartnership.complex.intro = We need the names of:
+addToListSummary.ScottishLimitedPartnership.complex.bullet1.singular = the partner responsible for tax advice
+addToListSummary.ScottishLimitedPartnership.complex.bullet1.plural = the {0} partners responsible for tax advice
+addToListSummary.ScottishLimitedPartnership.complex.bullet2.singular = 1 other partner
+addToListSummary.ScottishLimitedPartnership.complex.bullet2.plural = {0} other partners

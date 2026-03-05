@@ -20,7 +20,9 @@
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
 @import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
+@import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 @import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseIndividuaNameForm
+@import uk.gov.hmrc.agentregistrationfrontend.util.MessageKeys
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
@@ -37,7 +39,7 @@
 @(
         form: Form[IndividualName],
         entityName: String,
-        numberOfMembers: Int,
+        sixOrMoreOfficers: SixOrMoreOfficers,
         ordinalKey: String,
         formAction: Call,
         agentApplication: AgentApplication
@@ -58,6 +60,8 @@
 }
 
 @title = @{messages(s"$key.complex.title.$businessTypeKey", entityName)}
+@numberOfMembers = @{sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters}
+@paddingRequired = @{sixOrMoreOfficers.requiredPadding}
 
 @layout(
     pageTitle = title,
@@ -69,7 +73,15 @@
 
     <p class="govuk-body">@messages(s"$key.complex.p1")</p>
 
-    <p class="govuk-body">@messages(s"$key.complex.p2.$businessTypeKey", numberOfMembers)</p>
+    @if(paddingRequired > 0) {
+        <p class="govuk-body">@messages(s"$key.complex.intro.$businessTypeKey")</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages(s"$key.complex.bullet1.${MessageKeys.singularOrPlural(numberOfMembers)}.$businessTypeKey", numberOfMembers)</li>
+            <li>@messages(s"$key.complex.bullet2.${MessageKeys.singularOrPlural(paddingRequired)}.$businessTypeKey", paddingRequired)</li>
+        </ul>
+    } else {
+        <p class="govuk-body">@messages(s"$key.complex.p2.$businessTypeKey", numberOfMembers)</p>
+    }
 
     @govukDetails(Details(
         summary = Text(messages(s"$key.complex.details.summary")),

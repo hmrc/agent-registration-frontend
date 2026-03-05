@@ -84,15 +84,15 @@ extends ViewSpec:
         ) shouldBe AppRoutes.apply.listdetails.incoporated.RemoveCompaniesHouseOfficerController.show(tdAll.individualProvidedDetails._id).url
 
       "show inset text about needing more individuals" in:
-        doc.mainContent.select(".govuk-inset-text").text() should include("more LLP member")
+        doc.mainContent.select(".govuk-inset-text").text() should include("LLP member")
 
       "show the add another link" in:
         doc.mainContent.select("a").toString should include("Add another LLP member")
 
     "when the list matches the required count" should:
 
-      // Build a list that matches the required count
-      val requiredCount = sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters
+      // Build a list that matches the required count (including padding)
+      val requiredCount = sixOrMoreOfficers.totalListSize
       val fullList =
         (1 to requiredCount).map(i =>
           tdAll.individualProvidedDetails
