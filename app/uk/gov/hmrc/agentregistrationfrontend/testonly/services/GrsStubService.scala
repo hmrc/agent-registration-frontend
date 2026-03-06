@@ -24,7 +24,6 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.*
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -40,7 +39,8 @@ class GrsStubService @Inject() (
     name: String
   )(using Request[?]): Future[Unit] = agentsExternalStubsConnector.createIndividualUser(
     assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
-    maybeName = Some(name)
+    maybeName = Some(name),
+    maybeNino = None
   )
 
   def storeStubsData(
