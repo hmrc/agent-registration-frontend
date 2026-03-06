@@ -178,10 +178,10 @@ extends FrontendController(mcc, actions):
     maybeEmail = Some(
       Email(
         address = emailToVerify,
-        enterUrl = appConfig.thisFrontendBaseUrl + AppRoutes.providedetails.IndividualEmailAddressController.show(linkId).url
+        enterUrl = appConfig.thisFrontendRelativeBaseUrl + AppRoutes.providedetails.IndividualEmailAddressController.show(linkId).url
       )
     ),
-    continueUrl = appConfig.thisFrontendBaseUrl + AppRoutes.providedetails.IndividualEmailAddressController.verify(linkId).url,
+    continueUrl = appConfig.thisFrontendRelativeBaseUrl + AppRoutes.providedetails.IndividualEmailAddressController.verify(linkId).url,
     maybeBackUrl = None,
     accessibilityStatementUrl = appConfig.accessibilityStatementPath,
     lang = messagesApi.preferred(request).lang.code

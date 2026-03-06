@@ -63,6 +63,7 @@ extends AnyWordSpecLike,
   protected def configMap: Map[String, Any] =
     Map[String, Any](
       "urls.this-frontend" -> thisFrontendBaseUrl,
+      "urls.this-frontend-relative" -> thisFrontendBaseUrl,
       "microservice.services.object-store.port" -> WireMockSupport.port,
       "microservice.services.agent-registration.port" -> WireMockSupport.port,
       "microservice.services.agent-registration-risking.port" -> WireMockSupport.port,
