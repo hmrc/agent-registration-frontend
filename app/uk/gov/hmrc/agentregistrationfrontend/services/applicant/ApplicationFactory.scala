@@ -73,7 +73,7 @@ class ApplicationFactory @Inject() (
     refusalToDealWithCheckResult = None,
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    numberOfRequiredKeyIndividuals = None,
+    numberOfIndividuals = None,
     hasOtherRelevantIndividuals = None,
     vrns = None,
     payeRefs = None
@@ -98,7 +98,7 @@ class ApplicationFactory @Inject() (
     refusalToDealWithCheckResult = None,
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    numberOfRequiredKeyIndividuals = None,
+    numberOfIndividuals = None,
     hasOtherRelevantIndividuals = None,
     vrns = None,
     payeRefs = None
@@ -122,7 +122,7 @@ class ApplicationFactory @Inject() (
     agentDetails = None,
     refusalToDealWithCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    numberOfRequiredKeyIndividuals = None,
+    numberOfIndividuals = None,
     hasOtherRelevantIndividuals = None,
     vrns = None,
     payeRefs = None
@@ -147,7 +147,7 @@ class ApplicationFactory @Inject() (
     refusalToDealWithCheckResult = None,
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    numberOfRequiredKeyIndividuals = None,
+    numberOfIndividuals = None,
     hasOtherRelevantIndividuals = None,
     vrns = None,
     payeRefs = None
@@ -172,7 +172,7 @@ class ApplicationFactory @Inject() (
     refusalToDealWithCheckResult = None,
     companyStatusCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    numberOfRequiredKeyIndividuals = None,
+    numberOfIndividuals = None,
     hasOtherRelevantIndividuals = None,
     vrns = None,
     payeRefs = None
@@ -196,7 +196,7 @@ class ApplicationFactory @Inject() (
     agentDetails = None,
     refusalToDealWithCheckResult = None,
     hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    numberOfRequiredKeyIndividuals = None,
+    numberOfIndividuals = None,
     hasOtherRelevantIndividuals = None,
     vrns = None,
     payeRefs = None

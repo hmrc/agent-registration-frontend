@@ -14,7 +14,6 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
 @import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLaterLinks
@@ -22,6 +21,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components.*
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistrationfrontend.util.MessageKeys
+@import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 
 @this(
         layout: Layout,
@@ -33,7 +33,7 @@
 )
 
 @(
-        agentApplication: AgentApplication,
+        numberOfKeyIndividuals: NumberOfRequiredKeyIndividuals,
         existingList: List[IndividualProvidedDetails]
 )(implicit
         request: RequestHeader,
@@ -47,13 +47,13 @@
     messages(s"$key.title.${MessageKeys.singularOrPlural(existingList.size)}", existingList.size)
 }
 @requiredSize = @{
-    agentApplication.getNumberOfRequiredKeyIndividuals.totalListSize
+  numberOfKeyIndividuals.totalListSize
 }
 @diff = @{
   requiredSize - existingList.size
 }
 
-@paddingNeeded = @{agentApplication.getNumberOfRequiredKeyIndividuals match {
+@paddingNeeded = @{numberOfKeyIndividuals match {
   case a @ FiveOrLess(_) => 0
   case a @ SixOrMore(_) => a.requiredPadding
 }}

@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfIndividuals
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
@@ -62,13 +62,15 @@ extends FrontendController(mcc, actions):
       condition =
         implicit request =>
           request.get[IsNotSoleTrader] match
-            case a: AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
+            case a: (AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals | AgentApplication.IsIncorporated) =>
               val partnersSize = request.get[List[IndividualProvidedDetails]].count(_.isPersonOfControl)
-              NumberOfRequiredKeyIndividuals.isKeyIndividualListComplete(partnersSize, a.numberOfRequiredKeyIndividuals)
-            case _ => true,
+              NumberOfIndividuals.isKeyIndividualListComplete(partnersSize, a.numberOfIndividuals),
       resultWhenConditionNotMet =
         implicit request =>
-          Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
+          request.get[IsNotSoleTrader] match
+            case a: AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
+              Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
+            case a: AgentApplication.IsIncorporated => Redirect(AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show)
     )
     .ensure(
       condition = _.get[IsNotSoleTrader].hasOtherRelevantIndividuals.isDefined,

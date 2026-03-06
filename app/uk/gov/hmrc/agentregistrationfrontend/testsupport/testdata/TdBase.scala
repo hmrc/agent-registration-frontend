@@ -27,12 +27,15 @@ import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetai
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
+import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 import uk.gov.hmrc.agentregistration.shared.individual.*
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.Country
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.auth.core.retrieve.Credentials
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole.LlpMember
 
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -174,7 +177,9 @@ trait TdBase:
       day = Some(12),
       month = 11,
       year = 1990
-    ))
+    )),
+    resignedOn = None,
+    officerRole = Some(LlpMember)
   )
   def businessPartnerRecordResponse: BusinessPartnerRecordResponse = BusinessPartnerRecordResponse(
     organisationName = Some("Test Company Name"),
@@ -188,8 +193,18 @@ trait TdBase:
     numberOfKeyIndividuals = 3
   )
 
+  def fiveOrLessCompaniesHouseOfficers: FiveOrLessOfficers = FiveOrLessOfficers(
+    numberOfCompaniesHouseOfficers = 1,
+    isCompaniesHouseOfficersListCorrect = true
+  )
+
   def sixOrMoreKeyIndividuals: SixOrMore = SixOrMore(
     numberOfKeyIndividualsResponsibleForTaxMatters = 3
+  )
+
+  def sixOrMoreCompaniesHouseOfficers: SixOrMoreOfficers = SixOrMoreOfficers(
+    numberOfCompaniesHouseOfficers = 6,
+    numberOfOfficersResponsibleForTaxMatters = 4
   )
 
   val individualProvidedDetails: IndividualProvidedDetails = IndividualProvidedDetails(

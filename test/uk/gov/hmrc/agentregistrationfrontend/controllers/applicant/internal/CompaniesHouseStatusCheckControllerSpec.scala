@@ -16,12 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal
 
-import play.api.libs.json.Json
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.CheckResult
-import uk.gov.hmrc.agentregistrationfrontend.model.CompanyHouseStatus
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData.crn
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -72,7 +70,7 @@ extends ControllerSpec:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterHmrcEntityVerificationPass)
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterCompaniesHouseStatusCheckPass)
-    CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompanyHouseStatus.Active.key)
+    CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompaniesHouseStatus.Active.key)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe nextUrl
@@ -85,7 +83,7 @@ extends ControllerSpec:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterHmrcEntityVerificationPass)
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterCompaniesHouseStatusCheckFail)
-    CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompanyHouseStatus.Closed.key)
+    CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompaniesHouseStatus.Closed.key)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe failCheckPage
@@ -98,7 +96,6 @@ extends ControllerSpec:
     AuthStubs.stubAuthorise()
     val aa: AgentApplicationLlp = agentApplication.afterCompaniesHouseStatusCheckPass
     aa.companyStatusCheckResult shouldBe Some(CheckResult.Pass)
-    println(Json.prettyPrint(Json.toJson(aa: AgentApplication)))
     AgentRegistrationStubs.stubGetAgentApplication(aa)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
@@ -111,7 +108,7 @@ extends ControllerSpec:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterCompaniesHouseStatusCheckFail)
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterCompaniesHouseStatusCheckPass)
-    CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompanyHouseStatus.Active.key)
+    CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompaniesHouseStatus.Active.key)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe nextUrl

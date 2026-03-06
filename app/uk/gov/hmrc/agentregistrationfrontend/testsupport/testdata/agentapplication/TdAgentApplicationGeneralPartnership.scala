@@ -48,7 +48,7 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
       agentDetails = None,
       refusalToDealWithCheckResult = None,
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-      numberOfRequiredKeyIndividuals = None,
+      numberOfIndividuals = None,
       hasOtherRelevantIndividuals = None,
       vrns = None,
       payeRefs = None
@@ -87,7 +87,7 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
     )
 
     val afterHowManyKeyIndividuals: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
-      numberOfRequiredKeyIndividuals = Some(
+      numberOfIndividuals = Some(
         FiveOrLess(
           numberOfKeyIndividuals = 3
         )
@@ -95,7 +95,7 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
     )
 
     val afterOnlyOneKeyIndividual: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
-      numberOfRequiredKeyIndividuals = Some(
+      numberOfIndividuals = Some(
         FiveOrLess(
           numberOfKeyIndividuals = 1
         )
@@ -103,7 +103,7 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
     )
 
     val afterHowManyKeyIndividualsNeedsNoPadding: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
-      numberOfRequiredKeyIndividuals = Some(
+      numberOfIndividuals = Some(
         SixOrMore(
           numberOfKeyIndividualsResponsibleForTaxMatters = 6
         )
@@ -113,7 +113,7 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
     // when the number of key individuals is of type SixOrMore and padding is required because the number of
     // key individuals responsible for tax matters is less than minimum list size(5)
     val afterHowManyKeyIndividualsNeedsPadding: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
-      numberOfRequiredKeyIndividuals = Some(dependencies.sixOrMoreKeyIndividuals)
+      numberOfIndividuals = Some(dependencies.sixOrMoreKeyIndividuals)
     )
 
     val afterConfirmOtherRelevantIndividualsYes: AgentApplicationGeneralPartnership = afterHowManyKeyIndividuals

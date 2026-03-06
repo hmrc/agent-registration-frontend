@@ -1,0 +1,116 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedPartnership
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
+@import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
+@import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
+@import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseIndividuaNameForm
+@import uk.gov.hmrc.agentregistrationfrontend.util.MessageKeys
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
+
+@this(
+        layout: Layout,
+        govukInput: GovukInput,
+        govukDetails: GovukDetails,
+        formWithCSRF: FormWithCSRF,
+        govukButton: GovukButton,
+        continueOrSaveForLater: ContinueOrSaveForLater
+)
+
+@(
+        form: Form[IndividualName],
+        entityName: String,
+        sixOrMoreOfficers: SixOrMoreOfficers,
+        ordinalKey: String,
+        formAction: Call,
+        agentApplication: AgentApplication
+)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{ CompaniesHouseIndividuaNameForm.key }
+
+@businessTypeKey = @{
+    agentApplication match {
+        case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
+        case _: AgentApplicationLimitedCompany => "LimitedCompany"
+        case _: AgentApplicationLimitedPartnership => "LimitedPartnership"
+        case _: AgentApplicationScottishLimitedPartnership => "ScottishLimitedPartnership"
+    }
+}
+
+@title = @{messages(s"$key.complex.title.$businessTypeKey", entityName)}
+@numberOfMembers = @{sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters}
+@paddingRequired = @{sixOrMoreOfficers.requiredPadding}
+
+@layout(
+    pageTitle = title,
+    maybeForm = Some(form)
+) {
+    <h2 class="govuk-caption-l">@messages(s"lists.caption.title.$businessTypeKey")</h2>
+
+    <h1 class="govuk-heading-l">@title</h1>
+
+    <p class="govuk-body">@messages(s"$key.complex.p1")</p>
+
+    @if(paddingRequired > 0) {
+        <p class="govuk-body">@messages(s"$key.complex.intro.$businessTypeKey")</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>@messages(s"$key.complex.bullet1.${MessageKeys.singularOrPlural(numberOfMembers)}.$businessTypeKey", numberOfMembers)</li>
+            <li>@messages(s"$key.complex.bullet2.${MessageKeys.singularOrPlural(paddingRequired)}.$businessTypeKey", paddingRequired)</li>
+        </ul>
+    } else {
+        <p class="govuk-body">@messages(s"$key.complex.p2.$businessTypeKey", numberOfMembers)</p>
+    }
+
+    @govukDetails(Details(
+        summary = Text(messages(s"$key.complex.details.summary")),
+        content = HtmlContent(
+            s"""<p class="govuk-body">${messages(s"$key.complex.details.p1.$businessTypeKey")}</p>
+               |<ul class="govuk-list govuk-list--bullet">
+               |    <li>${messages(s"$key.complex.details.bullet1")}</li>
+               |    <li>${messages(s"$key.complex.details.bullet2")}</li>
+               |</ul>""".stripMargin
+        )
+    ))
+
+    <h2 class="govuk-heading-m">@messages(s"$key.question.$ordinalKey")</h2>
+
+    @formWithCSRF(action = formAction) {
+        @govukInput(Input(
+            label = Label(
+                content = Text(messages(s"$key.firstName.label")),
+                classes = "govuk-label"
+            )
+        ).withFormField(form(CompaniesHouseIndividuaNameForm.firstNameKey)))
+
+        @govukInput(Input(
+            label = Label(
+                content = Text(messages(s"$key.lastName.label")),
+                classes = "govuk-label"
+            )
+        ).withFormField(form(CompaniesHouseIndividuaNameForm.lastNameKey)))
+
+        @continueOrSaveForLater()
+    }
+}

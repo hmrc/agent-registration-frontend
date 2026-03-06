@@ -18,11 +18,10 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 
 import com.softwaremill.quicklens.modify
 import play.api.mvc.*
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
+
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm
@@ -71,7 +70,7 @@ extends FrontendController(mcc, actions):
             Ok(numberOfKeyIndividualsPage(
               form = NumberOfKeyIndividualsForm.form
                 .fill:
-                  agentApplication.numberOfRequiredKeyIndividuals
+                  agentApplication.getNumberOfRequiredKeyIndividuals
               ,
               entityName = bprOpt
                 .map(_.getEntityName)
@@ -110,11 +109,11 @@ extends FrontendController(mcc, actions):
             request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals] match
               case application: AgentApplicationScottishPartnership =>
                 application
-                  .modify(_.numberOfRequiredKeyIndividuals)
+                  .modify(_.numberOfIndividuals)
                   .setTo(Some(numberOfRequiredKeyIndividuals))
               case application: AgentApplicationGeneralPartnership =>
                 application
-                  .modify(_.numberOfRequiredKeyIndividuals)
+                  .modify(_.numberOfIndividuals)
                   .setTo(Some(numberOfRequiredKeyIndividuals))
 
           agentApplicationService
