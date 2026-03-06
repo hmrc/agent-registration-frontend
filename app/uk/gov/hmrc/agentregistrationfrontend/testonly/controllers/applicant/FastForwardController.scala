@@ -156,7 +156,7 @@ extends FrontendController(mcc, applicantActions):
       .map: individualName =>
         individualProvideDetailsService.create(
           individualName = individualName,
-          isPersonOfControl = false,
+          isPersonOfControl = true,
           agentApplicationId = applicationId
         )
 
