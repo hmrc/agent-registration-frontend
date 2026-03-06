@@ -24,6 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.*
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,6 +39,7 @@ class GrsStubService @Inject() (
   def storeIndividualProvidedDetails(
     name: String
   )(using Request[?]): Future[Unit] = agentsExternalStubsConnector.createIndividualUser(
+    nino = TestOnlyData.nino,
     assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
     maybeName = Some(name)
   )
@@ -52,7 +54,7 @@ class GrsStubService @Inject() (
       (businessType, journeyData.nino) match {
         case (SoleTrader, Some(nino: Nino)) =>
           agentsExternalStubsConnector.createIndividualUser(
-            maybeNino = Some(nino),
+            nino = nino,
             assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
             deceased = deceased
           )
