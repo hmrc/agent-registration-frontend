@@ -69,7 +69,8 @@ extends Connector:
   def createIndividualUser(
     nino: Nino,
     assignedPrincipalEnrolments: Seq[String],
-    deceased: Boolean = false
+    deceased: Boolean = false,
+    maybeName: Option[String] = None
   )(using
     request: RequestHeader
   ): Future[Unit] =
@@ -77,7 +78,8 @@ extends Connector:
       userId = UUID.randomUUID().toString,
       nino = Some(nino),
       assignedPrincipalEnrolments = assignedPrincipalEnrolments.map(EnrolmentKey(_)),
-      deceased = Some(deceased)
+      deceased = Some(deceased),
+      name = maybeName
     )
     createUser(user, affinityGroup = Some("Individual")).map(_ => ()).recover {
       // ignore 409 errors (created user with duplicate ninos) from user stubs repo

@@ -19,6 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 import play.api.mvc.PathBindable
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
 import uk.gov.hmrc.agentregistration.shared.util.SealedObjects
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
@@ -29,6 +31,7 @@ sealed trait CompletedSection:
   def businessType: BusinessType
   def displayOrder: Int
   def appState: AgentApplication
+  def maybeNumberOfIndividuals: Option[NumberOfRequiredKeyIndividuals] = None
 
 object CompletedSection:
 
@@ -73,11 +76,19 @@ object CompletedSection:
       override def displayOrder: Int = 5
       override def appState: AgentApplication = TestOnlyData.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
 
+    case object LlpPartnersAndOtherRelevantTaxAdvisers2
+    extends CompletedSectionLlp:
+
+      override def sectionName: String = "Partners and other relevant tax advisers (2)"
+      override def displayOrder: Int = 6
+      override def appState: AgentApplication = TestOnlyData.agentApplicationLlp.afterConfirmCompaniesHouseOfficersYes
+      override def maybeNumberOfIndividuals: Option[NumberOfRequiredKeyIndividuals] = Some(FiveOrLess(2))
+
     case object LlpDeclaration
     extends CompletedSectionLlp:
 
       override def sectionName: String = "Declaration"
-      override def displayOrder: Int = 6
+      override def displayOrder: Int = 7
       override def appState: AgentApplication = TestOnlyData.agentApplicationLlp.afterDeclarationSubmitted
 
     val values: Seq[CompletedSectionLlp] = SealedObjects.all[CompletedSectionLlp]
