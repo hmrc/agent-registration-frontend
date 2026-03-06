@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant
 import play.api.http.Status.SEE_OTHER
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
@@ -140,18 +139,11 @@ extends FrontendController(mcc, applicantActions):
     applicationId: AgentApplicationId
   )(using r: RequestWithAuth): Future[Unit] =
     val howManyIndividuals: Int = section.maybeNumberOfIndividuals.map(_.totalListSize).getOrElse(0)
-    if (howManyIndividuals > 6)
-      throw new RuntimeException("Only 6 individuals are stubbed in grs currently")
-    val stubbedIndividualNames = Seq(
-      IndividualName("Steve Austin"),
-      IndividualName("Beverly Hills"),
-      IndividualName("Pauline Austin"),
-      IndividualName("Justine Hills"),
-      IndividualName("Steve Palmer"),
-      IndividualName("Sandra Hills")
-    )
+    val individualNames = TestOnlyData.grsStubbedIndividualNames
+    if (howManyIndividuals > individualNames.length)
+      throw new RuntimeException(s"Only ${individualNames.length} individuals are stubbed in grs currently")
 
-    val createdIndividuals = stubbedIndividualNames
+    val createdIndividuals = individualNames
       .take(howManyIndividuals)
       .map: individualName =>
         individualProvideDetailsService.create(

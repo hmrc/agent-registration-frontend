@@ -70,7 +70,7 @@ extends Connector:
     assignedPrincipalEnrolments: Seq[String],
     deceased: Boolean = false,
     maybeName: Option[String] = None,
-    maybeNino: Option[Nino]
+    maybeNino: Option[Nino] = None
   )(using
     request: RequestHeader
   ): Future[Unit] =
