@@ -24,6 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.*
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -34,6 +35,14 @@ import scala.concurrent.Future
 class GrsStubService @Inject() (
   agentsExternalStubsConnector: AgentsExternalStubsConnector
 )(using ExecutionContext):
+
+  def storeIndividualProvidedDetails(
+    name: String
+  )(using Request[?]): Future[Unit] = agentsExternalStubsConnector.createIndividualUser(
+    nino = TestOnlyData.nino,
+    assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
+    maybeName = Some(name)
+  )
 
   def storeStubsData(
     businessType: BusinessType,
