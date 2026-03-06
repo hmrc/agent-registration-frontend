@@ -39,8 +39,7 @@ class GrsStubService @Inject() (
     name: String
   )(using Request[?]): Future[Unit] = agentsExternalStubsConnector.createIndividualUser(
     assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
-    maybeName = Some(name),
-    maybeNino = None
+    maybeName = Some(name)
   )
 
   def storeStubsData(

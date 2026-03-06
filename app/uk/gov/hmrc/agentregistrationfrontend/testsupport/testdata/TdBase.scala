@@ -243,6 +243,15 @@ trait TdBase:
     isPersonOfControl = true
   )
 
+  val grsStubbedIndividualNames: Seq[IndividualName] = Seq(
+    IndividualName("Steve Austin"),
+    IndividualName("Beverly Hills"),
+    IndividualName("Pauline Austin"),
+    IndividualName("Justine Hills"),
+    IndividualName("Steve Palmer"),
+    IndividualName("Sandra Hills")
+  )
+
   val soleTraderYetToProvideDetails: IndividualProvidedDetails = IndividualProvidedDetails(
     _id = individualProvidedDetailsId,
     internalUserId = None,
