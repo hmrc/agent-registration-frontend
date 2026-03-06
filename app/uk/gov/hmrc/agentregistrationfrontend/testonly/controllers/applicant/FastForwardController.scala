@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant
 import play.api.http.Status.SEE_OTHER
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
@@ -143,7 +142,7 @@ extends FrontendController(mcc, applicantActions):
     val howManyIndividuals: Int = section.maybeNumberOfIndividuals.map(_.totalListSize).getOrElse(0)
     if (howManyIndividuals > 6)
       throw new RuntimeException("Only 6 individuals are stubbed in grs currently")
-    val individualNameList = Seq(
+    val stubbedIndividualNames = Seq(
       IndividualName("Steve Austin"),
       IndividualName("Beverly Hills"),
       IndividualName("Pauline Austin"),
@@ -151,28 +150,26 @@ extends FrontendController(mcc, applicantActions):
       IndividualName("Steve Palmer"),
       IndividualName("Sandra Hills")
     )
-    val createdIndividuals: Seq[IndividualProvidedDetails] = {
-      for
-        i <- 0 until howManyIndividuals
-      yield individualProvideDetailsService.create(
-        individualName = individualNameList(i),
-        isPersonOfControl = false,
-        agentApplicationId = applicationId
-      )
-    }
-    createdIndividuals.foldLeft(Future.successful(())) {
+
+    val createdIndividuals = stubbedIndividualNames
+      .take(howManyIndividuals)
+      .map: individualName =>
+        individualProvideDetailsService.create(
+          individualName = individualName,
+          isPersonOfControl = false,
+          agentApplicationId = applicationId
+        )
+
+    createdIndividuals.foldLeft(Future.unit):
       (
         acc,
         individual
       ) =>
-        acc.flatMap {
-          _ =>
-            for
-              _ <- individualProvideDetailsService.upsertForApplication(individual)
-              _ <- grsStubService.storeIndividualProvidedDetails(individual.individualName.value)
-            yield ()
-        }
-    }
+        for
+          _ <- acc
+          _ <- individualProvideDetailsService.upsertForApplication(individual)
+          _ <- grsStubService.storeIndividualProvidedDetails(individual.individualName.value)
+        yield ()
 
   private def journeyDataFor(bt: BusinessType): JourneyData =
     bt match
