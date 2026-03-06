@@ -202,10 +202,10 @@ extends FrontendController(mcc, actions):
     maybeEmail = Some(
       Email(
         address = emailToVerify,
-        enterUrl = appConfig.thisFrontendBaseUrl + AppRoutes.apply.agentdetails.AgentEmailAddressController.show.url
+        enterUrl = appConfig.thisFrontendRelativeBaseUrl + AppRoutes.apply.agentdetails.AgentEmailAddressController.show.url
       )
     ),
-    continueUrl = appConfig.thisFrontendBaseUrl + AppRoutes.apply.agentdetails.AgentEmailAddressController.verify.url,
+    continueUrl = appConfig.thisFrontendRelativeBaseUrl + AppRoutes.apply.agentdetails.AgentEmailAddressController.verify.url,
     maybeBackUrl = None, // APB-10609 explicitly no back url for email verification as it will be used to hard code a back link which breaks the history chain
     accessibilityStatementUrl = appConfig.accessibilityStatementPath,
     lang = messagesApi.preferred(request).lang.code
