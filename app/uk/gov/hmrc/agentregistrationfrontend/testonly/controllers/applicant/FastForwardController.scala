@@ -16,16 +16,18 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant
 
-import org.apache.pekko.Done
 import play.api.http.Status.SEE_OTHER
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifiers
@@ -52,7 +54,8 @@ class FastForwardController @Inject() (
   grsStubService: GrsStubService,
   applicationService: AgentApplicationService,
   agentApplicationIdGenerator: AgentApplicationIdGenerator,
-  linkIdGenerator: LinkIdGenerator
+  linkIdGenerator: LinkIdGenerator,
+  individualProvideDetailsService: IndividualProvideDetailsService
 )(using
   clock: Clock,
   ex: ExecutionContext
@@ -119,10 +122,10 @@ extends FrontendController(mcc, applicantActions):
 
         case Left(result) => Future.successful(result)
 
-  private def fastForwardTo(section: CompletedSection)(using r: RequestWithAuth): Future[Done] =
-    val toAppState: AgentApplication = section.appState
+  private def fastForwardTo(section: CompletedSection)(using r: RequestWithAuth): Future[Unit] =
+    val toAppState = section.appState
 
-    for {
+    for
       _ <- grsStubService.storeStubsData(
         businessType = section.businessType,
         journeyData = journeyDataFor(section.businessType),
@@ -130,7 +133,46 @@ extends FrontendController(mcc, applicantActions):
       )
       updated <- updateIdentifiers(toAppState)
       _ <- applicationService.upsert(updated)
-    } yield Done
+      _ <- upsertIndividuals(section, updated.agentApplicationId)
+    yield ()
+
+  private def upsertIndividuals(
+    section: CompletedSection,
+    applicationId: AgentApplicationId
+  )(using r: RequestWithAuth): Future[Unit] =
+    val howManyIndividuals: Int = section.maybeNumberOfIndividuals.map(_.totalListSize).getOrElse(0)
+    if (howManyIndividuals > 6)
+      throw new RuntimeException("Only 6 individuals are stubbed in grs currently")
+    val individualNameList = Seq(
+      IndividualName("Steve Austin"),
+      IndividualName("Beverly Hills"),
+      IndividualName("Pauline Austin"),
+      IndividualName("Justine Hills"),
+      IndividualName("Steve Palmer"),
+      IndividualName("Sandra Hills")
+    )
+    val createdIndividuals: Seq[IndividualProvidedDetails] = {
+      for
+        i <- 0 until howManyIndividuals
+      yield individualProvideDetailsService.create(
+        individualName = individualNameList(i),
+        isPersonOfControl = false,
+        agentApplicationId = applicationId
+      )
+    }
+    createdIndividuals.foldLeft(Future.successful(())) {
+      (
+        acc,
+        individual
+      ) =>
+        acc.flatMap {
+          _ =>
+            for
+              _ <- individualProvideDetailsService.upsertForApplication(individual)
+              _ <- grsStubService.storeIndividualProvidedDetails(individual.individualName.value)
+            yield ()
+        }
+    }
 
   private def journeyDataFor(bt: BusinessType): JourneyData =
     bt match
