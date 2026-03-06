@@ -38,6 +38,7 @@ trait TdAgentApplicationScottishLimitedPartnership {
       linkId = dependencies.linkId,
       groupId = dependencies.groupId,
       createdAt = dependencies.nowAsInstant,
+      submittedAt = None,
       applicationState = ApplicationState.Started,
       userRole = Some(UserRole.Authorised),
       businessDetails = None,
@@ -112,7 +113,8 @@ trait TdAgentApplicationScottishLimitedPartnership {
     )
 
     val afterDeclarationSubmitted: AgentApplicationScottishLimitedPartnership = afterHmrcStandardForAgentsAgreed.copy(
-      applicationState = ApplicationState.SentForRisking
+      applicationState = ApplicationState.SentForRisking,
+      submittedAt = Some(dependencies.nowAsInstant)
     )
 
     val baseForSectionAmls: AgentApplicationScottishLimitedPartnership = afterGrsDataReceived

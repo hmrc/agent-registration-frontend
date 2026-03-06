@@ -18,7 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock as wm
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
+import uk.gov.hmrc.agentregistrationfrontend.model.ApplicationForRiskingStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AgentRegistrationRiskingStubs:
@@ -34,5 +36,24 @@ object AgentRegistrationRiskingStubs:
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration-risking/submit-for-risking"),
+    count = count
+  )
+
+  def stubGetApplicationStatus(
+    agentApplicationId: AgentApplicationId,
+    status: ApplicationForRiskingStatus
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration-risking/application-status/${agentApplicationId.value}"),
+    responseStatus = 200,
+    responseBody = s"""{"status": "${status.toString}"}"""
+  )
+
+  def verifyGetApplicationStatus(
+    agentApplicationId: AgentApplicationId,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration-risking/application-status/${agentApplicationId.value}"),
     count = count
   )

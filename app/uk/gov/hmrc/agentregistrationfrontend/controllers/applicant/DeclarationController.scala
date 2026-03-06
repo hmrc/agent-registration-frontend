@@ -31,11 +31,14 @@ import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistratio
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.DeclarationPage
 
+import java.time.Clock
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class DeclarationController @Inject() (
+  clock: Clock,
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   view: DeclarationPage,
@@ -91,5 +94,7 @@ extends FrontendController(mcc, actions):
               request.agentApplication
                 .modify(_.applicationState)
                 .setTo(ApplicationState.SentForRisking)
+                .modify(_.submittedAt)
+                .setTo(Some(Instant.now(clock)))
             )
         yield Redirect(AppRoutes.apply.AgentApplicationController.applicationSubmitted)
