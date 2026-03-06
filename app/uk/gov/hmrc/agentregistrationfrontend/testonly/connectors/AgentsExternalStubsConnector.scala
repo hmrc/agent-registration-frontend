@@ -67,16 +67,16 @@ extends Connector:
             )
 
   def createIndividualUser(
-    nino: Nino,
     assignedPrincipalEnrolments: Seq[String],
     deceased: Boolean = false,
-    maybeName: Option[String] = None
+    maybeName: Option[String] = None,
+    maybeNino: Option[Nino]
   )(using
     request: RequestHeader
   ): Future[Unit] =
     val user = User(
       userId = UUID.randomUUID().toString,
-      nino = Some(nino),
+      nino = maybeNino,
       assignedPrincipalEnrolments = assignedPrincipalEnrolments.map(EnrolmentKey(_)),
       deceased = Some(deceased),
       name = maybeName
