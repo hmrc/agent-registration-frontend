@@ -38,6 +38,7 @@ sealed trait AgentApplication:
   def linkId: LinkId
   def groupId: GroupId
   def createdAt: Instant
+  def submittedAt: Option[Instant] // only populated when the application is submitted, not during the registration journey
   def applicationState: ApplicationState
   def businessType: BusinessType
   def userRole: Option[UserRole]
@@ -105,6 +106,8 @@ sealed trait AgentApplication:
 
   def getNumberOfIndividuals: NumberOfIndividuals
 
+  def getSubmittedAt: Instant = submittedAt.getOrElse(expectedDataNotDefinedError("submittedAt"))
+
   private def as[T <: AgentApplication](using ct: reflect.ClassTag[T]): Option[T] =
     this match
       case t: T => Some(t)
@@ -130,6 +133,7 @@ final case class AgentApplicationSoleTrader(
   override val linkId: LinkId,
   override val groupId: GroupId,
   override val createdAt: Instant,
+  override val submittedAt: Option[Instant],
   override val applicationState: ApplicationState,
   override val userRole: Option[UserRole],
   businessDetails: Option[BusinessDetailsSoleTrader],
@@ -163,6 +167,7 @@ final case class AgentApplicationLlp(
   override val linkId: LinkId,
   override val groupId: GroupId,
   override val createdAt: Instant,
+  override val submittedAt: Option[Instant],
   override val applicationState: ApplicationState,
   override val userRole: Option[UserRole],
   businessDetails: Option[BusinessDetailsLlp],
@@ -195,6 +200,7 @@ final case class AgentApplicationLimitedCompany(
   override val linkId: LinkId,
   override val groupId: GroupId,
   override val createdAt: Instant,
+  override val submittedAt: Option[Instant],
   override val applicationState: ApplicationState,
   override val userRole: Option[UserRole],
   businessDetails: Option[BusinessDetailsLimitedCompany],
@@ -227,6 +233,7 @@ final case class AgentApplicationGeneralPartnership(
   override val linkId: LinkId,
   override val groupId: GroupId,
   override val createdAt: Instant,
+  override val submittedAt: Option[Instant],
   override val applicationState: ApplicationState,
   override val userRole: Option[UserRole],
   businessDetails: Option[BusinessDetailsGeneralPartnership],
@@ -258,6 +265,7 @@ final case class AgentApplicationLimitedPartnership(
   override val linkId: LinkId,
   override val groupId: GroupId,
   override val createdAt: Instant,
+  override val submittedAt: Option[Instant],
   override val applicationState: ApplicationState,
   override val userRole: Option[UserRole],
   businessDetails: Option[BusinessDetailsPartnership],
@@ -288,6 +296,7 @@ final case class AgentApplicationScottishLimitedPartnership(
   override val linkId: LinkId,
   override val groupId: GroupId,
   override val createdAt: Instant,
+  override val submittedAt: Option[Instant],
   override val applicationState: ApplicationState,
   override val userRole: Option[UserRole],
   businessDetails: Option[BusinessDetailsPartnership],
@@ -318,6 +327,7 @@ final case class AgentApplicationScottishPartnership(
   override val linkId: LinkId,
   override val groupId: GroupId,
   override val createdAt: Instant,
+  override val submittedAt: Option[Instant],
   override val applicationState: ApplicationState,
   override val userRole: Option[UserRole],
   businessDetails: Option[BusinessDetailsScottishPartnership],

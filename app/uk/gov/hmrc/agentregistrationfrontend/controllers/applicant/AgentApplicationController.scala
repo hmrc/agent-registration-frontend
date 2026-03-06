@@ -21,12 +21,19 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ViewApplicationPage
 
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.duration.FiniteDuration
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 
 @Singleton
 class AgentApplicationController @Inject() (
@@ -34,7 +41,8 @@ class AgentApplicationController @Inject() (
   mcc: MessagesControllerComponents,
   simplePage: SimplePage,
   confirmationPage: ConfirmationPage,
-  viewApplicationPage: ViewApplicationPage
+  viewApplicationPage: ViewApplicationPage,
+  appConfig: AppConfig
 )
 extends FrontendController(mcc, actions):
 
@@ -58,12 +66,20 @@ extends FrontendController(mcc, actions):
         ))
 
   def applicationSubmitted: Action[AnyContent] = actions
-    .getApplicationSubmitted
-    .getBusinessPartnerRecord:
+    .getApplicationSubmitted:
       implicit request =>
+        val agentApplication: AgentApplication = request.get
+        val decisionLeadTime: FiniteDuration = appConfig.applicationDecisionLeadTime
+        val submittedAt: Instant = agentApplication.getSubmittedAt
+        // Add the configured lead time (in milliseconds) to the Instant, then convert to a LocalDate using a ZoneId.
+        val localDateOfDecision: LocalDate =
+          submittedAt
+            .plus(decisionLeadTime.toMillis, ChronoUnit.MILLIS)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate
         Ok(confirmationPage(
-          entityName = request.businessPartnerRecordResponse.getEntityName,
-          agentApplication = request.get[AgentApplication]
+          dateOfDecision = displayDateForLang(Some(localDateOfDecision)),
+          agentApplication = agentApplication
         ))
 
   def viewSubmittedApplication: Action[AnyContent] = actions

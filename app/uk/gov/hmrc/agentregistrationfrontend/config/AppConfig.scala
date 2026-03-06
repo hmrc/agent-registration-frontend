@@ -99,6 +99,8 @@ class AppConfig @Inject() (
   val companiesHouseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.companies-house", configuration)
   val contacHmrctUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.contact-hmrc", configuration)
 
+  val applicationDecisionLeadTime: FiniteDuration = configuration.get[FiniteDuration]("application-decision-lead-time")
+
   object Upscan:
 
     val maxFileSize: ConfigMemorySize = configuration.underlying.getMemorySize("uploads.max-file-size")

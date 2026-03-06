@@ -31,6 +31,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistratio
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.DeclarationPage
 
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -91,5 +92,7 @@ extends FrontendController(mcc, actions):
               request.agentApplication
                 .modify(_.applicationState)
                 .setTo(ApplicationState.SentForRisking)
+                .modify(_.submittedAt)
+                .setTo(Some(Instant.now()))
             )
         yield Redirect(AppRoutes.apply.AgentApplicationController.applicationSubmitted)
