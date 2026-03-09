@@ -21,6 +21,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
 import uk.gov.hmrc.agentregistration.shared.util.SealedObjects
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
@@ -84,11 +85,19 @@ object CompletedSection:
       override def appState: AgentApplication = TestOnlyData.agentApplicationLlp.afterConfirmOtherRelevantTaxAdvisersNo
       override def maybeNumberOfIndividuals: Option[NumberOfRequiredKeyIndividuals] = Some(FiveOrLess(2))
 
+    case object LlpPartnersAndOtherRelevantTaxAdvisers6
+    extends CompletedSectionLlp:
+
+      override def sectionName: String = "Partners and other relevant tax advisers (6)"
+      override def displayOrder: Int = 7
+      override def appState: AgentApplication = TestOnlyData.agentApplicationLlp.afterConfirmOtherRelevantTaxAdvisersNo
+      override def maybeNumberOfIndividuals: Option[NumberOfRequiredKeyIndividuals] = Some(SixOrMore(6))
+
     case object LlpDeclaration
     extends CompletedSectionLlp:
 
       override def sectionName: String = "Declaration"
-      override def displayOrder: Int = 7
+      override def displayOrder: Int = 8
       override def appState: AgentApplication = TestOnlyData.agentApplicationLlp.afterDeclarationSubmitted
 
     val values: Seq[CompletedSectionLlp] = SealedObjects.all[CompletedSectionLlp]
@@ -192,11 +201,19 @@ object CompletedSection:
       override def appState: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterConfirmOtherRelevantIndividualsNo
       override def maybeNumberOfIndividuals: Option[NumberOfRequiredKeyIndividuals] = Some(FiveOrLess(2))
 
+    case object GeneralPartnershipPartnersAndOtherRelevantTaxAdvisers6
+    extends CompletedSectionGeneralPartnership:
+
+      override def sectionName: String = "Partners and other relevant tax advisers (6)"
+      override def displayOrder: Int = 7
+      override def appState: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterConfirmOtherRelevantIndividuals6OrMoreNo
+      override def maybeNumberOfIndividuals: Option[NumberOfRequiredKeyIndividuals] = Some(SixOrMore(6))
+
     case object GeneralPartnershipDeclaration
     extends CompletedSectionGeneralPartnership:
 
       override def sectionName: String = "Declaration"
-      override def displayOrder: Int = 7
+      override def displayOrder: Int = 8
       override def appState: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterDeclarationSubmitted
 
     val values: Seq[CompletedSectionGeneralPartnership] = SealedObjects.all[CompletedSectionGeneralPartnership]

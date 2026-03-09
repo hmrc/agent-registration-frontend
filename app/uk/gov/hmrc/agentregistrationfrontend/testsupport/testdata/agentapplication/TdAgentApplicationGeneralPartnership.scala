@@ -127,6 +127,16 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
         hasOtherRelevantIndividuals = Some(false)
       )
 
+    val afterConfirmOtherRelevantIndividuals6OrMoreNo: AgentApplicationGeneralPartnership = afterHowManyKeyIndividuals
+      .copy(
+        numberOfIndividuals = Some(
+          SixOrMore(
+            numberOfKeyIndividualsResponsibleForTaxMatters = 6
+          )
+        ),
+        hasOtherRelevantIndividuals = Some(false)
+      )
+
     val afterDeclarationSubmitted: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
       applicationState = ApplicationState.SentForRisking,
       submittedAt = Some(dependencies.nowAsInstant)
