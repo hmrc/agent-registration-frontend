@@ -184,11 +184,19 @@ object CompletedSection:
       override def displayOrder: Int = 5
       override def appState: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterHmrcStandardForAgentsAgreed
 
+    case object GeneralPartnershipPartnersAndOtherRelevantTaxAdvisers2
+    extends CompletedSectionGeneralPartnership:
+
+      override def sectionName: String = "Partners and other relevant tax advisers (2)"
+      override def displayOrder: Int = 6
+      override def appState: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterConfirmOtherRelevantIndividualsNo
+      override def maybeNumberOfIndividuals: Option[NumberOfRequiredKeyIndividuals] = Some(FiveOrLess(2))
+
     case object GeneralPartnershipDeclaration
     extends CompletedSectionGeneralPartnership:
 
       override def sectionName: String = "Declaration"
-      override def displayOrder: Int = 6
+      override def displayOrder: Int = 7
       override def appState: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterDeclarationSubmitted
 
     val values: Seq[CompletedSectionGeneralPartnership] = SealedObjects.all[CompletedSectionGeneralPartnership]
@@ -238,7 +246,7 @@ object CompletedSection:
     extends CompletedSectionScottishPartnership:
 
       override def sectionName: String = "Declaration"
-      override def displayOrder: Int = 6
+      override def displayOrder: Int = 7
       override def appState: AgentApplication = TestOnlyData.agentApplicationScottishPartnership.afterDeclarationSubmitted
 
     val values: Seq[CompletedSectionScottishPartnership] = SealedObjects.all[CompletedSectionScottishPartnership]

@@ -90,7 +90,7 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
     val afterHowManyKeyIndividuals: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
         FiveOrLess(
-          numberOfKeyIndividuals = 3
+          numberOfKeyIndividuals = 2
         )
       )
     )
