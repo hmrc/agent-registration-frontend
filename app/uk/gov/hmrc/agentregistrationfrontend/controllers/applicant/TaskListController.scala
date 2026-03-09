@@ -92,7 +92,10 @@ extends FrontendController(mcc, actions):
           case a: AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
             NumberOfIndividuals.isKeyIndividualListComplete(existingList.count(_.isPersonOfControl), a.numberOfIndividuals)
             && otherRelevantIndividualsComplete(existingList)
-          case _ => true
+          case a: AgentApplication.IsIncorporated =>
+            NumberOfIndividuals.isKeyIndividualListComplete(existingList.count(_.isPersonOfControl), a.numberOfIndividuals)
+            && otherRelevantIndividualsComplete(existingList)
+          case _ => false
 
       val listProgressComplete = listDetailsCompleted(existingList) && existingList.forall(_.hasFinished)
       // any state other than Precreated indicates the link has been sent; require the list to be non-empty
