@@ -81,7 +81,7 @@ object CompletedSection:
 
       override def sectionName: String = "Partners and other relevant tax advisers (2)"
       override def displayOrder: Int = 6
-      override def appState: AgentApplication = TestOnlyData.agentApplicationLlp.afterConfirmCompaniesHouseOfficersYes
+      override def appState: AgentApplication = TestOnlyData.agentApplicationLlp.afterConfirmOtherRelevantTaxAdvisersNo
       override def maybeNumberOfIndividuals: Option[NumberOfRequiredKeyIndividuals] = Some(FiveOrLess(2))
 
     case object LlpDeclaration
