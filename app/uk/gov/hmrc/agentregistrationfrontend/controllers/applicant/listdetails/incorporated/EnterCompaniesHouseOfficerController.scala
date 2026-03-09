@@ -165,7 +165,7 @@ extends FrontendController(mcc, actions):
             renderPage(
               CompaniesHouseIndividuaNameForm.form
                 .fill(individualName)
-                .withGlobalError("error.companiesHouseOfficer.nameNotMatched"),
+                .withError(CompaniesHouseIndividuaNameForm.firstNameKey, "error.companiesHouseOfficer.nameNotMatched"),
               BadRequest
             )(using request.delete[IndividualName])
 

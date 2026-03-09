@@ -30,82 +30,117 @@ extends ViewSpec:
 
   val viewTemplate: NumberOfCompaniesHouseOfficersPage = app.injector.instanceOf[NumberOfCompaniesHouseOfficersPage]
 
-  // Use an application type that the page explicitly supports (LLP/Ltd/Partnership/SoleTrader).
-  val agentApplication: AgentApplication =
-    tdAll
-      .agentApplicationLlp
-      .afterHmrcStandardForAgentsAgreed
-
   private val entityName: String = tdAll.companyName
   private val companiesHouseOfficersCount: Int = 6
 
-  private val caption: String = "LLP members and other tax adviser information"
-  private val heading: String = s"Members responsible for tax activities at $entityName"
-  private val intro: String = s"There are $companiesHouseOfficersCount people listed in Companies House as members of $entityName."
-  private val p1: String = "We need to know how many of these have:"
-  private val question: String = "How many members are responsible for tax advice?"
-  private val hint: String = s"Must be a number between 1 and $companiesHouseOfficersCount."
+  case class BusinessTypeTestCase(
+    label: String,
+    agentApplication: AgentApplication,
+    caption: String,
+    entityType: String,
+    heading: String,
+    intro: String,
+    question: String
+  )
 
-  private def render(form: play.api.data.Form[Int]): Document = Jsoup.parse(viewTemplate(
+  private val testCases = Seq(
+    BusinessTypeTestCase(
+      label = "LimitedLiabilityPartnership",
+      agentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed,
+      caption = "LLP members and other tax adviser information",
+      entityType = "members",
+      heading = s"Members responsible for tax activities at $entityName",
+      intro = s"There are $companiesHouseOfficersCount people listed in Companies House as members of $entityName.",
+      question = "How many members are responsible for tax advice?"
+    ),
+    BusinessTypeTestCase(
+      label = "LimitedCompany",
+      agentApplication = tdAll.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed,
+      caption = "Directors and other tax adviser information",
+      entityType = "directors",
+      heading = s"Directors responsible for tax activities at $entityName",
+      intro = s"There are $companiesHouseOfficersCount people listed in Companies House as directors of $entityName.",
+      question = "How many directors are responsible for tax advice?"
+    ),
+    BusinessTypeTestCase(
+      label = "LimitedPartnership",
+      agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
+      caption = "Partners and other tax adviser information",
+      entityType = "partners",
+      heading = s"Partners responsible for tax activities at $entityName",
+      intro = s"There are $companiesHouseOfficersCount people listed in Companies House as partners of $entityName.",
+      question = "How many partners are responsible for tax advice?"
+    ),
+    BusinessTypeTestCase(
+      label = "ScottishLimitedPartnership",
+      agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed,
+      caption = "Partners and other tax adviser information",
+      entityType = "partners",
+      heading = s"Partners responsible for tax activities at $entityName",
+      intro = s"There are $companiesHouseOfficersCount people listed in Companies House as partners of $entityName.",
+      question = "How many partners are responsible for tax advice?"
+    )
+  )
+
+  private def render(
+    form: play.api.data.Form[Int],
+    agentApplication: AgentApplication
+  ): Document = Jsoup.parse(viewTemplate(
     form = form,
     entityName = entityName,
     agentApplication = agentApplication,
     companiesHouseOfficersCount = companiesHouseOfficersCount
   ).body)
 
-  "NumberOfCompaniesHouseOfficersPage" should:
+  for testCase <- testCases do
+    s"NumberOfCompaniesHouseOfficersPage for ${testCase.label}" should:
 
-    val doc: Document = render(NumberCompaniesHouseOfficersForm.form(companiesHouseOfficersCount))
+      val doc: Document = render(NumberCompaniesHouseOfficersForm.form(companiesHouseOfficersCount), testCase.agentApplication)
 
-    "contain expected content" in:
-      doc.mainContent shouldContainContent (
-        s"""
-           |$caption
-           |$heading
-           |$intro
-           |$p1
-           |material responsibility for tax advice activities
-           |significant authority over HMRC interactions
-           |$question
-           |$hint
-           |Save and continue
-           |Save and come back later
-           |Is this page not working properly? (opens in new tab)
-           |""".stripMargin
-      )
+      "have the correct caption" in:
+        doc.mainContent.select("h2.govuk-caption-l").text() shouldBe testCase.caption
 
-    "have the correct title" in:
-      doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
+      "have the correct heading" in:
+        doc.mainContent.select("h1").text() shouldBe testCase.heading
 
-    "render a form with correct action" in:
-      val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
-      form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitSixOrMore.url
+      "have the correct title" in:
+        doc.title() shouldBe s"${testCase.heading} - Apply for an agent services account - GOV.UK"
 
-    "render a save and continue button" in:
-      doc
-        .mainContent
-        .selectOrFail(s"form button[value='${SaveAndContinue.toString}']")
-        .selectOnlyOneElementOrFail()
-        .text() shouldBe "Save and continue"
+      "show the correct intro text" in:
+        doc.mainContent.select("p.govuk-body").first().text() shouldBe testCase.intro
 
-    "render a save and come back later button" in:
-      doc
-        .mainContent
-        .selectOrFail(s"form button[value=${SaveAndComeBackLater.toString}]")
-        .selectOnlyOneElementOrFail()
-        .text() shouldBe "Save and come back later"
+      "show the correct question" in:
+        doc.mainContent.select("label.govuk-label--m").text() shouldBe testCase.question
 
-    "render a form error when the form contains an error" in:
-      val field = NumberCompaniesHouseOfficersForm.numberOfOfficersResponsibleForTaxMatters
-      val errorMessage = "Enter how many members are responsible for tax advice"
-      val formWithError = NumberCompaniesHouseOfficersForm
-        .form(companiesHouseOfficersCount)
-        .withError(field, errorMessage)
+      "render a form with correct action" in:
+        val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
+        form.attr("method") shouldBe "POST"
+        form.attr("action") shouldBe AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitSixOrMore.url
 
-      behavesLikePageWithErrorHandling(
-        field = field,
-        errorMessage = errorMessage,
-        errorDoc = render(formWithError),
-        heading = heading
-      )
+      "render a save and continue button" in:
+        doc
+          .mainContent
+          .selectOrFail(s"form button[value='${SaveAndContinue.toString}']")
+          .selectOnlyOneElementOrFail()
+          .text() shouldBe "Save and continue"
+
+      "render a save and come back later button" in:
+        doc
+          .mainContent
+          .selectOrFail(s"form button[value=${SaveAndComeBackLater.toString}]")
+          .selectOnlyOneElementOrFail()
+          .text() shouldBe "Save and come back later"
+
+      "render a form error when the form contains an error" in:
+        val field = NumberCompaniesHouseOfficersForm.numberOfOfficersResponsibleForTaxMatters
+        val errorMessage = "Enter how many are responsible for tax advice"
+        val formWithError = NumberCompaniesHouseOfficersForm
+          .form(companiesHouseOfficersCount)
+          .withError(field, errorMessage)
+
+        behavesLikePageWithErrorHandling(
+          field = field,
+          errorMessage = errorMessage,
+          errorDoc = render(formWithError, testCase.agentApplication),
+          heading = testCase.heading
+        )

@@ -32,15 +32,44 @@ extends ViewSpec:
   val viewTemplate: EnterCompaniesHouseNextIndividualNamePage = app.injector.instanceOf[EnterCompaniesHouseNextIndividualNamePage]
 
   private val entityName: String = tdAll.companyName
-  private val ordinalKey: String = "second"
+  private val ordinalKey: String = "subsequent"
   private val formAction: play.api.mvc.Call = AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitSixOrMore
-  private val agentApplication: AgentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
-
-  private val caption: String = "LLP members and other tax adviser information"
-  private val heading: String = s"companiesHouseIndividuaName.question.$ordinalKey"
+  private val heading: String = "What is the name of the next person?"
   private val p1: String = s"We'll check this against the business records for $entityName in Companies House."
 
-  private def render(form: play.api.data.Form[IndividualName]): Document = Jsoup.parse(viewTemplate(
+  case class BusinessTypeTestCase(
+    label: String,
+    agentApplication: AgentApplication,
+    caption: String
+  )
+
+  private val testCases = Seq(
+    BusinessTypeTestCase(
+      label = "LimitedLiabilityPartnership",
+      agentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed,
+      caption = "LLP members and other tax adviser information"
+    ),
+    BusinessTypeTestCase(
+      label = "LimitedCompany",
+      agentApplication = tdAll.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed,
+      caption = "Directors and other tax adviser information"
+    ),
+    BusinessTypeTestCase(
+      label = "LimitedPartnership",
+      agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
+      caption = "Partners and other tax adviser information"
+    ),
+    BusinessTypeTestCase(
+      label = "ScottishLimitedPartnership",
+      agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed,
+      caption = "Partners and other tax adviser information"
+    )
+  )
+
+  private def render(
+    form: play.api.data.Form[IndividualName],
+    agentApplication: AgentApplication
+  ): Document = Jsoup.parse(viewTemplate(
     form = form,
     entityName = entityName,
     ordinalKey = ordinalKey,
@@ -48,70 +77,66 @@ extends ViewSpec:
     agentApplication = agentApplication
   ).body)
 
-  "EnterCompaniesHouseNextIndividualNamePage" should:
+  for testCase <- testCases do
+    s"EnterCompaniesHouseNextIndividualNamePage for ${testCase.label}" should:
 
-    val doc: Document = render(CompaniesHouseIndividuaNameForm.form)
+      val doc: Document = render(CompaniesHouseIndividuaNameForm.form, testCase.agentApplication)
 
-    "contain expected content" in:
-      doc.mainContent shouldContainContent (
-        s"""
-           |$caption
-           |$heading
-           |$p1
-           |First names
-           |Last name
-           |Save and continue
-           |Save and come back later
-           |Is this page not working properly? (opens in new tab)
-           |""".stripMargin
-      )
+      "have the correct caption" in:
+        doc.mainContent.select("h2.govuk-caption-l").text() shouldBe testCase.caption
 
-    "have the correct title" in:
-      doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
+      "have the correct heading" in:
+        doc.mainContent.select("h1").text() shouldBe heading
 
-    "render a form with correct action" in:
-      val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
-      form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe formAction.url
+      "have the correct title" in:
+        doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
 
-    "render a save and continue button" in:
-      doc
-        .mainContent
-        .selectOrFail(s"form button[value='${SaveAndContinue.toString}']")
-        .selectOnlyOneElementOrFail()
-        .text() shouldBe "Save and continue"
+      "show the p1 text" in:
+        doc.mainContent.select("p.govuk-body").first().text() shouldBe p1
 
-    "render a save and come back later button" in:
-      doc
-        .mainContent
-        .selectOrFail(s"form button[value=${SaveAndComeBackLater.toString}]")
-        .selectOnlyOneElementOrFail()
-        .text() shouldBe "Save and come back later"
+      "render a form with correct action" in:
+        val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
+        form.attr("method") shouldBe "POST"
+        form.attr("action") shouldBe formAction.url
 
-    "render a form error when the firstName field contains an error" in:
-      val field = CompaniesHouseIndividuaNameForm.firstNameKey
-      val errorMessage = "Enter first name"
-      val formWithError = CompaniesHouseIndividuaNameForm
-        .form
-        .withError(field, errorMessage)
+      "render a save and continue button" in:
+        doc
+          .mainContent
+          .selectOrFail(s"form button[value='${SaveAndContinue.toString}']")
+          .selectOnlyOneElementOrFail()
+          .text() shouldBe "Save and continue"
 
-      behavesLikePageWithErrorHandling(
-        field = field,
-        errorMessage = errorMessage,
-        errorDoc = render(formWithError),
-        heading = heading
-      )
+      "render a save and come back later button" in:
+        doc
+          .mainContent
+          .selectOrFail(s"form button[value=${SaveAndComeBackLater.toString}]")
+          .selectOnlyOneElementOrFail()
+          .text() shouldBe "Save and come back later"
 
-    "render a form error when the lastName field contains an error" in:
-      val field = CompaniesHouseIndividuaNameForm.lastNameKey
-      val errorMessage = "Enter last name"
-      val formWithError = CompaniesHouseIndividuaNameForm
-        .form
-        .withError(field, errorMessage)
+      "render a form error when the firstName field contains an error" in:
+        val field = CompaniesHouseIndividuaNameForm.firstNameKey
+        val errorMessage = "Enter first name"
+        val formWithError = CompaniesHouseIndividuaNameForm
+          .form
+          .withError(field, errorMessage)
 
-      behavesLikePageWithErrorHandling(
-        field = field,
-        errorMessage = errorMessage,
-        errorDoc = render(formWithError),
-        heading = heading
-      )
+        behavesLikePageWithErrorHandling(
+          field = field,
+          errorMessage = errorMessage,
+          errorDoc = render(formWithError, testCase.agentApplication),
+          heading = heading
+        )
+
+      "render a form error when the lastName field contains an error" in:
+        val field = CompaniesHouseIndividuaNameForm.lastNameKey
+        val errorMessage = "Enter last name"
+        val formWithError = CompaniesHouseIndividuaNameForm
+          .form
+          .withError(field, errorMessage)
+
+        behavesLikePageWithErrorHandling(
+          field = field,
+          errorMessage = errorMessage,
+          errorDoc = render(formWithError, testCase.agentApplication),
+          heading = heading
+        )

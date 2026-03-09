@@ -31,80 +31,125 @@ extends ViewSpec:
 
   val viewTemplate: ConfirmCompaniesHouseOfficersPage = app.injector.instanceOf[ConfirmCompaniesHouseOfficersPage]
 
-  private val agentApplication: AgentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
-
   private val entityName: String = tdAll.companyName
   private val individualNameList: Seq[IndividualName] = Seq(
     IndividualName("Tester, John"),
     IndividualName("Tester, Alice")
   )
-
   private val key: String = ConfirmCompaniesHouseOfficersForm.isCompaniesHouseOfficersListCorrect
-  private val caption: String = "LLP members and other tax adviser information"
-  private val heading: String = s"Check this list of members for $entityName"
-  private val intro: String = s"These are the members listed in Companies House for $entityName:"
-  private val question: String = "Is this list of members correct?"
 
-  private def render(form: play.api.data.Form[Boolean]): Document = Jsoup.parse(viewTemplate(
+  case class BusinessTypeTestCase(
+    label: String,
+    agentApplication: AgentApplication,
+    caption: String,
+    entityType: String,
+    heading: String,
+    intro: String,
+    question: String
+  )
+
+  private val testCases = Seq(
+    BusinessTypeTestCase(
+      label = "LimitedLiabilityPartnership",
+      agentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed,
+      caption = "LLP members and other tax adviser information",
+      entityType = "members",
+      heading = s"Check this list of members for $entityName",
+      intro = s"These are the members listed in Companies House for $entityName:",
+      question = "Is this list of members correct?"
+    ),
+    BusinessTypeTestCase(
+      label = "LimitedCompany",
+      agentApplication = tdAll.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed,
+      caption = "Directors and other tax adviser information",
+      entityType = "directors",
+      heading = s"Check this list of directors for $entityName",
+      intro = s"These are the directors listed in Companies House for $entityName:",
+      question = "Is this list of directors correct?"
+    ),
+    BusinessTypeTestCase(
+      label = "LimitedPartnership",
+      agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
+      caption = "Partners and other tax adviser information",
+      entityType = "partners",
+      heading = s"Check this list of partners for $entityName",
+      intro = s"These are the partners listed in Companies House for $entityName:",
+      question = "Is this list of partners correct?"
+    ),
+    BusinessTypeTestCase(
+      label = "ScottishLimitedPartnership",
+      agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed,
+      caption = "Partners and other tax adviser information",
+      entityType = "partners",
+      heading = s"Check this list of partners for $entityName",
+      intro = s"These are the partners listed in Companies House for $entityName:",
+      question = "Is this list of partners correct?"
+    )
+  )
+
+  private def render(
+    form: play.api.data.Form[Boolean],
+    agentApplication: AgentApplication
+  ): Document = Jsoup.parse(viewTemplate(
     form = form,
     entityName = entityName,
     agentApplication = agentApplication,
     individualNameList = individualNameList
   ).body)
 
-  "ConfirmCompaniesHouseOfficersPage" should:
+  for testCase <- testCases do
+    s"ConfirmCompaniesHouseOfficersPage for ${testCase.label}" should:
 
-    val doc: Document = render(ConfirmCompaniesHouseOfficersForm.form)
+      val doc: Document = render(ConfirmCompaniesHouseOfficersForm.form, testCase.agentApplication)
 
-    "contain expected content" in:
-      doc.mainContent shouldContainContent (
-        s"""
-           |$caption
-           |$heading
-           |$intro
-           |Tester, John
-           |Tester, Alice
-           |$question
-           |Yes
-           |No
-           |Save and continue
-           |Save and come back later
-           |Is this page not working properly? (opens in new tab)
-           |""".stripMargin
-      )
+      "have the correct caption" in:
+        doc.mainContent.select("h2.govuk-caption-l").text() shouldBe testCase.caption
 
-    "have the correct title" in:
-      doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
+      "have the correct heading" in:
+        doc.mainContent.select("h1").text() shouldBe testCase.heading
 
-    "render a form with correct action" in:
-      val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
-      form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitFiveOrLess.url
+      "have the correct title" in:
+        doc.title() shouldBe s"${testCase.heading} - Apply for an agent services account - GOV.UK"
 
-    "render a save and continue button" in:
-      doc
-        .mainContent
-        .selectOrFail(s"form button[value='${SaveAndContinue.toString}']")
-        .selectOnlyOneElementOrFail()
-        .text() shouldBe "Save and continue"
+      "show the intro text" in:
+        doc.mainContent.select("p.govuk-body").text() should include(testCase.intro)
 
-    "render a save and come back later button" in:
-      doc
-        .mainContent
-        .selectOrFail(s"form button[value=${SaveAndComeBackLater.toString}]")
-        .selectOnlyOneElementOrFail()
-        .text() shouldBe "Save and come back later"
+      "show the officer names" in:
+        doc.mainContent.select("ul.govuk-list--bullet").text() should include("Tester, John")
+        doc.mainContent.select("ul.govuk-list--bullet").text() should include("Tester, Alice")
 
-    "render a form error when the form contains an error" in:
-      val field = key
-      val errorMessage = "Select yes if this list is correct"
-      val formWithError = ConfirmCompaniesHouseOfficersForm
-        .form
-        .withError(field, errorMessage)
+      "show the question" in:
+        doc.mainContent.select("fieldset legend").text() shouldBe testCase.question
 
-      behavesLikePageWithErrorHandling(
-        field = field,
-        errorMessage = errorMessage,
-        errorDoc = render(formWithError),
-        heading = heading
-      )
+      "render a form with correct action" in:
+        val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
+        form.attr("method") shouldBe "POST"
+        form.attr("action") shouldBe AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitFiveOrLess.url
+
+      "render a save and continue button" in:
+        doc
+          .mainContent
+          .selectOrFail(s"form button[value='${SaveAndContinue.toString}']")
+          .selectOnlyOneElementOrFail()
+          .text() shouldBe "Save and continue"
+
+      "render a save and come back later button" in:
+        doc
+          .mainContent
+          .selectOrFail(s"form button[value=${SaveAndComeBackLater.toString}]")
+          .selectOnlyOneElementOrFail()
+          .text() shouldBe "Save and come back later"
+
+      "render a form error when the form contains an error" in:
+        val field = key
+        val errorMessage = "Select yes if this list is correct"
+        val formWithError = ConfirmCompaniesHouseOfficersForm
+          .form
+          .withError(field, errorMessage)
+
+        behavesLikePageWithErrorHandling(
+          field = field,
+          errorMessage = errorMessage,
+          errorDoc = render(formWithError, testCase.agentApplication),
+          heading = testCase.heading
+        )
