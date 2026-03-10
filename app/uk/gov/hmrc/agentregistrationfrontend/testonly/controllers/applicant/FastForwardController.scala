@@ -139,21 +139,15 @@ extends FrontendController(mcc, applicantActions):
     applicationId: AgentApplicationId
   )(using r: RequestWithAuth): Future[Unit] =
     val howManyIndividuals: Int = section.maybeIndividualsList.map(_.numberOfKeyIndividuals.numberOfIndividuals).getOrElse(0)
-    val individualNames = TestOnlyData.grsStubbedIndividualNames
-    if (howManyIndividuals > individualNames.length)
-      throw new RuntimeException(s"Only ${individualNames.length} individuals are stubbed in grs currently")
+    val stubbedIndividuals = TestOnlyData.grsStubbedIndividuals
+    if (howManyIndividuals > stubbedIndividuals.length)
+      throw new RuntimeException(s"Only ${stubbedIndividuals.length} individuals are stubbed in grs currently")
 
     val individualProvidedDetailsState = section.maybeIndividualsList.map(_.providedDetailsState).get
 
-    val createdIndividuals = individualNames
+    val createdIndividuals = stubbedIndividuals
       .take(howManyIndividuals)
-      .map: individualName =>
-        individualProvideDetailsService.create(
-          individualName = individualName,
-          isPersonOfControl = true,
-          agentApplicationId = applicationId,
-          providedDetailsState = individualProvidedDetailsState
-        )
+      .map(_.copy(agentApplicationId = applicationId, providedDetailsState = individualProvidedDetailsState))
 
     createdIndividuals.foldLeft(Future.unit):
       (

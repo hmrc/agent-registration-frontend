@@ -141,6 +141,9 @@ trait TdBase:
   def individualProvidedDetailsId: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-12345")
   def individualProvidedDetailsId2: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-22345")
   def individualProvidedDetailsId3: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-32345")
+  def individualProvidedDetailsId4: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-42345")
+  def individualProvidedDetailsId5: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-52345")
+  def individualProvidedDetailsId6: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-62345")
   def bprPrimaryTelephoneNumber: String = "(+44) 78714743399"
   def newTelephoneNumber: String = "+44 (0) 7000000000"
   def bprEmailAddress: String = "bpr@example.com"
@@ -243,13 +246,61 @@ trait TdBase:
     isPersonOfControl = true
   )
 
-  val grsStubbedIndividualNames: Seq[IndividualName] = Seq(
-    IndividualName("Steve Austin"),
-    IndividualName("Beverly Hills"),
-    IndividualName("Pauline Austin"),
-    IndividualName("Justine Hills"),
-    IndividualName("Steve Palmer"),
-    IndividualName("Sandra Hills")
+  val grsStubbedIndividuals: Seq[IndividualProvidedDetails] = Seq(
+    IndividualProvidedDetails(
+      _id = individualProvidedDetailsId,
+      individualName = IndividualName("Steve Austin"),
+      internalUserId = None,
+      agentApplicationId = agentApplicationId,
+      createdAt = nowAsInstant,
+      providedDetailsState = ProvidedDetailsState.Precreated,
+      isPersonOfControl = true
+    ),
+    IndividualProvidedDetails(
+      _id = individualProvidedDetailsId2,
+      individualName = IndividualName("Beverly Hills"),
+      internalUserId = None,
+      agentApplicationId = agentApplicationId,
+      createdAt = nowAsInstant,
+      providedDetailsState = ProvidedDetailsState.Precreated,
+      isPersonOfControl = true
+    ),
+    IndividualProvidedDetails(
+      _id = individualProvidedDetailsId3,
+      individualName = IndividualName("Pauline Austin"),
+      internalUserId = None,
+      agentApplicationId = agentApplicationId,
+      createdAt = nowAsInstant,
+      providedDetailsState = ProvidedDetailsState.Precreated,
+      isPersonOfControl = true
+    ),
+    IndividualProvidedDetails(
+      _id = individualProvidedDetailsId4,
+      individualName = IndividualName("Justine Hills"),
+      internalUserId = None,
+      agentApplicationId = agentApplicationId,
+      createdAt = nowAsInstant,
+      providedDetailsState = ProvidedDetailsState.Precreated,
+      isPersonOfControl = true
+    ),
+    IndividualProvidedDetails(
+      _id = individualProvidedDetailsId5,
+      individualName = IndividualName("Steve Palmer"),
+      internalUserId = None,
+      agentApplicationId = agentApplicationId,
+      createdAt = nowAsInstant,
+      providedDetailsState = ProvidedDetailsState.Precreated,
+      isPersonOfControl = true
+    ),
+    IndividualProvidedDetails(
+      _id = individualProvidedDetailsId6,
+      individualName = IndividualName("Sandra Hills"),
+      internalUserId = None,
+      agentApplicationId = agentApplicationId,
+      createdAt = nowAsInstant,
+      providedDetailsState = ProvidedDetailsState.Precreated,
+      isPersonOfControl = true
+    )
   )
 
   val soleTraderYetToProvideDetails: IndividualProvidedDetails = IndividualProvidedDetails(
