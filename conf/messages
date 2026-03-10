@@ -406,6 +406,16 @@ listDetailsCheckYourAnswers.numberOfPartners.label = Number of partners
 listDetailsCheckYourAnswers.partnerNames.label = Partner names
 listDetailsCheckYourAnswers.hasOtherRelevantIndividuals.label = Other relevant tax advisers
 listDetailsCheckYourAnswers.otherRelevantIndividualsNames.label = Other relevant tax adviser names
+listDetailsCheckYourAnswers.numberOfPartners.Partnership.label = Number of partners
+listDetailsCheckYourAnswers.numberOfPartners.LimitedLiabilityPartnership.label = Number of LLP members
+listDetailsCheckYourAnswers.numberOfPartners.LimitedCompany.label = Number of directors
+listDetailsCheckYourAnswers.numberOfPartners.LimitedPartnership.label = Number of partners
+listDetailsCheckYourAnswers.numberOfPartners.ScottishLimitedPartnership.label = Number of partners
+listDetailsCheckYourAnswers.partnerNames.Partnership.label = Partner names
+listDetailsCheckYourAnswers.partnerNames.LimitedLiabilityPartnership.label = LLP member names
+listDetailsCheckYourAnswers.partnerNames.LimitedCompany.label = Director names
+listDetailsCheckYourAnswers.partnerNames.LimitedPartnership.label = Partner names
+listDetailsCheckYourAnswers.partnerNames.ScottishLimitedPartnership.label = Partner names
 
 
 
@@ -975,3 +985,13 @@ addToListSummary.ScottishLimitedPartnership.complex.bullet1.singular = the partn
 addToListSummary.ScottishLimitedPartnership.complex.bullet1.plural = the {0} partners responsible for tax advice
 addToListSummary.ScottishLimitedPartnership.complex.bullet2.singular = 1 other partner
 addToListSummary.ScottishLimitedPartnership.complex.bullet2.plural = {0} other partners
+
+removeKeyIndividual.title.LimitedLiabilityPartnership = Confirm that you want to remove {0} from the list of LLP members
+removeKeyIndividual.title.LimitedCompany = Confirm that you want to remove {0} from the list of directors
+removeKeyIndividual.title.LimitedPartnership = Confirm that you want to remove {0} from the list of partners
+removeKeyIndividual.title.ScottishLimitedPartnership = Confirm that you want to remove {0} from the list of partners
+
+removeKeyIndividual.error.required.LimitedLiabilityPartnership = Select yes if you want to remove {0} from the list of LLP members
+removeKeyIndividual.error.required.LimitedCompany = Select yes if you want to remove {0} from the list of directors
+removeKeyIndividual.error.required.LimitedPartnership = Select yes if you want to remove {0} from the list of partners
+removeKeyIndividual.error.required.ScottishLimitedPartnership = Select yes if you want to remove {0} from the list of partners

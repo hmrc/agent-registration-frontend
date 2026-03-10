@@ -17,7 +17,10 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationGeneralPartnership
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationLimitedCompany
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationLimitedPartnership
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationLlp
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationScottishLimitedPartnership
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationSoleTrader
 
 object TdAll:
@@ -47,6 +50,9 @@ extends TdBase,
   agentapplication.TdAgentApplicationRequest,
   TdAgentApplicationLlp,
   TdAgentApplicationGeneralPartnership,
+  TdAgentApplicationLimitedCompany,
+  TdAgentApplicationLimitedPartnership,
+  TdAgentApplicationScottishLimitedPartnership,
   TdAgentApplicationSoleTrader,
   agentapplication.sections.TdSectionContactDetails,
   agentapplication.sections.TdSectionAgentDetails,

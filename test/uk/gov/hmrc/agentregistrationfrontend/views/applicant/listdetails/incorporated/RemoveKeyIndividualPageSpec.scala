@@ -31,70 +31,101 @@ extends ViewSpec:
 
   val viewTemplate: RemoveKeyIndividualPage = app.injector.instanceOf[RemoveKeyIndividualPage]
 
-  private val agentApplication: AgentApplication = tdAll.agentApplicationLlp.afterNumberOfConfirmCompaniesHouseOfficers
-
   private val individualProvidedDetails = tdAll.individualProvidedDetails
   private val individualName: String = individualProvidedDetails.individualName.value
-
   private val key: String = RemoveKeyIndividualForm.key
-  private val caption: String = "LLP members and other tax adviser information"
-  private val heading: String = s"Confirm that you want to remove $individualName from the list of partners"
 
-  private def render(form: play.api.data.Form[YesNo]): Document = Jsoup.parse(viewTemplate(
+  case class BusinessTypeTestCase(
+    label: String,
+    agentApplication: AgentApplication,
+    caption: String,
+    entityListType: String,
+    heading: String
+  )
+
+  private val testCases = Seq(
+    BusinessTypeTestCase(
+      label = "LimitedLiabilityPartnership",
+      agentApplication = tdAll.agentApplicationLlp.afterNumberOfConfirmCompaniesHouseOfficers,
+      caption = "LLP members and other tax adviser information",
+      entityListType = "LLP members",
+      heading = s"Confirm that you want to remove $individualName from the list of LLP members"
+    ),
+    BusinessTypeTestCase(
+      label = "LimitedCompany",
+      agentApplication = tdAll.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed,
+      caption = "Directors and other tax adviser information",
+      entityListType = "directors",
+      heading = s"Confirm that you want to remove $individualName from the list of directors"
+    ),
+    BusinessTypeTestCase(
+      label = "LimitedPartnership",
+      agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
+      caption = "Partners and other tax adviser information",
+      entityListType = "partners",
+      heading = s"Confirm that you want to remove $individualName from the list of partners"
+    ),
+    BusinessTypeTestCase(
+      label = "ScottishLimitedPartnership",
+      agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed,
+      caption = "Partners and other tax adviser information",
+      entityListType = "partners",
+      heading = s"Confirm that you want to remove $individualName from the list of partners"
+    )
+  )
+
+  private def render(
+    form: play.api.data.Form[YesNo],
+    agentApplication: AgentApplication
+  ): Document = Jsoup.parse(viewTemplate(
     form = form,
     individualProvidedDetails = individualProvidedDetails,
     agentApplication = agentApplication
   ).body)
 
-  "RemoveKeyIndividualPage" should:
+  for testCase <- testCases do
+    s"RemoveKeyIndividualPage for ${testCase.label}" should:
 
-    val doc: Document = render(RemoveKeyIndividualForm.form(individualName))
+      val doc: Document = render(RemoveKeyIndividualForm.form(individualName), testCase.agentApplication)
 
-    "contain expected content" in:
-      doc.mainContent shouldContainContent (
-        s"""
-           |$caption
-           |$heading
-           |Yes
-           |No
-           |Save and continue
-           |Save and come back later
-           |Is this page not working properly? (opens in new tab)
-           |""".stripMargin
-      )
+      "have the correct caption" in:
+        doc.mainContent.select("h2.govuk-caption-l").text() shouldBe testCase.caption
 
-    "have the correct title" in:
-      doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
+      "have the correct heading with correct entity type" in:
+        doc.mainContent.select("h1").text() shouldBe testCase.heading
 
-    "render a form with correct action" in:
-      val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
-      form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe AppRoutes.apply.listdetails.incoporated.RemoveCompaniesHouseOfficerController.submit(individualProvidedDetails._id).url
+      "have the correct title" in:
+        doc.title() shouldBe s"${testCase.heading} - Apply for an agent services account - GOV.UK"
 
-    "render a save and continue button" in:
-      doc
-        .mainContent
-        .selectOrFail(s"form button[value='${SaveAndContinue.toString}']")
-        .selectOnlyOneElementOrFail()
-        .text() shouldBe "Save and continue"
+      "render a form with correct action" in:
+        val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
+        form.attr("method") shouldBe "POST"
+        form.attr("action") shouldBe AppRoutes.apply.listdetails.incoporated.RemoveCompaniesHouseOfficerController.submit(individualProvidedDetails._id).url
 
-    "render a save and come back later button" in:
-      doc
-        .mainContent
-        .selectOrFail(s"form button[value=${SaveAndComeBackLater.toString}]")
-        .selectOnlyOneElementOrFail()
-        .text() shouldBe "Save and come back later"
+      "render a save and continue button" in:
+        doc
+          .mainContent
+          .selectOrFail(s"form button[value='${SaveAndContinue.toString}']")
+          .selectOnlyOneElementOrFail()
+          .text() shouldBe "Save and continue"
 
-    "render a form error when the form contains an error" in:
-      val field = key
-      val errorMessage = "Select yes if you want to remove"
-      val formWithError = RemoveKeyIndividualForm
-        .form(individualName)
-        .withError(field, errorMessage)
+      "render a save and come back later button" in:
+        doc
+          .mainContent
+          .selectOrFail(s"form button[value=${SaveAndComeBackLater.toString}]")
+          .selectOnlyOneElementOrFail()
+          .text() shouldBe "Save and come back later"
 
-      behavesLikePageWithErrorHandling(
-        field = field,
-        errorMessage = errorMessage,
-        errorDoc = render(formWithError),
-        heading = heading
-      )
+      "render a form error when the form contains an error" in:
+        val field = key
+        val errorMessage = "Select yes if you want to remove"
+        val formWithError = RemoveKeyIndividualForm
+          .form(individualName)
+          .withError(field, errorMessage)
+
+        behavesLikePageWithErrorHandling(
+          field = field,
+          errorMessage = errorMessage,
+          errorDoc = render(formWithError, testCase.agentApplication),
+          heading = testCase.heading
+        )

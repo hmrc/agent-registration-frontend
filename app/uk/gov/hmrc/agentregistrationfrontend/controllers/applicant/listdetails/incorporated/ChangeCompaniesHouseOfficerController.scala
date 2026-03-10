@@ -170,7 +170,7 @@ extends FrontendController(mcc, actions):
               BadRequest(enterCompaniesHouseNextIndividualNamePage(
                 form = CompaniesHouseIndividuaNameForm.form
                   .fill(individualNameFromForm)
-                  .withGlobalError("error.companiesHouseOfficer.nameNotMatched"),
+                  .withError(CompaniesHouseIndividuaNameForm.firstNameKey, "error.companiesHouseOfficer.nameNotMatched"),
                 entityName = entityName,
                 ordinalKey = "subsequent",
                 formAction = formAction,

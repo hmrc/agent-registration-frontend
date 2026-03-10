@@ -35,23 +35,15 @@ extends ViewSpec:
 
   private val entityName: String = tdAll.companyName
   private val sixOrMoreOfficers: SixOrMoreOfficers = TestOnlyData.sixOrMoreCompaniesHouseOfficers
-  private val numberOfMembers: Int = sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters
-  private val paddingRequired: Int = sixOrMoreOfficers.requiredPadding
+//  private val numberOfMembers: Int = sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters
+//  private val paddingRequired: Int = sixOrMoreOfficers.requiredPadding
   private val ordinalKey: String = "first"
   private val formAction: play.api.mvc.Call = AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitSixOrMore
-  private val agentApplication: AgentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
 
-  private val caption: String = "LLP members and other tax adviser information"
-  private val heading: String = s"Tell us about the members of $entityName"
-  private val p1: String = "We'll check this against the business records in Companies House."
-  private val introLine: String = "We need the names of:"
-  private val bullet1: String = s"the $numberOfMembers LLP members responsible for tax advice"
-  private val bullet2: String = s"$paddingRequired other LLP member"
-  private val detailsSummary: String = "What we mean by responsible for tax advice"
-  private val detailsContent: String = "An LLP member is responsible for tax advice if they have:"
-  private val question: String = "What is the name of the first person?"
-
-  private def render(form: play.api.data.Form[IndividualName]): Document = Jsoup.parse(viewTemplate(
+  private def render(
+    form: play.api.data.Form[IndividualName],
+    agentApplication: AgentApplication
+  ): Document = Jsoup.parse(viewTemplate(
     form = form,
     entityName = entityName,
     sixOrMoreOfficers = sixOrMoreOfficers,
@@ -60,78 +52,126 @@ extends ViewSpec:
     agentApplication = agentApplication
   ).body)
 
-  "EnterCompaniesHouseFirstIndividualNamePage" should:
+  case class BusinessTypeTestCase(
+    label: String,
+    agentApplication: AgentApplication,
+    caption: String,
+    headingEntityType: String,
+    bullet1EntityType: String,
+    bullet2EntityType: String,
+    detailsContent: String
+  )
 
-    val doc: Document = render(CompaniesHouseIndividuaNameForm.form)
+  private val testCases = Seq(
+    BusinessTypeTestCase(
+      label = "LimitedLiabilityPartnership",
+      agentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed,
+      caption = "LLP members and other tax adviser information",
+      headingEntityType = "members",
+      bullet1EntityType = "LLP members",
+      bullet2EntityType = "LLP member",
+      detailsContent = "An LLP member is responsible for tax advice if they have:"
+    ),
+    BusinessTypeTestCase(
+      label = "LimitedCompany",
+      agentApplication = tdAll.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed,
+      caption = "Directors and other tax adviser information",
+      headingEntityType = "directors",
+      bullet1EntityType = "directors",
+      bullet2EntityType = "director",
+      detailsContent = "A director is responsible for tax advice if they have:"
+    ),
+    BusinessTypeTestCase(
+      label = "LimitedPartnership",
+      agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
+      caption = "Partners and other tax adviser information",
+      headingEntityType = "partners",
+      bullet1EntityType = "partners",
+      bullet2EntityType = "partner",
+      detailsContent = "A partner is responsible for tax advice if they have:"
+    ),
+    BusinessTypeTestCase(
+      label = "ScottishLimitedPartnership",
+      agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed,
+      caption = "Partners and other tax adviser information",
+      headingEntityType = "partners",
+      bullet1EntityType = "partners",
+      bullet2EntityType = "partner",
+      detailsContent = "A partner is responsible for tax advice if they have:"
+    )
+  )
 
-    "contain expected content" in:
-      doc.mainContent shouldContainContent (
-        s"""
-           |$caption
-           |$heading
-           |$p1
-           |$introLine
-           |$bullet1
-           |$bullet2
-           |$detailsSummary
-           |$detailsContent
-           |material responsibility for tax advice activities
-           |significant authority over HMRC interactions
-           |$question
-           |First names
-           |Last name
-           |Save and continue
-           |Save and come back later
-           |Is this page not working properly? (opens in new tab)
-           |""".stripMargin
-      )
+  for testCase <- testCases do
+    s"EnterCompaniesHouseFirstIndividualNamePage for ${testCase.label}" should:
 
-    "have the correct title" in:
-      doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
+      val heading = s"Tell us about the ${testCase.headingEntityType} of $entityName"
+      val doc: Document = render(CompaniesHouseIndividuaNameForm.form, testCase.agentApplication)
 
-    "render a form with correct action" in:
-      val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
-      form.attr("method") shouldBe "POST"
-      form.attr("action") shouldBe formAction.url
+      "have the correct caption" in:
+        doc.mainContent.select("h2.govuk-caption-l").text() shouldBe testCase.caption
 
-    "render a save and continue button" in:
-      doc
-        .mainContent
-        .selectOrFail(s"form button[value='${SaveAndContinue.toString}']")
-        .selectOnlyOneElementOrFail()
-        .text() shouldBe "Save and continue"
+      "have the correct heading" in:
+        doc.mainContent.select("h1").text() shouldBe heading
 
-    "render a save and come back later button" in:
-      doc
-        .mainContent
-        .selectOrFail(s"form button[value=${SaveAndComeBackLater.toString}]")
-        .selectOnlyOneElementOrFail()
-        .text() shouldBe "Save and come back later"
+      "have the correct title" in:
+        doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
 
-    "render a form error when the firstName field contains an error" in:
-      val field = CompaniesHouseIndividuaNameForm.firstNameKey
-      val errorMessage = "Enter first name"
-      val formWithError = CompaniesHouseIndividuaNameForm
-        .form
-        .withError(field, errorMessage)
+      "show the correct p1 text" in:
+        doc.mainContent.select("p.govuk-body").first().text() shouldBe
+          "We'll check this against the business records in Companies House."
 
-      behavesLikePageWithErrorHandling(
-        field = field,
-        errorMessage = errorMessage,
-        errorDoc = render(formWithError),
-        heading = heading
-      )
+      "show the correct padding breakdown bullet1" in:
+        doc.mainContent.select("ul.govuk-list--bullet li").first().text() should include(testCase.bullet1EntityType)
 
-    "render a form error when the lastName field contains an error" in:
-      val field = CompaniesHouseIndividuaNameForm.lastNameKey
-      val errorMessage = "Enter last name"
-      val formWithError = CompaniesHouseIndividuaNameForm
-        .form
-        .withError(field, errorMessage)
+      "show the correct padding breakdown bullet2" in:
+        doc.mainContent.select("ul.govuk-list--bullet li").get(1).text() should include(testCase.bullet2EntityType)
 
-      behavesLikePageWithErrorHandling(
-        field = field,
-        errorMessage = errorMessage,
-        errorDoc = render(formWithError),
-        heading = heading
-      )
+      "show the correct details content" in:
+        doc.mainContent.select(".govuk-details__text").text() should include(testCase.detailsContent)
+
+      "render a form with correct action" in:
+        val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
+        form.attr("method") shouldBe "POST"
+        form.attr("action") shouldBe formAction.url
+
+      "render a save and continue button" in:
+        doc
+          .mainContent
+          .selectOrFail(s"form button[value='${SaveAndContinue.toString}']")
+          .selectOnlyOneElementOrFail()
+          .text() shouldBe "Save and continue"
+
+      "render a save and come back later button" in:
+        doc
+          .mainContent
+          .selectOrFail(s"form button[value=${SaveAndComeBackLater.toString}]")
+          .selectOnlyOneElementOrFail()
+          .text() shouldBe "Save and come back later"
+
+      "render a form error when the firstName field contains an error" in:
+        val field = CompaniesHouseIndividuaNameForm.firstNameKey
+        val errorMessage = "Enter first name"
+        val formWithError = CompaniesHouseIndividuaNameForm
+          .form
+          .withError(field, errorMessage)
+
+        behavesLikePageWithErrorHandling(
+          field = field,
+          errorMessage = errorMessage,
+          errorDoc = render(formWithError, testCase.agentApplication),
+          heading = heading
+        )
+
+      "render a form error when the lastName field contains an error" in:
+        val field = CompaniesHouseIndividuaNameForm.lastNameKey
+        val errorMessage = "Enter last name"
+        val formWithError = CompaniesHouseIndividuaNameForm
+          .form
+          .withError(field, errorMessage)
+
+        behavesLikePageWithErrorHandling(
+          field = field,
+          errorMessage = errorMessage,
+          errorDoc = render(formWithError, testCase.agentApplication),
+          heading = heading
+        )

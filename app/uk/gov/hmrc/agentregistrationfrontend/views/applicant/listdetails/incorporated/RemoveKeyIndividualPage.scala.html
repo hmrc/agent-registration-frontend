@@ -48,7 +48,6 @@
 )
 
 @key = @{RemoveKeyIndividualForm.key}
-@title = @{messages(s"$key.title", individualProvidedDetails.individualName.value)}
 
 @businessTypeKey = @{
     agentApplication match {
@@ -58,6 +57,8 @@
         case _: AgentApplicationScottishLimitedPartnership => "ScottishLimitedPartnership"
     }
 }
+
+@title = @{messages(s"$key.title.$businessTypeKey", individualProvidedDetails.individualName.value)}
 
 @layout(
     pageTitle = title,

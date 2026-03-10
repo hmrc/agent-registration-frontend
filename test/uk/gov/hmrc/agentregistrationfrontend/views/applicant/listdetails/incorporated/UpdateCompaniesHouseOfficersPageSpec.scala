@@ -27,48 +27,72 @@ extends ViewSpec:
 
   val viewTemplate: UpdateCompaniesHouseOfficersPage = app.injector.instanceOf[UpdateCompaniesHouseOfficersPage]
 
-  private val agentApplication: AgentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
-
   private val entityName: String = tdAll.companyName
-
-  private val caption: String = "LLP members and other tax adviser information"
   private val heading: String = "You need to update Companies House"
-  private val p1: String = s"As part of this application process, we need a verifiable list of the current members of $entityName."
-  private val p2: String = "Update your Companies House so the correct details are showing on their website."
-  private val p3: String = "You can then continue with your application for an agent services account."
 
-  private def render(): Document = Jsoup.parse(viewTemplate(
+  case class BusinessTypeTestCase(
+    label: String,
+    agentApplication: AgentApplication,
+    caption: String,
+    p1EntityType: String
+  )
+
+  private val testCases = Seq(
+    BusinessTypeTestCase(
+      label = "LimitedLiabilityPartnership",
+      agentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed,
+      caption = "LLP members and other tax adviser information",
+      p1EntityType = "members"
+    ),
+    BusinessTypeTestCase(
+      label = "LimitedCompany",
+      agentApplication = tdAll.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed,
+      caption = "Directors and other tax adviser information",
+      p1EntityType = "directors"
+    ),
+    BusinessTypeTestCase(
+      label = "LimitedPartnership",
+      agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
+      caption = "Partners and other tax adviser information",
+      p1EntityType = "partners"
+    ),
+    BusinessTypeTestCase(
+      label = "ScottishLimitedPartnership",
+      agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed,
+      caption = "Partners and other tax adviser information",
+      p1EntityType = "partners"
+    )
+  )
+
+  private def render(agentApplication: AgentApplication): Document = Jsoup.parse(viewTemplate(
     entityName = entityName,
     agentApplication = agentApplication
   ).body)
 
-  "UpdateCompaniesHouseOfficersPage" should:
+  for testCase <- testCases do
+    s"UpdateCompaniesHouseOfficersPage for ${testCase.label}" should:
 
-    val doc: Document = render()
+      val doc: Document = render(testCase.agentApplication)
 
-    "contain expected content" in:
-      doc.mainContent shouldContainContent (
-        s"""
-           |$caption
-           |$heading
-           |$p1
-           |$p2
-           |$p3
-           |Save and come back later
-           |Is this page not working properly? (opens in new tab)
-           |""".stripMargin
-      )
+      "have the correct caption" in:
+        doc.mainContent.select("h2.govuk-caption-l").text() shouldBe testCase.caption
 
-    "have the correct title" in:
-      doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
+      "have the correct heading" in:
+        doc.mainContent.select("h1").text() shouldBe heading
 
-    "contain the caption" in:
-      doc.mainContent.select("h2.govuk-caption-l").text() shouldBe caption
+      "have the correct title" in:
+        doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
 
-    "contain the heading" in:
-      doc.mainContent.select("h1").text() shouldBe heading
+      "show the correct p1 text with entity type" in:
+        doc.mainContent.select("p.govuk-body").first().text() should include(s"current ${testCase.p1EntityType} of $entityName")
 
-    "contain the save and come back later button" in:
-      val button = doc.mainContent.select("a.govuk-button, button.govuk-button").first()
-      button.text() shouldBe "Save and come back later"
-      button.attr("href") shouldBe AppRoutes.apply.SaveForLaterController.show.url
+      "show the p2 text" in:
+        doc.mainContent.select("p.govuk-body").text() should include("Update your Companies House")
+
+      "show the p3 text" in:
+        doc.mainContent.select("p.govuk-body").text() should include("You can then continue")
+
+      "contain the save and come back later button" in:
+        val button = doc.mainContent.select("a.govuk-button, button.govuk-button").first()
+        button.text() shouldBe "Save and come back later"
+        button.attr("href") shouldBe AppRoutes.apply.SaveForLaterController.show.url

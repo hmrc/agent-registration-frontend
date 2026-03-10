@@ -19,8 +19,10 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplicat
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.ApplicationState.GrsDataReceived
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
+import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAgentDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAmls
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionContactDetails
@@ -91,12 +93,21 @@ trait TdAgentApplicationLimitedPartnership {
       hmrcStandardForAgentsAgreed = StateOfAgreement.Agreed
     )
 
-    val afterHowManyKeyIndividuals: AgentApplicationLimitedPartnership = afterHmrcStandardForAgentsAgreed.copy(
+    val afterConfirmCompaniesHouseOfficersYes: AgentApplicationLimitedPartnership = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
-        FiveOrLessOfficers(
-          numberOfCompaniesHouseOfficers = 3,
-          isCompaniesHouseOfficersListCorrect = true
-        )
+        TestOnlyData.fiveOrLessCompaniesHouseOfficers
+      )
+    )
+
+    val afterNumberOfConfirmCompaniesHouseOfficers: AgentApplicationLimitedPartnership = afterHmrcStandardForAgentsAgreed.copy(
+      numberOfIndividuals = Some(
+        TestOnlyData.sixOrMoreCompaniesHouseOfficers
+      )
+    )
+
+    val afterConfirmCompaniesHouseOfficersNo: AgentApplicationLimitedPartnership = afterHmrcStandardForAgentsAgreed.copy(
+      numberOfIndividuals = Some(
+        TestOnlyData.fiveOrLessCompaniesHouseOfficers.copy(isCompaniesHouseOfficersListCorrect = false)
       )
     )
 
