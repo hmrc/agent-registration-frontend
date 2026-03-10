@@ -46,13 +46,15 @@ extends RequestAwareLogging:
   def create(
     individualName: IndividualName,
     isPersonOfControl: Boolean,
-    agentApplicationId: AgentApplicationId
+    agentApplicationId: AgentApplicationId,
+    providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Precreated
   )(using request: RequestHeader): IndividualProvidedDetails =
     logger.info(s"creating provided details for individual with applicationId:[${agentApplicationId.value}] ")
     provideDetailsFactory.create(
       agentApplicationId,
       individualName,
-      isPersonOfControl
+      isPersonOfControl,
+      providedDetailsState
     )
 
   def upsertForApplication(individualProvidedDetails: IndividualProvidedDetails)(using request: RequestHeader): Future[Unit] =

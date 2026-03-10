@@ -17,7 +17,10 @@
 package uk.gov.hmrc.agentregistration.shared.individual
 
 import play.api.libs.json.Format
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Started
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 enum ProvidedDetailsState:
 
@@ -28,3 +31,6 @@ enum ProvidedDetailsState:
 
 object ProvidedDetailsState:
   given Format[ProvidedDetailsState] = JsonFormatsFactory.makeEnumFormat[ProvidedDetailsState]
+
+extension (pds: ProvidedDetailsState)
+  def internalUserIdProvided: Boolean = pds === Started || pds === Finished

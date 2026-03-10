@@ -138,10 +138,12 @@ extends FrontendController(mcc, applicantActions):
     section: CompletedSection,
     applicationId: AgentApplicationId
   )(using r: RequestWithAuth): Future[Unit] =
-    val howManyIndividuals: Int = section.maybeNumberOfIndividuals.map(_.totalListSize).getOrElse(0)
+    val howManyIndividuals: Int = section.maybeIndividualsList.map(_.numberOfKeyIndividuals.numberOfIndividuals).getOrElse(0)
     val individualNames = TestOnlyData.grsStubbedIndividualNames
     if (howManyIndividuals > individualNames.length)
       throw new RuntimeException(s"Only ${individualNames.length} individuals are stubbed in grs currently")
+
+    val individualProvidedDetailsState = section.maybeIndividualsList.map(_.providedDetailsState).get
 
     val createdIndividuals = individualNames
       .take(howManyIndividuals)
@@ -149,7 +151,8 @@ extends FrontendController(mcc, applicantActions):
         individualProvideDetailsService.create(
           individualName = individualName,
           isPersonOfControl = true,
-          agentApplicationId = applicationId
+          agentApplicationId = applicationId,
+          providedDetailsState = individualProvidedDetailsState
         )
 
     createdIndividuals.foldLeft(Future.unit):

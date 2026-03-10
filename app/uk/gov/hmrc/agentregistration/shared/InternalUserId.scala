@@ -16,8 +16,11 @@
 
 package uk.gov.hmrc.agentregistration.shared
 
+import org.bson.types.ObjectId
 import play.api.libs.json.Format
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+
+import javax.inject.Singleton
 
 /** Internal User Identifier, which comes from the Retrievals
   */
@@ -25,3 +28,7 @@ final case class InternalUserId(value: String)
 
 object InternalUserId:
   given format: Format[InternalUserId] = JsonFormatsFactory.makeValueClassFormat
+
+@Singleton
+class InternalUserIdGenerator:
+  def nextInternalUserId(): InternalUserId = InternalUserId(ObjectId.get().toHexString)

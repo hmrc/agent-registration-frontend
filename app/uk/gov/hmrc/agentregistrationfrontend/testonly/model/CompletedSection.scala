@@ -19,9 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 import play.api.mvc.PathBindable
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
-import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
-import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
 import uk.gov.hmrc.agentregistration.shared.util.SealedObjects
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
@@ -32,7 +29,7 @@ sealed trait CompletedSection:
   def businessType: BusinessType
   def displayOrder: Int
   def appState: AgentApplication
-  def maybeNumberOfIndividuals: Option[NumberOfRequiredKeyIndividuals] = None
+  def maybeIndividualsList: Option[ApplicationIndividualsListTest] = None
 
 object CompletedSection:
 
@@ -83,7 +80,7 @@ object CompletedSection:
       override def sectionName: String = "Partners and other relevant tax advisers (2)"
       override def displayOrder: Int = 6
       override def appState: AgentApplication = TestOnlyData.agentApplicationLlp.afterConfirmOtherRelevantTaxAdvisersNo
-      override def maybeNumberOfIndividuals: Option[NumberOfRequiredKeyIndividuals] = Some(FiveOrLess(2))
+      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(ApplicationIndividualsListTest.FiveOrLessPreCreated(2))
 
     case object LlpPartnersAndOtherRelevantTaxAdvisers6
     extends CompletedSectionLlp:
@@ -91,7 +88,7 @@ object CompletedSection:
       override def sectionName: String = "Partners and other relevant tax advisers (6)"
       override def displayOrder: Int = 7
       override def appState: AgentApplication = TestOnlyData.agentApplicationLlp.afterConfirmOtherRelevantTaxAdvisersNo
-      override def maybeNumberOfIndividuals: Option[NumberOfRequiredKeyIndividuals] = Some(SixOrMore(6))
+      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(ApplicationIndividualsListTest.SixOrMorePreCreated(6))
 
     case object LlpDeclaration
     extends CompletedSectionLlp:
@@ -199,7 +196,7 @@ object CompletedSection:
       override def sectionName: String = "Partners and other relevant tax advisers (2)"
       override def displayOrder: Int = 6
       override def appState: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterConfirmOtherRelevantIndividualsNo
-      override def maybeNumberOfIndividuals: Option[NumberOfRequiredKeyIndividuals] = Some(FiveOrLess(2))
+      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(ApplicationIndividualsListTest.FiveOrLessPreCreated(2))
 
     case object GeneralPartnershipPartnersAndOtherRelevantTaxAdvisers6
     extends CompletedSectionGeneralPartnership:
@@ -207,7 +204,8 @@ object CompletedSection:
       override def sectionName: String = "Partners and other relevant tax advisers (6)"
       override def displayOrder: Int = 7
       override def appState: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterConfirmOtherRelevantIndividuals6OrMoreNo
-      override def maybeNumberOfIndividuals: Option[NumberOfRequiredKeyIndividuals] = Some(SixOrMore(6))
+
+      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(ApplicationIndividualsListTest.SixOrMorePreCreated(6))
 
     case object GeneralPartnershipDeclaration
     extends CompletedSectionGeneralPartnership:

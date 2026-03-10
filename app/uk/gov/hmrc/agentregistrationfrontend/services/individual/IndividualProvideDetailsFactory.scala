@@ -19,8 +19,9 @@ package uk.gov.hmrc.agentregistrationfrontend.services.individual
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsIdGenerator
-import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Precreated
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
+import uk.gov.hmrc.agentregistration.shared.individual.internalUserIdProvided
 
 import java.time.Clock
 import java.time.Instant
@@ -30,19 +31,25 @@ import javax.inject.Singleton
 @Singleton
 class IndividualProvideDetailsFactory @Inject() (
   clock: Clock,
-  individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator
+  individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator,
+  internalUserIdGenerator: InternalUserIdGenerator
 ):
 
   def create(
     agentApplicationId: AgentApplicationId,
     individualName: IndividualName,
-    isPersonOfControl: Boolean
+    isPersonOfControl: Boolean,
+    providedDetailsState: ProvidedDetailsState
   ): IndividualProvidedDetails = IndividualProvidedDetails(
     _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
     agentApplicationId = agentApplicationId,
     createdAt = Instant.now(clock),
-    providedDetailsState = Precreated,
+    providedDetailsState = providedDetailsState,
     individualName = individualName,
     isPersonOfControl = isPersonOfControl,
-    internalUserId = None
+    internalUserId =
+      if (providedDetailsState.internalUserIdProvided)
+        Some(internalUserIdGenerator.nextInternalUserId())
+      else
+        None
   )
