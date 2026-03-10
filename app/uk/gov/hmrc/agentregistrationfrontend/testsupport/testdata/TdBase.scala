@@ -88,6 +88,8 @@ trait TdBase:
 
   def telephoneNumber: TelephoneNumber = TelephoneNumber("(+44) 10794554342")
   def crn: Crn = Crn("1234567890")
+  def grsCrn2: Crn = Crn("22222222")
+  def grsCrn6: Crn = Crn("22222226")
   def companyName = "Test Company Name"
   def dateOfIncorporation: LocalDate = LocalDate.now().minusYears(10)
   def companyProfile: CompanyProfile = CompanyProfile(

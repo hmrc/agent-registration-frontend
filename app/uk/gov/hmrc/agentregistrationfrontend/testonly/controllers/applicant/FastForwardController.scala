@@ -127,7 +127,8 @@ extends FrontendController(mcc, applicantActions):
       _ <- grsStubService.storeStubsData(
         businessType = section.businessType,
         journeyData = journeyDataFor(section.businessType),
-        deceased = false
+        deceased = false,
+        maybeGrsIndividuals = section.maybeIndividualsList.map(_.numberOfKeyIndividuals)
       )
       updated <- updateIdentifiers(toAppState)
       _ <- applicationService.upsert(updated)

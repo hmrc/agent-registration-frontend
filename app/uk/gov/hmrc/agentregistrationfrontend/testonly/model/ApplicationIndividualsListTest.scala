@@ -21,26 +21,26 @@ import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 
-trait ApplicationIndividualsListTest:
+sealed trait ApplicationIndividualsListTest:
 
   val numberOfKeyIndividuals: NumberOfRequiredKeyIndividuals
   val providedDetailsState: ProvidedDetailsState
 
 object ApplicationIndividualsListTest:
 
-  case class FiveOrLessPreCreated(number: Int)
+  final case class FiveOrLessPreCreated(number: Int)
   extends ApplicationIndividualsListTest:
 
     override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Precreated
     override val numberOfKeyIndividuals: NumberOfRequiredKeyIndividuals = FiveOrLess(number)
 
-  case class FiveOrLessFinished(number: Int)
+  final case class FiveOrLessFinished(number: Int)
   extends ApplicationIndividualsListTest:
 
     override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Finished
     override val numberOfKeyIndividuals: NumberOfRequiredKeyIndividuals = FiveOrLess(number)
 
-  case class SixOrMorePreCreated(number: Int)
+  final case class SixOrMorePreCreated(number: Int)
   extends ApplicationIndividualsListTest:
 
     override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Precreated
