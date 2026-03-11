@@ -195,7 +195,7 @@ object CompletedSection:
 
       override def sectionName: String = "Partners and other relevant tax advisers (2)"
       override def displayOrder: Int = 6
-      override def appState: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterConfirmOtherRelevantIndividualsNo
+      override def appState: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterConfirmOtherRelevantIndividualsNo2
       override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(ApplicationIndividualsListTest.FiveOrLessPreCreated(2))
 
     case object GeneralPartnershipPartnersAndOtherRelevantTaxAdvisers6
