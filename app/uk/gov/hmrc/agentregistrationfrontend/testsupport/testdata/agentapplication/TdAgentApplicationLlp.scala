@@ -125,11 +125,10 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       hasOtherRelevantIndividuals = Some(false)
     )
 
-    val afterDeclarationSubmitted: AgentApplicationLlp = afterConfirmTwoChOfficers.copy(
+    val afterDeclarationSubmitted: AgentApplicationLlp = afterConfirmCompaniesHouseOfficersNo.copy(
       applicationState = ApplicationState.SentForRisking,
       submittedAt = Some(dependencies.nowAsInstant)
-
-
+    )
 
     val baseForSectionAmls: AgentApplicationLlp = afterGrsDataReceived
     protected val agentApplicationLlpWithSectionAmls = new AgentApplicationWithSectionAmls(baseForSectionAmls = baseForSectionAmls)

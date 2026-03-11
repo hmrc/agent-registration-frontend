@@ -152,6 +152,10 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
       submittedAt = Some(dependencies.nowAsInstant)
     )
 
+    val afterDeclarationSubmittedAndIndividualFinished2: AgentApplicationGeneralPartnership = afterConfirmOtherRelevantIndividualsNo2.copy(
+      applicationState = ApplicationState.SentForRisking
+    )
+
     val baseForSectionAmls: AgentApplicationGeneralPartnership = afterGrsDataReceived
     protected val agentApplicationWithSectionAmls = new AgentApplicationWithSectionAmls(baseForSectionAmls = baseForSectionAmls)
     export agentApplicationWithSectionAmls.sectionAmls

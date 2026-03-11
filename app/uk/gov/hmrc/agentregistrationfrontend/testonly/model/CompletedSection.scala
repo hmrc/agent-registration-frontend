@@ -96,6 +96,7 @@ object CompletedSection:
       override def sectionName: String = "Declaration"
       override def displayOrder: Int = 8
       override def appState: AgentApplication = TestOnlyData.agentApplicationLlp.afterDeclarationSubmitted
+      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(ApplicationIndividualsListTest.FiveOrLessFinished(2))
 
     val values: Seq[CompletedSectionLlp] = SealedObjects.all[CompletedSectionLlp]
 
@@ -210,9 +211,10 @@ object CompletedSection:
     case object GeneralPartnershipDeclaration
     extends CompletedSectionGeneralPartnership:
 
-      override def sectionName: String = "Declaration"
+      override def sectionName: String = "Declaration (2)"
       override def displayOrder: Int = 8
       override def appState: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterDeclarationSubmitted
+      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(ApplicationIndividualsListTest.FiveOrLessFinished(2))
 
     val values: Seq[CompletedSectionGeneralPartnership] = SealedObjects.all[CompletedSectionGeneralPartnership]
 
