@@ -107,7 +107,11 @@ extends ViewSpec:
       "when individuals and no other relevant individuals" should:
 
         val partnersList = List(tdAll.individualProvidedDetails)
-        val doc: Document = render(testCase.agentApplication, partnersList, List.empty)
+        val doc: Document = render(
+          testCase.agentApplication,
+          partnersList,
+          List.empty
+        )
 
         "have the correct title" in:
           doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
@@ -153,16 +157,21 @@ extends ViewSpec:
 
       "when individuals and other relevant individuals present" should:
 
-        val agentApplicationWithOthers = testCase.agentApplication match
-          case a: uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership => a.copy(hasOtherRelevantIndividuals = Some(true))
-          case a: uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp => a.copy(hasOtherRelevantIndividuals = Some(true))
-          case a: uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany => a.copy(hasOtherRelevantIndividuals = Some(true))
-          case a: uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedPartnership => a.copy(hasOtherRelevantIndividuals = Some(true))
-          case a: uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership => a.copy(hasOtherRelevantIndividuals = Some(true))
-          case a => a  //should not happen
+        val agentApplicationWithOthers =
+          testCase.agentApplication match
+            case a: uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership => a.copy(hasOtherRelevantIndividuals = Some(true))
+            case a: uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp => a.copy(hasOtherRelevantIndividuals = Some(true))
+            case a: uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany => a.copy(hasOtherRelevantIndividuals = Some(true))
+            case a: uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedPartnership => a.copy(hasOtherRelevantIndividuals = Some(true))
+            case a: uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership => a.copy(hasOtherRelevantIndividuals = Some(true))
+            case a => a // should not happen
 
         val otherIndividual = tdAll.individualProvidedDetails.copy(isPersonOfControl = false)
-        val doc: Document = render(agentApplicationWithOthers, List(tdAll.individualProvidedDetails), List(otherIndividual))
+        val doc: Document = render(
+          agentApplicationWithOthers,
+          List(tdAll.individualProvidedDetails),
+          List(otherIndividual)
+        )
 
         "show the has other relevant individuals row with Yes" in:
           val keys = doc.mainContent.select(".govuk-summary-list__key")
@@ -176,7 +185,11 @@ extends ViewSpec:
 
       "when no individuals in the list" should:
 
-        val doc: Document = render(testCase.agentApplication, List.empty, List.empty)
+        val doc: Document = render(
+          testCase.agentApplication,
+          List.empty,
+          List.empty
+        )
 
         "show 0 as the number" in:
           val values = doc.mainContent.select(".govuk-summary-list__value")

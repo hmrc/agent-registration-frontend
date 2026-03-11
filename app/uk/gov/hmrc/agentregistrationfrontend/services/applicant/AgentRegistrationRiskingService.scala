@@ -17,8 +17,10 @@
 package uk.gov.hmrc.agentregistrationfrontend.services.applicant
 
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationRiskingConnector
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
+import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationRiskingConnector
+import uk.gov.hmrc.agentregistrationfrontend.model.ApplicationForRiskingStatus
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
@@ -34,3 +36,7 @@ extends RequestAwareLogging:
 
   def submitForRisking(submitForRiskingRequest: SubmitForRiskingRequest)(using request: RequestHeader): Future[Unit] = agentRegistrationRiskingConnector
     .submitForRisking(submitForRiskingRequest)
+
+  def getApplicationStatus(agentApplicationId: AgentApplicationId)(using request: RequestHeader): Future[ApplicationForRiskingStatus] =
+    agentRegistrationRiskingConnector
+      .getApplicationStatus(agentApplicationId)

@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ConfirmationPage
 
@@ -26,16 +26,15 @@ class ConfirmationPageSpec
 extends ViewSpec:
 
   val viewTemplate: ConfirmationPage = app.injector.instanceOf[ConfirmationPage]
-  implicit val agentApplicationRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(
-    agentApplication =
-      tdAll
-        .agentApplicationLlp
-        .afterDeclarationSubmitted
-  )
+  val agentApplication: AgentApplicationLlp =
+    tdAll
+      .agentApplicationLlp
+      .afterDeclarationSubmitted
+
   val doc: Document = Jsoup.parse(
     viewTemplate(
-      entityName = "Test Company Name",
-      agentApplication = agentApplicationRequest.agentApplication
+      dateOfDecision = "21 April 2026",
+      agentApplication = agentApplication
     ).body
   )
 
@@ -44,27 +43,23 @@ extends ViewSpec:
     "have expected content" in:
       doc.mainContent shouldContainContent
         s"""
-           |You’ve finished the first stage of the application
-           |Application reference: HDJ2123F
-           |What to do next
-           |Everyone listed in Companies House as a current member of Test Company Name needs to sign in and provide some personal details.
-           |Send this link to all members:
-           |$thisFrontendBaseUrl/agent-registration/provide-details/start/link-id-12345
-           |Copy link to clipboard
-           |Link copied
-           |How to check the progress of your application
+           |You’ve applied for an agent services account
+           |Application reference: ${agentApplication.agentApplicationId.value}
+           |What happens next
+           |We’ll carry out some checks based on the information you’ve given us.
+           |If we need any more information we’ll contact you.
+           |We aim to make a decision by 21 April 2026.
+           |Our decision
+           |We’ll send an email to let you know the outcome.
+           |How to check the progress of an application
            |You can click the link on the GOV.UK page “Apply for an agent services account”.
-           |This will let you check who has provided their personal details.
-           |When everyone has provided their personal details, we will:
-           |automatically submit your application
-           |email you at user@test.com to confirm this
            |View or print your application
            |Finish and sign out
            |"""
           .stripMargin
 
     "have the correct title" in:
-      doc.title() shouldBe "You’ve finished the first stage of the application - Apply for an agent services account - GOV.UK"
+      doc.title() shouldBe "You’ve applied for an agent services account - Apply for an agent services account - GOV.UK"
 
     "have the correct h1" in:
-      doc.h1 shouldBe "You’ve finished the first stage of the application"
+      doc.h1 shouldBe "You’ve applied for an agent services account"

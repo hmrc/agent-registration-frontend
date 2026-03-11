@@ -21,12 +21,21 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.model.ApplicationForRiskingStatus
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
+import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ViewApplicationPage
 
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.duration.FiniteDuration
 
 @Singleton
 class AgentApplicationController @Inject() (
@@ -34,7 +43,9 @@ class AgentApplicationController @Inject() (
   mcc: MessagesControllerComponents,
   simplePage: SimplePage,
   confirmationPage: ConfirmationPage,
-  viewApplicationPage: ViewApplicationPage
+  viewApplicationPage: ViewApplicationPage,
+  appConfig: AppConfig,
+  agentRegistrationRiskingService: AgentRegistrationRiskingService
 )
 extends FrontendController(mcc, actions):
 
@@ -59,11 +70,36 @@ extends FrontendController(mcc, actions):
 
   def applicationSubmitted: Action[AnyContent] = actions
     .getApplicationSubmitted
-    .getBusinessPartnerRecord:
+    .async:
       implicit request =>
-        Ok(confirmationPage(
-          entityName = request.businessPartnerRecordResponse.getEntityName,
-          agentApplication = request.get[AgentApplication]
+        val agentApplication: AgentApplication = request.get
+        // make a call to risking for the latest status of the application
+        agentRegistrationRiskingService
+          .getApplicationStatus(agentApplication.agentApplicationId)
+          .map:
+            case ApplicationForRiskingStatus.ReadyForSubmission => // show the confirmation screen
+              val decisionLeadTime: FiniteDuration = appConfig.applicationDecisionLeadTime
+              val submittedAt: Instant = agentApplication.getSubmittedAt
+              val localDateOfDecision: LocalDate =
+                submittedAt
+                  .plus(decisionLeadTime.toMillis, ChronoUnit.MILLIS)
+                  .atZone(ZoneId.systemDefault())
+                  .toLocalDate
+              Ok(confirmationPage(
+                dateOfDecision = displayDateForLang(Some(localDateOfDecision)),
+                agentApplication = agentApplication
+              ))
+            case _ => Redirect(AppRoutes.apply.AgentApplicationController.viewApplicationProgress)
+
+  def viewApplicationProgress: Action[AnyContent] = actions
+    .getApplicationSubmitted:
+      implicit request =>
+        val agentApplication: AgentApplication = request.get
+        Ok(simplePage(
+          h1 = s"Application reference: ${agentApplication.agentApplicationId.value}",
+          bodyText = Some(
+            "Placeholder for the Application Progress page..."
+          )
         ))
 
   def viewSubmittedApplication: Action[AnyContent] = actions

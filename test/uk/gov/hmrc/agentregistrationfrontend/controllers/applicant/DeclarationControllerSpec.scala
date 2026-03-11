@@ -56,7 +56,7 @@ extends ControllerSpec:
     val afterAllOtherTasksComplete: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
-        .afterHmrcStandardForAgentsAgreed
+        .afterConfirmTwoChOfficers
 
     val afterDeclarationSubmitted: AgentApplicationLlp =
       tdAll
@@ -66,7 +66,7 @@ extends ControllerSpec:
   s"GET $path before completing all other tasks should redirect to the tasklist" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeAllTasksComplete)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
-      agentApplicationId = agentApplication.afterAllOtherTasksComplete.agentApplicationId,
+      agentApplicationId = agentApplication.beforeAllTasksComplete.agentApplicationId,
       individuals = individualsForSubmission
     )
     val response: WSResponse = get(path)
@@ -88,6 +88,7 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Declaration - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterAllOtherTasksComplete.agentApplicationId)
 
   s"POST $path with accept and send should update the application state and redirect to the submitted page" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(

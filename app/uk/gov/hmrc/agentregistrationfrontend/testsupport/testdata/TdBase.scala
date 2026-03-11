@@ -198,6 +198,11 @@ trait TdBase:
     isCompaniesHouseOfficersListCorrect = true
   )
 
+  def twoCompaniesHouseOfficers: FiveOrLessOfficers = FiveOrLessOfficers(
+    numberOfCompaniesHouseOfficers = 2,
+    isCompaniesHouseOfficersListCorrect = true
+  )
+
   def sixOrMoreKeyIndividuals: SixOrMore = SixOrMore(
     numberOfKeyIndividualsResponsibleForTaxMatters = 3
   )
