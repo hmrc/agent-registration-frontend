@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistratio
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ConfirmationPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.InProgressPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ViewApplicationPage
 
 import java.time.Instant
@@ -43,6 +44,7 @@ class AgentApplicationController @Inject() (
   mcc: MessagesControllerComponents,
   simplePage: SimplePage,
   confirmationPage: ConfirmationPage,
+  inProgressPage: InProgressPage,
   viewApplicationPage: ViewApplicationPage,
   appConfig: AppConfig,
   agentRegistrationRiskingService: AgentRegistrationRiskingService
@@ -92,13 +94,42 @@ extends FrontendController(mcc, actions):
             case _ => Redirect(AppRoutes.apply.AgentApplicationController.viewApplicationProgress)
 
   def viewApplicationProgress: Action[AnyContent] = actions
+    .getApplicationSubmitted
+    .getBusinessPartnerRecord
+    .async:
+      implicit request =>
+        val agentApplication: AgentApplication = request.get
+        agentRegistrationRiskingService
+          .getApplicationStatus(agentApplication.agentApplicationId)
+          .map:
+            case ApplicationForRiskingStatus.SubmittedForRisking => // show the confirmation screen
+              val decisionLeadTime: FiniteDuration = appConfig.applicationDecisionLeadTime
+              val submittedAt: Instant = agentApplication.getSubmittedAt
+              val localDateOfDecision: LocalDate =
+                submittedAt
+                  .plus(decisionLeadTime.toMillis, ChronoUnit.MILLIS)
+                  .atZone(ZoneId.systemDefault())
+                  .toLocalDate
+              val localDateSubmitted: LocalDate =
+                submittedAt
+                  .atZone(ZoneId.systemDefault())
+                  .toLocalDate
+              Ok(inProgressPage(
+                entityName = request.businessPartnerRecordResponse.getEntityName,
+                agentApplication = agentApplication,
+                dateOfDecision = displayDateForLang(Some(localDateOfDecision)),
+                dateSubmitted = displayDateForLang(Some(localDateSubmitted))
+              ))
+            case _ => Redirect(AppRoutes.apply.AgentApplicationController.viewApplicationApproved)
+
+  def viewApplicationApproved: Action[AnyContent] = actions
     .getApplicationSubmitted:
       implicit request =>
         val agentApplication: AgentApplication = request.get
         Ok(simplePage(
           h1 = s"Application reference: ${agentApplication.agentApplicationId.value}",
           bodyText = Some(
-            "Placeholder for the Application Progress page..."
+            "Placeholder for the Application Approved page..."
           )
         ))
 

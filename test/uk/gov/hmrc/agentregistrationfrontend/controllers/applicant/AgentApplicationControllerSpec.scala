@@ -29,6 +29,7 @@ extends ControllerSpec:
   private val path: String = "/agent-registration/apply"
   private val submittedPath: String = "/agent-registration/application-submitted"
   private val viewApplicationPath: String = "/agent-registration/view-application"
+  private val viewApplicationProgressPath: String = "/agent-registration/view-application-progress"
 
   object agentApplication:
     val submitted: AgentApplicationLlp =
@@ -48,6 +49,10 @@ extends ControllerSpec:
     AppRoutes.apply.AgentApplicationController.viewSubmittedApplication shouldBe Call(
       method = "GET",
       url = "/agent-registration/view-application"
+    )
+    AppRoutes.apply.AgentApplicationController.viewApplicationProgress shouldBe Call(
+      method = "GET",
+      url = "/agent-registration/view-application-progress"
     )
 
   s"GET $path should redirect to agent type page" in:
@@ -75,6 +80,27 @@ extends ControllerSpec:
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.apply.AgentApplicationController.viewApplicationProgress.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
+    AgentRegistrationRiskingStubs.verifyGetApplicationStatus(agentApplication.submitted.agentApplicationId)
+
+  s"GET $viewApplicationProgressPath should render the in-progress page when status is SubmittedForRisking" in:
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.submitted)
+    AgentRegistrationRiskingStubs.stubGetApplicationStatus(agentApplication.submitted._id, ApplicationForRiskingStatus.SubmittedForRisking)
+    val response: WSResponse = get(viewApplicationProgressPath)
+
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe s"Application reference: ${agentApplication.submitted.agentApplicationId.value} - Apply for an agent services account - GOV.UK"
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+    AgentRegistrationRiskingStubs.verifyGetApplicationStatus(agentApplication.submitted.agentApplicationId)
+
+  s"GET $viewApplicationProgressPath should redirect when status is anything other than SubmittedForRisking" in:
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.submitted)
+    AgentRegistrationRiskingStubs.stubGetApplicationStatus(agentApplication.submitted._id, ApplicationForRiskingStatus.Approved)
+    val response: WSResponse = get(viewApplicationProgressPath)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe AppRoutes.apply.AgentApplicationController.viewApplicationApproved.url
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationRiskingStubs.verifyGetApplicationStatus(agentApplication.submitted.agentApplicationId)
 
   s"GET $viewApplicationPath should return OK" in:

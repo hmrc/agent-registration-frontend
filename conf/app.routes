@@ -12,6 +12,7 @@ GET         /timed-out                                                 uk.gov.hm
 GET         /application-submitted                                     uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.applicationSubmitted
 GET         /view-application                                          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.viewSubmittedApplication
 GET         /view-application-progress                                 uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.viewApplicationProgress
+GET         /view-application-approved                                 uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.viewApplicationApproved
 
 # Agent apply routes
 GET         /apply                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.startRegistration
