@@ -457,6 +457,21 @@ confirmation.progress.p1 = You can click the link on the GOV.UK page “Apply fo
 confirmation.viewLink = View or print your application
 confirmation.signOutLink = Finish and sign out
 
+# Apply / InProgress / SubmittedForRisking status
+applicationProgress.caption = Check the progress of an application
+applicationProgress.title = Application reference: {0}
+applicationProgress.p1 = This is application is for an agent services account for <strong>{0}</strong>.
+applicationProgress.p2 = Some of the information on this page uses real-time data and might change.
+applicationProgress.decision.h2 = When to expect a decision
+applicationProgress.decision.p1 = It''s currently taking up to 8 weeks to process applications for an agent services account.
+applicationProgress.decision.p2 = If we need further information to help us make a decision, we will contact you.
+applicationProgress.decision.p3 = We expect to reach a decision by <strong>{0}</strong> and will not be able to give you an update before this date.
+applicationProgress.decision.p4 = We''ll send you an email as soon as we''ve reached a decision.
+applicationProgress.submitted.h2 = Date submitted
+applicationProgress.viewLink = View or print your application (opens in a new tab)
+
+
+
 # Apply / entitycheckfailed/ CompanyStatusBlock
 companyStatusBlock.title = We cannot create an account for this company
 companyStatusBlock.p1 = We cannot register this company for an agent services account. This is because of the company''s status on the Companies House register.
