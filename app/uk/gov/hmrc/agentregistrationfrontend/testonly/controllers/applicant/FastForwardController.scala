@@ -23,8 +23,10 @@ import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Prec
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
-import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
-import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
+import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfCompaniesHouseOfficers
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfIndividuals
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
@@ -126,24 +128,33 @@ extends FrontendController(mcc, applicantActions):
 
   private def fastForwardTo(section: CompletedSection)(using r: RequestWithAuth): Future[Unit] =
     val toAppState: AgentApplication = section.agentApplication
-    val maybeNumberOfKeyIndividuals: Option[NumberOfRequiredKeyIndividuals] = None
+    val maybeNumberOfIndividuals: Option[NumberOfIndividuals] = section.maybeIndividualsList.map(_.numberOfIndividuals)
 
     for
       _ <- grsStubService.storeStubsData(
         businessType = section.businessType,
-        journeyData = journeyDataFor(section.businessType, maybeNumberOfKeyIndividuals),
+        journeyData = journeyDataFor(section.businessType, maybeNumberOfIndividuals),
         deceased = false
       )
       updated <- updateIdentifiers(toAppState)
       _ <- applicationService.upsert(updated)
-      _ <- upsertIndividuals(section, updated.agentApplicationId)
+      _ <-
+        if (maybeNumberOfIndividuals.nonEmpty)
+          upsertIndividuals(section, updated.agentApplicationId)
+        else
+          Future.unit
     yield ()
 
   private def upsertIndividuals(
     section: CompletedSection,
     applicationId: AgentApplicationId
   )(using r: RequestWithAuth): Future[Unit] =
-    val howManyIndividuals: Int = 0
+    val howManyIndividuals: Int =
+      section.maybeIndividualsList.map(_.numberOfIndividuals) match
+        case Some(n: NumberOfRequiredKeyIndividuals) => n.numberOfIndividuals
+        case Some(n: NumberOfCompaniesHouseOfficers) => n.numberOfIndividuals
+        case None => 0
+
     val stubbedIndividuals = TestOnlyData.grsStubbedIndividuals
     if (howManyIndividuals > stubbedIndividuals.length)
       throw new RuntimeException(s"Only ${stubbedIndividuals.length} individuals are stubbed in grs currently")
@@ -167,11 +178,11 @@ extends FrontendController(mcc, applicantActions):
 
   private def journeyDataFor(
     bt: BusinessType,
-    maybeNumOfTaxAdvisers: Option[NumberOfRequiredKeyIndividuals]
+    maybeNumberOfIndividuals: Option[NumberOfIndividuals]
   ): JourneyData =
-    (bt, maybeNumOfTaxAdvisers) match
-      case (BusinessType.Partnership.LimitedLiabilityPartnership, Some(FiveOrLess(_))) => TestOnlyData.grs.llp.journeyDataTaxAdvisers2
-      case (BusinessType.Partnership.LimitedLiabilityPartnership, Some(SixOrMore(_))) => TestOnlyData.grs.llp.journeyDataTaxAdvisers6
+    (bt, maybeNumberOfIndividuals) match
+      case (BusinessType.Partnership.LimitedLiabilityPartnership, Some(FiveOrLessOfficers(_, _))) => TestOnlyData.grs.llp.journeyDataTaxAdvisers2
+      case (BusinessType.Partnership.LimitedLiabilityPartnership, Some(SixOrMoreOfficers(_, _))) => TestOnlyData.grs.llp.journeyDataTaxAdvisers6
       case (BusinessType.Partnership.LimitedLiabilityPartnership, _) => TestOnlyData.grs.llp.journeyDataBase
       case (BusinessType.Partnership.GeneralPartnership, _) => TestOnlyData.grs.generalPartnership.journeyDataBase
       case (BusinessType.Partnership.ScottishPartnership, _) => TestOnlyData.grs.scottishPartnership.journeyDataBase

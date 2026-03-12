@@ -80,7 +80,9 @@ object CompletedSection:
       override def sectionName: String = "Partners and other relevant tax advisers (2)"
       override def displayOrder: Int = 6
       override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterConfirmOtherRelevantTaxAdvisersNoTaxAdvisers2
-      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = None
+      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(
+        ApplicationIndividualsListTest.CompaniesHouseOfficers.TwoPreCreatedOfficersCorrect
+      )
 
     case object LlpPartnersAndOtherRelevantTaxAdvisers6
     extends CompletedSectionLlp:
@@ -88,7 +90,9 @@ object CompletedSection:
       override def sectionName: String = "Partners and other relevant tax advisers (6)"
       override def displayOrder: Int = 7
       override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterConfirmOtherRelevantTaxAdvisersNoTaxAdvisers6
-      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = None
+      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(
+        ApplicationIndividualsListTest.CompaniesHouseOfficers.SixPreCreatedOfficersAllResponsible
+      )
 
     case object LlpDeclaration
     extends CompletedSectionLlp:
@@ -96,7 +100,9 @@ object CompletedSection:
       override def sectionName: String = "Declaration"
       override def displayOrder: Int = 8
       override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterDeclarationSubmitted
-      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = None
+      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(
+        ApplicationIndividualsListTest.CompaniesHouseOfficers.TwoFinishedOfficersCorrect
+      )
 
     val values: Seq[CompletedSectionLlp] = SealedObjects.all[CompletedSectionLlp]
 
@@ -197,7 +203,9 @@ object CompletedSection:
       override def sectionName: String = "Partners and other relevant tax advisers (2)"
       override def displayOrder: Int = 6
       override def agentApplication: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterConfirmOtherRelevantIndividualsNo2
-      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = None
+      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(
+        ApplicationIndividualsListTest.RequiredKeyIndividuals.TwoPreCreated
+      )
 
     case object GeneralPartnershipPartnersAndOtherRelevantTaxAdvisers6
     extends CompletedSectionGeneralPartnership:
@@ -205,8 +213,9 @@ object CompletedSection:
       override def sectionName: String = "Partners and other relevant tax advisers (6)"
       override def displayOrder: Int = 7
       override def agentApplication: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterConfirmOtherRelevantIndividuals6OrMoreNo
-
-      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = None
+      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(
+        ApplicationIndividualsListTest.RequiredKeyIndividuals.SixPreCreated
+      )
 
     case object GeneralPartnershipDeclaration
     extends CompletedSectionGeneralPartnership:
@@ -214,7 +223,9 @@ object CompletedSection:
       override def sectionName: String = "Declaration (2)"
       override def displayOrder: Int = 8
       override def agentApplication: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterDeclarationSubmitted
-      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = None
+      override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(
+        ApplicationIndividualsListTest.RequiredKeyIndividuals.TwoFinished
+      )
 
     val values: Seq[CompletedSectionGeneralPartnership] = SealedObjects.all[CompletedSectionGeneralPartnership]
 
