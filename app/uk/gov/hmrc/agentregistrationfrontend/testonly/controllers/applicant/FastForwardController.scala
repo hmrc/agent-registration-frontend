@@ -162,13 +162,13 @@ extends FrontendController(mcc, applicantActions):
 
   private def journeyDataFor(bt: BusinessType): JourneyData =
     bt match
-      case BusinessType.Partnership.LimitedLiabilityPartnership => TestOnlyData.grs.llp.journeyData
-      case BusinessType.Partnership.GeneralPartnership => TestOnlyData.grs.generalPartnership.journeyData
-      case BusinessType.Partnership.ScottishPartnership => TestOnlyData.grs.scottishPartnership.journeyData
-      case BusinessType.Partnership.ScottishLimitedPartnership => TestOnlyData.grs.scottishLtdPartnership.journeyData
-      case BusinessType.Partnership.LimitedPartnership => TestOnlyData.grs.ltdPartnership.journeyData
-      case BusinessType.SoleTrader => TestOnlyData.grs.soleTrader.journeyData
-      case BusinessType.LimitedCompany => TestOnlyData.grs.ltd.journeyData
+      case BusinessType.Partnership.LimitedLiabilityPartnership => TestOnlyData.grs.llp.journeyDataBase
+      case BusinessType.Partnership.GeneralPartnership => TestOnlyData.grs.generalPartnership.journeyDataBase
+      case BusinessType.Partnership.ScottishPartnership => TestOnlyData.grs.scottishPartnership.journeyDataBase
+      case BusinessType.Partnership.ScottishLimitedPartnership => TestOnlyData.grs.scottishLtdPartnership.journeyDataBase
+      case BusinessType.Partnership.LimitedPartnership => TestOnlyData.grs.ltdPartnership.journeyDataBase
+      case BusinessType.SoleTrader => TestOnlyData.grs.soleTrader.journeyDataBase
+      case BusinessType.LimitedCompany => TestOnlyData.grs.ltd.journeyDataBase
 
   private def updateIdentifiers(agentApplication: AgentApplication)(using
     r: RequestWithAuth,

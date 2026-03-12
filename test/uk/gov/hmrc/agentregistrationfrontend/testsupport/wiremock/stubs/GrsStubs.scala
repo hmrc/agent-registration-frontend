@@ -68,7 +68,7 @@ object GrsStubs:
     val journeyData: JourneyData =
       businessType match
         case bt @ BusinessType.Partnership.GeneralPartnership => throw NotImplementedError(s"$bt not implemented yet")
-        case BusinessType.Partnership.LimitedLiabilityPartnership => tdAll.grs.llp.journeyData
+        case BusinessType.Partnership.LimitedLiabilityPartnership => tdAll.grs.llp.journeyDataBase
         case bt @ BusinessType.Partnership.LimitedPartnership => throw NotImplementedError(s"$bt not implemented yet")
         case bt @ BusinessType.Partnership.ScottishLimitedPartnership => throw NotImplementedError(s"$bt not implemented yet")
         case bt @ BusinessType.Partnership.ScottishPartnership => throw NotImplementedError(s"$bt not implemented yet")

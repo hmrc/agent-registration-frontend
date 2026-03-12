@@ -41,7 +41,7 @@ extends ViewSpec:
         .afterVerifiedEmailAddressSelected
   )
   private val addressOptions = AddressOptions(
-    chroAddress = tdAll.companyProfile.unsanitisedCHROAddress,
+    chroAddress = tdAll.companyProfile().unsanitisedCHROAddress,
     bprAddress = Some(tdAll.bprRegisteredAddress),
     otherAddress = None
   )

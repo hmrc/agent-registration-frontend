@@ -37,13 +37,13 @@ trait TdGrs {
 
     object llp:
 
-      val journeyData: JourneyData = JourneyData(
+      val journeyDataBase: JourneyData = JourneyData(
         fullName = None,
         dateOfBirth = None,
         nino = None,
         trn = None,
         sautr = Some(dependencies.saUtr),
-        companyProfile = Some(dependencies.companyProfile),
+        companyProfile = Some(dependencies.companyProfile()),
         ctutr = None,
         postcode = Some(dependencies.postcode),
         identifiersMatch = true,
@@ -54,16 +54,16 @@ trait TdGrs {
       )
 
       val businessDetails = BusinessDetailsLlp(
-        safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
-        saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
-        companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
+        safeId = journeyDataBase.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+        saUtr = journeyDataBase.sautr.getOrThrowExpectedDataMissing("sautr"),
+        companyProfile = journeyDataBase.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
       )
 
     object soleTrader:
 
       val fullName: FullName = FullName(firstName = "ST Name", lastName = "ST Lastname")
       val dateOfBirth: LocalDate = LocalDate.of(1990, 1, 2)
-      val journeyData: JourneyData = JourneyData(
+      val journeyDataBase: JourneyData = JourneyData(
         fullName = Some(fullName),
         dateOfBirth = Some(dateOfBirth),
         nino = Some(dependencies.nino),
@@ -80,23 +80,23 @@ trait TdGrs {
       )
 
       val businessDetails = BusinessDetailsSoleTrader(
-        safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
-        saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
-        fullName = journeyData.fullName.getOrThrowExpectedDataMissing("fullName"),
-        dateOfBirth = journeyData.dateOfBirth.getOrThrowExpectedDataMissing("dateOfBirth"),
-        nino = journeyData.nino,
-        trn = journeyData.trn
+        safeId = journeyDataBase.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+        saUtr = journeyDataBase.sautr.getOrThrowExpectedDataMissing("sautr"),
+        fullName = journeyDataBase.fullName.getOrThrowExpectedDataMissing("fullName"),
+        dateOfBirth = journeyDataBase.dateOfBirth.getOrThrowExpectedDataMissing("dateOfBirth"),
+        nino = journeyDataBase.nino,
+        trn = journeyDataBase.trn
       )
 
     object ltd:
 
-      val journeyData: JourneyData = JourneyData(
+      val journeyDataBase: JourneyData = JourneyData(
         fullName = None,
         dateOfBirth = None,
         nino = None,
         trn = None,
         sautr = None,
-        companyProfile = Some(dependencies.companyProfile),
+        companyProfile = Some(dependencies.companyProfile()),
         ctutr = Some(dependencies.ctUtr),
         postcode = None,
         identifiersMatch = true,
@@ -107,20 +107,20 @@ trait TdGrs {
       )
 
       val businessDetails: BusinessDetailsLimitedCompany = BusinessDetailsLimitedCompany(
-        safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
-        ctUtr = journeyData.ctutr.getOrThrowExpectedDataMissing("ctutr"),
-        companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
+        safeId = journeyDataBase.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+        ctUtr = journeyDataBase.ctutr.getOrThrowExpectedDataMissing("ctutr"),
+        companyProfile = journeyDataBase.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
       )
 
     object ltdPartnership:
 
-      val journeyData: JourneyData = JourneyData(
+      val journeyDataBase: JourneyData = JourneyData(
         fullName = None,
         dateOfBirth = None,
         nino = None,
         trn = None,
         sautr = Some(dependencies.saUtr),
-        companyProfile = Some(dependencies.companyProfile),
+        companyProfile = Some(dependencies.companyProfile()),
         ctutr = None,
         postcode = Some(dependencies.postcode),
         identifiersMatch = true,
@@ -131,21 +131,21 @@ trait TdGrs {
       )
 
       val businessDetails: BusinessDetailsPartnership = BusinessDetailsPartnership(
-        safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
-        saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("saUtr"),
-        postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode"),
-        companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
+        safeId = journeyDataBase.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+        saUtr = journeyDataBase.sautr.getOrThrowExpectedDataMissing("saUtr"),
+        postcode = journeyDataBase.postcode.getOrThrowExpectedDataMissing("postcode"),
+        companyProfile = journeyDataBase.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
       )
 
     object scottishLtdPartnership:
 
-      val journeyData: JourneyData = JourneyData(
+      val journeyDataBase: JourneyData = JourneyData(
         fullName = None,
         dateOfBirth = None,
         nino = None,
         trn = None,
         sautr = Some(dependencies.saUtr),
-        companyProfile = Some(dependencies.companyProfile),
+        companyProfile = Some(dependencies.companyProfile()),
         ctutr = None,
         postcode = Some(dependencies.postcode),
         identifiersMatch = true,
@@ -156,15 +156,15 @@ trait TdGrs {
       )
 
       val businessDetails: BusinessDetailsPartnership = BusinessDetailsPartnership(
-        safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
-        saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("saUtr"),
-        postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode"),
-        companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
+        safeId = journeyDataBase.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+        saUtr = journeyDataBase.sautr.getOrThrowExpectedDataMissing("saUtr"),
+        postcode = journeyDataBase.postcode.getOrThrowExpectedDataMissing("postcode"),
+        companyProfile = journeyDataBase.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
       )
 
     object generalPartnership:
 
-      val journeyData: JourneyData = JourneyData(
+      val journeyDataBase: JourneyData = JourneyData(
         fullName = None,
         dateOfBirth = None,
         nino = None,
@@ -181,14 +181,14 @@ trait TdGrs {
       )
 
       val businessDetails: BusinessDetailsGeneralPartnership = BusinessDetailsGeneralPartnership(
-        safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
-        saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
-        postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode")
+        safeId = journeyDataBase.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+        saUtr = journeyDataBase.sautr.getOrThrowExpectedDataMissing("sautr"),
+        postcode = journeyDataBase.postcode.getOrThrowExpectedDataMissing("postcode")
       )
 
     object scottishPartnership:
 
-      val journeyData: JourneyData = JourneyData(
+      val journeyDataBase: JourneyData = JourneyData(
         fullName = None,
         dateOfBirth = None,
         nino = None,
@@ -205,9 +205,9 @@ trait TdGrs {
       )
 
       val businessDetails: BusinessDetailsScottishPartnership = BusinessDetailsScottishPartnership(
-        safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
-        saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
-        postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode")
+        safeId = journeyDataBase.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+        saUtr = journeyDataBase.sautr.getOrThrowExpectedDataMissing("sautr"),
+        postcode = journeyDataBase.postcode.getOrThrowExpectedDataMissing("postcode")
       )
 
 }
