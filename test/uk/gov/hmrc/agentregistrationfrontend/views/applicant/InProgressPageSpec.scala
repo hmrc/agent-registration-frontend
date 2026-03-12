@@ -50,10 +50,10 @@ extends ViewSpec:
            |This is application is for an agent services account for Test Company Name.
            |Some of the information on this page uses real-time data and might change.
            |When to expect a decision
-           |It's currently taking up to 8 weeks to process applications for an agent services account.
+           |It’s currently taking up to 8 weeks to process applications for an agent services account.
            |If we need further information to help us make a decision, we will contact you.
            |We expect to reach a decision by 21 April 2026 and will not be able to give you an update before this date.
-           |We'll send you an email as soon as we've reached a decision.
+           |We’ll send you an email as soon as we’ve reached a decision.
            |Date submitted
            |10 March 2026
            |View or print your application (opens in a new tab)

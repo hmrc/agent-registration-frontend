@@ -45,21 +45,25 @@
     <p class="govuk-body">@Html(messages(s"$key.p1", entityName))</p>
     <p class="govuk-body">@messages(s"$key.p2")</p>
 
-    <div class="govuk-inset-text">
-        <h2 class="govuk-heading-s">@messages(s"$key.decision.h2")</h2>
-        <p class="govuk-body">@messages(s"$key.decision.p1")</p>
-        <p class="govuk-body">@messages(s"$key.decision.p2")</p>
-        <p class="govuk-body">@Html(messages(s"$key.decision.p3", dateOfDecision))</p>
-        <p class="govuk-body">@messages(s"$key.decision.p4")</p>
-    </div>
-
-    <div class="govuk-inset-text">
-        <h2 class="govuk-heading-s">@messages(s"$key.submitted.h2")</h2>
-        <p class="govuk-body">@dateSubmitted</p>
-    </div>
+    <ol class="hmrc-timeline">
+        <li class="hmrc-timeline__event">
+            <h2 class="hmrc-timeline__event-title">@messages(s"$key.decision.h2")</h2>
+            <div class="hmrc-timeline__event-content">
+                <p class="govuk-body">@messages(s"$key.decision.p1")</p>
+                <p class="govuk-body">@messages(s"$key.decision.p2")</p>
+                <p class="govuk-body">@Html(messages(s"$key.decision.p3", dateOfDecision))</p>
+                <p class="govuk-body">@messages(s"$key.decision.p4")</p>
+            </div>
+        </li>
+        <li class="hmrc-timeline__event">
+            <h2 class="hmrc-timeline__event-title">@messages(s"$key.submitted.h2")</h2>
+            <time class="hmrc-timeline__event-meta">@dateSubmitted</time>
+        </li>
+    </ol>
 
     <p class="govuk-body govuk-!-display-none-print">
-        <a class="govuk-link" href="@{AppRoutes.apply.AgentApplicationController.viewSubmittedApplication.url}">@messages(s"$key.viewLink")
+        <a class="govuk-link" href="@{AppRoutes.apply.AgentApplicationController.viewSubmittedApplication.url}" target="_blank">
+        @messages(s"$key.viewLink")
         </a>
     </p>
 }
