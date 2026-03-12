@@ -126,7 +126,7 @@ extends FrontendController(mcc, applicantActions):
 
   private def fastForwardTo(section: CompletedSection)(using r: RequestWithAuth): Future[Unit] =
     val toAppState: AgentApplication = section.agentApplication
-    val maybeNumberOfKeyIndividuals: Option[NumberOfRequiredKeyIndividuals] = section.maybeIndividualsList.map(_.numberOfKeyIndividuals)
+    val maybeNumberOfKeyIndividuals: Option[NumberOfRequiredKeyIndividuals] = None
 
     for
       _ <- grsStubService.storeStubsData(
@@ -143,7 +143,7 @@ extends FrontendController(mcc, applicantActions):
     section: CompletedSection,
     applicationId: AgentApplicationId
   )(using r: RequestWithAuth): Future[Unit] =
-    val howManyIndividuals: Int = section.maybeIndividualsList.map(_.numberOfKeyIndividuals.numberOfIndividuals).getOrElse(0)
+    val howManyIndividuals: Int = 0
     val stubbedIndividuals = TestOnlyData.grsStubbedIndividuals
     if (howManyIndividuals > stubbedIndividuals.length)
       throw new RuntimeException(s"Only ${stubbedIndividuals.length} individuals are stubbed in grs currently")

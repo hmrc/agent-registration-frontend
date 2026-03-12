@@ -18,30 +18,69 @@ package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfCompaniesHouseOfficers
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfIndividuals
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
+import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 
 sealed trait ApplicationIndividualsListTest:
 
-  val numberOfKeyIndividuals: NumberOfRequiredKeyIndividuals
+  // Can be either number of required individuals or number of company house individuals
+  val numberOfIndividuals: NumberOfIndividuals
   val providedDetailsState: ProvidedDetailsState
 
 object ApplicationIndividualsListTest:
 
-  final case class FiveOrLessPreCreated(number: Int)
+  sealed trait RequiredKeyIndividuals
   extends ApplicationIndividualsListTest:
 
-    override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Precreated
-    override val numberOfKeyIndividuals: NumberOfRequiredKeyIndividuals = FiveOrLess(number)
+    override val numberOfIndividuals: NumberOfRequiredKeyIndividuals
+    override val providedDetailsState: ProvidedDetailsState
 
-  final case class FiveOrLessFinished(number: Int)
+  object RequiredKeyIndividuals:
+
+    object TwoPreCreated
+    extends RequiredKeyIndividuals:
+
+      override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Precreated
+      override val numberOfIndividuals: NumberOfRequiredKeyIndividuals = FiveOrLess(2)
+
+    object TwoFinished
+    extends RequiredKeyIndividuals:
+
+      override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Finished
+      override val numberOfIndividuals: NumberOfRequiredKeyIndividuals = FiveOrLess(2)
+
+    object SixPreCreated
+    extends RequiredKeyIndividuals:
+
+      override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Precreated
+      override val numberOfIndividuals: NumberOfRequiredKeyIndividuals = SixOrMore(6)
+
+  sealed trait CompaniesHouseOfficers
   extends ApplicationIndividualsListTest:
 
-    override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Finished
-    override val numberOfKeyIndividuals: NumberOfRequiredKeyIndividuals = FiveOrLess(number)
+    override val numberOfIndividuals: NumberOfCompaniesHouseOfficers
+    override val providedDetailsState: ProvidedDetailsState
 
-  final case class SixOrMorePreCreated(number: Int)
-  extends ApplicationIndividualsListTest:
+  object CompaniesHouseOfficers:
 
-    override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Precreated
-    override val numberOfKeyIndividuals: NumberOfRequiredKeyIndividuals = SixOrMore(number)
+    object TwoPreCreatedOfficersCorrect
+    extends CompaniesHouseOfficers:
+
+      override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Precreated
+      override val numberOfIndividuals: NumberOfCompaniesHouseOfficers = FiveOrLessOfficers(2, true)
+
+    object TwoFinishedOfficersCorrect
+    extends CompaniesHouseOfficers:
+
+      override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Finished
+      override val numberOfIndividuals: NumberOfCompaniesHouseOfficers = FiveOrLessOfficers(2, true)
+
+    object SixPreCreatedOfficersAllResponsible
+    extends CompaniesHouseOfficers:
+
+      override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Precreated
+      override val numberOfIndividuals: NumberOfCompaniesHouseOfficers = SixOrMoreOfficers(6, 6)
