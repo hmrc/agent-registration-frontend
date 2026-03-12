@@ -121,14 +121,13 @@ extends FrontendController(mcc, applicantActions):
         case Left(result) => Future.successful(result)
 
   private def fastForwardTo(section: CompletedSection)(using r: RequestWithAuth): Future[Unit] =
-    val toAppState = section.appState
+    val toAppState: AgentApplication = section.agentApplication
 
     for
       _ <- grsStubService.storeStubsData(
         businessType = section.businessType,
         journeyData = journeyDataFor(section.businessType),
-        deceased = false,
-        maybeGrsIndividuals = section.maybeIndividualsList.map(_.numberOfKeyIndividuals)
+        deceased = false
       )
       updated <- updateIdentifiers(toAppState)
       _ <- applicationService.upsert(updated)
