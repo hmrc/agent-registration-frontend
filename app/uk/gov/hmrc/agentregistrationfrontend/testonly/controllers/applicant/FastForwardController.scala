@@ -19,9 +19,13 @@ package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant
 import play.api.http.Status.SEE_OTHER
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Precreated
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
+import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
@@ -122,11 +126,12 @@ extends FrontendController(mcc, applicantActions):
 
   private def fastForwardTo(section: CompletedSection)(using r: RequestWithAuth): Future[Unit] =
     val toAppState: AgentApplication = section.agentApplication
+    val maybeNumberOfKeyIndividuals: Option[NumberOfRequiredKeyIndividuals] = section.maybeIndividualsList.map(_.numberOfKeyIndividuals)
 
     for
       _ <- grsStubService.storeStubsData(
         businessType = section.businessType,
-        journeyData = journeyDataFor(section.businessType),
+        journeyData = journeyDataFor(section.businessType, maybeNumberOfKeyIndividuals),
         deceased = false
       )
       updated <- updateIdentifiers(toAppState)
@@ -143,7 +148,7 @@ extends FrontendController(mcc, applicantActions):
     if (howManyIndividuals > stubbedIndividuals.length)
       throw new RuntimeException(s"Only ${stubbedIndividuals.length} individuals are stubbed in grs currently")
 
-    val individualProvidedDetailsState = section.maybeIndividualsList.map(_.providedDetailsState).get
+    val individualProvidedDetailsState = section.maybeIndividualsList.map(_.providedDetailsState).getOrElse(Precreated)
 
     val createdIndividuals = stubbedIndividuals
       .take(howManyIndividuals)
@@ -160,15 +165,20 @@ extends FrontendController(mcc, applicantActions):
           _ <- grsStubService.storeIndividualProvidedDetails(individual.individualName.value)
         yield ()
 
-  private def journeyDataFor(bt: BusinessType): JourneyData =
-    bt match
-      case BusinessType.Partnership.LimitedLiabilityPartnership => TestOnlyData.grs.llp.journeyDataBase
-      case BusinessType.Partnership.GeneralPartnership => TestOnlyData.grs.generalPartnership.journeyDataBase
-      case BusinessType.Partnership.ScottishPartnership => TestOnlyData.grs.scottishPartnership.journeyDataBase
-      case BusinessType.Partnership.ScottishLimitedPartnership => TestOnlyData.grs.scottishLtdPartnership.journeyDataBase
-      case BusinessType.Partnership.LimitedPartnership => TestOnlyData.grs.ltdPartnership.journeyDataBase
-      case BusinessType.SoleTrader => TestOnlyData.grs.soleTrader.journeyDataBase
-      case BusinessType.LimitedCompany => TestOnlyData.grs.ltd.journeyDataBase
+  private def journeyDataFor(
+    bt: BusinessType,
+    maybeNumOfTaxAdvisers: Option[NumberOfRequiredKeyIndividuals]
+  ): JourneyData =
+    (bt, maybeNumOfTaxAdvisers) match
+      case (BusinessType.Partnership.LimitedLiabilityPartnership, Some(FiveOrLess(_))) => TestOnlyData.grs.llp.journeyDataTaxAdvisers2
+      case (BusinessType.Partnership.LimitedLiabilityPartnership, Some(SixOrMore(_))) => TestOnlyData.grs.llp.journeyDataTaxAdvisers6
+      case (BusinessType.Partnership.LimitedLiabilityPartnership, _) => TestOnlyData.grs.llp.journeyDataBase
+      case (BusinessType.Partnership.GeneralPartnership, _) => TestOnlyData.grs.generalPartnership.journeyDataBase
+      case (BusinessType.Partnership.ScottishPartnership, _) => TestOnlyData.grs.scottishPartnership.journeyDataBase
+      case (BusinessType.Partnership.ScottishLimitedPartnership, _) => TestOnlyData.grs.scottishLtdPartnership.journeyDataBase
+      case (BusinessType.Partnership.LimitedPartnership, _) => TestOnlyData.grs.ltdPartnership.journeyDataBase
+      case (BusinessType.SoleTrader, _) => TestOnlyData.grs.soleTrader.journeyDataBase
+      case (BusinessType.LimitedCompany, _) => TestOnlyData.grs.ltd.journeyDataBase
 
   private def updateIdentifiers(agentApplication: AgentApplication)(using
     r: RequestWithAuth,

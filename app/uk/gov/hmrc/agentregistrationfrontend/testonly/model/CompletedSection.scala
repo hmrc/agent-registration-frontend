@@ -79,7 +79,7 @@ object CompletedSection:
 
       override def sectionName: String = "Partners and other relevant tax advisers (2)"
       override def displayOrder: Int = 6
-      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterConfirmOtherRelevantTaxAdvisersNo
+      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterConfirmOtherRelevantTaxAdvisersNoTaxAdvisers2
       override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(ApplicationIndividualsListTest.FiveOrLessPreCreated(2))
 
     case object LlpPartnersAndOtherRelevantTaxAdvisers6
@@ -87,7 +87,7 @@ object CompletedSection:
 
       override def sectionName: String = "Partners and other relevant tax advisers (6)"
       override def displayOrder: Int = 7
-      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterConfirmOtherRelevantTaxAdvisersNo
+      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterConfirmOtherRelevantTaxAdvisersNoTaxAdvisers6
       override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(ApplicationIndividualsListTest.SixOrMorePreCreated(6))
 
     case object LlpDeclaration

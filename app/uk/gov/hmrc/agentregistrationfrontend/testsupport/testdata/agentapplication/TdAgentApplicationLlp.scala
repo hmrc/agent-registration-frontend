@@ -58,7 +58,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
 
     val afterGrsDataReceived: AgentApplicationLlp = afterStarted.copy(
       businessDetails = Some(
-        dependencies.grs.llp.businessDetails
+        dependencies.grs.llp.journeyDataBase.asBusinessDetailsLlp
       ),
       applicationState = GrsDataReceived
     )
@@ -122,6 +122,22 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
     )
 
     val afterConfirmOtherRelevantTaxAdvisersNo: AgentApplicationLlp = afterConfirmCompaniesHouseOfficersYes.copy(
+      hasOtherRelevantIndividuals = Some(false)
+    )
+
+    val afterConfirmOtherRelevantTaxAdvisersNoTaxAdvisers2: AgentApplicationLlp = afterConfirmCompaniesHouseOfficersYes.copy(
+      // We must set the CRN in the journey data at this point in order to edit the tax advisers
+      businessDetails = Some(
+        dependencies.grs.llp.journeyDataTaxAdvisers2.asBusinessDetailsLlp
+      ),
+      hasOtherRelevantIndividuals = Some(false)
+    )
+
+    val afterConfirmOtherRelevantTaxAdvisersNoTaxAdvisers6: AgentApplicationLlp = afterConfirmCompaniesHouseOfficersYes.copy(
+      // We must set the CRN in the journey data at this point in order to edit the tax advisers
+      businessDetails = Some(
+        dependencies.grs.llp.journeyDataTaxAdvisers6.asBusinessDetailsLlp
+      ),
       hasOtherRelevantIndividuals = Some(false)
     )
 

@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
+import uk.gov.hmrc.agentregistration.shared.Crn
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLimitedCompany
-import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLlp
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsPartnership
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsSoleTrader
@@ -52,12 +52,12 @@ trait TdGrs {
           registeredBusinessPartnerId = Some(dependencies.safeId)
         )
       )
+      // These Crns are necessary to edit the tax advisors associated with the application
+      val crnTaxAdvisers2 = Crn("22222222")
+      val crnTaxAdvisers6 = Crn("22222226")
 
-      val businessDetails = BusinessDetailsLlp(
-        safeId = journeyDataBase.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
-        saUtr = journeyDataBase.sautr.getOrThrowExpectedDataMissing("sautr"),
-        companyProfile = journeyDataBase.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
-      )
+      val journeyDataTaxAdvisers2: JourneyData = journeyDataBase.copy(companyProfile = Some(companyProfile(Some(crnTaxAdvisers2))))
+      val journeyDataTaxAdvisers6: JourneyData = journeyDataBase.copy(companyProfile = Some(companyProfile(Some(crnTaxAdvisers6))))
 
     object soleTrader:
 

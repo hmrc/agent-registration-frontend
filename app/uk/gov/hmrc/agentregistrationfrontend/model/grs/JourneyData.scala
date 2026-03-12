@@ -16,8 +16,15 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.model.grs
 
+import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import play.api.libs.json.*
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsGeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLimitedCompany
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLlp
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsPartnership
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsScottishPartnership
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsSoleTrader
 import uk.gov.hmrc.agentregistration.shared.businessdetails.CompanyProfile
 import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
 
@@ -43,4 +50,47 @@ final case class JourneyData(
 )
 
 object JourneyData:
+
   given Format[JourneyData] = Json.format[JourneyData]
+
+  extension (journeyData: JourneyData)
+
+    def asBusinessDetailsSoleTrader: BusinessDetailsSoleTrader = BusinessDetailsSoleTrader(
+      safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+      saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
+      fullName = journeyData.fullName.getOrThrowExpectedDataMissing("fullName"),
+      dateOfBirth = journeyData.dateOfBirth.getOrThrowExpectedDataMissing("dateOfBirth"),
+      nino = journeyData.nino,
+      trn = journeyData.trn
+    )
+
+    def asBusinessDetailsLlp: BusinessDetailsLlp = BusinessDetailsLlp(
+      safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+      saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
+      companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
+    )
+
+    def asBusinessDetailsLimitedCompany: BusinessDetailsLimitedCompany = BusinessDetailsLimitedCompany(
+      safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+      ctUtr = journeyData.ctutr.getOrThrowExpectedDataMissing("ctutr"),
+      companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
+    )
+
+    def asBusinessDetailsPartnership: BusinessDetailsPartnership = BusinessDetailsPartnership(
+      safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+      saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
+      companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile"),
+      postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode")
+    )
+
+    def asBusinessScottishPartnership: BusinessDetailsScottishPartnership = BusinessDetailsScottishPartnership(
+      safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+      saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
+      postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode")
+    )
+
+    def asBusinessDetailsGeneralPartnership: BusinessDetailsGeneralPartnership = BusinessDetailsGeneralPartnership(
+      safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
+      saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
+      postcode = journeyData.postcode.getOrThrowExpectedDataMissing("postcode")
+    )
