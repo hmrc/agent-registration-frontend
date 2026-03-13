@@ -18,9 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.services.applicant
 
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
+import uk.gov.hmrc.agentregistration.shared.risking.ApplicationForRiskingStatus
 import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationRiskingConnector
-import uk.gov.hmrc.agentregistrationfrontend.model.ApplicationForRiskingStatus
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
