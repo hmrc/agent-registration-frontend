@@ -173,7 +173,7 @@ extends FrontendController(mcc, applicantActions):
         for
           _ <- acc
           _ <- individualProvideDetailsService.upsertForApplication(individual)
-          _ <- grsStubService.storeIndividualProvidedDetails(individual.individualName.value)
+          _ <- grsStubService.storeIndividualProvidedDetails(individual.individualName.value, Some(TestOnlyData.saUtr.asUtr))
         yield ()
 
   private def journeyDataFor(

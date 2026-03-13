@@ -20,6 +20,7 @@ import play.api.mvc.Request
 import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
@@ -36,10 +37,12 @@ class GrsStubService @Inject() (
 )(using ExecutionContext):
 
   def storeIndividualProvidedDetails(
-    name: String
+    name: String,
+    maybeUtr: Option[Utr] = None
   )(using Request[?]): Future[Unit] = agentsExternalStubsConnector.createIndividualUser(
     assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
-    maybeName = Some(name)
+    maybeName = Some(name),
+    maybeUtr = maybeUtr
   )
 
   def storeStubsData(

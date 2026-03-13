@@ -26,6 +26,7 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.UpstreamErrorResponse
@@ -70,7 +71,8 @@ extends Connector:
     assignedPrincipalEnrolments: Seq[String],
     deceased: Boolean = false,
     maybeName: Option[String] = None,
-    maybeNino: Option[Nino] = None
+    maybeNino: Option[Nino] = None,
+    maybeUtr: Option[Utr] = None
   )(using
     request: RequestHeader
   ): Future[Unit] =
@@ -79,7 +81,8 @@ extends Connector:
       nino = maybeNino,
       assignedPrincipalEnrolments = assignedPrincipalEnrolments.map(EnrolmentKey(_)),
       deceased = Some(deceased),
-      name = maybeName
+      name = maybeName,
+      utr = maybeUtr.map(_.value)
     )
     createUser(user, affinityGroup = Some("Individual")).map(_ => ()).recover {
       // ignore 409 errors (created user with duplicate ninos) from user stubs repo

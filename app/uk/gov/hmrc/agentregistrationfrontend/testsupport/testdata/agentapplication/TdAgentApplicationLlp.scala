@@ -103,17 +103,31 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       )
     )
 
-    val afterConfirmTwoChOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
-      numberOfIndividuals = Some(
-        TestOnlyData.twoCompaniesHouseOfficers
-      ),
-      hasOtherRelevantIndividuals = Some(false)
-    )
-
+    // I select 4 officers, companies house returns 6
     val afterNumberOfConfirmCompaniesHouseOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
         TestOnlyData.sixOrMoreCompaniesHouseOfficers
       )
+    )
+
+    val afterConfirmTwoChOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
+      numberOfIndividuals = Some(
+        TestOnlyData.twoCompaniesHouseOfficers
+      ),
+      businessDetails = Some(
+        dependencies.grs.llp.journeyDataTaxAdvisers2.asBusinessDetailsLlp
+      ),
+      hasOtherRelevantIndividuals = Some(false)
+    )
+
+    val afterConfirmSixChOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
+      numberOfIndividuals = Some(
+        TestOnlyData.sixCompaniesHouseOfficersSelectAll
+      ),
+      businessDetails = Some(
+        dependencies.grs.llp.journeyDataTaxAdvisers6.asBusinessDetailsLlp
+      ),
+      hasOtherRelevantIndividuals = Some(false)
     )
 
     val afterConfirmCompaniesHouseOfficersNo: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
@@ -123,22 +137,6 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
     )
 
     val afterConfirmOtherRelevantTaxAdvisersNo: AgentApplicationLlp = afterConfirmCompaniesHouseOfficersYes.copy(
-      hasOtherRelevantIndividuals = Some(false)
-    )
-
-    val afterConfirmOtherRelevantTaxAdvisersNoTaxAdvisers2: AgentApplicationLlp = afterConfirmCompaniesHouseOfficersYes.copy(
-      // We must set the CRN in the journey data at this point in order to edit the tax advisers
-      businessDetails = Some(
-        dependencies.grs.llp.journeyDataTaxAdvisers2.asBusinessDetailsLlp
-      ),
-      hasOtherRelevantIndividuals = Some(false)
-    )
-
-    val afterConfirmOtherRelevantTaxAdvisersNoTaxAdvisers6: AgentApplicationLlp = afterConfirmCompaniesHouseOfficersYes.copy(
-      // We must set the CRN in the journey data at this point in order to edit the tax advisers
-      businessDetails = Some(
-        dependencies.grs.llp.journeyDataTaxAdvisers6.asBusinessDetailsLlp
-      ),
       hasOtherRelevantIndividuals = Some(false)
     )
 

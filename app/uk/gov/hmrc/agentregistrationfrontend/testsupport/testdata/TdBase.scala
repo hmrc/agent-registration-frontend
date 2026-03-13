@@ -216,6 +216,11 @@ trait TdBase:
     numberOfOfficersResponsibleForTaxMatters = 4
   )
 
+  def sixCompaniesHouseOfficersSelectAll: SixOrMoreOfficers = SixOrMoreOfficers(
+    numberOfCompaniesHouseOfficers = 6,
+    numberOfOfficersResponsibleForTaxMatters = 6
+  )
+
   val individualProvidedDetails: IndividualProvidedDetails = IndividualProvidedDetails(
     _id = individualProvidedDetailsId,
     internalUserId = None,
