@@ -137,6 +137,16 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
         hasOtherRelevantIndividuals = Some(false)
       )
 
+    val afterConfirmTwoIndividuals: AgentApplicationGeneralPartnership = afterHowManyKeyIndividuals
+      .copy(
+        numberOfIndividuals = Some(
+          FiveOrLess(
+            numberOfKeyIndividuals = 2
+          )
+        ),
+        hasOtherRelevantIndividuals = Some(false)
+      )
+
     val afterConfirmSixOtherRelevantIndividualsNo: AgentApplicationGeneralPartnership = afterHowManyKeyIndividuals
       .copy(
         numberOfIndividuals = Some(

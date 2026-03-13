@@ -202,7 +202,7 @@ object CompletedSection:
 
       override def sectionName: String = "Partners and other relevant tax advisers (2)"
       override def displayOrder: Int = 6
-      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterConfirmTwoOtherRelevantIndividualsNo
+      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterConfirmTwoIndividuals
       override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(
         ApplicationIndividualsListTest.RequiredKeyIndividuals.TwoPreCreated
       )
