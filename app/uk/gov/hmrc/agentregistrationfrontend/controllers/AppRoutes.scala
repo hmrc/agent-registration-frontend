@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.r
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.applicantcontactdetails.routes as applicantcontactdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.agentdetails.routes as agentdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.routes as listdetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.soletrader.routes as listdetailsSoleTraderRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.routes as listdetailsNonIncorporatedRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.incorporated.routes as listdetailsIncorporatedRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.routes as listdetailsOthersRoutes
@@ -93,6 +94,10 @@ object AppRoutes:
     object listdetails:
 
       val CheckYourAnswersController = listdetailsRoutes.CheckYourAnswersController
+
+      object soletrader:
+
+        val ProveIdentityController = listdetailsSoleTraderRoutes.ProveIdentityController
 
       object nonincorporated:
 

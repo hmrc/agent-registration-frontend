@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.StateOfAgreement.Agreed
 import uk.gov.hmrc.agentregistration.shared.agentdetails.*
 import uk.gov.hmrc.agentregistration.shared.businessdetails.CompanyProfile
 import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
@@ -240,4 +241,35 @@ trait TdBase:
     providedDetailsState = ProvidedDetailsState.Precreated,
     individualName = IndividualName("Third Test Name"),
     isPersonOfControl = true
+  )
+
+  val soleTraderYetToProvideDetails: IndividualProvidedDetails = IndividualProvidedDetails(
+    _id = individualProvidedDetailsId,
+    internalUserId = None,
+    createdAt = nowAsInstant,
+    agentApplicationId = agentApplicationId,
+    providedDetailsState = ProvidedDetailsState.AccessConfirmed,
+    individualName = IndividualName("ST Name ST Lastname"),
+    isPersonOfControl = true,
+    telephoneNumber = Some(telephoneNumber),
+    emailAddress = Some(IndividualVerifiedEmailAddress(applicantEmailAddress, isVerified = true)),
+    hmrcStandardForAgentsAgreed = Agreed,
+    hasApprovedApplication = Some(true)
+  )
+
+  val soleTraderProvidedDetails: IndividualProvidedDetails = IndividualProvidedDetails(
+    _id = individualProvidedDetailsId,
+    internalUserId = None,
+    createdAt = nowAsInstant,
+    agentApplicationId = agentApplicationId,
+    providedDetailsState = ProvidedDetailsState.AccessConfirmed,
+    individualName = IndividualName("ST Name ST Lastname"),
+    isPersonOfControl = true,
+    individualDateOfBirth = Some(dateOfBirthFromCitizenDetails),
+    telephoneNumber = Some(telephoneNumber),
+    emailAddress = Some(IndividualVerifiedEmailAddress(applicantEmailAddress, isVerified = true)),
+    individualNino = Some(ninoFromAuth),
+    individualSaUtr = Some(saUtrFromCitizenDetails),
+    hmrcStandardForAgentsAgreed = Agreed,
+    hasApprovedApplication = Some(true)
   )

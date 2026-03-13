@@ -28,13 +28,22 @@ extends ViewSpec:
   val doc: Document = Jsoup.parse(
     viewTemplate(
       applicantName = "Test Applicant",
-      entityName = "Test Company Name"
+      entityName = "Test Company Name",
+      isSoleTrader = false
+    ).body
+  )
+
+  val soleTraderDoc: Document = Jsoup.parse(
+    viewTemplate(
+      applicantName = "ST Name ST Surname",
+      entityName = "ST Name ST Surname",
+      isSoleTrader = true
     ).body
   )
 
   "IndividualConfirmationPage" should:
 
-    "have expected content" in:
+    "have expected content when not sole trader" in:
       doc.mainContent shouldContainContent
         """
           |You have finished this process
@@ -48,8 +57,21 @@ extends ViewSpec:
           |"""
           .stripMargin
 
-    "have the correct title" in:
+    "have the correct title when not sole trader" in:
       doc.title() shouldBe "You have finished this process - Apply for an agent services account - GOV.UK"
 
-    "have the correct h2" in:
+    "have the correct h2 when not sole trader" in:
       doc.h2 shouldBe "What happens next"
+
+    "have expected content when sole trader" in:
+      soleTraderDoc.mainContent shouldContainContent
+        """
+          |You have proven your identity
+          |You have proven your identity, you can now use your agent credentials to sign back into your application and continue the application process.
+          |Sign back into your application
+          |Is this page not working properly? (opens in new tab)
+          |"""
+          .stripMargin
+
+    "have the correct title when sole trader" in:
+      soleTraderDoc.title() shouldBe "You have proven your identity - Apply for an agent services account - GOV.UK"

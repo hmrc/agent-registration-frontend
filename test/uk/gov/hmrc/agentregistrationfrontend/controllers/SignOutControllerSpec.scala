@@ -21,33 +21,39 @@ import play.api.libs.ws.WSResponse
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
+import java.net.URLEncoder
+
 class SignOutControllerSpec
 extends ControllerSpec:
 
+  private val signOutWithContinuePath = "/agent-registration/sign-out-with-continue"
   private val signOutPath = "/agent-registration/sign-out"
   private val timeOutPath = "/agent-registration/time-out"
-  private val timedOutPath = "/agent-registration/timed-out"
-  private val selfExternalUrl = s"$thisFrontendBaseUrl/agent-registration"
-  private val signOutViaBasGatewayUrl = uri"http://localhost:9099/bas-gateway/sign-out-without-state"
+  private val timedOutUrl = AppRoutes.SignOutController.timedOut.url
+  private val landingUrl = AppRoutes.apply.AgentApplicationController.landing.url
 
-  private def signOutWithContinue(continue: String): String = uri"$signOutViaBasGatewayUrl?${Map("continue" -> continue)}".toString
+  private def signOutWithContinue(continue: String): String = s"$signOutWithContinuePath?continueUrl=${URLEncoder.encode(continue, "UTF-8")}"
 
   "GET /sign-out" in:
     val response: WSResponse = get(signOutPath)
-
+    val expectedContinueUrl = uri"${thisFrontendBaseUrl + landingUrl}"
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe signOutWithContinue(selfExternalUrl)
+    response.header(
+      "Location"
+    ).value shouldBe signOutWithContinue(expectedContinueUrl.toString)
 
   "GET /time-out" in:
-    val timedOutUrl = uri"$selfExternalUrl/timed-out"
+    val expectedContinueUrl = uri"${thisFrontendBaseUrl + timedOutUrl}"
     val response: WSResponse = get(timeOutPath)
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe signOutWithContinue(timedOutUrl.toString)
+    response.header(
+      "Location"
+    ).value shouldBe signOutWithContinue(expectedContinueUrl.toString)
 
   "GET /timed-out" in:
-    val response: WSResponse = get(timedOutPath)
+    val response: WSResponse = get(timedOutUrl)
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "You have been signed out - Apply for an agent services account - GOV.UK"
