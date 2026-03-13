@@ -16,20 +16,15 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
-import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
-import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
-import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
-import uk.gov.hmrc.agentregistration.shared.lists.NumberOfCompaniesHouseOfficers
-import uk.gov.hmrc.agentregistration.shared.lists.NumberOfIndividuals
-import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
-import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
-import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.lists.*
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
 
 sealed trait ApplicationIndividualsListTest:
 
   // Can be either number of required individuals or number of company house individuals
   val numberOfIndividuals: NumberOfIndividuals
-  val providedDetailsState: ProvidedDetailsState
+  val individualProvidedDetails: IndividualProvidedDetails
 
 object ApplicationIndividualsListTest:
 
@@ -37,50 +32,50 @@ object ApplicationIndividualsListTest:
   extends ApplicationIndividualsListTest:
 
     override val numberOfIndividuals: NumberOfRequiredKeyIndividuals
-    override val providedDetailsState: ProvidedDetailsState
+    override val individualProvidedDetails: IndividualProvidedDetails
 
   object RequiredKeyIndividuals:
 
     object TwoPreCreated
     extends RequiredKeyIndividuals:
 
-      override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Precreated
       override val numberOfIndividuals: NumberOfRequiredKeyIndividuals = FiveOrLess(2)
+      override val individualProvidedDetails: IndividualProvidedDetails = TestOnlyData.providedDetails.unclaimed
 
     object TwoFinished
     extends RequiredKeyIndividuals:
 
-      override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Finished
       override val numberOfIndividuals: NumberOfRequiredKeyIndividuals = FiveOrLess(2)
+      override val individualProvidedDetails: IndividualProvidedDetails = TestOnlyData.providedDetails.afterProvidedDetailsConfirmed
 
     object SixPreCreated
     extends RequiredKeyIndividuals:
 
-      override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Precreated
       override val numberOfIndividuals: NumberOfRequiredKeyIndividuals = SixOrMore(6)
+      override val individualProvidedDetails: IndividualProvidedDetails = TestOnlyData.providedDetails.unclaimed
 
   sealed trait CompaniesHouseOfficers
   extends ApplicationIndividualsListTest:
 
     override val numberOfIndividuals: NumberOfCompaniesHouseOfficers
-    override val providedDetailsState: ProvidedDetailsState
+    override val individualProvidedDetails: IndividualProvidedDetails
 
   object CompaniesHouseOfficers:
 
     object TwoPreCreatedOfficersCorrect
     extends CompaniesHouseOfficers:
 
-      override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Precreated
       override val numberOfIndividuals: NumberOfCompaniesHouseOfficers = FiveOrLessOfficers(2, true)
+      override val individualProvidedDetails: IndividualProvidedDetails = TestOnlyData.providedDetails.unclaimed
 
     object TwoFinishedOfficersCorrect
     extends CompaniesHouseOfficers:
 
-      override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Finished
       override val numberOfIndividuals: NumberOfCompaniesHouseOfficers = FiveOrLessOfficers(2, true)
+      override val individualProvidedDetails: IndividualProvidedDetails = TestOnlyData.providedDetails.afterProvidedDetailsConfirmed
 
     object SixPreCreatedOfficersAllResponsible
     extends CompaniesHouseOfficers:
 
-      override val providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Precreated
       override val numberOfIndividuals: NumberOfCompaniesHouseOfficers = SixOrMoreOfficers(6, 6)
+      override val individualProvidedDetails: IndividualProvidedDetails = TestOnlyData.providedDetails.unclaimed

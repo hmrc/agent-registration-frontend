@@ -254,7 +254,7 @@ trait TdBase:
   /* This is a list of individuals that we currently have stubbed in grs,
        We need to use this list for fast forward links to ensure the names match
        the names we get from company house */
-  val grsStubbedIndividuals: Seq[IndividualProvidedDetails] = Seq(
+  val grsStubbedIndividualsBase: Seq[IndividualProvidedDetails] = Seq(
     IndividualProvidedDetails(
       _id = individualProvidedDetailsId,
       individualName = IndividualName("Steve Austin"),

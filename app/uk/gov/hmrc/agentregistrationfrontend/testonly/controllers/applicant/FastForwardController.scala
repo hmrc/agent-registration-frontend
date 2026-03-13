@@ -19,18 +19,16 @@ package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant
 import play.api.http.Status.SEE_OTHER
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Precreated
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.lists.*
+import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
-import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
-import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
-import uk.gov.hmrc.agentregistration.shared.lists.NumberOfCompaniesHouseOfficers
-import uk.gov.hmrc.agentregistration.shared.lists.NumberOfIndividuals
-import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
@@ -59,7 +57,8 @@ class FastForwardController @Inject() (
   applicationService: AgentApplicationService,
   agentApplicationIdGenerator: AgentApplicationIdGenerator,
   linkIdGenerator: LinkIdGenerator,
-  individualProvideDetailsService: IndividualProvideDetailsService
+  individualProvideDetailsService: IndividualProvideDetailsService,
+  agentRegistrationRiskingService: AgentRegistrationRiskingService
 )(using
   clock: Clock,
   ex: ExecutionContext
@@ -121,50 +120,59 @@ extends FrontendController(mcc, applicantActions):
     implicit request =>
       applicantAuthRefiner.refine(request).flatMap:
         case Right(authorisedRequest) => Future.successful(authorisedRequest)
-
         case Left(result) if result.header.status === SEE_OTHER => loginAndRetry
-
         case Left(result) => Future.successful(result)
 
   private def fastForwardTo(section: CompletedSection)(using r: RequestWithAuth): Future[Unit] =
-    val toAppState: AgentApplication = section.agentApplication
+    val agentApplication: AgentApplication = section.agentApplication
     val maybeNumberOfIndividuals: Option[NumberOfIndividuals] = section.maybeIndividualsList.map(_.numberOfIndividuals)
-
     for
       _ <- grsStubService.storeStubsData(
         businessType = section.businessType,
         journeyData = journeyDataFor(section.businessType, maybeNumberOfIndividuals),
         deceased = false
       )
-      updated <- updateIdentifiers(toAppState)
-      _ <- applicationService.upsert(updated)
+      updatedAgentApplication <- updateAgentApplication(agentApplication)
+      _ <- applicationService.upsert(updatedAgentApplication)
+      createdIndividuals <- Future.successful(createIndividuals(section, updatedAgentApplication.agentApplicationId))
       _ <-
         if (maybeNumberOfIndividuals.nonEmpty)
-          upsertIndividuals(section, updated.agentApplicationId)
+          upsertIndividuals(createdIndividuals)
+        else
+          Future.unit
+      _ <-
+        if (updatedAgentApplication.applicationState.sentForRisking)
+          agentRegistrationRiskingService.submitForRisking(
+            SubmitForRiskingRequest(
+              agentApplication = updatedAgentApplication,
+              individuals = createdIndividuals.toList
+            )
+          )
         else
           Future.unit
     yield ()
 
-  private def upsertIndividuals(
+  private def createIndividuals(
     section: CompletedSection,
     applicationId: AgentApplicationId
-  )(using r: RequestWithAuth): Future[Unit] =
-    val howManyIndividuals: Int =
-      section.maybeIndividualsList.map(_.numberOfIndividuals) match
-        case Some(n: NumberOfRequiredKeyIndividuals) => n.numberOfIndividuals
-        case Some(n: NumberOfCompaniesHouseOfficers) => n.numberOfIndividuals
-        case None => 0
+  ): Seq[IndividualProvidedDetails] =
+    val individualProvidedDetailsList = section.maybeIndividualsList.getOrThrowExpectedDataMissing("individualProvidedDetails")
+    val howManyIndividuals: Int = individualProvidedDetailsList.numberOfIndividuals.numberOfIndividuals
+    val individualProvidedDetails = individualProvidedDetailsList.individualProvidedDetails
 
-    val stubbedIndividuals = TestOnlyData.grsStubbedIndividuals
-    if (howManyIndividuals > stubbedIndividuals.length)
-      throw new RuntimeException(s"Only ${stubbedIndividuals.length} individuals are stubbed in grs currently")
-
-    val individualProvidedDetailsState = section.maybeIndividualsList.map(_.providedDetailsState).getOrElse(Precreated)
-
-    val createdIndividuals = stubbedIndividuals
+    TestOnlyData.grsStubbedIndividualsBase
       .take(howManyIndividuals)
-      .map(_.copy(agentApplicationId = applicationId, providedDetailsState = individualProvidedDetailsState))
+      .map: ipd =>
+        individualProvidedDetails.copy(
+          _id = ipd._id,
+          individualName = ipd.individualName,
+          agentApplicationId = applicationId,
+          internalUserId = ipd.internalUserId
+        )
 
+  private def upsertIndividuals(
+    createdIndividuals: Seq[IndividualProvidedDetails]
+  )(using r: RequestWithAuth): Future[Unit] =
     createdIndividuals.foldLeft(Future.unit):
       (
         acc,
@@ -191,7 +199,7 @@ extends FrontendController(mcc, applicantActions):
       case (BusinessType.SoleTrader, _) => TestOnlyData.grs.soleTrader.journeyDataBase
       case (BusinessType.LimitedCompany, _) => TestOnlyData.grs.ltd.journeyDataBase
 
-  private def updateIdentifiers(agentApplication: AgentApplication)(using
+  private def updateAgentApplication(agentApplication: AgentApplication)(using
     r: RequestWithAuth,
     clock: Clock
   ): Future[AgentApplication] =
