@@ -57,7 +57,7 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
 
     val afterGrsDataReceived: AgentApplicationGeneralPartnership = afterStarted.copy(
       businessDetails = Some(
-        dependencies.grs.generalPartnership.businessDetails
+        dependencies.grs.generalPartnership.journeyData.asBusinessDetailsGeneralPartnership
       ),
       applicationState = GrsDataReceived
     )
@@ -127,7 +127,7 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
         hasOtherRelevantIndividuals = Some(false)
       )
 
-    val afterConfirmOtherRelevantIndividualsNo2: AgentApplicationGeneralPartnership = afterHowManyKeyIndividuals
+    val afterConfirmTwoOtherRelevantIndividualsNo: AgentApplicationGeneralPartnership = afterHowManyKeyIndividuals
       .copy(
         numberOfIndividuals = Some(
           SixOrMore(
@@ -137,7 +137,7 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
         hasOtherRelevantIndividuals = Some(false)
       )
 
-    val afterConfirmOtherRelevantIndividuals6OrMoreNo: AgentApplicationGeneralPartnership = afterHowManyKeyIndividuals
+    val afterConfirmSixOtherRelevantIndividualsNo: AgentApplicationGeneralPartnership = afterHowManyKeyIndividuals
       .copy(
         numberOfIndividuals = Some(
           SixOrMore(
@@ -152,8 +152,9 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
       submittedAt = Some(dependencies.nowAsInstant)
     )
 
-    val afterDeclarationSubmittedAndIndividualFinished2: AgentApplicationGeneralPartnership = afterConfirmOtherRelevantIndividualsNo2.copy(
-      applicationState = ApplicationState.SentForRisking
+    val afterDeclarationSubmittedAndTwoIndividualFinished: AgentApplicationGeneralPartnership = afterConfirmTwoOtherRelevantIndividualsNo.copy(
+      applicationState = ApplicationState.SentForRisking,
+      submittedAt = Some(dependencies.nowAsInstant)
     )
 
     val baseForSectionAmls: AgentApplicationGeneralPartnership = afterGrsDataReceived

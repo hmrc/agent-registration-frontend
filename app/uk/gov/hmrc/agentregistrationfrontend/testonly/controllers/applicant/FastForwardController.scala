@@ -184,7 +184,7 @@ extends FrontendController(mcc, applicantActions):
       case (BusinessType.Partnership.LimitedLiabilityPartnership, Some(FiveOrLessOfficers(_, _))) => TestOnlyData.grs.llp.journeyDataTaxAdvisers2
       case (BusinessType.Partnership.LimitedLiabilityPartnership, Some(SixOrMoreOfficers(_, _))) => TestOnlyData.grs.llp.journeyDataTaxAdvisers6
       case (BusinessType.Partnership.LimitedLiabilityPartnership, _) => TestOnlyData.grs.llp.journeyDataBase
-      case (BusinessType.Partnership.GeneralPartnership, _) => TestOnlyData.grs.generalPartnership.journeyDataBase
+      case (BusinessType.Partnership.GeneralPartnership, _) => TestOnlyData.grs.generalPartnership.journeyData
       case (BusinessType.Partnership.ScottishPartnership, _) => TestOnlyData.grs.scottishPartnership.journeyDataBase
       case (BusinessType.Partnership.ScottishLimitedPartnership, _) => TestOnlyData.grs.scottishLtdPartnership.journeyDataBase
       case (BusinessType.Partnership.LimitedPartnership, _) => TestOnlyData.grs.ltdPartnership.journeyDataBase
