@@ -134,18 +134,20 @@ extends FrontendController(mcc, applicantActions):
       )
       updatedAgentApplication <- updateAgentApplication(agentApplication)
       _ <- applicationService.upsert(updatedAgentApplication)
-      createdIndividuals <- Future.successful(createIndividuals(section, updatedAgentApplication.agentApplicationId))
-      _ <-
-        if (maybeNumberOfIndividuals.nonEmpty)
+      maybeCreatedIndividuals <-
+        if (maybeNumberOfIndividuals.nonEmpty) {
+          val createdIndividuals = createIndividuals(section, updatedAgentApplication.agentApplicationId)
           upsertIndividuals(createdIndividuals)
+          Future.successful(Some(createdIndividuals))
+        }
         else
-          Future.unit
+          Future.successful(None)
       _ <-
         if (updatedAgentApplication.applicationState.sentForRisking)
           agentRegistrationRiskingService.submitForRisking(
             SubmitForRiskingRequest(
               agentApplication = updatedAgentApplication,
-              individuals = createdIndividuals.toList
+              individuals = maybeCreatedIndividuals.getOrThrowExpectedDataMissing("createdIndividuals").toList
             )
           )
         else
@@ -189,9 +191,8 @@ extends FrontendController(mcc, applicantActions):
     maybeNumberOfIndividuals: Option[NumberOfIndividuals]
   ): JourneyData =
     (bt, maybeNumberOfIndividuals) match
-      case (BusinessType.Partnership.LimitedLiabilityPartnership, Some(FiveOrLessOfficers(_, _))) => TestOnlyData.grs.llp.journeyDataTaxAdvisers2
       case (BusinessType.Partnership.LimitedLiabilityPartnership, Some(SixOrMoreOfficers(_, _))) => TestOnlyData.grs.llp.journeyDataTaxAdvisers6
-      case (BusinessType.Partnership.LimitedLiabilityPartnership, _) => TestOnlyData.grs.llp.journeyDataBase
+      case (BusinessType.Partnership.LimitedLiabilityPartnership, _) => TestOnlyData.grs.llp.journeyDataTaxAdvisers2
       case (BusinessType.Partnership.GeneralPartnership, _) => TestOnlyData.grs.generalPartnership.journeyData
       case (BusinessType.Partnership.ScottishPartnership, _) => TestOnlyData.grs.scottishPartnership.journeyDataBase
       case (BusinessType.Partnership.ScottishLimitedPartnership, _) => TestOnlyData.grs.scottishLtdPartnership.journeyDataBase

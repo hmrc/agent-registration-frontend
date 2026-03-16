@@ -59,7 +59,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
 
     val afterGrsDataReceived: AgentApplicationLlp = afterStarted.copy(
       businessDetails = Some(
-        dependencies.grs.llp.journeyDataBase.asBusinessDetailsLlp
+        dependencies.grs.llp.journeyDataTaxAdvisers2.asBusinessDetailsLlp
       ),
       applicationState = GrsDataReceived
     )
