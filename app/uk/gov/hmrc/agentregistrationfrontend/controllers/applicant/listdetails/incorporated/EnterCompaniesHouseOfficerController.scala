@@ -76,10 +76,20 @@ extends FrontendController(mcc, actions):
           companiesHouseOfficers <- companiesHouseService
             .getActiveOfficers(agentApplication.getCrn, agentApplication.getCompaniesHouseOfficerRole)
 
-          companiesHouseOfficersNames = companiesHouseOfficers
+          allCompaniesHouseOfficersNames = companiesHouseOfficers
             .map(x => CompaniesHouseOfficer.normaliseOfficerName(x.name))
             .map(IndividualName(_))
             .filter(_.isValidName)
+
+          existingNamesLower = individualsList.map(_.individualName.value.toLowerCase)
+
+          companiesHouseOfficersNames =
+            allCompaniesHouseOfficersNames.foldLeft((Seq.empty[IndividualName], existingNamesLower)):
+              case ((kept, remaining), chName) =>
+                val idx = remaining.indexOf(chName.value.toLowerCase)
+                if idx >= 0 then (kept, remaining.patch(idx, Nil, 1))
+                else (kept :+ chName, remaining)
+            ._1
         yield request
           .add[List[IndividualProvidedDetails]](individualsList)
           .add[Seq[IndividualName]](companiesHouseOfficersNames)
@@ -149,11 +159,11 @@ extends FrontendController(mcc, actions):
         val companiesHouseOfficerList = request.get[Seq[IndividualName]]
 
         NameMatching.individualNameMatching(individualName, companiesHouseOfficerList) match
-          case Some(_) =>
+          case Some(matchedOfficerName) =>
             individualProvideDetailsService
               .upsertForApplication(
                 individualProvideDetailsService.create(
-                  individualName = individualName,
+                  individualName = matchedOfficerName,
                   isPersonOfControl = true,
                   agentApplicationId = agentApplication.agentApplicationId
                 )
