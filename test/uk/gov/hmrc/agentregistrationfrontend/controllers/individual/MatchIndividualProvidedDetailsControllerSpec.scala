@@ -38,18 +38,20 @@ extends ControllerSpec:
     val afterStarted: IndividualProvidedDetails = tdAll.providedDetails.afterStarted
 
   "routes should have correct paths and methods" in:
-    AppRoutes.providedetails.MatchIndividualProvidedDetailsController.show(linkId) shouldBe Call(
+    AppRoutes.providedetails.MatchIndividualProvidedDetailsController.show(linkId, fromIv = None) shouldBe Call(
       method = "GET",
       url = path
     )
-    AppRoutes.providedetails.MatchIndividualProvidedDetailsController.submit(linkId) shouldBe Call(
+    AppRoutes.providedetails.MatchIndividualProvidedDetailsController.submit(linkId, fromIv = None) shouldBe Call(
       method = "POST",
       url = path
     )
     AppRoutes.providedetails.MatchIndividualProvidedDetailsController.submit(
-      linkId
+      linkId,
+      fromIv = None
     ).url shouldBe AppRoutes.providedetails.MatchIndividualProvidedDetailsController.show(
-      linkId
+      linkId,
+      fromIv = None
     ).url
 
   s"GET $path should return 200 and render page" in:

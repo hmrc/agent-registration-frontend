@@ -42,10 +42,6 @@ class TestOnlyController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithApplicationFromLinkId = AgentApplication *: DataWithAuth
-
-  private type DataWithIndividualProvidedDetails = IndividualProvidedDetails *: DataWithApplicationFromLinkId
-
   private def baseAction(linkId: LinkId): ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions
     .authorised
     .refine(implicit request =>

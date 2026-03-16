@@ -85,6 +85,7 @@ object IndividualAuthStubs {
        |  "authorisedEnrolments": [],
        |  "allEnrolments": [],
        |  "agentInformation": {},
+       |  "confidenceLevel": 250,
        |  "internalId": "${internalUserId.value}",
        |  "optionalCredentials": {"providerId":"cred-id-12345","providerType":"GovernmentGateway"}
        |}
@@ -113,6 +114,7 @@ object IndividualAuthStubs {
        |    }
        |  ],
        |  "agentInformation": {},
+       |  "confidenceLevel": 250,
        |  "internalId": "${internalUserId.value}",
        |  "optionalCredentials": {"providerId":"cred-id-12345","providerType":"GovernmentGateway"}
        |}
@@ -141,6 +143,7 @@ object IndividualAuthStubs {
        |    }
        |  ],
        |  "agentInformation": {},
+       |  "confidenceLevel": 250,
        |  "internalId": "${internalUserId.value}",
        |  "optionalCredentials": {"providerId":"cred-id-12345","providerType":"GovernmentGateway"}
        |}
@@ -181,6 +184,7 @@ object IndividualAuthStubs {
        |    }
        |  ],
        |  "agentInformation": {},
+       |  "confidenceLevel": 250,
        |  "internalId": "${internalUserId.value}",
        |  "optionalCredentials": {"providerId":"cred-id-12345","providerType":"GovernmentGateway"}
        |}
@@ -201,6 +205,7 @@ object IndividualAuthStubs {
       |    }
       |  ],
       |  "retrieve": [
+      |    "confidenceLevel",
       |    "allEnrolments",
       |    "internalId",
       |    "optionalCredentials"

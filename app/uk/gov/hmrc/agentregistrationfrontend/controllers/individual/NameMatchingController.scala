@@ -43,9 +43,11 @@ class NameMatchingController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithIndividualProvidedDetailsForSearch = List[IndividualProvidedDetails] *: AgentApplication *: DataWithAuth
+  private type DataWithIndividualProvidedDetailsForSearch = List[IndividualProvidedDetails] *: AgentApplication *: DataWithAuthAndCl
 
-  def baseAction(linkId: LinkId): ActionBuilderWithData[DataWithIndividualProvidedDetailsForSearch] = actions
+  def baseAction(
+    linkId: LinkId
+  ): ActionBuilderWithData[DataWithIndividualProvidedDetailsForSearch] = actions
     .authorised
     .refine:
       implicit request =>
@@ -61,14 +63,18 @@ extends FrontendController(mcc, actions):
           .map: listOfIndividuals =>
             request.add[List[IndividualProvidedDetails]](listOfIndividuals)
 
-  def show(linkId: LinkId): Action[AnyContent] = baseAction(linkId).async:
+  def show(
+    linkId: LinkId
+  ): Action[AnyContent] = baseAction(linkId).async:
     implicit request =>
       Future.successful(Ok(view(
         form = NameMatchingForm.form,
         linkId = linkId
       )))
 
-  def submit(linkId: LinkId): Action[AnyContent] = baseAction(linkId).async:
+  def submit(
+    linkId: LinkId
+  ): Action[AnyContent] = baseAction(linkId).async:
     implicit request =>
       NameMatchingForm.form.bindFromRequest().fold(
         formWithErrors =>

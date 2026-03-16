@@ -32,6 +32,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
+import uk.gov.hmrc.auth.core.ConfidenceLevel
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import javax.inject.Inject
@@ -46,11 +47,15 @@ object IndividualActions:
   type RequestWithAuth = RequestWithData[DataWithAuth]
   type RequestWithAuthCt[ContentType] = RequestWithDataCt[ContentType, DataWithAuth]
 
-  type DataWithAdditionalIdentifiers = Option[Nino] *: Option[SaUtr] *: DataWithAuth
+  type DataWithAuthAndCl = ConfidenceLevel *: DataWithAuth
+  type RequestWithAuthAndCl = RequestWithData[DataWithAuthAndCl]
+  type RequestWithAuthAndClCt[ContentType] = RequestWithDataCt[ContentType, DataWithAuthAndCl]
+
+  type DataWithAdditionalIdentifiers = Option[Nino] *: Option[SaUtr] *: DataWithAuthAndCl
   type RequestWithAdditionalIdentifiers = RequestWithData[DataWithAdditionalIdentifiers]
   type RequestWithAdditionalIdentifiersCt[ContentType] = RequestWithDataCt[ContentType, DataWithAdditionalIdentifiers]
 
-  type DataWithApplicationFromLinkId = AgentApplication *: DataWithAuth
+  type DataWithApplicationFromLinkId = AgentApplication *: DataWithAuthAndCl
   type DataWithIndividualProvidedDetails = IndividualProvidedDetails *: DataWithApplicationFromLinkId
 
 @Singleton
@@ -68,7 +73,7 @@ extends RequestAwareLogging:
   val action: ActionBuilderWithData[EmptyTuple] = defaultActionBuilder
     .refineUnion(request => RequestWithDataCt.empty(request))
 
-  val authorised: ActionBuilderWithData[DataWithAuth] = action
+  val authorised: ActionBuilderWithData[DataWithAuthAndCl] = action
     .refineFutureEither(individualAuthorisedRefiner.refineIntoRequestWithAuth)
 
   val authorisedWithAdditionalIdentifiers: ActionBuilderWithData[DataWithAdditionalIdentifiers] = action
@@ -91,6 +96,6 @@ extends RequestAwareLogging:
               .find(_.internalUserId.contains(request.get[InternalUserId]))
               .map(request.add[IndividualProvidedDetails])
               .getOrElse(
-                Redirect(AppRoutes.providedetails.MatchIndividualProvidedDetailsController.show(linkId))
+                Redirect(AppRoutes.providedetails.MatchIndividualProvidedDetailsController.show(linkId, fromIv = None))
               )
     )

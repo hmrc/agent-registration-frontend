@@ -79,10 +79,11 @@ class GrsStubService @Inject() (
                 organisationType = "5T"
               ))
             case _ => None,
-        crn =   businessType match
-          case BusinessType.Partnership.LimitedLiabilityPartnership | BusinessType.LimitedCompany | BusinessType.Partnership.LimitedPartnership | BusinessType.Partnership.ScottishLimitedPartnership =>
-            journeyData.companyProfile.map(_.companyNumber.value)
-          case _ => None,
+        crn =
+          businessType match
+            case BusinessType.Partnership.LimitedLiabilityPartnership | BusinessType.LimitedCompany | BusinessType.Partnership.LimitedPartnership | BusinessType.Partnership.ScottishLimitedPartnership =>
+              journeyData.companyProfile.map(_.companyNumber.value)
+            case _ => None,
         addressDetails = AddressDetails(
           addressLine1 = "1 Test Street",
           addressLine2 = Some("Test Area"),
