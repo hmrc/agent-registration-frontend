@@ -135,11 +135,10 @@ extends FrontendController(mcc, applicantActions):
       updatedAgentApplication <- updateAgentApplication(agentApplication)
       _ <- applicationService.upsert(updatedAgentApplication)
       maybeCreatedIndividuals <-
-        if (maybeNumberOfIndividuals.nonEmpty) {
+        if (maybeNumberOfIndividuals.nonEmpty)
           val createdIndividuals = createIndividuals(section, updatedAgentApplication.agentApplicationId)
-          upsertIndividuals(createdIndividuals)
-          Future.successful(Some(createdIndividuals))
-        }
+          upsertIndividuals(createdIndividuals).map: _ =>
+            Some(createdIndividuals)
         else
           Future.successful(None)
       _ <-
