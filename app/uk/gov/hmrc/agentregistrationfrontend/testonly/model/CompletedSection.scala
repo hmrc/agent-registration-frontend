@@ -44,42 +44,42 @@ object CompletedSection:
 
       override def sectionName: String = "About your business"
       override def displayOrder: Int = 1
-      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterCompaniesHouseStatusCheckPassTwoChOfficers
+      override def agentApplication: AgentApplication = TestOnlyData.llp.twoChOfficers.agentApplicationLlp.afterCompaniesHouseStatusCheckPass
 
     case object LlpApplicantContactDetails
     extends CompletedSectionLlp:
 
       override def sectionName: String = "Applicant Contact Details"
       override def displayOrder: Int = 2
-      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterContactDetailsCompleteTwoChOfficers
+      override def agentApplication: AgentApplication = TestOnlyData.llp.twoChOfficers.agentApplicationLlp.afterContactDetailsComplete
 
     case object LlpAgentServicesAccountDetails
     extends CompletedSectionLlp:
 
       override def sectionName: String = "Agent services account details"
       override def displayOrder: Int = 3
-      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterAgentDetailsCompleteTwoChOfficers
+      override def agentApplication: AgentApplication = TestOnlyData.llp.twoChOfficers.agentApplicationLlp.afterAgentDetailsComplete
 
     case object LlpAntiMoneyLaunderingSupervisionDetails
     extends CompletedSectionLlp:
 
       override def sectionName: String = "Anti-money laundering supervision details"
       override def displayOrder: Int = 4
-      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterAmlsCompleteTwoChOfficers
+      override def agentApplication: AgentApplication = TestOnlyData.llp.twoChOfficers.agentApplicationLlp.afterAmlsComplete
 
     case object LlpHmrcStandardForAgents
     extends CompletedSectionLlp:
 
       override def sectionName: String = "HMRC standard for agents"
       override def displayOrder: Int = 5
-      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterHmrcStandardForAgentsAgreedTwoChOfficers
+      override def agentApplication: AgentApplication = TestOnlyData.llp.twoChOfficers.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
 
     case object LlpPartnersAndOtherRelevantTaxAdvisers2
     extends CompletedSectionLlp:
 
       override def sectionName: String = "Members and other relevant tax advisers (2)"
       override def displayOrder: Int = 6
-      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterConfirmTwoChOfficers
+      override def agentApplication: AgentApplication = TestOnlyData.llp.twoChOfficers.agentApplicationLlp.afterConfirmTwoChOfficers
       override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(
         ApplicationIndividualsListTest.CompaniesHouseOfficers.TwoPreCreatedOfficersCorrect
       )
@@ -89,7 +89,7 @@ object CompletedSection:
 
       override def sectionName: String = "Members and other relevant tax advisers (6)"
       override def displayOrder: Int = 7
-      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterConfirmSixChOfficers
+      override def agentApplication: AgentApplication = TestOnlyData.llp.sixChOfficers.agentApplicationLlp.afterConfirmSixChOfficers
       override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(
         ApplicationIndividualsListTest.CompaniesHouseOfficers.SixPreCreatedOfficersAllResponsible
       )
@@ -99,7 +99,7 @@ object CompletedSection:
 
       override def sectionName: String = "Declaration"
       override def displayOrder: Int = 8
-      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterDeclarationSubmitted
+      override def agentApplication: AgentApplication = TestOnlyData.llp.twoChOfficers.agentApplicationLlp.afterDeclarationSubmitted
       override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(
         ApplicationIndividualsListTest.CompaniesHouseOfficers.TwoFinishedOfficersCorrect
       )

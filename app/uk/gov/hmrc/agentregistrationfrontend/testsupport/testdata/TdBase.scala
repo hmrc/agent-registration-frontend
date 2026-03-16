@@ -90,8 +90,8 @@ trait TdBase:
   def crn: Crn = Crn("1234567890")
   def companyName = "Test Company Name"
   def dateOfIncorporation: LocalDate = LocalDate.now().minusYears(10)
-  def companyProfile(maybeCrn: Option[Crn] = None): CompanyProfile = CompanyProfile(
-    companyNumber = maybeCrn.getOrElse(crn),
+  def companyProfile: CompanyProfile = CompanyProfile(
+    companyNumber = crn,
     companyName = companyName,
     dateOfIncorporation = Some(dateOfIncorporation),
     unsanitisedCHROAddress = Some(ChroAddress(

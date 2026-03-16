@@ -129,7 +129,7 @@ extends FrontendController(mcc, applicantActions):
     for
       _ <- grsStubService.storeStubsData(
         businessType = section.businessType,
-        journeyData = journeyDataFor(section.businessType, maybeNumberOfIndividuals),
+        journeyData = journeyDataFor(section.businessType),
         deceased = false
       )
       updatedAgentApplication <- updateAgentApplication(agentApplication)
@@ -187,18 +187,16 @@ extends FrontendController(mcc, applicantActions):
         yield ()
 
   private def journeyDataFor(
-    bt: BusinessType,
-    maybeNumberOfIndividuals: Option[NumberOfIndividuals]
+    bt: BusinessType
   ): JourneyData =
-    (bt, maybeNumberOfIndividuals) match
-      case (BusinessType.Partnership.LimitedLiabilityPartnership, Some(SixOrMoreOfficers(_, _))) => TestOnlyData.grs.llp.journeyDataSixChOfficers
-      case (BusinessType.Partnership.LimitedLiabilityPartnership, _) => TestOnlyData.grs.llp.journeyDataTwoChOfficers
-      case (BusinessType.Partnership.GeneralPartnership, _) => TestOnlyData.grs.generalPartnership.journeyData
-      case (BusinessType.Partnership.ScottishPartnership, _) => TestOnlyData.grs.scottishPartnership.journeyDataBase
-      case (BusinessType.Partnership.ScottishLimitedPartnership, _) => TestOnlyData.grs.scottishLtdPartnership.journeyDataBase
-      case (BusinessType.Partnership.LimitedPartnership, _) => TestOnlyData.grs.ltdPartnership.journeyDataBase
-      case (BusinessType.SoleTrader, _) => TestOnlyData.grs.soleTrader.journeyDataBase
-      case (BusinessType.LimitedCompany, _) => TestOnlyData.grs.ltd.journeyDataBase
+    bt match
+      case BusinessType.Partnership.LimitedLiabilityPartnership => TestOnlyData.grs.llp.journeyData
+      case BusinessType.Partnership.GeneralPartnership => TestOnlyData.grs.generalPartnership.journeyData
+      case BusinessType.Partnership.ScottishPartnership => TestOnlyData.grs.scottishPartnership.journeyData
+      case BusinessType.Partnership.ScottishLimitedPartnership => TestOnlyData.grs.scottishLtdPartnership.journeyData
+      case BusinessType.Partnership.LimitedPartnership => TestOnlyData.grs.ltdPartnership.journeyData
+      case BusinessType.SoleTrader => TestOnlyData.grs.soleTrader.journeyData
+      case BusinessType.LimitedCompany => TestOnlyData.grs.ltd.journeyData
 
   private def updateAgentApplication(agentApplication: AgentApplication)(using
     r: RequestWithAuth,
