@@ -57,7 +57,7 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
 
     val afterGrsDataReceived: AgentApplicationGeneralPartnership = afterStarted.copy(
       businessDetails = Some(
-        dependencies.grs.generalPartnership.journeyData.asBusinessDetailsGeneralPartnership
+        dependencies.grs.generalPartnership.businessDetails
       ),
       applicationState = GrsDataReceived
     )
@@ -147,7 +147,7 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
         hasOtherRelevantIndividuals = Some(false)
       )
 
-    val afterConfirmSixOtherRelevantIndividualsNo: AgentApplicationGeneralPartnership = afterHowManyKeyIndividuals
+    val afterConfirmSixIndividuals: AgentApplicationGeneralPartnership = afterHowManyKeyIndividuals
       .copy(
         numberOfIndividuals = Some(
           SixOrMore(
