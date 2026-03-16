@@ -220,7 +220,7 @@ object CompletedSection:
     case object GeneralPartnershipDeclaration
     extends CompletedSectionGeneralPartnership:
 
-      override def sectionName: String = "Declaration (2)"
+      override def sectionName: String = "Declaration"
       override def displayOrder: Int = 8
       override def agentApplication: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterDeclarationSubmittedAndTwoIndividualFinished
       override def maybeIndividualsList: Option[ApplicationIndividualsListTest] = Some(
