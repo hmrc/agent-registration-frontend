@@ -306,7 +306,7 @@ extends FrontendController(mcc, actions):
         ).contains(businessType)
       then
         Some(CompanyProfile(
-          companyNumber = Crn("12345678"),
+          companyNumber = companyNumberForBusinessType(businessType),
           companyName = if businessType === LimitedCompany then "Test Company Ltd" else "Test Partnership",
           dateOfIncorporation = Some(LocalDate.now().minusYears(10)),
           unsanitisedCHROAddress = Some(ChroAddress(
@@ -329,3 +329,12 @@ extends FrontendController(mcc, actions):
       then Some("AA1 1AA")
       else None
   ))
+
+  // these defaults are to match any stubs we have used for Companies House lookups including officer searches
+  private def companyNumberForBusinessType(businessType: BusinessType): Crn =
+    businessType match
+      case LimitedCompany => Crn("11111111")
+      case LimitedLiabilityPartnership => Crn("22222222")
+      case LimitedPartnership => Crn("33333333")
+      case ScottishLimitedPartnership => Crn("44444444")
+      case _ => Crn("12345678") // we don't have a matching CH stub for any other business type so return the original default
