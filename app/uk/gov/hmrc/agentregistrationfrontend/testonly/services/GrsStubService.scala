@@ -71,7 +71,6 @@ class GrsStubService @Inject() (
         utr = Some(utr),
         safeId = journeyData.registration.registeredBusinessPartnerId.map(_.value).getOrElse(""),
         isAnIndividual = businessType === SoleTrader,
-        crn = journeyData.companyProfile.map(_.companyName),
         individual =
           if businessType === SoleTrader then
             Some(
