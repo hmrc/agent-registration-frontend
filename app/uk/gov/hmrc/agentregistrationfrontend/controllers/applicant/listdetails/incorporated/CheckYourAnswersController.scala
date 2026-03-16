@@ -21,7 +21,6 @@ import com.google.inject.Singleton
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
@@ -68,11 +67,8 @@ extends FrontendController(mcc, actions):
         individualProvideDetailsService
           .findAllKeyIndividualsByApplicationId(
             agentApplication.agentApplicationId
-          ).map[RequestWithData[DataWithLists] | Result]:
-            case Nil => request.add[List[IndividualProvidedDetails]](List.empty[IndividualProvidedDetails])
-            case list: List[IndividualProvidedDetails] if list.size <= request.get[SixOrMoreOfficers].totalListSize =>
-              request.add[List[IndividualProvidedDetails]](list)
-            case _ => Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url)
+          ).map: list =>
+            request.add[List[IndividualProvidedDetails]](list)
   def show: Action[AnyContent] = baseAction:
     implicit request =>
       val agentApplication: IsIncorporated = request.get[IsIncorporated]

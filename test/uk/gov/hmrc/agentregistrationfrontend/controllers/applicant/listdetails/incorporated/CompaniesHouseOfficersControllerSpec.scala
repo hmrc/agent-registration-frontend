@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.NumberCompaniesHouseOfficersF
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CompaniesHouseStubs
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole
-import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
+
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -112,6 +112,23 @@ extends ControllerSpec:
     response.parseBodyAsJsoupDocument.title() shouldBe s"$headingFiveOrLess - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeCompaniesHouseOfficers.agentApplicationId)
+    CompaniesHouseStubs.verifySixOfficersCalls()
+
+  s"GET $getPath for five or less companies house officers with existing individuals should show existing names" in:
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterFiveOrLessCompaniesHouseOfficersYes)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterFiveOrLessCompaniesHouseOfficersYes.agentApplicationId,
+      individuals = List(tdAll.individualProvidedDetails)
+    )
+    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.individualProvidedDetails.individualName.value)
+    val response: WSResponse = get(getPath)
+
+    response.status shouldBe Status.OK
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe s"$headingFiveOrLess - Apply for an agent services account - GOV.UK"
+    doc.mainContent.select("ul.govuk-list li").text() should include(tdAll.individualProvidedDetails.individualName.value)
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterFiveOrLessCompaniesHouseOfficersYes.agentApplicationId)
     CompaniesHouseStubs.verifySixOfficersCalls()
 
   s"GET $getPath for six or more companies house officers should return 200, fetch the BPR and Companies House and render page" in:
@@ -205,7 +222,32 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeCompaniesHouseOfficers.agentApplicationId)
 
-  s"POST $postSixOrMorePath with valid selection should save data and redirect to other relevant individuals CYA" in:
+  s"POST $postFiveOrLessPath with 'No' selection and existing individuals should delete individuals and display update Companies House advice page" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeCompaniesHouseOfficers)
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.beforeCompaniesHouseOfficers,
+      updatedApplication = agentApplication.afterFiveOrLessCompaniesHouseOfficersNo
+    )
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeCompaniesHouseOfficers)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.beforeCompaniesHouseOfficers.agentApplicationId,
+      individuals = List(tdAll.individualProvidedDetails)
+    )
+    AgentRegistrationStubs.stubDeleteIndividualProvidedDetails(tdAll.individualProvidedDetails.individualProvidedDetailsId)
+    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.individualProvidedDetails.individualName.value)
+
+    val response: WSResponse =
+      post(postFiveOrLessPath)(Map(
+        ConfirmCompaniesHouseOfficersForm.isCompaniesHouseOfficersListCorrect -> Seq("No")
+      ))
+
+    response.status shouldBe Status.OK
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "You need to update Companies House - Apply for an agent services account - GOV.UK"
+    doc.mainContent.select("h1").text() shouldBe "You need to update Companies House"
+    AgentRegistrationStubs.verifyDeleteIndividualProvidedDetails(tdAll.individualProvidedDetails.individualProvidedDetailsId)
+
+  s"POST $postSixOrMorePath with valid selection should save data and redirect to check your answers" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(
       application = agentApplication.beforeCompaniesHouseOfficers,
       updatedApplication = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers
@@ -213,21 +255,6 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.beforeCompaniesHouseOfficers.agentApplicationId,
       individuals = List.empty
-    )
-    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("Tester, John"))
-    )
-    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("Tester, John Ian"))
-    )
-    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("Tester, Alice"))
-    )
-    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("Tester, Bob"))
-    )
-    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("Tester, Carol"))
     )
 
     CompaniesHouseStubs.stubSixOfficers()
@@ -240,7 +267,7 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe
-      AppRoutes.apply.listdetails.incoporated.EnterCompaniesHouseOfficerController.show.url
+      AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeCompaniesHouseOfficers.agentApplicationId)
     CompaniesHouseStubs.verifySixOfficersCalls(1)
@@ -377,41 +404,25 @@ extends ControllerSpec:
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeCompaniesHouseOfficers.agentApplicationId)
     CompaniesHouseStubs.verifySixOfficersCalls(1)
 
-//  s"POST $postSixOrMorePath with save for later and valid selection should redirect to save for later" in:
-//    ApplyStubHelper.stubsForSuccessfulUpdate(
-//      application = agentApplication.beforeCompaniesHouseOfficers,
-//      updatedApplication = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers
-//    )
-//    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeCompaniesHouseOfficers)
-//    AgentRegistrationStubs.stubFindIndividualsForApplication(
-//      agentApplicationId = agentApplication.beforeCompaniesHouseOfficers.agentApplicationId,
-//      individuals = List.empty
-//    )
-//    CompaniesHouseStubs.stubSixOfficers()
-//    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-//      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("Tester, John"))
-//    )
-//    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-//      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("Tester, John Ian"))
-//    )
-//    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-//      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("Tester, Alice"))
-//    )
-//    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-//      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("Tester, Bob"))
-//    )
-//    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-//      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("Tester, Carol"))
-//    )
-//
-//    val response: WSResponse =
-//      post(postSixOrMorePath)(Map(
-//        NumberCompaniesHouseOfficersForm.numberOfOfficersResponsibleForTaxMatters -> Seq("1"),
-//        "submit" -> Seq("SaveAndComeBackLater")
-//      ))
-//
-//    response.status shouldBe Status.SEE_OTHER
-//    response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
-//    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
-//    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeCompaniesHouseOfficers.agentApplicationId)
-//    CompaniesHouseStubs.verifySixOfficersCalls()
+  s"POST $postSixOrMorePath with save for later and valid selection should redirect to save for later" in:
+    ApplyStubHelper.stubsForSuccessfulUpdate(
+      application = agentApplication.beforeCompaniesHouseOfficers,
+      updatedApplication = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers
+    )
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.beforeCompaniesHouseOfficers.agentApplicationId,
+      individuals = List.empty
+    )
+    CompaniesHouseStubs.stubSixOfficers()
+
+    val response: WSResponse =
+      post(postSixOrMorePath)(Map(
+        NumberCompaniesHouseOfficersForm.numberOfOfficersResponsibleForTaxMatters -> Seq("4"),
+        "submit" -> Seq("SaveAndComeBackLater")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeCompaniesHouseOfficers.agentApplicationId)
+    CompaniesHouseStubs.verifySixOfficersCalls(1)

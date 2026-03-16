@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseIndividuaNameForm
@@ -89,6 +90,56 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
     CompaniesHouseStubs.verifySixOfficersCalls()
+
+  s"GET $getPath when list is already complete should redirect to CYA" in:
+    // SixOrMoreOfficers(6, 4) → totalListSize = 5. With 5 individuals, list is complete.
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
+    val fiveIndividuals = (1 to 5).toList.map(i =>
+      tdAll.individualProvidedDetails.copy(
+        _id = IndividualProvidedDetailsId(s"test-id-$i"),
+        individualName = IndividualName(s"Test Name $i")
+      )
+    )
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
+      individuals = fiveIndividuals
+    )
+    CompaniesHouseStubs.stubSixOfficers()
+    val response: WSResponse = get(getPath)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
+    CompaniesHouseStubs.verifySixOfficersCalls()
+
+  s"GET $getPath should redirect to CYA when numberOfIndividuals is five or less" in:
+    ApplyStubHelper.stubsForAuthAction(
+      tdAll.agentApplicationLlp.afterConfirmCompaniesHouseOfficersYes
+    )
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = tdAll.agentApplicationLlp.afterConfirmCompaniesHouseOfficersYes.agentApplicationId,
+      individuals = List.empty
+    )
+    CompaniesHouseStubs.stubSixOfficers()
+    val response: WSResponse = get(getPath)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
+
+  s"GET $getPath should redirect to CompaniesHouseOfficersController when numberOfIndividuals is not set" in:
+    ApplyStubHelper.stubsForAuthAction(
+      tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
+    )
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed.agentApplicationId,
+      individuals = List.empty
+    )
+    CompaniesHouseStubs.stubSixOfficers()
+    val response: WSResponse = get(getPath)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show.url
 
   s"GET $getPath with some individuals already entered should return 200 and render the next individual name page" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)

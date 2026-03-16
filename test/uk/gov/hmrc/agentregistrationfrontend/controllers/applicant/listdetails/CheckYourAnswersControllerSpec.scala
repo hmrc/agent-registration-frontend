@@ -16,11 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails
 
+import scala.jdk.CollectionConverters.*
+
 import org.jsoup.nodes.Document
 import play.api.http.HeaderNames
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -139,3 +142,28 @@ extends ControllerSpec:
 
     ApplyStubHelper.verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterConfirmOtherRelevantIndividualsYes.agentApplicationId)
+
+  s"GET $path for incorporated (LLP) should return 200 and Change link for LLP member names should go to incorporated CYA" in:
+    val llpApplication: AgentApplicationLlp = tdAll.agentApplicationLlp.afterConfirmTwoChOfficers
+    ApplyStubHelper.stubsForAuthAction(llpApplication)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = llpApplication.agentApplicationId,
+      individuals = List(tdAll.individualProvidedDetails, tdAll.individualProvidedDetails2)
+    )
+
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.OK
+    val doc: Document = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
+    doc.select("h1").text() shouldBe "Check your answers"
+
+    val changeLinks = doc.mainContent.select(".govuk-summary-list__actions a")
+    val llpMemberNamesChangeLink = changeLinks.asScala.find(_.text().contains("LLP member names"))
+    llpMemberNamesChangeLink shouldBe defined
+    llpMemberNamesChangeLink.fold(fail("LLP member names change link not found"))(link =>
+      link.attr("href") shouldBe AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
+    )
+
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(llpApplication.agentApplicationId)

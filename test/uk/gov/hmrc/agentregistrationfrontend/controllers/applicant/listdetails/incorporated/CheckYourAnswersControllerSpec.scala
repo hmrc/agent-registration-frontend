@@ -16,8 +16,13 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.incorporated
 
+import scala.jdk.CollectionConverters.*
+
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -67,7 +72,7 @@ extends ControllerSpec:
     doc.mainContent.select("h1").text() should include("You have added 1 LLP member")
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
 
-  s"GET $getPath should show Change and Remove action links for each individual" in:
+  s"GET $getPath should show Change and Remove action links with correct hrefs for each individual" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
@@ -78,8 +83,42 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
     val actions = doc.mainContent.select(".hmrc-summary-list__actions a")
-    actions.toString should include("Change")
-    actions.toString should include("Remove")
+    val changeLink = actions.asScala.find(_.text().contains("Change"))
+    val removeLink = actions.asScala.find(_.text().contains("Remove"))
+    changeLink shouldBe defined
+    removeLink shouldBe defined
+    changeLink.fold(fail("Change link not found"))(link =>
+      link.attr("href") shouldBe
+        AppRoutes.apply.listdetails.incoporated.ChangeCompaniesHouseOfficerController.show(tdAll.individualProvidedDetails._id).url
+    )
+    removeLink.fold(fail("Remove link not found"))(link =>
+      link.attr("href") shouldBe
+        AppRoutes.apply.listdetails.incoporated.RemoveCompaniesHouseOfficerController.show(tdAll.individualProvidedDetails._id).url
+    )
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
+
+  s"GET $getPath should only show Remove link for non-precreated individuals" in:
+    val nonPrecreatedIndividual = tdAll.individualProvidedDetails.copy(
+      providedDetailsState = ProvidedDetailsState.Started
+    )
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
+      individuals = List(nonPrecreatedIndividual)
+    )
+    val response: WSResponse = get(getPath)
+
+    response.status shouldBe Status.OK
+    val doc = response.parseBodyAsJsoupDocument
+    val actions = doc.mainContent.select(".hmrc-summary-list__actions a")
+    val changeLink = actions.asScala.find(_.text().contains("Change"))
+    val removeLink = actions.asScala.find(_.text().contains("Remove"))
+    changeLink shouldBe None
+    removeLink shouldBe defined
+    removeLink.fold(fail("Remove link not found"))(link =>
+      link.attr("href") shouldBe
+        AppRoutes.apply.listdetails.incoporated.RemoveCompaniesHouseOfficerController.show(nonPrecreatedIndividual._id).url
+    )
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
 
   s"GET $getPath should show 'Change the number of LLP members' link" in:
@@ -97,7 +136,7 @@ extends ControllerSpec:
       AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show.url
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
 
-  s"GET $getPath should show inset text when more individuals are needed" in:
+  s"GET $getPath should show inset text and 'Add another' link when more individuals are needed" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
@@ -108,6 +147,11 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
     doc.mainContent.select(".govuk-inset-text").text() should include("LLP member")
+    val addAnotherLink = doc.mainContent.select("a.govuk-button").asScala.find(_.text().contains("Add another LLP member"))
+    addAnotherLink shouldBe defined
+    addAnotherLink.fold(fail("Add another link not found"))(link =>
+      link.attr("href") shouldBe AppRoutes.apply.listdetails.incoporated.EnterCompaniesHouseOfficerController.show.url
+    )
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
 
   s"GET $getPath with no individuals entered should return 200 and show the CYA page with empty list" in:
@@ -121,6 +165,55 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
     doc.title() should include("added 0")
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
+
+  s"GET $getPath should return 200 and show warning when list has too many individuals" in:
+    // SixOrMoreOfficers(6, 4) → totalListSize = 5. With 6 individuals, diff = -1
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
+    val sixIndividuals = (1 to 6).toList.map(i =>
+      tdAll.individualProvidedDetails.copy(
+        _id = IndividualProvidedDetailsId(s"test-id-$i"),
+        individualName = IndividualName(s"Test Name $i")
+      )
+    )
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
+      individuals = sixIndividuals
+    )
+    val response: WSResponse = get(getPath)
+
+    response.status shouldBe Status.OK
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() should include("You have added 6 LLP members")
+    doc.mainContent.select(".govuk-warning-text__text").text() shouldBe
+      "Warning You told us there are 5 LLP members. Remove 1 LLP member from the list before you continue."
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
+
+  s"GET $getPath should show confirm and continue when list is complete" in:
+    // SixOrMoreOfficers(6, 4) → totalListSize = 5. With 5 individuals, diff = 0
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
+    val fiveIndividuals = (1 to 5).toList.map(i =>
+      tdAll.individualProvidedDetails.copy(
+        _id = IndividualProvidedDetailsId(s"test-id-$i"),
+        individualName = IndividualName(s"Test Name $i")
+      )
+    )
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
+      individuals = fiveIndividuals
+    )
+    val response: WSResponse = get(getPath)
+
+    response.status shouldBe Status.OK
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() should include("You have added 5 LLP members")
+    val confirmLink = doc.mainContent.select("a.govuk-button").asScala.find(_.text().contains("Confirm and continue"))
+    confirmLink shouldBe defined
+    confirmLink.fold(fail("Confirm and continue link not found"))(link =>
+      link.attr("href") shouldBe AppRoutes.apply.listdetails.CheckYourAnswersController.show.url
+    )
+    doc.mainContent.select(".govuk-warning-text").isEmpty shouldBe true
+    doc.mainContent.select(".govuk-inset-text").isEmpty shouldBe true
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
 
   s"GET $getPath should redirect to CompaniesHouseOfficersController when numberOfIndividuals is five or less" in:
