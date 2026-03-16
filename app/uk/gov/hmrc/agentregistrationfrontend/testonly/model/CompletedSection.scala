@@ -44,35 +44,35 @@ object CompletedSection:
 
       override def sectionName: String = "About your business"
       override def displayOrder: Int = 1
-      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterCompaniesHouseStatusCheckPass
+      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterCompaniesHouseStatusCheckPassTwoChOfficers
 
     case object LlpApplicantContactDetails
     extends CompletedSectionLlp:
 
       override def sectionName: String = "Applicant Contact Details"
       override def displayOrder: Int = 2
-      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterContactDetailsComplete
+      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterContactDetailsCompleteTwoChOfficers
 
     case object LlpAgentServicesAccountDetails
     extends CompletedSectionLlp:
 
       override def sectionName: String = "Agent services account details"
       override def displayOrder: Int = 3
-      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterAgentDetailsComplete
+      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterAgentDetailsCompleteTwoChOfficers
 
     case object LlpAntiMoneyLaunderingSupervisionDetails
     extends CompletedSectionLlp:
 
       override def sectionName: String = "Anti-money laundering supervision details"
       override def displayOrder: Int = 4
-      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterAmlsComplete
+      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterAmlsCompleteTwoChOfficers
 
     case object LlpHmrcStandardForAgents
     extends CompletedSectionLlp:
 
       override def sectionName: String = "HMRC standard for agents"
       override def displayOrder: Int = 5
-      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
+      override def agentApplication: AgentApplication = TestOnlyData.agentApplicationLlp.afterHmrcStandardForAgentsAgreedTwoChOfficers
 
     case object LlpPartnersAndOtherRelevantTaxAdvisers2
     extends CompletedSectionLlp:

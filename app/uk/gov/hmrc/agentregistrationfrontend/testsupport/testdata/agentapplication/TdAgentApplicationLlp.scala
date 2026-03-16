@@ -76,6 +76,13 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       companyStatusCheckResult = Some(CheckResult.Pass)
     )
 
+    val afterCompaniesHouseStatusCheckPassTwoChOfficers: AgentApplicationLlp = afterRefusalToDealWithCheckPass.copy(
+      businessDetails = Some(
+        dependencies.grs.llp.journeyDataTwoChOfficers.asBusinessDetailsLlp
+      ),
+      companyStatusCheckResult = Some(CheckResult.Pass)
+    )
+
     val afterCompaniesHouseStatusCheckFail: AgentApplicationLlp = afterRefusalToDealWithCheckPass.copy(
       companyStatusCheckResult = Some(CheckResult.Fail)
     )
@@ -85,7 +92,22 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       agentDetails = None
     )
 
+    val afterContactDetailsCompleteTwoChOfficers: AgentApplicationLlp = afterCompaniesHouseStatusCheckPass.copy(
+      businessDetails = Some(
+        dependencies.grs.llp.journeyDataTwoChOfficers.asBusinessDetailsLlp
+      ),
+      applicantContactDetails = Some(dependencies.applicantContactDetails),
+      agentDetails = None
+    )
+
     val afterAgentDetailsComplete: AgentApplicationLlp = afterContactDetailsComplete.copy(
+      agentDetails = Some(dependencies.completeAgentDetails)
+    )
+
+    val afterAgentDetailsCompleteTwoChOfficers: AgentApplicationLlp = afterContactDetailsComplete.copy(
+      businessDetails = Some(
+        dependencies.grs.llp.journeyDataTwoChOfficers.asBusinessDetailsLlp
+      ),
       agentDetails = Some(dependencies.completeAgentDetails)
     )
 
@@ -93,7 +115,21 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       amlsDetails = Some(dependencies.completeAmlsDetails)
     )
 
+    val afterAmlsCompleteTwoChOfficers: AgentApplicationLlp = afterAgentDetailsComplete.copy(
+      businessDetails = Some(
+        dependencies.grs.llp.journeyDataTwoChOfficers.asBusinessDetailsLlp
+      ),
+      amlsDetails = Some(dependencies.completeAmlsDetails)
+    )
+
     val afterHmrcStandardForAgentsAgreed: AgentApplicationLlp = afterAmlsComplete.copy(
+      hmrcStandardForAgentsAgreed = StateOfAgreement.Agreed
+    )
+
+    val afterHmrcStandardForAgentsAgreedTwoChOfficers: AgentApplicationLlp = afterAmlsComplete.copy(
+      businessDetails = Some(
+        dependencies.grs.llp.journeyDataTwoChOfficers.asBusinessDetailsLlp
+      ),
       hmrcStandardForAgentsAgreed = StateOfAgreement.Agreed
     )
 
