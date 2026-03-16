@@ -154,7 +154,7 @@ extends ControllerSpec:
     )
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
 
-  s"GET $getPath with no individuals entered should return 200 and show the CYA page with empty list" in:
+  s"GET $getPath with no individuals entered should redirect to enter companies house officer page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
@@ -162,9 +162,8 @@ extends ControllerSpec:
     )
     val response: WSResponse = get(getPath)
 
-    response.status shouldBe Status.OK
-    val doc = response.parseBodyAsJsoupDocument
-    doc.title() should include("added 0")
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.incoporated.EnterCompaniesHouseOfficerController.show.url
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
 
   s"GET $getPath should return 200 and show warning when list has too many individuals" in:
