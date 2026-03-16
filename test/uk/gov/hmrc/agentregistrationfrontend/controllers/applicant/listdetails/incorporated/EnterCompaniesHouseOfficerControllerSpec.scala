@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseIndividuaNameForm
@@ -90,6 +92,56 @@ extends ControllerSpec:
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
     CompaniesHouseStubs.verifySixOfficersCalls()
 
+  s"GET $getPath when list is already complete should redirect to CYA" in:
+    // SixOrMoreOfficers(6, 4) → totalListSize = 5. With 5 individuals, list is complete.
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
+    val fiveIndividuals = (1 to 5).toList.map(i =>
+      tdAll.individualProvidedDetails.copy(
+        _id = IndividualProvidedDetailsId(s"test-id-$i"),
+        individualName = IndividualName(s"Test Name $i")
+      )
+    )
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
+      individuals = fiveIndividuals
+    )
+    CompaniesHouseStubs.stubSixOfficers()
+    val response: WSResponse = get(getPath)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
+    CompaniesHouseStubs.verifySixOfficersCalls()
+
+  s"GET $getPath should redirect to CYA when numberOfIndividuals is five or less" in:
+    ApplyStubHelper.stubsForAuthAction(
+      tdAll.agentApplicationLlp.afterConfirmCompaniesHouseOfficersYes
+    )
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = tdAll.agentApplicationLlp.afterConfirmCompaniesHouseOfficersYes.agentApplicationId,
+      individuals = List.empty
+    )
+    CompaniesHouseStubs.stubSixOfficers()
+    val response: WSResponse = get(getPath)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
+
+  s"GET $getPath should redirect to CompaniesHouseOfficersController when numberOfIndividuals is not set" in:
+    ApplyStubHelper.stubsForAuthAction(
+      tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed
+    )
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed.agentApplicationId,
+      individuals = List.empty
+    )
+    CompaniesHouseStubs.stubSixOfficers()
+    val response: WSResponse = get(getPath)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show.url
+
   s"GET $getPath with some individuals already entered should return 200 and render the next individual name page" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
@@ -105,6 +157,109 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
     CompaniesHouseStubs.verifySixOfficersCalls()
+
+  // stubSixOfficers returns 6 active officers (normalised): John Tester, John Ian Tester, Alice Tester, Bob Tester, Carol Tester, Carol Tester (duplicate)
+  private def individualWithName(
+    name: String,
+    idSuffix: String
+  ): IndividualProvidedDetails = tdAll.individualProvidedDetails.copy(
+    _id = IndividualProvidedDetailsId(s"test-id-$idSuffix"),
+    individualName = IndividualName(name)
+  )
+
+  s"POST $postPath should redirect to CYA when all CH officers are already in individuals list" in:
+    // All 6 CH officers consumed (including both Carol Testers). Filtered list is empty.
+    // List is over-complete (6 > totalListSize 5), so renderPage redirects to CYA.
+    val allOfficers = List(
+      individualWithName("John Tester", "1"),
+      individualWithName("John Ian Tester", "2"),
+      individualWithName("Alice Tester", "3"),
+      individualWithName("Bob Tester", "4"),
+      individualWithName("Carol Tester", "5"),
+      individualWithName("Carol Tester", "6")
+    )
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
+      individuals = allOfficers
+    )
+    CompaniesHouseStubs.stubSixOfficers()
+
+    val response: WSResponse =
+      post(postPath)(Map(
+        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("Alice"),
+        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("Tester")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
+
+  s"POST $postPath with duplicate CH name should still allow submission when not all occurrences are used" in:
+    // "Carol Tester" appears twice in CH. With one already in individuals list, one should remain available.
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
+      individuals = List(individualWithName("Carol Tester", "1"))
+    )
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
+      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("Carol Tester"))
+    )
+    CompaniesHouseStubs.stubSixOfficers()
+
+    val response: WSResponse =
+      post(postPath)(Map(
+        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("Carol"),
+        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("Tester")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+
+  s"POST $postPath with duplicate CH name should return 400 when all occurrences are used" in:
+    // "Carol Tester" appears twice in CH. With both already in individuals list, none should remain.
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
+      individuals = List(
+        individualWithName("Carol Tester", "1"),
+        individualWithName("Carol Tester", "2")
+      )
+    )
+    CompaniesHouseStubs.stubSixOfficers()
+
+    val response: WSResponse =
+      post(postPath)(Map(
+        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("Carol"),
+        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("Tester")
+      ))
+
+    response.status shouldBe Status.BAD_REQUEST
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() should startWith("Error:")
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+
+  s"POST $postPath should store the matched CH officer name, not the user-entered name" in:
+    // User enters "john" / "tester" (lowercase), but CH has "John Tester".
+    // The stored name should be the CH officer name "John Tester", not "john tester".
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
+      individuals = List.empty
+    )
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
+      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("John Tester"))
+    )
+    CompaniesHouseStubs.stubSixOfficers()
+
+    val response: WSResponse =
+      post(postPath)(Map(
+        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("john"),
+        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("tester")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+    AgentRegistrationStubs.verifyUpsertIndividualProvidedDetails()
 
   s"POST $postPath with valid name matching a Companies House officer should save and redirect" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)

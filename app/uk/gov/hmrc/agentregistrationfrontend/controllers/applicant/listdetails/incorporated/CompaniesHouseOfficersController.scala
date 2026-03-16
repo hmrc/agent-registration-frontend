@@ -87,7 +87,14 @@ extends FrontendController(mcc, actions):
         yield request
           .add[List[IndividualProvidedDetails]](individualsList)
           .add[Seq[IndividualName]](companiesHouseOfficersNames)
-
+//    .refine:
+//      implicit request =>
+//        val individuals = request.get[List[IndividualProvidedDetails]]
+//        request.get[IsIncorporated].getNumberOfCompaniesHouseOfficers match
+//          case Some(n: SixOrMoreOfficers) if (n. isValid && n.totalListSize === individuals.size) =>
+//
+//
+//
   def show: Action[AnyContent] = baseAction
     .async:
       implicit request =>
@@ -250,7 +257,7 @@ extends FrontendController(mcc, actions):
           )
 
           for _ <- agentApplicationService.upsert(updatedApplication)
-          yield Redirect(AppRoutes.apply.listdetails.incoporated.EnterCompaniesHouseOfficerController.show.url)
+          yield Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url)
       .redirectIfSaveForLater
 
   // Private helper methods

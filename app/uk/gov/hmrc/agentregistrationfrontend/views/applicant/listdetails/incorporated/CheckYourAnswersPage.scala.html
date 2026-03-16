@@ -90,12 +90,18 @@
         rows = existingList.map { individualDetails =>
             SummaryListRow(
                 key = Key(content = Text(individualDetails.individualName.value), classes = "govuk-!-font-weight-regular hmrc-summary-list__key"),
-                actions = Some(Actions(items = Seq(
+                actions = Some(Actions(items = if(individualDetails.isPrecreated) Seq(
                     ActionItem(
                         href = AppRoutes.apply.listdetails.incoporated.ChangeCompaniesHouseOfficerController.show(individualDetails._id).url,
                         content = Text(messages("common.change")),
                         visuallyHiddenText = Some(individualDetails.individualName.value)
                     ),
+                    ActionItem(
+                        href = AppRoutes.apply.listdetails.incoporated.RemoveCompaniesHouseOfficerController.show(individualDetails._id).url,
+                        content = Text(messages("common.remove")),
+                        visuallyHiddenText = Some(individualDetails.individualName.value)
+                    )
+                ) else Seq(
                     ActionItem(
                         href = AppRoutes.apply.listdetails.incoporated.RemoveCompaniesHouseOfficerController.show(individualDetails._id).url,
                         content = Text(messages("common.remove")),

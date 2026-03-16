@@ -102,6 +102,32 @@ extends ControllerSpec:
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
     CompaniesHouseStubs.verifySixOfficersCalls()
 
+  s"POST $postPath should store the matched CH officer name, not the user-entered name" in:
+    // User enters "alice" / "tester" (lowercase), but CH has "Alice Tester".
+    // The stored name should be the CH officer name "Alice Tester", not "alice tester".
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
+      individuals = List(tdAll.individualProvidedDetails)
+    )
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
+      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("Alice Tester"))
+    )
+    CompaniesHouseStubs.stubSixOfficers()
+
+    val response: WSResponse =
+      post(postPath)(Map(
+        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("alice"),
+        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("tester")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe
+      AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+    AgentRegistrationStubs.verifyUpsertIndividualProvidedDetails()
+    CompaniesHouseStubs.verifySixOfficersCalls()
+
   s"POST $postPath with valid name matching a Companies House officer should update and redirect to CYA" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
