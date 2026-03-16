@@ -52,11 +52,11 @@ trait TdGrs {
         )
       )
       // These Crns are necessary to edit the tax advisors associated with the application
-      val crnTaxAdvisers2 = Crn("22222222")
-      val crnTaxAdvisers6 = Crn("22222226")
+      val crnTwoChOfficers = Crn("22222222")
+      val crnSixChOfficers = Crn("22222226")
 
-      val journeyDataTaxAdvisers2: JourneyData = journeyDataBase.copy(companyProfile = Some(companyProfile(Some(crnTaxAdvisers2))))
-      val journeyDataTaxAdvisers6: JourneyData = journeyDataBase.copy(companyProfile = Some(companyProfile(Some(crnTaxAdvisers6))))
+      val journeyDataTwoChOfficers: JourneyData = journeyDataBase.copy(companyProfile = Some(companyProfile(Some(crnTwoChOfficers))))
+      val journeyDataSixChOfficers: JourneyData = journeyDataBase.copy(companyProfile = Some(companyProfile(Some(crnTwoChOfficers))))
 
     object soleTrader:
 

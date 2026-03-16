@@ -59,7 +59,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
 
     val afterGrsDataReceived: AgentApplicationLlp = afterStarted.copy(
       businessDetails = Some(
-        dependencies.grs.llp.journeyDataTaxAdvisers2.asBusinessDetailsLlp
+        dependencies.grs.llp.journeyDataBase.asBusinessDetailsLlp
       ),
       applicationState = GrsDataReceived
     )
@@ -115,7 +115,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
         TestOnlyData.twoCompaniesHouseOfficers
       ),
       businessDetails = Some(
-        dependencies.grs.llp.journeyDataTaxAdvisers2.asBusinessDetailsLlp
+        dependencies.grs.llp.journeyDataTwoChOfficers.asBusinessDetailsLlp
       ),
       hasOtherRelevantIndividuals = Some(false)
     )
@@ -125,7 +125,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
         TestOnlyData.sixCompaniesHouseOfficersSelectAll
       ),
       businessDetails = Some(
-        dependencies.grs.llp.journeyDataTaxAdvisers6.asBusinessDetailsLlp
+        dependencies.grs.llp.journeyDataSixChOfficers.asBusinessDetailsLlp
       ),
       hasOtherRelevantIndividuals = Some(false)
     )
