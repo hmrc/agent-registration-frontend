@@ -19,8 +19,13 @@ package uk.gov.hmrc.agentregistrationfrontend.services.individual
 import com.softwaremill.quicklens.*
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.individual.*
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualDateOfBirth
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino.FromAuth
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.model.citizendetails.CitizenDetails
@@ -41,8 +46,7 @@ extends RequestAwareLogging:
   def create(
     individualName: IndividualName,
     isPersonOfControl: Boolean,
-    agentApplicationId: AgentApplicationId,
-    providedDetailsState: ProvidedDetailsState = ProvidedDetailsState.Precreated
+    agentApplicationId: AgentApplicationId
   )(using request: RequestHeader): IndividualProvidedDetails =
     logger.info(s"creating provided details for individual with applicationId:[${agentApplicationId.value}] ")
     provideDetailsFactory.create(

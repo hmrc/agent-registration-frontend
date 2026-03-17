@@ -43,5 +43,4 @@ final case class JourneyData(
 )
 
 object JourneyData:
-
   given Format[JourneyData] = Json.format[JourneyData]
