@@ -29,11 +29,11 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendContr
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
-import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifiers
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
+import uk.gov.hmrc.agentregistrationfrontend.testonly.services.IndividualProvidedDetailsTestService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
@@ -57,7 +57,7 @@ class FastForwardController @Inject() (
   applicationService: AgentApplicationService,
   agentApplicationIdGenerator: AgentApplicationIdGenerator,
   linkIdGenerator: LinkIdGenerator,
-  individualProvideDetailsService: IndividualProvideDetailsService,
+  individualProvideDetailsTestService: IndividualProvidedDetailsTestService,
   agentRegistrationRiskingService: AgentRegistrationRiskingService
 )(using
   clock: Clock,
@@ -158,7 +158,13 @@ extends FrontendController(mcc, applicantActions):
     applicationId: AgentApplicationId
   ): Seq[IndividualProvidedDetails] =
     val individualProvidedDetailsList = section.maybeIndividualsList.getOrThrowExpectedDataMissing("individualProvidedDetails")
-    val howManyIndividuals: Int = individualProvidedDetailsList.numberOfIndividuals.numberOfIndividuals
+    val howManyIndividuals: Int =
+      individualProvidedDetailsList.numberOfIndividuals match
+        case FiveOrLess(n) => n
+        case SixOrMore(n) => n
+        case FiveOrLessOfficers(n, _) => n
+        case SixOrMoreOfficers(_, n) => n
+
     val individualProvidedDetails = individualProvidedDetailsList.individualProvidedDetails
 
     TestOnlyData.grsStubbedIndividualsBase
@@ -181,7 +187,7 @@ extends FrontendController(mcc, applicantActions):
       ) =>
         for
           _ <- acc
-          _ <- individualProvideDetailsService.upsertForApplication(individual)
+          _ <- individualProvideDetailsTestService.upsertForApplication(individual)
           _ <- grsStubService.storeIndividualProvidedDetails(individual.individualName.value, Some(TestOnlyData.saUtr.asUtr))
         yield ()
 

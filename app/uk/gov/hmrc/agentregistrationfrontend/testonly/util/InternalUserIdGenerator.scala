@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared
+package uk.gov.hmrc.agentregistrationfrontend.testonly.util
 
-import play.api.libs.json.Format
-import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import org.bson.types.ObjectId
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
 
-/** Internal User Identifier, which comes from the Retrievals
-  */
-final case class InternalUserId(value: String)
+import javax.inject.Singleton
 
-object InternalUserId:
-  given format: Format[InternalUserId] = JsonFormatsFactory.makeValueClassFormat
+@Singleton
+class InternalUserIdGenerator:
+  def nextInternalUserId(): InternalUserId = InternalUserId(ObjectId.get().toHexString)

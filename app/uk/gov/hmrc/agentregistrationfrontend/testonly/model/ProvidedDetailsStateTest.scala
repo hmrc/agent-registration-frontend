@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared
+package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
-import play.api.libs.json.Format
-import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Started
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
-/** Internal User Identifier, which comes from the Retrievals
-  */
-final case class InternalUserId(value: String)
-
-object InternalUserId:
-  given format: Format[InternalUserId] = JsonFormatsFactory.makeValueClassFormat
+extension (pds: ProvidedDetailsState)
+  def internalUserIdProvided: Boolean = pds === Started || pds === Finished

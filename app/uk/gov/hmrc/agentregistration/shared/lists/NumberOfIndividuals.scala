@@ -22,8 +22,7 @@ import play.api.libs.json.JsonConfiguration
 import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
-sealed trait NumberOfIndividuals:
-  def numberOfIndividuals: Int
+sealed trait NumberOfIndividuals
 
 // =======================================================
 // Required Key Individuals
@@ -33,7 +32,7 @@ extends NumberOfIndividuals:
 
   def isValid: Boolean
   def totalListSize: Int
-  override def numberOfIndividuals: Int
+  def numberOfIndividuals: Int
 
 /** When there less or equal 5, the Applicant has to declare the exact number of all key individuals (partners, directors, owners, etc) */
 final case class FiveOrLess(
@@ -87,7 +86,7 @@ extends NumberOfIndividuals:
   def isValid: Boolean
   def totalListSize: Int
 
-  override def numberOfIndividuals: Int
+  def numberOfIndividuals: Int
 
 /** When there less or equal 5, the Applicant has to declare the exact number of all key individuals (partners, directors, owners, etc) */
 final case class FiveOrLessOfficers(

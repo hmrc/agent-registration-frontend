@@ -19,13 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.services.individual
 import com.softwaremill.quicklens.*
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualDateOfBirth
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
+import uk.gov.hmrc.agentregistration.shared.individual.*
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino.FromAuth
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
-import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.model.citizendetails.CitizenDetails
@@ -53,8 +48,7 @@ extends RequestAwareLogging:
     provideDetailsFactory.create(
       agentApplicationId,
       individualName,
-      isPersonOfControl,
-      providedDetailsState
+      isPersonOfControl
     )
 
   def upsertForApplication(individualProvidedDetails: IndividualProvidedDetails)(using request: RequestHeader): Future[Unit] =

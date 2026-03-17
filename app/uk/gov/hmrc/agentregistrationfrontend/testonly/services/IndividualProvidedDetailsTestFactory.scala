@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.services.individual
+package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
-import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsIdGenerator
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
-import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Precreated
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.internalUserIdProvided
+import uk.gov.hmrc.agentregistrationfrontend.testonly.util.InternalUserIdGenerator
 
 import java.time.Clock
 import java.time.Instant
@@ -29,21 +30,27 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class IndividualProvideDetailsFactory @Inject() (
+class IndividualProvidedDetailsTestFactory @Inject() (
   clock: Clock,
-  individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator
+  individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator,
+  internalUserIdGenerator: InternalUserIdGenerator
 ):
 
   def create(
     agentApplicationId: AgentApplicationId,
     individualName: IndividualName,
-    isPersonOfControl: Boolean
+    isPersonOfControl: Boolean,
+    providedDetailsState: ProvidedDetailsState
   ): IndividualProvidedDetails = IndividualProvidedDetails(
     _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
     agentApplicationId = agentApplicationId,
     createdAt = Instant.now(clock),
-    providedDetailsState = Precreated,
+    providedDetailsState = providedDetailsState,
     individualName = individualName,
     isPersonOfControl = isPersonOfControl,
-    internalUserId = None
+    internalUserId =
+      if (providedDetailsState.internalUserIdProvided)
+        Some(internalUserIdGenerator.nextInternalUserId())
+      else
+        None
   )
