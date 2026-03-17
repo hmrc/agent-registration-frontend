@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData.saUtr
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.TestOnlyData.saUtr
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentAssuranceStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs

@@ -21,7 +21,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.CheckResult
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData.crn
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.TestOnlyData.crn
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CompaniesHouseStubs

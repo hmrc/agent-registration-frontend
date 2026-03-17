@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock as wm
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object ObjectStoreStubs:

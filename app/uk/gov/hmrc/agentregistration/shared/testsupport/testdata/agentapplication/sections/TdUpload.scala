@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections
+package uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication.sections
 
 import play.api.libs.json.JsObject
 import play.api.libs.json.JsValue
@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadEventDetails
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadNotificationRequest
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadStatus
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.TdBase
 
 trait TdUpload { dependencies: TdBase =>
 

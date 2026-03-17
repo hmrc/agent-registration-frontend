@@ -22,7 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.TestOnlyData
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.CheckYourAnswersPage
 
 class CheckYourAnswersPageSpec

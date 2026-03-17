@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication
+package uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication
 
 import uk.gov.hmrc.agentregistration.shared.ApplicationState.GrsDataReceived
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAgentDetails
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAmls
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionContactDetails
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.TdBase
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.TdGrs
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication.sections.TdSectionAgentDetails
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication.sections.TdSectionAmls
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication.sections.TdSectionContactDetails
 
 trait TdAgentApplicationScottishPartnership { dependencies: (TdBase & TdSectionAmls & TdSectionContactDetails & TdGrs & TdSectionAgentDetails) =>
 

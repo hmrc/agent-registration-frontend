@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections
+package uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication.sections
 
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
@@ -22,7 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.TdBase
 import uk.gov.hmrc.objectstore.client.Path
 
 import java.time.LocalDate

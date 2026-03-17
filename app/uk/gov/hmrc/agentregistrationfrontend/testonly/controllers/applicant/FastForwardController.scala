@@ -32,7 +32,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifie
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.TestOnlyData
 import uk.gov.hmrc.http.SessionKeys
 
 import java.time.Clock

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
+package uk.gov.hmrc.agentregistration.shared.testsupport.testdata
 
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement.Agreed
@@ -141,6 +141,9 @@ trait TdBase:
   def individualProvidedDetailsId: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-12345")
   def individualProvidedDetailsId2: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-22345")
   def individualProvidedDetailsId3: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-32345")
+  def individualProvidedDetailsId4: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-42345")
+  def individualProvidedDetailsId5: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-52345")
+  def individualProvidedDetailsId6: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-62345")
   def bprPrimaryTelephoneNumber: String = "(+44) 78714743399"
   def newTelephoneNumber: String = "+44 (0) 7000000000"
   def bprEmailAddress: String = "bpr@example.com"
@@ -213,6 +216,11 @@ trait TdBase:
     numberOfOfficersResponsibleForTaxMatters = 4
   )
 
+  def sixCompaniesHouseOfficersSelectAll: SixOrMoreOfficers = SixOrMoreOfficers(
+    numberOfCompaniesHouseOfficers = 6,
+    numberOfOfficersResponsibleForTaxMatters = 6
+  )
+
   val individualProvidedDetails: IndividualProvidedDetails = IndividualProvidedDetails(
     _id = individualProvidedDetailsId,
     internalUserId = None,
@@ -241,6 +249,66 @@ trait TdBase:
     providedDetailsState = ProvidedDetailsState.Precreated,
     individualName = IndividualName("Third Test Name"),
     isPersonOfControl = true
+  )
+
+  /* This is a list of individuals that we currently have stubbed in grs,
+       We need to use this list for fast forward links to ensure the names match
+       the names we get from company house */
+  val grsStubbedIndividualsBase: Seq[IndividualProvidedDetails] = Seq(
+    IndividualProvidedDetails(
+      _id = individualProvidedDetailsId,
+      individualName = IndividualName("Steve Austin"),
+      internalUserId = None,
+      agentApplicationId = agentApplicationId,
+      createdAt = nowAsInstant,
+      providedDetailsState = ProvidedDetailsState.Precreated,
+      isPersonOfControl = true
+    ),
+    IndividualProvidedDetails(
+      _id = individualProvidedDetailsId2,
+      individualName = IndividualName("Beverly Hills"),
+      internalUserId = None,
+      agentApplicationId = agentApplicationId,
+      createdAt = nowAsInstant,
+      providedDetailsState = ProvidedDetailsState.Precreated,
+      isPersonOfControl = true
+    ),
+    IndividualProvidedDetails(
+      _id = individualProvidedDetailsId3,
+      individualName = IndividualName("Pauline Austin"),
+      internalUserId = None,
+      agentApplicationId = agentApplicationId,
+      createdAt = nowAsInstant,
+      providedDetailsState = ProvidedDetailsState.Precreated,
+      isPersonOfControl = true
+    ),
+    IndividualProvidedDetails(
+      _id = individualProvidedDetailsId4,
+      individualName = IndividualName("Justine Hills"),
+      internalUserId = None,
+      agentApplicationId = agentApplicationId,
+      createdAt = nowAsInstant,
+      providedDetailsState = ProvidedDetailsState.Precreated,
+      isPersonOfControl = true
+    ),
+    IndividualProvidedDetails(
+      _id = individualProvidedDetailsId5,
+      individualName = IndividualName("Steve Palmer"),
+      internalUserId = None,
+      agentApplicationId = agentApplicationId,
+      createdAt = nowAsInstant,
+      providedDetailsState = ProvidedDetailsState.Precreated,
+      isPersonOfControl = true
+    ),
+    IndividualProvidedDetails(
+      _id = individualProvidedDetailsId6,
+      individualName = IndividualName("Sandra Hills"),
+      internalUserId = None,
+      agentApplicationId = agentApplicationId,
+      createdAt = nowAsInstant,
+      providedDetailsState = ProvidedDetailsState.Precreated,
+      isPersonOfControl = true
+    )
   )
 
   val soleTraderYetToProvideDetails: IndividualProvidedDetails = IndividualProvidedDetails(

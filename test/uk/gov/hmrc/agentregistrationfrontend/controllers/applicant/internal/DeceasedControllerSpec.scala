@@ -20,7 +20,7 @@ import play.api.libs.ws.WSResponse
 import play.api.mvc.Call
 
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData.nino
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.TestOnlyData.nino
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CitizenDetailsStub

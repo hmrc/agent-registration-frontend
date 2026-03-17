@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
+package uk.gov.hmrc.agentregistration.shared.testsupport.testdata
 
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.*
+import uk.gov.hmrc.agentregistration.shared.Crn
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication.*
 
-object TestOnlyData
+trait TestOnlyData
 extends TdBase,
   TdGrs,
   TdAgentApplicationLlp,
@@ -33,3 +34,18 @@ extends TdBase,
   agentapplication.sections.TdUpload,
   agentapplication.sections.TdSectionAmls,
   providedetails.individual.TdIndividualProvidedDetails
+
+object TestOnlyData
+extends TestOnlyData:
+
+  object llp:
+
+    val twoChOfficers: TestOnlyData =
+      new TestOnlyData:
+        val crnTwoChOfficers = Crn("22222222")
+        override def crn: Crn = crnTwoChOfficers
+
+    val sixChOfficers: TestOnlyData =
+      new TestOnlyData:
+        val crnSixChOfficers = Crn("22222226")
+        override def crn: Crn = crnSixChOfficers

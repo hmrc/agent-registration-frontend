@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication
+package uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication
 
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
@@ -24,11 +24,11 @@ import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAgentDetails
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAmls
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionContactDetails
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.TdBase
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.TdGrs
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication.sections.TdSectionAgentDetails
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication.sections.TdSectionAmls
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication.sections.TdSectionContactDetails
 
 trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAmls & TdSectionContactDetails & TdGrs & TdSectionAgentDetails) =>
 
@@ -127,7 +127,42 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
         hasOtherRelevantIndividuals = Some(false)
       )
 
+    val afterConfirmTwoOtherRelevantIndividualsNo: AgentApplicationGeneralPartnership = afterHowManyKeyIndividuals
+      .copy(
+        numberOfIndividuals = Some(
+          SixOrMore(
+            numberOfKeyIndividualsResponsibleForTaxMatters = 2
+          )
+        ),
+        hasOtherRelevantIndividuals = Some(false)
+      )
+
+    val afterConfirmTwoIndividuals: AgentApplicationGeneralPartnership = afterHowManyKeyIndividuals
+      .copy(
+        numberOfIndividuals = Some(
+          FiveOrLess(
+            numberOfKeyIndividuals = 2
+          )
+        ),
+        hasOtherRelevantIndividuals = Some(false)
+      )
+
+    val afterConfirmSixIndividuals: AgentApplicationGeneralPartnership = afterHowManyKeyIndividuals
+      .copy(
+        numberOfIndividuals = Some(
+          SixOrMore(
+            numberOfKeyIndividualsResponsibleForTaxMatters = 6
+          )
+        ),
+        hasOtherRelevantIndividuals = Some(false)
+      )
+
     val afterDeclarationSubmitted: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
+      applicationState = ApplicationState.SentForRisking,
+      submittedAt = Some(dependencies.nowAsInstant)
+    )
+
+    val afterDeclarationSubmittedAndTwoIndividualFinished: AgentApplicationGeneralPartnership = afterConfirmTwoOtherRelevantIndividualsNo.copy(
       applicationState = ApplicationState.SentForRisking,
       submittedAt = Some(dependencies.nowAsInstant)
     )

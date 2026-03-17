@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
+package uk.gov.hmrc.agentregistration.shared.testsupport.testdata
 
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationGeneralPartnership
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationLimitedCompany
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationLimitedPartnership
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationLlp
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationScottishLimitedPartnership
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.TdAgentApplicationSoleTrader
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication.TdAgentApplicationGeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication.TdAgentApplicationLimitedCompany
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication.TdAgentApplicationLimitedPartnership
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication.TdAgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication.TdAgentApplicationScottishLimitedPartnership
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication.TdAgentApplicationSoleTrader
 
 object TdAll:
 

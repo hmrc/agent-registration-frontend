@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections
+package uk.gov.hmrc.agentregistration.shared.testsupport.testdata.agentapplication.sections
 
 import com.softwaremill.quicklens.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.agentdetails.*
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.TdBase
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors.*
 
 trait TdSectionAgentDetails {

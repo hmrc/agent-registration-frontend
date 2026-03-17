@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithApplication
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.applicantcontactdetails.CheckYourAnswersPage
 
 class CheckYourAnswersPageSpec

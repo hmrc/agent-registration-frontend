@@ -35,7 +35,7 @@ import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.config.CsvLoader
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadIdGenerator
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
+import uk.gov.hmrc.agentregistration.shared.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.WireMockSupport
 
 import java.time.Clock
