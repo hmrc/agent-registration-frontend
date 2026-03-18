@@ -20,6 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock as wm
 import com.github.tomakehurst.wiremock.matching.StringValuePattern
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
+import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.Nino
@@ -90,6 +91,20 @@ object IndividualAuthStubs {
        |  "optionalCredentials": {"providerId":"cred-id-12345","providerType":"GovernmentGateway"}
        |}
        |""".stripMargin
+
+  def responseBodyAsCl50(
+    internalUserId: InternalUserId = TdAll.tdAll.internalUserId
+  ): String =
+    Json.obj(
+      "internalId" -> internalUserId.value,
+      "affinityGroup" -> "Individual",
+      "confidenceLevel" -> 50,
+      "optionalCredentials" -> Json.obj(
+        "providerId" -> "cred-id-12345",
+        "providerType" -> "GovernmentGateway"
+      ),
+      "allEnrolments" -> Json.arr()
+    ).toString
 
   def responseBodyAsIndividualWithNino(
     internalUserId: InternalUserId = TdAll.tdAll.internalUserId,

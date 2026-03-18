@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.individual.NameMatchingForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.*
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
 class NameMatchingControllerSpec
@@ -68,7 +69,7 @@ extends ControllerSpec:
       AppRoutes.providedetails.NameMatchingController.show(linkId).url
 
   s"GET $path should return 200 and render page" in:
-    AuthStubs.stubAuthoriseIndividual()
+    IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
     AgentRegistrationStubs.stubFindApplicationByLinkId(
       linkId = linkId,
       agentApplication = completeAgentApplication
@@ -83,7 +84,7 @@ extends ControllerSpec:
     response.parseBodyAsJsoupDocument.title() shouldBe "Enter your full name - Apply for an agent services account - GOV.UK"
 
   s"GET $path should redirect to the contact applicant page when there is no application for the linkId" in:
-    AuthStubs.stubAuthoriseIndividual()
+    IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
     AgentRegistrationStubs.stubFindApplicationByLinkIdNoContent(
       linkId = linkId
     )
@@ -99,7 +100,7 @@ extends ControllerSpec:
 
   s"POST $path with a matching name should send the user to the potential match confirmation page" in:
     val testIndividualName = "Test Name"
-    AuthStubs.stubAuthoriseIndividual()
+    IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
     AgentRegistrationStubs.stubFindApplicationByLinkId(
       linkId = linkId,
       agentApplication = completeAgentApplication
@@ -120,7 +121,7 @@ extends ControllerSpec:
 
   s"POST $path with an incorrectly formatted name should show the page with the correct error" in:
     val testIndividualName = ""
-    AuthStubs.stubAuthoriseIndividual()
+    IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
     AgentRegistrationStubs.stubFindApplicationByLinkId(
       linkId = linkId,
       agentApplication = completeAgentApplication
@@ -144,7 +145,7 @@ extends ControllerSpec:
 
   s"POST $path with invalid characters should return the relevant error" in:
     val testName = "Bob///Stevenson"
-    AuthStubs.stubAuthoriseIndividual()
+    IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
     AgentRegistrationStubs.stubFindApplicationByLinkId(
       linkId = linkId,
       agentApplication = completeAgentApplication
@@ -167,7 +168,7 @@ extends ControllerSpec:
 
   s"POST $path with more than 100 characters should return the correct error message" in:
     val testName = s"Bob ${"A".repeat(100)} Boson"
-    AuthStubs.stubAuthoriseIndividual()
+    IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
     AgentRegistrationStubs.stubFindApplicationByLinkId(
       linkId = linkId,
       agentApplication = completeAgentApplication
@@ -190,7 +191,7 @@ extends ControllerSpec:
 
   s"POST $path with an individuals name which has not been matched should redirect to the contact applicant page" in:
     val NotPresentName = "Bob Boson"
-    AuthStubs.stubAuthoriseIndividual()
+    IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
     AgentRegistrationStubs.stubFindApplicationByLinkId(
       linkId = linkId,
       agentApplication = completeAgentApplication

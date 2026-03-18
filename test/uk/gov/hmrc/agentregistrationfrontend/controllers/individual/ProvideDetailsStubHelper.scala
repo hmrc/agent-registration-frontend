@@ -29,9 +29,11 @@ object ProvideDetailsStubHelper:
 
   def stubAuthAndFindApplicationAndProvidedDetails(
     agentApplication: AgentApplication,
-    individualProvideDetails: IndividualProvidedDetails
+    individualProvideDetails: IndividualProvidedDetails,
+    isScr: Boolean = false
   ): StubMapping =
-    IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
+    if isScr then IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
+    else IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails), agentApplication.agentApplicationId)
     AgentRegistrationStubs.stubFindApplicationByLinkId(tdAll.linkId, agentApplication)
 
