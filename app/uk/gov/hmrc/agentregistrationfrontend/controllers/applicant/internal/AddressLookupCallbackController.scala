@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddr
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AddressLookupFrontendConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
+import uk.gov.hmrc.agentregistration.shared.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.agentdetails.AgentCorrespondenceAddressHelper
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService

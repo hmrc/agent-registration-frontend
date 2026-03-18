@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.model.agentdetails
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistration.shared.util.StringExtensions.replaceCommasWithSpaces
-import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
+import uk.gov.hmrc.agentregistration.shared.addresslookup.GetConfirmedAddressResponse
 
 object AgentCorrespondenceAddressHelper:
 

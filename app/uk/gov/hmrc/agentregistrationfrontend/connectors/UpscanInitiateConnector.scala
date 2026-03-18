@@ -21,7 +21,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector.*
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference
+import uk.gov.hmrc.agentregistration.shared.upscan.FileUploadReference
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Inject

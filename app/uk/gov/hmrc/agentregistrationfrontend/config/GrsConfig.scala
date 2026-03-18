@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.config
 
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
+import uk.gov.hmrc.agentregistration.shared.grs.JourneyId
 
 import javax.inject.Inject
 import javax.inject.Singleton

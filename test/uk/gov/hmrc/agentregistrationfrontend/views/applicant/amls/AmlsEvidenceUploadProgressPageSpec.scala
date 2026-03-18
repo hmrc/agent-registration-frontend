@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.amls
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadStatus
+import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.amls.AmlsEvidenceUploadProgressPage
 

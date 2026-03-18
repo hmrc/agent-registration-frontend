@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.*
+import uk.gov.hmrc.agentregistration.shared.upscan.*
 import uk.gov.hmrc.agentregistrationfrontend.repository.UploadRepo
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 

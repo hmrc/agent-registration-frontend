@@ -23,7 +23,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
+import uk.gov.hmrc.agentregistration.shared.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AuthStubs {
