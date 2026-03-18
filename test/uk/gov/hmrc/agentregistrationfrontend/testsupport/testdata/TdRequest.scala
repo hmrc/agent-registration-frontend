@@ -71,9 +71,10 @@ trait TdRequest {
 
     import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions.*
 
-    def requestWithAuthData: RequestWithData[DataWithAuth] = RequestWithDataCt.apply(
+    def requestWithAuthData: RequestWithData[DataWithAuthAndCl] = RequestWithDataCt.apply(
       rawRequestLoggedIn,
       (
+        dependencies.confidenceLevel250,
         dependencies.internalUserId,
         dependencies.credentials
       )
@@ -87,6 +88,7 @@ trait TdRequest {
       (
         maybeBino,
         maybeSaUtr,
+        dependencies.confidenceLevel250,
         dependencies.internalUserId,
         dependencies.credentials
       )

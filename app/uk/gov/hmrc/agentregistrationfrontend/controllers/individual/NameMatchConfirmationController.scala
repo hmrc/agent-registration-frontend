@@ -30,6 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.getIndividu
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.ConfirmNameMatchPage
+import uk.gov.hmrc.auth.core.ConfidenceLevel
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import javax.inject.Inject
@@ -44,7 +45,9 @@ class NameMatchConfirmationController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private def baseAction(linkId: LinkId): ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions
+  private def baseAction(
+    linkId: LinkId
+  ): ActionBuilderWithData[DataWithIndividualProvidedDetails] = actions
     .authorised
     .refine:
       implicit request =>
@@ -96,7 +99,8 @@ extends FrontendController(mcc, actions):
           case YesNo.Yes =>
             individualProvideDetailsService
               .claimIndividualNonCiDProvidedDetails(
-                individualProvidedDetails = request.get[IndividualProvidedDetails],
+                individualProvidedDetails = request.get[IndividualProvidedDetails]
+                  .copy(passedIv = Some(request.get[ConfidenceLevel] === ConfidenceLevel.L250)),
                 internalUserId = request.get[InternalUserId]
               )
             Future.successful(Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url))

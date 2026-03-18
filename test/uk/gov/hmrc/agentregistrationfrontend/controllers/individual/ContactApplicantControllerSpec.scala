@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
 
 class ContactApplicantControllerSpec
 extends ControllerSpec:
@@ -32,7 +32,7 @@ extends ControllerSpec:
     )
 
   s"GET $path should return 200 and render the page name matching has failed" in:
-    AuthStubs.stubAuthoriseIndividual()
+    IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK

@@ -20,6 +20,9 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.RequestHeader
+import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
+import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
@@ -30,6 +33,7 @@ import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.CitizenDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmMatchToIndividualProvidedDetailsForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
@@ -38,6 +42,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordServi
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.ConfirmMatchToIndividualProvidedDetailsPage
+import uk.gov.hmrc.auth.core.ConfidenceLevel
 
 import javax.inject.Inject
 import scala.concurrent.Future
@@ -49,7 +54,8 @@ class MatchIndividualProvidedDetailsController @Inject() (
   agentApplicationService: AgentApplicationService,
   businessPartnerRecordService: BusinessPartnerRecordService,
   individualProvideDetailsService: IndividualProvideDetailsService,
-  citizenDetailsConnector: CitizenDetailsConnector
+  citizenDetailsConnector: CitizenDetailsConnector,
+  appConfig: AppConfig
 )
 extends FrontendController(mcc, actions):
 
@@ -57,8 +63,23 @@ extends FrontendController(mcc, actions):
 
   private type DataWithMatchedIndividualProvidedDetails = IndividualProvidedDetails *: DataWithCitizenDetails
 
-  private def baseAction(linkId: LinkId): ActionBuilderWithData[DataWithMatchedIndividualProvidedDetails] = actions
+  private def baseAction(
+    linkId: LinkId,
+    fromIv: Option[Boolean]
+  ): ActionBuilderWithData[DataWithMatchedIndividualProvidedDetails] = actions
     .authorisedWithAdditionalIdentifiers
+    .refine(implicit request =>
+      fromIv match
+        case Some(_) => Future.successful(request) // we have been through IV uplift
+        case None =>
+          if
+            request.get[ConfidenceLevel] < ConfidenceLevel.L250
+          then
+            logger.warn(s"User has confidence level ${request.get[ConfidenceLevel].level}, which is below L250, redirecting to IV uplift")
+            redirectToIdentityVerification()
+          else
+            Future.successful(request)
+    )
     .refine(implicit request =>
       agentApplicationService
         .find(linkId)
@@ -99,7 +120,10 @@ extends FrontendController(mcc, actions):
           Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url) // TODO: redirect to new exit page
     )
 
-  def show(linkId: LinkId): Action[AnyContent] = baseAction(linkId)
+  def show(
+    linkId: LinkId,
+    fromIv: Option[Boolean]
+  ): Action[AnyContent] = baseAction(linkId, fromIv)
     .async:
       implicit request =>
         val agentApplication: AgentApplication = request.get
@@ -118,11 +142,15 @@ extends FrontendController(mcc, actions):
                 individualProvidedDetails = request.get[IndividualProvidedDetails],
                 entityName = optBpr.map(_.getEntityName).getOrThrowExpectedDataMissing("BPR is missing for application"),
                 businessTypeKey = businessTypeKey,
-                linkId = linkId
+                linkId = linkId,
+                fromIv = fromIv
               )
             )
 
-  def submit(linkId: LinkId): Action[AnyContent] = baseAction(linkId)
+  def submit(
+    linkId: LinkId,
+    fromIv: Option[Boolean]
+  ): Action[AnyContent] = baseAction(linkId, fromIv)
     .ensureValidForm[YesNo](
       form = ConfirmMatchToIndividualProvidedDetailsForm.form,
       resultToServeWhenFormHasErrors =
@@ -144,7 +172,8 @@ extends FrontendController(mcc, actions):
                     individualProvidedDetails = request.get[IndividualProvidedDetails],
                     entityName = optBpr.map(_.getEntityName).getOrThrowExpectedDataMissing("BPR is missing for application"), // TODO work out whether we call BPR or change to put it into application
                     businessTypeKey = businessTypeKey,
-                    linkId = linkId
+                    linkId = linkId,
+                    fromIv = fromIv
                   )
                 )
     )
@@ -154,7 +183,10 @@ extends FrontendController(mcc, actions):
         if confirmMatchToIndividualProvidedDetails.toBoolean then
           individualProvideDetailsService
             .claimIndividualProvidedDetails(
-              individualProvidedDetails = request.get[IndividualProvidedDetails],
+              individualProvidedDetails = request.get[IndividualProvidedDetails]
+                .copy(
+                  passedIv = Some(request.get[ConfidenceLevel] === ConfidenceLevel.L250)
+                ),
               internalUserId = request.get[InternalUserId],
               maybeNino = request.get[Option[Nino]],
               citizenDetails = request.get[CitizenDetails]
@@ -164,6 +196,17 @@ extends FrontendController(mcc, actions):
         else
           logger.warn(s"User does not agree with the match to IndividualProvidedDetails record ${request.get[IndividualProvidedDetails]._id} for citizen details ${request.get[CitizenDetails]} and user ${request.get[InternalUserId].value}, redirecting to generic exit page")
           Future.successful(Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url))
+
+  private def currentUrl(implicit request: RequestHeader): String = appConfig.thisFrontendBaseUrl + request.uri
+
+  private def redirectToIdentityVerification()(using request: RequestHeader): Result = Redirect(
+    uri"""${appConfig.ivUpliftUrl}?${Map(
+        "origin" -> Some("agent-registration-frontend"),
+        "confidenceLevel" -> Some(ConfidenceLevel.L250.toString),
+        "completionURL" -> Some(s"$currentUrl?fromIv=true"),
+        "failureURL" -> Some(s"$currentUrl?fromIv=true")
+      )}""".toString
+  )
 
   extension (list: List[IndividualProvidedDetails])
     private def matchCitizenDetailsName(

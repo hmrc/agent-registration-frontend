@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.action.individual
 
 import play.api.mvc.Results.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions.RequestWithData
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions.RequestWithAuth
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions.RequestWithAuthAndCl
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
 
@@ -50,6 +50,7 @@ extends ISpec:
         .tuple shouldBe (
         None,
         None,
+        tdAll.confidenceLevel250,
         tdAll.internalUserId,
         tdAll.credentials
       )
@@ -69,6 +70,7 @@ extends ISpec:
         .tuple shouldBe (
         Some(tdAll.nino),
         None,
+        tdAll.confidenceLevel250,
         tdAll.internalUserId,
         tdAll.credentials
       )
@@ -86,6 +88,7 @@ extends ISpec:
         .tuple shouldBe (
         None,
         Some(tdAll.saUtr),
+        tdAll.confidenceLevel250,
         tdAll.internalUserId,
         tdAll.credentials
       )
@@ -107,7 +110,7 @@ extends ISpec:
     "successfully authorise and enrich request with InternalUserId and Credentials" in:
       val individualAuthorisedRefiner: IndividualAuthRefiner = app.injector.instanceOf[IndividualAuthRefiner]
       IndividualAuthStubs.stubAuthorise()
-      val request: RequestWithAuth =
+      val request: RequestWithAuthAndCl =
         individualAuthorisedRefiner
           .refineIntoRequestWithAuth(tdAll.requestLoggedIn)
           .futureValue

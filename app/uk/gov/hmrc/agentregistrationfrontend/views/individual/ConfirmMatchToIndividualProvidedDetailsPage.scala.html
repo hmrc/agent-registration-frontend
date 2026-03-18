@@ -38,7 +38,8 @@
         individualProvidedDetails: IndividualProvidedDetails,
         entityName: String,
         businessTypeKey: String,
-        linkId: LinkId
+        linkId: LinkId,
+        fromIv: Option[Boolean]
 )(implicit
         request: RequestHeader,
         messages: Messages
@@ -78,7 +79,7 @@
       rows = rows
     ))
 
-    @formWithCSRF(action = AppRoutes.providedetails.MatchIndividualProvidedDetailsController.submit(linkId)) {
+    @formWithCSRF(action = AppRoutes.providedetails.MatchIndividualProvidedDetailsController.submit(linkId, fromIv)) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(

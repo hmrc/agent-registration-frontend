@@ -24,7 +24,8 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.individual.ConfirmNameMatchFo
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
 class NameMatchConfirmationControllerSpec
 extends ControllerSpec:
@@ -65,14 +66,16 @@ extends ControllerSpec:
       AppRoutes.providedetails.NameMatchConfrimationController.show(linkId).url
 
   s"GET $path should return 200 and render the name confirmation page with the matched name" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationStubs.stubFindApplicationByLinkId(
-      linkId = linkId,
-      agentApplication = completeAgentApplication
+
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
+      List(testIndividualProvidedDetails.unclaimedDetails),
+      completeAgentApplication.agentApplicationId
     )
+
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
       completeAgentApplication,
-      testIndividualProvidedDetails.unclaimedDetails
+      testIndividualProvidedDetails.unclaimedDetails,
+      isScr = true
     )
 
     val response: WSResponse = get(
@@ -85,21 +88,17 @@ extends ControllerSpec:
     response.parseBodyAsJsoupDocument.select("dl.govuk-summary-list").text() should include("Test Name")
 
   "GET $path should redirect to exit page when agent application is missing" in:
-    AuthStubs.stubAuthoriseIndividual()
+    IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
     AgentRegistrationStubs.stubFindApplicationByLinkIdNoContent(linkId)
     val response = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.genericExitPage.url
 
   s"POST $path should return 200 redirect to the check your answers page when the user agrees with the match" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationStubs.stubFindApplicationByLinkId(
-      linkId = linkId,
-      agentApplication = completeAgentApplication
-    )
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
       completeAgentApplication,
-      testIndividualProvidedDetails.unclaimedDetails
+      testIndividualProvidedDetails.unclaimedDetails,
+      isScr = true
     )
 
     val response: WSResponse =
@@ -112,14 +111,10 @@ extends ControllerSpec:
     response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url
 
   s"POST $path should return 200 redirect to enter your name page when the user does not agree with the match" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationStubs.stubFindApplicationByLinkId(
-      linkId = linkId,
-      agentApplication = completeAgentApplication
-    )
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
       completeAgentApplication,
-      testIndividualProvidedDetails.unclaimedDetails
+      testIndividualProvidedDetails.unclaimedDetails,
+      isScr = true
     )
     val response: WSResponse =
       post(
@@ -131,14 +126,10 @@ extends ControllerSpec:
     response.header("Location").value shouldBe AppRoutes.providedetails.NameMatchingController.show(linkId).url
 
   s"POST $path should return 400 bad request when the user attempts to continue without an answer" in:
-    AuthStubs.stubAuthoriseIndividual()
-    AgentRegistrationStubs.stubFindApplicationByLinkId(
-      linkId = linkId,
-      agentApplication = completeAgentApplication
-    )
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
       completeAgentApplication,
-      testIndividualProvidedDetails.unclaimedDetails
+      testIndividualProvidedDetails.unclaimedDetails,
+      isScr = true
     )
 
     val response: WSResponse =

@@ -44,5 +44,6 @@ class IndividualProvideDetailsFactory @Inject() (
     providedDetailsState = Precreated,
     individualName = individualName,
     isPersonOfControl = isPersonOfControl,
-    internalUserId = None
+    internalUserId = None,
+    passedIv = None
   )

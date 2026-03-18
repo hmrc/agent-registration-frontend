@@ -35,7 +35,8 @@ extends ViewSpec:
     individualProvidedDetails = tdAll.providedDetails.unclaimed,
     entityName = "Company Name",
     businessTypeKey = "Partnership",
-    linkId = linkId
+    linkId = linkId,
+    fromIv = None
   ).body)
   private val heading: String = "Confirm your details"
   private val yesNoLabel: String = "Are these your details?"
@@ -76,7 +77,8 @@ extends ViewSpec:
         individualProvidedDetails = tdAll.providedDetails.unclaimed,
         entityName = "Company Name",
         businessTypeKey = "Partnership",
-        linkId = linkId
+        linkId = linkId,
+        fromIv = None
       ).body),
       heading = heading
     )

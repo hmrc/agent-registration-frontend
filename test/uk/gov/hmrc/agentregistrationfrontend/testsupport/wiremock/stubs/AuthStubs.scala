@@ -54,6 +54,16 @@ object AuthStubs {
     responseBody = responseBody
   )
 
+  def stubAuthoriseCL50(
+    responseBody: String = responseBodyAsCl50()
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlMatching("/auth/authorise"),
+    requestBody = Some(expectedRequestBodyIndividual),
+    responseStatus = Status.OK,
+    responseBody = responseBody
+  )
+
   def responseBodyAsCleanAgent(
     internalUserId: InternalUserId = TdAll.tdAll.internalUserId,
     groupId: GroupId = TdAll.tdAll.groupId
@@ -89,6 +99,20 @@ object AuthStubs {
           "value" -> "AnyValue"
         ))
       ))
+    ).toString
+
+  def responseBodyAsCl50(
+    internalUserId: InternalUserId = TdAll.tdAll.internalUserId
+  ): String =
+    Json.obj(
+      "internalId" -> internalUserId.value,
+      "affinityGroup" -> "Individual",
+      "confidenceLevel" -> 50,
+      "optionalCredentials" -> Json.obj(
+        "providerId" -> "cred-id-12345",
+        "providerType" -> "GovernmentGateway"
+      ),
+      "allEnrolments" -> Json.arr()
     ).toString
 
   private val expectedRequestBodyIndividual: StringValuePattern = wm.equalToJson(
