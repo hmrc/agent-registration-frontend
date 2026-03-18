@@ -103,6 +103,13 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       )
     )
 
+    // I select 4 officers, companies house returns 6
+    val afterNumberOfConfirmCompaniesHouseOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
+      numberOfIndividuals = Some(
+        TestOnlyData.sixOrMoreCompaniesHouseOfficers
+      )
+    )
+
     val afterConfirmTwoChOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
         TestOnlyData.twoCompaniesHouseOfficers
@@ -110,16 +117,21 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       hasOtherRelevantIndividuals = Some(false)
     )
 
-    val afterNumberOfConfirmCompaniesHouseOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
+    val afterConfirmSixChOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
-        TestOnlyData.sixOrMoreCompaniesHouseOfficers
-      )
+        TestOnlyData.sixCompaniesHouseOfficersSelectAll
+      ),
+      hasOtherRelevantIndividuals = Some(false)
     )
 
     val afterConfirmCompaniesHouseOfficersNo: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
         TestOnlyData.fiveOrLessCompaniesHouseOfficers.copy(isCompaniesHouseOfficersListCorrect = false)
       )
+    )
+
+    val afterConfirmOtherRelevantTaxAdvisersNo: AgentApplicationLlp = afterConfirmCompaniesHouseOfficersYes.copy(
+      hasOtherRelevantIndividuals = Some(false)
     )
 
     val afterDeclarationSubmitted: AgentApplicationLlp = afterConfirmTwoChOfficers.copy(

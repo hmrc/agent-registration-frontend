@@ -51,7 +51,8 @@ extends ControllerSpec:
     val unclaimedDetails: IndividualProvidedDetails =
       tdAll
         .providedDetails
-        .unclaimed
+        .precreated
+
     val claimedDetails: IndividualProvidedDetails =
       tdAll
         .providedDetails

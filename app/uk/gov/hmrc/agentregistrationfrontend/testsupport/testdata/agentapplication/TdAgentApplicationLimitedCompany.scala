@@ -95,7 +95,7 @@ trait TdAgentApplicationLimitedCompany { dependencies: (TdBase & TdSectionAmls &
 
     val afterConfirmCompaniesHouseOfficersYes: AgentApplicationLimitedCompany = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
-        TestOnlyData.fiveOrLessCompaniesHouseOfficers
+        TestOnlyData.twoCompaniesHouseOfficers
       )
     )
 
@@ -107,7 +107,7 @@ trait TdAgentApplicationLimitedCompany { dependencies: (TdBase & TdSectionAmls &
 
     val afterConfirmCompaniesHouseOfficersNo: AgentApplicationLimitedCompany = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
-        TestOnlyData.fiveOrLessCompaniesHouseOfficers.copy(isCompaniesHouseOfficersListCorrect = false)
+        TestOnlyData.twoCompaniesHouseOfficers.copy(isCompaniesHouseOfficersListCorrect = false)
       )
     )
 

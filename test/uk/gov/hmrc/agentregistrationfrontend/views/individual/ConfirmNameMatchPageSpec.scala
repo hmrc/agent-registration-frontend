@@ -32,7 +32,7 @@ extends ViewSpec:
   val viewTemplate: ConfirmNameMatchPage = app.injector.instanceOf[ConfirmNameMatchPage]
   val doc: Document = Jsoup.parse(viewTemplate(
     form = ConfirmNameMatchForm.form,
-    individualProvidedDetails = tdAll.providedDetails.unclaimed,
+    individualProvidedDetails = tdAll.providedDetails.precreated,
     linkId = linkId
   ).body)
   private val heading: String = "Are these details correct?"
@@ -79,7 +79,7 @@ extends ViewSpec:
       errorMessage = errorMessage,
       errorDoc = Jsoup.parse(viewTemplate(
         form = formWithError,
-        individualProvidedDetails = tdAll.providedDetails.unclaimed,
+        individualProvidedDetails = tdAll.providedDetails.precreated,
         linkId = linkId
       ).body),
       heading = heading

@@ -16,16 +16,20 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant
 
-import org.apache.pekko.Done
 import play.api.http.Status.SEE_OTHER
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.lists.*
+import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifiers
@@ -52,7 +56,9 @@ class FastForwardController @Inject() (
   grsStubService: GrsStubService,
   applicationService: AgentApplicationService,
   agentApplicationIdGenerator: AgentApplicationIdGenerator,
-  linkIdGenerator: LinkIdGenerator
+  linkIdGenerator: LinkIdGenerator,
+  individualProvideDetailsService: IndividualProvideDetailsService,
+  agentRegistrationRiskingService: AgentRegistrationRiskingService
 )(using
   clock: Clock,
   ex: ExecutionContext
@@ -114,25 +120,76 @@ extends FrontendController(mcc, applicantActions):
     implicit request =>
       applicantAuthRefiner.refine(request).flatMap:
         case Right(authorisedRequest) => Future.successful(authorisedRequest)
-
         case Left(result) if result.header.status === SEE_OTHER => loginAndRetry
-
         case Left(result) => Future.successful(result)
 
-  private def fastForwardTo(section: CompletedSection)(using r: RequestWithAuth): Future[Done] =
-    val toAppState: AgentApplication = section.appState
+  private def fastForwardTo(section: CompletedSection)(using r: RequestWithAuth): Future[Unit] =
+    val agentApplication: AgentApplication = section.agentApplication
 
-    for {
+    for
       _ <- grsStubService.storeStubsData(
         businessType = section.businessType,
         journeyData = journeyDataFor(section.businessType),
         deceased = false
       )
-      updated <- updateIdentifiers(toAppState)
-      _ <- applicationService.upsert(updated)
-    } yield Done
+      updatedAgentApplication <- updateAgentApplication(agentApplication)
+      _ <- applicationService.upsert(updatedAgentApplication)
+      maybeCreatedIndividuals <-
+        if (section.maybeIndividualProvidedDetails.nonEmpty)
+          val createdIndividuals = createIndividuals(section, updatedAgentApplication.agentApplicationId)
+          upsertIndividuals(createdIndividuals).map: _ =>
+            Some(createdIndividuals)
+        else
+          Future.successful(None)
+      _ <-
+        if (updatedAgentApplication.applicationState.sentForRisking)
+          agentRegistrationRiskingService.submitForRisking(
+            SubmitForRiskingRequest(
+              agentApplication = updatedAgentApplication,
+              individuals = maybeCreatedIndividuals.getOrThrowExpectedDataMissing("createdIndividuals").toList
+            )
+          )
+        else
+          Future.unit
+    yield ()
 
-  private def journeyDataFor(bt: BusinessType): JourneyData =
+  private def createIndividuals(
+    section: CompletedSection,
+    applicationId: AgentApplicationId
+  ): Seq[IndividualProvidedDetails] =
+    val individualProvidedDetails = section.maybeIndividualProvidedDetails.getOrThrowExpectedDataMissing("individualProvidedDetails")
+    val howManyIndividuals: Int =
+      section.agentApplication.getNumberOfIndividuals match
+        case n: NumberOfRequiredKeyIndividuals => n.numberOfIndividuals
+        case n: NumberOfCompaniesHouseOfficers => n.numberOfCompaniesHouseOfficers
+
+    TestOnlyData.grsStubbedIndividualsBase
+      .take(howManyIndividuals)
+      .map: ipd =>
+        individualProvidedDetails.copy(
+          _id = ipd._id,
+          individualName = ipd.individualName,
+          agentApplicationId = applicationId,
+          internalUserId = ipd.internalUserId
+        )
+
+  private def upsertIndividuals(
+    createdIndividuals: Seq[IndividualProvidedDetails]
+  )(using r: RequestWithAuth): Future[Unit] =
+    createdIndividuals.foldLeft(Future.unit):
+      (
+        acc,
+        individual
+      ) =>
+        for
+          _ <- acc
+          _ <- individualProvideDetailsService.upsertForApplication(individual)
+          _ <- grsStubService.storeIndividualProvidedDetails(individual.individualName.value, Some(TestOnlyData.saUtr.asUtr))
+        yield ()
+
+  private def journeyDataFor(
+    bt: BusinessType
+  ): JourneyData =
     bt match
       case BusinessType.Partnership.LimitedLiabilityPartnership => TestOnlyData.grs.llp.journeyData
       case BusinessType.Partnership.GeneralPartnership => TestOnlyData.grs.generalPartnership.journeyData
@@ -142,7 +199,7 @@ extends FrontendController(mcc, applicantActions):
       case BusinessType.SoleTrader => TestOnlyData.grs.soleTrader.journeyData
       case BusinessType.LimitedCompany => TestOnlyData.grs.ltd.journeyData
 
-  private def updateIdentifiers(agentApplication: AgentApplication)(using
+  private def updateAgentApplication(agentApplication: AgentApplication)(using
     r: RequestWithAuth,
     clock: Clock
   ): Future[AgentApplication] =

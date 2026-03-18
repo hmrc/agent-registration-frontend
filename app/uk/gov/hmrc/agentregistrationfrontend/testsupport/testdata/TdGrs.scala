@@ -53,7 +53,7 @@ trait TdGrs {
         )
       )
 
-      val businessDetails = BusinessDetailsLlp(
+      val businessDetails: BusinessDetailsLlp = BusinessDetailsLlp(
         safeId = journeyData.registration.registeredBusinessPartnerId.getOrThrowExpectedDataMissing("registration.registeredBusinessPartnerId"),
         saUtr = journeyData.sautr.getOrThrowExpectedDataMissing("sautr"),
         companyProfile = journeyData.companyProfile.getOrThrowExpectedDataMissing("companyProfile")
