@@ -34,7 +34,7 @@ extends ControllerSpec:
 
   private object individualProvideDetails:
 
-    val unclaimed: IndividualProvidedDetails = tdAll.providedDetails.unclaimed
+    val unclaimed: IndividualProvidedDetails = tdAll.providedDetails.precreated
     val afterStarted: IndividualProvidedDetails = tdAll.providedDetails.afterStarted
 
   "routes should have correct paths and methods" in:

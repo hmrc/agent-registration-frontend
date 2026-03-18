@@ -32,7 +32,7 @@ extends ViewSpec:
   val viewTemplate: ConfirmMatchToIndividualProvidedDetailsPage = app.injector.instanceOf[ConfirmMatchToIndividualProvidedDetailsPage]
   val doc: Document = Jsoup.parse(viewTemplate(
     form = ConfirmMatchToIndividualProvidedDetailsForm.form,
-    individualProvidedDetails = tdAll.providedDetails.unclaimed,
+    individualProvidedDetails = tdAll.providedDetails.precreated,
     entityName = "Company Name",
     businessTypeKey = "Partnership",
     linkId = linkId
@@ -73,7 +73,7 @@ extends ViewSpec:
       errorMessage = errorMessage,
       errorDoc = Jsoup.parse(viewTemplate(
         form = formWithError,
-        individualProvidedDetails = tdAll.providedDetails.unclaimed,
+        individualProvidedDetails = tdAll.providedDetails.precreated,
         entityName = "Company Name",
         businessTypeKey = "Partnership",
         linkId = linkId

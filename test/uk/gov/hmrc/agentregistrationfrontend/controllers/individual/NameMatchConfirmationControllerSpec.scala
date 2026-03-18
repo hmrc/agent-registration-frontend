@@ -50,7 +50,7 @@ extends ControllerSpec:
     val unclaimedDetails: IndividualProvidedDetails =
       tdAll
         .providedDetails
-        .unclaimed
+        .precreated
 
   "NameMatchConfirmationController should have the correct routes" in:
     AppRoutes.providedetails.NameMatchConfrimationController.show(linkId) shouldBe Call(

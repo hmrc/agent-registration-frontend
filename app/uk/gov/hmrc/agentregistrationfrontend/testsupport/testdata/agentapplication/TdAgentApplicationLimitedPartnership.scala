@@ -96,7 +96,7 @@ trait TdAgentApplicationLimitedPartnership {
 
     val afterConfirmCompaniesHouseOfficersYes: AgentApplicationLimitedPartnership = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
-        TestOnlyData.fiveOrLessCompaniesHouseOfficers
+        TestOnlyData.twoCompaniesHouseOfficers
       )
     )
 
@@ -108,7 +108,7 @@ trait TdAgentApplicationLimitedPartnership {
 
     val afterConfirmCompaniesHouseOfficersNo: AgentApplicationLimitedPartnership = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
-        TestOnlyData.fiveOrLessCompaniesHouseOfficers.copy(isCompaniesHouseOfficersListCorrect = false)
+        TestOnlyData.twoCompaniesHouseOfficers.copy(isCompaniesHouseOfficersListCorrect = false)
       )
     )
 

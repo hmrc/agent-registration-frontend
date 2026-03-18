@@ -20,6 +20,7 @@ import play.api.mvc.Request
 import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
@@ -35,6 +36,15 @@ class GrsStubService @Inject() (
   agentsExternalStubsConnector: AgentsExternalStubsConnector
 )(using ExecutionContext):
 
+  def storeIndividualProvidedDetails(
+    name: String,
+    maybeUtr: Option[Utr] = None
+  )(using Request[?]): Future[Unit] = agentsExternalStubsConnector.createIndividualUser(
+    assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
+    maybeName = Some(name),
+    maybeUtr = maybeUtr
+  )
+
   def storeStubsData(
     businessType: BusinessType,
     journeyData: JourneyData,
@@ -45,7 +55,7 @@ class GrsStubService @Inject() (
       (businessType, journeyData.nino) match {
         case (SoleTrader, Some(nino: Nino)) =>
           agentsExternalStubsConnector.createIndividualUser(
-            nino = nino,
+            maybeNino = Some(nino),
             assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
             deceased = deceased
           )
