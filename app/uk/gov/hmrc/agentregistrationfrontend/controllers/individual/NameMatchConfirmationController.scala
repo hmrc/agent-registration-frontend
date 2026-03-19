@@ -58,15 +58,18 @@ extends FrontendController(mcc, actions):
             case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
     .refine:
       implicit request =>
-        val providedName: IndividualName = request.getIndividualName
         individualProvideDetailsService
           .findAllForMatchingWithApplication(request.get[AgentApplication].agentApplicationId)
-          .map: list =>
-            list
-              .filter(_.internalUserId.isEmpty)
-              .find(_.individualName === providedName) match
-              case Some(matchedIndividual) => request.add(matchedIndividual)
-              case None => Redirect(AppRoutes.providedetails.ContactApplicantController.show.url)
+          .map:
+            case list: List[IndividualProvidedDetails] if list.exists(_.internalUserId.contains(request.get[InternalUserId])) =>
+              Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url)
+            case list: List[IndividualProvidedDetails] =>
+              val maybeMatchedIndividual: Option[IndividualProvidedDetails] = list
+                .filter(_.internalUserId.isEmpty)
+                .find(_.individualName === request.getIndividualName)
+              maybeMatchedIndividual match
+                case Some(matchedIndividual) => request.add[IndividualProvidedDetails](matchedIndividual)
+                case None => Redirect(AppRoutes.providedetails.ContactApplicantController.show.url)
 
   def show(linkId: LinkId): Action[AnyContent] = baseAction(linkId).async:
     implicit request =>
@@ -104,4 +107,4 @@ extends FrontendController(mcc, actions):
                 internalUserId = request.get[InternalUserId]
               )
             Future.successful(Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url))
-          case YesNo.No => Future.successful(Redirect(AppRoutes.providedetails.NameMatchingController.show(linkId).url))
+          case YesNo.No => Future.successful(Redirect(AppRoutes.providedetails.ContactApplicantController.show.url))

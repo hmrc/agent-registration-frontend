@@ -136,4 +136,6 @@ extends RequestAwareLogging:
       individualProvidedDetails
         .modify(_.internalUserId)
         .setTo(Some(internalUserId))
+        .modify(_.providedDetailsState)
+        .setTo(ProvidedDetailsState.Started)
     )
