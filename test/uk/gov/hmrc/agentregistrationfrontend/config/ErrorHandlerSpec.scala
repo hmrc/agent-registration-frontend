@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.config
 
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
-import uk.gov.hmrc.agentregistration.shared.testdata.TdAll
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 
 class ErrorHandlerSpec
 extends ISpec:

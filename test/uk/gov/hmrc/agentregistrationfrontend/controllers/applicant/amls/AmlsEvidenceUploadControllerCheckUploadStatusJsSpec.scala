@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls
 import play.api.libs.ws.WSResponse
 import play.api.libs.ws.readableAsString
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.upscan.Upload
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
 import uk.gov.hmrc.agentregistrationfrontend.repository.UploadRepo
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -32,7 +32,7 @@ extends ControllerSpec:
 
     val afterAmlsExpiryDateProvided: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
         .afterAmlsExpiryDateProvided

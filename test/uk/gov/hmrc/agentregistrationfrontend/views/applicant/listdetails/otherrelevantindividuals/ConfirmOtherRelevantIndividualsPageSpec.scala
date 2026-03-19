@@ -32,7 +32,7 @@ extends ViewSpec:
 
   val agentApplication: AgentApplication =
     tdAll
-      .agentApplicationGeneralPartnership
+      .agentApplicationGeneralPartnershipSections
       .sectionAgentDetails
       .whenUsingExistingCompanyName
       .afterBusinessNameProvided

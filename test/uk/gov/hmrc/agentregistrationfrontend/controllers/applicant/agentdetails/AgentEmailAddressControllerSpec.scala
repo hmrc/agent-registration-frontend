@@ -48,42 +48,42 @@ extends ControllerSpec:
 
     val beforeTelephoneProvided: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterBusinessNameProvided
 
     val beforeEmailAddressProvided: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterContactTelephoneSelected
 
     val afterContactEmailAddressSelected: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterContactEmailAddressSelected
 
     val afterBprEmailAddressSelected: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterBprEmailAddressSelected
 
     val afterOtherEmailAddressSelected: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterOtherEmailAddressSelected
 
     val afterEmailAddressVerified: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterVerifiedEmailAddressSelected

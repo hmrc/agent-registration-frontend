@@ -1,5 +1,5 @@
 /*
- * Copyright 2026 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.addresslookup
+package uk.gov.hmrc.agentregistrationfrontend.model.upscan
 
-final case class Country(
-  code: String,
-  name: Option[String]
-)
+import play.api.libs.json.Format
+import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+
+/** Upscan File Reference
+  */
+final case class FileUploadReference(value: String)
+
+object FileUploadReference:
+
+  given format: Format[FileUploadReference] = JsonFormatsFactory.makeValueClassFormat

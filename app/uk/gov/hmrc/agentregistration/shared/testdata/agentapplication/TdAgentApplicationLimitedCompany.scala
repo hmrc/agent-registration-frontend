@@ -23,11 +23,8 @@ import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 import uk.gov.hmrc.agentregistration.shared.testdata.TdGrs
 import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.sections.TdSectionAgentDetails
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.sections.TdSectionAmls
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.sections.TdSectionContactDetails
 
-trait TdAgentApplicationLimitedCompany { dependencies: (TdBase & TdSectionAmls & TdSectionContactDetails & TdGrs & TdSectionAgentDetails) =>
+trait TdAgentApplicationLimitedCompany { dependencies: (TdBase & TdGrs) =>
 
   object agentApplicationLimitedCompany:
 
@@ -115,20 +112,5 @@ trait TdAgentApplicationLimitedCompany { dependencies: (TdBase & TdSectionAmls &
       applicationState = ApplicationState.SentForRisking,
       submittedAt = Some(dependencies.nowAsInstant)
     )
-
-    val baseForSectionAmls: AgentApplicationLimitedCompany = afterGrsDataReceived
-    protected val AgentApplicationLimitedCompanyWithSectionAmls = new AgentApplicationWithSectionAmls(baseForSectionAmls = baseForSectionAmls)
-    export AgentApplicationLimitedCompanyWithSectionAmls.sectionAmls
-
-    val baseForSectionContactDetails: AgentApplicationLimitedCompany = afterGrsDataReceived
-    protected val tdAgentApplicationLimitedCompanyWithSectionContactDetails =
-      new TdAgentApplicationWithSectionContactDetails(baseForSectionContactDetails = baseForSectionContactDetails)
-
-    export tdAgentApplicationLimitedCompanyWithSectionContactDetails.sectionContactDetails
-
-    protected val tdAgentApplicationLimitedCompanyWithSectionAgentDetails =
-      new TdAgentApplicationWithSectionAgentDetails(baseForSectionAgentDetails = afterContactDetailsComplete)
-
-    export tdAgentApplicationLimitedCompanyWithSectionAgentDetails.sectionAgentDetails
 
 }

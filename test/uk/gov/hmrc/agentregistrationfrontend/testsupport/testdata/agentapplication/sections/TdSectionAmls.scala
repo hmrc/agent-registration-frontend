@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.sections
+package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections
 
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.AgentApplication

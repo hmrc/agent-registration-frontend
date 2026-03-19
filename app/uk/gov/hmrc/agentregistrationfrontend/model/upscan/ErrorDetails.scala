@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.addresslookup
+package uk.gov.hmrc.agentregistrationfrontend.model.upscan
 
-final case class GetConfirmedAddressResponse(
-  lines: Seq[String],
-  postcode: Option[String],
-  country: Country
+final case class ErrorDetails(
+  failureReason: String,
+  message: String
 )

@@ -23,8 +23,8 @@ import play.api.http.HeaderNames
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
 import play.api.libs.json.Writes
-import uk.gov.hmrc.agentregistration.shared.addresslookup.Country
-import uk.gov.hmrc.agentregistration.shared.addresslookup.GetConfirmedAddressResponse
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.Country
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker

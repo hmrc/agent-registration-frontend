@@ -36,7 +36,7 @@ extends ControllerSpec:
   private val linkId = tdAll.linkId
 
   val completeAgentApplication: AgentApplication = tdAll
-    .agentApplicationLlp
+    .agentApplicationLlpSections
     .sectionContactDetails
     .afterEmailAddressVerified
     .modify(_.applicationState)

@@ -16,8 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls
 
-import uk.gov.hmrc.agentregistration.shared.upscan.Upload
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadNotificationRequest
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadNotificationRequest
 import uk.gov.hmrc.agentregistrationfrontend.repository.UploadRepo
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.http.HttpResponse

@@ -20,11 +20,8 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.ApplicationState.GrsDataReceived
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 import uk.gov.hmrc.agentregistration.shared.testdata.TdGrs
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.sections.TdSectionAgentDetails
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.sections.TdSectionAmls
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.sections.TdSectionContactDetails
 
-trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdSectionAmls & TdSectionContactDetails & TdGrs & TdSectionAgentDetails) =>
+trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdGrs) =>
 
   object agentApplicationSoleTrader:
 

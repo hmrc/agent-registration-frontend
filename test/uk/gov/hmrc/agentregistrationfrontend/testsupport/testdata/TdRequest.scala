@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.testdata
+package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import play.api.mvc.AnyContent
 import play.api.mvc.Request
@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions.EmptyData
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 
 trait TdRequest {
   dependencies: TdBase =>

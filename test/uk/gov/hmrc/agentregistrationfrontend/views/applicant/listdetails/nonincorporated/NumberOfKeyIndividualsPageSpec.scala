@@ -31,7 +31,7 @@ extends ViewSpec:
   val viewTemplate: NumberOfKeyIndividualsPage = app.injector.instanceOf[NumberOfKeyIndividualsPage]
   val agentApplication: AgentApplication =
     tdAll
-      .agentApplicationGeneralPartnership
+      .agentApplicationGeneralPartnershipSections
       .sectionAgentDetails
       .whenUsingExistingCompanyName
       .afterBusinessNameProvided

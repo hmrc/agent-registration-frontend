@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
-import uk.gov.hmrc.agentregistration.shared.testdata.TdAll
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 class RequestWithDataCtSpec

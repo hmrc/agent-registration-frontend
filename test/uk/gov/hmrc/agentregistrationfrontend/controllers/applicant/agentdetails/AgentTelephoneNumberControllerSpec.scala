@@ -32,33 +32,33 @@ extends ControllerSpec:
 
     val beforeBusinessNameProvided: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .afterContactDetailsComplete
 
     val afterBusinessNameReused: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterBusinessNameProvided
 
     val afterBprTelephoneNumberSelected: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterBprTelephoneNumberSelected
 
     val afterContactTelephoneSelected: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterContactTelephoneSelected
 
     val afterOtherTelephoneNumberProvided: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterOtherTelephoneNumberProvided

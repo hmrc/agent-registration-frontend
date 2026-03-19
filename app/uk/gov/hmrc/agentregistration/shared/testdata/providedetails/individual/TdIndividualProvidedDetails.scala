@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Prec
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Started
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 
-trait TdIndividualProvidedDetails { dependencies: (TdBase) =>
+trait TdIndividualProvidedDetails { dependencies: TdBase =>
 
   object providedDetails:
 

@@ -30,7 +30,7 @@ extends ControllerSpec:
 
     val afterAmlsExpiryDateProvided: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
         .afterAmlsExpiryDateProvided

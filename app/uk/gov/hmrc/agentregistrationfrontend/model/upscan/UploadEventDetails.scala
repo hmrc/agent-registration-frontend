@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.upscan
+package uk.gov.hmrc.agentregistrationfrontend.model.upscan
 
 import java.time.Instant
 

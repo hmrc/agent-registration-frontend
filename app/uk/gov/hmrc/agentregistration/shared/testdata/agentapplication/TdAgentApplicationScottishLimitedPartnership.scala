@@ -23,12 +23,9 @@ import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 import uk.gov.hmrc.agentregistration.shared.testdata.TdGrs
 import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.sections.TdSectionAgentDetails
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.sections.TdSectionAmls
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.sections.TdSectionContactDetails
 
 trait TdAgentApplicationScottishLimitedPartnership {
-  dependencies: (TdBase & TdSectionAmls & TdSectionContactDetails & TdGrs & TdSectionAgentDetails) =>
+  dependencies: (TdBase & TdGrs) =>
 
   object agentApplicationScottishLimitedPartnership:
 
@@ -116,20 +113,5 @@ trait TdAgentApplicationScottishLimitedPartnership {
       applicationState = ApplicationState.SentForRisking,
       submittedAt = Some(dependencies.nowAsInstant)
     )
-
-    val baseForSectionAmls: AgentApplicationScottishLimitedPartnership = afterGrsDataReceived
-    protected val AgentApplicationScottishLimitedPartnershipWithSectionAmls = new AgentApplicationWithSectionAmls(baseForSectionAmls = baseForSectionAmls)
-    export AgentApplicationScottishLimitedPartnershipWithSectionAmls.sectionAmls
-
-    val baseForSectionContactDetails: AgentApplicationScottishLimitedPartnership = afterGrsDataReceived
-    protected val tdAgentApplicationScottishLimitedPartnershipWithSectionContactDetails =
-      new TdAgentApplicationWithSectionContactDetails(baseForSectionContactDetails = baseForSectionContactDetails)
-
-    export tdAgentApplicationScottishLimitedPartnershipWithSectionContactDetails.sectionContactDetails
-
-    protected val tdAgentApplicationScottishLimitedPartnershipWithSectionAgentDetails =
-      new TdAgentApplicationWithSectionAgentDetails(baseForSectionAgentDetails = afterContactDetailsComplete)
-
-    export tdAgentApplicationScottishLimitedPartnershipWithSectionAgentDetails.sectionAgentDetails
 
 }

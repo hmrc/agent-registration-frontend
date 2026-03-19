@@ -33,14 +33,14 @@ extends ControllerSpec:
 
     val afterEmailAddressSelected: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterVerifiedEmailAddressSelected
 
     val afterOtherAddressProvided: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterOtherAddressProvided

@@ -30,10 +30,10 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistration.shared.upscan.Upload
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadIdGenerator
-import uk.gov.hmrc.agentregistration.shared.upscan.UploadStatus
-import uk.gov.hmrc.agentregistration.shared.upscan.UpscanErrorCode
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadIdGenerator
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadStatus
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UpscanErrorCode
 import uk.gov.hmrc.agentregistrationfrontend.repository.UploadRepo
 import uk.gov.hmrc.agentregistrationfrontend.services.ObjectStoreService
 import uk.gov.hmrc.agentregistrationfrontend.services.UpscanInitiateService

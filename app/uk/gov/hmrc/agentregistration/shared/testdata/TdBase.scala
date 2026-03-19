@@ -33,8 +33,6 @@ import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 import uk.gov.hmrc.agentregistration.shared.individual.*
-import uk.gov.hmrc.agentregistration.shared.addresslookup.Country
-import uk.gov.hmrc.agentregistration.shared.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole.LlpMember
 import uk.gov.hmrc.auth.core.ConfidenceLevel
@@ -161,15 +159,6 @@ trait TdBase:
     addressLine4 = None,
     postalCode = Some("AB1 2CD"),
     countryCode = "GB"
-  )
-
-  def getConfirmedAddressResponse: GetConfirmedAddressResponse = GetConfirmedAddressResponse(
-    lines = Seq("New Line 1", "New Line 2"),
-    postcode = Some("CD3 4EF"),
-    country = Country(
-      code = "GB",
-      name = Some("United Kingdom")
-    )
   )
   def llpNameQuery = CompaniesHouseNameQuery(
     firstName = "Jane",

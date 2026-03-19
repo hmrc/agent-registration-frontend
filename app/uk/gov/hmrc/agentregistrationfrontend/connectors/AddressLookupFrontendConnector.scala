@@ -18,8 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistrationfrontend.config.AddressLookupConfig
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistration.shared.addresslookup.Country
-import uk.gov.hmrc.agentregistration.shared.addresslookup.GetConfirmedAddressResponse
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.Country
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.JourneyId
 import uk.gov.hmrc.http.client.HttpClientV2
 

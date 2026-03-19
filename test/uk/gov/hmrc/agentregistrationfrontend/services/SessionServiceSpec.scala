@@ -29,7 +29,7 @@ import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
-import uk.gov.hmrc.agentregistration.shared.testdata.TdAll
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 
 class SessionServiceSpec
 extends UnitSpec:
