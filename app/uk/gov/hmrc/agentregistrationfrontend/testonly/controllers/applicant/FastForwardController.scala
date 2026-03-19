@@ -33,6 +33,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistratio
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.internalUserIdProvided
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifiers
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
@@ -183,26 +184,61 @@ extends FrontendController(mcc, applicantActions):
   )(using
     r: RequestWithAuth,
     clock: Clock
-  ): Future[List[IndividualProvidedDetails]] = Future.sequence(
-    individualProvidedDetailsList.map { ipd =>
-      val identifiers: Future[(
-        IndividualProvidedDetailsId,
-        IndividualName,
-        Option[InternalUserId]
-      )] = individualProvideDetailsService.findById(ipd.individualProvidedDetailsId).map:
-        case Some(existingIndividual) => (existingIndividual.individualProvidedDetailsId, existingIndividual.individualName, existingIndividual.internalUserId)
-        case None => (IndividualProvidedDetailsId(""), IndividualName(""), Some(internalUserIdGenerator.nextInternalUserId()))
-      identifiers.map:
-        case (id, name, internalUserId) =>
-          ipd.copy(
-            _id = id,
-            individualName = name,
-            agentApplicationId = agentApplicationId,
-            internalUserId = internalUserId,
-            createdAt = Instant.now(clock)
-          )
-    }
-  )
+  ): Future[List[IndividualProvidedDetails]] =
+    Future.traverse(individualProvidedDetailsList.zipWithIndex):
+      case (tdIndividualProvidedDetails, index) =>
+        val (stubbedId, stubbedName) = stubbedIdentityAt(index)
+        for
+          maybeExistingIpd <- individualProvideDetailsService.findById(stubbedId)
+          ipdToUpsert <- Future.successful(withResolvedIdentifiers(
+            tdIndividualProvidedDetails,
+            maybeExistingIpd,
+            stubbedId,
+            stubbedName,
+            agentApplicationId
+          ))
+        yield ipdToUpsert
+
+  private def withResolvedIdentifiers(
+    tdIndividualProvidedDetails: IndividualProvidedDetails,
+    maybeExistingIpd: Option[IndividualProvidedDetails],
+    stubbedId: IndividualProvidedDetailsId,
+    stubbedName: IndividualName,
+    agentApplicationId: AgentApplicationId
+  )(using
+    clock: Clock
+  ): IndividualProvidedDetails =
+    maybeExistingIpd match
+      case Some(existingIpd)
+          if !existingIpd.providedDetailsState.internalUserIdProvided && tdIndividualProvidedDetails.providedDetailsState.internalUserIdProvided =>
+        tdIndividualProvidedDetails.copy(
+          individualName = existingIpd.individualName,
+          agentApplicationId = existingIpd.agentApplicationId,
+          internalUserId = Some(internalUserIdGenerator.nextInternalUserId())
+        )
+      case Some(existingIpd) =>
+        tdIndividualProvidedDetails.copy(
+          individualName = existingIpd.individualName,
+          agentApplicationId = existingIpd.agentApplicationId
+        )
+      case None if tdIndividualProvidedDetails.providedDetailsState.internalUserIdProvided =>
+        tdIndividualProvidedDetails.copy(
+          _id = stubbedId,
+          individualName = stubbedName,
+          agentApplicationId = agentApplicationId,
+          internalUserId = Some(internalUserIdGenerator.nextInternalUserId()),
+          createdAt = Instant.now(clock)
+        )
+      case None =>
+        tdIndividualProvidedDetails.copy(
+          _id = stubbedId,
+          individualName = stubbedName,
+          agentApplicationId = agentApplicationId,
+          createdAt = Instant.now(clock)
+        )
+
+  private def stubbedIdentityAt(index: Int): (IndividualProvidedDetailsId, IndividualName) = TestOnlyData.grsStubbedIndividualsBaseV2.lift(index)
+    .getOrThrowExpectedDataMissing(s"No identity stubbed at index $index")
 
   private def upsertIndividuals(
     createdIndividuals: Seq[IndividualProvidedDetails]
