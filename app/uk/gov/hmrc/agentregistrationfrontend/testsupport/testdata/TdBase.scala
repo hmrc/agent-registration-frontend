@@ -348,3 +348,33 @@ trait TdBase:
     hasApprovedApplication = Some(true),
     passedIv = None
   )
+
+  val grsStubbedIndividualsBaseV2: List[(
+    IndividualProvidedDetailsId,
+    IndividualName
+  )] = List(
+    (
+      individualProvidedDetailsId,
+      IndividualName("Steve Austin")
+    ),
+    (
+      individualProvidedDetailsId2,
+      IndividualName("Beverly Hills")
+    ),
+    (
+      individualProvidedDetailsId3,
+      IndividualName("Pauline Austin")
+    ),
+    (
+      individualProvidedDetailsId4,
+      IndividualName("Justine Hills")
+    ),
+    (
+      individualProvidedDetailsId5,
+      IndividualName("Steve Palmer")
+    ),
+    (
+      individualProvidedDetailsId6,
+      IndividualName("Sandra Hills")
+    )
+  )

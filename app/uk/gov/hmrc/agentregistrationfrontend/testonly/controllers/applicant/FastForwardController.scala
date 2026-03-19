@@ -20,6 +20,7 @@ import play.api.http.Status.SEE_OTHER
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.lists.*
 import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
@@ -35,6 +36,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifiers
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
+import uk.gov.hmrc.agentregistrationfrontend.testonly.util.InternalUserIdGenerator
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
 import uk.gov.hmrc.http.SessionKeys
@@ -58,7 +60,8 @@ class FastForwardController @Inject() (
   agentApplicationIdGenerator: AgentApplicationIdGenerator,
   linkIdGenerator: LinkIdGenerator,
   individualProvideDetailsService: IndividualProvideDetailsService,
-  agentRegistrationRiskingService: AgentRegistrationRiskingService
+  agentRegistrationRiskingService: AgentRegistrationRiskingService,
+  internalUserIdGenerator: InternalUserIdGenerator
 )(using
   clock: Clock,
   ex: ExecutionContext
@@ -172,6 +175,34 @@ extends FrontendController(mcc, applicantActions):
           agentApplicationId = applicationId,
           internalUserId = ipd.internalUserId
         )
+
+  // TODO: Instead of creating individuals for upserting, this needs to check if they already exist, if they do it needs to keep the identifiers and update the ipd, if they don't it needs to create a new ipd with new identifiers
+  private def updateIndividualProvidedDetailsList(
+    individualProvidedDetailsList: List[IndividualProvidedDetails],
+    agentApplicationId: AgentApplicationId
+  )(using
+    r: RequestWithAuth,
+    clock: Clock
+  ): Future[List[IndividualProvidedDetails]] = Future.sequence(
+    individualProvidedDetailsList.map { ipd =>
+      val identifiers: Future[(
+        IndividualProvidedDetailsId,
+        IndividualName,
+        Option[InternalUserId]
+      )] = individualProvideDetailsService.findById(ipd.individualProvidedDetailsId).map:
+        case Some(existingIndividual) => (existingIndividual.individualProvidedDetailsId, existingIndividual.individualName, existingIndividual.internalUserId)
+        case None => (IndividualProvidedDetailsId(""), IndividualName(""), Some(internalUserIdGenerator.nextInternalUserId()))
+      identifiers.map:
+        case (id, name, internalUserId) =>
+          ipd.copy(
+            _id = id,
+            individualName = name,
+            agentApplicationId = agentApplicationId,
+            internalUserId = internalUserId,
+            createdAt = Instant.now(clock)
+          )
+    }
+  )
 
   private def upsertIndividuals(
     createdIndividuals: Seq[IndividualProvidedDetails]
