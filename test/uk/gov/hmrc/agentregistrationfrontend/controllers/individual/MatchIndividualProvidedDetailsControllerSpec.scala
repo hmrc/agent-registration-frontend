@@ -21,6 +21,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmMatchToIndividualProvidedDetailsForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
 
 class MatchIndividualProvidedDetailsControllerSpec
 extends ControllerSpec:
@@ -62,6 +63,26 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Confirm your details - Apply for an agent services account - GOV.UK"
+    ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
+
+  s"GET $path when user has low confidence level should redirect to Identity Verification uplift" in:
+    IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
+    val response: WSResponse = get(path)
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe "http://localhost:9938/mdtp/uplift?origin=agent-registration-frontend&confidenceLevel=250&completionURL=http://localhost:19001/agent-registration/provide-details/match-application/link-id-12345?fromIv%3Dtrue&failureURL=http://localhost:19001/agent-registration/provide-details/match-application/link-id-12345?fromIv%3Dtrue"
+    IndividualAuthStubs.verifyAuthorise()
+
+  s"GET $path when CL50 user has failed IV uplift should redirect to manual name matching page" in:
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      agentApplication,
+      individualProvideDetails.unclaimed,
+      isScr = true
+    )
+    val response: WSResponse = get(path + "?fromIv=true")
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe AppRoutes.providedetails.NameMatchingController.show(linkId).url
     ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
 
   s"POST $path with a valid choice should save data and redirect to CYA controller" in:

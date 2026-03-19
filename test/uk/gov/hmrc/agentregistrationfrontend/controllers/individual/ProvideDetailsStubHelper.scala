@@ -47,9 +47,14 @@ object ProvideDetailsStubHelper:
 
   def stubAuthAndMatchIndividualProvidedDetails(
     agentApplication: AgentApplication,
-    individualProvidedDetails: IndividualProvidedDetails
+    individualProvidedDetails: IndividualProvidedDetails,
+    isScr: Boolean = false
   ): StubMapping =
-    stubAuthAndFindApplicationAndProvidedDetails(agentApplication, individualProvidedDetails)
+    stubAuthAndFindApplicationAndProvidedDetails(
+      agentApplication,
+      individualProvidedDetails,
+      isScr
+    )
     CitizenDetailsStub.stubFindSaUtrAndDateOfBirth(
       nino = tdAll.nino,
       saUtr = tdAll.saUtr,
