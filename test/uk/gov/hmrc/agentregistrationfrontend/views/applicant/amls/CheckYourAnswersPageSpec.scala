@@ -38,14 +38,14 @@ extends ViewSpec:
 
     val completeHmrcApplication: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAmls
         .whenSupervisorBodyIsHmrc
         .complete
 
     val completeNonHmrcApplication: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
         .complete

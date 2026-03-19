@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication
+package uk.gov.hmrc.agentregistration.shared.testdata.agentapplication
 
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
@@ -24,14 +24,11 @@ import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAgentDetails
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAmls
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionContactDetails
+import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
+import uk.gov.hmrc.agentregistration.shared.testdata.TdGrs
+import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData
 
-trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionContactDetails & TdGrs & TdSectionAgentDetails) =>
+trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrs) =>
 
   object agentApplicationLlp:
 
@@ -126,20 +123,5 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       applicationState = ApplicationState.SentForRisking,
       submittedAt = Some(dependencies.nowAsInstant)
     )
-
-    val baseForSectionAmls: AgentApplicationLlp = afterGrsDataReceived
-    protected val agentApplicationLlpWithSectionAmls = new AgentApplicationWithSectionAmls(baseForSectionAmls = baseForSectionAmls)
-    export agentApplicationLlpWithSectionAmls.sectionAmls
-
-    val baseForSectionContactDetails: AgentApplicationLlp = afterGrsDataReceived
-    protected val tdAgentApplicationLlpWithSectionContactDetails =
-      new TdAgentApplicationWithSectionContactDetails(baseForSectionContactDetails = baseForSectionContactDetails)
-
-    export tdAgentApplicationLlpWithSectionContactDetails.sectionContactDetails
-
-    protected val tdAgentApplicationLlpWithSectionAgentDetails =
-      new TdAgentApplicationWithSectionAgentDetails(baseForSectionAgentDetails = afterContactDetailsComplete)
-
-    export tdAgentApplicationLlpWithSectionAgentDetails.sectionAgentDetails
 
 }

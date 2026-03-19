@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
+import uk.gov.hmrc.agentregistration.shared.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
@@ -32,7 +32,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifie
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
+import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData
 import uk.gov.hmrc.http.SessionKeys
 
 import java.time.Clock

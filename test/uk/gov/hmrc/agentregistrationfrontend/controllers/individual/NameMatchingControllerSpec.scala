@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistrationfrontend.forms.individual.NameMatchingForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData.*
+import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
@@ -36,7 +36,7 @@ extends ControllerSpec:
   private val linkId = tdAll.linkId
 
   val completeAgentApplication: AgentApplication = tdAll
-    .agentApplicationLlp
+    .agentApplicationLlpSections
     .sectionContactDetails
     .afterEmailAddressVerified
     .modify(_.applicationState)

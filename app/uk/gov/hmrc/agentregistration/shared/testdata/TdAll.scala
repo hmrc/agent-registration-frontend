@@ -14,11 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
+package uk.gov.hmrc.agentregistration.shared.testdata
 
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.*
+import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.*
 
-object TestOnlyData
+// Marker trait for section test data. Extend with concrete section implementations.
+// noinspection ScalaUnusedSymbol
+trait TdSections:
+  this: TdBase =>
+
+trait TestOnlyData
 extends TdBase,
   TdGrs,
   TdAgentApplicationLlp,
@@ -28,8 +33,7 @@ extends TdBase,
   TdAgentApplicationLimitedCompany,
   TdAgentApplicationLimitedPartnership,
   TdAgentApplicationScottishLimitedPartnership,
-  agentapplication.sections.TdSectionContactDetails,
-  agentapplication.sections.TdSectionAgentDetails,
-  agentapplication.sections.TdUpload,
-  agentapplication.sections.TdSectionAmls,
   providedetails.individual.TdIndividualProvidedDetails
+
+object TestOnlyData
+extends TestOnlyData

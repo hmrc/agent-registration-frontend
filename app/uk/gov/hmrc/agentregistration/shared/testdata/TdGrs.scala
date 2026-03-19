@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
+package uk.gov.hmrc.agentregistration.shared.testdata
 
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLimitedCompany
@@ -23,8 +23,11 @@ import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsPartn
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsSoleTrader
 import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
+import uk.gov.hmrc.agentregistration.shared.grs.JourneyData
+import uk.gov.hmrc.agentregistration.shared.grs.JourneyId
+import uk.gov.hmrc.agentregistration.shared.grs.Registration
+import uk.gov.hmrc.agentregistration.shared.grs.RegistrationStatus
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.*
 
 import java.time.LocalDate
 

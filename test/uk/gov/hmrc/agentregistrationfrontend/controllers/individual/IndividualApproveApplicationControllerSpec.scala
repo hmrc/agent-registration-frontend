@@ -32,7 +32,7 @@ extends ControllerSpec:
 
   val applicationInProgress: AgentApplication =
     tdAll
-      .agentApplicationLlp
+      .agentApplicationLlpSections
       .sectionAgentDetails
       .whenUsingExistingCompanyName
       .afterContactTelephoneSelected

@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.grs
+package uk.gov.hmrc.agentregistration.shared.grs
 
 import play.api.libs.json.Format
-import play.api.mvc.QueryStringBindable
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
-import uk.gov.hmrc.agentregistrationfrontend.util.ValueClassBinder
 
 /** Journey id for use in the Generic Registration Service (GRS) integrated frontend journey
   */
@@ -28,7 +26,3 @@ final case class JourneyId(value: String)
 object JourneyId:
 
   given Format[JourneyId] = JsonFormatsFactory.makeValueClassFormat
-
-  /** Allows JourneyId final case class to be used as a query parameter in routes and controllers
-    */
-  given QueryStringBindable[JourneyId] = ValueClassBinder.queryStringValueBinder(_.value)

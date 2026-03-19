@@ -25,8 +25,8 @@ import uk.gov.hmrc.agentregistrationfrontend.config.GrsConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.GrsConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyConfig
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
+import uk.gov.hmrc.agentregistration.shared.grs.JourneyData
+import uk.gov.hmrc.agentregistration.shared.grs.JourneyId
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyLabels
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyStartUrl
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.TranslationLabels

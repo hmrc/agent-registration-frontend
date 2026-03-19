@@ -32,28 +32,28 @@ extends ControllerSpec:
 
     val hmrcAfterSupervisoryBodySelected: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAmls
         .whenSupervisorBodyIsHmrc
         .afterSupervisoryBodySelected
 
     val hmrcAfterRegistrationNumberProvided: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAmls
         .whenSupervisorBodyIsHmrc
         .afterRegistrationNumberProvided
 
     val nonHmrcAfterSupervisoryBodySelected: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
         .afterSupervisoryBodySelected
 
     val nonHmrcAfterRegistrationNumberProvided: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
         .afterRegistrationNumberProvided

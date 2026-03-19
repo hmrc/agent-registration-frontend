@@ -16,16 +16,23 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions.RequestWithData
-import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithApplication
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.Country
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.*
 
-trait TdAgentApplicationRequest {
-  dependencies: (TdBase & TdRequest) =>
+trait TdAllSections
+extends TdSectionContactDetails,
+  TdSectionAgentDetails,
+  TdUpload,
+  TdSectionAmls:
+  this: TdBase =>
 
-  def makeAgentApplicationRequest(
-    agentApplication: AgentApplication
-  ): RequestWithData[DataWithApplication] = dependencies.ApplicantRequests.requestWithAuthData.add(agentApplication)
-
-}
+  def getConfirmedAddressResponse: GetConfirmedAddressResponse = GetConfirmedAddressResponse(
+    lines = Seq("New Line 1", "New Line 2"),
+    postcode = Some("CD3 4EF"),
+    country = Country(
+      code = "GB",
+      name = Some("United Kingdom")
+    )
+  )

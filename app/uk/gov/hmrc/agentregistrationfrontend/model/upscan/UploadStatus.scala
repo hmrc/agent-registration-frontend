@@ -20,11 +20,11 @@ import play.api.libs.json.Json
 import play.api.libs.json.JsonConfiguration
 import play.api.libs.json.OFormat
 import sttp.model.Uri
-import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
+import uk.gov.hmrc.agentregistration.shared.util.UriFormat
 
 import scala.annotation.nowarn
-import uk.gov.hmrc.agentregistration.shared.util.UriFormat
 
 sealed trait UploadStatus
 

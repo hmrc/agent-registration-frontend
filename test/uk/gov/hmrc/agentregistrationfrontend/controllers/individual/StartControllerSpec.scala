@@ -38,7 +38,7 @@ extends ControllerSpec:
 
     val inComplete: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionContactDetails
         .afterEmailAddressVerified
     val complete: AgentApplication = inComplete

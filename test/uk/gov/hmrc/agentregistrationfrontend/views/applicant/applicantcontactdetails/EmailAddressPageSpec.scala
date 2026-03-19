@@ -35,7 +35,7 @@ extends ViewSpec:
 
     val beforeEmailAddressProvided: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionContactDetails
         .afterTelephoneNumberProvided
 

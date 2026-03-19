@@ -45,7 +45,7 @@ extends ControllerSpec:
     expectedRedirect: Option[String] = None
   )
 
-  private val sectionAmls = tdAll.agentApplicationLlp.sectionAmls
+  private val sectionAmls = tdAll.agentApplicationLlpSections.sectionAmls
 
   List(
     TestCaseForCya(

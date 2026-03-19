@@ -21,7 +21,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
+import uk.gov.hmrc.agentregistration.shared.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.*
 

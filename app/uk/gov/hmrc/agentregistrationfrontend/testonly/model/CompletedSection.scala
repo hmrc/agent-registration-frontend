@@ -21,7 +21,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.util.PathBindableFactory
 import uk.gov.hmrc.agentregistration.shared.util.SealedObjects
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
+import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData
 
 sealed trait CompletedSection:
 

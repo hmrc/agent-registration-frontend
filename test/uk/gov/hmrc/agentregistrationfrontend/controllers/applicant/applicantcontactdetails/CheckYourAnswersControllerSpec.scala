@@ -37,31 +37,31 @@ extends ControllerSpec:
 
     val complete: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionContactDetails
         .afterEmailAddressVerified
 
     val missingVerifiedEmail: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionContactDetails
         .afterEmailAddressProvided
 
     val missingEmail: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionContactDetails
         .afterTelephoneNumberProvided
 
     val missingTelephone: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionContactDetails
         .afterNameDeclared
 
     val noContactDetails: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .afterGrsDataReceived
 
   private final case class TestCaseForCya(
