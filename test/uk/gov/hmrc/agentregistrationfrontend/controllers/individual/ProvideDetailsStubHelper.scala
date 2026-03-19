@@ -40,9 +40,14 @@ object ProvideDetailsStubHelper:
   def stubAuthAndUpdateProvidedDetails(
     agentApplication: AgentApplication,
     individualProvidedDetails: IndividualProvidedDetails,
-    updatedIndividualProvidedDetails: IndividualProvidedDetails
+    updatedIndividualProvidedDetails: IndividualProvidedDetails,
+    isScr: Boolean = false
   ): StubMapping =
-    stubAuthAndFindApplicationAndProvidedDetails(agentApplication, individualProvidedDetails)
+    stubAuthAndFindApplicationAndProvidedDetails(
+      agentApplication,
+      individualProvidedDetails,
+      isScr
+    )
     AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(updatedIndividualProvidedDetails)
 
   def stubAuthAndMatchIndividualProvidedDetails(

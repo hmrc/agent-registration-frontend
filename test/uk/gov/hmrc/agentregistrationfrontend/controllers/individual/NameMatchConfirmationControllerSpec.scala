@@ -25,7 +25,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
 class NameMatchConfirmationControllerSpec
 extends ControllerSpec:
@@ -48,10 +47,15 @@ extends ControllerSpec:
   )
 
   object testIndividualProvidedDetails:
+
     val unclaimedDetails: IndividualProvidedDetails =
       tdAll
         .providedDetails
         .unclaimed
+    val claimedDetails: IndividualProvidedDetails =
+      tdAll
+        .providedDetails
+        .afterStarted
 
   "NameMatchConfirmationController should have the correct routes" in:
     AppRoutes.providedetails.NameMatchConfrimationController.show(linkId) shouldBe Call(
@@ -66,11 +70,6 @@ extends ControllerSpec:
       AppRoutes.providedetails.NameMatchConfrimationController.show(linkId).url
 
   s"GET $path should return 200 and render the name confirmation page with the matched name" in:
-
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
-      List(testIndividualProvidedDetails.unclaimedDetails),
-      completeAgentApplication.agentApplicationId
-    )
 
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
       completeAgentApplication,
@@ -87,17 +86,43 @@ extends ControllerSpec:
     response.parseBodyAsJsoupDocument.title() shouldBe "Are these details correct? - Apply for an agent services account - GOV.UK"
     response.parseBodyAsJsoupDocument.select("dl.govuk-summary-list").text() should include("Test Name")
 
-  "GET $path should redirect to exit page when agent application is missing" in:
+  s"GET $path should redirect to CYA controller when user has already matched a record" in:
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      completeAgentApplication,
+      testIndividualProvidedDetails.claimedDetails,
+      isScr = true
+    )
+    val response = get(path)
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url
+    ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
+
+  s"GET $path should redirect to exit page when agent application is missing" in:
     IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
     AgentRegistrationStubs.stubFindApplicationByLinkIdNoContent(linkId)
     val response = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.genericExitPage.url
 
-  s"POST $path should return 200 redirect to the check your answers page when the user agrees with the match" in:
+  s"POST $path should redirect to CYA controller when user has already matched a record" in:
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
       completeAgentApplication,
+      testIndividualProvidedDetails.claimedDetails,
+      isScr = true
+    )
+    val response: WSResponse =
+      post(
+        uri = path,
+        cookies = addIndividualNameToSession(individualName = testName).extractCookies
+      )(Map(ConfirmNameMatchForm.key -> Seq(YesNo.Yes.toString)))
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url
+
+  s"POST $path should redirect to the check your answers page when the user agrees with the match" in:
+    ProvideDetailsStubHelper.stubAuthAndUpdateProvidedDetails(
+      completeAgentApplication,
       testIndividualProvidedDetails.unclaimedDetails,
+      testIndividualProvidedDetails.claimedDetails,
       isScr = true
     )
 
@@ -110,7 +135,7 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url
 
-  s"POST $path should return 200 redirect to enter your name page when the user does not agree with the match" in:
+  s"POST $path should return 200 redirect to contact applicant when the match is not agreed with" in:
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
       completeAgentApplication,
       testIndividualProvidedDetails.unclaimedDetails,
@@ -123,7 +148,7 @@ extends ControllerSpec:
       )(Map(ConfirmNameMatchForm.key -> Seq(YesNo.No.toString)))
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe AppRoutes.providedetails.NameMatchingController.show(linkId).url
+    response.header("Location").value shouldBe AppRoutes.providedetails.ContactApplicantController.show.url
 
   s"POST $path should return 400 bad request when the user attempts to continue without an answer" in:
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(

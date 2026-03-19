@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
@@ -60,8 +61,10 @@ extends FrontendController(mcc, actions):
       implicit request =>
         individualProvideDetailsService
           .findAllForMatchingWithApplication(request.get[AgentApplication].agentApplicationId)
-          .map: listOfIndividuals =>
-            request.add[List[IndividualProvidedDetails]](listOfIndividuals)
+          .map:
+            case list: List[IndividualProvidedDetails] if list.exists(_.internalUserId.contains(request.get[InternalUserId])) =>
+              Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url)
+            case list: List[IndividualProvidedDetails] => request.add[List[IndividualProvidedDetails]](list)
 
   def show(
     linkId: LinkId

@@ -83,6 +83,18 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Enter your full name - Apply for an agent services account - GOV.UK"
 
+  s"GET $path should redirect to CYA when the user has already been matched to a record" in:
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      agentApplication = completeAgentApplication,
+      individualProvideDetails = providedDetails.providedDetails,
+      isScr = true
+    )
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe Constants.EMPTY_STRING
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url
+
   s"GET $path should redirect to the contact applicant page when there is no application for the linkId" in:
     IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
     AgentRegistrationStubs.stubFindApplicationByLinkIdNoContent(
