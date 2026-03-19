@@ -99,15 +99,18 @@ extends FrontendController(mcc, actions):
           case list: List[IndividualProvidedDetails] => request.add[List[IndividualProvidedDetails]](list)
     )
     .refine(implicit request =>
-      request.get[Option[Nino]] match
-        case None =>
-          logger.warn("No NINO found in session, cannot match to citizen details, redirecting to manual name matching page")
-          Future.successful(Redirect(AppRoutes.providedetails.NameMatchingController.show(linkId).url))
-        case Some(nino) =>
+      (request.get[ConfidenceLevel], request.get[Option[Nino]]) match
+        case (ConfidenceLevel.L250, Some(nino)) =>
           citizenDetailsConnector
             .getCitizenDetails(nino)
             .map[RequestWithData[DataWithCitizenDetails]]: details =>
-              request.add(details)
+              request.add[CitizenDetails](details)
+        case (cl, Some(nino)) =>
+          logger.warn(s"Insufficient confidence level found in session (${cl}), we cannot trust the nino to use in citizen details, redirecting to manual name matching page")
+          Future.successful(Redirect(AppRoutes.providedetails.NameMatchingController.show(linkId).url))
+        case (_, None) =>
+          logger.warn("No NINO found in session, cannot match to citizen details, redirecting to manual name matching page")
+          Future.successful(Redirect(AppRoutes.providedetails.NameMatchingController.show(linkId).url))
     )
     .refine(implicit request =>
       val list: List[IndividualProvidedDetails] = request.get
@@ -116,8 +119,8 @@ extends FrontendController(mcc, actions):
       listOfUnclaimedIndividualProvidedDetails.matchCitizenDetailsName(citizenDetails) match
         case Some(individualProvidedDetails) => request.add(individualProvidedDetails)
         case None =>
-          logger.warn("No matching IndividualProvidedDetails record found for citizen details, redirecting to dedicated exit page")
-          Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url) // TODO: redirect to new exit page
+          logger.warn(s"No matching IndividualProvidedDetails record found for citizen details, redirecting to contact applicant page")
+          Redirect(AppRoutes.providedetails.ContactApplicantController.show.url)
     )
 
   def show(
