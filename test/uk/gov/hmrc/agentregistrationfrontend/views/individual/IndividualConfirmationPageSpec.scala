@@ -28,8 +28,8 @@ extends ViewSpec:
   val doc: Document = Jsoup.parse(
     viewTemplate(
       applicantName = "Test Applicant",
-      entityName = "Test Company Name",
-      isSoleTrader = false
+      entityName = "Test Company",
+      isSoleTraderOwner = false
     ).body
   )
 
@@ -37,7 +37,7 @@ extends ViewSpec:
     viewTemplate(
       applicantName = "ST Name ST Surname",
       entityName = "ST Name ST Surname",
-      isSoleTrader = true
+      isSoleTraderOwner = true
     ).body
   )
 
@@ -48,10 +48,9 @@ extends ViewSpec:
         """
           |You have finished this process
           |What happens next
-          |We need to collect information for all members of Test Company Name.
-          |When we have the information we need, we’ll automatically submit the application and begin our checks.
-          |If we need any further information from you, we will contact you by email or telephone.
+          |Your information has been added to Test Company’s application for an agent services account. Once the application has been submitted we’ll begin our checks.
           |When we have finished our checks, we’ll email Test Applicant with a decision about the application.
+          |If we need any further information from you, we will contact you by email or telephone.
           |Finish and sign out
           |Is this page not working properly? (opens in new tab)
           |"""

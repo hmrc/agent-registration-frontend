@@ -23,6 +23,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
@@ -79,9 +80,9 @@ extends FrontendController(mcc, actions):
     )
     .ensure(
       // we have all the answers complete
-      // but only show the CYA page if not sole trader
+      // but only show the CYA page if not sole trader owner
       // as sole trader answers were copied in from the application
-      !_.get[AgentApplication].isSoleTrader,
+      !_.get[AgentApplication].isSoleTraderOwner,
       implicit request =>
         individualProvideDetailsService.upsert(
           request.get[IndividualProvidedDetails]
@@ -110,7 +111,7 @@ extends FrontendController(mcc, actions):
           Redirect(AppRoutes.providedetails.IndividualConfirmationController.show(linkId))
 
   extension (agentApplication: AgentApplication)
-    def isSoleTrader: Boolean =
+    def isSoleTraderOwner: Boolean =
       agentApplication match
-        case _: AgentApplication.IsSoleTrader => true
+        case a: AgentApplicationSoleTrader => a.isOwner
         case _ => false

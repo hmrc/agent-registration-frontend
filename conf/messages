@@ -318,6 +318,19 @@ soleTraderIdentity.p1 = You are currently signed in as an agent.
 soleTraderIdentity.p2 = We need you to sign in using the details you created for your personal taxes, not the details you use to act as an agent.
 soleTraderIdentity.p3 = If you do not have personal sign in details, you can create some.
 
+# Sole trader respresentative
+askOwnerToProveIdentity.caption = Ask the business owner to sign in
+askOwnerToProveIdentity.title = Share this link with the business owner
+askOwnerToProveIdentity.p1 = The business owner needs to sign in to confirm their identity.
+askOwnerToProveIdentity.p2 = We need them to use the link to sign in.
+askOwnerToProveIdentity.important.h2 = Important to know
+askOwnerToProveIdentity.important.p1 = They should use sign in details for their personal taxes, not their business taxes. If they do not have personal sign in details, they can create some.
+askOwnerToProveIdentity.important.p2 = We’ll also ask them to provide some personal information, including:
+askOwnerToProveIdentity.important.li1 = name, date of birth, telephone number and email address
+askOwnerToProveIdentity.important.li2 = National Insurance number
+askOwnerToProveIdentity.important.li3 = Self Assessment Unique Taxpayer Reference
+askOwnerToProveIdentity.important.p3 = Select ‘Confirm and continue’ when you have shared the link.
+
 # Lists
 lists.caption.title.Partnership = Partners and other relevant tax advisers
 lists.caption.title.LimitedCompany = Directors and other tax adviser information
@@ -436,6 +449,7 @@ link.p3 = Select ‘Confirm and continue’ when you have shared the link with e
 listProgress.caption = Check who has provided their details
 
 listProgress.title = HMRC needs information from everyone on this list
+listProgress.title.SoleTraderRepresentative = HMRC needs information from the business owner
 listProgress.h2 = Awaiting details for {0} of {1} people
 listProgress.th.name = Name
 listProgress.th.detailsProvided = Details provided
@@ -551,7 +565,10 @@ taskList.lists.share.linkText.LimitedCompany = Ask the directors and tax adviser
 taskList.lists.share.linkText.LimitedLiabilityPartnership = Ask the LLP members and tax advisers to sign in
 taskList.lists.tracking.linkText = Check who has provided their details
 taskList.soleTraderId.heading = Confirm who you are
-taskList.soleTraderId.linkText.SoleTrader = Prove your identity
+taskList.soleTraderId.linkText = Prove your identity
+taskList.soleTraderRepresentative.heading = Get the business owner to support this application
+taskList.soleTraderRepresentative.linkText = Ask the business owner to sign in
+taskList.soleTraderRepresentative.tracking.linkText = Check if they have provided their details
 taskList.declaration.heading = Review and submit application
 taskList.declaration.linkText = Declare and submit
 
@@ -694,11 +711,10 @@ individualDetailsCheckYourAnswers.dateOfBirth.label = Date of birth
 individualConfirmation.title = You have finished this process
 individualConfirmation.title.SoleTrader = You have proven your identity
 individualConfirmation.whatNext.h2 = What happens next
-individualConfirmation.whatNext.p1 = We need to collect information for all members of {0}.
+individualConfirmation.whatNext.p1 = Your information has been added to {0}’s application for an agent services account. Once the application has been submitted we’ll begin our checks.
 individualConfirmation.p1.SoleTrader = You have proven your identity, you can now use your agent credentials to sign back into your application and continue the application process.
-individualConfirmation.whatNext.p2 = When we have the information we need, we’ll automatically submit the application and begin our checks.
+individualConfirmation.whatNext.p2 = When we have finished our checks, we’ll email {0} with a decision about the application.
 individualConfirmation.whatNext.p3 = If we need any further information from you, we will contact you by email or telephone.
-individualConfirmation.whatNext.p4 = When we have finished our checks, we’ll email {0} with a decision about the application.
 individualConfirmation.signOutLink = Finish and sign out
 individualConfirmation.signOutToTaskListLink = Sign back into your application
 

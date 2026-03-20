@@ -94,6 +94,9 @@ POST        /apply/agent-standard/accept-agent-standard             uk.gov.hmrc.
 GET         /apply/list-details/check-your-answers                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.CheckYourAnswersController.show
 
 GET         /apply/list-details/sole-trader                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.soletrader.ProveIdentityController.show
+GET         /apply/list-details/ask-sole-trader                     uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.soletrader.AskOwnerToProveIdentityController.show
+POST        /apply/list-details/ask-sole-trader                     uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.soletrader.AskOwnerToProveIdentityController.submit
+
 # Lists of key individuals
 GET         /apply/list-details/how-many-key-individuals            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.NumberOfKeyIndividualsController.show
 POST        /apply/list-details/how-many-key-individuals            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.NumberOfKeyIndividualsController.submit

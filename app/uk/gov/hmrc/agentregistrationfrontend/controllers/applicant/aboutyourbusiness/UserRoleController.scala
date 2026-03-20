@@ -20,7 +20,6 @@ import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.BusinessType.SoleTrader
 import uk.gov.hmrc.agentregistration.shared.UserRole
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.UserRoleForm
@@ -49,11 +48,7 @@ extends FrontendController(mcc, actions):
     actions.action
       .ensureValidForm(UserRoleForm.form, implicit request => view(_, userRoleOptionForBusinessType(request.getBusinessType))):
         implicit request =>
-          val userRole: UserRole = request.get
-          // TODO: currently no support for non-business owners on the sole trader journey, but there will be once designed
-          if request.getBusinessType === SoleTrader && userRole === UserRole.Authorised
-          then Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage).addToSession(userRole)
-          else Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show.url).addToSession(userRole)
+          Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show.url).addToSession(request.get[UserRole])
 
   private def userRoleOptionForBusinessType(
     businessType: BusinessType

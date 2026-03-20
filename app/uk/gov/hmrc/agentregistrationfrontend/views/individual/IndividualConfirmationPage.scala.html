@@ -27,7 +27,7 @@
 @(
         applicantName: String,
         entityName: String,
-        isSoleTrader: Boolean)(implicit
+        isSoleTraderOwner: Boolean)(implicit
         request: RequestHeader,
         messages: Messages
 )
@@ -36,7 +36,7 @@
     "individualConfirmation"
 }
 @pageTitle = @{
-    if(isSoleTrader) messages(s"$key.title.SoleTrader") else messages(s"$key.title")
+    if(isSoleTraderOwner) messages(s"$key.title.SoleTrader") else messages(s"$key.title")
 }
 @signOutLink = @{
   s"${appConfig.basFrontendSignOutUrlBase}?continueUrl=feedback/AGENT_REG_IND_DETAILS"
@@ -51,7 +51,7 @@
         title = Text(pageTitle)
     ))
 
-  @if(isSoleTrader) {
+  @if(isSoleTraderOwner) {
     <p class="govuk-body">@{
         messages(s"$key.p1.SoleTrader")
     }
@@ -70,22 +70,17 @@
     </h2>
     <p class="govuk-body">
     @{
-        messages(s"$key.whatNext.p1", entityName)
+      messages(s"$key.whatNext.p1", entityName)
     }
     </p>
     <p class="govuk-body">
     @{
-        messages(s"$key.whatNext.p2")
+        messages(s"$key.whatNext.p2", applicantName)
     }
     </p>
     <p class="govuk-body">
     @{
-        messages(s"$key.whatNext.p3")
-    }
-    </p>
-    <p class="govuk-body">
-    @{
-        messages(s"$key.whatNext.p4", applicantName)
+      messages(s"$key.whatNext.p3")
     }
     </p>
     <p class="govuk-body govuk-!-display-none-print">

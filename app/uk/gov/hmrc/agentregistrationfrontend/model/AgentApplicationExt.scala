@@ -53,8 +53,9 @@ extension (agentApplication: AgentApplication)
         && existingList.forall(_.hasFinished)
     // any state other than Precreated indicates the link has been sent; require the list to be non-empty
     val listSharingComplete =
-      listDetailsCompleted(existingList) &&
-        existingList.forall(_.providedDetailsState =!= ProvidedDetailsState.Precreated)
+      existingList.nonEmpty
+        && listDetailsCompleted(existingList)
+        && existingList.forall(_.providedDetailsState =!= ProvidedDetailsState.Precreated)
     TaskListStatus(
       contactDetails = TaskStatus(
         canStart = true, // Contact details can be started at any time
