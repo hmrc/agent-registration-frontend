@@ -35,6 +35,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.internalUserIdProvided
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifiers
+import uk.gov.hmrc.agentregistrationfrontend.testonly.services.CompaniesHouseIndividualService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.util.InternalUserIdGenerator
@@ -62,7 +63,8 @@ class FastForwardController @Inject() (
   linkIdGenerator: LinkIdGenerator,
   individualProvideDetailsService: IndividualProvideDetailsService,
   agentRegistrationRiskingService: AgentRegistrationRiskingService,
-  internalUserIdGenerator: InternalUserIdGenerator
+  internalUserIdGenerator: InternalUserIdGenerator,
+  companiesHouseIndividualService: CompaniesHouseIndividualService
 )(using
   clock: Clock,
   ex: ExecutionContext
@@ -251,7 +253,7 @@ extends FrontendController(mcc, applicantActions):
         for
           _ <- acc
           _ <- individualProvideDetailsService.upsertForApplication(individual)
-          _ <- grsStubService.storeIndividualProvidedDetails(individual.individualName.value, Some(TestOnlyData.saUtr.asUtr))
+          _ <- companiesHouseIndividualService.storeIndividualProvidedDetails(individual.individualName.value, Some(TestOnlyData.saUtr.asUtr))
         yield ()
 
   private def journeyDataFor(
