@@ -156,34 +156,13 @@ extends FrontendController(mcc, applicantActions):
           agentRegistrationRiskingService.submitForRisking(
             SubmitForRiskingRequest(
               agentApplication = updatedAgentApplication,
-              individuals = maybeCreatedIndividuals.getOrThrowExpectedDataMissing("createdIndividuals").toList
+              individuals = maybeCreatedIndividuals.getOrThrowExpectedDataMissing("createdIndividuals")
             )
           )
         else
           Future.unit
     yield ()
 
-  private def createIndividuals(
-    section: CompletedSection,
-    applicationId: AgentApplicationId
-  ): Seq[IndividualProvidedDetails] =
-    val individualProvidedDetails = section.maybeIndividualProvidedDetails.getOrThrowExpectedDataMissing("individualProvidedDetails")
-    val howManyIndividuals: Int =
-      section.agentApplication.getNumberOfIndividuals match
-        case n: NumberOfRequiredKeyIndividuals => n.numberOfIndividuals
-        case n: NumberOfCompaniesHouseOfficers => n.numberOfCompaniesHouseOfficers
-
-    TestOnlyData.grsStubbedIndividualsBase
-      .take(howManyIndividuals)
-      .map: ipd =>
-        individualProvidedDetails.copy(
-          _id = ipd._id,
-          individualName = ipd.individualName,
-          agentApplicationId = applicationId,
-          internalUserId = ipd.internalUserId
-        )
-
-  // TODO: Instead of creating individuals for upserting, this needs to check if they already exist, if they do it needs to keep the identifiers and update the ipd, if they don't it needs to create a new ipd with new identifiers
   private def updateIndividualProvidedDetailsList(
     individualProvidedDetailsList: List[IndividualProvidedDetails],
     agentApplicationId: AgentApplicationId
@@ -196,7 +175,7 @@ extends FrontendController(mcc, applicantActions):
         val (stubbedId, stubbedName) = stubbedIdentityAt(index)
         for
           maybeExistingIpd <- individualProvideDetailsService.findById(stubbedId)
-          ipdToUpsert <- Future.successful(withResolvedIdentifiers(
+          ipdToUpsert <- Future.successful(ipdWithResolvedIdentifiers(
             tdIndividualProvidedDetails,
             maybeExistingIpd,
             stubbedId,
@@ -205,7 +184,7 @@ extends FrontendController(mcc, applicantActions):
           ))
         yield ipdToUpsert
 
-  private def withResolvedIdentifiers(
+  private def ipdWithResolvedIdentifiers(
     tdIndividualProvidedDetails: IndividualProvidedDetails,
     maybeExistingIpd: Option[IndividualProvidedDetails],
     stubbedId: IndividualProvidedDetailsId,
@@ -218,14 +197,16 @@ extends FrontendController(mcc, applicantActions):
       case Some(existingIpd)
           if !existingIpd.providedDetailsState.internalUserIdProvided && tdIndividualProvidedDetails.providedDetailsState.internalUserIdProvided =>
         tdIndividualProvidedDetails.copy(
+          _id = stubbedId,
           individualName = existingIpd.individualName,
-          agentApplicationId = existingIpd.agentApplicationId,
+          agentApplicationId = agentApplicationId,
           internalUserId = Some(internalUserIdGenerator.nextInternalUserId())
         )
       case Some(existingIpd) =>
         tdIndividualProvidedDetails.copy(
+          _id = stubbedId,
           individualName = existingIpd.individualName,
-          agentApplicationId = existingIpd.agentApplicationId
+          agentApplicationId = agentApplicationId
         )
       case None if tdIndividualProvidedDetails.providedDetailsState.internalUserIdProvided =>
         tdIndividualProvidedDetails.copy(
@@ -243,7 +224,7 @@ extends FrontendController(mcc, applicantActions):
           createdAt = Instant.now(clock)
         )
 
-  private def stubbedIdentityAt(index: Int): (IndividualProvidedDetailsId, IndividualName) = TestOnlyData.grsStubbedIndividualsBaseV2.lift(index)
+  private def stubbedIdentityAt(index: Int): (IndividualProvidedDetailsId, IndividualName) = TestOnlyData.grsStubbedIndividualsBase.lift(index)
     .getOrThrowExpectedDataMissing(s"No identity stubbed at index $index")
 
   private def upsertIndividuals(

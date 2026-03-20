@@ -251,66 +251,6 @@ trait TdBase:
     isPersonOfControl = true
   )
 
-  /* This is a list of individuals that we currently have stubbed in grs,
-       We need to use this list for fast forward links to ensure the names match
-       the names we get from company house */
-  val grsStubbedIndividualsBase: Seq[IndividualProvidedDetails] = Seq(
-    IndividualProvidedDetails(
-      _id = individualProvidedDetailsId,
-      individualName = IndividualName("Steve Austin"),
-      internalUserId = None,
-      agentApplicationId = agentApplicationId,
-      createdAt = nowAsInstant,
-      providedDetailsState = ProvidedDetailsState.Precreated,
-      isPersonOfControl = true
-    ),
-    IndividualProvidedDetails(
-      _id = individualProvidedDetailsId2,
-      individualName = IndividualName("Beverly Hills"),
-      internalUserId = None,
-      agentApplicationId = agentApplicationId,
-      createdAt = nowAsInstant,
-      providedDetailsState = ProvidedDetailsState.Precreated,
-      isPersonOfControl = true
-    ),
-    IndividualProvidedDetails(
-      _id = individualProvidedDetailsId3,
-      individualName = IndividualName("Pauline Austin"),
-      internalUserId = None,
-      agentApplicationId = agentApplicationId,
-      createdAt = nowAsInstant,
-      providedDetailsState = ProvidedDetailsState.Precreated,
-      isPersonOfControl = true
-    ),
-    IndividualProvidedDetails(
-      _id = individualProvidedDetailsId4,
-      individualName = IndividualName("Justine Hills"),
-      internalUserId = None,
-      agentApplicationId = agentApplicationId,
-      createdAt = nowAsInstant,
-      providedDetailsState = ProvidedDetailsState.Precreated,
-      isPersonOfControl = true
-    ),
-    IndividualProvidedDetails(
-      _id = individualProvidedDetailsId5,
-      individualName = IndividualName("Steve Palmer"),
-      internalUserId = None,
-      agentApplicationId = agentApplicationId,
-      createdAt = nowAsInstant,
-      providedDetailsState = ProvidedDetailsState.Precreated,
-      isPersonOfControl = true
-    ),
-    IndividualProvidedDetails(
-      _id = individualProvidedDetailsId6,
-      individualName = IndividualName("Sandra Hills"),
-      internalUserId = None,
-      agentApplicationId = agentApplicationId,
-      createdAt = nowAsInstant,
-      providedDetailsState = ProvidedDetailsState.Precreated,
-      isPersonOfControl = true
-    )
-  )
-
   val soleTraderYetToProvideDetails: IndividualProvidedDetails = IndividualProvidedDetails(
     _id = individualProvidedDetailsId,
     internalUserId = None,
@@ -342,7 +282,11 @@ trait TdBase:
     hasApprovedApplication = Some(true)
   )
 
-  val grsStubbedIndividualsBaseV2: List[(
+  /* This is a list of individual names that we currently have stubbed in grs,
+       We need to use this list for fast forward links to ensure the names match
+       the names we get from company house, each name needs a deterministic id so
+        it is paired as such */
+  val grsStubbedIndividualsBase: List[(
     IndividualProvidedDetailsId,
     IndividualName
   )] = List(
