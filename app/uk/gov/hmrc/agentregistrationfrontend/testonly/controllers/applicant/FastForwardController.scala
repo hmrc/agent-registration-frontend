@@ -141,10 +141,14 @@ extends FrontendController(mcc, applicantActions):
       updatedAgentApplication <- updateAgentApplication(agentApplication)
       _ <- applicationService.upsert(updatedAgentApplication)
       maybeCreatedIndividuals <-
-        if (section.maybeIndividualProvidedDetails.nonEmpty)
-          val createdIndividuals = createIndividuals(section, updatedAgentApplication.agentApplicationId)
-          upsertIndividuals(createdIndividuals).map: _ =>
-            Some(createdIndividuals)
+        if (section.maybeIndividualProvidedDetailsList.nonEmpty)
+          for
+            ipdList <- updateIndividualProvidedDetailsList(
+              section.maybeIndividualProvidedDetailsList.getOrThrowExpectedDataMissing("individualProvidedDetails"),
+              updatedAgentApplication.agentApplicationId
+            )
+            _ <- upsertIndividuals(ipdList)
+          yield Some(ipdList)
         else
           Future.successful(None)
       _ <-
@@ -243,7 +247,7 @@ extends FrontendController(mcc, applicantActions):
     .getOrThrowExpectedDataMissing(s"No identity stubbed at index $index")
 
   private def upsertIndividuals(
-    createdIndividuals: Seq[IndividualProvidedDetails]
+    createdIndividuals: List[IndividualProvidedDetails]
   )(using r: RequestWithAuth): Future[Unit] =
     createdIndividuals.foldLeft(Future.unit):
       (
