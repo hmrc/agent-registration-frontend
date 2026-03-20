@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
@@ -54,10 +55,12 @@ extends FrontendController(mcc, actions):
         .map: optBpr =>
           Ok(individualConfirmationPage(
             applicantName = applicantName.value,
-            entityName = optBpr.map(_.getEntityName).getOrThrowExpectedDataMissing("BPR is missing"),
-            isSoleTrader =
-              agentApplication match {
-                case _: AgentApplication.IsSoleTrader => true
-                case _ => false
-              }
+            entityName = optBpr.map(_.getEntityName).getOrThrowExpectedDataMissing("BPR for application entity is missing"),
+            isSoleTraderOwner = agentApplication.isSoleTraderOwner
           ))
+
+  extension (agentApplication: AgentApplication)
+    def isSoleTraderOwner: Boolean =
+      agentApplication match
+        case a: AgentApplicationSoleTrader => a.isOwner
+        case _ => false
