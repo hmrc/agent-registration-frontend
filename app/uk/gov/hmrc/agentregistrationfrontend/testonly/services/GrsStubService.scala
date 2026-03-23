@@ -36,15 +36,6 @@ class GrsStubService @Inject() (
   agentsExternalStubsConnector: AgentsExternalStubsConnector
 )(using ExecutionContext):
 
-  def storeIndividualProvidedDetails(
-    name: String,
-    maybeUtr: Option[Utr] = None
-  )(using Request[?]): Future[Unit] = agentsExternalStubsConnector.createIndividualUser(
-    assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
-    maybeName = Some(name),
-    maybeUtr = maybeUtr
-  )
-
   def storeStubsData(
     businessType: BusinessType,
     journeyData: JourneyData,
