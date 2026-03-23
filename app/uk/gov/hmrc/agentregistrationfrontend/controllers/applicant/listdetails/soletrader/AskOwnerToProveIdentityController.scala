@@ -52,7 +52,7 @@ extends FrontendController(mcc, actions):
     .refine(implicit request =>
       request.get[AgentApplication] match
         case agentApplication: AgentApplicationSoleTrader => request.replace[AgentApplication, AgentApplicationSoleTrader](agentApplication)
-        case _ =>
+        case _: AgentApplication.IsNotSoleTrader =>
           logger.warn(s"Application is not a sole trader application, applicationId:[${request.get[AgentApplication].agentApplicationId}], redirecting to task list for overview")
           Redirect(AppRoutes.apply.TaskListController.show)
     )
@@ -75,15 +75,15 @@ extends FrontendController(mcc, actions):
           // there is no existing individual record for this application,
           // so we need to automate the creation of one based on the application data as this is a sole trader application
           val soleTraderDetails: BusinessDetailsSoleTrader = agentApplication.getBusinessDetails
-          val baseRecord = individualProvideDetailsService.create(
+          val newIndividualProvidedDetails = individualProvideDetailsService.create(
             agentApplicationId = agentApplication.agentApplicationId,
             individualName = IndividualName(s"${soleTraderDetails.fullName.firstName} ${soleTraderDetails.fullName.lastName}"),
             isPersonOfControl = true // this individual record is for the sole trader owner not the applicant
           )
           individualProvideDetailsService
-            .upsertForApplication(baseRecord)
+            .upsertForApplication(newIndividualProvidedDetails)
             .map: _ =>
-              request.add[IndividualProvidedDetails](baseRecord)
+              request.add[IndividualProvidedDetails](newIndividualProvidedDetails)
         case soleTrader :: Nil => request.add[IndividualProvidedDetails](soleTrader) // we have already visited this page and the record has been created
         case _ =>
           logger.warn(s"Unexpected multiple provided details records for sole trader application, applicationId:[${agentApplication.agentApplicationId}], cannot recover from this state so exiting")
