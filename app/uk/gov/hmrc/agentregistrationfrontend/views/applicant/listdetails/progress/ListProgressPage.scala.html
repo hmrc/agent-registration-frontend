@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLaterLinks
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 
 @this(
         appConfig: AppConfig,
@@ -35,7 +36,13 @@
 )
 
 @key = @{"listProgress"}
-@pageTitle = @{messages(s"$key.title")}
+@messageKeySuffix = @{
+  agentApplication match {
+    case a: AgentApplicationSoleTrader if !a.isOwner => ".SoleTraderRepresentative"
+    case _ => ""
+  }
+}
+@pageTitle = @{messages(s"$key.title$messageKeySuffix")}
 
 @layout(
     pageTitle = pageTitle

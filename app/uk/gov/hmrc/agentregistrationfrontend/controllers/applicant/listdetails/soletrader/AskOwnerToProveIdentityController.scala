@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.soletrader
 
-import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
@@ -32,16 +31,16 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.soletrader.ProveIdentityPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.soletrader.AskOwnerToProveIdentityPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ProveIdentityController @Inject() (
+class AskOwnerToProveIdentityController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
-  view: ProveIdentityPage,
+  view: AskOwnerToProveIdentityPage,
   individualProvideDetailsService: IndividualProvideDetailsService
 )
 extends FrontendController(mcc, actions):
@@ -58,9 +57,9 @@ extends FrontendController(mcc, actions):
           Redirect(AppRoutes.apply.TaskListController.show)
     )
     .ensure(
-      _.get[AgentApplicationSoleTrader].getUserRole === UserRole.Owner,
+      _.get[AgentApplicationSoleTrader].getUserRole === UserRole.Authorised,
       implicit request =>
-        logger.warn(s"${request.get[AgentApplicationSoleTrader].getUserRole} is the wrong role, we require ${UserRole.Owner.toString} to access the sole trader prove own identity page, applicationId:[${request.get[AgentApplicationSoleTrader].agentApplicationId}], redirecting to task list for overview")
+        logger.warn(s"${request.get[AgentApplicationSoleTrader].getUserRole} is the wrong role, we require ${UserRole.Authorised.toString} to access the link for the sole trader owner, applicationId:[${request.get[AgentApplicationSoleTrader].agentApplicationId}], redirecting to task list for overview")
         Redirect(AppRoutes.apply.TaskListController.show)
     )
     .refine(implicit request =>
@@ -74,13 +73,13 @@ extends FrontendController(mcc, actions):
       existingList match
         case Nil =>
           // there is no existing individual record for this application,
-          // so we need to automate the creation of one based on the application data if this is a sole trader application
+          // so we need to automate the creation of one based on the application data as this is a sole trader application
           val soleTraderDetails: BusinessDetailsSoleTrader = agentApplication.getBusinessDetails
           val newIndividualProvidedDetails: IndividualProvidedDetails = individualProvideDetailsService.create(
             agentApplicationId = agentApplication.agentApplicationId,
             individualName = IndividualName(s"${soleTraderDetails.fullName.firstName} ${soleTraderDetails.fullName.lastName}"),
-            isPersonOfControl = true // we have ensured user is the sole trader owner
-          ).addApplicationAnswers(agentApplication)
+            isPersonOfControl = true // this individual record is for the sole trader owner not the applicant
+          )
           individualProvideDetailsService
             .upsertForApplication(newIndividualProvidedDetails)
             .map: _ =>
@@ -93,28 +92,17 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
-      val individualProvidedDetails: IndividualProvidedDetails = request.get
       Ok(view(
-        agentApplication = request.get[AgentApplicationSoleTrader],
-        hasProvedIdentity = individualProvidedDetails.hasFinished
+        agentApplication = request.get[AgentApplicationSoleTrader]
       ))
 
-  extension (individualProvidedDetails: IndividualProvidedDetails)
-    // when the sole trader applicant is the same person as the individual whose details are being provided,
-    // we can automatically populate these answers from the application data
-    private def addApplicationAnswers(agentApplication: AgentApplicationSoleTrader): IndividualProvidedDetails =
-      val applicantContactDetails = agentApplication.getApplicantContactDetails
-      individualProvidedDetails
-        .modify(_.providedDetailsState)
-        .setTo(ProvidedDetailsState.AccessConfirmed) // no link to send - access to individual journey is provided by the task list
-        .modify(_.telephoneNumber)
-        .setTo(applicantContactDetails.telephoneNumber)
-        .modify(_.emailAddress)
-        .setTo(Some(IndividualVerifiedEmailAddress(
-          emailAddress = applicantContactDetails.getVerifiedEmail,
-          isVerified = true
-        )))
-        .modify(_.hasApprovedApplication)
-        .setTo(Some(true)) // Sole trader owner applicants are always approved as they are the same person
-        .modify(_.hmrcStandardForAgentsAgreed)
-        .setTo(agentApplication.hmrcStandardForAgentsAgreed)
+  def submit: Action[AnyContent] = baseAction.async:
+    implicit request =>
+      val individualProvidedDetails: IndividualProvidedDetails = request.get
+      val updatedRecord = individualProvidedDetails.copy(
+        providedDetailsState = ProvidedDetailsState.AccessConfirmed
+      )
+      individualProvideDetailsService
+        .upsertForApplication(updatedRecord)
+        .map: _ =>
+          Redirect(AppRoutes.apply.TaskListController.show.url)

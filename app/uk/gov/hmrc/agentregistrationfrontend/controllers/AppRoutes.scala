@@ -98,6 +98,7 @@ object AppRoutes:
       object soletrader:
 
         val ProveIdentityController = listdetailsSoleTraderRoutes.ProveIdentityController
+        val AskOwnerToProveIdentityController = listdetailsSoleTraderRoutes.AskOwnerToProveIdentityController
 
       object nonincorporated:
 
