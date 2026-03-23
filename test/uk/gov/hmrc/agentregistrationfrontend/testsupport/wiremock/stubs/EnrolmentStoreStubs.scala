@@ -33,10 +33,14 @@ object EnrolmentStoreStubs {
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlMatching(s"/enrolment-store-proxy/enrolment-store/groups/${groupId.value}/enrolments"),
     responseStatus = Status.OK,
-    responseBody = Json.prettyPrint(Json.arr(Json.obj(
-      "service" -> enrolment.service,
-      "state" -> enrolment.state
-    )))
+    responseBody = Json.prettyPrint(
+      Json.obj(
+        "enrolments" -> Json.arr(Json.obj(
+          "service" -> enrolment.service,
+          "state" -> enrolment.state
+        ))
+      )
+    )
   )
 
   def stubQueryEnrolmentsAllocatedToGroupNoContent(

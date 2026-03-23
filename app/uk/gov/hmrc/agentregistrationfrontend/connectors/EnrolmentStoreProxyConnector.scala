@@ -47,7 +47,7 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => response.json.as[List[EnrolmentStoreProxyConnector.Enrolment]]
+          case Status.OK => (response.json \ "enrolments").as[List[EnrolmentStoreProxyConnector.Enrolment]]
           case Status.NO_CONTENT => List[EnrolmentStoreProxyConnector.Enrolment]()
           case status =>
             Errors.throwUpstreamErrorResponse(
