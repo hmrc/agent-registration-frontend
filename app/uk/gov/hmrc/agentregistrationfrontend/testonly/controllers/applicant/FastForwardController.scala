@@ -21,6 +21,7 @@ import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsIdGenerator
 import uk.gov.hmrc.agentregistration.shared.lists.*
 import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
@@ -64,6 +65,7 @@ class FastForwardController @Inject() (
   individualProvideDetailsService: IndividualProvideDetailsService,
   agentRegistrationRiskingService: AgentRegistrationRiskingService,
   internalUserIdGenerator: InternalUserIdGenerator,
+  individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator,
   companiesHouseIndividualService: CompaniesHouseIndividualService
 )(using
   clock: Clock,
@@ -140,7 +142,7 @@ extends FrontendController(mcc, applicantActions):
       )
       updatedAgentApplication <- updateAgentApplication(agentApplication)
       _ <- applicationService.upsert(updatedAgentApplication)
-      removeIndividuals <- removeStubbedIndividuals()
+      removeIndividuals <- removeStubbedIndividualsFor(updatedAgentApplication.agentApplicationId)
       maybeCreatedIndividuals <-
         section.maybeIndividualProvidedDetailsList.fold(Future.successful(None)): individualProvidedDetailsList =>
           for
@@ -162,10 +164,14 @@ extends FrontendController(mcc, applicantActions):
           Future.unit
     yield ()
 
-  private def removeStubbedIndividuals()(using r: RequestWithAuth): Future[Unit] = Future.sequence:
-    TestOnlyData.grsStubbedIndividualsBase.map: (id, _) =>
-      individualProvideDetailsService.delete(id)
-  .map(_ => ())
+  private def removeStubbedIndividualsFor(applicationId: AgentApplicationId)(using r: RequestWithAuth): Future[Unit] =
+    for
+      individuals: List[IndividualProvidedDetails] <- individualProvideDetailsService.findAllByApplicationId(applicationId)
+      _ <- Future.sequence(
+        individuals.map: ipd =>
+          individualProvideDetailsService.delete(ipd.individualProvidedDetailsId)
+      )
+    yield ()
 
   private def createIndividualProvidedDetailsList(
     individualProvidedDetailsList: List[IndividualProvidedDetails],
@@ -175,16 +181,16 @@ extends FrontendController(mcc, applicantActions):
   ): Future[List[IndividualProvidedDetails]] =
     Future.traverse(individualProvidedDetailsList.zipWithIndex):
       case (tdIndividualProvidedDetails, index) =>
-        val (stubbedId, stubbedName) = stubbedIdentityAt(index)
+        val stubbedName = stubbedIdentityAt(index)
         Future.successful(tdIndividualProvidedDetails.copy(
-          _id = stubbedId,
+          _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
           individualName = stubbedName,
           agentApplicationId = agentApplicationId,
           internalUserId = tdIndividualProvidedDetails.internalUserId.map(_ => internalUserIdGenerator.nextInternalUserId()),
           createdAt = Instant.now(clock)
         ))
 
-  private def stubbedIdentityAt(index: Int): (IndividualProvidedDetailsId, IndividualName) = TestOnlyData.grsStubbedIndividualsBase.lift(index)
+  private def stubbedIdentityAt(index: Int): IndividualName = TestOnlyData.grsStubbedIndividualsBase.lift(index)
     .getOrThrowExpectedDataMissing(s"No identity stubbed at index $index")
 
   private def upsertIndividuals(

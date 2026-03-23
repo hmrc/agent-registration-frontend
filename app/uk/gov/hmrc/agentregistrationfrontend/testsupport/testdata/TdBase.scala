@@ -291,34 +291,14 @@ trait TdBase:
 
   /* This is a list of individual names that we currently have stubbed in grs,
        We need to use this list for fast forward links to ensure the names match
-       the names we get from company house, each name needs a deterministic id so
-        it is paired as such */
-  val grsStubbedIndividualsBase: List[(
-    IndividualProvidedDetailsId,
+       the names we get from companies house */
+  val grsStubbedIndividualsBase: List[
     IndividualName
-  )] = List(
-    (
-      individualProvidedDetailsId,
-      IndividualName("Steve Austin")
-    ),
-    (
-      individualProvidedDetailsId2,
-      IndividualName("Beverly Hills")
-    ),
-    (
-      individualProvidedDetailsId3,
-      IndividualName("Pauline Austin")
-    ),
-    (
-      individualProvidedDetailsId4,
-      IndividualName("Justine Hills")
-    ),
-    (
-      individualProvidedDetailsId5,
-      IndividualName("Steve Palmer")
-    ),
-    (
-      individualProvidedDetailsId6,
-      IndividualName("Sandra Hills")
-    )
+  ] = List(
+    IndividualName("Steve Austin"),
+    IndividualName("Beverly Hills"),
+    IndividualName("Pauline Austin"),
+    IndividualName("Justine Hills"),
+    IndividualName("Steve Palmer"),
+    IndividualName("Sandra Hills")
   )
