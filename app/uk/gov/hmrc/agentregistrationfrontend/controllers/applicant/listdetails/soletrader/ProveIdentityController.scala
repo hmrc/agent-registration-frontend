@@ -76,7 +76,7 @@ extends FrontendController(mcc, actions):
           // there is no existing individual record for this application,
           // so we need to automate the creation of one based on the application data if this is a sole trader application
           val soleTraderDetails: BusinessDetailsSoleTrader = agentApplication.getBusinessDetails
-          val newIndividualProvidedDetails = individualProvideDetailsService.create(
+          val newIndividualProvidedDetails: IndividualProvidedDetails = individualProvideDetailsService.create(
             agentApplicationId = agentApplication.agentApplicationId,
             individualName = IndividualName(s"${soleTraderDetails.fullName.firstName} ${soleTraderDetails.fullName.lastName}"),
             isPersonOfControl = true // we have ensured user is the sole trader owner
