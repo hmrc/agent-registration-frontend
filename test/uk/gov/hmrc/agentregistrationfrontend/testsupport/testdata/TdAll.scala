@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.TdAgentApp
 import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.TdAgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.testdata.providedetails.individual.TdIndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
-import uk.gov.hmrc.agentregistration.shared.testdata.TdGrs
+import uk.gov.hmrc.agentregistration.shared.testdata.TdGrsBusinessDetails
 
 object TdAll:
 
@@ -50,7 +50,8 @@ object TdAll:
 trait TdAll
 extends TdBase,
   TdRequest,
-  TdGrs,
+  TdGrsBusinessDetails,
+  TdGrsJourneyData,
   TdAgentApplicationRequest,
   TdAgentApplicationLlp,
   TdAgentApplicationGeneralPartnership,

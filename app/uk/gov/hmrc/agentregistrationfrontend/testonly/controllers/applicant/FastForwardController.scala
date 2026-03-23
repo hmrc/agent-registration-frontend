@@ -24,7 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistration.shared.grs.JourneyData
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
@@ -32,7 +32,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifie
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
-import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.GrsTestData
 import uk.gov.hmrc.http.SessionKeys
 
 import java.time.Clock
@@ -134,13 +134,13 @@ extends FrontendController(mcc, applicantActions):
 
   private def journeyDataFor(bt: BusinessType): JourneyData =
     bt match
-      case BusinessType.Partnership.LimitedLiabilityPartnership => TestOnlyData.grs.llp.journeyData
-      case BusinessType.Partnership.GeneralPartnership => TestOnlyData.grs.generalPartnership.journeyData
-      case BusinessType.Partnership.ScottishPartnership => TestOnlyData.grs.scottishPartnership.journeyData
-      case BusinessType.Partnership.ScottishLimitedPartnership => TestOnlyData.grs.scottishLtdPartnership.journeyData
-      case BusinessType.Partnership.LimitedPartnership => TestOnlyData.grs.ltdPartnership.journeyData
-      case BusinessType.SoleTrader => TestOnlyData.grs.soleTrader.journeyData
-      case BusinessType.LimitedCompany => TestOnlyData.grs.ltd.journeyData
+      case BusinessType.Partnership.LimitedLiabilityPartnership => GrsTestData.grsJourneyData.llp.journeyData
+      case BusinessType.Partnership.GeneralPartnership => GrsTestData.grsJourneyData.generalPartnership.journeyData
+      case BusinessType.Partnership.ScottishPartnership => GrsTestData.grsJourneyData.scottishPartnership.journeyData
+      case BusinessType.Partnership.ScottishLimitedPartnership => GrsTestData.grsJourneyData.scottishLtdPartnership.journeyData
+      case BusinessType.Partnership.LimitedPartnership => GrsTestData.grsJourneyData.ltdPartnership.journeyData
+      case BusinessType.SoleTrader => GrsTestData.grsJourneyData.soleTrader.journeyData
+      case BusinessType.LimitedCompany => GrsTestData.grsJourneyData.ltd.journeyData
 
   private def updateIdentifiers(agentApplication: AgentApplication)(using
     r: RequestWithAuth,

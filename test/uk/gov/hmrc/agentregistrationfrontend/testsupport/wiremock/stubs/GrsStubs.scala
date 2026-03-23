@@ -24,8 +24,8 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.*
-import uk.gov.hmrc.agentregistration.shared.grs.JourneyId
-import uk.gov.hmrc.agentregistration.shared.grs.JourneyData
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker.HttpMethod.GET
@@ -68,7 +68,7 @@ object GrsStubs:
     val journeyData: JourneyData =
       businessType match
         case bt @ BusinessType.Partnership.GeneralPartnership => throw NotImplementedError(s"$bt not implemented yet")
-        case BusinessType.Partnership.LimitedLiabilityPartnership => tdAll.grs.llp.journeyData
+        case BusinessType.Partnership.LimitedLiabilityPartnership => tdAll.grsJourneyData.llp.journeyData
         case bt @ BusinessType.Partnership.LimitedPartnership => throw NotImplementedError(s"$bt not implemented yet")
         case bt @ BusinessType.Partnership.ScottishLimitedPartnership => throw NotImplementedError(s"$bt not implemented yet")
         case bt @ BusinessType.Partnership.ScottishPartnership => throw NotImplementedError(s"$bt not implemented yet")

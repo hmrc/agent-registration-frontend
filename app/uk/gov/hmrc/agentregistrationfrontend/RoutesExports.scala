@@ -21,7 +21,7 @@ import uk.gov.hmrc.agentregistrationfrontend.util.ValueClassBinder
 
 object RoutesExports:
 
-  given QueryStringBindable[uk.gov.hmrc.agentregistration.shared.grs.JourneyId] = ValueClassBinder.queryStringValueBinder(_.value)
+  given QueryStringBindable[uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyId] = ValueClassBinder.queryStringValueBinder(_.value)
 
   export uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
   export uk.gov.hmrc.agentregistration.shared.BusinessType

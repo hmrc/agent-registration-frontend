@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.grs
+package uk.gov.hmrc.agentregistrationfrontend.model.grs
 
-import play.api.libs.json.Format
-import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import play.api.libs.json.*
+import uk.gov.hmrc.agentregistration.shared.SafeId
 
-/** Journey id for use in the Generic Registration Service (GRS) integrated frontend journey
-  */
-final case class JourneyId(value: String)
+final case class Registration(
+  registrationStatus: RegistrationStatus,
+  registeredBusinessPartnerId: Option[SafeId]
+)
 
-object JourneyId:
-
-  given Format[JourneyId] = JsonFormatsFactory.makeValueClassFormat
+object Registration:
+  given Format[Registration] = Json.format[Registration]

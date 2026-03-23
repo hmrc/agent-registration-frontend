@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.grs
+package uk.gov.hmrc.agentregistrationfrontend.model.grs
 
 import play.api.libs.json.*
 import uk.gov.hmrc.agentregistration.shared.*

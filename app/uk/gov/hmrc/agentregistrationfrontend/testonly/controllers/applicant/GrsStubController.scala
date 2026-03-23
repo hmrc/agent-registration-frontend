@@ -39,8 +39,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.*
-import uk.gov.hmrc.agentregistration.shared.grs.*
-import uk.gov.hmrc.agentregistration.shared.grs.RegistrationStatus.*
+import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.GrsStub
 import uk.gov.hmrc.domain.NinoGenerator

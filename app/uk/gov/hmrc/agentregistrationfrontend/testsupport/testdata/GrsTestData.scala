@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.grs
+package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-import play.api.libs.json.*
-import uk.gov.hmrc.agentregistration.shared.SafeId
+import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData
 
-final case class Registration(
-  registrationStatus: RegistrationStatus,
-  registeredBusinessPartnerId: Option[SafeId]
-)
-
-object Registration:
-  given Format[Registration] = Json.format[Registration]
+object GrsTestData
+extends TestOnlyData
+with TdGrsJourneyData
