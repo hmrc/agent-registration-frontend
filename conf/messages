@@ -422,6 +422,8 @@ addToListSummary.relevant.individuals.more.question = Are there any more relevan
 addToListSummary.relevant.individuals.more.hint = We need to know everyone who has material responsibility for how tax advice is carried out, but is not an official partner.
 addToListSummary.relevant.individuals.more.error.required = Select yes if there are more relevant tax advisers
 addToListSummary.relevant.individuals.more.error.invalid = Select yes if there are more relevant tax advisers
+addOtherRelevantIndividuals.error.required = Select yes if there are more relevant tax advisers
+addOtherRelevantIndividuals.error.invalid = Select yes if there are more relevant tax advisers
 
 listDetailsCheckYourAnswers.title = Check your answers
 listDetailsCheckYourAnswers.numberOfPartners.label = Number of partners
@@ -910,6 +912,8 @@ lists.caption.title.ScottishLimitedPartnership = Partners and other tax adviser 
 numberOfOfficersResponsibleForTaxMatters.question.ScottishLimitedPartnership = How many partners are responsible for tax advice?
 
 error.companiesHouseOfficer.nameNotMatched = The name you entered does not match any records in Companies House. Check the name and try again.
+isCompaniesHouseOfficersListCorrect.error.required = Select yes if this list is correct
+isCompaniesHouseOfficersListCorrect.error.invalid = Select yes if this list is correct
 isCompaniesHouseOfficersListCorrect.error.required.LimitedLiabilityPartnership = Select yes if this list of members is correct
 isCompaniesHouseOfficersListCorrect.error.invalid.LimitedLiabilityPartnership = Select yes if this list of members is correct
 isCompaniesHouseOfficersListCorrect.error.required.LimitedCompany = Select yes if this list of directors is correct
@@ -919,6 +923,8 @@ isCompaniesHouseOfficersListCorrect.error.invalid.LimitedPartnership = Select ye
 isCompaniesHouseOfficersListCorrect.error.required.ScottishLimitedPartnership = Select yes if this list of partners is correct
 isCompaniesHouseOfficersListCorrect.error.invalid.ScottishLimitedPartnership = Select yes if this list of partners is correct
 
+numberOfOfficersResponsibleForTaxMatters.error.required = Enter how many officers are responsible for tax advice
+numberOfOfficersResponsibleForTaxMatters.error.invalid = Enter a valid number
 numberOfOfficersResponsibleForTaxMatters.error.required.LimitedLiabilityPartnership = Enter how many members are responsible for tax advice
 numberOfOfficersResponsibleForTaxMatters.error.invalid.LimitedLiabilityPartnership = Enter a number between 1 and {0}
 numberOfOfficersResponsibleForTaxMatters.error.required.LimitedCompany = Enter how many directors are responsible for tax advice

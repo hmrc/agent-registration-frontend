@@ -73,10 +73,18 @@ extends FrontendController(mcc, actions):
             case a: AgentApplication.IsIncorporated => Redirect(AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show)
     )
     .ensure(
-      condition = _.get[IsNotSoleTrader].hasOtherRelevantIndividuals.isDefined,
+      condition =
+        implicit request =>
+          val otherRelevantIndividuals = request.get[List[IndividualProvidedDetails]].count(!_.isPersonOfControl)
+          request.get[IsNotSoleTrader].hasOtherRelevantIndividuals match {
+            case Some(true) if (otherRelevantIndividuals > 0) => true
+            case Some(false) => true
+            case _ => false
+          }
+      ,
       resultWhenConditionNotMet =
         implicit request =>
-          Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url)
+          Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show.url)
     )
 
   def show: Action[AnyContent] = baseAction:

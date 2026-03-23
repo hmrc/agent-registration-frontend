@@ -100,7 +100,7 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterHowManyKeyIndividualsNeedsPadding.agentApplicationId)
 
-  s"GET $path should redirect to other relevant individuals CYA when hasOtherRelevantIndividuals is not answered" in:
+  s"GET $path should redirect to confirm other relevant individuals when hasOtherRelevantIndividuals is not answered" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeConfirmOtherRelevantIndividuals)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.beforeConfirmOtherRelevantIndividuals.agentApplicationId,
@@ -116,11 +116,33 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
     response.header(HeaderNames.LOCATION) shouldBe Some(
-      AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url
+      AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show.url
     )
 
     ApplyStubHelper.verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeConfirmOtherRelevantIndividuals.agentApplicationId)
+
+  s"GET $path should redirect to confirm other relevant individuals when hasOtherRelevantIndividuals is true but no individuals added" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterConfirmOtherRelevantIndividualsYes)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterConfirmOtherRelevantIndividualsYes.agentApplicationId,
+      individuals = List(
+        tdAll.individualProvidedDetails,
+        tdAll.individualProvidedDetails2,
+        tdAll.individualProvidedDetails3
+      ) // all isPersonOfControl = true, no other relevant individuals
+    )
+
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe Constants.EMPTY_STRING
+    response.header(HeaderNames.LOCATION) shouldBe Some(
+      AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show.url
+    )
+
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterConfirmOtherRelevantIndividualsYes.agentApplicationId)
 
   s"GET $path should return 200 and render page when lists are complete and hasOtherRelevantIndividuals is defined" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterConfirmOtherRelevantIndividualsYes)
