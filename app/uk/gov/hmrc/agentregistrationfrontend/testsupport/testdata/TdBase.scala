@@ -286,10 +286,10 @@ trait TdBase:
     passedIv = None
   )
 
-  /* This is a list of individual names that we currently have stubbed in grs,
-       We need to use this list for fast forward links to ensure the names match
-       the names we get from companies house */
-  val grsStubbedIndividualsBase: List[
+  /* This is a list of individual names that we currently have stubbed in companies house,
+       We need to use this list for fast forward links to ensure the names match the names
+       we get from companies house */
+  val chStubbedIndividualsBase: List[
     IndividualName
   ] = List(
     IndividualName("Steve Austin"),

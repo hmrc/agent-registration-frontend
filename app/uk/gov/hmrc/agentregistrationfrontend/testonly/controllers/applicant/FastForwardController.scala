@@ -190,7 +190,7 @@ extends FrontendController(mcc, applicantActions):
           createdAt = Instant.now(clock)
         ))
 
-  private def stubbedIdentityAt(index: Int): IndividualName = TestOnlyData.grsStubbedIndividualsBase.lift(index)
+  private def stubbedIdentityAt(index: Int): IndividualName = TestOnlyData.chStubbedIndividualsBase.lift(index)
     .getOrThrowExpectedDataMissing(s"No identity stubbed at index $index")
 
   private def upsertIndividuals(

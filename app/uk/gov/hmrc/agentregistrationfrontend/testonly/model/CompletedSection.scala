@@ -82,7 +82,7 @@ object CompletedSection:
       override def displayOrder: Int = 6
       override def agentApplication: AgentApplication = TestOnlyData.llp.twoChOfficers.agentApplicationLlp.afterConfirmTwoChOfficers
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
-        List(TestOnlyData.providedDetails.precreated, TestOnlyData.providedDetails.precreated)
+        List.fill(2)(TestOnlyData.providedDetails.precreated)
       )
 
     case object LlpPartnersAndOtherRelevantTaxAdvisers6
@@ -92,14 +92,7 @@ object CompletedSection:
       override def displayOrder: Int = 7
       override def agentApplication: AgentApplication = TestOnlyData.llp.sixChOfficers.agentApplicationLlp.afterConfirmSixChOfficers
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
-        List(
-          TestOnlyData.providedDetails.precreated,
-          TestOnlyData.providedDetails.precreated,
-          TestOnlyData.providedDetails.precreated,
-          TestOnlyData.providedDetails.precreated,
-          TestOnlyData.providedDetails.precreated,
-          TestOnlyData.providedDetails.precreated
-        )
+        List.fill(6)(TestOnlyData.providedDetails.precreated)
       )
 
     case object LlpDeclaration
@@ -109,7 +102,7 @@ object CompletedSection:
       override def displayOrder: Int = 8
       override def agentApplication: AgentApplication = TestOnlyData.llp.twoChOfficers.agentApplicationLlp.afterDeclarationSubmitted
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
-        List(TestOnlyData.providedDetails.afterProvidedDetailsConfirmed, TestOnlyData.providedDetails.afterProvidedDetailsConfirmed)
+        List.fill(2)(TestOnlyData.providedDetails.afterProvidedDetailsConfirmed)
       )
 
     val values: Seq[CompletedSectionLlp] = SealedObjects.all[CompletedSectionLlp]
@@ -212,7 +205,7 @@ object CompletedSection:
       override def displayOrder: Int = 6
       override def agentApplication: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterConfirmTwoIndividuals
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
-        List(TestOnlyData.providedDetails.precreated, TestOnlyData.providedDetails.precreated)
+        List.fill(2)(TestOnlyData.providedDetails.precreated)
       )
 
     case object GeneralPartnershipPartnersAndOtherRelevantTaxAdvisers6
@@ -222,14 +215,7 @@ object CompletedSection:
       override def displayOrder: Int = 7
       override def agentApplication: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterConfirmSixIndividuals
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
-        List(
-          TestOnlyData.providedDetails.precreated,
-          TestOnlyData.providedDetails.precreated,
-          TestOnlyData.providedDetails.precreated,
-          TestOnlyData.providedDetails.precreated,
-          TestOnlyData.providedDetails.precreated,
-          TestOnlyData.providedDetails.precreated
-        )
+        List.fill(6)(TestOnlyData.providedDetails.precreated)
       )
 
     case object GeneralPartnershipDeclaration
@@ -239,7 +225,7 @@ object CompletedSection:
       override def displayOrder: Int = 8
       override def agentApplication: AgentApplication = TestOnlyData.agentApplicationGeneralPartnership.afterDeclarationSubmittedAndTwoIndividualFinished
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
-        List(TestOnlyData.providedDetails.afterProvidedDetailsConfirmed, TestOnlyData.providedDetails.afterProvidedDetailsConfirmed)
+        List.fill(2)(TestOnlyData.providedDetails.afterProvidedDetailsConfirmed)
       )
 
     val values: Seq[CompletedSectionGeneralPartnership] = SealedObjects.all[CompletedSectionGeneralPartnership]

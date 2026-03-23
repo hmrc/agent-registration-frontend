@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
-import play.api.mvc.Request
+import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
 
@@ -33,7 +33,7 @@ class CompaniesHouseIndividualService @Inject() (
   def storeIndividualProvidedDetails(
     name: String,
     maybeUtr: Option[Utr] = None
-  )(using Request[?]): Future[Unit] = agentsExternalStubsConnector.createIndividualUser(
+  )(using RequestHeader): Future[Unit] = agentsExternalStubsConnector.createIndividualUser(
     assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
     maybeName = Some(name),
     maybeUtr = maybeUtr
