@@ -76,11 +76,11 @@ extends FrontendController(mcc, actions):
       condition =
         implicit request =>
           val otherRelevantIndividuals = request.get[List[IndividualProvidedDetails]].count(!_.isPersonOfControl)
-          request.get[IsNotSoleTrader].hasOtherRelevantIndividuals match {
+          request.get[IsNotSoleTrader].hasOtherRelevantIndividuals match 
             case Some(true) if (otherRelevantIndividuals > 0) => true
             case Some(false) => true
             case _ => false
-          }
+          
       ,
       resultWhenConditionNotMet =
         implicit request =>
