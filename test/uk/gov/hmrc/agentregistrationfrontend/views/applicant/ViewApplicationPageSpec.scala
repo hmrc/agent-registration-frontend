@@ -80,7 +80,7 @@ extends ViewSpec:
            |Supervisory body
            |HM Revenue and Customs (HMRC)
            |Registration number
-           |XAML1234567890
+           |XAML00000123456
            |HMRC standard for agents
            |Agreed to meet the HMRC standard for agents
            |Yes
