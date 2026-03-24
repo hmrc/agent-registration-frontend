@@ -78,6 +78,8 @@ extends FrontendController(mcc, actions):
       Ok("agent applicationId added to session")
         .addToSession(agentApplicationId)
 
+  // TODO: remove this once FF links can handle this
+
   // as we add more types of entity support we may want to specify which business type to create
   // possibly as part of the url, for now we only create an LLP application
   def makeTestSubmittedApplication(): Action[AnyContent] = Action

@@ -16,18 +16,26 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
+import java.util.UUID
 import play.api.libs.json.Format
 import play.api.libs.json.Json
 import play.api.libs.json.JsValue
 import play.api.libs.json.JsResult
 import play.api.libs.json.JsString
+import play.api.mvc.PathBindable
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User.AdditionalInformation
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User.EnrolmentKey
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import uk.gov.hmrc.agentregistration.shared.util.ValueClassBinder
+
 import java.time.LocalDate
 
+/** This represents User at agents-external-stubs https://github.com/hmrc/agents-external-stubs/blob/main/app/uk/gov/hmrc/agentsexternalstubs/models/User.scala
+  */
 final case class User(
-  userId: String,
+  userId: UserId,
+  planetId: PlanetId, // It's mandatory in this service, but not in the original User model
   groupId: Option[String] = None,
   confidenceLevel: Option[Int] = None,
   credentialStrength: Option[String] = None,
@@ -37,7 +45,6 @@ final case class User(
   assignedDelegatedEnrolments: Seq[EnrolmentKey] = Seq.empty,
   name: Option[String] = None,
   dateOfBirth: Option[LocalDate] = None,
-  planetId: Option[String] = None,
   isNonCompliant: Option[Boolean] = None,
   complianceIssues: Option[Seq[String]] = None,
   recordIds: Seq[String] = Seq.empty,
@@ -71,3 +78,20 @@ object User:
         override def writes(o: EnrolmentKey): JsValue = JsString(o.tag)
 
   given format: Format[User] = Json.format[User]
+
+final case class UserId(value: String)
+
+object UserId:
+
+  def nextUserId: UserId = UserId(UUID.randomUUID.toString)
+  given format: Format[UserId] = JsonFormatsFactory.makeValueClassFormat
+
+final case class PlanetId(value: String)
+
+object PlanetId:
+
+  val mmtar: PlanetId = PlanetId("MMTAR")
+
+  def nextPlanetId: PlanetId = PlanetId(UUID.randomUUID.toString)
+  given format: Format[PlanetId] = JsonFormatsFactory.makeValueClassFormat
+  given pathBindable: PathBindable[PlanetId] = ValueClassBinder.valueClassBinder[PlanetId](_.value)

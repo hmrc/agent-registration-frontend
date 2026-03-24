@@ -50,6 +50,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+import scala.util.chaining.scalaUtilChainingOps
 
 @Singleton
 class FastForwardController @Inject() (
@@ -77,39 +78,13 @@ extends FrontendController(mcc, applicantActions):
     implicit request =>
       Ok(fastForwardPage())
 
-  def fastForward(
-    completedSection: CompletedSection
-  ): Action[AnyContent] =
-    completedSection match
-      case c: CompletedSectionLlp =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
-      case c: CompletedSectionGeneralPartnership =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
-      case c: CompletedSectionScottishPartnership =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
-      case c: CompletedSectionSoleTrader =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
-      case c: CompletedSectionLimitedCompany =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
-      case c: CompletedSectionLimitedPartnership =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
-      case c: CompletedSectionScottishLimitedPartnership =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
+  def fastForward(completedSection: CompletedSection): Action[AnyContent] = authorisedOrCreateAndLoginAgent
+    .async:
+      implicit req: RequestWithAuth =>
+        fastForwardTo(completedSection)
+          .map(_ => Redirect(AppRoutes.apply.TaskListController.show))
 
+  // TODO: always new user so no need to sync with DB and with Risking
   private def loginAndRetry(using request: Request[AnyContent]): Future[Result | RequestWithAuth] = stubUserService.createAndLoginAgent.map: stubsHc =>
     val bearerToken: String = stubsHc.authorization
       .map(_.value)
@@ -132,37 +107,47 @@ extends FrontendController(mcc, applicantActions):
         case Left(result) => Future.successful(result)
 
   private def fastForwardTo(section: CompletedSection)(using r: RequestWithAuth): Future[Unit] =
-    val agentApplication: AgentApplication = section.agentApplication
-
     for
       _ <- grsStubService.storeStubsData(
         businessType = section.businessType,
         journeyData = journeyDataFor(section.businessType),
         deceased = false
       )
-      updatedAgentApplication <- updateAgentApplication(agentApplication)
-      _ <- applicationService.upsert(updatedAgentApplication)
-      removeIndividuals <- removeStubbedIndividualsFor(updatedAgentApplication.agentApplicationId)
-      maybeCreatedIndividuals <-
-        section.maybeIndividualProvidedDetailsList.fold(Future.successful(None)): individualProvidedDetailsList =>
-          for
-            ipdList <- createIndividualProvidedDetailsList(
-              section.maybeIndividualProvidedDetailsList.getOrThrowExpectedDataMissing("individualProvidedDetails"),
-              updatedAgentApplication.agentApplicationId
-            )
-            _ <- upsertIndividuals(ipdList)
-          yield Some(ipdList)
-      _ <-
-        if (updatedAgentApplication.applicationState.sentForRisking)
-          agentRegistrationRiskingService.submitForRisking(
-            SubmitForRiskingRequest(
-              agentApplication = updatedAgentApplication,
-              individuals = maybeCreatedIndividuals.getOrThrowExpectedDataMissing("createdIndividuals")
-            )
+      agentApplication <- updateAgentApplication(section.agentApplication)
+      _ <- applicationService.upsert(agentApplication)
+      removeIndividuals <- removeStubbedIndividualsFor(agentApplication.agentApplicationId)
+      individuals <- section
+        .maybeIndividualProvidedDetailsList
+        .getOrElse(Nil)
+        .zipWithIndex
+        .map: (t: (IndividualProvidedDetails, Int)) =>
+          updateIndividualProvidedDetails(
+            individualProvidedDetails = t._1,
+            agentApplicationId = agentApplication.agentApplicationId,
+            individualName = getIndividualName(t._2)
           )
-        else
-          Future.unit
+        .map(i => individualProvideDetailsService.upsertForApplication(i).map(_ => i))
+        .pipe(Future.sequence)
+      _ <- individuals
+        .map: individual =>
+          companiesHouseIndividualService.storeIndividualProvidedDetails(individual.individualName.value, Some(TestOnlyData.saUtr.asUtr))
+        .pipe(Future.sequence)
+      _ <- sendForRiskingIfNeeded(agentApplication, individuals)
     yield ()
+
+  private def sendForRiskingIfNeeded(
+    agentApplication: AgentApplication,
+    individuals: List[IndividualProvidedDetails]
+  )(using request: RequestHeader) =
+    if agentApplication.applicationState.sentForRisking
+    then
+      agentRegistrationRiskingService.submitForRisking(
+        submitForRiskingRequest = SubmitForRiskingRequest(
+          agentApplication = agentApplication,
+          individuals = individuals
+        )
+      )
+    else Future.unit
 
   private def removeStubbedIndividualsFor(applicationId: AgentApplicationId)(using r: RequestWithAuth): Future[Unit] =
     for
@@ -173,39 +158,55 @@ extends FrontendController(mcc, applicantActions):
       )
     yield ()
 
-  private def createIndividualProvidedDetailsList(
-    individualProvidedDetailsList: List[IndividualProvidedDetails],
-    agentApplicationId: AgentApplicationId
+//  private def createIndividualProvidedDetailsList(
+//    individualProvidedDetailsList: List[IndividualProvidedDetails],
+//    agentApplicationId: AgentApplicationId
+//  )(using
+//    clock: Clock
+//  ): Future[List[IndividualProvidedDetails]] =
+//    Future.traverse(individualProvidedDetailsList.zipWithIndex):
+//      case (tdIndividualProvidedDetails, index) =>
+//        val stubbedName = getIndividualName(index)
+//        Future.successful(tdIndividualProvidedDetails.copy(
+//          _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
+//          individualName = stubbedName,
+//          agentApplicationId = agentApplicationId,
+//          internalUserId = tdIndividualProvidedDetails.internalUserId.map(_ => internalUserIdGenerator.nextInternalUserId()),
+//          createdAt = Instant.now(clock)
+//        ))
+
+  private def updateIndividualProvidedDetails(
+    individualProvidedDetails: IndividualProvidedDetails,
+    agentApplicationId: AgentApplicationId,
+    individualName: IndividualName
   )(using
     clock: Clock
-  ): Future[List[IndividualProvidedDetails]] =
-    Future.traverse(individualProvidedDetailsList.zipWithIndex):
-      case (tdIndividualProvidedDetails, index) =>
-        val stubbedName = stubbedIdentityAt(index)
-        Future.successful(tdIndividualProvidedDetails.copy(
-          _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
-          individualName = stubbedName,
-          agentApplicationId = agentApplicationId,
-          internalUserId = tdIndividualProvidedDetails.internalUserId.map(_ => internalUserIdGenerator.nextInternalUserId()),
-          createdAt = Instant.now(clock)
-        ))
+  ): IndividualProvidedDetails = individualProvidedDetails.copy(
+    _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
+    individualName = individualName,
+    agentApplicationId = agentApplicationId,
+    internalUserId = individualProvidedDetails.internalUserId.map(_ => internalUserIdGenerator.nextInternalUserId()),
+    createdAt = Instant.now(clock)
+  )
 
-  private def stubbedIdentityAt(index: Int): IndividualName = TestOnlyData.chStubbedIndividualsBase.lift(index)
+  private def getIndividualName(index: Int): IndividualName = TestOnlyData
+    .individualNamesStubbedInCompaniesHouse
+    .lift(index)
     .getOrThrowExpectedDataMissing(s"No identity stubbed at index $index")
 
-  private def upsertIndividuals(
-    createdIndividuals: List[IndividualProvidedDetails]
-  )(using r: RequestWithAuth): Future[Unit] =
-    createdIndividuals.foldLeft(Future.unit):
-      (
-        acc,
-        individual
-      ) =>
-        for
-          _ <- acc
-          _ <- individualProvideDetailsService.upsertForApplication(individual)
-          _ <- companiesHouseIndividualService.storeIndividualProvidedDetails(individual.individualName.value, Some(TestOnlyData.saUtr.asUtr))
-        yield ()
+//  private def upsertIndividuals(
+//    createdIndividuals: List[IndividualProvidedDetails]
+//  )(using r: RequestWithAuth): Future[Unit] =
+//    createdIndividuals.foldLeft(Future.unit):
+//      (
+//        acc,
+//        individual
+//      ) =>
+//        for
+//          _ <- acc
+//          _ <- individualProvideDetailsService.upsertForApplication(individual)
+//          _ <- companiesHouseIndividualService.storeIndividualProvidedDetails(individual.individualName.value, Some(TestOnlyData.saUtr.asUtr))
+//        yield ()
 
   private def journeyDataFor(
     bt: BusinessType
@@ -230,9 +231,9 @@ extends FrontendController(mcc, applicantActions):
       case (id, linkId) =>
         agentApplication
           .withUpdatedIdentifiers(
-            id,
-            r.internalUserId,
-            linkId,
-            r.groupId,
-            Instant.now(clock)
+            id = id,
+            internalUserId = r.internalUserId,
+            linkId = linkId,
+            groupId = r.groupId,
+            createdAt = Instant.now(clock)
           )
