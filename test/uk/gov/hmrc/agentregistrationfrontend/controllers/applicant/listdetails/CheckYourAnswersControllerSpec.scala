@@ -165,7 +165,7 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterConfirmOtherRelevantIndividualsYes.agentApplicationId)
 
-  s"GET $path for incorporated (LLP) should return 200 and Change link for LLP member names should go to incorporated CYA" in:
+  s"GET $path for incorporated (LLP) FiveOrLess should show Companies House list correct row" in:
     val llpApplication: AgentApplicationLlp = tdAll.agentApplicationLlp.afterConfirmTwoChOfficers
     ApplyStubHelper.stubsForAuthAction(llpApplication)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
@@ -181,11 +181,12 @@ extends ControllerSpec:
     doc.select("h1").text() shouldBe "Check your answers"
 
     val changeLinks = doc.mainContent.select(".govuk-summary-list__actions a")
-    val llpMemberNamesChangeLink = changeLinks.asScala.find(_.text().contains("LLP member names"))
-    llpMemberNamesChangeLink shouldBe defined
-    llpMemberNamesChangeLink.fold(fail("LLP member names change link not found"))(link =>
-      link.attr("href") shouldBe AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
+    val companiesHouseCorrectLink = changeLinks.asScala.find(_.text().contains("Companies House list of LLP members correct"))
+    companiesHouseCorrectLink shouldBe defined
+    companiesHouseCorrectLink.fold(fail("Companies House list correct change link not found"))(link =>
+      link.attr("href") shouldBe AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show.url
     )
+    doc.mainContent.select(".govuk-summary-list__value").first().text() shouldBe "Yes"
 
     ApplyStubHelper.verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(llpApplication.agentApplicationId)

@@ -15,10 +15,13 @@
  *@
 
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
+@import uk.gov.hmrc.agentregistration.shared.getNumberOfCompaniesHouseOfficers
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedPartnership
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
+@import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLaterLinks
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.govukfrontend.views.html.components.*
@@ -56,6 +59,20 @@
 @isIncorporated = @{
     agentApplication match {
         case _: AgentApplicationLlp | _: AgentApplicationLimitedCompany | _: AgentApplicationLimitedPartnership | _: AgentApplicationScottishLimitedPartnership => true
+        case _ => false
+    }
+}
+
+@isFiveOrLessOfficers = @{
+    agentApplication match {
+        case a: IsIncorporated => a.getNumberOfCompaniesHouseOfficers.exists(_.isInstanceOf[FiveOrLessOfficers])
+        case _ => false
+    }
+}
+
+@fiveOrLessIsCorrect = @{
+    agentApplication match {
+        case a: IsIncorporated => a.getNumberOfCompaniesHouseOfficers.collect { case f: FiveOrLessOfficers => f.isCompaniesHouseOfficersListCorrect }.getOrElse(false)
         case _ => false
     }
 }
@@ -153,7 +170,26 @@
     else Seq.empty
 }
 
-@rows = @{keyNumberRow ++ keyNamesRow ++ hasOthersRow ++ otherNamesRow}
+@companiesHouseListCorrectRow = @{
+    Seq(
+        SummaryListRow(
+            key = Key(content = Text(messages(s"$key.companiesHouseListCorrect.$businessTypeKey.label"))),
+            value = Value(content = Text(if(fiveOrLessIsCorrect) messages("common.yes") else messages("common.no"))),
+            actions = Some(Actions(items = Seq(
+                ActionItem(
+                    href = AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show.url,
+                    content = Text(messages("common.change")),
+                    visuallyHiddenText = Some(messages(s"$key.companiesHouseListCorrect.$businessTypeKey.label"))
+                )
+            )))
+        )
+    )
+}
+
+@rows = @{
+    if (isFiveOrLessOfficers) companiesHouseListCorrectRow ++ hasOthersRow ++ otherNamesRow
+    else keyNumberRow ++ keyNamesRow ++ hasOthersRow ++ otherNamesRow
+}
 
 @layout(pageTitle = title) {
     <h2 class="govuk-caption-l">@messages(s"lists.caption.title.$businessTypeKey")</h2>
