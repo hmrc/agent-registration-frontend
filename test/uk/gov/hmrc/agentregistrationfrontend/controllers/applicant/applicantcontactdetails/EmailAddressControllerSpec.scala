@@ -44,25 +44,25 @@ extends ControllerSpec:
 
     val beforeTelephoneProvided: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionContactDetails
         .afterNameDeclared
 
     val beforeEmailAddressProvided: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionContactDetails
         .afterTelephoneNumberProvided
 
     val afterEmailAddressProvided: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionContactDetails
         .afterEmailAddressProvided
 
     val afterEmailAddressVerified: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionContactDetails
         .afterEmailAddressVerified
 

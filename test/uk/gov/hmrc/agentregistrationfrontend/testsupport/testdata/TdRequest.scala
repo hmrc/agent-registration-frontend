@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions.EmptyData
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 
 trait TdRequest {
   dependencies: TdBase =>

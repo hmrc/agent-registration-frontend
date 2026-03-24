@@ -25,6 +25,11 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 extension (agentApplication: AgentApplication)
 
+  private def isSoleTraderOwner: Boolean =
+    agentApplication match
+      case a: AgentApplication.IsSoleTrader => a.userRole.contains(UserRole.Owner)
+      case _: AgentApplication.IsNotSoleTrader => false
+
   def taskListStatus(existingList: List[IndividualProvidedDetails]): TaskListStatus = {
     val contactIsComplete = agentApplication.applicantContactDetails.exists(_.isComplete)
     val amlsDetailsCompleted = agentApplication.amlsDetails.exists(_.isComplete)
@@ -45,17 +50,18 @@ extension (agentApplication: AgentApplication)
         case a: AgentApplication.IsIncorporated =>
           NumberOfIndividuals.isKeyIndividualListComplete(existingList.count(_.isPersonOfControl), a.numberOfIndividuals)
           && otherRelevantIndividualsComplete(existingList)
-        case _: AgentApplication.IsSoleTrader => true
+        case _: AgentApplication.IsSoleTrader => contactIsComplete // we skip the list building for sole traders, so we consider list details complete if contact details are complete
 
     val listProgressComplete =
       existingList.nonEmpty
         && listDetailsCompleted(existingList)
         && existingList.forall(_.hasFinished)
-    // any state other than Precreated indicates the link has been sent; require the list to be non-empty
+    // any state other than Precreated indicates the link has been sent; require the list to be non-empty for all except sole trader owners
     val listSharingComplete =
-      existingList.nonEmpty
+      (existingList.nonEmpty || agentApplication.isSoleTraderOwner)
         && listDetailsCompleted(existingList)
         && existingList.forall(_.providedDetailsState =!= ProvidedDetailsState.Precreated)
+
     TaskListStatus(
       contactDetails = TaskStatus(
         canStart = true, // Contact details can be started at any time

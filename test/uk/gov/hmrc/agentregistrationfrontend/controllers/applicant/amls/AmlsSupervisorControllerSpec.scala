@@ -30,25 +30,25 @@ extends ControllerSpec:
 
   private object agentApplication:
 
-    val baseForSectionAmls: AgentApplication = tdAll.agentApplicationLlp.baseForSectionAmls
+    val baseForSectionAmls: AgentApplication = tdAll.agentApplicationLlpSections.baseForSectionAmls
 
     val afterSupervisoryBodySelected: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
         .afterSupervisoryBodySelected
 
     val afterHmrcSelected: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAmls
         .whenSupervisorBodyIsHmrc
         .afterSupervisoryBodySelected
 
     val afterHmrcRegistrationNumberStored: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAmls
         .whenSupervisorBodyIsHmrc
         .afterRegistrationNumberProvided

@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication
+package uk.gov.hmrc.agentregistration.shared.testdata.agentapplication
 
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.ApplicationState.GrsDataReceived
-import uk.gov.hmrc.agentregistration.shared.CheckResult
-import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
-import uk.gov.hmrc.agentregistration.shared.UserRole
+import uk.gov.hmrc.agentregistration.shared.agentdetails.*
+import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsLlp
+import uk.gov.hmrc.agentregistration.shared.businessdetails.CompanyProfile
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantEmailAddress
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAgentDetails
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAmls
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionContactDetails
+import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
+import uk.gov.hmrc.agentregistration.shared.testdata.TdGrsBusinessDetails
+import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData
 
-trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionContactDetails & TdGrs & TdSectionAgentDetails) =>
+trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
 
   object agentApplicationLlp:
 
@@ -59,7 +58,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
 
     val afterGrsDataReceived: AgentApplicationLlp = afterStarted.copy(
       businessDetails = Some(
-        dependencies.grs.llp.businessDetails
+        dependencies.grsBusinessDetails.llp.businessDetails
       ),
       applicationState = GrsDataReceived
     )
@@ -139,19 +138,55 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdSectionAmls & TdSectionC
       submittedAt = Some(dependencies.nowAsInstant)
     )
 
-    val baseForSectionAmls: AgentApplicationLlp = afterGrsDataReceived
-    protected val agentApplicationLlpWithSectionAmls = new AgentApplicationWithSectionAmls(baseForSectionAmls = baseForSectionAmls)
-    export agentApplicationLlpWithSectionAmls.sectionAmls
-
-    val baseForSectionContactDetails: AgentApplicationLlp = afterGrsDataReceived
-    protected val tdAgentApplicationLlpWithSectionContactDetails =
-      new TdAgentApplicationWithSectionContactDetails(baseForSectionContactDetails = baseForSectionContactDetails)
-
-    export tdAgentApplicationLlpWithSectionContactDetails.sectionContactDetails
-
-    protected val tdAgentApplicationLlpWithSectionAgentDetails =
-      new TdAgentApplicationWithSectionAgentDetails(baseForSectionAgentDetails = afterContactDetailsComplete)
-
-    export tdAgentApplicationLlpWithSectionAgentDetails.sectionAgentDetails
+    val afterSentForRisking: AgentApplicationLlp = afterDeclarationSubmitted.copy(
+      userRole = Some(UserRole.Partner),
+      businessDetails = Some(BusinessDetailsLlp(
+        companyProfile = CompanyProfile(
+          companyNumber = dependencies.crn,
+          companyName = "Test LLP",
+          dateOfIncorporation = Some(java.time.LocalDate.now()),
+          unsanitisedCHROAddress = None
+        ),
+        saUtr = dependencies.saUtr,
+        safeId = SafeId("AARN1234567")
+      )),
+      applicantContactDetails = Some(ApplicantContactDetails(
+        applicantName = ApplicantName(dependencies.authorisedPersonName),
+        telephoneNumber = Some(dependencies.telephoneNumber),
+        applicantEmailAddress = Some(ApplicantEmailAddress(dependencies.applicantEmailAddress, isVerified = true))
+      )),
+      amlsDetails = Some(AmlsDetails(
+        supervisoryBody = AmlsCode("HMRC"),
+        amlsRegistrationNumber = Some(AmlsRegistrationNumber("XAML1234567890")),
+        amlsExpiryDate = Some(java.time.LocalDate.parse(dependencies.dateString)),
+        amlsEvidence = Some(uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence(
+          uk.gov.hmrc.agentregistration.shared.upload.UploadId("evidence-reference-123"),
+          "certificate.pdf",
+          uk.gov.hmrc.objectstore.client.Path.File("/test.txt")
+        ))
+      )),
+      agentDetails = Some(AgentDetails(
+        businessName = AgentBusinessName(
+          agentBusinessName = "Test LLP",
+          otherAgentBusinessName = None
+        ),
+        telephoneNumber = Some(AgentTelephoneNumber(
+          agentTelephoneNumber = dependencies.telephoneNumber.value,
+          otherAgentTelephoneNumber = None
+        )),
+        agentEmailAddress = Some(AgentVerifiedEmailAddress(
+          emailAddress = AgentEmailAddress(
+            agentEmailAddress = dependencies.applicantEmailAddress.value,
+            otherAgentEmailAddress = None
+          ),
+          isVerified = true
+        )),
+        agentCorrespondenceAddress = None
+      )),
+      companyStatusCheckResult = None,
+      hasOtherRelevantIndividuals = Some(true),
+      vrns = Some(List(Vrn("123456789"), Vrn("123456789"))),
+      payeRefs = Some(List(PayeRef("123/AB12345"), PayeRef("123/AB12345")))
+    )
 
 }

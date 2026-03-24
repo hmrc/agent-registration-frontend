@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.providedetails.individual
+package uk.gov.hmrc.agentregistration.shared.testdata.providedetails.individual
 
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
@@ -25,9 +25,9 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualVerifiedEmailAd
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Precreated
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Started
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
+import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 
-trait TdIndividualProvidedDetails { dependencies: (TdBase) =>
+trait TdIndividualProvidedDetails { dependencies: TdBase =>
 
   object providedDetails:
 

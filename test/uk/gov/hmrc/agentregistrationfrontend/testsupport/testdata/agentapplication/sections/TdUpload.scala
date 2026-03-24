@@ -28,7 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadEventDetails
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadNotificationRequest
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadStatus
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
+import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 
 trait TdUpload { dependencies: TdBase =>
 

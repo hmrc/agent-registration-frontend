@@ -54,25 +54,25 @@ import scala.util.chaining.scalaUtilChainingOps
 
 @Singleton
 class FastForwardController @Inject() (
-  mcc: MessagesControllerComponents,
-  applicantActions: ApplicantActions,
-  applicantAuthRefiner: ApplicantAuthRefiner,
-  fastForwardPage: FastForwardPage,
-  stubUserService: StubUserService,
-  grsStubService: GrsStubService,
-  applicationService: AgentApplicationService,
-  agentApplicationIdGenerator: AgentApplicationIdGenerator,
-  linkIdGenerator: LinkIdGenerator,
-  individualProvideDetailsService: IndividualProvideDetailsService,
-  agentRegistrationRiskingService: AgentRegistrationRiskingService,
-  internalUserIdGenerator: InternalUserIdGenerator,
-  individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator,
-  companiesHouseIndividualService: CompaniesHouseIndividualService
-)(using
-  clock: Clock,
-  ex: ExecutionContext
-)
-extends FrontendController(mcc, applicantActions):
+                                        mcc: MessagesControllerComponents,
+                                        applicantActions: ApplicantActions,
+                                        applicantAuthRefiner: ApplicantAuthRefiner,
+                                        fastForwardPage: FastForwardPage,
+                                        stubUserService: StubUserService,
+                                        grsStubService: GrsStubService,
+                                        applicationService: AgentApplicationService,
+                                        agentApplicationIdGenerator: AgentApplicationIdGenerator,
+                                        linkIdGenerator: LinkIdGenerator,
+                                        individualProvideDetailsService: IndividualProvideDetailsService,
+                                        agentRegistrationRiskingService: AgentRegistrationRiskingService,
+                                        internalUserIdGenerator: InternalUserIdGenerator,
+                                        individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator,
+                                        companiesHouseIndividualService: CompaniesHouseIndividualService
+                                      )(using
+                                        clock: Clock,
+                                        ex: ExecutionContext
+                                      )
+  extends FrontendController(mcc, applicantActions):
 
   def show: Action[AnyContent] = applicantActions.action:
     implicit request =>
@@ -136,9 +136,9 @@ extends FrontendController(mcc, applicantActions):
     yield ()
 
   private def sendForRiskingIfNeeded(
-    agentApplication: AgentApplication,
-    individuals: List[IndividualProvidedDetails]
-  )(using request: RequestHeader) =
+                                      agentApplication: AgentApplication,
+                                      individuals: List[IndividualProvidedDetails]
+                                    )(using request: RequestHeader) =
     if agentApplication.applicationState.sentForRisking
     then
       agentRegistrationRiskingService.submitForRisking(
@@ -158,30 +158,30 @@ extends FrontendController(mcc, applicantActions):
       )
     yield ()
 
-//  private def createIndividualProvidedDetailsList(
-//    individualProvidedDetailsList: List[IndividualProvidedDetails],
-//    agentApplicationId: AgentApplicationId
-//  )(using
-//    clock: Clock
-//  ): Future[List[IndividualProvidedDetails]] =
-//    Future.traverse(individualProvidedDetailsList.zipWithIndex):
-//      case (tdIndividualProvidedDetails, index) =>
-//        val stubbedName = getIndividualName(index)
-//        Future.successful(tdIndividualProvidedDetails.copy(
-//          _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
-//          individualName = stubbedName,
-//          agentApplicationId = agentApplicationId,
-//          internalUserId = tdIndividualProvidedDetails.internalUserId.map(_ => internalUserIdGenerator.nextInternalUserId()),
-//          createdAt = Instant.now(clock)
-//        ))
+  //  private def createIndividualProvidedDetailsList(
+  //    individualProvidedDetailsList: List[IndividualProvidedDetails],
+  //    agentApplicationId: AgentApplicationId
+  //  )(using
+  //    clock: Clock
+  //  ): Future[List[IndividualProvidedDetails]] =
+  //    Future.traverse(individualProvidedDetailsList.zipWithIndex):
+  //      case (tdIndividualProvidedDetails, index) =>
+  //        val stubbedName = getIndividualName(index)
+  //        Future.successful(tdIndividualProvidedDetails.copy(
+  //          _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
+  //          individualName = stubbedName,
+  //          agentApplicationId = agentApplicationId,
+  //          internalUserId = tdIndividualProvidedDetails.internalUserId.map(_ => internalUserIdGenerator.nextInternalUserId()),
+  //          createdAt = Instant.now(clock)
+  //        ))
 
   private def updateIndividualProvidedDetails(
-    individualProvidedDetails: IndividualProvidedDetails,
-    agentApplicationId: AgentApplicationId,
-    individualName: IndividualName
-  )(using
-    clock: Clock
-  ): IndividualProvidedDetails = individualProvidedDetails.copy(
+                                               individualProvidedDetails: IndividualProvidedDetails,
+                                               agentApplicationId: AgentApplicationId,
+                                               individualName: IndividualName
+                                             )(using
+                                               clock: Clock
+                                             ): IndividualProvidedDetails = individualProvidedDetails.copy(
     _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
     individualName = individualName,
     agentApplicationId = agentApplicationId,
@@ -194,35 +194,35 @@ extends FrontendController(mcc, applicantActions):
     .lift(index)
     .getOrThrowExpectedDataMissing(s"No identity stubbed at index $index")
 
-//  private def upsertIndividuals(
-//    createdIndividuals: List[IndividualProvidedDetails]
-//  )(using r: RequestWithAuth): Future[Unit] =
-//    createdIndividuals.foldLeft(Future.unit):
-//      (
-//        acc,
-//        individual
-//      ) =>
-//        for
-//          _ <- acc
-//          _ <- individualProvideDetailsService.upsertForApplication(individual)
-//          _ <- companiesHouseIndividualService.storeIndividualProvidedDetails(individual.individualName.value, Some(TestOnlyData.saUtr.asUtr))
-//        yield ()
+  //  private def upsertIndividuals(
+  //    createdIndividuals: List[IndividualProvidedDetails]
+  //  )(using r: RequestWithAuth): Future[Unit] =
+  //    createdIndividuals.foldLeft(Future.unit):
+  //      (
+  //        acc,
+  //        individual
+  //      ) =>
+  //        for
+  //          _ <- acc
+  //          _ <- individualProvideDetailsService.upsertForApplication(individual)
+  //          _ <- companiesHouseIndividualService.storeIndividualProvidedDetails(individual.individualName.value, Some(TestOnlyData.saUtr.asUtr))
+  //        yield ()
 
   private def journeyDataFor(
-    bt: BusinessType
-  ): JourneyData =
+                              bt: BusinessType
+                            ): JourneyData =
     bt match
-      case BusinessType.Partnership.LimitedLiabilityPartnership => TestOnlyData.grs.llp.journeyData
-      case BusinessType.Partnership.GeneralPartnership => TestOnlyData.grs.generalPartnership.journeyData
-      case BusinessType.Partnership.ScottishPartnership => TestOnlyData.grs.scottishPartnership.journeyData
-      case BusinessType.Partnership.ScottishLimitedPartnership => TestOnlyData.grs.scottishLtdPartnership.journeyData
-      case BusinessType.Partnership.LimitedPartnership => TestOnlyData.grs.ltdPartnership.journeyData
-      case BusinessType.SoleTrader => TestOnlyData.grs.soleTrader.journeyData
-      case BusinessType.LimitedCompany => TestOnlyData.grs.ltd.journeyData
+      case BusinessType.Partnership.LimitedLiabilityPartnership => GrsTestData.grs.llp.journeyData
+      case BusinessType.Partnership.GeneralPartnership => GrsTestData.grs.generalPartnership.journeyData
+      case BusinessType.Partnership.ScottishPartnership => GrsTestData.grs.scottishPartnership.journeyData
+      case BusinessType.Partnership.ScottishLimitedPartnership => GrsTestData.grs.scottishLtdPartnership.journeyData
+      case BusinessType.Partnership.LimitedPartnership => GrsTestData.grs.ltdPartnership.journeyData
+      case BusinessType.SoleTrader => GrsTestData.grs.soleTrader.journeyData
+      case BusinessType.LimitedCompany => GrsTestData.grs.ltd.journeyData
 
   private def updateAgentApplication(agentApplication: AgentApplication)(using
-    r: RequestWithAuth,
-    clock: Clock
+                                                                         r: RequestWithAuth,
+                                                                         clock: Clock
   ): Future[AgentApplication] =
     val identifiers: Future[(AgentApplicationId, LinkId)] = applicationService.find().map:
       case Some(existingApplication) => (existingApplication.agentApplicationId, existingApplication.linkId)

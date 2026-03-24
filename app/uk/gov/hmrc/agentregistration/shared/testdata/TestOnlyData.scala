@@ -14,29 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
+package uk.gov.hmrc.agentregistration.shared.testdata
 
-import uk.gov.hmrc.agentregistration.shared.Crn
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.*
+import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.*
 
 trait TestOnlyData
-extends TdBase,
-  TdGrs,
-  TdAgentApplicationLlp,
-  TdAgentApplicationGeneralPartnership,
-  TdAgentApplicationScottishPartnership,
-  TdAgentApplicationSoleTrader,
-  TdAgentApplicationLimitedCompany,
-  TdAgentApplicationLimitedPartnership,
-  TdAgentApplicationScottishLimitedPartnership,
-  agentapplication.sections.TdSectionContactDetails,
-  agentapplication.sections.TdSectionAgentDetails,
-  agentapplication.sections.TdUpload,
-  agentapplication.sections.TdSectionAmls,
-  providedetails.individual.TdIndividualProvidedDetails
+  extends TdBase,
+    TdAgentApplicationLlp,
+    TdAgentApplicationGeneralPartnership,
+    TdAgentApplicationScottishPartnership,
+    TdAgentApplicationSoleTrader,
+    TdAgentApplicationLimitedCompany,
+    TdAgentApplicationLimitedPartnership,
+    TdAgentApplicationScottishLimitedPartnership,
+    providedetails.individual.TdIndividualProvidedDetails,
+    TdGrsBusinessDetails
 
 object TestOnlyData
-extends TestOnlyData:
+  extends TestOnlyData:
 
   object llp:
 

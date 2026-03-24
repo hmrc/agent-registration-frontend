@@ -20,7 +20,7 @@ import com.softwaremill.quicklens.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.contactdetails.*
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
+import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 
 trait TdSectionContactDetails {
   dependencies: TdBase =>
