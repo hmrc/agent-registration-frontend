@@ -95,7 +95,10 @@
     Seq(
         SummaryListRow(
             key = Key(content = Text(messages(s"$key.numberOfPartners.$businessTypeKey.label"))),
-            value = Value(content = Text(nonIncorporatedIndividualsList.size.toString)),
+            value = Value(content = Text(agentApplication match {
+                case a: IsIncorporated => a.getNumberOfCompaniesHouseOfficers.map(_.numberOfIndividuals.toString).getOrElse("")
+                case _ => nonIncorporatedIndividualsList.size.toString
+            })),
             actions = Some(Actions(items = Seq(
                 ActionItem(
                     href = changeNumberHref,
