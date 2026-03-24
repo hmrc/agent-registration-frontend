@@ -41,7 +41,8 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.util.InternalUserIdGenerator
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
+
 import uk.gov.hmrc.http.SessionKeys
 
 import java.time.Clock
@@ -54,25 +55,25 @@ import scala.util.chaining.scalaUtilChainingOps
 
 @Singleton
 class FastForwardController @Inject() (
-                                        mcc: MessagesControllerComponents,
-                                        applicantActions: ApplicantActions,
-                                        applicantAuthRefiner: ApplicantAuthRefiner,
-                                        fastForwardPage: FastForwardPage,
-                                        stubUserService: StubUserService,
-                                        grsStubService: GrsStubService,
-                                        applicationService: AgentApplicationService,
-                                        agentApplicationIdGenerator: AgentApplicationIdGenerator,
-                                        linkIdGenerator: LinkIdGenerator,
-                                        individualProvideDetailsService: IndividualProvideDetailsService,
-                                        agentRegistrationRiskingService: AgentRegistrationRiskingService,
-                                        internalUserIdGenerator: InternalUserIdGenerator,
-                                        individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator,
-                                        companiesHouseIndividualService: CompaniesHouseIndividualService
-                                      )(using
-                                        clock: Clock,
-                                        ex: ExecutionContext
-                                      )
-  extends FrontendController(mcc, applicantActions):
+  mcc: MessagesControllerComponents,
+  applicantActions: ApplicantActions,
+  applicantAuthRefiner: ApplicantAuthRefiner,
+  fastForwardPage: FastForwardPage,
+  stubUserService: StubUserService,
+  grsStubService: GrsStubService,
+  applicationService: AgentApplicationService,
+  agentApplicationIdGenerator: AgentApplicationIdGenerator,
+  linkIdGenerator: LinkIdGenerator,
+  individualProvideDetailsService: IndividualProvideDetailsService,
+  agentRegistrationRiskingService: AgentRegistrationRiskingService,
+  internalUserIdGenerator: InternalUserIdGenerator,
+  individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator,
+  companiesHouseIndividualService: CompaniesHouseIndividualService
+)(using
+  clock: Clock,
+  ex: ExecutionContext
+)
+extends FrontendController(mcc, applicantActions):
 
   def show: Action[AnyContent] = applicantActions.action:
     implicit request =>
@@ -130,15 +131,16 @@ class FastForwardController @Inject() (
         .pipe(Future.sequence)
       _ <- individuals
         .map: individual =>
-          companiesHouseIndividualService.storeIndividualProvidedDetails(individual.individualName.value, Some(TestOnlyData.saUtr.asUtr))
+          val saUtr = TdTestOnly.saUtr.asUtr // TODO: this has to come from completed section
+          companiesHouseIndividualService.storeIndividualProvidedDetails(individual.individualName.value, Some(saUtr))
         .pipe(Future.sequence)
       _ <- sendForRiskingIfNeeded(agentApplication, individuals)
     yield ()
 
   private def sendForRiskingIfNeeded(
-                                      agentApplication: AgentApplication,
-                                      individuals: List[IndividualProvidedDetails]
-                                    )(using request: RequestHeader) =
+    agentApplication: AgentApplication,
+    individuals: List[IndividualProvidedDetails]
+  )(using request: RequestHeader) =
     if agentApplication.applicationState.sentForRisking
     then
       agentRegistrationRiskingService.submitForRisking(
@@ -176,12 +178,12 @@ class FastForwardController @Inject() (
   //        ))
 
   private def updateIndividualProvidedDetails(
-                                               individualProvidedDetails: IndividualProvidedDetails,
-                                               agentApplicationId: AgentApplicationId,
-                                               individualName: IndividualName
-                                             )(using
-                                               clock: Clock
-                                             ): IndividualProvidedDetails = individualProvidedDetails.copy(
+    individualProvidedDetails: IndividualProvidedDetails,
+    agentApplicationId: AgentApplicationId,
+    individualName: IndividualName
+  )(using
+    clock: Clock
+  ): IndividualProvidedDetails = individualProvidedDetails.copy(
     _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
     individualName = individualName,
     agentApplicationId = agentApplicationId,
@@ -189,7 +191,7 @@ class FastForwardController @Inject() (
     createdAt = Instant.now(clock)
   )
 
-  private def getIndividualName(index: Int): IndividualName = TestOnlyData
+  private def getIndividualName(index: Int): IndividualName = TdTestOnly // TODO: this has to compre from completedSection
     .individualNamesStubbedInCompaniesHouse
     .lift(index)
     .getOrThrowExpectedDataMissing(s"No identity stubbed at index $index")
@@ -209,20 +211,20 @@ class FastForwardController @Inject() (
   //        yield ()
 
   private def journeyDataFor(
-                              bt: BusinessType
-                            ): JourneyData =
+    bt: BusinessType
+  ): JourneyData =
     bt match
-      case BusinessType.Partnership.LimitedLiabilityPartnership => GrsTestData.grs.llp.journeyData
-      case BusinessType.Partnership.GeneralPartnership => GrsTestData.grs.generalPartnership.journeyData
-      case BusinessType.Partnership.ScottishPartnership => GrsTestData.grs.scottishPartnership.journeyData
-      case BusinessType.Partnership.ScottishLimitedPartnership => GrsTestData.grs.scottishLtdPartnership.journeyData
-      case BusinessType.Partnership.LimitedPartnership => GrsTestData.grs.ltdPartnership.journeyData
-      case BusinessType.SoleTrader => GrsTestData.grs.soleTrader.journeyData
-      case BusinessType.LimitedCompany => GrsTestData.grs.ltd.journeyData
+      case BusinessType.Partnership.LimitedLiabilityPartnership => TdTestOnly.grsJourneyData.llp.journeyData
+      case BusinessType.Partnership.GeneralPartnership => TdTestOnly.grsJourneyData.generalPartnership.journeyData
+      case BusinessType.Partnership.ScottishPartnership => TdTestOnly.grsJourneyData.scottishPartnership.journeyData
+      case BusinessType.Partnership.ScottishLimitedPartnership => TdTestOnly.grsJourneyData.scottishLtdPartnership.journeyData
+      case BusinessType.Partnership.LimitedPartnership => TdTestOnly.grsJourneyData.ltdPartnership.journeyData
+      case BusinessType.SoleTrader => TdTestOnly.grsJourneyData.soleTrader.journeyData
+      case BusinessType.LimitedCompany => TdTestOnly.grsJourneyData.ltd.journeyData
 
   private def updateAgentApplication(agentApplication: AgentApplication)(using
-                                                                         r: RequestWithAuth,
-                                                                         clock: Clock
+    r: RequestWithAuth,
+    clock: Clock
   ): Future[AgentApplication] =
     val identifiers: Future[(AgentApplicationId, LinkId)] = applicationService.find().map:
       case Some(existingApplication) => (existingApplication.agentApplicationId, existingApplication.linkId)

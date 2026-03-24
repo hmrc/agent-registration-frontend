@@ -20,7 +20,6 @@ import play.api.libs.ws.WSResponse
 import play.api.mvc.Call
 
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData.nino
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CitizenDetailsStub
@@ -69,27 +68,27 @@ extends ControllerSpec:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRefusalToDealWithCheckPass)
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterDeceasedCheckPass)
-    CitizenDetailsStub.stubDesignatoryDetailsFound(nino = nino, deceased = false)
+    CitizenDetailsStub.stubDesignatoryDetailsFound(nino = tdAll.nino, deceased = false)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe nextPageUrl
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
-    CitizenDetailsStub.verifyDesignatoryDetails(nino = nino)
+    CitizenDetailsStub.verifyDesignatoryDetails(nino = tdAll.nino)
 
   s"GET $path when deceased should update application with fail status and open entity checks fail page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRefusalToDealWithCheckPass)
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterDeceasedCheckFail)
-    CitizenDetailsStub.stubDesignatoryDetailsFound(nino = nino, deceased = true)
+    CitizenDetailsStub.stubDesignatoryDetailsFound(nino = tdAll.nino, deceased = true)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe cannotRegisterPage
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
-    CitizenDetailsStub.verifyDesignatoryDetails(nino = nino)
+    CitizenDetailsStub.verifyDesignatoryDetails(nino = tdAll.nino)
 
   s"GET $path should redirect to company status check when deceased check already pass" in:
     AuthStubs.stubAuthorise()
@@ -100,20 +99,20 @@ extends ControllerSpec:
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication(0)
-    CitizenDetailsStub.verifyDesignatoryDetails(nino = nino, 0)
+    CitizenDetailsStub.verifyDesignatoryDetails(nino = tdAll.nino, 0)
 
   s"GET $path should run deceased check when deceased check already fail" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterDeceasedCheckFail)
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterDeceasedCheckPass)
-    CitizenDetailsStub.stubDesignatoryDetailsFound(nino = nino, deceased = false)
+    CitizenDetailsStub.stubDesignatoryDetailsFound(nino = tdAll.nino, deceased = false)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe nextPageUrl
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
-    CitizenDetailsStub.verifyDesignatoryDetails(nino = nino)
+    CitizenDetailsStub.verifyDesignatoryDetails(nino = tdAll.nino)
 
   s"GET $path should redirect to company status check when business type is not SoleTrader like LLP" in:
     AuthStubs.stubAuthorise()
@@ -124,4 +123,4 @@ extends ControllerSpec:
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication(0)
-    CitizenDetailsStub.verifyDesignatoryDetails(nino = nino, 0)
+    CitizenDetailsStub.verifyDesignatoryDetails(nino = tdAll.nino, 0)

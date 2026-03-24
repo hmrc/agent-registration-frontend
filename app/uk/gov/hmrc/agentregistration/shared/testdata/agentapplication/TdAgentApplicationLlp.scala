@@ -28,7 +28,6 @@ import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 import uk.gov.hmrc.agentregistration.shared.testdata.TdGrsBusinessDetails
-import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData
 
 trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
 
@@ -98,34 +97,34 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
 
     val afterConfirmCompaniesHouseOfficersYes: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
-        TestOnlyData.fiveOrLessCompaniesHouseOfficers
+        dependencies.fiveOrLessCompaniesHouseOfficers
       )
     )
 
     // I select 4 officers, companies house returns 6
     val afterNumberOfConfirmCompaniesHouseOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
-        TestOnlyData.sixOrMoreCompaniesHouseOfficers
+        dependencies.sixOrMoreCompaniesHouseOfficers
       )
     )
 
     val afterConfirmTwoChOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
-        TestOnlyData.twoCompaniesHouseOfficers
+        dependencies.twoCompaniesHouseOfficers
       ),
       hasOtherRelevantIndividuals = Some(false)
     )
 
     val afterConfirmSixChOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
-        TestOnlyData.sixCompaniesHouseOfficersSelectAll
+        dependencies.sixCompaniesHouseOfficersSelectAll
       ),
       hasOtherRelevantIndividuals = Some(false)
     )
 
     val afterConfirmCompaniesHouseOfficersNo: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
-        TestOnlyData.fiveOrLessCompaniesHouseOfficers.copy(isCompaniesHouseOfficersListCorrect = false)
+        dependencies.fiveOrLessCompaniesHouseOfficers.copy(isCompaniesHouseOfficersListCorrect = false)
       )
     )
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,33 +14,28 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.testdata
+package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
-import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.*
+import uk.gov.hmrc.agentregistration.shared.Crn
+import uk.gov.hmrc.agentregistration.shared.testdata.TdShared
 
-trait TestOnlyData
-  extends TdBase,
-    TdAgentApplicationLlp,
-    TdAgentApplicationGeneralPartnership,
-    TdAgentApplicationScottishPartnership,
-    TdAgentApplicationSoleTrader,
-    TdAgentApplicationLimitedCompany,
-    TdAgentApplicationLimitedPartnership,
-    TdAgentApplicationScottishLimitedPartnership,
-    providedetails.individual.TdIndividualProvidedDetails,
-    TdGrsBusinessDetails
+/** Test Data (Td) user for TestOnly endpoints
+  */
+trait TdTestOnly
+extends TdShared
+with TdGrsJourneyData
 
-object TestOnlyData
-  extends TestOnlyData:
+object TdTestOnly
+extends TdTestOnly:
 
   object llp:
 
-    val twoChOfficers: TestOnlyData =
-      new TestOnlyData:
+    val twoChOfficers: TdTestOnly =
+      new TdTestOnly:
         val crnTwoChOfficers = Crn("22222222")
         override def crn: Crn = crnTwoChOfficers
 
-    val sixChOfficers: TestOnlyData =
-      new TestOnlyData:
+    val sixChOfficers: TdTestOnly =
+      new TdTestOnly:
         val crnSixChOfficers = Crn("22222226")
         override def crn: Crn = crnSixChOfficers

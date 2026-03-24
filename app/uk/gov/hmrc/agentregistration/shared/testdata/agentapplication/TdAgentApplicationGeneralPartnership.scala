@@ -54,7 +54,7 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdGrsBusine
 
     val afterGrsDataReceived: AgentApplicationGeneralPartnership = afterStarted.copy(
       businessDetails = Some(
-        dependencies.grs.generalPartnership.businessDetails
+        dependencies.grsBusinessDetails.generalPartnership.businessDetails
       ),
       applicationState = GrsDataReceived
     )
