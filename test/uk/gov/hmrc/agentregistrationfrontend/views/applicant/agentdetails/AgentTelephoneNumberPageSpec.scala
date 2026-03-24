@@ -32,7 +32,7 @@ extends ViewSpec:
   implicit val agentApplicationRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(
     agentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterBusinessNameProvided

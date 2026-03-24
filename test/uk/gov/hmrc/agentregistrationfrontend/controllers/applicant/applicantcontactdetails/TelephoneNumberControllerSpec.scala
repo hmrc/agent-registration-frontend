@@ -32,13 +32,13 @@ extends ControllerSpec:
 
     val beforeTelephoneUpdate: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionContactDetails
         .afterNameDeclared
 
     val afterTelephoneNumberProvided: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionContactDetails
         .afterTelephoneNumberProvided
 

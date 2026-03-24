@@ -14,13 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
+package uk.gov.hmrc.agentregistration.shared.testdata
 
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.*
+import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.*
 
-object TestOnlyData
+trait TestOnlyData
 extends TdBase,
-  TdGrs,
   TdAgentApplicationLlp,
   TdAgentApplicationGeneralPartnership,
   TdAgentApplicationScottishPartnership,
@@ -28,8 +27,8 @@ extends TdBase,
   TdAgentApplicationLimitedCompany,
   TdAgentApplicationLimitedPartnership,
   TdAgentApplicationScottishLimitedPartnership,
-  agentapplication.sections.TdSectionContactDetails,
-  agentapplication.sections.TdSectionAgentDetails,
-  agentapplication.sections.TdUpload,
-  agentapplication.sections.TdSectionAmls,
-  providedetails.individual.TdIndividualProvidedDetails
+  providedetails.individual.TdIndividualProvidedDetails,
+  TdGrsBusinessDetails
+
+object TestOnlyData
+extends TestOnlyData

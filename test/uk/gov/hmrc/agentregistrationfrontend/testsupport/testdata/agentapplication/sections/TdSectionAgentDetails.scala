@@ -19,11 +19,14 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplicat
 import com.softwaremill.quicklens.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.agentdetails.*
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
-import uk.gov.hmrc.agentregistrationfrontend.util.Errors.*
+import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
+import uk.gov.hmrc.agentregistration.shared.util.Errors.*
+import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
 
 trait TdSectionAgentDetails {
   dependencies: TdBase =>
+
+  def getConfirmedAddressResponse: GetConfirmedAddressResponse
 
   class TdAgentApplicationWithSectionAgentDetails(baseForSectionAgentDetails: AgentApplication):
 

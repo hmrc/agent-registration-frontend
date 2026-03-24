@@ -33,7 +33,7 @@ extends ViewSpec:
     .makeAgentApplicationRequest(
       agentApplication =
         tdAll
-          .agentApplicationLlp
+          .agentApplicationLlpSections
           .sectionContactDetails
           .afterNameDeclared
     )

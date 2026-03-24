@@ -34,7 +34,7 @@ extends ViewSpec:
   object agentApplication:
     val complete: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionAgentDetails
         .whenUsingExistingCompanyName
         .afterBprAddressSelected

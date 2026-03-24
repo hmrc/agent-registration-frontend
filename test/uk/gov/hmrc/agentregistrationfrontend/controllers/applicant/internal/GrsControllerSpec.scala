@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.GrsStubs
 class GrsControllerSpec
 extends ControllerSpec:
 
-  private val journeyId: JourneyId = tdAll.grs.journeyId
+  private val journeyId: JourneyId = tdAll.grsJourneyData.journeyId
 
   private val startJourneyPath: String = "/agent-registration/apply/internal/grs/start-journey"
   private val journeyCallbackPath: String = s"/agent-registration/apply/internal/grs/journey-callback?journeyId=${journeyId.value}"

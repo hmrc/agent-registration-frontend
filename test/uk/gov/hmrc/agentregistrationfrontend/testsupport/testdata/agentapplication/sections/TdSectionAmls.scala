@@ -22,7 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
+import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 import uk.gov.hmrc.objectstore.client.Path
 
 import java.time.LocalDate

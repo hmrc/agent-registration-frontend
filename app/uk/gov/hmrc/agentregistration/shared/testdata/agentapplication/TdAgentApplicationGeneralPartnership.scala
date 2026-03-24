@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication
+package uk.gov.hmrc.agentregistration.shared.testdata.agentapplication
 
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
@@ -24,13 +24,10 @@ import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdBase
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdGrs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAgentDetails
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionAmls
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplication.sections.TdSectionContactDetails
+import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
+import uk.gov.hmrc.agentregistration.shared.testdata.TdGrsBusinessDetails
 
-trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAmls & TdSectionContactDetails & TdGrs & TdSectionAgentDetails) =>
+trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdGrsBusinessDetails) =>
 
   object agentApplicationGeneralPartnership:
 
@@ -57,7 +54,7 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
 
     val afterGrsDataReceived: AgentApplicationGeneralPartnership = afterStarted.copy(
       businessDetails = Some(
-        dependencies.grs.generalPartnership.businessDetails
+        dependencies.grsBusinessDetails.generalPartnership.businessDetails
       ),
       applicationState = GrsDataReceived
     )
@@ -131,20 +128,5 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdSectionAm
       applicationState = ApplicationState.SentForRisking,
       submittedAt = Some(dependencies.nowAsInstant)
     )
-
-    val baseForSectionAmls: AgentApplicationGeneralPartnership = afterGrsDataReceived
-    protected val agentApplicationWithSectionAmls = new AgentApplicationWithSectionAmls(baseForSectionAmls = baseForSectionAmls)
-    export agentApplicationWithSectionAmls.sectionAmls
-
-    val baseForSectionContactDetails: AgentApplicationGeneralPartnership = afterGrsDataReceived
-    protected val tdAgentApplicationLlpWithSectionContactDetails =
-      new TdAgentApplicationWithSectionContactDetails(baseForSectionContactDetails = baseForSectionContactDetails)
-
-    export tdAgentApplicationLlpWithSectionContactDetails.sectionContactDetails
-
-    protected val tdAgentApplicationLlpWithSectionAgentDetails =
-      new TdAgentApplicationWithSectionAgentDetails(baseForSectionAgentDetails = afterContactDetailsComplete)
-
-    export tdAgentApplicationLlpWithSectionAgentDetails.sectionAgentDetails
 
 }

@@ -40,7 +40,7 @@ extends ViewSpec:
   object agentApplication:
     val complete: AgentApplication =
       tdAll
-        .agentApplicationLlp
+        .agentApplicationLlpSections
         .sectionContactDetails
         .afterEmailAddressVerified
 

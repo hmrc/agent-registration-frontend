@@ -22,7 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.forms.individual.ConfirmNameMatchForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TestOnlyData.*
+import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
 
@@ -36,7 +36,7 @@ extends ControllerSpec:
 
   val completeAgentApplication: AgentApplication =
     tdAll
-      .agentApplicationLlp
+      .agentApplicationLlpSections
       .sectionContactDetails
       .afterEmailAddressVerified
 
