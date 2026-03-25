@@ -146,3 +146,21 @@ extends ControllerSpec:
       .text() shouldBe "Error: The person’s name must only include letters a to z, hyphens, apostrophes and spaces"
     ApplyStubHelper.verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterConfirmOtherRelevantIndividualsYes.agentApplicationId)
+
+  s"POST $path with save for later and valid input should redirect to save for later" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterConfirmOtherRelevantIndividualsYes)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterConfirmOtherRelevantIndividualsYes.agentApplicationId,
+      individuals = List.empty
+    )
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetailsAnyBody()
+
+    val response: WSResponse =
+      post(path)(Map(
+        OtherRelevantIndividualNameForm.key -> Seq("Test Name"),
+        "submit" -> Seq("SaveAndComeBackLater")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()

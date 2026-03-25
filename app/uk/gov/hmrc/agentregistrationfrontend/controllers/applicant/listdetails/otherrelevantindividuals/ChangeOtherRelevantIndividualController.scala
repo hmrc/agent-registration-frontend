@@ -94,37 +94,39 @@ extends FrontendController(mcc, actions):
           ordinalKey = "change"
         )))
 
-  def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction
-    .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
-      form = OtherRelevantIndividualNameForm.form,
-      resultToServeWhenFormHasErrors =
-        implicit request =>
-          (formWithErrors: Form[IndividualName]) =>
-            val formAction: Call = AppRoutes.apply.listdetails.otherrelevantindividuals.ChangeOtherRelevantIndividualController.submit(
-              individualProvidedDetailsId
-            )
-
-            BadRequest(
-              enterIndividualNamePage(
-                form = formWithErrors,
-                formAction = formAction,
-                ordinalKey = "change"
+  def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] =
+    baseAction
+      .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
+        form = OtherRelevantIndividualNameForm.form,
+        resultToServeWhenFormHasErrors =
+          implicit request =>
+            (formWithErrors: Form[IndividualName]) =>
+              val formAction: Call = AppRoutes.apply.listdetails.otherrelevantindividuals.ChangeOtherRelevantIndividualController.submit(
+                individualProvidedDetailsId
               )
+
+              BadRequest(
+                enterIndividualNamePage(
+                  form = formWithErrors,
+                  formAction = formAction,
+                  ordinalKey = "change"
+                )
+              )
+      )
+      .async:
+        implicit request =>
+          val individualNameFromForm: IndividualName = request.get
+          val existingList: List[IndividualProvidedDetails] = request.get
+          val individualToChange: IndividualProvidedDetails = existingList
+            .find(_._id === individualProvidedDetailsId)
+            .getOrThrowExpectedDataMissing(
+              s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
             )
-    )
-    .async:
-      implicit request =>
-        val individualNameFromForm: IndividualName = request.get
-        val existingList: List[IndividualProvidedDetails] = request.get
-        val individualToChange: IndividualProvidedDetails = existingList
-          .find(_._id === individualProvidedDetailsId)
-          .getOrThrowExpectedDataMissing(
-            s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
+          individualProvideDetailsService.upsertForApplication(
+            individualToChange
+              .modify(_.individualName)
+              .setTo(individualNameFromForm)
           )
-        individualProvideDetailsService.upsertForApplication(
-          individualToChange
-            .modify(_.individualName)
-            .setTo(individualNameFromForm)
-        )
-          .map: _ =>
-            Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show)
+            .map: _ =>
+              Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show)
+      .redirectIfSaveForLater

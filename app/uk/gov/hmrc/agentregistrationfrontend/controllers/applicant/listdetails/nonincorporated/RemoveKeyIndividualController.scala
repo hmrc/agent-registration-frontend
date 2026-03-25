@@ -83,32 +83,34 @@ extends FrontendController(mcc, actions):
           individualProvidedDetails = existingRecord
         ))
 
-  def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction(individualProvidedDetailsId)
-    .ensureValidFormAndRedirectIfSaveForLater[YesNo](
-      form =
-        (request: RequestWithData[DataWithIndividual]) =>
-          RemoveKeyIndividualForm.form(request.get[IndividualProvidedDetails].individualName.value),
-      resultToServeWhenFormHasErrors =
+  def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] =
+    baseAction(individualProvidedDetailsId)
+      .ensureValidFormAndRedirectIfSaveForLater[YesNo](
+        form =
+          (request: RequestWithData[DataWithIndividual]) =>
+            RemoveKeyIndividualForm.form(request.get[IndividualProvidedDetails].individualName.value),
+        resultToServeWhenFormHasErrors =
+          implicit request =>
+            formWithErrors =>
+              view(
+                form = formWithErrors,
+                individualProvidedDetails = request.get[IndividualProvidedDetails]
+              )
+      )
+      .async:
         implicit request =>
-          formWithErrors =>
-            view(
-              form = formWithErrors,
-              individualProvidedDetails = request.get[IndividualProvidedDetails]
-            )
-    )
-    .async:
-      implicit request =>
-        val confirmRemoveIndividual: YesNo = request.get
-        val individualProvidedDetails: IndividualProvidedDetails = request.get
-        confirmRemoveIndividual match
-          case YesNo.Yes =>
-            individualProvideDetailsService
-              .delete(individualProvidedDetails._id)
-              .map: _ =>
-                Redirect(
-                  AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show
-                )
-          case YesNo.No =>
-            Future.successful(
-              Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
-            )
+          val confirmRemoveIndividual: YesNo = request.get
+          val individualProvidedDetails: IndividualProvidedDetails = request.get
+          confirmRemoveIndividual match
+            case YesNo.Yes =>
+              individualProvideDetailsService
+                .delete(individualProvidedDetails._id)
+                .map: _ =>
+                  Redirect(
+                    AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show
+                  )
+            case YesNo.No =>
+              Future.successful(
+                Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
+              )
+      .redirectIfSaveForLater
