@@ -19,7 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.util
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 
-class NameMatchingSpec extends UnitSpec:
+class NameMatchingSpec
+extends UnitSpec:
 
   private val officerList = Seq(
     IndividualName("Steve Austin"),
@@ -67,3 +68,64 @@ class NameMatchingSpec extends UnitSpec:
 
     "not match with extra spaces" in:
       NameMatching.individualNameMatching(IndividualName("Steve  Austin"), officerList) shouldBe None
+
+  "filterAlreadyUsedNames" should:
+
+    "return all officers when no names are used" in:
+      NameMatching.filterAlreadyUsedNames(officerList, Seq.empty) shouldBe officerList
+
+    "remove a single used name" in:
+      val result = NameMatching.filterAlreadyUsedNames(officerList, Seq(IndividualName("Steve Austin")))
+      result should contain theSameElementsInOrderAs Seq(
+        IndividualName("Pauline Austin"),
+        IndividualName("Beverly Hills"),
+        IndividualName("Justine Hills"),
+        IndividualName("Sandra Hills"),
+        IndividualName("Steve Palmer")
+      )
+
+    "remove multiple used names" in:
+      val result = NameMatching.filterAlreadyUsedNames(officerList, Seq(IndividualName("Steve Austin"), IndividualName("Beverly Hills")))
+      result should contain theSameElementsInOrderAs Seq(
+        IndividualName("Pauline Austin"),
+        IndividualName("Justine Hills"),
+        IndividualName("Sandra Hills"),
+        IndividualName("Steve Palmer")
+      )
+
+    "match case-insensitively when filtering" in:
+      val result = NameMatching.filterAlreadyUsedNames(officerList, Seq(IndividualName("steve austin")))
+      result should contain theSameElementsInOrderAs Seq(
+        IndividualName("Pauline Austin"),
+        IndividualName("Beverly Hills"),
+        IndividualName("Justine Hills"),
+        IndividualName("Sandra Hills"),
+        IndividualName("Steve Palmer")
+      )
+
+    "only remove one occurrence when duplicate names exist in CH list" in:
+      val listWithDuplicate = officerList :+ IndividualName("Steve Austin")
+      val result = NameMatching.filterAlreadyUsedNames(listWithDuplicate, Seq(IndividualName("Steve Austin")))
+      result should contain theSameElementsInOrderAs Seq(
+        IndividualName("Pauline Austin"),
+        IndividualName("Beverly Hills"),
+        IndividualName("Justine Hills"),
+        IndividualName("Sandra Hills"),
+        IndividualName("Steve Palmer"),
+        IndividualName("Steve Austin")
+      )
+
+    "remove all occurrences when all duplicates are used" in:
+      val listWithDuplicate = officerList :+ IndividualName("Steve Austin")
+      val result = NameMatching.filterAlreadyUsedNames(listWithDuplicate, Seq(IndividualName("Steve Austin"), IndividualName("Steve Austin")))
+      result should contain theSameElementsInOrderAs Seq(
+        IndividualName("Pauline Austin"),
+        IndividualName("Beverly Hills"),
+        IndividualName("Justine Hills"),
+        IndividualName("Sandra Hills"),
+        IndividualName("Steve Palmer")
+      )
+
+    "not remove names that don't match any officer" in:
+      val result = NameMatching.filterAlreadyUsedNames(officerList, Seq(IndividualName("Unknown Person")))
+      result shouldBe officerList

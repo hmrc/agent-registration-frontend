@@ -128,6 +128,29 @@ extends ControllerSpec:
     AgentRegistrationStubs.verifyUpsertIndividualProvidedDetails()
     CompaniesHouseStubs.verifySixOfficersCalls()
 
+  s"POST $postPath should allow submitting the same name when not changing it" in:
+    // Individual already has "Alice Tester" (a CH officer name). User clicks Change but submits the same name.
+    val individualWithChName = tdAll.individualProvidedDetails.copy(individualName = IndividualName("Alice Tester"))
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
+      individuals = List(individualWithChName)
+    )
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
+      individualProvidedDetails = individualWithChName
+    )
+    CompaniesHouseStubs.stubSixOfficers()
+
+    val response: WSResponse =
+      post(postPath)(Map(
+        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("Alice"),
+        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("Tester")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe
+      AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
+
   s"POST $postPath with valid name matching a Companies House officer should update and redirect to CYA" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(

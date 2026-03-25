@@ -93,19 +93,9 @@ extends FrontendController(mcc, actions):
             .map(x => CompaniesHouseOfficer.normaliseOfficerName(x.name))
             .map(IndividualName(_))
             .filter(_.isValidName)
-
-          existingNamesLower = individualsList.map(_.individualName.value.toLowerCase)
-
-          companiesHouseOfficersNames =
-            allCompaniesHouseOfficersNames.foldLeft((Seq.empty[IndividualName], existingNamesLower)):
-              case ((kept, remaining), chName) =>
-                val idx = remaining.indexOf(chName.value.toLowerCase)
-                if idx >= 0 then (kept, remaining.patch(idx, Nil, 1))
-                else (kept :+ chName, remaining)
-            ._1
         yield request
           .add[List[IndividualProvidedDetails]](individualsList)
-          .add[Seq[IndividualName]](companiesHouseOfficersNames)
+          .add[Seq[IndividualName]](allCompaniesHouseOfficersNames)
 
   def show(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction
     .async:
@@ -155,14 +145,21 @@ extends FrontendController(mcc, actions):
       implicit request =>
         val individualNameFromForm: IndividualName = request.get
         val existingList: List[IndividualProvidedDetails] = request.get
-        val companiesHouseOfficerList: Seq[IndividualName] = request.get
+        val allCompaniesHouseOfficerNames: Seq[IndividualName] = request.get
         val individualToChange: IndividualProvidedDetails = existingList
           .find(_._id === individualProvidedDetailsId)
           .getOrThrowExpectedDataMissing(
             s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
           )
 
-        NameMatching.individualNameMatching(individualNameFromForm, companiesHouseOfficerList) match
+        // Filter out already-used names, but exclude the individual being changed
+        val otherIndividuals = existingList.filterNot(_._id === individualProvidedDetailsId)
+        val notUsedCompaniesHouseOfficersNames = NameMatching.filterAlreadyUsedNames(
+          allCompaniesHouseOfficerNames,
+          otherIndividuals.map(_.individualName)
+        )
+
+        NameMatching.individualNameMatching(individualNameFromForm, notUsedCompaniesHouseOfficersNames) match
           case Some(matchedOfficerName) =>
             individualProvideDetailsService.upsertForApplication(
               individualToChange

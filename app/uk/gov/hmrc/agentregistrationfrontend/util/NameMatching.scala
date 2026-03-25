@@ -20,10 +20,25 @@ import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 object NameMatching {
+
   def individualNameMatching(
     individualName: IndividualName,
     companiesHouseOfficerList: Seq[IndividualName]
   ): Option[IndividualName] = companiesHouseOfficerList.find(officer =>
     officer.value.toLowerCase === individualName.value.toLowerCase
   )
+
+  def filterAlreadyUsedNames(
+    allCompaniesHouseOfficerNames: Seq[IndividualName],
+    existingIndividualNames: Seq[IndividualName]
+  ): Seq[IndividualName] =
+    val existingNamesLower = existingIndividualNames.map(_.value.toLowerCase)
+    allCompaniesHouseOfficerNames
+      .foldLeft((Seq.empty[IndividualName], existingNamesLower)):
+        case ((kept, remaining), chName) =>
+          val idx = remaining.indexOf(chName.value.toLowerCase)
+          if idx >= 0 then (kept, remaining.patch(idx, Nil, 1))
+          else (kept :+ chName, remaining)
+      ._1
+
 }
