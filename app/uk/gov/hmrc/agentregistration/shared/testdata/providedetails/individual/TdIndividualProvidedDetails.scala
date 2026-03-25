@@ -24,6 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualVerifiedEmailAddress
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.AccessConfirmed
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Precreated
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Started
@@ -45,7 +46,7 @@ trait TdIndividualProvidedDetails { dependencies: TdBase =>
       passedIv = None
     )
 
-    val unclaimed: IndividualProvidedDetails = IndividualProvidedDetails(
+    val precreated: IndividualProvidedDetails = IndividualProvidedDetails(
       _id = dependencies.individualProvidedDetailsId,
       internalUserId = None,
       individualName = dependencies.individualName,
@@ -145,25 +146,7 @@ trait TdIndividualProvidedDetails { dependencies: TdBase =>
 
     object soleTrader:
 
-      val soleTraderProvidedDetails: IndividualProvidedDetails = IndividualProvidedDetails(
-        _id = individualProvidedDetailsId,
-        internalUserId = None,
-        createdAt = nowAsInstant,
-        agentApplicationId = agentApplicationId,
-        providedDetailsState = ProvidedDetailsState.AccessConfirmed,
-        individualName = IndividualName(fullName.toStringFull),
-        isPersonOfControl = true,
-        individualDateOfBirth = Some(dateOfBirthFromCitizenDetails),
-        telephoneNumber = Some(telephoneNumber),
-        emailAddress = Some(individualVerifiedEmailAddress),
-        individualNino = Some(ninoFromAuth),
-        individualSaUtr = Some(saUtrFromCitizenDetails),
-        hmrcStandardForAgentsAgreed = Agreed,
-        hasApprovedApplication = Some(true),
-        passedIv = None
-      )
-
-      val soleTraderYetToProvideDetails: IndividualProvidedDetails = IndividualProvidedDetails(
+      val soleTraderAutopopulatedDetails: IndividualProvidedDetails = IndividualProvidedDetails(
         _id = individualProvidedDetailsId,
         internalUserId = None,
         createdAt = nowAsInstant,
