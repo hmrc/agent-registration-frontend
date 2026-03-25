@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.Utr
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
@@ -29,6 +30,10 @@ object ApplyStubHelper:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(application)
 
+  def verifyConnectorsForAuthAction(): Unit =
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetAgentApplication()
+
   def stubsForSuccessfulUpdate(
     application: AgentApplication,
     updatedApplication: AgentApplication
@@ -36,23 +41,37 @@ object ApplyStubHelper:
     stubsForAuthAction(application)
     AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
 
-  def verifyConnectorsForAuthAction(): Unit =
-    AuthStubs.verifyAuthorise()
-    AgentRegistrationStubs.verifyGetAgentApplication()
-
   def verifyConnectorsForSuccessfulUpdate(): Unit =
     verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
 
-  private val utr: Utr = Utr(tdAll.saUtr.value)
-
-  def stubsToSupplyBprToPage(application: AgentApplication): StubMapping =
+  def stubsToSupplyBprToPage(
+    application: AgentApplication
+  ): StubMapping =
     stubsForAuthAction(application)
-    AgentRegistrationStubs.stubGetBusinessPartnerRecord(
-      utr = utr,
-      responseBody = tdAll.businessPartnerRecordResponse
-    )
+    application match
+      case a: AgentApplication.IsSoleTrader =>
+        AgentRegistrationStubs.stubGetBusinessPartnerRecord(
+          utr = a.getUtr,
+          responseBody = tdAll.businessPartnerRecordResponseSoleTrader
+        )
+      case a: AgentApplication.IsNotSoleTrader =>
+        AgentRegistrationStubs.stubGetBusinessPartnerRecord(
+          utr = a.getUtr,
+          responseBody = tdAll.businessPartnerRecordResponse
+        )
 
-  def verifyConnectorsToSupplyBprToPage(): Unit =
+  def verifyConnectorsToSupplyBprToPage(utr: Option[Utr] = None): Unit =
     verifyConnectorsForAuthAction()
-    AgentRegistrationStubs.verifyGetBusinessPartnerRecord(utr)
+    AgentRegistrationStubs.verifyGetBusinessPartnerRecord(utr.getOrElse(tdAll.saUtr.asUtr))
+
+  def stubsForTaskListPage(
+    application: AgentApplication,
+    individuals: List[IndividualProvidedDetails]
+  ): StubMapping =
+    stubsToSupplyBprToPage(application)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(application.agentApplicationId, individuals)
+
+  def verifyConnectorsForTaskListPage(agentApplication: AgentApplication): Unit =
+    verifyConnectorsToSupplyBprToPage(Some(agentApplication.getUtr))
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.agentApplicationId)
