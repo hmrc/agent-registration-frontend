@@ -86,10 +86,10 @@ extends FrontendController(mcc, actions):
           individualsList <- individualProvideDetailsService
             .findAllKeyIndividualsByApplicationId(agentApplication.agentApplicationId)
 
-          companiesHouseOfficers <- companiesHouseService
+          companiesHouseOfficers: Seq[CompaniesHouseOfficer] <- companiesHouseService
             .getActiveOfficers(agentApplication.getCrn, agentApplication.getCompaniesHouseOfficerRole)
 
-          allCompaniesHouseOfficersNames = companiesHouseOfficers
+          allCompaniesHouseOfficersNames: Seq[IndividualName] = companiesHouseOfficers
             .map(x => CompaniesHouseOfficer.normaliseOfficerName(x.name))
             .map(IndividualName(_))
             .filter(_.isValidName)
@@ -153,8 +153,8 @@ extends FrontendController(mcc, actions):
           )
 
         // Filter out already-used names, but exclude the individual being changed
-        val otherIndividuals = existingList.filterNot(_._id === individualProvidedDetailsId)
-        val notUsedCompaniesHouseOfficersNames = NameMatching.filterAlreadyUsedNames(
+        val otherIndividuals: Seq[IndividualProvidedDetails] = existingList.filterNot(_._id === individualProvidedDetailsId)
+        val notUsedCompaniesHouseOfficersNames: Seq[IndividualName] = NameMatching.filterAlreadyUsedNames(
           allCompaniesHouseOfficerNames,
           otherIndividuals.map(_.individualName)
         )
