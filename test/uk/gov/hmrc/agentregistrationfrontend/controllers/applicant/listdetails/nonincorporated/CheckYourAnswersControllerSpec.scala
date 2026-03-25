@@ -69,9 +69,9 @@ extends ControllerSpec:
       description = "list is complete with 3 individuals",
       agentApplication = agentApplication.afterHowManyKeyIndividuals,
       existingIndividuals = List(
-        tdAll.individualProvidedDetails,
-        tdAll.individualProvidedDetails2,
-        tdAll.individualProvidedDetails3
+        tdAll.providedDetails.precreated,
+        tdAll.providedDetails.individualProvidedDetails2,
+        tdAll.providedDetails.individualProvidedDetails3
       ),
       expectedHeading = "You have added 3 partners",
       expectedButtonText = Some("Confirm and continue Save and come back later") // there are 2 buttons expected
@@ -79,7 +79,7 @@ extends ControllerSpec:
     TestCase(
       description = "list needs padding and is incomplete with 1 existing individual",
       agentApplication = agentApplication.afterHowManyKeyIndividualsNeedsPadding,
-      existingIndividuals = List(tdAll.individualProvidedDetails),
+      existingIndividuals = List(tdAll.providedDetails.precreated),
       expectedHeading = "You have added 1 partner",
       expectedButtonText = Some("Add another partner Save and come back later"), // there are 2 buttons expected
       expectedInsetText = Some("We need the names of: the 3 partners responsible for tax advice 2 other partners")
@@ -87,7 +87,7 @@ extends ControllerSpec:
     TestCase(
       description = "list is incomplete and has 1 existing individual",
       agentApplication = agentApplication.afterHowManyKeyIndividuals,
-      existingIndividuals = List(tdAll.individualProvidedDetails),
+      existingIndividuals = List(tdAll.providedDetails.precreated),
       expectedHeading = "You have added 1 partner",
       expectedButtonText = Some("Add another partner Save and come back later"), // there are 2 buttons expected
       expectedInsetText = Some("You need to tell us about 2 more partners")
@@ -96,9 +96,9 @@ extends ControllerSpec:
       description = "list has too many individuals",
       agentApplication = agentApplication.afterOnlyOneKeyIndividual,
       existingIndividuals = List(
-        tdAll.individualProvidedDetails,
-        tdAll.individualProvidedDetails2,
-        tdAll.individualProvidedDetails3
+        tdAll.providedDetails.precreated,
+        tdAll.providedDetails.individualProvidedDetails2,
+        tdAll.providedDetails.individualProvidedDetails3
       ),
       expectedHeading = "You have added 3 partners",
       expectedWarningText = Some(

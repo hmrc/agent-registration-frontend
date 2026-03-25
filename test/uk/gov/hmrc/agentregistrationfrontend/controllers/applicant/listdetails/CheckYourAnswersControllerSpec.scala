@@ -61,10 +61,10 @@ extends ControllerSpec:
         .afterGrsDataReceived
 
   val completeIndividualsList = List(
-    tdAll.individualProvidedDetails, // partner (isPersonOfControl = true in test data)
-    tdAll.individualProvidedDetails2, // partner
-    tdAll.individualProvidedDetails3, // partner
-    tdAll.individualProvidedDetails.copy(isPersonOfControl = false) // other relevant individual
+    tdAll.providedDetails.precreated, // partner (isPersonOfControl = true in test data)
+    tdAll.providedDetails.individualProvidedDetails2, // partner
+    tdAll.providedDetails.individualProvidedDetails3, // partner
+    tdAll.providedDetails.precreated.copy(isPersonOfControl = false) // other relevant individual
   )
 
   "routes should have correct paths and methods" in:
@@ -86,7 +86,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividualsNeedsPadding)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterHowManyKeyIndividualsNeedsPadding.agentApplicationId,
-      individuals = List(tdAll.individualProvidedDetails) // only 1 partner => incomplete
+      individuals = List(tdAll.providedDetails.precreated) // only 1 partner => incomplete
     )
 
     val response: WSResponse = get(path)
@@ -105,9 +105,9 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.beforeConfirmOtherRelevantIndividuals.agentApplicationId,
       individuals = List(
-        tdAll.individualProvidedDetails,
-        tdAll.individualProvidedDetails2,
-        tdAll.individualProvidedDetails3
+        tdAll.providedDetails.precreated,
+        tdAll.providedDetails.individualProvidedDetails2,
+        tdAll.providedDetails.individualProvidedDetails3
       )
     )
 
@@ -170,7 +170,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(llpApplication)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = llpApplication.agentApplicationId,
-      individuals = List(tdAll.individualProvidedDetails, tdAll.individualProvidedDetails2)
+      individuals = List(tdAll.providedDetails.precreated, tdAll.providedDetails.individualProvidedDetails2)
     )
 
     val response: WSResponse = get(path)

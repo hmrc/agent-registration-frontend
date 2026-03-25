@@ -29,7 +29,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.provided
 class RemoveOtherRelevantIndividualControllerSpec
 extends ControllerSpec:
 
-  private val individualProvidedDetailsId: IndividualProvidedDetailsId = tdAll.individualProvidedDetails.individualProvidedDetailsId
+  private val individualProvidedDetailsId: IndividualProvidedDetailsId = tdAll.providedDetails.precreated.individualProvidedDetailsId
 
   private val path = s"/agent-registration/apply/list-details/remove-other-relevant-individual/${individualProvidedDetailsId.value}"
 
@@ -46,8 +46,8 @@ extends ControllerSpec:
         .afterGrsDataReceived
 
   val listOfTwoIndividualProvidedDetails: List[IndividualProvidedDetails] = List(
-    tdAll.individualProvidedDetails.copy(isPersonOfControl = false),
-    tdAll.individualProvidedDetails2.copy(isPersonOfControl = false)
+    tdAll.providedDetails.precreated.copy(isPersonOfControl = false),
+    tdAll.providedDetails.individualProvidedDetails2.copy(isPersonOfControl = false)
   )
 
   "routes should have correct paths and methods" in:
@@ -144,7 +144,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterHowManyKeyIndividuals.agentApplicationId,
-      individuals = List(tdAll.individualProvidedDetails.copy(isPersonOfControl = false))
+      individuals = List(tdAll.providedDetails.precreated.copy(isPersonOfControl = false))
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubDeleteIndividualProvidedDetails(individualProvidedDetailsId)
     val response: WSResponse =

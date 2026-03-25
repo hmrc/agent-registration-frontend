@@ -44,7 +44,7 @@ extends ControllerSpec:
   s"GET $path when no individual record exists should create individual record, return 200 and render page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHmrcStandardForAgentsAgreed)
     AgentRegistrationStubs.stubFindIndividualsForApplication(agentApplication.afterHmrcStandardForAgentsAgreed.agentApplicationId)
-    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.soleTraderYetToProvideDetails)
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.providedDetails.soleTrader.soleTraderYetToProvideDetails)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -57,7 +57,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHmrcStandardForAgentsAgreed)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterHmrcStandardForAgentsAgreed.agentApplicationId,
-      individuals = List(tdAll.soleTraderProvidedDetails)
+      individuals = List(tdAll.providedDetails.soleTrader.soleTraderProvidedDetails)
     )
     val response: WSResponse = get(path)
 
@@ -71,7 +71,8 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHmrcStandardForAgentsAgreed)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterHmrcStandardForAgentsAgreed.agentApplicationId,
-      individuals = List(tdAll.soleTraderProvidedDetails.copy(providedDetailsState = ProvidedDetailsState.Finished))
+      // TODO: Refactor this
+      individuals = List(tdAll.providedDetails.soleTrader.soleTraderProvidedDetails.copy(providedDetailsState = ProvidedDetailsState.Finished))
     )
     val response: WSResponse = get(path)
 

@@ -40,8 +40,8 @@ extends ControllerSpec:
 
   object individualProvidedDetails:
 
-    val precreated: IndividualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("ST Name ST Lastname"))
-    val claimed: IndividualProvidedDetails = tdAll.soleTraderProvidedDetails
+    val precreated: IndividualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("ST Name ST Lastname"))
+    val claimed: IndividualProvidedDetails = tdAll.providedDetails.soleTrader.soleTraderProvidedDetails
 
   "routes should have correct paths and methods" in:
     AppRoutes.apply.listdetails.soletrader.AskOwnerToProveIdentityController.show shouldBe Call(

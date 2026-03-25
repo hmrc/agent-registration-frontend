@@ -47,9 +47,9 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplicationId,
       individuals = List(
-        tdAll.individualProvidedDetails,
-        tdAll.individualProvidedDetails2,
-        tdAll.individualProvidedDetails3
+        tdAll.providedDetails.precreated,
+        tdAll.providedDetails.individualProvidedDetails2,
+        tdAll.providedDetails.individualProvidedDetails3
       )
     )
     val response: WSResponse = get(path)

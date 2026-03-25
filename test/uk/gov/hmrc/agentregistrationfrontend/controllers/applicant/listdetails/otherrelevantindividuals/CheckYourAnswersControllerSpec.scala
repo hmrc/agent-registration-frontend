@@ -32,9 +32,9 @@ extends ControllerSpec:
   private val path = "/agent-registration/apply/list-details/other-relevant-individuals/check-your-answers"
 
   val existingOtherRelevantIndividuals = List(
-    tdAll.individualProvidedDetails.copy(isPersonOfControl = false),
-    tdAll.individualProvidedDetails2.copy(isPersonOfControl = false),
-    tdAll.individualProvidedDetails3.copy(isPersonOfControl = false)
+    tdAll.providedDetails.precreated.copy(isPersonOfControl = false),
+    tdAll.providedDetails.individualProvidedDetails2.copy(isPersonOfControl = false),
+    tdAll.providedDetails.individualProvidedDetails3.copy(isPersonOfControl = false)
   )
 
   object agentApplication:

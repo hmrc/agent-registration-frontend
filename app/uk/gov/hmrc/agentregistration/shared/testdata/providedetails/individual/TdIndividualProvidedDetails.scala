@@ -18,13 +18,16 @@ package uk.gov.hmrc.agentregistration.shared.testdata.providedetails.individual
 
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
+import uk.gov.hmrc.agentregistration.shared.StateOfAgreement.Agreed
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualVerifiedEmailAddress
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Precreated
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Started
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 
 trait TdIndividualProvidedDetails { dependencies: TdBase =>
@@ -139,5 +142,40 @@ trait TdIndividualProvidedDetails { dependencies: TdBase =>
     val afterProvidedDetailsConfirmed: IndividualProvidedDetails = afterHmrcStandardforAgentsAgreed
       .modify(_.providedDetailsState)
       .setTo(Finished)
+
+    object soleTrader:
+
+      val soleTraderProvidedDetails: IndividualProvidedDetails = IndividualProvidedDetails(
+        _id = individualProvidedDetailsId,
+        internalUserId = None,
+        createdAt = nowAsInstant,
+        agentApplicationId = agentApplicationId,
+        providedDetailsState = ProvidedDetailsState.AccessConfirmed,
+        individualName = IndividualName(fullName.toStringFull),
+        isPersonOfControl = true,
+        individualDateOfBirth = Some(dateOfBirthFromCitizenDetails),
+        telephoneNumber = Some(telephoneNumber),
+        emailAddress = Some(individualVerifiedEmailAddress),
+        individualNino = Some(ninoFromAuth),
+        individualSaUtr = Some(saUtrFromCitizenDetails),
+        hmrcStandardForAgentsAgreed = Agreed,
+        hasApprovedApplication = Some(true),
+        passedIv = None
+      )
+
+      val soleTraderYetToProvideDetails: IndividualProvidedDetails = IndividualProvidedDetails(
+        _id = individualProvidedDetailsId,
+        internalUserId = None,
+        createdAt = nowAsInstant,
+        agentApplicationId = agentApplicationId,
+        providedDetailsState = ProvidedDetailsState.AccessConfirmed,
+        individualName = IndividualName(fullName.toStringFull),
+        isPersonOfControl = true,
+        telephoneNumber = Some(telephoneNumber),
+        emailAddress = Some(IndividualVerifiedEmailAddress(applicantEmailAddress, isVerified = true)),
+        hmrcStandardForAgentsAgreed = Agreed,
+        hasApprovedApplication = Some(true),
+        passedIv = None
+      )
 
 }

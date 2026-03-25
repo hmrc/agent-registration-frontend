@@ -42,8 +42,8 @@ extends ControllerSpec:
   AppRoutes.apply.DeclarationController.submit.url shouldBe AppRoutes.apply.DeclarationController.show.url
 
   private val individualsForSubmission = List(
-    tdAll.individualProvidedDetails.copy(providedDetailsState = Finished),
-    tdAll.individualProvidedDetails2.copy(providedDetailsState = Finished)
+    tdAll.providedDetails.precreated.copy(providedDetailsState = Finished),
+    tdAll.providedDetails.individualProvidedDetails2.copy(providedDetailsState = Finished)
   )
 
   object agentApplication:

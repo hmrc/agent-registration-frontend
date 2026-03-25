@@ -29,9 +29,9 @@ extends ViewSpec:
     viewTemplate(
       agentApplication = tdAll.agentApplicationGeneralPartnership.afterHowManyKeyIndividuals,
       existingList = List(
-        tdAll.individualProvidedDetails,
-        tdAll.individualProvidedDetails2,
-        tdAll.individualProvidedDetails3
+        tdAll.providedDetails.precreated,
+        tdAll.providedDetails.individualProvidedDetails2,
+        tdAll.providedDetails.individualProvidedDetails3
       )
     ).body
   )

@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentregistration.shared.testdata
 
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.StateOfAgreement.Agreed
 import uk.gov.hmrc.agentregistration.shared.agentdetails.*
 import uk.gov.hmrc.agentregistration.shared.businessdetails.CompanyProfile
 import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
@@ -225,97 +224,6 @@ trait TdBase:
   def sixOrMoreCompaniesHouseOfficers: SixOrMoreOfficers = SixOrMoreOfficers(
     numberOfCompaniesHouseOfficers = 6,
     numberOfOfficersResponsibleForTaxMatters = 4
-  )
-
-  val individualProvidedDetails: IndividualProvidedDetails = IndividualProvidedDetails(
-    _id = individualProvidedDetailsId,
-    internalUserId = None,
-    createdAt = nowAsInstant,
-    agentApplicationId = agentApplicationId,
-    providedDetailsState = ProvidedDetailsState.Precreated,
-    individualName = IndividualName("Test Name"),
-    isPersonOfControl = true,
-    passedIv = None
-  )
-
-  val individualProvidedDetails2: IndividualProvidedDetails = IndividualProvidedDetails(
-    _id = individualProvidedDetailsId2,
-    internalUserId = None,
-    createdAt = nowAsInstant,
-    agentApplicationId = agentApplicationId,
-    providedDetailsState = ProvidedDetailsState.Precreated,
-    individualName = IndividualName("Second Test Name"),
-    isPersonOfControl = true,
-    passedIv = None
-  )
-
-  val individualProvidedDetails3: IndividualProvidedDetails = IndividualProvidedDetails(
-    _id = individualProvidedDetailsId3,
-    internalUserId = None,
-    createdAt = nowAsInstant,
-    agentApplicationId = agentApplicationId,
-    providedDetailsState = ProvidedDetailsState.Precreated,
-    individualName = IndividualName("Third Test Name"),
-    isPersonOfControl = true
-  )
-
-  val individualProvidedDetailsFinished: IndividualProvidedDetails = IndividualProvidedDetails(
-    _id = individualProvidedDetailsId,
-    individualName = individualName,
-    isPersonOfControl = true,
-    internalUserId = Some(internalUserId),
-    createdAt = nowAsInstant,
-    providedDetailsState = Finished,
-    agentApplicationId = agentApplicationId,
-    individualDateOfBirth = Some(Provided(individualDateOfBirth)),
-    telephoneNumber = Some(telephoneNumber),
-    emailAddress = Some(individualVerifiedEmailAddress),
-    individualNino = Some(IndividualNino.Provided(nino)),
-    individualSaUtr = Some(saUtrProvided),
-    hmrcStandardForAgentsAgreed = Agreed,
-    hasApprovedApplication = Some(true),
-    vrns = Some(List(vrn, vrn)),
-    payeRefs = Some(List(payeRef, payeRef)),
-    passedIv = Some(true)
-  )
-
-  val soleTraderYetToProvideDetails: IndividualProvidedDetails = IndividualProvidedDetails(
-    _id = individualProvidedDetailsId,
-    internalUserId = None,
-    createdAt = nowAsInstant,
-    agentApplicationId = agentApplicationId,
-    providedDetailsState = ProvidedDetailsState.AccessConfirmed,
-    individualName = IndividualName(fullName.toStringFull),
-    isPersonOfControl = true,
-    telephoneNumber = Some(telephoneNumber),
-    emailAddress = Some(IndividualVerifiedEmailAddress(applicantEmailAddress, isVerified = true)),
-    hmrcStandardForAgentsAgreed = Agreed,
-    hasApprovedApplication = Some(true),
-    passedIv = None
-  )
-
-  val soleTraderProvidedDetails: IndividualProvidedDetails = IndividualProvidedDetails(
-    _id = individualProvidedDetailsId,
-    internalUserId = None,
-    createdAt = nowAsInstant,
-    agentApplicationId = agentApplicationId,
-    providedDetailsState = ProvidedDetailsState.AccessConfirmed,
-    individualName = IndividualName(fullName.toStringFull),
-    isPersonOfControl = true,
-    individualDateOfBirth = Some(dateOfBirthFromCitizenDetails),
-    telephoneNumber = Some(telephoneNumber),
-    emailAddress = Some(individualVerifiedEmailAddress),
-    individualNino = Some(ninoFromAuth),
-    individualSaUtr = Some(saUtrFromCitizenDetails),
-    hmrcStandardForAgentsAgreed = Agreed,
-    hasApprovedApplication = Some(true),
-    passedIv = None
-  )
-
-  val soleTraderFinishedProvideDetails: IndividualProvidedDetails = soleTraderProvidedDetails.copy(
-    internalUserId = Some(internalUserId),
-    providedDetailsState = Finished,
-    passedIv = Some(true)
   )
 
   def sixCompaniesHouseOfficersSelectAll: SixOrMoreOfficers = SixOrMoreOfficers(

@@ -40,9 +40,9 @@ extends ControllerSpec:
       .afterEmailAddressVerified
 
   val listOfAgentProvidedDetails: List[IndividualProvidedDetails] = List(
-    tdAll.individualProvidedDetails,
-    tdAll.individualProvidedDetails2,
-    tdAll.individualProvidedDetails3
+    tdAll.providedDetails.precreated,
+    tdAll.providedDetails.individualProvidedDetails2,
+    tdAll.providedDetails.individualProvidedDetails3
   )
 
   object testIndividualProvidedDetails:
@@ -51,7 +51,6 @@ extends ControllerSpec:
       tdAll
         .providedDetails
         .precreated
-
     val claimedDetails: IndividualProvidedDetails =
       tdAll
         .providedDetails

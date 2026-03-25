@@ -180,9 +180,9 @@ extends ControllerSpec:
 
   s"POST $path with save for later and No selection should delete other relevant individuals and save data and redirect to the saved for later page" in:
     val existingOtherRelevantIndividuals = List(
-      tdAll.individualProvidedDetails.copy(isPersonOfControl = false),
-      tdAll.individualProvidedDetails2.copy(isPersonOfControl = false),
-      tdAll.individualProvidedDetails3.copy(isPersonOfControl = false)
+      tdAll.providedDetails.precreated.copy(isPersonOfControl = false),
+      tdAll.providedDetails.individualProvidedDetails2.copy(isPersonOfControl = false),
+      tdAll.providedDetails.individualProvidedDetails3.copy(isPersonOfControl = false)
     )
 
     ApplyStubHelper.stubsForSuccessfulUpdate(

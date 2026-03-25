@@ -62,7 +62,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
-      individuals = List(tdAll.individualProvidedDetails)
+      individuals = List(tdAll.providedDetails.precreated)
     )
     val response: WSResponse = get(getPath)
 
@@ -76,7 +76,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
-      individuals = List(tdAll.individualProvidedDetails)
+      individuals = List(tdAll.providedDetails.precreated)
     )
     val response: WSResponse = get(getPath)
 
@@ -89,16 +89,16 @@ extends ControllerSpec:
     removeLink shouldBe defined
     changeLink.fold(fail("Change link not found"))(link =>
       link.attr("href") shouldBe
-        AppRoutes.apply.listdetails.incoporated.ChangeCompaniesHouseOfficerController.show(tdAll.individualProvidedDetails._id).url
+        AppRoutes.apply.listdetails.incoporated.ChangeCompaniesHouseOfficerController.show(tdAll.providedDetails.precreated._id).url
     )
     removeLink.fold(fail("Remove link not found"))(link =>
       link.attr("href") shouldBe
-        AppRoutes.apply.listdetails.incoporated.RemoveCompaniesHouseOfficerController.show(tdAll.individualProvidedDetails._id).url
+        AppRoutes.apply.listdetails.incoporated.RemoveCompaniesHouseOfficerController.show(tdAll.providedDetails.precreated._id).url
     )
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
 
   s"GET $getPath should only show Remove link for non-precreated individuals" in:
-    val nonPrecreatedIndividual = tdAll.individualProvidedDetails.copy(
+    val nonPrecreatedIndividual = tdAll.providedDetails.precreated.copy(
       providedDetailsState = ProvidedDetailsState.Started
     )
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
@@ -125,7 +125,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
-      individuals = List(tdAll.individualProvidedDetails)
+      individuals = List(tdAll.providedDetails.precreated)
     )
     val response: WSResponse = get(getPath)
 
@@ -140,7 +140,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
-      individuals = List(tdAll.individualProvidedDetails)
+      individuals = List(tdAll.providedDetails.precreated)
     )
     val response: WSResponse = get(getPath)
 
@@ -170,7 +170,7 @@ extends ControllerSpec:
     // SixOrMoreOfficers(6, 4) → totalListSize = 5. With 6 individuals, diff = -1
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     val sixIndividuals = (1 to 6).toList.map(i =>
-      tdAll.individualProvidedDetails.copy(
+      tdAll.providedDetails.precreated.copy(
         _id = IndividualProvidedDetailsId(s"test-id-$i"),
         individualName = IndividualName(s"Test Name $i")
       )
@@ -192,7 +192,7 @@ extends ControllerSpec:
     // SixOrMoreOfficers(6, 4) → totalListSize = 5. With 5 individuals, diff = 0
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     val fiveIndividuals = (1 to 5).toList.map(i =>
-      tdAll.individualProvidedDetails.copy(
+      tdAll.providedDetails.precreated.copy(
         _id = IndividualProvidedDetailsId(s"test-id-$i"),
         individualName = IndividualName(s"Test Name $i")
       )

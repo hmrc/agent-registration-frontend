@@ -53,9 +53,9 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterHowManyKeyIndividuals.agentApplicationId,
       individuals = List(
-        tdAll.individualProvidedDetails,
-        tdAll.individualProvidedDetails2,
-        tdAll.individualProvidedDetails3
+        tdAll.providedDetails.precreated,
+        tdAll.providedDetails.individualProvidedDetails2,
+        tdAll.providedDetails.individualProvidedDetails3
       )
     )
     val response: WSResponse = get(path)
@@ -70,18 +70,18 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterHowManyKeyIndividuals.agentApplicationId,
       individuals = List(
-        tdAll.individualProvidedDetails,
-        tdAll.individualProvidedDetails2,
-        tdAll.individualProvidedDetails3
+        tdAll.providedDetails.precreated,
+        tdAll.providedDetails.individualProvidedDetails2,
+        tdAll.providedDetails.individualProvidedDetails3
       )
     )
-    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.individualProvidedDetails.copy(providedDetailsState =
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.providedDetails.precreated.copy(providedDetailsState =
       ProvidedDetailsState.AccessConfirmed
     ))
-    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.individualProvidedDetails2.copy(providedDetailsState =
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.providedDetails.individualProvidedDetails2.copy(providedDetailsState =
       ProvidedDetailsState.AccessConfirmed
     ))
-    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.individualProvidedDetails3.copy(providedDetailsState =
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.providedDetails.individualProvidedDetails3.copy(providedDetailsState =
       ProvidedDetailsState.AccessConfirmed
     ))
     val response: WSResponse =
