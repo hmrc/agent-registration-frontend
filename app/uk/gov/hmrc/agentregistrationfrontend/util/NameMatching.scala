@@ -23,23 +23,7 @@ object NameMatching {
   def individualNameMatching(
     individualName: IndividualName,
     companiesHouseOfficerList: Seq[IndividualName]
-  ): Option[IndividualName] =
-    val maybeExactMatch = companiesHouseOfficerList.find(officer =>
-      officer.value.toLowerCase === individualName.value.toLowerCase
-    )
-    maybeExactMatch match
-      case Some(officer) => Some(officer)
-      case None =>
-        val inputSurname = individualName.value.split(" ").lastOption.map(_.toLowerCase)
-        val surnameMatches = companiesHouseOfficerList.filter(officer =>
-          officer.value.split(" ").lastOption.map(_.toLowerCase) === inputSurname
-        )
-        surnameMatches match
-          case Seq(singleMatch) => Some(singleMatch)
-          case Seq() => None
-          case multipleMatches =>
-            val inputFirstName = individualName.value.split(" ").headOption.map(_.toLowerCase)
-            multipleMatches.find(officer =>
-              officer.value.split(" ").headOption.map(_.toLowerCase) === inputFirstName
-            )
+  ): Option[IndividualName] = companiesHouseOfficerList.find(officer =>
+    officer.value.toLowerCase === individualName.value.toLowerCase
+  )
 }
