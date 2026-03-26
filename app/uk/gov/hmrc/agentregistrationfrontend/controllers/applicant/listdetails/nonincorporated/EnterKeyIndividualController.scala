@@ -108,41 +108,43 @@ extends FrontendController(mcc, actions):
               resultStatus = Ok
             )
 
-  def submit: Action[AnyContent] = baseAction
-    .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
-      form = IndividualNameForm.form,
-      resultToServeWhenFormHasErrors =
+  def submit: Action[AnyContent] =
+    baseAction
+      .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
+        form = IndividualNameForm.form,
+        resultToServeWhenFormHasErrors =
+          implicit request =>
+            (formWithErrors: Form[IndividualName]) =>
+              val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.EnterKeyIndividualController.submit
+              request.get[NumberOfRequiredKeyIndividuals] match
+                case n: SixOrMore =>
+                  whenSixOrMore(
+                    request = request,
+                    sixOrMore = n,
+                    form = formWithErrors,
+                    formAction = formAction,
+                    resultStatus = BadRequest
+                  )
+                case n: FiveOrLess =>
+                  whenFiveOrLess(
+                    request = request,
+                    fiveOrLess = n,
+                    form = formWithErrors,
+                    formAction = formAction,
+                    resultStatus = BadRequest
+                  )
+      )
+      .async:
         implicit request =>
-          (formWithErrors: Form[IndividualName]) =>
-            val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.EnterKeyIndividualController.submit
-            request.get[NumberOfRequiredKeyIndividuals] match
-              case n: SixOrMore =>
-                whenSixOrMore(
-                  request = request,
-                  sixOrMore = n,
-                  form = formWithErrors,
-                  formAction = formAction,
-                  resultStatus = BadRequest
-                )
-              case n: FiveOrLess =>
-                whenFiveOrLess(
-                  request = request,
-                  fiveOrLess = n,
-                  form = formWithErrors,
-                  formAction = formAction,
-                  resultStatus = BadRequest
-                )
-    )
-    .async:
-      implicit request =>
-        val individualName: IndividualName = request.get
-        individualProvideDetailsService.upsertForApplication(individualProvideDetailsService.create(
-          individualName = individualName,
-          isPersonOfControl = true, // from this page we are only adding partners, who are persons of control
-          agentApplicationId = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].agentApplicationId
-        ))
-          .map: _ =>
-            Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
+          val individualName: IndividualName = request.get
+          individualProvideDetailsService.upsertForApplication(individualProvideDetailsService.create(
+            individualName = individualName,
+            isPersonOfControl = true, // from this page we are only adding partners, who are persons of control
+            agentApplicationId = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].agentApplicationId
+          ))
+            .map: _ =>
+              Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
+      .redirectIfSaveForLater
 
   private def whenSixOrMore(
     request: RequestWithData[DataWithList],

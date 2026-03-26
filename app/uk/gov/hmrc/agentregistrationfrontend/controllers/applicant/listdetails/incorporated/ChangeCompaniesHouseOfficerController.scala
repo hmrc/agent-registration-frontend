@@ -122,67 +122,69 @@ extends FrontendController(mcc, actions):
             agentApplication = agentApplication
           ))
 
-  def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction
-    .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
-      form = CompaniesHouseIndividuaNameForm.form,
-      resultToServeWhenFormHasErrors =
-        implicit request =>
-          (formWithErrors: Form[IndividualName]) =>
-            val agentApplication: IsIncorporated = request.get
-            val formAction: Call = AppRoutes.apply.listdetails.incoporated.ChangeCompaniesHouseOfficerController.submit(
-              individualProvidedDetailsId
-            )
-            getEntityName(agentApplication).map: entityName =>
-              enterCompaniesHouseNextIndividualNamePage(
-                form = formWithErrors,
-                entityName = entityName,
-                ordinalKey = "subsequent",
-                formAction = formAction,
-                agentApplication = agentApplication
+  def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] =
+    baseAction
+      .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
+        form = CompaniesHouseIndividuaNameForm.form,
+        resultToServeWhenFormHasErrors =
+          implicit request =>
+            (formWithErrors: Form[IndividualName]) =>
+              val agentApplication: IsIncorporated = request.get
+              val formAction: Call = AppRoutes.apply.listdetails.incoporated.ChangeCompaniesHouseOfficerController.submit(
+                individualProvidedDetailsId
               )
-    )
-    .async:
-      implicit request =>
-        val individualNameFromForm: IndividualName = request.get
-        val existingList: List[IndividualProvidedDetails] = request.get
-        val allCompaniesHouseOfficerNames: Seq[IndividualName] = request.get
-        val individualToChange: IndividualProvidedDetails = existingList
-          .find(_._id === individualProvidedDetailsId)
-          .getOrThrowExpectedDataMissing(
-            s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
+              getEntityName(agentApplication).map: entityName =>
+                enterCompaniesHouseNextIndividualNamePage(
+                  form = formWithErrors,
+                  entityName = entityName,
+                  ordinalKey = "subsequent",
+                  formAction = formAction,
+                  agentApplication = agentApplication
+                )
+      )
+      .async:
+        implicit request =>
+          val individualNameFromForm: IndividualName = request.get
+          val existingList: List[IndividualProvidedDetails] = request.get
+          val allCompaniesHouseOfficerNames: Seq[IndividualName] = request.get
+          val individualToChange: IndividualProvidedDetails = existingList
+            .find(_._id === individualProvidedDetailsId)
+            .getOrThrowExpectedDataMissing(
+              s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
+            )
+
+          // Filter out already-used names, but exclude the individual being changed
+          val otherIndividuals: Seq[IndividualProvidedDetails] = existingList.filterNot(_._id === individualProvidedDetailsId)
+          val notUsedCompaniesHouseOfficersNames: Seq[IndividualName] = NameMatching.filterAlreadyUsedNames(
+            allCompaniesHouseOfficerNames,
+            otherIndividuals.map(_.individualName)
           )
 
-        // Filter out already-used names, but exclude the individual being changed
-        val otherIndividuals: Seq[IndividualProvidedDetails] = existingList.filterNot(_._id === individualProvidedDetailsId)
-        val notUsedCompaniesHouseOfficersNames: Seq[IndividualName] = NameMatching.filterAlreadyUsedNames(
-          allCompaniesHouseOfficerNames,
-          otherIndividuals.map(_.individualName)
-        )
-
-        NameMatching.individualNameMatching(individualNameFromForm, notUsedCompaniesHouseOfficersNames) match
-          case Some(matchedOfficerName) =>
-            individualProvideDetailsService.upsertForApplication(
-              individualToChange
-                .modify(_.individualName)
-                .setTo(matchedOfficerName)
-            )
-              .map: _ =>
-                Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
-          case None =>
-            val agentApplication: IsIncorporated = request.get
-            val formAction: Call = AppRoutes.apply.listdetails.incoporated.ChangeCompaniesHouseOfficerController.submit(
-              individualProvidedDetailsId
-            )
-            getEntityName(agentApplication).map: entityName =>
-              BadRequest(enterCompaniesHouseNextIndividualNamePage(
-                form = CompaniesHouseIndividuaNameForm.form
-                  .fill(individualNameFromForm)
-                  .withError(CompaniesHouseIndividuaNameForm.firstNameKey, "error.companiesHouseOfficer.nameNotMatched"),
-                entityName = entityName,
-                ordinalKey = "subsequent",
-                formAction = formAction,
-                agentApplication = agentApplication
-              ))
+          NameMatching.individualNameMatching(individualNameFromForm, notUsedCompaniesHouseOfficersNames) match
+            case Some(matchedOfficerName) =>
+              individualProvideDetailsService.upsertForApplication(
+                individualToChange
+                  .modify(_.individualName)
+                  .setTo(matchedOfficerName)
+              )
+                .map: _ =>
+                  Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
+            case None =>
+              val agentApplication: IsIncorporated = request.get
+              val formAction: Call = AppRoutes.apply.listdetails.incoporated.ChangeCompaniesHouseOfficerController.submit(
+                individualProvidedDetailsId
+              )
+              getEntityName(agentApplication).map: entityName =>
+                BadRequest(enterCompaniesHouseNextIndividualNamePage(
+                  form = CompaniesHouseIndividuaNameForm.form
+                    .fill(individualNameFromForm)
+                    .withError(CompaniesHouseIndividuaNameForm.firstNameKey, "error.companiesHouseOfficer.nameNotMatched"),
+                  entityName = entityName,
+                  ordinalKey = "subsequent",
+                  formAction = formAction,
+                  agentApplication = agentApplication
+                ))
+      .redirectIfSaveForLater
 
   private def getEntityName(agentApplication: IsIncorporated)(using RequestHeader): Future[String] = businessPartnerRecordService
     .getBusinessPartnerRecord(agentApplication.getUtr)

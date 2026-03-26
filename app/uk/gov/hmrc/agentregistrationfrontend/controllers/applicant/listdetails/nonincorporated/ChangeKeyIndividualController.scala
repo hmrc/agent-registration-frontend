@@ -118,49 +118,51 @@ extends FrontendController(mcc, actions):
               resultStatus = Ok
             )
 
-  def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction
-    .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
-      form = IndividualNameForm.form,
-      resultToServeWhenFormHasErrors =
+  def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] =
+    baseAction
+      .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
+        form = IndividualNameForm.form,
+        resultToServeWhenFormHasErrors =
+          implicit request =>
+            (formWithErrors: Form[IndividualName]) =>
+              val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.ChangeKeyIndividualController.submit(
+                individualProvidedDetailsId
+              )
+              request.get[NumberOfRequiredKeyIndividuals] match
+                case n: SixOrMore =>
+                  whenSixOrMore(
+                    request = request,
+                    sixOrMore = n,
+                    form = formWithErrors,
+                    formAction = formAction,
+                    resultStatus = BadRequest
+                  )
+                case n: FiveOrLess =>
+                  whenFiveOrLess(
+                    request = request,
+                    fiveOrLess = n,
+                    form = formWithErrors,
+                    formAction = formAction,
+                    resultStatus = BadRequest
+                  )
+      )
+      .async:
         implicit request =>
-          (formWithErrors: Form[IndividualName]) =>
-            val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.ChangeKeyIndividualController.submit(
-              individualProvidedDetailsId
+          val individualNameFromForm: IndividualName = request.get
+          val existingList: List[IndividualProvidedDetails] = request.get
+          val individualToChange: IndividualProvidedDetails = existingList
+            .find(_._id === individualProvidedDetailsId)
+            .getOrThrowExpectedDataMissing(
+              s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
             )
-            request.get[NumberOfRequiredKeyIndividuals] match
-              case n: SixOrMore =>
-                whenSixOrMore(
-                  request = request,
-                  sixOrMore = n,
-                  form = formWithErrors,
-                  formAction = formAction,
-                  resultStatus = BadRequest
-                )
-              case n: FiveOrLess =>
-                whenFiveOrLess(
-                  request = request,
-                  fiveOrLess = n,
-                  form = formWithErrors,
-                  formAction = formAction,
-                  resultStatus = BadRequest
-                )
-    )
-    .async:
-      implicit request =>
-        val individualNameFromForm: IndividualName = request.get
-        val existingList: List[IndividualProvidedDetails] = request.get
-        val individualToChange: IndividualProvidedDetails = existingList
-          .find(_._id === individualProvidedDetailsId)
-          .getOrThrowExpectedDataMissing(
-            s"IndividualProvidedDetails with id $individualProvidedDetailsId not found"
+          individualProvideDetailsService.upsertForApplication(
+            individualToChange
+              .modify(_.individualName)
+              .setTo(individualNameFromForm)
           )
-        individualProvideDetailsService.upsertForApplication(
-          individualToChange
-            .modify(_.individualName)
-            .setTo(individualNameFromForm)
-        )
-          .map: _ =>
-            Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
+            .map: _ =>
+              Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
+      .redirectIfSaveForLater
 
   private def whenSixOrMore(
     request: RequestWithData[DataWithList],

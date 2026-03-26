@@ -324,7 +324,46 @@ extends ControllerSpec:
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
     CompaniesHouseStubs.verifySixOfficersCalls()
 
-  s"POST $postPath with save for later should redirect to save for later" in:
+  s"POST $postPath with save for later and valid matching name should redirect to save for later" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
+      individuals = List.empty
+    )
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
+      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("John Tester"))
+    )
+    CompaniesHouseStubs.stubSixOfficers()
+
+    val response: WSResponse =
+      post(postPath)(Map(
+        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("John"),
+        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("Tester"),
+        "submit" -> Seq("SaveAndComeBackLater")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+
+  s"POST $postPath with save for later and valid non-matching name should redirect to save for later" in:
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
+      individuals = List.empty
+    )
+    CompaniesHouseStubs.stubSixOfficers()
+
+    val response: WSResponse =
+      post(postPath)(Map(
+        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("Unknown"),
+        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("Person"),
+        "submit" -> Seq("SaveAndComeBackLater")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+
+  s"POST $postPath with save for later and empty inputs should redirect to save for later" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
