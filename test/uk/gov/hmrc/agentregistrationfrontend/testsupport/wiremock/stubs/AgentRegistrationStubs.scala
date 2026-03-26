@@ -175,6 +175,12 @@ object AgentRegistrationStubs:
     requestBody = Some(equalToJson(Json.toJson(individualProvidedDetails).toString))
   )
 
+  def stubUpsertIndividualProvidedDetailsAnyBody(): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/individual-provided-details/for-application"),
+    responseStatus = Status.OK
+  )
+
   def verifyUpsertIndividualProvidedDetails(count: Int = 1): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/individual-provided-details/for-application"),

@@ -76,33 +76,35 @@ extends FrontendController(mcc, actions):
           individualProvidedDetails = existingRecord
         ))
 
-  def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = baseAction(individualProvidedDetailsId)
-    .ensureValidFormAndRedirectIfSaveForLater[YesNo](
-      form =
-        (request: RequestWithData[DataWithIndividual]) =>
-          RemoveKeyIndividualForm.form(request.get[IndividualProvidedDetails].individualName.value),
-      resultToServeWhenFormHasErrors =
+  def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] =
+    baseAction(individualProvidedDetailsId)
+      .ensureValidFormAndRedirectIfSaveForLater[YesNo](
+        form =
+          (request: RequestWithData[DataWithIndividual]) =>
+            RemoveKeyIndividualForm.form(request.get[IndividualProvidedDetails].individualName.value),
+        resultToServeWhenFormHasErrors =
+          implicit request =>
+            formWithErrors =>
+              view(
+                form = formWithErrors,
+                individualProvidedDetails = request.get[IndividualProvidedDetails]
+              )
+      )
+      .async:
         implicit request =>
-          formWithErrors =>
-            view(
-              form = formWithErrors,
-              individualProvidedDetails = request.get[IndividualProvidedDetails]
-            )
-    )
-    .async:
-      implicit request =>
-        val confirmRemoveIndividual: YesNo = request.get
-        val individualProvidedDetails: IndividualProvidedDetails = request.get
-        val existingListBeforeDeletion: List[IndividualProvidedDetails] = request.get
-        confirmRemoveIndividual match
-          case YesNo.Yes =>
-            individualProvideDetailsService
-              .delete(individualProvidedDetails._id)
-              .map: _ =>
-                if existingListBeforeDeletion.size > 1
-                then Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show)
-                else Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show)
-          case YesNo.No =>
-            Future.successful(
-              Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show)
-            )
+          val confirmRemoveIndividual: YesNo = request.get
+          val individualProvidedDetails: IndividualProvidedDetails = request.get
+          val existingListBeforeDeletion: List[IndividualProvidedDetails] = request.get
+          confirmRemoveIndividual match
+            case YesNo.Yes =>
+              individualProvideDetailsService
+                .delete(individualProvidedDetails._id)
+                .map: _ =>
+                  if existingListBeforeDeletion.size > 1
+                  then Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show)
+                  else Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show)
+            case YesNo.No =>
+              Future.successful(
+                Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show)
+              )
+      .redirectIfSaveForLater

@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.getNumberOfCompaniesHouseOfficers
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.CheckYourAnswersPage
@@ -63,7 +64,7 @@ extends ViewSpec:
   private val incorporatedTestCases = Seq(
     BusinessTypeTestCase(
       label = "LimitedLiabilityPartnership",
-      agentApplication = tdAll.agentApplicationLlp.afterConfirmCompaniesHouseOfficersYes.copy(hasOtherRelevantIndividuals = Some(false)),
+      agentApplication = tdAll.agentApplicationLlp.afterNumberOfConfirmCompaniesHouseOfficers.copy(hasOtherRelevantIndividuals = Some(false)),
       caption = "LLP members and other tax adviser information",
       numberOfPartnersLabel = "Number of LLP members",
       partnerNamesLabel = "LLP member names",
@@ -72,7 +73,7 @@ extends ViewSpec:
     ),
     BusinessTypeTestCase(
       label = "LimitedCompany",
-      agentApplication = tdAll.agentApplicationLimitedCompany.afterConfirmCompaniesHouseOfficersYes.copy(hasOtherRelevantIndividuals = Some(false)),
+      agentApplication = tdAll.agentApplicationLimitedCompany.afterNumberOfConfirmCompaniesHouseOfficers.copy(hasOtherRelevantIndividuals = Some(false)),
       caption = "Directors and other tax adviser information",
       numberOfPartnersLabel = "Number of directors",
       partnerNamesLabel = "Director names",
@@ -81,7 +82,7 @@ extends ViewSpec:
     ),
     BusinessTypeTestCase(
       label = "LimitedPartnership",
-      agentApplication = tdAll.agentApplicationLimitedPartnership.afterConfirmCompaniesHouseOfficersYes.copy(hasOtherRelevantIndividuals = Some(false)),
+      agentApplication = tdAll.agentApplicationLimitedPartnership.afterNumberOfConfirmCompaniesHouseOfficers.copy(hasOtherRelevantIndividuals = Some(false)),
       caption = "Partners and other tax adviser information",
       numberOfPartnersLabel = "Number of partners",
       partnerNamesLabel = "Partner names",
@@ -90,7 +91,9 @@ extends ViewSpec:
     ),
     BusinessTypeTestCase(
       label = "ScottishLimitedPartnership",
-      agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterConfirmCompaniesHouseOfficersYes.copy(hasOtherRelevantIndividuals = Some(false)),
+      agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterNumberOfConfirmCompaniesHouseOfficers.copy(hasOtherRelevantIndividuals =
+        Some(false)
+      ),
       caption = "Partners and other tax adviser information",
       numberOfPartnersLabel = "Number of partners",
       partnerNamesLabel = "Partner names",
@@ -128,7 +131,13 @@ extends ViewSpec:
 
         "show the number of partners value" in:
           val values = doc.mainContent.select(".govuk-summary-list__value")
-          values.get(0).text() shouldBe "1"
+          val expectedNumber =
+            testCase.agentApplication match {
+              case a: uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated =>
+                a.getNumberOfCompaniesHouseOfficers.map(_.numberOfIndividuals.toString).getOrElse("")
+              case _ => partnersList.size.toString
+            }
+          values.get(0).text() shouldBe expectedNumber
 
         "show the change number link with correct href" in:
           val changeLinks = doc.mainContent.select(".govuk-summary-list__actions a")
@@ -191,9 +200,15 @@ extends ViewSpec:
           List.empty
         )
 
-        "show 0 as the number" in:
+        "show the number value" in:
           val values = doc.mainContent.select(".govuk-summary-list__value")
-          values.get(0).text() shouldBe "0"
+          val expectedNumber =
+            testCase.agentApplication match {
+              case a: uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated =>
+                a.getNumberOfCompaniesHouseOfficers.map(_.numberOfIndividuals.toString).getOrElse("")
+              case _ => "0"
+            }
+          values.get(0).text() shouldBe expectedNumber
 
         "not show the partner names row" in:
           val keys = doc.mainContent.select(".govuk-summary-list__key")

@@ -56,6 +56,14 @@
 @key = @{
     s"addToListSummary.$businessTypeKey"
 }
+@entityName = @{
+    agentApplication match {
+        case a: AgentApplicationLlp => a.getBusinessDetails.companyProfile.companyName
+        case a: AgentApplicationLimitedCompany => a.getBusinessDetails.companyProfile.companyName
+        case a: AgentApplicationLimitedPartnership => a.getBusinessDetails.companyProfile.companyName
+        case a: AgentApplicationScottishLimitedPartnership => a.getBusinessDetails.companyProfile.companyName
+    }
+}
 @title = @{
     messages(s"$key.title.${MessageKeys.singularOrPlural(existingList.size)}", existingList.size)
 }
@@ -72,8 +80,8 @@
 @paddingInset = {
     <p class="govuk-body">@messages(s"$key.complex.intro")</p>
     <ul class="govuk-list govuk-list--bullet">
-        <li>@messages(s"$key.complex.bullet1.${MessageKeys.singularOrPlural(sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters)}", sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters)</li>
-        <li>@messages(s"$key.complex.bullet2.${MessageKeys.singularOrPlural(paddingNeeded)}", paddingNeeded)</li>
+        <li>@messages(s"$key.complex.bullet1.${MessageKeys.singularOrPlural(sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters)}", sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters, entityName)</li>
+        <li>@messages(s"$key.complex.bullet2.${MessageKeys.singularOrPlural(paddingNeeded)}", paddingNeeded, entityName)</li>
     </ul>
 }
 

@@ -158,3 +158,20 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
+
+  s"POST $path with save for later and valid input should redirect to save for later" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
+    AgentRegistrationStubs.stubFindIndividualForApplication(
+      individual = tdAll.individualProvidedDetails
+    )
+    AgentRegistrationStubs.stubDeleteIndividualProvidedDetails(tdAll.individualProvidedDetails._id)
+
+    val response: WSResponse =
+      post(path)(Map(
+        RemoveKeyIndividualForm.key -> Seq("Yes"),
+        "submit" -> Seq("SaveAndComeBackLater")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()

@@ -81,18 +81,13 @@ extends FrontendController(mcc, actions):
             .map(IndividualName(_))
             .filter(_.isValidName)
 
-          existingNamesLower = individualsList.map(_.individualName.value.toLowerCase)
-
-          companiesHouseOfficersNames =
-            allCompaniesHouseOfficersNames.foldLeft((Seq.empty[IndividualName], existingNamesLower)):
-              case ((kept, remaining), chName) =>
-                val idx = remaining.indexOf(chName.value.toLowerCase)
-                if idx >= 0 then (kept, remaining.patch(idx, Nil, 1))
-                else (kept :+ chName, remaining)
-            ._1
+          notUsedCompaniesHouseOfficersNames = NameMatching.filterAlreadyUsedNames(
+            allCompaniesHouseOfficersNames,
+            individualsList.map(_.individualName)
+          )
         yield request
           .add[List[IndividualProvidedDetails]](individualsList)
-          .add[Seq[IndividualName]](companiesHouseOfficersNames)
+          .add[Seq[IndividualName]](notUsedCompaniesHouseOfficersNames)
     .refine:
       implicit request =>
         request.get[IsIncorporated].getNumberOfCompaniesHouseOfficers match
@@ -144,40 +139,43 @@ extends FrontendController(mcc, actions):
     implicit request =>
       renderPage(CompaniesHouseIndividuaNameForm.form, Ok)
 
-  def submit: Action[AnyContent] = baseAction
-    .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
-      form = CompaniesHouseIndividuaNameForm.form,
-      resultToServeWhenFormHasErrors =
+  def submit: Action[AnyContent] =
+    baseAction
+      .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
+        form = CompaniesHouseIndividuaNameForm.form,
+        resultToServeWhenFormHasErrors =
+          implicit request =>
+            (formWithErrors: Form[IndividualName]) =>
+              renderPage(formWithErrors, BadRequest)
+      )
+      .async:
         implicit request =>
-          (formWithErrors: Form[IndividualName]) =>
-            renderPage(formWithErrors, BadRequest)
-    )
-    .async:
-      implicit request =>
-        val individualName: IndividualName = request.get
-        val agentApplication = request.get[IsIncorporated]
-        val companiesHouseOfficerList = request.get[Seq[IndividualName]]
+          val individualName: IndividualName = request.get
+          val agentApplication = request.get[IsIncorporated]
+          val companiesHouseOfficerList = request.get[Seq[IndividualName]]
 
-        NameMatching.individualNameMatching(individualName, companiesHouseOfficerList) match
-          case Some(matchedOfficerName) =>
-            individualProvideDetailsService
-              .upsertForApplication(
-                individualProvideDetailsService.create(
-                  individualName = matchedOfficerName,
-                  isPersonOfControl = true,
-                  agentApplicationId = agentApplication.agentApplicationId
+          NameMatching.individualNameMatching(individualName, companiesHouseOfficerList) match
+            case Some(matchedOfficerName) =>
+              individualProvideDetailsService
+                .upsertForApplication(
+                  individualProvideDetailsService.create(
+                    individualName = matchedOfficerName,
+                    isPersonOfControl = true,
+                    agentApplicationId = agentApplication.agentApplicationId
+                  )
                 )
-              )
-              .map: _ =>
-                Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
-          case None =>
-            // No match found — re-render the form with an error
-            renderPage(
-              CompaniesHouseIndividuaNameForm.form
-                .fill(individualName)
-                .withError(CompaniesHouseIndividuaNameForm.firstNameKey, "error.companiesHouseOfficer.nameNotMatched"),
-              BadRequest
-            )(using request.delete[IndividualName])
+                .map: _ =>
+                  Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
+
+            case None =>
+              // No match found — re-render the form with an error
+              renderPage(
+                CompaniesHouseIndividuaNameForm.form
+                  .fill(individualName)
+                  .withError(CompaniesHouseIndividuaNameForm.firstNameKey, "error.companiesHouseOfficer.nameNotMatched"),
+                BadRequest
+              )(using request.delete[IndividualName])
+      .redirectIfSaveForLater
 
   private def getEntityName(agentApplication: IsIncorporated)(using RequestHeader): Future[String] = businessPartnerRecordService
     .getBusinessPartnerRecord(agentApplication.getUtr)

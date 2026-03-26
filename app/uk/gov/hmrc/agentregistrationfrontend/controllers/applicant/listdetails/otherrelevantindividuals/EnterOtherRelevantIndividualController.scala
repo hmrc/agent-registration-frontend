@@ -82,32 +82,34 @@ extends FrontendController(mcc, actions):
           )
         )))
 
-  def submit: Action[AnyContent] = baseAction
-    .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
-      form = OtherRelevantIndividualNameForm.form,
-      resultToServeWhenFormHasErrors =
+  def submit: Action[AnyContent] =
+    baseAction
+      .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
+        form = OtherRelevantIndividualNameForm.form,
+        resultToServeWhenFormHasErrors =
+          implicit request =>
+            (formWithErrors: Form[IndividualName]) =>
+              val formAction: Call = AppRoutes.apply.listdetails.otherrelevantindividuals.EnterOtherRelevantIndividualController.submit
+              Future.successful(BadRequest(enterIndividualNameSimplePage(
+                form = formWithErrors,
+                formAction = formAction,
+                ordinalKey = MessageKeys.ordinalKey(
+                  existingSize =
+                    request.get[List[IndividualProvidedDetails]]
+                      .filterNot(_.isPersonOfControl)
+                      .size,
+                  isOnlyOne = false
+                )
+              )))
+      )
+      .async:
         implicit request =>
-          (formWithErrors: Form[IndividualName]) =>
-            val formAction: Call = AppRoutes.apply.listdetails.otherrelevantindividuals.EnterOtherRelevantIndividualController.submit
-            Future.successful(BadRequest(enterIndividualNameSimplePage(
-              form = formWithErrors,
-              formAction = formAction,
-              ordinalKey = MessageKeys.ordinalKey(
-                existingSize =
-                  request.get[List[IndividualProvidedDetails]]
-                    .filterNot(_.isPersonOfControl)
-                    .size,
-                isOnlyOne = false
-              )
-            )))
-    )
-    .async:
-      implicit request =>
-        val individualName: IndividualName = request.get
-        individualProvideDetailsService.upsertForApplication(individualProvideDetailsService.create(
-          individualName = individualName,
-          isPersonOfControl = false, // from this page we are only adding other relevant people, who are not persons of control
-          agentApplicationId = request.get[IsNotSoleTrader].agentApplicationId
-        ))
-          .map: _ =>
-            Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show)
+          val individualName: IndividualName = request.get
+          individualProvideDetailsService.upsertForApplication(individualProvideDetailsService.create(
+            individualName = individualName,
+            isPersonOfControl = false, // from this page we are only adding other relevant people, who are not persons of control
+            agentApplicationId = request.get[IsNotSoleTrader].agentApplicationId
+          ))
+            .map: _ =>
+              Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show)
+      .redirectIfSaveForLater
