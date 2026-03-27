@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
+package uk.gov.hmrc.agentregistrationfrontend.testonly.util
 
-import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData
+import org.bson.types.ObjectId
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
 
-object GrsTestData
-extends TestOnlyData
-with TdGrsJourneyData
+import javax.inject.Singleton
+
+@Singleton
+class InternalUserIdGenerator:
+  def nextInternalUserId(): InternalUserId = InternalUserId(ObjectId.get().toHexString)

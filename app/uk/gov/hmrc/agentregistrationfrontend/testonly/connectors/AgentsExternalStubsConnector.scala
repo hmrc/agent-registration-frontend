@@ -19,14 +19,18 @@ package uk.gov.hmrc.agentregistrationfrontend.testonly.connectors
 import play.api.http.Status.CONFLICT
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.BusinessPartnerRecord
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.LoginResponse
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.SignInRequest
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User.EnrolmentKey
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -67,26 +71,29 @@ extends Connector:
             )
 
   def createIndividualUser(
-    nino: Nino,
     assignedPrincipalEnrolments: Seq[String],
-    deceased: Boolean = false
+    deceased: Boolean = false,
+    maybeName: Option[String] = None,
+    maybeNino: Option[Nino] = None,
+    maybeUtr: Option[Utr] = None
   )(using
     request: RequestHeader
   ): Future[Unit] =
     val user = User(
-      userId = UUID.randomUUID().toString,
-      nino = Some(nino),
+      userId = UserId(UUID.randomUUID().toString),
+      planetId = PlanetId.mmtar,
+      nino = maybeNino,
       assignedPrincipalEnrolments = assignedPrincipalEnrolments.map(EnrolmentKey(_)),
-      deceased = Some(deceased)
+      deceased = Some(deceased),
+      name = maybeName,
+      utr = maybeUtr.map(_.value)
     )
-    createUser(user, affinityGroup = Some("Individual")).map(_ => ()).recover {
+    createUser(user, affinityGroup = Some(AffinityGroup.Individual)).recover {
       // ignore 409 errors (created user with duplicate ninos) from user stubs repo
       case e: UpstreamErrorResponse if e.statusCode === CONFLICT =>
         logger.info(s"[AgentsExternalStubsConnector][createIndividualUser] Recovered from ${e.message}")
         ()
     }
-
-  def signIn()(using hc: HeaderCarrier): Future[LoginResponse] = signIn(SignInRequest.empty)
 
   def signIn(signInRequest: SignInRequest)(using hc: HeaderCarrier): Future[LoginResponse] =
     val url: URL = url"$baseUrl/sign-in"
@@ -102,11 +109,12 @@ extends Connector:
               httpMethod = "POST",
               url = url,
               status = status,
-              response = response
+              response = response,
+              info = "sign-in problem"
             )
 
-  def removeUser(userId: String)(using hc: HeaderCarrier): Future[Unit] =
-    val url: URL = url"$baseUrl/users/$userId"
+  def removeUser(userId: UserId)(using hc: HeaderCarrier): Future[Unit] =
+    val url: URL = url"$baseUrl/users/${userId.value}"
     httpClient
       .delete(url)
       .execute[HttpResponse]
@@ -124,14 +132,10 @@ extends Connector:
 
   def createUser(
     user: User,
-    affinityGroup: Option[String] = None
-  )(using hc: HeaderCarrier): Future[String] =
-    val queryParams =
-      Seq(
-        affinityGroup.map("affinityGroup" -> _)
-      ).flatten
-
-    val url = if queryParams.isEmpty then url"$baseUrl/users" else url"$baseUrl/users?$queryParams"
+    affinityGroup: Option[AffinityGroup] = None
+  )(using hc: HeaderCarrier): Future[Unit] =
+    val queryParams: Seq[(String, String)] = ("planetId" -> user.planetId.value) :: affinityGroup.map("affinityGroup" -> _.toString).toList
+    val url: URL = url"$baseUrl/users?$queryParams"
 
     httpClient
       .post(url)
@@ -139,9 +143,7 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.CREATED | Status.OK =>
-            val userUrl = headerOne(response, HeaderNames.LOCATION)
-            userUrl.split("/").lastOption.getOrElse(userUrl)
+          case Status.CREATED | Status.OK => ()
           case status =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "POST",
@@ -151,12 +153,3 @@ extends Connector:
             )
 
   private val baseUrl: String = appConfig.agentsExternalStubsBaseUrl + "/agents-external-stubs"
-
-  private def headerOne(
-    response: HttpResponse,
-    name: String
-  ): String = response
-    .header(name)
-    .getOrElse {
-      throw new RuntimeException("\"Missing required header: $name")
-    }

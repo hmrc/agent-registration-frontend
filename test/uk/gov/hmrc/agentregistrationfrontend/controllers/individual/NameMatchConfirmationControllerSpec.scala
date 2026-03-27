@@ -22,7 +22,6 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.forms.individual.ConfirmNameMatchForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
 
@@ -41,9 +40,9 @@ extends ControllerSpec:
       .afterEmailAddressVerified
 
   val listOfAgentProvidedDetails: List[IndividualProvidedDetails] = List(
-    individualProvidedDetails,
-    individualProvidedDetails2,
-    individualProvidedDetails3
+    tdAll.individualProvidedDetails,
+    tdAll.individualProvidedDetails2,
+    tdAll.individualProvidedDetails3
   )
 
   object testIndividualProvidedDetails:
@@ -51,7 +50,8 @@ extends ControllerSpec:
     val unclaimedDetails: IndividualProvidedDetails =
       tdAll
         .providedDetails
-        .unclaimed
+        .precreated
+
     val claimedDetails: IndividualProvidedDetails =
       tdAll
         .providedDetails

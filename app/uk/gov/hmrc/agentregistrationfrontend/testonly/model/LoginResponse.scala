@@ -23,8 +23,8 @@ import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMi
 final case class LoginResponse(
   authorization: String,
   sessionId: String,
-  planetId: String,
-  userId: String,
+  planetId: PlanetId,
+  userId: UserId,
   location: String
 )
 
@@ -33,8 +33,8 @@ object LoginResponse:
   def from(response: HttpResponse): LoginResponse = LoginResponse(
     authorization = headerOne(response, HeaderNames.AUTHORIZATION),
     sessionId = headerOne(response, "X-Session-ID"),
-    planetId = headerOne(response, "X-Planet-ID"),
-    userId = headerOne(response, "X-User-ID"),
+    planetId = PlanetId(headerOne(response, "X-Planet-ID")),
+    userId = UserId(headerOne(response, "X-User-ID")),
     location = headerOne(response, HeaderNames.LOCATION)
   )
 

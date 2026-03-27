@@ -20,15 +20,18 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User.EnrolmentKey
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
+import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.Authorization
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.SessionId
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User
+//import uk.gov.hmrc.agentregistrationfrontend.testonly.model.LoginResponse
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.SignInRequest
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
@@ -40,37 +43,35 @@ final class StubUserService @Inject() (
 )(implicit ec: ExecutionContext):
 
   def createAndLoginAgent(using request: Request[AnyContent]): Future[HeaderCarrier] =
-    for {
-      initialLoginResponse <- agentsExternalStubsConnector.signIn()
-
-      hc = makeHeaderCarrier(
-        sessionId = initialLoginResponse.sessionId,
-        authorization = initialLoginResponse.authorization
-      )
-      given HeaderCarrier = hc
-
-      deletedUserId <- agentsExternalStubsConnector.removeUser(initialLoginResponse.userId)
-
-      agentUserId <- createAgentUser()
-
+    for
+//      initialLoginResponse: LoginResponse <- agentsExternalStubsConnector.signIn()
+//      given HeaderCarrier = makeHeaderCarrier(
+//        sessionId = initialLoginResponse.sessionId,
+//        authorization = initialLoginResponse.authorization
+//      )
+//      _ <- agentsExternalStubsConnector.removeUser(initialLoginResponse.userId)
+      user: User <- createAgentUser()
       loginResponse <- agentsExternalStubsConnector.signIn(
         SignInRequest(
-          userId = Some(agentUserId),
-          planetId = Some(initialLoginResponse.planetId)
+          userId = Some(user.userId),
+          planetId = user.planetId
         )
       )
-
-    } yield makeHeaderCarrier(
+    yield makeHeaderCarrier(
       sessionId = loginResponse.sessionId,
       authorization = loginResponse.authorization
     )
 
-  def createAgentUser()(using hc: HeaderCarrier): Future[String] =
-    val user = User(
-      userId = UUID.randomUUID().toString,
+  private def createAgentUser()(using hc: HeaderCarrier): Future[User] =
+    val user: User = User(
+      userId = UserId.nextUserId,
+      planetId = PlanetId.mmtar,
       assignedPrincipalEnrolments = Seq.empty[EnrolmentKey]
     )
-    agentsExternalStubsConnector.createUser(user, affinityGroup = Some("Agent"))
+    agentsExternalStubsConnector.createUser(
+      user = user,
+      affinityGroup = Some(AffinityGroup.Agent)
+    ).map(_ => user)
 
   private def makeHeaderCarrier(
     sessionId: String,

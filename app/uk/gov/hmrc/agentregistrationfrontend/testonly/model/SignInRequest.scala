@@ -20,10 +20,10 @@ import play.api.libs.json.Format
 import play.api.libs.json.Json
 
 final case class SignInRequest(
-  userId: Option[String],
+  userId: Option[UserId],
+  planetId: PlanetId, // It's mandatory in this service, but not in the original User model
   plainTextPassword: Option[String] = Some("p@ssw0rd"),
   providerType: Option[String] = Some("GovernmentGateway"),
-  planetId: Option[String],
   syncToAuthLoginApi: Option[Boolean] = Some(true),
   newUserData: Option[User] = None,
   newUserAffinityGroup: Option[String] = None
@@ -31,13 +31,4 @@ final case class SignInRequest(
 
 object SignInRequest:
 
-  implicit val formats: Format[SignInRequest] = Json.format[SignInRequest]
-  def empty: SignInRequest = SignInRequest(
-    userId = None,
-    plainTextPassword = None,
-    providerType = None,
-    planetId = None,
-    syncToAuthLoginApi = None,
-    newUserData = None,
-    newUserAffinityGroup = None
-  )
+  given Format[SignInRequest] = Json.format

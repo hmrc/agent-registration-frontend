@@ -20,6 +20,7 @@ import play.api.mvc.Request
 import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
@@ -41,20 +42,19 @@ class GrsStubService @Inject() (
     deceased: Boolean
   )(using Request[?]): Future[Unit] =
 
-    val soleTraderIndividualRecord =
-      (businessType, journeyData.nino) match {
+    val createSoleTraderIndividualRecordIfNeeded: Future[Unit] =
+      (businessType, journeyData.nino) match
         case (SoleTrader, Some(nino: Nino)) =>
           agentsExternalStubsConnector.createIndividualUser(
-            nino = nino,
+            maybeNino = Some(nino),
             assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
             deceased = deceased
           )
         case _ => Future.successful(())
-      }
 
-    val utr = journeyData.sautr.map(_.value).getOrElse(journeyData.ctutr.map(_.value).getOrElse(""))
+    val utr: String = journeyData.sautr.map(_.value).getOrElse(journeyData.ctutr.map(_.value).getOrElse(""))
     // to get BPR fetches working we need to store a BPR in stubs using GRS data
-    val businessPartnerRecord = agentsExternalStubsConnector.storeBusinessPartnerRecord(
+    val businessPartnerRecord: Future[Unit] = agentsExternalStubsConnector.storeBusinessPartnerRecord(
       BusinessPartnerRecord(
         businessPartnerExists = true,
         uniqueTaxReference = Some(utr),
@@ -100,6 +100,6 @@ class GrsStubService @Inject() (
     )
 
     for {
-      _ <- soleTraderIndividualRecord
+      _ <- createSoleTraderIndividualRecordIfNeeded
       _ <- businessPartnerRecord
     } yield ()
