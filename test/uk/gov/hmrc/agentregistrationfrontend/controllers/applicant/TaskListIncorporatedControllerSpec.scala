@@ -158,7 +158,7 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.amls) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.hmrcStandards) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.buildListOfIndividuals) shouldBe Constants.COMPLETED // becomes COMPLETED
-    doc.getTaskStatus(tasks.shareLinkWithIndividuals) shouldBe Constants.INCOMPLETE
+    doc.getTaskStatus(tasks.shareLinkWithIndividuals) shouldBe Constants.INCOMPLETE // becomes INCOMPLETE
     doc.getTaskStatus(tasks.checkProgressOfIndividuals) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
     ApplyStubHelper.verifyConnectorsForTaskListPage(baseApplication)
