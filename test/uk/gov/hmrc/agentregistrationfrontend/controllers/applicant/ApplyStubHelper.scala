@@ -45,6 +45,14 @@ object ApplyStubHelper:
     verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
 
+  def stubsForDeleteAndStartAgain(application: AgentApplication): StubMapping =
+    stubsForAuthAction(application)
+    AgentRegistrationStubs.stubDeleteAgentApplication
+
+  def verifyConnectorsForDeleteAndStartAgain(): Unit =
+    verifyConnectorsForAuthAction()
+    AgentRegistrationStubs.verifyDeleteAgentApplication()
+
   def stubsToSupplyBprToPage(
     application: AgentApplication
   ): StubMapping =

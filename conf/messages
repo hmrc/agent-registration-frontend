@@ -7,6 +7,7 @@ common.saveAndContinue = Save and continue
 common.confirmAndContinue = Confirm and continue
 common.saveAndComeBackLater = Save and come back later
 common.tryAgain = Try again
+common.startAgain = Start again
 common.errorPrefix = Error
 common.or = or
 common.dobPrefix = Date of birth
@@ -16,6 +17,7 @@ common.warning = Warning
 common.yes = Yes
 common.no = No
 common.returnToTaskList = Return to task list
+common.cancel = Cancel
 
 button.copy=Copy link to clipboard
 button.copied=Link copied
@@ -92,7 +94,10 @@ signInWithAgentDetails.h2=If you have more than one set of sign in details
 signInWithAgentDetails.p3=Choose the one you want to be linked to your new agent services account.
 
 # Apply / About your business CYA
-aboutYourBusinessCheckYourAnswers.title = Check your answers
+aboutYourBusinessCheckYourAnswers.title = Your business details
+aboutYourBusinessCheckYourAnswers.summaryHeading = Business details
+aboutYourBusinessCheckYourAnswers.p1 = The details you provided match your HMRC record.
+aboutYourBusinessCheckYourAnswers.p2 = If you change any of these details you will need to start the application again.
 aboutYourBusinessCheckYourAnswers.agentType.label = UK-based agent
 aboutYourBusinessCheckYourAnswers.businessType.label = Business type
 aboutYourBusinessCheckYourAnswers.userRole.label = Are you the business owner?
@@ -101,6 +106,8 @@ aboutYourBusinessCheckYourAnswers.companyName.label = Company name
 aboutYourBusinessCheckYourAnswers.partnershipName.label = Partnership name
 aboutYourBusinessCheckYourAnswers.utr.label = Unique taxpayer reference
 aboutYourBusinessCheckYourAnswers.saPostcode = Self Assessment postcode
+
+confirmDeleteAndStartAgain.title = Confirm you want to delete your application and start again
 
 # Apply / Applicant contact details
 

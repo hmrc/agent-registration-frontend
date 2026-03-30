@@ -1,0 +1,58 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
+@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.*
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
+
+@this(
+        layout: Layout,
+        govukRadios: GovukRadios,
+        formWithCSRF: FormWithCSRF,
+        govukButton: GovukButton,
+        continueOrSaveForLater: ContinueOrSaveForLater
+)
+
+@()(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{"confirmDeleteAndStartAgain"}
+@h1 = @{messages(s"$key.title")}
+
+@layout(
+    pageTitle = h1
+) {
+  <h2 class="govuk-caption-l">@messages("about-your-business.title")</h2>
+  <h1 class="govuk-heading-xl">@h1</h1>
+  @formWithCSRF(action = AppRoutes.apply.aboutyourbusiness.ConfirmDeleteAndStartAgainController.submit) {
+    @govukButton(Button(
+      name = Some("submit"),
+      value = Some("DeleteAndStartAgain"),
+      content = Text(messages("common.startAgain")),
+      classes = "govuk-!-margin-right-3"
+    ))
+    @govukButton(Button(
+      href = Some(AppRoutes.apply.aboutyourbusiness.CheckYourAnswersController.show.url),
+      content = Text(messages("common.cancel")),
+      classes = "govuk-button--secondary"
+    ))
+  }
+}

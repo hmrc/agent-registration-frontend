@@ -25,7 +25,7 @@
         key: String,
         answers: BusinessDetailsSoleTrader,
         userRole: UserRole,
-        canChange: Boolean = true)(implicit
+        summaryCard: Option[Card])(implicit
         messages: Messages
 )
 
@@ -37,15 +37,7 @@
     value = Value(
       content = Text(messages("agentType.UkTaxAgent"))
     ),
-    actions = if(!canChange) None else Some(Actions(
-      items = Seq(
-        ActionItem(
-          href = s"${AppRoutes.apply.aboutyourbusiness.AgentTypeController.show}",
-          content = Text(messages("common.change")),
-          visuallyHiddenText = Some(messages(s"$key.agentType.label"))
-        )
-      )
-    ))
+    actions = None
   )
 }
 @businessTypeRow = @{
@@ -56,15 +48,7 @@
     value = Value(
       content = Text(messages("businessType.SoleTrader"))
     ),
-    actions = if(!canChange) None else Some(Actions(
-      items = Seq(
-        ActionItem(
-          href = s"${AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show}",
-          content = Text(messages("common.change")),
-          visuallyHiddenText = Some(messages(s"$key.businessType.label"))
-        )
-      )
-    ))
+    actions = None
   )
 }
 @userRoleRow = @{
@@ -102,4 +86,7 @@
 }
 @rows = @{Seq(agentTypeRow, businessTypeRow, userRoleRow, companyNameRow, utrRow)}
 
-@govukSummaryList(SummaryList(rows = rows))
+@govukSummaryList(SummaryList(
+  rows = rows,
+  card = summaryCard
+))

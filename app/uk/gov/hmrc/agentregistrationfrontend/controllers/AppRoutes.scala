@@ -64,6 +64,7 @@ object AppRoutes:
       val BusinessTypeSessionController = aboutyourbusinessRoutes.BusinessTypeSessionController
       val UserRoleController = aboutyourbusinessRoutes.UserRoleController
       val CheckYourAnswersController = aboutyourbusinessRoutes.CheckYourAnswersController
+      val ConfirmDeleteAndStartAgainController = aboutyourbusinessRoutes.ConfirmDeleteAndStartAgainController
 
     object amls:
 
