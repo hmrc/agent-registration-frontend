@@ -26,6 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.TdAgentApp
 import uk.gov.hmrc.agentregistration.shared.testdata.providedetails.individual.TdIndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 import uk.gov.hmrc.agentregistration.shared.testdata.TdGrsBusinessDetails
+import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.TdAgentApplicationSoleTraderRepresentative
 
 object TdAll:
 
@@ -60,6 +61,7 @@ extends TdBase,
   TdAgentApplicationScottishLimitedPartnership,
   TdAgentApplicationScottishPartnership,
   TdAgentApplicationSoleTrader,
+  TdAgentApplicationSoleTraderRepresentative,
   TdAllSections,
   TdIndividualProvidedDetails:
 

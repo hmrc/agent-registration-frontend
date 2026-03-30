@@ -36,6 +36,12 @@ object ViewSelectors:
     def h2(using pos: Position): String = element.mainContent.selectOrFail(Selectors.h2).selectOnlyOneElementOrFail().text()
     def mainContent(using pos: Position): Element = element.selectOrFail(main).selectOnlyOneElementOrFail()
 
+    def getTaskStatus(taskId: String)(using pos: Position): String = element
+      .mainContent
+      .selectOrFail(s"#$taskId")
+      .selectOnlyOneElementOrFail()
+      .text()
+
     inline def toLink(using pos: Position): TestLink = {
       element.tagName() shouldBe "a"
       TestLink(text = element.text(), href = element.selectAttrOrFail("href"))

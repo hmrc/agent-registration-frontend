@@ -35,6 +35,9 @@ extends ISpec,
 
     val EMPTY_STRING = ""
     val OTHER = "other"
+    val COMPLETED = "Completed"
+    val INCOMPLETE = "Incomplete"
+    val CANNOT_START_YET = "Cannot start yet"
 
   def addAgentTypeToSession(agentType: AgentType): WSResponse = get(
     s"/agent-registration/test-only/add-agent-type/${agentType.toStringHyphenated}"

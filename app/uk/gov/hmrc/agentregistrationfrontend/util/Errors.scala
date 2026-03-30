@@ -17,11 +17,9 @@
 package uk.gov.hmrc.agentregistrationfrontend.util
 
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.http.HttpErrorFunctions
-import uk.gov.hmrc.http.HttpResponse
+
 import uk.gov.hmrc.http.UpstreamErrorResponse
 
-import java.net.URL
 import scala.concurrent.Future
 
 object Errors:
