@@ -83,7 +83,7 @@ extends ViewSpec:
       val doc: Document = render(CompaniesHouseIndividuaNameForm.form, testCase.agentApplication)
 
       "have the correct caption" in:
-        doc.mainContent.select("h2.govuk-caption-l").text() shouldBe testCase.caption
+        doc.h2Caption shouldBe testCase.caption
 
       "have the correct heading" in:
         doc.mainContent.select("h1").text() shouldBe heading

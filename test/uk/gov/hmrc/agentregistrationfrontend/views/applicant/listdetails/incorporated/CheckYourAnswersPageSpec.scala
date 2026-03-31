@@ -101,7 +101,7 @@ extends ViewSpec:
           doc.title() shouldBe s"${testCase.singularTitle} - Apply for an agent services account - GOV.UK"
 
         "contain the caption" in:
-          doc.mainContent.select("h2.govuk-caption-l").text() shouldBe testCase.caption
+          doc.h2Caption shouldBe testCase.caption
 
         "contain the heading" in:
           doc.mainContent.select("h1").text() shouldBe testCase.singularTitle

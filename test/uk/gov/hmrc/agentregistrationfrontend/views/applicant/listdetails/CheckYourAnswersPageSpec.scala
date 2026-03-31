@@ -120,7 +120,7 @@ extends ViewSpec:
           doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
 
         "contain the caption" in:
-          doc.mainContent.select("h2.govuk-caption-l").text() shouldBe testCase.caption
+          doc.h2Caption shouldBe testCase.caption
 
         "contain the heading" in:
           doc.mainContent.select("h1").text() shouldBe "Check your answers"

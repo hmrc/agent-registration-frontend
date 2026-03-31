@@ -34,6 +34,7 @@ object ViewSelectors:
     def hasLanguageSwitch: Boolean = element.select(languageSwitcher).headOption.nonEmpty
     def h1(using pos: Position): String = element.mainContent.selectOrFail(Selectors.h1).selectOnlyOneElementOrFail().text()
     def h2(using pos: Position): String = element.mainContent.selectOrFail(Selectors.h2).selectOnlyOneElementOrFail().text()
+    def h2Caption(using pos: Position): String = element.mainContent.selectOrFail(Selectors.captionL).selectOnlyOneElementOrFail().text()
     def mainContent(using pos: Position): Element = element.selectOrFail(main).selectOnlyOneElementOrFail()
 
     def getTaskStatus(taskId: String)(using pos: Position): String = element

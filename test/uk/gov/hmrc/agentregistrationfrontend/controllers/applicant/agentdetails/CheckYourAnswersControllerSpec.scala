@@ -121,7 +121,7 @@ extends ControllerSpec:
           response.status shouldBe Status.OK
           val doc = response.parseBodyAsJsoupDocument
           doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
-          doc.select("h2.govuk-caption-l").text() shouldBe "Agent services account details"
+          doc.h2Caption shouldBe "Agent services account details"
           ApplyStubHelper.verifyConnectorsForAuthAction()
       case Some(expectedRedirect) =>
         s"GET $path with missing ${testCase.name} should redirect to the ${testCase.name} page" in:

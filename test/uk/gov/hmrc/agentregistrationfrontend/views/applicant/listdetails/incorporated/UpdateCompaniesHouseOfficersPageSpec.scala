@@ -75,10 +75,10 @@ extends ViewSpec:
       val doc: Document = render(testCase.agentApplication)
 
       "have the correct caption" in:
-        doc.mainContent.select("h2.govuk-caption-l").text() shouldBe testCase.caption
+        doc.h2Caption shouldBe testCase.caption
 
       "have the correct heading" in:
-        doc.mainContent.select("h1").text() shouldBe heading
+        doc.h1 shouldBe heading
 
       "have the correct title" in:
         doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"

@@ -43,8 +43,8 @@
 @pageTitle = @{messages(s"$key.title")}
 
 @layout(pageTitle = pageTitle) {
-    <h2 class="govuk-caption-xl">@messages(s"$key.caption")</h2>
-    <h1 class="govuk-heading-xl">@pageTitle</h1>
+    <h2 class="govuk-caption-l">@messages(s"$key.caption")</h2>
+    <h1 class="govuk-heading-l">@pageTitle</h1>
     @govukWarningText(WarningText(
         iconFallbackText = Some(messages("common.warning")),
         content = Text(messages(s"$key.warning"))

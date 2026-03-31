@@ -59,7 +59,7 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Agree to meet the HMRC standard for agents - Apply for an agent services account - GOV.UK"
-    doc.select("h2.govuk-caption-xl").text() shouldBe "HMRC standard for agents"
+    doc.h2Caption shouldBe "HMRC standard for agents"
 
   s"GET $path after agreeing terms should return 200 and render page" in:
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
@@ -70,7 +70,7 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "Agree to meet the HMRC standard for agents - Apply for an agent services account - GOV.UK"
-    doc.select("h2.govuk-caption-xl").text() shouldBe "HMRC standard for agents"
+    doc.h2Caption shouldBe "HMRC standard for agents"
 
   s"POST $path with agree should update the application and redirect to the task list" in:
     ProvideDetailsStubHelper.stubAuthAndUpdateProvidedDetails(

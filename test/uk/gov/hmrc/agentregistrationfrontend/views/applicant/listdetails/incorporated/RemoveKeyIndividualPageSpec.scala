@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.incorp
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.nodes.Element
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.forms.RemoveKeyIndividualForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
@@ -89,7 +90,7 @@ extends ViewSpec:
       val doc: Document = render(RemoveKeyIndividualForm.form(individualName), testCase.agentApplication)
 
       "have the correct caption" in:
-        doc.mainContent.select("h2.govuk-caption-l").text() shouldBe testCase.caption
+        doc.h2Caption shouldBe testCase.caption
 
       "have the correct heading with correct entity type" in:
         doc.mainContent.select("h1").text() shouldBe testCase.heading

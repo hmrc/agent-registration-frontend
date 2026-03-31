@@ -68,7 +68,7 @@ extends ControllerSpec:
           response.status shouldBe Status.OK
           val doc = response.parseBodyAsJsoupDocument
           doc.title() shouldBe "Your business details - Apply for an agent services account - GOV.UK"
-          doc.select("h2.govuk-caption-l").text() shouldBe "About your business"
+          doc.h2Caption shouldBe "About your business"
           doc.select(".govuk-summary-card__actions > a").text() shouldBe "Change (Business details)"
           ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
