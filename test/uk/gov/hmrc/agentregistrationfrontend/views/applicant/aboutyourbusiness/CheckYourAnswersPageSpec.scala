@@ -39,7 +39,7 @@ extends ViewSpec:
         .agentApplicationLlp
         .afterGrsDataReceived
 
-  private val heading: String = "Check your answers"
+  private val heading: String = "Your business details"
 
   "CheckYourAnswersPage for complete GRS details received" should:
     given agentApplicationHmrcRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(agentApplication.complete)
@@ -49,7 +49,11 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         """
           |About your business
-          |Check your answers
+          |Your business details
+          |The details you provided match your HMRC record.
+          |If you change any of these details you will need to start the application again.
+          |Business details
+          |Change (Business details)
           |UK-based agent
           |Yes
           |Business type
@@ -60,7 +64,8 @@ extends ViewSpec:
           |Test Company Name
           |Unique taxpayer reference
           |1234567895
-          |Confirm and continue
+          |Return to task list
+          |Save and come back later
           """.stripMargin
 
     "have the correct title" in:
@@ -93,5 +98,12 @@ extends ViewSpec:
       )
       doc.mainContent.extractReadOnlySummaryList() shouldBe expectedSummaryList
 
-    "render a confirm and continue button" in:
-      doc.extractLinkButton(1).text shouldBe "Confirm and continue"
+    "render a change link for the entire business details section" in:
+      doc.select(".govuk-summary-card__actions > a").text() shouldBe "Change (Business details)"
+      doc.select(".govuk-summary-card__actions > a").attr("href") shouldBe AppRoutes.apply.aboutyourbusiness.ConfirmDeleteAndStartAgainController.show.url
+
+    "render a button to return to task list" in:
+      doc.extractLinkButton(1).text shouldBe "Return to task list"
+
+    "render a button to save for later" in:
+      doc.extractLinkButton(2).text shouldBe "Save and come back later"

@@ -145,4 +145,21 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to get business partner record")
 
+  def deleteApplication()(using RequestHeader): Future[Unit] =
+    val url: URL = url"$baseUrl/application"
+    httpClient
+      .delete(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.NO_CONTENT => ()
+          case other =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "DELETE",
+              url = url,
+              status = other,
+              response = response
+            )
+      .andLogOnFailure("Failed to delete user's Agent Application")
+
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration"

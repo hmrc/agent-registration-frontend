@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLaterLinks
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.LimitedCompany.{AnswerSummary as AnswerSummaryLimitedCompany}
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.Llp.{AnswerSummary as AnswerSummaryLlp}
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.SoleTrader.{AnswerSummary as AnswerSummarySoleTrader}
@@ -30,14 +31,14 @@
 @this(
         layout: Layout,
         govukButton: GovukButton,
-        govukSummaryList: GovukSummaryList,
         answerSummaryLimitedCompany: AnswerSummaryLimitedCompany,
         answerSummaryLlp: AnswerSummaryLlp,
         answerSummarySoleTrader: AnswerSummarySoleTrader,
         answerSummaryGeneralPartnership: AnswerSummaryGeneralPartnership,
         answerSummaryLimitedPartnership: AnswerSummaryLimitedPartnership,
         answerSummaryScottishLimitedPartnership: AnswerSummaryScottishLimitedPartnership,
-        answerSummaryScottishPartnership: AnswerSummaryScottishPartnership
+        answerSummaryScottishPartnership: AnswerSummaryScottishPartnership,
+        continueOrSaveForLaterLinks: ContinueOrSaveForLaterLinks
 )
 
 @(
@@ -53,6 +54,21 @@
 @title = @{
     messages(s"$key.title")
 }
+@commonSummaryCard = @{
+  Some(Card(
+    title = Some(CardTitle(
+      content = Text(messages(s"$key.summaryHeading"))
+    )),
+    actions = Some(Actions(
+      items = Seq(
+        ActionItem(
+          href = AppRoutes.apply.aboutyourbusiness.ConfirmDeleteAndStartAgainController.show.url,
+          content = Text(messages("common.change"))
+        )
+      )
+    )
+  )))
+}
 @answerSummary = @{
   agentApplication match {
     case agentApplication: AgentApplicationSoleTrader =>
@@ -60,28 +76,28 @@
         key = key,
         answers = agentApplication.getBusinessDetails,
         userRole = agentApplication.getUserRole,
-        canChange = false
+        summaryCard = commonSummaryCard
       )
     case agentApplication: AgentApplicationLlp =>
       answerSummaryLlp(
         key = key,
         answers = agentApplication.getBusinessDetails,
         userRole = agentApplication.getUserRole,
-        canChange = false
+        summaryCard = commonSummaryCard
       )
     case agentApplication: AgentApplicationLimitedCompany =>
       answerSummaryLimitedCompany(
         key = key,
         answers = agentApplication.getBusinessDetails,
         userRole = agentApplication.getUserRole,
-        canChange = false
+        summaryCard = commonSummaryCard
       )
     case agentApplication: AgentApplicationGeneralPartnership =>
       answerSummaryGeneralPartnership(
         key = key,
         answers = agentApplication.getBusinessDetails,
         userRole = agentApplication.getUserRole,
-        canChange = false,
+        summaryCard = commonSummaryCard,
         entityName = bpr.getEntityName
       )
     case agentApplication: AgentApplicationLimitedPartnership =>
@@ -89,7 +105,7 @@
         key = key,
         answers = agentApplication.getBusinessDetails,
         userRole = agentApplication.getUserRole,
-        canChange = false,
+        summaryCard = commonSummaryCard,
         entityName = bpr.getEntityName
       )
     case agentApplication: AgentApplicationScottishLimitedPartnership =>
@@ -97,7 +113,7 @@
         key = key,
         answers = agentApplication.getBusinessDetails,
         userRole = agentApplication.getUserRole,
-        canChange = false,
+        summaryCard = commonSummaryCard,
         entityName = bpr.getEntityName
       )
     case agentApplication: AgentApplicationScottishPartnership =>
@@ -105,7 +121,7 @@
         key = key,
         answers = agentApplication.getBusinessDetails,
         userRole = agentApplication.getUserRole,
-        canChange = false,
+        summaryCard = commonSummaryCard,
         entityName = bpr.getEntityName
       )
     case _ =>
@@ -114,14 +130,15 @@
 }
 
 @layout(pageTitle = title) {
-    <h2 class="govuk-caption-l">@messages("about-your-business.title")</h2>
-    <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
-    @answerSummary
-    <p class="govuk-body">
-      @govukButton(Button(
-          href = Some(AppRoutes.apply.TaskListController.show.url),
-          content = Text(messages("common.confirmAndContinue"))
-      ))
-    </p>
-
+  <h2 class="govuk-caption-l">@messages("about-your-business.title")</h2>
+  <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
+  <p class="govuk-body">@messages(s"$key.p1")</p>
+  <p class="govuk-body">@messages(s"$key.p2")</p>
+  @answerSummary
+  <p class="govuk-body">
+    @continueOrSaveForLaterLinks(
+      continueHref = AppRoutes.apply.TaskListController.show.url,
+      continueLabel = Some(messages("common.returnToTaskList"))
+    )
+  </p>
 }
