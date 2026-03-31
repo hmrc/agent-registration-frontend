@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.services.applicant
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import java.time.Clock
 import java.time.Instant
@@ -32,11 +33,13 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationSoleTrader(
     internalUserId: InternalUserId,
+    applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole
   ): AgentApplicationSoleTrader = AgentApplicationSoleTrader(
     _id = agentApplicationIdGenerator.nextApplicationId(),
     internalUserId = internalUserId,
+    applicantCredentials = applicantCredentials,
     linkId = linkIdGenerator.nextLinkId(),
     groupId = groupId,
     createdAt = Instant.now(clock),
@@ -57,11 +60,13 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationLlp(
     internalUserId: InternalUserId,
+    applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole
   ): AgentApplicationLlp = AgentApplicationLlp(
     _id = agentApplicationIdGenerator.nextApplicationId(),
     internalUserId = internalUserId,
+    applicantCredentials = applicantCredentials,
     linkId = linkIdGenerator.nextLinkId(),
     groupId = groupId,
     createdAt = Instant.now(clock),
@@ -83,11 +88,13 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationLimitedCompany(
     internalUserId: InternalUserId,
+    applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole
   ): AgentApplicationLimitedCompany = AgentApplicationLimitedCompany(
     _id = agentApplicationIdGenerator.nextApplicationId(),
     internalUserId = internalUserId,
+    applicantCredentials = applicantCredentials,
     linkId = linkIdGenerator.nextLinkId(),
     groupId = groupId,
     createdAt = Instant.now(clock),
@@ -109,11 +116,13 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationGeneralPartnership(
     internalUserId: InternalUserId,
+    applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole
   ): AgentApplicationGeneralPartnership = AgentApplicationGeneralPartnership(
     _id = agentApplicationIdGenerator.nextApplicationId(),
     internalUserId = internalUserId,
+    applicantCredentials = applicantCredentials,
     linkId = linkIdGenerator.nextLinkId(),
     groupId = groupId,
     createdAt = Instant.now(clock),
@@ -134,11 +143,13 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationLimitedPartnership(
     internalUserId: InternalUserId,
+    applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole
   ): AgentApplicationLimitedPartnership = AgentApplicationLimitedPartnership(
     _id = agentApplicationIdGenerator.nextApplicationId(),
     internalUserId = internalUserId,
+    applicantCredentials = applicantCredentials,
     linkId = linkIdGenerator.nextLinkId(),
     groupId = groupId,
     createdAt = Instant.now(clock),
@@ -160,11 +171,13 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationScottishLimitedPartnership(
     internalUserId: InternalUserId,
+    applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole
   ): AgentApplicationScottishLimitedPartnership = AgentApplicationScottishLimitedPartnership(
     _id = agentApplicationIdGenerator.nextApplicationId(),
     internalUserId = internalUserId,
+    applicantCredentials = applicantCredentials,
     linkId = linkIdGenerator.nextLinkId(),
     groupId = groupId,
     createdAt = Instant.now(clock),
@@ -186,11 +199,13 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationScottishPartnership(
     internalUserId: InternalUserId,
+    applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole
   ): AgentApplicationScottishPartnership = AgentApplicationScottishPartnership(
     _id = agentApplicationIdGenerator.nextApplicationId(),
     internalUserId = internalUserId,
+    applicantCredentials = applicantCredentials,
     linkId = linkIdGenerator.nextLinkId(),
     groupId = groupId,
     createdAt = Instant.now(clock),
