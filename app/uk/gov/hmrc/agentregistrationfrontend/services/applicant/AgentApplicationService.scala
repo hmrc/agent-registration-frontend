@@ -45,7 +45,4 @@ extends RequestAwareLogging:
     agentApplication: AgentApplication
   )(using RequestHeader): Future[Unit] = agentRegistrationConnector.upsertApplication(agentApplication)
 
-  // we only ever delete an authorised user's own application, this will delete the application for this authorised user,
-  // so we don't need to pass in an application id or link id, the backend will find the application to delete based on
-  // the authorised user's internal id
   def deleteAndStartAgain()(using RequestHeader): Future[Unit] = agentRegistrationConnector.deleteApplication()
