@@ -61,14 +61,15 @@ extends ControllerSpec:
   ).foreach: testCase =>
     testCase.expectedRedirect match
       case None =>
-        s"GET $path with complete GRS details should return 200 and render page" in:
+        s"GET $path with complete GRS details should return 200 and render summary card page with change link" in:
           ApplyStubHelper.stubsToSupplyBprToPage(testCase.application)
           val response: WSResponse = get(path)
 
           response.status shouldBe Status.OK
           val doc = response.parseBodyAsJsoupDocument
-          doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
+          doc.title() shouldBe "Your business details - Apply for an agent services account - GOV.UK"
           doc.select("h2.govuk-caption-l").text() shouldBe "About your business"
+          doc.select(".govuk-summary-card__actions > a").text() shouldBe "Change (Business details)"
           ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
       case Some(expectedRedirect) =>

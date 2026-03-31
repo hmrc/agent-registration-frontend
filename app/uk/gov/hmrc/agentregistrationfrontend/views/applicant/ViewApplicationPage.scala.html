@@ -68,28 +68,28 @@
         key = "aboutYourBusinessCheckYourAnswers",
         answers = agentApplication.getBusinessDetails,
         userRole = agentApplication.getUserRole,
-        canChange = false
+        summaryCard = None
       )
     case agentApplication: AgentApplicationLlp =>
       answerSummaryLlp(
         key = "aboutYourBusinessCheckYourAnswers",
         answers = agentApplication.getBusinessDetails,
         userRole = agentApplication.getUserRole,
-        canChange = false
+        summaryCard = None
       )
     case agentApplication: AgentApplicationLimitedCompany =>
       answerSummaryLimitedCompany(
         key = "aboutYourBusinessCheckYourAnswers",
         answers = agentApplication.asLimitedCompanyApplication.getBusinessDetails,
         userRole = agentApplication.getUserRole,
-        canChange = false
+        summaryCard = None
       )
     case agentApplication: AgentApplicationGeneralPartnership =>
       answerSummaryGeneralPartnership(
         key = "aboutYourBusinessCheckYourAnswers",
         answers = agentApplication.getBusinessDetails,
         userRole = agentApplication.getUserRole,
-        canChange = false,
+        summaryCard = None,
         entityName = entityName
       )
     case agentApplication: AgentApplicationLimitedPartnership =>
@@ -97,7 +97,7 @@
         key = "aboutYourBusinessCheckYourAnswers",
         answers = agentApplication.getBusinessDetails,
         userRole = agentApplication.getUserRole,
-        canChange = false,
+        summaryCard = None,
         entityName = entityName
       )
     case agentApplication: AgentApplicationScottishLimitedPartnership =>
@@ -105,7 +105,7 @@
         key = "aboutYourBusinessCheckYourAnswers",
         answers = agentApplication.getBusinessDetails,
         userRole = agentApplication.getUserRole,
-        canChange = false,
+        summaryCard = None,
         entityName = entityName
       )
     case agentApplication: AgentApplicationScottishPartnership =>
@@ -113,7 +113,7 @@
         key = "aboutYourBusinessCheckYourAnswers",
         answers = agentApplication.getBusinessDetails,
         userRole = agentApplication.getUserRole,
-        canChange = false,
+        summaryCard = None,
         entityName = entityName
       )
     case _ =>

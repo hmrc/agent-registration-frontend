@@ -44,3 +44,5 @@ extends RequestAwareLogging:
   inline def upsert(
     agentApplication: AgentApplication
   )(using RequestHeader): Future[Unit] = agentRegistrationConnector.upsertApplication(agentApplication)
+
+  def deleteAndStartAgain()(using RequestHeader): Future[Unit] = agentRegistrationConnector.deleteApplication()

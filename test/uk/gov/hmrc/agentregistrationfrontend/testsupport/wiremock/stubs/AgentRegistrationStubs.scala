@@ -59,17 +59,29 @@ object AgentRegistrationStubs:
     requestBody = Some(wm.equalToJson(Json.toJson(agentApplication).toString))
   )
 
+  def verifyUpdateAgentApplication(count: Int = 1): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlPathEqualTo("/agent-registration/application"),
+    count = count
+  )
+
+  def stubDeleteAgentApplication: StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.DELETE,
+    urlPattern = wm.urlPathEqualTo("/agent-registration/application"),
+    responseStatus = Status.NO_CONTENT
+  )
+
+  def verifyDeleteAgentApplication(count: Int = 1): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.DELETE,
+    urlPattern = wm.urlPathEqualTo("/agent-registration/application"),
+    count = count
+  )
+
   def stubDeleteIndividualProvidedDetails(individualProvidedDetailsId: IndividualProvidedDetailsId): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.DELETE,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/individual-provided-details/delete-by-id/${individualProvidedDetailsId.value}"),
     responseStatus = Status.OK,
     responseBody = ""
-  )
-
-  def verifyUpdateAgentApplication(count: Int = 1): Unit = StubMaker.verify(
-    httpMethod = StubMaker.HttpMethod.POST,
-    urlPattern = wm.urlPathEqualTo("/agent-registration/application"),
-    count = count
   )
 
   def stubFindApplicationByLinkId(
