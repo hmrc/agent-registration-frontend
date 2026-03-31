@@ -21,15 +21,12 @@ import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithApplication
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.agentdetails.CheckYourAnswersPage
 
 class CheckYourAnswersPageSpec
 extends ViewSpec:
 
   val viewTemplate: CheckYourAnswersPage = app.injector.instanceOf[CheckYourAnswersPage]
-
-  private val tdAll: TdAll = TdAll()
 
   object agentApplication:
     val complete: AgentApplication =

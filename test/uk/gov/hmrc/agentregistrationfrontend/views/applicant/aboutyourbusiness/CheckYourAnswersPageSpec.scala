@@ -22,7 +22,6 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithApplication
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.viewspecsupport.ViewSelectors.*
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.CheckYourAnswersPage
 
@@ -30,8 +29,6 @@ class CheckYourAnswersPageSpec
 extends ViewSpec:
 
   val viewTemplate: CheckYourAnswersPage = app.injector.instanceOf[CheckYourAnswersPage]
-
-  private val tdAll: TdAll = TdAll()
 
   object agentApplication:
     val complete: AgentApplicationLlp =

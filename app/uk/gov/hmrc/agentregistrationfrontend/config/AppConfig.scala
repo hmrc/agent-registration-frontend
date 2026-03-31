@@ -30,6 +30,33 @@ import scala.concurrent.duration.Duration.Infinite
 import scala.concurrent.duration.FiniteDuration
 import scala.util.Try
 
+/*
+
+NumberOfIndividuals
+├── NumberOfRequiredKeyIndividuals //NumberOfPartners
+│   ├── FiveOrLess n
+│   └── SixOrMore n
+└── NumberOfCompaniesHouseOfficers
+    ├── FiveOrLessOfficers n
+    └── SixOrMoreOfficers n
+
+
+afterGrsDataReceived
+└── afterRefusalToDealWithCheckPass
+    └── afterCompaniesHouseStatusCheckPass
+        └── afterContactDetailsComplete
+            └── afterAgentDetailsComplete
+                └── afterAmlsComplete
+                    └── afterHmrcStandardForAgentsAgreed
+                        ├── (afterConfirmCompaniesHouseOfficersYes, Individuals)
+                        │   └── afterConfirmOtherRelevantTaxAdvisersNo
+
+                        ├── afterNumberOfConfirmCompaniesHouseOfficers
+                        ├── afterConfirmTwoChOfficers
+                        │   └── afterDeclarationSubmitted
+                        ├── afterConfirmSixChOfficers
+                        └── afterConfirmCompaniesHouseOfficersNo
+ */
 @Singleton
 class AppConfig @Inject() (
   servicesConfig: ServicesConfig,

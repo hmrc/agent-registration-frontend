@@ -154,6 +154,17 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdGrsBusine
         hasOtherRelevantIndividuals = Some(false)
       )
 
+//    final case class SystemState(agentAPplication: AgentApplication, individuals List[IPD]):
+//      //assertions for system coherence
+//
+//    val afterConfirmSixIndividualsIndividuals: List[IPD] = dependencies.individualNamesStubbedInCompaniesHouse.take(2).map(n => new Td {
+//      override name = n
+//      override id = id
+//      override id = id
+//    })
+//
+//    val declarationReady = afterConfirmSixIndividualsIndividuals
+
     val afterDeclarationSubmitted: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
       applicationState = ApplicationState.SentForRisking,
       submittedAt = Some(dependencies.nowAsInstant)
