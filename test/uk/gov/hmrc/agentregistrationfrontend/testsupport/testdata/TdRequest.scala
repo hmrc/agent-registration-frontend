@@ -53,8 +53,6 @@ trait TdRequest {
   def requestNotLoggedIn: RequestWithData[EmptyData] = RequestWithDataCt.empty(rawRequestNotLoggedIn)
   def requestLoggedIn: RequestWithData[EmptyData] = RequestWithDataCt.empty(rawRequestLoggedIn)
 
-  def deleteMerequestLoggedIn: Request[AnyContent] = baseRequest.withAuthTokenInSession()
-
   object ApplicantRequests:
 
     import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.*
