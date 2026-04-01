@@ -24,6 +24,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -97,6 +98,26 @@ extends Connector:
               response = response
             )
       .andLogOnFailure("Failed to find application")
+
+  def findIndividual(individualProvidedDetailsId: IndividualProvidedDetailsId)(using
+    request: RequestHeader
+  ): Future[Option[IndividualProvidedDetails]] =
+    val url: URL = url"$baseUrl/individuals/by-id/${individualProvidedDetailsId.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if status === Status.OK => Some(response.json.as[IndividualProvidedDetails])
+          case status if status === Status.NO_CONTENT => None
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to find IndividualProvidedDetails")
 
   def findIndividuals(agentApplicationId: AgentApplicationId)(using
     request: RequestHeader

@@ -19,7 +19,9 @@
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 
-@this()
+@this(
+        individualTile: IndividualTile
+)
 
 @(
     agentApplication: AgentApplication,
@@ -58,7 +60,19 @@
 
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">@individuals.size individuals</dt>
-            <dd class="govuk-summary-list__value">...</dd>
+            <dd class="govuk-summary-list__value">
+                <ul class="govuk-list govuk-list--number">
+
+                @individuals.map { individual =>
+
+                    <li class="govuk-!-margin-bottom-4">
+                        @individualTile(individual)
+                    </li>
+                }
+
+                </ul>
+
+            </dd>
         </div>
     </dl>
 
