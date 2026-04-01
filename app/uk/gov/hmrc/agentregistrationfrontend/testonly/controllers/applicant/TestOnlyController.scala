@@ -21,6 +21,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
@@ -29,7 +30,10 @@ import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowRecentApplicationsPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestLinkPage
+import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
+import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -39,13 +43,33 @@ class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   testApplicationService: TestApplicationService,
-  testLinkPage: TestLinkPage
+  testAgentRegistrationConnector: TestAgentRegistrationConnector,
+  testLinkPage: TestLinkPage,
+  showRecentApplicationsPage: ShowRecentApplicationsPage,
+  individualProvidedDetailsConnector: IndividualProvidedDetailsConnector
 )
 extends FrontendController(mcc, actions):
 
   def showAgentApplication: Action[AnyContent] = actions
     .getApplication: request =>
       Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))
+
+  def showRecentAgentApplications: Action[AnyContent] = actions
+    .action
+    .async:
+      implicit request =>
+        testAgentRegistrationConnector
+          .getRecentApplications()
+          .map(applications => Ok(showRecentApplicationsPage(applications)))
+
+  def showIndividualsForApplication: Action[AnyContent] = actions
+    .getApplication
+    .async:
+      implicit request =>
+        individualProvidedDetailsConnector
+          .findAll(request.get[AgentApplication].agentApplicationId)
+          .map: individuals =>
+            Ok(Json.prettyPrint(Json.toJson(individuals)))
 
   def addAgentTypeToSession(
     agentType: AgentType

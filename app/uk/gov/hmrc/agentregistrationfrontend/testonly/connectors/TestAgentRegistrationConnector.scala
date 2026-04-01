@@ -20,6 +20,7 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -54,5 +55,24 @@ extends Connector:
               response = response
             )
       .andLogOnFailure("Failed to created submitted application")
+
+  def getRecentApplications()(using
+    request: RequestHeader
+  ): Future[List[AgentApplication]] =
+    val url: URL = url"$baseUrl/recent-applications"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => response.json.as[List[AgentApplication]]
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to get recent applications")
 
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration/test-only"

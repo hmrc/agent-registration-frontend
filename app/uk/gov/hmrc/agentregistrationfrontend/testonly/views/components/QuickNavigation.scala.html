@@ -1,0 +1,71 @@
+@*
+ * Copyright 2023 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import play.api.i18n.Messages
+@import play.twirl.api.Html
+@this()
+
+@()
+
+<style>
+        #top-nav-bar a:first-of-type {
+            padding-left: 0;
+        }
+        #top-nav-bar {
+            display: flex;
+            justify-content: flex-start; /* or center, depending on preference */
+            gap: 0; /* optional: add gap between items */
+        }
+
+        #top-nav-bar a {
+            border-right: 2px solid gray;
+            text-align: center;
+            margin: 0;
+            padding: 0 1rem; /* optional: add some padding for spacing */
+        }
+
+        #top-nav-bar a:last-of-type {
+            border: none;
+        }
+</style>
+
+<nav class="govuk-!-margin-bottom-5" id="top-nav-bar" aria-label="Section navigation">
+
+    <a
+    class="govuk-body govuk-link"
+    id="show-recent-applications"
+    href="@AppRoutes.testOnly.applicant.TestOnlyController.showRecentAgentApplications"
+    >recent applications</a>
+
+    <a
+    class="govuk-body govuk-link"
+    id="goto-agents-external-stubs"
+    href="http://localhost:9099/agents-external-stubs"
+    >stubs</a>
+
+    <a
+    class="govuk-body govuk-link"
+    id="goto-agents-external-stubs"
+    href="@AppRoutes.testOnly.TestOnlyController.showPlaySession"
+    >play session</a>
+
+    <a
+    class="govuk-body govuk-link"
+    id="goto-agents-external-stubs"
+    href="@AppRoutes.apply.AgentApplicationController.startRegistration"
+    >Start Registration</a>
+
+</nav>

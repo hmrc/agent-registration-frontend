@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
 
 @this(
         appConfig: AppConfig,
@@ -24,7 +25,7 @@
 )
 
 @(
-
+        agentApplications: Seq[AgentApplication]
 )(implicit
         request: RequestHeader,
         messages: Messages
@@ -36,18 +37,23 @@
 ) {
 
     @quickNavigation()
+    <h1 class="govuk-heading-l">Recent Applications</h1>
 
-  <h1 class="govuk-heading-l">Test Only Hub</h1>
-  <ul class="govuk-list govuk-list--bullet">
-    <li><a class="govuk-link" href="@AppRoutes.apply.AgentApplicationController.startRegistration">
-      Agent Start Registration</a></li>
-    <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.FastForwardController.show">fast forward links</a></li>
-    <li><a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showPlaySession">showPlaySession</a></li>
-    <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplication">
-      showAgentApplication</a></li>
-    <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showIndividualsForApplication">
-      showIndividualsForApplication</a></li>
-    <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.makeTestSubmittedApplication()">
-      get-link-id</a></li>
-  </ul>
+    <ul class="govuk-list govuk-list--bullet">
+
+    @agentApplications.map { agentApplication =>
+        <li>
+            @agentApplication.agentApplicationId
+            @agentApplication.businessType
+            @agentApplication.applicationState
+            @agentApplication.internalUserId.value
+        <a
+            class="govuk-link"
+            href="@AppRoutes.apply.AgentApplicationController.startRegistration"
+            >log in as applicant </a>
+
+        </li>
+    }
+
+    </ul>
 }

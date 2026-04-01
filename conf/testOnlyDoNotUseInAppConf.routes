@@ -18,6 +18,9 @@ GET         /agent-registration/test-only/show-play-session                     
 GET         /agent-registration/test-only/email-verification-pass-codes                      uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.EmailVerificationPasscodesController.showEmailVerificationPassCodes(emailVerificationLink: String)
 
 GET         /agent-registration/test-only/show-agent-application                             uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.TestOnlyController.showAgentApplication
+GET         /agent-registration/test-only/show-recent-agent-applications                             uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.TestOnlyController.showRecentAgentApplications
+GET         /agent-registration/test-only/show-individuals-for-application                   uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.TestOnlyController.showIndividualsForApplication
+
 GET         /agent-registration/test-only/grs-stub/:businessType                             uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.GrsStubController.showGrsData(businessType: BusinessType, journeyId: grs.JourneyId)
 POST        /agent-registration/test-only/grs-stub/:businessType                             uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.GrsStubController.submitGrsData(businessType: BusinessType, journeyId: grs.JourneyId)
 GET         /agent-registration/test-only/grs-stub-retrieve                                  uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.GrsStubController.retrieveGrsData(journeyId: grs.JourneyId)
