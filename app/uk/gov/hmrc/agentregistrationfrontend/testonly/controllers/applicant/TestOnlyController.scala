@@ -32,6 +32,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowRecentApplicationsPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestLinkPage
+import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
 
@@ -44,6 +45,7 @@ class TestOnlyController @Inject() (
   actions: ApplicantActions,
   testApplicationService: TestApplicationService,
   testAgentRegistrationConnector: TestAgentRegistrationConnector,
+  agentRegistrationConnector: AgentRegistrationConnector,
   testLinkPage: TestLinkPage,
   showRecentApplicationsPage: ShowRecentApplicationsPage,
   individualProvidedDetailsConnector: IndividualProvidedDetailsConnector
@@ -61,6 +63,16 @@ extends FrontendController(mcc, actions):
         testAgentRegistrationConnector
           .getRecentApplications()
           .map(applications => Ok(showRecentApplicationsPage(applications)))
+
+  def showAgentApplicationById(agentApplicationId: AgentApplicationId): Action[AnyContent] = actions
+    .action
+    .async:
+      implicit request =>
+        testAgentRegistrationConnector
+          .findApplication(agentApplicationId)
+          .map:
+            case Some(application) => Ok(Json.prettyPrint(Json.toJson(application)))
+            case None => Ok(s"No application with such id: $agentApplicationId")
 
   def showIndividualsForApplication: Action[AnyContent] = actions
     .getApplication

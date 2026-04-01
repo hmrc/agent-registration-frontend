@@ -16,11 +16,13 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.connectors
 
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -74,5 +76,25 @@ extends Connector:
               response = response
             )
       .andLogOnFailure("Failed to get recent applications")
+
+  def findApplication(agentApplicationId: AgentApplicationId)(using
+    request: RequestHeader
+  ): Future[Option[AgentApplication]] =
+    val url: URL = url"$baseUrl/application/by-agent-application-id/${agentApplicationId.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if status === Status.OK => Some(response.json.as[AgentApplication])
+          case status if status === Status.NO_CONTENT => None
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to find application")
 
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration/test-only"
