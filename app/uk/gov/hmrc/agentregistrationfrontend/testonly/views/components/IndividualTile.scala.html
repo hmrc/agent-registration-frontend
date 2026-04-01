@@ -25,37 +25,114 @@
 )
 
 <style>
+    .individual-tile {
+        border: 1px solid #b1b4b6;
+        border-radius: 4px;
+    }
 
+    .individual-tile__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #f3f2f1;
+    }
+
+    .individual-tile__name {
+        font-size: 1.1875rem;
+        font-weight: bold;
+        margin: 0;
+    }
+
+    .individual-tile__badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        border-radius: 2px;
+    }
+
+    .individual-tile__badge--finished {
+        background-color: #00703c;
+        color: #ffffff;
+    }
+
+    .individual-tile__badge--in-progress {
+        background-color: #1d70b8;
+        color: #ffffff;
+    }
+
+    .individual-tile__badge--precreated {
+        background-color: #f3f2f1;
+        color: #0b0c0c;
+    }
+
+    .individual-tile__info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+
+    .individual-tile__info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .individual-tile__info-label {
+        color: #505a5f;
+        font-size: 0.8125rem;
+    }
+
+    .individual-tile__info-value {
+        font-weight: 600;
+        word-break: break-all;
+    }
+
+    .individual-tile__footer {
+        margin-top: 0.75rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #f3f2f1;
+    }
 </style>
 
-<div class="govuk-card govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-radius: 4px;">
+<div class="govuk-!-padding-4 individual-tile">
+    <div class="individual-tile__header">
+        <h3 class="individual-tile__name">@individual.individualName.value</h3>
+        <span class="individual-tile__badge individual-tile__badge--@{individual.providedDetailsState.toString.toLowerCase}">
+            @individual.providedDetailsState
+        </span>
+    </div>
 
-    <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-2">
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">individualProvidedDetailsId</dt>
-            <dd class="govuk-summary-list__value">
+    <div class="individual-tile__info">
+        <div class="individual-tile__info-item">
+            <span class="individual-tile__info-label">Individual ID</span>
+            <span class="individual-tile__info-value">
                 <a
                 class="govuk-link"
                 href="@AppRoutes.testOnly.individual.TestOnlyController.showIndividualProvidedDetails(individual.individualProvidedDetailsId)"
-                >@individual.individualProvidedDetailsId.value</a> <br>
-
-
-            </dd>
+                >@individual.individualProvidedDetailsId.value</a>
+            </span>
         </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">providedDetailsState</dt>
-            <dd class="govuk-summary-list__value">@individual.providedDetailsState</dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">internalUserId</dt>
-            <dd class="govuk-summary-list__value">@individual.internalUserId</dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">isPersonOfControl</dt>
-            <dd class="govuk-summary-list__value">@individual.isPersonOfControl</dd>
-        </div>
-    </dl>
+        @individual.internalUserId.map { internalUserId =>
+            <div class="individual-tile__info-item">
+                <span class="individual-tile__info-label">Internal User ID</span>
+                <span class="individual-tile__info-value">@internalUserId.value</span>
+            </div>
+        }
 
+        <div class="individual-tile__info-item">
+            <span class="individual-tile__info-label">Person of Control</span>
+            <span class="individual-tile__info-value">@individual.isPersonOfControl</span>
+        </div>
+    </div>
 
-
+    <div class="individual-tile__footer">
+        <a
+        class="govuk-link"
+        href="TODO"
+        >Login</a>
+    </div>
 </div>
