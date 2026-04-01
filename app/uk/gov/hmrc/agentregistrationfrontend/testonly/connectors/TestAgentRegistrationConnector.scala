@@ -23,6 +23,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -96,5 +97,24 @@ extends Connector:
               response = response
             )
       .andLogOnFailure("Failed to find application")
+
+  def findIndividuals(agentApplicationId: AgentApplicationId)(using
+    request: RequestHeader
+  ): Future[List[IndividualProvidedDetails]] =
+    val url: URL = url"$baseUrl/individuals/by-agent-application-id/${agentApplicationId.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if status === Status.OK => response.json.as[List[IndividualProvidedDetails]]
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to find individuals for application id: ${agentApplicationId.value}")
 
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration/test-only"

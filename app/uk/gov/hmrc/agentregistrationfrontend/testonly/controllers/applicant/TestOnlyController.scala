@@ -24,6 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
@@ -38,6 +39,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegist
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.Future
 
 @Singleton
 class TestOnlyController @Inject() (
@@ -60,9 +62,14 @@ extends FrontendController(mcc, actions):
     .action
     .async:
       implicit request =>
-        testAgentRegistrationConnector
-          .getRecentApplications()
-          .map(applications => Ok(showRecentApplicationsPage(applications)))
+        for
+          applications <- testAgentRegistrationConnector.getRecentApplications()
+          applicationsWithIndividuals: Seq[(AgentApplication, List[IndividualProvidedDetails])] <- Future.sequence:
+            applications.map: agentApplication =>
+              testAgentRegistrationConnector
+                .findIndividuals(agentApplication.agentApplicationId)
+                .map(individuals => (agentApplication, individuals))
+        yield Ok(showRecentApplicationsPage(applicationsWithIndividuals))
 
   def showAgentApplicationById(agentApplicationId: AgentApplicationId): Action[AnyContent] = actions
     .action

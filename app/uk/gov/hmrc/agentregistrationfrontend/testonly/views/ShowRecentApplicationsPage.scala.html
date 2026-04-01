@@ -17,15 +17,17 @@
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 
 @this(
         appConfig: AppConfig,
         layout: Layout,
-        quickNavigation: components.QuickNavigation
+        quickNavigation: components.QuickNavigation,
+        agentApplicationTile: components.AgentApplicationTile
 )
 
 @(
-        agentApplications: Seq[AgentApplication]
+        agentApplicationsWithIndividuals: Seq[(AgentApplication, List[IndividualProvidedDetails])]
 )(implicit
         request: RequestHeader,
         messages: Messages
@@ -41,45 +43,10 @@
 
     <ul class="govuk-list govuk-list--number">
 
-    @agentApplications.map { agentApplication =>
+    @agentApplicationsWithIndividuals.map { agentApplicationWithIndividuals =>
+
         <li class="govuk-!-margin-bottom-4">
-            <div class="govuk-card govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-radius: 4px;">
-
-                <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-2">
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">AgentApplicationId</dt>
-                        <dd class="govuk-summary-list__value">@agentApplication.agentApplicationId.value</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Business type</dt>
-                        <dd class="govuk-summary-list__value">@agentApplication.businessType</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">State</dt>
-                        <dd class="govuk-summary-list__value">@agentApplication.applicationState</dd>
-                    </div>
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Internal user id</dt>
-                        <dd class="govuk-summary-list__value">@agentApplication.internalUserId.value</dd>
-                    </div>
-                    @agentApplication.applicantContactDetails.map { contactDetails =>
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">Applicant Name</dt>
-                            <dd class="govuk-summary-list__value">@contactDetails.applicantName.value</dd>
-                        </div>
-                    }
-                </dl>
-
-                <a
-                class="govuk-link"
-                href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationById(agentApplication.agentApplicationId)"
-                >show json</a> <br>
-                <a
-                class="govuk-link"
-                href="@AppRoutes.apply.AgentApplicationController.startRegistration"
-                >login as applicant</a> <br>
-
-            </div>
+            @agentApplicationTile(agentApplicationWithIndividuals._1, agentApplicationWithIndividuals._2)
         </li>
     }
 
