@@ -82,15 +82,13 @@ extends RequestAwareLogging:
       affinityGroup = Some(AffinityGroup.Agent)
     ).map(_ => user)
 
-  def createIndividualUser(
+  def createUserIndividual(
     userId: UserId,
     planetId: PlanetId,
+    name: String,
     deceased: Boolean = false,
-    maybeName: Option[String] = None,
     maybeNino: Option[Nino] = None,
     maybeUtr: Option[Utr] = None
-  )(using
-    request: RequestHeader
   ): Future[User] =
     val user = User(
       userId = userId,
@@ -98,7 +96,7 @@ extends RequestAwareLogging:
       nino = maybeNino,
       assignedPrincipalEnrolments = Seq(EnrolmentKey("HMRC-MTD-IT")),
       deceased = Some(deceased),
-      name = maybeName,
+      name = Some(name),
       utr = maybeUtr
     )
 

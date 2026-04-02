@@ -60,6 +60,48 @@ extends Connector:
             )
       .andLogOnFailure("Failed to created submitted application")
 
+  def upsertAgentApplication(agentApplication: AgentApplication)(using
+    request: RequestHeader
+  ): Future[Unit] =
+    val url: URL = url"$baseUrl/application"
+    httpClient
+      .post(url)
+      .withBody(Json.toJson(agentApplication))
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => ()
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = status,
+              response = response,
+              info = "upsertAgentApplication problem"
+            )
+      .andLogOnFailure("Failed to upsert application")
+
+  def upsertIndividualProvidedDetails(individualProvidedDetails: IndividualProvidedDetails)(using
+    request: RequestHeader
+  ): Future[Unit] =
+    val url: URL = url"$baseUrl/individual-provided-details"
+    httpClient
+      .post(url)
+      .withBody(Json.toJson(individualProvidedDetails))
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => ()
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = status,
+              response = response,
+              info = "upsertAgentApplication problem"
+            )
+      .andLogOnFailure("Failed to upsert application")
+
   def getRecentApplications()(using
     request: RequestHeader
   ): Future[List[AgentApplication]] =

@@ -53,6 +53,7 @@ import StubUserService.addToSession
 import play.api.mvc.request.Cell
 import play.api.mvc.request.RequestAttrKey
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
+import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.hmrcfrontend.views.viewmodels.header.v2.HeaderNames
 
@@ -70,7 +71,8 @@ class FastForwardController @Inject() (
   individualProvideDetailsService: IndividualProvideDetailsService,
   agentRegistrationRiskingService: AgentRegistrationRiskingService,
   internalUserIdGenerator: InternalUserIdGenerator,
-  individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator
+  individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator,
+  testAgentRegistrationConnector: TestAgentRegistrationConnector
 )(using
   clock: Clock,
   ex: ExecutionContext
@@ -101,6 +103,7 @@ extends FrontendController(mcc, applicantActions):
       loggedInAsUserApplicantRequest: RequestWithDataCt[AnyContent, EmptyTuple] = RequestWithDataCt.empty(
         loginResponse.refineRequest(request.request)
       )
+
       loggedInAsUserApplicantRequestWithAuthData: RequestWithData[DataWithAuth] <- applicantAuthRefiner
         .refine(loggedInAsUserApplicantRequest)
         .map:
@@ -114,7 +117,7 @@ extends FrontendController(mcc, applicantActions):
         groupId = loggedInAsUserApplicantRequestWithAuthData.get[GroupId],
         createdAt = Instant.now(clock)
       )
-      _ <- applicationService.upsert(agentApplication)(using loggedInAsUserApplicantRequest)
+      _ <- testAgentRegistrationConnector.upsertAgentApplication(agentApplication)
       _ <-
         grsStubService.storeStubsData(
           businessType = section.businessType,
@@ -127,20 +130,38 @@ extends FrontendController(mcc, applicantActions):
         .getOrElse(Nil)
         .zipWithIndex
         .map: (t: (IndividualProvidedDetails, Int)) =>
-          updateIndividualProvidedDetails(
-            individualProvidedDetails = t._1,
+          primeIndividual(
+            template = t._1,
             agentApplicationId = agentApplication.agentApplicationId,
             individualName = getIndividualName(t._2)
           )
-        .map(i => individualProvideDetailsService.upsertForApplication(i).map(_ => i))
         .pipe(Future.sequence)
-      //      _ <- individuals
-      //        .map: individual =>
-      //          val saUtr = TdTestOnly.saUtr.asUtr // TODO: this has to come from completed section
-      //          companiesHouseIndividualService.storeIndividualProvidedDetails(individual.individualName.value, Some(saUtr))
-      //        .pipe(Future.sequence)
       _ <- sendForRiskingIfNeeded(agentApplication, individuals)
     yield agentApplicationId
+
+  private def primeIndividual(
+    template: IndividualProvidedDetails,
+    agentApplicationId: AgentApplicationId,
+    individualName: IndividualName
+  )(using request: Request[?]): Future[IndividualProvidedDetails] =
+    val individualProvidedDetailsId: IndividualProvidedDetailsId = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId()
+    val individualProvidedDetails = template.copy(
+      _id = individualProvidedDetailsId,
+      individualName = individualName,
+      agentApplicationId = agentApplicationId,
+      internalUserId = template.internalUserId.map(_ => internalUserIdGenerator.nextInternalUserId()),
+      createdAt = Instant.now(clock)
+    )
+    val planetId: PlanetId = PlanetId.make(agentApplicationId)
+    val userIdIndividual: UserId = UserId.make(individualProvidedDetailsId)
+    for
+      userIndividual <- stubUserService.createUserIndividual(
+        userId = userIdIndividual,
+        planetId = planetId,
+        name = individualName.value
+      )
+      _ <- testAgentRegistrationConnector.upsertIndividualProvidedDetails(individualProvidedDetails)
+    yield individualProvidedDetails
 
   private def sendForRiskingIfNeeded(
     agentApplication: AgentApplication,
@@ -155,15 +176,6 @@ extends FrontendController(mcc, applicantActions):
         )
       )
     else Future.unit
-
-  private def removeStubbedIndividualsFor(applicationId: AgentApplicationId)(using r: RequestWithAuth): Future[Unit] =
-    for
-      individuals: List[IndividualProvidedDetails] <- individualProvideDetailsService.findAllByApplicationId(applicationId)
-      _ <- Future.sequence(
-        individuals.map: ipd =>
-          individualProvideDetailsService.delete(ipd.individualProvidedDetailsId)
-      )
-    yield ()
 
   //  private def createIndividualProvidedDetailsList(
   //    individualProvidedDetailsList: List[IndividualProvidedDetails],
@@ -182,17 +194,17 @@ extends FrontendController(mcc, applicantActions):
   //          createdAt = Instant.now(clock)
   //        ))
 
-  private def updateIndividualProvidedDetails(
-    individualProvidedDetails: IndividualProvidedDetails,
-    agentApplicationId: AgentApplicationId,
-    individualName: IndividualName
-  ): IndividualProvidedDetails = individualProvidedDetails.copy(
-    _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
-    individualName = individualName,
-    agentApplicationId = agentApplicationId,
-    internalUserId = individualProvidedDetails.internalUserId.map(_ => internalUserIdGenerator.nextInternalUserId()),
-    createdAt = Instant.now(clock)
-  )
+//  private def updateIndividualProvidedDetails(
+//    individualProvidedDetails: IndividualProvidedDetails,
+//    agentApplicationId: AgentApplicationId,
+//    individualName: IndividualName
+//  ): IndividualProvidedDetails = individualProvidedDetails.copy(
+//    _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
+//    individualName = individualName,
+//    agentApplicationId = agentApplicationId,
+//    internalUserId = individualProvidedDetails.internalUserId.map(_ => internalUserIdGenerator.nextInternalUserId()),
+//    createdAt = Instant.now(clock)
+//  )
 
   private def getIndividualName(index: Int): IndividualName = TdTestOnly // TODO: this has to compre from completedSection
     .individualNamesStubbedInCompaniesHouse
