@@ -27,9 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
-import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
-import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
@@ -49,13 +47,9 @@ import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.util.chaining.scalaUtilChainingOps
-import StubUserService.addToSession
-import play.api.mvc.request.Cell
-import play.api.mvc.request.RequestAttrKey
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
 import uk.gov.hmrc.auth.core.retrieve.Credentials
-import uk.gov.hmrc.hmrcfrontend.views.viewmodels.header.v2.HeaderNames
 
 @Singleton
 class FastForwardController @Inject() (
@@ -65,10 +59,8 @@ class FastForwardController @Inject() (
   fastForwardPage: FastForwardPage,
   stubUserService: StubUserService,
   grsStubService: GrsStubService,
-  applicationService: AgentApplicationService,
   agentApplicationIdGenerator: AgentApplicationIdGenerator,
   linkIdGenerator: LinkIdGenerator,
-  individualProvideDetailsService: IndividualProvideDetailsService,
   agentRegistrationRiskingService: AgentRegistrationRiskingService,
   internalUserIdGenerator: InternalUserIdGenerator,
   individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator,
@@ -177,53 +169,10 @@ extends FrontendController(mcc, applicantActions):
       )
     else Future.unit
 
-  //  private def createIndividualProvidedDetailsList(
-  //    individualProvidedDetailsList: List[IndividualProvidedDetails],
-  //    agentApplicationId: AgentApplicationId
-  //  )(using
-  //    clock: Clock
-  //  ): Future[List[IndividualProvidedDetails]] =
-  //    Future.traverse(individualProvidedDetailsList.zipWithIndex):
-  //      case (tdIndividualProvidedDetails, index) =>
-  //        val stubbedName = getIndividualName(index)
-  //        Future.successful(tdIndividualProvidedDetails.copy(
-  //          _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
-  //          individualName = stubbedName,
-  //          agentApplicationId = agentApplicationId,
-  //          internalUserId = tdIndividualProvidedDetails.internalUserId.map(_ => internalUserIdGenerator.nextInternalUserId()),
-  //          createdAt = Instant.now(clock)
-  //        ))
-
-//  private def updateIndividualProvidedDetails(
-//    individualProvidedDetails: IndividualProvidedDetails,
-//    agentApplicationId: AgentApplicationId,
-//    individualName: IndividualName
-//  ): IndividualProvidedDetails = individualProvidedDetails.copy(
-//    _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
-//    individualName = individualName,
-//    agentApplicationId = agentApplicationId,
-//    internalUserId = individualProvidedDetails.internalUserId.map(_ => internalUserIdGenerator.nextInternalUserId()),
-//    createdAt = Instant.now(clock)
-//  )
-
   private def getIndividualName(index: Int): IndividualName = TdTestOnly // TODO: this has to compre from completedSection
     .individualNamesStubbedInCompaniesHouse
     .lift(index)
     .getOrThrowExpectedDataMissing(s"No identity stubbed at index $index")
-
-  //  private def upsertIndividuals(
-  //    createdIndividuals: List[IndividualProvidedDetails]
-  //  )(using r: RequestWithAuth): Future[Unit] =
-  //    createdIndividuals.foldLeft(Future.unit):
-  //      (
-  //        acc,
-  //        individual
-  //      ) =>
-  //        for
-  //          _ <- acc
-  //          _ <- individualProvideDetailsService.upsertForApplication(individual)
-  //          _ <- companiesHouseIndividualService.storeIndividualProvidedDetails(individual.individualName.value, Some(TestOnlyData.saUtr.asUtr))
-  //        yield ()
 
   private def journeyDataFor(
     bt: BusinessType
