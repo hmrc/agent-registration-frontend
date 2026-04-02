@@ -28,7 +28,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User.AdditionalInfor
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User.EnrolmentKey
 
 import java.time.LocalDate
-import scala.util.Random
 
 /** This represents User at agents-external-stubs https://github.com/hmrc/agents-external-stubs/blob/main/app/uk/gov/hmrc/agentsexternalstubs/models/User.scala
   */

@@ -16,26 +16,19 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.connectors
 
-import play.api.http.Status.CONFLICT
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.BusinessPartnerRecord
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.LoginResponse
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.SignInRequest
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User.EnrolmentKey
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
 import play.api.libs.json.JsValue
-import uk.gov.hmrc.agentregistration.shared.Nino
-import uk.gov.hmrc.agentregistration.shared.Utr
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.http.client.HttpClientV2
 
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
