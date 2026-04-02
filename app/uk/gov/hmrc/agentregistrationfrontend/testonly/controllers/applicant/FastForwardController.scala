@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant
 
-import play.api.http.Status.SEE_OTHER
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
@@ -24,7 +23,6 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsIdGenerator
 import uk.gov.hmrc.agentregistration.shared.lists.*
 import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
@@ -32,10 +30,8 @@ import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.given_PathBindable_CompletedSection
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.LoginResponse
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifiers
@@ -45,9 +41,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.util.InternalUserIdGenerat
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.SessionKeys
-import uk.gov.hmrc.http.HeaderNames as HMRCHeaderNames
 
 import java.time.Clock
 import java.time.Instant
@@ -94,9 +87,9 @@ extends FrontendController(mcc, applicantActions):
     .async:
       implicit req: RequestWithData[EmptyData] =>
         fastForwardApplicantTo(completedSection)
-          .map(_ => Redirect(AppRoutes.testOnly.TestOnlyController.showTestOnlyHub))
+          .map(agentApplicationId => Redirect(AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationTile(agentApplicationId)))
 
-  private def fastForwardApplicantTo(section: CompletedSection)(using request: RequestWithData[EmptyData]): Future[Unit] =
+  private def fastForwardApplicantTo(section: CompletedSection)(using request: RequestWithData[EmptyData]): Future[AgentApplicationId] =
 
     val agentApplicationId: AgentApplicationId = agentApplicationIdGenerator.nextApplicationId()
     val planetId: PlanetId = PlanetId.make(agentApplicationId)
@@ -147,7 +140,7 @@ extends FrontendController(mcc, applicantActions):
       //          companiesHouseIndividualService.storeIndividualProvidedDetails(individual.individualName.value, Some(saUtr))
       //        .pipe(Future.sequence)
       _ <- sendForRiskingIfNeeded(agentApplication, individuals)
-    yield ()
+    yield agentApplicationId
 
   private def sendForRiskingIfNeeded(
     agentApplication: AgentApplication,

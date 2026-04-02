@@ -21,18 +21,14 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Request
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
-import sttp.model.HeaderNames.Authorization
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.LoginResponse
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User.EnrolmentKey
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
 import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.SessionKeys
-import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.SignInRequest
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
@@ -66,6 +62,14 @@ extends RequestAwareLogging:
   def signIn(user: User): Future[LoginResponse] = agentsExternalStubsConnector.signIn(SignInRequest(
     userId = Some(user.userId),
     planetId = user.planetId
+  ))
+
+  def signIn(
+    userId: UserId,
+    planetId: PlanetId
+  ): Future[LoginResponse] = agentsExternalStubsConnector.signIn(SignInRequest(
+    userId = Some(userId),
+    planetId = planetId
   ))
 
   def createUserApplicant(

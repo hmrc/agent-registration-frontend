@@ -24,8 +24,9 @@
 )
 
 @(
-    agentApplication: AgentApplication,
-    individuals: Seq[IndividualProvidedDetails]
+        agentApplication: AgentApplication,
+        individuals: Seq[IndividualProvidedDetails])(implicit
+        requestHeader: RequestHeader
 )
 
 <style>
@@ -37,7 +38,12 @@
     <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-2">
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">AgentApplicationId</dt>
-            <dd class="govuk-summary-list__value">@agentApplication.agentApplicationId.value</dd>
+            <dd class="govuk-summary-list__value">
+                <a
+                class="govuk-link"
+                href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationById(agentApplication.agentApplicationId)"
+                >@agentApplication.agentApplicationId.value</a>
+                </dd>
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Business type</dt>
@@ -58,6 +64,17 @@
             </div>
         }
 
+        <a
+        class="govuk-link"
+        href="@AppRoutes.testOnly.TestOnlyController.logIn(agentApplication.internalUserId, requestHeader.uri)"
+        >login as @agentApplication.internalUserId.value</a> <br>
+
+        <a
+        class="govuk-link"
+        href="@AppRoutes.apply.TaskListController.show"
+        >task list page</a> <br>
+
+
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">@individuals.size individuals</dt>
             <dd class="govuk-summary-list__value">
@@ -76,13 +93,7 @@
         </div>
     </dl>
 
-    <a
-    class="govuk-link"
-    href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationById(agentApplication.agentApplicationId)"
-    >show json</a> <br>
-    <a
-    class="govuk-link"
-    href="@AppRoutes.apply.AgentApplicationController.startRegistration"
-    >login as applicant</a> <br>
+
+
 
 </div>

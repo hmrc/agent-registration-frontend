@@ -20,6 +20,7 @@ import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentType
@@ -29,9 +30,12 @@ import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowRecentApplicationsPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowAgentApplicationsTilePage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestLinkPage
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
@@ -50,6 +54,7 @@ class TestOnlyController @Inject() (
   agentRegistrationConnector: AgentRegistrationConnector,
   testLinkPage: TestLinkPage,
   showRecentApplicationsPage: ShowRecentApplicationsPage,
+  showAgentApplicationsTilePage: ShowAgentApplicationsTilePage,
   individualProvidedDetailsConnector: IndividualProvidedDetailsConnector
 )
 extends FrontendController(mcc, actions):
@@ -80,6 +85,25 @@ extends FrontendController(mcc, actions):
           .map:
             case Some(application) => Ok(Json.prettyPrint(Json.toJson(application)))
             case None => Ok(s"No application with such id: $agentApplicationId")
+
+  def showAgentApplicationTile(agentApplicationId: AgentApplicationId): Action[AnyContent] = actions
+    .action
+    .refine:
+      implicit request =>
+        testAgentRegistrationConnector.findApplication(agentApplicationId)
+          .map[Result | RequestWithData[AgentApplication *: EmptyData]]:
+            case Some(agentApplication) => request.add(agentApplication)
+            case None => InternalServerError(s"There is no application under given agentApplicationId: $agentApplicationId")
+    .refine:
+      implicit request =>
+        testAgentRegistrationConnector
+          .findIndividuals(request.get[AgentApplication].agentApplicationId)
+          .map[Result | RequestWithData[List[IndividualProvidedDetails] *: AgentApplication *: EmptyData]](request.add)
+    .apply:
+      implicit request =>
+        val agentApplication: AgentApplication = request.get[AgentApplication]
+        val individuals: List[IndividualProvidedDetails] = request.get[List[IndividualProvidedDetails]]
+        Ok(showAgentApplicationsTilePage(agentApplication, individuals))
 
   def showIndividualsForApplication: Action[AnyContent] = actions
     .getApplication

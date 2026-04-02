@@ -19,6 +19,7 @@ GET         /agent-registration/test-only/email-verification-pass-codes         
 
 GET         /agent-registration/test-only/show-agent-application                             uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.TestOnlyController.showAgentApplication
 GET         /agent-registration/test-only/show-agent-application/:agentApplicationId         uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.TestOnlyController.showAgentApplicationById(agentApplicationId: AgentApplicationId)
+GET         /agent-registration/test-only/show-agent-application-tile/:agentApplicationId    uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.TestOnlyController.showAgentApplicationTile(agentApplicationId: AgentApplicationId)
 GET         /agent-registration/test-only/show-recent-agent-applications                     uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.TestOnlyController.showRecentAgentApplications
 GET         /agent-registration/test-only/show-individuals-for-application                   uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.TestOnlyController.showIndividualsForApplication
 
@@ -41,4 +42,6 @@ GET         /agent-registration/test-only/show-provided-details/:linkId         
 GET         /agent-registration/test-only/show-individual-provided-details/:individualProvidedDetailsId                      uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.showIndividualProvidedDetails(individualProvidedDetailsId: IndividualProvidedDetailsId)
 
 GET         /agent-registration/test-only/individual/create-individual-if-needed-and-login-via-link-id/:individualProvidedDetailsId                      uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.createIndividualIfNeededAndLoginViaLinkId(individualProvidedDetailsId: IndividualProvidedDetailsId)
+
+GET         /agent-registration/test-only/login/:internalUserId                        uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.logIn(internalUserId: InternalUserId, redirectUrl: String)
 
