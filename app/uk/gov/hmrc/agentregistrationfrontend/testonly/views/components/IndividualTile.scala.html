@@ -17,11 +17,14 @@
 @import play.api.i18n.Messages
 @import play.twirl.api.Html
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 
 @this()
 
 @(
-    individual: IndividualProvidedDetails
+        individual: IndividualProvidedDetails)(implicit
+        requestHeader: RequestHeader
 )
 
 <style>
@@ -129,12 +132,16 @@
             <span class="individual-tile__info-label">Person of Control</span>
             <span class="individual-tile__info-value">@individual.isPersonOfControl</span>
         </div>
+
+        <a
+        class="govuk-link"
+        href="@AppRoutes.testOnly.TestOnlyController.logIn(
+            UserId.make(individual.individualProvidedDetailsId), PlanetId.make(individual.agentApplicationId), requestHeader.uri
+        )"
+        >login</a>
     </div>
 
     <div class="individual-tile__footer">
-        <a
-        class="govuk-link"
-        href="@AppRoutes.testOnly.individual.TestOnlyController.createIndividualIfNeededAndLoginViaLinkId(individual.individualProvidedDetailsId)"
-        >Create individual if needed and login via linkId</a>
+
     </div>
 </div>

@@ -16,9 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
-import play.api.http.Status.CONFLICT
-import play.api.mvc.AnyContent
-import play.api.mvc.Request
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.Nino

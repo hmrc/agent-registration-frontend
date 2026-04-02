@@ -41,13 +41,15 @@
     @quickNavigation()
     <h1 class="govuk-heading-l">Recent Applications</h1>
 
-    <ul class="govuk-list govuk-list--number">
+    <ul class="govuk-list govuk-list--number"
 
     @agentApplicationsWithIndividuals.map { agentApplicationWithIndividuals =>
 
-        <li class="govuk-!-margin-bottom-4">
-            @agentApplicationTile(agentApplicationWithIndividuals._1, agentApplicationWithIndividuals._2)
-        </li>
+            <li class="govuk-!-margin-bottom-4">
+                <a href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationTile(agentApplicationWithIndividuals._1.agentApplicationId)"
+                >show tile</a>
+                @agentApplicationTile(agentApplicationWithIndividuals._1, agentApplicationWithIndividuals._2)
+            </li>
     }
 
     </ul>

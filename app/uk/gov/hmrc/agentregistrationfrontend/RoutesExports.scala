@@ -34,3 +34,6 @@ object RoutesExports:
   export uk.gov.hmrc.agentregistration.shared.upload.UploadId
   export uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
   export uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
+
+  export uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
+  export uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId

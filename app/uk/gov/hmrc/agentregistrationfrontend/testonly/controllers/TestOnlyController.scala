@@ -50,17 +50,18 @@ extends FrontendControllerBase(mcc):
     Ok(Json.prettyPrint(Json.toJson(request.session.data)))
 
   def logIn(
-    internalUserId: InternalUserId,
+    userId: UserId,
+    planetId: PlanetId,
     redirectUrl: String
   ): Action[AnyContent] = defaultActionBuilder
     .async:
       implicit request =>
-        val (userId: UserId, planetId: PlanetId) =
-          internalUserId
-            .value
-            .split("@", 2) match
-            case Array(left, right) => (UserId(left), PlanetId(right))
-            case e => throw new IllegalArgumentException(s"Invalid internalUserId (it must be in format userId@planetId): $e")
+//        val (userId: UserId, planetId: PlanetId) =
+//          internalUserId
+//            .value
+//            .split("@", 2) match
+//            case Array(left, right) => (UserId(left), PlanetId(right))
+//            case e => throw new IllegalArgumentException(s"Invalid internalUserId (it must be in format userId@planetId): $e")
 
         import StubUserService.addToSession
         for

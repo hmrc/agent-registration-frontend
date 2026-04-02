@@ -43,5 +43,5 @@ GET         /agent-registration/test-only/show-individual-provided-details/:indi
 
 GET         /agent-registration/test-only/individual/create-individual-if-needed-and-login-via-link-id/:individualProvidedDetailsId                      uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.createIndividualIfNeededAndLoginViaLinkId(individualProvidedDetailsId: IndividualProvidedDetailsId)
 
-GET         /agent-registration/test-only/login/:internalUserId                        uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.logIn(internalUserId: InternalUserId, redirectUrl: String)
+GET         /agent-registration/test-only/login/:userId/:planetId                        uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.logIn(userId: UserId, planetId: PlanetId, redirectUrl: String)
 

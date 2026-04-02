@@ -86,15 +86,12 @@ object UserId:
 
   def make(individualProvidedDetailsId: IndividualProvidedDetailsId) = UserId(s"individual_${individualProvidedDetailsId.value}")
 
-  def nextUserId(prefix: String): UserId = UserId(prefix.replaceAll("\\s+", "") + "-" + Random.nextInt(1000000))
-
   given format: Format[UserId] = JsonFormatsFactory.makeValueClassFormat
+  given pathBindable: PathBindable[UserId] = ValueClassBinder.valueClassBinder[UserId](_.value)
 
 final case class PlanetId(value: String)
 
 object PlanetId:
-
-  val mmtar: PlanetId = PlanetId("MMTAR")
 
   def make(agentApplicationId: AgentApplicationId) = PlanetId(s"MMTAR_${agentApplicationId.value}")
   given format: Format[PlanetId] = JsonFormatsFactory.makeValueClassFormat

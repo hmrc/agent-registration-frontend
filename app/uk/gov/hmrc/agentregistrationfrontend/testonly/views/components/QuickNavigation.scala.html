@@ -45,33 +45,39 @@
 <nav class="govuk-!-margin-bottom-5" id="top-nav-bar" aria-label="Section navigation">
 
     <a
-    class="govuk-body govuk-link"
+    class="govuk-link"
     id="show-recent-applications"
     href="@AppRoutes.testOnly.applicant.TestOnlyController.showRecentAgentApplications"
     >recent applications</a>
 
     <a
-    class="govuk-body govuk-link"
+    class="govuk-link"
     id="show-recent-applications"
     href="@AppRoutes.testOnly.applicant.FastForwardController.show"
     >fast forward</a>
 
     <a
-    class="govuk-body govuk-link"
+    class="govuk-link"
     id="goto-agents-external-stubs"
     href="http://localhost:9099/agents-external-stubs/user"
-    >stubs</a>
+    >show current user in stubs</a>
 
     <a
-    class="govuk-body govuk-link"
+    class="govuk-link"
     id="goto-agents-external-stubs"
     href="@AppRoutes.testOnly.TestOnlyController.showPlaySession"
     >play session</a>
 
     <a
-    class="govuk-body govuk-link"
+    class="govuk-link"
     id="goto-agents-external-stubs"
     href="@AppRoutes.apply.AgentApplicationController.startRegistration"
-    >Start Registration</a>
+    >start registration page</a>
+
+    <a
+    class="govuk-link"
+    id="goto-task-list-page"
+    href="@AppRoutes.apply.TaskListController.show"
+    >task list page</a> <br>
 
 </nav>
