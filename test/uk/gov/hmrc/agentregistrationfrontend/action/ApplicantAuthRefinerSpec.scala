@@ -100,7 +100,7 @@ extends ISpec:
     )
 
     val result: Result = authRefiner.refine(tdAll.requestLoggedIn).futureValue.left.value
-    result shouldBe Redirect("http://localhost:9437/agent-services-account/home")
+    result shouldBe Redirect("http://localhost:9401/agent-services-account/home")
     AuthStubs.verifyAuthorise()
 
   "successfully authorise when user is logged in, credentialRole is User/Admin, and no active HMRC-AS-AGENT enrolment" in:
