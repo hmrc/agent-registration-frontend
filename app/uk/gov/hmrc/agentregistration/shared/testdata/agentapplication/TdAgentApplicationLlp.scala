@@ -102,7 +102,6 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
       )
     )
 
-    // I select 4 officers, companies house returns 6
     val afterNumberOfConfirmCompaniesHouseOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
         dependencies.sixOrMoreCompaniesHouseOfficers

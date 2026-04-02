@@ -34,7 +34,6 @@ import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
@@ -63,7 +62,6 @@ extends RequestAwareLogging:
     InternalUserId *: GroupId *: Credentials *: Data
   ]]] =
     given RequestWithDataCt[ContentType, Data] = request
-    val hc = summon[HeaderCarrier]
     af.authorised(
       AuthProviders(GovernmentGateway)
         and AffinityGroup.Agent

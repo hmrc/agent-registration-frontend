@@ -50,12 +50,6 @@ final class StubUserService @Inject() (
 )(implicit ec: ExecutionContext)
 extends RequestAwareLogging:
 
-//  def createAndLoginAgent(using request: Request[AnyContent]): Future[LoginResponse] =
-//    for
-//      user: User <- createUserApplicant()
-//      loginResponse <- signIn(user)
-//    yield loginResponse
-
   def signIn(user: User): Future[LoginResponse] = agentsExternalStubsConnector.signIn(SignInRequest(
     userId = Some(user.userId),
     planetId = user.planetId

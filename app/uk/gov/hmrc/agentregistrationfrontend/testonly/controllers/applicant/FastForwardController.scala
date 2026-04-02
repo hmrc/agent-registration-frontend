@@ -169,7 +169,7 @@ extends FrontendController(mcc, applicantActions):
       )
     else Future.unit
 
-  private def getIndividualName(index: Int): IndividualName = TdTestOnly // TODO: this has to compre from completedSection
+  private def getIndividualName(index: Int): IndividualName = TdTestOnly
     .individualNamesStubbedInCompaniesHouse
     .lift(index)
     .getOrThrowExpectedDataMissing(s"No identity stubbed at index $index")

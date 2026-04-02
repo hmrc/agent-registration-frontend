@@ -90,10 +90,9 @@ extends NumberOfIndividuals:
 
 /** When there less or equal 5, the Applicant has to declare the exact number of all key individuals (partners, directors, owners, etc) */
 final case class FiveOrLessOfficers(
-  override val numberOfCompaniesHouseOfficers: Int, // from CH (1)
-  isCompaniesHouseOfficersListCorrect: Boolean // from user ( never no)
+  override val numberOfCompaniesHouseOfficers: Int,
+  isCompaniesHouseOfficersListCorrect: Boolean
 )
-//individuals precreated automatically
 extends NumberOfCompaniesHouseOfficers:
 
   override def isValid: Boolean = numberOfCompaniesHouseOfficers <= 5 && numberOfCompaniesHouseOfficers >= 1 // this probably is not used
@@ -103,10 +102,9 @@ extends NumberOfCompaniesHouseOfficers:
 /** When there are more than 5, the Applicant has to declare how many of those are responsible for tax matters */
 //Minimum 5, if less then 5 then padd with difference up to 5
 final case class SixOrMoreOfficers(
-  override val numberOfCompaniesHouseOfficers: Int, // from CH (1)
-  numberOfOfficersResponsibleForTaxMatters: Int // from user (2) O up to numberOfCompaniesHouseOfficers
+  override val numberOfCompaniesHouseOfficers: Int,
+  numberOfOfficersResponsibleForTaxMatters: Int
 )
-//individuals not precreated automatically, created when user supplies/matches the officer name (exact match)
 extends NumberOfCompaniesHouseOfficers:
 
   // is valid numberOfOfficersResponsibleForTaxMatters
