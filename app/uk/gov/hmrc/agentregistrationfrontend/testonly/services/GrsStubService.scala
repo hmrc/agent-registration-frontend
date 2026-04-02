@@ -42,20 +42,20 @@ class GrsStubService @Inject() (
     deceased: Boolean
   )(using Request[?]): Future[Unit] =
 
-    val createSoleTraderIndividualRecordIfNeeded: Future[Unit] =
-      (businessType, journeyData.nino) match
-        case (SoleTrader, Some(nino: Nino)) =>
-          agentsExternalStubsConnector.createIndividualUser(
-            maybeNino = Some(nino),
-            assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
-            deceased = deceased
-          )
-        case _ => Future.successful(())
+//    val createSoleTraderIndividualRecordIfNeeded: Future[Unit] =
+//      (businessType, journeyData.nino) match
+//        case (SoleTrader, Some(nino: Nino)) =>
+//          agentsExternalStubsConnector.createIndividualUser(
+//            maybeNino = Some(nino),
+//            assignedPrincipalEnrolments = Seq("HMRC-MTD-IT"),
+//            deceased = deceased
+//          )
+//        case _ => Future.successful(())
 
     val utr: String = journeyData.sautr.map(_.value).getOrElse(journeyData.ctutr.map(_.value).getOrElse(""))
     // to get BPR fetches working we need to store a BPR in stubs using GRS data
     val businessPartnerRecord: Future[Unit] = agentsExternalStubsConnector.storeBusinessPartnerRecord(
-      BusinessPartnerRecord(
+      bpr = BusinessPartnerRecord(
         businessPartnerExists = true,
         uniqueTaxReference = Some(utr),
         utr = Some(utr),
@@ -100,6 +100,6 @@ class GrsStubService @Inject() (
     )
 
     for {
-      _ <- createSoleTraderIndividualRecordIfNeeded
+//      _ <- createSoleTraderIndividualRecordIfNeeded
       _ <- businessPartnerRecord
     } yield ()

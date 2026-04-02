@@ -16,72 +16,101 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
+import play.api.http.Status.CONFLICT
 import play.api.mvc.AnyContent
 import play.api.mvc.Request
+import play.api.mvc.RequestHeader
+import play.api.mvc.Result
+import sttp.model.HeaderNames.Authorization
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.LoginResponse
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User.EnrolmentKey
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
 import uk.gov.hmrc.auth.core.AffinityGroup
-import uk.gov.hmrc.http.Authorization
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.SessionId
-//import uk.gov.hmrc.agentregistrationfrontend.testonly.model.LoginResponse
+import uk.gov.hmrc.http.SessionKeys
+import uk.gov.hmrc.http.UpstreamErrorResponse
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.SignInRequest
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
+object StubUserService:
+
+  extension (r: Result)
+    def addToSession(loginResponse: LoginResponse)(using request: RequestHeader): Result = r.addingToSession(
+      SessionKeys.authToken -> loginResponse.authorization,
+      SessionKeys.sessionId -> loginResponse.sessionId
+    )
+
 @Singleton
 final class StubUserService @Inject() (
   agentsExternalStubsConnector: AgentsExternalStubsConnector
-)(implicit ec: ExecutionContext):
+)(implicit ec: ExecutionContext)
+extends RequestAwareLogging:
 
-  def createAndLoginAgent(using request: Request[AnyContent]): Future[HeaderCarrier] =
-    for
-//      initialLoginResponse: LoginResponse <- agentsExternalStubsConnector.signIn()
-//      given HeaderCarrier = makeHeaderCarrier(
-//        sessionId = initialLoginResponse.sessionId,
-//        authorization = initialLoginResponse.authorization
-//      )
-//      _ <- agentsExternalStubsConnector.removeUser(initialLoginResponse.userId)
-      user: User <- createAgentUser()
-      loginResponse <- agentsExternalStubsConnector.signIn(
-        SignInRequest(
-          userId = Some(user.userId),
-          planetId = user.planetId
-        )
-      )
-    yield makeHeaderCarrier(
-      sessionId = loginResponse.sessionId,
-      authorization = loginResponse.authorization
-    )
+//  def createAndLoginAgent(using request: Request[AnyContent]): Future[LoginResponse] =
+//    for
+//      user: User <- createUserApplicant()
+//      loginResponse <- signIn(user)
+//    yield loginResponse
 
-  private def createAgentUser()(using hc: HeaderCarrier): Future[User] =
+  def signIn(user: User): Future[LoginResponse] = agentsExternalStubsConnector.signIn(SignInRequest(
+    userId = Some(user.userId),
+    planetId = user.planetId
+  ))
+
+  def createUserApplicant(
+    userId: UserId,
+    planetId: PlanetId
+  ): Future[User] =
     val user: User = User(
-      userId = UserId.nextUserId,
-      planetId = PlanetId.mmtar,
-      assignedPrincipalEnrolments = Seq.empty[EnrolmentKey]
+      userId = userId,
+      planetId = planetId
     )
     agentsExternalStubsConnector.createUser(
       user = user,
       affinityGroup = Some(AffinityGroup.Agent)
     ).map(_ => user)
 
-  private def makeHeaderCarrier(
-    sessionId: String,
-    authorization: String
-  ): HeaderCarrier = HeaderCarrier(
-    sessionId = Some(SessionId(sessionId)),
-    authorization = Some(Authorization(asBearer(authorization)))
-  )
+  def createIndividualUser(
+    userId: UserId,
+    planetId: PlanetId,
+    deceased: Boolean = false,
+    maybeName: Option[String] = None,
+    maybeNino: Option[Nino] = None,
+    maybeUtr: Option[Utr] = None
+  )(using
+    request: RequestHeader
+  ): Future[User] =
+    val user = User(
+      userId = userId,
+      planetId = planetId,
+      nino = maybeNino,
+      assignedPrincipalEnrolments = Seq(EnrolmentKey("HMRC-MTD-IT")),
+      deceased = Some(deceased),
+      name = maybeName,
+      utr = maybeUtr
+    )
 
-  private def asBearer(authToken: String): String =
-    val trimmed = authToken.trim
-    if trimmed.toLowerCase.startsWith("bearer ") then trimmed
-    else s"Bearer $trimmed"
+    agentsExternalStubsConnector.createUser(
+      user = user,
+      affinityGroup = Some(AffinityGroup.Individual)
+    )
+      .map(_ => user)
+
+  def findUser(
+    userId: UserId,
+    planetId: PlanetId
+  )(using RequestHeader): Future[Option[User]] = agentsExternalStubsConnector.findUser(
+    userId = userId,
+    planetId = planetId
+  )

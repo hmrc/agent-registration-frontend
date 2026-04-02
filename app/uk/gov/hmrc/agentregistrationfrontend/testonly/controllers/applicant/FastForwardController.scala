@@ -32,18 +32,22 @@ import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.given_PathBindable_CompletedSection
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.LoginResponse
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifiers
-import uk.gov.hmrc.agentregistrationfrontend.testonly.services.CompaniesHouseIndividualService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.util.InternalUserIdGenerator
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
-
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.SessionKeys
+import uk.gov.hmrc.http.HeaderNames as HMRCHeaderNames
 
 import java.time.Clock
 import java.time.Instant
@@ -52,6 +56,12 @@ import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.util.chaining.scalaUtilChainingOps
+import StubUserService.addToSession
+import play.api.mvc.request.Cell
+import play.api.mvc.request.RequestAttrKey
+import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
+import uk.gov.hmrc.auth.core.retrieve.Credentials
+import uk.gov.hmrc.hmrcfrontend.views.viewmodels.header.v2.HeaderNames
 
 @Singleton
 class FastForwardController @Inject() (
@@ -67,56 +77,58 @@ class FastForwardController @Inject() (
   individualProvideDetailsService: IndividualProvideDetailsService,
   agentRegistrationRiskingService: AgentRegistrationRiskingService,
   internalUserIdGenerator: InternalUserIdGenerator,
-  individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator,
-  companiesHouseIndividualService: CompaniesHouseIndividualService
+  individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator
 )(using
   clock: Clock,
   ex: ExecutionContext
 )
 extends FrontendController(mcc, applicantActions):
 
-  def show: Action[AnyContent] = applicantActions.action:
-    implicit request =>
-      Ok(fastForwardPage())
+  def show: Action[AnyContent] = applicantActions
+    .action:
+      implicit request =>
+        Ok(fastForwardPage())
 
-  def fastForward(completedSection: CompletedSection): Action[AnyContent] = authorisedOrCreateAndLoginAgent
+  def fastForward(completedSection: CompletedSection): Action[AnyContent] = applicantActions
+    .action
     .async:
-      implicit req: RequestWithAuth =>
-        fastForwardTo(completedSection)
-          .map(_ => Redirect(AppRoutes.apply.TaskListController.show))
+      implicit req: RequestWithData[EmptyData] =>
+        fastForwardApplicantTo(completedSection)
+          .map(_ => Redirect(AppRoutes.testOnly.TestOnlyController.showTestOnlyHub))
 
-  // TODO: always new user so no need to sync with DB and with Risking
-  private def loginAndRetry(using request: Request[AnyContent]): Future[Result | RequestWithAuth] = stubUserService.createAndLoginAgent.map: stubsHc =>
-    val bearerToken: String = stubsHc.authorization
-      .map(_.value)
-      .getOrThrowExpectedDataMissing("Expected auth token in stubs HeaderCarrier")
+  private def fastForwardApplicantTo(section: CompletedSection)(using request: RequestWithData[EmptyData]): Future[Unit] =
 
-    val sessionId: String = stubsHc.sessionId
-      .map(_.value)
-      .getOrThrowExpectedDataMissing("Expected sessionId in stubs HeaderCarrier")
+    val agentApplicationId: AgentApplicationId = agentApplicationIdGenerator.nextApplicationId()
+    val planetId: PlanetId = PlanetId.make(agentApplicationId)
+    val userIdApplicant: UserId = UserId.make(agentApplicationId)
 
-    Redirect(request.uri).addingToSession(
-      SessionKeys.authToken -> bearerToken,
-      SessionKeys.sessionId -> sessionId
-    )
-
-  private val authorisedOrCreateAndLoginAgent: ActionBuilderWithData[DataWithAuth] = applicantActions.action.refine:
-    implicit request =>
-      applicantAuthRefiner.refine(request).flatMap:
-        case Right(authorisedRequest) => Future.successful(authorisedRequest)
-        case Left(result) if result.header.status === SEE_OTHER => loginAndRetry
-        case Left(result) => Future.successful(result)
-
-  private def fastForwardTo(section: CompletedSection)(using r: RequestWithAuth): Future[Unit] =
     for
-      _ <- grsStubService.storeStubsData(
-        businessType = section.businessType,
-        journeyData = journeyDataFor(section.businessType),
-        deceased = false
+      userApplicant <- stubUserService.createUserApplicant(userIdApplicant, planetId)
+      loginResponse <- stubUserService.signIn(userApplicant)
+      loggedInAsUserApplicantRequest: RequestWithDataCt[AnyContent, EmptyTuple] = RequestWithDataCt.empty(
+        loginResponse.refineRequest(request.request)
       )
-      agentApplication <- updateAgentApplication(section.agentApplication)
-      _ <- applicationService.upsert(agentApplication)
-      removeIndividuals <- removeStubbedIndividualsFor(agentApplication.agentApplicationId)
+      loggedInAsUserApplicantRequestWithAuthData: RequestWithData[DataWithAuth] <- applicantAuthRefiner
+        .refine(loggedInAsUserApplicantRequest)
+        .map:
+          case Right(data: RequestWithData[DataWithAuth]) => data
+          case Left(r) => throw new RuntimeException(s"ApplicantAuthRefiner didn't fetch DataWithAuth: $r")
+
+      agentApplication = section.agentApplication.withUpdatedIdentifiers(
+        id = agentApplicationId,
+        internalUserId = loggedInAsUserApplicantRequestWithAuthData.get[InternalUserId],
+        linkId = linkIdGenerator.nextLinkId(),
+        groupId = loggedInAsUserApplicantRequestWithAuthData.get[GroupId],
+        createdAt = Instant.now(clock)
+      )
+      _ <- applicationService.upsert(agentApplication)(using loggedInAsUserApplicantRequest)
+      _ <-
+        grsStubService.storeStubsData(
+          businessType = section.businessType,
+          journeyData = journeyDataFor(section.businessType),
+          deceased = false
+        )(using loggedInAsUserApplicantRequest)
+
       individuals <- section
         .maybeIndividualProvidedDetailsList
         .getOrElse(Nil)
@@ -129,11 +141,11 @@ extends FrontendController(mcc, applicantActions):
           )
         .map(i => individualProvideDetailsService.upsertForApplication(i).map(_ => i))
         .pipe(Future.sequence)
-      _ <- individuals
-        .map: individual =>
-          val saUtr = TdTestOnly.saUtr.asUtr // TODO: this has to come from completed section
-          companiesHouseIndividualService.storeIndividualProvidedDetails(individual.individualName.value, Some(saUtr))
-        .pipe(Future.sequence)
+      //      _ <- individuals
+      //        .map: individual =>
+      //          val saUtr = TdTestOnly.saUtr.asUtr // TODO: this has to come from completed section
+      //          companiesHouseIndividualService.storeIndividualProvidedDetails(individual.individualName.value, Some(saUtr))
+      //        .pipe(Future.sequence)
       _ <- sendForRiskingIfNeeded(agentApplication, individuals)
     yield ()
 
@@ -181,8 +193,6 @@ extends FrontendController(mcc, applicantActions):
     individualProvidedDetails: IndividualProvidedDetails,
     agentApplicationId: AgentApplicationId,
     individualName: IndividualName
-  )(using
-    clock: Clock
   ): IndividualProvidedDetails = individualProvidedDetails.copy(
     _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
     individualName = individualName,
@@ -221,21 +231,3 @@ extends FrontendController(mcc, applicantActions):
       case BusinessType.Partnership.LimitedPartnership => TdTestOnly.grsJourneyData.ltdPartnership.journeyData
       case BusinessType.SoleTrader => TdTestOnly.grsJourneyData.soleTrader.journeyData
       case BusinessType.LimitedCompany => TdTestOnly.grsJourneyData.ltd.journeyData
-
-  private def updateAgentApplication(agentApplication: AgentApplication)(using
-    r: RequestWithAuth,
-    clock: Clock
-  ): Future[AgentApplication] =
-    val identifiers: Future[(AgentApplicationId, LinkId)] = applicationService.find().map:
-      case Some(existingApplication) => (existingApplication.agentApplicationId, existingApplication.linkId)
-      case None => (agentApplicationIdGenerator.nextApplicationId(), linkIdGenerator.nextLinkId())
-    identifiers.map:
-      case (id, linkId) =>
-        agentApplication
-          .withUpdatedIdentifiers(
-            id = id,
-            internalUserId = r.internalUserId,
-            linkId = linkId,
-            groupId = r.groupId,
-            createdAt = Instant.now(clock)
-          )

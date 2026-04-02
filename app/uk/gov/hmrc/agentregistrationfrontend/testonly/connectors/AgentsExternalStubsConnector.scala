@@ -51,7 +51,10 @@ class AgentsExternalStubsConnector @Inject() (
 )
 extends Connector:
 
-  def storeBusinessPartnerRecord(bpr: BusinessPartnerRecord)(using
+  // Requires user to be logged in in stubs
+  def storeBusinessPartnerRecord(
+    bpr: BusinessPartnerRecord
+  )(using
     request: RequestHeader
   ): Future[Unit] =
     val url: URL = url"$baseUrl/records/business-partner-record"
@@ -70,33 +73,9 @@ extends Connector:
               response = response
             )
 
-  def createIndividualUser(
-    assignedPrincipalEnrolments: Seq[String],
-    deceased: Boolean = false,
-    maybeName: Option[String] = None,
-    maybeNino: Option[Nino] = None,
-    maybeUtr: Option[Utr] = None
-  )(using
-    request: RequestHeader
-  ): Future[Unit] =
-    val user = User(
-      userId = UserId(UUID.randomUUID().toString),
-      planetId = PlanetId.mmtar,
-      nino = maybeNino,
-      assignedPrincipalEnrolments = assignedPrincipalEnrolments.map(EnrolmentKey(_)),
-      deceased = Some(deceased),
-      name = maybeName,
-      utr = maybeUtr.map(_.value)
-    )
-    createUser(user, affinityGroup = Some(AffinityGroup.Individual)).recover {
-      // ignore 409 errors (created user with duplicate ninos) from user stubs repo
-      case e: UpstreamErrorResponse if e.statusCode === CONFLICT =>
-        logger.info(s"[AgentsExternalStubsConnector][createIndividualUser] Recovered from ${e.message}")
-        ()
-    }
-
-  def signIn(signInRequest: SignInRequest)(using hc: HeaderCarrier): Future[LoginResponse] =
+  def signIn(signInRequest: SignInRequest): Future[LoginResponse] =
     val url: URL = url"$baseUrl/sign-in"
+    given hc: HeaderCarrier = HeaderCarrier()
     httpClient
       .post(url)
       .withBody(Json.toJson(signInRequest))
@@ -113,10 +92,14 @@ extends Connector:
               info = "sign-in problem"
             )
 
-  def removeUser(userId: UserId)(using hc: HeaderCarrier): Future[Unit] =
+  def removeUser(
+    userId: UserId,
+    planetId: PlanetId
+  )(using hc: HeaderCarrier): Future[Unit] =
     val url: URL = url"$baseUrl/users/${userId.value}"
     httpClient
       .delete(url)
+      .setHeader(dummySessionForStubs(planetId)*)
       .execute[HttpResponse]
       .map: response =>
         response.status match
@@ -133,7 +116,9 @@ extends Connector:
   def createUser(
     user: User,
     affinityGroup: Option[AffinityGroup] = None
-  )(using hc: HeaderCarrier): Future[Unit] =
+  ): Future[Unit] =
+
+    given hc: HeaderCarrier = HeaderCarrier()
     val queryParams: Seq[(String, String)] = ("planetId" -> user.planetId.value) :: affinityGroup.map("affinityGroup" -> _.toString).toList
     val url: URL = url"$baseUrl/users?$queryParams"
 
@@ -144,12 +129,45 @@ extends Connector:
       .map: response =>
         response.status match
           case Status.CREATED | Status.OK => ()
+          case Status.CONFLICT => () // ignore 409 errors (created user with duplicate ninos) from user stubs repo
           case status =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "POST",
               url = url,
               status = status,
               response = response
+            )
+
+  private def dummySessionForStubs(planetId: PlanetId): Seq[(String, String)] = Seq(
+    "AuthenticatedSession-Planet-ID" -> planetId.value,
+    "AuthenticatedSession-User-ID" -> "dummy",
+    "AuthenticatedSession-Auth-Token" -> "dummy",
+    "AuthenticatedSession-Provider-Type" -> "dummy"
+  )
+  def findUser(
+    userId: UserId,
+    planetId: PlanetId
+  )(using RequestHeader): Future[Option[User]] =
+
+    val url: URL = url"$baseUrl/users/${userId.value}"
+
+    httpClient
+      .get(url)
+      .setHeader(
+        dummySessionForStubs(planetId)*
+      )
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => Some(response.json.as[User])
+          case Status.NOT_FOUND => None
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response,
+              info = s"find user problem: $userId, $planetId"
             )
 
   private val baseUrl: String = appConfig.agentsExternalStubsBaseUrl + "/agents-external-stubs"

@@ -39,3 +39,6 @@ GET         /agent-registration/test-only/add-individual-name/:individualName   
 
 GET         /agent-registration/test-only/show-provided-details/:linkId                      uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.showProvidedDetails(linkId: LinkId)
 GET         /agent-registration/test-only/show-individual-provided-details/:individualProvidedDetailsId                      uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.showIndividualProvidedDetails(individualProvidedDetailsId: IndividualProvidedDetailsId)
+
+GET         /agent-registration/test-only/individual/create-individual-if-needed-and-login-via-link-id/:individualProvidedDetailsId                      uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.TestOnlyController.createIndividualIfNeededAndLoginViaLinkId(individualProvidedDetailsId: IndividualProvidedDetailsId)
+

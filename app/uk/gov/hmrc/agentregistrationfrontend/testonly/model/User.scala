@@ -16,20 +16,19 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
-import java.util.UUID
-import play.api.libs.json.Format
-import play.api.libs.json.Json
-import play.api.libs.json.JsValue
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsString
+import play.api.libs.json.*
 import play.api.mvc.PathBindable
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User.AdditionalInformation
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User.EnrolmentKey
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.Utr
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 import uk.gov.hmrc.agentregistration.shared.util.ValueClassBinder
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User.AdditionalInformation
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User.EnrolmentKey
 
 import java.time.LocalDate
+import scala.util.Random
 
 /** This represents User at agents-external-stubs https://github.com/hmrc/agents-external-stubs/blob/main/app/uk/gov/hmrc/agentsexternalstubs/models/User.scala
   */
@@ -52,7 +51,7 @@ final case class User(
   additionalInformation: Option[AdditionalInformation] = None,
   strideRoles: Seq[String] = Seq.empty,
   deceased: Option[Boolean] = None,
-  utr: Option[String] = None
+  utr: Option[Utr] = None
 )
 
 object User:
@@ -83,7 +82,12 @@ final case class UserId(value: String)
 
 object UserId:
 
-  def nextUserId: UserId = UserId(UUID.randomUUID.toString)
+  def make(agentApplicationId: AgentApplicationId) = UserId(s"applicant_${agentApplicationId.value}")
+
+  def make(individualProvidedDetailsId: IndividualProvidedDetailsId) = UserId(s"individual_${individualProvidedDetailsId.value}")
+
+  def nextUserId(prefix: String): UserId = UserId(prefix.replaceAll("\\s+", "") + "-" + Random.nextInt(1000000))
+
   given format: Format[UserId] = JsonFormatsFactory.makeValueClassFormat
 
 final case class PlanetId(value: String)
@@ -92,6 +96,6 @@ object PlanetId:
 
   val mmtar: PlanetId = PlanetId("MMTAR")
 
-  def nextPlanetId: PlanetId = PlanetId(UUID.randomUUID.toString)
+  def make(agentApplicationId: AgentApplicationId) = PlanetId(s"MMTAR_${agentApplicationId.value}")
   given format: Format[PlanetId] = JsonFormatsFactory.makeValueClassFormat
   given pathBindable: PathBindable[PlanetId] = ValueClassBinder.valueClassBinder[PlanetId](_.value)

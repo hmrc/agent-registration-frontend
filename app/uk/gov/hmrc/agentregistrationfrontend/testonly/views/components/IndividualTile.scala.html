@@ -70,9 +70,9 @@
     }
 
     .individual-tile__info {
-        display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        gap: 0.5rem 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
         font-size: 0.875rem;
     }
 
@@ -100,7 +100,9 @@
 
 <div class="govuk-!-padding-4 individual-tile">
     <div class="individual-tile__header">
+
         <h3 class="individual-tile__name">@individual.individualName.value</h3>
+
         <span class="individual-tile__badge individual-tile__badge--@{individual.providedDetailsState.toString.toLowerCase}">
             @individual.providedDetailsState
         </span>
@@ -132,7 +134,7 @@
     <div class="individual-tile__footer">
         <a
         class="govuk-link"
-        href="TODO"
-        >Login</a>
+        href="@AppRoutes.testOnly.individual.TestOnlyController.createIndividualIfNeededAndLoginViaLinkId(individual.individualProvidedDetailsId)"
+        >Create individual if needed and login via linkId</a>
     </div>
 </div>
