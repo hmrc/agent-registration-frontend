@@ -16,26 +16,62 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
-import play.api.http.HeaderNames
+import play.api.mvc.request.Cell
+import play.api.mvc.request.RequestAttrKey
+import play.api.mvc.Headers
+import play.api.mvc.Request
+import play.api.mvc.Session
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.HeaderNames
 import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 
 final case class LoginResponse(
   authorization: String,
   sessionId: String,
-  planetId: String,
-  userId: String,
+  planetId: PlanetId,
+  userId: UserId,
   location: String
-)
+):
+
+  def asHeaderCarrier: HeaderCarrier = HeaderCarrier(
+    sessionId = Some(uk.gov.hmrc.http.SessionId(sessionId)),
+    authorization = Some(uk.gov.hmrc.http.Authorization(asBearer(authorization)))
+  )
+
+  /** Updates given request with auth and session id
+    */
+  def refineRequest[CT](request: Request[CT]) =
+    val session: Session =
+      request
+        .session
+        + (SessionKeys.authToken -> asBearer(authorization))
+        + (SessionKeys.sessionId -> sessionId)
+
+    request
+      .withHeaders(asHeaders)
+      .addAttr(RequestAttrKey.Session, Cell(session))
+
+  def asHeaders: Headers = Headers(
+    HeaderNames.xSessionId -> sessionId,
+    HeaderNames.authorisation -> asBearer(authorization)
+  )
+
+  private def asBearer(authToken: String): String =
+    val trimmed = authToken.trim
+    if trimmed.toLowerCase.startsWith("bearer ")
+    then trimmed
+    else s"Bearer $trimmed"
 
 object LoginResponse:
 
   def from(response: HttpResponse): LoginResponse = LoginResponse(
-    authorization = headerOne(response, HeaderNames.AUTHORIZATION),
+    authorization = headerOne(response, HeaderNames.authorisation),
     sessionId = headerOne(response, "X-Session-ID"),
-    planetId = headerOne(response, "X-Planet-ID"),
-    userId = headerOne(response, "X-User-ID"),
-    location = headerOne(response, HeaderNames.LOCATION)
+    planetId = PlanetId(headerOne(response, "X-Planet-ID")),
+    userId = UserId(headerOne(response, "X-User-ID")),
+    location = headerOne(response, play.api.http.HeaderNames.LOCATION)
   )
 
   private def headerOne(

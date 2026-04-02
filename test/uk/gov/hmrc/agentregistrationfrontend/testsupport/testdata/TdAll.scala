@@ -29,9 +29,6 @@ import uk.gov.hmrc.agentregistration.shared.testdata.TdGrsBusinessDetails
 import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.TdAgentApplicationSoleTraderRepresentative
 
 object TdAll:
-
-  def apply(): TdAll = new TdAll {}
-
   val tdAll: TdAll = new TdAll {}
 
 /** Test Data (Td) composition trait that combines All available test data instances.

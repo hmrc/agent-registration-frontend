@@ -1,0 +1,56 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+
+@this(
+        appConfig: AppConfig,
+        layout: Layout,
+        quickNavigation: components.QuickNavigation,
+        agentApplicationTile: components.AgentApplicationTile
+)
+
+@(
+        agentApplicationsWithIndividuals: Seq[(AgentApplication, List[IndividualProvidedDetails])]
+)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@layout(
+    pageTitle = "Test Only Hub",
+    suppressBackLink = true
+) {
+
+    @quickNavigation()
+    <h1 class="govuk-heading-l">Recent Applications</h1>
+
+    <ul class="govuk-list govuk-list--number"
+
+    @agentApplicationsWithIndividuals.map { agentApplicationWithIndividuals =>
+
+            <li class="govuk-!-margin-bottom-4">
+                <a href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationTile(agentApplicationWithIndividuals._1.agentApplicationId)"
+                >show tile</a>
+                @agentApplicationTile(agentApplicationWithIndividuals._1, agentApplicationWithIndividuals._2)
+            </li>
+    }
+
+    </ul>
+}

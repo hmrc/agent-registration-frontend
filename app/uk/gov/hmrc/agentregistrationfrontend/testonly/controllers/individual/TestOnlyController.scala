@@ -21,14 +21,17 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -38,7 +41,8 @@ class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
   actions: IndividualActions,
   individualProvideDetailsService: IndividualProvideDetailsService,
-  agentApplicationService: AgentApplicationService
+  agentApplicationService: AgentApplicationService,
+  testAgentRegistrationConnector: TestAgentRegistrationConnector
 )
 extends FrontendController(mcc, actions):
 
@@ -68,6 +72,14 @@ extends FrontendController(mcc, actions):
     baseAction(linkId):
       implicit request =>
         Ok(Json.prettyPrint(Json.toJson(request.get[IndividualProvidedDetails])))
+
+  def showIndividualProvidedDetails(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = actions
+    .action
+    .async:
+      implicit request =>
+        testAgentRegistrationConnector.findIndividual(individualProvidedDetailsId).map:
+          case Some(individualProvidedDetails) => Ok(Json.prettyPrint(Json.toJson(individualProvidedDetails)))
+          case None => Ok("There is no individual under the given ID")
 
   def addIndividualNameToSession(individualName: String): Action[AnyContent] = Action:
     implicit request =>

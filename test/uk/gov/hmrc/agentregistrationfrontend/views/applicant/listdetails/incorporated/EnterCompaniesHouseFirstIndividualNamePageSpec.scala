@@ -22,7 +22,6 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseIndividuaNameForm
-import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -34,7 +33,7 @@ extends ViewSpec:
   val viewTemplate: EnterCompaniesHouseFirstIndividualNamePage = app.injector.instanceOf[EnterCompaniesHouseFirstIndividualNamePage]
 
   private val entityName: String = tdAll.companyName
-  private val sixOrMoreOfficers: SixOrMoreOfficers = TestOnlyData.sixOrMoreCompaniesHouseOfficers
+  private val sixOrMoreOfficers: SixOrMoreOfficers = tdAll.sixOrMoreCompaniesHouseOfficers
 //  private val numberOfMembers: Int = sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters
 //  private val paddingRequired: Int = sixOrMoreOfficers.requiredPadding
   private val ordinalKey: String = "first"

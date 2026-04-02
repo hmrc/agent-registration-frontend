@@ -20,32 +20,95 @@ import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowRecentApplicationsPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowAgentApplicationsTilePage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestLinkPage
+import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
+import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.Future
 
 @Singleton
 class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   testApplicationService: TestApplicationService,
-  testLinkPage: TestLinkPage
+  testAgentRegistrationConnector: TestAgentRegistrationConnector,
+  testLinkPage: TestLinkPage,
+  showRecentApplicationsPage: ShowRecentApplicationsPage,
+  showAgentApplicationsTilePage: ShowAgentApplicationsTilePage,
+  individualProvidedDetailsConnector: IndividualProvidedDetailsConnector
 )
 extends FrontendController(mcc, actions):
 
   def showAgentApplication: Action[AnyContent] = actions
     .getApplication: request =>
       Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))
+
+  def showRecentAgentApplications: Action[AnyContent] = actions
+    .action
+    .async:
+      implicit request =>
+        for
+          applications <- testAgentRegistrationConnector.getRecentApplications()
+          applicationsWithIndividuals: Seq[(AgentApplication, List[IndividualProvidedDetails])] <- Future.sequence:
+            applications.map: agentApplication =>
+              testAgentRegistrationConnector
+                .findIndividuals(agentApplication.agentApplicationId)
+                .map(individuals => (agentApplication, individuals))
+        yield Ok(showRecentApplicationsPage(applicationsWithIndividuals))
+
+  def showAgentApplicationById(agentApplicationId: AgentApplicationId): Action[AnyContent] = actions
+    .action
+    .async:
+      implicit request =>
+        testAgentRegistrationConnector
+          .findApplication(agentApplicationId)
+          .map:
+            case Some(application) => Ok(Json.prettyPrint(Json.toJson(application)))
+            case None => Ok(s"No application with such id: $agentApplicationId")
+
+  def showAgentApplicationTile(agentApplicationId: AgentApplicationId): Action[AnyContent] = actions
+    .action
+    .refine:
+      implicit request =>
+        testAgentRegistrationConnector.findApplication(agentApplicationId)
+          .map[Result | RequestWithData[AgentApplication *: EmptyData]]:
+            case Some(agentApplication) => request.add(agentApplication)
+            case None => InternalServerError(s"There is no application under given agentApplicationId: $agentApplicationId")
+    .refine:
+      implicit request =>
+        testAgentRegistrationConnector
+          .findIndividuals(request.get[AgentApplication].agentApplicationId)
+          .map[Result | RequestWithData[List[IndividualProvidedDetails] *: AgentApplication *: EmptyData]](request.add)
+    .apply:
+      implicit request =>
+        val agentApplication: AgentApplication = request.get[AgentApplication]
+        val individuals: List[IndividualProvidedDetails] = request.get[List[IndividualProvidedDetails]]
+        Ok(showAgentApplicationsTilePage(agentApplication, individuals))
+
+  def showIndividualsForApplication: Action[AnyContent] = actions
+    .getApplication
+    .async:
+      implicit request =>
+        individualProvidedDetailsConnector
+          .findAll(request.get[AgentApplication].agentApplicationId)
+          .map: individuals =>
+            Ok(Json.prettyPrint(Json.toJson(individuals)))
 
   def addAgentTypeToSession(
     agentType: AgentType
@@ -77,6 +140,8 @@ extends FrontendController(mcc, actions):
     implicit request =>
       Ok("agent applicationId added to session")
         .addToSession(agentApplicationId)
+
+  // TODO: remove this once FF links can handle this
 
   // as we add more types of entity support we may want to specify which business type to create
   // possibly as part of the url, for now we only create an LLP application

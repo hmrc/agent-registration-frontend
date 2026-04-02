@@ -21,7 +21,6 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.CheckResult
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData.crn
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CompaniesHouseStubs
@@ -70,27 +69,27 @@ extends ControllerSpec:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterHmrcEntityVerificationPass)
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterCompaniesHouseStatusCheckPass)
-    CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompaniesHouseStatus.Active.key)
+    CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = tdAll.crn, companyStatus = CompaniesHouseStatus.Active.key)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe nextUrl
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
-    CompaniesHouseStubs.verifyGetCompanyHouse(crn = crn)
+    CompaniesHouseStubs.verifyGetCompanyHouse(crn = tdAll.crn)
 
   s"GET $path should update application with fail status and open company status fail page when company status is blocked" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterHmrcEntityVerificationPass)
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterCompaniesHouseStatusCheckFail)
-    CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompaniesHouseStatus.Closed.key)
+    CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = tdAll.crn, companyStatus = CompaniesHouseStatus.Closed.key)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe failCheckPage
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
-    CompaniesHouseStubs.verifyGetCompanyHouse(crn = crn)
+    CompaniesHouseStubs.verifyGetCompanyHouse(crn = tdAll.crn)
 
   s"GET path should redirect to task list page when entity verification already done" in:
     AuthStubs.stubAuthorise()
@@ -108,14 +107,14 @@ extends ControllerSpec:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterCompaniesHouseStatusCheckFail)
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterCompaniesHouseStatusCheckPass)
-    CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = crn, companyStatus = CompaniesHouseStatus.Active.key)
+    CompaniesHouseStubs.givenSuccessfulGetCompanyHouseResponse(crn = tdAll.crn, companyStatus = CompaniesHouseStatus.Active.key)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe nextUrl
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
-    CompaniesHouseStubs.verifyGetCompanyHouse(crn = crn)
+    CompaniesHouseStubs.verifyGetCompanyHouse(crn = tdAll.crn)
 
   s"GET $path should redirect to task list page when business type is not incorporated like SoleTrader" in:
     AuthStubs.stubAuthorise()

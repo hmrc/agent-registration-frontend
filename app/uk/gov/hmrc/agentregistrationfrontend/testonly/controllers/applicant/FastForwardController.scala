@@ -16,24 +16,29 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant
 
-import org.apache.pekko.Done
-import play.api.http.Status.SEE_OTHER
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsIdGenerator
+import uk.gov.hmrc.agentregistration.shared.lists.*
+import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
-import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifiers
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
+import uk.gov.hmrc.agentregistrationfrontend.testonly.util.InternalUserIdGenerator
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.FastForwardPage
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.GrsTestData
-import uk.gov.hmrc.http.SessionKeys
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
 
 import java.time.Clock
 import java.time.Instant
@@ -41,6 +46,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+import scala.util.chaining.scalaUtilChainingOps
+import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
+import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 @Singleton
 class FastForwardController @Inject() (
@@ -50,112 +59,129 @@ class FastForwardController @Inject() (
   fastForwardPage: FastForwardPage,
   stubUserService: StubUserService,
   grsStubService: GrsStubService,
-  applicationService: AgentApplicationService,
   agentApplicationIdGenerator: AgentApplicationIdGenerator,
-  linkIdGenerator: LinkIdGenerator
+  linkIdGenerator: LinkIdGenerator,
+  agentRegistrationRiskingService: AgentRegistrationRiskingService,
+  internalUserIdGenerator: InternalUserIdGenerator,
+  individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator,
+  testAgentRegistrationConnector: TestAgentRegistrationConnector
 )(using
   clock: Clock,
   ex: ExecutionContext
 )
 extends FrontendController(mcc, applicantActions):
 
-  def show: Action[AnyContent] = applicantActions.action:
-    implicit request =>
-      Ok(fastForwardPage())
+  def show: Action[AnyContent] = applicantActions
+    .action:
+      implicit request =>
+        Ok(fastForwardPage())
 
-  def fastForward(
-    completedSection: CompletedSection
-  ): Action[AnyContent] =
-    completedSection match
-      case c: CompletedSectionLlp =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
-      case c: CompletedSectionGeneralPartnership =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
-      case c: CompletedSectionScottishPartnership =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
-      case c: CompletedSectionSoleTrader =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
-      case c: CompletedSectionLimitedCompany =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
-      case c: CompletedSectionLimitedPartnership =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
-      case c: CompletedSectionScottishLimitedPartnership =>
-        authorisedOrCreateAndLoginAgent.async: (req: RequestWithAuth) =>
-          given RequestWithAuth = req
-          fastForwardTo(c).map(_ => Redirect(AppRoutes.apply.TaskListController.show))
+  def fastForward(completedSection: CompletedSection): Action[AnyContent] = applicantActions
+    .action
+    .async:
+      implicit req: RequestWithData[EmptyData] =>
+        fastForwardApplicantTo(completedSection)
+          .map(agentApplicationId => Redirect(AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationTile(agentApplicationId)))
 
-  private def loginAndRetry(using request: Request[AnyContent]): Future[Result | RequestWithAuth] = stubUserService.createAndLoginAgent.map: stubsHc =>
-    val bearerToken: String = stubsHc.authorization
-      .map(_.value)
-      .getOrThrowExpectedDataMissing("Expected auth token in stubs HeaderCarrier")
+  private def fastForwardApplicantTo(section: CompletedSection)(using request: RequestWithData[EmptyData]): Future[AgentApplicationId] =
 
-    val sessionId: String = stubsHc.sessionId
-      .map(_.value)
-      .getOrThrowExpectedDataMissing("Expected sessionId in stubs HeaderCarrier")
+    val agentApplicationId: AgentApplicationId = agentApplicationIdGenerator.nextApplicationId()
+    val planetId: PlanetId = PlanetId.make(agentApplicationId)
+    val userIdApplicant: UserId = UserId.make(agentApplicationId)
 
-    Redirect(request.uri).addingToSession(
-      SessionKeys.authToken -> bearerToken,
-      SessionKeys.sessionId -> sessionId
-    )
-
-  private val authorisedOrCreateAndLoginAgent: ActionBuilderWithData[DataWithAuth] = applicantActions.action.refine:
-    implicit request =>
-      applicantAuthRefiner.refine(request).flatMap:
-        case Right(authorisedRequest) => Future.successful(authorisedRequest)
-
-        case Left(result) if result.header.status === SEE_OTHER => loginAndRetry
-
-        case Left(result) => Future.successful(result)
-
-  private def fastForwardTo(section: CompletedSection)(using r: RequestWithAuth): Future[Done] =
-    val toAppState: AgentApplication = section.appState
-
-    for {
-      _ <- grsStubService.storeStubsData(
-        businessType = section.businessType,
-        journeyData = journeyDataFor(section.businessType),
-        deceased = false
+    for
+      userApplicant <- stubUserService.createUserApplicant(userIdApplicant, planetId)
+      loginResponse <- stubUserService.signIn(userApplicant)
+      loggedInAsUserApplicantRequest: RequestWithDataCt[AnyContent, EmptyTuple] = RequestWithDataCt.empty(
+        loginResponse.refineRequest(request.request)
       )
-      updated <- updateIdentifiers(toAppState)
-      _ <- applicationService.upsert(updated)
-    } yield Done
 
-  private def journeyDataFor(bt: BusinessType): JourneyData =
-    bt match
-      case BusinessType.Partnership.LimitedLiabilityPartnership => GrsTestData.grsJourneyData.llp.journeyData
-      case BusinessType.Partnership.GeneralPartnership => GrsTestData.grsJourneyData.generalPartnership.journeyData
-      case BusinessType.Partnership.ScottishPartnership => GrsTestData.grsJourneyData.scottishPartnership.journeyData
-      case BusinessType.Partnership.ScottishLimitedPartnership => GrsTestData.grsJourneyData.scottishLtdPartnership.journeyData
-      case BusinessType.Partnership.LimitedPartnership => GrsTestData.grsJourneyData.ltdPartnership.journeyData
-      case BusinessType.SoleTrader => GrsTestData.grsJourneyData.soleTrader.journeyData
-      case BusinessType.LimitedCompany => GrsTestData.grsJourneyData.ltd.journeyData
+      loggedInAsUserApplicantRequestWithAuthData: RequestWithData[DataWithAuth] <- applicantAuthRefiner
+        .refine(loggedInAsUserApplicantRequest)
+        .map:
+          case Right(data: RequestWithData[DataWithAuth]) => data
+          case Left(r) => throw new RuntimeException(s"ApplicantAuthRefiner didn't fetch DataWithAuth: $r")
 
-  private def updateIdentifiers(agentApplication: AgentApplication)(using
-    r: RequestWithAuth,
-    clock: Clock
-  ): Future[AgentApplication] =
-    val identifiers: Future[(AgentApplicationId, LinkId)] = applicationService.find().map:
-      case Some(existingApplication) => (existingApplication.agentApplicationId, existingApplication.linkId)
-      case None => (agentApplicationIdGenerator.nextApplicationId(), linkIdGenerator.nextLinkId())
-    identifiers.map:
-      case (id, linkId) =>
-        agentApplication
-          .withUpdatedIdentifiers(
-            id,
-            r.internalUserId,
-            linkId,
-            r.groupId,
-            Instant.now(clock)
+      agentApplication = section.agentApplication.withUpdatedIdentifiers(
+        id = agentApplicationId,
+        internalUserId = loggedInAsUserApplicantRequestWithAuthData.get[InternalUserId],
+        linkId = linkIdGenerator.nextLinkId(),
+        groupId = loggedInAsUserApplicantRequestWithAuthData.get[GroupId],
+        createdAt = Instant.now(clock)
+      )
+      _ <- testAgentRegistrationConnector.upsertAgentApplication(agentApplication)
+      _ <-
+        grsStubService.storeStubsData(
+          businessType = section.businessType,
+          journeyData = journeyDataFor(section.businessType),
+          deceased = false
+        )(using loggedInAsUserApplicantRequest)
+
+      individuals <- section
+        .maybeIndividualProvidedDetailsList
+        .getOrElse(Nil)
+        .zipWithIndex
+        .map: (t: (IndividualProvidedDetails, Int)) =>
+          primeIndividual(
+            template = t._1,
+            agentApplicationId = agentApplication.agentApplicationId,
+            individualName = getIndividualName(t._2)
           )
+        .pipe(Future.sequence)
+      _ <- sendForRiskingIfNeeded(agentApplication, individuals)
+    yield agentApplicationId
+
+  private def primeIndividual(
+    template: IndividualProvidedDetails,
+    agentApplicationId: AgentApplicationId,
+    individualName: IndividualName
+  )(using request: Request[?]): Future[IndividualProvidedDetails] =
+    val individualProvidedDetailsId: IndividualProvidedDetailsId = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId()
+    val individualProvidedDetails = template.copy(
+      _id = individualProvidedDetailsId,
+      individualName = individualName,
+      agentApplicationId = agentApplicationId,
+      internalUserId = template.internalUserId.map(_ => internalUserIdGenerator.nextInternalUserId()),
+      createdAt = Instant.now(clock)
+    )
+    val planetId: PlanetId = PlanetId.make(agentApplicationId)
+    val userIdIndividual: UserId = UserId.make(individualProvidedDetailsId)
+    for
+      userIndividual <- stubUserService.createUserIndividual(
+        userId = userIdIndividual,
+        planetId = planetId,
+        name = individualName.value
+      )
+      _ <- testAgentRegistrationConnector.upsertIndividualProvidedDetails(individualProvidedDetails)
+    yield individualProvidedDetails
+
+  private def sendForRiskingIfNeeded(
+    agentApplication: AgentApplication,
+    individuals: List[IndividualProvidedDetails]
+  )(using request: RequestHeader) =
+    if agentApplication.applicationState.sentForRisking
+    then
+      agentRegistrationRiskingService.submitForRisking(
+        submitForRiskingRequest = SubmitForRiskingRequest(
+          agentApplication = agentApplication,
+          individuals = individuals
+        )
+      )
+    else Future.unit
+
+  private def getIndividualName(index: Int): IndividualName = TdTestOnly
+    .individualNamesStubbedInCompaniesHouse
+    .lift(index)
+    .getOrThrowExpectedDataMissing(s"No identity stubbed at index $index")
+
+  private def journeyDataFor(
+    bt: BusinessType
+  ): JourneyData =
+    bt match
+      case BusinessType.Partnership.LimitedLiabilityPartnership => TdTestOnly.grsJourneyData.llp.journeyData
+      case BusinessType.Partnership.GeneralPartnership => TdTestOnly.grsJourneyData.generalPartnership.journeyData
+      case BusinessType.Partnership.ScottishPartnership => TdTestOnly.grsJourneyData.scottishPartnership.journeyData
+      case BusinessType.Partnership.ScottishLimitedPartnership => TdTestOnly.grsJourneyData.scottishLtdPartnership.journeyData
+      case BusinessType.Partnership.LimitedPartnership => TdTestOnly.grsJourneyData.ltdPartnership.journeyData
+      case BusinessType.SoleTrader => TdTestOnly.grsJourneyData.soleTrader.journeyData
+      case BusinessType.LimitedCompany => TdTestOnly.grsJourneyData.ltd.journeyData

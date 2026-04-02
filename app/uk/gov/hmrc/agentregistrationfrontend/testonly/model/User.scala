@@ -16,18 +16,24 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
-import play.api.libs.json.Format
-import play.api.libs.json.Json
-import play.api.libs.json.JsValue
-import play.api.libs.json.JsResult
-import play.api.libs.json.JsString
+import play.api.libs.json.*
+import play.api.mvc.PathBindable
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
+import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.Utr
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import uk.gov.hmrc.agentregistration.shared.util.ValueClassBinder
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User.AdditionalInformation
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.User.EnrolmentKey
-import uk.gov.hmrc.agentregistration.shared.Nino
+
 import java.time.LocalDate
 
+/** This represents User at agents-external-stubs https://github.com/hmrc/agents-external-stubs/blob/main/app/uk/gov/hmrc/agentsexternalstubs/models/User.scala
+  */
 final case class User(
-  userId: String,
+  userId: UserId,
+  planetId: PlanetId, // It's mandatory in this service, but not in the original User model
   groupId: Option[String] = None,
   confidenceLevel: Option[Int] = None,
   credentialStrength: Option[String] = None,
@@ -37,7 +43,6 @@ final case class User(
   assignedDelegatedEnrolments: Seq[EnrolmentKey] = Seq.empty,
   name: Option[String] = None,
   dateOfBirth: Option[LocalDate] = None,
-  planetId: Option[String] = None,
   isNonCompliant: Option[Boolean] = None,
   complianceIssues: Option[Seq[String]] = None,
   recordIds: Seq[String] = Seq.empty,
@@ -45,7 +50,7 @@ final case class User(
   additionalInformation: Option[AdditionalInformation] = None,
   strideRoles: Seq[String] = Seq.empty,
   deceased: Option[Boolean] = None,
-  utr: Option[String] = None
+  utr: Option[Utr] = None
 )
 
 object User:
@@ -71,3 +76,22 @@ object User:
         override def writes(o: EnrolmentKey): JsValue = JsString(o.tag)
 
   given format: Format[User] = Json.format[User]
+
+final case class UserId(value: String)
+
+object UserId:
+
+  def make(agentApplicationId: AgentApplicationId) = UserId(s"applicant_${agentApplicationId.value}")
+
+  def make(individualProvidedDetailsId: IndividualProvidedDetailsId) = UserId(s"individual_${individualProvidedDetailsId.value}")
+
+  given format: Format[UserId] = JsonFormatsFactory.makeValueClassFormat
+  given pathBindable: PathBindable[UserId] = ValueClassBinder.valueClassBinder[UserId](_.value)
+
+final case class PlanetId(value: String)
+
+object PlanetId:
+
+  def make(agentApplicationId: AgentApplicationId) = PlanetId(s"MMTAR_${agentApplicationId.value}")
+  given format: Format[PlanetId] = JsonFormatsFactory.makeValueClassFormat
+  given pathBindable: PathBindable[PlanetId] = ValueClassBinder.valueClassBinder[PlanetId](_.value)

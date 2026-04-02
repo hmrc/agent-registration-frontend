@@ -16,10 +16,15 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.connectors
 
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -54,5 +59,125 @@ extends Connector:
               response = response
             )
       .andLogOnFailure("Failed to created submitted application")
+
+  def upsertAgentApplication(agentApplication: AgentApplication)(using
+    request: RequestHeader
+  ): Future[Unit] =
+    val url: URL = url"$baseUrl/application"
+    httpClient
+      .post(url)
+      .withBody(Json.toJson(agentApplication))
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => ()
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = status,
+              response = response,
+              info = "upsertAgentApplication problem"
+            )
+      .andLogOnFailure("Failed to upsert application")
+
+  def upsertIndividualProvidedDetails(individualProvidedDetails: IndividualProvidedDetails)(using
+    request: RequestHeader
+  ): Future[Unit] =
+    val url: URL = url"$baseUrl/individual-provided-details"
+    httpClient
+      .post(url)
+      .withBody(Json.toJson(individualProvidedDetails))
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => ()
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = status,
+              response = response,
+              info = "upsertAgentApplication problem"
+            )
+      .andLogOnFailure("Failed to upsert application")
+
+  def getRecentApplications()(using
+    request: RequestHeader
+  ): Future[List[AgentApplication]] =
+    val url: URL = url"$baseUrl/recent-applications"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => response.json.as[List[AgentApplication]]
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to get recent applications")
+
+  def findApplication(agentApplicationId: AgentApplicationId)(using
+    request: RequestHeader
+  ): Future[Option[AgentApplication]] =
+    val url: URL = url"$baseUrl/application/by-agent-application-id/${agentApplicationId.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if status === Status.OK => Some(response.json.as[AgentApplication])
+          case status if status === Status.NO_CONTENT => None
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to find application")
+
+  def findIndividual(individualProvidedDetailsId: IndividualProvidedDetailsId)(using
+    request: RequestHeader
+  ): Future[Option[IndividualProvidedDetails]] =
+    val url: URL = url"$baseUrl/individuals/by-id/${individualProvidedDetailsId.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if status === Status.OK => Some(response.json.as[IndividualProvidedDetails])
+          case status if status === Status.NO_CONTENT => None
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to find IndividualProvidedDetails")
+
+  def findIndividuals(agentApplicationId: AgentApplicationId)(using
+    request: RequestHeader
+  ): Future[List[IndividualProvidedDetails]] =
+    val url: URL = url"$baseUrl/individuals/by-agent-application-id/${agentApplicationId.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if status === Status.OK => response.json.as[List[IndividualProvidedDetails]]
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to find individuals for application id: ${agentApplicationId.value}")
 
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration/test-only"

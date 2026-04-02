@@ -25,7 +25,7 @@ class RequestWithDataCt[
   ContentType,
   Data <: Tuple
 ] private (
-  request: Request[ContentType],
+  val request: Request[ContentType],
   val data: UniqueTuple[Data]
 )
 extends WrappedRequest[ContentType](request):
