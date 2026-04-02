@@ -84,6 +84,7 @@ extends FrontendController(mcc, actions):
                 agentApplicationService
                   .upsert(applicationFactory.makeNewAgentApplicationLlp(
                     internalUserId = request.internalUserId,
+                    applicantCredentials = request.credentials,
                     groupId = request.groupId,
                     userRole = userRole
                   ))
@@ -92,6 +93,7 @@ extends FrontendController(mcc, actions):
                 agentApplicationService
                   .upsert(applicationFactory.makeNewAgentApplicationSoleTrader(
                     internalUserId = request.internalUserId,
+                    applicantCredentials = request.credentials,
                     groupId = request.groupId,
                     userRole = userRole
                   ))
@@ -100,6 +102,7 @@ extends FrontendController(mcc, actions):
                 agentApplicationService
                   .upsert(applicationFactory.makeNewAgentApplicationLimitedCompany(
                     internalUserId = request.internalUserId,
+                    applicantCredentials = request.credentials,
                     groupId = request.groupId,
                     userRole = userRole
                   ))
@@ -108,6 +111,7 @@ extends FrontendController(mcc, actions):
                 agentApplicationService
                   .upsert(applicationFactory.makeNewAgentApplicationGeneralPartnership(
                     internalUserId = request.internalUserId,
+                    applicantCredentials = request.credentials,
                     groupId = request.groupId,
                     userRole = userRole
                   ))
@@ -116,6 +120,7 @@ extends FrontendController(mcc, actions):
                 agentApplicationService
                   .upsert(applicationFactory.makeNewAgentApplicationLimitedPartnership(
                     internalUserId = request.internalUserId,
+                    applicantCredentials = request.credentials,
                     groupId = request.groupId,
                     userRole = userRole
                   ))
@@ -124,6 +129,7 @@ extends FrontendController(mcc, actions):
                 agentApplicationService
                   .upsert(applicationFactory.makeNewAgentApplicationScottishLimitedPartnership(
                     internalUserId = request.internalUserId,
+                    applicantCredentials = request.credentials,
                     groupId = request.groupId,
                     userRole = userRole
                   ))
@@ -132,6 +138,7 @@ extends FrontendController(mcc, actions):
                 agentApplicationService
                   .upsert(applicationFactory.makeNewAgentApplicationScottishPartnership(
                     internalUserId = request.internalUserId,
+                    applicantCredentials = request.credentials,
                     groupId = request.groupId,
                     userRole = userRole
                   ))
