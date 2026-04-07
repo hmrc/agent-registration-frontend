@@ -24,6 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 
 class CheckYourAnswersControllerSpec
@@ -70,8 +71,8 @@ extends ControllerSpec:
       agentApplication = agentApplication.afterHowManyKeyIndividuals,
       existingIndividuals = List(
         tdAll.providedDetails.precreated,
-        tdAll.providedDetails.individualProvidedDetails2,
-        tdAll.providedDetails.individualProvidedDetails3
+        TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
+        TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated
       ),
       expectedHeading = "You have added 3 partners",
       expectedButtonText = Some("Confirm and continue Save and come back later") // there are 2 buttons expected
@@ -97,8 +98,8 @@ extends ControllerSpec:
       agentApplication = agentApplication.afterOnlyOneKeyIndividual,
       existingIndividuals = List(
         tdAll.providedDetails.precreated,
-        tdAll.providedDetails.individualProvidedDetails2,
-        tdAll.providedDetails.individualProvidedDetails3
+        TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
+        TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated
       ),
       expectedHeading = "You have added 3 partners",
       expectedWarningText = Some(

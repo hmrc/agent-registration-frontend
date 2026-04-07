@@ -18,11 +18,13 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.RemoveKeyIndividualForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
@@ -40,14 +42,14 @@ extends ControllerSpec:
         .agentApplicationGeneralPartnership
         .afterHowManyKeyIndividuals
 
-    val soleTraderInProgress =
+    val soleTraderInProgress: AgentApplicationSoleTrader =
       tdAll
         .agentApplicationSoleTrader
         .afterGrsDataReceived
 
   val listOfTwoIndividualProvidedDetails: List[IndividualProvidedDetails] = List(
     tdAll.providedDetails.precreated.copy(isPersonOfControl = false),
-    tdAll.providedDetails.individualProvidedDetails2.copy(isPersonOfControl = false)
+    TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated.copy(isPersonOfControl = false)
   )
 
   "routes should have correct paths and methods" in:

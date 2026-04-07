@@ -140,7 +140,7 @@ trait TdIndividualProvidedDetails { dependencies: TdBase =>
       .modify(_.hmrcStandardForAgentsAgreed)
       .setTo(StateOfAgreement.Agreed)
 
-    val afterProvidedDetailsConfirmed: IndividualProvidedDetails = afterHmrcStandardforAgentsAgreed
+    val afterFinished: IndividualProvidedDetails = afterHmrcStandardforAgentsAgreed
       .modify(_.providedDetailsState)
       .setTo(Finished)
 

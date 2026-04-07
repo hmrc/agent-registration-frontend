@@ -151,8 +151,6 @@ trait TdBase:
   def agentApplicationId: AgentApplicationId = AgentApplicationId("agent-application-id-12345")
 
   def individualProvidedDetailsId: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-12345")
-  def individualProvidedDetailsId2: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-22345")
-  def individualProvidedDetailsId3: IndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-32345")
   def bprPrimaryTelephoneNumber: String = "(+44) 78714743399"
   def newTelephoneNumber: String = "+44 (0) 7000000000"
   def bprEmailAddress: String = "bpr@example.com"

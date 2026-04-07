@@ -70,7 +70,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHmrcStandardForAgentsAgreed)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterHmrcStandardForAgentsAgreed.agentApplicationId,
-      individuals = List(tdAll.providedDetails.afterProvidedDetailsConfirmed)
+      individuals = List(tdAll.providedDetails.afterFinished)
     )
     val response: WSResponse = get(path)
 

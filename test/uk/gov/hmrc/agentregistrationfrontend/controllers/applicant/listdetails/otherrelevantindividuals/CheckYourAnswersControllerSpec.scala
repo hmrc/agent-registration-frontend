@@ -21,9 +21,12 @@ import play.api.http.HeaderNames
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AddOtherRelevantIndividualsForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 
 class CheckYourAnswersControllerSpec
@@ -31,10 +34,10 @@ extends ControllerSpec:
 
   private val path = "/agent-registration/apply/list-details/other-relevant-individuals/check-your-answers"
 
-  val existingOtherRelevantIndividuals = List(
+  val existingOtherRelevantIndividuals: List[IndividualProvidedDetails] = List(
     tdAll.providedDetails.precreated.copy(isPersonOfControl = false),
-    tdAll.providedDetails.individualProvidedDetails2.copy(isPersonOfControl = false),
-    tdAll.providedDetails.individualProvidedDetails3.copy(isPersonOfControl = false)
+    TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated.copy(isPersonOfControl = false),
+    TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated.copy(isPersonOfControl = false)
   )
 
   object agentApplication:
@@ -54,7 +57,7 @@ extends ControllerSpec:
         .agentApplicationGeneralPartnership
         .afterConfirmOtherRelevantIndividualsNo
 
-    val soleTraderInProgress =
+    val soleTraderInProgress: AgentApplicationSoleTrader =
       tdAll
         .agentApplicationSoleTrader
         .afterGrsDataReceived

@@ -18,8 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.progre
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.progress.ListProgressPage
 
 class ListProgressPageSpec
@@ -31,8 +31,8 @@ extends ViewSpec:
       agentApplication = tdAll.agentApplicationGeneralPartnership.afterHowManyKeyIndividuals,
       existingList = List(
         tdAll.providedDetails.precreated,
-        tdAll.providedDetails.individualProvidedDetails2,
-        tdAll.providedDetails.individualProvidedDetails3.copy(providedDetailsState = ProvidedDetailsState.Finished)
+        TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
+        TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.afterFinished
       )
     ).body
   )

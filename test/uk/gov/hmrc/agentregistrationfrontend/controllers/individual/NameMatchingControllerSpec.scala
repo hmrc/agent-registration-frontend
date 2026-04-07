@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistrationfrontend.forms.individual.NameMatchingForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly.agentApplicationId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
@@ -50,8 +51,8 @@ extends ControllerSpec:
 
   val listOfAgentProvidedDetails: List[IndividualProvidedDetails] = List(
     tdAll.providedDetails.precreated,
-    tdAll.providedDetails.individualProvidedDetails2,
-    tdAll.providedDetails.individualProvidedDetails3
+    TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
+    TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated
   )
 
   private val path = s"/agent-registration/provide-details/individual-name-search/${linkId.value}"

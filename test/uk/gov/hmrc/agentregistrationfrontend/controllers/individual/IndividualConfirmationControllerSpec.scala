@@ -42,7 +42,7 @@ extends ControllerSpec:
     val completedProvidedDetails: IndividualProvidedDetails =
       tdAll
         .providedDetails
-        .afterProvidedDetailsConfirmed
+        .afterFinished
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.IndividualConfirmationController.show(linkId) shouldBe Call(

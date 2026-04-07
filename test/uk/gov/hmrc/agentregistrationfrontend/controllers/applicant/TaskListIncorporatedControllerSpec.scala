@@ -193,10 +193,10 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForTaskListPage(
       application = tdAll.agentApplicationLimitedCompany.afterIndividualsDefined,
       individuals = List(
-        tdAll.providedDetails.afterProvidedDetailsConfirmed.copy(
+        tdAll.providedDetails.afterFinished.copy(
           individualName = IndividualName("Steve Austin")
         ),
-        tdAll.providedDetails.afterProvidedDetailsConfirmed.copy(
+        tdAll.providedDetails.afterFinished.copy(
           individualName = IndividualName("Beverly Hills")
         )
       )

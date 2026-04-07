@@ -38,16 +38,16 @@ extends ControllerSpec:
 
   private object individualProvideDetails:
 
-    val complete = tdAll.providedDetails.afterHmrcStandardforAgentsAgreed
-    val completeAndConfirmed = tdAll.providedDetails.afterProvidedDetailsConfirmed
-    val missingAgreeStandards = tdAll.providedDetails.afterApproveAgentApplication
-    val missingApproveApplication = tdAll.providedDetails.AfterSaUtr.afterSaUtrProvided
-    val missingSaUtr = tdAll.providedDetails.AfterNino.afterNinoProvided
-    val missingDateOfBirth = tdAll.providedDetails.afterEmailAddressVerified
-    val missingNino = tdAll.providedDetails.AfterDateOfBirth.afterDateOfBirthProvided
-    val missingEmail = tdAll.providedDetails.afterTelephoneNumberProvided
-    val missingEmailValidation = tdAll.providedDetails.afterEmailAddressProvided
-    val missingTelephone = tdAll.providedDetails.afterStarted
+    val complete: IndividualProvidedDetails = tdAll.providedDetails.afterHmrcStandardforAgentsAgreed
+    val completeAndConfirmed: IndividualProvidedDetails = tdAll.providedDetails.afterFinished
+    val missingAgreeStandards: IndividualProvidedDetails = tdAll.providedDetails.afterApproveAgentApplication
+    val missingApproveApplication: IndividualProvidedDetails = tdAll.providedDetails.AfterSaUtr.afterSaUtrProvided
+    val missingSaUtr: IndividualProvidedDetails = tdAll.providedDetails.AfterNino.afterNinoProvided
+    val missingDateOfBirth: IndividualProvidedDetails = tdAll.providedDetails.afterEmailAddressVerified
+    val missingNino: IndividualProvidedDetails = tdAll.providedDetails.AfterDateOfBirth.afterDateOfBirthProvided
+    val missingEmail: IndividualProvidedDetails = tdAll.providedDetails.afterTelephoneNumberProvided
+    val missingEmailValidation: IndividualProvidedDetails = tdAll.providedDetails.afterEmailAddressProvided
+    val missingTelephone: IndividualProvidedDetails = tdAll.providedDetails.afterStarted
 
   private final case class TestCaseForCya(
     providedDetails: IndividualProvidedDetails,
