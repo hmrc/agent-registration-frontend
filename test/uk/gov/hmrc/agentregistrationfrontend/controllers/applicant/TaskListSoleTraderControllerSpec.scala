@@ -127,7 +127,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForTaskListPage(
       application = tdAll.agentApplicationSoleTrader.afterHmrcStandardForAgentsAgreed,
       individuals = List(
-        tdAll.soleTraderFinishedProvideDetails
+        tdAll.providedDetails.afterProvidedDetailsConfirmed
       )
     )
     val response: WSResponse = get(path)

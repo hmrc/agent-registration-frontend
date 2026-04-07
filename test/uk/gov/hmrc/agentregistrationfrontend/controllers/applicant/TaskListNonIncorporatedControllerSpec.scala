@@ -17,8 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant
 
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.AccessConfirmed
-import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
@@ -143,9 +141,9 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForTaskListPage(
       application = tdAll.agentApplicationGeneralPartnership.afterConfirmOtherRelevantIndividualsNo,
       individuals = List(
-        tdAll.individualProvidedDetails.copy(individualName = IndividualName("Steve Austin")),
-        tdAll.individualProvidedDetails.copy(individualName = IndividualName("Beverly Hills")),
-        tdAll.individualProvidedDetails.copy(individualName = IndividualName("Pauline Austin"))
+        tdAll.providedDetails.precreated.copy(individualName = IndividualName("Steve Austin")),
+        tdAll.providedDetails.precreated.copy(individualName = IndividualName("Beverly Hills")),
+        tdAll.providedDetails.precreated.copy(individualName = IndividualName("Pauline Austin"))
       )
     )
     val response: WSResponse = get(path)
@@ -168,17 +166,14 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForTaskListPage(
       application = tdAll.agentApplicationGeneralPartnership.afterConfirmOtherRelevantIndividualsNo,
       individuals = List(
-        tdAll.individualProvidedDetails.copy(
-          individualName = IndividualName("Steve Austin"),
-          providedDetailsState = AccessConfirmed
+        tdAll.providedDetails.afterAccessConfirmed.copy(
+          individualName = IndividualName("Steve Austin")
         ),
-        tdAll.individualProvidedDetails.copy(
-          individualName = IndividualName("Beverly Hills"),
-          providedDetailsState = AccessConfirmed
+        tdAll.providedDetails.afterAccessConfirmed.copy(
+          individualName = IndividualName("Beverly Hills")
         ),
-        tdAll.individualProvidedDetails.copy(
-          individualName = IndividualName("Pauline Austin"),
-          providedDetailsState = AccessConfirmed
+        tdAll.providedDetails.afterAccessConfirmed.copy(
+          individualName = IndividualName("Pauline Austin")
         )
       )
     )
@@ -202,17 +197,14 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForTaskListPage(
       application = tdAll.agentApplicationGeneralPartnership.afterConfirmOtherRelevantIndividualsNo,
       individuals = List(
-        tdAll.individualProvidedDetails.copy(
-          individualName = IndividualName("Steve Austin"),
-          providedDetailsState = Finished
+        tdAll.providedDetails.afterProvidedDetailsConfirmed.copy(
+          individualName = IndividualName("Steve Austin")
         ),
-        tdAll.individualProvidedDetails.copy(
-          individualName = IndividualName("Beverly Hills"),
-          providedDetailsState = Finished
+        tdAll.providedDetails.afterProvidedDetailsConfirmed.copy(
+          individualName = IndividualName("Beverly Hills")
         ),
-        tdAll.individualProvidedDetails.copy(
-          individualName = IndividualName("Pauline Austin"),
-          providedDetailsState = Finished
+        tdAll.providedDetails.afterProvidedDetailsConfirmed.copy(
+          individualName = IndividualName("Pauline Austin")
         )
       )
     )

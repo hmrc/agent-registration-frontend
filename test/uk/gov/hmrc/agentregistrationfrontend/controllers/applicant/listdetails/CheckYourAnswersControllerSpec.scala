@@ -127,9 +127,9 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterConfirmOtherRelevantIndividualsYes.agentApplicationId,
       individuals = List(
-        tdAll.individualProvidedDetails,
-        tdAll.individualProvidedDetails2,
-        tdAll.individualProvidedDetails3
+        tdAll.providedDetails.precreated,
+        tdAll.providedDetails.individualProvidedDetails2,
+        tdAll.providedDetails.individualProvidedDetails3
       ) // all isPersonOfControl = true, no other relevant individuals
     )
 

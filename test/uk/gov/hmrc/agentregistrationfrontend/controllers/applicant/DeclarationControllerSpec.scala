@@ -42,7 +42,7 @@ extends ControllerSpec:
   AppRoutes.apply.DeclarationController.submit.url shouldBe AppRoutes.apply.DeclarationController.show.url
 
   private val individualsForSubmission = List(
-    tdAll.providedDetails.precreated.copy(providedDetailsState = Finished),
+    tdAll.providedDetails.afterProvidedDetailsConfirmed,
     tdAll.providedDetails.individualProvidedDetails2.copy(providedDetailsState = Finished)
   )
 

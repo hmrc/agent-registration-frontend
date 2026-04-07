@@ -79,7 +79,7 @@ extends ControllerSpec:
   s"POST $path with save for later and valid input should redirect to save for later" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
     AgentRegistrationStubs.stubFindIndividualForApplication(
-      individual = tdAll.individualProvidedDetails
+      individual = tdAll.providedDetails.precreated
     )
     AgentRegistrationStubs.stubDeleteIndividualProvidedDetails(individualProvidedDetailsId)
 

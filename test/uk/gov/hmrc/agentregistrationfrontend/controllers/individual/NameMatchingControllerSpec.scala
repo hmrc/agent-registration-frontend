@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistrationfrontend.forms.individual.NameMatchingForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData.*
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly.agentApplicationId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
@@ -76,7 +76,7 @@ extends ControllerSpec:
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
       listOfAgentProvidedDetails,
-      agentApplicationId
+      tdAll.agentApplicationId
     )
     val response: WSResponse = get(path)
 

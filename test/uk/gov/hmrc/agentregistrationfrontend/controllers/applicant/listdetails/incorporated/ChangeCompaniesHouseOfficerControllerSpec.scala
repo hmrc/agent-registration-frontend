@@ -130,7 +130,7 @@ extends ControllerSpec:
 
   s"POST $postPath should allow submitting the same name when not changing it" in:
     // Individual already has "Alice Tester" (a CH officer name). User clicks Change but submits the same name.
-    val individualWithChName = tdAll.individualProvidedDetails.copy(individualName = IndividualName("Alice Tester"))
+    val individualWithChName = tdAll.providedDetails.precreated.copy(individualName = IndividualName("Alice Tester"))
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
@@ -221,10 +221,10 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
-      individuals = List(tdAll.individualProvidedDetails)
+      individuals = List(tdAll.providedDetails.precreated)
     )
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("Alice Tester"))
+      individualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("Alice Tester"))
     )
     CompaniesHouseStubs.stubSixOfficers()
 
@@ -242,7 +242,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
-      individuals = List(tdAll.individualProvidedDetails)
+      individuals = List(tdAll.providedDetails.precreated)
     )
     CompaniesHouseStubs.stubSixOfficers()
 

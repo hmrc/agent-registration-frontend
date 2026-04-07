@@ -46,13 +46,13 @@ trait TdIndividualProvidedDetails { dependencies: TdBase =>
       passedIv = None
     )
 
-    val precreated: IndividualProvidedDetails = IndividualProvidedDetails(
+    val afterAccessConfirmed: IndividualProvidedDetails = IndividualProvidedDetails(
       _id = dependencies.individualProvidedDetailsId,
       internalUserId = None,
       individualName = dependencies.individualName,
       createdAt = dependencies.nowAsInstant,
       agentApplicationId = dependencies.agentApplicationId,
-      providedDetailsState = Precreated,
+      providedDetailsState = AccessConfirmed,
       isPersonOfControl = true,
       passedIv = None
     )

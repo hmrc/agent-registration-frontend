@@ -98,7 +98,7 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubFindIndividualForApplication(
       individual = tdAll.providedDetails.precreated
     )
-    AgentRegistrationStubs.stubDeleteIndividualProvidedDetails(tdAll.providedDetails.precreated._id)
+    AgentRegistrationStubs.stubDeleteIndividualProvidedDetails(tdAll.individualProvidedDetailsId)
 
     val response: WSResponse =
       post(path)(Map(
@@ -109,7 +109,7 @@ extends ControllerSpec:
     response.header("Location").value shouldBe
       AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
-    AgentRegistrationStubs.verifyDeleteIndividualProvidedDetails(tdAll.providedDetails.precreated._id)
+    AgentRegistrationStubs.verifyDeleteIndividualProvidedDetails(tdAll.individualProvidedDetailsId)
 
   s"POST $path with No should redirect to CYA without deleting" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
@@ -126,7 +126,7 @@ extends ControllerSpec:
     response.header("Location").value shouldBe
       AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
-    AgentRegistrationStubs.verifyDeleteIndividualProvidedDetails(tdAll.providedDetails.precreated._id, count = 0)
+    AgentRegistrationStubs.verifyDeleteIndividualProvidedDetails(tdAll.individualProvidedDetailsId, count = 0)
 
   s"POST $path with blank inputs should return 400 and show an error" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
@@ -162,9 +162,9 @@ extends ControllerSpec:
   s"POST $path with save for later and valid input should redirect to save for later" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualForApplication(
-      individual = tdAll.individualProvidedDetails
+      individual = tdAll.providedDetails.precreated
     )
-    AgentRegistrationStubs.stubDeleteIndividualProvidedDetails(tdAll.individualProvidedDetails._id)
+    AgentRegistrationStubs.stubDeleteIndividualProvidedDetails(tdAll.individualProvidedDetailsId)
 
     val response: WSResponse =
       post(path)(Map(

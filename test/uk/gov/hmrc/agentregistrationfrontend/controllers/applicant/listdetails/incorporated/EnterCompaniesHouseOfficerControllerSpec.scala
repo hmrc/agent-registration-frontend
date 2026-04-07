@@ -331,7 +331,7 @@ extends ControllerSpec:
       individuals = List.empty
     )
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("John Tester"))
+      individualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("John Tester"))
     )
     CompaniesHouseStubs.stubSixOfficers()
 

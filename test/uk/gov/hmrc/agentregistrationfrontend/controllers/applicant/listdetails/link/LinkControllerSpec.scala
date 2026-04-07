@@ -75,9 +75,7 @@ extends ControllerSpec:
         tdAll.providedDetails.individualProvidedDetails3
       )
     )
-    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.providedDetails.precreated.copy(providedDetailsState =
-      ProvidedDetailsState.AccessConfirmed
-    ))
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.providedDetails.afterAccessConfirmed)
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.providedDetails.individualProvidedDetails2.copy(providedDetailsState =
       ProvidedDetailsState.AccessConfirmed
     ))
