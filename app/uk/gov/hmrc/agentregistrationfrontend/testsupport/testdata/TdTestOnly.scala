@@ -17,12 +17,12 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import uk.gov.hmrc.agentregistration.shared.Crn
-import uk.gov.hmrc.agentregistration.shared.testdata.TdShared
+import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData
 
 /** Test Data (Td) user for TestOnly endpoints
   */
 trait TdTestOnly
-extends TdShared
+extends TestOnlyData
 with TdGrsJourneyData
 
 object TdTestOnly
