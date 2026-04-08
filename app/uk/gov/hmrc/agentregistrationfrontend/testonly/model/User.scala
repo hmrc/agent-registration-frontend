@@ -33,7 +33,7 @@ import java.time.LocalDate
   */
 final case class User(
   userId: UserId,
-  planetId: PlanetId, // It's mandatory in this service, but not in the original User model
+  planetId: Option[PlanetId],
   groupId: Option[String] = None,
   confidenceLevel: Option[Int] = None,
   credentialStrength: Option[String] = None,
@@ -84,6 +84,8 @@ object UserId:
   def make(agentApplicationId: AgentApplicationId) = UserId(s"applicant_${agentApplicationId.value}")
 
   def make(individualProvidedDetailsId: IndividualProvidedDetailsId) = UserId(s"individual_${individualProvidedDetailsId.value}")
+
+  def make(nino: Nino) = UserId(s"individual_${nino.value}")
 
   given format: Format[UserId] = JsonFormatsFactory.makeValueClassFormat
   given pathBindable: PathBindable[UserId] = ValueClassBinder.valueClassBinder[UserId](_.value)
