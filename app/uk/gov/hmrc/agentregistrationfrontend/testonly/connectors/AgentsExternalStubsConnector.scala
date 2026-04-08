@@ -75,7 +75,7 @@ extends Connector:
     request: RequestHeader
   ): Future[Unit] =
     val user = User(
-      userId = UserId(UUID.randomUUID().toString),
+      userId = UserId.make(nino),
       planetId = None, // None will default to current planet - we require this for deceased check to work
       nino = Some(nino),
       deceased = Some(deceased)

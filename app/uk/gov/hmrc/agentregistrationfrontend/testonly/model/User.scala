@@ -85,6 +85,8 @@ object UserId:
 
   def make(individualProvidedDetailsId: IndividualProvidedDetailsId) = UserId(s"individual_${individualProvidedDetailsId.value}")
 
+  def make(nino: Nino) = UserId(s"individual_${nino.value}")
+
   given format: Format[UserId] = JsonFormatsFactory.makeValueClassFormat
   given pathBindable: PathBindable[UserId] = ValueClassBinder.valueClassBinder[UserId](_.value)
 
