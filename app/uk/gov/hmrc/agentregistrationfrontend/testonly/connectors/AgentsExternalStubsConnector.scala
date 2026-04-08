@@ -29,7 +29,6 @@ import uk.gov.hmrc.auth.core.AffinityGroup
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.client.HttpClientV2
 
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
