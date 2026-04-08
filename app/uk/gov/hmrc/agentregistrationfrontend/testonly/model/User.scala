@@ -33,7 +33,7 @@ import java.time.LocalDate
   */
 final case class User(
   userId: UserId,
-  planetId: PlanetId, // It's mandatory in this service, but not in the original User model
+  planetId: Option[PlanetId],
   groupId: Option[String] = None,
   confidenceLevel: Option[Int] = None,
   credentialStrength: Option[String] = None,

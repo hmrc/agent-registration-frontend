@@ -55,21 +55,13 @@ extends RequestAwareLogging:
     planetId = user.planetId
   ))
 
-  def signIn(
-    userId: UserId,
-    planetId: PlanetId
-  ): Future[LoginResponse] = agentsExternalStubsConnector.signIn(SignInRequest(
-    userId = Some(userId),
-    planetId = planetId
-  ))
-
   def createUserApplicant(
     userId: UserId,
     planetId: PlanetId
   ): Future[User] =
     val user: User = User(
       userId = userId,
-      planetId = planetId
+      planetId = Some(planetId)
     )
     agentsExternalStubsConnector.createUser(
       user = user,
@@ -86,7 +78,7 @@ extends RequestAwareLogging:
   ): Future[User] =
     val user = User(
       userId = userId,
-      planetId = planetId,
+      planetId = Some(planetId),
       nino = maybeNino,
       assignedPrincipalEnrolments = Seq(EnrolmentKey("HMRC-MTD-IT")),
       deceased = Some(deceased),

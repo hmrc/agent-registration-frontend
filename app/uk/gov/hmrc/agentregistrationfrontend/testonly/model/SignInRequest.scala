@@ -21,7 +21,7 @@ import play.api.libs.json.Json
 
 final case class SignInRequest(
   userId: Option[UserId],
-  planetId: PlanetId, // It's mandatory in this service, but not in the original User model
+  planetId: Option[PlanetId], // It's mandatory in this service, but not in the original User model
   plainTextPassword: Option[String] = Some("p@ssw0rd"),
   providerType: Option[String] = Some("GovernmentGateway"),
   syncToAuthLoginApi: Option[Boolean] = Some(true),
