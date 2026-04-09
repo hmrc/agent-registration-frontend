@@ -238,3 +238,8 @@ trait TdBase:
     IndividualName("Steve Palmer"),
     IndividualName("Sandra Hills")
   )
+
+  def ucrIdentifiers: UcrIdentifiers = UcrIdentifiers(
+    vrns = List(vrn),
+    payeRefs = List(payeRef)
+  )

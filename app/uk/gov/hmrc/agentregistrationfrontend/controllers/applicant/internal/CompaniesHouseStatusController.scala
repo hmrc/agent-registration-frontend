@@ -49,7 +49,7 @@ extends FrontendController(mcc, actions):
         case a: IsIncorporated => request.replace[AgentApplication, IsIncorporated](a)
         case a: IsNotIncorporated =>
           logger.debug("No Companies House check required for non-incorporated business types, redirecting to task list.")
-          Redirect(AppRoutes.apply.TaskListController.show)
+          Redirect(nextPage)
     )
     .ensure(
       condition = _.get[IsIncorporated].isCompanyStatusCheckRequired,
@@ -77,7 +77,7 @@ extends FrontendController(mcc, actions):
           case CheckResult.Fail => Redirect(failedCheckPage)
 
   private def failedCheckPage = AppRoutes.apply.checkfailed.CanNotRegisterCompanyOrPartnershipController.show
-  private def nextPage: Call = AppRoutes.apply.TaskListController.show
+  private def nextPage: Call = AppRoutes.apply.internal.UnifiedCustomerRegistryController.updateApplicationIdentifiers
 
   extension (agentApplication: IsIncorporated)
     private def isCompanyStatusCheckRequired: Boolean = agentApplication.companyStatusCheck =!= Some(CheckResult.Pass)
