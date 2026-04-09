@@ -241,7 +241,22 @@ object AgentRegistrationStubs:
     ucrIdentifiers: UcrIdentifiers
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = wm.urlEqualTo(s"/unified-customer-registry/organisation/utr/$utr"),
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/unified-customer-registry/organisation/utr/${utr.value}"),
     responseStatus = 200,
     responseBody = Json.toJson(ucrIdentifiers).toString
+  )
+
+  def verifyGetOrganisationIdentifiers(
+    utr: Utr
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/unified-customer-registry/organisation/utr/${utr.value}")
+  )
+
+  def stubGetOrganisationIdentifiersFails(
+    utr: Utr
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/unified-customer-registry/organisation/utr/${utr.value}"),
+    responseStatus = 400
   )

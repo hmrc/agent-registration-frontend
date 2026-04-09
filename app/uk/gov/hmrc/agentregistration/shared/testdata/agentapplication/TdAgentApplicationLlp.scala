@@ -84,6 +84,11 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
       payeRefs = Some(List(dependencies.payeRef))
     )
 
+    val afterUnifiedCustomerRegistryUpdateEmptyIdentifiers: AgentApplicationLlp = afterCompaniesHouseStatusCheckPass.copy(
+      vrns = Some(List.empty),
+      payeRefs = Some(List.empty)
+    )
+
     val afterContactDetailsComplete: AgentApplicationLlp = afterCompaniesHouseStatusCheckPass.copy(
       applicantContactDetails = Some(dependencies.applicantContactDetails),
       agentDetails = None

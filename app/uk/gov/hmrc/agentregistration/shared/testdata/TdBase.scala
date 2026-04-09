@@ -243,3 +243,8 @@ trait TdBase:
     vrns = List(vrn),
     payeRefs = List(payeRef)
   )
+
+  def emptyUcrIdentifiers: UcrIdentifiers = UcrIdentifiers(
+    vrns = List.empty,
+    payeRefs = List.empty
+  )

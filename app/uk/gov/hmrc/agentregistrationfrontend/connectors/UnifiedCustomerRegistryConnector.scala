@@ -37,7 +37,7 @@ extends Connector:
   def getOrganisationIdentifiers(
     utr: Utr
   )(using RequestHeader): Future[Option[UcrIdentifiers]] =
-    val url: URL = url"$baseUrl/unified-customer-registry/organisation/utr/$utr"
+    val url: URL = url"$baseUrl/unified-customer-registry/organisation/utr/${utr.value}"
     httpClient
       .get(url)
       .execute[HttpResponse]

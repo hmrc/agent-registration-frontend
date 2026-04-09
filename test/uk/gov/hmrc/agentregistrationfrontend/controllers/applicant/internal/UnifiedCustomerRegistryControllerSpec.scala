@@ -17,13 +17,30 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal
 
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CitizenDetailsStub
 
 class UnifiedCustomerRegistryControllerSpec
 extends ControllerSpec:
+
+  object agentApplication:
+
+    val afterCompaniesHouseStatusCheckPass: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .afterCompaniesHouseStatusCheckPass
+
+    val afterIdentifiersUpdated: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .afterUnifiedCustomerRegistryUpdateIdentifiers
+
+    val afterEmptyIdentifiersUpdated: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .afterUnifiedCustomerRegistryUpdateEmptyIdentifiers
 
   private val path: String = "/agent-registration/apply/internal/unified-customer-registry-identifiers"
   private val nextPageUrl: String = "/agent-registration/apply/task-list"
@@ -37,13 +54,36 @@ extends ControllerSpec:
   s"GET $path should update application with vrns and payeRefs if present and redirect to task list page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetOrganisationIdentifiers(tdAll.saUtr.asUtr, tdAll.ucrIdentifiers)
-    AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterCompaniesHouseStatusCheckPass)
-    AgentRegistrationStubs.stubUpdateAgentApplication(tdAll.agentApplicationLlp.afterUnifiedCustomerRegistryUpdateIdentifiers)
-    CitizenDetailsStub.stubDesignatoryDetailsFound(nino = tdAll.nino)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterCompaniesHouseStatusCheckPass)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterIdentifiersUpdated)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe nextPageUrl
     AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetOrganisationIdentifiers(tdAll.saUtr.asUtr)
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
-    CitizenDetailsStub.verifyDesignatoryDetails(nino = tdAll.nino)
+
+  s"GET $path should update application with empty list if vrns/ payeRefs not present and redirect to task list" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetOrganisationIdentifiers(tdAll.saUtr.asUtr, tdAll.emptyUcrIdentifiers)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterCompaniesHouseStatusCheckPass)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterEmptyIdentifiersUpdated)
+    val response: WSResponse = get(path)
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe nextPageUrl
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetOrganisationIdentifiers(tdAll.saUtr.asUtr)
+    AgentRegistrationStubs.verifyGetAgentApplication()
+    AgentRegistrationStubs.verifyUpdateAgentApplication()
+
+  s"GET $path should not update application identifiers if connector fails and redirect to task list" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetOrganisationIdentifiersFails(tdAll.saUtr.asUtr)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterCompaniesHouseStatusCheckPass)
+    val response: WSResponse = get(path)
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe nextPageUrl
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetOrganisationIdentifiers(tdAll.saUtr.asUtr)
+    AgentRegistrationStubs.verifyGetAgentApplication()
