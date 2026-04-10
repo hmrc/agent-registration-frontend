@@ -19,9 +19,11 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmOtherRelevantIndividualsForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 
 class ConfirmOtherRelevantIndividualsControllerSpec
@@ -48,7 +50,7 @@ extends ControllerSpec:
         .agentApplicationGeneralPartnership
         .afterConfirmOtherRelevantIndividualsNo
 
-    val soleTraderInProgress =
+    val soleTraderInProgress: AgentApplicationSoleTrader =
       tdAll
         .agentApplicationSoleTrader
         .afterGrsDataReceived
@@ -180,9 +182,9 @@ extends ControllerSpec:
 
   s"POST $path with save for later and No selection should delete other relevant individuals and save data and redirect to the saved for later page" in:
     val existingOtherRelevantIndividuals = List(
-      tdAll.individualProvidedDetails.copy(isPersonOfControl = false),
-      tdAll.individualProvidedDetails2.copy(isPersonOfControl = false),
-      tdAll.individualProvidedDetails3.copy(isPersonOfControl = false)
+      tdAll.providedDetails.precreated.copy(isPersonOfControl = false),
+      TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated.copy(isPersonOfControl = false),
+      TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated.copy(isPersonOfControl = false)
     )
 
     ApplyStubHelper.stubsForSuccessfulUpdate(

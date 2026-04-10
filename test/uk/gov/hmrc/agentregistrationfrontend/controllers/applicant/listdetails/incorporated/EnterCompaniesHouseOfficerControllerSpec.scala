@@ -96,7 +96,7 @@ extends ControllerSpec:
     // SixOrMoreOfficers(6, 4) → totalListSize = 5. With 5 individuals, list is complete.
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     val fiveIndividuals = (1 to 5).toList.map(i =>
-      tdAll.individualProvidedDetails.copy(
+      tdAll.providedDetails.precreated.copy(
         _id = IndividualProvidedDetailsId(s"test-id-$i"),
         individualName = IndividualName(s"Test Name $i")
       )
@@ -146,7 +146,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
-      individuals = List(tdAll.individualProvidedDetails)
+      individuals = List(tdAll.providedDetails.precreated)
     )
     CompaniesHouseStubs.stubSixOfficers()
     val response: WSResponse = get(getPath)
@@ -162,7 +162,7 @@ extends ControllerSpec:
   private def individualWithName(
     name: String,
     idSuffix: String
-  ): IndividualProvidedDetails = tdAll.individualProvidedDetails.copy(
+  ): IndividualProvidedDetails = tdAll.providedDetails.precreated.copy(
     _id = IndividualProvidedDetailsId(s"test-id-$idSuffix"),
     individualName = IndividualName(name)
   )
@@ -202,7 +202,7 @@ extends ControllerSpec:
       individuals = List(individualWithName("Carol Tester", "1"))
     )
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("Carol Tester"))
+      individualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("Carol Tester"))
     )
     CompaniesHouseStubs.stubSixOfficers()
 
@@ -247,7 +247,7 @@ extends ControllerSpec:
       individuals = List.empty
     )
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("John Tester"))
+      individualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("John Tester"))
     )
     CompaniesHouseStubs.stubSixOfficers()
 
@@ -268,7 +268,7 @@ extends ControllerSpec:
       individuals = List.empty
     )
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("John Tester"))
+      individualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("John Tester"))
     )
     CompaniesHouseStubs.stubSixOfficers()
 
@@ -331,7 +331,7 @@ extends ControllerSpec:
       individuals = List.empty
     )
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-      individualProvidedDetails = tdAll.individualProvidedDetails.copy(individualName = IndividualName("John Tester"))
+      individualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("John Tester"))
     )
     CompaniesHouseStubs.stubSixOfficers()
 

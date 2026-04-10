@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
-import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -44,7 +43,7 @@ extends ControllerSpec:
   s"GET $path when no individual record exists should create individual record, return 200 and render page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHmrcStandardForAgentsAgreed)
     AgentRegistrationStubs.stubFindIndividualsForApplication(agentApplication.afterHmrcStandardForAgentsAgreed.agentApplicationId)
-    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.soleTraderYetToProvideDetails)
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.providedDetails.soleTrader.soleTraderAutopopulatedDetails)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -57,7 +56,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHmrcStandardForAgentsAgreed)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterHmrcStandardForAgentsAgreed.agentApplicationId,
-      individuals = List(tdAll.soleTraderProvidedDetails)
+      individuals = List(tdAll.providedDetails.afterStarted)
     )
     val response: WSResponse = get(path)
 
@@ -71,7 +70,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHmrcStandardForAgentsAgreed)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterHmrcStandardForAgentsAgreed.agentApplicationId,
-      individuals = List(tdAll.soleTraderProvidedDetails.copy(providedDetailsState = ProvidedDetailsState.Finished))
+      individuals = List(tdAll.providedDetails.afterFinished)
     )
     val response: WSResponse = get(path)
 

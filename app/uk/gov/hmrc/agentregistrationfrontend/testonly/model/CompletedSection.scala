@@ -102,7 +102,7 @@ object CompletedSection:
       override def displayOrder: Int = 8
       override def agentApplication: AgentApplication = TdTestOnly.llp.twoChOfficers.agentApplicationLlp.afterDeclarationSubmitted
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
-        List.fill(2)(TdTestOnly.llp.twoChOfficers.providedDetails.afterProvidedDetailsConfirmed)
+        List.fill(2)(TdTestOnly.llp.twoChOfficers.providedDetails.afterFinished)
       )
 
     val values: Seq[CompletedSectionLlp] = SealedObjects.all[CompletedSectionLlp]
@@ -225,7 +225,7 @@ object CompletedSection:
       override def displayOrder: Int = 8
       override def agentApplication: AgentApplication = TdTestOnly.agentApplicationGeneralPartnership.afterDeclarationSubmittedAndTwoIndividualFinished
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
-        List.fill(2)(TdTestOnly.providedDetails.afterProvidedDetailsConfirmed)
+        List.fill(2)(TdTestOnly.providedDetails.afterFinished)
       )
 
     val values: Seq[CompletedSectionGeneralPartnership] = SealedObjects.all[CompletedSectionGeneralPartnership]

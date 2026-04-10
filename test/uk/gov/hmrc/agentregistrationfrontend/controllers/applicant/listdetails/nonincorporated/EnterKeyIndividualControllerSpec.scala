@@ -85,7 +85,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterHowManyKeyIndividuals.agentApplicationId,
-      individuals = List(tdAll.individualProvidedDetails) // existing list already has one individual so this is the "next" partner
+      individuals = List(tdAll.providedDetails.precreated) // existing list already has one individual so this is the "next" partner
     )
     val response: WSResponse = get(path)
 

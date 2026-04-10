@@ -17,8 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant
 
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.AccessConfirmed
-import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
@@ -143,8 +141,8 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForTaskListPage(
       application = tdAll.agentApplicationLimitedCompany.afterIndividualsDefined,
       individuals = List(
-        tdAll.individualProvidedDetails.copy(individualName = IndividualName("Steve Austin")),
-        tdAll.individualProvidedDetails.copy(individualName = IndividualName("Beverly Hills"))
+        tdAll.providedDetails.precreated.copy(individualName = IndividualName("Steve Austin")),
+        tdAll.providedDetails.precreated.copy(individualName = IndividualName("Beverly Hills"))
       )
     )
     val response: WSResponse = get(path)
@@ -167,13 +165,11 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForTaskListPage(
       application = tdAll.agentApplicationLimitedCompany.afterIndividualsDefined,
       individuals = List(
-        tdAll.individualProvidedDetails.copy(
-          individualName = IndividualName("Steve Austin"),
-          providedDetailsState = AccessConfirmed
+        tdAll.providedDetails.afterAccessConfirmed.copy(
+          individualName = IndividualName("Steve Austin")
         ),
-        tdAll.individualProvidedDetails.copy(
-          individualName = IndividualName("Beverly Hills"),
-          providedDetailsState = AccessConfirmed
+        tdAll.providedDetails.afterAccessConfirmed.copy(
+          individualName = IndividualName("Beverly Hills")
         )
       )
     )
@@ -197,13 +193,11 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForTaskListPage(
       application = tdAll.agentApplicationLimitedCompany.afterIndividualsDefined,
       individuals = List(
-        tdAll.individualProvidedDetails.copy(
-          individualName = IndividualName("Steve Austin"),
-          providedDetailsState = Finished
+        tdAll.providedDetails.afterFinished.copy(
+          individualName = IndividualName("Steve Austin")
         ),
-        tdAll.individualProvidedDetails.copy(
-          individualName = IndividualName("Beverly Hills"),
-          providedDetailsState = Finished
+        tdAll.providedDetails.afterFinished.copy(
+          individualName = IndividualName("Beverly Hills")
         )
       )
     )

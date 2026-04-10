@@ -31,7 +31,7 @@ extends ViewSpec:
 
   val viewTemplate: RemoveKeyIndividualPage = app.injector.instanceOf[RemoveKeyIndividualPage]
 
-  private val individualProvidedDetails = tdAll.individualProvidedDetails
+  private val individualProvidedDetails = tdAll.providedDetails.precreated
   private val individualName: String = individualProvidedDetails.individualName.value
   private val key: String = RemoveKeyIndividualForm.key
 

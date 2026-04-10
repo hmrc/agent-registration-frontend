@@ -17,15 +17,17 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails
 
 import scala.jdk.CollectionConverters.*
-
 import org.jsoup.nodes.Document
 import play.api.http.HeaderNames
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 
 class CheckYourAnswersControllerSpec
@@ -55,16 +57,16 @@ extends ControllerSpec:
         .agentApplicationGeneralPartnership
         .afterHowManyKeyIndividualsNeedsPadding
 
-    val soleTraderInProgress =
+    val soleTraderInProgress: AgentApplicationSoleTrader =
       tdAll
         .agentApplicationSoleTrader
         .afterGrsDataReceived
 
-  val completeIndividualsList = List(
-    tdAll.individualProvidedDetails, // partner (isPersonOfControl = true in test data)
-    tdAll.individualProvidedDetails2, // partner
-    tdAll.individualProvidedDetails3, // partner
-    tdAll.individualProvidedDetails.copy(isPersonOfControl = false) // other relevant individual
+  val completeIndividualsList: List[IndividualProvidedDetails] = List(
+    tdAll.providedDetails.precreated, // partner (isPersonOfControl = true in test data)
+    TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated, // partner
+    TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated, // partner
+    tdAll.providedDetails.precreated.copy(isPersonOfControl = false) // other relevant individual
   )
 
   "routes should have correct paths and methods" in:
@@ -86,7 +88,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividualsNeedsPadding)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterHowManyKeyIndividualsNeedsPadding.agentApplicationId,
-      individuals = List(tdAll.individualProvidedDetails) // only 1 partner => incomplete
+      individuals = List(tdAll.providedDetails.precreated) // only 1 partner => incomplete
     )
 
     val response: WSResponse = get(path)
@@ -105,9 +107,9 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.beforeConfirmOtherRelevantIndividuals.agentApplicationId,
       individuals = List(
-        tdAll.individualProvidedDetails,
-        tdAll.individualProvidedDetails2,
-        tdAll.individualProvidedDetails3
+        tdAll.providedDetails.precreated,
+        TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
+        TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated
       )
     )
 
@@ -127,9 +129,9 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterConfirmOtherRelevantIndividualsYes.agentApplicationId,
       individuals = List(
-        tdAll.individualProvidedDetails,
-        tdAll.individualProvidedDetails2,
-        tdAll.individualProvidedDetails3
+        tdAll.providedDetails.precreated,
+        TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
+        TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated
       ) // all isPersonOfControl = true, no other relevant individuals
     )
 
@@ -170,7 +172,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(llpApplication)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = llpApplication.agentApplicationId,
-      individuals = List(tdAll.individualProvidedDetails, tdAll.individualProvidedDetails2)
+      individuals = List(tdAll.providedDetails.precreated, TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated)
     )
 
     val response: WSResponse = get(path)

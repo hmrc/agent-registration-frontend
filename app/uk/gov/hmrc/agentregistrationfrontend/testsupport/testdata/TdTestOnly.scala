@@ -17,6 +17,8 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata
 
 import uk.gov.hmrc.agentregistration.shared.Crn
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.testdata.TestOnlyData
 
 /** Test Data (Td) user for TestOnly endpoints
@@ -39,3 +41,19 @@ extends TdTestOnly:
       new TdTestOnly:
         val crnSixChOfficers = Crn("22222226")
         override def crn: Crn = crnSixChOfficers
+
+  object additionalIndividuals:
+
+    val secondIndividual: TdTestOnly =
+      new TdTestOnly:
+        val secondIndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-22345")
+        val secondIndividualName = IndividualName("Second Test Name")
+        override def individualProvidedDetailsId: IndividualProvidedDetailsId = secondIndividualProvidedDetailsId
+        override def individualName: IndividualName = secondIndividualName
+
+    val thirdIndividual: TdTestOnly =
+      new TdTestOnly:
+        val thirdIndividualProvidedDetailsId = IndividualProvidedDetailsId("individual-provided-details-id-32345")
+        val thirdIndividualName = IndividualName("Third Test Name")
+        override def individualProvidedDetailsId: IndividualProvidedDetailsId = thirdIndividualProvidedDetailsId
+        override def individualName: IndividualName = thirdIndividualName

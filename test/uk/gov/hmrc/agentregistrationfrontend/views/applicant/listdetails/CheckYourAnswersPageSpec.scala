@@ -109,7 +109,7 @@ extends ViewSpec:
 
       "when individuals and no other relevant individuals" should:
 
-        val partnersList = List(tdAll.individualProvidedDetails)
+        val partnersList = List(tdAll.providedDetails.precreated)
         val doc: Document = render(
           testCase.agentApplication,
           partnersList,
@@ -149,7 +149,7 @@ extends ViewSpec:
 
         "show the partner names value" in:
           val values = doc.mainContent.select(".govuk-summary-list__value")
-          values.get(1).text() should include(tdAll.individualProvidedDetails.individualName.value)
+          values.get(1).text() should include(tdAll.providedDetails.precreated.individualName.value)
 
         "show the change names link with correct href" in:
           val changeLinks = doc.mainContent.select(".govuk-summary-list__actions a")
@@ -175,10 +175,10 @@ extends ViewSpec:
             case a: uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership => a.copy(hasOtherRelevantIndividuals = Some(true))
             case a => a // should not happen
 
-        val otherIndividual = tdAll.individualProvidedDetails.copy(isPersonOfControl = false)
+        val otherIndividual = tdAll.providedDetails.precreated.copy(isPersonOfControl = false)
         val doc: Document = render(
           agentApplicationWithOthers,
-          List(tdAll.individualProvidedDetails),
+          List(tdAll.providedDetails.precreated),
           List(otherIndividual)
         )
 

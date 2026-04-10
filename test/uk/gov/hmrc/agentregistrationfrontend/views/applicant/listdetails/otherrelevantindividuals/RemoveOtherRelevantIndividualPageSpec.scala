@@ -28,7 +28,7 @@ class RemoveOtherRelevantIndividualPageSpec
 extends ViewSpec:
 
   private val formAction = AppRoutes.apply.listdetails.otherrelevantindividuals.RemoveOtherRelevantIndividualController.submit(
-    tdAll.individualProvidedDetails.individualProvidedDetailsId
+    tdAll.providedDetails.precreated.individualProvidedDetailsId
   )
 
   val heading = "Confirm that you want to remove Test Name from the list of partners"
@@ -37,8 +37,8 @@ extends ViewSpec:
 
   "RemoveKeyIndividualPage" should {
     val doc: Document = Jsoup.parse(viewTemplate(
-      form = RemoveKeyIndividualForm.form(tdAll.individualProvidedDetails.individualName.value),
-      individualProvidedDetails = tdAll.individualProvidedDetails
+      form = RemoveKeyIndividualForm.form(tdAll.providedDetails.precreated.individualName.value),
+      individualProvidedDetails = tdAll.providedDetails.precreated
     ).body)
 
     "have the correct title for '$ordinalKey'" in:
@@ -77,14 +77,14 @@ extends ViewSpec:
     "render a form error when the form contains an error" in:
       val field = RemoveKeyIndividualForm.key
       val errorMessage = "Select yes if you want to remove Test Name from the list of partners"
-      val formWithError = RemoveKeyIndividualForm.form(tdAll.individualProvidedDetails.individualName.value)
+      val formWithError = RemoveKeyIndividualForm.form(tdAll.providedDetails.precreated.individualName.value)
         .withError(field, errorMessage)
       behavesLikePageWithErrorHandling(
         field = field,
         errorMessage = errorMessage,
         errorDoc = Jsoup.parse(viewTemplate(
           form = formWithError,
-          individualProvidedDetails = tdAll.individualProvidedDetails
+          individualProvidedDetails = tdAll.providedDetails.precreated
         ).body),
         heading = heading
       )

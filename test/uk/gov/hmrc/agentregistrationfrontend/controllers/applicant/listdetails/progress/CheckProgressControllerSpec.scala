@@ -20,6 +20,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 
 class CheckProgressControllerSpec
@@ -47,9 +48,9 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplicationId,
       individuals = List(
-        tdAll.individualProvidedDetails,
-        tdAll.individualProvidedDetails2,
-        tdAll.individualProvidedDetails3
+        tdAll.providedDetails.precreated,
+        TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
+        TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated
       )
     )
     val response: WSResponse = get(path)

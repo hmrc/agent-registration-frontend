@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant
 
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.AccessConfirmed
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
 class TaskListSoleTraderRepControllerSpec
@@ -134,9 +133,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForTaskListPage(
       application = tdAll.agentApplicationSoleTraderRepresentative.afterHmrcStandardForAgentsAgreed,
       individuals = List(
-        tdAll.soleTraderYetToProvideDetails.copy(
-          providedDetailsState = AccessConfirmed // becomes AccessConfirmed when link is confirmed as having been shared
-        )
+        tdAll.providedDetails.afterAccessConfirmed // becomes AccessConfirmed when link is confirmed as having been shared
       )
     )
     val response: WSResponse = get(path)
@@ -158,7 +155,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForTaskListPage(
       application = tdAll.agentApplicationSoleTraderRepresentative.afterHmrcStandardForAgentsAgreed,
       individuals = List(
-        tdAll.soleTraderFinishedProvideDetails
+        tdAll.providedDetails.afterFinished
       )
     )
     val response: WSResponse = get(path)

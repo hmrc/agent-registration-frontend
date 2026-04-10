@@ -19,11 +19,11 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationRiskingStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
 
 class DeclarationControllerSpec
 extends ControllerSpec:
@@ -42,8 +42,8 @@ extends ControllerSpec:
   AppRoutes.apply.DeclarationController.submit.url shouldBe AppRoutes.apply.DeclarationController.show.url
 
   private val individualsForSubmission = List(
-    tdAll.individualProvidedDetails.copy(providedDetailsState = Finished),
-    tdAll.individualProvidedDetails2.copy(providedDetailsState = Finished)
+    tdAll.providedDetails.afterFinished,
+    TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.afterFinished
   )
 
   object agentApplication:

@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentReg
 class RemoveCompaniesHouseOfficerControllerSpec
 extends ControllerSpec:
 
-  private val individualProvidedDetailsId: IndividualProvidedDetailsId = tdAll.individualProvidedDetails.individualProvidedDetailsId
+  private val individualProvidedDetailsId: IndividualProvidedDetailsId = tdAll.providedDetails.precreated.individualProvidedDetailsId
 
   private val path = s"/agent-registration/apply/list-details/remove-companies-house-officer/${individualProvidedDetailsId.value}"
 
@@ -83,22 +83,22 @@ extends ControllerSpec:
   s"GET $path should return 200 and render the remove confirmation page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualForApplication(
-      individual = tdAll.individualProvidedDetails
+      individual = tdAll.providedDetails.precreated
     )
 
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument
-      .title() should include(s"Confirm that you want to remove ${tdAll.individualProvidedDetails.individualName.value}")
+      .title() should include(s"Confirm that you want to remove ${tdAll.providedDetails.precreated.individualName.value}")
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with Yes should delete the individual and redirect to CYA" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualForApplication(
-      individual = tdAll.individualProvidedDetails
+      individual = tdAll.providedDetails.precreated
     )
-    AgentRegistrationStubs.stubDeleteIndividualProvidedDetails(tdAll.individualProvidedDetails._id)
+    AgentRegistrationStubs.stubDeleteIndividualProvidedDetails(tdAll.individualProvidedDetailsId)
 
     val response: WSResponse =
       post(path)(Map(
@@ -109,12 +109,12 @@ extends ControllerSpec:
     response.header("Location").value shouldBe
       AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
-    AgentRegistrationStubs.verifyDeleteIndividualProvidedDetails(tdAll.individualProvidedDetails._id)
+    AgentRegistrationStubs.verifyDeleteIndividualProvidedDetails(tdAll.individualProvidedDetailsId)
 
   s"POST $path with No should redirect to CYA without deleting" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualForApplication(
-      individual = tdAll.individualProvidedDetails
+      individual = tdAll.providedDetails.precreated
     )
 
     val response: WSResponse =
@@ -126,12 +126,12 @@ extends ControllerSpec:
     response.header("Location").value shouldBe
       AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
-    AgentRegistrationStubs.verifyDeleteIndividualProvidedDetails(tdAll.individualProvidedDetails._id, count = 0)
+    AgentRegistrationStubs.verifyDeleteIndividualProvidedDetails(tdAll.individualProvidedDetailsId, count = 0)
 
   s"POST $path with blank inputs should return 400 and show an error" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualForApplication(
-      individual = tdAll.individualProvidedDetails
+      individual = tdAll.providedDetails.precreated
     )
 
     val response: WSResponse = post(path)(Map.empty)
@@ -147,7 +147,7 @@ extends ControllerSpec:
   s"POST $path with save for later should redirect to save for later" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualForApplication(
-      individual = tdAll.individualProvidedDetails
+      individual = tdAll.providedDetails.precreated
     )
 
     val response: WSResponse =
@@ -162,9 +162,9 @@ extends ControllerSpec:
   s"POST $path with save for later and valid input should redirect to save for later" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualForApplication(
-      individual = tdAll.individualProvidedDetails
+      individual = tdAll.providedDetails.precreated
     )
-    AgentRegistrationStubs.stubDeleteIndividualProvidedDetails(tdAll.individualProvidedDetails._id)
+    AgentRegistrationStubs.stubDeleteIndividualProvidedDetails(tdAll.individualProvidedDetailsId)
 
     val response: WSResponse =
       post(path)(Map(

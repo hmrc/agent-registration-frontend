@@ -27,7 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentReg
 class RemoveKeyIndividualControllerSpec
 extends ControllerSpec:
 
-  private val individualProvidedDetailsId: IndividualProvidedDetailsId = tdAll.individualProvidedDetails.individualProvidedDetailsId
+  private val individualProvidedDetailsId: IndividualProvidedDetailsId = tdAll.providedDetails.precreated.individualProvidedDetailsId
 
   private val path = s"/agent-registration/apply/list-details/remove-key-individual/${individualProvidedDetailsId.value}"
 
@@ -53,7 +53,7 @@ extends ControllerSpec:
   s"GET $path should return 200 and render page for removing selected partner" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
     AgentRegistrationStubs.stubFindIndividualForApplication(
-      individual = tdAll.individualProvidedDetails
+      individual = tdAll.providedDetails.precreated
     )
     val response: WSResponse = get(path)
 
@@ -64,7 +64,7 @@ extends ControllerSpec:
   s"POST $path with blank inputs should return 400" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
     AgentRegistrationStubs.stubFindIndividualForApplication(
-      individual = tdAll.individualProvidedDetails
+      individual = tdAll.providedDetails.precreated
     )
     val response: WSResponse = post(path)(Map.empty)
 
@@ -79,7 +79,7 @@ extends ControllerSpec:
   s"POST $path with save for later and valid input should redirect to save for later" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
     AgentRegistrationStubs.stubFindIndividualForApplication(
-      individual = tdAll.individualProvidedDetails
+      individual = tdAll.providedDetails.precreated
     )
     AgentRegistrationStubs.stubDeleteIndividualProvidedDetails(individualProvidedDetailsId)
 

@@ -105,7 +105,7 @@ extends ControllerSpec:
       agentApplicationId = agentApplication.beforeCompaniesHouseOfficers.agentApplicationId,
       individuals = List.empty
     )
-    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.individualProvidedDetails.individualName.value)
+    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.providedDetails.precreated.individualName.value)
     val response: WSResponse = get(getPath)
 
     response.status shouldBe Status.OK
@@ -118,15 +118,15 @@ extends ControllerSpec:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterFiveOrLessCompaniesHouseOfficersYes)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterFiveOrLessCompaniesHouseOfficersYes.agentApplicationId,
-      individuals = List(tdAll.individualProvidedDetails)
+      individuals = List(tdAll.providedDetails.precreated)
     )
-    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.individualProvidedDetails.individualName.value)
+    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.providedDetails.precreated.individualName.value)
     val response: WSResponse = get(getPath)
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe s"$headingFiveOrLess - Apply for an agent services account - GOV.UK"
-    doc.mainContent.select("ul.govuk-list li").text() should include(tdAll.individualProvidedDetails.individualName.value)
+    doc.mainContent.select("ul.govuk-list li").text() should include(tdAll.providedDetails.precreated.individualName.value)
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterFiveOrLessCompaniesHouseOfficersYes.agentApplicationId)
     CompaniesHouseStubs.verifySixOfficersCalls()
@@ -152,7 +152,7 @@ extends ControllerSpec:
       individuals = List.empty
     )
     CompaniesHouseStubs.stubFiveOrLess(
-      name = tdAll.individualProvidedDetails.individualName.value,
+      name = tdAll.providedDetails.precreated.individualName.value,
       officerRole = CompaniesHouseOfficerRole.Director
     )
 
@@ -178,10 +178,10 @@ extends ControllerSpec:
       individuals = List.empty
     )
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-      individualProvidedDetails = tdAll.individualProvidedDetails
+      individualProvidedDetails = tdAll.providedDetails.precreated
     )
 
-    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.individualProvidedDetails.individualName.value)
+    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.providedDetails.precreated.individualName.value)
 
     val response: WSResponse =
       post(postFiveOrLessPath)(Map(
@@ -207,7 +207,7 @@ extends ControllerSpec:
       agentApplicationId = agentApplication.beforeCompaniesHouseOfficers.agentApplicationId,
       individuals = List.empty
     )
-    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.individualProvidedDetails.individualName.value)
+    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.providedDetails.precreated.individualName.value)
 
     val response: WSResponse =
       post(postFiveOrLessPath)(Map(
@@ -231,10 +231,10 @@ extends ControllerSpec:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.beforeCompaniesHouseOfficers.agentApplicationId,
-      individuals = List(tdAll.individualProvidedDetails)
+      individuals = List(tdAll.providedDetails.precreated)
     )
-    AgentRegistrationStubs.stubDeleteIndividualProvidedDetails(tdAll.individualProvidedDetails.individualProvidedDetailsId)
-    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.individualProvidedDetails.individualName.value)
+    AgentRegistrationStubs.stubDeleteIndividualProvidedDetails(tdAll.providedDetails.precreated.individualProvidedDetailsId)
+    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.providedDetails.precreated.individualName.value)
 
     val response: WSResponse =
       post(postFiveOrLessPath)(Map(
@@ -245,7 +245,7 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe "You need to update Companies House - Apply for an agent services account - GOV.UK"
     doc.mainContent.select("h1").text() shouldBe "You need to update Companies House"
-    AgentRegistrationStubs.verifyDeleteIndividualProvidedDetails(tdAll.individualProvidedDetails.individualProvidedDetailsId)
+    AgentRegistrationStubs.verifyDeleteIndividualProvidedDetails(tdAll.providedDetails.precreated.individualProvidedDetailsId)
 
   s"POST $postSixOrMorePath with valid selection should save data and redirect to check your answers" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(
@@ -278,7 +278,7 @@ extends ControllerSpec:
       agentApplicationId = agentApplication.beforeCompaniesHouseOfficers.agentApplicationId,
       individuals = List.empty
     )
-    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.individualProvidedDetails.individualName.value)
+    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.providedDetails.precreated.individualName.value)
 
     val response: WSResponse = post(postFiveOrLessPath)(Map.empty)
 
@@ -298,7 +298,7 @@ extends ControllerSpec:
       agentApplicationId = agentApplication.beforeCompaniesHouseOfficers.agentApplicationId,
       individuals = List.empty
     )
-    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.individualProvidedDetails.individualName.value)
+    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.providedDetails.precreated.individualName.value)
 
     val response: WSResponse =
       post(postFiveOrLessPath)(Map(
@@ -325,9 +325,9 @@ extends ControllerSpec:
       individuals = List.empty
     )
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
-      individualProvidedDetails = tdAll.individualProvidedDetails
+      individualProvidedDetails = tdAll.providedDetails.precreated
     )
-    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.individualProvidedDetails.individualName.value)
+    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.providedDetails.precreated.individualName.value)
 
     val response: WSResponse =
       post(postFiveOrLessPath)(Map(
@@ -347,7 +347,7 @@ extends ControllerSpec:
       agentApplicationId = agentApplication.beforeCompaniesHouseOfficers.agentApplicationId,
       individuals = List.empty
     )
-    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.individualProvidedDetails.individualName.value)
+    CompaniesHouseStubs.stubFiveOrLess(name = tdAll.providedDetails.precreated.individualName.value)
 
     val response: WSResponse =
       post(postFiveOrLessPath)(Map(

@@ -19,9 +19,9 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
-import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 
 class LinkControllerSpec
@@ -53,9 +53,9 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterHowManyKeyIndividuals.agentApplicationId,
       individuals = List(
-        tdAll.individualProvidedDetails,
-        tdAll.individualProvidedDetails2,
-        tdAll.individualProvidedDetails3
+        tdAll.providedDetails.precreated,
+        TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
+        TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated
       )
     )
     val response: WSResponse = get(path)
@@ -70,20 +70,14 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterHowManyKeyIndividuals.agentApplicationId,
       individuals = List(
-        tdAll.individualProvidedDetails,
-        tdAll.individualProvidedDetails2,
-        tdAll.individualProvidedDetails3
+        tdAll.providedDetails.precreated,
+        TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
+        TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated
       )
     )
-    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.individualProvidedDetails.copy(providedDetailsState =
-      ProvidedDetailsState.AccessConfirmed
-    ))
-    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.individualProvidedDetails2.copy(providedDetailsState =
-      ProvidedDetailsState.AccessConfirmed
-    ))
-    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.individualProvidedDetails3.copy(providedDetailsState =
-      ProvidedDetailsState.AccessConfirmed
-    ))
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.providedDetails.afterAccessConfirmed)
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.afterAccessConfirmed)
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.afterAccessConfirmed)
     val response: WSResponse =
       post(path)(
         Map("submit" -> Seq("SaveAndContinue"))

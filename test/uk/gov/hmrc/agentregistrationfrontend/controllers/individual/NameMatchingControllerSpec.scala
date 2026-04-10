@@ -25,6 +25,8 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistrationfrontend.forms.individual.NameMatchingForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly.agentApplicationId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
@@ -48,9 +50,9 @@ extends ControllerSpec:
         .afterStarted
 
   val listOfAgentProvidedDetails: List[IndividualProvidedDetails] = List(
-    tdAll.individualProvidedDetails,
-    tdAll.individualProvidedDetails2,
-    tdAll.individualProvidedDetails3
+    tdAll.providedDetails.precreated,
+    TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
+    TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated
   )
 
   private val path = s"/agent-registration/provide-details/individual-name-search/${linkId.value}"
@@ -101,7 +103,7 @@ extends ControllerSpec:
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
       listOfAgentProvidedDetails,
-      tdAll.agentApplicationId
+      agentApplicationId
     )
     val response: WSResponse = get(path)
 
@@ -118,7 +120,7 @@ extends ControllerSpec:
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
       listOfAgentProvidedDetails,
-      tdAll.agentApplicationId
+      agentApplicationId
     )
 
     val response: WSResponse =
@@ -139,7 +141,7 @@ extends ControllerSpec:
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
       listOfAgentProvidedDetails,
-      tdAll.agentApplicationId
+      agentApplicationId
     )
 
     val response: WSResponse =
@@ -163,7 +165,7 @@ extends ControllerSpec:
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
       listOfAgentProvidedDetails,
-      tdAll.agentApplicationId
+      agentApplicationId
     )
     val response: WSResponse =
       post(path)(Map(
@@ -186,7 +188,7 @@ extends ControllerSpec:
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
       listOfAgentProvidedDetails,
-      tdAll.agentApplicationId
+      agentApplicationId
     )
     val response: WSResponse =
       post(path)(Map(
@@ -209,7 +211,7 @@ extends ControllerSpec:
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
       listOfAgentProvidedDetails,
-      tdAll.agentApplicationId
+      agentApplicationId
     )
 
     val response: WSResponse =

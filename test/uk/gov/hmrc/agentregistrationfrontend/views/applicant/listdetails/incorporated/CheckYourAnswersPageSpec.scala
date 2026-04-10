@@ -94,7 +94,7 @@ extends ViewSpec:
 
       "when the list has fewer individuals than required" should:
 
-        val doc: Document = render(List(tdAll.individualProvidedDetails), testCase.agentApplication)
+        val doc: Document = render(List(tdAll.providedDetails.precreated), testCase.agentApplication)
 
         "have the correct title" in:
           doc.title() shouldBe s"${testCase.singularTitle} - Apply for an agent services account - GOV.UK"
@@ -111,7 +111,7 @@ extends ViewSpec:
           link.attr("href") shouldBe AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show.url
 
         "contain a summary list with the individual name" in:
-          doc.mainContent.select(".hmrc-summary-list__key").text() should include(tdAll.individualProvidedDetails.individualName.value)
+          doc.mainContent.select(".hmrc-summary-list__key").text() should include(tdAll.providedDetails.precreated.individualName.value)
 
         "contain Change and Remove action links" in:
           val actions = doc.mainContent.select(".hmrc-summary-list__actions a")
@@ -127,7 +127,7 @@ extends ViewSpec:
       "when the list matches the required count" should:
 
         val requiredCount = sixOrMoreOfficers.totalListSize
-        val fullList = (1 to requiredCount).map(_ => tdAll.individualProvidedDetails).toList
+        val fullList = (1 to requiredCount).map(_ => tdAll.providedDetails.precreated).toList
         val doc: Document = render(fullList, testCase.agentApplication)
 
         "show confirm and continue link" in:
