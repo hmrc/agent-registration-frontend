@@ -87,3 +87,15 @@ extends ControllerSpec:
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetOrganisationIdentifiers(tdAll.saUtr.asUtr)
     AgentRegistrationStubs.verifyGetAgentApplication()
+    AgentRegistrationStubs.verifyUpdateAgentApplication(0)
+
+  s"GET $path should redirect to task list page when ucr identifiers already populated" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetOrganisationIdentifiers(tdAll.saUtr.asUtr, tdAll.ucrIdentifiers)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterIdentifiersUpdated)
+    val response: WSResponse = get(path)
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe nextPageUrl
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetAgentApplication()
+    AgentRegistrationStubs.verifyUpdateAgentApplication(0)

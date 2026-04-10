@@ -242,7 +242,7 @@ object AgentRegistrationStubs:
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/unified-customer-registry/organisation/utr/${utr.value}"),
-    responseStatus = 200,
+    responseStatus = Status.OK,
     responseBody = Json.toJson(ucrIdentifiers).toString
   )
 
@@ -258,5 +258,5 @@ object AgentRegistrationStubs:
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/unified-customer-registry/organisation/utr/${utr.value}"),
-    responseStatus = 400
+    responseStatus = Status.IM_A_TEAPOT
   )
