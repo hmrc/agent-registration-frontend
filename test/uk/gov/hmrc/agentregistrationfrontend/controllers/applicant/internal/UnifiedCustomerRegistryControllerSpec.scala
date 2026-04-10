@@ -46,7 +46,7 @@ extends ControllerSpec:
   private val nextPageUrl: String = "/agent-registration/apply/task-list"
 
   "routes should have correct paths and methods" in:
-    AppRoutes.apply.internal.UnifiedCustomerRegistryController.updateApplicationIdentifiers shouldBe Call(
+    AppRoutes.apply.internal.UnifiedCustomerRegistryController.populateApplicationIdentifiersFromUcr shouldBe Call(
       method = "GET",
       url = path
     )

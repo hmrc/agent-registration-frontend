@@ -77,7 +77,7 @@ extends FrontendController(mcc, actions):
           case CheckResult.Fail => Redirect(failedCheckPage)
 
   private def failedCheckPage = AppRoutes.apply.checkfailed.CanNotRegisterCompanyOrPartnershipController.show
-  private def nextPage: Call = AppRoutes.apply.internal.UnifiedCustomerRegistryController.updateApplicationIdentifiers
+  private def nextPage: Call = AppRoutes.apply.internal.UnifiedCustomerRegistryController.populateApplicationIdentifiersFromUcr
 
   extension (agentApplication: IsIncorporated)
     private def isCompanyStatusCheckRequired: Boolean = agentApplication.companyStatusCheck =!= Some(CheckResult.Pass)

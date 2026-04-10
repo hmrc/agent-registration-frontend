@@ -50,7 +50,7 @@ extends FrontendController(mcc, actions):
 
   private def nextPage: Call = AppRoutes.apply.TaskListController.show
 
-  def updateApplicationIdentifiers: Action[AnyContent] = actions
+  def populateApplicationIdentifiersFromUcr: Action[AnyContent] = actions
     .getApplicationInProgress
     .async:
       implicit request =>
@@ -59,11 +59,11 @@ extends FrontendController(mcc, actions):
           maybeUcrIdentifiers <- unifiedCustomerRegistryConnector.getOrganisationIdentifiers(application.getUtr)
           _ <-
             maybeUcrIdentifiers match
-              case Some(ucrIdentifiers) => updateApplicationIdentifiers(ucrIdentifiers, application)
+              case Some(ucrIdentifiers) => populateApplicationIdentifiers(ucrIdentifiers, application)
               case None => Future.unit
         yield Redirect(nextPage)
 
-  private def updateApplicationIdentifiers(
+  private def populateApplicationIdentifiers(
     ucrIdentifiers: UcrIdentifiers,
     agentApplication: AgentApplication
   )(using request: RequestHeader): Future[Unit] =
