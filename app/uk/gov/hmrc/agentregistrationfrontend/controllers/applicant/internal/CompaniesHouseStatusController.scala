@@ -48,14 +48,14 @@ extends FrontendController(mcc, actions):
       request.agentApplication match
         case a: IsIncorporated => request.replace[AgentApplication, IsIncorporated](a)
         case a: IsNotIncorporated =>
-          logger.debug("No Companies House check required for non-incorporated business types, redirecting to task list.")
+          logger.debug("No Companies House check required for non-incorporated business types, redirecting to next page.")
           Redirect(nextPage)
     )
     .ensure(
       condition = _.get[IsIncorporated].isCompanyStatusCheckRequired,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("Company status already done or not needed. Redirecting to task list page.")
+          logger.warn("Company status already done or not needed. Redirecting to next page.")
           Redirect(nextPage)
     )
     .async:

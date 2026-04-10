@@ -52,6 +52,13 @@ extends FrontendController(mcc, actions):
 
   def populateApplicationIdentifiersFromUcr: Action[AnyContent] = actions
     .getApplicationInProgress
+    .ensure(
+      condition = _.agentApplication.requiresUcrIdentifiers,
+      resultWhenConditionNotMet =
+        implicit request =>
+          logger.warn("Ucr identifiers already populated. Redirecting to next page.")
+          Redirect(nextPage)
+    )
     .async:
       implicit request =>
         val application = request.agentApplication
@@ -107,3 +114,6 @@ extends FrontendController(mcc, actions):
 
     agentApplicationService
       .upsert(updatedApplication)
+
+  extension (agentApplication: AgentApplication)
+    private def requiresUcrIdentifiers: Boolean = agentApplication.payeRefs.isEmpty || agentApplication.vrns.isEmpty
