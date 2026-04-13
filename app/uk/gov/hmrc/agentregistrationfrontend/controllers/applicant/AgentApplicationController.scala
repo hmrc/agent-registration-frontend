@@ -20,13 +20,15 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.risking.ApplicationForRiskingStatus
+import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ConfirmationPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.FailedNonFixablePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.InProgressPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ViewApplicationPage
 
@@ -36,7 +38,6 @@ import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.duration.FiniteDuration
 
 @Singleton
 class AgentApplicationController @Inject() (
@@ -45,9 +46,9 @@ class AgentApplicationController @Inject() (
   simplePage: SimplePage,
   confirmationPage: ConfirmationPage,
   inProgressPage: InProgressPage,
+  failedNonFixablePage: FailedNonFixablePage,
   viewApplicationPage: ViewApplicationPage,
-  appConfig: AppConfig,
-  agentRegistrationRiskingService: AgentRegistrationRiskingService
+  appConfig: AppConfig
 )
 extends FrontendController(mcc, actions):
 
@@ -59,86 +60,56 @@ extends FrontendController(mcc, actions):
         // which will redirect to the start of registration if needed
         Redirect(AppRoutes.apply.TaskListController.show)
 
-  // TODO: is this endpoint really needed?
-  def applicationDashboard: Action[AnyContent] = actions
-    .getApplicationInProgress:
-      implicit request =>
-        Ok(simplePage(
-          h1 = "Application Dashboard page...",
-          bodyText = Some(
-            "Placeholder for the Application Dashboard page..."
-          )
-        ))
-
-  def applicationSubmitted: Action[AnyContent] = actions
-    .getApplicationSubmitted
-    .async:
+  def applicationStatus: Action[AnyContent] = actions
+    .getApplicationRiskingResponse:
       implicit request =>
         val agentApplication: AgentApplication = request.get
-        // make a call to risking for the latest status of the application
-        agentRegistrationRiskingService
-          .getApplicationStatus(agentApplication.agentApplicationId)
-          .map:
-            case ApplicationForRiskingStatus.ReadyForSubmission => // show the confirmation screen
-              val decisionLeadTime: FiniteDuration = appConfig.applicationDecisionLeadTime
-              val submittedAt: Instant = agentApplication.getSubmittedAt
-              val localDateOfDecision: LocalDate =
-                submittedAt
-                  .plus(decisionLeadTime.toMillis, ChronoUnit.MILLIS)
-                  .atZone(ZoneId.systemDefault())
-                  .toLocalDate
-              Ok(confirmationPage(
-                dateOfDecision = displayDateForLang(Some(localDateOfDecision)),
-                agentApplication = agentApplication
+        val submittedAt: Instant = agentApplication.getSubmittedAt
+        val projectedDecisionDate: LocalDate = calculateDecisionDate(submittedAt)
+
+        val applicationRiskingResponse: ApplicationRiskingResponse = request.get
+        val actualDecisionDate: Option[Instant] = Some(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant) // TODO: this should be coming from the ApplicationRiskingResponse, but we don't have it there yet so using the current time as a placeholder
+        applicationRiskingResponse.status match
+          case ApplicationForRiskingStatus.ReadyForSubmission => // show the confirmation screen
+            Ok(confirmationPage(
+              dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
+              agentApplication = agentApplication
+            ))
+          case ApplicationForRiskingStatus.SubmittedForRisking => // show the in progress screen
+            val localDateSubmitted: LocalDate =
+              submittedAt
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate
+            Ok(inProgressPage(
+              entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+              agentApplication = agentApplication,
+              dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
+              dateSubmitted = displayDateForLang(Some(localDateSubmitted))
+            ))
+          case ApplicationForRiskingStatus.FailedNonFixable => // show the non-fixable failures page
+            Ok(failedNonFixablePage(
+              applicationRiskingResponse = applicationRiskingResponse,
+              agentApplication = agentApplication,
+              entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+              dateToAppeal = displayDateForLang(Some(
+                calculateTimeToAppeal(actualDecisionDate.getOrThrowExpectedDataMissing("the date of decision is missing from teh ApplicationRiskingResponse"))
               ))
-            case _ => Redirect(AppRoutes.apply.AgentApplicationController.viewApplicationProgress)
-
-  def viewApplicationProgress: Action[AnyContent] = actions
-    .getApplicationSubmitted
-    .getBusinessPartnerRecord
-    .async:
-      implicit request =>
-        val agentApplication: AgentApplication = request.get
-        agentRegistrationRiskingService
-          .getApplicationStatus(agentApplication.agentApplicationId)
-          .map:
-            case ApplicationForRiskingStatus.SubmittedForRisking => // show the confirmation screen
-              val decisionLeadTime: FiniteDuration = appConfig.applicationDecisionLeadTime
-              val submittedAt: Instant = agentApplication.getSubmittedAt
-              val localDateOfDecision: LocalDate =
-                submittedAt
-                  .plus(decisionLeadTime.toMillis, ChronoUnit.MILLIS)
-                  .atZone(ZoneId.systemDefault())
-                  .toLocalDate
-              val localDateSubmitted: LocalDate =
-                submittedAt
-                  .atZone(ZoneId.systemDefault())
-                  .toLocalDate
-              Ok(inProgressPage(
-                entityName = request.businessPartnerRecordResponse.getEntityName,
-                agentApplication = agentApplication,
-                dateOfDecision = displayDateForLang(Some(localDateOfDecision)),
-                dateSubmitted = displayDateForLang(Some(localDateSubmitted))
-              ))
-            case _ => Redirect(AppRoutes.apply.AgentApplicationController.viewApplicationApproved)
-
-  def viewApplicationApproved: Action[AnyContent] = actions
-    .getApplicationSubmitted:
-      implicit request =>
-        val agentApplication: AgentApplication = request.get
-        Ok(simplePage(
-          h1 = s"Application reference: ${agentApplication.agentApplicationId.value}",
-          bodyText = Some(
-            "Placeholder for the Application Approved page..."
-          )
-        ))
+            ))
+          case ApplicationForRiskingStatus.FailedFixable => // TODO: show the fixable failures page
+            Ok(simplePage(
+              h1 = "Fixable failure placeholder",
+              bodyText = Some("Placeholder for the fixable failures...")
+            ))
+          case _ => // this should never happen but if it does then throw an error as it is not recoverable from here
+            throw new IllegalStateException(
+              s"[getApplicationSubmitted] has passed an unsupported application risking status ${applicationRiskingResponse.status} for application ${agentApplication.agentApplicationId.value}."
+            )
 
   def viewSubmittedApplication: Action[AnyContent] = actions
-    .getApplicationSubmitted
-    .getBusinessPartnerRecord:
+    .getApplicationSubmitted:
       implicit request =>
         Ok(viewApplicationPage(
-          entityName = request.businessPartnerRecordResponse.getEntityName,
+          entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
           agentApplication = request.get[AgentApplication]
         ))
 
@@ -155,3 +126,15 @@ extends FrontendController(mcc, actions):
           "Placeholder for the generic exit page..."
         )
       ))
+
+  private def calculateDecisionDate(submittedAt: Instant): LocalDate =
+    submittedAt
+      .plus(appConfig.applicationDecisionLeadTime.toMillis, ChronoUnit.MILLIS)
+      .atZone(ZoneId.systemDefault())
+      .toLocalDate
+
+  private def calculateTimeToAppeal(decisionDate: Instant): LocalDate =
+    decisionDate
+      .plus(appConfig.applicationTimeToAppeal.toMillis, ChronoUnit.MILLIS)
+      .atZone(ZoneId.systemDefault())
+      .toLocalDate

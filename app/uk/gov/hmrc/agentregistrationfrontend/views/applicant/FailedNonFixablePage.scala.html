@@ -1,0 +1,130 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import play.twirl.api.Html
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+@import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
+@import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
+@import uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure
+@import uk.gov.hmrc.agentregistration.shared.risking.IndividualRiskingResponse
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import views.html.helper.CSPNonce
+
+@this(
+        layout: Layout,
+        govukButton: GovukButton
+)
+
+@(
+        applicationRiskingResponse: ApplicationRiskingResponse,
+        agentApplication: AgentApplication,
+        entityName: String,
+        dateToAppeal: String
+)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{"failedNonFixable"}
+@entityListKey = @{"NonFixableOutcomeListForEntityFailures"}
+@individualListKey = @{"NonFixableOutcomeListForIndividualFailures"}
+
+@caption = @{messages(s"$key.caption")}
+@title = @{messages(s"$key.title", entityName)}
+@businessTypeSuffix = @{
+  agentApplication match {
+    case a: AgentApplicationSoleTrader if a.isOwner => ".SoleTrader"
+    case _: AgentApplicationSoleTrader => ".SoleTraderNotOwner"
+    case _ => ""
+  }
+}
+@entityFailuresResolvedAsSet = @{
+  applicationRiskingResponse
+  .failures.getOrElse(List.empty)
+  .map(f => messages(s"$entityListKey.${f.toString}$businessTypeSuffix", entityName))
+  .toSet
+}
+@hasIndividualFailures = @{applicationRiskingResponse.individuals.exists(_.failures.exists(_.nonEmpty))}
+@individualFailureToMessage(failure: IndividualFailure, providedName: IndividualName) = @{
+  messages(s"$individualListKey.${failure.toString}$businessTypeSuffix", providedName.value)
+}
+@individualFailuresResolvedAsSet(individual: IndividualRiskingResponse) = @{
+  individual.failures
+    .getOrElse(List.empty)
+    .map(f => individualFailureToMessage(f, individual.providedName))
+    .toSet
+}
+@individualFailures(individual: IndividualRiskingResponse) = {
+  @if(individualFailuresResolvedAsSet(individual).nonEmpty) {
+    <h3 class="govuk-heading-s">@{
+      individual.providedName.value
+    }</h3>
+    <p class="govuk-body">@messages(s"$key.individualListIntro", individual.providedName.value)</p>
+    <ul id="@{individual.personReference.value}-reasons" class="govuk-list govuk-list--bullet">
+      @individualFailuresResolvedAsSet(individual).map(f => <li>{f}</li>)
+    </ul>
+  }
+}
+@templateScripts = {
+  <script src="@{controllers.routes.Assets.versioned("javascripts/print-link.js")}" @{CSPNonce.attr}></script>
+}
+@templateStyles = {
+  <link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/print-button.css")}" @{CSPNonce.attr}>
+}
+@layout(
+  pageTitle = title,
+  suppressBackLink = true,
+  templateScripts = Some(templateScripts),
+  templateStyles = Some(templateStyles)
+) {
+  <h2 class="govuk-caption-l">@caption</h2>
+  <h1 class="govuk-heading-l">@title</h1>
+  <p class="govuk-body">@messages(s"$key.p1")</p>
+  <p class="govuk-body">@messages(s"$key.p2")</p>
+  <ul id="entity-reasons" class="govuk-list govuk-list--bullet">
+    @entityFailuresResolvedAsSet.map(f => <li>{f}</li>)
+    @if(hasIndividualFailures) {
+      <li>@messages(s"$entityListKey.AnyIndividualFailures$businessTypeSuffix", entityName)</li>
+    }
+  </ul>
+
+  @if(hasIndividualFailures) {
+    <h2 id="individual-failures" class="govuk-heading-m">@messages(s"$key.individualFailures.h2")</h2>
+  }
+
+  @applicationRiskingResponse.individuals.map(individualFailures)
+
+  <h2 class="govuk-heading-m">@messages(s"$key.decision.h2")</h2>
+  <p class="govuk-body">@messages(s"$key.decision.p1", entityName)</p>
+  <p class="govuk-body">@messages(s"$key.decision.p2", dateToAppeal)</p>
+  <h2 class="govuk-heading-m">@messages(s"$key.appeal.h2")</h2>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>@messages(s"$key.appeal.li1")</li>
+    <li>@Html(messages(s"$key.appeal.li2"))</li>
+  </ul>
+
+  <p class="govuk-body govuk-!-display-none-print govuk-!-margin-top-6">
+    @govukButton(Button(
+      href = Some("#print-dialogue"),
+      classes = "govuk-button--secondary gem-c-print-link__button",
+      content = Text(messages("viewApplication.print"))
+    ))
+  </p>
+  <p class="govuk-body govuk-!-display-none-print govuk-!-margin-top-6 govuk-!-margin-bottom-6">
+    <a href="@{AppRoutes.SignOutController.signOut.url}" class="govuk-link">@messages("common.finishAndSignOut")</a>
+  </p>
+}

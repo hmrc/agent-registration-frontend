@@ -36,9 +36,9 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         """
           |We cannot create an account for this company
-          |We cannot register this company for an agent services account. This is because of the company's status on the Companies House register.
+          |We cannot register this company for an agent services account. This is because of the company’s status on the Companies House register.
           |To view your company status you can search the Companies House register (opens in a new tab). If you believe the status is incorrect, contact Companies House.
-          |If you've entered the incorrect details, you can try again.
+          |If you’ve entered the incorrect details, you can try again.
           |Try again
           |"""
           .stripMargin
