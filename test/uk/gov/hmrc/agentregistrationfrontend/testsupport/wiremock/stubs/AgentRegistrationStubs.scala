@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
+import uk.gov.hmrc.agentregistration.shared.UcrIdentifiers
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
@@ -233,4 +234,29 @@ object AgentRegistrationStubs:
     httpMethod = StubMaker.HttpMethod.DELETE,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/individual-provided-details/delete-by-id/${individualProvidedDetailsId.value}"),
     count = count
+  )
+
+  def stubGetOrganisationIdentifiers(
+    utr: Utr,
+    ucrIdentifiers: UcrIdentifiers
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/unified-customer-registry/organisation/utr/${utr.value}"),
+    responseStatus = Status.OK,
+    responseBody = Json.toJson(ucrIdentifiers).toString
+  )
+
+  def verifyGetOrganisationIdentifiers(
+    utr: Utr
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/unified-customer-registry/organisation/utr/${utr.value}")
+  )
+
+  def stubGetOrganisationIdentifiersFails(
+    utr: Utr
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/unified-customer-registry/organisation/utr/${utr.value}"),
+    responseStatus = Status.IM_A_TEAPOT
   )

@@ -51,6 +51,7 @@ GET        /apply/internal/address-lookup/journey-callback                      
 GET        /apply/internal/refusal-to-deal-with-check                                 uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.RefusalToDealWithController.check()
 GET        /apply/internal/deceased-check                                             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.DeceasedController.check()
 GET        /apply/internal/companies-house-status-check                               uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.CompaniesHouseStatusController.check()
+GET        /apply/internal/unified-customer-registry-identifiers                      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.UnifiedCustomerRegistryController.populateApplicationIdentifiersFromUcr
 
 ## Applicant contact details routes
 GET         /apply/applicant/applicant-name                        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.applicantcontactdetails.ApplicantNameController.show

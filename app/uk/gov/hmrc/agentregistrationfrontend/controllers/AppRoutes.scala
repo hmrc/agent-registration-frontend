@@ -147,6 +147,7 @@ object AppRoutes:
       val RefusalToDealWithController = internalRoutes.RefusalToDealWithController
       val DeceasedController = internalRoutes.DeceasedController
       val CompaniesHouseStatusController = internalRoutes.CompaniesHouseStatusController
+      val UnifiedCustomerRegistryController = internalRoutes.UnifiedCustomerRegistryController
 
   object providedetails:
 

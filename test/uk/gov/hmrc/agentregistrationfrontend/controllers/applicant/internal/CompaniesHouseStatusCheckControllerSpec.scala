@@ -56,7 +56,7 @@ extends ControllerSpec:
         .afterDeceasedCheckPass
 
   private val path: String = "/agent-registration/apply/internal/companies-house-status-check"
-  private val nextUrl: String = "/agent-registration/apply/task-list"
+  private val nextUrl: String = "/agent-registration/apply/internal/unified-customer-registry-identifiers"
   private val failCheckPage: String = "/agent-registration/apply/cannot-register-company-or-partnership"
 
   "routes should have correct paths and methods" in:
