@@ -53,7 +53,8 @@ extends Connector:
   def getIndividualIdentifiersByNino(
     nino: Nino
   )(using RequestHeader): Future[Option[UcrIdentifiers]] =
-    val url: URL = url"$baseUrl/unified-customer-registry/individual/nino/${nino.value}"
+    val sanitisedNino = nino.value.replaceAll("\\s", "")
+    val url: URL = url"$baseUrl/unified-customer-registry/individual/nino/$sanitisedNino"
     httpClient
       .get(url)
       .execute[HttpResponse]
