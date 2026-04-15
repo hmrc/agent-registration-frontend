@@ -128,7 +128,7 @@ extends FrontendController(mcc, applicantActions):
             individualName = getIndividualName(t._2)
           )
         .pipe(Future.sequence)
-      _ <- sendForRiskingIfNeeded(agentApplication, individuals)
+      _ <- sendForRiskingIfNeeded(agentApplication, individuals)(using loggedInAsUserApplicantRequestWithAuthData)
     yield agentApplicationId
 
   private def primeIndividual(
@@ -158,7 +158,7 @@ extends FrontendController(mcc, applicantActions):
   private def sendForRiskingIfNeeded(
     agentApplication: AgentApplication,
     individuals: List[IndividualProvidedDetails]
-  )(using request: RequestHeader) =
+  )(using request: Request[?]) =
     if agentApplication.applicationState.sentForRisking
     then
       agentRegistrationRiskingService.submitForRisking(
