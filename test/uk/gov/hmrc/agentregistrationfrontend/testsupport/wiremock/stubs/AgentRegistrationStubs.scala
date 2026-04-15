@@ -25,6 +25,8 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
+import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistration.shared.UcrIdentifiers
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
@@ -258,5 +260,55 @@ object AgentRegistrationStubs:
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/unified-customer-registry/organisation/utr/${utr.value}"),
-    responseStatus = Status.IM_A_TEAPOT
+    responseStatus = Status.INTERNAL_SERVER_ERROR
+  )
+
+  def stubGetIndividualIdentifiersByNino(
+    nino: Nino,
+    ucrIdentifiers: UcrIdentifiers
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/unified-customer-registry/individual/nino/${nino.value}"),
+    responseStatus = Status.OK,
+    responseBody = Json.toJson(ucrIdentifiers).toString
+  )
+
+  def verifyGetIndividualIdentifiersByNino(
+    nino: Nino
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/unified-customer-registry/individual/nino/${nino.value}")
+  )
+
+  def stubGetIndividualIdentifiersByNinoFails(
+    nino: Nino
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/unified-customer-registry/individual/nino/${nino.value}"),
+    responseStatus = Status.INTERNAL_SERVER_ERROR
+  )
+
+  def stubGetIndividualIdentifiersBySaUtr(
+    saUtr: SaUtr,
+    ucrIdentifiers: UcrIdentifiers
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/unified-customer-registry/individual/utr/${saUtr.value}"),
+    responseStatus = Status.OK,
+    responseBody = Json.toJson(ucrIdentifiers).toString
+  )
+
+  def verifyGetIndividualIdentifiersBySaUtr(
+    saUtr: SaUtr
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/unified-customer-registry/individual/utr/${saUtr.value}")
+  )
+
+  def stubGetIndividualIdentifiersBySaUtrFails(
+    saUtr: SaUtr
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/unified-customer-registry/individual/utr/${saUtr.value}"),
+    responseStatus = Status.INTERNAL_SERVER_ERROR
   )

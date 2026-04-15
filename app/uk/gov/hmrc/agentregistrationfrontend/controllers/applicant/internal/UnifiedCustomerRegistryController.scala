@@ -62,12 +62,11 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         val application = request.agentApplication
+        val emptyIdentifiers = UcrIdentifiers(vrns = List.empty, payeRefs = List.empty)
         for
           maybeUcrIdentifiers <- unifiedCustomerRegistryConnector.getOrganisationIdentifiers(application.getUtr)
-          _ <-
-            maybeUcrIdentifiers match
-              case Some(ucrIdentifiers) => populateApplicationIdentifiers(ucrIdentifiers, application)
-              case None => Future.unit
+          ucrIdentifiers = maybeUcrIdentifiers.getOrElse(emptyIdentifiers)
+          _ <- populateApplicationIdentifiers(ucrIdentifiers, application)
         yield Redirect(nextPage)
 
   private def populateApplicationIdentifiers(
