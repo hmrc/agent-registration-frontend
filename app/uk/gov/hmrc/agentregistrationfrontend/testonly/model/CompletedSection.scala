@@ -321,12 +321,35 @@ object CompletedSection:
       override def displayOrder: Int = 5
       override def agentApplication: AgentApplication = TdTestOnly.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed
 
+    case object LimitedCompanyPartnersAndOtherRelevantTaxAdvisers2
+    extends CompletedSectionLimitedCompany:
+
+      override def sectionName: String = "Members and other relevant tax advisers (2)"
+      override def displayOrder: Int = 6
+      override def agentApplication: AgentApplication = TdTestOnly.limitedCompany.twoChOfficers.agentApplicationLimitedCompany.afterConfirmTwoChOfficers
+      override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
+        List.fill(2)(TdTestOnly.limitedCompany.twoChOfficers.providedDetails.precreated)
+      )
+
+    case object LimitedCompanyPartnersAndOtherRelevantTaxAdvisers6
+    extends CompletedSectionLimitedCompany:
+
+      override def sectionName: String = "Members and other relevant tax advisers (6)"
+      override def displayOrder: Int = 7
+      override def agentApplication: AgentApplication = TdTestOnly.limitedCompany.sixChOfficers.agentApplicationLimitedCompany.afterConfirmSixChOfficers
+      override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
+        List.fill(6)(TdTestOnly.limitedCompany.sixChOfficers.providedDetails.precreated)
+      )
+
     case object LimitedCompanyDeclaration
     extends CompletedSectionLimitedCompany:
 
       override def sectionName: String = "Declaration"
-      override def displayOrder: Int = 6
-      override def agentApplication: AgentApplication = TdTestOnly.agentApplicationLimitedCompany.afterDeclarationSubmitted
+      override def displayOrder: Int = 8
+      override def agentApplication: AgentApplication = TdTestOnly.limitedCompany.twoChOfficers.agentApplicationLimitedCompany.afterDeclarationSubmitted
+      override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
+        List.fill(2)(TdTestOnly.limitedCompany.twoChOfficers.providedDetails.afterFinished)
+      )
 
     val values: Seq[CompletedSectionLimitedCompany] = SealedObjects.all[CompletedSectionLimitedCompany]
 
