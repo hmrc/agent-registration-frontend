@@ -56,6 +56,20 @@ extends TdTestOnly:
 
         override def crn: Crn = crnSixChOfficers
 
+  object limitedPartnership:
+
+    val twoChOfficers: TdTestOnly =
+      new TdTestOnly:
+        val crnTwoChOfficers = Crn("33333333")
+
+        override def crn: Crn = crnTwoChOfficers
+
+    val sixChOfficers: TdTestOnly =
+      new TdTestOnly:
+        val crnSixChOfficers = Crn("33333336")
+
+        override def crn: Crn = crnSixChOfficers
+
   object additionalIndividuals:
 
     val secondIndividual: TdTestOnly =
