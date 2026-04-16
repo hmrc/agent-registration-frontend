@@ -20,7 +20,6 @@ To start/stop these dependent services, use the Service Manager commands:
 sm2 --start AGENT_REGISTRATION_ALL \
 && sm2 -s
 ```
-
 ```bash
 sm2 -stop-all \
 && sm2 -s
