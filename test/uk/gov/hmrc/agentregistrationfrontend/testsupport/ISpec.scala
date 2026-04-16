@@ -111,8 +111,9 @@ extends AnyWordSpecLike,
         bind(classOf[IndividualProvidedDetailsIdGenerator]).toInstance(new IndividualProvidedDetailsIdGenerator {
           override def nextIndividualProvidedDetailsId(): IndividualProvidedDetailsId = tdAll.individualProvidedDetailsId
         })
-//        bind(classOf[ObjectStoreClientConfig]).toInstance(objectStoreConfig)
-//        bind(classOf[PlayObjectStoreClient]).toProvider(classOf[StubPlayObjectStoreClientProvider]).asEagerSingleton()
+        bind(classOf[ApplicationReferenceGenerator]).toInstance(new ApplicationReferenceGenerator {
+          override def nextApplicationReference(): ApplicationReference = tdAll.applicationReference
+        })
 
   override def fakeApplication(): Application = GuiceApplicationBuilder()
     .overrides(GuiceableModule.fromGuiceModules(Seq(overridesModule)))
