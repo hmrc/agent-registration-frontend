@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
+import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistration.shared.UcrIdentifiers
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
@@ -46,4 +48,33 @@ extends Connector:
           case status if is2xx(status) => Some(response.json.as[UcrIdentifiers])
           case status =>
             logger.warn("Failed to get organisation identifiers")
+            None
+
+  def getIndividualIdentifiersByNino(
+    nino: Nino
+  )(using RequestHeader): Future[Option[UcrIdentifiers]] =
+    val sanitisedNino = nino.value.replaceAll("\\s", "")
+    val url: URL = url"$baseUrl/unified-customer-registry/individual/nino/$sanitisedNino"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => Some(response.json.as[UcrIdentifiers])
+          case status =>
+            logger.warn("Failed to get individual identifiers by nino")
+            None
+
+  def getIndividualIdentifiersBySaUtr(
+    saUtr: SaUtr
+  )(using RequestHeader): Future[Option[UcrIdentifiers]] =
+    val url: URL = url"$baseUrl/unified-customer-registry/individual/utr/${saUtr.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => Some(response.json.as[UcrIdentifiers])
+          case status =>
+            logger.warn("Failed to get individual identifiers by sa-utr")
             None

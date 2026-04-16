@@ -69,6 +69,11 @@ extends FrontendController(mcc, actions):
         Redirect(AppRoutes.providedetails.IndividualSaUtrController.show(linkId))
     )
     .ensure(
+      request => request.get[IndividualProvidedDetails].vrns.isDefined && request.get[IndividualProvidedDetails].payeRefs.isDefined,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.internal.UcrIndividualController.populateIndividualIdentifiersFromUcr(linkId))
+    )
+    .ensure(
       _.get[IndividualProvidedDetails].hasApprovedApplication.getOrElse(false),
       implicit request =>
         Redirect(AppRoutes.providedetails.IndividualApproveApplicantController.show(linkId))

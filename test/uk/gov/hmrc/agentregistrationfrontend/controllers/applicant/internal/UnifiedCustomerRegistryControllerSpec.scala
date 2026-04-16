@@ -77,17 +77,18 @@ extends ControllerSpec:
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
 
-  s"GET $path should not update application identifiers if connector fails and redirect to task list" in:
+  s"GET $path should update application with empty lists if connector fails and redirect to task list" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetOrganisationIdentifiersFails(tdAll.saUtr.asUtr)
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterCompaniesHouseStatusCheckPass)
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterEmptyIdentifiersUpdated)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe nextPageUrl
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetOrganisationIdentifiers(tdAll.saUtr.asUtr)
     AgentRegistrationStubs.verifyGetAgentApplication()
-    AgentRegistrationStubs.verifyUpdateAgentApplication(0)
+    AgentRegistrationStubs.verifyUpdateAgentApplication()
 
   s"GET $path should redirect to task list page when ucr identifiers already populated" in:
     AuthStubs.stubAuthorise()

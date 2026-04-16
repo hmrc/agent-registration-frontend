@@ -41,7 +41,8 @@ extends ControllerSpec:
     val complete: IndividualProvidedDetails = tdAll.providedDetails.afterHmrcStandardforAgentsAgreed
     val completeAndConfirmed: IndividualProvidedDetails = tdAll.providedDetails.afterFinished
     val missingAgreeStandards: IndividualProvidedDetails = tdAll.providedDetails.afterApproveAgentApplication
-    val missingApproveApplication: IndividualProvidedDetails = tdAll.providedDetails.AfterSaUtr.afterSaUtrProvided
+    val missingApproveApplication: IndividualProvidedDetails = tdAll.providedDetails.afterUcrProvided
+    val missingUcrIdentifiers: IndividualProvidedDetails = tdAll.providedDetails.AfterSaUtr.afterSaUtrProvided
     val missingSaUtr: IndividualProvidedDetails = tdAll.providedDetails.AfterNino.afterNinoProvided
     val missingDateOfBirth: IndividualProvidedDetails = tdAll.providedDetails.afterEmailAddressVerified
     val missingNino: IndividualProvidedDetails = tdAll.providedDetails.AfterDateOfBirth.afterDateOfBirthProvided
@@ -69,6 +70,11 @@ extends ControllerSpec:
       providedDetails = individualProvideDetails.missingApproveApplication,
       name = "approve applicant",
       expectedRedirect = Some(AppRoutes.providedetails.IndividualApproveApplicantController.show(linkId).url)
+    ),
+    TestCaseForCya(
+      providedDetails = individualProvideDetails.missingUcrIdentifiers,
+      name = "ucr identifiers",
+      expectedRedirect = Some(AppRoutes.providedetails.internal.UcrIndividualController.populateIndividualIdentifiersFromUcr(linkId).url)
     ),
     TestCaseForCya(
       providedDetails = individualProvideDetails.missingSaUtr,

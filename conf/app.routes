@@ -182,3 +182,6 @@ POST        /provide-details/individual-name-search/:linkId                 uk.g
 GET         /provide-details/name-match-confirmation/:linkId                uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NameMatchConfirmationController.show(linkId: LinkId)
 POST        /provide-details/name-match-confirmation/:linkId                uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NameMatchConfirmationController.submit(linkId: LinkId)
 GET         /provide-details/contact-applicant                              uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ContactApplicantController.show
+
+## Internal Routes for individuals
+GET        /provide-details/internal/unified-customer-registry-identifiers/:linkId   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.internal.UcrIndividualController.populateIndividualIdentifiersFromUcr(linkId: LinkId)
