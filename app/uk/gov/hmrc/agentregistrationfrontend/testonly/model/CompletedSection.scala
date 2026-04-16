@@ -467,12 +467,38 @@ object CompletedSection:
       override def displayOrder: Int = 5
       override def agentApplication: AgentApplication = TdTestOnly.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed
 
+    case object ScottishLimitedPartnershipPartnersAndOtherRelevantTaxAdvisers2
+    extends CompletedSectionScottishLimitedPartnership:
+
+      override def sectionName: String = "Members and other relevant tax advisers (2)"
+      override def displayOrder: Int = 6
+      override def agentApplication: AgentApplication =
+        TdTestOnly.scottishLimitedPartnership.twoChOfficers.agentApplicationScottishLimitedPartnership.afterConfirmTwoChOfficers
+      override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
+        List.fill(2)(TdTestOnly.scottishLimitedPartnership.twoChOfficers.providedDetails.precreated)
+      )
+
+    case object ScottishLimitedPartnershipPartnersAndOtherRelevantTaxAdvisers6
+    extends CompletedSectionScottishLimitedPartnership:
+
+      override def sectionName: String = "Members and other relevant tax advisers (6)"
+      override def displayOrder: Int = 7
+      override def agentApplication: AgentApplication =
+        TdTestOnly.scottishLimitedPartnership.sixChOfficers.agentApplicationScottishLimitedPartnership.afterConfirmSixChOfficers
+      override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
+        List.fill(6)(TdTestOnly.scottishLimitedPartnership.sixChOfficers.providedDetails.precreated)
+      )
+
     case object ScottishLimitedPartnershipDeclaration
     extends CompletedSectionScottishLimitedPartnership:
 
       override def sectionName: String = "Declaration"
-      override def displayOrder: Int = 6
-      override def agentApplication: AgentApplication = TdTestOnly.agentApplicationScottishLimitedPartnership.afterDeclarationSubmitted
+      override def displayOrder: Int = 8
+      override def agentApplication: AgentApplication =
+        TdTestOnly.scottishLimitedPartnership.twoChOfficers.agentApplicationScottishLimitedPartnership.afterDeclarationSubmitted
+      override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
+        List.fill(2)(TdTestOnly.scottishLimitedPartnership.twoChOfficers.providedDetails.afterFinished)
+      )
 
     val values: Seq[CompletedSectionScottishLimitedPartnership] = SealedObjects.all[CompletedSectionScottishLimitedPartnership]
 
