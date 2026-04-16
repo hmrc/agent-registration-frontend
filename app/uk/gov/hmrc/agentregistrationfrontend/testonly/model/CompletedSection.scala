@@ -271,12 +271,35 @@ object CompletedSection:
       override def displayOrder: Int = 5
       override def agentApplication: AgentApplication = TdTestOnly.agentApplicationScottishPartnership.afterHmrcStandardForAgentsAgreed
 
+    case object ScottishPartnershipPartnersAndOtherRelevantTaxAdvisers2
+    extends CompletedSectionScottishPartnership:
+
+      override def sectionName: String = "Partners and other relevant tax advisers (2)"
+      override def displayOrder: Int = 6
+      override def agentApplication: AgentApplication = TdTestOnly.agentApplicationScottishPartnership.afterConfirmTwoIndividuals
+      override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
+        List.fill(2)(TdTestOnly.providedDetails.precreated)
+      )
+
+    case object ScottishPartnershipPartnersAndOtherRelevantTaxAdvisers6
+    extends CompletedSectionScottishPartnership:
+
+      override def sectionName: String = "Partners and other relevant tax advisers (6)"
+      override def displayOrder: Int = 7
+      override def agentApplication: AgentApplication = TdTestOnly.agentApplicationScottishPartnership.afterConfirmSixIndividuals
+      override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
+        List.fill(6)(TdTestOnly.providedDetails.precreated)
+      )
+
     case object ScottishPartnershipDeclaration
     extends CompletedSectionScottishPartnership:
 
       override def sectionName: String = "Declaration"
-      override def displayOrder: Int = 7
-      override def agentApplication: AgentApplication = TdTestOnly.agentApplicationScottishPartnership.afterDeclarationSubmitted
+      override def displayOrder: Int = 8
+      override def agentApplication: AgentApplication = TdTestOnly.agentApplicationScottishPartnership.afterDeclarationSubmittedAndTwoIndividualFinished
+      override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
+        List.fill(2)(TdTestOnly.providedDetails.afterFinished)
+      )
 
     val values: Seq[CompletedSectionScottishPartnership] = SealedObjects.all[CompletedSectionScottishPartnership]
 
