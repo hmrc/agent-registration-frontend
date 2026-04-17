@@ -68,7 +68,6 @@ extends FrontendController(mcc, actions):
         val projectedDecisionDate: LocalDate = calculateDecisionDate(submittedAt)
 
         val applicationRiskingResponse: ApplicationRiskingResponse = request.get
-        val actualDecisionDate: Option[Instant] = Some(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant) // TODO: this should be coming from the ApplicationRiskingResponse, but we don't have it there yet so using the current time as a placeholder
         applicationRiskingResponse.status match
           case ApplicationForRiskingStatus.ReadyForSubmission => // show the confirmation screen
             Ok(confirmationPage(
@@ -90,10 +89,7 @@ extends FrontendController(mcc, actions):
             Ok(failedNonFixablePage(
               applicationRiskingResponse = applicationRiskingResponse,
               agentApplication = agentApplication,
-              entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
-              dateToAppeal = displayDateForLang(Some(
-                calculateTimeToAppeal(actualDecisionDate.getOrThrowExpectedDataMissing("the date of decision is missing from teh ApplicationRiskingResponse"))
-              ))
+              entityName = request.get[BusinessPartnerRecordResponse].getEntityName
             ))
           case ApplicationForRiskingStatus.FailedFixable => // TODO: show the fixable failures page
             Ok(simplePage(
@@ -130,11 +126,5 @@ extends FrontendController(mcc, actions):
   private def calculateDecisionDate(submittedAt: Instant): LocalDate =
     submittedAt
       .plus(appConfig.applicationDecisionLeadTime.toMillis, ChronoUnit.MILLIS)
-      .atZone(ZoneId.systemDefault())
-      .toLocalDate
-
-  private def calculateTimeToAppeal(decisionDate: Instant): LocalDate =
-    decisionDate
-      .plus(appConfig.applicationTimeToAppeal.toMillis, ChronoUnit.MILLIS)
       .atZone(ZoneId.systemDefault())
       .toLocalDate

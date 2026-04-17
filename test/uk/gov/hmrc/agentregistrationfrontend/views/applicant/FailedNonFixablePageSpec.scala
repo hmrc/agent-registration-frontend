@@ -49,8 +49,7 @@ extends ViewSpec:
     viewTemplate(
       applicationRiskingResponse = failedNonFixableResponse.allIndividualsHaveFailures,
       agentApplication = agentApplication,
-      entityName = "Test Company Name",
-      dateToAppeal = "20 June 2026"
+      entityName = "Test Company Name"
     ).body
   )
   val renderedEntityFailures: Elements = docWithIndividualFailures.selectOrFail("#entity-reasons").select("li")
@@ -59,8 +58,7 @@ extends ViewSpec:
     viewTemplate(
       applicationRiskingResponse = failedNonFixableResponse.noIndividualsWithFailures,
       agentApplication = agentApplication,
-      entityName = "Test Company Name",
-      dateToAppeal = "20 June 2026"
+      entityName = "Test Company Name"
     ).body
   )
   val renderedEntityFailuresWithNoIndividualFailures: Elements = docWithNoIndividualFailures.selectOrFail("#entity-reasons").select("li")
@@ -86,7 +84,7 @@ extends ViewSpec:
            |has one or more relevant returns outstanding
            |Failure to meet the registration conditions
            |Test Company Name will not be given an agent services account on this occasion.
-           |The application will be deleted on 20 June 2026 to comply with our data retention policy.
+           |The application will be deleted 45 days after the date we emailed you about this outcome, to comply with our data retention policy.
            |What to do if you disagree
            |If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can apply again.
            |If you disagree with the outcome, you can request a review or appeal the decision (opens in a new tab).
@@ -133,7 +131,7 @@ extends ViewSpec:
            |the business has missing tax returns in their HMRC record
            |Failure to meet the registration conditions
            |Test Company Name will not be given an agent services account on this occasion.
-           |The application will be deleted on 20 June 2026 to comply with our data retention policy.
+           |The application will be deleted 45 days after the date we emailed you about this outcome, to comply with our data retention policy.
            |What to do if you disagree
            |If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can apply again.
            |If you disagree with the outcome, you can request a review or appeal the decision (opens in a new tab).

@@ -104,7 +104,6 @@ class AppConfig @Inject() (
   val contacHmrctUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.contact-hmrc", configuration)
 
   val applicationDecisionLeadTime: FiniteDuration = configuration.get[FiniteDuration]("application-decision-lead-time")
-  val applicationTimeToAppeal: FiniteDuration = configuration.get[FiniteDuration]("application-time-to-appeal")
 
   object Upscan:
 

@@ -1023,7 +1023,7 @@ failedNonFixable.individualListIntro = Records indicate that {0}:
 
 failedNonFixable.decision.h2 = Failure to meet the registration conditions
 failedNonFixable.decision.p1 = {0} will not be given an agent services account on this occasion.
-failedNonFixable.decision.p2 = The application will be deleted on {0} to comply with our data retention policy.
+failedNonFixable.decision.p2 = The application will be deleted 45 days after the date we emailed you about this outcome, to comply with our data retention policy.
 failedNonFixable.appeal.h2 = What to do if you disagree
 failedNonFixable.appeal.li1 = If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can apply again.
 failedNonFixable.appeal.li2 = If you disagree with the outcome, you can <a class="govuk-link" href="{0}" target="_blank" rel="noopener noreferrer">request a review or appeal the decision (opens in a new tab)</a>.
