@@ -35,7 +35,7 @@ extends ViewSpec:
   private val ordinalKey: String = "subsequent"
   private val formAction: play.api.mvc.Call = AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitSixOrMore
   private val heading: String = "What is the name of the next person?"
-  private val p1: String = s"We'll check this against the business records for $entityName in Companies House."
+  private val p1: String = s"We’ll check this against the business records for $entityName in Companies House."
 
   case class BusinessTypeTestCase(
     label: String,

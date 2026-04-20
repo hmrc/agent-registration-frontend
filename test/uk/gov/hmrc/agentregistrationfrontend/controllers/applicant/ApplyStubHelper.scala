@@ -20,7 +20,9 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationRiskingStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
@@ -72,6 +74,17 @@ object ApplyStubHelper:
   def verifyConnectorsToSupplyBprToPage(utr: Option[Utr] = None): Unit =
     verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyGetBusinessPartnerRecord(utr.getOrElse(tdAll.saUtr.asUtr))
+
+  def stubsForApplicationRiskingResponse(
+    application: AgentApplication,
+    applicationRiskingResponse: ApplicationRiskingResponse
+  ): StubMapping =
+    stubsToSupplyBprToPage(application)
+    AgentRegistrationRiskingStubs.stubGetApplicationRiskingResponse(application.agentApplicationId, applicationRiskingResponse)
+
+  def verifyConnectorsForApplicationRiskingResponse(agentApplication: AgentApplication): Unit =
+    verifyConnectorsToSupplyBprToPage(Some(agentApplication.getUtr))
+    AgentRegistrationRiskingStubs.verifyGetApplicationRiskingResponse(agentApplication.agentApplicationId)
 
   def stubsForTaskListPage(
     application: AgentApplication,

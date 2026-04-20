@@ -23,6 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineFutureEither
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineUnion
@@ -31,6 +32,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
@@ -50,12 +52,21 @@ object ApplicantActions:
   type RequestWithApplication = RequestWithData[DataWithApplication]
   type RequestWithApplicationCt[A] = RequestWithDataCt[A, DataWithApplication]
 
+  type DataWithApplicationAndBpr = BusinessPartnerRecordResponse *: DataWithApplication
+  type RequestWithApplicationAndBpr = RequestWithData[DataWithApplicationAndBpr]
+  type RequestWithApplicationAndBprCt[A] = RequestWithDataCt[A, DataWithApplicationAndBpr]
+
+  type DataWithRiskingResponse = ApplicationRiskingResponse *: DataWithApplicationAndBpr
+  type RequestWithRiskingResponse = RequestWithData[DataWithRiskingResponse]
+  type RequestWithRiskingResponseCt[A] = RequestWithDataCt[A, DataWithRiskingResponse]
+
 @Singleton
 class ApplicantActions @Inject() (
   defaultActionBuilder: DefaultActionBuilder,
   authorisedActionRefiner: ApplicantAuthRefiner,
   agentApplicationService: AgentApplicationService,
-  businessPartnerRecordService: BusinessPartnerRecordService
+  businessPartnerRecordService: BusinessPartnerRecordService,
+  agentRegistrationRiskingService: AgentRegistrationRiskingService
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
@@ -85,29 +96,38 @@ extends RequestAwareLogging:
       condition = _.get[AgentApplication].isInProgress,
       resultWhenConditionNotMet =
         implicit request =>
-          // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-          val call = AppRoutes.apply.AgentApplicationController.applicationSubmitted
+          val call = AppRoutes.apply.AgentApplicationController.applicationStatus
           logger.warn(
-            s"The application is not in the final state" +
+            s"The application is not in progress" +
               s" (current application state: ${request.get[AgentApplication].applicationState.toString}), " +
               s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
           )
           Redirect(call.url)
     )
 
-  val getApplicationSubmitted: ActionBuilderWithData[DataWithApplication] = getApplication
-    .ensure(
-      condition = _.agentApplication.hasFinished,
-      resultWhenConditionNotMet =
-        implicit request =>
-          // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-          val call = AppRoutes.apply.AgentApplicationController.landing // or task list
-          logger.warn(
-            s"The application is not in the final state" +
-              s" (current application state: ${request.agentApplication.applicationState.toString}), " +
-              s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
-          )
-          Redirect(call.url)
+  val getApplicationSubmitted: ActionBuilderWithData[DataWithApplicationAndBpr] =
+    getApplication
+      .ensure(
+        condition = _.agentApplication.hasFinished,
+        resultWhenConditionNotMet =
+          implicit request =>
+            // TODO: this is a temporary solution and should be revisited once we have full journey implemented
+            val call = AppRoutes.apply.AgentApplicationController.landing // or task list
+            logger.warn(
+              s"The application is not in the final state" +
+                s" (current application state: ${request.agentApplication.applicationState.toString}), " +
+                s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
+            )
+            Redirect(call.url)
+      )
+      .getBusinessPartnerRecord
+
+  val getApplicationRiskingResponse: ActionBuilderWithData[DataWithRiskingResponse] = getApplicationSubmitted
+    .refine(implicit request =>
+      agentRegistrationRiskingService
+        .getApplicationRiskingResponse(request.agentApplication.agentApplicationId)
+        .map: applicationRiskingResponse =>
+          request.add[ApplicationRiskingResponse](applicationRiskingResponse.getOrThrowExpectedDataMissing(s"Risking response missing for complete application ${request.agentApplication.agentApplicationId}"))
     )
 
   extension [Data <: Tuple](ab: ActionBuilderWithData[Data])

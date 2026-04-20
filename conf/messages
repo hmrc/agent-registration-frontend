@@ -6,6 +6,7 @@ common.continue = Continue
 common.saveAndContinue = Save and continue
 common.confirmAndContinue = Confirm and continue
 common.saveAndComeBackLater = Save and come back later
+common.finishAndSignOut = Finish and sign out
 common.tryAgain = Try again
 common.startAgain = Start again
 common.errorPrefix = Error
@@ -508,9 +509,9 @@ applicationProgress.viewLink = View or print your application (opens in a new ta
 
 # Apply / entitycheckfailed/ CompanyStatusBlock
 companyStatusBlock.title = We cannot create an account for this company
-companyStatusBlock.p1 = We cannot register this company for an agent services account. This is because of the company''s status on the Companies House register.
-companyStatusBlock.p2 = To view your company status you can <a class="govuk-link" href={0} target='_blank'>search the Companies House register (opens in a new tab)</a>. If you believe the status is incorrect, contact Companies House.
-companyStatusBlock.p3 = If you''ve entered the incorrect details, you can try again.
+companyStatusBlock.p1 = We cannot register this company for an agent services account. This is because of the company’s status on the Companies House register.
+companyStatusBlock.p2 = To view your company status you can <a class="govuk-link" href={0} target="_blank">search the Companies House register (opens in a new tab)</a>. If you believe the status is incorrect, contact Companies House.
+companyStatusBlock.p3 = If you’ve entered the incorrect details, you can try again.
 companyStatusBlock.tryAgain.button = Try again
 
 # Apply / entitycheckfailed/ CannotConfirmIdentity
@@ -840,12 +841,12 @@ companiesHouseIndividuaName.complex.title.LimitedLiabilityPartnership = Tell us 
 companiesHouseIndividuaName.complex.title.LimitedCompany = Tell us about the directors of {0}
 companiesHouseIndividuaName.complex.title.LimitedPartnership = Tell us about the partners of {0}
 companiesHouseIndividuaName.complex.title.ScottishLimitedPartnership = Tell us about the partners of {0}
-companiesHouseIndividuaName.complex.p1 = We''ll check this against the business records in Companies House.
+companiesHouseIndividuaName.complex.p1 = We’ll check this against the business records in Companies House.
 companiesHouseIndividuaName.complex.p2.LimitedLiabilityPartnership = We need the names of all {0} LLP members responsible for tax advice activities.
 companiesHouseIndividuaName.complex.p2.LimitedCompany = We need the names of all {0} directors responsible for tax advice activities.
 companiesHouseIndividuaName.complex.p2.LimitedPartnership = We need the names of all {0} partners responsible for tax advice activities.
 companiesHouseIndividuaName.complex.p2.ScottishLimitedPartnership = We need the names of all {0} partners responsible for tax advice activities.
-companiesHouseIndividuaName.complex.details.summary = What we mean by 'responsible for tax advice'
+companiesHouseIndividuaName.complex.details.summary = What we mean by ‘responsible for tax advice’
 companiesHouseIndividuaName.complex.details.p1.LimitedLiabilityPartnership = An LLP member is responsible for tax advice if they have:
 companiesHouseIndividuaName.complex.details.p1.LimitedCompany = A director is responsible for tax advice if they have:
 companiesHouseIndividuaName.complex.details.p1.LimitedPartnership = A partner is responsible for tax advice if they have:
@@ -865,10 +866,10 @@ companiesHouseIndividuaName.lastName.label = Last name
 firstName.error.invalid = First names must only include letters a to z, hyphens, apostrophes and spaces
 lastName.error.required = Enter the last name of the LLP member
 lastName.error.invalid = Last name must only include letters a to z, hyphens, apostrophes and spaces
-llpMemberName.error.invalid = The member''s name must only include letters a to z, hyphens, apostrophes and spaces
+llpMemberName.error.invalid = The member’s name must only include letters a to z, hyphens, apostrophes and spaces
 
 # LLP Member Name - Next person page (simpler layout)
-companiesHouseIndividuaName.p1 = We''ll check this against the business records for {0} in Companies House.
+companiesHouseIndividuaName.p1 = We’ll check this against the business records for {0} in Companies House.
 
 # Incorporated: Check Your Answers / Add to list summary (LLP)
 addToListSummary.LimitedLiabilityPartnership.title.plural = You have added {0} LLP members
@@ -1010,3 +1011,104 @@ removeKeyIndividual.error.required.LimitedLiabilityPartnership = Select yes if y
 removeKeyIndividual.error.required.LimitedCompany = Select yes if you want to remove {0} from the list of directors
 removeKeyIndividual.error.required.LimitedPartnership = Select yes if you want to remove {0} from the list of partners
 removeKeyIndividual.error.required.ScottishLimitedPartnership = Select yes if you want to remove {0} from the list of partners
+
+# Application outcome
+failedNonFixable.caption = Application outcome
+failedNonFixable.title = {0} does not meet the registration conditions
+failedNonFixable.p1 = Your application for an agent services account cannot be approved (refused under Section 230 of the Finance Act 2026).
+failedNonFixable.p2 = This is because:
+
+failedNonFixable.individualFailures.h2 = Relevant individuals who do not meet the registration conditions
+failedNonFixable.individualListIntro = Records indicate that {0}:
+
+failedNonFixable.decision.h2 = Failure to meet the registration conditions
+failedNonFixable.decision.p1 = {0} will not be given an agent services account on this occasion.
+failedNonFixable.decision.p2 = The application will be deleted 45 days after the date we emailed you about this outcome, to comply with our data retention policy.
+failedNonFixable.appeal.h2 = What to do if you disagree
+failedNonFixable.appeal.li1 = If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can apply again.
+failedNonFixable.appeal.li2 = If you disagree with the outcome, you can <a class="govuk-link" href="{0}" target="_blank" rel="noopener noreferrer">request a review or appeal the decision (opens in a new tab)</a>.
+
+# Failure messages for non-fixable page as shown to entity
+NonFixableOutcomeListForEntityFailures.EntityFailure.3.1 = we could not confirm the anti-money laundering supervision for {0} based on the information you provided
+NonFixableOutcomeListForEntityFailures.EntityFailure.3.1.SoleTrader = we could not confirm the anti-money laundering supervision for {0} based on the information you provided
+NonFixableOutcomeListForEntityFailures.EntityFailure.3.1.SoleTraderNotOwner = we could not confirm the anti-money laundering supervision for {0} based on the information you provided
+NonFixableOutcomeListForEntityFailures.EntityFailure.3.2 = we could not confirm the anti-money laundering supervision for {0} based on the information you provided
+NonFixableOutcomeListForEntityFailures.EntityFailure.3.2.SoleTrader = we could not confirm the anti-money laundering supervision for {0} based on the information you provided
+NonFixableOutcomeListForEntityFailures.EntityFailure.3.2.SoleTraderNotOwner = we could not confirm the anti-money laundering supervision for {0} based on the information you provided
+NonFixableOutcomeListForEntityFailures.EntityFailure.3.3 = we could not confirm the anti-money laundering supervision for {0} based on the information you provided
+NonFixableOutcomeListForEntityFailures.EntityFailure.3.3.SoleTrader = we could not confirm the anti-money laundering supervision for {0} based on the information you provided
+NonFixableOutcomeListForEntityFailures.EntityFailure.3.3.SoleTraderNotOwner = we could not confirm the anti-money laundering supervision for {0} based on the information you provided
+NonFixableOutcomeListForEntityFailures.EntityFailure.3.5 = we could not confirm the anti-money laundering supervision for {0} based on the information you provided
+NonFixableOutcomeListForEntityFailures.EntityFailure.3.5.SoleTrader = we could not confirm the anti-money laundering supervision for {0} based on the information you provided
+NonFixableOutcomeListForEntityFailures.EntityFailure.3.5.SoleTraderNotOwner = we could not confirm the anti-money laundering supervision for {0} based on the information you provided
+NonFixableOutcomeListForEntityFailures.EntityFailure.4.1 = the business has missing tax returns in their HMRC record
+NonFixableOutcomeListForEntityFailures.EntityFailure.4.1.SoleTrader = the business has missing tax returns in their HMRC record
+NonFixableOutcomeListForEntityFailures.EntityFailure.4.1.SoleTraderNotOwner = the business has missing tax returns in their HMRC record
+NonFixableOutcomeListForEntityFailures.EntityFailure.4.2 = the business has missing tax returns in their HMRC record
+NonFixableOutcomeListForEntityFailures.EntityFailure.4.2.SoleTrader = the business has missing tax returns in their HMRC record
+NonFixableOutcomeListForEntityFailures.EntityFailure.4.2.SoleTraderNotOwner = the business has missing tax returns in their HMRC record
+NonFixableOutcomeListForEntityFailures.EntityFailure.4.3 = the business has missing tax returns in their HMRC record
+NonFixableOutcomeListForEntityFailures.EntityFailure.4.3.SoleTrader = the business has missing tax returns in their HMRC record
+NonFixableOutcomeListForEntityFailures.EntityFailure.4.3.SoleTraderNotOwner = the business has missing tax returns in their HMRC record
+NonFixableOutcomeListForEntityFailures.EntityFailure.4.4 = the business has missing tax returns in their HMRC record
+NonFixableOutcomeListForEntityFailures.EntityFailure.4.4.SoleTrader = the business has missing tax returns in their HMRC record
+NonFixableOutcomeListForEntityFailures.EntityFailure.4.4.SoleTraderNotOwner = the business has missing tax returns in their HMRC record
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.1 = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.1.SoleTrader = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.1.SoleTraderNotOwner = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.2 = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.2.SoleTrader = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.2.SoleTraderNotOwner = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.3 = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.3.SoleTrader = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.3.SoleTraderNotOwner = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.4 = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.4.SoleTrader = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.4.SoleTraderNotOwner = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.5 = the business has unpaid penalty liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.5.SoleTrader = the business has unpaid penalty liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.5.SoleTraderNotOwner = the business has unpaid penalty liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.6 = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.6.SoleTrader = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.6.SoleTraderNotOwner = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.7 = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.7.SoleTrader = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.5.7.SoleTraderNotOwner = the business has unpaid tax liabilities
+NonFixableOutcomeListForEntityFailures.EntityFailure.7 = our records show that the business is formally insolvent
+NonFixableOutcomeListForEntityFailures.EntityFailure.7.SoleTrader = our records show that the business is formally insolvent
+NonFixableOutcomeListForEntityFailures.EntityFailure.7.SoleTraderNotOwner = our records show that the business is formally insolvent
+NonFixableOutcomeListForEntityFailures.EntityFailure.8.1 = the business appears on a published HMRC list of tax avoidance promoter, enablers or suppliers
+NonFixableOutcomeListForEntityFailures.EntityFailure.8.1.SoleTrader = the business appears on a published HMRC list of tax avoidance promoter, enablers or suppliers
+NonFixableOutcomeListForEntityFailures.EntityFailure.8.1.SoleTraderNotOwner = the business appears on a published HMRC list of tax avoidance promoter, enablers or suppliers
+NonFixableOutcomeListForEntityFailures.EntityFailure.8.4 = the business was issued with a relevant anti-avoidance penalty within the last 12 months
+NonFixableOutcomeListForEntityFailures.EntityFailure.8.4.SoleTrader = the business was issued with a relevant anti-avoidance penalty within the last 12 months
+NonFixableOutcomeListForEntityFailures.EntityFailure.8.4.SoleTraderNotOwner = the business was issued with a relevant anti-avoidance penalty within the last 12 months
+NonFixableOutcomeListForEntityFailures.EntityFailure.8.5 = the business has one or more relevant anti-avoidance penalties to pay
+NonFixableOutcomeListForEntityFailures.EntityFailure.8.5.SoleTrader = the business has one or more relevant anti-avoidance penalties to pay
+NonFixableOutcomeListForEntityFailures.EntityFailure.8.5.SoleTraderNotOwner = the business has one or more relevant anti-avoidance penalties to pay
+NonFixableOutcomeListForEntityFailures.EntityFailure.8.6 = the business was issued with a relevant anti-avoidance penalty within the last 12 months
+NonFixableOutcomeListForEntityFailures.EntityFailure.8.6.SoleTrader = the business was issued with a relevant anti-avoidance penalty within the last 12 months
+NonFixableOutcomeListForEntityFailures.EntityFailure.8.6.SoleTraderNotOwner = the business was issued with a relevant anti-avoidance penalty within the last 12 months
+NonFixableOutcomeListForEntityFailures.EntityFailure.8.7 = the business has one or more relevant anti-avoidance penalties to pay
+NonFixableOutcomeListForEntityFailures.EntityFailure.8.7.SoleTrader = the business has one or more relevant anti-avoidance penalties to pay
+NonFixableOutcomeListForEntityFailures.EntityFailure.8.7.SoleTraderNotOwner = the business has one or more relevant anti-avoidance penalties to pay
+NonFixableOutcomeListForEntityFailures.AnyIndividualFailures = one or more relevant individuals linked to the application do not meet the registration conditions
+NonFixableOutcomeListForEntityFailures.AnyIndividualFailures.SoleTrader = you do not meet the registration conditions
+NonFixableOutcomeListForEntityFailures.AnyIndividualFailures.SoleTraderNotOwner = the business owner does not meet the registration conditions
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.4.1 = has one or more relevant returns outstanding
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.4.3 = has one or more relevant returns outstanding
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.4.4 = has one or more relevant returns outstanding
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.5.1 = has one or more overdue liabilities
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.5.3 = has one or more overdue liabilities
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.5.4 = has one or more overdue liabilities
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.5.5 = has one or more overdue liabilities
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.5.6 = has one or more overdue liabilities
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.5.7 = has one or more overdue liabilities
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.6 = is actively disqualified on Companies house
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.7 = is formally insolvent
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.8.1 = is subject to a relevant anti-avoidance measure, or has an unpaid liability connected to relevant anti-avoidance
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.8.6 = is subject to a relevant anti-avoidance measure, or has an unpaid liability connected to relevant anti-avoidance
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.8.7 = is subject to a relevant anti-avoidance measure, or has an unpaid liability connected to relevant anti-avoidance
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.9 = has a relevant unspent criminal conviction
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.10.1 = We did not get enough information to check that {0} met the registration conditions
+NonFixableOutcomeListForIndividualFailures.IndividualFailure.10.2 = We did not get enough information to check that {0} met the registration conditions

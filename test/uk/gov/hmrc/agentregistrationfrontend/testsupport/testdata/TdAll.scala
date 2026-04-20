@@ -27,6 +27,8 @@ import uk.gov.hmrc.agentregistration.shared.testdata.providedetails.individual.T
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 import uk.gov.hmrc.agentregistration.shared.testdata.TdGrsBusinessDetails
 import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.TdAgentApplicationSoleTraderRepresentative
+import uk.gov.hmrc.agentregistration.shared.testdata.risking.TdApplicationRiskingResponse
+import uk.gov.hmrc.agentregistration.shared.testdata.risking.TdIndividualRiskingResponse
 
 object TdAll:
   val tdAll: TdAll = new TdAll {}
@@ -60,7 +62,9 @@ extends TdBase,
   TdAgentApplicationSoleTrader,
   TdAgentApplicationSoleTraderRepresentative,
   TdAllSections,
-  TdIndividualProvidedDetails:
+  TdIndividualProvidedDetails,
+  TdIndividualRiskingResponse,
+  TdApplicationRiskingResponse:
 
   object agentApplicationLlpSections:
 
