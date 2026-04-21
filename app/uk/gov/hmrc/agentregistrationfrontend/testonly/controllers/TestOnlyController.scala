@@ -29,6 +29,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyHubPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.Future
 
 @Singleton
 class TestOnlyController @Inject() (
@@ -46,7 +47,7 @@ extends FrontendControllerBase(mcc):
   def showPlaySession: Action[AnyContent] = defaultActionBuilder: request =>
     Ok(Json.prettyPrint(Json.toJson(request.session.data)))
 
-  def logIn(
+  def findAndLogInApplicant(
     userId: UserId,
     planetId: PlanetId,
     redirectUrl: String
@@ -57,5 +58,28 @@ extends FrontendControllerBase(mcc):
         import StubUserService.addToSession
         for
           user <- stubUserService.findUser(userId, planetId).map(_.getOrThrowExpectedDataMissing("user"))
+          loginResponse <- stubUserService.signIn(user)
+        yield Redirect(redirectUrl).addToSession(loginResponse)
+
+  def findOrCreateAndLogInIndividual(
+    userId: UserId,
+    planetId: PlanetId,
+    individualName: String,
+    redirectUrl: String
+  ): Action[AnyContent] = defaultActionBuilder
+    .async:
+      implicit request =>
+        import StubUserService.addToSession
+        for
+          maybeUser <- stubUserService.findUser(userId, planetId)
+          user <-
+            maybeUser match
+              case Some(user) => Future.successful(user)
+              case None =>
+                stubUserService.createUserIndividual(
+                  userId,
+                  planetId,
+                  individualName
+                )
           loginResponse <- stubUserService.signIn(user)
         yield Redirect(redirectUrl).addToSession(loginResponse)
