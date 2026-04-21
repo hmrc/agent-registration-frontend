@@ -132,11 +132,10 @@
             <span class="individual-tile__info-label">Person of Control</span>
             <span class="individual-tile__info-value">@individual.isPersonOfControl</span>
         </div>
-
         <a
         class="govuk-link"
-        href="@AppRoutes.testOnly.TestOnlyController.logIn(
-            UserId.make(individual.individualProvidedDetailsId), PlanetId.make(individual.agentApplicationId), requestHeader.uri
+        href="@AppRoutes.testOnly.TestOnlyController.findOrCreateAndLogInIndividual(
+            UserId.make(individual.individualProvidedDetailsId), PlanetId.make(individual.agentApplicationId), individual.individualName.value, requestHeader.uri
         )"
         >login</a>
     </div>
