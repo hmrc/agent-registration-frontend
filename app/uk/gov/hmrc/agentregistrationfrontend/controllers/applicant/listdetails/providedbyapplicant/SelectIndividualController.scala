@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedetails
+package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
+import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
@@ -27,40 +28,63 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.forms.SelectIndividualForm
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.providedbyapplicant.SelectIndividualPage
 
 @Singleton
 class SelectIndividualController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
-  view: SimplePage,
+  view: SelectIndividualPage,
   individualProvideDetailsService: IndividualProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithLists = List[IndividualProvidedDetails] *: IsNotSoleTrader *: DataWithAuth
+  private type DataWithListOfIncompleteIndividuals = List[IndividualProvidedDetails] *: IsNotSoleTrader *: DataWithAuth
 
-  private val baseAction: ActionBuilderWithData[DataWithLists] = actions
+  private val baseAction: ActionBuilderWithData[DataWithListOfIncompleteIndividuals] = actions
     .getApplicationInProgress
     .refine:
       implicit request =>
         request.get[AgentApplication] match
           case _: AgentApplicationSoleTrader =>
-            logger.warn("Sole traders do not add details for individuals")
+            logger.warn("Sole traders do not provide details like this, redirecting to task list for the correct links")
             Redirect(AppRoutes.apply.TaskListController.show.url)
           case aa: IsNotSoleTrader => request.replace[AgentApplication, IsNotSoleTrader](aa)
     .refine:
       implicit request =>
-        val agentApplication: IsNotSoleTrader = request.get[IsNotSoleTrader]
+        val agentApplication: IsNotSoleTrader = request.get
         individualProvideDetailsService
           .findAllByApplicationId(agentApplication.agentApplicationId)
           .map: individualsList =>
-            request.add[List[IndividualProvidedDetails]](individualsList)
+            val incompleteIndividuals: List[IndividualProvidedDetails] = individualsList.filterNot(_.hasFinished)
+            request.add[List[IndividualProvidedDetails]](incompleteIndividuals)
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
+      val incompleteIndividuals: List[IndividualProvidedDetails] = request.get
+      val form = SelectIndividualForm.form(incompleteIndividuals)
       Ok(view(
-        h1 = "Select individual placeholder",
-        bodyText = Some("placeholder page for selecting an individual to provide details for...")
+        form = form,
+        incompleteIndividuals = incompleteIndividuals
       ))
+
+  def submit: Action[AnyContent] =
+    baseAction
+      .ensureValidFormAndRedirectIfSaveForLater[IndividualProvidedDetails](
+        form =
+          (request: RequestWithData[DataWithListOfIncompleteIndividuals]) =>
+            SelectIndividualForm.form(request.get[List[IndividualProvidedDetails]]),
+        resultToServeWhenFormHasErrors =
+          implicit request: RequestWithData[DataWithListOfIncompleteIndividuals] =>
+            (formWithErrors: Form[IndividualProvidedDetails]) =>
+              view(
+                form = formWithErrors,
+                incompleteIndividuals = request.get[List[IndividualProvidedDetails]]
+              )
+      ):
+        implicit request: RequestWithData[IndividualProvidedDetails *: DataWithListOfIncompleteIndividuals] =>
+          val i: IndividualProvidedDetails = request.get
+          Ok(s"submitted selection to provide details for ${i.individualName.value}")
+      .redirectIfSaveForLater
