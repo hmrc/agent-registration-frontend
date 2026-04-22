@@ -113,9 +113,6 @@ extends ViewSpec:
           |Registration number
           |NONHMRC-REF-AMLS-NUMBER-00001
           |Change Registration number
-          |Supervision expiry date
-          |25 May 2060
-          |Change Supervision expiry date
           |Evidence of anti-money laundering supervision
           |evidence.pdf
           |Change Evidence of anti-money laundering supervision
@@ -138,12 +135,6 @@ extends ViewSpec:
             value = "NONHMRC-REF-AMLS-NUMBER-00001",
             action = AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url,
             changeLinkAccessibleContent = "Change Registration number"
-          ),
-          TestSummaryRow(
-            key = "Supervision expiry date",
-            value = "25 May 2060",
-            action = AppRoutes.apply.amls.AmlsExpiryDateController.show.url,
-            changeLinkAccessibleContent = "Change Supervision expiry date"
           ),
           TestSummaryRow(
             key = "Evidence of anti-money laundering supervision",

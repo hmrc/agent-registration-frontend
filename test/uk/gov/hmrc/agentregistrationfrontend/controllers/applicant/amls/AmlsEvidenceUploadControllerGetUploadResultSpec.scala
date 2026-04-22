@@ -31,12 +31,12 @@ extends ControllerSpec:
 
   private object agentApplication:
 
-    val afterAmlsExpiryDateProvided: AgentApplication =
+    val afterAmlsRegistrationNumberProvided: AgentApplication =
       tdAll
         .agentApplicationLlpSections
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
-        .afterAmlsExpiryDateProvided
+        .afterRegistrationNumberProvided
 
     val afterUploadSucceeded: AgentApplication =
       tdAll
@@ -65,7 +65,7 @@ extends ControllerSpec:
       uploadRepo.drop().futureValue
       uploadRepo.upsert(tdAll.uploadInProgress).futureValue
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterAmlsExpiryDateProvided)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterAmlsRegistrationNumberProvided)
 
     val response: WSResponse = get(uploadResultPath)
 
@@ -80,7 +80,7 @@ extends ControllerSpec:
       uploadRepo.drop().futureValue
       uploadRepo.upsert(tdAll.uploadFailed).futureValue
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterAmlsExpiryDateProvided)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterAmlsRegistrationNumberProvided)
 
     val response: WSResponse = get(uploadResultPath)
 
@@ -95,7 +95,7 @@ extends ControllerSpec:
       uploadRepo.drop().futureValue
       uploadRepo.upsert(tdAll.uploadFailedWithVirus).futureValue
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterAmlsExpiryDateProvided)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterAmlsRegistrationNumberProvided)
 
     val response: WSResponse = get(uploadResultPath)
 
@@ -111,7 +111,7 @@ extends ControllerSpec:
       uploadRepo.upsert(tdAll.uploadUploadedSuccessfully).futureValue
 
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterAmlsExpiryDateProvided)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterAmlsRegistrationNumberProvided)
     ObjectStoreStubs.stubObjectStoreTransfer()
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterUploadSucceeded)
 

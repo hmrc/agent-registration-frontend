@@ -76,10 +76,10 @@ extends FrontendController(mcc, actions):
         Redirect(AppRoutes.apply.amls.CheckYourAnswersController.show.url)
     )
     .ensure(
-      _.agentApplication.getAmlsDetails.amlsExpiryDate.isDefined, // safe to getAmlsDetails as ensured above
+      _.agentApplication.getAmlsDetails.amlsRegistrationNumber.isDefined, // safe to getAmlsDetails as ensured above
       implicit r =>
-        logger.warn("Missing AmlsExpiryDate, redirecting to AmlsExpiryDate page")
-        Redirect(AppRoutes.apply.amls.AmlsExpiryDateController.show.url)
+        logger.warn("Missing AmlsRegistrationNumber, redirecting to AmlsRegistrationNumber page")
+        Redirect(AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url)
     )
 
   def showAmlsEvidenceUploadPage: Action[AnyContent] = baseAction.async:

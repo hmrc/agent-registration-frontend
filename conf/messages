@@ -257,20 +257,6 @@ amlsRegistrationNumber.title = What is your registration number?
 amlsRegistrationNumber.error.required = Enter your registration number
 amlsRegistrationNumber.error.invalid = Enter your registration number in the correct format
 
-## Apply / Meet the HMRC standard for agents / AmlsDetails / Expiry date
-amlsExpiryDate.title = When does your supervision run out?
-amlsExpiryDate.hint = Tells us the last day you will be covered in your current 12-month supervision period. For example, 27 3 2026
-amlsExpiryDate.error.required = Enter the date your supervision runs out
-amlsExpiryDate.error.month-year.required = The date your supervision runs out must include a month and year
-amlsExpiryDate.error.day-month.required = The date your supervision runs out must include a day and month
-amlsExpiryDate.error.day-year.required = The date your supervision runs out must include a day and year
-amlsExpiryDate.error.day.required = The date your supervision runs out must include a day
-amlsExpiryDate.error.month.required = The date your supervision runs out must include a month
-amlsExpiryDate.error.year.required = The date your supervision runs out must include a year
-amlsExpiryDate.error.invalid = The date your supervision runs out must be a real date
-amlsExpiryDate.error.past = The date your supervision runs out must be in the future
-amlsExpiryDate.error.future = The date your supervision runs out must be in the next 13 months
-
 ## Apply / Meet the HMRC standard for agents / AmlsDetails / Evidence upload
 amlsEvidenceUpload.title = Evidence of your anti-money laundering supervision
 amlsEvidenceUpload.p1=Upload evidence to show that {0} is your current anti-money laundering supervisor.
@@ -313,7 +299,6 @@ upscanError.Unknown.message = TODO
 amlsCheckYourAnswers.title = Check your answers
 amlsCheckYourAnswers.supervisoryBody.label = Supervisory body
 amlsCheckYourAnswers.registrationNumber.label = Registration number
-amlsCheckYourAnswers.expiryDate.label = Supervision expiry date
 amlsCheckYourAnswers.notApplicable = n/a
 amlsCheckYourAnswers.evidence.label = Evidence of anti-money laundering supervision
 amlsCheckYourAnswers.change = Change
@@ -326,7 +311,7 @@ soleTraderIdentity.p1 = You are currently signed in as an agent.
 soleTraderIdentity.p2 = We need you to sign in using the details you created for your personal taxes, not the details you use to act as an agent.
 soleTraderIdentity.p3 = If you do not have personal sign in details, you can create some.
 
-# Sole trader respresentative
+# Sole trader representative
 askOwnerToProveIdentity.caption = Ask the business owner to sign in
 askOwnerToProveIdentity.title = Share this link with the business owner
 askOwnerToProveIdentity.p1 = The business owner needs to sign in to confirm their identity.
