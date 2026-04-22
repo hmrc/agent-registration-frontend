@@ -30,12 +30,12 @@ extends ControllerSpec:
 
   private object agentApplication:
 
-    val afterAmlsExpiryDateProvided: AgentApplication =
+    val afterRegistrationNumberProvided: AgentApplication =
       tdAll
         .agentApplicationLlpSections
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
-        .afterAmlsExpiryDateProvided
+        .afterRegistrationNumberProvided
 
   val path: String = AppRoutes.apply.amls.AmlsEvidenceUploadController.checkUploadStatusJs.url
 
@@ -65,7 +65,7 @@ extends ControllerSpec:
         uploadRepo.upsert(tc.upload).futureValue
 
       AuthStubs.stubAuthorise()
-      AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterAmlsExpiryDateProvided)
+      AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRegistrationNumberProvided)
 
       val response: WSResponse = get(path)
       response.status shouldBe tc.expectedHttpStatus

@@ -42,23 +42,19 @@ extends FrontendController(mcc, actions):
         r => r.agentApplication.amlsDetails.exists(_.isComplete),
         implicit request =>
           logger.warn(s"Cannot display Check Your Answers page - incomplete AMLS details.")
-          request.agentApplication.amlsDetails match {
-            case Some(AmlsDetails(_, None, _, _)) => Redirect(AppRoutes.apply.amls.AmlsRegistrationNumberController.show)
+          request.agentApplication.amlsDetails match
             case Some(AmlsDetails(
-                  AmlsCode(amlsCode),
-                  Some(_),
+                  AmlsCode(_),
                   None,
                   _
-                )) if !amlsCode.contains("HMRC") =>
-              Redirect(AppRoutes.apply.amls.AmlsExpiryDateController.show)
+                )) =>
+              Redirect(AppRoutes.apply.amls.AmlsRegistrationNumberController.show)
             case Some(AmlsDetails(
                   AmlsCode(amlsCode),
-                  Some(_),
                   Some(_),
                   _
                 )) if !amlsCode.contains("HMRC") =>
               Redirect(AppRoutes.apply.amls.AmlsEvidenceUploadController.showAmlsEvidenceUploadPage)
             case _ => Redirect(AppRoutes.apply.amls.AmlsSupervisorController.show)
-          }
       ):
         implicit request => Ok(view(request.agentApplication))

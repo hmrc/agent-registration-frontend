@@ -41,19 +41,19 @@ extends ControllerSpec:
         .whenSupervisorBodyIsHmrc
         .afterRegistrationNumberProvided
 
-    val beforeAmlsExpiryDateProvided: AgentApplication =
+    val beforeRegistrationNumberProvided: AgentApplication =
+      tdAll
+        .agentApplicationLlpSections
+        .sectionAmls
+        .whenSupervisorBodyIsNonHmrc
+        .afterSupervisoryBodySelected
+
+    val afterRegistrationNumberProvided: AgentApplication =
       tdAll
         .agentApplicationLlpSections
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
         .afterRegistrationNumberProvided
-
-    val afterAmlsExpiryDateProvided: AgentApplication =
-      tdAll
-        .agentApplicationLlpSections
-        .sectionAmls
-        .whenSupervisorBodyIsNonHmrc
-        .afterAmlsExpiryDateProvided
 
     val afterUploadSucceeded: AgentApplication =
       tdAll
@@ -62,7 +62,7 @@ extends ControllerSpec:
         .whenSupervisorBodyIsNonHmrc
         .afterUploadSucceeded
 
-    val afterUploadFailed: AgentApplication = afterAmlsExpiryDateProvided
+    val afterUploadFailed: AgentApplication = afterRegistrationNumberProvided
 
   "routes should have correct paths and methods" in:
     AppRoutes.apply.amls.AmlsEvidenceUploadController.showAmlsEvidenceUploadPage shouldBe Call(
@@ -75,14 +75,14 @@ extends ControllerSpec:
     private val heading = "Evidence of your anti-money laundering supervision"
     val title: String = s"$heading - Apply for an agent services account - GOV.UK"
 
-  s"GET $evidencePath when expiry date is missing should redirect to the expiry date page" in:
+  s"GET $evidencePath when registration number is missing should redirect to the registration number page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeAmlsExpiryDateProvided)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.beforeRegistrationNumberProvided)
 
     val response: WSResponse = get(evidencePath)
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.apply.amls.AmlsExpiryDateController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url
 
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
@@ -101,7 +101,7 @@ extends ControllerSpec:
 
   s"GET $evidencePath should initialise upscan and upload and return 200 and render page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterAmlsExpiryDateProvided)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRegistrationNumberProvided)
     UpscanStubs.stubUpscanInitiate()
     val uploadRepo: UploadRepo = app.injector.instanceOf[UploadRepo]
     uploadRepo.drop().futureValue

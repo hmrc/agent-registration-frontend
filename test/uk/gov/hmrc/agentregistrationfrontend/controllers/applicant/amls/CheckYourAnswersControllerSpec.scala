@@ -86,14 +86,6 @@ extends ControllerSpec:
           .whenSupervisorBodyIsNonHmrc
           .afterRegistrationNumberProvided,
       amlsType = "non-HMRC",
-      expectedRedirect = Some(AppRoutes.apply.amls.AmlsExpiryDateController.show.url)
-    ),
-    TestCaseForCya(
-      application =
-        sectionAmls
-          .whenSupervisorBodyIsNonHmrc
-          .afterAmlsExpiryDateProvided,
-      amlsType = "non-HMRC",
       expectedRedirect = Some(AppRoutes.apply.amls.AmlsEvidenceUploadController.showAmlsEvidenceUploadPage.url)
     )
   ).foreach: testCase =>

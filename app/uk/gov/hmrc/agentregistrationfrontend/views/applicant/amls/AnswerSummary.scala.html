@@ -80,26 +80,6 @@
   )
 }
 
-@expiryDateRow = @{
-  SummaryListRow(
-    key = Key(
-      content = Text(messages(s"$key.expiryDate.label"))
-    ),
-    value = Value(
-      content = Text(if(amlsDetails.isHmrc) messages(s"$key.notApplicable") else displayDateForLang(Some(amlsDetails.getAmlsExpiryDate)))
-    ),
-    actions = if(!canChange) None else Some(Actions(
-      items = Seq(
-        ActionItem(
-          href = s"${AppRoutes.apply.amls.AmlsExpiryDateController.show}",
-          content = Text(messages(s"$key.change")),
-          visuallyHiddenText = Some(messages(s"$key.expiryDate.label"))
-        )
-      )
-    ))
-  )
-}
-
 @evidenceRow = @{
   SummaryListRow(
     key = Key(
@@ -120,7 +100,7 @@
   )
 }
 @commonRows = @{Seq(supervisorRow, registrationNumberRow)}
-@nonHmrcRows = @{Seq(expiryDateRow, evidenceRow)}
+@nonHmrcRows = @{Seq(evidenceRow)}
 @rows = @{if(amlsDetails.isHmrc) commonRows else commonRows ++ nonHmrcRows}
 
 @govukSummaryList(SummaryList(rows = rows))

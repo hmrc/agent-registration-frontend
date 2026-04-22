@@ -75,7 +75,6 @@ extends FrontendController(mcc, actions):
                     Some(AmlsDetails(
                       supervisoryBody = supervisoryBody,
                       amlsRegistrationNumber = None,
-                      amlsExpiryDate = None,
                       amlsEvidence = None
                     ))
                 }
