@@ -23,6 +23,7 @@ import play.api.http.Status
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
+import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.Nino
@@ -102,6 +103,15 @@ object AgentRegistrationStubs:
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/linkId/${linkId.value}"),
+    responseStatus = Status.NO_CONTENT,
+    responseBody = ""
+  )
+
+  def stubFindApplicationByApplicationReferenceNoContent(
+    applicationReference: ApplicationReference
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/by-application-reference/${applicationReference.value}"),
     responseStatus = Status.NO_CONTENT,
     responseBody = ""
   )

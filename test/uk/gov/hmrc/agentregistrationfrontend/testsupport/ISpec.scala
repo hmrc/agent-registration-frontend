@@ -112,7 +112,7 @@ extends AnyWordSpecLike,
           override def nextIndividualProvidedDetailsId(): IndividualProvidedDetailsId = tdAll.individualProvidedDetailsId
         })
         bind(classOf[ApplicationReferenceGenerator]).toInstance(new ApplicationReferenceGenerator {
-          override def nextApplicationReference(): ApplicationReference = tdAll.applicationReference
+          override def generateApplicationReference(): ApplicationReference = tdAll.applicationReference
         })
         bind(classOf[PersonReferenceGenerator]).toInstance(new PersonReferenceGenerator {
           override def nextPersonReference(): PersonReference = tdAll.personReference

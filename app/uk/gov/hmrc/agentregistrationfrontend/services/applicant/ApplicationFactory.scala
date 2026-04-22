@@ -28,18 +28,18 @@ import javax.inject.Singleton
 class ApplicationFactory @Inject() (
   clock: Clock,
   linkIdGenerator: LinkIdGenerator,
-  agentApplicationIdGenerator: AgentApplicationIdGenerator,
-  applicationReferenceGenerator: ApplicationReferenceGenerator
+  agentApplicationIdGenerator: AgentApplicationIdGenerator
 ):
 
   def makeNewAgentApplicationSoleTrader(
     internalUserId: InternalUserId,
     applicantCredentials: Credentials,
     groupId: GroupId,
-    userRole: UserRole
+    userRole: UserRole,
+    applicationReference: ApplicationReference
   ): AgentApplicationSoleTrader = AgentApplicationSoleTrader(
     _id = agentApplicationIdGenerator.nextApplicationId(),
-    applicationReference = applicationReferenceGenerator.nextApplicationReference(),
+    applicationReference = applicationReference,
     internalUserId = internalUserId,
     applicantCredentials = applicantCredentials,
     linkId = linkIdGenerator.nextLinkId(),
@@ -64,10 +64,11 @@ class ApplicationFactory @Inject() (
     internalUserId: InternalUserId,
     applicantCredentials: Credentials,
     groupId: GroupId,
-    userRole: UserRole
+    userRole: UserRole,
+    applicationReference: ApplicationReference
   ): AgentApplicationLlp = AgentApplicationLlp(
     _id = agentApplicationIdGenerator.nextApplicationId(),
-    applicationReference = applicationReferenceGenerator.nextApplicationReference(),
+    applicationReference = applicationReference,
     internalUserId = internalUserId,
     applicantCredentials = applicantCredentials,
     linkId = linkIdGenerator.nextLinkId(),
@@ -93,10 +94,11 @@ class ApplicationFactory @Inject() (
     internalUserId: InternalUserId,
     applicantCredentials: Credentials,
     groupId: GroupId,
-    userRole: UserRole
+    userRole: UserRole,
+    applicationReference: ApplicationReference
   ): AgentApplicationLimitedCompany = AgentApplicationLimitedCompany(
     _id = agentApplicationIdGenerator.nextApplicationId(),
-    applicationReference = applicationReferenceGenerator.nextApplicationReference(),
+    applicationReference = applicationReference,
     internalUserId = internalUserId,
     applicantCredentials = applicantCredentials,
     linkId = linkIdGenerator.nextLinkId(),
@@ -122,10 +124,11 @@ class ApplicationFactory @Inject() (
     internalUserId: InternalUserId,
     applicantCredentials: Credentials,
     groupId: GroupId,
-    userRole: UserRole
+    userRole: UserRole,
+    applicationReference: ApplicationReference
   ): AgentApplicationGeneralPartnership = AgentApplicationGeneralPartnership(
     _id = agentApplicationIdGenerator.nextApplicationId(),
-    applicationReference = applicationReferenceGenerator.nextApplicationReference(),
+    applicationReference = applicationReference,
     internalUserId = internalUserId,
     applicantCredentials = applicantCredentials,
     linkId = linkIdGenerator.nextLinkId(),
@@ -150,10 +153,11 @@ class ApplicationFactory @Inject() (
     internalUserId: InternalUserId,
     applicantCredentials: Credentials,
     groupId: GroupId,
-    userRole: UserRole
+    userRole: UserRole,
+    applicationReference: ApplicationReference
   ): AgentApplicationLimitedPartnership = AgentApplicationLimitedPartnership(
     _id = agentApplicationIdGenerator.nextApplicationId(),
-    applicationReference = applicationReferenceGenerator.nextApplicationReference(),
+    applicationReference = applicationReference,
     internalUserId = internalUserId,
     applicantCredentials = applicantCredentials,
     linkId = linkIdGenerator.nextLinkId(),
@@ -179,10 +183,11 @@ class ApplicationFactory @Inject() (
     internalUserId: InternalUserId,
     applicantCredentials: Credentials,
     groupId: GroupId,
-    userRole: UserRole
+    userRole: UserRole,
+    applicationReference: ApplicationReference
   ): AgentApplicationScottishLimitedPartnership = AgentApplicationScottishLimitedPartnership(
     _id = agentApplicationIdGenerator.nextApplicationId(),
-    applicationReference = applicationReferenceGenerator.nextApplicationReference(),
+    applicationReference = applicationReference,
     internalUserId = internalUserId,
     applicantCredentials = applicantCredentials,
     linkId = linkIdGenerator.nextLinkId(),
@@ -208,10 +213,11 @@ class ApplicationFactory @Inject() (
     internalUserId: InternalUserId,
     applicantCredentials: Credentials,
     groupId: GroupId,
-    userRole: UserRole
+    userRole: UserRole,
+    applicationReference: ApplicationReference
   ): AgentApplicationScottishPartnership = AgentApplicationScottishPartnership(
     _id = agentApplicationIdGenerator.nextApplicationId(),
-    applicationReference = applicationReferenceGenerator.nextApplicationReference(),
+    applicationReference = applicationReference,
     internalUserId = internalUserId,
     applicantCredentials = applicantCredentials,
     linkId = linkIdGenerator.nextLinkId(),

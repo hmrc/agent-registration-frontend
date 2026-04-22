@@ -75,6 +75,7 @@ extends ControllerSpec:
     s"GET $initiateAgentApplicationUrl should create initial agent application" in:
       AuthStubs.stubAuthorise()
       AgentRegistrationStubs.stubGetAgentApplicationNoContent()
+      AgentRegistrationStubs.stubFindApplicationByApplicationReferenceNoContent(tdAll.applicationReference)
       AgentRegistrationStubs.stubUpdateAgentApplication(tdAll.agentApplicationLlp.afterStarted)
       EnrolmentStoreStubs.stubQueryEnrolmentsAllocatedToGroupNoContent(tdAll.groupId)
 
