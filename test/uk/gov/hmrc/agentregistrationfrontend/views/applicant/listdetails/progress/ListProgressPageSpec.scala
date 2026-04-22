@@ -33,11 +33,23 @@ extends ViewSpec:
         tdAll.providedDetails.precreated,
         TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
         TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.afterFinished
-      )
+      ),
+      entityName = "Test Company Name"
+    ).body
+  )
+  val docWhenComplete: Document = Jsoup.parse(
+    viewTemplate(
+      agentApplication = tdAll.agentApplicationGeneralPartnership.afterHowManyKeyIndividuals,
+      existingList = List(
+        tdAll.providedDetails.afterFinished,
+        TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.afterFinished,
+        TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.afterFinished
+      ),
+      entityName = "Test Company Name"
     ).body
   )
 
-  "ListProgressPage" should:
+  "ListProgressPage when individuals have yet to provide details" should:
 
     "have expected content" in:
       doc.mainContent shouldContainContent
@@ -53,6 +65,11 @@ extends ViewSpec:
            |No
            |Third Test Name
            |Yes
+           |What happens if someone cannot sign in?
+           |Ideally, everyone on the list will sign in and provide personal details.
+           |However, if there’s an exceptional reason why someone cannot sign in, we allow you to submit details on their behalf.
+           |This might affect how we assess the risk of providing Test Company Name with an agent services account.
+           |If you accept this risk, you can provide us with information on someone else’s behalf.
            |Return to task list
            |Save and come back later
            |"""
@@ -63,3 +80,30 @@ extends ViewSpec:
 
     "have the correct h1" in:
       doc.h1 shouldBe "HMRC needs information from everyone on this list"
+
+  "ListProgressPage when all individuals have provided details" should:
+
+    "have expected content without content and link for applicant to provide details" in:
+      docWhenComplete.mainContent shouldContainContent
+        s"""
+           |Check who has provided their details
+           |HMRC needs information from everyone on this list
+           |Awaiting details for 0 of 3 people
+           |Name
+           |Details provided
+           |Test Name
+           |Yes
+           |Second Test Name
+           |Yes
+           |Third Test Name
+           |Yes
+           |Return to task list
+           |Save and come back later
+           |"""
+          .stripMargin
+
+    "have the correct title" in:
+      docWhenComplete.title() shouldBe "HMRC needs information from everyone on this list - Apply for an agent services account - GOV.UK"
+
+    "have the correct h1" in:
+      docWhenComplete.h1 shouldBe "HMRC needs information from everyone on this list"
