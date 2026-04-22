@@ -19,17 +19,14 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistration.shared.risking.ApplicationForRiskingStatus
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationRiskingStubs
 
 class AgentApplicationControllerSpec
 extends ControllerSpec:
 
-  private val path: String = "/agent-registration/apply"
-  private val submittedPath: String = "/agent-registration/application-submitted"
+  private val applyPath: String = "/agent-registration/apply"
+  private val applicationStatusPath: String = "/agent-registration/application-status"
   private val viewApplicationPath: String = "/agent-registration/view-application"
-  private val viewApplicationProgressPath: String = "/agent-registration/view-application-progress"
 
   object agentApplication:
     val submitted: AgentApplicationLlp =
@@ -42,66 +39,54 @@ extends ControllerSpec:
       method = "GET",
       url = "/agent-registration/apply"
     )
-    AppRoutes.apply.AgentApplicationController.applicationSubmitted shouldBe Call(
+    AppRoutes.apply.AgentApplicationController.applicationStatus shouldBe Call(
       method = "GET",
-      url = "/agent-registration/application-submitted"
+      url = "/agent-registration/application-status"
     )
     AppRoutes.apply.AgentApplicationController.viewSubmittedApplication shouldBe Call(
       method = "GET",
       url = "/agent-registration/view-application"
     )
-    AppRoutes.apply.AgentApplicationController.viewApplicationProgress shouldBe Call(
-      method = "GET",
-      url = "/agent-registration/view-application-progress"
-    )
 
-  s"GET $path should redirect to agent type page" in:
-    val response: WSResponse = get(path)
+  s"GET $applyPath should redirect to agent type page" in:
+    val response: WSResponse = get(applyPath)
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url
 
-  s"GET $submittedPath should check the latest status and render the confirmation page when status is ReadyForSubmission" in:
-    ApplyStubHelper.stubsForAuthAction(agentApplication.submitted)
-    AgentRegistrationRiskingStubs.stubGetApplicationStatus(agentApplication.submitted._id, ApplicationForRiskingStatus.ReadyForSubmission)
-    val response: WSResponse = get(submittedPath)
+  s"GET $applicationStatusPath should check the latest status and render the confirmation page when status is ReadyForSubmission" in:
+    ApplyStubHelper.stubsForApplicationRiskingResponse(
+      application = agentApplication.submitted,
+      applicationRiskingResponse = tdAll.applicationRiskingResponse.readyForSubmissionResponse
+    )
+    val response: WSResponse = get(applicationStatusPath)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "You’ve applied for an agent services account - Apply for an agent services account - GOV.UK"
-    ApplyStubHelper.verifyConnectorsForAuthAction()
-    AgentRegistrationRiskingStubs.verifyGetApplicationStatus(agentApplication.submitted._id)
+    ApplyStubHelper.verifyConnectorsForApplicationRiskingResponse(agentApplication.submitted)
 
-  s"GET $submittedPath should check the latest status and redirect to the progress tracker page when status is anything other than ReadyForSubmission" in:
-    ApplyStubHelper.stubsForAuthAction(agentApplication.submitted)
-    AgentRegistrationRiskingStubs.stubGetApplicationStatus(agentApplication.submitted._id, ApplicationForRiskingStatus.SubmittedForRisking)
-    val response: WSResponse = get(submittedPath)
-
-    response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
-    response.header("Location").value shouldBe AppRoutes.apply.AgentApplicationController.viewApplicationProgress.url
-    ApplyStubHelper.verifyConnectorsForAuthAction()
-    AgentRegistrationRiskingStubs.verifyGetApplicationStatus(agentApplication.submitted.agentApplicationId)
-
-  s"GET $viewApplicationProgressPath should render the in-progress page when status is SubmittedForRisking" in:
-    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.submitted)
-    AgentRegistrationRiskingStubs.stubGetApplicationStatus(agentApplication.submitted._id, ApplicationForRiskingStatus.SubmittedForRisking)
-    val response: WSResponse = get(viewApplicationProgressPath)
+  s"GET $applicationStatusPath should render the in-progress page when status is SubmittedForRisking" in:
+    ApplyStubHelper.stubsForApplicationRiskingResponse(
+      application = agentApplication.submitted,
+      applicationRiskingResponse = tdAll.applicationRiskingResponse.submittedForRiskingResponse
+    )
+    val response: WSResponse = get(applicationStatusPath)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe s"Application reference: ${agentApplication.submitted.agentApplicationId.value} - Apply for an agent services account - GOV.UK"
-    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
-    AgentRegistrationRiskingStubs.verifyGetApplicationStatus(agentApplication.submitted.agentApplicationId)
+    ApplyStubHelper.verifyConnectorsForApplicationRiskingResponse(agentApplication.submitted)
 
-  s"GET $viewApplicationProgressPath should redirect when status is anything other than SubmittedForRisking" in:
-    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.submitted)
-    AgentRegistrationRiskingStubs.stubGetApplicationStatus(agentApplication.submitted._id, ApplicationForRiskingStatus.Approved)
-    val response: WSResponse = get(viewApplicationProgressPath)
+  s"GET $applicationStatusPath should render the failed non-fixable page when status is FailedNonFixable" in:
+    ApplyStubHelper.stubsForApplicationRiskingResponse(
+      application = agentApplication.submitted,
+      applicationRiskingResponse = tdAll.applicationRiskingResponse.failedNonFixableResponse
+    )
 
-    response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe ""
-    response.header("Location").value shouldBe AppRoutes.apply.AgentApplicationController.viewApplicationApproved.url
-    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
-    AgentRegistrationRiskingStubs.verifyGetApplicationStatus(agentApplication.submitted.agentApplicationId)
+    val response: WSResponse = get(applicationStatusPath)
+
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe "Test Company Name does not meet the registration conditions - Apply for an agent services account - GOV.UK"
+    ApplyStubHelper.verifyConnectorsForApplicationRiskingResponse(agentApplication.submitted)
 
   s"GET $viewApplicationPath should return OK" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.submitted)

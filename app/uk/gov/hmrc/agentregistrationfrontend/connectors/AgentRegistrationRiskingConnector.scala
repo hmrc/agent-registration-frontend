@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.risking.ApplicationForRiskingStatus
+import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
 import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -73,5 +74,24 @@ extends Connector:
               info = "get application status problem"
             )
       .andLogOnFailure(s"Failed to get application status for agent application ID: ${agentApplicationId.value}")
+
+  def getApplicationRiskingResponse(agentApplicationId: AgentApplicationId)(using RequestHeader): Future[Option[ApplicationRiskingResponse]] =
+    val url: URL = url"$baseUrl/application/${agentApplicationId.value}" // the risking service reads this id as ApplicationReference
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => Some(response.json.as[ApplicationRiskingResponse])
+          case Status.NOT_FOUND => None
+          case other =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = other,
+              response = response,
+              info = "get application risking response problem"
+            )
+      .andLogOnFailure(s"Failed to get application for risking for agent application ID: ${agentApplicationId.value}")
 
   private val baseUrl: String = appConfig.agentRegistrationRiskingBaseUrl + "/agent-registration-risking"

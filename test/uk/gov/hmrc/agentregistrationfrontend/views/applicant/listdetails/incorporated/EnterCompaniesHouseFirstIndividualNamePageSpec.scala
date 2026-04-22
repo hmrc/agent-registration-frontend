@@ -117,7 +117,7 @@ extends ViewSpec:
 
       "show the correct p1 text" in:
         doc.mainContent.select("p.govuk-body").first().text() shouldBe
-          "We'll check this against the business records in Companies House."
+          "We’ll check this against the business records in Companies House."
 
       "show the correct padding breakdown bullet1" in:
         doc.mainContent.select("ul.govuk-list--bullet li").first().text() should include(testCase.bullet1EntityType)

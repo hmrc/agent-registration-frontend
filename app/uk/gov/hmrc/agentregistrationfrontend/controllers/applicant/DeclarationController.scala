@@ -97,4 +97,4 @@ extends FrontendController(mcc, actions):
                 .modify(_.submittedAt)
                 .setTo(Some(Instant.now(clock)))
             )
-        yield Redirect(AppRoutes.apply.AgentApplicationController.applicationSubmitted)
+        yield Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
