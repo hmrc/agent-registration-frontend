@@ -23,7 +23,7 @@ import scala.util.Random
 class ApplicationReferenceGenerator:
 
   private def randomChar(chars: List[Char]): Char =
-    val rnd: Int = Random.nextInt(chars.length)
+    val rnd = Random.nextInt(chars.length)
     chars.iterator.drop(rnd).next()
 
   def generateApplicationReference(): ApplicationReference = {

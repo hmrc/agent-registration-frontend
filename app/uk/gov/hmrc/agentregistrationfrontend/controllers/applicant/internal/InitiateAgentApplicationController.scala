@@ -70,7 +70,6 @@ extends FrontendController(mcc, actions):
     )
     .async:
       implicit request =>
-        println(s"${Console.CYAN}IN HERE")
         if agentType =!= AgentType.UkTaxAgent then Errors.notImplemented("only UkTaxAgent is supported for now") else ()
         val nextEndpoint: Call = AppRoutes.apply.internal.GrsController.startJourney()
 

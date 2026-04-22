@@ -115,7 +115,6 @@ extends Connector:
       .get(url)
       .execute[HttpResponse]
       .map: response =>
-        println(s"${Console.CYAN}response status: ${response.status}")
         response.status match
           case Status.OK => Some(response.json.as[AgentApplication])
           case Status.NO_CONTENT => None
