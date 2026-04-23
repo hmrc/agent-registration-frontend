@@ -455,6 +455,12 @@ listProgress.th.detailsProvided = Details provided
 listProgress.yes = Yes
 listProgress.no = No
 
+listProgress.details.summary = What happens if someone cannot sign in?
+listProgress.details.p1 = Ideally, everyone on the list will sign in and provide personal details.
+listProgress.details.p2 = However, if there’s an exceptional reason why someone cannot sign in, we allow you to submit details on their behalf.
+listProgress.details.p3 = This might affect how we assess the risk of providing {0} with an agent services account.
+listProgress.details.p4 = If you accept this risk, you can <a class="govuk-link" href="{0}">provide us with information on someone else’s behalf</a>.
+
 # Apply / Declaration
 declaration.title = Declaration
 declaration.p1 = I am authorised by {0} to apply for an agent services account with HMRC.

@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import play.twirl.api.Html
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
@@ -25,12 +26,14 @@
         appConfig: AppConfig,
         layout: Layout,
         govukTable: GovukTable,
-        continueOrSaveForLaterLinks: ContinueOrSaveForLaterLinks
+        continueOrSaveForLaterLinks: ContinueOrSaveForLaterLinks,
+        govukDetails: GovukDetails
 )
 
 @(
         agentApplication: AgentApplication,
-        existingList: List[IndividualProvidedDetails])(implicit
+        existingList: List[IndividualProvidedDetails],
+        entityName: String)(implicit
         request: RequestHeader,
         messages: Messages
 )
@@ -43,6 +46,13 @@
   }
 }
 @pageTitle = @{messages(s"$key.title$messageKeySuffix")}
+@numberOfUsersYetToProvideDetails = @{existingList.count(!_.hasFinished)}
+@detailsHtml = {
+  <p class="govuk-body">@messages(s"$key.details.p1")</p>
+  <p class="govuk-body">@messages(s"$key.details.p2")</p>
+  <p class="govuk-body">@messages(s"$key.details.p3", entityName)</p>
+  <p class="govuk-body">@Html(messages(s"$key.details.p4", AppRoutes.apply.listdetails.providedetails.SelectIndividualController.show.url))</p>
+}
 
 @layout(
     pageTitle = pageTitle
@@ -58,7 +68,7 @@
         content = Text(messages(s"$key.th.detailsProvided"))
       )
     )),
-    caption = Some(messages(s"$key.h2", existingList.count(!_.hasFinished), existingList.size)),
+    caption = Some(messages(s"$key.h2", numberOfUsersYetToProvideDetails, existingList.size)),
     captionClasses = "govuk-table__caption--m",
     firstCellIsHeader = true,
     rows = existingList.map { individual =>
@@ -74,6 +84,13 @@
       )
     }
   ))
+
+  @if(numberOfUsersYetToProvideDetails > 0) {
+    @govukDetails(Details(
+      summary = Text(messages(s"$key.details.summary")),
+      content = HtmlContent(detailsHtml)
+    ))
+  }
 
   <p class="govuk-body">
     @continueOrSaveForLaterLinks(

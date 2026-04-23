@@ -20,9 +20,11 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.progress.ListProgressPage
 
@@ -34,19 +36,26 @@ class CheckProgressController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   view: ListProgressPage,
-  individualProvideDetailsService: IndividualProvideDetailsService
+  individualProvideDetailsService: IndividualProvideDetailsService,
+  businessPartnerRecordService: BusinessPartnerRecordService
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithList = List[IndividualProvidedDetails] *: DataWithApplication
+  private type DataWithListAndBpr = BusinessPartnerRecordResponse *: List[IndividualProvidedDetails] *: DataWithApplication
 
-  private val baseAction: ActionBuilderWithData[DataWithList] = actions
+  private val baseAction: ActionBuilderWithData[DataWithListAndBpr] = actions
     .getApplicationInProgress
-    .refine(implicit request =>
-      val agentApplication: AgentApplication = request.get
-      individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
-        request.add[List[IndividualProvidedDetails]](individualsList)
-    )
+    .refine:
+      implicit request =>
+        val agentApplication: AgentApplication = request.get
+        individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
+          request.add[List[IndividualProvidedDetails]](individualsList)
+    .refine:
+      implicit request =>
+        businessPartnerRecordService
+          .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
+          .map(_.getOrThrowExpectedDataMissing(s"Business Partner Record for UTR ${request.get[AgentApplication].getUtr.value}"))
+          .map(request.add)
     .ensure(
       condition =
         implicit request =>
@@ -60,5 +69,6 @@ extends FrontendController(mcc, actions):
     implicit request =>
       Ok(view(
         agentApplication = request.get[AgentApplication],
-        existingList = request.get[List[IndividualProvidedDetails]]
+        existingList = request.get[List[IndividualProvidedDetails]],
+        entityName = request.get[BusinessPartnerRecordResponse].getEntityName
       ))

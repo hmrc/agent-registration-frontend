@@ -44,7 +44,7 @@ extends ControllerSpec:
     )
 
   s"GET $path should return 200 and render page" in:
-    ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterHowManyKeyIndividuals)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplicationId,
       individuals = List(
@@ -57,5 +57,5 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "HMRC needs information from everyone on this list - Apply for an agent services account - GOV.UK"
-    ApplyStubHelper.verifyConnectorsForAuthAction()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplicationId)
