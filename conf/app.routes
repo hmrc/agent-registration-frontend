@@ -76,8 +76,6 @@ GET         /apply/anti-money-laundering/supervisor-name            uk.gov.hmrc.
 POST        /apply/anti-money-laundering/supervisor-name            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls.AmlsSupervisorController.submit
 GET         /apply/anti-money-laundering/registration-number        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls.AmlsRegistrationNumberController.show
 POST        /apply/anti-money-laundering/registration-number        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls.AmlsRegistrationNumberController.submit
-GET         /apply/anti-money-laundering/supervision-runs-out       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls.AmlsExpiryDateController.show
-POST        /apply/anti-money-laundering/supervision-runs-out       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls.AmlsExpiryDateController.submit
 
 GET         /apply/anti-money-laundering/evidence                   uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls.AmlsEvidenceUploadController.showAmlsEvidenceUploadPage
 GET         /apply/anti-money-laundering/evidence/check-upload-status-js  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls.AmlsEvidenceUploadController.checkUploadStatusJs

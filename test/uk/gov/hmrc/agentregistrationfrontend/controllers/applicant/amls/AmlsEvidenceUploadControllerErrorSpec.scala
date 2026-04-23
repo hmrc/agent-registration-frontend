@@ -28,14 +28,14 @@ extends ControllerSpec:
 
   private object agentApplication:
 
-    val afterAmlsExpiryDateProvided: AgentApplication =
+    val afterAmlsRegistrationNumberProvided: AgentApplication =
       tdAll
         .agentApplicationLlpSections
         .sectionAmls
         .whenSupervisorBodyIsNonHmrc
-        .afterAmlsExpiryDateProvided
+        .afterRegistrationNumberProvided
 
-    val afterUploadFailed: AgentApplication = afterAmlsExpiryDateProvided
+    val afterUploadFailed: AgentApplication = afterAmlsRegistrationNumberProvided
 
   "routes should have correct paths and methods" in:
     AppRoutes.apply.amls.AmlsEvidenceUploadController.showError(
@@ -49,7 +49,7 @@ extends ControllerSpec:
     )
 
   s"GET $uploadErrorPath with params should render the error page" in:
-    ApplyStubHelper.stubsForAuthAction(agentApplication.afterAmlsExpiryDateProvided)
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterAmlsRegistrationNumberProvided)
     val response: WSResponse = get(s"$uploadErrorPath?key=reference&errorRequestId=1&errorCode=EntityTooLarge&errorMessage=The%20file%20is%20too%20large")
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title shouldBe "Your upload is too large - Apply for an agent services account - GOV.UK"

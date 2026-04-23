@@ -25,7 +25,6 @@ import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 import uk.gov.hmrc.objectstore.client.Path
 
-import java.time.LocalDate
 import scala.util.chaining.scalaUtilChainingOps
 
 trait TdSectionAmls {
@@ -36,9 +35,6 @@ trait TdSectionAmls {
 
   private def amlsRegistrationNumberHmrc = AmlsRegistrationNumber("XAML00000123456")
   private def amlsRegistrationNumberNonHmrc = AmlsRegistrationNumber("NONHMRC-REF-AMLS-NUMBER-00001")
-
-  def amlsExpiryDateValid: LocalDate = dependencies.nowPlus6mAsLocalDateTime.toLocalDate
-  def amlsExpiryDateInvalid: LocalDate = dependencies.nowPlus13mAsLocalDateTime.toLocalDate
 
   class AgentApplicationWithSectionAmls(baseForSectionAmls: AgentApplication):
 
@@ -57,7 +53,6 @@ trait TdSectionAmls {
           def afterSupervisoryBodySelected: AmlsDetails = AmlsDetails(
             supervisoryBody = amlsCode,
             amlsRegistrationNumber = None,
-            amlsExpiryDate = None,
             amlsEvidence = None
           )
 
@@ -85,7 +80,6 @@ trait TdSectionAmls {
           def afterSupervisoryBodySelected: AmlsDetails = AmlsDetails(
             supervisoryBody = amlsCode,
             amlsRegistrationNumber = None,
-            amlsExpiryDate = None,
             amlsEvidence = None
           )
 
@@ -93,12 +87,8 @@ trait TdSectionAmls {
             amlsRegistrationNumber = Some(amlsRegistrationNumber)
           )
 
-          def afterAmlsExpiryDateProvided: AmlsDetails = afterRegistrationNumberProvided.copy(
-            amlsExpiryDate = Some(amlsExpiryDateValid)
-          )
-
           def afterUploadedAmlsEvidence: AmlsDetails = {
-            afterAmlsExpiryDateProvided.copy(
+            afterRegistrationNumberProvided.copy(
               amlsEvidence = Some(AmlsEvidence(
                 uploadId = dependencies.uploadId,
                 fileName = dependencies.fileName,
@@ -114,10 +104,6 @@ trait TdSectionAmls {
         def afterRegistrationNumberProvided: AgentApplication = baseForSectionAmls
           .modify(_.amlsDetails)
           .setTo(Some(amlsDetailsHelper.afterRegistrationNumberProvided))
-
-        def afterAmlsExpiryDateProvided: AgentApplication = baseForSectionAmls
-          .modify(_.amlsDetails)
-          .setTo(Some(amlsDetailsHelper.afterAmlsExpiryDateProvided))
 
         def afterUploadSucceeded: AgentApplication = baseForSectionAmls
           .modify(_.amlsDetails)
