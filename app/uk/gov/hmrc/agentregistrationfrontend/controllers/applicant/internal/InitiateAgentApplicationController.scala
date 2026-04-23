@@ -79,67 +79,78 @@ extends FrontendController(mcc, actions):
             Future.successful(Redirect(nextEndpoint))
           case None =>
             logger.info(s"Application does not exist, creating new application: $agentType, $businessType")
-            businessType match
-              case BusinessType.Partnership.LimitedLiabilityPartnership =>
-                agentApplicationService
-                  .upsert(applicationFactory.makeNewAgentApplicationLlp(
-                    internalUserId = request.internalUserId,
-                    applicantCredentials = request.credentials,
-                    groupId = request.groupId,
-                    userRole = userRole
-                  ))
-                  .map(_ => Redirect(nextEndpoint))
-              case BusinessType.SoleTrader =>
-                agentApplicationService
-                  .upsert(applicationFactory.makeNewAgentApplicationSoleTrader(
-                    internalUserId = request.internalUserId,
-                    applicantCredentials = request.credentials,
-                    groupId = request.groupId,
-                    userRole = userRole
-                  ))
-                  .map(_ => Redirect(nextEndpoint))
-              case BusinessType.LimitedCompany =>
-                agentApplicationService
-                  .upsert(applicationFactory.makeNewAgentApplicationLimitedCompany(
-                    internalUserId = request.internalUserId,
-                    applicantCredentials = request.credentials,
-                    groupId = request.groupId,
-                    userRole = userRole
-                  ))
-                  .map(_ => Redirect(nextEndpoint))
-              case BusinessType.Partnership.GeneralPartnership =>
-                agentApplicationService
-                  .upsert(applicationFactory.makeNewAgentApplicationGeneralPartnership(
-                    internalUserId = request.internalUserId,
-                    applicantCredentials = request.credentials,
-                    groupId = request.groupId,
-                    userRole = userRole
-                  ))
-                  .map(_ => Redirect(nextEndpoint))
-              case BusinessType.Partnership.LimitedPartnership =>
-                agentApplicationService
-                  .upsert(applicationFactory.makeNewAgentApplicationLimitedPartnership(
-                    internalUserId = request.internalUserId,
-                    applicantCredentials = request.credentials,
-                    groupId = request.groupId,
-                    userRole = userRole
-                  ))
-                  .map(_ => Redirect(nextEndpoint))
-              case BusinessType.Partnership.ScottishLimitedPartnership =>
-                agentApplicationService
-                  .upsert(applicationFactory.makeNewAgentApplicationScottishLimitedPartnership(
-                    internalUserId = request.internalUserId,
-                    applicantCredentials = request.credentials,
-                    groupId = request.groupId,
-                    userRole = userRole
-                  ))
-                  .map(_ => Redirect(nextEndpoint))
-              case BusinessType.Partnership.ScottishPartnership =>
-                agentApplicationService
-                  .upsert(applicationFactory.makeNewAgentApplicationScottishPartnership(
-                    internalUserId = request.internalUserId,
-                    applicantCredentials = request.credentials,
-                    groupId = request.groupId,
-                    userRole = userRole
-                  ))
-                  .map(_ => Redirect(nextEndpoint))
+            for {
+              applicationReference <- agentApplicationService.generateNewApplicationReference()
+              result <-
+                businessType match
+                  case BusinessType.Partnership.LimitedLiabilityPartnership =>
+                    agentApplicationService
+                      .upsert(applicationFactory.makeNewAgentApplicationLlp(
+                        internalUserId = request.internalUserId,
+                        applicantCredentials = request.credentials,
+                        groupId = request.groupId,
+                        userRole = userRole,
+                        applicationReference = applicationReference
+                      ))
+                      .map(_ => Redirect(nextEndpoint))
+                  case BusinessType.SoleTrader =>
+                    agentApplicationService
+                      .upsert(applicationFactory.makeNewAgentApplicationSoleTrader(
+                        internalUserId = request.internalUserId,
+                        applicantCredentials = request.credentials,
+                        groupId = request.groupId,
+                        userRole = userRole,
+                        applicationReference = applicationReference
+                      ))
+                      .map(_ => Redirect(nextEndpoint))
+                  case BusinessType.LimitedCompany =>
+                    agentApplicationService
+                      .upsert(applicationFactory.makeNewAgentApplicationLimitedCompany(
+                        internalUserId = request.internalUserId,
+                        applicantCredentials = request.credentials,
+                        groupId = request.groupId,
+                        userRole = userRole,
+                        applicationReference = applicationReference
+                      ))
+                      .map(_ => Redirect(nextEndpoint))
+                  case BusinessType.Partnership.GeneralPartnership =>
+                    agentApplicationService
+                      .upsert(applicationFactory.makeNewAgentApplicationGeneralPartnership(
+                        internalUserId = request.internalUserId,
+                        applicantCredentials = request.credentials,
+                        groupId = request.groupId,
+                        userRole = userRole,
+                        applicationReference = applicationReference
+                      ))
+                      .map(_ => Redirect(nextEndpoint))
+                  case BusinessType.Partnership.LimitedPartnership =>
+                    agentApplicationService
+                      .upsert(applicationFactory.makeNewAgentApplicationLimitedPartnership(
+                        internalUserId = request.internalUserId,
+                        applicantCredentials = request.credentials,
+                        groupId = request.groupId,
+                        userRole = userRole,
+                        applicationReference = applicationReference
+                      ))
+                      .map(_ => Redirect(nextEndpoint))
+                  case BusinessType.Partnership.ScottishLimitedPartnership =>
+                    agentApplicationService
+                      .upsert(applicationFactory.makeNewAgentApplicationScottishLimitedPartnership(
+                        internalUserId = request.internalUserId,
+                        applicantCredentials = request.credentials,
+                        groupId = request.groupId,
+                        userRole = userRole,
+                        applicationReference = applicationReference
+                      ))
+                      .map(_ => Redirect(nextEndpoint))
+                  case BusinessType.Partnership.ScottishPartnership =>
+                    agentApplicationService
+                      .upsert(applicationFactory.makeNewAgentApplicationScottishPartnership(
+                        internalUserId = request.internalUserId,
+                        applicantCredentials = request.credentials,
+                        groupId = request.groupId,
+                        userRole = userRole,
+                        applicationReference = applicationReference
+                      ))
+                      .map(_ => Redirect(nextEndpoint))
+            } yield result

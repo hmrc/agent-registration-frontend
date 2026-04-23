@@ -109,6 +109,24 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to find Agent Application by agentApplicationId: $agentApplicationId")
 
+  def findApplication(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[AgentApplication]] =
+    val url: URL = url"$baseUrl/application/by-application-reference/${applicationReference.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => Some(response.json.as[AgentApplication])
+          case Status.NO_CONTENT => None
+          case other =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = other,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to find Agent Application by applicationReference: $applicationReference")
+
   def getBusinessPartnerRecord(utr: Utr)(using RequestHeader): Future[Option[BusinessPartnerRecordResponse]] =
     val url: URL = url"$baseUrl/business-partner-record/utr/${utr.value}"
     httpClient

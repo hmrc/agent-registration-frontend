@@ -28,7 +28,8 @@ import scala.concurrent.Future
 
 @Singleton
 class AgentApplicationService @Inject() (
-  agentRegistrationConnector: AgentRegistrationConnector
+  agentRegistrationConnector: AgentRegistrationConnector,
+  applicationReferenceGenerator: ApplicationReferenceGenerator
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
@@ -46,3 +47,10 @@ extends RequestAwareLogging:
   )(using RequestHeader): Future[Unit] = agentRegistrationConnector.upsertApplication(agentApplication)
 
   def deleteAndStartAgain()(using RequestHeader): Future[Unit] = agentRegistrationConnector.deleteApplication()
+
+  @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+  def generateNewApplicationReference()(using RequestHeader): Future[ApplicationReference] =
+    val reference = applicationReferenceGenerator.generateApplicationReference()
+    agentRegistrationConnector.findApplication(reference).flatMap:
+      case Some(_) => generateNewApplicationReference()
+      case None => Future.successful(reference)
