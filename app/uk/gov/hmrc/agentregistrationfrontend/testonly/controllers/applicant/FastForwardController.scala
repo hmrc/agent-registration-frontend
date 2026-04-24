@@ -64,7 +64,8 @@ class FastForwardController @Inject() (
   agentRegistrationRiskingService: AgentRegistrationRiskingService,
   internalUserIdGenerator: InternalUserIdGenerator,
   individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator,
-  testAgentRegistrationConnector: TestAgentRegistrationConnector
+  testAgentRegistrationConnector: TestAgentRegistrationConnector,
+  applicationReferenceGenerator: ApplicationReferenceGenerator
 )(using
   clock: Clock,
   ex: ExecutionContext
@@ -107,6 +108,7 @@ extends FrontendController(mcc, applicantActions):
         internalUserId = loggedInAsUserApplicantRequestWithAuthData.get[InternalUserId],
         linkId = linkIdGenerator.nextLinkId(),
         groupId = loggedInAsUserApplicantRequestWithAuthData.get[GroupId],
+        applicationReference = applicationReferenceGenerator.generateApplicationReference(),
         createdAt = Instant.now(clock)
       )
       _ <- testAgentRegistrationConnector.upsertAgentApplication(agentApplication)
