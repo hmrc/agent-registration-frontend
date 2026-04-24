@@ -461,6 +461,13 @@ listProgress.details.p2 = However, if there’s an exceptional reason why someon
 listProgress.details.p3 = This might affect how we assess the risk of providing {0} with an agent services account.
 listProgress.details.p4 = If you accept this risk, you can <a class="govuk-link" href="{0}">provide us with information on someone else’s behalf</a>.
 
+# Applicant providing details for an individual
+applicantProvidingDetails.caption = Relevant individual details
+selectIndividual.title = Which relevant individual do you need to tell us about?
+selectIndividual.hint = Start to enter their name and choose it from the list.
+selectIndividual.error.required = Select which relevant individual you need to tell us about
+selectIndividual.error.invalid = Select which relevant individual you need to tell us about
+
 # Apply / Declaration
 declaration.title = Declaration
 declaration.p1 = I am authorised by {0} to apply for an agent services account with HMRC.

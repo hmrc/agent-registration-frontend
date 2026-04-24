@@ -33,7 +33,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.i
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.routes as listdetailsOthersRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.link.routes as listdetailsLinkRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.progress.routes as listdetailsProgressRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedetails.routes as listdetailsProvideDetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.routes as listdetailsProvideDetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.routes as internalRoutes
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.routes as providedetailsRoutes
@@ -134,7 +134,7 @@ object AppRoutes:
 
         val CheckProgressController = listdetailsProgressRoutes.CheckProgressController
 
-      object providedetails:
+      object providedbyapplicant:
         val SelectIndividualController = listdetailsProvideDetailsRoutes.SelectIndividualController
 
     object checkfailed:
