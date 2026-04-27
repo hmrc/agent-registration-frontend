@@ -29,15 +29,19 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.SelectIndividualForm
+import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
+import uk.gov.hmrc.agentregistrationfrontend.services.SessionCacheService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.providedbyapplicant.SelectIndividualPage
+import uk.gov.hmrc.mongo.cache.DataKey
 
 @Singleton
 class SelectIndividualController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   view: SelectIndividualPage,
-  individualProvideDetailsService: IndividualProvideDetailsService
+  individualProvideDetailsService: IndividualProvideDetailsService,
+  sessionCacheService: SessionCacheService
 )
 extends FrontendController(mcc, actions):
 
@@ -83,8 +87,16 @@ extends FrontendController(mcc, actions):
                 form = formWithErrors,
                 incompleteIndividuals = request.get[List[IndividualProvidedDetails]]
               )
-      ):
+      )
+      .async:
         implicit request: RequestWithData[IndividualProvidedDetails *: DataWithListOfIncompleteIndividuals] =>
           val i: IndividualProvidedDetails = request.get
-          Ok(s"submitted selection to provide details for ${i.individualName.value}")
+          val providedByApplicant: ProvidedByApplicant = ProvidedByApplicant(
+            individualProvidedDetailsId = i._id,
+            individualName = i.individualName
+          )
+          sessionCacheService
+            .put[ProvidedByApplicant](DataKey("providedByApplicant"), providedByApplicant)
+            .map: _ =>
+              Ok(providedByApplicant.toString) // TODO: Date of Birth should be next page even if coming from CYA as changing individual wipes everything - ideally via CYA controller when available
       .redirectIfSaveForLater
