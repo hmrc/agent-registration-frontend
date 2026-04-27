@@ -126,7 +126,11 @@ extends ViewSpec:
 
     "print a list of unique failures for each individual with failures" in:
       failedNonFixableResponse.allIndividualsHaveFailures.riskedIndividuals.foreach: individual =>
-        docWithIndividualFailures.selectOrFail(s"#${individual.personReference.value}-reasons").select("li").size shouldBe individual.failures.size
+        val elements: Elements = docWithIndividualFailures.selectOrFail(
+          s"#${individual.personReference.value}-reasons"
+        )
+        val li: Elements = elements.select("li")
+        li.size shouldBe individual.failures.size withClue elements
 
   "FailedNonFixablePage when no individuals have failures" should:
 

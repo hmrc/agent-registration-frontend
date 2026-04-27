@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistration.shared.testdata.risking
 
 import uk.gov.hmrc.agentregistration.shared.PersonReference
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.risking.RiskedIndividual
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
@@ -24,27 +25,30 @@ import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 trait TdRiskedIndividual:
   dependencies: (TdBase) =>
 
-  val riskedIndividualApproved: RiskedIndividual = RiskedIndividual(
-    personReference = dependencies.personReference,
-    individualName = dependencies.individualName,
+  def riskedIndividualApproved(
+    personReference: PersonReference = dependencies.personReference,
+    individualName: IndividualName = dependencies.individualName
+  ): RiskedIndividual = RiskedIndividual(
+    personReference = personReference,
+    individualName = individualName,
     failures = Nil
   )
 
-  val riskedIndividualFixable: RiskedIndividual = riskedIndividualApproved.copy(
+  def riskedIndividualFixable(
+    personReference: PersonReference = dependencies.personReference,
+    individualName: IndividualName = dependencies.individualName
+  ): RiskedIndividual = riskedIndividualApproved(personReference, individualName).copy(
     failures = List(
       IndividualFailure._4._1 // Fixable
     )
   )
 
-  val riskedIndividualNonFixable: RiskedIndividual = riskedIndividualApproved.copy(
+  def riskedIndividualNonFixable(
+    personReference: PersonReference = dependencies.personReference,
+    individualName: IndividualName = dependencies.individualName
+  ): RiskedIndividual = riskedIndividualApproved(personReference, individualName).copy(
     failures = List(
       IndividualFailure._5._1(325), // Fixable
       IndividualFailure._6 // NonFixable
-    )
-  )
-
-  val riskedIndividualNonFixable2: RiskedIndividual = riskedIndividualApproved.copy(
-    failures = List(
-      IndividualFailure._4._1 // Fixable
     )
   )

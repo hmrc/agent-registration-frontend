@@ -16,13 +16,15 @@
 
 package uk.gov.hmrc.agentregistration.shared.testdata.risking
 
+import uk.gov.hmrc.agentregistration.shared.PersonReference
+import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 trait TdApplicationRiskingResponse:
-  dependencies: (TdRiskedEntity & TdRiskedIndividual) =>
+  dependencies: (TdBase & TdRiskedEntity & TdRiskedIndividual) =>
 
   val riskingCompletedDateString: String = "2059-12-21"
   val riskingCompletedDate: LocalDate = LocalDate.parse(riskingCompletedDateString, DateTimeFormatter.ISO_DATE)
@@ -32,8 +34,11 @@ trait TdApplicationRiskingResponse:
     val failedFixable: ApplicationRiskingResponse.FailedFixable = ApplicationRiskingResponse.FailedFixable(
       riskedEntity = dependencies.riskedEntityApproved,
       riskedIndividuals = List(
-        dependencies.riskedIndividualApproved,
-        dependencies.riskedIndividualFixable
+        dependencies.riskedIndividualApproved(
+          personReference = PersonReference("PREF0"),
+          individualName = dependencies.getIndividualName(0)
+        ),
+        dependencies.riskedIndividualFixable(individualName = dependencies.getIndividualName(1))
       ),
       riskingCompletedDate = riskingCompletedDate
     )
@@ -41,8 +46,14 @@ trait TdApplicationRiskingResponse:
     val failedNonFixable: ApplicationRiskingResponse.FailedNonFixable = ApplicationRiskingResponse.FailedNonFixable(
       riskedEntity = dependencies.riskedEntityFailedFixable,
       riskedIndividuals = List(
-        dependencies.riskedIndividualNonFixable,
-        dependencies.riskedIndividualFixable
+        dependencies.riskedIndividualNonFixable(
+          personReference = PersonReference("PREF0"),
+          individualName = dependencies.getIndividualName(0)
+        ),
+        dependencies.riskedIndividualFixable(
+          personReference = PersonReference("PREF1"),
+          individualName = dependencies.getIndividualName(1)
+        )
       ),
       riskingCompletedDate = riskingCompletedDate
     )
@@ -50,8 +61,14 @@ trait TdApplicationRiskingResponse:
     val failedNonFixable_failedApplicant_approvedIndividuls: ApplicationRiskingResponse.FailedNonFixable = ApplicationRiskingResponse.FailedNonFixable(
       riskedEntity = dependencies.riskedEntityFailedFixable,
       riskedIndividuals = List(
-        dependencies.riskedIndividualApproved,
-        dependencies.riskedIndividualApproved
+        dependencies.riskedIndividualApproved(
+          personReference = PersonReference("PREF0"),
+          individualName = dependencies.getIndividualName(0)
+        ),
+        dependencies.riskedIndividualApproved(
+          personReference = PersonReference("PREF1"),
+          individualName = dependencies.getIndividualName(1)
+        )
       ),
       riskingCompletedDate = riskingCompletedDate
     )
