@@ -44,7 +44,7 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         s"""
            |You’ve applied for an agent services account
-           |Application reference: ${agentApplication.agentApplicationId.value}
+           |Application reference: ${agentApplication.applicationReference.value}
            |What happens next
            |We’ll carry out some checks based on the information you’ve given us.
            |If we need any more information we’ll contact you.
