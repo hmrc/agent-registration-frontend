@@ -43,18 +43,18 @@ import scala.concurrent.duration.DurationInt
 /** Repository for managing [[ProvidedByApplicant]] data in the session cache.
   *
   * This repository is short-lived and tied to the user's session only. Data stored here will expire when the session ends or after the configured TTL
-  * [[SessionCacheRepository]] configuration.
+  * [[ProvidedByApplicantSessionStore]] configuration.
   */
-class ProvidedByApplicantRepo @Inject() (sessionCacheRepository: SessionCacheRepository)(using ExecutionContext):
+class ProvidedByApplicantRepo @Inject() (providedByApplicantSessionStore: ProvidedByApplicantSessionStore)(using ExecutionContext):
 
   private val dataKey: DataKey[ProvidedByApplicant] = DataKey("providedByApplicant")
 
-  def upsert(providedByApplicant: ProvidedByApplicant)(using RequestHeader): Future[Unit] = sessionCacheRepository
+  def upsert(providedByApplicant: ProvidedByApplicant)(using RequestHeader): Future[Unit] = providedByApplicantSessionStore
     .putSession[ProvidedByApplicant](dataKey, providedByApplicant)
     .map(_ => ())
 
-  def find()(using RequestHeader): Future[Option[ProvidedByApplicant]] = sessionCacheRepository.getFromSession(dataKey)
-  def delete()(using RequestHeader): Future[Unit] = sessionCacheRepository.deleteFromSession(dataKey)
+  def find()(using RequestHeader): Future[Option[ProvidedByApplicant]] = providedByApplicantSessionStore.getFromSession(dataKey)
+  def delete()(using RequestHeader): Future[Unit] = providedByApplicantSessionStore.deleteFromSession(dataKey)
 
 /** Low-level session cache repository used as a delegate to implement concrete session-based repositories.
   *
@@ -62,10 +62,10 @@ class ProvidedByApplicantRepo @Inject() (sessionCacheRepository: SessionCacheRep
   * their storage needs.
   */
 @Singleton
-class SessionCacheRepository @Inject() (
+class ProvidedByApplicantSessionStore @Inject() (
   val mongoComponent: MongoComponent,
   timestampSupport: TimestampSupport
-)(implicit
+)(using
   ec: ExecutionContext,
   @Named("aes") val crypto: Encrypter & Decrypter
 )
@@ -81,17 +81,17 @@ extends CacheRepository(
   override def putSession[T: Writes](
     dataKey: DataKey[T],
     data: T
-  )(implicit request: RequestHeader): Future[(String, String)] = Mdc.preservingMdc:
+  )(using RequestHeader): Future[(String, String)] = Mdc.preservingMdc:
     super.putSession(DataKey[SensitiveWrapper[T]](dataKey.unwrap), SensitiveWrapper(data))
 
   override def getFromSession[T: Reads](
     dataKey: DataKey[T]
-  )(implicit request: RequestHeader): Future[Option[T]] = Mdc.preservingMdc:
+  )(using RequestHeader): Future[Option[T]] = Mdc.preservingMdc:
     super.getFromSession(DataKey[SensitiveWrapper[T]](dataKey.unwrap)).map(_.map(_.decryptedValue))
 
   override def deleteFromSession[T](
     dataKey: DataKey[T]
-  )(implicit request: RequestHeader): Future[Unit] = Mdc.preservingMdc:
+  )(using RequestHeader): Future[Unit] = Mdc.preservingMdc:
     super.deleteFromSession(DataKey[SensitiveWrapper[T]](dataKey.unwrap))
 
 final case class SensitiveWrapper[T](override val decryptedValue: T)
@@ -99,12 +99,12 @@ extends Sensitive[T]
 
 object SensitiveWrapper:
 
-  implicit def reads[T](implicit
+  given reads[T](using
     reads: Reads[T],
     crypto: Encrypter & Decrypter
   ): Reads[SensitiveWrapper[T]] = sensitiveDecrypter(SensitiveWrapper[T])
 
-  implicit def writes[T](implicit
+  given writes[T](using
     writes: Writes[T],
     crypto: Encrypter & Decrypter
   ): Writes[SensitiveWrapper[T]] = sensitiveEncrypter
