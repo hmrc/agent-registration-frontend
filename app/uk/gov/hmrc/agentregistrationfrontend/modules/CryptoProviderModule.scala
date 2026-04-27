@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.modules
 
-import play.api.Configuration
-import play.api.Environment
-import play.api.inject.Binding
-import play.api.inject.Module
+import com.google.inject.AbstractModule
+import com.google.inject.Provides
+import com.google.inject.name.Named
+import com.typesafe.config.Config
 import uk.gov.hmrc.crypto.Crypted
 import uk.gov.hmrc.crypto.Decrypter
 import uk.gov.hmrc.crypto.Encrypter
@@ -30,26 +30,22 @@ import uk.gov.hmrc.crypto.SymmetricCryptoFactory
 
 import java.nio.charset.StandardCharsets
 import java.util.Base64
+import javax.inject.Singleton
 
-class CryptoProviderModule
-extends Module:
+class Module
+extends AbstractModule:
 
-  def aesCryptoInstance(configuration: Configuration): Encrypter & Decrypter =
-    if (configuration.underlying.getBoolean("fieldLevelEncryption.enable"))
-      SymmetricCryptoFactory.aesCryptoFromConfig("fieldLevelEncryption", configuration.underlying)
-    else
-      NoCrypto
-
-  override def bindings(
-    environment: Environment,
-    configuration: Configuration
-  ): Seq[Binding[?]] = Seq(
-    bind[Encrypter & Decrypter].qualifiedWith("aes").toInstance(aesCryptoInstance(configuration))
-  )
+  @Provides
+  @Singleton
+  @Named("fieldLevelEncryption")
+  def crypto(config: Config): Encrypter & Decrypter =
+    if (config.getBoolean("fieldLevelEncryption.enable"))
+    then SymmetricCryptoFactory.aesCryptoFromConfig("fieldLevelEncryption", config)
+    else NoCrypto
 
 /** Encrypter/decrypter that does nothing (i.e. leaves content in plaintext). Only to be used for debugging.
   */
-trait NoCrypto
+private trait NoCrypto
 extends Encrypter,
   Decrypter:
 
