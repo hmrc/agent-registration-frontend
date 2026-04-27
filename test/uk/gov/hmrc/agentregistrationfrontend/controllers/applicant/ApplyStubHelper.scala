@@ -80,11 +80,11 @@ object ApplyStubHelper:
     applicationRiskingResponse: ApplicationRiskingResponse
   ): StubMapping =
     stubsToSupplyBprToPage(application)
-    AgentRegistrationRiskingStubs.stubGetApplicationRiskingResponse(application.agentApplicationId, applicationRiskingResponse)
+    AgentRegistrationRiskingStubs.stubGetApplicationRiskingResponse(application.applicationReference, applicationRiskingResponse)
 
   def verifyConnectorsForApplicationRiskingResponse(agentApplication: AgentApplication): Unit =
     verifyConnectorsToSupplyBprToPage(Some(agentApplication.getUtr))
-    AgentRegistrationRiskingStubs.verifyGetApplicationRiskingResponse(agentApplication.agentApplicationId)
+    AgentRegistrationRiskingStubs.verifyGetApplicationRiskingResponse(agentApplication.applicationReference)
 
   def stubsForTaskListPage(
     application: AgentApplication,
