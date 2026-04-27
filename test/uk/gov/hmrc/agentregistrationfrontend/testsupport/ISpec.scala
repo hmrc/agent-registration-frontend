@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.testsupport
 
 import com.google.inject.AbstractModule
-import com.google.inject.name.Names
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.wordspec.AnyWordSpecLike
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
@@ -38,9 +37,6 @@ import uk.gov.hmrc.agentregistrationfrontend.config.CsvLoader
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadIdGenerator
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.WireMockSupport
-import uk.gov.hmrc.crypto.AesCrypto
-import uk.gov.hmrc.crypto.Decrypter
-import uk.gov.hmrc.crypto.Encrypter
 
 import java.time.Clock
 import java.time.Instant
@@ -95,15 +91,9 @@ extends AnyWordSpecLike,
 
   protected def configOverrides: Map[String, Any] = Map[String, Any]()
 
-  given testCrypto: (Encrypter & Decrypter) =
-    new AesCrypto:
-      override protected val encryptionKey: String = "P5xsJ9Nt+quxGZzB4DeLfw=="
-
   lazy val overridesModule: AbstractModule =
     new AbstractModule:
       override def configure(): Unit =
-        bind(classOf[Encrypter]).annotatedWith(Names.named("aes")).toInstance(testCrypto)
-        bind(classOf[Decrypter]).annotatedWith(Names.named("aes")).toInstance(testCrypto)
         bind(classOf[Clock]).toInstance(clock)
         bind(classOf[AmlsCodes]).toInstance(
           new AmlsCodes {
