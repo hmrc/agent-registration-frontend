@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.repository
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
 import uk.gov.hmrc.agentregistrationfrontend.repository.SensitiveWrapper.*
 import uk.gov.hmrc.crypto.json.JsonEncryption.sensitiveDecrypter
@@ -64,16 +65,17 @@ class ProvidedByApplicantRepo @Inject() (providedByApplicantSessionStore: Provid
 @Singleton
 class ProvidedByApplicantSessionStore @Inject() (
   val mongoComponent: MongoComponent,
-  timestampSupport: TimestampSupport
+  timestampSupport: TimestampSupport,
+  appConfig: AppConfig
 )(using
   ec: ExecutionContext,
   @Named("aes") val crypto: Encrypter & Decrypter
 )
 extends CacheRepository(
   mongoComponent = mongoComponent,
-  collectionName = "sessions",
+  collectionName = "provided-by-applicant-sessions",
   replaceIndexes = true,
-  ttl = 15.minutes, // TODO: match with the session duration from the config
+  ttl = appConfig.sessionTimeout,
   timestampSupport = timestampSupport,
   sessionIdKey = SessionKeys.sessionId
 ):
