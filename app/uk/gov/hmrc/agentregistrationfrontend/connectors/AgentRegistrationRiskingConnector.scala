@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
+import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.risking.ApplicationForRiskingStatus
 import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
 import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
@@ -57,8 +57,8 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to submit agent application for risking: ${submitForRiskingRequest.agentApplication.agentApplicationId.value}")
 
-  def getApplicationStatus(agentApplicationId: AgentApplicationId)(using RequestHeader): Future[ApplicationForRiskingStatus] =
-    val url: URL = url"$baseUrl/application-status/${agentApplicationId.value}"
+  def getApplicationStatus(applicationReference: ApplicationReference)(using RequestHeader): Future[ApplicationForRiskingStatus] =
+    val url: URL = url"$baseUrl/application-status/${applicationReference.value}"
     httpClient
       .get(url)
       .execute[HttpResponse]
@@ -73,10 +73,10 @@ extends Connector:
               response = response,
               info = "get application status problem"
             )
-      .andLogOnFailure(s"Failed to get application status for agent application ID: ${agentApplicationId.value}")
+      .andLogOnFailure(s"Failed to get application status for application reference: ${applicationReference.value}")
 
-  def getApplicationRiskingResponse(agentApplicationId: AgentApplicationId)(using RequestHeader): Future[Option[ApplicationRiskingResponse]] =
-    val url: URL = url"$baseUrl/application/${agentApplicationId.value}" // the risking service reads this id as ApplicationReference
+  def getApplicationRiskingResponse(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[ApplicationRiskingResponse]] =
+    val url: URL = url"$baseUrl/application/${applicationReference.value}"
     httpClient
       .get(url)
       .execute[HttpResponse]
@@ -92,6 +92,6 @@ extends Connector:
               response = response,
               info = "get application risking response problem"
             )
-      .andLogOnFailure(s"Failed to get application for risking for agent application ID: ${agentApplicationId.value}")
+      .andLogOnFailure(s"Failed to get application for risking for application reference: ${applicationReference.value}")
 
   private val baseUrl: String = appConfig.agentRegistrationRiskingBaseUrl + "/agent-registration-risking"

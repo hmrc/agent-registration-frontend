@@ -125,7 +125,7 @@ extends RequestAwareLogging:
   val getApplicationRiskingResponse: ActionBuilderWithData[DataWithRiskingResponse] = getApplicationSubmitted
     .refine(implicit request =>
       agentRegistrationRiskingService
-        .getApplicationRiskingResponse(request.agentApplication.agentApplicationId)
+        .getApplicationRiskingResponse(request.agentApplication.applicationReference)
         .map: applicationRiskingResponse =>
           request.add[ApplicationRiskingResponse](applicationRiskingResponse.getOrThrowExpectedDataMissing(s"Risking response missing for complete application ${request.agentApplication.agentApplicationId}"))
     )
