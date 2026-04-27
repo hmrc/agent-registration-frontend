@@ -35,10 +35,22 @@ extends ViewSpec:
 
   object failedNonFixableResponse:
 
+    // ApplicationReference(APPREF123),
+    // Some(List(EntityFailure.4.1, EntityFailure.4.3, EntityFailure.4.4)),
+    // 0 = {IndividualRiskingResponse@13174} IndividualRiskingResponse(PersonReference(individual-provided-details-id-12345),IndividualName(Steve Austin),FailedNonFixable,Some(List(IndividualFailure.5.1, IndividualFailure.6)))
+    // 1 = {IndividualRiskingResponse@13178} IndividualRiskingResponse(PersonReference(test-individual-2),IndividualName(Beverly Hills),FailedNonFixable,Some(List(IndividualFailure.4.1)))
     val allIndividualsHaveFailures: ApplicationRiskingResponse.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixable
-    val noIndividualsWithFailures: ApplicationRiskingResponse.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixable.copy(
-      riskedIndividuals = tdAll.applicationRiskingResponse.failedNonFixable.riskedIndividuals.map(_.copy(failures = List.empty))
-    )
+
+    // ApplicationReference(APPREF123)
+    // Some(List(EntityFailure.4.1, EntityFailure.4.3, EntityFailure.4.4))
+    // 0 = {IndividualRiskingResponse@13197} IndividualRiskingResponse(PersonReference(individual-provided-details-id-12345),IndividualName(Steve Austin),FailedNonFixable,Some(List()))
+    // 1 = {IndividualRiskingResponse@13200} IndividualRiskingResponse(PersonReference(test-individual-2),IndividualName(Beverly Hills),FailedNonFixable,Some(List()))
+//    val noIndividualsWithFailures: ApplicationRiskingResponse.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixable.copy(
+//      riskedIndividuals = tdAll.applicationRiskingResponse.failedNonFixable.riskedIndividuals.map(_.copy(failures = List.empty))
+//    )
+
+    val noIndividualsWithFailures: ApplicationRiskingResponse.FailedNonFixable =
+      tdAll.applicationRiskingResponse.failedNonFixable_failedApplicant_approvedIndividuls
 
   val entityFailureMessages: Map[String, String] = Map(
     "duplicatedMessage" -> "the business has missing tax returns in their HMRC record", // all three entity failures have this same failure message

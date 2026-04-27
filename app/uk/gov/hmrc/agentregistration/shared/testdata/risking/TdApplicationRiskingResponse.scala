@@ -39,10 +39,19 @@ trait TdApplicationRiskingResponse:
     )
 
     val failedNonFixable: ApplicationRiskingResponse.FailedNonFixable = ApplicationRiskingResponse.FailedNonFixable(
-      riskedEntity = dependencies.riskedEntityFailedNonFixable,
+      riskedEntity = dependencies.riskedEntityFailedFixable,
+      riskedIndividuals = List(
+        dependencies.riskedIndividualNonFixable,
+        dependencies.riskedIndividualFixable
+      ),
+      riskingCompletedDate = riskingCompletedDate
+    )
+
+    val failedNonFixable_failedApplicant_approvedIndividuls: ApplicationRiskingResponse.FailedNonFixable = ApplicationRiskingResponse.FailedNonFixable(
+      riskedEntity = dependencies.riskedEntityFailedFixable,
       riskedIndividuals = List(
         dependencies.riskedIndividualApproved,
-        dependencies.riskedIndividualFixable
+        dependencies.riskedIndividualApproved
       ),
       riskingCompletedDate = riskingCompletedDate
     )
