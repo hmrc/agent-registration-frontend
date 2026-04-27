@@ -21,7 +21,6 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
-import uk.gov.hmrc.agentregistration.shared.risking.ApplicationForRiskingStatus
 import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
@@ -68,13 +67,13 @@ extends FrontendController(mcc, actions):
         val projectedDecisionDate: LocalDate = calculateDecisionDate(submittedAt)
 
         val applicationRiskingResponse: ApplicationRiskingResponse = request.get
-        applicationRiskingResponse.status match
-          case ApplicationForRiskingStatus.ReadyForSubmission => // show the confirmation screen
+        applicationRiskingResponse match
+          case ApplicationRiskingResponse.ReadyForSubmission => // show the confirmation screen
             Ok(confirmationPage(
               dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
               agentApplication = agentApplication
             ))
-          case ApplicationForRiskingStatus.SubmittedForRisking => // show the in progress screen
+          case ApplicationRiskingResponse.SubmittedForRisking => // show the in progress screen
             val localDateSubmitted: LocalDate =
               submittedAt
                 .atZone(ZoneId.systemDefault())
@@ -85,21 +84,17 @@ extends FrontendController(mcc, actions):
               dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
               dateSubmitted = displayDateForLang(Some(localDateSubmitted))
             ))
-          case ApplicationForRiskingStatus.FailedNonFixable => // show the non-fixable failures page
+          case failedNonFixable: ApplicationRiskingResponse.FailedNonFixable =>
             Ok(failedNonFixablePage(
-              applicationRiskingResponse = applicationRiskingResponse,
+              failedNonFixable = failedNonFixable,
               agentApplication = agentApplication,
               entityName = request.get[BusinessPartnerRecordResponse].getEntityName
             ))
-          case ApplicationForRiskingStatus.FailedFixable => // TODO: show the fixable failures page
+          case _: ApplicationRiskingResponse.FailedFixable => // TODO: show the fixable failures page
             Ok(simplePage(
               h1 = "Fixable failure placeholder",
               bodyText = Some("Placeholder for the fixable failures...")
             ))
-          case _ => // this should never happen but if it does then throw an error as it is not recoverable from here
-            throw new IllegalStateException(
-              s"[getApplicationSubmitted] has passed an unsupported application risking status ${applicationRiskingResponse.status} for application ${agentApplication.agentApplicationId.value}."
-            )
 
   def viewSubmittedApplication: Action[AnyContent] = actions
     .getApplicationSubmitted:

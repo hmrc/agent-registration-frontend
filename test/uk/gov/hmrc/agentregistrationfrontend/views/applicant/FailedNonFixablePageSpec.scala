@@ -35,9 +35,9 @@ extends ViewSpec:
 
   object failedNonFixableResponse:
 
-    val allIndividualsHaveFailures: ApplicationRiskingResponse = tdAll.applicationRiskingResponse.failedNonFixableResponse
-    val noIndividualsWithFailures: ApplicationRiskingResponse = tdAll.applicationRiskingResponse.failedNonFixableResponse.copy(
-      individuals = tdAll.applicationRiskingResponse.failedNonFixableResponse.individuals.map(_.copy(failures = Some(List.empty)))
+    val allIndividualsHaveFailures: ApplicationRiskingResponse.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixable
+    val noIndividualsWithFailures: ApplicationRiskingResponse.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixable.copy(
+      riskedIndividuals = tdAll.applicationRiskingResponse.failedNonFixable.riskedIndividuals.map(_.copy(failures = List.empty))
     )
 
   val entityFailureMessages: Map[String, String] = Map(
@@ -47,7 +47,7 @@ extends ViewSpec:
 
   val docWithIndividualFailures: Document = Jsoup.parse(
     viewTemplate(
-      applicationRiskingResponse = failedNonFixableResponse.allIndividualsHaveFailures,
+      failedNonFixable = failedNonFixableResponse.allIndividualsHaveFailures,
       agentApplication = agentApplication,
       entityName = "Test Company Name"
     ).body
@@ -56,7 +56,7 @@ extends ViewSpec:
 
   val docWithNoIndividualFailures: Document = Jsoup.parse(
     viewTemplate(
-      applicationRiskingResponse = failedNonFixableResponse.noIndividualsWithFailures,
+      failedNonFixable = failedNonFixableResponse.noIndividualsWithFailures,
       agentApplication = agentApplication,
       entityName = "Test Company Name"
     ).body
@@ -113,10 +113,8 @@ extends ViewSpec:
       ).text() shouldBe "Relevant individuals who do not meet the registration conditions"
 
     "print a list of unique failures for each individual with failures" in:
-      failedNonFixableResponse.allIndividualsHaveFailures.individuals.foreach: individual =>
-        docWithIndividualFailures.selectOrFail(s"#${individual.personReference.value}-reasons").select("li").size shouldBe individual.failures.getOrElse(
-          List.empty
-        ).size
+      failedNonFixableResponse.allIndividualsHaveFailures.riskedIndividuals.foreach: individual =>
+        docWithIndividualFailures.selectOrFail(s"#${individual.personReference.value}-reasons").select("li").size shouldBe individual.failures.size
 
   "FailedNonFixablePage when no individuals have failures" should:
 

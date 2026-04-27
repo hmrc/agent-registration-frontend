@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant
 
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
@@ -29,6 +30,7 @@ extends ControllerSpec:
   private val viewApplicationPath: String = "/agent-registration/view-application"
 
   object agentApplication:
+
     val submitted: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
@@ -57,7 +59,7 @@ extends ControllerSpec:
   s"GET $applicationStatusPath should check the latest status and render the confirmation page when status is ReadyForSubmission" in:
     ApplyStubHelper.stubsForApplicationRiskingResponse(
       application = agentApplication.submitted,
-      applicationRiskingResponse = tdAll.applicationRiskingResponse.readyForSubmissionResponse
+      applicationRiskingResponse = ApplicationRiskingResponse.ReadyForSubmission
     )
     val response: WSResponse = get(applicationStatusPath)
 
@@ -68,7 +70,7 @@ extends ControllerSpec:
   s"GET $applicationStatusPath should render the in-progress page when status is SubmittedForRisking" in:
     ApplyStubHelper.stubsForApplicationRiskingResponse(
       application = agentApplication.submitted,
-      applicationRiskingResponse = tdAll.applicationRiskingResponse.submittedForRiskingResponse
+      applicationRiskingResponse = ApplicationRiskingResponse.SubmittedForRisking
     )
     val response: WSResponse = get(applicationStatusPath)
 
@@ -79,7 +81,7 @@ extends ControllerSpec:
   s"GET $applicationStatusPath should render the failed non-fixable page when status is FailedNonFixable" in:
     ApplyStubHelper.stubsForApplicationRiskingResponse(
       application = agentApplication.submitted,
-      applicationRiskingResponse = tdAll.applicationRiskingResponse.failedNonFixableResponse
+      applicationRiskingResponse = tdAll.applicationRiskingResponse.failedNonFixable
     )
 
     val response: WSResponse = get(applicationStatusPath)

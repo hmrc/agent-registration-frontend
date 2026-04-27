@@ -16,60 +16,35 @@
 
 package uk.gov.hmrc.agentregistration.shared.testdata.risking
 
-import uk.gov.hmrc.agentregistration.shared.PersonReference
-import uk.gov.hmrc.agentregistration.shared.risking.ApplicationForRiskingStatus
-import uk.gov.hmrc.agentregistration.shared.risking.ApplicationForRiskingStatus.FailedNonFixable
 import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
-import uk.gov.hmrc.agentregistration.shared.risking.EntityFailure
-import uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure
-import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
+
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 trait TdApplicationRiskingResponse:
-  dependencies: (TdBase & TdIndividualRiskingResponse) =>
+  dependencies: (TdRiskedEntity & TdRiskedIndividual) =>
+
+  val riskingCompletedDateString: String = "2059-12-21"
+  val riskingCompletedDate: LocalDate = LocalDate.parse(riskingCompletedDateString, DateTimeFormatter.ISO_DATE)
 
   object applicationRiskingResponse:
 
-    val readyForSubmissionResponse: ApplicationRiskingResponse = ApplicationRiskingResponse(
-      applicationReference = dependencies.applicationReference,
-      status = ApplicationForRiskingStatus.ReadyForSubmission,
-      individuals = List(
-        individualRiskingResponse.readyForSubmissionResponse,
-        individualRiskingResponse.readyForSubmissionResponse.copy(
-          providedName = dependencies.getIndividualName(1),
-          personReference = PersonReference("any-id")
-        )
+    val failedFixable: ApplicationRiskingResponse.FailedFixable = ApplicationRiskingResponse.FailedFixable(
+      riskedEntity = dependencies.riskedEntityApproved,
+      riskedIndividuals = List(
+        dependencies.riskedIndividualApproved,
+        dependencies.riskedIndividualFixable
       ),
-      failures = None
+      riskingCompletedDate = riskingCompletedDate
     )
 
-    val submittedForRiskingResponse: ApplicationRiskingResponse = ApplicationRiskingResponse(
-      applicationReference = dependencies.applicationReference,
-      status = ApplicationForRiskingStatus.SubmittedForRisking,
-      individuals = List(
-        individualRiskingResponse.submittedForRiskingResponse,
-        individualRiskingResponse.submittedForRiskingResponse.copy(
-          personReference = PersonReference("any-id")
-        )
+    val failedNonFixable: ApplicationRiskingResponse.FailedNonFixable = ApplicationRiskingResponse.FailedNonFixable(
+      riskedEntity = dependencies.riskedEntityFailedNonFixable,
+      riskedIndividuals = List(
+        dependencies.riskedIndividualApproved,
+        dependencies.riskedIndividualFixable
       ),
-      failures = None
+      riskingCompletedDate = riskingCompletedDate
     )
 
-    val failedNonFixableResponse: ApplicationRiskingResponse = ApplicationRiskingResponse(
-      applicationReference = dependencies.applicationReference,
-      status = FailedNonFixable,
-      individuals = List(
-        individualRiskingResponse.failedNonFixableResponse,
-        individualRiskingResponse.failedNonFixableResponse.copy(
-          providedName = dependencies.getIndividualName(1),
-          personReference = PersonReference("test-individual-2"),
-          failures = Some(List(
-            IndividualFailure._4._1
-          ))
-        )
-      ),
-      failures = Some(List(
-        EntityFailure._4._1,
-        EntityFailure._4._3,
-        EntityFailure._4._4
-      ))
-    )
+    // TODO: more cases possible, those should be created and used in tests
