@@ -30,7 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.SelectIndividualForm
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
-import uk.gov.hmrc.agentregistrationfrontend.services.applicant.ProvidedByApplicantService
+import uk.gov.hmrc.agentregistrationfrontend.repository.ProvidedByApplicantRepo
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.providedbyapplicant.SelectIndividualPage
 
@@ -40,7 +40,7 @@ class SelectIndividualController @Inject() (
   actions: ApplicantActions,
   view: SelectIndividualPage,
   individualProvideDetailsService: IndividualProvideDetailsService,
-  providedByApplicantService: ProvidedByApplicantService
+  providedByApplicantRepo: ProvidedByApplicantRepo
 )
 extends FrontendController(mcc, actions):
 
@@ -94,7 +94,7 @@ extends FrontendController(mcc, actions):
             individualProvidedDetailsId = i._id,
             individualName = i.individualName
           )
-          providedByApplicantService
+          providedByApplicantRepo
             .upsert(providedByApplicant)
             .map: _ =>
               Ok(providedByApplicant.toString) // TODO: Date of Birth should be next page even if coming from CYA as changing individual wipes everything - ideally via CYA controller when available

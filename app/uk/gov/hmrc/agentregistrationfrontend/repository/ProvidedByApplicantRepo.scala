@@ -21,12 +21,11 @@ import play.api.libs.json.Writes
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
-import uk.gov.hmrc.agentregistrationfrontend.repository.SensitiveWrapper.*
-import uk.gov.hmrc.crypto.json.JsonEncryption.sensitiveDecrypter
-import uk.gov.hmrc.crypto.json.JsonEncryption.sensitiveEncrypter
 import uk.gov.hmrc.crypto.Decrypter
 import uk.gov.hmrc.crypto.Encrypter
 import uk.gov.hmrc.crypto.Sensitive
+import uk.gov.hmrc.crypto.json.JsonEncryption.sensitiveDecrypter
+import uk.gov.hmrc.crypto.json.JsonEncryption.sensitiveEncrypter
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.mdc.Mdc
 import uk.gov.hmrc.mongo.MongoComponent
@@ -39,9 +38,8 @@ import javax.inject.Named
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
-import scala.concurrent.duration.DurationInt
 
-/** Repository for managing [[ProvidedByApplicant]] data in the session cache.
+/** Repository for managing [[ProvidedByApplicant]] data.
   *
   * This repository is short-lived and tied to the user's session only. Data stored here will expire when the session ends or after the configured TTL
   * [[ProvidedByApplicantSessionStore]] configuration.
