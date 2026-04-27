@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.repository
 import play.api.libs.json.Reads
 import play.api.libs.json.Writes
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
 import uk.gov.hmrc.agentregistrationfrontend.repository.SensitiveWrapper.*
 import uk.gov.hmrc.crypto.json.JsonEncryption.sensitiveDecrypter
 import uk.gov.hmrc.crypto.json.JsonEncryption.sensitiveEncrypter
@@ -39,6 +40,27 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 import scala.concurrent.duration.DurationInt
 
+/** Repository for managing [[ProvidedByApplicant]] data in the session cache.
+  *
+  * This repository is short-lived and tied to the user's session only. Data stored here will expire when the session ends or after the configured TTL
+  * [[SessionCacheRepository]] configuration.
+  */
+class ProvidedByApplicantRepo @Inject() (sessionCacheRepository: SessionCacheRepository)(using ExecutionContext):
+
+  private val dataKey: DataKey[ProvidedByApplicant] = DataKey("providedByApplicant")
+
+  def upsert(providedByApplicant: ProvidedByApplicant)(using RequestHeader): Future[Unit] = sessionCacheRepository
+    .putSession[ProvidedByApplicant](dataKey, providedByApplicant)
+    .map(_ => ())
+
+  def find()(using RequestHeader): Future[Option[ProvidedByApplicant]] = sessionCacheRepository.getFromSession(dataKey)
+  def delete()(using RequestHeader): Future[Unit] = sessionCacheRepository.deleteFromSession(dataKey)
+
+/** Low-level session cache repository used as a delegate to implement concrete session-based repositories.
+  *
+  * It is NOT intended to be used directly - instead, create specific repository classes (like [[ProvidedByApplicantRepo]]) that delegate to this repository for
+  * their storage needs.
+  */
 @Singleton
 class SessionCacheRepository @Inject() (
   val mongoComponent: MongoComponent,
@@ -51,7 +73,7 @@ extends CacheRepository(
   mongoComponent = mongoComponent,
   collectionName = "sessions",
   replaceIndexes = true,
-  ttl = 15.minutes,
+  ttl = 15.minutes, // TODO: match with the session duration from the config
   timestampSupport = timestampSupport,
   sessionIdKey = SessionKeys.sessionId
 ):
