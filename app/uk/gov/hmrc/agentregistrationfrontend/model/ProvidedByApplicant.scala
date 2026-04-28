@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.util.Errors.*
 
-/** Individual record as provided by the applicant for session cache. This final case class represents the data entered by an applicant that can be used to
+/** Individual record as provided by the applicant. This final case class represents the data entered by an applicant that can be used to
   * hydrate the IndividualProvidedDetails record for the given _id.
   */
 final case class ProvidedByApplicant(
