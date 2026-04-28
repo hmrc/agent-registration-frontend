@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.modules
+package uk.gov.hmrc.agentregistrationfrontend.config
 
 import com.google.inject.AbstractModule
 import com.google.inject.Provides
@@ -32,7 +32,7 @@ import java.nio.charset.StandardCharsets
 import java.util.Base64
 import javax.inject.Singleton
 
-class Module
+class CryptoProviderModule
 extends AbstractModule:
 
   @Provides
