@@ -132,6 +132,9 @@ POST        /apply/list-details/remove-companies-house-officer/:individualProvid
 GET         /apply/list-details/provide-details/select-individual       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.SelectIndividualController.show
 POST        /apply/list-details/provide-details/select-individual       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.SelectIndividualController.submit
 
+GET         /apply/list-details/applicant-provides-individual-date-of-birth       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.ApplicantProvidedDoBController.show
+POST        /apply/list-details/applicant-provides-individual-date-of-birth       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.ApplicantProvidedDoBController.submit
+
 GET         /apply/list-details/companies-house-officers/check-your-answers  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.incorporated.CheckYourAnswersController.show
 
 

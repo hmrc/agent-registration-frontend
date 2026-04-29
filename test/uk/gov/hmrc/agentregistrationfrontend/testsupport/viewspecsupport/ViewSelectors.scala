@@ -95,6 +95,16 @@ object ViewSelectors:
           hint = element.select(fieldSetHint).toList.headOption.map(_.text)
         )
 
+    // TODO this input helper is incorrect and needs to be changed
+    inline def extractDateInput(index: Int = 1): TestDateInput = element
+      .selectOrFail(fieldSet)
+      .selectOrFail(index)
+      .pipe: element =>
+        TestDateInput(
+          inputName = element.selectOrFail(fieldSetLegend).first().text(),
+          hint = element.select(fieldSetHint).toList.headOption.map(_.text)
+        )
+
     inline def extractNumberedList(index: Int = 1): TestNumberedList = element
       .selectOrFail(numberedList)
       .selectOrFail(index)
@@ -201,6 +211,7 @@ object ViewSelectors:
   ):
 
     def uri: Uri = Uri.parse(href).value
+
     def uriRelative: Uri = uri.copy(authority = None, scheme = None)
 
   final case class TestRadioGroup(
@@ -208,6 +219,11 @@ object ViewSelectors:
     options: List[(String, String)],
     hint: Option[String],
     optionHints: List[(String, Option[String])] = Nil
+  )
+
+  final case class TestDateInput(
+    inputName: String,
+    hint: Option[String]
   )
 
   final case class TestSelect(
@@ -273,6 +289,8 @@ object ViewSelectors:
     val formGroup = ".govuk-form-group"
     val input = ".govuk-input"
     val select = ".govuk-select"
+
+    val dateInput = "govuk-date-input"
 
     val table = ".govuk-table"
     val tableCaption = ".govuk-table__caption"
