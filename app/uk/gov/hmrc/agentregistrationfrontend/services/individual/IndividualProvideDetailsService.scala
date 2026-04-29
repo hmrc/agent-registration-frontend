@@ -39,18 +39,21 @@ import scala.concurrent.Future
 @Singleton
 class IndividualProvideDetailsService @Inject() (
   individualProvideDetailsConnector: IndividualProvidedDetailsConnector,
-  provideDetailsFactory: IndividualProvideDetailsFactory
+  provideDetailsFactory: IndividualProvideDetailsFactory,
+  personReferenceGenerator: PersonReferenceGenerator
 )(using ec: ExecutionContext)
 extends RequestAwareLogging:
 
   def create(
     individualName: IndividualName,
     isPersonOfControl: Boolean,
-    agentApplicationId: AgentApplicationId
+    agentApplicationId: AgentApplicationId,
+    personReference: PersonReference
   )(using request: RequestHeader): IndividualProvidedDetails =
     logger.info(s"creating provided details for individual with applicationId:[${agentApplicationId.value}] ")
     provideDetailsFactory.create(
       agentApplicationId,
+      personReference,
       individualName,
       isPersonOfControl
     )
@@ -139,3 +142,10 @@ extends RequestAwareLogging:
         .modify(_.providedDetailsState)
         .setTo(ProvidedDetailsState.Started)
     )
+
+  @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
+  def generateNewPersonReference()(using RequestHeader): Future[PersonReference] =
+    val reference = personReferenceGenerator.generatePersonReference()
+    individualProvideDetailsConnector.findByPersonReference(reference).flatMap:
+      case Some(_) => generateNewPersonReference()
+      case None => Future.successful(reference)

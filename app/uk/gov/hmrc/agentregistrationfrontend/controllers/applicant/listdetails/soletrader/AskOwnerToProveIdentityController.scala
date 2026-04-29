@@ -75,15 +75,19 @@ extends FrontendController(mcc, actions):
           // there is no existing individual record for this application,
           // so we need to automate the creation of one based on the application data as this is a sole trader application
           val soleTraderDetails: BusinessDetailsSoleTrader = agentApplication.getBusinessDetails
-          val newIndividualProvidedDetails: IndividualProvidedDetails = individualProvideDetailsService.create(
-            agentApplicationId = agentApplication.agentApplicationId,
-            individualName = IndividualName(s"${soleTraderDetails.fullName.firstName} ${soleTraderDetails.fullName.lastName}"),
-            isPersonOfControl = true // this individual record is for the sole trader owner not the applicant
-          )
-          individualProvideDetailsService
-            .upsertForApplication(newIndividualProvidedDetails)
-            .map: _ =>
-              request.add[IndividualProvidedDetails](newIndividualProvidedDetails)
+          val newIndividualProvidedDetails =
+            for {
+              newPersonReference <- individualProvideDetailsService.generateNewPersonReference()
+              newIndividualProvidedDetails = individualProvideDetailsService.create(
+                agentApplicationId = agentApplication.agentApplicationId,
+                individualName = IndividualName(s"${soleTraderDetails.fullName.firstName} ${soleTraderDetails.fullName.lastName}"),
+                isPersonOfControl = true, // this individual record is for the sole trader owner not the applicant
+                personReference = newPersonReference
+              )
+              _ = individualProvideDetailsService.upsertForApplication(newIndividualProvidedDetails)
+            } yield newIndividualProvidedDetails
+
+          newIndividualProvidedDetails.map(individualProvidedDetails => request.add[IndividualProvidedDetails](individualProvidedDetails))
         case soleTrader :: Nil => request.add[IndividualProvidedDetails](soleTrader) // we have already visited this page and the record has been created
         case _ =>
           logger.warn(s"Unexpected multiple provided details records for sole trader application, applicationId:[${agentApplication.agentApplicationId}], cannot recover from this state so exiting")

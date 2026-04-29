@@ -177,6 +177,7 @@ extends ControllerSpec:
       agentApplicationId = agentApplication.beforeCompaniesHouseOfficers.agentApplicationId,
       individuals = List.empty
     )
+    AgentRegistrationStubs.stubFindIndividualByPersonReferenceNoContent(tdAll.personReference)
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
       individualProvidedDetails = tdAll.providedDetails.precreated
     )
@@ -324,6 +325,7 @@ extends ControllerSpec:
       agentApplicationId = agentApplication.beforeCompaniesHouseOfficers.agentApplicationId,
       individuals = List.empty
     )
+    AgentRegistrationStubs.stubFindIndividualByPersonReferenceNoContent(tdAll.personReference)
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
       individualProvidedDetails = tdAll.providedDetails.precreated
     )

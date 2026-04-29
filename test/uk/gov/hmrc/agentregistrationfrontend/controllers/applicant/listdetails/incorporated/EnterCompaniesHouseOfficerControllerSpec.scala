@@ -201,6 +201,7 @@ extends ControllerSpec:
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
       individuals = List(individualWithName("Carol Tester", "1"))
     )
+    AgentRegistrationStubs.stubFindIndividualByPersonReferenceNoContent(tdAll.personReference)
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
       individualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("Carol Tester"))
     )
@@ -246,6 +247,7 @@ extends ControllerSpec:
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
       individuals = List.empty
     )
+    AgentRegistrationStubs.stubFindIndividualByPersonReferenceNoContent(tdAll.personReference)
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
       individualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("John Tester"))
     )
@@ -267,6 +269,7 @@ extends ControllerSpec:
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
       individuals = List.empty
     )
+    AgentRegistrationStubs.stubFindIndividualByPersonReferenceNoContent(tdAll.personReference)
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
       individualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("John Tester"))
     )
@@ -330,6 +333,7 @@ extends ControllerSpec:
       agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
       individuals = List.empty
     )
+    AgentRegistrationStubs.stubFindIndividualByPersonReferenceNoContent(tdAll.personReference)
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
       individualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("John Tester"))
     )

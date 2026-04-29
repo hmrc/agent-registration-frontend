@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistration.shared.UcrIdentifiers
 import uk.gov.hmrc.agentregistration.shared.Utr
@@ -321,4 +322,13 @@ object AgentRegistrationStubs:
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/unified-customer-registry/individual/utr/${saUtr.value}"),
     responseStatus = Status.INTERNAL_SERVER_ERROR
+  )
+
+  def stubFindIndividualByPersonReferenceNoContent(
+    personReference: PersonReference
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/individual-provided-details/by-person-reference/${personReference.value}"),
+    responseStatus = Status.NO_CONTENT,
+    responseBody = ""
   )
