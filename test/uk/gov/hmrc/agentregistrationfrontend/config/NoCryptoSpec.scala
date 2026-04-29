@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.config
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpecLike
-import play.api.Configuration
 import uk.gov.hmrc.crypto.Crypted
 import uk.gov.hmrc.crypto.PlainBytes
 import uk.gov.hmrc.crypto.PlainText
@@ -26,21 +25,9 @@ import uk.gov.hmrc.crypto.PlainText
 import java.nio.charset.StandardCharsets
 import java.util.Base64
 
-class CryptoProviderModuleSpec
+class NoCryptoSpec
 extends AnyWordSpecLike
 with Matchers:
-
-  val module = new CryptoProviderModule
-
-  "CryptoProviderModule.crypto" should:
-
-    "return a real crypto instance when the 'fieldLevelEncryption' config flag is enabled" in:
-      val config = Configuration("fieldLevelEncryption.key" -> "123", "fieldLevelEncryption.enable" -> true)
-      module.crypto(config.underlying) should not be a[NoCrypto.type]
-
-    "return a NoCrypto instance when the 'fieldLevelEncryption' config flag is disabled" in:
-      val config = Configuration("fieldLevelEncryption.enable" -> false)
-      module.crypto(config.underlying) shouldBe a[NoCrypto.type]
 
   "NoCrypto" should:
 

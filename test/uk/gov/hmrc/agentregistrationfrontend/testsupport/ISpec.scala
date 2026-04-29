@@ -86,7 +86,7 @@ extends AnyWordSpecLike,
       "features.grs-stub" -> false,
       "inject-email-verification-passcodes-page" -> false, // false to match production behavior where email verification is performed without injected test only page
       "fieldLevelEncryption.enabled" -> true,
-      "fieldLevelEncryption.key" -> "test-field-level-encryption-key"
+      "fieldLevelEncryption.key" -> "edkOOwt7uvzw1TXnFIN6aRVHkfWcgiOrbBvkEQvO65g=" // use base64 even for tests
     ) ++ configOverrides
 
   protected def configOverrides: Map[String, Any] = Map[String, Any]()
