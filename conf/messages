@@ -468,6 +468,13 @@ selectIndividual.hint = Start to enter their name and choose it from the list.
 selectIndividual.error.required = Select which relevant individual you need to tell us about
 selectIndividual.error.invalid = Select which relevant individual you need to tell us about
 
+providedByApplicantTelephoneNumber.title = What is {0}’s telephone number?
+providedByApplicantTelephoneNumber.hint = We will not send a code to confirm this number.
+providedByApplicantTelephoneNumber.error.required = Enter the number we should call to speak to the individual about this application
+providedByApplicantTelephoneNumber.error.invalid = Enter a phone number, like 01632 960 001 or 07700 900 982
+providedByApplicantTelephoneNumber.error.tooLong = The phone number must be 24 characters or fewer
+
+
 # Apply / Declaration
 declaration.title = Declaration
 declaration.p1 = I am authorised by {0} to apply for an agent services account with HMRC.

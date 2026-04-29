@@ -135,7 +135,10 @@ object AppRoutes:
         val CheckProgressController = listdetailsProgressRoutes.CheckProgressController
 
       object providedbyapplicant:
+
         val SelectIndividualController = listdetailsProvideDetailsRoutes.SelectIndividualController
+        val TelephoneNumberController = listdetailsProvideDetailsRoutes.TelephoneNumberController
+        val EmailAddressController = listdetailsProvideDetailsRoutes.EmailAddressController
 
     object checkfailed:
 
