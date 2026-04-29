@@ -16,10 +16,12 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant
 
+import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualDateOfBirth.ApplicantProvided
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.ApplicantProvidedDoBForm
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
 import uk.gov.hmrc.agentregistrationfrontend.repository.ProvidedByApplicantSessionStore
@@ -78,7 +80,7 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url
 
-  s"POST $path with valid date of birth should save data and redirect to UNDER CONSTRUCTION" in:
+  s"POST $path with valid date of birth should save data and redirect to the telephone page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(application)
     providedByApplicantSessionStore.upsert(providedByApplicant).futureValue
@@ -89,8 +91,10 @@ extends ControllerSpec:
         ApplicantProvidedDoBForm.yearKey -> Seq(tdAll.dateOfBirth.getYear.toString)
       ))
 
-    response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe s"Telephone page - Apply for an agent services account - GOV.UK"
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.TelephoneNumberController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
 
     providedByApplicantSessionStore.find().futureValue.value shouldBe
       ProvidedByApplicant(

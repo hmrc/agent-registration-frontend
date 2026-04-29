@@ -135,6 +135,10 @@ POST        /apply/list-details/provide-details/select-individual       uk.gov.h
 GET         /apply/list-details/provide-details/date-of-birth       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.ApplicantProvidedDoBController.show
 POST        /apply/list-details/provide-details/date-of-birth       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.ApplicantProvidedDoBController.submit
 
+GET         /apply/list-details/provide-details/telephone-number       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.TelephoneNumberController.show
+POST        /apply/list-details/provide-details/telephone-number       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.TelephoneNumberController.submit
+GET         /apply/list-details/provide-details/email-address          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.EmailAddressController.show
+
 GET         /apply/list-details/companies-house-officers/check-your-answers  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.incorporated.CheckYourAnswersController.show
 
 

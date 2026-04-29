@@ -137,6 +137,8 @@ object AppRoutes:
       object providedbyapplicant:
 
         val SelectIndividualController = listdetailsProvideDetailsRoutes.SelectIndividualController
+        val TelephoneNumberController = listdetailsProvideDetailsRoutes.TelephoneNumberController
+        val EmailAddressController = listdetailsProvideDetailsRoutes.EmailAddressController
         val ApplicantProvidedDoBController = listdetailsProvideDetailsRoutes.ApplicantProvidedDoBController
 
     object checkfailed:

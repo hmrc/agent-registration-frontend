@@ -62,7 +62,10 @@ extends FrontendController(mcc, actions):
       condition =
         implicit request =>
           request.get[IsNotSoleTrader] match
-            case a: (AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals | AgentApplication.IsIncorporated) =>
+            case a: AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
+              val partnersSize = request.get[List[IndividualProvidedDetails]].count(_.isPersonOfControl)
+              NumberOfIndividuals.isKeyIndividualListComplete(partnersSize, a.numberOfIndividuals)
+            case a: AgentApplication.IsIncorporated =>
               val partnersSize = request.get[List[IndividualProvidedDetails]].count(_.isPersonOfControl)
               NumberOfIndividuals.isKeyIndividualListComplete(partnersSize, a.numberOfIndividuals),
       resultWhenConditionNotMet =
