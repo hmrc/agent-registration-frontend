@@ -40,8 +40,8 @@ import scala.concurrent.Future
 
 /** Low-level session store repository used as a delegate to implement concrete session-based repositories.
   *
-  * It is NOT intended to be used directly - instead, create specific repository classes (like [[ProvidedByApplicantSessionStore]]) that delegate to this repository for
-  * their storage needs.
+  * It is NOT intended to be used directly - instead, create specific repository classes (like [[ProvidedByApplicantSessionStore]]) that delegate to this
+  * repository for their storage needs.
   */
 @Singleton
 class SessionStore @Inject() (
