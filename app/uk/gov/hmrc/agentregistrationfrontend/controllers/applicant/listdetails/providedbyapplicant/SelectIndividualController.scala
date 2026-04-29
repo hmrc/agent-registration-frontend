@@ -23,9 +23,9 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.SelectIndividualForm
@@ -44,25 +44,32 @@ class SelectIndividualController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithListOfIncompleteIndividuals = List[IndividualProvidedDetails] *: IsNotSoleTrader *: DataWithAuth
+  private type DataWithListOfIncompleteIndividuals = List[IndividualProvidedDetails] *: DataWithApplication
 
   private val baseAction: ActionBuilderWithData[DataWithListOfIncompleteIndividuals] = actions
     .getApplicationInProgress
+    .ensure(
+      condition =
+        implicit request =>
+          request.get[AgentApplication].getUserRole =!= UserRole.Owner,
+      resultWhenConditionNotMet =
+        implicit request =>
+          logger.warn("Sole trader owners do not provide details like this, redirecting to task list for the correct links")
+          Redirect(AppRoutes.apply.TaskListController.show.url)
+    )
     .refine:
       implicit request =>
-        request.get[AgentApplication] match
-          case _: AgentApplicationSoleTrader =>
-            logger.warn("Sole traders do not provide details like this, redirecting to task list for the correct links")
-            Redirect(AppRoutes.apply.TaskListController.show.url)
-          case aa: IsNotSoleTrader => request.replace[AgentApplication, IsNotSoleTrader](aa)
-    .refine:
-      implicit request =>
-        val agentApplication: IsNotSoleTrader = request.get
+        val agentApplication: AgentApplication = request.get
         individualProvideDetailsService
           .findAllByApplicationId(agentApplication.agentApplicationId)
           .map: individualsList =>
             val incompleteIndividuals: List[IndividualProvidedDetails] = individualsList.filterNot(_.hasFinished)
-            request.add[List[IndividualProvidedDetails]](incompleteIndividuals)
+            if incompleteIndividuals.isEmpty
+            then
+              logger.warn("There are no individuals with incomplete details, redirecting to progress page which will show status of all individuals")
+              Redirect(AppRoutes.apply.listdetails.progress.CheckProgressController.show.url)
+            else
+              request.add[List[IndividualProvidedDetails]](incompleteIndividuals)
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
