@@ -137,4 +137,24 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to delete IndividualProvidedDetails by id: ${individualProvidedDetailsId.value}")
 
+  def findByPersonReference(personReference: PersonReference)(using
+    RequestHeader
+  ): Future[Option[IndividualProvidedDetails]] =
+    val url: URL = url"$baseUrl/individual-provided-details/by-person-reference/${personReference.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => Some(response.json.as[IndividualProvidedDetails])
+          case Status.NO_CONTENT => None
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to find IndividualProvidedDetails by person reference: ${personReference.value}")
+
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration"

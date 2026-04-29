@@ -153,6 +153,7 @@ extends ControllerSpec:
       agentApplicationId = agentApplication.afterConfirmOtherRelevantIndividualsYes.agentApplicationId,
       individuals = List.empty
     )
+    AgentRegistrationStubs.stubFindIndividualByPersonReferenceNoContent(tdAll.personReference)
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetailsAnyBody()
 
     val response: WSResponse =

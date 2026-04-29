@@ -117,7 +117,7 @@ extends AnyWordSpecLike,
           override def generateApplicationReference(): ApplicationReference = tdAll.applicationReference
         })
         bind(classOf[PersonReferenceGenerator]).toInstance(new PersonReferenceGenerator {
-          override def nextPersonReference(): PersonReference = tdAll.personReference
+          override def generatePersonReference(): PersonReference = tdAll.personReference
         })
 
   override def fakeApplication(): Application = GuiceApplicationBuilder()

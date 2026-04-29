@@ -65,7 +65,8 @@ class FastForwardController @Inject() (
   internalUserIdGenerator: InternalUserIdGenerator,
   individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator,
   testAgentRegistrationConnector: TestAgentRegistrationConnector,
-  applicationReferenceGenerator: ApplicationReferenceGenerator
+  applicationReferenceGenerator: ApplicationReferenceGenerator,
+  personReferenceGenerator: PersonReferenceGenerator
 )(using
   clock: Clock,
   ex: ExecutionContext
@@ -141,6 +142,7 @@ extends FrontendController(mcc, applicantActions):
     val individualProvidedDetailsId: IndividualProvidedDetailsId = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId()
     val individualProvidedDetails = template.copy(
       _id = individualProvidedDetailsId,
+      personReference = personReferenceGenerator.generatePersonReference(),
       individualName = individualName,
       agentApplicationId = agentApplicationId,
       internalUserId = template.internalUserId.map(_ => internalUserIdGenerator.nextInternalUserId()),

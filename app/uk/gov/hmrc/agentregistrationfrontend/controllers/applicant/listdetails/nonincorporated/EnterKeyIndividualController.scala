@@ -137,11 +137,14 @@ extends FrontendController(mcc, actions):
       .async:
         implicit request =>
           val individualName: IndividualName = request.get
-          individualProvideDetailsService.upsertForApplication(individualProvideDetailsService.create(
-            individualName = individualName,
-            isPersonOfControl = true, // from this page we are only adding partners, who are persons of control
-            agentApplicationId = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].agentApplicationId
-          ))
+          individualProvideDetailsService.generateNewPersonReference().map(personReference =>
+            individualProvideDetailsService.upsertForApplication(individualProvideDetailsService.create(
+              individualName = individualName,
+              isPersonOfControl = true, // from this page we are only adding partners, who are persons of control
+              agentApplicationId = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].agentApplicationId,
+              personReference = personReference
+            ))
+          )
             .map: _ =>
               Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
       .redirectIfSaveForLater
