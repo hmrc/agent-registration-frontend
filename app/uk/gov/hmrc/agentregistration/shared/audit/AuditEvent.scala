@@ -19,22 +19,29 @@ package uk.gov.hmrc.agentregistration.shared.audit
 import play.api.libs.json.Format
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
-import uk.gov.hmrc.agentregistration.shared.ApplicationReference
-import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.{AgentApplication, ApplicationReference, BusinessType}
 
 sealed trait AuditEvent:
   val auditType: AuditType
 
+// The application does not support non-uk for now so isUkEntity is set to always true
 final case class StartOrContinueApplicationAuditEvent(
   applicationReference: ApplicationReference,
   journeyType: StartOrContinueApplicationAuditEvent.JourneyType,
   entityType: BusinessType,
-  isUkEntity: Boolean
+  isUkEntity: true
 )
 extends AuditEvent:
   override val auditType: AuditType = AuditType.StartOrContinueApplication
 
 object StartOrContinueApplicationAuditEvent:
+  
+  def make(agentApplication: AgentApplication, journeyType: JourneyType): StartOrContinueApplicationAuditEvent = StartOrContinueApplicationAuditEvent(
+    applicationReference = agentApplication.applicationReference,
+    journeyType = journeyType,
+    entityType = agentApplication.businessType,
+    isUkEntity = true
+  )
 
   given format: Format[StartOrContinueApplicationAuditEvent] = Json.format[StartOrContinueApplicationAuditEvent]
 

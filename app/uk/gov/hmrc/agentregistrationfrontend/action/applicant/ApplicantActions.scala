@@ -18,8 +18,17 @@ package uk.gov.hmrc.agentregistrationfrontend.action.applicant
 
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
+import uk.gov.hmrc.agentregistration.shared.audit.StartOrContinueApplicationAuditEvent.JourneyType
+import uk.gov.hmrc.agentregistration.shared.audit.StartOrContinueApplicationAuditEvent.JourneyType.Continue
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
@@ -29,12 +38,15 @@ import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineFutureE
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineUnion
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuildersWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
+import uk.gov.hmrc.agentregistrationfrontend.audit.AuditService
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.retrieve.Credentials
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
+import uk.gov.hmrc.http.SessionId
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -66,7 +78,8 @@ class ApplicantActions @Inject() (
   authorisedActionRefiner: ApplicantAuthRefiner,
   agentApplicationService: AgentApplicationService,
   businessPartnerRecordService: BusinessPartnerRecordService,
-  agentRegistrationRiskingService: AgentRegistrationRiskingService
+  agentRegistrationRiskingService: AgentRegistrationRiskingService,
+  auditService: AuditService
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
@@ -90,6 +103,13 @@ extends RequestAwareLogging:
               val redirect = AppRoutes.apply.AgentApplicationController.startRegistration
               logger.error(s"[Unexpected State] No agent application found for authenticated user ${request.get[InternalUserId].value}. Redirecting to startRegistration page ($redirect)")
               Redirect(redirect)
+    .refine:
+      implicit request: RequestWithApplication =>
+        val aa: AgentApplication = request.agentApplication
+        if aa.continueJourney() then
+          auditService.auditStartOrContinueApplication(aa, JourneyType.Continue)
+          aa.updateCachedSessionId()
+        else request
 
   def getApplicationInProgress: ActionBuilderWithData[DataWithApplication] = getApplication
     .ensure(
@@ -150,3 +170,31 @@ extends RequestAwareLogging:
         businessPartnerRecordService
           .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
           .map(request.add)
+
+  extension (agentApplication: AgentApplication)
+    def continueJourney()(using request: RequestWithApplication): Boolean =
+      agentApplication.cachedSessionId != hc.sessionId.get
+      
+    def updateCachedSessionId()(using request: RequestWithApplication): RequestWithApplication =
+      agentApplication match
+        case a: AgentApplicationLlp =>
+          val application: AgentApplication = a.copy(cachedSessionId = hc.sessionId.get)
+          request.update(application)
+        case a: AgentApplicationSoleTrader =>
+          val application: AgentApplication = a.copy(cachedSessionId = hc.sessionId.get)
+          request.update(application)
+        case a: AgentApplicationLimitedCompany =>
+          val application: AgentApplication = a.copy(cachedSessionId = hc.sessionId.get)
+          request.update(application)
+        case a: AgentApplicationGeneralPartnership =>
+          val application: AgentApplication = a.copy(cachedSessionId = hc.sessionId.get)
+          request.update(application)
+        case a: AgentApplicationLimitedPartnership =>
+          val application: AgentApplication = a.copy(cachedSessionId = hc.sessionId.get)
+          request.update(application)
+        case a: AgentApplicationScottishLimitedPartnership =>
+          val application: AgentApplication = a.copy(cachedSessionId = hc.sessionId.get)
+          request.update(application)
+        case a: AgentApplicationScottishPartnership =>
+          val application: AgentApplication = a.copy(cachedSessionId = hc.sessionId.get)
+          request.update(application)
