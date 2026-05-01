@@ -20,7 +20,9 @@ import com.google.inject.Inject
 import com.google.inject.Singleton
 import play.api.Configuration
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.audit.StartOrContinueApplicationAuditEvent
+import uk.gov.hmrc.agentregistration.shared.audit.StartOrContinueApplicationAuditEvent.JourneyType
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.play.audit.DefaultAuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
@@ -40,7 +42,8 @@ extends RequestAwareLogging:
 
   private final val auditSource = AppName.fromConfiguration(config)
 
-  def auditStartOrContinueApplication(auditEvent: StartOrContinueApplicationAuditEvent)(using RequestHeader): Future[AuditResult] =
+  def auditStartOrContinueApplication(agentApplication: AgentApplication, journeyType: JourneyType)(using RequestHeader): Future[AuditResult] =
+    val auditEvent = StartOrContinueApplicationAuditEvent.make(agentApplication, journeyType)
     logger.info(s"Auditing application ${auditEvent.auditType} event")
     auditConnector.sendEvent(
       DataEvent(
