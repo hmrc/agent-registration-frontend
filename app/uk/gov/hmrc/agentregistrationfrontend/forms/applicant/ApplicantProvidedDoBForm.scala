@@ -27,7 +27,7 @@ import java.time.LocalDate
 
 object ApplicantProvidedDoBForm:
 
-  val key: String = "applicant.provided-individual-details"
+  val key: String = "applicant-provided.date-of-birth"
   val dayKey: String = s"$key.day"
   val monthKey: String = s"$key.month"
   val yearKey: String = s"$key.year"

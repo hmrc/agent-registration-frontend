@@ -30,33 +30,22 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStub
 class ApplicantProvidedDoBControllerSpec
 extends ControllerSpec:
 
-  val testApplication: AgentApplication = tdAll.agentApplicationLimitedPartnership.afterStarted
+  val application: AgentApplication = tdAll.agentApplicationLimitedPartnership.afterStarted
 
   val name: String = tdAll.providedDetails.afterAccessConfirmed.individualName.value
 
-  val testProvidedApplication: ProvidedByApplicant = ProvidedByApplicant(
-    tdAll.individualProvidedDetailsId,
-    tdAll.individualName
-  )
-
-  val testProvidedByApplicant = ProvidedByApplicant(
+  val providedByApplicant: ProvidedByApplicant = ProvidedByApplicant(
     individualProvidedDetailsId = tdAll.providedDetails.afterAccessConfirmed._id,
     individualName = tdAll.providedDetails.afterAccessConfirmed.individualName
   )
 
-  val testSessionStore: ProvidedByApplicantSessionStore = app.injector.instanceOf[ProvidedByApplicantSessionStore]
+  val providedByApplicantSessionStore: ProvidedByApplicantSessionStore = app.injector.instanceOf[ProvidedByApplicantSessionStore]
 
-  override def beforeEach(): Unit = {
-    super.beforeEach()
-    testSessionStore.upsert(testProvidedByApplicant).futureValue
-  }
-
-  override def afterEach(): Unit = {
-    testSessionStore.delete().futureValue
+  override def afterEach(): Unit =
+    providedByApplicantSessionStore.delete().futureValue
     super.afterEach()
-  }
 
-  private val path = s"/agent-registration/apply/list-details/applicant-provides-individual-date-of-birth"
+  private val path = s"/agent-registration/apply/list-details/provide-details/date-of-birth"
 
   "routes should have correct paths and methods" in:
     AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedDoBController.show shouldBe Call(
@@ -72,15 +61,25 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render page" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(testApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(application)
+    providedByApplicantSessionStore.upsert(providedByApplicant).futureValue
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe s"What is $name’s date of birth? - Apply for an agent services account - GOV.UK"
 
+  s"GET $path should return 303 and redirect to the select individual page" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(application)
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url
+
   s"POST $path with valid date of birth should save data and redirect to UNDER CONSTRUCTION" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(testApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(application)
+    providedByApplicantSessionStore.upsert(providedByApplicant).futureValue
     val response: WSResponse =
       post(path)(Map(
         ApplicantProvidedDoBForm.dayKey -> Seq(tdAll.dateOfBirth.getDayOfMonth.toString),
@@ -90,7 +89,8 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.genericExitPage.url // Use exit page for now
-    testSessionStore.find().futureValue shouldBe Some(
+
+    providedByApplicantSessionStore.find().futureValue shouldBe Some(
       ProvidedByApplicant(
         individualProvidedDetailsId = tdAll.providedDetails.afterAccessConfirmed._id,
         individualName = tdAll.providedDetails.afterAccessConfirmed.individualName,
@@ -100,7 +100,8 @@ extends ControllerSpec:
 
   s"POST $path without providing a date should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(testApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(application)
+    providedByApplicantSessionStore.upsert(providedByApplicant).futureValue
     val response: WSResponse =
       post(path)(
         Map(
@@ -113,11 +114,12 @@ extends ControllerSpec:
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe s"Error: What is $name’s date of birth? - Apply for an agent services account - GOV.UK"
-    doc.mainContent.getElementById(s"${ApplicantProvidedDoBForm.key}-error").text() shouldBe "Error: Enter your date of birth"
+    doc.mainContent.getElementById(s"${ApplicantProvidedDoBForm.key}-error").text() shouldBe "Error: What is the date of birth?"
 
   s"POST $path without a valid date should return 400" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(testApplication)
+    AgentRegistrationStubs.stubGetAgentApplication(application)
+    providedByApplicantSessionStore.upsert(providedByApplicant).futureValue
     val response: WSResponse =
       post(path)(
         Map(
@@ -130,4 +132,4 @@ extends ControllerSpec:
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
     doc.title() shouldBe s"Error: What is $name’s date of birth? - Apply for an agent services account - GOV.UK"
-    doc.mainContent.getElementById(s"${ApplicantProvidedDoBForm.key}-error").text() shouldBe "Error: Your date of birth must be a real date"
+    doc.mainContent.getElementById(s"${ApplicantProvidedDoBForm.key}-error").text() shouldBe "Error: The date of birth must be a real date"

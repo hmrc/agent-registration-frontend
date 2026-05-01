@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.provid
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualDateOfBirthForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.ApplicantProvidedDoBForm
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -51,7 +52,7 @@ extends ViewSpec:
         .mainContent
         .selectOrFail("h2.govuk-caption-l")
         .selectOnlyOneElementOrFail()
-        .text() shouldBe messages("applicant.provided-individual-details.caption")
+        .text() shouldBe messages("applicant-provided.date-of-birth.caption")
 
     "render a date input box" in:
       val expectedDateInputBox: TestDateInput = TestDateInput(
@@ -73,3 +74,35 @@ extends ViewSpec:
         .selectOrFail("a.govuk-button--secondary")
         .selectOnlyOneElementOrFail()
         .text() shouldBe "Save and come back later"
+
+    "render a form errors correctly when the form contains an error" in:
+      val field = ApplicantProvidedDoBForm.key
+      val errorMessage = messages("applicant-provided.date-of-birth.error.required")
+      val formWithError = ApplicantProvidedDoBForm.form.withError(ApplicantProvidedDoBForm.dayKey, errorMessage)
+
+      val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError, Some(name)).body)
+
+      errorDoc.mainContent shouldContainContent
+        """
+          |There is a problem
+          |What is the date of birth?
+          |Relevant individual details
+          |What is Test Name’s date of birth?
+          |For example, 31 3 1980
+          |Error:
+          |What is the date of birth?
+          |Day
+          |Month
+          |Year
+          |Save and continue
+          |Save and come back later
+          |Is this page not working properly? (opens in new tab)
+          |""".stripMargin
+
+      behavesLikePageWithErrorHandling(
+        field = field,
+        errorMessage = errorMessage,
+        errorDoc = errorDoc,
+        heading = heading,
+        isWholeDateError = true
+      )

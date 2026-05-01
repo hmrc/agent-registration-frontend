@@ -19,10 +19,10 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedDateOfBirth
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.ApplicantProvidedDoBForm
@@ -43,17 +43,17 @@ class ApplicantProvidedDoBController @Inject() (
 )(using clock: Clock)
 extends FrontendController(mcc, actions):
 
-  private type AgentProvidedIndividualDetails = ProvidedByApplicant *: IsNotSoleTrader *: DataWithAuth
+  private type AgentProvidedIndividualDetails = ProvidedByApplicant *: AgentApplication *: DataWithAuth
 
   private def baseAction: ActionBuilderWithData[AgentProvidedIndividualDetails] = actions
     .getApplicationInProgress
-    .refine:
-      implicit request =>
-        request.get[AgentApplication] match
-          case _: AgentApplicationSoleTrader =>
-            logger.warn("Sole trader is attempting to access applicant journey, redirect to task list")
-            Redirect(AppRoutes.apply.TaskListController.show.url)
-          case aa: IsNotSoleTrader => request.replace[AgentApplication, IsNotSoleTrader](aa)
+    .ensure(
+      condition = implicit request => request.get[AgentApplication].getUserRole =!= UserRole.Owner,
+      resultWhenConditionNotMet =
+        implicit request =>
+          logger.warn("Sole trader attempting to access applicant provided date of birth page")
+          Redirect(AppRoutes.apply.TaskListController.show.url)
+    )
     .refine:
       implicit request =>
         providedByApplicantSessionStore.find().map:
