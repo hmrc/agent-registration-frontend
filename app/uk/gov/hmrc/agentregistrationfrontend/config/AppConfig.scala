@@ -93,7 +93,8 @@ class AppConfig @Inject() (
     .getOrElse(false)
 
   val allowedRedirectHosts: Set[String] = configuration.getOptional[Seq[String]]("allowed-redirect-hosts").getOrElse(Nil).toSet
-
+  // for accessibility, we are registering date fields for use in Layout template to ensure error links go into the first input (day input)
+  val accessibleDateFields: Seq[String] = Seq("dateOfBirth", "applicant-provided.date-of-birth")
   /*
    * GRS CONFIG START
    */

@@ -64,9 +64,9 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Sign in and confirm your details - Apply for an agent services account - GOV.UK"
 
-  s"GET $path with complete application should return 303 and redirect to an exit page" in:
+  s"GET $path with complete application should return 303 and redirect to the status page" in:
     AgentRegistrationStubs.stubFindApplicationByLinkId(linkId = linkId, agentApplication = agentApplication.complete)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location") shouldBe Some("/agent-registration/apply/exit")
+    response.header("Location") shouldBe Some("/agent-registration/provide-details/status/link-id-12345")

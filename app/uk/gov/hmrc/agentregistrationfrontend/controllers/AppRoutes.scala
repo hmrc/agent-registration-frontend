@@ -37,6 +37,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.p
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.routes as internalRoutes
 
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.routes as providedetailsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingprogress.routes as riskingProgressRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.internal.routes as internalIndividualRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.routes as testOnlyRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.routes as testOnlyApplicantRoutes
@@ -178,6 +179,9 @@ object AppRoutes:
 
     object internal:
       val UcrIndividualController = internalIndividualRoutes.UcrIndividualController
+
+    object riskingprogress:
+      val RiskingProgressController = riskingProgressRoutes.RiskingProgressController
 
   object testOnly:
 

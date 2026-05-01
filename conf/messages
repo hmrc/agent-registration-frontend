@@ -1118,6 +1118,30 @@ NonFixableOutcomeListForIndividualFailures.IndividualFailure.9 = has a relevant 
 NonFixableOutcomeListForIndividualFailures.IndividualFailure.10.1 = We did not get enough information to check that {0} met the registration conditions
 NonFixableOutcomeListForIndividualFailures.IndividualFailure.10.2 = We did not get enough information to check that {0} met the registration conditions
 
+
+# Individual outcome
+NonFixableIndividualListPage.caption = Application outcome
+NonFixableIndividualListPage.title = Records show that you do not meet the registration conditions
+NonFixableIndividualListPage.p1 = We have contacted {0} to explain you have not met the registration conditions. This is because records indicate that
+NonFixableIndividualListPage.IndividualFailure.4.1 = you have one or more Self Assessment returns outstanding
+NonFixableIndividualListPage.IndividualFailure.4.3 = you have one or more VAT Returns outstanding
+NonFixableIndividualListPage.IndividualFailure.4.4 = you have one or more PAYE reports outstanding
+NonFixableIndividualListPage.IndividualFailure.5.1 = you have an overdue Self Assessment liability
+NonFixableIndividualListPage.IndividualFailure.5.3 = you have an overdue VAT liability
+NonFixableIndividualListPage.IndividualFailure.5.4 = you have an overdue PAYE liability
+NonFixableIndividualListPage.IndividualFailure.5.5 = you have an overdue civil penalty liability
+NonFixableIndividualListPage.IndividualFailure.5.6 = you have an overdue Stamp Duty liability
+NonFixableIndividualListPage.IndividualFailure.5.7 = you have an overdue Capital Gains Tax liability
+NonFixableIndividualListPage.IndividualFailure.6 = you are actively disqualified on Companies House
+NonFixableIndividualListPage.IndividualFailure.7 = you are formally insolvent
+NonFixableIndividualListPage.IndividualFailure.8.1 = you are on a published HMRC list of tax avoidance promoters, enablers or suppliers
+NonFixableIndividualListPage.IndividualFailure.8.6 = a relevant anti-avoidance penalty has been issued to you within the last 12 months
+NonFixableIndividualListPage.IndividualFailure.8.7 = you have a relevant unpaid anti-avoidance penalty liability
+NonFixableIndividualListPage.IndividualFailure.9 = you have a relevant unspent criminal conviction
+NonFixableIndividualListPage.h2 = What you need to do
+NonFixableIndividualListPage.WhatYouNeedToDoBullet1 = You should speak to the business about this decision
+NonFixableIndividualListPage.WhatYouNeedToDoBullet2 = If the business disagrees with this decision, they can raise it with HMRC
+
 # Applicant provided individual details
 applicant-provided.date-of-birth.title = What is {0}’s date of birth?
 applicant-provided.date-of-birth.caption = Relevant individual details
