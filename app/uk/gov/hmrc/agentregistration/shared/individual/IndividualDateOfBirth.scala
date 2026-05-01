@@ -27,6 +27,9 @@ sealed trait IndividualDateOfBirth
 sealed trait UserProvidedDateOfBirth
 extends IndividualDateOfBirth
 
+sealed trait ApplicantProvidedDateOfBirth
+extends IndividualDateOfBirth
+
 object IndividualDateOfBirth:
 
   final case class Provided(dateOfBirth: LocalDate)

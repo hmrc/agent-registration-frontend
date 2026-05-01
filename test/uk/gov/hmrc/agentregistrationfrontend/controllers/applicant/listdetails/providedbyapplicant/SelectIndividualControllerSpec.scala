@@ -132,8 +132,6 @@ extends ControllerSpec:
         individualName = tdAll.providedDetails.afterAccessConfirmed.individualName
       )
     )
-    response.status shouldBe Status.OK // this ought to be a redirect to the DoB page but that controller isn't yet implemented so for now it just returns OK
-    /** checks disabled until DoB controller available to check response.header("Location") shouldBe
-      * Some(AppRoutes.apply.listdetails.providedbyapplicant.DateOfBirthController.show.url) ApplyStubHelper.verifyConnectorsForAuthAction()
-      * AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplicationId)
-      */
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedDoBController.show.url

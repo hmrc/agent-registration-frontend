@@ -33,7 +33,6 @@ object SubmitAction:
       case Some("SaveAndComeBackLater") => SaveAndComeBackLater
       case _ => SaveAndContinue // default
     }
-
   extension (submitAction: SubmitAction)
     def isSaveAndComeBackLater: Boolean = submitAction === SubmitAction.SaveAndComeBackLater
 
