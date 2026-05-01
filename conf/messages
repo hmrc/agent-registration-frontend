@@ -1112,10 +1112,16 @@ NonFixableOutcomeListForIndividualFailures.IndividualFailure.10.1 = We did not g
 NonFixableOutcomeListForIndividualFailures.IndividualFailure.10.2 = We did not get enough information to check that {0} met the registration conditions
 
 # Applicant provided individual details
-applicant.provided-individual-details.title = What is {0}’s date of birth?
-applicant.provided-individual-details.caption = Relevant individual details
+applicant-provided.date-of-birth.title = What is {0}’s date of birth?
+applicant-provided.date-of-birth.caption = Relevant individual details
+applicant-provided.date-of-birth.hint = For example, 31 3 1980
 
-applicant.provided-individual-details.hint = For example, 31 3 1980
-
-applicant.provided-individual-details.error.required = Enter your date of birth
-applicant.provided-individual-details.error.invalid = Your date of birth must be a real date
+applicant-provided.date-of-birth.error.required = What is the date of birth?
+applicant-provided.date-of-birth.error.day-year.required = The date of birth must include a day and year
+applicant-provided.date-of-birth.error.month-year.required = The date of birth must include a month and year
+applicant-provided.date-of-birth.error.day-month.required = The date of birth must include a day and month
+applicant-provided.date-of-birth.error.day.required = The date of birth must include a day
+applicant-provided.date-of-birth.error.month.required = The date of birth must include a month
+applicant-provided.date-of-birth.error.year.required = The date of birth must include a year
+applicant-provided.date-of-birth.error.invalid = The date of birth must be a real date
+applicant-provided.date-of-birth.error.future = The date of birth must be in the past

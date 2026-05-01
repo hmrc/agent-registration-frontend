@@ -95,7 +95,6 @@ object ViewSelectors:
           hint = element.select(fieldSetHint).toList.headOption.map(_.text)
         )
 
-    // TODO this input helper is incorrect and needs to be changed
     inline def extractDateInput(index: Int = 1): TestDateInput = element
       .selectOrFail(fieldSet)
       .selectOrFail(index)

@@ -45,7 +45,7 @@
     maybeForm = Some(form)
 ) {
 
-    <h2 class="govuk-caption-l">@messages("applicant.provided-individual-details.caption")</h2>
+    <h2 class="govuk-caption-l">@messages("applicant-provided.date-of-birth.caption")</h2>
     @formWithCSRF(action = AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedDoBController.submit) {
         @govukDateInput(DateInput(
             id = key,

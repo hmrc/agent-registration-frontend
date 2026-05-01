@@ -39,6 +39,7 @@ object IndividualDateOfBirthForm:
     )(date => IndividualDateOfBirth.Provided(date).toUserProvidedDateOfBirth)(
       {
         case IndividualDateOfBirth.Provided(date) => Some(date)
+        case _ => None
       }
     )
   )

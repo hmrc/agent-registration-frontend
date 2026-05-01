@@ -19,16 +19,17 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedDateOfBirth
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.ApplicantProvidedDoBForm
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
 import uk.gov.hmrc.agentregistrationfrontend.repository.ProvidedByApplicantSessionStore
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.providedbyapplicant.ApplicantProvidedDoBPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import java.time.Clock
 import javax.inject.Inject
@@ -39,26 +40,29 @@ class ApplicantProvidedDoBController @Inject() (
   actions: ApplicantActions,
   mcc: MessagesControllerComponents,
   providedByApplicantSessionStore: ProvidedByApplicantSessionStore,
-  view: ApplicantProvidedDoBPage
+  view: ApplicantProvidedDoBPage,
+  placeholderView: SimplePage
 )(using clock: Clock)
 extends FrontendController(mcc, actions):
 
-  private type AgentProvidedIndividualDetails = ProvidedByApplicant *: IsNotSoleTrader *: DataWithAuth
+  private type AgentProvidedIndividualDetails = ProvidedByApplicant *: AgentApplication *: DataWithAuth
 
   private def baseAction: ActionBuilderWithData[AgentProvidedIndividualDetails] = actions
     .getApplicationInProgress
-    .refine:
-      implicit request =>
-        request.get[AgentApplication] match
-          case _: AgentApplicationSoleTrader =>
-            logger.warn("Sole trader is attempting to access applicant journey, redirect to task list")
-            Redirect(AppRoutes.apply.TaskListController.show.url)
-          case aa: IsNotSoleTrader => request.replace[AgentApplication, IsNotSoleTrader](aa)
+    .ensure(
+      condition = implicit request => request.get[AgentApplication].getUserRole =!= UserRole.Owner,
+      resultWhenConditionNotMet =
+        implicit request =>
+          logger.warn("Sole trader attempting to access applicant provided date of birth page")
+          Redirect(AppRoutes.apply.TaskListController.show.url)
+    )
     .refine:
       implicit request =>
         providedByApplicantSessionStore.find().map:
           case Some(details) => request.add[ProvidedByApplicant](details)
-          case _ => Redirect(AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url)
+          case _ =>
+            logger.warn("No details found in session store redirecting to the select individual page")
+            Redirect(AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url)
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
@@ -94,4 +98,4 @@ extends FrontendController(mcc, actions):
         providedByApplicantSessionStore
           .upsert(updatedDetails)
           .map: _ =>
-            Redirect(AppRoutes.providedetails.ExitController.genericExitPage)
+            Ok(placeholderView("Telephone page", None)) // TODO change for APB-11137
