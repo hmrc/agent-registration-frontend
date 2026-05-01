@@ -172,6 +172,7 @@ GET         /provide-details/confirm-stop                                   uk.g
 GET         /provide-details/check-your-answers/:linkId                     uk.gov.hmrc.agentregistrationfrontend.controllers.individual.CheckYourAnswersController.show(linkId: LinkId)
 POST        /provide-details/check-your-answers/:linkId                     uk.gov.hmrc.agentregistrationfrontend.controllers.individual.CheckYourAnswersController.submit(linkId: LinkId)
 GET         /provide-details/confirmation/:linkId                           uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualConfirmationController.show(linkId: LinkId)
+GET         /provide-details/status/:linkId                                 uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingprogress.RiskingProgressController.show(linkId: LinkId)
 GET         /provide-details/individual-name-search/:linkId                 uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NameMatchingController.show(linkId: LinkId)
 POST        /provide-details/individual-name-search/:linkId                 uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NameMatchingController.submit(linkId: LinkId)
 GET         /provide-details/name-match-confirmation/:linkId                uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NameMatchConfirmationController.show(linkId: LinkId)

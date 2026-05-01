@@ -83,7 +83,7 @@ extends Connector:
       .map: response =>
         response.status match
           case Status.OK => Some(response.json.as[ApplicationRiskingResponse])
-          case Status.NOT_FOUND => None
+          case Status.NOT_FOUND | Status.NO_CONTENT => None
           case other =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "GET",
