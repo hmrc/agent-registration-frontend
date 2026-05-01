@@ -36,6 +36,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.*
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole.LlpMember
 import uk.gov.hmrc.auth.core.ConfidenceLevel
+import uk.gov.hmrc.http.SessionId
 
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -62,7 +63,8 @@ trait TdBase:
   def newInstant: Instant = nowAsInstant.plusSeconds(20) // used when a new application is created from existing one
 
   final val clock: Clock = Clock.fixed(nowAsInstant, zoneId)
-
+  
+  def cachedSessionId: SessionId = SessionId("session-id-123")
   def saUtr: SaUtr = SaUtr("1234567895")
   def ctUtr: CtUtr = CtUtr("2202108031")
   def internalUserId: InternalUserId = InternalUserId("internal-user-id-12345")
