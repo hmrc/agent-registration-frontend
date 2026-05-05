@@ -728,7 +728,7 @@ individualConfirmation.p1.SoleTrader = You need to sign back in with your agent 
 individualConfirmation.whatNext.p2 = When we have finished our checks, we’ll email {0} with a decision about the application.
 individualConfirmation.whatNext.p3 = If we need any further information from you, we will contact you by email or telephone.
 individualConfirmation.signOutLink = Finish and sign out
-individualConfirmation.signOutToTaskListLink = Continue your application using your agent sign in details
+individualConfirmation.signOutToTaskListLink = Continue to your application using your agent sign in details
 
 # Individual date of birth
 dateOfBirth.title = What is your date of birth?

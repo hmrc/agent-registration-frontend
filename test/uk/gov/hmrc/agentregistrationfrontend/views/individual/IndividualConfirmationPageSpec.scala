@@ -67,7 +67,7 @@ extends ViewSpec:
         """
           |You have proved your identity
           |You need to sign back in with your agent sign in details to continue your application.
-          |Continue your application using your agent sign in details
+          |Continue to your application using your agent sign in details
           |Is this page not working properly? (opens in new tab)
           |"""
           .stripMargin
