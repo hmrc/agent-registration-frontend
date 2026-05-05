@@ -27,15 +27,15 @@ import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 
 /** Connector to the companion backend microservice
-  */
+ */
 @Singleton
 class AgentRegistrationRiskingConnector @Inject() (
-  httpClient: HttpClientV2,
-  appConfig: AppConfig
-)(using
-  ExecutionContext
-)
-extends Connector:
+                                                    httpClient: HttpClientV2,
+                                                    appConfig: AppConfig
+                                                  )(using
+                                                    ExecutionContext
+                                                  )
+  extends Connector:
 
   def submitForRisking(submitForRiskingRequest: SubmitForRiskingRequest)(using RequestHeader): Future[Unit] =
     val url: URL = url"$baseUrl/submit-for-risking"

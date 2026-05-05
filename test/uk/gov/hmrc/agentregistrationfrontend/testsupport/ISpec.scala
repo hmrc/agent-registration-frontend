@@ -84,7 +84,9 @@ extends AnyWordSpecLike,
       "auditing.traceRequests" -> false,
       "play.filters.csrf.header.bypassHeaders.Csrf-Token" -> "nocheck",
       "features.grs-stub" -> false,
-      "inject-email-verification-passcodes-page" -> false // false to match production behavior where email verification is performed without injected test only page
+      "inject-email-verification-passcodes-page" -> false, // false to match production behavior where email verification is performed without injected test only page
+      "fieldLevelEncryption.enabled" -> true,
+      "fieldLevelEncryption.key" -> "edkOOwt7uvzw1TXnFIN6aRVHkfWcgiOrbBvkEQvO65g=" // use base64 even for tests
     ) ++ configOverrides
 
   protected def configOverrides: Map[String, Any] = Map[String, Any]()
@@ -115,7 +117,7 @@ extends AnyWordSpecLike,
           override def generateApplicationReference(): ApplicationReference = tdAll.applicationReference
         })
         bind(classOf[PersonReferenceGenerator]).toInstance(new PersonReferenceGenerator {
-          override def nextPersonReference(): PersonReference = tdAll.personReference
+          override def generatePersonReference(): PersonReference = tdAll.personReference
         })
 
   override def fakeApplication(): Application = GuiceApplicationBuilder()

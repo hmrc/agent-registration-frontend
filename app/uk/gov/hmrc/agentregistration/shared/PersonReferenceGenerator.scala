@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.agentregistration.shared
 
-import org.bson.types.ObjectId
 import javax.inject.Singleton
+import uk.gov.hmrc.agentregistration.util.ReferenceGenerator.generateReference
 
 @Singleton
 class PersonReferenceGenerator:
-  def nextPersonReference(): PersonReference = PersonReference(ObjectId.get().toHexString)
+
+  def generatePersonReference(): PersonReference = PersonReference(generateReference())

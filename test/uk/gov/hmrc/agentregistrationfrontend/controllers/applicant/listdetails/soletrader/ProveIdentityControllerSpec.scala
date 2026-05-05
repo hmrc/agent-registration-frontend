@@ -43,6 +43,7 @@ extends ControllerSpec:
   s"GET $path when no individual record exists should create individual record, return 200 and render page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHmrcStandardForAgentsAgreed)
     AgentRegistrationStubs.stubFindIndividualsForApplication(agentApplication.afterHmrcStandardForAgentsAgreed.agentApplicationId)
+    AgentRegistrationStubs.stubFindIndividualByPersonReferenceNoContent(tdAll.personReference)
     AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(tdAll.providedDetails.soleTrader.soleTraderAutopopulatedDetails)
     val response: WSResponse = get(path)
 

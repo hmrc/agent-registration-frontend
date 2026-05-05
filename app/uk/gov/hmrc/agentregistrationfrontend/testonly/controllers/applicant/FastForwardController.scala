@@ -64,7 +64,9 @@ class FastForwardController @Inject() (
   agentRegistrationRiskingService: AgentRegistrationRiskingService,
   internalUserIdGenerator: InternalUserIdGenerator,
   individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator,
-  testAgentRegistrationConnector: TestAgentRegistrationConnector
+  testAgentRegistrationConnector: TestAgentRegistrationConnector,
+  applicationReferenceGenerator: ApplicationReferenceGenerator,
+  personReferenceGenerator: PersonReferenceGenerator
 )(using
   clock: Clock,
   ex: ExecutionContext
@@ -107,6 +109,7 @@ extends FrontendController(mcc, applicantActions):
         internalUserId = loggedInAsUserApplicantRequestWithAuthData.get[InternalUserId],
         linkId = linkIdGenerator.nextLinkId(),
         groupId = loggedInAsUserApplicantRequestWithAuthData.get[GroupId],
+        applicationReference = applicationReferenceGenerator.generateApplicationReference(),
         createdAt = Instant.now(clock)
       )
       _ <- testAgentRegistrationConnector.upsertAgentApplication(agentApplication)
@@ -139,6 +142,7 @@ extends FrontendController(mcc, applicantActions):
     val individualProvidedDetailsId: IndividualProvidedDetailsId = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId()
     val individualProvidedDetails = template.copy(
       _id = individualProvidedDetailsId,
+      personReference = personReferenceGenerator.generatePersonReference(),
       individualName = individualName,
       agentApplicationId = agentApplicationId,
       internalUserId = template.internalUserId.map(_ => internalUserIdGenerator.nextInternalUserId()),

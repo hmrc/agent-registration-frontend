@@ -30,9 +30,9 @@ import scala.concurrent.Future
 
 @Singleton
 class AgentRegistrationRiskingService @Inject() (
-  agentRegistrationRiskingConnector: AgentRegistrationRiskingConnector
-)(using ExecutionContext)
-extends RequestAwareLogging:
+                                                  agentRegistrationRiskingConnector: AgentRegistrationRiskingConnector
+                                                )(using ExecutionContext)
+  extends RequestAwareLogging:
 
   def submitForRisking(submitForRiskingRequest: SubmitForRiskingRequest)(using request: RequestHeader): Future[Unit] = agentRegistrationRiskingConnector
     .submitForRisking(submitForRiskingRequest)

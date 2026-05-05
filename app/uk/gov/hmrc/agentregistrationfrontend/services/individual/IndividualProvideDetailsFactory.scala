@@ -30,17 +30,17 @@ import javax.inject.Singleton
 @Singleton
 class IndividualProvideDetailsFactory @Inject() (
   clock: Clock,
-  individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator,
-  personReferenceGenerator: PersonReferenceGenerator
+  individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator
 ):
 
   def create(
     agentApplicationId: AgentApplicationId,
+    personReference: PersonReference,
     individualName: IndividualName,
     isPersonOfControl: Boolean
   ): IndividualProvidedDetails = IndividualProvidedDetails(
     _id = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId(),
-    personReference = personReferenceGenerator.nextPersonReference(),
+    personReference = personReference,
     agentApplicationId = agentApplicationId,
     createdAt = Instant.now(clock),
     providedDetailsState = Precreated,

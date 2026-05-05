@@ -201,14 +201,17 @@ extends FrontendController(mcc, actions):
                 if (individuals.nonEmpty)
                   Future.successful(())
                 else
-                  Future.traverse(companiesHouseOfficers.toList)(valideName =>
-                    individualProvideDetailsService.upsertForApplication(
-                      individualProvideDetailsService.create(
-                        individualName = valideName,
+                  Future.traverse(companiesHouseOfficers.toList)(validName =>
+                    for
+                      personReference <- individualProvideDetailsService.generateNewPersonReference()
+                      individualProvidedDetails = individualProvideDetailsService.create(
+                        individualName = validName,
                         isPersonOfControl = true,
-                        agentApplicationId = agentApplication.agentApplicationId
+                        agentApplicationId = agentApplication.agentApplicationId,
+                        personReference = personReference
                       )
-                    )
+                      _ <- individualProvideDetailsService.upsertForApplication(individualProvidedDetails)
+                    yield ()
                   )
 
               for

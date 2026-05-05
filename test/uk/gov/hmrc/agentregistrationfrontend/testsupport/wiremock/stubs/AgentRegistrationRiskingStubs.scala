@@ -33,17 +33,17 @@ object AgentRegistrationRiskingStubs:
   )
 
   def verifySubmitAgentApplication(
-    count: Int = 1
-  ): Unit = StubMaker.verify(
+                                    count: Int = 1
+                                  ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration-risking/submit-for-risking"),
     count = count
   )
 
   def stubGetApplicationRiskingResponse(
-    applicationReference: ApplicationReference,
-    applicationRiskingResponse: ApplicationRiskingResponse
-  ): StubMapping = StubMaker.make(
+                                         applicationReference: ApplicationReference,
+                                         applicationRiskingResponse: ApplicationRiskingResponse
+                                       ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration-risking/application/${applicationReference.value}"),
     responseStatus = 200,
@@ -51,9 +51,9 @@ object AgentRegistrationRiskingStubs:
   )
 
   def verifyGetApplicationRiskingResponse(
-    applicationReference: ApplicationReference,
-    count: Int = 1
-  ): Unit = StubMaker.verify(
+                                           applicationReference: ApplicationReference,
+                                           count: Int = 1
+                                         ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration-risking/application/${applicationReference.value}"),
     count = count

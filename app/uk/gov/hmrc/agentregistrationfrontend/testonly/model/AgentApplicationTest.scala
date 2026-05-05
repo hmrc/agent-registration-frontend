@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.LinkId
@@ -37,6 +38,7 @@ extension (a: AgentApplication)
     internalUserId: InternalUserId,
     linkId: LinkId,
     groupId: GroupId,
+    applicationReference: ApplicationReference,
     createdAt: Instant
   ): AgentApplication =
     a match
@@ -46,6 +48,7 @@ extension (a: AgentApplication)
           internalUserId = internalUserId,
           linkId = linkId,
           groupId = groupId,
+          applicationReference = applicationReference,
           createdAt = createdAt
         )
       case a: AgentApplicationLlp =>
@@ -54,6 +57,7 @@ extension (a: AgentApplication)
           internalUserId = internalUserId,
           linkId = linkId,
           groupId = groupId,
+          applicationReference = applicationReference,
           createdAt = createdAt
         )
       case a: AgentApplicationLimitedCompany =>
@@ -62,6 +66,7 @@ extension (a: AgentApplication)
           internalUserId = internalUserId,
           linkId = linkId,
           groupId = groupId,
+          applicationReference = applicationReference,
           createdAt = createdAt
         )
       case a: AgentApplicationGeneralPartnership =>
@@ -70,6 +75,7 @@ extension (a: AgentApplication)
           internalUserId = internalUserId,
           linkId = linkId,
           groupId = groupId,
+          applicationReference = applicationReference,
           createdAt = createdAt
         )
       case a: AgentApplicationLimitedPartnership =>
@@ -78,6 +84,7 @@ extension (a: AgentApplication)
           internalUserId = internalUserId,
           linkId = linkId,
           groupId = groupId,
+          applicationReference = applicationReference,
           createdAt = createdAt
         )
       case a: AgentApplicationScottishLimitedPartnership =>
@@ -86,6 +93,7 @@ extension (a: AgentApplication)
           internalUserId = internalUserId,
           linkId = linkId,
           groupId = groupId,
+          applicationReference = applicationReference,
           createdAt = createdAt
         )
       case a: AgentApplicationScottishPartnership =>
@@ -94,5 +102,6 @@ extension (a: AgentApplication)
           internalUserId = internalUserId,
           linkId = linkId,
           groupId = groupId,
+          applicationReference = applicationReference,
           createdAt = createdAt
         )

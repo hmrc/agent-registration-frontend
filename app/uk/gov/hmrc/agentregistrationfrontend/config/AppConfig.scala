@@ -80,6 +80,7 @@ class AppConfig @Inject() (
   def applicationLink(linkId: String): Uri = uri"$thisFrontendBaseUrl/agent-registration/provide-details/start/$linkId"
   def soleTraderProvideDetailsLink(linkId: String): Uri = uri"$thisFrontendBaseUrl/agent-registration/provide-details/match-application/$linkId"
 
+  val sessionTimeout: FiniteDuration = configuration.get[FiniteDuration]("session.timeout")
   val welshLanguageSupportEnabled: Boolean = configuration.getOptional[Boolean]("features.welsh-language-support").getOrElse(false)
   val contactFrontendId: String = configuration.get[String]("contact-frontend.serviceId") // TODO placeholder
   val accessibilityStatementPath: String = configuration.get[String]("accessibility-statement.service-path")
