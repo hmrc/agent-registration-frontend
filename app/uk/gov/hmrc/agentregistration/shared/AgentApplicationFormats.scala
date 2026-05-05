@@ -16,21 +16,15 @@
 
 package uk.gov.hmrc.agentregistration.shared
 
-import play.api.libs.functional.syntax.toInvariantFunctorOps
-import play.api.libs.json.Format
 import play.api.libs.json.Json
 import play.api.libs.json.JsonConfiguration
 import play.api.libs.json.OFormat
 import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
 import uk.gov.hmrc.auth.core.retrieve.Credentials
-import uk.gov.hmrc.http.SessionId
 
 import scala.annotation.nowarn
 
 object AgentApplicationFormats:
-
-  // Can't use JsonFormatsFactory here because SessionId is in a HMRC library
-  given sessionIdFormatter: Format[SessionId] = Format.of[String].inmap(SessionId.apply, _.value)
 
   @nowarn()
   given format: OFormat[AgentApplication] =
