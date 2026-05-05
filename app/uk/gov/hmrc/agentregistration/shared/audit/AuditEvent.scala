@@ -19,7 +19,9 @@ package uk.gov.hmrc.agentregistration.shared.audit
 import play.api.libs.json.Format
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
-import uk.gov.hmrc.agentregistration.shared.{AgentApplication, ApplicationReference, BusinessType}
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistration.shared.BusinessType
 
 sealed trait AuditEvent:
   val auditType: AuditType
@@ -29,18 +31,20 @@ final case class StartOrContinueApplicationAuditEvent(
   applicationReference: ApplicationReference,
   journeyType: StartOrContinueApplicationAuditEvent.JourneyType,
   entityType: BusinessType,
-  isUkEntity: true
+  isUkEntity: Boolean = true
 )
 extends AuditEvent:
   override val auditType: AuditType = AuditType.StartOrContinueApplication
 
 object StartOrContinueApplicationAuditEvent:
-  
-  def make(agentApplication: AgentApplication, journeyType: JourneyType): StartOrContinueApplicationAuditEvent = StartOrContinueApplicationAuditEvent(
+
+  def make(
+    agentApplication: AgentApplication,
+    journeyType: JourneyType
+  ): StartOrContinueApplicationAuditEvent = StartOrContinueApplicationAuditEvent(
     applicationReference = agentApplication.applicationReference,
     journeyType = journeyType,
-    entityType = agentApplication.businessType,
-    isUkEntity = true
+    entityType = agentApplication.businessType
   )
 
   given format: Format[StartOrContinueApplicationAuditEvent] = Json.format[StartOrContinueApplicationAuditEvent]
