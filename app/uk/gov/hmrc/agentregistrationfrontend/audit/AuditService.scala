@@ -42,9 +42,25 @@ extends RequestAwareLogging:
 
   private final val auditSource = AppName.fromConfiguration(config)
 
-  def auditStartOrContinueApplication(agentApplication: AgentApplication, journeyType: JourneyType)(using RequestHeader): Future[AuditResult] =
-    val auditEvent = StartOrContinueApplicationAuditEvent.make(agentApplication, journeyType)
-    logger.info(s"Auditing application ${auditEvent.auditType} event")
+  def auditContinueApplication(agentApplication: AgentApplication)(using RequestHeader): Future[AuditResult] =
+    val auditEvent = StartOrContinueApplicationAuditEvent.make(agentApplication, JourneyType.Continue)
+    logger.info(s"Auditing continue application event")
+    auditConnector.sendEvent(
+      DataEvent(
+        auditSource = auditSource,
+        auditType = auditEvent.auditType.toString,
+        detail = Map(
+          "applicationReference" -> auditEvent.applicationReference.value,
+          "journeyType" -> auditEvent.journeyType.toString,
+          "entityType" -> auditEvent.entityType.toString,
+          "isUkEntity" -> auditEvent.isUkEntity.toString
+        )
+      )
+    )
+
+  def auditStartApplication(agentApplication: AgentApplication)(using RequestHeader): Future[AuditResult] =
+    val auditEvent = StartOrContinueApplicationAuditEvent.make(agentApplication, JourneyType.Start)
+    logger.info(s"Auditing start application event")
     auditConnector.sendEvent(
       DataEvent(
         auditSource = auditSource,
