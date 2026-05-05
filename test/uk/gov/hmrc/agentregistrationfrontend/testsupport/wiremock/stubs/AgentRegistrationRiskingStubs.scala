@@ -45,7 +45,7 @@ object AgentRegistrationRiskingStubs:
     applicationRiskingResponse: ApplicationRiskingResponse
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = wm.urlPathEqualTo(s"/agent-registration-risking/application/${applicationReference.value}"),
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration-risking/risking-progress/for-applicant/${applicationReference.value}"),
     responseStatus = 200,
     responseBody = Json.toJson(applicationRiskingResponse).toString()
   )
@@ -55,6 +55,6 @@ object AgentRegistrationRiskingStubs:
     count: Int = 1
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = wm.urlPathEqualTo(s"/agent-registration-risking/application/${applicationReference.value}"),
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration-risking/risking-progress/for-applicant/${applicationReference.value}"),
     count = count
   )
