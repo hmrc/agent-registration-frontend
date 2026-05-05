@@ -21,7 +21,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
-import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
@@ -60,20 +60,20 @@ extends FrontendController(mcc, actions):
         Redirect(AppRoutes.apply.TaskListController.show)
 
   def applicationStatus: Action[AnyContent] = actions
-    .getApplicationRiskingResponse:
+    .getRiskingProgress:
       implicit request =>
         val agentApplication: AgentApplication = request.get
         val submittedAt: Instant = agentApplication.getSubmittedAt
         val projectedDecisionDate: LocalDate = calculateDecisionDate(submittedAt)
 
-        val applicationRiskingResponse: ApplicationRiskingResponse = request.get
-        applicationRiskingResponse match
-          case ApplicationRiskingResponse.ReadyForSubmission => // show the confirmation screen
+        val riskingProgress: RiskingProgress = request.get
+        riskingProgress match
+          case RiskingProgress.ReadyForSubmission => // show the confirmation screen
             Ok(confirmationPage(
               dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
               agentApplication = agentApplication
             ))
-          case ApplicationRiskingResponse.SubmittedForRisking => // show the in progress screen
+          case RiskingProgress.SubmittedForRisking => // show the in progress screen
             val localDateSubmitted: LocalDate =
               submittedAt
                 .atZone(ZoneId.systemDefault())
@@ -84,16 +84,21 @@ extends FrontendController(mcc, actions):
               dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
               dateSubmitted = displayDateForLang(Some(localDateSubmitted))
             ))
-          case failedNonFixable: ApplicationRiskingResponse.FailedNonFixable =>
+          case failedNonFixable: RiskingProgress.FailedNonFixable =>
             Ok(failedNonFixablePage(
               failedNonFixable = failedNonFixable,
               agentApplication = agentApplication,
               entityName = request.get[BusinessPartnerRecordResponse].getEntityName
             ))
-          case _: ApplicationRiskingResponse.FailedFixable => // TODO: show the fixable failures page
+          case _: RiskingProgress.FailedFixable => // TODO: show the fixable failures page
             Ok(simplePage(
               h1 = "Fixable failure placeholder",
               bodyText = Some("Placeholder for the fixable failures...")
+            ))
+          case RiskingProgress.Approved =>
+            Ok(simplePage(
+              h1 = "RiskingProgress.Approved",
+              bodyText = Some("Placeholder for the RiskingProgress.Approved case...")
             ))
 
   def viewSubmittedApplication: Action[AnyContent] = actions

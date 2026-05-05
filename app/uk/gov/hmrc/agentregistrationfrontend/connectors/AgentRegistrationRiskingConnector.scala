@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
-import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -56,14 +56,14 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to submit agent application for risking: ${submitForRiskingRequest.agentApplication.agentApplicationId.value}")
 
-  def getRiskingProgressForApplicant(applicationReference: ApplicationReference)(using RequestHeader): Future[ApplicationRiskingResponse] =
+  def getRiskingProgressForApplicant(applicationReference: ApplicationReference)(using RequestHeader): Future[RiskingProgress] =
     val url: URL = url"$baseUrl/risking-progress/for-applicant/${applicationReference.value}"
     httpClient
       .get(url)
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => response.json.as[ApplicationRiskingResponse] // at the point of calling this endpoint the Application must be at risking microservice
+          case Status.OK => response.json.as[RiskingProgress] // at the point of calling this endpoint the Application must be at risking microservice
           case other =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "GET",
@@ -74,14 +74,14 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to get riskingProgressForApplicant: ${applicationReference.value}")
 
-  def getRiskingProgressForIndividual(applicationReference: ApplicationReference)(using RequestHeader): Future[ApplicationRiskingResponse] =
+  def getRiskingProgressForIndividual(applicationReference: ApplicationReference)(using RequestHeader): Future[RiskingProgress] =
     val url: URL = url"$baseUrl/risking-progress/for-individual/${applicationReference.value}"
     httpClient
       .get(url)
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => response.json.as[ApplicationRiskingResponse] // at the point of calling this endpoint the Application must be at risking microservice
+          case Status.OK => response.json.as[RiskingProgress] // at the point of calling this endpoint the Application must be at risking microservice
           case other =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "GET",

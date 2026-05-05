@@ -23,7 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineFutureEither
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineUnion
@@ -56,9 +56,9 @@ object ApplicantActions:
   type RequestWithApplicationAndBpr = RequestWithData[DataWithApplicationAndBpr]
   type RequestWithApplicationAndBprCt[A] = RequestWithDataCt[A, DataWithApplicationAndBpr]
 
-  type DataWithRiskingResponse = ApplicationRiskingResponse *: DataWithApplicationAndBpr
-  type RequestWithRiskingResponse = RequestWithData[DataWithRiskingResponse]
-  type RequestWithRiskingResponseCt[A] = RequestWithDataCt[A, DataWithRiskingResponse]
+  type DataWithRiskingProgress = RiskingProgress *: DataWithApplicationAndBpr
+  type RequestWithRiskingProgress = RequestWithData[DataWithRiskingProgress]
+  type RequestWithRiskingProgressCt[A] = RequestWithDataCt[A, DataWithRiskingProgress]
 
 @Singleton
 class ApplicantActions @Inject() (
@@ -122,12 +122,12 @@ extends RequestAwareLogging:
       )
       .getBusinessPartnerRecord
 
-  val getApplicationRiskingResponse: ActionBuilderWithData[DataWithRiskingResponse] = getApplicationSubmitted
+  val getRiskingProgress: ActionBuilderWithData[DataWithRiskingProgress] = getApplicationSubmitted
     .refine(implicit request =>
       agentRegistrationRiskingService
-        .getApplicationRiskingResponse(request.agentApplication.applicationReference)
-        .map: applicationRiskingResponse =>
-          request.add[ApplicationRiskingResponse](applicationRiskingResponse)
+        .getRiskingProgress(request.agentApplication.applicationReference)
+        .map: riskingProgress =>
+          request.add[RiskingProgress](riskingProgress)
     )
 
   extension [Data <: Tuple](ab: ActionBuilderWithData[Data])

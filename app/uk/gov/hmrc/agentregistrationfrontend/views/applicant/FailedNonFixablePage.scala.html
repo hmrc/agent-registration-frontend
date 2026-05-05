@@ -18,7 +18,7 @@
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 @import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
-@import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
+@import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 @import uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import views.html.helper.CSPNonce
@@ -30,7 +30,7 @@
 )
 
 @(
-        failedNonFixable: ApplicationRiskingResponse.FailedNonFixable,
+        failedNonFixable: RiskingProgress.FailedNonFixable,
         agentApplication: AgentApplication,
         entityName: String
 )(implicit
