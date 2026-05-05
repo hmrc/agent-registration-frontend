@@ -66,7 +66,6 @@ extends ViewSpec:
   "FailedNonFixablePage when individuals have failures" should:
 
     "have expected content" in:
-
       docWithIndividualFailures.mainContent shouldContainContent
         s"""
            |Application outcome
@@ -117,6 +116,15 @@ extends ViewSpec:
         docWithIndividualFailures.selectOrFail(s"#${individual.personReference.value}-reasons").select("li").size shouldBe individual.failures.getOrElse(
           List.empty
         ).size
+
+    "should contain a link to the appeals guidance" in:
+      val appealLink = "https://www.gov.uk/guidance/if-you-disagree-with-hmrcs-decision-about-your-tax-adviser-registration"
+      val link = docWithIndividualFailures
+        .mainContent
+        .select("a.govuk-link")
+
+      link.attr("href") shouldBe appealLink
+      link.text() should include("request a review or appeal the decision (opens in a new tab)")
 
   "FailedNonFixablePage when no individuals have failures" should:
 
