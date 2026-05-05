@@ -87,7 +87,6 @@ extends FrontendController(mcc, actions):
             for {
               applicationReference <- agentApplicationService.generateNewApplicationReference()
               agentApplication = businessType.makeNewAgentApplication(userRole, applicationReference)
-              _ <- auditService.auditStartApplication(agentApplication)
               result <- agentApplicationService
                 .upsert(agentApplication)
                 .map(_ => Redirect(nextEndpoint))
