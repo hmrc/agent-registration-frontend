@@ -65,12 +65,12 @@ extends ViewSpec:
     "have expected content when sole trader" in:
       soleTraderDoc.mainContent shouldContainContent
         """
-          |You have proven your identity
-          |You have proven your identity, you can now use your agent credentials to sign back into your application and continue the application process.
-          |Sign back into your application
+          |You have proved your identity
+          |You need to sign back in with your agent sign in details to continue your application.
+          |Continue your application using your agent sign in details
           |Is this page not working properly? (opens in new tab)
           |"""
           .stripMargin
 
     "have the correct title when sole trader" in:
-      soleTraderDoc.title() shouldBe "You have proven your identity - Apply for an agent services account - GOV.UK"
+      soleTraderDoc.title() shouldBe "You have proved your identity - Apply for an agent services account - GOV.UK"
