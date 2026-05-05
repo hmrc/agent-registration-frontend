@@ -21,6 +21,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.audit.CachedSessionId
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
@@ -90,6 +91,7 @@ extends FrontendController(mcc, actions):
               result <- agentApplicationService
                 .upsert(agentApplication)
                 .map(_ => Redirect(nextEndpoint))
+              _ <- auditService.auditStartApplication(agentApplication)
             } yield result
 
   extension (businessType: BusinessType)
@@ -97,12 +99,12 @@ extends FrontendController(mcc, actions):
       userRole: UserRole,
       applicationReference: ApplicationReference
     )(using request: RequestWithDataCt[AnyContent, DataWithAuth]): AgentApplication = {
-      val sessionId = hc.sessionId.getOrThrowExpectedDataMissing("sessionId")
+      val cachedSessionId = CachedSessionId.make(hc.sessionId.getOrThrowExpectedDataMissing("sessionId"))
       businessType match
         case BusinessType.Partnership.LimitedLiabilityPartnership =>
           applicationFactory.makeNewAgentApplicationLlp(
             internalUserId = request.internalUserId,
-            sessionId = sessionId,
+            cachedSessionId = cachedSessionId,
             applicantCredentials = request.credentials,
             groupId = request.groupId,
             userRole = userRole,
@@ -111,7 +113,7 @@ extends FrontendController(mcc, actions):
         case BusinessType.SoleTrader =>
           applicationFactory.makeNewAgentApplicationSoleTrader(
             internalUserId = request.internalUserId,
-            sessionId = sessionId,
+            cachedSessionId = cachedSessionId,
             applicantCredentials = request.credentials,
             groupId = request.groupId,
             userRole = userRole,
@@ -120,7 +122,7 @@ extends FrontendController(mcc, actions):
         case BusinessType.LimitedCompany =>
           applicationFactory.makeNewAgentApplicationLimitedCompany(
             internalUserId = request.internalUserId,
-            sessionId = sessionId,
+            cachedSessionId = cachedSessionId,
             applicantCredentials = request.credentials,
             groupId = request.groupId,
             userRole = userRole,
@@ -129,7 +131,7 @@ extends FrontendController(mcc, actions):
         case BusinessType.Partnership.GeneralPartnership =>
           applicationFactory.makeNewAgentApplicationGeneralPartnership(
             internalUserId = request.internalUserId,
-            sessionId = sessionId,
+            cachedSessionId = cachedSessionId,
             applicantCredentials = request.credentials,
             groupId = request.groupId,
             userRole = userRole,
@@ -138,7 +140,7 @@ extends FrontendController(mcc, actions):
         case BusinessType.Partnership.LimitedPartnership =>
           applicationFactory.makeNewAgentApplicationLimitedPartnership(
             internalUserId = request.internalUserId,
-            sessionId = sessionId,
+            cachedSessionId = cachedSessionId,
             applicantCredentials = request.credentials,
             groupId = request.groupId,
             userRole = userRole,
@@ -147,7 +149,7 @@ extends FrontendController(mcc, actions):
         case BusinessType.Partnership.ScottishLimitedPartnership =>
           applicationFactory.makeNewAgentApplicationScottishLimitedPartnership(
             internalUserId = request.internalUserId,
-            sessionId = sessionId,
+            cachedSessionId = cachedSessionId,
             applicantCredentials = request.credentials,
             groupId = request.groupId,
             userRole = userRole,
@@ -156,7 +158,7 @@ extends FrontendController(mcc, actions):
         case BusinessType.Partnership.ScottishPartnership =>
           applicationFactory.makeNewAgentApplicationScottishPartnership(
             internalUserId = request.internalUserId,
-            sessionId = sessionId,
+            cachedSessionId = cachedSessionId,
             applicantCredentials = request.credentials,
             groupId = request.groupId,
             userRole = userRole,
