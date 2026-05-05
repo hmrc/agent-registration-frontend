@@ -721,14 +721,14 @@ individualDetailsCheckYourAnswers.dateOfBirth.label = Date of birth
 
 # Individual Confirmation of submission
 individualConfirmation.title = You have finished this process
-individualConfirmation.title.SoleTrader = You have proven your identity
+individualConfirmation.title.SoleTrader = You have proved your identity
 individualConfirmation.whatNext.h2 = What happens next
 individualConfirmation.whatNext.p1 = Your information has been added to {0}’s application for an agent services account. Once the application has been submitted we’ll begin our checks.
-individualConfirmation.p1.SoleTrader = You have proven your identity, you can now use your agent credentials to sign back into your application and continue the application process.
+individualConfirmation.p1.SoleTrader = You need to sign back in with your agent sign in details to continue your application.
 individualConfirmation.whatNext.p2 = When we have finished our checks, we’ll email {0} with a decision about the application.
 individualConfirmation.whatNext.p3 = If we need any further information from you, we will contact you by email or telephone.
 individualConfirmation.signOutLink = Finish and sign out
-individualConfirmation.signOutToTaskListLink = Sign back into your application
+individualConfirmation.signOutToTaskListLink = Continue your application using your agent sign in details
 
 # Individual date of birth
 dateOfBirth.title = What is your date of birth?
