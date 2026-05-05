@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock as wm
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
-import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
@@ -42,12 +42,12 @@ object AgentRegistrationRiskingStubs:
 
   def stubGetApplicationRiskingResponse(
     applicationReference: ApplicationReference,
-    applicationRiskingResponse: ApplicationRiskingResponse
+    riskingProgress: RiskingProgress
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration-risking/risking-progress/for-applicant/${applicationReference.value}"),
     responseStatus = 200,
-    responseBody = Json.toJson(applicationRiskingResponse).toString()
+    responseBody = Json.toJson(riskingProgress).toString()
   )
 
   def verifyGetApplicationRiskingResponse(

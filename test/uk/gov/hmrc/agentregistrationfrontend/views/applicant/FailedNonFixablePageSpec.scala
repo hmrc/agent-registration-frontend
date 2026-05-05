@@ -20,7 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.FailedNonFixablePage
 
@@ -39,7 +39,7 @@ extends ViewSpec:
     // Some(List(EntityFailure.4.1, EntityFailure.4.3, EntityFailure.4.4)),
     // 0 = {IndividualRiskingResponse@13174} IndividualRiskingResponse(PersonReference(individual-provided-details-id-12345),IndividualName(Steve Austin),FailedNonFixable,Some(List(IndividualFailure.5.1, IndividualFailure.6)))
     // 1 = {IndividualRiskingResponse@13178} IndividualRiskingResponse(PersonReference(test-individual-2),IndividualName(Beverly Hills),FailedNonFixable,Some(List(IndividualFailure.4.1)))
-    val allIndividualsHaveFailures: ApplicationRiskingResponse.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixable
+    val allIndividualsHaveFailures: RiskingProgress.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixable
 
     // ApplicationReference(APPREF123)
     // Some(List(EntityFailure.4.1, EntityFailure.4.3, EntityFailure.4.4))
@@ -49,8 +49,7 @@ extends ViewSpec:
 //      riskedIndividuals = tdAll.applicationRiskingResponse.failedNonFixable.riskedIndividuals.map(_.copy(failures = List.empty))
 //    )
 
-    val noIndividualsWithFailures: ApplicationRiskingResponse.FailedNonFixable =
-      tdAll.applicationRiskingResponse.failedNonFixable_failedApplicant_approvedIndividuls
+    val noIndividualsWithFailures: RiskingProgress.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixable_failedApplicant_approvedIndividuls
 
   val entityFailureMessages: Map[String, String] = Map(
     "duplicatedMessage" -> "the business has missing tax returns in their HMRC record", // all three entity failures have this same failure message
