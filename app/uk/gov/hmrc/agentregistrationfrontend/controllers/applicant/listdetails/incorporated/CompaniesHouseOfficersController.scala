@@ -204,11 +204,10 @@ extends FrontendController(mcc, actions):
                   Future.traverse(companiesHouseOfficers.toList)(validName =>
                     for
                       personReference <- individualProvideDetailsService.generateNewPersonReference()
-                      individualProvidedDetails = individualProvideDetailsService.create(
+                      individualProvidedDetails <- individualProvideDetailsService.create(
                         individualName = validName,
                         isPersonOfControl = true,
-                        agentApplicationId = agentApplication.agentApplicationId,
-                        personReference = personReference
+                        agentApplicationId = agentApplication.agentApplicationId
                       )
                       _ = logger.debug(s"Inserting individual $personReference...")
                       _ <- individualProvideDetailsService.upsertForApplication(individualProvidedDetails)

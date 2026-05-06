@@ -156,21 +156,14 @@ extends FrontendController(mcc, actions):
 
           NameMatching.individualNameMatching(individualName, companiesHouseOfficerList) match
             case Some(matchedOfficerName) =>
-              individualProvideDetailsService
-                .generateNewPersonReference()
-                .flatMap(personReference =>
-                  individualProvideDetailsService
-                    .upsertForApplication(
-                      individualProvideDetailsService.create(
-                        individualName = matchedOfficerName,
-                        isPersonOfControl = true,
-                        agentApplicationId = agentApplication.agentApplicationId,
-                        personReference = personReference
-                      )
-                    )
+              for
+                individualProvidedDetails: IndividualProvidedDetails <- individualProvideDetailsService.create(
+                  individualName = matchedOfficerName,
+                  isPersonOfControl = true,
+                  agentApplicationId = agentApplication.agentApplicationId
                 )
-                .map: _ =>
-                  Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
+                _ <- individualProvideDetailsService.upsertForApplication(individualProvidedDetails)
+              yield Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
 
             case None =>
               // No match found — re-render the form with an error
