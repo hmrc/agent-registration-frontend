@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistration.shared
 
 import javax.inject.Singleton
-import uk.gov.hmrc.agentregistration.util.ReferenceGenerator.generateReference
+import uk.gov.hmrc.agentregistration.shared.util.ReferenceGenerator.generateReference
 
 @Singleton
 class PersonReferenceGenerator:
