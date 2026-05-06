@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.services.applicant
 
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.audit.CachedSessionId
+import uk.gov.hmrc.agentregistration.shared.audit.SessionId
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import java.time.Clock
@@ -34,7 +34,7 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationSoleTrader(
     internalUserId: InternalUserId,
-    cachedSessionId: CachedSessionId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
@@ -65,7 +65,7 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationLlp(
     internalUserId: InternalUserId,
-    cachedSessionId: CachedSessionId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
@@ -97,7 +97,7 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationLimitedCompany(
     internalUserId: InternalUserId,
-    cachedSessionId: CachedSessionId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
@@ -129,7 +129,7 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationGeneralPartnership(
     internalUserId: InternalUserId,
-    cachedSessionId: CachedSessionId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
@@ -160,7 +160,7 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationLimitedPartnership(
     internalUserId: InternalUserId,
-    cachedSessionId: CachedSessionId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
@@ -192,7 +192,7 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationScottishLimitedPartnership(
     internalUserId: InternalUserId,
-    cachedSessionId: CachedSessionId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
@@ -224,7 +224,7 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationScottishPartnership(
     internalUserId: InternalUserId,
-    cachedSessionId: CachedSessionId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,

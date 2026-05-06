@@ -18,58 +18,34 @@ package uk.gov.hmrc.agentregistrationfrontend.audit
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import play.api.Configuration
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.audit.StartOrContinueApplicationAuditEvent
-import uk.gov.hmrc.agentregistration.shared.audit.StartOrContinueApplicationAuditEvent.JourneyType
+import uk.gov.hmrc.agentregistration.shared.audit.StartOrContinueApplication
+import uk.gov.hmrc.agentregistration.shared.audit.StartOrContinueApplication.JourneyType
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport
 import uk.gov.hmrc.play.audit.DefaultAuditConnector
-import uk.gov.hmrc.play.audit.http.connector.AuditResult
-import uk.gov.hmrc.play.audit.model.DataEvent
-import uk.gov.hmrc.play.bootstrap.config.AppName
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
-
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
 @Singleton
 class AuditService @Inject (auditConnector: DefaultAuditConnector)(using
-  ec: ExecutionContext,
-  config: Configuration
+  ec: ExecutionContext
 )
 extends RequestAwareLogging:
 
-  private final val auditSource = AppName.fromConfiguration(config)
-
-  def auditContinueApplication(agentApplication: AgentApplication)(using RequestHeader): Future[AuditResult] =
-    val auditEvent = StartOrContinueApplicationAuditEvent.make(agentApplication, JourneyType.Continue)
+  def auditContinueApplication(agentApplication: AgentApplication)(using request: RequestHeader): Unit =
+    val auditEvent = StartOrContinueApplication.make(agentApplication, JourneyType.Continue)
     logger.info(s"Auditing continue application event")
-    auditConnector.sendEvent(
-      DataEvent(
-        auditSource = auditSource,
-        auditType = auditEvent.auditType.toString,
-        detail = Map(
-          "applicationReference" -> auditEvent.applicationReference.value,
-          "journeyType" -> auditEvent.journeyType.toString,
-          "entityType" -> auditEvent.entityType.toString,
-          "isUkEntity" -> auditEvent.isUkEntity.toString
-        )
-      )
+    auditConnector.sendExplicitAudit(
+      auditType = auditEvent.auditType,
+      detail = auditEvent
     )
 
-  def auditStartApplication(agentApplication: AgentApplication)(using RequestHeader): Future[AuditResult] =
-    val auditEvent = StartOrContinueApplicationAuditEvent.make(agentApplication, JourneyType.Start)
+  def auditStartApplication(agentApplication: AgentApplication)(using RequestHeader): Unit =
+    val auditEvent = StartOrContinueApplication.make(agentApplication, JourneyType.Start)
     logger.info(s"Auditing start application event")
-    auditConnector.sendEvent(
-      DataEvent(
-        auditSource = auditSource,
-        auditType = auditEvent.auditType.toString,
-        detail = Map(
-          "applicationReference" -> auditEvent.applicationReference.value,
-          "journeyType" -> auditEvent.journeyType.toString,
-          "entityType" -> auditEvent.entityType.toString,
-          "isUkEntity" -> auditEvent.isUkEntity.toString
-        )
-      )
+    auditConnector.sendExplicitAudit(
+      auditType = auditEvent.auditType,
+      detail = auditEvent
     )

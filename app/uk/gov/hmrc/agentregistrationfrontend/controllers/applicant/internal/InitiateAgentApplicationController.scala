@@ -21,7 +21,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.audit.CachedSessionId
+import uk.gov.hmrc.agentregistration.shared.audit.SessionId
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
@@ -33,7 +33,6 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendContr
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
-import uk.gov.hmrc.http.SessionId
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -89,8 +88,10 @@ extends FrontendController(mcc, actions):
               agentApplication = businessType.makeNewAgentApplication(userRole, applicationReference)
               result <- agentApplicationService
                 .upsert(agentApplication)
-                .map(_ => Redirect(nextEndpoint))
-              _ <- auditService.auditStartApplication(agentApplication)
+                .map(_ =>
+                  auditService.auditStartApplication(agentApplication)
+                  Redirect(nextEndpoint)
+                )
             } yield result
 
   extension (businessType: BusinessType)
@@ -98,7 +99,7 @@ extends FrontendController(mcc, actions):
       userRole: UserRole,
       applicationReference: ApplicationReference
     )(using request: RequestWithDataCt[AnyContent, DataWithAuth]): AgentApplication = {
-      val cachedSessionId = CachedSessionId.make(hc.sessionId.getOrThrowExpectedDataMissing("sessionId"))
+      val cachedSessionId = SessionId.make(hc.sessionId.getOrThrowExpectedDataMissing("sessionId"))
       businessType match
         case BusinessType.Partnership.LimitedLiabilityPartnership =>
           applicationFactory.makeNewAgentApplicationLlp(

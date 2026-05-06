@@ -18,36 +18,39 @@ package uk.gov.hmrc.agentregistration.shared.audit
 
 import play.api.libs.json.Format
 import play.api.libs.json.Json
+import play.api.libs.json.OFormat
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 
 sealed trait AuditEvent:
-  val auditType: AuditType
+
+  val applicationReference: ApplicationReference
+  val auditType: String
 
 // The application does not support non-uk for now so isUkEntity is set to always true
-final case class StartOrContinueApplicationAuditEvent(
+final case class StartOrContinueApplication(
   applicationReference: ApplicationReference,
-  journeyType: StartOrContinueApplicationAuditEvent.JourneyType,
+  journeyType: StartOrContinueApplication.JourneyType,
   entityType: BusinessType,
   isUkEntity: Boolean = true
 )
 extends AuditEvent:
-  override val auditType: AuditType = AuditType.StartOrContinueApplication
+  override val auditType: String = "StartOrContinueApplication"
 
-object StartOrContinueApplicationAuditEvent:
+object StartOrContinueApplication:
 
   def make(
     agentApplication: AgentApplication,
     journeyType: JourneyType
-  ): StartOrContinueApplicationAuditEvent = StartOrContinueApplicationAuditEvent(
+  ): StartOrContinueApplication = StartOrContinueApplication(
     applicationReference = agentApplication.applicationReference,
     journeyType = journeyType,
     entityType = agentApplication.businessType
   )
 
-  given format: Format[StartOrContinueApplicationAuditEvent] = Json.format[StartOrContinueApplicationAuditEvent]
+  given format: Format[StartOrContinueApplication] = Json.format[StartOrContinueApplication]
 
   enum JourneyType:
 
@@ -55,4 +58,4 @@ object StartOrContinueApplicationAuditEvent:
     case Continue
 
   object JourneyType:
-    given format: Format[JourneyType] = JsonFormatsFactory.makeEnumFormat[JourneyType]
+    given format: Format[JourneyType] = JsonFormatsFactory.makeEnumFormat
