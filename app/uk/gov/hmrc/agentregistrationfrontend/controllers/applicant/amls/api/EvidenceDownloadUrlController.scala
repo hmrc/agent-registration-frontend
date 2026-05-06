@@ -25,12 +25,14 @@ import uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.services.ObjectStoreService
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core.AuthProviders
+import uk.gov.hmrc.auth.core.AuthorisationException
 import uk.gov.hmrc.auth.core.AuthorisedFunctions
 import uk.gov.hmrc.auth.core.Enrolment
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 @Singleton
 class EvidenceDownloadUrlController @Inject() (
@@ -45,9 +47,10 @@ extends FrontendController(mcc, actions):
   // Returns a signed upscan download URL for the given fileReference
   def evidenceDownloadUrl(fileReference: FileUploadReference): Action[AnyContent] = Action.async:
     implicit request =>
-      af.authorised((Enrolment(appConfig.Stride.strideRoleAmls) or Enrolment(appConfig.Stride.strideRoleSmu)) and AuthProviders(PrivilegedApplication)) {
+      af.authorised((Enrolment(appConfig.Stride.strideRoleAmls) or Enrolment(appConfig.Stride.strideRoleSmu)) and AuthProviders(PrivilegedApplication)).apply:
         objectStoreService.getEvidenceDownloadUrl(fileReference).map {
-          case Some(url) => Ok(Json.obj("downloadUrl" -> url.toString))
+          case Some(url) => Ok(Json.obj("downloadUrl" -> url.downloadUrl.toString))
           case None => NotFound
         }
-      }
+      .recoverWith:
+        case _: AuthorisationException => Future.successful(Forbidden)

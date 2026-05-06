@@ -23,6 +23,8 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
+import java.time.Instant
+
 object ObjectStoreStubs:
 
   def stubObjectStoreTransfer(response: JsObject = TdAll.tdAll.objectStoreUploadResponse): StubMapping = StubMaker.make(
@@ -36,4 +38,47 @@ object ObjectStoreStubs:
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlEqualTo("/object-store/ops/upload-from-url"),
     count = count
+  )
+
+  def stubObjectStoreListObjects(
+    directory: String,
+    fileName: String
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlEqualTo(s"/object-store/list/agent-registration-frontend/$directory"),
+    responseStatus = 200,
+    responseBody =
+      Json.obj(
+        "objectSummaries" -> Json.arr(
+          Json.obj(
+            "location" -> s"/agent-registration-frontend/$directory/$fileName",
+            "contentLength" -> 1234,
+            "lastModified" -> Instant.now()
+          )
+        )
+      ).toString
+  )
+
+  def stubObjectStoreListObjectsNotFound(directory: String): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlEqualTo(s"/object-store/list/agent-registration-frontend/$directory"),
+    responseStatus = 200,
+    responseBody =
+      Json.obj(
+        "objectSummaries" -> Json.arr()
+      ).toString
+  )
+
+  def stubObjectStorePresignedDownloadUrl(
+    downloadUrl: String = "https://object-store/download-url"
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlEqualTo(s"/object-store/ops/presigned-url"),
+    responseStatus = 200,
+    responseBody =
+      Json.obj(
+        "downloadUrl" -> downloadUrl,
+        "contentLength" -> 1234,
+        "contentMD5" -> "abc123"
+      ).toString
   )
