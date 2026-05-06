@@ -60,20 +60,6 @@ extends RequestAwareLogging:
     )
   }
 
-//  def create(
-//    individualName: IndividualName,
-//    isPersonOfControl: Boolean,
-//    agentApplicationId: AgentApplicationId,
-//    personReference: PersonReference
-//  )(using request: RequestHeader): IndividualProvidedDetails =
-//    logger.info(s"creating provided details for individual with applicationId:[${agentApplicationId.value}] ")
-//    provideDetailsFactory.create(
-//      agentApplicationId,
-//      personReference,
-//      individualName,
-//      isPersonOfControl
-//    )
-
   def upsertForApplication(individualProvidedDetails: IndividualProvidedDetails)(using request: RequestHeader): Future[Unit] =
     logger.debug(s"Upserting providedDetails for user:[${individualProvidedDetails._id}] and applicationId:[${individualProvidedDetails.agentApplicationId}]")
     individualProvideDetailsConnector
