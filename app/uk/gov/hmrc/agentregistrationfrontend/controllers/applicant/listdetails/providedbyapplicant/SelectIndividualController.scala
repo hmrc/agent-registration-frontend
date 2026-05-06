@@ -104,5 +104,5 @@ extends FrontendController(mcc, actions):
           providedByApplicantSessionStore
             .upsert(providedByApplicant)
             .map: _ =>
-              Ok(providedByApplicant.toString) // TODO: Date of Birth should be next page even if coming from CYA as changing individual wipes everything - ideally via CYA controller when available
+              Redirect(AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedDoBController.show.url)
       .redirectIfSaveForLater

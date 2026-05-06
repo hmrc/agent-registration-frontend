@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.forms
+package uk.gov.hmrc.agentregistrationfrontend.forms.applicant
 
 import play.api.data.Form
 import play.api.data.Forms.mapping
@@ -25,21 +25,25 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.mappings.Mappings
 import java.time.Clock
 import java.time.LocalDate
 
-object IndividualDateOfBirthForm:
+object ApplicantProvidedDoBForm {
 
-  val key: String = "dateOfBirth"
+  val key: String = "applicant-provided.date-of-birth"
   val dayKey: String = s"$key.day"
   val monthKey: String = s"$key.month"
   val yearKey: String = s"$key.year"
 
   def form(using clock: Clock): Form[UserProvidedDateOfBirth] = Form(
     mapping(
-      key -> Mappings.localDate(key)
-        .verifying(s"$key.error.future", date => date.isBefore(LocalDate.now(clock)))
-    )(date => IndividualDateOfBirth.Provided(date).toUserProvidedDateOfBirth)(
-      {
-        case IndividualDateOfBirth.Provided(date) => Some(date)
-        case _ => None
-      }
-    )
+      key -> Mappings
+        .localDate(key)
+        .verifying(
+          s"$key.error.future",
+          _.isBefore(LocalDate.now(clock))
+        )
+    )(date => IndividualDateOfBirth.ApplicantProvided(date): UserProvidedDateOfBirth) {
+      case IndividualDateOfBirth.ApplicantProvided(date) => Some(date)
+      case _ => None
+    }
   )
+
+}
