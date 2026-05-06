@@ -118,13 +118,17 @@ extends ViewSpec:
         ).size
 
     "should contain a link to the appeals guidance" in:
-      val appealLink = "https://www.gov.uk/guidance/if-you-disagree-with-hmrcs-decision-about-your-tax-adviser-registration"
-      val link = docWithIndividualFailures
-        .mainContent
-        .select("a.govuk-link")
+      val hmrcStandardLink: TestLink =
+        docWithIndividualFailures
+          .mainContent
+          .selectOrFail("a.govuk-link")
+          .get(0)
+          .toLink
 
-      link.attr("href") shouldBe appealLink
-      link.text() should include("request a review or appeal the decision (opens in a new tab)")
+      hmrcStandardLink shouldBe TestLink(
+        text = "request a review or appeal the decision (opens in a new tab)",
+        href = "https://www.gov.uk/guidance/if-you-disagree-with-hmrcs-decision-about-your-tax-adviser-registration"
+      )
 
   "FailedNonFixablePage when no individuals have failures" should:
 

@@ -22,9 +22,11 @@
 @import uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure
 @import uk.gov.hmrc.agentregistration.shared.risking.IndividualRiskingResponse
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import views.html.helper.CSPNonce
 
 @this(
+        appConfig: AppConfig,
         layout: Layout,
         govukButton: GovukButton
 )
@@ -39,7 +41,6 @@
 )
 
 @key = @{"failedNonFixable"}
-@appealsUrl = @{"https://www.gov.uk/guidance/if-you-disagree-with-hmrcs-decision-about-your-tax-adviser-registration"}
 @entityListKey = @{"NonFixableOutcomeListForEntityFailures"}
 @individualListKey = @{"NonFixableOutcomeListForIndividualFailures"}
 
@@ -114,7 +115,7 @@
   <h2 class="govuk-heading-m">@messages(s"$key.appeal.h2")</h2>
   <ul class="govuk-list govuk-list--bullet">
     <li>@messages(s"$key.appeal.li1")</li>
-    <li>@Html(messages(s"$key.appeal.li2", appealsUrl))</li>
+    <li>@Html(messages(s"$key.appeal.li2", appConfig.guidanceForFailedNonFixableAppealsUrl))</li>
   </ul>
 
   <p class="govuk-body govuk-!-display-none-print govuk-!-margin-top-6">
