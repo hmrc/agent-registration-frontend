@@ -116,6 +116,11 @@ class AppConfig @Inject() (
   object UploadRepo:
     val ttl: FiniteDuration = ConfigHelper.readFiniteDuration("mongodb.upload-repo-ttl", servicesConfig)
 
+  object Stride:
+
+    val strideRoleAmls: String = configuration.get[String]("stride.roles.amls")
+    val strideRoleSmu: String = configuration.get[String]("stride.roles.smu")
+
   // !!!
   // Access objects eagerly to initialize its vals, ensuring config errors are detected at startup
   Upscan
