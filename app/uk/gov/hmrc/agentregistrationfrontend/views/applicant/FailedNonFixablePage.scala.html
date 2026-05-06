@@ -21,10 +21,12 @@
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 @import uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import views.html.helper.CSPNonce
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskedIndividual
 
 @this(
+        appConfig: AppConfig,
         layout: Layout,
         govukButton: GovukButton
 )
@@ -114,7 +116,7 @@
   <h2 class="govuk-heading-m">@messages(s"$key.appeal.h2")</h2>
   <ul class="govuk-list govuk-list--bullet">
     <li>@messages(s"$key.appeal.li1")</li>
-    <li>@Html(messages(s"$key.appeal.li2"))</li>
+    <li>@Html(messages(s"$key.appeal.li2", appConfig.guidanceForFailedNonFixableAppealsUrl))</li>
   </ul>
 
   <p class="govuk-body govuk-!-display-none-print govuk-!-margin-top-6">
