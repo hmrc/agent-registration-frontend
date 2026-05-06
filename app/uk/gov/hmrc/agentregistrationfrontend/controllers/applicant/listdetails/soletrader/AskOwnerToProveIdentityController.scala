@@ -77,12 +77,10 @@ extends FrontendController(mcc, actions):
           val soleTraderDetails: BusinessDetailsSoleTrader = agentApplication.getBusinessDetails
           val newIndividualProvidedDetails =
             for {
-              newPersonReference <- individualProvideDetailsService.generateNewPersonReference()
-              newIndividualProvidedDetails = individualProvideDetailsService.create(
+              newIndividualProvidedDetails <- individualProvideDetailsService.create(
                 agentApplicationId = agentApplication.agentApplicationId,
                 individualName = IndividualName(s"${soleTraderDetails.fullName.firstName} ${soleTraderDetails.fullName.lastName}"),
-                isPersonOfControl = true, // this individual record is for the sole trader owner not the applicant
-                personReference = newPersonReference
+                isPersonOfControl = true // this individual record is for the sole trader owner not the applicant
               )
               _ = individualProvideDetailsService.upsertForApplication(newIndividualProvidedDetails)
             } yield newIndividualProvidedDetails
