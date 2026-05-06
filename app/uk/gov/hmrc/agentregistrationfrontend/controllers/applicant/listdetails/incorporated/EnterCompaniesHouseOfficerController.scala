@@ -156,14 +156,14 @@ extends FrontendController(mcc, actions):
 
           NameMatching.individualNameMatching(individualName, companiesHouseOfficerList) match
             case Some(matchedOfficerName) =>
-              for {
+              for
                 individualProvidedDetails: IndividualProvidedDetails <- individualProvideDetailsService.create(
                   individualName = matchedOfficerName,
                   isPersonOfControl = true,
                   agentApplicationId = agentApplication.agentApplicationId
                 )
                 _ <- individualProvideDetailsService.upsertForApplication(individualProvidedDetails)
-              } yield Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
+              yield Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
 
             case None =>
               // No match found — re-render the form with an error

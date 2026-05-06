@@ -76,14 +76,14 @@ extends FrontendController(mcc, actions):
           // so we need to automate the creation of one based on the application data as this is a sole trader application
           val soleTraderDetails: BusinessDetailsSoleTrader = agentApplication.getBusinessDetails
           val newIndividualProvidedDetails =
-            for {
+            for
               newIndividualProvidedDetails <- individualProvideDetailsService.create(
                 agentApplicationId = agentApplication.agentApplicationId,
                 individualName = IndividualName(s"${soleTraderDetails.fullName.firstName} ${soleTraderDetails.fullName.lastName}"),
                 isPersonOfControl = true // this individual record is for the sole trader owner not the applicant
               )
               _ = individualProvideDetailsService.upsertForApplication(newIndividualProvidedDetails)
-            } yield newIndividualProvidedDetails
+            yield newIndividualProvidedDetails
 
           newIndividualProvidedDetails.map(individualProvidedDetails => request.add[IndividualProvidedDetails](individualProvidedDetails))
         case soleTrader :: Nil => request.add[IndividualProvidedDetails](soleTrader) // we have already visited this page and the record has been created

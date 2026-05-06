@@ -77,7 +77,7 @@ extends FrontendController(mcc, actions):
           // so we need to automate the creation of one based on the application data if this is a sole trader application
           val soleTraderDetails: BusinessDetailsSoleTrader = agentApplication.getBusinessDetails
           val newIndividualProvidedDetails =
-            for {
+            for
               createIndividualProvidedDetails <- individualProvideDetailsService.create(
                 agentApplicationId = agentApplication.agentApplicationId,
                 individualName = IndividualName(s"${soleTraderDetails.fullName.firstName} ${soleTraderDetails.fullName.lastName}"),
@@ -85,7 +85,7 @@ extends FrontendController(mcc, actions):
               )
               individualDetailsWithApplicationAnswers = createIndividualProvidedDetails.addApplicationAnswers(agentApplication)
               _ = individualProvideDetailsService.upsertForApplication(individualDetailsWithApplicationAnswers)
-            } yield individualDetailsWithApplicationAnswers
+            yield individualDetailsWithApplicationAnswers
 
           newIndividualProvidedDetails.map(individualProvidedDetails => request.add[IndividualProvidedDetails](individualProvidedDetails))
         case soleTrader :: Nil => request.add[IndividualProvidedDetails](soleTrader) // we have already visited this page and the record has been created

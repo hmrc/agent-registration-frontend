@@ -105,12 +105,12 @@ extends FrontendController(mcc, actions):
       .async:
         implicit request =>
           val individualName: IndividualName = request.get
-          for {
+          for
             individualProvidedDetails: IndividualProvidedDetails <- individualProvideDetailsService.create(
               individualName = individualName,
               isPersonOfControl = false, // from this page we are only adding other relevant people, who are not persons of control
               agentApplicationId = request.get[IsNotSoleTrader].agentApplicationId
             )
             _ <- individualProvideDetailsService.upsertForApplication(individualProvidedDetails)
-          } yield Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
+          yield Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
       .redirectIfSaveForLater

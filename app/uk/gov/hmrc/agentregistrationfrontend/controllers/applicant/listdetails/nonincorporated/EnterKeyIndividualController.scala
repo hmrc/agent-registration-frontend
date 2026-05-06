@@ -137,14 +137,14 @@ extends FrontendController(mcc, actions):
       .async:
         implicit request =>
           val individualName: IndividualName = request.get
-          for {
+          for
             individualProvidedDetails: IndividualProvidedDetails <- individualProvideDetailsService.create(
               individualName = individualName,
               isPersonOfControl = true,
               agentApplicationId = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].agentApplicationId
             )
             _ <- individualProvideDetailsService.upsertForApplication(individualProvidedDetails)
-          } yield Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
+          yield Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
       .redirectIfSaveForLater
 
   private def whenSixOrMore(
