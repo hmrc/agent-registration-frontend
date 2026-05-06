@@ -29,7 +29,6 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.ApplicantProvidedDo
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
 import uk.gov.hmrc.agentregistrationfrontend.repository.ProvidedByApplicantSessionStore
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.providedbyapplicant.ApplicantProvidedDoBPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import java.time.Clock
 import javax.inject.Inject
@@ -40,8 +39,7 @@ class ApplicantProvidedDoBController @Inject() (
   actions: ApplicantActions,
   mcc: MessagesControllerComponents,
   providedByApplicantSessionStore: ProvidedByApplicantSessionStore,
-  view: ApplicantProvidedDoBPage,
-  placeholderView: SimplePage
+  view: ApplicantProvidedDoBPage
 )(using clock: Clock)
 extends FrontendController(mcc, actions):
 
@@ -98,4 +96,4 @@ extends FrontendController(mcc, actions):
         providedByApplicantSessionStore
           .upsert(updatedDetails)
           .map: _ =>
-            Ok(placeholderView("Telephone page", None)) // TODO change for APB-11137
+            Redirect(AppRoutes.apply.listdetails.providedbyapplicant.TelephoneNumberController.show.url)
