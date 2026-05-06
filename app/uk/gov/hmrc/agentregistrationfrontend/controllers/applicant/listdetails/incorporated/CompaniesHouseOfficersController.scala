@@ -209,7 +209,9 @@ extends FrontendController(mcc, actions):
                         isPersonOfControl = true,
                         agentApplicationId = agentApplication.agentApplicationId
                       )
+                      _ = logger.debug(s"Inserting individual $personReference...")
                       _ <- individualProvideDetailsService.upsertForApplication(individualProvidedDetails)
+                      _ = logger.debug(s"Inserted individual $personReference")
                     yield ()
                   )
 

@@ -20,7 +20,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationRiskingStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -77,10 +77,10 @@ object ApplyStubHelper:
 
   def stubsForApplicationRiskingResponse(
     application: AgentApplication,
-    applicationRiskingResponse: ApplicationRiskingResponse
+    riskingProgress: RiskingProgress
   ): StubMapping =
     stubsToSupplyBprToPage(application)
-    AgentRegistrationRiskingStubs.stubGetApplicationRiskingResponse(application.applicationReference, applicationRiskingResponse)
+    AgentRegistrationRiskingStubs.stubGetApplicationRiskingResponse(application.applicationReference, riskingProgress)
 
   def verifyConnectorsForApplicationRiskingResponse(agentApplication: AgentApplication): Unit =
     verifyConnectorsToSupplyBprToPage(Some(agentApplication.getUtr))
