@@ -18,12 +18,11 @@ package uk.gov.hmrc.agentregistration.shared.audit
 
 import play.api.libs.json.Format
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
-import uk.gov.hmrc.http.SessionId
 
-final case class CachedSessionId(value: String)
+final case class SessionId(value: String)
 
-object CachedSessionId:
+object SessionId:
 
-  given format: Format[CachedSessionId] = JsonFormatsFactory.makeValueClassFormat
+  given format: Format[SessionId] = JsonFormatsFactory.makeValueClassFormat
 
-  def make(sessionId: SessionId): CachedSessionId = CachedSessionId.apply(sessionId.value)
+  def make(sessionId: uk.gov.hmrc.http.SessionId): SessionId = SessionId.apply(sessionId.value)

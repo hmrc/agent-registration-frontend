@@ -30,7 +30,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistration.shared.audit.CachedSessionId
+import uk.gov.hmrc.agentregistration.shared.audit.SessionId
 import uk.gov.hmrc.agentregistration.shared.risking.ApplicationRiskingResponse
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
@@ -50,6 +50,7 @@ import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
+import scala.concurrent.Future
 
 object ApplicantActions:
 
@@ -105,7 +106,8 @@ extends RequestAwareLogging:
     .refine:
       implicit request: RequestWithApplication =>
         val aa: AgentApplication = request.agentApplication
-        if aa.continueJourney() then
+        if aa.continueJourney()
+        then
           auditService.auditContinueApplication(aa)
           aa.updateCachedSessionId()
         else request
@@ -173,31 +175,21 @@ extends RequestAwareLogging:
   extension (agentApplication: AgentApplication)
 
     private def continueJourney()(using request: RequestWithApplication): Boolean =
-      val cachedSessionId = CachedSessionId.make(hc.sessionId.getOrThrowExpectedDataMissing("sessionId"))
+      val cachedSessionId = SessionId.make(hc.sessionId.getOrThrowExpectedDataMissing("sessionId"))
       agentApplication.cachedSessionId =!= cachedSessionId
 
-    private def updateCachedSessionId()(using request: RequestWithApplication): RequestWithApplication = {
-      val cachedSessionId = CachedSessionId.make(hc.sessionId.getOrThrowExpectedDataMissing("sessionId"))
-      agentApplication match
-        case a: AgentApplicationLlp =>
-          val application: AgentApplication = a.copy(cachedSessionId = cachedSessionId)
-          request.update(application)
-        case a: AgentApplicationSoleTrader =>
-          val application: AgentApplication = a.copy(cachedSessionId = cachedSessionId)
-          request.update(application)
-        case a: AgentApplicationLimitedCompany =>
-          val application: AgentApplication = a.copy(cachedSessionId = cachedSessionId)
-          request.update(application)
-        case a: AgentApplicationGeneralPartnership =>
-          val application: AgentApplication = a.copy(cachedSessionId = cachedSessionId)
-          request.update(application)
-        case a: AgentApplicationLimitedPartnership =>
-          val application: AgentApplication = a.copy(cachedSessionId = cachedSessionId)
-          request.update(application)
-        case a: AgentApplicationScottishLimitedPartnership =>
-          val application: AgentApplication = a.copy(cachedSessionId = cachedSessionId)
-          request.update(application)
-        case a: AgentApplicationScottishPartnership =>
-          val application: AgentApplication = a.copy(cachedSessionId = cachedSessionId)
-          request.update(application)
-    }
+    private def updateCachedSessionId()(using request: RequestWithApplication): Future[RequestWithApplication] =
+      val cachedSessionId = SessionId.make(hc.sessionId.getOrThrowExpectedDataMissing("sessionId"))
+      val updatedApplication: AgentApplication =
+        agentApplication match
+          case a: AgentApplicationLlp => a.copy(cachedSessionId = cachedSessionId)
+          case a: AgentApplicationSoleTrader => a.copy(cachedSessionId = cachedSessionId)
+          case a: AgentApplicationLimitedCompany => a.copy(cachedSessionId = cachedSessionId)
+          case a: AgentApplicationGeneralPartnership => a.copy(cachedSessionId = cachedSessionId)
+          case a: AgentApplicationLimitedPartnership => a.copy(cachedSessionId = cachedSessionId)
+          case a: AgentApplicationScottishLimitedPartnership => a.copy(cachedSessionId = cachedSessionId)
+          case a: AgentApplicationScottishPartnership => a.copy(cachedSessionId = cachedSessionId)
+
+      agentApplicationService.upsert(updatedApplication).map(_ =>
+        request.update(updatedApplication)
+      )
