@@ -97,7 +97,7 @@ trait WsHelper:
   val sessionHeaders: Map[String, String] = Map(
     SessionKeys.lastRequestTimestamp -> System.currentTimeMillis().toString,
     SessionKeys.authToken -> "mock-bearer-token",
-    SessionKeys.sessionId -> "mock-sessionid"
+    SessionKeys.sessionId -> "session-id-123"
   )
 
   implicit val request: Request[AnyContent] = FakeRequest()
