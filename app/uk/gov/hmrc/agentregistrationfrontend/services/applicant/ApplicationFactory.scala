@@ -17,18 +17,21 @@
 package uk.gov.hmrc.agentregistrationfrontend.services.applicant
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import java.time.Clock
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.jdk.DurationConverters.*
 
 @Singleton
 class ApplicationFactory @Inject() (
   clock: Clock,
   linkIdGenerator: LinkIdGenerator,
-  agentApplicationIdGenerator: AgentApplicationIdGenerator
+  agentApplicationIdGenerator: AgentApplicationIdGenerator,
+  appConfig: AppConfig
 ):
 
   def makeNewAgentApplicationSoleTrader(
@@ -37,28 +40,31 @@ class ApplicationFactory @Inject() (
     groupId: GroupId,
     userRole: UserRole,
     applicationReference: ApplicationReference
-  ): AgentApplicationSoleTrader = AgentApplicationSoleTrader(
-    _id = agentApplicationIdGenerator.nextApplicationId(),
-    applicationReference = applicationReference,
-    internalUserId = internalUserId,
-    applicantCredentials = applicantCredentials,
-    linkId = linkIdGenerator.nextLinkId(),
-    groupId = groupId,
-    createdAt = Instant.now(clock),
-    submittedAt = None,
-    applicationState = ApplicationState.Started,
-    businessDetails = None,
-    userRole = Some(userRole),
-    applicantContactDetails = None,
-    amlsDetails = None,
-    agentDetails = None,
-    refusalToDealWithCheckResult = None,
-    deceasedCheckResult = None,
-    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    hasOtherRelevantIndividuals = None,
-    vrns = None,
-    payeRefs = None
-  )
+  ): AgentApplicationSoleTrader =
+    val now = Instant.now(clock)
+    AgentApplicationSoleTrader(
+      _id = agentApplicationIdGenerator.nextApplicationId(),
+      applicationReference = applicationReference,
+      internalUserId = internalUserId,
+      applicantCredentials = applicantCredentials,
+      linkId = linkIdGenerator.nextLinkId(),
+      groupId = groupId,
+      createdAt = now,
+      applicationExpiresAt = now.plus(appConfig.daysToSubmitApplication.toJava),
+      submittedAt = None,
+      applicationState = ApplicationState.Started,
+      businessDetails = None,
+      userRole = Some(userRole),
+      applicantContactDetails = None,
+      amlsDetails = None,
+      agentDetails = None,
+      refusalToDealWithCheckResult = None,
+      deceasedCheckResult = None,
+      hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
+      hasOtherRelevantIndividuals = None,
+      vrns = None,
+      payeRefs = None
+    )
 
   def makeNewAgentApplicationLlp(
     internalUserId: InternalUserId,
@@ -66,29 +72,32 @@ class ApplicationFactory @Inject() (
     groupId: GroupId,
     userRole: UserRole,
     applicationReference: ApplicationReference
-  ): AgentApplicationLlp = AgentApplicationLlp(
-    _id = agentApplicationIdGenerator.nextApplicationId(),
-    applicationReference = applicationReference,
-    internalUserId = internalUserId,
-    applicantCredentials = applicantCredentials,
-    linkId = linkIdGenerator.nextLinkId(),
-    groupId = groupId,
-    createdAt = Instant.now(clock),
-    submittedAt = None,
-    applicationState = ApplicationState.Started,
-    userRole = Some(userRole),
-    businessDetails = None,
-    applicantContactDetails = None,
-    amlsDetails = None,
-    agentDetails = None,
-    refusalToDealWithCheckResult = None,
-    companyStatusCheckResult = None,
-    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    numberOfIndividuals = None,
-    hasOtherRelevantIndividuals = None,
-    vrns = None,
-    payeRefs = None
-  )
+  ): AgentApplicationLlp =
+    val now = Instant.now(clock)
+    AgentApplicationLlp(
+      _id = agentApplicationIdGenerator.nextApplicationId(),
+      applicationReference = applicationReference,
+      internalUserId = internalUserId,
+      applicantCredentials = applicantCredentials,
+      linkId = linkIdGenerator.nextLinkId(),
+      groupId = groupId,
+      createdAt = now,
+      applicationExpiresAt = now.plus(appConfig.daysToSubmitApplication.toJava),
+      submittedAt = None,
+      applicationState = ApplicationState.Started,
+      userRole = Some(userRole),
+      businessDetails = None,
+      applicantContactDetails = None,
+      amlsDetails = None,
+      agentDetails = None,
+      refusalToDealWithCheckResult = None,
+      companyStatusCheckResult = None,
+      hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
+      numberOfIndividuals = None,
+      hasOtherRelevantIndividuals = None,
+      vrns = None,
+      payeRefs = None
+    )
 
   def makeNewAgentApplicationLimitedCompany(
     internalUserId: InternalUserId,
@@ -96,29 +105,32 @@ class ApplicationFactory @Inject() (
     groupId: GroupId,
     userRole: UserRole,
     applicationReference: ApplicationReference
-  ): AgentApplicationLimitedCompany = AgentApplicationLimitedCompany(
-    _id = agentApplicationIdGenerator.nextApplicationId(),
-    applicationReference = applicationReference,
-    internalUserId = internalUserId,
-    applicantCredentials = applicantCredentials,
-    linkId = linkIdGenerator.nextLinkId(),
-    groupId = groupId,
-    createdAt = Instant.now(clock),
-    submittedAt = None,
-    applicationState = ApplicationState.Started,
-    businessDetails = None,
-    userRole = Some(userRole),
-    applicantContactDetails = None,
-    amlsDetails = None,
-    agentDetails = None,
-    refusalToDealWithCheckResult = None,
-    companyStatusCheckResult = None,
-    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    numberOfIndividuals = None,
-    hasOtherRelevantIndividuals = None,
-    vrns = None,
-    payeRefs = None
-  )
+  ): AgentApplicationLimitedCompany =
+    val now = Instant.now(clock)
+    AgentApplicationLimitedCompany(
+      _id = agentApplicationIdGenerator.nextApplicationId(),
+      applicationReference = applicationReference,
+      internalUserId = internalUserId,
+      applicantCredentials = applicantCredentials,
+      linkId = linkIdGenerator.nextLinkId(),
+      groupId = groupId,
+      createdAt = now,
+      applicationExpiresAt = now.plus(appConfig.daysToSubmitApplication.toJava),
+      submittedAt = None,
+      applicationState = ApplicationState.Started,
+      businessDetails = None,
+      userRole = Some(userRole),
+      applicantContactDetails = None,
+      amlsDetails = None,
+      agentDetails = None,
+      refusalToDealWithCheckResult = None,
+      companyStatusCheckResult = None,
+      hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
+      numberOfIndividuals = None,
+      hasOtherRelevantIndividuals = None,
+      vrns = None,
+      payeRefs = None
+    )
 
   def makeNewAgentApplicationGeneralPartnership(
     internalUserId: InternalUserId,
@@ -126,28 +138,31 @@ class ApplicationFactory @Inject() (
     groupId: GroupId,
     userRole: UserRole,
     applicationReference: ApplicationReference
-  ): AgentApplicationGeneralPartnership = AgentApplicationGeneralPartnership(
-    _id = agentApplicationIdGenerator.nextApplicationId(),
-    applicationReference = applicationReference,
-    internalUserId = internalUserId,
-    applicantCredentials = applicantCredentials,
-    linkId = linkIdGenerator.nextLinkId(),
-    groupId = groupId,
-    createdAt = Instant.now(clock),
-    submittedAt = None,
-    applicationState = ApplicationState.Started,
-    businessDetails = None,
-    userRole = Some(userRole),
-    applicantContactDetails = None,
-    amlsDetails = None,
-    agentDetails = None,
-    refusalToDealWithCheckResult = None,
-    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    numberOfIndividuals = None,
-    hasOtherRelevantIndividuals = None,
-    vrns = None,
-    payeRefs = None
-  )
+  ): AgentApplicationGeneralPartnership =
+    val now = Instant.now(clock)
+    AgentApplicationGeneralPartnership(
+      _id = agentApplicationIdGenerator.nextApplicationId(),
+      applicationReference = applicationReference,
+      internalUserId = internalUserId,
+      applicantCredentials = applicantCredentials,
+      linkId = linkIdGenerator.nextLinkId(),
+      groupId = groupId,
+      createdAt = now,
+      applicationExpiresAt = now.plus(appConfig.daysToSubmitApplication.toJava),
+      submittedAt = None,
+      applicationState = ApplicationState.Started,
+      businessDetails = None,
+      userRole = Some(userRole),
+      applicantContactDetails = None,
+      amlsDetails = None,
+      agentDetails = None,
+      refusalToDealWithCheckResult = None,
+      hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
+      numberOfIndividuals = None,
+      hasOtherRelevantIndividuals = None,
+      vrns = None,
+      payeRefs = None
+    )
 
   def makeNewAgentApplicationLimitedPartnership(
     internalUserId: InternalUserId,
@@ -155,29 +170,32 @@ class ApplicationFactory @Inject() (
     groupId: GroupId,
     userRole: UserRole,
     applicationReference: ApplicationReference
-  ): AgentApplicationLimitedPartnership = AgentApplicationLimitedPartnership(
-    _id = agentApplicationIdGenerator.nextApplicationId(),
-    applicationReference = applicationReference,
-    internalUserId = internalUserId,
-    applicantCredentials = applicantCredentials,
-    linkId = linkIdGenerator.nextLinkId(),
-    groupId = groupId,
-    createdAt = Instant.now(clock),
-    submittedAt = None,
-    applicationState = ApplicationState.Started,
-    businessDetails = None,
-    userRole = Some(userRole),
-    applicantContactDetails = None,
-    amlsDetails = None,
-    agentDetails = None,
-    refusalToDealWithCheckResult = None,
-    companyStatusCheckResult = None,
-    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    numberOfIndividuals = None,
-    hasOtherRelevantIndividuals = None,
-    vrns = None,
-    payeRefs = None
-  )
+  ): AgentApplicationLimitedPartnership =
+    val now = Instant.now(clock)
+    AgentApplicationLimitedPartnership(
+      _id = agentApplicationIdGenerator.nextApplicationId(),
+      applicationReference = applicationReference,
+      internalUserId = internalUserId,
+      applicantCredentials = applicantCredentials,
+      linkId = linkIdGenerator.nextLinkId(),
+      groupId = groupId,
+      createdAt = now,
+      applicationExpiresAt = now.plus(appConfig.daysToSubmitApplication.toJava),
+      submittedAt = None,
+      applicationState = ApplicationState.Started,
+      businessDetails = None,
+      userRole = Some(userRole),
+      applicantContactDetails = None,
+      amlsDetails = None,
+      agentDetails = None,
+      refusalToDealWithCheckResult = None,
+      companyStatusCheckResult = None,
+      hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
+      numberOfIndividuals = None,
+      hasOtherRelevantIndividuals = None,
+      vrns = None,
+      payeRefs = None
+    )
 
   def makeNewAgentApplicationScottishLimitedPartnership(
     internalUserId: InternalUserId,
@@ -185,29 +203,32 @@ class ApplicationFactory @Inject() (
     groupId: GroupId,
     userRole: UserRole,
     applicationReference: ApplicationReference
-  ): AgentApplicationScottishLimitedPartnership = AgentApplicationScottishLimitedPartnership(
-    _id = agentApplicationIdGenerator.nextApplicationId(),
-    applicationReference = applicationReference,
-    internalUserId = internalUserId,
-    applicantCredentials = applicantCredentials,
-    linkId = linkIdGenerator.nextLinkId(),
-    groupId = groupId,
-    createdAt = Instant.now(clock),
-    submittedAt = None,
-    applicationState = ApplicationState.Started,
-    businessDetails = None,
-    userRole = Some(userRole),
-    applicantContactDetails = None,
-    amlsDetails = None,
-    agentDetails = None,
-    refusalToDealWithCheckResult = None,
-    companyStatusCheckResult = None,
-    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    numberOfIndividuals = None,
-    hasOtherRelevantIndividuals = None,
-    vrns = None,
-    payeRefs = None
-  )
+  ): AgentApplicationScottishLimitedPartnership =
+    val now = Instant.now(clock)
+    AgentApplicationScottishLimitedPartnership(
+      _id = agentApplicationIdGenerator.nextApplicationId(),
+      applicationReference = applicationReference,
+      internalUserId = internalUserId,
+      applicantCredentials = applicantCredentials,
+      linkId = linkIdGenerator.nextLinkId(),
+      groupId = groupId,
+      createdAt = now,
+      applicationExpiresAt = now.plus(appConfig.daysToSubmitApplication.toJava),
+      submittedAt = None,
+      applicationState = ApplicationState.Started,
+      businessDetails = None,
+      userRole = Some(userRole),
+      applicantContactDetails = None,
+      amlsDetails = None,
+      agentDetails = None,
+      refusalToDealWithCheckResult = None,
+      companyStatusCheckResult = None,
+      hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
+      numberOfIndividuals = None,
+      hasOtherRelevantIndividuals = None,
+      vrns = None,
+      payeRefs = None
+    )
 
   def makeNewAgentApplicationScottishPartnership(
     internalUserId: InternalUserId,
@@ -215,25 +236,28 @@ class ApplicationFactory @Inject() (
     groupId: GroupId,
     userRole: UserRole,
     applicationReference: ApplicationReference
-  ): AgentApplicationScottishPartnership = AgentApplicationScottishPartnership(
-    _id = agentApplicationIdGenerator.nextApplicationId(),
-    applicationReference = applicationReference,
-    internalUserId = internalUserId,
-    applicantCredentials = applicantCredentials,
-    linkId = linkIdGenerator.nextLinkId(),
-    groupId = groupId,
-    createdAt = Instant.now(clock),
-    submittedAt = None,
-    applicationState = ApplicationState.Started,
-    businessDetails = None,
-    userRole = Some(userRole),
-    applicantContactDetails = None,
-    amlsDetails = None,
-    agentDetails = None,
-    refusalToDealWithCheckResult = None,
-    hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
-    numberOfIndividuals = None,
-    hasOtherRelevantIndividuals = None,
-    vrns = None,
-    payeRefs = None
-  )
+  ): AgentApplicationScottishPartnership =
+    val now = Instant.now(clock)
+    AgentApplicationScottishPartnership(
+      _id = agentApplicationIdGenerator.nextApplicationId(),
+      applicationReference = applicationReference,
+      internalUserId = internalUserId,
+      applicantCredentials = applicantCredentials,
+      linkId = linkIdGenerator.nextLinkId(),
+      groupId = groupId,
+      createdAt = now,
+      applicationExpiresAt = now.plus(appConfig.daysToSubmitApplication.toJava),
+      submittedAt = None,
+      applicationState = ApplicationState.Started,
+      businessDetails = None,
+      userRole = Some(userRole),
+      applicantContactDetails = None,
+      amlsDetails = None,
+      agentDetails = None,
+      refusalToDealWithCheckResult = None,
+      hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
+      numberOfIndividuals = None,
+      hasOtherRelevantIndividuals = None,
+      vrns = None,
+      payeRefs = None
+    )

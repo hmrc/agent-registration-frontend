@@ -33,6 +33,7 @@ trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdGrsBusinessDetail
       linkId = dependencies.linkId,
       groupId = dependencies.groupId,
       createdAt = dependencies.nowAsInstant,
+      applicationExpiresAt = dependencies.applicationExpiresAtAsInstant,
       submittedAt = None,
       applicationState = ApplicationState.Started,
       userRole = Some(UserRole.Owner),
