@@ -20,6 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock as wm
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.JsObject
 import play.api.libs.json.Json
+import uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
@@ -41,17 +42,17 @@ object ObjectStoreStubs:
   )
 
   def stubObjectStoreListObjects(
-    directory: String,
+    fileUploadReference: FileUploadReference,
     fileName: String
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = wm.urlEqualTo(s"/object-store/list/agent-registration-frontend/$directory"),
+    urlPattern = wm.urlEqualTo(s"/object-store/list/agent-registration-frontend/${fileUploadReference.value}"),
     responseStatus = 200,
     responseBody =
       Json.obj(
         "objectSummaries" -> Json.arr(
           Json.obj(
-            "location" -> s"/agent-registration-frontend/$directory/$fileName",
+            "location" -> s"/agent-registration-frontend/${fileUploadReference.value}/$fileName",
             "contentLength" -> 1234,
             "lastModified" -> Instant.now()
           )
@@ -59,14 +60,23 @@ object ObjectStoreStubs:
       ).toString
   )
 
-  def stubObjectStoreListObjectsNotFound(directory: String): StubMapping = StubMaker.make(
+  def stubObjectStoreListObjectsNotFound(fileUploadReference: FileUploadReference): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = wm.urlEqualTo(s"/object-store/list/agent-registration-frontend/$directory"),
+    urlPattern = wm.urlEqualTo(s"/object-store/list/agent-registration-frontend/${fileUploadReference.value}"),
     responseStatus = 200,
     responseBody =
       Json.obj(
         "objectSummaries" -> Json.arr()
       ).toString
+  )
+
+  def verifyObjectStoreListObjects(
+    fileUploadReference: FileUploadReference,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlEqualTo(s"/object-store/list/agent-registration-frontend/${fileUploadReference.value}"),
+    count = count
   )
 
   def stubObjectStorePresignedDownloadUrl(
@@ -81,4 +91,10 @@ object ObjectStoreStubs:
         "contentLength" -> 1234,
         "contentMD5" -> "abc123"
       ).toString
+  )
+
+  def verifyObjectStorePresignedDownloadUrl(count: Int = 1): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlEqualTo(s"/object-store/ops/presigned-url"),
+    count = count
   )

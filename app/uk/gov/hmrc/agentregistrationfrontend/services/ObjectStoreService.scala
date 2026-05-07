@@ -41,7 +41,7 @@ extends RequestAwareLogging:
   private def evidenceDirectory(fileReference: FileUploadReference): Path.Directory = Path.Directory(fileReference.value)
 
   def getEvidenceDownloadUrl(fileReference: FileUploadReference)(using request: RequestHeader): Future[Option[PresignedDownloadUrl]] =
-    for {
+    for
       objects <- playObjectStoreClient.listObjects(evidenceDirectory(fileReference))
       url <-
         objects.objectSummaries.headOption match
@@ -49,7 +49,7 @@ extends RequestAwareLogging:
             val path = evidenceDirectory(fileReference).file(objectListing.location.fileName)
             playObjectStoreClient.presignedDownloadUrl(path).map(Some(_))
           case None => Future.successful(None)
-    } yield url
+    yield url
 
   def deleteObject(path: Path.File)(using request: RequestHeader): Future[Unit] = playObjectStoreClient
     .deleteObject(

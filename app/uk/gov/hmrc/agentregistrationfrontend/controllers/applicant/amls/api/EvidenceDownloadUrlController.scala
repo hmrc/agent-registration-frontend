@@ -23,6 +23,7 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.services.ObjectStoreService
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core.AuthProviders
 import uk.gov.hmrc.auth.core.AuthorisationException
@@ -42,7 +43,8 @@ class EvidenceDownloadUrlController @Inject() (
   appConfig: AppConfig,
   af: AuthorisedFunctions
 )(using ec: ExecutionContext)
-extends FrontendController(mcc, actions):
+extends FrontendController(mcc, actions)
+with RequestAwareLogging:
 
   // Returns a signed upscan download URL for the given fileReference
   def evidenceDownloadUrl(fileReference: FileUploadReference): Action[AnyContent] = Action.async:
@@ -50,7 +52,9 @@ extends FrontendController(mcc, actions):
       af.authorised((Enrolment(appConfig.Stride.strideRoleAmls) or Enrolment(appConfig.Stride.strideRoleSmu)) and AuthProviders(PrivilegedApplication)).apply:
         objectStoreService.getEvidenceDownloadUrl(fileReference).map {
           case Some(url) => Ok(Json.obj("downloadUrl" -> url.downloadUrl.toString))
-          case None => NotFound
+          case None => NoContent
         }
       .recoverWith:
-        case _: AuthorisationException => Future.successful(Forbidden)
+        case e: AuthorisationException =>
+          logger.info(s"Unauthorised because of '${e.reason}', ${e.toString}")
+          Future.successful(Forbidden)

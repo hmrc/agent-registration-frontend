@@ -164,6 +164,7 @@ object AuthStubs {
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlMatching("/auth/authorise"),
     responseBody =
+      // language=JSON
       s"""
          |{
          |  "authorise": [
