@@ -146,7 +146,8 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
 
     val afterDeclarationSubmitted: AgentApplicationLlp = afterConfirmTwoChOfficers.copy(
       applicationState = ApplicationState.SentForRisking,
-      submittedAt = Some(dependencies.nowAsInstant)
+      submittedAt = Some(dependencies.nowAsInstant),
+      applicationExpiresAt = None
     )
 
     val afterSentForRisking: AgentApplicationLlp = afterDeclarationSubmitted.copy(

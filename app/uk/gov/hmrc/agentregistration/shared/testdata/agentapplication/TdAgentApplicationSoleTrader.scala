@@ -91,7 +91,8 @@ trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdGrsBusinessDetail
 
     val afterDeclarationSubmitted: AgentApplicationSoleTrader = afterHmrcStandardForAgentsAgreed.copy(
       applicationState = ApplicationState.SentForRisking,
-      submittedAt = Some(dependencies.nowAsInstant)
+      submittedAt = Some(dependencies.nowAsInstant),
+      applicationExpiresAt = None
     )
 
 }

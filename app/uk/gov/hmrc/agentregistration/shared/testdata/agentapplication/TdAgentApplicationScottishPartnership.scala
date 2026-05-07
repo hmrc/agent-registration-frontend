@@ -135,12 +135,14 @@ trait TdAgentApplicationScottishPartnership { dependencies: (TdBase & TdGrsBusin
 
     val afterDeclarationSubmitted: AgentApplicationScottishPartnership = afterHmrcStandardForAgentsAgreed.copy(
       applicationState = ApplicationState.SentForRisking,
-      submittedAt = Some(dependencies.nowAsInstant)
+      submittedAt = Some(dependencies.nowAsInstant),
+      applicationExpiresAt = None
     )
 
     val afterDeclarationSubmittedAndTwoIndividualFinished: AgentApplicationScottishPartnership = afterConfirmTwoIndividuals.copy(
       applicationState = ApplicationState.SentForRisking,
-      submittedAt = Some(dependencies.nowAsInstant)
+      submittedAt = Some(dependencies.nowAsInstant),
+      applicationExpiresAt = None
     )
 
 }
