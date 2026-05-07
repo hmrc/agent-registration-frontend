@@ -112,5 +112,5 @@ extends FrontendController(mcc, actions):
               agentApplicationId = request.get[IsNotSoleTrader].agentApplicationId
             )
             _ <- individualProvideDetailsService.upsertForApplication(individualProvidedDetails)
-          yield Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
+          yield Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show)
       .redirectIfSaveForLater
