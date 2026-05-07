@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.util
 
 import play.api.i18n.*
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistration.shared.audit.SessionId
+import uk.gov.hmrc.agentregistrationfrontend.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.SessionKeys
 import uk.gov.hmrc.play.bootstrap.binders.AbsoluteWithHostnameFromAllowlist
@@ -58,6 +60,8 @@ object RequestSupport:
     else {
       redirectUrl.get(AbsoluteWithHostnameFromAllowlist(allowedHosts)).url
     }
+
+  def getCurrentSessionId(using request: RequestHeader): SessionId = SessionId(hc.sessionId.getOrThrowExpectedDataMissing("sessionId").value)
 
   /** This is because we want to give responsibility of creation of HeaderCarrier to the platform code. If they refactor how hc is created our code will pick it
     * up automatically.

@@ -21,7 +21,6 @@ import play.api.mvc.AnyContent
 import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.audit.SessionId
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
@@ -33,6 +32,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendContr
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.ApplicationFactory
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.getCurrentSessionId
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -99,12 +99,12 @@ extends FrontendController(mcc, actions):
       userRole: UserRole,
       applicationReference: ApplicationReference
     )(using request: RequestWithDataCt[AnyContent, DataWithAuth]): AgentApplication = {
-      val cachedSessionId = SessionId.make(hc.sessionId.getOrThrowExpectedDataMissing("sessionId"))
+      val currentSessionId = getCurrentSessionId
       businessType match
         case BusinessType.Partnership.LimitedLiabilityPartnership =>
           applicationFactory.makeNewAgentApplicationLlp(
             internalUserId = request.internalUserId,
-            cachedSessionId = cachedSessionId,
+            cachedSessionId = currentSessionId,
             applicantCredentials = request.credentials,
             groupId = request.groupId,
             userRole = userRole,
@@ -113,7 +113,7 @@ extends FrontendController(mcc, actions):
         case BusinessType.SoleTrader =>
           applicationFactory.makeNewAgentApplicationSoleTrader(
             internalUserId = request.internalUserId,
-            cachedSessionId = cachedSessionId,
+            cachedSessionId = currentSessionId,
             applicantCredentials = request.credentials,
             groupId = request.groupId,
             userRole = userRole,
@@ -122,7 +122,7 @@ extends FrontendController(mcc, actions):
         case BusinessType.LimitedCompany =>
           applicationFactory.makeNewAgentApplicationLimitedCompany(
             internalUserId = request.internalUserId,
-            cachedSessionId = cachedSessionId,
+            cachedSessionId = currentSessionId,
             applicantCredentials = request.credentials,
             groupId = request.groupId,
             userRole = userRole,
@@ -131,7 +131,7 @@ extends FrontendController(mcc, actions):
         case BusinessType.Partnership.GeneralPartnership =>
           applicationFactory.makeNewAgentApplicationGeneralPartnership(
             internalUserId = request.internalUserId,
-            cachedSessionId = cachedSessionId,
+            cachedSessionId = currentSessionId,
             applicantCredentials = request.credentials,
             groupId = request.groupId,
             userRole = userRole,
@@ -140,7 +140,7 @@ extends FrontendController(mcc, actions):
         case BusinessType.Partnership.LimitedPartnership =>
           applicationFactory.makeNewAgentApplicationLimitedPartnership(
             internalUserId = request.internalUserId,
-            cachedSessionId = cachedSessionId,
+            cachedSessionId = currentSessionId,
             applicantCredentials = request.credentials,
             groupId = request.groupId,
             userRole = userRole,
@@ -149,7 +149,7 @@ extends FrontendController(mcc, actions):
         case BusinessType.Partnership.ScottishLimitedPartnership =>
           applicationFactory.makeNewAgentApplicationScottishLimitedPartnership(
             internalUserId = request.internalUserId,
-            cachedSessionId = cachedSessionId,
+            cachedSessionId = currentSessionId,
             applicantCredentials = request.credentials,
             groupId = request.groupId,
             userRole = userRole,
@@ -158,7 +158,7 @@ extends FrontendController(mcc, actions):
         case BusinessType.Partnership.ScottishPartnership =>
           applicationFactory.makeNewAgentApplicationScottishPartnership(
             internalUserId = request.internalUserId,
-            cachedSessionId = cachedSessionId,
+            cachedSessionId = currentSessionId,
             applicantCredentials = request.credentials,
             groupId = request.groupId,
             userRole = userRole,
