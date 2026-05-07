@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.services.applicant
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.audit.SessionId
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import java.time.Clock
@@ -33,12 +34,14 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationSoleTrader(
     internalUserId: InternalUserId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
     applicationReference: ApplicationReference
   ): AgentApplicationSoleTrader = AgentApplicationSoleTrader(
     _id = agentApplicationIdGenerator.nextApplicationId(),
+    cachedSessionId = cachedSessionId,
     applicationReference = applicationReference,
     internalUserId = internalUserId,
     applicantCredentials = applicantCredentials,
@@ -62,12 +65,14 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationLlp(
     internalUserId: InternalUserId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
     applicationReference: ApplicationReference
   ): AgentApplicationLlp = AgentApplicationLlp(
     _id = agentApplicationIdGenerator.nextApplicationId(),
+    cachedSessionId = cachedSessionId,
     applicationReference = applicationReference,
     internalUserId = internalUserId,
     applicantCredentials = applicantCredentials,
@@ -92,12 +97,14 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationLimitedCompany(
     internalUserId: InternalUserId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
     applicationReference: ApplicationReference
   ): AgentApplicationLimitedCompany = AgentApplicationLimitedCompany(
     _id = agentApplicationIdGenerator.nextApplicationId(),
+    cachedSessionId = cachedSessionId,
     applicationReference = applicationReference,
     internalUserId = internalUserId,
     applicantCredentials = applicantCredentials,
@@ -122,12 +129,14 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationGeneralPartnership(
     internalUserId: InternalUserId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
     applicationReference: ApplicationReference
   ): AgentApplicationGeneralPartnership = AgentApplicationGeneralPartnership(
     _id = agentApplicationIdGenerator.nextApplicationId(),
+    cachedSessionId = cachedSessionId,
     applicationReference = applicationReference,
     internalUserId = internalUserId,
     applicantCredentials = applicantCredentials,
@@ -151,12 +160,14 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationLimitedPartnership(
     internalUserId: InternalUserId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
     applicationReference: ApplicationReference
   ): AgentApplicationLimitedPartnership = AgentApplicationLimitedPartnership(
     _id = agentApplicationIdGenerator.nextApplicationId(),
+    cachedSessionId = cachedSessionId,
     applicationReference = applicationReference,
     internalUserId = internalUserId,
     applicantCredentials = applicantCredentials,
@@ -181,12 +192,14 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationScottishLimitedPartnership(
     internalUserId: InternalUserId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
     applicationReference: ApplicationReference
   ): AgentApplicationScottishLimitedPartnership = AgentApplicationScottishLimitedPartnership(
     _id = agentApplicationIdGenerator.nextApplicationId(),
+    cachedSessionId = cachedSessionId,
     applicationReference = applicationReference,
     internalUserId = internalUserId,
     applicantCredentials = applicantCredentials,
@@ -211,12 +224,14 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationScottishPartnership(
     internalUserId: InternalUserId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
     applicationReference: ApplicationReference
   ): AgentApplicationScottishPartnership = AgentApplicationScottishPartnership(
     _id = agentApplicationIdGenerator.nextApplicationId(),
+    cachedSessionId = cachedSessionId,
     applicationReference = applicationReference,
     internalUserId = internalUserId,
     applicantCredentials = applicantCredentials,
