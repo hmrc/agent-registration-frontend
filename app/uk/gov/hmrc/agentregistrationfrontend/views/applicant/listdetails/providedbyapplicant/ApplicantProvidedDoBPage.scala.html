@@ -16,9 +16,9 @@
 
 @import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedDateOfBirth
 @import uk.gov.hmrc.agentregistration.shared.LinkId
-@import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.ApplicantProvidedDoBForm
+@import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.providedbyapplicant.ApplicantProvidedDoBForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.partials.SaveAndContinue
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ProvidedByApplicantButtons
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits.*
 @import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 
@@ -27,7 +27,7 @@
         formWithCSRF: FormWithCSRF,
         govukDateInput: GovukDateInput,
         govukButton: GovukButton,
-        saveAndContinue: SaveAndContinue
+        providedByApplicantButtons: ProvidedByApplicantButtons
 )
 
 @(
@@ -59,14 +59,6 @@
             ))
         ).withDayMonthYearFormField(form(key)))
 
-        @saveAndContinue()
-
-    @govukButton(Button(
-        name = Some("submit"),
-        value = Some(SaveAndComeBackLater.toString),
-        content = Text(messages("common.saveAndComeBackLater")),
-        href = Some(AppRoutes.apply.SaveForLaterController.show.url),
-        classes = "govuk-button--secondary"
-        ))
+        @providedByApplicantButtons()
     }
 }

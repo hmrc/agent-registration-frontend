@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.forms.applicant
+package uk.gov.hmrc.agentregistrationfrontend.forms.applicant.providedbyapplicant
 
 import play.api.data.Form
 import play.api.data.Forms.mapping

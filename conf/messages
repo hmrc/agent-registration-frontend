@@ -474,6 +474,12 @@ providedByApplicantTelephoneNumber.error.required = Enter the number we should c
 providedByApplicantTelephoneNumber.error.invalid = Enter a phone number, like 01632 960 001 or 07700 900 982
 providedByApplicantTelephoneNumber.error.tooLong = The phone number must be 24 characters or fewer
 
+providedByApplicantEmailAddress.title = What is {0}’s email address?
+providedByApplicantEmailAddress.hint = We will not send a code to confirm this email address.
+providedByApplicantEmailAddress.error.required = Enter the email address
+providedByApplicantEmailAddress.error.invalid = Enter the email address with a name, @ symbol and a domain name, like yourname@example.com
+providedByApplicantEmailAddress.error.tooLong = The email address must be 132 characters or fewer
+
 
 # Apply / Declaration
 declaration.title = Declaration
