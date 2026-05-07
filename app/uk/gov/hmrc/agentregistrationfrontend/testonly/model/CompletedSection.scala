@@ -45,7 +45,7 @@ object CompletedSection:
 
       override def sectionName: String = "About your business"
       override def displayOrder: Int = 1
-      override def agentApplication: AgentApplication = TdTestOnly.llp.twoChOfficers.agentApplicationLlp.afterCompaniesHouseStatusCheckPass
+      override def agentApplication: AgentApplication = TdTestOnly.llp.twoChOfficers.agentApplicationLlp.afterRefusalToDealWithCheckPass
 
     case object LlpApplicantContactDetails
     extends CompletedSectionLlp:

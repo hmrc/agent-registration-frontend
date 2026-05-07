@@ -15,7 +15,6 @@ GET         /view-application                                          uk.gov.hm
 GET         /apply                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.startRegistration
 GET         /apply/task-list                                        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.TaskListController.show
 GET         /apply/save-and-come-back-later                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.SaveForLaterController.show
-GET         /apply/cannot-register-company-or-partnership           uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.CanNotRegisterCompanyOrPartnershipController.show
 GET         /apply/cannot-confirm-identity                          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.CanNotConfirmIdentityController.show
 GET         /apply/cannot-register                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.CanNotRegisterController.show
 GET         /apply/exit                                             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.genericExitPage
@@ -46,7 +45,6 @@ GET        /apply/internal/grs/journey-callback                                 
 GET        /apply/internal/address-lookup/journey-callback                            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.AddressLookupCallbackController.journeyCallback(id: Option[addresslookup.JourneyId])
 GET        /apply/internal/refusal-to-deal-with-check                                 uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.RefusalToDealWithController.check()
 GET        /apply/internal/deceased-check                                             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.DeceasedController.check()
-GET        /apply/internal/companies-house-status-check                               uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.CompaniesHouseStatusController.check()
 GET        /apply/internal/unified-customer-registry-identifiers                      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.UnifiedCustomerRegistryController.populateApplicationIdentifiersFromUcr
 
 ## Applicant contact details routes
