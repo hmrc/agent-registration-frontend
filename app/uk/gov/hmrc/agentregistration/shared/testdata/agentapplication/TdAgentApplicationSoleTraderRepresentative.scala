@@ -33,7 +33,7 @@ trait TdAgentApplicationSoleTraderRepresentative { dependencies: (TdBase & TdGrs
       linkId = dependencies.linkId,
       groupId = dependencies.groupId,
       createdAt = dependencies.nowAsInstant,
-      applicationExpiresAt = dependencies.applicationExpiresAtAsInstant,
+      applicationExpiresAt = Some(dependencies.applicationExpiresAtAsInstant),
       submittedAt = None,
       applicationState = ApplicationState.Started,
       userRole = Some(UserRole.Authorised),

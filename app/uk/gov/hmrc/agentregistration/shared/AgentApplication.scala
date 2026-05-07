@@ -41,7 +41,7 @@ sealed trait AgentApplication:
   def linkId: LinkId
   def groupId: GroupId
   def createdAt: Instant
-  def applicationExpiresAt: Instant // set at creation time as createdAt + days-to-submit-application
+  def applicationExpiresAt: Option[Instant] // set at creation time as createdAt + days-to-submit-application; cleared when the application is sent to Risking
   def submittedAt: Option[Instant] // only populated when the application is submitted, not during the registration journey
   def applicationState: ApplicationState
   def businessType: BusinessType
@@ -154,7 +154,7 @@ final case class AgentApplicationSoleTrader(
   override val linkId: LinkId,
   override val groupId: GroupId,
   override val createdAt: Instant,
-  override val applicationExpiresAt: Instant,
+  override val applicationExpiresAt: Option[Instant],
   override val submittedAt: Option[Instant],
   override val applicationState: ApplicationState,
   override val userRole: Option[UserRole],
@@ -189,7 +189,7 @@ final case class AgentApplicationLlp(
   override val linkId: LinkId,
   override val groupId: GroupId,
   override val createdAt: Instant,
-  override val applicationExpiresAt: Instant,
+  override val applicationExpiresAt: Option[Instant],
   override val submittedAt: Option[Instant],
   override val applicationState: ApplicationState,
   override val userRole: Option[UserRole],
@@ -222,7 +222,7 @@ final case class AgentApplicationLimitedCompany(
   override val linkId: LinkId,
   override val groupId: GroupId,
   override val createdAt: Instant,
-  override val applicationExpiresAt: Instant,
+  override val applicationExpiresAt: Option[Instant],
   override val submittedAt: Option[Instant],
   override val applicationState: ApplicationState,
   override val userRole: Option[UserRole],
@@ -255,7 +255,7 @@ final case class AgentApplicationGeneralPartnership(
   override val linkId: LinkId,
   override val groupId: GroupId,
   override val createdAt: Instant,
-  override val applicationExpiresAt: Instant,
+  override val applicationExpiresAt: Option[Instant],
   override val submittedAt: Option[Instant],
   override val applicationState: ApplicationState,
   override val userRole: Option[UserRole],
@@ -286,7 +286,7 @@ final case class AgentApplicationLimitedPartnership(
   override val linkId: LinkId,
   override val groupId: GroupId,
   override val createdAt: Instant,
-  override val applicationExpiresAt: Instant,
+  override val applicationExpiresAt: Option[Instant],
   override val submittedAt: Option[Instant],
   override val applicationState: ApplicationState,
   override val userRole: Option[UserRole],
@@ -317,7 +317,7 @@ final case class AgentApplicationScottishLimitedPartnership(
   override val linkId: LinkId,
   override val groupId: GroupId,
   override val createdAt: Instant,
-  override val applicationExpiresAt: Instant,
+  override val applicationExpiresAt: Option[Instant],
   override val submittedAt: Option[Instant],
   override val applicationState: ApplicationState,
   override val userRole: Option[UserRole],
@@ -348,7 +348,7 @@ final case class AgentApplicationScottishPartnership(
   override val linkId: LinkId,
   override val groupId: GroupId,
   override val createdAt: Instant,
-  override val applicationExpiresAt: Instant,
+  override val applicationExpiresAt: Option[Instant],
   override val submittedAt: Option[Instant],
   override val applicationState: ApplicationState,
   override val userRole: Option[UserRole],
