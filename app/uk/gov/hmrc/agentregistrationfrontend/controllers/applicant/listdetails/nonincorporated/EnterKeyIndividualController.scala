@@ -144,7 +144,7 @@ extends FrontendController(mcc, actions):
               agentApplicationId = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].agentApplicationId
             )
             _ <- individualProvideDetailsService.upsertForApplication(individualProvidedDetails)
-          yield Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
+          yield Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
       .redirectIfSaveForLater
 
   private def whenSixOrMore(

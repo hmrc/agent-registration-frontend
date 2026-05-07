@@ -158,3 +158,22 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
+
+  s"POST $path with valid input should redirect to check your answers" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterHowManyKeyIndividuals.agentApplicationId,
+      individuals = List.empty
+    )
+    AgentRegistrationStubs.stubFindIndividualByPersonReferenceNoContent(tdAll.personReference)
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetailsAnyBody()
+
+    val response: WSResponse =
+      post(path)(Map(
+        IndividualNameForm.key -> Seq("Test Name"),
+        "submit" -> Seq("SaveAndContinue")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url
+    ApplyStubHelper.verifyConnectorsForAuthAction()
