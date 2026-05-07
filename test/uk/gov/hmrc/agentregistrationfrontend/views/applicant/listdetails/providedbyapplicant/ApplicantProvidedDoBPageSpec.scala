@@ -103,5 +103,6 @@ extends ViewSpec:
         field = field,
         errorMessage = errorMessage,
         errorDoc = errorDoc,
-        heading = heading
+        heading = heading,
+        isWholeDateError = true // this ensures the error summary links to an input field instead of a fieldset
       )

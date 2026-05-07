@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
@@ -74,8 +75,8 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to get riskingProgressForApplicant: ${applicationReference.value}")
 
-  def getRiskingProgressForIndividual(applicationReference: ApplicationReference)(using RequestHeader): Future[RiskingProgress] =
-    val url: URL = url"$baseUrl/risking-progress/for-individual/${applicationReference.value}"
+  def getRiskingProgressForIndividual(personReference: PersonReference)(using RequestHeader): Future[RiskingProgress] =
+    val url: URL = url"$baseUrl/risking-progress/for-individual/${personReference.value}"
     httpClient
       .get(url)
       .execute[HttpResponse]
@@ -90,6 +91,6 @@ extends Connector:
               response = response,
               info = "getRiskingProgressForIndividual problem"
             )
-      .andLogOnFailure(s"Failed to get riskingProgressForIndividual: ${applicationReference.value}")
+      .andLogOnFailure(s"Failed to get riskingProgressForIndividual: ${personReference.value}")
 
   private val baseUrl: String = appConfig.agentRegistrationRiskingBaseUrl + "/agent-registration-risking"

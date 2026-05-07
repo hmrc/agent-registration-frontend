@@ -20,6 +20,7 @@ import com.github.tomakehurst.wiremock.client.WireMock as wm
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
@@ -56,5 +57,24 @@ object AgentRegistrationRiskingStubs:
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration-risking/risking-progress/for-applicant/${applicationReference.value}"),
+    count = count
+  )
+
+  def stubGetIndividualRiskingResponse(
+    personReference: PersonReference,
+    riskingProgress: RiskingProgress
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration-risking/risking-progress/for-individual/${personReference.value}"),
+    responseStatus = 200,
+    responseBody = Json.toJson(riskingProgress).toString()
+  )
+
+  def verifyGetIndividualRiskingResponse(
+    personReference: PersonReference,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration-risking/risking-progress/for-individual/${personReference.value}"),
     count = count
   )
