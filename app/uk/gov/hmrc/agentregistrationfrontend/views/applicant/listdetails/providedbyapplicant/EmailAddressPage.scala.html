@@ -14,12 +14,12 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
+@import uk.gov.hmrc.agentregistration.shared.EmailAddress
 @import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
-@import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.providedbyapplicant.TelephoneNumberForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ProvidedByApplicantButtons
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
+@import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.providedbyapplicant.EmailAddressForm
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ProvidedByApplicantButtons
 
 @this(
         layout: Layout,
@@ -30,15 +30,14 @@
 )
 
 @(
-        form: Form[TelephoneNumber],
-        individualName: IndividualName
-)(implicit
+        form: Form[EmailAddress],
+        individualName: IndividualName)(implicit
         request: RequestHeader,
         messages: Messages
 )
 
 @key = @{
-    TelephoneNumberForm.key
+    EmailAddressForm.key
 }
 @title = @{
     messages(s"$key.title", individualName.value)
@@ -48,17 +47,17 @@
     maybeForm = Some(form)
 ) {
   <h2 class="govuk-caption-l">@messages("applicantProvidingDetails.caption")</h2>
-  @formWithCSRF(action = AppRoutes.apply.listdetails.providedbyapplicant.TelephoneNumberController.submit) {
+  @formWithCSRF(action = AppRoutes.apply.listdetails.providedbyapplicant.EmailAddressController.submit) {
     @govukInput(Input(
       label = Label(
-        content = Text(title),
-        isPageHeading = true,
-        classes = "govuk-label--l"
+          content = Text(title),
+          isPageHeading = true,
+          classes = "govuk-label--l"
       ),
-        inputType = "tel",
-        hint = Some(Hint(content = Text(messages(s"$key.hint")))),
-        autocomplete = None,
-        classes = "govuk-input--width-20"
+      inputType = "email",
+      hint = Some(Hint(content = Text(messages(s"$key.hint")))),
+      autocomplete = None, // this is not the user's own email
+      spellcheck = Some("false")
     ).withFormField(form(key)))
 
     @providedByApplicantButtons()
