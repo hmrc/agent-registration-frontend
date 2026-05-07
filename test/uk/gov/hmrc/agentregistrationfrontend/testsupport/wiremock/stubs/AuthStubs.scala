@@ -158,4 +158,28 @@ object AuthStubs {
       |""".stripMargin
   )
 
+  def stubStrideAuth(
+    role: String = "maintain_agent_manually_assure"
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlMatching("/auth/authorise"),
+    responseBody =
+      // language=JSON
+      s"""
+         |{
+         |  "authorise": [
+         |    { "authProviders": ["PrivilegedApplication"] }
+         |  ]
+         |}
+           """.stripMargin,
+    responseStatus = Status.OK
+  )
+
+  def stubUnauthorized(reason: String = "UnsupportedCredentialRole"): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlMatching("/auth/authorise"),
+    responseStatus = Status.UNAUTHORIZED,
+    responseHeaders = Seq("WWW-Authenticate" -> s"""MDTP detail="$reason"""")
+  )
+
 }

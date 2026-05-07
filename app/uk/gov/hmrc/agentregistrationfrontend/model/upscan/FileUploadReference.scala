@@ -17,7 +17,9 @@
 package uk.gov.hmrc.agentregistrationfrontend.model.upscan
 
 import play.api.libs.json.Format
+import play.api.mvc.PathBindable
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import uk.gov.hmrc.agentregistration.shared.util.ValueClassBinder
 
 /** Upscan File Reference
   */
@@ -26,3 +28,4 @@ final case class FileUploadReference(value: String)
 object FileUploadReference:
 
   given format: Format[FileUploadReference] = JsonFormatsFactory.makeValueClassFormat
+  given pathBindable: PathBindable[FileUploadReference] = ValueClassBinder.valueClassBinder[FileUploadReference](_.value)
