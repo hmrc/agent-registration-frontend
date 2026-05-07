@@ -52,7 +52,7 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "LimitedLiabilityPartnership",
       agentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed,
-      caption = "LLP members and other tax adviser information",
+      caption = "LLP members and other relevant individuals",
       entityType = "members",
       heading = s"Check this list of members for $entityName",
       intro = s"These are the members listed in Companies House for $entityName:",
@@ -61,7 +61,7 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "LimitedCompany",
       agentApplication = tdAll.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed,
-      caption = "Directors and other tax adviser information",
+      caption = "Directors and other relevant individuals",
       entityType = "directors",
       heading = s"Check this list of directors for $entityName",
       intro = s"These are the directors listed in Companies House for $entityName:",
@@ -70,7 +70,7 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "LimitedPartnership",
       agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
-      caption = "Partners and other tax adviser information",
+      caption = "Partners and other relevant individuals",
       entityType = "partners",
       heading = s"Check this list of partners for $entityName",
       intro = s"These are the partners listed in Companies House for $entityName:",
@@ -79,7 +79,7 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "ScottishLimitedPartnership",
       agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed,
-      caption = "Partners and other tax adviser information",
+      caption = "Partners and other relevant individuals",
       entityType = "partners",
       heading = s"Check this list of partners for $entityName",
       intro = s"These are the partners listed in Companies House for $entityName:",

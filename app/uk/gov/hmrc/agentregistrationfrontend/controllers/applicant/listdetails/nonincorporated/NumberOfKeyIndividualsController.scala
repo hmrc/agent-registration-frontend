@@ -18,14 +18,13 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 
 import com.softwaremill.quicklens.modify
 import play.api.mvc.*
-
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
-import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm
-import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.nonincorporated.NumberOfKeyIndividualsPage
 
@@ -37,15 +36,17 @@ class NumberOfKeyIndividualsController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   numberOfKeyIndividualsPage: NumberOfKeyIndividualsPage,
-  agentApplicationService: AgentApplicationService,
-  businessPartnerRecordService: BusinessPartnerRecordService
+  agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
+  type DataWithValidApplicationAndBpr = BusinessPartnerRecordResponse *: IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
+
   private val baseAction: ActionBuilderWithData[
-    IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
+    DataWithValidApplicationAndBpr
   ] = actions
     .getApplicationInProgress
+    .getBusinessPartnerRecord
     .refine:
       implicit request =>
         request.agentApplication match
@@ -60,25 +61,17 @@ extends FrontendController(mcc, actions):
           case aa: IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
             request.replace[AgentApplication, IsAgentApplicationForDeclaringNumberOfKeyIndividuals](aa)
 
-  def show: Action[AnyContent] = baseAction
-    .async:
-      implicit request =>
-        val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals]
-        businessPartnerRecordService
-          .getBusinessPartnerRecord(agentApplication.getUtr)
-          .map: bprOpt =>
-            Ok(numberOfKeyIndividualsPage(
-              form = NumberOfKeyIndividualsForm.form
-                .fill:
-                  agentApplication.getNumberOfRequiredKeyIndividuals
-              ,
-              entityName = bprOpt
-                .map(_.getEntityName)
-                .getOrThrowExpectedDataMissing(
-                  "Business Partner Record is missing"
-                ),
-              agentApplication = agentApplication
-            ))
+  def show: Action[AnyContent] = baseAction:
+    implicit request =>
+      val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
+      Ok(numberOfKeyIndividualsPage(
+        form = NumberOfKeyIndividualsForm.form
+          .fill:
+            agentApplication.getNumberOfRequiredKeyIndividuals
+        ,
+        entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+        agentApplication = agentApplication
+      ))
 
   def submit: Action[AnyContent] =
     baseAction
@@ -86,35 +79,43 @@ extends FrontendController(mcc, actions):
         form = NumberOfKeyIndividualsForm.form,
         resultToServeWhenFormHasErrors =
           implicit request =>
-            formWithErrors => {
+            formWithErrors =>
               val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals]
-              businessPartnerRecordService
-                .getBusinessPartnerRecord(agentApplication.getUtr)
-                .map: bprOpt =>
-                  numberOfKeyIndividualsPage(
-                    form = formWithErrors,
-                    entityName = bprOpt
-                      .map(_.getEntityName)
-                      .getOrThrowExpectedDataMissing(
-                        "Business Partner Record is missing"
-                      ),
-                    agentApplication = agentApplication
-                  )
-            }
+              numberOfKeyIndividualsPage(
+                form = formWithErrors,
+                entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+                agentApplication = agentApplication
+              )
       )
       .async:
         implicit request =>
+          val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
           val numberOfRequiredKeyIndividuals: NumberOfRequiredKeyIndividuals = request.get[NumberOfRequiredKeyIndividuals]
+
+          /** When zero key individuals (partners) has been specified then user must supply at least one other relevant individual, we infer Some(true) for
+            * hasOtherRelevantIndividuals in this case to ensure they are taken to the correct page to add other relevant individuals. We must also be careful
+            * to preserve any existing value if not zero key individuals as we don't want to override a user's answer
+            */
+          val requiresOtherRelevantIndividuals: Option[Boolean] =
+            if numberOfRequiredKeyIndividuals.numberOfIndividuals === 0
+            then Some(true)
+            else if agentApplication.hasOtherRelevantIndividuals.isDefined
+            then agentApplication.hasOtherRelevantIndividuals
+            else None
           val updatedApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals =
-            request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals] match
+            agentApplication match
               case application: AgentApplicationScottishPartnership =>
                 application
                   .modify(_.numberOfIndividuals)
                   .setTo(Some(numberOfRequiredKeyIndividuals))
+                  .modify(_.hasOtherRelevantIndividuals)
+                  .setTo(requiresOtherRelevantIndividuals)
               case application: AgentApplicationGeneralPartnership =>
                 application
                   .modify(_.numberOfIndividuals)
                   .setTo(Some(numberOfRequiredKeyIndividuals))
+                  .modify(_.hasOtherRelevantIndividuals)
+                  .setTo(requiresOtherRelevantIndividuals)
 
           agentApplicationService
             .upsert(updatedApplication)

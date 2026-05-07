@@ -18,27 +18,25 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 
 import com.softwaremill.quicklens.modify
 import play.api.mvc.*
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole.getCompaniesHouseOfficerRole
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfCompaniesHouseOfficers
+import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuildersWithData.*
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmCompaniesHouseOfficersForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.NumberCompaniesHouseOfficersForm
-import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.CompaniesHouseService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.NumberOfCompaniesHouseOfficersPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.ConfirmCompaniesHouseOfficersPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.NumberOfCompaniesHouseOfficersPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.incorporated.UpdateCompaniesHouseOfficersPage
-import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
-import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -52,14 +50,16 @@ class CompaniesHouseOfficersController @Inject() (
   numberOfCompaniesHouseOfficersPage: NumberOfCompaniesHouseOfficersPage,
   updateCompaniesHouseOfficersPage: UpdateCompaniesHouseOfficersPage,
   agentApplicationService: AgentApplicationService,
-  businessPartnerRecordService: BusinessPartnerRecordService,
   individualProvideDetailsService: IndividualProvideDetailsService,
   companiesHouseService: CompaniesHouseService
 )
 extends FrontendController(mcc, actions):
 
-  private val baseAction: ActionBuilderWithData[Seq[IndividualName] *: List[IndividualProvidedDetails] *: IsIncorporated *: DataWithAuth] = actions
+  private val baseAction: ActionBuilderWithData[
+    Seq[IndividualName] *: List[IndividualProvidedDetails] *: BusinessPartnerRecordResponse *: IsIncorporated *: DataWithAuth
+  ] = actions
     .getApplicationInProgress
+    .getBusinessPartnerRecord
     .refine:
       implicit request =>
         request.agentApplication match
@@ -85,16 +85,9 @@ extends FrontendController(mcc, actions):
             .map(IndividualName(_))
             .filter(_.isValidName)
         yield request
-          .add[List[IndividualProvidedDetails]](individualsList)
+          .add[List[IndividualProvidedDetails]](individualsList.filter(_.isPersonOfControl)) // important we don't include other relevant individuals
           .add[Seq[IndividualName]](companiesHouseOfficersNames)
-//    .refine:
-//      implicit request =>
-//        val individuals = request.get[List[IndividualProvidedDetails]]
-//        request.get[IsIncorporated].getNumberOfCompaniesHouseOfficers match
-//          case Some(n: SixOrMoreOfficers) if (n. isValid && n.totalListSize === individuals.size) =>
-//
-//
-//
+
   def show: Action[AnyContent] = baseAction
     .async:
       implicit request =>
@@ -102,26 +95,26 @@ extends FrontendController(mcc, actions):
         val individuals = request.get[List[IndividualProvidedDetails]]
         val companiesHouseOfficers = request.get[Seq[IndividualName]]
 
-        getEntityName(agentApplication).map: entityName =>
-          companiesHouseOfficers.size match
-            case 0 =>
-              Ok(updateCompaniesHouseOfficersPage(
-                entityName = entityName,
-                agentApplication = agentApplication
-              ))
-            case n if n >= 1 && n <= 5 =>
-              renderFiveOrLessPage(
-                agentApplication,
-                entityName,
-                companiesHouseOfficers,
-                individuals
-              )
-            case n if n >= 6 =>
-              renderSixOrMorePage(
-                agentApplication,
-                entityName,
-                companiesHouseOfficers
-              )
+        companiesHouseOfficers.size match
+          case 0 =>
+            val updatedApplication = updateApplicationWithZeroOfficers(
+              agentApplication = agentApplication
+            )
+            agentApplicationService.upsert(updatedApplication).map: _ =>
+              Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.MandatoryRelevantIndividualsController.show.url)
+          case n if n >= 1 && n <= 5 =>
+            renderFiveOrLessPage(
+              agentApplication,
+              request.get[BusinessPartnerRecordResponse].getEntityName,
+              companiesHouseOfficers,
+              individuals
+            )
+          case n if n >= 6 =>
+            renderSixOrMorePage(
+              agentApplication,
+              request.get[BusinessPartnerRecordResponse].getEntityName,
+              companiesHouseOfficers
+            )
 
   def submitFiveOrLess: Action[AnyContent] =
     baseAction
@@ -132,19 +125,12 @@ extends FrontendController(mcc, actions):
             formWithErrors =>
               val agentApplication = request.get[IsIncorporated]
               val companiesHouseOfficers = request.get[Seq[IndividualName]]
-              val individuals = request.get[List[IndividualProvidedDetails]]
-
-              getEntityName(agentApplication).map: entityName =>
-                confirmCompaniesHouseOfficersPage(
-                  form = formWithErrors,
-                  entityName = entityName,
-                  agentApplication = agentApplication,
-                  individualNameList =
-                    if (individuals.nonEmpty)
-                      individuals.map(_.individualName)
-                    else
-                      companiesHouseOfficers
-                )
+              confirmCompaniesHouseOfficersPage(
+                form = formWithErrors,
+                entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+                agentApplication = agentApplication,
+                individualNameList = companiesHouseOfficers
+              )
       )
       .async:
         implicit request =>
@@ -158,11 +144,7 @@ extends FrontendController(mcc, actions):
               val updatedApplication = updateApplicationWithOfficerCount(
                 agentApplication = agentApplication,
                 numberOfCompaniesHouseOfficers = FiveOrLessOfficers(
-                  numberOfCompaniesHouseOfficers =
-                    if (individuals.nonEmpty)
-                      individuals.size
-                    else
-                      companiesHouseOfficers.size,
+                  numberOfCompaniesHouseOfficers = companiesHouseOfficers.size,
                   isCompaniesHouseOfficersListCorrect = isCompaniesHouseOfficersListCorrect
                 )
               )
@@ -178,9 +160,8 @@ extends FrontendController(mcc, actions):
               for
                 _ <- deleteIndividualProvideDetails
                 _ <- agentApplicationService.upsert(updatedApplication)
-                entityName <- getEntityName(agentApplication)
               yield Ok(updateCompaniesHouseOfficersPage(
-                entityName = entityName,
+                entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
                 agentApplication = agentApplication
               ))
 
@@ -188,11 +169,7 @@ extends FrontendController(mcc, actions):
               val updatedApplication = updateApplicationWithOfficerCount(
                 agentApplication = agentApplication,
                 numberOfCompaniesHouseOfficers = FiveOrLessOfficers(
-                  numberOfCompaniesHouseOfficers =
-                    if (individuals.nonEmpty)
-                      individuals.size
-                    else
-                      companiesHouseOfficers.size,
+                  numberOfCompaniesHouseOfficers = companiesHouseOfficers.size,
                   isCompaniesHouseOfficersListCorrect = isCompaniesHouseOfficersListCorrect
                 )
               )
@@ -235,14 +212,12 @@ extends FrontendController(mcc, actions):
             formWithErrors =>
               val agentApplication = request.get[IsIncorporated]
               val companiesHouseOfficers = request.get[Seq[IndividualName]]
-
-              getEntityName(agentApplication).map: entityName =>
-                numberOfCompaniesHouseOfficersPage(
-                  form = formWithErrors,
-                  entityName = entityName,
-                  agentApplication = agentApplication,
-                  companiesHouseOfficersCount = companiesHouseOfficers.size
-                )
+              numberOfCompaniesHouseOfficersPage(
+                form = formWithErrors,
+                entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+                agentApplication = agentApplication,
+                companiesHouseOfficersCount = companiesHouseOfficers.size
+              )
       )
       .async:
         implicit request =>
@@ -266,16 +241,12 @@ extends FrontendController(mcc, actions):
 
   // Private helper methods
 
-  private def getEntityName(agentApplication: IsIncorporated)(using RequestHeader): Future[String] = businessPartnerRecordService
-    .getBusinessPartnerRecord(agentApplication.getUtr)
-    .map(_.map(_.getEntityName).getOrThrowExpectedDataMissing("Business Partner Record is missing"))
-
   private def renderFiveOrLessPage(
     agentApplication: IsIncorporated,
     entityName: String,
     companiesHouseOfficers: Seq[IndividualName],
     individuals: List[IndividualProvidedDetails]
-  )(using RequestWithData[?]): Result = {
+  )(using RequestWithData[?]): Future[Result] =
 
     // If we present different list always confirm the list
     val listConfirmation: Option[Boolean] =
@@ -286,38 +257,30 @@ extends FrontendController(mcc, actions):
       else
         None
 
-    Ok(confirmCompaniesHouseOfficersPage(
+    Future.successful(Ok(confirmCompaniesHouseOfficersPage(
       form =
         listConfirmation
           .fold(ConfirmCompaniesHouseOfficersForm.form)(ConfirmCompaniesHouseOfficersForm.form.fill),
       entityName = entityName,
       agentApplication = agentApplication,
-      individualNameList =
-        if (individuals.nonEmpty)
-          individuals.map(_.individualName)
-        else
-          companiesHouseOfficers
-    ))
-  }
+      individualNameList = companiesHouseOfficers // we must present the list from CH - this is what user is confirming
+    )))
 
   private def renderSixOrMorePage(
     agentApplication: IsIncorporated,
     entityName: String,
     companiesHouseOfficers: Seq[IndividualName]
-  )(using RequestWithData[?]): Result = {
-
-    Ok(numberOfCompaniesHouseOfficersPage(
-      form =
-        agentApplication
-          .getNumberOfCompaniesHouseOfficers
-          .collect {
-            case SixOrMoreOfficers(_, x) => x
-          }.fold(NumberCompaniesHouseOfficersForm.form(companiesHouseOfficers.size))(NumberCompaniesHouseOfficersForm.form(companiesHouseOfficers.size).fill),
-      entityName = entityName,
-      agentApplication = agentApplication,
-      companiesHouseOfficersCount = companiesHouseOfficers.size
-    ))
-  }
+  )(using RequestWithData[?]): Future[Result] = Future.successful(Ok(numberOfCompaniesHouseOfficersPage(
+    form =
+      agentApplication
+        .getNumberOfCompaniesHouseOfficers
+        .collect {
+          case SixOrMoreOfficers(_, x) => x
+        }.fold(NumberCompaniesHouseOfficersForm.form(companiesHouseOfficers.size))(NumberCompaniesHouseOfficersForm.form(companiesHouseOfficers.size).fill),
+    entityName = entityName,
+    agentApplication = agentApplication,
+    companiesHouseOfficersCount = companiesHouseOfficers.size
+  )))
 
   private def updateApplicationWithOfficerCount(
     agentApplication: IsIncorporated,
@@ -328,3 +291,28 @@ extends FrontendController(mcc, actions):
       case application: AgentApplicationLimitedPartnership => application.modify(_.numberOfIndividuals).setTo(Some(numberOfCompaniesHouseOfficers))
       case application: AgentApplicationLlp => application.modify(_.numberOfIndividuals).setTo(Some(numberOfCompaniesHouseOfficers))
       case application: AgentApplicationScottishLimitedPartnership => application.modify(_.numberOfIndividuals).setTo(Some(numberOfCompaniesHouseOfficers))
+
+  private def updateApplicationWithZeroOfficers(
+    agentApplication: IsIncorporated
+  ): IsIncorporated =
+    val zeroOfficers = FiveOrLessOfficers(
+      numberOfCompaniesHouseOfficers = 0,
+      isCompaniesHouseOfficersListCorrect = true
+    )
+    agentApplication match
+      case application: AgentApplicationLimitedCompany =>
+        application
+          .modify(_.numberOfIndividuals).setTo(Some(zeroOfficers))
+          .modify(_.hasOtherRelevantIndividuals).setTo(Some(true))
+      case application: AgentApplicationLimitedPartnership =>
+        application
+          .modify(_.numberOfIndividuals).setTo(Some(zeroOfficers))
+          .modify(_.hasOtherRelevantIndividuals).setTo(Some(true))
+      case application: AgentApplicationLlp =>
+        application
+          .modify(_.numberOfIndividuals).setTo(Some(zeroOfficers))
+          .modify(_.hasOtherRelevantIndividuals).setTo(Some(true))
+      case application: AgentApplicationScottishLimitedPartnership =>
+        application
+          .modify(_.numberOfIndividuals).setTo(Some(zeroOfficers))
+          .modify(_.hasOtherRelevantIndividuals).setTo(Some(true))

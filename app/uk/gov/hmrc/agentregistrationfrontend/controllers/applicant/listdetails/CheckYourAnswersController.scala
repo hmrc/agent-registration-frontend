@@ -25,7 +25,10 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfIndividuals
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
@@ -61,42 +64,45 @@ extends FrontendController(mcc, actions):
     .ensure(
       condition =
         implicit request =>
+          val numberOfKeyIndividuals: Int = request.get[List[IndividualProvidedDetails]].count(_.isPersonOfControl)
           request.get[IsNotSoleTrader] match
             case a: AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
-              val partnersSize = request.get[List[IndividualProvidedDetails]].count(_.isPersonOfControl)
-              NumberOfIndividuals.isKeyIndividualListComplete(partnersSize, a.numberOfIndividuals)
-            case a: AgentApplication.IsIncorporated =>
-              val partnersSize = request.get[List[IndividualProvidedDetails]].count(_.isPersonOfControl)
-              NumberOfIndividuals.isKeyIndividualListComplete(partnersSize, a.numberOfIndividuals),
+              NumberOfIndividuals.isKeyIndividualListComplete(numberOfKeyIndividuals, a.numberOfIndividuals)
+            case a: AgentApplication.IsIncorporated => NumberOfIndividuals.isKeyIndividualListComplete(numberOfKeyIndividuals, a.numberOfIndividuals),
       resultWhenConditionNotMet =
         implicit request =>
           request.get[IsNotSoleTrader] match
             case a: AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
               Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
-            case a: AgentApplication.IsIncorporated => Redirect(AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show)
+            case a: AgentApplication.IsIncorporated => Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
     )
     .ensure(
       condition =
         implicit request =>
-          val otherRelevantIndividuals = request.get[List[IndividualProvidedDetails]].count(!_.isPersonOfControl)
+          val numberOfOtherRelevantIndividuals: Int = request.get[List[IndividualProvidedDetails]].count(!_.isPersonOfControl)
           request.get[IsNotSoleTrader].hasOtherRelevantIndividuals match
-            case Some(true) if (otherRelevantIndividuals > 0) => true
+            case Some(true) if (numberOfOtherRelevantIndividuals > 0) => true
             case Some(false) => true
             case _ => false,
       resultWhenConditionNotMet =
         implicit request =>
-          Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show.url)
+          request.get[IsNotSoleTrader].numberOfIndividuals match
+            case Some(FiveOrLess(n)) if n === 0 =>
+              Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.MandatoryRelevantIndividualsController.show.url)
+            case Some(FiveOrLessOfficers(n, true)) if n === 0 =>
+              Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.MandatoryRelevantIndividualsController.show.url)
+            case _ => Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show.url)
     )
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
       val allIndividualsList: List[IndividualProvidedDetails] = request.get
-      val partnersList = allIndividualsList.filter(_.isPersonOfControl)
-      val otherRelevantIndividualsList = allIndividualsList.filterNot(_.isPersonOfControl)
+      val listOfKeyIndividuals: List[IndividualProvidedDetails] = allIndividualsList.filter(_.isPersonOfControl)
+      val listOfOtherRelevantIndividuals: List[IndividualProvidedDetails] = allIndividualsList.filterNot(_.isPersonOfControl)
       val agentApplication = request.get[IsNotSoleTrader]
 
       Ok(view(
-        agentApplication,
-        partnersList,
-        otherRelevantIndividualsList
+        agentApplication = agentApplication,
+        listOfKeyIndividuals = listOfKeyIndividuals,
+        listOfOtherRelevantIndividuals = listOfOtherRelevantIndividuals
       ))

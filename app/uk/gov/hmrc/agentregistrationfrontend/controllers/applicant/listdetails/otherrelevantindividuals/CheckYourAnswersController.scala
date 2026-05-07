@@ -22,16 +22,19 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AddOtherRelevantIndividualsForm
-import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.otherrelevantindividuals.CheckYourAnswersPage
+
 import scala.concurrent.Future
 
 @Singleton
@@ -39,15 +42,15 @@ class CheckYourAnswersController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   view: CheckYourAnswersPage,
-  individualProvideDetailsService: IndividualProvideDetailsService,
-  businessPartnerRecordService: BusinessPartnerRecordService
+  individualProvideDetailsService: IndividualProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithLists = List[IndividualProvidedDetails] *: IsNotSoleTrader *: DataWithAuth
+  private type DataWithLists = List[IndividualProvidedDetails] *: BusinessPartnerRecordResponse *: IsNotSoleTrader *: DataWithAuth
 
   private val baseAction: ActionBuilderWithData[DataWithLists] = actions
     .getApplicationInProgress
+    .getBusinessPartnerRecord
     .refine:
       implicit request =>
         request.get[AgentApplication] match
@@ -77,24 +80,17 @@ extends FrontendController(mcc, actions):
               Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.EnterOtherRelevantIndividualController.show.url)
             case list: List[IndividualProvidedDetails] => request.add[List[IndividualProvidedDetails]](list)
 
-  def show: Action[AnyContent] = baseAction
-    .async:
-      implicit request =>
-        val agentApplication: IsNotSoleTrader = request.get[
-          IsNotSoleTrader
-        ]
-        businessPartnerRecordService
-          .getBusinessPartnerRecord(agentApplication.getUtr)
-          .map: bprOpt =>
-            Ok(view(
-              existingList = request.get[List[IndividualProvidedDetails]],
-              form = AddOtherRelevantIndividualsForm.form,
-              entityName = bprOpt
-                .map(_.getEntityName)
-                .getOrThrowExpectedDataMissing(
-                  "Business Partner Record is missing"
-                )
-            ))
+  def show: Action[AnyContent] = baseAction:
+    implicit request =>
+      val agentApplication: IsNotSoleTrader = request.get[
+        IsNotSoleTrader
+      ]
+      Ok(view(
+        existingList = request.get[List[IndividualProvidedDetails]],
+        form = AddOtherRelevantIndividualsForm.form,
+        entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+        businessTypeKey = businessTypeKey(agentApplication)
+      ))
 
   def submit: Action[AnyContent] =
     baseAction
@@ -102,23 +98,16 @@ extends FrontendController(mcc, actions):
         form = AddOtherRelevantIndividualsForm.form,
         resultToServeWhenFormHasErrors =
           implicit request =>
-            formWithErrors => {
+            formWithErrors =>
               val agentApplication: IsNotSoleTrader = request.get[
                 IsNotSoleTrader
               ]
-              businessPartnerRecordService
-                .getBusinessPartnerRecord(agentApplication.getUtr)
-                .map: bprOpt =>
-                  view(
-                    existingList = request.get[List[IndividualProvidedDetails]],
-                    form = formWithErrors,
-                    entityName = bprOpt
-                      .map(_.getEntityName)
-                      .getOrThrowExpectedDataMissing(
-                        "Business Partner Record is missing"
-                      )
-                  )
-            }
+              view(
+                existingList = request.get[List[IndividualProvidedDetails]],
+                form = formWithErrors,
+                entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+                businessTypeKey = businessTypeKey(agentApplication)
+              )
       )
       .async:
         implicit request =>
@@ -128,3 +117,9 @@ extends FrontendController(mcc, actions):
             case false => Future.successful(Redirect(AppRoutes.apply.listdetails.CheckYourAnswersController.show.url))
           }
       .redirectIfSaveForLater
+
+  private def businessTypeKey(agentApplication: IsNotSoleTrader): String =
+    agentApplication match
+      case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
+      case _: AgentApplicationLimitedCompany => "LimitedCompany"
+      case _ => "Partnership"

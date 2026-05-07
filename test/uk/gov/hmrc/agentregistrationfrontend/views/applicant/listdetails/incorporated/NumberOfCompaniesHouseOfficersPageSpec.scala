@@ -47,7 +47,7 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "LimitedLiabilityPartnership",
       agentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed,
-      caption = "LLP members and other tax adviser information",
+      caption = "LLP members and other relevant individuals",
       entityType = "members",
       heading = s"Members responsible for tax activities at $entityName",
       intro = s"There are $companiesHouseOfficersCount people listed in Companies House as members of $entityName.",
@@ -56,7 +56,7 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "LimitedCompany",
       agentApplication = tdAll.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed,
-      caption = "Directors and other tax adviser information",
+      caption = "Directors and other relevant individuals",
       entityType = "directors",
       heading = s"Directors responsible for tax activities at $entityName",
       intro = s"There are $companiesHouseOfficersCount people listed in Companies House as directors of $entityName.",
@@ -65,7 +65,7 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "LimitedPartnership",
       agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
-      caption = "Partners and other tax adviser information",
+      caption = "Partners and other relevant individuals",
       entityType = "partners",
       heading = s"Partners responsible for tax activities at $entityName",
       intro = s"There are $companiesHouseOfficersCount people listed in Companies House as partners of $entityName.",
@@ -74,7 +74,7 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "ScottishLimitedPartnership",
       agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed,
-      caption = "Partners and other tax adviser information",
+      caption = "Partners and other relevant individuals",
       entityType = "partners",
       heading = s"Partners responsible for tax activities at $entityName",
       intro = s"There are $companiesHouseOfficersCount people listed in Companies House as partners of $entityName.",

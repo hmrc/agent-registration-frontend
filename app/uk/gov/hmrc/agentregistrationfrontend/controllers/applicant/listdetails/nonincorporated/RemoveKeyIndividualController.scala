@@ -70,9 +70,9 @@ extends FrontendController(mcc, actions):
             case Some(individualProvidedDetails) => request.add[IndividualProvidedDetails](individualProvidedDetails)
             case None =>
               logger.warn(
-                "Number of required key individuals not specified in application, redirecting to number of key individuals page"
+                s"Individual provided details record not found for the provided id ${individualProvidedDetailsId.value} - redirecting as this may be due to a stale link or an attempt to access another record that does not belong to the current application"
               )
-              Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
+              Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show.url)
 
   def show(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] =
     baseAction(individualProvidedDetailsId):
