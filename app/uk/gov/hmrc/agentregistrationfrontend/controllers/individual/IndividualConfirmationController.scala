@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualConfirmationPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingprogress.IndividualConfirmationPage
 
 import javax.inject.Inject
 import javax.inject.Singleton

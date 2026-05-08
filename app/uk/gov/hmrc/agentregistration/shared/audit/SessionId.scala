@@ -1,5 +1,5 @@
 /*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.upscan
+package uk.gov.hmrc.agentregistration.shared.audit
 
 import play.api.libs.json.Format
-import play.api.mvc.PathBindable
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
-import uk.gov.hmrc.agentregistration.shared.util.ValueClassBinder
 
-/** Upscan File Reference
-  */
-final case class FileUploadReference(value: String)
+final case class SessionId(value: String)
 
-object FileUploadReference:
+object SessionId:
 
-  given format: Format[FileUploadReference] = JsonFormatsFactory.makeValueClassFormat
-  given pathBindable: PathBindable[FileUploadReference] = ValueClassBinder.valueClassBinder[FileUploadReference](_.value)
+  given format: Format[SessionId] = JsonFormatsFactory.makeValueClassFormat

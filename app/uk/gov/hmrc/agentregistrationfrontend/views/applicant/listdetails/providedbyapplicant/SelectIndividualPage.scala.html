@@ -19,14 +19,14 @@
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistrationfrontend.forms.SelectIndividualForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ProvidedByApplicantButtons
 
 @this(
         layout: Layout,
         formWithCSRF: FormWithCSRF,
         govukButton: GovukButton,
         govukSelect: GovukSelect,
-        continueOrSaveForLater: ContinueOrSaveForLater
+        providedByApplicantButtons: ProvidedByApplicantButtons
 )
 
 @(
@@ -76,6 +76,6 @@
             )
         )).withFormField(form(key)))
 
-        @continueOrSaveForLater()
+        @providedByApplicantButtons()
     }
 }

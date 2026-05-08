@@ -21,7 +21,6 @@ import org.jsoup.nodes.Document
 import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.forms.SelectIndividualForm
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.providedbyapplicant.SelectIndividualPage
@@ -88,10 +87,10 @@ extends ViewSpec:
         .selectOnlyOneElementOrFail()
         .text() shouldBe "Save and continue"
 
-    "render a save and come back later button" in:
+    "render a save and come back later link button" in:
       doc
         .mainContent
-        .selectOrFail(s"form button[value=${SaveAndComeBackLater.toString}]")
+        .selectOrFail(s"form a.govuk-button--secondary")
         .selectOnlyOneElementOrFail()
         .text() shouldBe "Save and come back later"
 

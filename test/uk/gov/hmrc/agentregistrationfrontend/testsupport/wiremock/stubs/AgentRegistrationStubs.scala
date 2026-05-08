@@ -147,6 +147,15 @@ object AgentRegistrationStubs:
     responseBody = Json.toJson(responseBody).toString()
   )
 
+  def verifyGetApplicationBusinessPartnerRecord(
+    utr: Utr,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/business-partner-record/utr/${utr.value}"),
+    count = count
+  )
+
   def stubFindApplicationByAgentApplicationId(
     agentApplicationId: AgentApplicationId,
     agentApplication: AgentApplication

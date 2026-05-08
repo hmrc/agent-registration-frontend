@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistration.shared
 
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
+import uk.gov.hmrc.agentregistration.shared.audit.SessionId
 import uk.gov.hmrc.agentregistration.shared.businessdetails.*
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
@@ -35,6 +36,7 @@ import java.time.Instant
 sealed trait AgentApplication:
 
   def _id: AgentApplicationId
+  def cachedSessionId: SessionId
   def applicationReference: ApplicationReference
   def internalUserId: InternalUserId
   def applicantCredentials: Credentials
@@ -148,6 +150,7 @@ sealed trait AgentApplication:
   */
 final case class AgentApplicationSoleTrader(
   override val _id: AgentApplicationId,
+  override val cachedSessionId: SessionId,
   override val applicationReference: ApplicationReference,
   override val internalUserId: InternalUserId,
   override val applicantCredentials: Credentials,
@@ -183,6 +186,7 @@ object AgentApplicationSoleTrader:
   */
 final case class AgentApplicationLlp(
   override val _id: AgentApplicationId,
+  override val cachedSessionId: SessionId,
   override val applicationReference: ApplicationReference,
   override val internalUserId: InternalUserId,
   override val applicantCredentials: Credentials,
@@ -216,6 +220,7 @@ extends AgentApplication:
   */
 final case class AgentApplicationLimitedCompany(
   override val _id: AgentApplicationId,
+  override val cachedSessionId: SessionId,
   override val applicationReference: ApplicationReference,
   override val internalUserId: InternalUserId,
   override val applicantCredentials: Credentials,
@@ -249,6 +254,7 @@ extends AgentApplication:
   */
 final case class AgentApplicationGeneralPartnership(
   override val _id: AgentApplicationId,
+  override val cachedSessionId: SessionId,
   override val applicationReference: ApplicationReference,
   override val internalUserId: InternalUserId,
   override val applicantCredentials: Credentials,
@@ -280,6 +286,7 @@ extends AgentApplication:
   */
 final case class AgentApplicationLimitedPartnership(
   override val _id: AgentApplicationId,
+  override val cachedSessionId: SessionId,
   override val applicationReference: ApplicationReference,
   override val internalUserId: InternalUserId,
   override val applicantCredentials: Credentials,
@@ -311,6 +318,7 @@ extends AgentApplication:
 
 final case class AgentApplicationScottishLimitedPartnership(
   override val _id: AgentApplicationId,
+  override val cachedSessionId: SessionId,
   override val applicationReference: ApplicationReference,
   override val internalUserId: InternalUserId,
   override val applicantCredentials: Credentials,
@@ -342,6 +350,7 @@ extends AgentApplication:
 
 final case class AgentApplicationScottishPartnership(
   override val _id: AgentApplicationId,
+  override val cachedSessionId: SessionId,
   override val applicationReference: ApplicationReference,
   override val internalUserId: InternalUserId,
   override val applicantCredentials: Credentials,

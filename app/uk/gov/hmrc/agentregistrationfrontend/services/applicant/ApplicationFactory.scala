@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.services.applicant
 
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistration.shared.audit.SessionId
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import java.time.Clock
@@ -36,6 +37,7 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationSoleTrader(
     internalUserId: InternalUserId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
@@ -44,6 +46,7 @@ class ApplicationFactory @Inject() (
     val now = Instant.now(clock)
     AgentApplicationSoleTrader(
       _id = agentApplicationIdGenerator.nextApplicationId(),
+      cachedSessionId = cachedSessionId,
       applicationReference = applicationReference,
       internalUserId = internalUserId,
       applicantCredentials = applicantCredentials,
@@ -68,6 +71,7 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationLlp(
     internalUserId: InternalUserId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
@@ -76,6 +80,7 @@ class ApplicationFactory @Inject() (
     val now = Instant.now(clock)
     AgentApplicationLlp(
       _id = agentApplicationIdGenerator.nextApplicationId(),
+      cachedSessionId = cachedSessionId,
       applicationReference = applicationReference,
       internalUserId = internalUserId,
       applicantCredentials = applicantCredentials,
@@ -101,6 +106,7 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationLimitedCompany(
     internalUserId: InternalUserId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
@@ -109,6 +115,7 @@ class ApplicationFactory @Inject() (
     val now = Instant.now(clock)
     AgentApplicationLimitedCompany(
       _id = agentApplicationIdGenerator.nextApplicationId(),
+      cachedSessionId = cachedSessionId,
       applicationReference = applicationReference,
       internalUserId = internalUserId,
       applicantCredentials = applicantCredentials,
@@ -134,6 +141,7 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationGeneralPartnership(
     internalUserId: InternalUserId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
@@ -142,6 +150,7 @@ class ApplicationFactory @Inject() (
     val now = Instant.now(clock)
     AgentApplicationGeneralPartnership(
       _id = agentApplicationIdGenerator.nextApplicationId(),
+      cachedSessionId = cachedSessionId,
       applicationReference = applicationReference,
       internalUserId = internalUserId,
       applicantCredentials = applicantCredentials,
@@ -166,6 +175,7 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationLimitedPartnership(
     internalUserId: InternalUserId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
@@ -174,6 +184,7 @@ class ApplicationFactory @Inject() (
     val now = Instant.now(clock)
     AgentApplicationLimitedPartnership(
       _id = agentApplicationIdGenerator.nextApplicationId(),
+      cachedSessionId = cachedSessionId,
       applicationReference = applicationReference,
       internalUserId = internalUserId,
       applicantCredentials = applicantCredentials,
@@ -199,6 +210,7 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationScottishLimitedPartnership(
     internalUserId: InternalUserId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
@@ -207,6 +219,7 @@ class ApplicationFactory @Inject() (
     val now = Instant.now(clock)
     AgentApplicationScottishLimitedPartnership(
       _id = agentApplicationIdGenerator.nextApplicationId(),
+      cachedSessionId = cachedSessionId,
       applicationReference = applicationReference,
       internalUserId = internalUserId,
       applicantCredentials = applicantCredentials,
@@ -232,6 +245,7 @@ class ApplicationFactory @Inject() (
 
   def makeNewAgentApplicationScottishPartnership(
     internalUserId: InternalUserId,
+    cachedSessionId: SessionId,
     applicantCredentials: Credentials,
     groupId: GroupId,
     userRole: UserRole,
@@ -240,6 +254,7 @@ class ApplicationFactory @Inject() (
     val now = Instant.now(clock)
     AgentApplicationScottishPartnership(
       _id = agentApplicationIdGenerator.nextApplicationId(),
+      cachedSessionId = cachedSessionId,
       applicationReference = applicationReference,
       internalUserId = internalUserId,
       applicantCredentials = applicantCredentials,

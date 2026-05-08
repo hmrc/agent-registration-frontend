@@ -1,3 +1,4 @@
 
 +nocsrf
 POST        /amls/process-notification-from-upscan/:uploadId        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls.api.NotificationFromUpscanController.processNotificationFromUpscan(uploadId: UploadId)
+GET         /amls/evidence-download-url/:fileReference              uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls.api.EvidenceDownloadUrlController.evidenceDownloadUrl(fileReference: FileUploadReference)

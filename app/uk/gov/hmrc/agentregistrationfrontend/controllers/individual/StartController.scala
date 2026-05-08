@@ -43,8 +43,8 @@ extends FrontendController(mcc, actions):
         val genericExitPageUrl: String = AppRoutes.apply.AgentApplicationController.genericExitPage.url
         applicationService.find(linkId).map {
           case Some(app) if app.hasFinished =>
-            logger.info(s"Individual details can no longer be provided on this link id, the application for linkId $linkId has already finished, redirecting to $genericExitPageUrl")
-            Redirect(genericExitPageUrl)
+            logger.info(s"the application for linkId $linkId has finished, redirecting to get status")
+            Redirect(AppRoutes.providedetails.riskingprogress.RiskingProgressController.show(linkId))
           case Some(app) => Ok(startPage(linkId: LinkId))
           case None =>
             logger.info(s"Application for linkId $linkId not found, redirecting to $genericExitPageUrl")

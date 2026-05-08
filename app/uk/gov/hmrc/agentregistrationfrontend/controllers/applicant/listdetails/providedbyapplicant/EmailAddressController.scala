@@ -16,12 +16,20 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant
 
+import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.EmailAddress
+import uk.gov.hmrc.agentregistration.shared.UserRole
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.providedbyapplicant.EmailAddressForm
+import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
+import uk.gov.hmrc.agentregistrationfrontend.repository.ProvidedByApplicantSessionStore
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.providedbyapplicant.EmailAddressPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -30,13 +38,66 @@ import javax.inject.Singleton
 class EmailAddressController @Inject() (
   actions: ApplicantActions,
   mcc: MessagesControllerComponents,
-  view: SimplePage
+  view: EmailAddressPage,
+  providedByApplicantSessionStore: ProvidedByApplicantSessionStore
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getApplicationInProgress:
+  private type DataWithProvidedByApplicant = ProvidedByApplicant *: DataWithApplication
+
+  private val baseAction: ActionBuilderWithData[DataWithProvidedByApplicant] = actions
+    .getApplicationInProgress
+    .ensure(
+      condition =
+        implicit request =>
+          request.get[AgentApplication].getUserRole =!= UserRole.Owner,
+      resultWhenConditionNotMet =
+        implicit request =>
+          logger.warn("Sole trader owners do not provide email addresses like this, redirecting to task list for the correct links")
+          Redirect(AppRoutes.apply.TaskListController.show.url)
+    )
+    .refine:
+      implicit request =>
+        providedByApplicantSessionStore
+          .find()
+          .map:
+            case Some(providedByApplicant) => request.add[ProvidedByApplicant](providedByApplicant)
+            case None =>
+              logger.warn(
+                "No individual provided details found in session when trying to access individual email address page, redirecting to select individual page"
+              )
+              Redirect(AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url)
+
+  def show: Action[AnyContent] = baseAction:
     implicit request =>
+      val providedByApplicant: ProvidedByApplicant = request.get
       Ok(view(
-        h1 = "Enter relevant individual's email address",
-        bodyText = Some("Placeholder for the email address page...")
+        form = EmailAddressForm.form
+          .fill:
+            providedByApplicant
+              .emailAddress
+        ,
+        individualName = providedByApplicant.individualName
       ))
+
+  def submit: Action[AnyContent] = baseAction
+    .ensureValidForm[EmailAddress](
+      EmailAddressForm.form,
+      implicit r =>
+        formWithErrors =>
+          view(
+            form = formWithErrors,
+            individualName = r.get[ProvidedByApplicant].individualName
+          )
+    )
+    .async:
+      implicit request =>
+        val emailAddressFromForm: EmailAddress = request.get
+        val providedByApplicant: ProvidedByApplicant = request.get
+        val updatedProvidedDetails: ProvidedByApplicant = providedByApplicant
+          .modify(_.emailAddress)
+          .setTo(Some(emailAddressFromForm))
+        providedByApplicantSessionStore
+          .upsert(updatedProvidedDetails)
+          .map: _ =>
+            Redirect(AppRoutes.apply.listdetails.providedbyapplicant.EmailAddressController.show.url) // TODO: this should go to the Nino controller which is being worked on in parallel

@@ -22,6 +22,7 @@ import uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
 import uk.gov.hmrc.objectstore.client.Path
+import uk.gov.hmrc.objectstore.client.PresignedDownloadUrl
 import uk.gov.hmrc.objectstore.client.RetentionPeriod
 import uk.gov.hmrc.objectstore.client.Sha256Checksum
 import uk.gov.hmrc.objectstore.client.play.PlayObjectStoreClient
@@ -36,6 +37,19 @@ class ObjectStoreService @Inject() (
   playObjectStoreClient: PlayObjectStoreClient
 )(using ec: ExecutionContext)
 extends RequestAwareLogging:
+
+  private def evidenceDirectory(fileReference: FileUploadReference): Path.Directory = Path.Directory(fileReference.value)
+
+  def getEvidenceDownloadUrl(fileReference: FileUploadReference)(using request: RequestHeader): Future[Option[PresignedDownloadUrl]] =
+    for
+      objects <- playObjectStoreClient.listObjects(evidenceDirectory(fileReference))
+      url <-
+        objects.objectSummaries.headOption match
+          case Some(objectListing) =>
+            val path = evidenceDirectory(fileReference).file(objectListing.location.fileName)
+            playObjectStoreClient.presignedDownloadUrl(path).map(Some(_))
+          case None => Future.successful(None)
+    yield url
 
   def deleteObject(path: Path.File)(using request: RequestHeader): Future[Unit] = playObjectStoreClient
     .deleteObject(
@@ -53,7 +67,7 @@ extends RequestAwareLogging:
     checksum: String,
     fileName: String
   )(using request: RequestHeader): Future[Path.File] =
-    val fileLocation: Path.File = Path.File(s"${fileReference.value}/$fileName")
+    val fileLocation: Path.File = evidenceDirectory(fileReference).file(fileName)
     val contentSha256 = Sha256Checksum.fromHex(checksum)
     playObjectStoreClient.uploadFromUrl(
       from = downloadUrl.toJavaUri.toURL,

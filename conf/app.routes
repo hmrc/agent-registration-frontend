@@ -138,6 +138,7 @@ POST        /apply/list-details/provide-details/date-of-birth       uk.gov.hmrc.
 GET         /apply/list-details/provide-details/telephone-number       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.TelephoneNumberController.show
 POST        /apply/list-details/provide-details/telephone-number       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.TelephoneNumberController.submit
 GET         /apply/list-details/provide-details/email-address          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.EmailAddressController.show
+POST        /apply/list-details/provide-details/email-address          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.EmailAddressController.submit
 
 GET         /apply/list-details/companies-house-officers/check-your-answers  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.incorporated.CheckYourAnswersController.show
 
@@ -179,6 +180,7 @@ GET         /provide-details/confirm-stop                                   uk.g
 GET         /provide-details/check-your-answers/:linkId                     uk.gov.hmrc.agentregistrationfrontend.controllers.individual.CheckYourAnswersController.show(linkId: LinkId)
 POST        /provide-details/check-your-answers/:linkId                     uk.gov.hmrc.agentregistrationfrontend.controllers.individual.CheckYourAnswersController.submit(linkId: LinkId)
 GET         /provide-details/confirmation/:linkId                           uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualConfirmationController.show(linkId: LinkId)
+GET         /provide-details/status/:linkId                                 uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingprogress.RiskingProgressController.show(linkId: LinkId)
 GET         /provide-details/individual-name-search/:linkId                 uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NameMatchingController.show(linkId: LinkId)
 POST        /provide-details/individual-name-search/:linkId                 uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NameMatchingController.submit(linkId: LinkId)
 GET         /provide-details/name-match-confirmation/:linkId                uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NameMatchConfirmationController.show(linkId: LinkId)

@@ -93,7 +93,8 @@ class AppConfig @Inject() (
     .getOrElse(false)
 
   val allowedRedirectHosts: Set[String] = configuration.getOptional[Seq[String]]("allowed-redirect-hosts").getOrElse(Nil).toSet
-
+  // for accessibility, we are registering date fields for use in Layout template to ensure error links go into the first input (day input)
+  val accessibleDateFields: Seq[String] = Seq("dateOfBirth", "applicant-provided.date-of-birth")
   /*
    * GRS CONFIG START
    */
@@ -120,6 +121,11 @@ class AppConfig @Inject() (
 
   object UploadRepo:
     val ttl: FiniteDuration = ConfigHelper.readFiniteDuration("mongodb.upload-repo-ttl", servicesConfig)
+
+  object Stride:
+
+    val strideRoleAmls: String = configuration.get[String]("stride.roles.amls")
+    val strideRoleSmu: String = configuration.get[String]("stride.roles.smu")
 
   // !!!
   // Access objects eagerly to initialize its vals, ensuring config errors are detected at startup
