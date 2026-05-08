@@ -27,10 +27,10 @@ extends ControllerSpec:
 
   object agentApplication:
 
-    val afterCompaniesHouseStatusCheckPass: AgentApplicationLlp =
+    val afterRefusalToDealWithCheckPass: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
-        .afterCompaniesHouseStatusCheckPass
+        .afterRefusalToDealWithCheckPass
 
     val afterIdentifiersUpdated: AgentApplicationLlp =
       tdAll
@@ -54,7 +54,7 @@ extends ControllerSpec:
   s"GET $path should update application with vrns and payeRefs if present and redirect to task list page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetOrganisationIdentifiers(tdAll.saUtr.asUtr, tdAll.ucrIdentifiers)
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterCompaniesHouseStatusCheckPass)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRefusalToDealWithCheckPass)
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterIdentifiersUpdated)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
@@ -67,7 +67,7 @@ extends ControllerSpec:
   s"GET $path should update application with empty list if vrns/ payeRefs not present and redirect to task list" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetOrganisationIdentifiers(tdAll.saUtr.asUtr, tdAll.emptyUcrIdentifiers)
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterCompaniesHouseStatusCheckPass)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRefusalToDealWithCheckPass)
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterEmptyIdentifiersUpdated)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
@@ -80,7 +80,7 @@ extends ControllerSpec:
   s"GET $path should update application with empty lists if connector fails and redirect to task list" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetOrganisationIdentifiersFails(tdAll.saUtr.asUtr)
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterCompaniesHouseStatusCheckPass)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRefusalToDealWithCheckPass)
     AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterEmptyIdentifiersUpdated)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER

@@ -22,7 +22,6 @@ import uk.gov.hmrc.agentregistration.shared.Crn
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole
-import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseStatus
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.http.client.HttpClientV2
 
@@ -69,28 +68,6 @@ extends Connector:
             response = response
           )
     .andLogOnFailure(s"Failed to retrieve officers from Companies House for $url")
-
-  def getCompanyHouseStatus(
-    crn: Crn
-  )(implicit
-    rh: RequestHeader
-  ): Future[CompaniesHouseStatus] =
-
-    val url = url"$baseUrl/companies-house-api-proxy/company/${crn.value}"
-    http
-      .get(url)
-      .execute[HttpResponse]
-      .map: response =>
-        response.status match
-          case s if is2xx(s) => (response.json \ "company_status").as[CompaniesHouseStatus]
-          case status =>
-            Errors.throwUpstreamErrorResponse(
-              httpMethod = "GET",
-              url = url,
-              status = status,
-              response = response
-            )
-      .andLogOnFailure(s"Failed to retrieve company status for ${crn.value}")
 
   private given Reads[CompaniesHouseOfficer] =
     (

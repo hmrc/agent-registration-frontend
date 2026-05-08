@@ -29,6 +29,7 @@ trait TdAgentApplicationLimitedCompany { dependencies: (TdBase & TdGrsBusinessDe
 
     val afterStarted: AgentApplicationLimitedCompany = AgentApplicationLimitedCompany(
       _id = dependencies.agentApplicationId,
+      cachedSessionId = dependencies.cachedSessionId,
       applicationReference = dependencies.applicationReference,
       internalUserId = dependencies.internalUserId,
       applicantCredentials = dependencies.credentials,
@@ -43,7 +44,6 @@ trait TdAgentApplicationLimitedCompany { dependencies: (TdBase & TdGrsBusinessDe
       amlsDetails = None,
       agentDetails = None,
       refusalToDealWithCheckResult = None,
-      companyStatusCheckResult = None,
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
       numberOfIndividuals = None,
       hasOtherRelevantIndividuals = None,
@@ -66,15 +66,7 @@ trait TdAgentApplicationLimitedCompany { dependencies: (TdBase & TdGrsBusinessDe
       refusalToDealWithCheckResult = Some(CheckResult.Fail)
     )
 
-    val afterCompaniesHouseStatusCheckPass: AgentApplicationLimitedCompany = afterRefusalToDealWithCheckPass.copy(
-      companyStatusCheckResult = Some(CheckResult.Pass)
-    )
-
-    val afterCompaniesHouseStatusCheckFail: AgentApplicationLimitedCompany = afterRefusalToDealWithCheckPass.copy(
-      companyStatusCheckResult = Some(CheckResult.Fail)
-    )
-
-    val afterContactDetailsComplete: AgentApplicationLimitedCompany = afterCompaniesHouseStatusCheckPass.copy(
+    val afterContactDetailsComplete: AgentApplicationLimitedCompany = afterRefusalToDealWithCheckPass.copy(
       applicantContactDetails = Some(dependencies.applicantContactDetails),
       agentDetails = None
     )
