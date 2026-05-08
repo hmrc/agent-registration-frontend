@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.upscan
+package uk.gov.hmrc.agentregistration.shared.upload
 
 import play.api.libs.json.Format
 import play.api.mvc.PathBindable

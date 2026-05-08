@@ -90,7 +90,7 @@ trait TdSectionAmls {
           def afterUploadedAmlsEvidence: AmlsDetails = {
             afterRegistrationNumberProvided.copy(
               amlsEvidence = Some(AmlsEvidence(
-                uploadId = dependencies.uploadId,
+                fileUploadReference = dependencies.fileUploadReference,
                 fileName = dependencies.fileName,
                 objectStoreLocation = Path.File(dependencies.objectStoreLocation)
               ))

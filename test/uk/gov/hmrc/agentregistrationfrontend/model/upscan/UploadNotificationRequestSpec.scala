@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.model.upscan
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import sttp.model.Uri.UriContext
+import uk.gov.hmrc.agentregistration.shared.upload.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 
 import java.time.Instant

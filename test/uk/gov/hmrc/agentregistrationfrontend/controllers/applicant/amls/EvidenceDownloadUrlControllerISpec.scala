@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls
 
 import play.api.libs.ws.WSResponse
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference
+import uk.gov.hmrc.agentregistration.shared.upload.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.ObjectStoreStubs
