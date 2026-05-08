@@ -96,5 +96,7 @@ extends FrontendController(mcc, actions):
                 .setTo(ApplicationState.SentForRisking)
                 .modify(_.submittedAt)
                 .setTo(Some(Instant.now(clock)))
+                .modify(_.applicationExpiresAt)
+                .setTo(None)
             )
         yield Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
