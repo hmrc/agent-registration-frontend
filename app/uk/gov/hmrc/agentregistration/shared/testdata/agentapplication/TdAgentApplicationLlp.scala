@@ -51,7 +51,6 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
       amlsDetails = None,
       agentDetails = None,
       refusalToDealWithCheckResult = None,
-      companyStatusCheckResult = None,
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
       numberOfIndividuals = None,
       hasOtherRelevantIndividuals = None,
@@ -74,20 +73,12 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
       refusalToDealWithCheckResult = Some(CheckResult.Fail)
     )
 
-    val afterCompaniesHouseStatusCheckPass: AgentApplicationLlp = afterRefusalToDealWithCheckPass.copy(
-      companyStatusCheckResult = Some(CheckResult.Pass)
-    )
-
-    val afterCompaniesHouseStatusCheckFail: AgentApplicationLlp = afterRefusalToDealWithCheckPass.copy(
-      companyStatusCheckResult = Some(CheckResult.Fail)
-    )
-
-    val afterUnifiedCustomerRegistryUpdateIdentifiers: AgentApplicationLlp = afterCompaniesHouseStatusCheckPass.copy(
+    val afterUnifiedCustomerRegistryUpdateIdentifiers: AgentApplicationLlp = afterRefusalToDealWithCheckPass.copy(
       vrns = Some(List(dependencies.vrn)),
       payeRefs = Some(List(dependencies.payeRef))
     )
 
-    val afterUnifiedCustomerRegistryUpdateEmptyIdentifiers: AgentApplicationLlp = afterCompaniesHouseStatusCheckPass.copy(
+    val afterUnifiedCustomerRegistryUpdateEmptyIdentifiers: AgentApplicationLlp = afterRefusalToDealWithCheckPass.copy(
       vrns = Some(List.empty),
       payeRefs = Some(List.empty)
     )
@@ -195,7 +186,6 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
         )),
         agentCorrespondenceAddress = None
       )),
-      companyStatusCheckResult = None,
       hasOtherRelevantIndividuals = Some(true),
       vrns = Some(List(Vrn("123456789"), Vrn("123456789"))),
       payeRefs = Some(List(PayeRef("123/AB12345"), PayeRef("123/AB12345")))

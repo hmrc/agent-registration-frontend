@@ -146,7 +146,6 @@ object AppRoutes:
 
     object checkfailed:
 
-      val CanNotRegisterCompanyOrPartnershipController = entitycheckfailedRoutes.CanNotRegisterCompanyOrPartnershipController
       val CanNotRegisterController = entitycheckfailedRoutes.CanNotRegisterController
       val CanNotConfirmIdentityController = entitycheckfailedRoutes.CanNotConfirmIdentityController
 
@@ -157,7 +156,6 @@ object AppRoutes:
       val AddressLookupCallbackController = internalRoutes.AddressLookupCallbackController
       val RefusalToDealWithController = internalRoutes.RefusalToDealWithController
       val DeceasedController = internalRoutes.DeceasedController
-      val CompaniesHouseStatusController = internalRoutes.CompaniesHouseStatusController
       val UnifiedCustomerRegistryController = internalRoutes.UnifiedCustomerRegistryController
 
   object providedetails:
