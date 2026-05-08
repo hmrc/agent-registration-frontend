@@ -85,7 +85,7 @@ extends FrontendController(mcc, actions):
           case CheckResult.Fail => Redirect(failedCheckPage)
 
   private def failedCheckPage: Call = AppRoutes.apply.checkfailed.CanNotConfirmIdentityController.show
-  private def nextCheckEndpoint: Call = AppRoutes.apply.internal.CompaniesHouseStatusController.check()
+  private def nextCheckEndpoint: Call = AppRoutes.apply.internal.UnifiedCustomerRegistryController.populateApplicationIdentifiersFromUcr
 
   extension (agentApplication: AgentApplicationSoleTrader)
     private def isDeceasedCheckRequired: Boolean = agentApplication.deceasedCheckResult =!= Some(CheckResult.Pass)
