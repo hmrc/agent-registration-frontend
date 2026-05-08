@@ -16,16 +16,12 @@
 
 @import uk.gov.hmrc.agentregistration.shared.LinkId
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.partials.SaveAndContinue
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
-@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 
 @this(
         layout: Layout,
         formWithCSRF: FormWithCSRF,
         govukButton: GovukButton
 )
-
 
 @(
         officerName: String,
@@ -37,7 +33,6 @@
 @key: String = @{"individualApproveAgentApplication"}
 
 @title = @{messages(s"$key.title")}
-@question = @{messages(s"$key.question", officerName)}
 
 @layout(
     pageTitle = title

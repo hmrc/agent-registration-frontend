@@ -35,7 +35,7 @@ extends ViewSpec:
     ).body
   )
 
-  "HmrcStandardForAgentsPage" should:
+  "IndividualApproveApplicationPage" should:
 
     "have expected content" in:
       doc.mainContent shouldContainContent
