@@ -20,7 +20,6 @@ import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualApproveApplicationForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
@@ -101,7 +100,7 @@ extends ControllerSpec:
     response.header("Location").value shouldBe AppRoutes.providedetails.IndividualEmailAddressController.show(linkId).url
     ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
 
-  s"POST $path with selected Yes should save data and redirect to agree standard" in:
+  s"POST $path should save data and redirect to agree standard" in:
     ProvideDetailsStubHelper.stubAuthAndUpdateProvidedDetails(
       agentApplication = applicationInProgress,
       individualProvidedDetails = individualProvideDetails.afterApproveAgentApplication,
@@ -111,49 +110,7 @@ extends ControllerSpec:
       utr = tdAll.saUtr.asUtr,
       responseBody = tdAll.businessPartnerRecordResponse
     )
-    val response: WSResponse =
-      post(path)(Map(
-        IndividualApproveApplicationForm.key -> Seq("Yes")
-      ))
+    val response: WSResponse = post(path)(Map())
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.providedetails.IndividualHmrcStandardForAgentsController.show(linkId).url
-
-  s"POST $path with selected No should save data and redirect to agree standard" in:
-    ProvideDetailsStubHelper.stubAuthAndUpdateProvidedDetails(
-      agentApplication = applicationInProgress,
-      individualProvidedDetails = individualProvideDetails.afterSaUtrProvided,
-      updatedIndividualProvidedDetails = individualProvideDetails.afterDoNotApproveAgentApplication
-    )
-    AgentRegistrationIndividualProvidedDetailsStubs.stubGetBusinessPartnerRecord(
-      utr = tdAll.saUtr.asUtr,
-      responseBody = tdAll.businessPartnerRecordResponse
-    )
-    val response: WSResponse =
-      post(path)(Map(
-        IndividualApproveApplicationForm.key -> Seq("No")
-      ))
-    response.status shouldBe Status.SEE_OTHER
-    response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.providedetails.IndividualConfirmStopController.show.url
-
-  s"POST $path without selecting an option should return 400" in:
-    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
-      applicationInProgress,
-      individualProvideDetails.afterSaUtrProvided
-    )
-    AgentRegistrationIndividualProvidedDetailsStubs.stubGetBusinessPartnerRecord(
-      utr = tdAll.saUtr.asUtr,
-      responseBody = tdAll.businessPartnerRecordResponse
-    )
-    val response: WSResponse =
-      post(path)(Map(
-        IndividualApproveApplicationForm.key -> Seq().empty
-      ))
-    response.status shouldBe Status.BAD_REQUEST
-    val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe ExpectedStrings.errorTitle
-    doc.mainContent.select("#individualApproveAgentApplication-error").text() shouldBe ExpectedStrings.requiredError(
-      applicationInProgress.getApplicantContactDetails.applicantName.value
-    )
-    ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()

@@ -705,11 +705,8 @@ individualHmrcStandardForAgents.agree.button = Agree and continue
 
 ## Individual Approve Agent Application
 individualApproveAgentApplication.title = Approve the applicant
-individualApproveAgentApplication.info = {0} has applied for an agent services account on behalf of {1}.
-individualApproveAgentApplication.question = Do you agree that {0} can apply for an account?
-individualApproveAgentApplication.yes = Yes
-individualApproveAgentApplication.no = No
-individualApproveAgentApplication.error.required = Select yes if you agree that {0} can apply for an account
+individualApproveAgentApplication.info = You need to confirm that {0} was authorised to make this application.
+individualApproveAgentApplication.approve.button = Approve and continue
 
 ## Individual / LLP / check your answers
 

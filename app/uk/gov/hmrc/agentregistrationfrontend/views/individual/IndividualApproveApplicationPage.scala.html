@@ -16,64 +16,40 @@
 
 @import uk.gov.hmrc.agentregistration.shared.LinkId
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.partials.SaveAndContinue
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
-@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
-@import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualApproveApplicationForm
 
 @this(
         layout: Layout,
-        govukRadios: GovukRadios,
         formWithCSRF: FormWithCSRF,
-        govukButton: GovukButton,
-        govukInsetText: GovukInsetText,
-        saveAndContinue: SaveAndContinue
+        govukButton: GovukButton
 )
 
-
 @(
-        form: Form[YesNo],
         officerName: String,
-        entityName: String,
         linkId: LinkId)(implicit
         request: RequestHeader,
         messages: Messages
 )
 
-@key: String = @{IndividualApproveApplicationForm.key}
+@key: String = @{"individualApproveAgentApplication"}
 
 @title = @{messages(s"$key.title")}
-@question = @{messages(s"$key.question", officerName)}
 
 @layout(
-    pageTitle = title,
-    maybeForm = Some(form)
+    pageTitle = title
 ) {
 
     <h1 class="govuk-heading-l">@title</h1>
 
-    <p class="govuk-body">@messages(s"$key.info", officerName, entityName)</p>
+    <p class="govuk-body">@messages(s"$key.info", officerName)</p>
+
 
     @formWithCSRF(action = AppRoutes.providedetails.IndividualApproveApplicantController.submit(linkId)) {
-        @govukRadios(Radios(
-            fieldset = Some(Fieldset(
-                legend = Some(Legend(
-                    content = Text(question),
-                    isPageHeading = false,
-                    classes = "govuk-fieldset__legend--m"
-                ))
-            )),
-            items = YesNo.values.toSeq.map:
-                case YesNo.Yes => RadioItem(
-                    content = HtmlContent(messages(s"$key.yes")),
-                    value = Some(YesNo.Yes.toString),
-                )
-                case YesNo.No => RadioItem(
-                    content = HtmlContent(messages(s"$key.no")),
-                    value = Some(YesNo.No.toString)
-                )
-        ).withFormField(form(key)))
 
-        @saveAndContinue()
+        @govukButton(Button(
+            name = Some("submit"),
+            value = Some(messages("ApproveAndContinue")),
+            content = Text(messages(s"$key.approve.button"))
+        ))
+
     }
 }
