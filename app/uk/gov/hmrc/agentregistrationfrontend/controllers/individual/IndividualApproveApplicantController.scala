@@ -23,12 +23,8 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
-import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualApproveApplicationForm
-import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
-import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.toYesNo
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualApproveApplicationPage
@@ -69,58 +65,30 @@ extends FrontendController(mcc, actions):
     .apply:
       implicit request =>
         val applicantName = request.get[AgentApplication].getApplicantContactDetails.applicantName
-        val filledForm = IndividualApproveApplicationForm
-          .form(applicantName.value)
-          .fill:
-            request.get[IndividualProvidedDetails]
-              .hasApprovedApplication
-              .map(_.toYesNo)
         Ok(
           view(
-            form = filledForm,
             officerName = applicantName.value,
-            entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
             linkId = linkId
           )
         )
 
-  def submit(linkId: LinkId): Action[AnyContent] =
-    baseAction(linkId)
-      .refine:
-        implicit request =>
-          businessPartnerRecordService
-            .getApplicationBusinessPartnerRecord(request.get[AgentApplication].getUtr)
-            .map((bprOpt: Option[BusinessPartnerRecordResponse]) =>
-              request.add(bprOpt.getOrThrowExpectedDataMissing(
-                s"Business Partner Record for UTR ${request.get[AgentApplication].getUtr.value}"
-              ))
-            )
-      .ensureValidFormAndRedirectIfSaveForLater[YesNo](
-        implicit request =>
-          val applicantName: ApplicantName = request.get[AgentApplication].getApplicantContactDetails.applicantName
-          IndividualApproveApplicationForm.form(applicantName.value)
-        ,
-        implicit request =>
-          val applicantName: ApplicantName = request.get[AgentApplication].getApplicantContactDetails.applicantName
-          view(
-            _,
-            officerName = applicantName.value,
-            entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
-            linkId = linkId
+  def submit(linkId: LinkId): Action[AnyContent] = baseAction(linkId)
+    .refine:
+      implicit request =>
+        businessPartnerRecordService
+          .getApplicationBusinessPartnerRecord(request.get[AgentApplication].getUtr)
+          .map((bprOpt: Option[BusinessPartnerRecordResponse]) =>
+            request.add(bprOpt.getOrThrowExpectedDataMissing(
+              s"Business Partner Record for UTR ${request.get[AgentApplication].getUtr.value}"
+            ))
           )
-      )
-      .async:
-        implicit request =>
-          val approved: Boolean = request.get[YesNo].toBoolean
-          val updatedIndividualProvidedDetails: IndividualProvidedDetails = request.get[IndividualProvidedDetails]
-            .modify(_.hasApprovedApplication)
-            .setTo(Some(approved))
+    .async:
+      implicit request =>
+        val updatedIndividualProvidedDetails: IndividualProvidedDetails = request.get[IndividualProvidedDetails]
+          .modify(_.hasApprovedApplication)
+          .setTo(Some(true))
 
-          individualProvideDetailsService
-            .upsert(updatedIndividualProvidedDetails)
-            .map: _ =>
-              if approved then
-                Redirect(AppRoutes.providedetails.IndividualHmrcStandardForAgentsController.show(linkId).url)
-              else
-                Redirect(AppRoutes.providedetails.IndividualConfirmStopController.show.url)
-      .redirectIfSaveForLater
+        individualProvideDetailsService
+          .upsert(updatedIndividualProvidedDetails)
+          .map: _ =>
+            Redirect(AppRoutes.providedetails.IndividualHmrcStandardForAgentsController.show(linkId).url)
