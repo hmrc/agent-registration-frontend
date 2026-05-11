@@ -78,6 +78,13 @@ object CompaniesHouseStubs {
             "date_of_birth" -> Json.obj("month" -> 2, "year" -> 1980),
             "resigned_on" -> "2024-01-01",
             "officer_role" -> officerRole.role
+          ),
+          Json.obj(
+            "name" -> "Corporate Entity",
+            "identification" -> Json.obj(
+              "identification_type" -> "corporate-entity"
+            ),
+            "officer_role" -> officerRole.role
           )
         )
       ).toString
@@ -89,13 +96,23 @@ object CompaniesHouseStubs {
     count = count
   )
 
+  /** We include a corporate entity in this response to verify that the service correctly filters out non-natural persons.
+    */
   def stubZeroOfficers(): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers"),
     responseStatus = 200,
     responseBody =
       Json.obj(
-        "items" -> Json.arr()
+        "items" -> Json.arr(
+          Json.obj(
+            "name" -> "Corporate Entity",
+            "identification" -> Json.obj(
+              "identification_type" -> "corporate-entity"
+            ),
+            "officer_role" -> "general-partner-in-a-limited-partnership"
+          )
+        )
       ).toString
   )
 

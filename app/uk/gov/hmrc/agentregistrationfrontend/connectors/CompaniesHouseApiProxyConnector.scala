@@ -21,6 +21,7 @@ import play.api.libs.json.*
 import uk.gov.hmrc.agentregistration.shared.Crn
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerIdentification
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -74,5 +75,6 @@ extends Connector:
       (__ \ "name").read[String] and
         (__ \ "date_of_birth").readNullable[CompaniesHouseDateOfBirth] and
         (__ \ "resigned_on").readNullable[LocalDate](Reads.localDateReads("yyyy-MM-dd")) and
-        (__ \ "officer_role").readNullable[CompaniesHouseOfficerRole]
+        (__ \ "officer_role").readNullable[CompaniesHouseOfficerRole] and
+        (__ \ "identification").readNullable[CompaniesHouseOfficerIdentification]
     )(CompaniesHouseOfficer.apply)
