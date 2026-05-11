@@ -142,7 +142,7 @@ extends ControllerSpec:
     response.header("Location").value shouldBe AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
-  s"POST $path with valid inputs should redirect to confirm other relevant individuals page when there is only 1 other relevant individual in the list before deletion" in:
+  s"POST $path with valid inputs should redirect to the parent CYA controller for navigation when there is only 1 other relevant individual in the list before deletion" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterHowManyKeyIndividuals.agentApplicationId,
@@ -154,7 +154,7 @@ extends ControllerSpec:
         RemoveKeyIndividualForm.key -> Seq("Yes")
       ))
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with save for later and valid input should redirect to save for later" in:

@@ -135,7 +135,7 @@ extends ControllerSpec:
     doc.title() shouldBe s"Error: $heading - Apply for an agent services account - GOV.UK"
     doc.mainContent
       .select(s"#${ConfirmOtherRelevantIndividualsForm.hasOtherRelevantIndividuals}-error")
-      .text() shouldBe "Error: Select yes if there are any other relevant tax advisers"
+      .text() shouldBe "Error: Select yes if there are any other relevant individuals"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeConfirmOtherRelevantIndividuals.agentApplicationId)
 

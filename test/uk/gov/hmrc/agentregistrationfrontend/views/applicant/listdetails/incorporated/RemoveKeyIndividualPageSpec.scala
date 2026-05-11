@@ -47,28 +47,28 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "LimitedLiabilityPartnership",
       agentApplication = tdAll.agentApplicationLlp.afterNumberOfConfirmCompaniesHouseOfficers,
-      caption = "LLP members and other tax adviser information",
+      caption = "LLP members and other relevant individuals",
       entityListType = "LLP members",
       heading = s"Confirm that you want to remove $individualName from the list of LLP members"
     ),
     BusinessTypeTestCase(
       label = "LimitedCompany",
       agentApplication = tdAll.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed,
-      caption = "Directors and other tax adviser information",
+      caption = "Directors and other relevant individuals",
       entityListType = "directors",
       heading = s"Confirm that you want to remove $individualName from the list of directors"
     ),
     BusinessTypeTestCase(
       label = "LimitedPartnership",
       agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
-      caption = "Partners and other tax adviser information",
+      caption = "Partners and other relevant individuals",
       entityListType = "partners",
       heading = s"Confirm that you want to remove $individualName from the list of partners"
     ),
     BusinessTypeTestCase(
       label = "ScottishLimitedPartnership",
       agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed,
-      caption = "Partners and other tax adviser information",
+      caption = "Partners and other relevant individuals",
       entityListType = "partners",
       heading = s"Confirm that you want to remove $individualName from the list of partners"
     )

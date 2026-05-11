@@ -26,7 +26,6 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
-import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
@@ -43,13 +42,12 @@ import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordServi
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
-import uk.gov.hmrc.auth.core.retrieve.Credentials
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.getCurrentSessionId
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
-import scala.concurrent.Future
 
 object ApplicantActions:
 

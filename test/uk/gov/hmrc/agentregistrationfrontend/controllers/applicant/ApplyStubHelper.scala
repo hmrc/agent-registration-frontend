@@ -43,6 +43,13 @@ object ApplyStubHelper:
     stubsForAuthAction(application)
     AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
 
+  def stubsForSuccessfulUpdateWithBpr(
+    application: AgentApplication,
+    updatedApplication: AgentApplication
+  ): StubMapping =
+    stubsToSupplyBprToPage(application)
+    AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
+
   def verifyConnectorsForSuccessfulUpdate(): Unit =
     verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyUpdateAgentApplication()

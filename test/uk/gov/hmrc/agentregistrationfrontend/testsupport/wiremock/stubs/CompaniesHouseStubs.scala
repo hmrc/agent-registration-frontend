@@ -89,6 +89,16 @@ object CompaniesHouseStubs {
     count = count
   )
 
+  def stubZeroOfficers(): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers"),
+    responseStatus = 200,
+    responseBody =
+      Json.obj(
+        "items" -> Json.arr()
+      ).toString
+  )
+
   def stubSingleMatch(
     lastName: String,
     officerRole: CompaniesHouseOfficerRole = CompaniesHouseOfficerRole.LlpMember

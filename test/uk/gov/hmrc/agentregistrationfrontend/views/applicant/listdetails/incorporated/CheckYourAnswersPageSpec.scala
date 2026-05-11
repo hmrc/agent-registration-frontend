@@ -54,7 +54,7 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "LimitedLiabilityPartnership",
       agentApplication = tdAll.agentApplicationLlp.afterNumberOfConfirmCompaniesHouseOfficers,
-      caption = "LLP members and other tax adviser information",
+      caption = "LLP members and other relevant individuals",
       entityType = "LLP member",
       singularTitle = "You have added 1 LLP member",
       changeNumberLink = "Change the number of LLP members",
@@ -63,7 +63,7 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "LimitedCompany",
       agentApplication = tdAll.agentApplicationLimitedCompany.afterNumberOfConfirmCompaniesHouseOfficers,
-      caption = "Directors and other tax adviser information",
+      caption = "Directors and other relevant individuals",
       entityType = "director",
       singularTitle = "You have added 1 director",
       changeNumberLink = "Change the number of directors",
@@ -72,7 +72,7 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "LimitedPartnership",
       agentApplication = tdAll.agentApplicationLimitedPartnership.afterNumberOfConfirmCompaniesHouseOfficers,
-      caption = "Partners and other tax adviser information",
+      caption = "Partners and other relevant individuals",
       entityType = "partner",
       singularTitle = "You have added 1 partner",
       changeNumberLink = "Change the number of partners",
@@ -81,7 +81,7 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "ScottishLimitedPartnership",
       agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterNumberOfConfirmCompaniesHouseOfficers,
-      caption = "Partners and other tax adviser information",
+      caption = "Partners and other relevant individuals",
       entityType = "partner",
       singularTitle = "You have added 1 partner",
       changeNumberLink = "Change the number of partners",

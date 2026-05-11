@@ -102,7 +102,7 @@ extends FrontendController(mcc, actions):
                 .map: _ =>
                   if existingListBeforeDeletion.size > 1
                   then Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show)
-                  else Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show)
+                  else Redirect(AppRoutes.apply.listdetails.CheckYourAnswersController.show)
             case YesNo.No =>
               Future.successful(
                 Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show)

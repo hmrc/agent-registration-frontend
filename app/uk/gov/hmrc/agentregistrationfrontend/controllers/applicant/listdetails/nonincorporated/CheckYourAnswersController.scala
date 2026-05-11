@@ -87,9 +87,9 @@ extends FrontendController(mcc, actions):
               Redirect(AppRoutes.apply.listdetails.nonincorporated.EnterKeyIndividualController.show.url)
             case Nil =>
               logger.warn(
-                "Number of required key individuals specified in application is zero, skipping CYA and redirecting to number of other relevant individuals page"
+                "Number of required key individuals specified in application is zero, skipping CYA and redirecting to main CYA to see if other individuals needed"
               )
-              Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url)
+              Redirect(AppRoutes.apply.listdetails.CheckYourAnswersController.show.url)
             case list: List[IndividualProvidedDetails] => request.add[List[IndividualProvidedDetails]](list)
 
   def show: Action[AnyContent] = baseAction:

@@ -120,6 +120,7 @@ object AppRoutes:
         val ChangeOtherRelevantIndividualController = listdetailsOthersRoutes.ChangeOtherRelevantIndividualController
         val RemoveOtherRelevantIndividualController = listdetailsOthersRoutes.RemoveOtherRelevantIndividualController
         val CheckYourAnswersController = listdetailsOthersRoutes.CheckYourAnswersController
+        val MandatoryRelevantIndividualsController = listdetailsOthersRoutes.MandatoryRelevantIndividualsController
 
       object incoporated:
 

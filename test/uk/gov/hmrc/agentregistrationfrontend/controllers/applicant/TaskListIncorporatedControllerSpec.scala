@@ -36,7 +36,7 @@ extends ControllerSpec:
     val accountDetails = "accountDetails-1-status"
     val amls = "hmrcStandards-1-status"
     val hmrcStandards = "hmrcStandards-2-status"
-    val buildListOfIndividuals = "lists-1-status" // e.g. "Directors and other relevant tax advisers"
+    val buildListOfIndividuals = "lists-1-status" // e.g. "Directors and other relevant individuals"
     val shareLinkWithIndividuals = "lists-2-status" // e.g. "Ask the directors and tax advisers to sign in"
     val checkProgressOfIndividuals = "lists-3-status" // e.g. "Check who has provided their details"
     val declaration = "declaration-1-status"
