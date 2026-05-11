@@ -21,9 +21,9 @@ import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import sttp.model.Uri
 import sttp.model.Uri.UriContext
+import uk.gov.hmrc.agentregistration.shared.upload.FileUploadReference
 import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.ErrorDetails
-import uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadEventDetails
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.UploadNotificationRequest

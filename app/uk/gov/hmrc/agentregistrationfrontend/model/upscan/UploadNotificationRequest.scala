@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.model.upscan
 
 import play.api.libs.json.*
 import sttp.model.Uri
+import uk.gov.hmrc.agentregistration.shared.upload.FileUploadReference
 import uk.gov.hmrc.agentregistration.shared.util.UriFormat
 
 /** Represents a callback notification request body sent from upscan-notify microsvice containing the outcome of uploaded file processing.

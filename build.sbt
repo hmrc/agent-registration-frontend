@@ -30,7 +30,6 @@ lazy val microservice = Project("agent-registration-frontend", file("."))
       "uk.gov.hmrc.agentregistrationfrontend",
       "uk.gov.hmrc.agentregistrationfrontend.model.grs",
       "uk.gov.hmrc.agentregistrationfrontend.model.addresslookup",
-      "uk.gov.hmrc.agentregistrationfrontend.model.upscan.FileUploadReference",
       "uk.gov.hmrc.agentregistrationfrontend.RoutesExports.*",
       "uk.gov.hmrc.agentregistrationfrontend.RoutesExports.given"
     )

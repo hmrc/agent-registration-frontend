@@ -141,7 +141,7 @@ extends FrontendController(mcc, actions):
       case UploadStatus.InProgress => Future.successful(())
       case _: UploadStatus.Failed => Future.successful(())
       case succeeded: UploadStatus.UploadedSuccessfully =>
-        if agentApplication.getAmlsDetails.amlsEvidence.exists(_.uploadId === upload.uploadId)
+        if agentApplication.getAmlsDetails.amlsEvidence.exists(_.fileUploadReference === upload.fileUploadReference)
         then Future.successful(()) // Evidence already exists for this upload - skipping duplicate transfer to Object Store and database update
         else
           for
@@ -165,7 +165,7 @@ extends FrontendController(mcc, actions):
                 .modify(_.amlsDetails.each.amlsEvidence)
                 .setTo(
                   Some(AmlsEvidence(
-                    uploadId = upload.uploadId,
+                    fileUploadReference = upload.fileUploadReference,
                     fileName = succeeded.fileName,
                     objectStoreLocation = objectStoreLocation
                   ))
