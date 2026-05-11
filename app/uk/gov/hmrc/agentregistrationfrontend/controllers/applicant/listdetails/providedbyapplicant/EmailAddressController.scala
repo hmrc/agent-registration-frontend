@@ -100,4 +100,4 @@ extends FrontendController(mcc, actions):
         providedByApplicantSessionStore
           .upsert(updatedProvidedDetails)
           .map: _ =>
-            Redirect(AppRoutes.apply.listdetails.providedbyapplicant.EmailAddressController.show.url) // TODO: this should go to the Nino controller which is being worked on in parallel
+            Redirect(AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedNinoController.show.url)

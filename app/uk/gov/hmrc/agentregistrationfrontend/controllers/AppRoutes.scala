@@ -143,6 +143,7 @@ object AppRoutes:
         val TelephoneNumberController = listdetailsProvideDetailsRoutes.TelephoneNumberController
         val EmailAddressController = listdetailsProvideDetailsRoutes.EmailAddressController
         val ApplicantProvidedDoBController = listdetailsProvideDetailsRoutes.ApplicantProvidedDoBController
+        val ApplicantProvidedNinoController = listdetailsProvideDetailsRoutes.ApplicantProvidedNinoController
 
     object checkfailed:
 
