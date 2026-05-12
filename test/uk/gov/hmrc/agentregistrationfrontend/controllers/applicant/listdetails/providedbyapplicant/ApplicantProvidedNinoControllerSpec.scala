@@ -77,7 +77,7 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url
 
-  s"POST $path should redirect to the enter your UTR page when 'yes' has been selected and a valid nino has been provided" in:
+  s"POST $path should redirect to the CYA controller for navigation when 'yes' has been selected and a valid nino has been provided" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(application)
     providedByApplicantSessionStore.upsert(providedByApplicant).futureValue
@@ -88,7 +88,7 @@ extends ControllerSpec:
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.EmailAddressController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.show.url
     providedByApplicantSessionStore.find().futureValue.value shouldBe
       ProvidedByApplicant(
         individualProvidedDetailsId = tdAll.providedDetails.afterAccessConfirmed._id,
