@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino.NotProvided
 import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.providedbyapplicant.ApplicantProvidedNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
 import uk.gov.hmrc.agentregistrationfrontend.repository.ProvidedByApplicantSessionStore
@@ -130,7 +131,7 @@ extends ControllerSpec:
       ProvidedByApplicant(
         individualProvidedDetailsId = tdAll.providedDetails.afterAccessConfirmed._id,
         individualName = tdAll.providedDetails.afterAccessConfirmed.individualName,
-        individualNino = None
+        individualNino = Some(NotProvided)
       )
 
   s"POST $path should return a 400 when 'yes' has been selected and an invalid NINO has been provided" in:
