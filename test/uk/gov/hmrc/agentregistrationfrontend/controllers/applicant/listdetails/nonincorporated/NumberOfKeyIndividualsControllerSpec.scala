@@ -61,7 +61,7 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with valid amounts should save data and redirect to CYA for working out the next page" in:
-    ApplyStubHelper.stubsForSuccessfulUpdate(
+    ApplyStubHelper.stubsForSuccessfulUpdateWithBpr(
       application = agentApplication.beforeHowManyKeyIndividuals,
       updatedApplication = agentApplication.afterHowManyKeyIndividuals
     )
@@ -100,7 +100,7 @@ extends ControllerSpec:
     doc.title() shouldBe "Error: How many partners are there at Test Company Name? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
       s"#${NumberOfKeyIndividualsForm.howManyIndividuals}-error"
-    ).text() shouldBe "Error: Enter a number between 1 and 5, for example 3"
+    ).text() shouldBe "Error: Enter a number between 0 and 5, for example 3"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with selection of other and invalid characters should return 400" in:
@@ -116,7 +116,7 @@ extends ControllerSpec:
     doc.title() shouldBe "Error: How many partners are there at Test Company Name? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
       s"#${NumberOfKeyIndividualsForm.howManyIndividuals}-error"
-    ).text() shouldBe "Error: Enter a number between 1 and 5, for example 3"
+    ).text() shouldBe "Error: Enter a number between 0 and 5, for example 3"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with selection of FiveOrLess and a value higher than 5 should return 400" in:
@@ -132,11 +132,11 @@ extends ControllerSpec:
     doc.title() shouldBe "Error: How many partners are there at Test Company Name? - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
       s"#${NumberOfKeyIndividualsForm.howManyIndividuals}-error"
-    ).text() shouldBe "Error: Enter a number between 1 and 5, for example 3"
+    ).text() shouldBe "Error: Enter a number between 0 and 5, for example 3"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with save for later and valid selection should save data and redirect to the saved for later page" in:
-    ApplyStubHelper.stubsForSuccessfulUpdate(
+    ApplyStubHelper.stubsForSuccessfulUpdateWithBpr(
       application = agentApplication.beforeHowManyKeyIndividuals,
       updatedApplication = agentApplication.afterHowManyKeyIndividuals
     )

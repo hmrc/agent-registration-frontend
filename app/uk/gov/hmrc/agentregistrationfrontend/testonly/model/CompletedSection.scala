@@ -78,7 +78,7 @@ object CompletedSection:
     case object LlpPartnersAndOtherRelevantTaxAdvisers2
     extends CompletedSectionLlp:
 
-      override def sectionName: String = "Members and other relevant tax advisers (2)"
+      override def sectionName: String = "members and other relevant individuals (2)"
       override def displayOrder: Int = 6
       override def agentApplication: AgentApplication = TdTestOnly.llp.twoChOfficers.agentApplicationLlp.afterConfirmTwoChOfficers
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
@@ -88,7 +88,7 @@ object CompletedSection:
     case object LlpPartnersAndOtherRelevantTaxAdvisers6
     extends CompletedSectionLlp:
 
-      override def sectionName: String = "Members and other relevant tax advisers (6)"
+      override def sectionName: String = "members and other relevant individuals (6)"
       override def displayOrder: Int = 7
       override def agentApplication: AgentApplication = TdTestOnly.llp.sixChOfficers.agentApplicationLlp.afterConfirmSixChOfficers
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
@@ -201,7 +201,7 @@ object CompletedSection:
     case object GeneralPartnershipPartnersAndOtherRelevantTaxAdvisers2
     extends CompletedSectionGeneralPartnership:
 
-      override def sectionName: String = "Partners and other relevant tax advisers (2)"
+      override def sectionName: String = "Partners and other relevant individuals (2)"
       override def displayOrder: Int = 6
       override def agentApplication: AgentApplication = TdTestOnly.agentApplicationGeneralPartnership.afterConfirmTwoIndividuals
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
@@ -211,7 +211,7 @@ object CompletedSection:
     case object GeneralPartnershipPartnersAndOtherRelevantTaxAdvisers6
     extends CompletedSectionGeneralPartnership:
 
-      override def sectionName: String = "Partners and other relevant tax advisers (6)"
+      override def sectionName: String = "Partners and other relevant individuals (6)"
       override def displayOrder: Int = 7
       override def agentApplication: AgentApplication = TdTestOnly.agentApplicationGeneralPartnership.afterConfirmSixIndividuals
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
@@ -274,7 +274,7 @@ object CompletedSection:
     case object ScottishPartnershipPartnersAndOtherRelevantTaxAdvisers2
     extends CompletedSectionScottishPartnership:
 
-      override def sectionName: String = "Partners and other relevant tax advisers (2)"
+      override def sectionName: String = "Partners and other relevant individuals (2)"
       override def displayOrder: Int = 6
       override def agentApplication: AgentApplication = TdTestOnly.agentApplicationScottishPartnership.afterConfirmTwoIndividuals
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
@@ -284,7 +284,7 @@ object CompletedSection:
     case object ScottishPartnershipPartnersAndOtherRelevantTaxAdvisers6
     extends CompletedSectionScottishPartnership:
 
-      override def sectionName: String = "Partners and other relevant tax advisers (6)"
+      override def sectionName: String = "Partners and other relevant individuals (6)"
       override def displayOrder: Int = 7
       override def agentApplication: AgentApplication = TdTestOnly.agentApplicationScottishPartnership.afterConfirmSixIndividuals
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
@@ -347,7 +347,7 @@ object CompletedSection:
     case object LimitedCompanyPartnersAndOtherRelevantTaxAdvisers2
     extends CompletedSectionLimitedCompany:
 
-      override def sectionName: String = "Members and other relevant tax advisers (2)"
+      override def sectionName: String = "members and other relevant individuals (2)"
       override def displayOrder: Int = 6
       override def agentApplication: AgentApplication = TdTestOnly.limitedCompany.twoChOfficers.agentApplicationLimitedCompany.afterConfirmTwoChOfficers
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
@@ -357,7 +357,7 @@ object CompletedSection:
     case object LimitedCompanyPartnersAndOtherRelevantTaxAdvisers6
     extends CompletedSectionLimitedCompany:
 
-      override def sectionName: String = "Members and other relevant tax advisers (6)"
+      override def sectionName: String = "members and other relevant individuals (6)"
       override def displayOrder: Int = 7
       override def agentApplication: AgentApplication = TdTestOnly.limitedCompany.sixChOfficers.agentApplicationLimitedCompany.afterConfirmSixChOfficers
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
@@ -420,7 +420,7 @@ object CompletedSection:
     case object LimitedPartnershipPartnersAndOtherRelevantTaxAdvisers2
     extends CompletedSectionLimitedPartnership:
 
-      override def sectionName: String = "Members and other relevant tax advisers (2)"
+      override def sectionName: String = "members and other relevant individuals (2)"
       override def displayOrder: Int = 6
       override def agentApplication: AgentApplication = TdTestOnly.limitedPartnership.twoChOfficers.agentApplicationLimitedPartnership.afterConfirmTwoChOfficers
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
@@ -430,7 +430,7 @@ object CompletedSection:
     case object LimitedPartnershipPartnersAndOtherRelevantTaxAdvisers6
     extends CompletedSectionLimitedPartnership:
 
-      override def sectionName: String = "Members and other relevant tax advisers (6)"
+      override def sectionName: String = "members and other relevant individuals (6)"
       override def displayOrder: Int = 7
       override def agentApplication: AgentApplication = TdTestOnly.limitedPartnership.sixChOfficers.agentApplicationLimitedPartnership.afterConfirmSixChOfficers
       override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
@@ -493,7 +493,7 @@ object CompletedSection:
     case object ScottishLimitedPartnershipPartnersAndOtherRelevantTaxAdvisers2
     extends CompletedSectionScottishLimitedPartnership:
 
-      override def sectionName: String = "Members and other relevant tax advisers (2)"
+      override def sectionName: String = "members and other relevant individuals (2)"
       override def displayOrder: Int = 6
       override def agentApplication: AgentApplication =
         TdTestOnly.scottishLimitedPartnership.twoChOfficers.agentApplicationScottishLimitedPartnership.afterConfirmTwoChOfficers
@@ -504,7 +504,7 @@ object CompletedSection:
     case object ScottishLimitedPartnershipPartnersAndOtherRelevantTaxAdvisers6
     extends CompletedSectionScottishLimitedPartnership:
 
-      override def sectionName: String = "Members and other relevant tax advisers (6)"
+      override def sectionName: String = "members and other relevant individuals (6)"
       override def displayOrder: Int = 7
       override def agentApplication: AgentApplication =
         TdTestOnly.scottishLimitedPartnership.sixChOfficers.agentApplicationScottishLimitedPartnership.afterConfirmSixChOfficers

@@ -65,7 +65,7 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "LimitedLiabilityPartnership",
       agentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed,
-      caption = "LLP members and other tax adviser information",
+      caption = "LLP members and other relevant individuals",
       headingEntityType = "members",
       bullet1EntityType = "LLP members",
       bullet2EntityType = "LLP member",
@@ -74,7 +74,7 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "LimitedCompany",
       agentApplication = tdAll.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed,
-      caption = "Directors and other tax adviser information",
+      caption = "Directors and other relevant individuals",
       headingEntityType = "directors",
       bullet1EntityType = "directors",
       bullet2EntityType = "director",
@@ -83,7 +83,7 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "LimitedPartnership",
       agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
-      caption = "Partners and other tax adviser information",
+      caption = "Partners and other relevant individuals",
       headingEntityType = "partners",
       bullet1EntityType = "partners",
       bullet2EntityType = "partner",
@@ -92,7 +92,7 @@ extends ViewSpec:
     BusinessTypeTestCase(
       label = "ScottishLimitedPartnership",
       agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed,
-      caption = "Partners and other tax adviser information",
+      caption = "Partners and other relevant individuals",
       headingEntityType = "partners",
       bullet1EntityType = "partners",
       bullet2EntityType = "partner",

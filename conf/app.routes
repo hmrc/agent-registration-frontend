@@ -107,6 +107,9 @@ POST        /apply/list-details/remove-key-individual/:individualProvidedDetails
 # Lists of other relevant individuals ("unofficial" directors/partners/members)
 GET         /apply/list-details/how-many-other-individuals            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show
 POST        /apply/list-details/how-many-other-individuals            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.submit
+GET         /apply/list-details/tell-us-about-relevant-individuals            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.MandatoryRelevantIndividualsController.show
+POST        /apply/list-details/tell-us-about-relevant-individuals            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.MandatoryRelevantIndividualsController.submit
+
 GET         /apply/list-details/enter-other-relevant-individual       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.EnterOtherRelevantIndividualController.show
 POST        /apply/list-details/enter-other-relevant-individual       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.EnterOtherRelevantIndividualController.submit
 GET         /apply/list-details/other-relevant-individuals/check-your-answers  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.otherrelevantindividuals.CheckYourAnswersController.show
@@ -137,6 +140,9 @@ GET         /apply/list-details/provide-details/telephone-number       uk.gov.hm
 POST        /apply/list-details/provide-details/telephone-number       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.TelephoneNumberController.submit
 GET         /apply/list-details/provide-details/email-address          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.EmailAddressController.show
 POST        /apply/list-details/provide-details/email-address          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.EmailAddressController.submit
+
+GET         /apply/list-details/provide-details/national-insurance-number       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.ApplicantProvidedNinoController.show
+POST        /apply/list-details/provide-details/national-insurance-number       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.ApplicantProvidedNinoController.submit
 
 GET         /apply/list-details/companies-house-officers/check-your-answers  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.incorporated.CheckYourAnswersController.show
 

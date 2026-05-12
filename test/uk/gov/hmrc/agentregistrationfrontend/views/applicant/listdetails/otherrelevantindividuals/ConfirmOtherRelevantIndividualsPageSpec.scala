@@ -39,7 +39,7 @@ extends ViewSpec:
 
   private val entityName: String = tdAll.companyName
   private val heading: String = "Other people we need to know about"
-  private val question: String = s"Does $entityName have any other relevant tax advisers?"
+  private val question: String = s"Does $entityName have any other relevant individuals?"
 
   private def render(form: play.api.data.Form[Boolean]): Document = Jsoup.parse(viewTemplate(
     form = form,
@@ -54,11 +54,11 @@ extends ViewSpec:
     "contain expected content" in:
       doc.mainContent shouldContainContent (
         s"""
-           |Partners and other relevant tax advisers
+           |Partners and other relevant individuals
            |$heading
-           |We also need to know about other relevant tax advisers.
+           |We also need to know about other relevant individuals.
            |This means anyone responsible for tax advice at Test Company Name, who is not an official partner.
-           |Read the guidance about how HMRC defines ‘relevant tax advisers’ (opens in new tab)
+           |Read the guidance about how HMRC defines ‘relevant individuals’ (opens in new tab)
            |$question
            |Yes
            |No

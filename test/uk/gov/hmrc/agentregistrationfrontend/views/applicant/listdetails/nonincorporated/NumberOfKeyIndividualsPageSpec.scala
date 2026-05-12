@@ -47,7 +47,7 @@ extends ViewSpec:
     "contain expected content" in:
       doc.mainContent shouldContainContent
         """
-          |Partners and other relevant tax advisers
+          |Partners and other relevant individuals
           |How many partners are there at Test Company Name?
           |Only tell us about people with the title ‘partner’. Do not include partner organisations.
           |5 or fewer

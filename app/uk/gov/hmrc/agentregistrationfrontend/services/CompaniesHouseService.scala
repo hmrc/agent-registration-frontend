@@ -39,7 +39,7 @@ extends RequestAwareLogging:
     expectedRole: Set[CompaniesHouseOfficerRole]
   )(using request: RequestHeader): Future[Seq[CompaniesHouseOfficer]] = companiesHouseApiProxyConnector
     .getCompaniesHouseOfficers(companyRegistrationNumber)
-    .map(_.filter(isActiveOfficers(_, expectedRole)))
+    .map(_.filter(isNaturalPersonAndActive(_, expectedRole)))
 
   def getActiveOfficers(
     companyRegistrationNumber: Crn,
@@ -47,11 +47,14 @@ extends RequestAwareLogging:
     expectedRole: Set[CompaniesHouseOfficerRole]
   )(using request: RequestHeader): Future[Seq[CompaniesHouseOfficer]] = companiesHouseApiProxyConnector
     .getCompaniesHouseOfficers(companyRegistrationNumber, lastName)
-    .map(_.filter(isActiveOfficers(_, expectedRole)))
+    .map(_.filter(isNaturalPersonAndActive(_, expectedRole)))
 
-  private def isActiveOfficers(
+  private def isNaturalPersonAndActive(
     officer: CompaniesHouseOfficer,
     expectedRole: Set[CompaniesHouseOfficerRole]
   ): Boolean =
+    // we only want active officers who are natural persons, so no resignation date and no identification object
+    // which is only used to describe corporate officers
     officer.resignedOn.isEmpty &&
+      officer.identification.isEmpty &&
       officer.officerRole.exists(expectedRole.contains)

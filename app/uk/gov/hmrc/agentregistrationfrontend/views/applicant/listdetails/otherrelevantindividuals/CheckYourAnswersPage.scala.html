@@ -14,14 +14,12 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.*
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.html.components.*
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
-@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-@import uk.gov.hmrc.agentregistrationfrontend.util.MessageKeys
 @this(
         layout: Layout,
         govukSummaryList: GovukSummaryList,
@@ -32,7 +30,8 @@
 @(
         existingList: List[IndividualProvidedDetails],
         form: Form[Boolean],
-        entityName: String
+        entityName: String,
+        businessTypeKey: String
 )(implicit
         request: RequestHeader,
         messages: Messages
@@ -55,7 +54,7 @@
 }
 
 @hint = @{
-    messages(s"$messageKeyPrefix.more.hint")
+    messages(s"$messageKeyPrefix.more.hint.$businessTypeKey")
 }
 
 @summaryRows = @{
@@ -106,7 +105,7 @@
     pageTitle = title,
     maybeForm = Some(form)
 ) {
-    <h2 class="govuk-caption-l">@messages(s"$messageKeyPrefix.caption")</h2>
+    <h2 class="govuk-caption-l">@messages(s"lists.caption.title.$businessTypeKey")</h2>
     <h1 class="govuk-heading-l">@title</h1>
 
     @govukSummaryList(

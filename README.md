@@ -48,6 +48,7 @@ company officer lists we can use company numbers from the following table:
 | Limited Partnership           | 6                         | 33333336       |
 | Scottish Limited Partnership  | 2                         | 44444444       |
 | Scottish Limited Partnership  | 6                         | 44444446       |
+| Any incorporated type         | 0                         | 55555555       |
 
 # Project Setup in IntelliJ
 

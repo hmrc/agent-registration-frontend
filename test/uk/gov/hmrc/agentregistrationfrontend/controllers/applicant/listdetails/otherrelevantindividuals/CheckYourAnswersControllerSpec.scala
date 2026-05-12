@@ -73,15 +73,15 @@ extends ControllerSpec:
     )
 
   s"GET $path should redirect to task list when application is a sole trader" in:
-    ApplyStubHelper.stubsForAuthAction(agentApplication.soleTraderInProgress)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.soleTraderInProgress)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe AppRoutes.apply.TaskListController.show.url
-    ApplyStubHelper.verifyConnectorsForAuthAction()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path should redirect to task list when application is a sole trader" in:
-    ApplyStubHelper.stubsForAuthAction(agentApplication.soleTraderInProgress)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.soleTraderInProgress)
     val response: WSResponse =
       post(path)(Map(
         AddOtherRelevantIndividualsForm.addOtherRelevantIndividuals -> Seq("Yes")
@@ -89,7 +89,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe AppRoutes.apply.TaskListController.show.url
-    ApplyStubHelper.verifyConnectorsForAuthAction()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $path should return 200 and render page" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterConfirmOtherRelevantIndividualsYes)
@@ -104,15 +104,15 @@ extends ControllerSpec:
 
     val doc: Document = response.parseBodyAsJsoupDocument
 
-    doc.title() shouldBe "Other relevant tax advisers for Test Company Name - Apply for an agent services account - GOV.UK"
-    doc.select("h1").text() shouldBe "Other relevant tax advisers for Test Company Name"
+    doc.title() shouldBe "Other relevant individuals for Test Company Name - Apply for an agent services account - GOV.UK"
+    doc.select("h1").text() shouldBe "Other relevant individuals for Test Company Name"
     doc.select("main button.govuk-button").eachText().toArray.mkString(" ") shouldBe "Save and continue Save and come back later"
     doc.select("main .govuk-warning-text__text").text() shouldBe ""
 
     doc.select("main form").attr("action") shouldBe
       AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.submit.url
 
-    doc.select("main fieldset legend").text() shouldBe "Are there any more relevant tax advisers?"
+    doc.select("main fieldset legend").text() shouldBe "Are there any more relevant individuals?"
     doc.select("main #addOtherRelevantIndividuals-hint").text() shouldBe
       "We need to know everyone who has material responsibility for how tax advice is carried out, but is not an official partner."
 
@@ -147,7 +147,7 @@ extends ControllerSpec:
       AppRoutes.apply.listdetails.otherrelevantindividuals.ConfirmOtherRelevantIndividualsController.show.url
     )
 
-    ApplyStubHelper.verifyConnectorsForAuthAction()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $path when hasOtherRelevantIndividuals selected Yes and list is empty should redirect EnterOtherIndividual page" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterConfirmOtherRelevantIndividualsYes)
@@ -164,11 +164,11 @@ extends ControllerSpec:
       AppRoutes.apply.listdetails.otherrelevantindividuals.EnterOtherRelevantIndividualController.show.url
     )
 
-    ApplyStubHelper.verifyConnectorsForAuthAction()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterConfirmOtherRelevantIndividualsYes.agentApplicationId)
 
   s"POST $path with are there any more unofficial partners? Yes and should redirect to EnterOtherRelevantIndividual page:" in:
-    ApplyStubHelper.stubsForAuthAction(agentApplication.afterConfirmOtherRelevantIndividualsYes)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterConfirmOtherRelevantIndividualsYes)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterConfirmOtherRelevantIndividualsYes.agentApplicationId,
       individuals = existingOtherRelevantIndividuals
@@ -184,10 +184,10 @@ extends ControllerSpec:
     response.header("Location").value shouldBe AppRoutes.apply.listdetails.otherrelevantindividuals.EnterOtherRelevantIndividualController.show.url
 
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterConfirmOtherRelevantIndividualsYes.agentApplicationId)
-    ApplyStubHelper.verifyConnectorsForAuthAction()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with are there any more unofficial partners? No and should redirect to CYA for all Partners page:" in:
-    ApplyStubHelper.stubsForAuthAction(agentApplication.afterConfirmOtherRelevantIndividualsYes)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterConfirmOtherRelevantIndividualsYes)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterConfirmOtherRelevantIndividualsYes.agentApplicationId,
       individuals = existingOtherRelevantIndividuals
@@ -203,4 +203,4 @@ extends ControllerSpec:
     response.header("Location").value shouldBe AppRoutes.apply.listdetails.CheckYourAnswersController.show.url
 
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterConfirmOtherRelevantIndividualsYes.agentApplicationId)
-    ApplyStubHelper.verifyConnectorsForAuthAction()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()

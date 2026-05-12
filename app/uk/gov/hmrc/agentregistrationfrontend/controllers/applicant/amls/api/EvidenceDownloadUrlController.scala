@@ -29,6 +29,8 @@ import uk.gov.hmrc.auth.core.AuthProviders
 import uk.gov.hmrc.auth.core.AuthorisationException
 import uk.gov.hmrc.auth.core.AuthorisedFunctions
 import uk.gov.hmrc.auth.core.Enrolment
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -49,6 +51,7 @@ with RequestAwareLogging:
   // Returns a signed upscan download URL for the given fileReference
   def evidenceDownloadUrl(fileReference: FileUploadReference): Action[AnyContent] = Action.async:
     implicit request =>
+      given HeaderCarrier = HeaderCarrierConverter.fromRequest(request)
       af.authorised((Enrolment(appConfig.Stride.strideRoleAmls) or Enrolment(appConfig.Stride.strideRoleSmu)) and AuthProviders(PrivilegedApplication)).apply:
         objectStoreService.getEvidenceDownloadUrl(fileReference).map {
           case Some(url) => Ok(Json.obj("downloadUrl" -> url.downloadUrl.toString))
