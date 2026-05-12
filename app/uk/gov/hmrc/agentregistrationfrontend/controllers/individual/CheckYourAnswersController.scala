@@ -30,6 +30,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.audit.AuditService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.CheckYourAnswersPage
 
@@ -38,7 +39,8 @@ class CheckYourAnswersController @Inject() (
   mcc: MessagesControllerComponents,
   actions: IndividualActions,
   view: CheckYourAnswersPage,
-  individualProvideDetailsService: IndividualProvideDetailsService
+  individualProvideDetailsService: IndividualProvideDetailsService,
+  auditService: AuditService
 )
 extends FrontendController(mcc, actions):
 
@@ -107,12 +109,19 @@ extends FrontendController(mcc, actions):
 
   def submit(linkId: LinkId): Action[AnyContent] = baseAction(linkId).async:
     implicit request =>
+      val finishedIndividualProvidedDetails = request.get[IndividualProvidedDetails]
+        .modify(_.providedDetailsState)
+        .setTo(Finished)
+      val applicationReference = request.get[AgentApplication].applicationReference
       individualProvideDetailsService
         .upsert(
-          request.get[IndividualProvidedDetails]
-            .modify(_.providedDetailsState)
-            .setTo(Finished)
+          finishedIndividualProvidedDetails
         ).map: _ =>
+          auditService.auditIndividualSubmission(
+            applicationReference = applicationReference,
+            individualProvidedDetails = finishedIndividualProvidedDetails,
+            providedByApplicant = true
+          )
           Redirect(AppRoutes.providedetails.IndividualConfirmationController.show(linkId))
 
   extension (agentApplication: AgentApplication)
