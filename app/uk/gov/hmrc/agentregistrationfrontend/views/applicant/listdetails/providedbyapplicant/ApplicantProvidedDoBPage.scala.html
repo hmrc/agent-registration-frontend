@@ -45,20 +45,20 @@
     maybeForm = Some(form)
 ) {
 
-    <h2 class="govuk-caption-l">@messages("applicant-provided.date-of-birth.caption")</h2>
-    @formWithCSRF(action = AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedDoBController.submit) {
-        @govukDateInput(DateInput(
-            id = key,
-            hint = Some(Hint(content = Text(messages(s"$key.hint")))),
-            fieldset = Some(Fieldset(
-                legend = Some(Legend(
-                    content = Text(pageTitle),
-                    classes = "govuk-fieldset__legend--l",
-                    isPageHeading = true
-                ))
-            ))
-        ).withDayMonthYearFormField(form(key)))
+  <h2 class="govuk-caption-l">@messages("applicantProvidingDetails.caption")</h2>
+  @formWithCSRF(action = AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedDoBController.submit) {
+    @govukDateInput(DateInput(
+      id = key,
+      hint = Some(Hint(content = Text(messages(s"$key.hint")))),
+      fieldset = Some(Fieldset(
+        legend = Some(Legend(
+          content = Text(pageTitle),
+          classes = "govuk-fieldset__legend--l",
+          isPageHeading = true
+        ))
+      ))
+    ).withDayMonthYearFormField(form(key)))
 
-        @providedByApplicantButtons()
-    }
+    @providedByApplicantButtons()
+  }
 }

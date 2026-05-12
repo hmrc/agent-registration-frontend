@@ -21,39 +21,37 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
 import uk.gov.hmrc.agentregistration.shared.UserRole
+import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedSaUtr
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.providedbyapplicant.TelephoneNumberForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.providedbyapplicant.SaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
 import uk.gov.hmrc.agentregistrationfrontend.repository.ProvidedByApplicantSessionStore
-import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.providedbyapplicant.TelephoneNumberPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.providedbyapplicant.SaUtrPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class TelephoneNumberController @Inject() (
+class SaUtrController @Inject() (
   actions: ApplicantActions,
   mcc: MessagesControllerComponents,
-  view: TelephoneNumberPage,
+  view: SaUtrPage,
   providedByApplicantSessionStore: ProvidedByApplicantSessionStore
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithProvidedByApplicant = ProvidedByApplicant *: DataWithApplication
+  private type AgentProvidedIndividualDetails = ProvidedByApplicant *: AgentApplication *: DataWithAuth
 
-  private val baseAction: ActionBuilderWithData[DataWithProvidedByApplicant] = actions
+  private def baseAction: ActionBuilderWithData[AgentProvidedIndividualDetails] = actions
     .getApplicationInProgress
     .ensure(
-      condition =
-        implicit request =>
-          request.get[AgentApplication].getUserRole =!= UserRole.Owner,
+      condition = implicit request => request.get[AgentApplication].getUserRole =!= UserRole.Owner,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("Sole trader owners do not provide details like this, redirecting to task list for the correct links")
+          logger.warn("Sole trader attempting to access applicant provided SaUtr page")
           Redirect(AppRoutes.apply.TaskListController.show.url)
     )
     .refine:
@@ -63,41 +61,36 @@ extends FrontendController(mcc, actions):
           .map:
             case Some(providedByApplicant) => request.add[ProvidedByApplicant](providedByApplicant)
             case None =>
-              logger.warn(
-                "No individual provided details found in session when trying to access individual telephone number page, redirecting to select individual page"
-              )
+              logger.warn("No ProvidedByApplicant details found in session when trying to access SaUtr page, redirecting to select individual page")
               Redirect(AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url)
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
       val providedByApplicant: ProvidedByApplicant = request.get
       Ok(view(
-        form = TelephoneNumberForm.form
+        form = SaUtrForm.form
           .fill:
             providedByApplicant
-              .telephoneNumber
+              .individualSaUtr
+              .map(_.toUserProvidedSaUtr)
         ,
         individualName = providedByApplicant.individualName
       ))
 
-  def submit: Action[AnyContent] = baseAction
-    .ensureValidForm[TelephoneNumber](
-      TelephoneNumberForm.form,
-      implicit r =>
-        formWithErrors =>
-          view(
-            form = formWithErrors,
-            individualName = r.get[ProvidedByApplicant].individualName
-          )
-    )
-    .async:
-      implicit request =>
-        val telephoneNumberFromForm: TelephoneNumber = request.get
-        val providedByApplicant: ProvidedByApplicant = request.get
-        val updatedProvidedDetails: ProvidedByApplicant = providedByApplicant
-          .modify(_.telephoneNumber)
-          .setTo(Some(telephoneNumberFromForm))
-        providedByApplicantSessionStore
-          .upsert(updatedProvidedDetails)
-          .map: _ =>
-            Redirect(AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.show.url)
+  def submit: Action[AnyContent] =
+    baseAction
+      .ensureValidFormAndRedirectIfSaveForLater[UserProvidedSaUtr](
+        SaUtrForm.form,
+        implicit r => view(_, r.get[ProvidedByApplicant].individualName)
+      )
+      .async:
+        implicit request =>
+          val validFormData: UserProvidedSaUtr = request.get
+          val updatedIndividualProvidedDetails: ProvidedByApplicant = request.get[ProvidedByApplicant]
+            .modify(_.individualSaUtr)
+            .setTo(Some(validFormData))
+          providedByApplicantSessionStore
+            .upsert(updatedIndividualProvidedDetails)
+            .map: _ =>
+              Redirect(AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.show.url)
+      .redirectIfSaveForLater

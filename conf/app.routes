@@ -129,7 +129,9 @@ GET         /apply/list-details/change-companies-house-officer/:individualProvid
 POST        /apply/list-details/change-companies-house-officer/:individualProvidedDetailsId    uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.incorporated.ChangeCompaniesHouseOfficerController.submit(individualProvidedDetailsId: IndividualProvidedDetailsId)
 GET         /apply/list-details/remove-companies-house-officer/:individualProvidedDetailsId    uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.incorporated.RemoveCompaniesHouseOfficerController.show(individualProvidedDetailsId: IndividualProvidedDetailsId)
 POST        /apply/list-details/remove-companies-house-officer/:individualProvidedDetailsId    uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.incorporated.RemoveCompaniesHouseOfficerController.submit(individualProvidedDetailsId: IndividualProvidedDetailsId)
+GET         /apply/list-details/companies-house-officers/check-your-answers  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.incorporated.CheckYourAnswersController.show
 
+# Applicant provided individual details
 GET         /apply/list-details/provide-details/select-individual       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.SelectIndividualController.show
 POST        /apply/list-details/provide-details/select-individual       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.SelectIndividualController.submit
 
@@ -143,9 +145,12 @@ POST        /apply/list-details/provide-details/email-address          uk.gov.hm
 
 GET         /apply/list-details/provide-details/national-insurance-number       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.ApplicantProvidedNinoController.show
 POST        /apply/list-details/provide-details/national-insurance-number       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.ApplicantProvidedNinoController.submit
+GET         /apply/list-details/provide-details/self-assessment-unique-taxpayer-reference  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.SaUtrController.show
+POST        /apply/list-details/provide-details/self-assessment-unique-taxpayer-reference  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.SaUtrController.submit
 
-GET         /apply/list-details/companies-house-officers/check-your-answers  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.incorporated.CheckYourAnswersController.show
-
+GET         /apply/list-details/provide-details/check-your-answers               uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.CheckYourAnswersController.show
+GET         /apply/list-details/provide-details/view/:individualProvidedDetailsId               uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.CheckYourAnswersController.view(individualProvidedDetailsId: IndividualProvidedDetailsId)
+POST        /apply/list-details/provide-details/check-your-answers               uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.CheckYourAnswersController.submit
 
 # Lists share link
 GET        /apply/list-details/key-individuals/share-link             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.link.LinkController.show

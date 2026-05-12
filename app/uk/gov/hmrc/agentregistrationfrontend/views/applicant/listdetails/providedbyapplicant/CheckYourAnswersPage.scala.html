@@ -1,0 +1,57 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ProvidedByApplicantButtons
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.providedbyapplicant.AnswerSummary
+
+@this(
+  layout: Layout,
+  govukButton: GovukButton,
+  answerSummary: AnswerSummary,
+  formWithCSRF: FormWithCSRF,
+  providedByApplicantButtons: ProvidedByApplicantButtons
+)
+
+@(
+   providedByApplicant: ProvidedByApplicant
+)(implicit
+   request: RequestHeader,
+   messages: Messages
+)
+
+@key = @{
+    "providedByApplicantCheckYourAnswers"
+}
+@title = @{
+    messages(s"$key.title")
+}
+
+@layout(pageTitle = title) {
+  <h2 class="govuk-caption-l">@messages("applicantProvidingDetails.caption")</h2>
+  <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
+  @answerSummary(
+    key,
+    providedByApplicant = providedByApplicant
+  )
+  <p class="govuk-body">
+    @formWithCSRF(action = AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.submit) {
+      @providedByApplicantButtons(Some(messages("common.confirmAndContinue")))
+    }
+  </p>
+}
