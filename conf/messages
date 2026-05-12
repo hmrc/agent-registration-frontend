@@ -1165,3 +1165,14 @@ applicant-provided.date-of-birth.error.month.required = The date of birth must i
 applicant-provided.date-of-birth.error.year.required = The date of birth must include a year
 applicant-provided.date-of-birth.error.invalid = The date of birth must be a real date
 applicant-provided.date-of-birth.error.future = The date of birth must be in the past
+
+# Applicant provided nino
+applicant-provided.hasNino.yes = Yes
+applicant-provided.hasNino.no = No
+applicant-provided.hasNino.title = Do you know {0}’s National Insurance Number?
+applicant-provided.hasNino.error.required = Select yes if you know their National Insurance number
+applicant-provided.hasNino.hint = For example, QQ 12 34 56 C.
+applicant-provided.hasNino.label = Enter their National Insurance Number
+applicant-provided.nino.caption = Relevant individual details
+applicant-provided.nino.error.invalid = Enter their National Insurance number in the correct format
+applicant-provided.nino.error.required = Enter their National Insurance number

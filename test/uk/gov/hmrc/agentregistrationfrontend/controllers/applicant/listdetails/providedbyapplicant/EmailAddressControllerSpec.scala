@@ -93,7 +93,7 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
 
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.EmailAddressController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedNinoController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with blank inputs should return 400" in:
