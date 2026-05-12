@@ -68,7 +68,8 @@ trait TdIndividualProvidedDetails { dependencies: TdBase =>
       agentApplicationId = dependencies.agentApplicationId,
       providedDetailsState = Started,
       isPersonOfControl = true,
-      passedIv = Some(true)
+      passedIv = Some(true),
+      providedByApplicant = Some(false)
     )
 
     val afterTelephoneNumberProvided: IndividualProvidedDetails = afterStarted

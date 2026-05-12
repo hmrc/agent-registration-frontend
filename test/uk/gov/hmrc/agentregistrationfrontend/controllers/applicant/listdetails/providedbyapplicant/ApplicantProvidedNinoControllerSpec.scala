@@ -114,7 +114,7 @@ extends ControllerSpec:
       s"${ApplicantProvidedNinoForm.hasNino}-error"
     ).text() shouldBe "Error: Select yes if you know their National Insurance number"
 
-  s"POST $path should redirect to the enter your UTR page with no NINO in session when 'no' has been selected" in:
+  s"POST $path should redirect to the CYA controller for navigation with no NINO in session when 'no' has been selected" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(application)
     providedByApplicantSessionStore.upsert(providedByApplicant).futureValue
@@ -124,8 +124,8 @@ extends ControllerSpec:
         ApplicantProvidedNinoForm.ninoKey -> Seq("//")
       ))
 
-    response.status shouldBe Status.SEE_OTHER // TODO replace with redirect to APB-11164 UTR Page
-    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.EmailAddressController.show.url
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.show.url
     providedByApplicantSessionStore.find().futureValue.value shouldBe
       ProvidedByApplicant(
         individualProvidedDetailsId = tdAll.providedDetails.afterAccessConfirmed._id,
