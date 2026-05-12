@@ -22,6 +22,8 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import StartOrContinueApplication.JourneyType
+import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
+import uk.gov.hmrc.agentregistrationfrontend.audit.ApplicationSubmitted.requestToAuditEvent
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
@@ -78,3 +80,10 @@ extends RequestAwareLogging:
           detail = auditEvent
         )
     yield ()
+
+  def sendRiskingSubmissionEvent(submitForRiskingRequest: SubmitForRiskingRequest)(using RequestHeader): Unit =
+    val auditEvent: ApplicationSubmitted = requestToAuditEvent(submitForRiskingRequest)
+    auditConnector.sendExplicitAudit(
+      auditType = auditEvent.auditType,
+      detail = auditEvent
+    )

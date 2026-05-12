@@ -20,9 +20,17 @@ import play.api.libs.json.Format
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import play.api.libs.json.OWrites
+import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import uk.gov.hmrc.agentregistration.shared.LinkId
+import uk.gov.hmrc.agentregistration.shared.Utr
+import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
@@ -63,6 +71,34 @@ object StartOrContinueApplication:
 
   object JourneyType:
     given format: Format[JourneyType] = JsonFormatsFactory.makeEnumFormat
+
+
+final case class ApplicationSubmitted(
+                                       applicationReference: ApplicationReference,
+                                       linkId: LinkId,
+                                       isResubmission: Boolean,
+                                       utr: Utr,
+                                       applicantDetails: ApplicantContactDetails,
+                                       agentDetails: Option[AgentDetails],
+                                       amlsSupervisionDetails: Option[AmlsDetails],
+                                       individuals: List[IndividualProvidedDetails]
+                                     )
+  extends AuditEvent
+
+object ApplicationSubmitted:
+
+  given OWrites[ApplicationSubmitted] = Json.writes[ApplicationSubmitted]
+
+  def requestToAuditEvent(riskingRequest: SubmitForRiskingRequest): ApplicationSubmitted = ApplicationSubmitted(
+    applicationReference = riskingRequest.agentApplication.applicationReference,
+    linkId = riskingRequest.agentApplication.linkId,
+    isResubmission = false, // TODO Will need changing when risking resubmissions are added
+    utr = riskingRequest.agentApplication.getUtr,
+    applicantDetails = riskingRequest.agentApplication.getApplicantContactDetails,
+    agentDetails = Some(riskingRequest.agentApplication.getAgentDetails),
+    amlsSupervisionDetails = riskingRequest.agentApplication.amlsDetails,
+    individuals = riskingRequest.individuals
+  )
 
 final case class IndividualSubmission(
   applicationReference: ApplicationReference,
