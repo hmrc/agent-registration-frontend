@@ -22,11 +22,16 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedLiab
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuditStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.EnrolmentStoreStubs
 
 class InitiateAgentApplicationControllerSpec
 extends ControllerSpec:
+
+  override def configOverrides: Map[String, Any] = Map[String, Any](
+    "auditing.enabled" -> true
+  )
 
   def initiateAgentApplication(
     agentType: AgentType,
@@ -73,11 +78,13 @@ extends ControllerSpec:
       )
 
     s"GET $initiateAgentApplicationUrl should create initial agent application" in:
+
       AuthStubs.stubAuthorise()
       AgentRegistrationStubs.stubGetAgentApplicationNoContent()
       AgentRegistrationStubs.stubFindApplicationByApplicationReferenceNoContent(tdAll.applicationReference)
       AgentRegistrationStubs.stubUpdateAgentApplication(tdAll.agentApplicationLlp.afterStarted)
       EnrolmentStoreStubs.stubQueryEnrolmentsAllocatedToGroupNoContent(tdAll.groupId)
+      AuditStubs.stubAuditEvent()
 
       val response: WSResponse = get(initiateAgentApplicationUrl)
       response.status shouldBe Status.SEE_OTHER
@@ -86,6 +93,7 @@ extends ControllerSpec:
       AgentRegistrationStubs.verifyGetAgentApplication()
       AgentRegistrationStubs.verifyUpdateAgentApplication()
       EnrolmentStoreStubs.verifyQueryEnrolmentsAllocatedToGroup(tdAll.groupId)
+      AuditStubs.verifyAuditEvent()
 
     s"GET $initiateAgentApplicationUrl should redirect to taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment when HmrcAsAgentEnrolment is Allocated to the group" in:
       AuthStubs.stubAuthorise()
