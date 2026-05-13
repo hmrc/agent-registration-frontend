@@ -58,7 +58,7 @@ extends ViewSpec:
           |Are you a member of the limited liability partnership?
           |No, but I’m authorised by them to set up this account
           |Company name
-          |Test Company Name
+          |Test Partnership
           |Unique taxpayer reference
           |1234567895
           |Return to task list
@@ -85,7 +85,7 @@ extends ViewSpec:
           ),
           TestReadOnlySummaryRow(
             key = "Company name",
-            value = "Test Company Name"
+            value = "Test Partnership"
           ),
           TestReadOnlySummaryRow(
             key = "Unique taxpayer reference",

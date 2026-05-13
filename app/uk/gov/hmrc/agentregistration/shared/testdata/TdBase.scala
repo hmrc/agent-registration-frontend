@@ -149,6 +149,7 @@ trait TdBase:
     agentEmailAddress = Some(agentVerifiedEmailAddress),
     businessName = agentBusinessName
   )
+
   def completeAmlsDetails: AmlsDetails = AmlsDetails(
     supervisoryBody = amlsCode,
     amlsRegistrationNumber = Some(amlsRegistrationNumber),
