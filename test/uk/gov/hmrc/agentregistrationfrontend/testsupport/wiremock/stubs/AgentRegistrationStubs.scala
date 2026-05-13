@@ -184,6 +184,15 @@ object AgentRegistrationStubs:
     responseBody = Json.toJson(individual).toString
   )
 
+  def verifyFindIndividualForApplication(
+    individualProvidedDetailsId: IndividualProvidedDetailsId,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/individual-provided-details/by-id/${individualProvidedDetailsId.value}"),
+    count = count
+  )
+
   def stubFindIndividualsForApplication(
     agentApplicationId: AgentApplicationId,
     individuals: List[IndividualProvidedDetails] = List.empty
