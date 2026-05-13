@@ -37,6 +37,11 @@ extends ControllerSpec:
 
     val unclaimed: IndividualProvidedDetails = tdAll.providedDetails.precreated
     val afterStarted: IndividualProvidedDetails = tdAll.providedDetails.afterStarted
+    val providedByApplicant: IndividualProvidedDetails = tdAll.providedDetails.AfterSaUtr.afterSaUtrProvided.copy(
+      internalUserId = None,
+      passedIv = Some(false),
+      providedByApplicant = Some(true)
+    )
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.MatchIndividualProvidedDetailsController.show(linkId, fromIv = None) shouldBe Call(
@@ -83,6 +88,17 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.providedetails.NameMatchingController.show(linkId).url
+    ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
+
+  s"GET $path when details already provided by applicant should redirect to dedicated exit page" in:
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      agentApplication,
+      individualProvideDetails.providedByApplicant
+    )
+    val response: WSResponse = get(path)
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe AppRoutes.providedetails.ExitController.detailsAlreadyProvided.url
     ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
 
   s"POST $path with a valid choice should save data and redirect to CYA controller" in:

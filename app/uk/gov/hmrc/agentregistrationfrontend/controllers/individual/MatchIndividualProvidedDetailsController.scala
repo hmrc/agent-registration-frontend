@@ -122,6 +122,17 @@ extends FrontendController(mcc, actions):
           logger.warn(s"No matching IndividualProvidedDetails record found for citizen details, redirecting to contact applicant page")
           Redirect(AppRoutes.providedetails.ContactApplicantController.show.url)
     )
+    .ensure(
+      condition =
+        implicit request =>
+          val individualProvidedDetails: IndividualProvidedDetails = request.get
+          !individualProvidedDetails.providedByApplicant.contains(true)
+      ,
+      resultWhenConditionNotMet =
+        implicit request =>
+          logger.warn(s"IndividualProvidedDetails record ${request.get[IndividualProvidedDetails]._id} has already been completed by the applicant, redirecting to details already provided page")
+          Redirect(AppRoutes.providedetails.ExitController.detailsAlreadyProvided.url)
+    )
 
   def show(
     linkId: LinkId,

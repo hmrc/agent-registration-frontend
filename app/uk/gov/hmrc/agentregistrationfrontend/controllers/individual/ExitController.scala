@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.DetailsAlreadyProvidedPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,9 +29,14 @@ class ExitController @Inject() (
   actions: IndividualActions,
   mcc: MessagesControllerComponents,
   placeholderExitPage: SimplePage,
-  multipleMemberProvidedDetailsPage: SimplePage
+  multipleMemberProvidedDetailsPage: SimplePage,
+  detailsAlreadyProvidedPage: DetailsAlreadyProvidedPage
 )
 extends FrontendController(mcc, actions):
+
+  def detailsAlreadyProvided: Action[AnyContent] = actions.action:
+    implicit request =>
+      Ok(detailsAlreadyProvidedPage())
 
   def genericExitPage: Action[AnyContent] = actions.action:
     implicit request =>
