@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed
 
 import play.api.mvc.*
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.CheckResult.Fail
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
@@ -37,6 +38,7 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] =
     actions
       .getApplicationInProgress
+      .getBusinessPartnerRecord
       .ensure(
         condition =
           _.agentApplication
@@ -47,7 +49,4 @@ extends FrontendController(mcc, actions):
             Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
       ):
         implicit request =>
-          Ok(canNotRegisterPage(request
-            .agentApplication
-            .dontCallMe_getCompanyProfile
-            .companyName))
+          Ok(canNotRegisterPage(request.get[BusinessPartnerRecordResponse].getEntityName))
