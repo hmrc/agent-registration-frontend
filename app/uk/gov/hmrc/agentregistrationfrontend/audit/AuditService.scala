@@ -20,8 +20,7 @@ import com.google.inject.Inject
 import com.google.inject.Singleton
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.audit.StartOrContinueApplication
-import uk.gov.hmrc.agentregistration.shared.audit.StartOrContinueApplication.JourneyType
+import StartOrContinueApplication.JourneyType
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport
 import uk.gov.hmrc.play.audit.DefaultAuditConnector
