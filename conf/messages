@@ -465,6 +465,7 @@ listProgress.title.SoleTraderRepresentative = HMRC needs information from the bu
 listProgress.h2 = Awaiting details for {0} of {1} people
 listProgress.th.name = Name
 listProgress.th.detailsProvided = Details provided
+listProgress.providedByApplicant = Yes (on their behalf) <br><a class="govuk-link" href="{0}">View or change</a>
 listProgress.yes = Yes
 listProgress.no = No
 
@@ -493,6 +494,26 @@ providedByApplicantEmailAddress.error.required = Enter the email address
 providedByApplicantEmailAddress.error.invalid = Enter the email address with a name, @ symbol and a domain name, like yourname@example.com
 providedByApplicantEmailAddress.error.tooLong = The email address must be 132 characters or fewer
 
+providedByApplicantSaUtr.title = Do you know {0}’s Self Assessment Unique Taxpayer Reference?
+providedByApplicantSaUtr.hasSaUtr.title = Do you know {0}’s Self Assessment Unique Taxpayer Reference?
+providedByApplicantSaUtr.hasSaUtr.yes = Yes
+providedByApplicantSaUtr.hasSaUtr.no = No
+providedByApplicantSaUtr.hasSaUtr.error.required = Select yes if you know their Self Assessment Unique Taxpayer Reference
+providedByApplicantSaUtr.saUtr.label = Enter the Self Assessment Unique Taxpayer Reference
+providedByApplicantSaUtr.saUtr.hint = This is 10 numbers, for example 1234567890.
+providedByApplicantSaUtr.saUtr.error.required = Enter the Self Assessment Unique Taxpayer Reference
+providedByApplicantSaUtr.saUtr.error.invalid = Enter a Self Assessment Unique Taxpayer Reference in the correct format
+
+providedByApplicantCheckYourAnswers.title = Check your answers
+providedByApplicantCheckYourAnswers.individualName.label = Name
+providedByApplicantCheckYourAnswers.telephone.label = Telephone number
+providedByApplicantCheckYourAnswers.email.label = Email address
+providedByApplicantCheckYourAnswers.saUtr.label = Self Assessment Unique Taxpayer Reference
+providedByApplicantCheckYourAnswers.nino.label = National Insurance number
+providedByApplicantCheckYourAnswers.change = Change
+providedByApplicantCheckYourAnswers.hasSaUtr.label = Do you know {0}’s Self Assessment Unique Taxpayer Reference?
+providedByApplicantCheckYourAnswers.hasNino.label = Do you know {0}’s National Insurance number?
+providedByApplicantCheckYourAnswers.dateOfBirth.label = Date of birth
 
 # Apply / Declaration
 declaration.title = Declaration

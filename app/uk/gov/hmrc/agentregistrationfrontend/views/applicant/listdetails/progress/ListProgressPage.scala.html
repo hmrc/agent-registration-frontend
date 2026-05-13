@@ -77,8 +77,10 @@
           content = Text(individual.individualName.value)
         ),
         TableRow(
-          content = Text(
-            if(individual.hasFinished) messages(s"$key.yes") else messages(s"$key.no")
+          content = HtmlContent(
+            if(individual.providedByApplicant.contains(true)) Html(messages(s"$key.providedByApplicant", AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.view(individual._id).url))
+            else if(individual.hasFinished) Html(messages(s"$key.yes"))
+            else Html(messages(s"$key.no"))
           )
         )
       )

@@ -96,4 +96,4 @@ extends FrontendController(mcc, actions):
         providedByApplicantSessionStore
           .upsert(updatedDetails)
           .map: _ =>
-            Redirect(AppRoutes.apply.listdetails.providedbyapplicant.TelephoneNumberController.show.url)
+            Redirect(AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.show.url)

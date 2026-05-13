@@ -82,7 +82,7 @@ extends ControllerSpec:
     response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
-  s"POST $path with a valid email address should save data and redirect to nino page" in:
+  s"POST $path with a valid email address should save data and redirect to CYA controller for navigating" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication)
     providedByApplicantSessionStore.upsert(providedByApplicant.beforeEmailAddress).futureValue
     val response: WSResponse =
@@ -93,7 +93,7 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
 
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedNinoController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with blank inputs should return 400" in:

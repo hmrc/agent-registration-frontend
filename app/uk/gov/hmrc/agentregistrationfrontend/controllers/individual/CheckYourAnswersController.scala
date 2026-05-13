@@ -84,13 +84,15 @@ extends FrontendController(mcc, actions):
         Redirect(AppRoutes.providedetails.IndividualHmrcStandardForAgentsController.show(linkId).url)
     )
     .ensure(
-      // we have all the answers complete
-      // but only show the CYA page if not sole trader owner
-      // as sole trader answers were copied in from the application
+      /** we have all the answers complete only show the CYA page if not sole trader owner as sole trader answers were copied in from the application this does
+        * not equate to providedByApplicant which is only when another person populates it - in sole trader owner cases they are the same person
+        */
       !_.get[AgentApplication].isSoleTraderOwner,
       implicit request =>
         individualProvideDetailsService.upsert(
           request.get[IndividualProvidedDetails]
+            .modify(_.providedByApplicant)
+            .setTo(Some(false))
             .modify(_.providedDetailsState)
             .setTo(Finished)
         ).map: _ =>
@@ -110,6 +112,8 @@ extends FrontendController(mcc, actions):
       individualProvideDetailsService
         .upsert(
           request.get[IndividualProvidedDetails]
+            .modify(_.providedByApplicant)
+            .setTo(Some(false))
             .modify(_.providedDetailsState)
             .setTo(Finished)
         ).map: _ =>

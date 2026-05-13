@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino.NotProvided
 import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.providedbyapplicant.ApplicantProvidedNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
 import uk.gov.hmrc.agentregistrationfrontend.repository.ProvidedByApplicantSessionStore
@@ -77,7 +78,7 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url
 
-  s"POST $path should redirect to the enter your UTR page when 'yes' has been selected and a valid nino has been provided" in:
+  s"POST $path should redirect to the CYA controller for navigation when 'yes' has been selected and a valid nino has been provided" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(application)
     providedByApplicantSessionStore.upsert(providedByApplicant).futureValue
@@ -88,7 +89,7 @@ extends ControllerSpec:
       ))
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.EmailAddressController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.show.url
     providedByApplicantSessionStore.find().futureValue.value shouldBe
       ProvidedByApplicant(
         individualProvidedDetailsId = tdAll.providedDetails.afterAccessConfirmed._id,
@@ -114,7 +115,7 @@ extends ControllerSpec:
       s"${ApplicantProvidedNinoForm.hasNino}-error"
     ).text() shouldBe "Error: Select yes if you know their National Insurance number"
 
-  s"POST $path should redirect to the enter your UTR page with no NINO in session when 'no' has been selected" in:
+  s"POST $path should redirect to the CYA controller for navigation with no NINO in session when 'no' has been selected" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(application)
     providedByApplicantSessionStore.upsert(providedByApplicant).futureValue
@@ -124,13 +125,13 @@ extends ControllerSpec:
         ApplicantProvidedNinoForm.ninoKey -> Seq("//")
       ))
 
-    response.status shouldBe Status.SEE_OTHER // TODO replace with redirect to APB-11164 UTR Page
-    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.EmailAddressController.show.url
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.show.url
     providedByApplicantSessionStore.find().futureValue.value shouldBe
       ProvidedByApplicant(
         individualProvidedDetailsId = tdAll.providedDetails.afterAccessConfirmed._id,
         individualName = tdAll.providedDetails.afterAccessConfirmed.individualName,
-        individualNino = None
+        individualNino = Some(NotProvided)
       )
 
   s"POST $path should return a 400 when 'yes' has been selected and an invalid NINO has been provided" in:

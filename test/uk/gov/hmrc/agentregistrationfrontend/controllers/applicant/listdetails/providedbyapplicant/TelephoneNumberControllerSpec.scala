@@ -79,7 +79,7 @@ extends ControllerSpec:
     response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
-  s"POST $path with a valid number should save data and redirect to email address page" in:
+  s"POST $path with a valid number should save data and redirect to CYA controller for navigation" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication)
     providedByApplicantSessionStore.upsert(providedByApplicant.beforeTelephoneUpdate).futureValue
     val response: WSResponse =
@@ -90,7 +90,7 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
 
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.EmailAddressController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with blank inputs should return 400" in:

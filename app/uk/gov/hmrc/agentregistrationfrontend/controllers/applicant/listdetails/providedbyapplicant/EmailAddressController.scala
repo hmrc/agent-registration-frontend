@@ -100,4 +100,4 @@ extends FrontendController(mcc, actions):
         providedByApplicantSessionStore
           .upsert(updatedProvidedDetails)
           .map: _ =>
-            Redirect(AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedNinoController.show.url)
+            Redirect(AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.show.url)

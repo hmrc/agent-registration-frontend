@@ -145,6 +145,8 @@ object AppRoutes:
         val EmailAddressController = listdetailsProvideDetailsRoutes.EmailAddressController
         val ApplicantProvidedDoBController = listdetailsProvideDetailsRoutes.ApplicantProvidedDoBController
         val ApplicantProvidedNinoController = listdetailsProvideDetailsRoutes.ApplicantProvidedNinoController
+        val SaUtrController = listdetailsProvideDetailsRoutes.SaUtrController
+        val CheckYourAnswersController = listdetailsProvideDetailsRoutes.CheckYourAnswersController
 
     object checkfailed:
 
