@@ -72,18 +72,17 @@ object StartOrContinueApplication:
   object JourneyType:
     given format: Format[JourneyType] = JsonFormatsFactory.makeEnumFormat
 
-
 final case class ApplicationSubmitted(
-                                       applicationReference: ApplicationReference,
-                                       linkId: LinkId,
-                                       isResubmission: Boolean,
-                                       utr: Utr,
-                                       applicantDetails: ApplicantContactDetails,
-                                       agentDetails: Option[AgentDetails],
-                                       amlsSupervisionDetails: Option[AmlsDetails],
-                                       individuals: List[IndividualProvidedDetails]
-                                     )
-  extends AuditEvent
+  applicationReference: ApplicationReference,
+  linkId: LinkId,
+  isResubmission: Boolean,
+  utr: Utr,
+  applicantDetails: ApplicantContactDetails,
+  agentDetails: Option[AgentDetails],
+  amlsSupervisionDetails: Option[AmlsDetails],
+  individuals: List[IndividualProvidedDetails]
+)
+extends AuditEvent
 
 object ApplicationSubmitted:
 
