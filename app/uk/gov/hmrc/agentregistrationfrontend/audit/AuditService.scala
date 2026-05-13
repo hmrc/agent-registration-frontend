@@ -21,7 +21,6 @@ import com.google.inject.Singleton
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
-import uk.gov.hmrc.agentregistration.shared.audit.IndividualSubmission
 import StartOrContinueApplication.JourneyType
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
