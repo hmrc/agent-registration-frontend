@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.provid
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualDateOfBirth
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
@@ -38,7 +39,7 @@ extends ViewSpec:
     val complete: ProvidedByApplicant = ProvidedByApplicant(
       individualProvidedDetailsId = tdAll.providedDetails.afterAccessConfirmed._id,
       individualName = individualName,
-      individualDateOfBirth = Some(tdAll.dateOfBirthProvided),
+      individualDateOfBirth = Some(IndividualDateOfBirth.ApplicantProvided(tdAll.dateOfBirth)),
       telephoneNumber = Some(tdAll.telephoneNumber),
       emailAddress = Some(tdAll.individualEmailAddress),
       individualNino = Some(tdAll.ninoProvided),
@@ -77,16 +78,17 @@ extends ViewSpec:
     "contain correct content" in:
       doc.mainContent shouldContainContent
         s"""
+           |Relevant individual details
            |Check your answers
+           |Date of birth
+           |1 January 2000
+           |Change Date of birth
            |Telephone number
            |(+44) 10794554342
            |Change Telephone number
            |Email address
            |member@test.com
            |Change Email address
-           |Date of birth
-           |1 January 2000
-           |Change Date of birth
            |Do you know $individualNameValue’s National Insurance number?
            |Yes
            |Change Do you know $individualNameValue’s National Insurance number?
@@ -111,6 +113,11 @@ extends ViewSpec:
       val expectedSummaryList: TestSummaryList = TestSummaryList(
         List(
           summaryRow(
+            key = "Date of birth",
+            value = "1 January 2000",
+            action = AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedDoBController.show.url
+          ),
+          summaryRow(
             key = "Telephone number",
             value = "(+44) 10794554342",
             action = AppRoutes.apply.listdetails.providedbyapplicant.TelephoneNumberController.show.url
@@ -119,11 +126,6 @@ extends ViewSpec:
             key = "Email address",
             value = "member@test.com",
             action = AppRoutes.apply.listdetails.providedbyapplicant.EmailAddressController.show.url
-          ),
-          summaryRow(
-            key = "Date of birth",
-            value = "1 January 2000",
-            action = AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedDoBController.show.url
           ),
           summaryRow(
             key = s"Do you know $individualNameValue’s National Insurance number?",
@@ -160,15 +162,15 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         s"""
            |Check your answers
+           |Date of birth
+           |1 January 2000
+           |Change Date of birth
            |Telephone number
            |(+44) 10794554342
            |Change Telephone number
            |Email address
            |member@test.com
            |Change Email address
-           |Date of birth
-           |1 January 2000
-           |Change Date of birth
            |Do you know $individualNameValue’s National Insurance number?
            |No
            |Change Do you know $individualNameValue’s National Insurance number?
@@ -187,6 +189,11 @@ extends ViewSpec:
       val expectedSummaryList: TestSummaryList = TestSummaryList(
         List(
           summaryRow(
+            key = "Date of birth",
+            value = "1 January 2000",
+            action = AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedDoBController.show.url
+          ),
+          summaryRow(
             key = "Telephone number",
             value = "(+44) 10794554342",
             action = AppRoutes.apply.listdetails.providedbyapplicant.TelephoneNumberController.show.url
@@ -195,11 +202,6 @@ extends ViewSpec:
             key = "Email address",
             value = "member@test.com",
             action = AppRoutes.apply.listdetails.providedbyapplicant.EmailAddressController.show.url
-          ),
-          summaryRow(
-            key = "Date of birth",
-            value = "1 January 2000",
-            action = AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedDoBController.show.url
           ),
           summaryRow(
             key = s"Do you know $individualNameValue’s National Insurance number?",

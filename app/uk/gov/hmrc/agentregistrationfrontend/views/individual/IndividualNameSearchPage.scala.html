@@ -14,52 +14,54 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.EmailAddress
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistration.shared.LinkId
+@import uk.gov.hmrc.agentregistrationfrontend.forms.individual.IndividualNameSearchForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
-@import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualEmailAddressForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.partials.SaveAndContinue
+@import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
 
 @this(
         layout: Layout,
         govukInput: GovukInput,
         formWithCSRF: FormWithCSRF,
         govukButton: GovukButton,
+        govukFieldset: GovukFieldset,
         saveAndContinue: SaveAndContinue
 )
 
 @(
-        form: Form[EmailAddress],
-        linkId: LinkId)(implicit
+        form: Form[IndividualProvidedDetails],
+        linkId: LinkId,
+        applicantName: String
+)(implicit
         request: RequestHeader,
         messages: Messages
 )
 
-@key = @{
-    IndividualEmailAddressForm.key
-}
-@title = @{
-    messages(s"$key.title")
-}
+@key = @{IndividualNameSearchForm.key}
+
+@title = @{messages(s"$key.title")}
+
 @layout(
     pageTitle = title,
     maybeForm = Some(form)
 ) {
   <h2 class="govuk-caption-l">@messages("relevant-individual.caption")</h2>
-    @formWithCSRF(action = AppRoutes.providedetails.IndividualEmailAddressController.submit(linkId)) {
-        @govukInput(Input(
-            label = Label(
-                content = Text(title),
-                isPageHeading = true,
-                classes = "govuk-label--l"
-            ),
-            inputType = "email",
-            hint = Some(Hint(content = Text(messages(s"$key.hint")))),
-            autocomplete = Some("email"),
-            spellcheck = Some("false")
-        ).withFormField(form(key)))
+  @formWithCSRF(action = AppRoutes.providedetails.NameMatchingController.submit(linkId)) {
+    @govukInput(Input(
+      label = Label(
+        content = Text(title),
+        isPageHeading = true,
+        classes = "govuk-label--l"
+      ),
+      hint = Some(Hint(content = Text(messages(s"$key.hint", applicantName)))),
+      autocomplete = Some("name"),
+      classes = "govuk-!-width-two-thirds"
+    ).withFormField(form(key)))
 
-        @saveAndContinue()
-    }
+    @govukButton(Button(
+      content = Text(messages("common.continue"))
+    ))
+  }
 }

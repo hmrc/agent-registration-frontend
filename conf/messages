@@ -122,16 +122,6 @@ applicantRoleInLlp.Authorised = No, but I’m authorised by them to set up this 
 applicantRoleInLlp.error.required = Select yes if you are a member of the limited liability partnership
 applicantRoleInLlp.error.invalid = Select yes if you are a member of the limited liability partnership
 
-## Apply / Applicant contact details / Llp member name
-llpMemberName.title = What is your name?
-llpMemberName.p1 = We’ll check this against the business records for {0} on Companies House.
-llpMemberName.firstName.label = First names
-llpMemberName.lastName.label = Last name
-firstName.error.required = Enter your first name
-firstName.error.invalid = Your first name must only include letters a to z, hyphens, apostrophes and spaces
-lastName.error.required = Enter your last name
-lastName.error.invalid = Your last name must only include letters a to z, hyphens, apostrophes and spaces
-
 ## Apply / Applicant contact details / Companies House match
 companiesHouseOfficer.single.title=Are these your details?
 companiesHouseOfficer.single.yes=Yes
@@ -655,6 +645,7 @@ timed-out.p1 = You have not done anything for 15 minutes, so we have signed you 
 timed-out.link = Sign in again
 
 # Individual journeys
+relevant-individual.caption = Relevant individual details
 provide-details.llp.title=LLP member confirmation
 
 ## Generic start page
@@ -673,8 +664,14 @@ companiesHouseNameQuery.title = What is your name?
 companiesHouseNameQuery.p1 = We’ll check this against the business records for {0} on Companies House.
 companiesHouseNameQuery.firstName.label = First names
 companiesHouseNameQuery.lastName.label = Last name
-firstName.error.required = Enter your first name
-firstName.error.invalid = Your first name must only include letters a to z, hyphens, apostrophes and spaces
+
+## Generic first and last name form messages
+firstNames.label = First names
+lastName.label = Last name
+firstName.error.required = Enter your first names
+firstNames.error.required = Enter your first names
+firstName.error.invalid = Your first names must only include letters a to z, hyphens, apostrophes and spaces
+firstNames.error.invalid = Your first names must only include letters a to z, hyphens, apostrophes and spaces
 lastName.error.required = Enter your last name
 lastName.error.invalid = Your last name must only include letters a to z, hyphens, apostrophes and spaces
 
@@ -798,6 +795,14 @@ confirmMatchToIndividualProvidedDetails.no = No
 confirmMatchToIndividualProvidedDetails.error.required = Select yes if these details are correct
 confirmMatchToIndividualProvidedDetails.error.invalid = Select yes if these details are correct
 
+
+individualNameSearch.title = What is your full name?
+individualNameSearch.hint = We’ll check this against the list given to us by {0}.
+individualNameSearch.error.required = Enter your full name
+individualNameSearch.error.invalid = Your full name must only include letters a to z, hyphens, apostrophes and spaces
+individualNameSearch.error.nameNotFound = Your name does not match the name given to us by {0}
+individualNameSearch.error.tooLong = Your full name must be 100 characters or fewer
+
 # Individual name lookup
 individualNameForSearch.title = Enter your full name
 individualNameForSearch.inputText = Enter your full name
@@ -900,12 +905,6 @@ companiesHouseIndividuaName.question.subsequent = What is the name of the next p
 # LLP Member Name - Field labels
 companiesHouseIndividuaName.firstName.label = First names
 companiesHouseIndividuaName.lastName.label = Last name
-
-# LLP Member Name - Validation errors (using ErrorKeys pattern)
-firstName.error.invalid = First names must only include letters a to z, hyphens, apostrophes and spaces
-lastName.error.required = Enter the last name of the LLP member
-lastName.error.invalid = Last name must only include letters a to z, hyphens, apostrophes and spaces
-llpMemberName.error.invalid = The member’s name must only include letters a to z, hyphens, apostrophes and spaces
 
 # LLP Member Name - Next person page (simpler layout)
 companiesHouseIndividuaName.p1 = We’ll check this against the business records for {0} in Companies House.
@@ -1045,11 +1044,12 @@ removeKeyIndividual.title.LimitedLiabilityPartnership = Confirm that you want to
 removeKeyIndividual.title.LimitedCompany = Confirm that you want to remove {0} from the list of directors
 removeKeyIndividual.title.LimitedPartnership = Confirm that you want to remove {0} from the list of partners
 removeKeyIndividual.title.ScottishLimitedPartnership = Confirm that you want to remove {0} from the list of partners
-
+removeKeyIndividual.title.otherRelevantIndividuals = Confirm that you want to remove {0} from the list of relevant individuals
 removeKeyIndividual.error.required.LimitedLiabilityPartnership = Select yes if you want to remove {0} from the list of LLP members
 removeKeyIndividual.error.required.LimitedCompany = Select yes if you want to remove {0} from the list of directors
 removeKeyIndividual.error.required.LimitedPartnership = Select yes if you want to remove {0} from the list of partners
 removeKeyIndividual.error.required.ScottishLimitedPartnership = Select yes if you want to remove {0} from the list of partners
+removeKeyIndividual.error.required.otherRelevantIndividuals = Select yes if you want to remove {0} from the list of relevant individuals
 
 # Application outcome
 failedNonFixable.caption = Application outcome
