@@ -121,3 +121,5 @@ extends FrontendController(mcc, actions):
         .setTo(Some(true)) // Sole trader owner applicants are always approved as they are the same person
         .modify(_.hmrcStandardForAgentsAgreed)
         .setTo(agentApplication.hmrcStandardForAgentsAgreed)
+        .modify(_.providedByApplicant)
+        .setTo(Some(false)) // sole trader owners are providing their own data so this is false

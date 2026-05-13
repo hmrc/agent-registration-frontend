@@ -60,13 +60,19 @@ extends FrontendController(mcc, actions):
           .map:
             case Some(providedByApplicant) => request.add[ProvidedByApplicant](providedByApplicant)
             case None =>
-              logger.warn("Details found in session when trying to access Nino page, redirecting to select individual page")
+              logger.warn("No ProvidedByApplicant details found in session when trying to access Nino page, redirecting to select individual page")
               Redirect(AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url)
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
       Ok(view(
-        form = ApplicantProvidedNinoForm.form,
+        form = ApplicantProvidedNinoForm.form
+          .fill:
+            request
+              .get[ProvidedByApplicant]
+              .individualNino
+              .map(_.toUserProvidedNino)
+        ,
         applicantProvidedName = Some(request.get[ProvidedByApplicant].individualName.value)
       ))
 
@@ -87,11 +93,14 @@ extends FrontendController(mcc, actions):
       val providedByApplicant: ProvidedByApplicant = request.get
       val updatedProvidedDetails: ProvidedByApplicant = providedByApplicant
         .modify(_.individualNino)
-        .setTo:
-          nino match
-            case provided: IndividualNino.Provided => Some(provided)
-            case IndividualNino.NotProvided => None
+        .setTo(Some(nino))
       providedByApplicantSessionStore
         .upsert(updatedProvidedDetails)
-        .map: _ => //TODO replace with redirect to APB-11164 UTR Page
-          Redirect(AppRoutes.apply.listdetails.providedbyapplicant.EmailAddressController.show.url)
+        .map: _ =>
+          Redirect(AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.show.url)
+
+  extension (individualNino: IndividualNino)
+    def toUserProvidedNino: UserProvidedNino =
+      individualNino match
+        case u: UserProvidedNino => u
+        case h: IndividualNino.FromAuth => throw new IllegalArgumentException(s"Nino is already provided from auth enrolments (${h.nino})")

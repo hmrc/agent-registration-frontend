@@ -80,7 +80,7 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url
 
-  s"POST $path with valid date of birth should save data and redirect to the telephone page" in:
+  s"POST $path with valid date of birth should save data and redirect to the CYA controller for navigation" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(application)
     providedByApplicantSessionStore.upsert(providedByApplicant).futureValue
@@ -93,7 +93,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.TelephoneNumberController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
     providedByApplicantSessionStore.find().futureValue.value shouldBe

@@ -52,7 +52,8 @@ final case class IndividualProvidedDetails(
   hasApprovedApplication: Option[Boolean] = None,
   vrns: Option[List[Vrn]] = None,
   payeRefs: Option[List[PayeRef]] = None,
-  passedIv: Option[Boolean] = None
+  passedIv: Option[Boolean] = None,
+  providedByApplicant: Option[Boolean] = None
 ):
 
   val individualProvidedDetailsId: IndividualProvidedDetailsId = _id

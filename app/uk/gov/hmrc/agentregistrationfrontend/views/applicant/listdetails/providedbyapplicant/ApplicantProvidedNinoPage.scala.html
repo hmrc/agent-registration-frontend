@@ -16,9 +16,8 @@
 
 @import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.providedbyapplicant.ApplicantProvidedNinoForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.partials.SaveAndContinue
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ProvidedByApplicantButtons
 @import uk.gov.hmrc.hmrcfrontend.views.html.components.implicits.*
-@import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 @import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedNino
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
@@ -30,7 +29,7 @@
         govukRadios: GovukRadios,
         govukInput: GovukInput,
         govukButton: GovukButton,
-        saveAndContinue: SaveAndContinue
+        providedByApplicantButtons: ProvidedByApplicantButtons
 )
 
 @(
@@ -62,37 +61,30 @@
     maybeForm = Some(form)
 ) {
 
-    <h2 class="govuk-caption-l">@messages("applicant-provided.nino.caption")</h2>
+    <h2 class="govuk-caption-l">@messages("applicantProvidingDetails.caption")</h2>
     @formWithCSRF(action = AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedNinoController.submit) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
-            legend = Some(Legend(
-            content = Text(pageTitle),
-            isPageHeading = true,
-            classes = "govuk-fieldset__legend--l"
+              legend = Some(Legend(
+              content = Text(pageTitle),
+              isPageHeading = true,
+              classes = "govuk-fieldset__legend--l"
             ))
-        )),
-        items = YesNo.values.toSeq.map {
+          )),
+          items = YesNo.values.toSeq.map {
             case YesNo.Yes => RadioItem(
-                content = HtmlContent(messages(s"$key.yes")),
-                value = Some(YesNo.Yes.toString),
-                conditionalHtml = Some(ninoInput)
-                )
+              content = HtmlContent(messages(s"$key.yes")),
+              value = Some(YesNo.Yes.toString),
+              conditionalHtml = Some(ninoInput)
+            )
             case YesNo.No => RadioItem(
-                content = HtmlContent(messages(s"$key.no")),
-                value = Some(YesNo.No.toString)
-                )
-            }
+              content = HtmlContent(messages(s"$key.no")),
+              value = Some(YesNo.No.toString)
+            )
+          }
         ).withFormField(form(key)))
 
-        @saveAndContinue()
+        @providedByApplicantButtons()
 
-    @govukButton(Button(
-        name = Some("submit"),
-        value = Some(SaveAndComeBackLater.toString),
-        content = Text(messages("common.saveAndComeBackLater")),
-        href = Some(AppRoutes.apply.SaveForLaterController.show.url),
-        classes = "govuk-button--secondary"
-        ))
     }
 }

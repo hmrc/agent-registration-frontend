@@ -22,37 +22,37 @@
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ProvidedByApplicantButtons
 
 @this(
-        layout: Layout,
-        govukInput: GovukInput,
-        formWithCSRF: FormWithCSRF,
-        govukButton: GovukButton,
-        providedByApplicantButtons: ProvidedByApplicantButtons
+  layout: Layout,
+  govukInput: GovukInput,
+  formWithCSRF: FormWithCSRF,
+  govukButton: GovukButton,
+  providedByApplicantButtons: ProvidedByApplicantButtons
 )
 
 @(
-        form: Form[EmailAddress],
-        individualName: IndividualName)(implicit
-        request: RequestHeader,
-        messages: Messages
+  form: Form[EmailAddress],
+  individualName: IndividualName)(implicit
+  request: RequestHeader,
+  messages: Messages
 )
 
 @key = @{
-    EmailAddressForm.key
+  EmailAddressForm.key
 }
 @title = @{
-    messages(s"$key.title", individualName.value)
+  messages(s"$key.title", individualName.value)
 }
 @layout(
-    pageTitle = title,
-    maybeForm = Some(form)
+  pageTitle = title,
+  maybeForm = Some(form)
 ) {
   <h2 class="govuk-caption-l">@messages("applicantProvidingDetails.caption")</h2>
   @formWithCSRF(action = AppRoutes.apply.listdetails.providedbyapplicant.EmailAddressController.submit) {
     @govukInput(Input(
       label = Label(
-          content = Text(title),
-          isPageHeading = true,
-          classes = "govuk-label--l"
+        content = Text(title),
+        isPageHeading = true,
+        classes = "govuk-label--l"
       ),
       inputType = "email",
       hint = Some(Hint(content = Text(messages(s"$key.hint")))),

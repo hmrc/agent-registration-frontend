@@ -22,8 +22,7 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.audit.IndividualSubmission
-import uk.gov.hmrc.agentregistration.shared.audit.StartOrContinueApplication
-import uk.gov.hmrc.agentregistration.shared.audit.StartOrContinueApplication.JourneyType
+import StartOrContinueApplication.JourneyType
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
@@ -31,7 +30,6 @@ import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport
 import uk.gov.hmrc.play.audit.DefaultAuditConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
-
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
