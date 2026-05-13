@@ -93,7 +93,7 @@ extends ControllerSpec:
     continueUrl = s"${ISpec.thisFrontendBaseUrl}/agent-registration/apply/agent-details/verify-email-address",
     origin = "HMRC Agent Services",
     deskproServiceName = None,
-    accessibilityStatementUrl = "/agent-services-account",
+    accessibilityStatementUrl = "/agent-registration",
     email = Some(Email(
       address = tdAll.newEmailAddress,
       enterUrl = s"${ISpec.thisFrontendBaseUrl}/agent-registration/apply/agent-details/email-address"

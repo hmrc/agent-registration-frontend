@@ -71,7 +71,7 @@ extends ControllerSpec:
     continueUrl = s"$thisFrontendBaseUrl/agent-registration/apply/applicant/verify-email-address",
     origin = "HMRC Agent Services",
     deskproServiceName = None,
-    accessibilityStatementUrl = "/agent-services-account",
+    accessibilityStatementUrl = "/agent-registration",
     email = Some(Email(
       address = tdAll.applicantEmailAddress.value,
       enterUrl = s"$thisFrontendBaseUrl/agent-registration/apply/applicant/email-address"

@@ -91,7 +91,7 @@ extends ControllerSpec:
     ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
 
   s"GET $path when details already provided by applicant should redirect to dedicated exit page" in:
-    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+    ProvideDetailsStubHelper.stubAuthAndMatchIndividualProvidedDetails(
       agentApplication,
       individualProvideDetails.providedByApplicant
     )
