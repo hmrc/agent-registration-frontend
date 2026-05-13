@@ -809,6 +809,10 @@ individualNameForSearch.error.tooLong = Your full name must be 100 characters or
 contactApplicant.title = Name matching has failed contact the applicant
 contactApplicant.p1 = We have been unable to match your name to the name on the application. Contact the applicant.
 
+# Details already provided page
+detailsAlreadyProvided.title = Your details have already been provided
+detailsAlreadyProvided.p1 = This is because someone has provided details on your behalf. Speak to the applicant if you have any questions.
+
 # Confirm matching name page
 nameMatchConfirmDetails.title = Are these details correct?
 nameMatchConfirmDetails.p1 = Confirm these are your details

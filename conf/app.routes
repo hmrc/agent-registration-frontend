@@ -164,6 +164,7 @@ GET         /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.
 POST        /apply/agent-declaration/confirm-declaration            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.DeclarationController.submit
 
 # Individuals (directors/partners/members/owners) providing details
+GET         /details-already-provided                               uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ExitController.detailsAlreadyProvided
 GET         /provide-details/exit                                   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ExitController.genericExitPage
 GET         /provide-details/start/:linkId                          uk.gov.hmrc.agentregistrationfrontend.controllers.individual.StartController.start(linkId: LinkId)
 

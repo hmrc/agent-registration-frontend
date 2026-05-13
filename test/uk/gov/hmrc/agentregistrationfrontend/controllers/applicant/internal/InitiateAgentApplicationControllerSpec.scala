@@ -98,6 +98,6 @@ extends ControllerSpec:
       val response: WSResponse = get(initiateAgentApplicationUrl)
       response.status shouldBe Status.SEE_OTHER
       // TODO: actual url isn't known yet
-      response.header("Location").value shouldBe "http://localhost:22201/taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment"
+      response.header("Location").value shouldBe "http://localhost:22201/tax-and-scheme-management/users?origin=ASA"
       AuthStubs.verifyAuthorise()
       EnrolmentStoreStubs.verifyQueryEnrolmentsAllocatedToGroup(tdAll.groupId)
