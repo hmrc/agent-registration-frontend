@@ -93,5 +93,5 @@ extends FrontendController(mcc, actions):
             case IndividualNino.NotProvided => None
       providedByApplicantSessionStore
         .upsert(updatedProvidedDetails)
-        .map: _ => //TODO replace with redirect to APB-11164 UTR Page
+        .map: _ => // TODO replace with redirect to APB-11164 UTR Page
           Redirect(AppRoutes.apply.listdetails.providedbyapplicant.EmailAddressController.show.url)
