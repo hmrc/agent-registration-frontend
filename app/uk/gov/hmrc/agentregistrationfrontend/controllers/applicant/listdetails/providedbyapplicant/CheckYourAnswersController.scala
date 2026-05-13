@@ -162,8 +162,7 @@ extends FrontendController(mcc, actions):
         ).map: _ =>
           auditService.auditIndividualSubmission(
             applicationReference = applicationReference,
-            individualProvidedDetails = individualProvidedDetails,
-            providedByApplicant = true
+            individualProvidedDetails = individualProvidedDetails
           )
           Redirect(AppRoutes.apply.listdetails.progress.CheckProgressController.show)
 

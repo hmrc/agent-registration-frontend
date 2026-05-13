@@ -123,8 +123,7 @@ extends FrontendController(mcc, actions):
         ).map: _ =>
           auditService.auditIndividualSubmission(
             applicationReference = applicationReference,
-            individualProvidedDetails = finishedIndividualProvidedDetails,
-            providedByApplicant = false
+            individualProvidedDetails = finishedIndividualProvidedDetails
           )
           Redirect(AppRoutes.providedetails.IndividualConfirmationController.show(linkId))
 

@@ -29,6 +29,7 @@ import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport
 import uk.gov.hmrc.play.audit.DefaultAuditConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
+
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
@@ -59,8 +60,7 @@ extends RequestAwareLogging:
 
   def auditIndividualSubmission(
     applicationReference: ApplicationReference,
-    individualProvidedDetails: IndividualProvidedDetails,
-    providedByApplicant: Boolean
+    individualProvidedDetails: IndividualProvidedDetails
   )(using RequestHeader): Future[Unit] =
     for
       individualsOnApplication <- individualProvidedDetailsConnector.findAllForMatching(individualProvidedDetails.agentApplicationId)
@@ -68,7 +68,7 @@ extends RequestAwareLogging:
       auditEvent = IndividualSubmission.make(
         applicationReference,
         individualProvidedDetails,
-        providedByApplicant = providedByApplicant,
+        providedByApplicant = individualProvidedDetails.providedByApplicant.getOrElse(false),
         lastIndividualResponse = lastIndividualResponse
       )
       _ =

@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 
 sealed trait AuditEvent:
 
@@ -66,7 +67,7 @@ object StartOrContinueApplication:
 final case class IndividualSubmission(
   applicationReference: ApplicationReference,
   personReference: PersonReference,
-  fullName: String,
+  fullName: IndividualName,
   providedByApplicant: Boolean,
   nino: Option[IndividualNino] = None,
   sautr: Option[IndividualSaUtr] = None,
@@ -84,7 +85,7 @@ object IndividualSubmission:
   ): IndividualSubmission = IndividualSubmission(
     applicationReference = applicationReference,
     personReference = individualProvidedDetails.personReference,
-    fullName = individualProvidedDetails.individualName.value,
+    fullName = individualProvidedDetails.individualName,
     providedByApplicant = providedByApplicant,
     nino = individualProvidedDetails.individualNino,
     sautr = individualProvidedDetails.individualSaUtr,
