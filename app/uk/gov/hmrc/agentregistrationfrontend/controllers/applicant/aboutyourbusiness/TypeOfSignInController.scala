@@ -24,6 +24,7 @@ import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.UserRole
+import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
@@ -31,6 +32,7 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.TypeOfSignInForm
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn
 import uk.gov.hmrc.agentregistrationfrontend.model.TypeOfSignIn.*
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.CreateSignInDetailsPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.SignInWithAgentDetailsPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.TypeOfSignInPage
@@ -50,42 +52,80 @@ class TypeOfSignInController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = action:
+  def signInLink(
+    agentType: AgentType,
+    businessType: BusinessType,
+    userRole: UserRole
+  ): Uri = AppRoutes
+    .apply
+    .internal
+    .InitiateAgentApplicationController
+    .initiateAgentApplication(
+      agentType = agentType,
+      businessType = businessType,
+      userRole = userRole
+    )
+    .url
+    .pipe(initiateUrl => uri"${appConfig.thisFrontendBaseUrl + initiateUrl}")
+
+  private val baseAction = action
+    .refine(r => r.readFromSessionAgentType.fold(Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url))(r.add))
+    .refine(r => r.readBusinessType.fold(Redirect(AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show.url))(r.add))
+    .refine(r => r.readUserRole.fold(Redirect(AppRoutes.apply.aboutyourbusiness.UserRoleController.show.url))(r.add))
+    .ensure(
+      condition =
+        implicit request =>
+          !RequestSupport.isSignedIn(using request.request),
+      resultWhenConditionNotMet =
+        implicit request =>
+          val agentType: AgentType = request.get
+          val businessType: BusinessType = request.get
+          val userRole: UserRole = request.get
+          Redirect(signInLink(
+            agentType,
+            businessType,
+            userRole
+          ).toString)
+    )
+
+  def show: Action[AnyContent] = baseAction:
     implicit request =>
       Ok(view(TypeOfSignInForm.form.fill(request.readTypeOfSignIn)))
 
   def submit: Action[AnyContent] =
-    action
+    baseAction
       .ensureValidForm(TypeOfSignInForm.form, implicit request => view(_)):
         implicit request =>
           val typeOfSignIn: TypeOfSignIn = request.get
           Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.showSignInPage)
             .addToSession(typeOfSignIn)
 
-  def showSignInPage: Action[AnyContent] =
-    action
-      .refine(r => r.readFromSessionAgentType.fold(Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url))(r.add))
-      .refine(r => r.readBusinessType.fold(Redirect(AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show.url))(r.add))
+  /** Using curly braces here to overcome compiler issues with scope of the implicit request type Using the ActionBuilder's apply method instead of the Scala 3
+    * indented-colon block avoids parser/inference ambiguity and yields an Action (not a plain function).
+    */
+  def showSignInPage: Action[AnyContent] = {
+    type SignInRequestWithCompleteSession = RequestWithDataCt[AnyContent, TypeOfSignIn *: UserRole *: BusinessType *: AgentType *: EmptyTuple]
+
+    baseAction
       .refine(r => r.readTypeOfSignIn.fold(Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show.url))(r.add))
-      .refine(r => r.readUserRole.fold(Redirect(AppRoutes.apply.aboutyourbusiness.UserRoleController.show.url))(r.add)):
-        implicit request =>
-          val agentType: AgentType = request.get
-          val businessType: BusinessType = request.get
-          val typeOfSignIn: TypeOfSignIn = request.get
-          val userRole: UserRole = request.get
+      .apply { implicit request: SignInRequestWithCompleteSession =>
+        val agentType: AgentType = request.get[AgentType]
+        val businessType: BusinessType = request.get[BusinessType]
+        val typeOfSignIn: TypeOfSignIn = request.get[TypeOfSignIn]
+        val userRole: UserRole = request.get[UserRole]
 
-          val signInLink: Uri = AppRoutes
-            .apply
-            .internal
-            .InitiateAgentApplicationController
-            .initiateAgentApplication(
-              agentType = agentType,
-              businessType = businessType,
-              userRole = userRole
-            )
-            .url
-            .pipe(initiateUrl => uri"${appConfig.thisFrontendBaseUrl + initiateUrl}")
-
-          typeOfSignIn match
-            case HmrcOnlineServices => Ok(signInWithAgentDetailsPage(signInLink))
-            case CreateSignInDetails => Ok(createSignInDetailsPage(signInLink))
+        typeOfSignIn match
+          case HmrcOnlineServices =>
+            Ok(signInWithAgentDetailsPage(signInLink(
+              agentType,
+              businessType,
+              userRole
+            )))
+          case CreateSignInDetails =>
+            Ok(createSignInDetailsPage(signInLink(
+              agentType,
+              businessType,
+              userRole
+            )))
+      }
+  }

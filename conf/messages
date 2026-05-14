@@ -76,23 +76,25 @@ partnershipType.error.required = Tell us what type of partnership
 partnershipType.error.invalid = Tell us what type of partnership
 
 ## Apply / About your business / Type of sign in page
-typeOfSignIn.title = Do you have an HMRC online services for agents account?
-typeOfSignIn.hint = You’ll have this account if you already manage taxes on behalf of clients.
+typeOfSignIn.title = Do you already use HMRC online services on behalf of your clients?
 typeOfSignIn.HmrcOnlineServices = Yes
 typeOfSignIn.CreateSignInDetails = No, I do not manage any taxes for clients
-typeOfSignIn.error.required = Select yes if you have an HMRC online services for agents account
-typeOfSignIn.error.invalid = Select yes if you have an HMRC online services for agents account
+typeOfSignIn.error.required = Select yes if you already use HMRC online services on behalf of your clients
+typeOfSignIn.error.invalid = Select yes if already use HMRC online services on behalf of your clients
 
 createSignInDetails.title=Create your agent account sign in details
 createSignInDetails.p1=You do not have agent sign in details yet.
 createSignInDetails.p2=You’ll need to create some before you can get an agent services account.
 createSignInDetails.p3=Select ‘Continue’ to start.
 
-signInWithAgentDetails.title=Sign in with your agent account details
-signInWithAgentDetails.p1=Sign in using the details for your existing agent account.
-signInWithAgentDetails.p2=Your new agent services account will then be linked to those sign in details.
-signInWithAgentDetails.h2=If you have more than one set of sign in details
-signInWithAgentDetails.p3=Choose the one you want to be linked to your new agent services account.
+signInWithAgentDetails.title=Sign in with your existing agent account details
+signInWithAgentDetails.p1=On the next page, enter the sign in details for your existing agent account.
+signInWithAgentDetails.p2=We’ll link your new agent services account to these sign in details.
+signInWithAgentDetails.details.summary=If you have more than one set of sign in details
+signInWithAgentDetails.details.p1=We can link an agent services account to any existing Government Gateway account, as long as:
+signInWithAgentDetails.details.li1=it was set up as an account for agents (not for an individual or non-agent organisation)
+signInWithAgentDetails.details.li2=you can enter the user ID and password when we ask you for them
+signInWithAgentDetails.details.p2=Adding your agent services account to existing sign in details will not affect any other services you access with those sign in details.
 
 # Apply / About your business CYA
 aboutYourBusinessCheckYourAnswers.title = Your business details
@@ -555,6 +557,7 @@ cannotRegister.tryAgain.button = Try again
 
 # About your application / user role
 userRole.Owner.title = Are you the owner of the business?
+userRole.Owner.label = Owner of the business
 userRole.Member.title = Are you a member of the limited liability partnership?
 userRole.Partner.title = Are you a partner in the business?
 userRole.Director.title = Are you a director of the limited company?
@@ -574,7 +577,7 @@ checkYourAnswer.businessType.SoleTrader = Sole trader
 checkYourAnswer.businessType.LimitedCompany = Limited company
 checkYourAnswer.businessType.GeneralPartnership = Partnership
 checkYourAnswer.businessType.LimitedLiabilityPartnership = Limited liability partnership
-checkYourAnswer.userRole.label = Are you the business owner?
+checkYourAnswer.userRole.label = Owner of the business
 checkYourAnswer.userRole.Owner = Yes
 checkYourAnswer.change = Change
 checkYourAnswer.userRole.Authorised = No, but I’m authorised by them to set up this account
@@ -589,6 +592,7 @@ taskList.status.Completed = Completed
 taskList.status.CannotStartYet = Cannot start yet
 
 taskList.title = Application for {0}
+taskList.expiryNotice = You have until {0} to complete this application.
 taskList.businessDetails.heading = Tell us about your business
 taskList.businessDetails.linkText = About your business
 taskList.contact.heading = How to contact you
