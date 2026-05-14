@@ -669,6 +669,10 @@ provideDetailsStart.signIn.h2 = Use the right sign in details
 provideDetailsStart.signIn.p1 = We need you to sign in using sign in details you created for your personal taxes, not your business taxes.
 provideDetailsStart.signIn.p2 = If you do not have personal sign in details, you can create some.
 
+notAgentCredential.title = You need to sign in with personal tax account details
+notAgentCredential.p1 = You signed in with agent account details. To continue, sign in with the details you created for your personal taxes.
+notAgentCredential.continue = Continue
+
 companiesHouseNameQuery.title = What is your name?
 companiesHouseNameQuery.p1 = We’ll check this against the business records for {0} on Companies House.
 companiesHouseNameQuery.firstName.label = First names

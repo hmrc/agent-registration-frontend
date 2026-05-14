@@ -70,6 +70,14 @@ object IndividualAuthStubs {
     responseBody = responseBody
   )
 
+  def stubAuthoriseWithAgentAffinity(): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlMatching("/auth/authorise"),
+    requestBody = Some(expectedRequestBody),
+    responseStatus = Status.OK,
+    responseBody = responseBodyAsAgent()
+  )
+
   def verifyAuthorise(count: Int = 1): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlMatching("/auth/authorise"),
@@ -85,6 +93,7 @@ object IndividualAuthStubs {
        |{
        |  "authorisedEnrolments": [],
        |  "allEnrolments": [],
+       |  "affinityGroup": "Individual",
        |  "agentInformation": {},
        |  "confidenceLevel": 250,
        |  "internalId": "${internalUserId.value}",
@@ -128,6 +137,7 @@ object IndividualAuthStubs {
        |      "key": "HMRC-PT"
        |    }
        |  ],
+       |  "affinityGroup": "Individual",
        |  "agentInformation": {},
        |  "confidenceLevel": 250,
        |  "internalId": "${internalUserId.value}",
@@ -157,6 +167,7 @@ object IndividualAuthStubs {
        |      "key": "IR-SA"
        |    }
        |  ],
+       |  "affinityGroup": "Individual",
        |  "agentInformation": {},
        |  "confidenceLevel": 250,
        |  "internalId": "${internalUserId.value}",
@@ -198,6 +209,7 @@ object IndividualAuthStubs {
        |      "key": "IR-SA"
        |    }
        |  ],
+       |  "affinityGroup": "Individual",
        |  "agentInformation": {},
        |  "confidenceLevel": 250,
        |  "internalId": "${internalUserId.value}",
@@ -214,19 +226,33 @@ object IndividualAuthStubs {
       |      "authProviders": [
       |        "GovernmentGateway"
       |      ]
-      |    },
-      |    {
-      |      "affinityGroup": "Individual"
       |    }
       |  ],
       |  "retrieve": [
       |    "confidenceLevel",
       |    "allEnrolments",
       |    "internalId",
-      |    "optionalCredentials"
+      |    "optionalCredentials",
+      |    "affinityGroup"
       |  ]
       |}
       |""".stripMargin
   )
+
+  private def responseBodyAsAgent(
+    internalUserId: InternalUserId = TdAll.tdAll.internalUserId
+  ): String =
+    // language=JSON
+    s"""
+       |{
+       |  "authorisedEnrolments": [],
+       |  "allEnrolments": [],
+       |  "affinityGroup": "Agent",
+       |  "agentInformation": {},
+       |  "confidenceLevel": 250,
+       |  "internalId": "${internalUserId.value}",
+       |  "optionalCredentials": {"providerId":"cred-id-12345","providerType":"GovernmentGateway"}
+       |}
+       |""".stripMargin
 
 }
