@@ -78,7 +78,8 @@ object StubMaker:
     urlPattern: UrlPattern = wm.urlPathEqualTo("/example/path"),
     queryParams: Map[String, StringValuePattern] = Map.empty,
     requestHeaders: Seq[(String, StringValuePattern)] = Nil,
-    count: Int = 1
+    count: Int = 1,
+    requestBody: Option[ContentPattern[?]] = None
   ): Unit =
     val basePattern =
       requestHeaders
@@ -86,7 +87,12 @@ object StubMaker:
 
     val patternWithParams = queryParams.foldLeft(basePattern)((acc, c) => acc.withQueryParam(c._1, c._2))
 
-    wm.verify(wm.exactly(count), patternWithParams)
+    val patternWithBody =
+      requestBody match
+        case Some(body) => patternWithParams.withRequestBody(body)
+        case None => patternWithParams
+
+    wm.verify(wm.exactly(count), patternWithBody)
 
   private def initialMappingBuilder(httpMethod: HttpMethod): UrlPattern => MappingBuilder =
     httpMethod match
