@@ -96,11 +96,6 @@ object StubMaker:
 
     wm.verify(wm.exactly(count), patternWithBody)
 
-  def findAll(
-    httpMethod: HttpMethod = HttpMethod.POST,
-    urlPattern: UrlPattern
-  ): util.List[LoggedRequest] = wm.findAll(initialRequestPatternBuilder(httpMethod)(urlPattern))
-
   private def initialMappingBuilder(httpMethod: HttpMethod): UrlPattern => MappingBuilder =
     httpMethod match
       case HttpMethod.GET => wm.get
