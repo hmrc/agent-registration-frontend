@@ -29,6 +29,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualVerifiedEmailAddress
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.audit.AuditService
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
 import uk.gov.hmrc.agentregistrationfrontend.repository.ProvidedByApplicantSessionStore
@@ -41,7 +42,8 @@ class CheckYourAnswersController @Inject() (
   actions: ApplicantActions,
   view: CheckYourAnswersPage,
   providedByApplicantSessionStore: ProvidedByApplicantSessionStore,
-  individualProvideDetailsService: IndividualProvideDetailsService
+  individualProvideDetailsService: IndividualProvideDetailsService,
+  auditService: AuditService
 )
 extends FrontendController(mcc, actions):
 
@@ -133,29 +135,35 @@ extends FrontendController(mcc, actions):
   def submit: Action[AnyContent] = baseAction.async:
     implicit request =>
       val providedByApplicant: ProvidedByApplicant = request.get
-      val individualProvidedDetails: IndividualProvidedDetails = request.get
+      val applicationReference = request.get[AgentApplication].applicationReference
+      val individualProvidedDetails: IndividualProvidedDetails = request.get[IndividualProvidedDetails]
+        .modify(_.individualDateOfBirth)
+        .setTo(providedByApplicant.individualDateOfBirth)
+        .modify(_.telephoneNumber)
+        .setTo(providedByApplicant.telephoneNumber)
+        .modify(_.emailAddress)
+        .setTo(Some(IndividualVerifiedEmailAddress(
+          emailAddress = providedByApplicant.getEmailAddress,
+          isVerified = false
+        )))
+        .modify(_.individualNino)
+        .setTo(providedByApplicant.individualNino)
+        .modify(_.individualSaUtr)
+        .setTo(providedByApplicant.individualSaUtr)
+        .modify(_.passedIv)
+        .setTo(Some(false))
+        .modify(_.providedByApplicant)
+        .setTo(Some(true))
+        .modify(_.providedDetailsState)
+        .setTo(Finished)
       individualProvideDetailsService
-        .upsertForApplication(individualProvidedDetails
-          .modify(_.individualDateOfBirth)
-          .setTo(providedByApplicant.individualDateOfBirth)
-          .modify(_.telephoneNumber)
-          .setTo(providedByApplicant.telephoneNumber)
-          .modify(_.emailAddress)
-          .setTo(Some(IndividualVerifiedEmailAddress(
-            emailAddress = providedByApplicant.getEmailAddress,
-            isVerified = false
-          )))
-          .modify(_.individualNino)
-          .setTo(providedByApplicant.individualNino)
-          .modify(_.individualSaUtr)
-          .setTo(providedByApplicant.individualSaUtr)
-          .modify(_.passedIv)
-          .setTo(Some(false))
-          .modify(_.providedByApplicant)
-          .setTo(Some(true))
-          .modify(_.providedDetailsState)
-          .setTo(Finished))
-        .map: _ =>
+        .upsertForApplication(
+          individualProvidedDetails
+        ).map: _ =>
+          auditService.auditIndividualSubmission(
+            applicationReference = applicationReference,
+            individualProvidedDetails = individualProvidedDetails
+          )
           Redirect(AppRoutes.apply.listdetails.progress.CheckProgressController.show)
 
   def view(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] =

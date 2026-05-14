@@ -23,6 +23,11 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
+import uk.gov.hmrc.agentregistration.shared.PersonReference
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 
 sealed trait AuditEvent:
 
@@ -58,3 +63,33 @@ object StartOrContinueApplication:
 
   object JourneyType:
     given format: Format[JourneyType] = JsonFormatsFactory.makeEnumFormat
+
+final case class IndividualSubmission(
+  applicationReference: ApplicationReference,
+  personReference: PersonReference,
+  fullName: IndividualName,
+  providedByApplicant: Boolean,
+  nino: Option[IndividualNino] = None,
+  sautr: Option[IndividualSaUtr] = None,
+  lastIndividualResponse: Boolean
+)
+extends AuditEvent
+
+object IndividualSubmission:
+
+  def make(
+    applicationReference: ApplicationReference,
+    individualProvidedDetails: IndividualProvidedDetails,
+    providedByApplicant: Boolean,
+    lastIndividualResponse: Boolean
+  ): IndividualSubmission = IndividualSubmission(
+    applicationReference = applicationReference,
+    personReference = individualProvidedDetails.personReference,
+    fullName = individualProvidedDetails.individualName,
+    providedByApplicant = providedByApplicant,
+    nino = individualProvidedDetails.individualNino,
+    sautr = individualProvidedDetails.individualSaUtr,
+    lastIndividualResponse = lastIndividualResponse
+  )
+
+  given format: Format[IndividualSubmission] = Json.format[IndividualSubmission]
