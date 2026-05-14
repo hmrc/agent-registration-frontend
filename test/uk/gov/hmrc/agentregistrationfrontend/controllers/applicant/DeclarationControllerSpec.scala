@@ -19,7 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.risking.submitforrisking.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationRiskingStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -41,9 +42,14 @@ extends ControllerSpec:
     )
   AppRoutes.apply.DeclarationController.submit.url shouldBe AppRoutes.apply.DeclarationController.show.url
 
-  private val individualsForSubmission = List(
+  private val individualsForSubmission: List[IndividualProvidedDetails] = List(
     tdAll.providedDetails.afterFinished,
     TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.afterFinished
+  )
+
+  private val individualDataList: List[IndividualData] = List(
+    tdAll.providedDetails.individualData,
+    TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.individualData
   )
 
   object agentApplication:
@@ -62,6 +68,11 @@ extends ControllerSpec:
       tdAll
         .agentApplicationLlp
         .afterDeclarationSubmitted
+
+    val applicationData: ApplicationData =
+      tdAll
+        .agentApplicationLlp
+        .applicationData
 
   s"GET $path before completing all other tasks should redirect to the tasklist" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.beforeAllTasksComplete)
@@ -101,8 +112,8 @@ extends ControllerSpec:
     )
     AgentRegistrationRiskingStubs.stubSubmitAgentApplication(
       SubmitForRiskingRequest(
-        agentApplication = agentApplication.afterDeclarationSubmitted,
-        individuals = individualsForSubmission
+        applicationData = agentApplication.applicationData,
+        individuals = individualDataList
       )
     )
     val response: WSResponse =
