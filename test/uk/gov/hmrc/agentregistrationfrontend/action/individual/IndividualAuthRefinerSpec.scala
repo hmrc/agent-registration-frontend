@@ -21,6 +21,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.Actions.RequestWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions.RequestWithAuthAndCl
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 class IndividualAuthRefinerSpec
 extends ISpec:
@@ -53,6 +54,19 @@ extends ISpec:
         tdAll.confidenceLevel250,
         tdAll.internalUserId,
         tdAll.credentials
+      )
+      IndividualAuthStubs.verifyAuthorise()
+
+    "redirect to the not agent credential page when the user signs in with agent affinity" in:
+      val individualAuthRefiner: IndividualAuthRefiner = app.injector.instanceOf[IndividualAuthRefiner]
+      IndividualAuthStubs.stubAuthoriseWithAgentAffinity()
+
+      individualAuthRefiner
+        .refineIntoRequestWithAdditionalIdentifiers(tdAll.requestLoggedIn)
+        .futureValue
+        .left
+        .value shouldBe Redirect(
+        AppRoutes.providedetails.NotAgentCredentialController.show(Some(RedirectUrl(s"$thisFrontendBaseUrl/")))
       )
       IndividualAuthStubs.verifyAuthorise()
 

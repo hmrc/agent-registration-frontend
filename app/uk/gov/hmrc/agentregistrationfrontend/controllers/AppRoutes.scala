@@ -180,6 +180,7 @@ object AppRoutes:
     val NameMatchingController = providedetailsRoutes.NameMatchingController
     val NameMatchConfrimationController = providedetailsRoutes.NameMatchConfirmationController
     val ContactApplicantController = providedetailsRoutes.ContactApplicantController
+    val NotAgentCredentialController = providedetailsRoutes.NotAgentCredentialController
 
     object internal:
       val UcrIndividualController = internalIndividualRoutes.UcrIndividualController

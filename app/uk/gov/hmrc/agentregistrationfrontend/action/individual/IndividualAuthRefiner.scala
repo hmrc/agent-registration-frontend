@@ -26,6 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.Nino as ModelNino
 import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions.*
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
@@ -34,6 +35,7 @@ import uk.gov.hmrc.auth.core.*
 import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -53,24 +55,30 @@ extends RequestAwareLogging:
 
     af.authorised(
       AuthProviders(GovernmentGateway)
-        and AffinityGroup.Individual
     ).retrieve(
       Retrievals.confidenceLevel
         and Retrievals.allEnrolments
         and Retrievals.internalId
         and Retrievals.credentials
+        and Retrievals.affinityGroup
     ).apply:
-      case cl ~ allEnrolments ~ maybeInternalId ~ maybeCredentials =>
-        val internalUserId: InternalUserId = maybeInternalId.map(
-          InternalUserId.apply
-        ).getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing"))
-        val credentials: Credentials = maybeCredentials.getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing"))
-        Future.successful(Right(
-          request
-            .add(credentials)
-            .add(internalUserId)
-            .add(cl)
-        ))
+      case cl ~ allEnrolments ~ maybeInternalId ~ maybeCredentials ~ maybeAffinityGroup =>
+        maybeAffinityGroup match
+          case Some(AffinityGroup.Agent) => Future.successful(Left(redirectToNotForAgentPage))
+          case Some(AffinityGroup.Individual | AffinityGroup.Organisation) =>
+            val internalUserId: InternalUserId = maybeInternalId.map(
+              InternalUserId.apply
+            ).getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing"))
+            val credentials: Credentials = maybeCredentials.getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing"))
+            Future.successful(Right(
+              request
+                .add(credentials)
+                .add(internalUserId)
+                .add(cl)
+            ))
+          case Some(unsupportedAffinityGroup) =>
+            Future.successful(Left(errorResults.unauthorised(message = s"UnsupportedAffinityGroup: $unsupportedAffinityGroup")))
+          case None => Future.successful(Left(errorResults.unauthorised(message = "AffinityGroup missing")))
     .recoverWith: e =>
       Future.successful(Left(recover(e)))
 
@@ -80,29 +88,41 @@ extends RequestAwareLogging:
     given RequestWithData[EmptyData] = request
     af.authorised(
       AuthProviders(GovernmentGateway)
-        and AffinityGroup.Individual
     ).retrieve(
       Retrievals.confidenceLevel
         and Retrievals.allEnrolments
         and Retrievals.internalId
         and Retrievals.credentials
+        and Retrievals.affinityGroup
     ).apply:
-      case cl ~ allEnrolments ~ maybeInternalId ~ maybeCredentials =>
-        val internalUserId: InternalUserId = maybeInternalId
-          .map(InternalUserId.apply)
-          .getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing"))
-        val credentials: Credentials = maybeCredentials
-          .getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing"))
-        Future.successful(Right(
-          request
-            .add(credentials)
-            .add(internalUserId)
-            .add(cl)
-            .add(getUtr(allEnrolments))
-            .add(getNino(allEnrolments))
-        ))
+      case cl ~ allEnrolments ~ maybeInternalId ~ maybeCredentials ~ maybeAffinityGroup =>
+        maybeAffinityGroup match
+          case Some(AffinityGroup.Agent) => Future.successful(Left(redirectToNotForAgentPage))
+          case Some(AffinityGroup.Individual | AffinityGroup.Organisation) =>
+            val internalUserId: InternalUserId = maybeInternalId
+              .map(InternalUserId.apply)
+              .getOrElse(Errors.throwServerErrorException("Retrievals for internalId is missing"))
+            val credentials: Credentials = maybeCredentials
+              .getOrElse(Errors.throwServerErrorException("Retrievals for credentials is missing"))
+            Future.successful(Right(
+              request
+                .add(credentials)
+                .add(internalUserId)
+                .add(cl)
+                .add(getUtr(allEnrolments))
+                .add(getNino(allEnrolments))
+            ))
+          case Some(unsupportedAffinityGroup) =>
+            Future.successful(Left(errorResults.unauthorised(message = s"UnsupportedAffinityGroup: $unsupportedAffinityGroup")))
+          case None => Future.successful(Left(errorResults.unauthorised(message = "AffinityGroup missing")))
     .recoverWith: e =>
       Future.successful(Left(recover(e)))
+
+  private def redirectToNotForAgentPage(using request: RequestHeader): Result = Redirect(
+    AppRoutes.providedetails.NotAgentCredentialController.show(
+      Some(RedirectUrl(appConfig.thisFrontendBaseUrl + request.uri))
+    )
+  )
 
   private def recover(e: Throwable)(using request: RequestHeader): Result =
     e match
@@ -114,7 +134,7 @@ extends RequestAwareLogging:
         errorResults.unauthorised(message = e.reason)
       case e: UnsupportedAffinityGroup =>
         logger.info(s"Unauthorised because of '${e.reason}', ${e.toString}")
-        errorResults.unauthorised(message = e.reason)
+        redirectToNotForAgentPage
       case e: AuthorisationException =>
         logger.info(s"Unauthorised because of '${e.reason}', ${e.toString}")
         errorResults.unauthorised(message = e.toString)

@@ -38,6 +38,15 @@ object AuthStubs {
     responseBody = responseBody
   )
 
+  def stubAuthoriseAgentAffinityOnly(
+    responseBody: String = "{}"
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.POST,
+    urlPattern = wm.urlMatching("/auth/authorise"),
+    responseStatus = Status.OK,
+    responseBody = responseBody
+  )
+
   def verifyAuthorise(count: Int = 1): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlMatching("/auth/authorise"),
