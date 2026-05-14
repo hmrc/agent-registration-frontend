@@ -40,20 +40,27 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AuditStubs:
 
-  private val auditUrlPattern = urlMatching("/write/audit(/merged)?")
+  val stubUrl = "/write/audit.*"
 
-  def stubAuditEvent(): StubMapping = StubMaker.make(
+  def stubAudit(): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
-    urlPattern = auditUrlPattern,
+    urlPattern = urlMatching(stubUrl),
     responseStatus = 204
   )
 
   def verifyAuditEvent(
     auditType: String,
-    count: Int
-  ): Unit = StubMaker.verify(
-    httpMethod = StubMaker.HttpMethod.POST,
-    urlPattern = auditUrlPattern,
-    count = count,
-    requestBody = Some(matchingJsonPath("$.auditType", equalTo(auditType)))
-  )
+    journeyType: Option[String] = None,
+    count: Int = 1
+  ): Unit = {
+    val requestBody =
+      journeyType match
+        case Some(jt) => matchingJsonPath("$.auditType", equalTo(auditType)).and(matchingJsonPath("*.journeyType", equalTo(jt)))
+        case None => matchingJsonPath("$.auditType", equalTo(auditType))
+    StubMaker.verify(
+      httpMethod = StubMaker.HttpMethod.POST,
+      urlPattern = urlMatching(stubUrl),
+      count = count,
+      requestBody = Some(requestBody)
+    )
+  }

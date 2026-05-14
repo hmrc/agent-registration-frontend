@@ -46,7 +46,7 @@ extends ISpec:
 
     "send a continue event when the same user logs back in with a new session" in:
       AuthStubs.stubAuthorise()
-      AuditStubs.stubAuditEvent()
+      AuditStubs.stubAudit()
 
       val applicationFromPreviousSession = tdAll.agentApplicationLlp.afterStarted.copy(cachedSessionId = SessionId("first-session-id"))
 
@@ -65,7 +65,7 @@ extends ISpec:
 
       AgentRegistrationStubs.verifyGetAgentApplication()
       AgentRegistrationStubs.verifyUpdateAgentApplication()
-      AuditStubs.verifyAuditEvent("StartOrContinueApplication", 1)
+      AuditStubs.verifyAuditEvent(auditType = "StartOrContinueApplication", journeyType = Some("Continue"))
 
   private def runGetApplication(
     request: RequestWithData[EmptyTuple]

@@ -78,13 +78,12 @@ extends ControllerSpec:
       )
 
     s"GET $initiateAgentApplicationUrl should create initial agent application" in:
-
       AuthStubs.stubAuthorise()
       AgentRegistrationStubs.stubGetAgentApplicationNoContent()
       AgentRegistrationStubs.stubFindApplicationByApplicationReferenceNoContent(tdAll.applicationReference)
       AgentRegistrationStubs.stubUpdateAgentApplication(tdAll.agentApplicationLlp.afterStarted)
       EnrolmentStoreStubs.stubQueryEnrolmentsAllocatedToGroupNoContent(tdAll.groupId)
-      AuditStubs.stubAuditEvent()
+      AuditStubs.stubAudit()
 
       val response: WSResponse = get(initiateAgentApplicationUrl)
       response.status shouldBe Status.SEE_OTHER
@@ -93,10 +92,11 @@ extends ControllerSpec:
       AgentRegistrationStubs.verifyGetAgentApplication()
       AgentRegistrationStubs.verifyUpdateAgentApplication()
       EnrolmentStoreStubs.verifyQueryEnrolmentsAllocatedToGroup(tdAll.groupId)
-      AuditStubs.verifyAuditEvent("StartOrContinueApplication", 1)
+      AuditStubs.verifyAuditEvent(auditType = "StartOrContinueApplication", journeyType = Some("Start"))
 
     s"GET $initiateAgentApplicationUrl should redirect to taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment when HmrcAsAgentEnrolment is Allocated to the group" in:
       AuthStubs.stubAuthorise()
+      AuditStubs.stubAudit()
 
       EnrolmentStoreStubs.stubQueryEnrolmentsAllocatedToGroup(
         tdAll.groupId,
