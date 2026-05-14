@@ -22,7 +22,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
-import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
+import uk.gov.hmrc.agentregistration.shared.risking.submitforrisking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AgentRegistrationRiskingStubs:
@@ -30,6 +30,7 @@ object AgentRegistrationRiskingStubs:
   def stubSubmitAgentApplication(submitForRiskingRequest: SubmitForRiskingRequest): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration-risking/submit-for-risking"),
+    requestBody = Some(wm.equalToJson(Json.prettyPrint(Json.toJson(submitForRiskingRequest)))),
     responseStatus = 201
   )
 

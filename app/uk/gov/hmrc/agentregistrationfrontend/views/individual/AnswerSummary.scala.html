@@ -112,7 +112,7 @@
 @rows = @{
     val base = Seq(telephoneRow, emailRow)
 
-  val dateOfBirthRows = individualProvidedDetails.getDateOfBirth match {
+  val dateOfBirthRows = individualProvidedDetails.getIndividualDateOfBirth match {
         case IndividualDateOfBirth.Provided(dob) => Seq(dateOfBirthRow(dob))
         case _ => Seq.empty[SummaryListRow]
     }
@@ -123,7 +123,7 @@
         case _: IndividualNino.FromAuth => Seq.empty[SummaryListRow]
     }
 
-    val saUtrRows = individualProvidedDetails.getSaUtr match {
+    val saUtrRows = individualProvidedDetails.getIndividualSaUtr match {
         case IndividualSaUtr.Provided(saUtr) => Seq(hasSaUtrRow("Yes"), saUtrRow(saUtr.value))
         case IndividualSaUtr.NotProvided => Seq(hasSaUtrRow("No"))
         case _: IndividualSaUtr.FromAuth => Seq.empty[SummaryListRow]

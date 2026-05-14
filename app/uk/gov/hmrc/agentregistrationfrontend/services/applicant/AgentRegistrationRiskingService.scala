@@ -17,10 +17,16 @@
 package uk.gov.hmrc.agentregistrationfrontend.services.applicant
 
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotIncorporated
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistration.shared.getCrn
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
-import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
+import uk.gov.hmrc.agentregistration.shared.risking.submitforrisking.*
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationRiskingConnector
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingServiceHelper.*
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
@@ -34,8 +40,71 @@ class AgentRegistrationRiskingService @Inject() (
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
-  def submitForRisking(submitForRiskingRequest: SubmitForRiskingRequest)(using request: RequestHeader): Future[Unit] = agentRegistrationRiskingConnector
-    .submitForRisking(submitForRiskingRequest)
+  def submitForRisking(
+    agentApplication: AgentApplication,
+    individuals: List[IndividualProvidedDetails]
+  )(using request: RequestHeader): Future[Unit] =
+
+    val submitForRiskingRequest: SubmitForRiskingRequest = SubmitForRiskingRequest(
+      applicationData = makeApplicationData(agentApplication),
+      individuals = individuals.map(makeIndividualData)
+    )
+
+    agentRegistrationRiskingConnector.submitForRisking(submitForRiskingRequest)
 
   def getRiskingProgress(applicationReference: ApplicationReference)(using request: RequestHeader): Future[RiskingProgress] = agentRegistrationRiskingConnector
     .getRiskingProgressForApplicant(applicationReference)
+
+object AgentRegistrationRiskingServiceHelper:
+
+  def makeApplicationData(agentApplication: AgentApplication) = ApplicationData(
+    applicationReference = agentApplication.applicationReference,
+    internalUserId = agentApplication.internalUserId,
+    applicantCredentials = agentApplication.applicantCredentials,
+    businessType = agentApplication.businessType,
+    groupId = agentApplication.groupId,
+    applicantContactDetails = ApplicantContactDetailsData(
+      applicantName = agentApplication.getApplicantContactDetails.applicantName,
+      telephoneNumber = agentApplication.getApplicantContactDetails.getTelephoneNumber,
+      applicantEmailAddress = agentApplication.getApplicantContactDetails.getVerifiedEmail
+    ),
+    amlsDetails = AmlsDetailsData(
+      supervisoryBody = agentApplication.getAmlsDetails.supervisoryBody,
+      amlsRegistrationNumber = agentApplication.getAmlsDetails.getAmlsRegistrationNumber,
+      amlsEvidence = agentApplication.getAmlsDetails.amlsEvidence.map: amlsEvidence =>
+        AmlsEvidenceData(
+          fileUploadReference = amlsEvidence.fileUploadReference,
+          fileName = amlsEvidence.fileName
+        )
+    ),
+    agentDetails = AgentDetailsData(
+      businessName = agentApplication.getAgentDetails.businessName,
+      telephoneNumber = agentApplication.getAgentDetails.getTelephoneNumber,
+      agentEmailAddress = agentApplication.getAgentDetails.getAgentEmailAddress.emailAddress.getEmailAddress,
+      agentCorrespondenceAddress = agentApplication.getAgentDetails.getAgentCorrespondenceAddress
+    ),
+    vrns = agentApplication.getVrns,
+    payeRefs = agentApplication.getPayeRefs,
+    crn =
+      agentApplication match
+        case a: IsIncorporated => Some(a.getCrn)
+        case a: IsNotIncorporated => None
+    ,
+    utr = agentApplication.getUtr,
+    safeId = agentApplication.getSafeId
+  )
+
+  def makeIndividualData(i: IndividualProvidedDetails) = IndividualData(
+    personReference = i.personReference,
+    individualName = i.individualName,
+    isPersonOfControl = i.isPersonOfControl,
+    internalUserId = i.getInternalUserId,
+    individualDateOfBirth = i.getIndividualDateOfBirth,
+    telephoneNumber = i.getTelephoneNumber,
+    emailAddress = i.getEmailAddress.emailAddress,
+    individualNino = i.getNino,
+    individualSaUtr = i.getIndividualSaUtr,
+    vrns = i.getVrns,
+    payeRefs = i.getPayeRefs,
+    passedIv = i.getPassedIv
+  )

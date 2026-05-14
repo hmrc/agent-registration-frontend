@@ -22,7 +22,6 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsIdGenerator
 import uk.gov.hmrc.agentregistration.shared.lists.*
-import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
@@ -166,10 +165,8 @@ extends FrontendController(mcc, applicantActions):
     if agentApplication.applicationState.sentForRisking
     then
       agentRegistrationRiskingService.submitForRisking(
-        submitForRiskingRequest = SubmitForRiskingRequest(
-          agentApplication = agentApplication,
-          individuals = individuals
-        )
+        agentApplication = agentApplication,
+        individuals = individuals
       )
     else Future.unit
 
