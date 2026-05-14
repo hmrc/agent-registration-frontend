@@ -25,8 +25,10 @@ import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder
 import com.github.tomakehurst.wiremock.matching.StringValuePattern
 import com.github.tomakehurst.wiremock.matching.UrlPattern
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
+import com.github.tomakehurst.wiremock.verification.LoggedRequest
 import play.api.http.Status
 
+import java.util
 import scala.jdk.CollectionConverters.MapHasAsJava
 import scala.jdk.CollectionConverters.SeqHasAsJava
 
@@ -78,7 +80,8 @@ object StubMaker:
     urlPattern: UrlPattern = wm.urlPathEqualTo("/example/path"),
     queryParams: Map[String, StringValuePattern] = Map.empty,
     requestHeaders: Seq[(String, StringValuePattern)] = Nil,
-    count: Int = 1
+    count: Int = 1,
+    requestBody: Option[ContentPattern[?]] = None
   ): Unit =
     val basePattern =
       requestHeaders
@@ -86,7 +89,17 @@ object StubMaker:
 
     val patternWithParams = queryParams.foldLeft(basePattern)((acc, c) => acc.withQueryParam(c._1, c._2))
 
-    wm.verify(wm.exactly(count), patternWithParams)
+    val patternWithBody =
+      requestBody match
+        case Some(body) => patternWithParams.withRequestBody(body)
+        case None => patternWithParams
+
+    wm.verify(wm.exactly(count), patternWithBody)
+
+  def findAll(
+    httpMethod: HttpMethod = HttpMethod.POST,
+    urlPattern: UrlPattern
+  ): util.List[LoggedRequest] = wm.findAll(initialRequestPatternBuilder(httpMethod)(urlPattern))
 
   private def initialMappingBuilder(httpMethod: HttpMethod): UrlPattern => MappingBuilder =
     httpMethod match

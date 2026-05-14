@@ -93,7 +93,7 @@ extends ControllerSpec:
       AgentRegistrationStubs.verifyGetAgentApplication()
       AgentRegistrationStubs.verifyUpdateAgentApplication()
       EnrolmentStoreStubs.verifyQueryEnrolmentsAllocatedToGroup(tdAll.groupId)
-      AuditStubs.verifyAuditEvent()
+      AuditStubs.verifyAuditEvent("StartOrContinueApplication", 1)
 
     s"GET $initiateAgentApplicationUrl should redirect to taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment when HmrcAsAgentEnrolment is Allocated to the group" in:
       AuthStubs.stubAuthorise()
