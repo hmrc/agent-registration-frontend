@@ -103,7 +103,7 @@ extends FrontendController(mcc, actions):
         case (ConfidenceLevel.L250, Some(nino)) =>
           citizenDetailsConnector
             .getCitizenDetails(nino)
-            .map[RequestWithData[DataWithOptionalCitizenDetails]]: details =>
+            .map[RequestWithData[DataWithOptionalCitizenDetails]]: (details: CitizenDetails) =>
               request.add[Option[CitizenDetails]](Some(details))
         case (cl, Some(nino)) =>
           logger.warn(s"Insufficient confidence level found in session (${cl}), we cannot trust the nino to use in citizen details, redirecting to manual name matching page")
@@ -117,7 +117,7 @@ extends FrontendController(mcc, actions):
       val maybeCitizenDetails: Option[CitizenDetails] = request.get[Option[CitizenDetails]]
       val listOfUnclaimedIndividualProvidedDetails: List[IndividualProvidedDetails] = list.filter(_.internalUserId.isEmpty)
       listOfUnclaimedIndividualProvidedDetails.matchCitizenDetailsName(maybeCitizenDetails) match
-        case Some(individualProvidedDetails) => request.add(individualProvidedDetails)
+        case Some(individualProvidedDetails) => request.add[IndividualProvidedDetails](individualProvidedDetails)
         case None =>
           logger.warn(s"No matching IndividualProvidedDetails record found for citizen details name, redirecting to manual name matching page")
           Redirect(AppRoutes.providedetails.NameMatchingController.show(linkId).url)
@@ -141,7 +141,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         val agentApplication: AgentApplication = request.get
-        val businessTypeKey =
+        val businessTypeKey: String =
           agentApplication match
             case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
             case _: AgentApplicationLimitedCompany => "LimitedCompany"
@@ -171,7 +171,7 @@ extends FrontendController(mcc, actions):
         implicit request =>
           formWithErrors =>
             val agentApplication: AgentApplication = request.get
-            val businessTypeKey =
+            val businessTypeKey: String =
               agentApplication match
                 case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
                 case _: AgentApplicationLimitedCompany => "LimitedCompany"
@@ -229,13 +229,13 @@ extends FrontendController(mcc, actions):
       maybeCitizenDetails match
         case Some(citizenDetails) =>
           val fullName: String = s"${citizenDetails.firstName.getOrElse("")} ${citizenDetails.lastName.getOrElse("")}"
-          val maybeExactMatch = list.find(individualProvidedDetails =>
+          val maybeExactMatch: Option[IndividualProvidedDetails] = list.find(individualProvidedDetails =>
             individualProvidedDetails.individualName.value.toLowerCase === fullName.toLowerCase
           )
           maybeExactMatch match
             case Some(individualProvidedDetails) => Some(individualProvidedDetails)
             case None =>
-              val surnameMatches = list.filter(individualProvidedDetails =>
+              val surnameMatches: List[IndividualProvidedDetails] = list.filter(individualProvidedDetails =>
                 individualProvidedDetails.individualName.value.split(" ")
                   .lastOption.exists(_.toLowerCase === citizenDetails.lastName.getOrElse("").toLowerCase)
               )
