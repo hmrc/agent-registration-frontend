@@ -19,39 +19,44 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
+import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.SaveForLaterPage
+
+import java.time.LocalDate
+import java.time.ZoneId
 
 class SaveForLaterPageSpec
 extends ViewSpec:
 
   val viewTemplate: SaveForLaterPage = app.injector.instanceOf[SaveForLaterPage]
-
+  val expiryDate: LocalDate = tdAll.applicationExpiresAtAsInstant.atZone(ZoneId.systemDefault()).toLocalDate
+  val expiryDateDisplay: String = DisplayDate.displayDateForLang(Some(expiryDate))
   val doc: Document = Jsoup.parse(
-    viewTemplate().body
+    viewTemplate(expiryDate).body
   )
 
   "SaveForLaterPage" should:
 
     "have expected content" in:
       doc.mainContent shouldContainContent
-        """
-          |Your progress has been saved for 30 days
-          |What you need to do next
-          |You need to come back and complete this application within 30 days.
-          |To come back to this application:
-          |Go to the Apply for an agent services account page.
-          |Click on the link under the start button to check the progress of your application.
-          |Sign in again using the same credentials you are currently signed in with.
-          |Continue where you left off
-          |Finish and sign out
-          |"""
+        s"""
+           |Your progress will be saved until $expiryDateDisplay
+           |What you need to do next
+           |You need to come back and complete this application by $expiryDateDisplay.
+           |To come back to this application:
+           |Go to Apply for an agent services account (opens in a new tab).
+           |In the section How long this process takes select the link ‘Check the progress of an existing application’.
+           |Sign in with the agent details you used when you made this application.
+           |Continue with the application
+           |Finish and sign out
+           |"""
           .stripMargin
 
     "have the correct title" in:
-      doc.title() shouldBe "Your progress has been saved for 30 days - Apply for an agent services account - GOV.UK"
+      doc.title() shouldBe s"Your progress will be saved until $expiryDateDisplay - Apply for an agent services account - GOV.UK"
 
     "have the correct h1" in:
-      doc.h1 shouldBe "Your progress has been saved for 30 days"
+      doc.h1 shouldBe s"Your progress will be saved until $expiryDateDisplay"
 
     "have the correct h2" in:
       doc.h2 shouldBe "What you need to do next"
@@ -61,7 +66,7 @@ extends ViewSpec:
         .mainContent
         .selectOrFail("p.govuk-body")
         .first()
-        .text() shouldBe "You need to come back and complete this application within 30 days."
+        .text() shouldBe s"You need to come back and complete this application by $expiryDateDisplay."
 
     "render second paragraph" in:
       doc
@@ -75,9 +80,9 @@ extends ViewSpec:
         .mainContent
         .extractNumberedList().shouldBe(TestNumberedList(
           items = List(
-            "Go to the Apply for an agent services account page.",
-            "Click on the link under the start button to check the progress of your application.",
-            "Sign in again using the same credentials you are currently signed in with."
+            "Go to Apply for an agent services account (opens in a new tab).",
+            "In the section How long this process takes select the link ‘Check the progress of an existing application’.",
+            "Sign in with the agent details you used when you made this application."
           )
         ))
 
@@ -90,7 +95,7 @@ extends ViewSpec:
           .toLink
 
       startPageLink shouldBe TestLink(
-        text = "Apply for an agent services account",
+        text = "Apply for an agent services account (opens in a new tab)",
         href = "https://www.gov.uk/guidance/get-an-hmrc-agent-services-account"
       )
 
@@ -103,7 +108,7 @@ extends ViewSpec:
           .toLink
 
       taskListLink shouldBe TestLink(
-        text = "Continue where you left off",
+        text = "Continue with the application",
         href = "/agent-registration/apply/task-list"
       )
 

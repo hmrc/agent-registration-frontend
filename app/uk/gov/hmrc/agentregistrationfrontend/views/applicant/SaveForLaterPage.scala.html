@@ -15,9 +15,11 @@
  *@
 
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
+@import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 
+@import java.time.LocalDate
 
 @this(
     govukPanel: GovukPanel,
@@ -26,13 +28,14 @@
     appConfig: AppConfig
 )
 
-@()(implicit
+@(applicationExpiryDate: LocalDate)(implicit
         request: RequestHeader,
         messages: Messages
 )
 
 @key = @{"saveForLater"}
-@title = @{messages(s"$key.title")}
+@expiryDate = @{DisplayDate.displayDateForLang(Some(applicationExpiryDate))}
+@title = @{messages(s"$key.title", expiryDate)}
 
 @layout(
     pageTitle = title,
@@ -44,11 +47,11 @@
     ))
 
     <h2 class="govuk-heading-m">@messages(s"$key.h2")</h2>
-    <p class="govuk-body">@messages(s"$key.p1")</p>
+    <p class="govuk-body">@messages(s"$key.p1", expiryDate)</p>
     <p class="govuk-body">@messages(s"$key.p2")</p>
     <ol class="govuk-list govuk-list--number">
         <li>@Html(messages(s"$key.li1", appConfig.govukStartPageUrl))</li>
-        <li>@messages(s"$key.li2")</li>
+        <li>@Html(messages(s"$key.li2"))</li>
         <li>@messages(s"$key.li3")</li>
     </ol>
     <p class="govuk-body">
