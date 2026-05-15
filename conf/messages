@@ -668,6 +668,11 @@ notAgentCredential.title = You need to sign in with personal tax account details
 notAgentCredential.p1 = You signed in with agent account details. To continue, sign in with the details you created for your personal taxes.
 notAgentCredential.continue = Continue
 
+notAgentLogin.title = You need to use your agent sign in details
+notAgentLogin.p1 = You have signed in with details linked to your personal taxes.
+notAgentLogin.p2 = You need to sign in with your agent user ID.
+notAgentLogin.continue = Continue
+
 companiesHouseNameQuery.title = What is your name?
 companiesHouseNameQuery.p1 = We’ll check this against the business records for {0} on Companies House.
 companiesHouseNameQuery.firstName.label = First names
