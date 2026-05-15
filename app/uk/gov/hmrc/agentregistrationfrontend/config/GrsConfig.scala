@@ -29,7 +29,7 @@ class GrsConfig @Inject() (appConfig: AppConfig):
   val enableGrsStub: Boolean = appConfig.enableGrsStub
   val deskProServiceId: String = appConfig.contactFrontendId
   val accessibilityUrl: String = appConfig.accessibilityStatementPath
-  val regime: String = "VATC" // TODO placeholder
+  val regime: String = "ITSA"
 
   def createJourneyUrl(businessType: BusinessType): String =
     val grsUrl: String =

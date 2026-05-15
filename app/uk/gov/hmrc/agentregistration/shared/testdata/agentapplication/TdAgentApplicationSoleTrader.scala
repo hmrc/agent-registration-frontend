@@ -43,6 +43,7 @@ trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdGrsBusinessDetail
       amlsDetails = None,
       agentDetails = None,
       refusalToDealWithCheckResult = None,
+      duplicateAsaCheckResult = None,
       deceasedCheckResult = None,
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
       hasOtherRelevantIndividuals = None,
