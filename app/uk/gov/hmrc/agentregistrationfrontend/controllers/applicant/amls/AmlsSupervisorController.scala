@@ -23,6 +23,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AmlsCode
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
@@ -43,18 +44,31 @@ class AmlsSupervisorController @Inject() (
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = actions
-    .getApplicationInProgress:
+    .getApplicationInProgress
+    .getBusinessPartnerRecord:
       implicit request =>
         val form: Form[AmlsCode] = amlsCodeForm.form.fill(request
           .agentApplication
           .amlsDetails
           .map(_.supervisoryBody))
-        Ok(view(form))
+        Ok(view(
+          form = form,
+          entityName = request.get[BusinessPartnerRecordResponse].getEntityName
+        ))
 
   def submit: Action[AnyContent] =
     actions
       .getApplicationInProgress
-      .ensureValidFormAndRedirectIfSaveForLater(amlsCodeForm.form, implicit r => view(_))
+      .getBusinessPartnerRecord
+      .ensureValidFormAndRedirectIfSaveForLater(
+        amlsCodeForm.form,
+        implicit request =>
+          formWithErrors =>
+            view(
+              form = formWithErrors,
+              entityName = request.get[BusinessPartnerRecordResponse].getEntityName
+            )
+      )
       .async:
         implicit request =>
           val supervisoryBody: AmlsCode = request.get

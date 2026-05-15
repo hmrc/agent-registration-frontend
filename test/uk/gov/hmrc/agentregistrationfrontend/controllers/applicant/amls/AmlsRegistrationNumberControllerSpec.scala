@@ -60,12 +60,12 @@ extends ControllerSpec:
 
   private object ExpectedStrings:
 
-    val heading = "What is your registration number?"
+    val heading = "What is the registration number?"
     val title = s"$heading - Apply for an agent services account - GOV.UK"
     val errorTitle = s"Error: $heading - Apply for an agent services account - GOV.UK"
     val hint = "This is the registration number given to you by your supervisory body."
-    val requiredError = "Enter your registration number"
-    val invalidFormatError = "Enter your registration number in the correct format"
+    val requiredError = "Enter the registration number"
+    val invalidFormatError = "Enter the registration number in the correct format"
 
   "routes should have correct paths and methods" in:
     AppRoutes.apply.amls.AmlsRegistrationNumberController.show shouldBe Call(

@@ -113,9 +113,9 @@ extends ViewSpec:
           |Registration number
           |NONHMRC-REF-AMLS-NUMBER-00001
           |Change Registration number
-          |Evidence of anti-money laundering supervision
+          |Evidence
           |evidence.pdf
-          |Change Evidence of anti-money laundering supervision
+          |Change Evidence
           """.stripMargin
 
     "have the correct title" in:
@@ -137,10 +137,10 @@ extends ViewSpec:
             changeLinkAccessibleContent = "Change Registration number"
           ),
           TestSummaryRow(
-            key = "Evidence of anti-money laundering supervision",
+            key = "Evidence",
             value = "evidence.pdf",
             action = AppRoutes.apply.amls.AmlsEvidenceUploadController.showAmlsEvidenceUploadPage.url,
-            changeLinkAccessibleContent = "Change Evidence of anti-money laundering supervision"
+            changeLinkAccessibleContent = "Change Evidence"
           )
         )
       )

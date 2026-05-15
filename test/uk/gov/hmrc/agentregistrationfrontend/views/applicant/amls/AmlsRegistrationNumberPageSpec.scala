@@ -36,7 +36,7 @@ extends ViewSpec:
       AmlsRegistrationNumberForm(isHmrc = false).form
     ).body
   )
-  private val heading: String = "What is your registration number?"
+  private val heading: String = "What is the registration number?"
 
   "AmlsRegistrationNumberPage view" should:
 
@@ -44,7 +44,7 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         """
           |Anti-money laundering supervision details
-          |What is your registration number?
+          |What is the registration number?
           |Save and continue
           |Save and come back later
           |""".stripMargin
@@ -86,7 +86,7 @@ extends ViewSpec:
           |There is a problem
           |Enter your registration number
           |Anti-money laundering supervision details
-          |What is your registration number?
+          |What is the registration number?
           |Error:
           |Enter your registration number
           |Save and continue

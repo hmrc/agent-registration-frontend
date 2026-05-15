@@ -34,13 +34,14 @@
 )
 
 @(
-        form: Form[AmlsCode])(implicit
+        form: Form[AmlsCode],
+        entityName: String)(implicit
         request: RequestHeader,
         messages: Messages
 )
 
 @key = @{AmlsCodeForm.key}
-@pageTitle = @{messages(s"$key.title")}
+@pageTitle = @{messages(s"$key.title", entityName)}
     
 @layout(
     pageTitle = pageTitle,
