@@ -189,18 +189,22 @@ trait TdBase:
   )
   def businessPartnerRecordResponse: BusinessPartnerRecordResponse = BusinessPartnerRecordResponse(
     organisationName = Some("Test Company Name"),
+    agentReferenceNumber = None,
     individualName = None,
     address = bprRegisteredAddress,
     primaryPhoneNumber = Some(bprPrimaryTelephoneNumber),
-    emailAddress = Some(bprEmailAddress)
+    emailAddress = Some(bprEmailAddress),
+    isAnASAgent = false
   )
 
   def businessPartnerRecordResponseSoleTrader: BusinessPartnerRecordResponse = BusinessPartnerRecordResponse(
     organisationName = None,
+    agentReferenceNumber = None,
     individualName = Some(individualName.value),
     address = bprRegisteredAddress,
     primaryPhoneNumber = Some(bprPrimaryTelephoneNumber),
-    emailAddress = Some(bprEmailAddress)
+    emailAddress = Some(bprEmailAddress),
+    isAnASAgent = false
   )
 
   def fiveOrFewerKeyIndividuals: FiveOrLess = FiveOrLess(

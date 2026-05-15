@@ -22,10 +22,12 @@ import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMi
 
 final case class BusinessPartnerRecordResponse(
   organisationName: Option[String],
+  agentReferenceNumber: Option[String],
   individualName: Option[String],
   address: DesBusinessAddress,
   emailAddress: Option[String],
-  primaryPhoneNumber: Option[String]
+  primaryPhoneNumber: Option[String],
+  isAnASAgent: Boolean
 ):
 
   def getEntityName: String = organisationName.orElse(individualName).getOrThrowExpectedDataMissing("No entity name found")
