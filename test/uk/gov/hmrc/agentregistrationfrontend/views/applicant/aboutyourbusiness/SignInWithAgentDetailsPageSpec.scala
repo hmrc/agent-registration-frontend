@@ -39,12 +39,16 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         """
           |About your business
-          |Sign in with your agent account details
-          |Sign in using the details for your existing agent account.
-          |Your new agent services account will then be linked to those sign in details.
+          |Sign in with your existing agent account details
+          |On the next page, enter the sign in details for your existing agent account.
+          |We’ll link your new agent services account to these sign in details.
           |If you have more than one set of sign in details
-          |Choose the one you want to be linked to your new agent services account.
+          |We can link an agent services account to any existing Government Gateway account, as long as:
+          |it was set up as an account for agents (not for an individual or non-agent organisation)
+          |you can enter the user ID and password when we ask you for them
+          |Adding your agent services account to existing sign in details will not affect any other services you access with those sign in details.
           |Continue
+          |Is this page not working properly? (opens in new tab)
           |"""
           .stripMargin
 
@@ -52,38 +56,24 @@ extends ViewSpec:
       doc.selectOrFail(captionL).text() shouldBe "About your business"
 
     "have the correct title" in:
-      doc.title() shouldBe "Sign in with your agent account details - Apply for an agent services account - GOV.UK"
+      doc.title() shouldBe "Sign in with your existing agent account details - Apply for an agent services account - GOV.UK"
 
     "have the correct h1" in:
-      doc.h1 shouldBe "Sign in with your agent account details"
+      doc.h1 shouldBe "Sign in with your existing agent account details"
 
     "render first paragraph" in:
       doc
         .mainContent
         .selectOrFail("p.govuk-body")
         .first()
-        .text() shouldBe "Sign in using the details for your existing agent account."
+        .text() shouldBe "On the next page, enter the sign in details for your existing agent account."
 
     "render second paragraph" in:
       doc
         .mainContent
         .selectOrFail("p.govuk-body")
         .get(1)
-        .text() shouldBe "Your new agent services account will then be linked to those sign in details."
-
-    "have the correct h2 heading" in:
-      doc
-        .mainContent
-        .selectOrFail("h2")
-        .get(1)
-        .text() shouldBe "If you have more than one set of sign in details"
-
-    "render third paragraph" in:
-      doc
-        .mainContent
-        .selectOrFail("p.govuk-body")
-        .get(2)
-        .text() shouldBe "Choose the one you want to be linked to your new agent services account."
+        .text() shouldBe "We’ll link your new agent services account to these sign in details."
 
     "render a continue link styled as a button" in:
       doc.select("a.govuk-button[role=button]").text() shouldBe "Continue"

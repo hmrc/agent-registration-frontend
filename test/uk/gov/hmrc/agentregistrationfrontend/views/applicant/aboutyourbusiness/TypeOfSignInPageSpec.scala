@@ -27,9 +27,9 @@ extends ViewSpec:
 
   val viewTemplate: TypeOfSignInPage = app.injector.instanceOf[TypeOfSignInPage]
   implicit val doc: Document = Jsoup.parse(viewTemplate(TypeOfSignInForm.form).body)
-  private val heading: String = "Do you have an HMRC online services for agents account?"
+  private val heading: String = "Do you already use HMRC online services on behalf of your clients?"
 
-  "BusinessTypePage" should:
+  "TypeOfSignInPage" should:
 
     "have the correct title" in:
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
@@ -50,7 +50,7 @@ extends ViewSpec:
 
     "render a form error when the form contains an error" in:
       val field = TypeOfSignInForm.key
-      val errorMessage = "Select yes if you have an HMRC online services for agents account"
+      val errorMessage = "Select yes if you use HMRC online services on behalf of your clients?"
       val formWithError = TypeOfSignInForm.form
         .withError(field, errorMessage)
       behavesLikePageWithErrorHandling(

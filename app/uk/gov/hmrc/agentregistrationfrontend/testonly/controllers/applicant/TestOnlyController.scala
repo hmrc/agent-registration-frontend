@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
@@ -133,6 +134,15 @@ extends FrontendController(mcc, actions):
         .addToSession(AgentType.UkTaxAgent)
         .addToSession(BusinessTypeAnswer.PartnershipType)
         .addSession(partnershipType)
+
+  def addUserRoleToSession(
+    userRole: UserRole
+  ): Action[AnyContent] = Action:
+    implicit request =>
+      Ok("user role added to session")
+        .addToSession(AgentType.UkTaxAgent)
+        .addToSession(BusinessTypeAnswer.LimitedCompany) // in specs we are always adding Director
+        .addToSession(userRole)
 
   def addAgentApplicationIdToSession(
     agentApplicationId: AgentApplicationId

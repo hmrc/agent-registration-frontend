@@ -75,7 +75,40 @@ trait WsHelper:
       .delete()
       .futureValue
 
+  def getUnauthenticated[T](
+    uri: String,
+    cookies: Seq[WSCookie] = Seq.empty
+  ): WSResponse =
+    buildUnauthenticatedClient(
+      path = uri,
+      cookies = cookies
+    )
+      .get()
+      .futureValue
+
+  def postUnauthenticated(
+    uri: String,
+    cookies: Seq[WSCookie] = Seq.empty
+  )(body: Map[String, Seq[String]]): WSResponse =
+    buildUnauthenticatedClient(
+      path = uri,
+      cookies = cookies
+    )
+      .withHttpHeaders("Csrf-Token" -> "nocheck")
+      .post(body)
+      .futureValue
+
   val baseUrl: String = "/agent-registration"
+
+  private def buildUnauthenticatedClient(
+    path: String,
+    cookies: Seq[WSCookie] = Seq.empty
+  ): WSRequest = {
+    ws
+      .url(s"http://localhost:$port$baseUrl${path.replace(baseUrl, "")}")
+      .withFollowRedirects(false)
+      .withCookies(cookies*)
+  }
 
   private def buildClient(
     path: String,
