@@ -49,7 +49,7 @@ extends ViewSpec:
     "contain expected content" in:
       doc.mainContent shouldContainContent
         """
-          |Agent services account details
+          |Account contact details
           |What telephone number should we use for your agent services account?
           |(+44) 10794554342
           |This is the number you have given us.

@@ -17,13 +17,14 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.agentdetails.AnswerSummary
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLaterLinks
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
-
 
 @this(
         layout: Layout,
         govukButton: GovukButton,
-        answerSummary: AnswerSummary
+        answerSummary: AnswerSummary,
+        continueOrSaveForLaterLinks: ContinueOrSaveForLaterLinks
 )
 
 @(      agentApplication: AgentApplication)(implicit
@@ -49,10 +50,10 @@
       answers = agentDetails
     )
     <p class="govuk-body">
-      @govukButton(Button(
-          href = Some(AppRoutes.apply.TaskListController.show.url),
-          content = Text(messages("common.confirmAndContinue"))
-      ))
+      @continueOrSaveForLaterLinks(
+        continueHref = AppRoutes.apply.TaskListController.show.url,
+        continueLabel = Some(messages("common.confirmAndContinue"))
+      )
     </p>
 
 }

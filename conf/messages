@@ -166,7 +166,7 @@ contactCheckYourAnswers.email.label = Email address
 contactCheckYourAnswers.change = Change
 
 # Apply / Agent details
-agentDetails.title = Agent services account details
+agentDetails.title = Account contact details
 
 ## Apply / Agent details / business name
 agentBusinessName.title = What business name will you use for clients?

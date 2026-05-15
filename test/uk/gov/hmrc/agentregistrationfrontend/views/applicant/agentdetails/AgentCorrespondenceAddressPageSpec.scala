@@ -72,7 +72,7 @@ extends ViewSpec:
     "contain expected content when there is no other address" in:
       doc.mainContent shouldContainContent
         """
-          |Agent services account details
+          |Account contact details
           |What correspondence address should we use for your agent services account?
           |23 Great Portland Street, London, W1 8LT, GB
           |This is your Companies House registered office address.
@@ -88,7 +88,7 @@ extends ViewSpec:
     "contain expected content when there is an other address" in:
       docWithOther.mainContent shouldContainContent
         """
-          |Agent services account details
+          |Account contact details
           |What correspondence address should we use for your agent services account?
           |23 Great Portland Street, London, W1 8LT, GB
           |This is your Companies House registered office address.
