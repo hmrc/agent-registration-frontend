@@ -22,7 +22,6 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import StartOrContinueApplication.JourneyType
-import uk.gov.hmrc.agentregistrationfrontend.audit.ApplicationSubmitted.createAuditEvent
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
@@ -38,26 +37,20 @@ import scala.concurrent.Future
 class AuditService @Inject (
   auditConnector: DefaultAuditConnector,
   individualProvidedDetailsConnector: IndividualProvidedDetailsConnector
-)(using
-  ec: ExecutionContext
-)
+)(using ExecutionContext)
 extends RequestAwareLogging:
 
-  def auditContinueApplication(agentApplication: AgentApplication)(using request: RequestHeader): Unit =
-    val auditEvent = StartOrContinueApplication.make(agentApplication, JourneyType.Continue)
-    logger.info(s"Auditing continue application event")
-    auditConnector.sendExplicitAudit(
-      auditType = auditEvent.auditType,
-      detail = auditEvent
-    )
+  def auditContinueApplication(agentApplication: AgentApplication)(using request: RequestHeader): Unit = sendEvent(StartOrContinueApplication(
+    applicationReference = agentApplication.applicationReference,
+    journeyType = JourneyType.Continue,
+    entityType = agentApplication.businessType
+  ))
 
-  def auditStartApplication(agentApplication: AgentApplication)(using RequestHeader): Unit =
-    val auditEvent = StartOrContinueApplication.make(agentApplication, JourneyType.Start)
-    logger.info(s"Auditing start application event")
-    auditConnector.sendExplicitAudit(
-      auditType = auditEvent.auditType,
-      detail = auditEvent
-    )
+  def auditStartApplication(agentApplication: AgentApplication)(using RequestHeader): Unit = sendEvent(StartOrContinueApplication(
+    applicationReference = agentApplication.applicationReference,
+    journeyType = JourneyType.Start,
+    entityType = agentApplication.businessType
+  ))
 
   def auditIndividualSubmission(
     applicationReference: ApplicationReference,
@@ -66,25 +59,33 @@ extends RequestAwareLogging:
     for
       individualsOnApplication <- individualProvidedDetailsConnector.findAllForMatching(individualProvidedDetails.agentApplicationId)
       lastIndividualResponse = individualsOnApplication.filterNot(_.personReference === individualProvidedDetails.personReference) forall (_.hasFinished)
-      auditEvent = IndividualSubmission.make(
-        applicationReference,
-        individualProvidedDetails,
+      _ = sendEvent(IndividualSubmission(
+        applicationReference = applicationReference,
+        personReference = individualProvidedDetails.personReference,
+        fullName = individualProvidedDetails.individualName,
         providedByApplicant = individualProvidedDetails.providedByApplicant.getOrElse(false),
+        nino = individualProvidedDetails.individualNino,
+        sautr = individualProvidedDetails.individualSaUtr,
         lastIndividualResponse = lastIndividualResponse
-      )
-      _ =
-        logger.info(s"Auditing individual submission event")
-        auditConnector.sendExplicitAudit(
-          auditType = auditEvent.auditType,
-          detail = auditEvent
-        )
+      ))
     yield ()
 
   def sendRiskingSubmissionEvent(
     agentApplication: AgentApplication,
     individualDetails: List[IndividualProvidedDetails]
-  )(using RequestHeader): Unit =
-    val auditEvent: ApplicationSubmitted = createAuditEvent(agentApplication, individualDetails)
+  )(using RequestHeader): Unit = sendEvent(ApplicationSubmitted(
+    applicationReference = agentApplication.applicationReference,
+    linkId = agentApplication.linkId,
+    isResubmission = false, // TODO Will need changing when risking resubmissions are added
+    utr = agentApplication.getUtr,
+    applicantDetails = agentApplication.getApplicantContactDetails,
+    agentDetails = Some(agentApplication.getAgentDetails),
+    amlsSupervisionDetails = agentApplication.amlsDetails,
+    individualsList = individualDetails
+  ))
+
+  private def sendEvent(auditEvent: AuditEvent)(using RequestHeader): Unit =
+    logger.debug(s"send ExplicitAudit event: ${auditEvent.auditType}...")
     auditConnector.sendExplicitAudit(
       auditType = auditEvent.auditType,
       detail = auditEvent
