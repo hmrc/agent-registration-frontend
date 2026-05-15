@@ -25,7 +25,6 @@ import uk.gov.hmrc.agentregistration.shared.getCrn
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistration.shared.risking.submitforrisking.*
-import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
 import uk.gov.hmrc.agentregistrationfrontend.audit.AuditService
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationRiskingConnector
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingServiceHelper.*
@@ -47,17 +46,15 @@ extends RequestAwareLogging:
     agentApplication: AgentApplication,
     individuals: List[IndividualProvidedDetails]
   )(using request: RequestHeader): Future[Unit] =
-
     val submitForRiskingRequest: SubmitForRiskingRequest = SubmitForRiskingRequest(
       applicationData = makeApplicationData(agentApplication),
       individuals = individuals.map(makeIndividualData)
     )
 
-    agentRegistrationRiskingConnector.submitForRisking(submitForRiskingRequest)
-
-  def submitForRisking(submitForRiskingRequest: SubmitForRiskingRequest)(using request: RequestHeader): Future[Unit] =
-    auditService.sendRiskingSubmissionEvent(submitForRiskingRequest)
-    agentRegistrationRiskingConnector.submitForRisking(submitForRiskingRequest)
+    for
+      _ <- agentRegistrationRiskingConnector.submitForRisking(submitForRiskingRequest)
+      _ = auditService.sendRiskingSubmissionEvent(agentApplication, individuals)
+    yield ()
 
   def getRiskingProgress(applicationReference: ApplicationReference)(using request: RequestHeader): Future[RiskingProgress] =
     agentRegistrationRiskingConnector.getRiskingProgressForApplicant(applicationReference)

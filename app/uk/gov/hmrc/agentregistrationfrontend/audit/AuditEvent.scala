@@ -19,23 +19,15 @@ package uk.gov.hmrc.agentregistrationfrontend.audit
 import play.api.libs.json.Format
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import play.api.libs.json.OWrites
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
-import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.AmlsDetails
-import uk.gov.hmrc.agentregistration.shared.ApplicationReference
-import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
-import uk.gov.hmrc.agentregistration.shared.LinkId
-import uk.gov.hmrc.agentregistration.shared.Utr
-import uk.gov.hmrc.agentregistration.shared.risking.SubmitForRiskingRequest
-import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
+import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 
 sealed trait AuditEvent:
 
@@ -80,7 +72,7 @@ final case class ApplicationSubmitted(
   applicantDetails: ApplicantContactDetails,
   agentDetails: Option[AgentDetails],
   amlsSupervisionDetails: Option[AmlsDetails],
-  individuals: List[IndividualProvidedDetails]
+  individualsList: List[IndividualProvidedDetails]
 )
 extends AuditEvent
 
@@ -88,15 +80,18 @@ object ApplicationSubmitted:
 
   given OWrites[ApplicationSubmitted] = Json.writes[ApplicationSubmitted]
 
-  def requestToAuditEvent(riskingRequest: SubmitForRiskingRequest): ApplicationSubmitted = ApplicationSubmitted(
-    applicationReference = riskingRequest.agentApplication.applicationReference,
-    linkId = riskingRequest.agentApplication.linkId,
+  def createAuditEvent(
+    agentApplication: AgentApplication,
+    individualDetails: List[IndividualProvidedDetails]
+  ): ApplicationSubmitted = ApplicationSubmitted(
+    applicationReference = agentApplication.applicationReference,
+    linkId = agentApplication.linkId,
     isResubmission = false, // TODO Will need changing when risking resubmissions are added
-    utr = riskingRequest.agentApplication.getUtr,
-    applicantDetails = riskingRequest.agentApplication.getApplicantContactDetails,
-    agentDetails = Some(riskingRequest.agentApplication.getAgentDetails),
-    amlsSupervisionDetails = riskingRequest.agentApplication.amlsDetails,
-    individuals = riskingRequest.individuals
+    utr = agentApplication.getUtr,
+    applicantDetails = agentApplication.getApplicantContactDetails,
+    agentDetails = Some(agentApplication.getAgentDetails),
+    amlsSupervisionDetails = agentApplication.amlsDetails,
+    individualsList = individualDetails
   )
 
 final case class IndividualSubmission(
