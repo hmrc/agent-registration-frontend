@@ -44,7 +44,6 @@ extends ViewSpec:
           |I am authorised by Test Company Name to apply for an agent services account with HMRC.
           |The information I have given in this application is accurate to the best of my knowledge.
           |I understand that applying for an HMRC agent services account with the intention to commit tax fraud is a crime.
-          |I understand that HMRC can suspend an agent services account if the agent business or any individual officer working on its behalf, fails up uphold the HMRC standard for agents.
           |Accept and send
           |"""
           .stripMargin
