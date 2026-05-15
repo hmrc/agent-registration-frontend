@@ -31,7 +31,7 @@ extends ViewSpec:
     tdAll.providedDetails.precreated.individualProvidedDetailsId
   )
 
-  val heading = "Confirm that you want to remove Test Name from the list of partners"
+  val heading = "Confirm that you want to remove Test Name from the list of relevant individuals"
 
   val viewTemplate: RemoveKeyIndividualPage = app.injector.instanceOf[RemoveKeyIndividualPage]
 
@@ -76,7 +76,7 @@ extends ViewSpec:
 
     "render a form error when the form contains an error" in:
       val field = RemoveKeyIndividualForm.key
-      val errorMessage = "Select yes if you want to remove Test Name from the list of partners"
+      val errorMessage = "Select yes if you want to remove Test Name from the list of relevant individuals"
       val formWithError = RemoveKeyIndividualForm.form(tdAll.providedDetails.precreated.individualName.value)
         .withError(field, errorMessage)
       behavesLikePageWithErrorHandling(

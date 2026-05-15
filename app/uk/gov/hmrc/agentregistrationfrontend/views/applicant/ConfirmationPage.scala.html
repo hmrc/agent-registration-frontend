@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
@@ -71,6 +72,6 @@
     <a class="govuk-link" href="@{AppRoutes.apply.AgentApplicationController.viewSubmittedApplication.url}">@{messages(s"$key.viewLink")}</a>
   </p>
   <p class="govuk-body govuk-!-display-none-print">
-    <a class="govuk-link" href="#">@{messages(s"$key.signOutLink")}</a>
+    <a class="govuk-link" href="@{AppRoutes.SignOutController.signOutWithContinue(continueUrl = RedirectUrl(appConfig.feedbackFrontendBaseUrl + "/feedback/AGENT_REG_AGENT"))}">@{messages(s"$key.signOutLink")}</a>
   </p>
 }

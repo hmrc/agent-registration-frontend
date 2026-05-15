@@ -42,13 +42,13 @@
 )
 
 @key = @{RemoveKeyIndividualForm.key}
-@title = @{messages(s"$key.title", individualProvidedDetails.individualName.value)}
+@title = @{messages(s"$key.title.otherRelevantIndividuals", individualProvidedDetails.individualName.value)}
 
 @layout(
     pageTitle = title,
     maybeForm = Some(form)
 ) {
-    <h2 class="govuk-caption-l">@messages(s"lists.caption.title.Partnership")</h2>
+    <h2 class="govuk-caption-l">@messages("relevant-individual.caption")</h2>
     @formWithCSRF(action = AppRoutes.apply.listdetails.otherrelevantindividuals.RemoveOtherRelevantIndividualController.submit(individualProvidedDetails._id)) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(

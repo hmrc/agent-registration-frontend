@@ -108,27 +108,28 @@
 }
 
 @rows = @{
-    val base = Seq(telephoneRow, emailRow)
 
   val dateOfBirthRows = providedByApplicant.getDateOfBirth match {
-        case IndividualDateOfBirth.Provided(dob) => Seq(dateOfBirthRow(dob))
-        case _ => Seq.empty[SummaryListRow]
-    }
+    case IndividualDateOfBirth.ApplicantProvided(dob) => Seq(dateOfBirthRow(dob))
+    case _ => Seq.empty[SummaryListRow]
+  }
 
-    val ninoRows = providedByApplicant.getNino match {
-        case IndividualNino.Provided(nino) => Seq(hasNinoRow("Yes"), ninoRow(nino.value))
-        case IndividualNino.NotProvided => Seq(hasNinoRow("No"))
-        case _: IndividualNino.FromAuth => Seq.empty[SummaryListRow]
-    }
+  val base = dateOfBirthRows ++ Seq(telephoneRow, emailRow)
+
+  val ninoRows = providedByApplicant.getNino match {
+    case IndividualNino.Provided(nino) => Seq(hasNinoRow("Yes"), ninoRow(nino.value))
+    case IndividualNino.NotProvided => Seq(hasNinoRow("No"))
+    case _: IndividualNino.FromAuth => Seq.empty[SummaryListRow]
+  }
 
     val saUtrRows = providedByApplicant.getSaUtr match {
-        case IndividualSaUtr.Provided(saUtr) => Seq(hasSaUtrRow("Yes"), saUtrRow(saUtr.value))
-        case IndividualSaUtr.NotProvided => Seq(hasSaUtrRow("No"))
-        case _: IndividualSaUtr.FromAuth => Seq.empty[SummaryListRow]
-        case _: IndividualSaUtr.FromCitizenDetails => Seq.empty[SummaryListRow]
+      case IndividualSaUtr.Provided(saUtr) => Seq(hasSaUtrRow("Yes"), saUtrRow(saUtr.value))
+      case IndividualSaUtr.NotProvided => Seq(hasSaUtrRow("No"))
+      case _: IndividualSaUtr.FromAuth => Seq.empty[SummaryListRow]
+      case _: IndividualSaUtr.FromCitizenDetails => Seq.empty[SummaryListRow]
     }
 
-    base ++ dateOfBirthRows ++ ninoRows ++ saUtrRows
+    base ++ ninoRows ++ saUtrRows
 }
 
 @govukSummaryList(SummaryList(rows = rows))

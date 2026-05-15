@@ -37,7 +37,7 @@ extends ViewSpec:
     "have expected content" in:
       doc.mainContent shouldContainContent
         """
-          |HMRC standard for agents
+          |Relevant individual details
           |Agree to meet the HMRC standard for agents
           |!
           |Warning

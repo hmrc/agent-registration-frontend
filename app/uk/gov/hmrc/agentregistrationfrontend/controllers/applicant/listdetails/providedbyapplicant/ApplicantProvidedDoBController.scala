@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant
 
+import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedDateOfBirth
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.UserRole
+import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedDateOfBirth
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.providedbyapplicant.ApplicantProvidedDoBForm
@@ -66,7 +67,12 @@ extends FrontendController(mcc, actions):
     implicit request =>
       Ok(
         view(
-          form = ApplicantProvidedDoBForm.form,
+          form = ApplicantProvidedDoBForm.form
+            .fill:
+              request.get[ProvidedByApplicant]
+                .individualDateOfBirth
+                .map(_.toUserProvidedDateOfBirth)
+          ,
           applicantProvidedName = Some(request.get[ProvidedByApplicant].individualName.value)
         )
       )
@@ -88,11 +94,9 @@ extends FrontendController(mcc, actions):
       implicit request =>
         val applicantProvidedDetails: ProvidedByApplicant = request.get
         val date: UserProvidedDateOfBirth = request.get
-        val updatedDetails: ProvidedByApplicant = ProvidedByApplicant(
-          individualProvidedDetailsId = applicantProvidedDetails.individualProvidedDetailsId,
-          individualName = applicantProvidedDetails.individualName,
-          individualDateOfBirth = Some(date)
-        )
+        val updatedDetails: ProvidedByApplicant = applicantProvidedDetails
+          .modify(_.individualDateOfBirth)
+          .setTo(Some(date))
         providedByApplicantSessionStore
           .upsert(updatedDetails)
           .map: _ =>

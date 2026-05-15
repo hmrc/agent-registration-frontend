@@ -62,6 +62,7 @@
     pageTitle = title,
     maybeForm = Some(form)
 ) {
+  <h2 class="govuk-caption-l">@messages("relevant-individual.caption")</h2>
     @formWithCSRF(action = AppRoutes.providedetails.IndividualSaUtrController.submit(linkId)) {
         @govukRadios(Radios(
             fieldset = Some(Fieldset(

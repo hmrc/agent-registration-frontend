@@ -194,8 +194,6 @@ GET         /provide-details/confirmation/:linkId                           uk.g
 GET         /provide-details/status/:linkId                                 uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingprogress.RiskingProgressController.show(linkId: LinkId)
 GET         /provide-details/individual-name-search/:linkId                 uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NameMatchingController.show(linkId: LinkId)
 POST        /provide-details/individual-name-search/:linkId                 uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NameMatchingController.submit(linkId: LinkId)
-GET         /provide-details/name-match-confirmation/:linkId                uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NameMatchConfirmationController.show(linkId: LinkId)
-POST        /provide-details/name-match-confirmation/:linkId                uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NameMatchConfirmationController.submit(linkId: LinkId)
 GET         /provide-details/contact-applicant                              uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ContactApplicantController.show
 
 ## Internal Routes for individuals

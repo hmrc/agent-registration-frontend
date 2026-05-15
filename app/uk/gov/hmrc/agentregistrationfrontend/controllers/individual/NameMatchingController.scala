@@ -20,15 +20,17 @@ import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.LinkId
+import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.forms.individual.NameMatchingForm
-import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.addToSession
+import uk.gov.hmrc.agentregistrationfrontend.connectors.CitizenDetailsConnector
+import uk.gov.hmrc.agentregistrationfrontend.forms.individual.IndividualNameSearchForm
+import uk.gov.hmrc.agentregistrationfrontend.model.citizendetails.CitizenDetails
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.NameMatchingPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualNameSearchPage
+import uk.gov.hmrc.auth.core.ConfidenceLevel
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -40,16 +42,18 @@ class NameMatchingController @Inject() (
   mcc: MessagesControllerComponents,
   agentApplicationService: AgentApplicationService,
   individualProvideDetailsService: IndividualProvideDetailsService,
-  view: NameMatchingPage
+  citizenDetailsConnector: CitizenDetailsConnector,
+  view: IndividualNameSearchPage
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithIndividualProvidedDetailsForSearch = List[IndividualProvidedDetails] *: AgentApplication *: DataWithAuthAndCl
+  private type DataWithIndividualProvidedDetailsForSearch =
+    Option[CitizenDetails] *: List[IndividualProvidedDetails] *: AgentApplication *: DataWithAdditionalIdentifiers
 
   def baseAction(
     linkId: LinkId
   ): ActionBuilderWithData[DataWithIndividualProvidedDetailsForSearch] = actions
-    .authorised
+    .authorisedWithAdditionalIdentifiers
     .refine:
       implicit request =>
         agentApplicationService
@@ -61,41 +65,63 @@ extends FrontendController(mcc, actions):
       implicit request =>
         individualProvideDetailsService
           .findAllForMatchingWithApplication(request.get[AgentApplication].agentApplicationId)
-          .map:
-            case list: List[IndividualProvidedDetails] if list.exists(_.internalUserId.contains(request.get[InternalUserId])) =>
-              Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url)
-            case list: List[IndividualProvidedDetails] => request.add[List[IndividualProvidedDetails]](list)
+          .map: list =>
+            /** We filter out any provided details that have an internalUserId that does not match the current user, we keep the current user to support back
+              * linking to the search form and submitting again.
+              */
+            request.add[List[IndividualProvidedDetails]](list.filterNot(individual =>
+              individual.internalUserId.isDefined && !individual.internalUserId.contains(request.get[InternalUserId])
+            ))
+    .refine:
+      implicit request =>
+        (request.get[ConfidenceLevel], request.get[Option[Nino]]) match
+          case (ConfidenceLevel.L250, Some(nino)) =>
+            citizenDetailsConnector
+              .getCitizenDetails(nino)
+              .map[RequestWithData[DataWithIndividualProvidedDetailsForSearch]]: details =>
+                request.add[Option[CitizenDetails]](Some(details))
+          case _ => request.add[Option[CitizenDetails]](None)
 
   def show(
     linkId: LinkId
   ): Action[AnyContent] = baseAction(linkId).async:
     implicit request =>
+      val unclaimedIndividuals: List[IndividualProvidedDetails] = request.get
+      val applicantName = request.get[AgentApplication].getApplicantContactDetails.applicantName.value
+      val form = IndividualNameSearchForm.form(unclaimedIndividuals, applicantName)
       Future.successful(Ok(view(
-        form = NameMatchingForm.form,
-        linkId = linkId
+        form = form,
+        linkId = linkId,
+        applicantName = applicantName
       )))
 
   def submit(
     linkId: LinkId
   ): Action[AnyContent] = baseAction(linkId).async:
     implicit request =>
-      NameMatchingForm.form.bindFromRequest().fold(
+      val applicantName = request.get[AgentApplication].getApplicantContactDetails.applicantName.value
+      IndividualNameSearchForm.form(request.get[List[IndividualProvidedDetails]], applicantName).bindFromRequest().fold(
         formWithErrors =>
+          logger.warn(s"Individual name search form submission had errors: ${formWithErrors.errors}")
           Future.successful(BadRequest(view(
             form = formWithErrors,
-            linkId = linkId
-          ))),
-        providedName =>
-          val agentProvidedNamesList = request.get[List[IndividualProvidedDetails]]
-          if agentProvidedNamesList.isNamePresent(providedName) then
-            Future.successful(Redirect(AppRoutes.providedetails.NameMatchConfrimationController.show(linkId))
-              .addToSession(providedName))
+            linkId = linkId,
+            applicantName = applicantName
+          )))
+        ,
+        matchedIndividual =>
+          if
+          matchedIndividual.internalUserId.exists(_ === request.get[InternalUserId]) // we already matched before so don't upsert again
+          then
+            Future.successful(Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url))
           else
-            Future.successful(Redirect(AppRoutes.providedetails.ContactApplicantController.show))
+            individualProvideDetailsService
+              .claimIndividualProvidedDetails(
+                individualProvidedDetails = matchedIndividual
+                  .copy(passedIv = Some(request.get[ConfidenceLevel] === ConfidenceLevel.L250)),
+                internalUserId = request.get[InternalUserId],
+                maybeNino = request.get[Option[Nino]],
+                citizenDetails = request.get[Option[CitizenDetails]]
+              ).map: _ =>
+                Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url)
       )
-
-extension (details: List[IndividualProvidedDetails])
-  private def isNamePresent(name: IndividualName): Boolean = details
-    .filter(_.internalUserId.isEmpty)
-    .exists: agentProvidedDetails =>
-      name === agentProvidedDetails.individualName

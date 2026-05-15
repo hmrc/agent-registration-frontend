@@ -114,7 +114,7 @@ extends RequestAwareLogging:
     individualProvidedDetails: IndividualProvidedDetails,
     internalUserId: InternalUserId,
     maybeNino: Option[Nino],
-    citizenDetails: CitizenDetails
+    citizenDetails: Option[CitizenDetails]
   )(using request: RequestHeader): Future[Unit] = {
     logger.debug(s"Claiming IndividualProvidedDetails for user:[${internalUserId.value}] and applicationId:[${individualProvidedDetails.agentApplicationId.value}]")
     individualProvideDetailsConnector
@@ -125,9 +125,9 @@ extends RequestAwareLogging:
           .modify(_.individualNino)
           .setTo(maybeNino.map(FromAuth(_))) // TODO: Should probably use a concrete nino given we expect CitizenDetails
           .modify(_.individualDateOfBirth)
-          .setTo(citizenDetails.dateOfBirth.map(IndividualDateOfBirth.FromCitizensDetails(_)))
+          .setTo(citizenDetails.flatMap(_.dateOfBirth.map(IndividualDateOfBirth.FromCitizensDetails(_))))
           .modify(_.individualSaUtr)
-          .setTo(citizenDetails.saUtr.map(IndividualSaUtr.FromCitizenDetails(_)))
+          .setTo(citizenDetails.flatMap(_.saUtr.map(IndividualSaUtr.FromCitizenDetails(_))))
           .modify(_.providedDetailsState)
           .setTo(ProvidedDetailsState.Started)
       )

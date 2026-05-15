@@ -59,9 +59,9 @@ class MatchIndividualProvidedDetailsController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithCitizenDetails = CitizenDetails *: List[IndividualProvidedDetails] *: AgentApplication *: DataWithAdditionalIdentifiers
+  private type DataWithOptionalCitizenDetails = Option[CitizenDetails] *: List[IndividualProvidedDetails] *: AgentApplication *: DataWithAdditionalIdentifiers
 
-  private type DataWithMatchedIndividualProvidedDetails = IndividualProvidedDetails *: DataWithCitizenDetails
+  private type DataWithMatchedIndividualProvidedDetails = IndividualProvidedDetails *: DataWithOptionalCitizenDetails
 
   private def baseAction(
     linkId: LinkId,
@@ -103,8 +103,8 @@ extends FrontendController(mcc, actions):
         case (ConfidenceLevel.L250, Some(nino)) =>
           citizenDetailsConnector
             .getCitizenDetails(nino)
-            .map[RequestWithData[DataWithCitizenDetails]]: details =>
-              request.add[CitizenDetails](details)
+            .map[RequestWithData[DataWithOptionalCitizenDetails]]: (details: CitizenDetails) =>
+              request.add[Option[CitizenDetails]](Some(details))
         case (cl, Some(nino)) =>
           logger.warn(s"Insufficient confidence level found in session (${cl}), we cannot trust the nino to use in citizen details, redirecting to manual name matching page")
           Future.successful(Redirect(AppRoutes.providedetails.NameMatchingController.show(linkId).url))
@@ -114,13 +114,13 @@ extends FrontendController(mcc, actions):
     )
     .refine(implicit request =>
       val list: List[IndividualProvidedDetails] = request.get
-      val citizenDetails: CitizenDetails = request.get[CitizenDetails]
+      val maybeCitizenDetails: Option[CitizenDetails] = request.get[Option[CitizenDetails]]
       val listOfUnclaimedIndividualProvidedDetails: List[IndividualProvidedDetails] = list.filter(_.internalUserId.isEmpty)
-      listOfUnclaimedIndividualProvidedDetails.matchCitizenDetailsName(citizenDetails) match
-        case Some(individualProvidedDetails) => request.add(individualProvidedDetails)
+      listOfUnclaimedIndividualProvidedDetails.matchCitizenDetailsName(maybeCitizenDetails) match
+        case Some(individualProvidedDetails) => request.add[IndividualProvidedDetails](individualProvidedDetails)
         case None =>
-          logger.warn(s"No matching IndividualProvidedDetails record found for citizen details, redirecting to contact applicant page")
-          Redirect(AppRoutes.providedetails.ContactApplicantController.show.url)
+          logger.warn(s"No matching IndividualProvidedDetails record found for citizen details name, redirecting to manual name matching page")
+          Redirect(AppRoutes.providedetails.NameMatchingController.show(linkId).url)
     )
     .ensure(
       condition =
@@ -141,7 +141,7 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         val agentApplication: AgentApplication = request.get
-        val businessTypeKey =
+        val businessTypeKey: String =
           agentApplication match
             case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
             case _: AgentApplicationLimitedCompany => "LimitedCompany"
@@ -171,7 +171,7 @@ extends FrontendController(mcc, actions):
         implicit request =>
           formWithErrors =>
             val agentApplication: AgentApplication = request.get
-            val businessTypeKey =
+            val businessTypeKey: String =
               agentApplication match
                 case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
                 case _: AgentApplicationLimitedCompany => "LimitedCompany"
@@ -203,13 +203,13 @@ extends FrontendController(mcc, actions):
                 ),
               internalUserId = request.get[InternalUserId],
               maybeNino = request.get[Option[Nino]],
-              citizenDetails = request.get[CitizenDetails]
+              citizenDetails = request.get[Option[CitizenDetails]]
             )
             .map: _ =>
               Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url)
         else
-          logger.warn(s"User does not agree with the match to IndividualProvidedDetails record ${request.get[IndividualProvidedDetails]._id} for citizen details ${request.get[CitizenDetails]} and user ${request.get[InternalUserId].value}, redirecting to generic exit page")
-          Future.successful(Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url))
+          logger.warn(s"User does not agree with the match to IndividualProvidedDetails record ${request.get[IndividualProvidedDetails]._id} from citizen details for user ${request.get[InternalUserId].value}, redirecting to manual name matching page")
+          Future.successful(Redirect(AppRoutes.providedetails.NameMatchingController.show(linkId).url))
 
   private def currentUrl(implicit request: RequestHeader): String = appConfig.thisFrontendBaseUrl + request.uri
 
@@ -224,24 +224,27 @@ extends FrontendController(mcc, actions):
 
   extension (list: List[IndividualProvidedDetails])
     private def matchCitizenDetailsName(
-      citizenDetails: CitizenDetails
+      maybeCitizenDetails: Option[CitizenDetails]
     )(using request: RequestHeader): Option[IndividualProvidedDetails] =
-      val fullName: String = s"${citizenDetails.firstName.getOrElse("")} ${citizenDetails.lastName.getOrElse("")}"
-      val maybeExactMatch = list.find(individualProvidedDetails =>
-        individualProvidedDetails.individualName.value.toLowerCase === fullName.toLowerCase
-      )
-      maybeExactMatch match
-        case Some(individualProvidedDetails) => Some(individualProvidedDetails)
-        case None =>
-          val surnameMatches = list.filter(individualProvidedDetails =>
-            individualProvidedDetails.individualName.value.split(" ")
-              .lastOption.exists(_.toLowerCase === citizenDetails.lastName.getOrElse("").toLowerCase)
+      maybeCitizenDetails match
+        case Some(citizenDetails) =>
+          val fullName: String = s"${citizenDetails.firstName.getOrElse("")} ${citizenDetails.lastName.getOrElse("")}"
+          val maybeExactMatch: Option[IndividualProvidedDetails] = list.find(individualProvidedDetails =>
+            individualProvidedDetails.individualName.value.toLowerCase === fullName.toLowerCase
           )
-          surnameMatches match
-            case individualProvidedDetails :: Nil => Some(individualProvidedDetails)
-            case Nil => None
-            case surnameList: List[IndividualProvidedDetails] =>
-              surnameList.find(individualProvidedDetails =>
+          maybeExactMatch match
+            case Some(individualProvidedDetails) => Some(individualProvidedDetails)
+            case None =>
+              val surnameMatches: List[IndividualProvidedDetails] = list.filter(individualProvidedDetails =>
                 individualProvidedDetails.individualName.value.split(" ")
-                  .headOption.exists(_.toLowerCase === citizenDetails.firstName.getOrElse("").toLowerCase)
+                  .lastOption.exists(_.toLowerCase === citizenDetails.lastName.getOrElse("").toLowerCase)
               )
+              surnameMatches match
+                case individualProvidedDetails :: Nil => Some(individualProvidedDetails)
+                case Nil => None
+                case surnameList: List[IndividualProvidedDetails] =>
+                  surnameList.find(individualProvidedDetails =>
+                    individualProvidedDetails.individualName.value.split(" ")
+                      .headOption.exists(_.toLowerCase === citizenDetails.firstName.getOrElse("").toLowerCase)
+                  )
+        case None => None
