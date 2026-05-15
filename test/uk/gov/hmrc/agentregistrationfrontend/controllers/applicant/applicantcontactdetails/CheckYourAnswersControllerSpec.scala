@@ -100,7 +100,7 @@ extends ControllerSpec:
           response.status shouldBe Status.OK
           val doc = response.parseBodyAsJsoupDocument
           doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
-          doc.select("h2.govuk-caption-l").text() shouldBe "Applicant contact details"
+          doc.select("h2.govuk-caption-l").text() shouldBe "Your contact details"
           ApplyStubHelper.verifyConnectorsForAuthAction()
 
       case Some(expectedRedirect) =>

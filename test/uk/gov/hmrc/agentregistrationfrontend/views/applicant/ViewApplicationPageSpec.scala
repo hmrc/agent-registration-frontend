@@ -57,7 +57,7 @@ extends ViewSpec:
            |Test Company Name
            |Unique taxpayer reference
            |1234567895
-           |Applicant contact details
+           |Your contact details
            |Name
            |Alice Smith
            |Telephone number

@@ -50,7 +50,7 @@ extends ViewSpec:
     "contain content" in:
       doc.mainContent shouldContainContent
         """
-          |Applicant contact details
+          |Your contact details
           |Check your answers
           |Name
           |Miss Alexa Fantastic
