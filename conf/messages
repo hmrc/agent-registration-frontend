@@ -51,6 +51,13 @@ agentType.NonUkTaxAgent = No, it’s based outside the UK
 agentType.error.required = Select yes if your agent business is based in the UK
 agentType.error.invalid = Select yes if your agent business is based in the UK
 
+# Apply / About your business / Non UK Agent
+nonUkAgent.title = You need to apply in a different way if the business is based outside the UK
+nonUkAgent.heading = You need to apply in a different way if the business is based outside the UK
+nonUkAgent.caption = About your business
+nonUkAgent.p1 = You can still apply online, but the information we ask for is different because the agent business is not in the UK.
+nonUkAgent.guidanceLink = <a class="govuk-link" href={0} target="_blank" rel="noopener noreferrer">Start the application process for a business based outside the UK</a>
+
 ## Apply / About your business / business type
 
 # Apply / About your application / business type
