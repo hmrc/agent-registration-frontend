@@ -57,7 +57,7 @@ object CompletedSection:
     case object LlpAgentServicesAccountDetails
     extends CompletedSectionLlp:
 
-      override def sectionName: String = "Agent services account details"
+      override def sectionName: String = "Account contact details"
       override def displayOrder: Int = 3
       override def agentApplication: AgentApplication = TdTestOnly.llp.twoChOfficers.agentApplicationLlp.afterAgentDetailsComplete
 
@@ -130,7 +130,7 @@ object CompletedSection:
     case object SoleTraderAgentServicesAccountDetails
     extends CompletedSectionSoleTrader:
 
-      override def sectionName: String = "Agent services account details"
+      override def sectionName: String = "Account contact details"
       override def displayOrder: Int = 3
       override def agentApplication: AgentApplication = TdTestOnly.agentApplicationSoleTrader.afterAgentDetailsComplete
 
@@ -180,7 +180,7 @@ object CompletedSection:
     case object GeneralPartnershipAgentServicesAccountDetails
     extends CompletedSectionGeneralPartnership:
 
-      override def sectionName: String = "Agent services account details"
+      override def sectionName: String = "Account contact details"
       override def displayOrder: Int = 3
       override def agentApplication: AgentApplication = TdTestOnly.agentApplicationGeneralPartnership.afterAgentDetailsComplete
 
@@ -253,7 +253,7 @@ object CompletedSection:
     case object ScottishPartnershipAgentServicesAccountDetails
     extends CompletedSectionScottishPartnership:
 
-      override def sectionName: String = "Agent services account details"
+      override def sectionName: String = "Account contact details"
       override def displayOrder: Int = 3
       override def agentApplication: AgentApplication = TdTestOnly.agentApplicationScottishPartnership.afterAgentDetailsComplete
 
@@ -326,7 +326,7 @@ object CompletedSection:
     case object LimitedCompanyAgentServicesAccountDetails
     extends CompletedSectionLimitedCompany:
 
-      override def sectionName: String = "Agent services account details"
+      override def sectionName: String = "Account contact details"
       override def displayOrder: Int = 3
       override def agentApplication: AgentApplication = TdTestOnly.agentApplicationLimitedCompany.afterAgentDetailsComplete
 
@@ -399,7 +399,7 @@ object CompletedSection:
     case object LimitedPartnershipAgentServicesAccountDetails
     extends CompletedSectionLimitedPartnership:
 
-      override def sectionName: String = "Agent services account details"
+      override def sectionName: String = "Account contact details"
       override def displayOrder: Int = 3
       override def agentApplication: AgentApplication = TdTestOnly.agentApplicationLimitedPartnership.afterAgentDetailsComplete
 
@@ -472,7 +472,7 @@ object CompletedSection:
     case object ScottishLimitedPartnershipAgentServicesAccountDetails
     extends CompletedSectionScottishLimitedPartnership:
 
-      override def sectionName: String = "Agent services account details"
+      override def sectionName: String = "Account contact details"
       override def displayOrder: Int = 3
       override def agentApplication: AgentApplication = TdTestOnly.agentApplicationScottishLimitedPartnership.afterAgentDetailsComplete
 

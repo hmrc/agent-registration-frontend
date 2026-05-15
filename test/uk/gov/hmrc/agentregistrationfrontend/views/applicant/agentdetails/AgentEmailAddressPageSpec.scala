@@ -49,7 +49,7 @@ extends ViewSpec:
     "contain expected content" in:
       doc.mainContent shouldContainContent
         """
-          |Agent services account details
+          |Account contact details
           |What email address should we use for your agent services account?
           |user@test.com
           |This is the email address you have given us.

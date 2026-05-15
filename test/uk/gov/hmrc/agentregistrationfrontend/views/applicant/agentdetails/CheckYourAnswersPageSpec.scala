@@ -45,7 +45,7 @@ extends ViewSpec:
     "contain content" in:
       doc.mainContent shouldContainContent
         """
-          |Agent services account details
+          |Account contact details
           |Check your answers
           |Name shown to clients
           |Test Company Name
