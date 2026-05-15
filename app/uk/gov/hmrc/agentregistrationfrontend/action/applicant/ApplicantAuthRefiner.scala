@@ -24,6 +24,7 @@ import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
@@ -34,6 +35,7 @@ import uk.gov.hmrc.auth.core.AuthProvider.GovernmentGateway
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.*
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 import scala.annotation.nowarn
 import scala.concurrent.ExecutionContext
@@ -109,12 +111,12 @@ extends RequestAwareLogging:
           )
         ))
       case e: UnsupportedAffinityGroup =>
-        logger.info(s"Unauthorised because of '${e.reason}', ${e.toString}")
-        Future.successful(Left(
-          errorResults.unauthorised(
-            message = e.reason
+        logger.info(s"Unauthorised because of '${e.reason}', redirecting to the not agent login page")
+        Future.successful(Left(Redirect(
+          AppRoutes.apply.NotAgentLoginController.show(
+            Some(RedirectUrl(appConfig.thisFrontendBaseUrl + request.uri))
           )
-        ))
+        )))
       case e: UnsupportedCredentialRole =>
         logger.info(s"Unauthorised because of '${e.reason}', ${e.toString}")
         Future.successful(Left(

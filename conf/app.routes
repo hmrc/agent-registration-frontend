@@ -18,6 +18,7 @@ GET         /apply/save-and-come-back-later                         uk.gov.hmrc.
 GET         /apply/cannot-confirm-identity                          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.CanNotConfirmIdentityController.show
 GET         /apply/cannot-register                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.CanNotRegisterController.show
 GET         /apply/not-agent-credential                             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NotAgentCredentialController.show(continueUrl: Option[RedirectUrl])
+GET         /apply/not-agent-login                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.NotAgentLoginController.show(continueUrl: Option[RedirectUrl])
 GET         /apply/exit                                             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.genericExitPage
 
 ## About your business routes

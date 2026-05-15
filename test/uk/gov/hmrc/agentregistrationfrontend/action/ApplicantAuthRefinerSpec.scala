@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.D
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 import scala.concurrent.Future
 
@@ -69,6 +70,18 @@ extends ISpec:
         .value
     contentAsString(Future.successful(result)) should include("unauthorised.heading")
     result.header.status shouldBe Status.UNAUTHORIZED
+    AuthStubs.verifyAuthorise()
+
+  "when the affinity group is not Agent the action redirects to the not agent login page" in:
+    val authRefiner: ApplicantAuthRefiner = app.injector.instanceOf[ApplicantAuthRefiner]
+    AuthStubs.stubUnauthorized(reason = "UnsupportedAffinityGroup")
+    authRefiner
+      .refine(tdAll.requestLoggedIn)
+      .futureValue
+      .left
+      .value shouldBe Redirect(
+      AppRoutes.apply.NotAgentLoginController.show(Some(RedirectUrl(s"$thisFrontendBaseUrl/")))
+    )
     AuthStubs.verifyAuthorise()
 
   "active HMRC-AS-AGENT enrolment MUST NOT be assigned to user or else the action redirects to ASA Dashboard" in:
