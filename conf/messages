@@ -114,7 +114,7 @@ confirmDeleteAndStartAgain.title = Confirm you want to delete your application a
 
 # Apply / Applicant contact details
 
-applicant-contact-details.title = Applicant contact details
+applicant-contact-details.title = Your contact details
 
 ## Apply / Applicant contact details / Llp role
 applicantRoleInLlp.title = Are you a member of the limited liability partnership?
@@ -150,7 +150,7 @@ telephoneNumber.error.tooLong = The phone number must be 24 characters or fewer
 
 ## Apply / Applicant contact details / Email address
 emailAddress.title = If we need to email you about this application, what’s the email address?
-emailAddress.hint = We will send a code to this email address to confirm it.
+emailAddress.hint = We will send a confirmation code to this email address.
 emailAddress.error.required = Enter your email address
 emailAddress.error.invalid = Enter your email address with a name, @ symbol and a domain name, like yourname@example.com
 emailAddress.error.tooLong = The email address must be 132 characters or fewer
@@ -199,7 +199,7 @@ agentEmailAddress.bpr.hint = This is the email address HMRC has in your business
 agentEmailAddress.other = Something else
 agentEmailAddress.error.required = Enter the email address for your agent services account
 otherAgentEmailAddress.label = Enter the email address you want to use
-otherAgentEmailAddress.hint = We will send a code to this email address to confirm it.
+otherAgentEmailAddress.hint = We will send a confirmation code to this email address.
 otherAgentEmailAddress.error.required = Enter the email address for your agent services account
 otherAgentEmailAddress.error.invalid = Enter an email address in the correct format, like name@example.com
 otherAgentEmailAddress.error.tooLong = The email address must be 132 characters or fewer
@@ -596,9 +596,9 @@ taskList.expiryNotice = You have until {0} to complete this application.
 taskList.businessDetails.heading = Tell us about your business
 taskList.businessDetails.linkText = About your business
 taskList.contact.heading = How to contact you
-taskList.contact.linkText = Applicant contact details
-taskList.accountDetails.heading = How you want your account set up
-taskList.accountDetails.linkText = Agent services account details
+taskList.contact.linkText = Your contact details
+taskList.accountDetails.heading = How you want your agent services account set up
+taskList.accountDetails.linkText = Account contact details
 taskList.hmrcStandards.heading = Meet the HMRC standard for agents
 taskList.hmrcStandards.amls.linkText = Anti-money laundering supervision details
 taskList.hmrcStandards.agreement.linkText = HMRC standard for agents
@@ -621,7 +621,7 @@ taskList.declaration.linkText = Declare and submit
 # Apply / View application
 viewApplication.title = Application for {0}
 viewApplication.subHeading = Application reference: {0}
-viewApplication.contact.h2 = Applicant contact details
+viewApplication.contact.h2 = Your contact details
 viewApplication.agentdetails.h2 = Agency contact details
 viewApplication.amls.h2 = Anti-money laundering supervision details
 viewApplication.hmrcStandard.h2 = HMRC standard for agents
@@ -694,7 +694,7 @@ individualTelephoneNumber.error.tooLong = The phone number must be 24 characters
 ## Individual Email Address
 
 individualEmailAddress.title = What is your email address?
-individualEmailAddress.hint = We will send a code to this email address to confirm it.
+individualEmailAddress.hint = We will send a confirmation code to this email address.
 individualEmailAddress.error.required = Enter your email address
 individualEmailAddress.error.invalid = Enter your email address with a name, @ symbol and a domain name, like yourname@example.com
 individualEmailAddress.error.tooLong = The email address must be 132 characters or fewer

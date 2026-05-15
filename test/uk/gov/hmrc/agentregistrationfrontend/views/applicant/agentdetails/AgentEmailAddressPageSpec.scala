@@ -58,7 +58,7 @@ extends ViewSpec:
           |or
           |Something else
           |Enter the email address you want to use
-          |We will send a code to this email address to confirm it.
+          |We will send a confirmation code to this email address.
           |Save and continue
           |Save and come back later
           |Is this page not working properly? (opens in new tab)
