@@ -19,9 +19,12 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.SaveForLaterPage
 
+import java.time.Instant
+import java.time.ZoneId
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -36,4 +39,10 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] = actions
     .getApplicationInProgress:
       implicit request =>
-        Ok(saveForLaterPage())
+        val agentApplication: AgentApplication = request.get
+        val applicationExpiryInstant: Instant = agentApplication
+          .applicationExpiresAt
+          .getOrThrowExpectedDataMissing("Application expiry date is missing from application in progress")
+        Ok(saveForLaterPage(
+          applicationExpiryDate = applicationExpiryInstant.atZone(ZoneId.systemDefault()).toLocalDate
+        ))

@@ -639,14 +639,14 @@ viewApplication.whatNext.p3 = Your can check the progress of your application by
 viewApplication.print = Print this page
 
 # Save for later
-saveForLater.title = Your progress has been saved for 30 days
+saveForLater.title = Your progress will be saved until {0}
 saveForLater.h2 = What you need to do next
-saveForLater.p1 = You need to come back and complete this application within 30 days.
+saveForLater.p1 = You need to come back and complete this application by {0}.
 saveForLater.p2 = To come back to this application:
-saveForLater.li1 = Go to the <a class="govuk-link" href="{0}">Apply for an agent services account</a> page.
-saveForLater.li2 = Click on the link under the start button to check the progress of your application.
-saveForLater.li3 = Sign in again using the same credentials you are currently signed in with.
-saveForLater.continueLink = Continue where you left off
+saveForLater.li1 = Go to <a class="govuk-link" href="{0}" rel="noreferrer noopener">Apply for an agent services account (opens in a new tab)</a>.
+saveForLater.li2 = In the section <strong>How long this process takes</strong> select the link ‘Check the progress of an existing application’.
+saveForLater.li3 = Sign in with the agent details you used when you made this application.
+saveForLater.continueLink = Continue with the application
 saveForLater.finishLink = Finish and sign out
 
 # Timed out
