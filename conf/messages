@@ -239,18 +239,18 @@ hmrcStandardForAgents.agree.button = Agree and continue
 amlsDetails.title = Anti-money laundering supervision details
 
 ## Apply / Meet the HMRC standard for agents / AmlsDetails / Supervisory body
-amlsSupervisoryBody.title = What is the name of your supervisory body?
+amlsSupervisoryBody.title = What is the name of the supervisory body for {0}?
 amlsSupervisoryBody.hint = Start to enter a name and choose your supervisor from the list
 amlsSupervisoryBody.error.required = Enter a name and choose your supervisor from the list
 amlsSupervisoryBody.error.invalid = Enter a name and choose your supervisor from the list
 
 ## Apply / Meet the HMRC standard for agents / AmlsDetails / Registration number
-amlsRegistrationNumber.title = What is your registration number?
-amlsRegistrationNumber.error.required = Enter your registration number
-amlsRegistrationNumber.error.invalid = Enter your registration number in the correct format
+amlsRegistrationNumber.title = What is the registration number?
+amlsRegistrationNumber.error.required = Enter the registration number
+amlsRegistrationNumber.error.invalid = Enter the registration number in the correct format
 
 ## Apply / Meet the HMRC standard for agents / AmlsDetails / Evidence upload
-amlsEvidenceUpload.title = Evidence of your anti-money laundering supervision
+amlsEvidenceUpload.title = Upload evidence
 amlsEvidenceUpload.p1=Upload evidence to show that {0} is your current anti-money laundering supervisor.
 amlsEvidenceUpload.p2=You can choose what evidence to upload.
 amlsEvidenceUpload.p3=Suitable evidence might be a letter, email or payment receipt from your supervisory body, confirming you’re covered.
@@ -263,7 +263,7 @@ amlsEvidenceUpload.fileTypes.bullet3=email (.txt or .msg)
 amlsEvidenceUpload.fileTypes.bullet4=Microsoft (Word, Excel or PowerPoint)
 amlsEvidenceUpload.fileTypes.bullet5=Open Document Format (ODF)
 amlsEvidenceUpload.label=Choose your file
-amlsEvidenceUpload.scanning.header = Your report is being checked
+amlsEvidenceUpload.scanning.header = Your file is being checked
 amlsEvidenceUpload.scanning.paragraph = Do not close this window, it will refresh automatically.
 amlsEvidenceUpload.error.required = Upload a file as evidence of your anti-money laundering supervision
 amlsEvidenceUpload.error.wrong-file-type = The selected file must be a JPG, JPEG, PNG, TIFF, PDF, TXT, MSG, DOC, DOCX, XLS, XLSX, PPT, PPTX, ODT, ODS or ODP file
@@ -292,7 +292,7 @@ amlsCheckYourAnswers.title = Check your answers
 amlsCheckYourAnswers.supervisoryBody.label = Supervisory body
 amlsCheckYourAnswers.registrationNumber.label = Registration number
 amlsCheckYourAnswers.notApplicable = n/a
-amlsCheckYourAnswers.evidence.label = Evidence of anti-money laundering supervision
+amlsCheckYourAnswers.evidence.label = Evidence
 amlsCheckYourAnswers.change = Change
 
 # Sole trader identity

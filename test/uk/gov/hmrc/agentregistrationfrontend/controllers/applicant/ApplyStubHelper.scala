@@ -43,6 +43,10 @@ object ApplyStubHelper:
     stubsForAuthAction(application)
     AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
 
+  def verifyConnectorsForSuccessfulUpdate(): Unit =
+    verifyConnectorsForAuthAction()
+    AgentRegistrationStubs.verifyUpdateAgentApplication()
+
   def stubsForSuccessfulUpdateWithBpr(
     application: AgentApplication,
     updatedApplication: AgentApplication
@@ -50,8 +54,8 @@ object ApplyStubHelper:
     stubsToSupplyBprToPage(application)
     AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
 
-  def verifyConnectorsForSuccessfulUpdate(): Unit =
-    verifyConnectorsForAuthAction()
+  def verifyConnectorsForSuccessfulUpdateWithBpr(): Unit =
+    verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
 
   def stubsForDeleteAndStartAgain(application: AgentApplication): StubMapping =

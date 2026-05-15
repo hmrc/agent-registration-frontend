@@ -43,7 +43,7 @@ extends ViewSpec:
     ).body
   )
 
-  private val heading: String = "Evidence of your anti-money laundering supervision"
+  private val heading: String = "Upload evidence"
 
   "AmlsEvidenceUploadPage view" should:
 
@@ -51,7 +51,7 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         """
           |Anti-money laundering supervision details
-          |Evidence of your anti-money laundering supervision
+          |Upload evidence
           |Upload evidence to show that Gambling Commission is your current anti-money laundering supervisor.
           |You can choose what evidence to upload.
           |Suitable evidence might be a letter, email or payment receipt from your supervisory body, confirming you’re covered.

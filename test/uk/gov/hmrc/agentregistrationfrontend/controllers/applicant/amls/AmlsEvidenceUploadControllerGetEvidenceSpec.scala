@@ -72,7 +72,7 @@ extends ControllerSpec:
 
   private object ExpectedStrings:
 
-    private val heading = "Evidence of your anti-money laundering supervision"
+    private val heading = "Upload evidence"
     val title: String = s"$heading - Apply for an agent services account - GOV.UK"
 
   s"GET $evidencePath when registration number is missing should redirect to the registration number page" in:

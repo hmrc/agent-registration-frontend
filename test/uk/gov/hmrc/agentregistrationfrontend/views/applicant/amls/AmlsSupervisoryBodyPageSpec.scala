@@ -39,10 +39,10 @@ extends ViewSpec:
   )
 
   val doc: Document = Jsoup.parse(
-    viewTemplate(form).body
+    viewTemplate(form, "Test Company").body
   )
 
-  private val heading: String = "What is the name of your supervisory body?"
+  private val heading: String = "What is the name of the supervisory body for Test Company?"
 
   "AmlsSupervisoryBodyPage view" should:
 
@@ -50,7 +50,7 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         """
           |Anti-money laundering supervision details
-          |What is the name of your supervisory body?
+          |What is the name of the supervisory body for Test Company?
           |Start to enter a name and choose your supervisor from the list
           |Association of TaxationTechnicians (ATT)
           |HM Revenue and Customs (HMRC)
@@ -94,13 +94,13 @@ extends ViewSpec:
       val errorMessage = "Enter a name and choose your supervisor from the list"
       // TODO: form is duplicated, not really testing that such form with this particular error will be used in controller
       val formWithError = form.withError(field, errorMessage)
-      val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
+      val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError, "Test Company").body)
       errorDoc.mainContent shouldContainContent
         """
           |There is a problem
           |Enter a name and choose your supervisor from the list
           |Anti-money laundering supervision details
-          |What is the name of your supervisory body?
+          |What is the name of the supervisory body for Test Company?
           |Start to enter a name and choose your supervisor from the list
           |Error:
           |Enter a name and choose your supervisor from the list
