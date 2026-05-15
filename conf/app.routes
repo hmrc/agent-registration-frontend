@@ -25,6 +25,8 @@ GET         /apply/exit                                             uk.gov.hmrc.
 GET         /apply/about-your-business/agent-type                   uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.AgentTypeController.show
 POST        /apply/about-your-business/agent-type                   uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.AgentTypeController.submit
 
+GET         /apply/about-your-business/non-uk-agent            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.NonUkAgentController.show
+
 GET         /apply/about-your-business/business-type                uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.BusinessTypeSessionController.show
 POST        /apply/about-your-business/business-type                uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.BusinessTypeSessionController.submit
 GET         /apply/about-your-business/partnership-type             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.PartnershipTypeController.show

@@ -54,6 +54,7 @@ class AppConfig @Inject() (
     "urls.govuk-guidance-failed-non-fixable-review-and-appeals",
     configuration
   )
+  val guidanceForNonUkApplicantUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.govuk-guidance-not-based-in-uk", configuration)
   val addressLookupFrontendBaseUrl: String = servicesConfig.baseUrl("address-lookup-frontend")
   val agentsExternalStubsBaseUrl: String = servicesConfig.baseUrl("agents-external-stubs")
   val companiesHouseApiProxyBaseUrl: String = servicesConfig.baseUrl("companies-house-api-proxy")

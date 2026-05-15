@@ -63,6 +63,7 @@ object AppRoutes:
     object aboutyourbusiness:
 
       val AgentTypeController = aboutyourbusinessRoutes.AgentTypeController
+      val NonUkAgentController = aboutyourbusinessRoutes.NonUkAgentController
       val TypeOfSignInController = aboutyourbusinessRoutes.TypeOfSignInController
       val PartnershipTypeController = aboutyourbusinessRoutes.PartnershipTypeController
       val BusinessTypeSessionController = aboutyourbusinessRoutes.BusinessTypeSessionController
