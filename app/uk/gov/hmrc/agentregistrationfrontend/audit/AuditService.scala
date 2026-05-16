@@ -22,6 +22,7 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import StartOrContinueApplication.JourneyType
+import play.api.libs.json.OWrites
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
@@ -84,7 +85,10 @@ extends RequestAwareLogging:
     individualsList = individualDetails
   ))
 
-  private def sendEvent(auditEvent: AuditEvent)(using RequestHeader): Unit =
+  private def sendEvent[E <: AuditEvent](auditEvent: E)(using
+    RequestHeader,
+    OWrites[E]
+  ): Unit =
     logger.debug(s"send ExplicitAudit event: ${auditEvent.auditType}...")
     auditConnector.sendExplicitAudit(
       auditType = auditEvent.auditType,

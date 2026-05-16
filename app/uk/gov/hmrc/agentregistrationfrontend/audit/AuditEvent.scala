@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.audit
 
 import play.api.libs.json.Format
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
+import play.api.libs.json.OWrites
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
@@ -33,9 +33,6 @@ sealed trait AuditEvent:
   val applicationReference: ApplicationReference
   val auditType: String = this.getClass.getSimpleName
 
-object AuditEvent:
-  given OFormat[AuditEvent] = Json.format[AuditEvent]
-
 final case class StartOrContinueApplication(
   applicationReference: ApplicationReference,
   journeyType: StartOrContinueApplication.JourneyType,
@@ -46,7 +43,7 @@ extends AuditEvent
 
 object StartOrContinueApplication:
 
-  given OFormat[StartOrContinueApplication] = Json.format[StartOrContinueApplication]
+  given OWrites[StartOrContinueApplication] = Json.writes[StartOrContinueApplication]
 
   enum JourneyType:
 
@@ -69,7 +66,7 @@ final case class ApplicationSubmitted(
 extends AuditEvent
 
 object ApplicationSubmitted:
-  given OFormat[ApplicationSubmitted] = Json.format[ApplicationSubmitted]
+  given OWrites[ApplicationSubmitted] = Json.writes[ApplicationSubmitted]
 
 final case class IndividualSubmission(
   applicationReference: ApplicationReference,
@@ -83,4 +80,4 @@ final case class IndividualSubmission(
 extends AuditEvent
 
 object IndividualSubmission:
-  given OFormat[IndividualSubmission] = Json.format[IndividualSubmission]
+  given OWrites[IndividualSubmission] = Json.writes[IndividualSubmission]
