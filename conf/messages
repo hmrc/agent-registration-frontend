@@ -565,6 +565,16 @@ cannotRegister.p3 = If your circumstances change and you think you now meet the 
 cannotRegister.p4 = If you disagree with the outcome, you can <a class="govuk-link" href={0}>request a review or appeal the decision</a>.
 cannotRegister.finishAndSignOut = Finish and sign out
 
+# Apply / entitycheckfailed / UnableToConfirmBusinessDetails (GRS failure)
+unableToConfirmBusinessDetails.title = We cannot confirm your business details
+unableToConfirmBusinessDetails.thisMightBeBecause = This might be because:
+unableToConfirmBusinessDetails.bullet1 = you provided incomplete details
+unableToConfirmBusinessDetails.bullet2 = you provided details that did not match the HMRC record
+unableToConfirmBusinessDetails.bullet3 = we could not find a record of the business
+unableToConfirmBusinessDetails.cannotApply = You cannot apply for an agent services account until we can confirm the business details.
+unableToConfirmBusinessDetails.tryAgain = If you think you gave incorrect answers, you can <a class="govuk-link" href={0}>try to confirm the business details again</a>.
+unableToConfirmBusinessDetails.contactHmrc = Alternatively you can <a class="govuk-link" href={0}>contact HMRC</a>.
+
 # About your application / user role
 userRole.Owner.title = Are you the owner of the business?
 userRole.Owner.label = Owner of the business
