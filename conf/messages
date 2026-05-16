@@ -577,6 +577,9 @@ unableToConfirmBusinessDetails.cannotApply = You cannot apply for an agent servi
 unableToConfirmBusinessDetails.tryAgain = If you think you gave incorrect answers, you can <a class="govuk-link" href={0}>try to confirm the business details again</a>.
 unableToConfirmBusinessDetails.contactHmrc = Alternatively you can <a class="govuk-link" href={0}>contact HMRC</a>.
 
+# Apply / entitycheckfailed/ AlreadySubscribed
+alreadySubscribed.title=You already have an agent services account
+
 # About your application / user role
 userRole.Owner.title = Are you the owner of the business?
 userRole.Owner.label = Owner of the business
