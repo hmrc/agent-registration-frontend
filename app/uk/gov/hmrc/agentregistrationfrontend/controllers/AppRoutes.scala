@@ -154,6 +154,7 @@ object AppRoutes:
 
       val CanNotRegisterController = entitycheckfailedRoutes.CanNotRegisterController
       val CanNotConfirmIdentityController = entitycheckfailedRoutes.CanNotConfirmIdentityController
+      val UnableToConfirmBusinessDetailsController = entitycheckfailedRoutes.UnableToConfirmBusinessDetailsController
 
     object internal:
 

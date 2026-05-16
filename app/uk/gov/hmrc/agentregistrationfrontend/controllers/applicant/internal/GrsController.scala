@@ -40,7 +40,6 @@ import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus
 import uk.gov.hmrc.agentregistrationfrontend.services.GrsService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -51,8 +50,7 @@ class GrsController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   grsService: GrsService,
-  agentApplicationService: AgentApplicationService,
-  simplePage: SimplePage
+  agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
@@ -100,27 +98,9 @@ extends FrontendController(mcc, actions):
               case RegistrationStatus.GrsRegistered =>
                 if journeyData.identifiersMatch
                 then onGrsRegisteredAndIdentifiersMatch(request.agentApplication, journeyData)
-                else
-                  Future.successful(Ok(simplePage(
-                    h1 = "Identifiers did not match...",
-                    bodyText = Some(
-                      "Placeholder for the Identifier match failure page..."
-                    )
-                  )))
-              case RegistrationStatus.GrsFailed =>
-                Future.successful(Ok(simplePage(
-                  h1 = "Registration call on GRS failed...",
-                  bodyText = Some(
-                    "Placeholder for the Business registration grs error page... (GrsFailed)"
-                  )
-                )))
-              case RegistrationStatus.GrsNotCalled =>
-                Future.successful(Ok(simplePage(
-                  h1 = "GrsNotCalled...",
-                  bodyText = Some(
-                    "Placeholder for the GrsNotCalled page... (GrsNotCalled) "
-                  )
-                )))
+                else Future.successful(Redirect(AppRoutes.apply.checkfailed.UnableToConfirmBusinessDetailsController.show))
+              case RegistrationStatus.GrsFailed => Future.successful(Redirect(AppRoutes.apply.checkfailed.UnableToConfirmBusinessDetailsController.show))
+              case RegistrationStatus.GrsNotCalled => Future.successful(Redirect(AppRoutes.apply.checkfailed.UnableToConfirmBusinessDetailsController.show))
         yield result
 
   private def onGrsRegisteredAndIdentifiersMatch(

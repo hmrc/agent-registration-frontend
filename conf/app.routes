@@ -17,6 +17,7 @@ GET         /apply/task-list                                        uk.gov.hmrc.
 GET         /apply/save-and-come-back-later                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.SaveForLaterController.show
 GET         /apply/cannot-confirm-identity                          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.CanNotConfirmIdentityController.show
 GET         /apply/cannot-register                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.CanNotRegisterController.show
+GET         /apply/unable-to-confirm-business-details               uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.UnableToConfirmBusinessDetailsController.show
 GET         /apply/not-agent-credential                             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NotAgentCredentialController.show(continueUrl: Option[RedirectUrl])
 GET         /apply/not-agent-login                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.NotAgentLoginController.show(continueUrl: Option[RedirectUrl])
 GET         /apply/exit                                             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.genericExitPage
