@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.otherr
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.forms.OtherRelevantIndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -28,6 +29,12 @@ class EnterIndividualNamePageSpec
 extends ViewSpec:
 
   private val formAction = AppRoutes.apply.listdetails.otherrelevantindividuals.EnterOtherRelevantIndividualController.submit
+  val agentApplication: AgentApplication =
+    tdAll
+      .agentApplicationLlpSections
+      .sectionAgentDetails
+      .whenUsingExistingCompanyName
+      .afterBusinessNameProvided
 
   private val viewTemplate: EnterIndividualNamePage = app.injector.instanceOf[EnterIndividualNamePage]
 
@@ -36,7 +43,8 @@ extends ViewSpec:
     val doc: Document = Jsoup.parse(viewTemplate(
       form = OtherRelevantIndividualNameForm.form,
       formAction = formAction,
-      ordinalKey = "first"
+      ordinalKey = "first",
+      agentApplication = agentApplication
     ).body)
 
     val expectedHeading = messages("otherRelevantIndividualName.label.first")
@@ -44,12 +52,12 @@ extends ViewSpec:
     "have the correct title" in:
       doc.title() shouldBe s"$expectedHeading - Apply for an agent services account - GOV.UK"
 
-    "render the partnership caption" in:
+    "render the correct caption for the business type" in:
       doc
         .mainContent
-        .selectOrFail("h2.govuk-caption-l")
+        .selectOrFail(captionL)
         .selectOnlyOneElementOrFail()
-        .text() shouldBe messages("lists.caption.title.Partnership")
+        .text() shouldBe "LLP members and other relevant individuals"
 
     "render a form with an input of type text" in:
       val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
@@ -91,7 +99,8 @@ extends ViewSpec:
         errorDoc = Jsoup.parse(viewTemplate(
           form = formWithError,
           formAction = formAction,
-          ordinalKey = "first"
+          ordinalKey = "first",
+          agentApplication = agentApplication
         ).body),
         heading = expectedHeading
       )

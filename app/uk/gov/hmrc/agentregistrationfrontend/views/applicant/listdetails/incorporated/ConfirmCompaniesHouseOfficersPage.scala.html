@@ -50,8 +50,7 @@
         agentApplication match {
             case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
             case _: AgentApplicationLimitedCompany => "LimitedCompany"
-            case _: AgentApplicationLimitedPartnership => "LimitedPartnership"
-            case _: AgentApplicationScottishLimitedPartnership => "ScottishLimitedPartnership"
+            case _: AgentApplication.IsPartnership => "Partnership"
         }
     }
 

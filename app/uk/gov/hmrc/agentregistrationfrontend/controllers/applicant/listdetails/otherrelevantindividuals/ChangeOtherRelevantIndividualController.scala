@@ -91,7 +91,8 @@ extends FrontendController(mcc, actions):
         Future.successful(Ok(enterIndividualNamePage(
           form = OtherRelevantIndividualNameForm.form.fill(nameToChange),
           formAction = formAction,
-          ordinalKey = "change"
+          ordinalKey = "change",
+          agentApplication = request.get[IsNotSoleTrader]
         )))
 
   def submit(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] =
@@ -109,7 +110,8 @@ extends FrontendController(mcc, actions):
                 enterIndividualNamePage(
                   form = formWithErrors,
                   formAction = formAction,
-                  ordinalKey = "change"
+                  ordinalKey = "change",
+                  agentApplication = request.get[IsNotSoleTrader]
                 )
               )
       )

@@ -54,6 +54,7 @@ class AppConfig @Inject() (
     "urls.govuk-guidance-failed-non-fixable-review-and-appeals",
     configuration
   )
+  val govukDefinitionOfRelevantIndividualsUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.govuk-definition-of-relevant-individuals", configuration)
   val guidanceForDedicatedHelplinesForAuthorisedAgentsUrl: String = ConfigHelper.readConfigAsValidUrlString(
     "urls.govuk-guidance-dedicated-helplines-for-authorised-agents",
     configuration

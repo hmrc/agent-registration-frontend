@@ -83,7 +83,7 @@ extends ControllerSpec:
       existingIndividuals = List(tdAll.providedDetails.precreated),
       expectedHeading = "You have added 1 partner",
       expectedButtonText = Some("Add another partner Save and come back later"), // there are 2 buttons expected
-      expectedInsetText = Some("We need the names of: the 3 partners responsible for tax advice 2 other partners")
+      expectedInsetText = Some("We need the names of: the 3 partners responsible for tax advice any other 2 partners")
     ),
     TestCase(
       description = "list is incomplete and has 1 existing individual",
@@ -91,7 +91,7 @@ extends ControllerSpec:
       existingIndividuals = List(tdAll.providedDetails.precreated),
       expectedHeading = "You have added 1 partner",
       expectedButtonText = Some("Add another partner Save and come back later"), // there are 2 buttons expected
-      expectedInsetText = Some("You need to tell us about 2 more partners")
+      expectedInsetText = Some("You need to tell us about 2 more partners who are relevant individuals.")
     ),
     TestCase(
       description = "list has too many individuals",
@@ -103,7 +103,7 @@ extends ControllerSpec:
       ),
       expectedHeading = "You have added 3 partners",
       expectedWarningText = Some(
-        "Warning You told us there is 1 partner. Change the number of partners or remove 2 partners from the list before you continue."
+        "Warning You told us there is 1 partner. Remove 2 partners from the list before you continue."
       )
     )
   )

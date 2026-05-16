@@ -16,10 +16,12 @@
 
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo.*
+@import uk.gov.hmrc.agentregistrationfrontend.util.MessageKeys
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.html.components.*
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
+
 @this(
         layout: Layout,
         govukSummaryList: GovukSummaryList,
@@ -27,6 +29,7 @@
         formWithCSRF: FormWithCSRF,
         continueOrSaveForLater: ContinueOrSaveForLater
 )
+
 @(
         existingList: List[IndividualProvidedDetails],
         form: Form[Boolean],
@@ -42,7 +45,7 @@
 }
 
 @title = @{
-    messages(s"$messageKeyPrefix.title", entityName)
+    messages(s"$messageKeyPrefix.title.${MessageKeys.singularOrPlural(existingList.size)}", existingList.size)
 }
 
 @yesNoFieldKey = @{
@@ -54,7 +57,7 @@
 }
 
 @hint = @{
-    messages(s"$messageKeyPrefix.more.hint.$businessTypeKey")
+    messages(s"$messageKeyPrefix.more.hint.$businessTypeKey", entityName)
 }
 
 @summaryRows = @{

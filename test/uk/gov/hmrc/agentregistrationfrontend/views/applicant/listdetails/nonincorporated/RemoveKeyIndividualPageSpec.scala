@@ -31,7 +31,7 @@ extends ViewSpec:
     tdAll.providedDetails.precreated.individualProvidedDetailsId
   )
 
-  val heading = "Confirm that you want to remove Test Name from the list of partners"
+  val heading = "Confirm that you want to remove Test Name from the list"
 
   val viewTemplate: RemoveKeyIndividualPage = app.injector.instanceOf[RemoveKeyIndividualPage]
 

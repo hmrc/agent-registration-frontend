@@ -91,19 +91,8 @@ extends ViewSpec:
       changeNamesHref = AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
     ),
     BusinessTypeTestCase(
-      label = "LimitedPartnership",
+      label = "Partnership",
       agentApplication = tdAll.agentApplicationLimitedPartnership.afterNumberOfConfirmCompaniesHouseOfficers.copy(hasOtherRelevantIndividuals = Some(false)),
-      caption = "Partners and other relevant individuals",
-      numberOfKeyIndividualsLabel = "Number of partners",
-      keyIndividualNamesLabel = "Partner names",
-      changeNumberHref = AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show.url,
-      changeNamesHref = AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
-    ),
-    BusinessTypeTestCase(
-      label = "ScottishLimitedPartnership",
-      agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterNumberOfConfirmCompaniesHouseOfficers.copy(hasOtherRelevantIndividuals =
-        Some(false)
-      ),
       caption = "Partners and other relevant individuals",
       numberOfKeyIndividualsLabel = "Number of partners",
       keyIndividualNamesLabel = "Partner names",

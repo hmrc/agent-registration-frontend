@@ -39,7 +39,7 @@ extends ViewSpec:
 
   private val entityName: String = tdAll.companyName
   private val heading: String = "Other people we need to know about"
-  private val question: String = s"Does $entityName have any other relevant individuals?"
+  private val question: String = s"Are there any non-partner relevant individuals at $entityName?"
 
   private def render(form: play.api.data.Form[Boolean]): Document = Jsoup.parse(viewTemplate(
     form = form,
@@ -56,9 +56,9 @@ extends ViewSpec:
         s"""
            |Partners and other relevant individuals
            |$heading
-           |We also need to know about other relevant individuals.
-           |This means anyone responsible for tax advice at Test Company Name, who is not an official partner.
-           |Read the guidance about how HMRC defines ‘relevant individuals’ (opens in new tab)
+           |We also need to know if Test Company Name has any other relevant individuals.
+           |This means anyone who meets the definition of relevant individual in the Finance Act 2026, but who is not a partner at Test Company Name.
+           |Read the guidance about how we define ‘relevant individuals’ (opens in new tab)
            |$question
            |Yes
            |No

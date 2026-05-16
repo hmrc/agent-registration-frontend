@@ -69,7 +69,7 @@
 
     <h1 class="govuk-heading-l">@h1</h1>
 
-    <p class="govuk-body">@messages(s"$key.p1")</p>
+    <p class="govuk-body">@messages(s"$key.p1", entityName)</p>
     <p class="govuk-body">@messages(s"$key.p2.$businessTypeKey", entityName)</p>
 
   <p class="govuk-body">
@@ -84,7 +84,7 @@
         @govukRadios(Radios(
             fieldset = Some(Fieldset(
                 legend = Some(Legend(
-                    content = Text(messages(s"$key.label", entityName)),
+                    content = Text(messages(s"$key.label.$businessTypeKey", entityName)),
                     isPageHeading = false,
                     classes = "govuk-fieldset__legend--m"
                 ))

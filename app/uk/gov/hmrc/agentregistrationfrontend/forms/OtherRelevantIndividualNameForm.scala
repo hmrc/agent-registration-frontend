@@ -34,6 +34,10 @@ object OtherRelevantIndividualNameForm:
       key -> Forms.of(TextFormatter(ErrorKeys.requiredFieldErrorMessage(key)))
         .transform[String](canonicalise, identity)
         .verifying(
+          ErrorKeys.requiredFieldErrorMessage(key),
+          _.nonEmpty
+        )
+        .verifying(
           ErrorKeys.inputTooLongErrorMessage(key),
           _.length <= 100
         )

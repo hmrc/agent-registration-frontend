@@ -204,7 +204,7 @@ extends FrontendController(mcc, actions):
         form =
           request =>
             val companiesHouseOfficers = request.get[Seq[IndividualName]]
-            Future.successful(NumberCompaniesHouseOfficersForm.form(companiesHouseOfficers.size))
+            Future.successful(NumberCompaniesHouseOfficersForm.form(companiesHouseOfficers.size, businessTypeKey(request.get[IsIncorporated])))
         ,
         resultToServeWhenFormHasErrors =
           implicit request =>
@@ -215,8 +215,8 @@ extends FrontendController(mcc, actions):
               numberOfCompaniesHouseOfficersPage(
                 form = formWithErrors,
                 entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
-                agentApplication = agentApplication,
-                companiesHouseOfficersCount = companiesHouseOfficers.size
+                companiesHouseOfficersCount = companiesHouseOfficers.size,
+                businessTypeKey = businessTypeKey(agentApplication)
               )
       )
       .async:
@@ -276,10 +276,13 @@ extends FrontendController(mcc, actions):
         .getNumberOfCompaniesHouseOfficers
         .collect {
           case SixOrMoreOfficers(_, x) => x
-        }.fold(NumberCompaniesHouseOfficersForm.form(companiesHouseOfficers.size))(NumberCompaniesHouseOfficersForm.form(companiesHouseOfficers.size).fill),
+        }.fold(NumberCompaniesHouseOfficersForm.form(
+          companiesHouseOfficers.size,
+          businessTypeKey(agentApplication)
+        ))(NumberCompaniesHouseOfficersForm.form(companiesHouseOfficers.size, businessTypeKey(agentApplication)).fill),
     entityName = entityName,
-    agentApplication = agentApplication,
-    companiesHouseOfficersCount = companiesHouseOfficers.size
+    companiesHouseOfficersCount = companiesHouseOfficers.size,
+    businessTypeKey = businessTypeKey(agentApplication)
   )))
 
   private def updateApplicationWithOfficerCount(
@@ -316,3 +319,9 @@ extends FrontendController(mcc, actions):
         application
           .modify(_.numberOfIndividuals).setTo(Some(zeroOfficers))
           .modify(_.hasOtherRelevantIndividuals).setTo(Some(true))
+
+  def businessTypeKey(agentApplication: IsIncorporated): String =
+    agentApplication match
+      case _: AgentApplicationLimitedCompany => "LimitedCompany"
+      case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
+      case _: AgentApplication.IsPartnership => "Partnership"

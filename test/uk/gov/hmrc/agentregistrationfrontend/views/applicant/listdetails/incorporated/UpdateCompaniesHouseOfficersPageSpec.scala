@@ -51,14 +51,8 @@ extends ViewSpec:
       p1EntityType = "directors"
     ),
     BusinessTypeTestCase(
-      label = "LimitedPartnership",
+      label = "Partnership",
       agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
-      caption = "Partners and other relevant individuals",
-      p1EntityType = "partners"
-    ),
-    BusinessTypeTestCase(
-      label = "ScottishLimitedPartnership",
-      agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed,
       caption = "Partners and other relevant individuals",
       p1EntityType = "partners"
     )

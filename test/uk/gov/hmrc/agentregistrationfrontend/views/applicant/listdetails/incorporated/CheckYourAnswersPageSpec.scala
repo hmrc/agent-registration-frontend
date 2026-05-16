@@ -70,17 +70,8 @@ extends ViewSpec:
       addAnotherLink = "Add another director"
     ),
     BusinessTypeTestCase(
-      label = "LimitedPartnership",
+      label = "Partnership",
       agentApplication = tdAll.agentApplicationLimitedPartnership.afterNumberOfConfirmCompaniesHouseOfficers,
-      caption = "Partners and other relevant individuals",
-      entityType = "partner",
-      singularTitle = "You have added 1 partner",
-      changeNumberLink = "Change the number of partners",
-      addAnotherLink = "Add another partner"
-    ),
-    BusinessTypeTestCase(
-      label = "ScottishLimitedPartnership",
-      agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterNumberOfConfirmCompaniesHouseOfficers,
       caption = "Partners and other relevant individuals",
       entityType = "partner",
       singularTitle = "You have added 1 partner",

@@ -34,8 +34,6 @@ extends ViewSpec:
 
   private val entityName: String = tdAll.companyName
   private val sixOrMoreOfficers: SixOrMoreOfficers = tdAll.sixOrMoreCompaniesHouseOfficers
-//  private val numberOfMembers: Int = sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters
-//  private val paddingRequired: Int = sixOrMoreOfficers.requiredPadding
   private val ordinalKey: String = "first"
   private val formAction: play.api.mvc.Call = AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitSixOrMore
 
@@ -57,8 +55,7 @@ extends ViewSpec:
     caption: String,
     headingEntityType: String,
     bullet1EntityType: String,
-    bullet2EntityType: String,
-    detailsContent: String
+    bullet2EntityType: String
   )
 
   private val testCases = Seq(
@@ -66,10 +63,9 @@ extends ViewSpec:
       label = "LimitedLiabilityPartnership",
       agentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed,
       caption = "LLP members and other relevant individuals",
-      headingEntityType = "members",
+      headingEntityType = "LLP members",
       bullet1EntityType = "LLP members",
-      bullet2EntityType = "LLP member",
-      detailsContent = "An LLP member is responsible for tax advice if they have:"
+      bullet2EntityType = "LLP member"
     ),
     BusinessTypeTestCase(
       label = "LimitedCompany",
@@ -77,37 +73,26 @@ extends ViewSpec:
       caption = "Directors and other relevant individuals",
       headingEntityType = "directors",
       bullet1EntityType = "directors",
-      bullet2EntityType = "director",
-      detailsContent = "A director is responsible for tax advice if they have:"
+      bullet2EntityType = "director"
     ),
     BusinessTypeTestCase(
-      label = "LimitedPartnership",
+      label = "Partnership",
       agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
       caption = "Partners and other relevant individuals",
       headingEntityType = "partners",
       bullet1EntityType = "partners",
-      bullet2EntityType = "partner",
-      detailsContent = "A partner is responsible for tax advice if they have:"
-    ),
-    BusinessTypeTestCase(
-      label = "ScottishLimitedPartnership",
-      agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed,
-      caption = "Partners and other relevant individuals",
-      headingEntityType = "partners",
-      bullet1EntityType = "partners",
-      bullet2EntityType = "partner",
-      detailsContent = "A partner is responsible for tax advice if they have:"
+      bullet2EntityType = "partner"
     )
   )
 
   for testCase <- testCases do
     s"EnterCompaniesHouseFirstIndividualNamePage for ${testCase.label}" should:
 
-      val heading = s"Tell us about the ${testCase.headingEntityType} of $entityName"
+      val heading = s"Tell us about the ${testCase.headingEntityType} who are relevant individuals"
       val doc: Document = render(CompaniesHouseIndividuaNameForm.form, testCase.agentApplication)
 
       "have the correct caption" in:
-        doc.mainContent.select("h2.govuk-caption-l").text() shouldBe testCase.caption
+        doc.mainContent.select(captionL).text() shouldBe testCase.caption
 
       "have the correct heading" in:
         doc.mainContent.select("h1").text() shouldBe heading
@@ -117,16 +102,13 @@ extends ViewSpec:
 
       "show the correct p1 text" in:
         doc.mainContent.select("p.govuk-body").first().text() shouldBe
-          "We’ll check this against the business records in Companies House."
+          "We need the names of:"
 
       "show the correct padding breakdown bullet1" in:
         doc.mainContent.select("ul.govuk-list--bullet li").first().text() should include(testCase.bullet1EntityType)
 
       "show the correct padding breakdown bullet2" in:
         doc.mainContent.select("ul.govuk-list--bullet li").get(1).text() should include(testCase.bullet2EntityType)
-
-      "show the correct details content" in:
-        doc.mainContent.select(".govuk-details__text").text() should include(testCase.detailsContent)
 
       "render a form with correct action" in:
         val form = doc.mainContent.selectOrFail("form").selectOnlyOneElementOrFail()
