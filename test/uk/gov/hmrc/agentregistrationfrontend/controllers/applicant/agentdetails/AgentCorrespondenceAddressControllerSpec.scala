@@ -16,9 +16,12 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.agentdetails
 
+import com.softwaremill.quicklens.each
+import com.softwaremill.quicklens.modify
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentCorrespondenceAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -137,6 +140,26 @@ extends ControllerSpec:
     val radioForOtherAddress = doc.mainContent.select(s"input#${AgentCorrespondenceAddressForm.key}-3") // third radio button dynamically added for "other" address
     radioForOtherAddress.attr("value") shouldBe """New Line 1, New Line 2, CD3 4EF, GB"""
     radioForOtherAddress.attr("checked") shouldBe "" // checked attribute is present when selected and has no value
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+
+  s"GET $path when CHRO address contains no postcode then the option does not exist on the page" in:
+    val applicationWithChroWithoutPostcode = agentApplication.afterEmailAddressSelected.asLlpApplication
+      .modify(_.businessDetails.each.companyProfile.unsanitisedCHROAddress)
+      .setTo(Some(ChroAddress(
+        address_line_1 = Some("23 Great Portland Street"),
+        address_line_2 = Some("London"),
+        locality = None,
+        postal_code = None,
+        country = Some("GB")
+      )))
+    ApplyStubHelper.stubsToSupplyBprToPage(applicationWithChroWithoutPostcode)
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.OK
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe ExpectedStrings.documentTitle
+    val firstRadio = doc.mainContent.select(s"input#${AgentCorrespondenceAddressForm.key}") // the first radio button
+    firstRadio.attr("value") shouldBe tdAll.bprRegisteredAddress.toValueString // NOT the chro address
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path with selection of BPR address should save data and redirect to CYA page" in:
