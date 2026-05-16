@@ -151,14 +151,23 @@ extends FrontendController(mcc, actions):
             .getCompanyProfile
             .unsanitisedCHROAddress
 
+    /** The schema for CHRO addresses from Companies House allows for the postal code to be missing, but subscription requires a postal code for UK addresses -
+      * it is optional in the subscription API but the rule is, if it's UK then it's required To work around this we treat CHRO addresses with missing postal
+      * codes as invalid options for pre-filling.
+      */
+    val validChroAddressOption: Option[ChroAddress] =
+      chroAddressOption match
+        case Some(chroAddress) if chroAddress.postal_code.isEmpty => None
+        case _ => chroAddressOption
+
     AddressOptions(
-      chroAddress = chroAddressOption,
+      chroAddress = validChroAddressOption,
       bprAddress = bprOption,
       otherAddress = inferAnyOtherAddress(
         existingAddress = agentApplication
           .agentDetails
           .flatMap(_.agentCorrespondenceAddress),
         bprAddress = bprOption,
-        chroAddress = chroAddressOption
+        chroAddress = validChroAddressOption
       )
     )
