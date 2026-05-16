@@ -79,6 +79,8 @@ class AppConfig @Inject() (
   val hmrcAsAgentEnrolment: Enrolment = Enrolment(key = "HMRC-AS-AGENT")
   val citizenDetailsBaseUrl: String = servicesConfig.baseUrl("citizen-details")
 
+  val taxEnrolmentsBaseUrl: String = servicesConfig.baseUrl("tax-enrolments")
+
   def signInUri(
     continueUri: Uri,
     affinityGroup: AffinityGroup

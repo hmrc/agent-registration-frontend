@@ -63,17 +63,17 @@ extends Connector:
   /** ES1: Query groups who have an allocated enrolment
     * https://confluence.tools.tax.service.gov.uk/pages/viewpage.action?spaceKey=GGWRLS&title=ES1+-+Query+groups+who+have+an+allocated+enrolment
     */
-  //TODO: change to return an option? Easier to match on if groups exist or not?
   def queryPrincipleGroupsAllocatedToArn(
     agentReferenceNumber: String
-  )(using RequestHeader): Future[EnrolmentStoreProxyConnector.PrincipalGroupsAllocatedToArn] =
+  )(using RequestHeader): Future[Option[EnrolmentStoreProxyConnector.PrincipalGroupsAllocatedToArn]] =
     val url: URL = url"$baseUrl/enrolment-store/enrolments/HMRC-AS-AGENT~AgentReferenceNumber~$agentReferenceNumber/groups?type=principal"
     httpClient
       .get(url)
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => response.json.as[EnrolmentStoreProxyConnector.PrincipalGroupsAllocatedToArn]
+          case Status.OK => Some(response.json.as[EnrolmentStoreProxyConnector.PrincipalGroupsAllocatedToArn])
+          case Status.NO_CONTENT => None
           case status =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "GET",
@@ -101,9 +101,7 @@ object EnrolmentStoreProxyConnector:
 
   final case class PrincipalGroupsAllocatedToArn(
     principalGroupIds: List[PrincipalGroupId]
-  ):
-
-    def hasPrincipalGroups: Boolean = principalGroupIds.nonEmpty
+  )
 
   object PrincipalGroupsAllocatedToArn:
 
