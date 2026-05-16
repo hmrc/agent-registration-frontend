@@ -343,22 +343,20 @@ exactNumberOfOfficials.error.required = Enter a number between 0 and 5, for exam
 exactNumberOfOfficials.error.invalid = Enter a number between 0 and 5, for example 3
 numberOfOfficialsWhoDealWithTax.error.required = Enter the number who are responsible for tax matters, for example 12 or 3
 numberOfOfficialsWhoDealWithTax.error.invalid = Enter the number who are responsible for tax matters, for example 12 or 3
-numberOfOfficialsWhoDealWithTax.label = How many are responsible for tax matters?
-numberOfOfficialsWhoDealWithTax.hint = This means material responsibility for tax advice activities or significant authority over HMRC interactions.
+numberOfOfficialsWhoDealWithTax.label = How many of these are relevant individuals with a senior role in managing or organising tax adviser activities?
+numberOfOfficialsWhoDealWithTax.linkText = Read the guidance about relevant individuals
 
 individualName.label.first = What is the full name of the first partner?
 individualName.label.subsequent = What is the full name of the next partner?
 individualName.label.only = What is the full name of the partner?
 individualName.complex.title = Tell us about the partners of {0}
+individualName.complex.withPadding.title = Tell us about 5 partners at {0}
 individualName.complex.intro = We need the names of:
-individualName.complex.bullet1.plural = the {0} partners responsible for tax advice
-individualName.complex.bullet1.singular = the partner responsible for tax advice
-individualName.complex.bullet2.plural = {0} other partners
-individualName.complex.bullet2.singular = 1 other partner
-individualName.complex.details = What we mean by ‘responsible for tax advice’
-individualName.complex.details.p1 = A partner is responsible for tax advice if they have:
-individualName.complex.details.bullet1 = material responsibility for tax advice activities
-individualName.complex.details.bullet2 = significant authority over HMRC interactions
+individualName.complex.bullet1.plural = the {0} partners who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
+individualName.complex.bullet1.singular = the partner who meets the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
+individualName.complex.bullet2.plural = any other {0} partners at {1}
+individualName.complex.bullet2.singular = 1 other partner at {1}
+individualName.guidanceLink = Read the guidance about how we define ‘relevant individuals’
 individualName.error.required = Enter the full name of the partner
 individualName.error.invalid = The partner’s name must only include letters a to z, hyphens, apostrophes and spaces
 
@@ -379,10 +377,10 @@ addToListSummary.Partnership.removeExtra.span1.singular = You told us there is 1
 addToListSummary.Partnership.removeExtra.span2.plural = Remove {0} partners from the list before you continue.
 addToListSummary.Partnership.removeExtra.span2.singular = Remove 1 partner from the list before you continue.
 addToListSummary.Partnership.complex.intro = We need the names of:
-addToListSummary.Partnership.complex.bullet1.plural = the {0} partners responsible for tax advice
-addToListSummary.Partnership.complex.bullet1.singular = the partner responsible for tax advice
-addToListSummary.Partnership.complex.bullet2.plural = {0} other partners
-addToListSummary.Partnership.complex.bullet2.singular = 1 other partner
+addToListSummary.Partnership.bullet1.plural = the {0} partners who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
+addToListSummary.Partnership.bullet1.singular = the partner who meets the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
+addToListSummary.Partnership.bullet2.plural = any other {0} partners at {1}
+addToListSummary.Partnership.bullet2.singular = 1 other partner at {1}
 
 
 # Lists of other relevant individuals ("unofficial" directors/partners/members)
@@ -907,8 +905,11 @@ updateCompaniesHousePage.p1.Partnership = As part of this application process, w
 
 # CH officer Name Page - Complex (6+ officers from Companies House)
 companiesHouseIndividuaName.complex.title.LimitedLiabilityPartnership = Tell us about the LLP members who are relevant individuals
+companiesHouseIndividuaName.complex.withPadding.title.LimitedLiabilityPartnership = Tell us about 5 LLP members at {0}
 companiesHouseIndividuaName.complex.title.LimitedCompany = Tell us about the directors who are relevant individuals
+companiesHouseIndividuaName.complex.withPadding.title.LimitedCompany = Tell us about 5 directors at {0}
 companiesHouseIndividuaName.complex.title.Partnership = Tell us about the partners who are relevant individuals
+companiesHouseIndividuaName.complex.withPadding.title.Partnership = Tell us about 5 partners at {0}
 companiesHouseIndividuaName.complex.hint = We’ll check this against the business records in Companies House.
 companiesHouseIndividuaName.guidanceLink = Read the guidance about how we define ‘relevant individuals’
 companiesHouseIndividuaName.complex.p1.LimitedLiabilityPartnership = We need the names of all {0} LLP members who meet the definition of relevant individual under <a class="govuk-link" href="{1}" rel="noreferrer noopener">Chapter 226(2) of the Finance Act 2026 (opens in new tab)</a>.

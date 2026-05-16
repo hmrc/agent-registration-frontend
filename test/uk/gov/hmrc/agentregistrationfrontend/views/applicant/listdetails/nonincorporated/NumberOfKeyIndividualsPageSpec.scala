@@ -53,8 +53,8 @@ extends ViewSpec:
           |5 or fewer
           |What is the exact number?
           |6 or more
-          |How many are responsible for tax matters?
-          |This means material responsibility for tax advice activities or significant authority over HMRC interactions.
+          |How many of these are relevant individuals with a senior role in managing or organising tax adviser activities?
+          |Read the guidance about relevant individuals (opens in new tab)
           |Save and continue
           |Save and come back later
           |Is this page not working properly? (opens in new tab)
