@@ -57,11 +57,11 @@ extends FrontendController(mcc, actions):
         if isAlreadyRegisteredBpr
         then
 //        connect to enrolment-store and check agentReferenceNumber
-          enrolmentStoreProxyConnector.queryPrincipleGroupsAllocatedToArn(bpr.agentReferenceNumber.get).flatMap: groups =>
-            groups match
-              //        if groups are returned
-              case groups if groups.hasPrincipalGroups => ??? //        then show a page telling them they already have an ASA account
-              case _ => ??? //        else allocate enrolments and update known facts and show user a success screen
+          enrolmentStoreProxyConnector.queryPrincipleGroupsAllocatedToArn(bpr.agentReferenceNumber.get).map:
+            //        if groups are returned
+            case groups if groups.exists(_.principalGroupIds.nonEmpty) => Redirect(failedCheckPage) //        then show a page telling them they already have an ASA account
+            case _ => ???
+          //        else allocate enrolments and update known facts and show user a success screen
 
 //        after each branch make sure to set checkResult:
 //            .upsert(request.agentApplication
