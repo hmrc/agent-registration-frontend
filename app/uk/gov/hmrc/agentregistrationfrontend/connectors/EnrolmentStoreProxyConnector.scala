@@ -20,7 +20,9 @@ import play.api.libs.functional.syntax.*
 import play.api.libs.json.Reads
 import play.api.libs.json.__
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector.PrincipalGroupsAllocatedToArn.PrincipalGroupId
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Inject
@@ -58,6 +60,29 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed query for EnrolmentsAllocatedToGroup for $groupId")
 
+  /** ES1: Query groups who have an allocated enrolment
+    * https://confluence.tools.tax.service.gov.uk/pages/viewpage.action?spaceKey=GGWRLS&title=ES1+-+Query+groups+who+have+an+allocated+enrolment
+    */
+  //TODO: change to return an option? Easier to match on if groups exist or not?
+  def queryPrincipleGroupsAllocatedToArn(
+    agentReferenceNumber: String
+  )(using RequestHeader): Future[EnrolmentStoreProxyConnector.PrincipalGroupsAllocatedToArn] =
+    val url: URL = url"$baseUrl/enrolment-store/enrolments/HMRC-AS-AGENT~AgentReferenceNumber~$agentReferenceNumber/groups?type=principal"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => response.json.as[EnrolmentStoreProxyConnector.PrincipalGroupsAllocatedToArn]
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed query for queryGroupsAllocatedToArn for agentReferenceNumber $agentReferenceNumber")
+
   private val baseUrl: String = appConfig.enrolmentStoreProxyBaseUrl + "/enrolment-store-proxy"
 
 object EnrolmentStoreProxyConnector:
@@ -73,3 +98,26 @@ object EnrolmentStoreProxyConnector:
         (__ \ "service").read[String] and
           (__ \ "state").read[String]
       )(Enrolment.apply)
+
+  final case class PrincipalGroupsAllocatedToArn(
+    principalGroupIds: List[PrincipalGroupId]
+  ):
+
+    def hasPrincipalGroups: Boolean = principalGroupIds.nonEmpty
+
+  object PrincipalGroupsAllocatedToArn:
+
+    val empty: PrincipalGroupsAllocatedToArn = PrincipalGroupsAllocatedToArn(
+      principalGroupIds = List.empty
+    )
+
+    given Reads[PrincipalGroupsAllocatedToArn] = (__ \ "principalGroupIds")
+      .readWithDefault[List[PrincipalGroupId]](List.empty)
+      .map(PrincipalGroupsAllocatedToArn.apply)
+
+    final case class PrincipalGroupId(
+      value: String
+    )
+
+    object PrincipalGroupId:
+      given Reads[PrincipalGroupId] = JsonFormatsFactory.makeValueClassFormat

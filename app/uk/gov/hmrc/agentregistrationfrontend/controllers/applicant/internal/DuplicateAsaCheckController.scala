@@ -24,6 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 
 import javax.inject.Inject
@@ -32,7 +33,8 @@ import javax.inject.Singleton
 @Singleton
 class DuplicateAsaCheckController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: ApplicantActions
+  actions: ApplicantActions,
+  enrolmentStoreProxyConnector: EnrolmentStoreProxyConnector
 )
 extends FrontendController(mcc, actions):
 
@@ -54,12 +56,13 @@ extends FrontendController(mcc, actions):
 
         if isAlreadyRegisteredBpr
         then
-          ???
 //        connect to enrolment-store and check agentReferenceNumber
-//        if groups are returned
-//        then show a page telling them they already have an ASA account
-//        else allocate enrolments and update known facts and show user a success screen
-//
+          enrolmentStoreProxyConnector.queryPrincipleGroupsAllocatedToArn(bpr.agentReferenceNumber.get).flatMap: groups =>
+            groups match
+              //        if groups are returned
+              case groups if groups.hasPrincipalGroups => ??? //        then show a page telling them they already have an ASA account
+              case _ => ??? //        else allocate enrolments and update known facts and show user a success screen
+
 //        after each branch make sure to set checkResult:
 //            .upsert(request.agentApplication
 //              .modify(_.isDuplicateAsaCheckRequired)
