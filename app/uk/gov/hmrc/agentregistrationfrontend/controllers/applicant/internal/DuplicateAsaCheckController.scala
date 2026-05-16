@@ -16,31 +16,23 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal
 
-import com.softwaremill.quicklens.*
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.connectors.CitizenDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.model.citizendetails.DesignatoryDetailsResponse
-import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.Future
 
 @Singleton
 class DuplicateAsaCheckController @Inject() (
   mcc: MessagesControllerComponents,
-  actions: ApplicantActions,
-  citizenDetailsConnector: CitizenDetailsConnector,
-  agentApplicationService: AgentApplicationService
+  actions: ApplicantActions
 )
 extends FrontendController(mcc, actions):
 
@@ -56,13 +48,12 @@ extends FrontendController(mcc, actions):
     )
     .async:
       implicit request =>
-        val bpr =
-          request
-            .get[BusinessPartnerRecordResponse]
-        val isAlreadyRegisteredBpr = bpr.isAnASAgent === true && bpr.agentReferenceNumber.isDefined    
+        val bpr = request
+          .get[BusinessPartnerRecordResponse]
+        val isAlreadyRegisteredBpr = bpr.isAnASAgent === true && bpr.agentReferenceNumber.isDefined
 
         if isAlreadyRegisteredBpr
-        then 
+        then
           ???
 //        connect to enrolment-store and check agentReferenceNumber
 //        if groups are returned
@@ -80,7 +71,7 @@ extends FrontendController(mcc, actions):
 //          case CheckResult.Pass => Redirect(nextCheckEndpoint)
 //          case CheckResult.Fail => Redirect(failedCheckPage)
 
-  private def failedCheckPage: Call = AppRoutes.apply.checkfailed.CanNotConfirmIdentityController.show
+  private def failedCheckPage: Call = AppRoutes.apply.checkfailed.AlreadySubscribedController.show
   private def nextCheckEndpoint: Call = AppRoutes.apply.internal.UnifiedCustomerRegistryController.populateApplicationIdentifiersFromUcr
 
   extension (agentApplication: AgentApplication)
