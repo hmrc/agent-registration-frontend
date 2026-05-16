@@ -64,9 +64,9 @@ extends Connector:
     * https://confluence.tools.tax.service.gov.uk/pages/viewpage.action?spaceKey=GGWRLS&title=ES1+-+Query+groups+who+have+an+allocated+enrolment
     */
   def queryPrincipleGroupsAllocatedToArn(
-    agentReferenceNumber: String
+    agentReferenceNumber: Arn
   )(using RequestHeader): Future[Option[EnrolmentStoreProxyConnector.PrincipalGroupsAllocatedToArn]] =
-    val url: URL = url"$baseUrl/enrolment-store/enrolments/HMRC-AS-AGENT~AgentReferenceNumber~$agentReferenceNumber/groups?type=principal"
+    val url: URL = url"$baseUrl/enrolment-store/enrolments/HMRC-AS-AGENT~AgentReferenceNumber~${agentReferenceNumber.value}/groups?type=principal"
     httpClient
       .get(url)
       .execute[HttpResponse]

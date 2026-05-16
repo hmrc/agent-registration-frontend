@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import uk.gov.hmrc.agentregistration.shared.Arn
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.http.client.HttpClientV2
 
@@ -65,58 +66,57 @@ extends Connector:
   // EACD's ES8 API
   def enrol(
     groupId: String,
-    arn: String,
+    arn: Arn,
     enrolmentRequest: EnrolmentRequest
   )(implicit
     rh: RequestHeader
   ): Future[Unit] =
-    val url = url"$taxEnrolmentsBaseUrl/tax-enrolments/groups/$groupId/enrolments/${enrolmentKey(arn)}"
+    val url = url"$taxEnrolmentsBaseUrl/tax-enrolments/groups/$groupId/enrolments/${enrolmentKey(arn.value)}"
     http
       .post(url)
       .withBody(Json.toJson(enrolmentRequest))
       .execute[HttpResponse]
-      .map:
-        response =>
-          response.status match
-            case status if is2xx(status) => ()
-            case status =>
-              Errors.throwUpstreamErrorResponse(
-                httpMethod = "POST",
-                url = url,
-                status = status,
-                response = response
-              )
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => ()
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = status,
+              response = response
+            )
       .andLogOnFailure(s"Failed enrol $arn")
 
-  case class Legacy(previousVerifiers: Seq[KnownFact])
+case class Legacy(previousVerifiers: Seq[KnownFact])
 
-  object Legacy:
-    given format: OFormat[Legacy] = Json.format
+object Legacy:
+  given format: OFormat[Legacy] = Json.format
 
-  case class KnownFactsRequest(
-    verifiers: Seq[KnownFact],
-    legacy: Option[Legacy]
-  )
+case class KnownFactsRequest(
+  verifiers: Seq[KnownFact],
+  legacy: Option[Legacy]
+)
 
-  object KnownFactsRequest:
-    given format: OFormat[KnownFactsRequest] = Json.format
+object KnownFactsRequest:
+  given format: OFormat[KnownFactsRequest] = Json.format
 
-  case class KnownFact(
-    key: String,
-    value: String
-  )
+case class KnownFact(
+  key: String,
+  value: String
+)
 
-  object KnownFact:
-    given format: OFormat[KnownFact] = Json.format
+object KnownFact:
+  given format: OFormat[KnownFact] = Json.format
 
-  case class EnrolmentRequest(
-    userId: String,
-    `type`: String,
-    friendlyName: String,
-    verifiers: Seq[KnownFact]
-  )
+case class EnrolmentRequest(
+  userId: String,
+  `type`: String,
+  friendlyName: String,
+  verifiers: Seq[KnownFact]
+)
 
-  object EnrolmentRequest:
-    given formats: OFormat[EnrolmentRequest] = Json.format
+object EnrolmentRequest:
+  given formats: OFormat[EnrolmentRequest] = Json.format
 
-  private def enrolmentKey(arn: String): String = s"HMRC-AS-AGENT~AgentReferenceNumber~$arn"
+private def enrolmentKey(arn: String): String = s"HMRC-AS-AGENT~AgentReferenceNumber~$arn"

@@ -69,6 +69,11 @@ object ApplicantActions:
   type RequestWithRiskingProgress = RequestWithData[DataWithRiskingProgress]
   type RequestWithRiskingProgressCt[A] = RequestWithDataCt[A, DataWithRiskingProgress]
 
+  extension [Data <: Tuple](request: RequestWithData[Data])
+
+    inline def internalUserId(using InternalUserId PresentIn Data): InternalUserId = request.get[InternalUserId]
+    inline def groupId(using GroupId PresentIn Data): GroupId = request.get[GroupId]
+
 @Singleton
 class ApplicantActions @Inject() (
   defaultActionBuilder: DefaultActionBuilder,

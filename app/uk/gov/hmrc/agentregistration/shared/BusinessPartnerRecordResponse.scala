@@ -22,7 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMi
 
 final case class BusinessPartnerRecordResponse(
   organisationName: Option[String],
-  agentReferenceNumber: Option[String],
+  agentReferenceNumber: Option[Arn],
   individualName: Option[String],
   address: DesBusinessAddress,
   emailAddress: Option[String],
