@@ -1,5 +1,5 @@
 @*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,9 +19,7 @@
 
 @this(
         appConfig: AppConfig,
-        layout: Layout,
-        formWithCSRF: FormWithCSRF,
-        govukButton: GovukButton
+        layout: Layout
 )
 
 @(
@@ -37,15 +35,24 @@
     <h1 class="govuk-heading-xl">@pageTitle</h1>
 
     <p class="govuk-body">
-        @Html(messages(s"$key.p1", appConfig.govukStartPageUrl))
+        @messages(s"$key.p1", entityName)
+    </p>
+
+    <p class="govuk-body">
+        @messages(s"$key.p2")
+    </p>
+
+    <h2 class="govuk-heading-m">@messages(s"$key.h2")</h2>
+
+    <p class="govuk-body">
+        @Html(messages(s"$key.p3", appConfig.govukStartPageUrl))
+    </p>
+
+    <p class="govuk-body">
+        @Html(messages(s"$key.p4", appConfig.guidanceForFailedNonFixableAppealsUrl))
     </p>
 
     <p class="govuk-body govuk-!-display-none-print">
-    @govukButton(Button(
-        href = Some(AppRoutes.apply.internal.RefusalToDealWithController.check().url),
-        classes = "govuk-link",
-        content = Text(messages(s"$key.tryAgain.button"))
-    ))
+        <a class="govuk-link" href="@AppRoutes.SignOutController.signOut.url">@messages(s"$key.finishAndSignOut")</a>
     </p>
-
 }

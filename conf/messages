@@ -554,13 +554,17 @@ applicationProgress.viewLink = View or print your application (opens in a new ta
 # Apply / entitycheckfailed/ CannotConfirmIdentity
 cannotConfirmIdentity.title=Get in touch to confirm your details
 cannotConfirmIdentity.p1=We need more details to confirm who you are. Get in touch using the information on <a class="govuk-link" href={0} target="_blank" rel="noopener noreferrer">Contact HMRC (opens in new tab)</a>.
-cannotConfirmIdentity.p2=If you’ve entered the incorrect details, you can try again.
+cannotConfirmIdentity.p2=If you’ve entered incorrect details, you can try again.
 cannotConfirmIdentity.tryAgain.button = Try again
 
 # Apply / entitycheckfailed/ CannotRegister
-cannotRegister.title=This {0} cannot be registered for an Agent Services Account
-cannotRegister.p1=If you wish to register a different Agent, use <a class="govuk-link" href={0} target="_blank" rel="noopener noreferrer">this link (opens in new tab)</a>.
-cannotRegister.tryAgain.button = Try again
+cannotRegister.title = {0} does not meet the registration conditions
+cannotRegister.p1 = Your application to register {0} for an agent services account cannot be approved (refused under Section 230 of The Finance Act 2026).
+cannotRegister.p2 = This is because the business is on a list of organisations who cannot have an agent services account.
+cannotRegister.h2 = What to do if you disagree
+cannotRegister.p3 = If your circumstances change and you think you now meet the registration conditions, you can <a class="govuk-link" href={0}>apply again</a>.
+cannotRegister.p4 = If you disagree with the outcome, you can <a class="govuk-link" href={0}>request a review or appeal the decision</a>.
+cannotRegister.finishAndSignOut = Finish and sign out
 
 # About your application / user role
 userRole.Owner.title = Are you the owner of the business?

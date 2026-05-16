@@ -44,7 +44,7 @@
 
     <p class="govuk-body govuk-!-display-none-print">
     @govukButton(Button(
-        href = Some(AppRoutes.apply.internal.DeceasedController.check().url),
+        href = Some(appConfig.govukStartPageUrl),
         classes = "govuk-link",
         content = Text(messages(s"$key.tryAgain.button"))
     ))

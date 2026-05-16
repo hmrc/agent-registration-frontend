@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.entitycheckfailed
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.checkfailed.CanNotConfirmIdentityPage
 
@@ -25,6 +26,7 @@ class CanNotConfirmIdentityPageSpec
 extends ViewSpec:
 
   val viewTemplate: CanNotConfirmIdentityPage = app.injector.instanceOf[CanNotConfirmIdentityPage]
+  val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
   val doc: Document = Jsoup.parse(
     viewTemplate().body
@@ -37,7 +39,7 @@ extends ViewSpec:
         """
           |Get in touch to confirm your details
           | We need more details to confirm who you are. Get in touch using the information on Contact HMRC (opens in new tab).
-          |If you’ve entered the incorrect details, you can try again.
+          |If you’ve entered incorrect details, you can try again.
           |Try again
           |"""
           .stripMargin
@@ -55,4 +57,4 @@ extends ViewSpec:
         .selectOnlyOneElementOrFail()
 
       button.text() shouldBe "Try again"
-      button.attr("href") shouldBe "/agent-registration/apply/internal/deceased-check"
+      button.attr("href") shouldBe appConfig.govukStartPageUrl
