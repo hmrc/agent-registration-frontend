@@ -60,11 +60,19 @@ trait TdAgentApplicationLimitedCompany { dependencies: (TdBase & TdGrsBusinessDe
       applicationState = GrsDataReceived
     )
 
-    val afterRefusalToDealWithCheckPass: AgentApplicationLimitedCompany = afterGrsDataReceived.copy(
+    val afterDuplicateAsaCheckPass: AgentApplicationLimitedCompany = afterGrsDataReceived.copy(
+      isDuplicateAsa = Some(false)
+    )
+
+    val afterDuplicateAsaCheckFail: AgentApplicationLimitedCompany = afterGrsDataReceived.copy(
+      isDuplicateAsa = Some(true)
+    )
+
+    val afterRefusalToDealWithCheckPass: AgentApplicationLimitedCompany = afterDuplicateAsaCheckPass.copy(
       refusalToDealWithCheckResult = Some(CheckResult.Pass)
     )
 
-    val afterRefusalToDealWithCheckFail: AgentApplicationLimitedCompany = afterGrsDataReceived.copy(
+    val afterRefusalToDealWithCheckFail: AgentApplicationLimitedCompany = afterDuplicateAsaCheckPass.copy(
       refusalToDealWithCheckResult = Some(CheckResult.Fail)
     )
 
