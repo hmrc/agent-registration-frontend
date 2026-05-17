@@ -61,11 +61,19 @@ trait TdAgentApplicationScottishLimitedPartnership {
       applicationState = GrsDataReceived
     )
 
-    val afterRefusalToDealWithCheckPass: AgentApplicationScottishLimitedPartnership = afterGrsDataReceived.copy(
+    val afterDuplicateAsaCheckPass: AgentApplicationScottishLimitedPartnership = afterGrsDataReceived.copy(
+      isDuplicateAsa = Some(false)
+    )
+
+    val afterDuplicateAsaCheckFail: AgentApplicationScottishLimitedPartnership = afterGrsDataReceived.copy(
+      isDuplicateAsa = Some(true)
+    )
+
+    val afterRefusalToDealWithCheckPass: AgentApplicationScottishLimitedPartnership = afterDuplicateAsaCheckPass.copy(
       refusalToDealWithCheckResult = Some(CheckResult.Pass)
     )
 
-    val afterRefusalToDealWithCheckFail: AgentApplicationScottishLimitedPartnership = afterGrsDataReceived.copy(
+    val afterRefusalToDealWithCheckFail: AgentApplicationScottishLimitedPartnership = afterDuplicateAsaCheckPass.copy(
       refusalToDealWithCheckResult = Some(CheckResult.Fail)
     )
 
