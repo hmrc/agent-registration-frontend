@@ -26,15 +26,21 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.services.SubscriptionService
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
+import com.softwaremill.quicklens.*
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.Future
 
 @Singleton
 class DuplicateAsaCheckController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
-  enrolmentStoreProxyConnector: EnrolmentStoreProxyConnector
+  enrolmentStoreProxyConnector: EnrolmentStoreProxyConnector,
+  subscriptionService: SubscriptionService,
+  agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
@@ -50,32 +56,32 @@ extends FrontendController(mcc, actions):
     )
     .async:
       implicit request =>
-        val bpr = request
-          .get[BusinessPartnerRecordResponse]
+        val bpr = request.get[BusinessPartnerRecordResponse]
         val isAlreadyRegisteredBpr = bpr.isAnASAgent === true && bpr.agentReferenceNumber.isDefined
 
         if isAlreadyRegisteredBpr
         then
-//        connect to enrolment-store and check agentReferenceNumber
-          enrolmentStoreProxyConnector.queryPrincipleGroupsAllocatedToArn(bpr.agentReferenceNumber.get).map:
-            //        if groups are returned
-            case groups if groups.exists(_.principalGroupIds.nonEmpty) => Redirect(failedCheckPage) //        then show a page telling them they already have an ASA account
-            case _ => ???
-          //        else allocate enrolments and update known facts and show user a success screen
-
-//        after each branch make sure to set checkResult:
-//            .upsert(request.agentApplication
-//              .modify(_.isDuplicateAsaCheckRequired)
-//              .setTo(if isAlreadyRegisteredBpr then CheckResult.Pass else CheckResult.Fail))
+          for
+            arnHasGroups <- enrolmentStoreProxyConnector.queryArnHasPrincipleGroups(bpr.agentReferenceNumber.get)
+            _ <-
+              if !arnHasGroups
+              then
+                subscriptionService.addKnownFactsAndEnrolUk(bpr.agentReferenceNumber.get).map: _ =>
+                  Redirect(failedCheckPage)
+              else Future.successful(Redirect(failedCheckPage))
+            _ <- agentApplicationService
+              .upsert(request.agentApplication
+                .modify(_.isDuplicateAsa)
+                .setTo(Some(arnHasGroups)))
+          yield
+            if arnHasGroups
+            then Redirect(failedCheckPage)
+            else Redirect(nextCheckEndpoint)
         else
-          ???
-//        continue to next check
-//        yield checkResult match
-//          case CheckResult.Pass => Redirect(nextCheckEndpoint)
-//          case CheckResult.Fail => Redirect(failedCheckPage)
+          Future.successful(Redirect(nextCheckEndpoint))
 
   private def failedCheckPage: Call = AppRoutes.apply.checkfailed.AlreadySubscribedController.show
   private def nextCheckEndpoint: Call = AppRoutes.apply.internal.UnifiedCustomerRegistryController.populateApplicationIdentifiersFromUcr
 
   extension (agentApplication: AgentApplication)
-    private def isDuplicateAsaCheckRequired: Boolean = agentApplication.duplicateAsaCheckResult =!= Some(CheckResult.Pass)
+    private def isDuplicateAsaCheckRequired: Boolean = agentApplication.isDuplicateAsa =!= Some(true)
