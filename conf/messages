@@ -578,7 +578,8 @@ unableToConfirmBusinessDetails.tryAgain = If you think you gave incorrect answer
 unableToConfirmBusinessDetails.contactHmrc = Alternatively you can <a class="govuk-link" href={0}>contact HMRC</a>.
 
 # Apply / entitycheckfailed/ AlreadySubscribed
-alreadySubscribed.title=You already have an agent services account
+alreadySubscribed.title=Your business already has an agent services account
+alreadySubscribed.p1=Contact your administrator to get access to your business’s agent services account.
 
 # About your application / user role
 userRole.Owner.title = Are you the owner of the business?

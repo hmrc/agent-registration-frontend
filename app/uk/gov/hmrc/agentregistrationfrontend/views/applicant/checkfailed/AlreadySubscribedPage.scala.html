@@ -18,13 +18,15 @@
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 
 @this(
-        appConfig: AppConfig,
-        layout: Layout
+    appConfig: AppConfig,
+    layout: Layout,
+    formWithCSRF: FormWithCSRF,
+    govukButton: GovukButton
 )
 
 @()(implicit
-        request: RequestHeader,
-        messages: Messages
+    request: RequestHeader,
+    messages: Messages
 )
 
 @key = @{"alreadySubscribed"}
@@ -33,4 +35,11 @@
 @layout(pageTitle = pageTitle) {
     <h1 class="govuk-heading-xl">@pageTitle</h1>
 
+    <p class="govuk-body">
+        @messages(s"$key.p1")
+    </p>
+
+    <p class="govuk-body govuk-!-display-none-print">
+        <a class="govuk-link" href="@AppRoutes.SignOutController.signOut.url">@messages(s"common.finishAndSignOut")</a>
+    </p>
 }
