@@ -58,8 +58,6 @@ trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdGrsBusinessDetail
       applicationState = GrsDataReceived
     )
 
-
-
     val afterRefusalToDealWithCheckPass: AgentApplicationSoleTrader = afterGrsDataReceived.copy(
       refusalToDealWithCheckResult = Some(CheckResult.Pass)
     )

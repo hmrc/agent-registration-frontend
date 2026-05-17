@@ -266,3 +266,5 @@ trait TdBase:
     vrns = List.empty,
     payeRefs = List.empty
   )
+
+  def arn: Arn = Arn("TARN0000001")

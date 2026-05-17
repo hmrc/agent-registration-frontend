@@ -18,9 +18,10 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal
 
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
+import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.RequestHeader
-import play.api.mvc.Resultimport
+import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsGeneralPartnership

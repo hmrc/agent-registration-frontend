@@ -82,7 +82,6 @@ trait TdAgentApplicationLimitedPartnership {
       agentDetails = None
     )
 
-
     val afterAgentDetailsComplete: AgentApplicationLimitedPartnership = afterContactDetailsComplete.copy(
       agentDetails = Some(dependencies.completeAgentDetails)
     )
