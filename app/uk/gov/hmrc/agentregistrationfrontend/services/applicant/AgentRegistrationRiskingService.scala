@@ -102,7 +102,6 @@ object AgentRegistrationRiskingServiceHelper:
     personReference = i.personReference,
     individualName = i.individualName,
     isPersonOfControl = i.isPersonOfControl,
-    internalUserId = i.getInternalUserId,
     individualDateOfBirth = i.getIndividualDateOfBirth,
     telephoneNumber = i.getTelephoneNumber,
     emailAddress = i.getEmailAddress.emailAddress,
@@ -110,5 +109,6 @@ object AgentRegistrationRiskingServiceHelper:
     individualSaUtr = i.getIndividualSaUtr,
     vrns = i.getVrns,
     payeRefs = i.getPayeRefs,
-    passedIv = i.getPassedIv
+    passedIv = i.getPassedIv,
+    providedByApplicant = i.providedByApplicant.getOrElse(false)
   )

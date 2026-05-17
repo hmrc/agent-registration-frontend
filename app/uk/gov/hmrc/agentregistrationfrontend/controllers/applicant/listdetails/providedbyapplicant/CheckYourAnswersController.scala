@@ -154,6 +154,10 @@ extends FrontendController(mcc, actions):
         .setTo(Some(false))
         .modify(_.providedByApplicant)
         .setTo(Some(true))
+        .modify(_.vrns)
+        .setTo(Some(List.empty)) // no call can be made on individual's behalf so empty list
+        .modify(_.payeRefs)
+        .setTo(Some(List.empty))
         .modify(_.providedDetailsState)
         .setTo(Finished)
       individualProvideDetailsService
