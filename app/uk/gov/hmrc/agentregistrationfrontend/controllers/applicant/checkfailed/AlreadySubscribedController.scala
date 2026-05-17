@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed
 
 import play.api.mvc.*
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.checkfailed.AlreadySubscribedPage
@@ -38,7 +39,7 @@ extends FrontendController(mcc, actions):
       .ensure(
         condition =
           _.agentApplication
-            .isDuplicateAsa.get,
+            .isDuplicateAsa.contains(true),
         resultWhenConditionNotMet =
           implicit request =>
             logger.warn("Duplicate ASA check has not failed. Redirecting to duplicate ASA check.")

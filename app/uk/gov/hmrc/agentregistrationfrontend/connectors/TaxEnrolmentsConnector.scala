@@ -88,12 +88,12 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed enrol $arn")
 
-case class Legacy(previousVerifiers: Seq[KnownFact])
+final case class Legacy(previousVerifiers: Seq[KnownFact])
 
 object Legacy:
   given format: OFormat[Legacy] = Json.format
 
-case class KnownFactsRequest(
+final case class KnownFactsRequest(
   verifiers: Seq[KnownFact],
   legacy: Option[Legacy]
 )
@@ -101,7 +101,7 @@ case class KnownFactsRequest(
 object KnownFactsRequest:
   given format: OFormat[KnownFactsRequest] = Json.format
 
-case class KnownFact(
+final case class KnownFact(
   key: String,
   value: String
 )
@@ -109,7 +109,7 @@ case class KnownFact(
 object KnownFact:
   given format: OFormat[KnownFact] = Json.format
 
-case class EnrolmentRequest(
+final case class EnrolmentRequest(
   userId: String,
   `type`: String,
   friendlyName: String,
