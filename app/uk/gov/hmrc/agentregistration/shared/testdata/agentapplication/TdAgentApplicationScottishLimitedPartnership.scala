@@ -46,7 +46,7 @@ trait TdAgentApplicationScottishLimitedPartnership {
       amlsDetails = None,
       agentDetails = None,
       refusalToDealWithCheckResult = None,
-      duplicateAsaCheckResult = None,
+      isDuplicateAsa = None,
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
       numberOfIndividuals = None,
       hasOtherRelevantIndividuals = None,
