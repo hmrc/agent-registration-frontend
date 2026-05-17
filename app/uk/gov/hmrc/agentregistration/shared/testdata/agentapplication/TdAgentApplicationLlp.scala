@@ -70,19 +70,19 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
       applicationState = GrsDataReceived
     )
 
-    val afterDuplicateAsaCheckPass: AgentApplicationLlp = afterGrsDataReceived.copy(
+    val afterIsDuplicateAsaFalse: AgentApplicationLlp = afterGrsDataReceived.copy(
       isDuplicateAsa = Some(false)
     )
 
-    val afterDuplicateAsaCheckFail: AgentApplicationLlp = afterGrsDataReceived.copy(
+    val afterIsDuplicateAsaTrue: AgentApplicationLlp = afterGrsDataReceived.copy(
       isDuplicateAsa = Some(true)
     )
 
-    val afterRefusalToDealWithCheckPass: AgentApplicationLlp = afterDuplicateAsaCheckPass.copy(
+    val afterRefusalToDealWithCheckPass: AgentApplicationLlp = afterIsDuplicateAsaFalse.copy(
       refusalToDealWithCheckResult = Some(CheckResult.Pass)
     )
 
-    val afterRefusalToDealWithCheckFail: AgentApplicationLlp = afterDuplicateAsaCheckPass.copy(
+    val afterRefusalToDealWithCheckFail: AgentApplicationLlp = afterIsDuplicateAsaFalse.copy(
       refusalToDealWithCheckResult = Some(CheckResult.Fail)
     )
 

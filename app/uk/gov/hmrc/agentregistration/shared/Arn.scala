@@ -20,7 +20,7 @@ import play.api.libs.json.Format
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 import uk.gov.hmrc.domain.TaxIdentifier
 
-case class Arn(value: String)
+final case class Arn(value: String)
 extends TaxIdentifier
 
 object Arn:

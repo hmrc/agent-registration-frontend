@@ -22,7 +22,6 @@ import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
@@ -82,4 +81,4 @@ extends FrontendController(mcc, actions):
   private def nextCheckEndpoint: Call = AppRoutes.apply.internal.UnifiedCustomerRegistryController.populateApplicationIdentifiersFromUcr
 
   extension (agentApplication: AgentApplication)
-    private def isDuplicateAsaCheckRequired: Boolean = agentApplication.isDuplicateAsa =!= Some(true)
+    private def isDuplicateAsaCheckRequired: Boolean = agentApplication.isDuplicateAsa.isEmpty
