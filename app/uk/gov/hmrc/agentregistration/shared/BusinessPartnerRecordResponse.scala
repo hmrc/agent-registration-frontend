@@ -32,5 +32,9 @@ final case class BusinessPartnerRecordResponse(
 
   def getEntityName: String = organisationName.orElse(individualName).getOrThrowExpectedDataMissing("No entity name found")
 
+  def isAlreadyRegisteredAsAgent: Boolean = agentReferenceNumber.isDefined && isAnASAgent
+
+  def getAgentReferenceNumber: Arn = agentReferenceNumber.getOrThrowExpectedDataMissing("agentReferenceNumber")
+
 object BusinessPartnerRecordResponse:
   given format: Format[BusinessPartnerRecordResponse] = Json.format[BusinessPartnerRecordResponse]

@@ -20,9 +20,9 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.Call
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
@@ -56,31 +56,29 @@ extends FrontendController(mcc, actions):
     )
     .async:
       implicit request =>
-        val bpr = request.get[BusinessPartnerRecordResponse]
-        val isAlreadyRegisteredBpr = bpr.isAnASAgent === true && bpr.agentReferenceNumber.isDefined
+        request.get[BusinessPartnerRecordResponse] match
+          case bpr if bpr.isAlreadyRegisteredAsAgent => handleRegisteredAsAgent(bpr.getAgentReferenceNumber)
+          case _ => Future.successful(Redirect(nextCheckEndpoint))
 
-        if isAlreadyRegisteredBpr
-        then
-          for
-            arnHasGroups <- enrolmentStoreProxyConnector.queryArnHasPrincipleGroups(bpr.agentReferenceNumber.get)
-            _ <-
-              if !arnHasGroups
-              then
-                subscriptionService.addKnownFactsAndEnrolUk(bpr.agentReferenceNumber.get).map: _ =>
-                  Redirect(failedCheckPage)
-              else Future.successful(Redirect(failedCheckPage))
-            _ <- agentApplicationService
-              .upsert(request.agentApplication
-                .modify(_.isDuplicateAsa)
-                .setTo(Some(arnHasGroups)))
-          yield
-            if arnHasGroups
-            then Redirect(failedCheckPage)
-            else Redirect(nextCheckEndpoint)
-        else
-          Future.successful(Redirect(nextCheckEndpoint))
+  private def handleRegisteredAsAgent(
+    agentReferenceNumber: Arn
+  )(using request: RequestWithData[DataWithApplicationAndBpr]): Future[Result] =
+    for
+      arnHasPrincipalGroups: Boolean <- enrolmentStoreProxyConnector.queryArnHasPrincipleGroups(agentReferenceNumber)
+      _ <-
+        if arnHasPrincipalGroups
+        then Future.unit
+        else subscriptionService.addKnownFactsAndEnrolUk(agentReferenceNumber)
+      _ <- agentApplicationService.upsert(
+        request.agentApplication
+          .modify(_.isDuplicateAsa)
+          .setTo(Some(arnHasPrincipalGroups))
+      )
+    yield
+      if arnHasPrincipalGroups then Redirect(alreadySubscribedPage)
+      else Redirect(nextCheckEndpoint)
 
-  private def failedCheckPage: Call = AppRoutes.apply.checkfailed.AlreadySubscribedController.show
+  private def alreadySubscribedPage: Call = AppRoutes.apply.checkfailed.AlreadySubscribedController.show
   private def nextCheckEndpoint: Call = AppRoutes.apply.internal.UnifiedCustomerRegistryController.populateApplicationIdentifiersFromUcr
 
   extension (agentApplication: AgentApplication)
