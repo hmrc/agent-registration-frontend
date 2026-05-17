@@ -122,7 +122,7 @@ extends ControllerSpec:
     doc.title() shouldBe "Error: Confirm that you want to remove Test Name from the list of relevant individuals - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
       s"#${RemoveKeyIndividualForm.key}-error"
-    ).text() shouldBe "Error: Select yes if you want to remove Test Name from the list of partners"
+    ).text() shouldBe "Error: Select yes if you want to remove Test Name from the list"
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with valid inputs should redirect to check your answers page when there are more than 1 other relevant individuals in the list before deletion" in:

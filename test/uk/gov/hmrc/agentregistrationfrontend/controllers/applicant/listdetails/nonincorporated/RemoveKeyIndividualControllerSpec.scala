@@ -58,7 +58,7 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe "Confirm that you want to remove Test Name from the list of partners - Apply for an agent services account - GOV.UK"
+    response.parseBodyAsJsoupDocument.title() shouldBe "Confirm that you want to remove Test Name from the list - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with blank inputs should return 400" in:
@@ -70,10 +70,10 @@ extends ControllerSpec:
 
     response.status shouldBe Status.BAD_REQUEST
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Error: Confirm that you want to remove Test Name from the list of partners - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe "Error: Confirm that you want to remove Test Name from the list - Apply for an agent services account - GOV.UK"
     doc.mainContent.select(
       s"#${RemoveKeyIndividualForm.key}-error"
-    ).text() shouldBe "Error: Select yes if you want to remove Test Name from the list of partners"
+    ).text() shouldBe "Error: Select yes if you want to remove Test Name from the list"
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"POST $path with save for later and valid input should redirect to save for later" in:

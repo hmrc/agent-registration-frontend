@@ -18,8 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 
 import play.api.data.Form
 import play.api.mvc.*
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
@@ -79,7 +79,8 @@ extends FrontendController(mcc, actions):
                 .filterNot(_.isPersonOfControl)
                 .size,
             isOnlyOne = false
-          )
+          ),
+          agentApplication = request.get[IsNotSoleTrader]
         )))
 
   def submit: Action[AnyContent] =
@@ -99,7 +100,8 @@ extends FrontendController(mcc, actions):
                       .filterNot(_.isPersonOfControl)
                       .size,
                   isOnlyOne = false
-                )
+                ),
+                agentApplication = request.get[IsNotSoleTrader]
               )))
       )
       .async:

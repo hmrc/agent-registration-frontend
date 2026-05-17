@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.incorp
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.forms.NumberCompaniesHouseOfficersForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -35,79 +34,65 @@ extends ViewSpec:
 
   case class BusinessTypeTestCase(
     label: String,
-    agentApplication: AgentApplication,
     caption: String,
-    entityType: String,
+    officerType: String,
     heading: String,
-    intro: String,
     question: String
   )
 
   private val testCases = Seq(
     BusinessTypeTestCase(
       label = "LimitedLiabilityPartnership",
-      agentApplication = tdAll.agentApplicationLlp.afterHmrcStandardForAgentsAgreed,
       caption = "LLP members and other relevant individuals",
-      entityType = "members",
-      heading = s"Members responsible for tax activities at $entityName",
-      intro = s"There are $companiesHouseOfficersCount people listed in Companies House as members of $entityName.",
-      question = "How many members are responsible for tax advice?"
+      officerType = "LLP members",
+      heading = "LLP members who are also ‘relevant individuals’",
+      question = "How many members are also relevant individuals?"
     ),
     BusinessTypeTestCase(
       label = "LimitedCompany",
-      agentApplication = tdAll.agentApplicationLimitedCompany.afterHmrcStandardForAgentsAgreed,
       caption = "Directors and other relevant individuals",
-      entityType = "directors",
-      heading = s"Directors responsible for tax activities at $entityName",
-      intro = s"There are $companiesHouseOfficersCount people listed in Companies House as directors of $entityName.",
-      question = "How many directors are responsible for tax advice?"
+      officerType = "directors",
+      heading = "Directors who are also ‘relevant individuals’",
+      question = "How many directors are also relevant individuals?"
     ),
     BusinessTypeTestCase(
-      label = "LimitedPartnership",
-      agentApplication = tdAll.agentApplicationLimitedPartnership.afterHmrcStandardForAgentsAgreed,
+      label = "Partnership",
       caption = "Partners and other relevant individuals",
-      entityType = "partners",
-      heading = s"Partners responsible for tax activities at $entityName",
-      intro = s"There are $companiesHouseOfficersCount people listed in Companies House as partners of $entityName.",
-      question = "How many partners are responsible for tax advice?"
-    ),
-    BusinessTypeTestCase(
-      label = "ScottishLimitedPartnership",
-      agentApplication = tdAll.agentApplicationScottishLimitedPartnership.afterHmrcStandardForAgentsAgreed,
-      caption = "Partners and other relevant individuals",
-      entityType = "partners",
-      heading = s"Partners responsible for tax activities at $entityName",
-      intro = s"There are $companiesHouseOfficersCount people listed in Companies House as partners of $entityName.",
-      question = "How many partners are responsible for tax advice?"
+      officerType = "partners",
+      heading = "Partners who are also ‘relevant individuals’",
+      question = "How many partners are also relevant individuals?"
     )
   )
 
   private def render(
     form: play.api.data.Form[Int],
-    agentApplication: AgentApplication
+    businessTypeKey: String
   ): Document = Jsoup.parse(viewTemplate(
     form = form,
     entityName = entityName,
-    agentApplication = agentApplication,
-    companiesHouseOfficersCount = companiesHouseOfficersCount
+    companiesHouseOfficersCount = companiesHouseOfficersCount,
+    businessTypeKey = businessTypeKey
   ).body)
 
   for testCase <- testCases do
     s"NumberOfCompaniesHouseOfficersPage for ${testCase.label}" should:
 
-      val doc: Document = render(NumberCompaniesHouseOfficersForm.form(companiesHouseOfficersCount), testCase.agentApplication)
+      val doc: Document = render(
+        form = NumberCompaniesHouseOfficersForm.form(companiesHouseOfficersCount, testCase.label),
+        businessTypeKey = testCase.label
+      )
 
       "have the correct caption" in:
-        doc.mainContent.select("h2.govuk-caption-l").text() shouldBe testCase.caption
+        doc.mainContent.select(captionL).text() shouldBe testCase.caption
 
       "have the correct heading" in:
-        doc.mainContent.select("h1").text() shouldBe testCase.heading
+        doc.mainContent.h1 shouldBe testCase.heading
 
       "have the correct title" in:
         doc.title() shouldBe s"${testCase.heading} - Apply for an agent services account - GOV.UK"
 
       "show the correct intro text" in:
-        doc.mainContent.select("p.govuk-body").first().text() shouldBe testCase.intro
+        doc.mainContent.select("p.govuk-body").first().text() shouldBe s"We need to know which of the ${testCase.officerType} at $entityName meet the legal definition of relevant individuals, as defined in Chapter 226(2) of the Finance Act 2026 (opens in new tab)."
 
       "show the correct question" in:
         doc.mainContent.select("label.govuk-label--m").text() shouldBe testCase.question
@@ -133,14 +118,14 @@ extends ViewSpec:
 
       "render a form error when the form contains an error" in:
         val field = NumberCompaniesHouseOfficersForm.numberOfOfficersResponsibleForTaxMatters
-        val errorMessage = "Enter how many are responsible for tax advice"
+        val errorMessage = s"Enter how many ${testCase.officerType} are also relevant individuals"
         val formWithError = NumberCompaniesHouseOfficersForm
-          .form(companiesHouseOfficersCount)
+          .form(companiesHouseOfficersCount, testCase.label)
           .withError(field, errorMessage)
 
         behavesLikePageWithErrorHandling(
           field = field,
           errorMessage = errorMessage,
-          errorDoc = render(formWithError, testCase.agentApplication),
+          errorDoc = render(formWithError, testCase.label),
           heading = testCase.heading
         )

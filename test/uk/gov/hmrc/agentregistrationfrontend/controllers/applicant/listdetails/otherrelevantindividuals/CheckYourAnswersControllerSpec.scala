@@ -104,17 +104,17 @@ extends ControllerSpec:
 
     val doc: Document = response.parseBodyAsJsoupDocument
 
-    doc.title() shouldBe "Other relevant individuals for Test Company Name - Apply for an agent services account - GOV.UK"
-    doc.select("h1").text() shouldBe "Other relevant individuals for Test Company Name"
+    doc.title() shouldBe "You have added 3 people - Apply for an agent services account - GOV.UK"
+    doc.select("h1").text() shouldBe "You have added 3 people"
     doc.select("main button.govuk-button").eachText().toArray.mkString(" ") shouldBe "Save and continue Save and come back later"
     doc.select("main .govuk-warning-text__text").text() shouldBe ""
 
     doc.select("main form").attr("action") shouldBe
       AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.submit.url
 
-    doc.select("main fieldset legend").text() shouldBe "Are there any more relevant individuals?"
+    doc.select("main fieldset legend").text() shouldBe "Do you need to tell us about any other relevant individuals?"
     doc.select("main #addOtherRelevantIndividuals-hint").text() shouldBe
-      "We need to know everyone who has material responsibility for how tax advice is carried out, but is not an official partner."
+      "We need to know everyone who has a senior role in managing or organising tax adviser activities, but is not a partner at Test Company Name."
 
     val radioLabels = doc.select("main .govuk-radios__item label").eachText()
     radioLabels.contains("Yes") shouldBe true

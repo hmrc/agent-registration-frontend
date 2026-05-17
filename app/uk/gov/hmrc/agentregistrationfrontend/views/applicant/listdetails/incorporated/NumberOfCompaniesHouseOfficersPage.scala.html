@@ -14,81 +14,78 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.AgentApplication
-@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
-@import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
-@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedPartnership
 @import play.api.data.Form
-@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.forms.NumberCompaniesHouseOfficersForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 
 @this(
         layout: Layout,
         govukInput: GovukInput,
         formWithCSRF: FormWithCSRF,
-        continueOrSaveForLater: ContinueOrSaveForLater
+        continueOrSaveForLater: ContinueOrSaveForLater,
+        appConfig: AppConfig,
+        hmrcNewTabLinkHelper: HmrcNewTabLinkHelper
 )
 
 @(
         form: Form[Int],
         entityName: String,
-        agentApplication: AgentApplication,
-        companiesHouseOfficersCount: Int
+        companiesHouseOfficersCount: Int,
+        businessTypeKey: String
         )(implicit
         request: RequestHeader,
         messages: Messages
 )
 
 @key = @{ NumberCompaniesHouseOfficersForm.numberOfOfficersResponsibleForTaxMatters }
-
-@businessTypeKey = @{
-    agentApplication match {
-        case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
-        case _: AgentApplicationLimitedCompany => "LimitedCompany"
-        case _: AgentApplicationLimitedPartnership => "LimitedPartnership"
-        case _: AgentApplicationScottishLimitedPartnership => "ScottishLimitedPartnership"
-    }
-}
-
-@title = @{ messages(s"$key.title.$businessTypeKey", entityName) }
+@title = @{ messages(s"$key.title.$businessTypeKey") }
 @question = @{ messages(s"$key.question.$businessTypeKey") }
 
 @layout(
     pageTitle = title,
     maybeForm = Some(form)
 ) {
-    <h2 class="govuk-caption-l">@messages(s"lists.caption.title.$businessTypeKey")</h2>
+  <h2 class="govuk-caption-l">@messages(s"lists.caption.title.$businessTypeKey")</h2>
+  <h1 class="govuk-heading-l">@title</h1>
 
-    <h1 class="govuk-heading-l">@title</h1>
+  <p class="govuk-body">
+    @Html(messages(s"$key.intro.$businessTypeKey", entityName, appConfig.govukDefinitionOfRelevantIndividualsUrl))
+  </p>
 
-    <p class="govuk-body">
-        @messages(s"$key.intro.$businessTypeKey", companiesHouseOfficersCount, entityName)
-    </p>
+  <h2 class="govuk-heading-m">@messages(s"$key.definition.h2")</h2>
+  <p class="govuk-body">
+    @messages(s"$key.definition.p1")
+  </p>
+  <p class="govuk-body">
+    @messages(s"$key.definition.p2.$businessTypeKey")
+  </p>
 
-    <p class="govuk-body">
-        @messages(s"$key.p1.$businessTypeKey")
-    </p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>@messages(s"$key.definition.bullet1")</li>
+    <li>@messages(s"$key.definition.bullet2")</li>
+  </ul>
 
-    <ul class="govuk-list govuk-list--bullet">
-        <li>@messages(s"$key.responsibilities.bullet1")</li>
-        <li>@messages(s"$key.responsibilities.bullet2")</li>
-    </ul>
+  <p class="govuk-body">
+  @hmrcNewTabLinkHelper(NewTabLinkHelper(
+    text = messages(s"$key.guidanceLink"),
+    href = Some(appConfig.guidanceForWhatARelevantTaxAdviserIsUrl),
+  ))
+  </p>
 
-    @formWithCSRF(action = AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitSixOrMore) {
-        @govukInput(Input(
-            label = Label(
-                content = Text(question),
-                classes = "govuk-label--m"
-            ),
-            hint = Some(Hint(
-                content = Text(messages(s"$key.hint.$businessTypeKey", companiesHouseOfficersCount))
-            )),
-            classes = "govuk-input--width-5"
-        ).withFormField(form(key)))
+  @formWithCSRF(action = AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitSixOrMore) {
+    @govukInput(Input(
+      label = Label(
+        content = Text(question),
+        classes = "govuk-label--m"
+      ),
+      classes = "govuk-input--width-5"
+    ).withFormField(form(key)))
 
-        @continueOrSaveForLater()
-    }
+    @continueOrSaveForLater()
+  }
 }

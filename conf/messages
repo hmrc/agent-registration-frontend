@@ -368,16 +368,16 @@ addToListSummary.Partnership.changeNumber = Change number of partners
 addToListSummary.Partnership.insetText.singular = You need to tell us about 1 more partner
 addToListSummary.Partnership.insetText.plural = You need to tell us about {0} more partners
 
-removeKeyIndividual.title = Confirm that you want to remove {0} from the list of partners
+removeKeyIndividual.title = Confirm that you want to remove {0} from the list
 removeKeyIndividual.Yes = Yes
 removeKeyIndividual.No = No
-removeKeyIndividual.error.required = Select yes if you want to remove {0} from the list of partners
+removeKeyIndividual.error.required = Select yes if you want to remove {0} from the list
 
 addToListSummary.Partnership.addAnotherPartner = Add another partner
 addToListSummary.Partnership.removeExtra.span1.plural = You told us there are {0} partners.
 addToListSummary.Partnership.removeExtra.span1.singular = You told us there is 1 partner.
-addToListSummary.Partnership.removeExtra.span2.plural = Change the number of partners or remove {0} partners from the list before you continue.
-addToListSummary.Partnership.removeExtra.span2.singular = Change the number of partners or remove 1 partner from the list before you continue.
+addToListSummary.Partnership.removeExtra.span2.plural = Remove {0} partners from the list before you continue.
+addToListSummary.Partnership.removeExtra.span2.singular = Remove 1 partner from the list before you continue.
 addToListSummary.Partnership.complex.intro = We need the names of:
 addToListSummary.Partnership.complex.bullet1.plural = the {0} partners responsible for tax advice
 addToListSummary.Partnership.complex.bullet1.singular = the partner responsible for tax advice
@@ -404,26 +404,32 @@ hasOtherRelevantIndividuals.title.LimitedLiabilityPartnership = Are there any ot
 hasOtherRelevantIndividuals.title.SoleTrader = Are there any other relevant individuals at {0}?
 
 hasOtherRelevantIndividuals.heading = Other people we need to know about
-hasOtherRelevantIndividuals.p1 = We also need to know about other relevant individuals.
-hasOtherRelevantIndividuals.p2.Partnership = This means anyone responsible for tax advice at {0}, who is not an official partner.
-hasOtherRelevantIndividuals.p2.LimitedCompany = This means anyone responsible for tax advice at {0}, who is not an official director.
-hasOtherRelevantIndividuals.p2.LimitedLiabilityPartnership = This means anyone responsible for tax advice at {0}, who is not an official member.
-hasOtherRelevantIndividuals.guidanceLink = Read the guidance about how HMRC defines ‘relevant individuals’
+
+
+hasOtherRelevantIndividuals.p1 = We also need to know if {0} has any other relevant individuals.
+hasOtherRelevantIndividuals.p2.Partnership = This means anyone who meets the definition of relevant individual in the Finance Act 2026, but who is not a partner at {0}.
+hasOtherRelevantIndividuals.p2.LimitedCompany = This means anyone who meets the definition of relevant individual in the Finance Act 2026, but who is not a director at {0}.
+hasOtherRelevantIndividuals.p2.LimitedLiabilityPartnership = This means anyone who meets the definition of relevant individual in the Finance Act 2026, but who is not a member at {0}.
+hasOtherRelevantIndividuals.guidanceLink = Read the guidance about how we define ‘relevant individuals’
 hasOtherRelevantIndividuals.label = Does {0} have any other relevant individuals?
+hasOtherRelevantIndividuals.label.Partnership = Are there any non-partner relevant individuals at {0}?
+hasOtherRelevantIndividuals.label.LimitedCompany = Are there any non-director relevant individuals at {0}?
+hasOtherRelevantIndividuals.label.LimitedLiabilityPartnership = Are there any non-LLP member relevant individuals at {0}?
 
 hasOtherRelevantIndividuals.error.required = Select yes if there are any other relevant individuals
 hasOtherRelevantIndividuals.error.invalid = Select yes if there are any other relevant individuals
 
-addToListSummary.relevant.individuals.title = Other relevant individuals for {0}
+addToListSummary.relevant.individuals.title.singular = You have added {0} person
+addToListSummary.relevant.individuals.title.plural = You have added {0} people
 addToListSummary.relevant.individuals.caption = Partners and other relevant individuals
-addToListSummary.relevant.individuals.more.question = Are there any more relevant individuals?
-addToListSummary.relevant.individuals.more.hint.Partnership = We need to know everyone who has material responsibility for how tax advice is carried out, but is not an official partner.
-addToListSummary.relevant.individuals.more.hint.LimitedCompany = We need to know everyone who has material responsibility for how tax advice is carried out, but is not an official director.
-addToListSummary.relevant.individuals.more.hint.LimitedLiabilityPartnership = We need to know everyone who has material responsibility for how tax advice is carried out, but is not an official member.
-addToListSummary.relevant.individuals.more.error.required = Select yes if there are more relevant individuals
-addToListSummary.relevant.individuals.more.error.invalid = Select yes if there are more relevant individuals
-addOtherRelevantIndividuals.error.required = Select yes if there are more relevant individuals
-addOtherRelevantIndividuals.error.invalid = Select yes if there are more relevant individuals
+addToListSummary.relevant.individuals.more.question = Do you need to tell us about any other relevant individuals?
+addToListSummary.relevant.individuals.more.hint.Partnership = We need to know everyone who has a senior role in managing or organising tax adviser activities, but is not a partner at {0}.
+addToListSummary.relevant.individuals.more.hint.LimitedCompany = We need to know everyone who has a senior role in managing or organising tax adviser activities, but is not a director at {0}.
+addToListSummary.relevant.individuals.more.hint.LimitedLiabilityPartnership = We need to know everyone who has a senior role in managing or organising tax adviser activities, but who is not a LLP member at {0}.
+addToListSummary.relevant.individuals.more.error.required = Select yes if you need to tell us about any other relevant individuals
+addToListSummary.relevant.individuals.more.error.invalid = Select yes if you need to tell us about any other relevant individuals
+addOtherRelevantIndividuals.error.required = Select yes if you need to tell us about any other relevant individuals
+addOtherRelevantIndividuals.error.invalid = Select yes if you need to tell us about any other relevant individuals
 
 listDetailsCheckYourAnswers.title = Check your answers
 listDetailsCheckYourAnswers.numberOfPartners.label = Number of partners
@@ -433,17 +439,13 @@ listDetailsCheckYourAnswers.otherRelevantIndividualsNames.label = Other relevant
 listDetailsCheckYourAnswers.numberOfKeyIndividuals.Partnership.label = Number of partners
 listDetailsCheckYourAnswers.numberOfKeyIndividuals.LimitedLiabilityPartnership.label = Number of LLP members
 listDetailsCheckYourAnswers.numberOfKeyIndividuals.LimitedCompany.label = Number of directors
-listDetailsCheckYourAnswers.numberOfKeyIndividuals.LimitedPartnership.label = Number of partners
-listDetailsCheckYourAnswers.numberOfKeyIndividuals.ScottishLimitedPartnership.label = Number of partners
 listDetailsCheckYourAnswers.companiesHouseListCorrect.LimitedLiabilityPartnership.label = Companies House list of LLP members correct
 listDetailsCheckYourAnswers.companiesHouseListCorrect.LimitedCompany.label = Companies House list of directors correct
-listDetailsCheckYourAnswers.companiesHouseListCorrect.LimitedPartnership.label = Companies House list of partners correct
-listDetailsCheckYourAnswers.companiesHouseListCorrect.ScottishLimitedPartnership.label = Companies House list of partners correct
+listDetailsCheckYourAnswers.companiesHouseListCorrect.Partnership.label = Companies House list of partners correct
 listDetailsCheckYourAnswers.keyIndividualNames.Partnership.label = Partner names
 listDetailsCheckYourAnswers.keyIndividualNames.LimitedLiabilityPartnership.label = LLP member names
 listDetailsCheckYourAnswers.keyIndividualNames.LimitedCompany.label = Director names
-listDetailsCheckYourAnswers.keyIndividualNames.LimitedPartnership.label = Partner names
-listDetailsCheckYourAnswers.keyIndividualNames.ScottishLimitedPartnership.label = Partner names
+listDetailsCheckYourAnswers.keyIndividualNames.Partnership.label = Partner names
 
 zeroKeyIndividualsCheckYourAnswers.title = Check your answers
 zeroKeyIndividualsCheckYourAnswers.otherRelevantIndividualsNames.label = Relevant individual names
@@ -869,40 +871,31 @@ isCompaniesHouseOfficersListCorrect.heading.LimitedCompany = Check this list of 
 isCompaniesHouseOfficersListCorrect.intro.LimitedCompany = These are the directors listed in Companies House for {0}:
 isCompaniesHouseOfficersListCorrect.question.LimitedCompany = Is this list of directors correct?
 
-isCompaniesHouseOfficersListCorrect.heading.LimitedPartnership = Check this list of partners for {0}
-isCompaniesHouseOfficersListCorrect.intro.LimitedPartnership = These are the partners listed in Companies House for {0}:
-isCompaniesHouseOfficersListCorrect.question.LimitedPartnership = Is this list of partners correct?
+isCompaniesHouseOfficersListCorrect.heading.Partnership = Check this list of partners for {0}
+isCompaniesHouseOfficersListCorrect.intro.Partnership = These are the partners listed in Companies House for {0}:
+isCompaniesHouseOfficersListCorrect.question.Partnership = Is this list of partners correct?
 
-isCompaniesHouseOfficersListCorrect.heading.ScottishLimitedPartnership = Check this list of partners for {0}
-isCompaniesHouseOfficersListCorrect.intro.ScottishLimitedPartnership = These are the partners listed in Companies House for {0}:
-isCompaniesHouseOfficersListCorrect.question.ScottishLimitedPartnership = Is this list of partners correct?
+# Incorporated: when Companies House returns 6+ officers/members/directors, ask how many are relevant individuals
 
-# Incorporated: when Companies House returns 6+ officers/members/directors, ask how many are responsible for tax matters
-numberOfOfficersResponsibleForTaxMatters.title.LimitedLiabilityPartnership = Members responsible for tax activities at {0}
-numberOfOfficersResponsibleForTaxMatters.intro.LimitedLiabilityPartnership = There are {0} people listed in Companies House as members of {1}.
-numberOfOfficersResponsibleForTaxMatters.p1.LimitedLiabilityPartnership = We need to know how many of these have:
-numberOfOfficersResponsibleForTaxMatters.question.LimitedLiabilityPartnership = How many members are responsible for tax advice?
-numberOfOfficersResponsibleForTaxMatters.hint.LimitedLiabilityPartnership = Must be a number between 1 and {0}.
+numberOfOfficersResponsibleForTaxMatters.title.LimitedCompany = Directors who are also ‘relevant individuals’
+numberOfOfficersResponsibleForTaxMatters.title.Partnership = Partners who are also ‘relevant individuals’
+numberOfOfficersResponsibleForTaxMatters.title.LimitedLiabilityPartnership = LLP members who are also ‘relevant individuals’
 
-numberOfOfficersResponsibleForTaxMatters.title.LimitedCompany = Directors responsible for tax activities at {0}
-numberOfOfficersResponsibleForTaxMatters.intro.LimitedCompany = There are {0} people listed in Companies House as directors of {1}.
-numberOfOfficersResponsibleForTaxMatters.p1.LimitedCompany = We need to know how many of these have:
-numberOfOfficersResponsibleForTaxMatters.question.LimitedCompany = How many directors are responsible for tax advice?
-numberOfOfficersResponsibleForTaxMatters.hint.LimitedCompany = Must be a number between 1 and {0}.
+numberOfOfficersResponsibleForTaxMatters.intro.LimitedCompany = We need to know which of the directors at {0} meet the legal definition of relevant individuals, as defined in <a class="govuk-link" href="{1}" rel="noreferrer noopener">Chapter 226(2) of the Finance Act 2026 (opens in new tab)</a>.
+numberOfOfficersResponsibleForTaxMatters.intro.LimitedLiabilityPartnership = We need to know which of the LLP members at {0} meet the legal definition of relevant individuals, as defined in <a class="govuk-link" href="{1}" rel="noreferrer noopener">Chapter 226(2) of the Finance Act 2026 (opens in new tab)</a>.
+numberOfOfficersResponsibleForTaxMatters.intro.Partnership = We need to know which of the partners at {0} meet the legal definition of relevant individuals, as defined in <a class="govuk-link" href="{1}" rel="noreferrer noopener">Chapter 226(2) of the Finance Act 2026 (opens in new tab)</a>.
 
-numberOfOfficersResponsibleForTaxMatters.title.LimitedPartnership = Partners responsible for tax activities at {0}
-numberOfOfficersResponsibleForTaxMatters.intro.LimitedPartnership = There are {0} people listed in Companies House as partners of {1}.
-numberOfOfficersResponsibleForTaxMatters.p1.LimitedPartnership = We need to know how many of these have:
-numberOfOfficersResponsibleForTaxMatters.question.LimitedPartnership = How many partners are responsible for tax advice?
-numberOfOfficersResponsibleForTaxMatters.hint.LimitedPartnership = Must be a number between 1 and {0}.
-
-numberOfOfficersResponsibleForTaxMatters.title.ScottishLimitedPartnership = Partners responsible for tax activities at {0}
-numberOfOfficersResponsibleForTaxMatters.intro.ScottishLimitedPartnership = There are {0} people listed in Companies House as partners of {1}.
-numberOfOfficersResponsibleForTaxMatters.p1.ScottishLimitedPartnership = We need to know how many of these have:
-numberOfOfficersResponsibleForTaxMatters.hint.ScottishLimitedPartnership = Must be a number between 1 and {0}.
-numberOfOfficersResponsibleForTaxMatters.responsibilities.bullet1 = material responsibility for tax advice activities
-numberOfOfficersResponsibleForTaxMatters.responsibilities.bullet2 = significant authority over HMRC interactions
-
+numberOfOfficersResponsibleForTaxMatters.definition.h2 = The definition of relevant individuals
+numberOfOfficersResponsibleForTaxMatters.definition.p1 = The definition of ‘relevant individual’ depends on the size of the business.
+numberOfOfficersResponsibleForTaxMatters.definition.p2.LimitedCompany = For a business with 6 or more directors, someone is a relevant individual if they work for the business and play a significant role in:
+numberOfOfficersResponsibleForTaxMatters.definition.p2.LimitedLiabilityPartnership = For a business with 6 or more LLP members, someone is a relevant individual if they work for the business and play a significant role in:
+numberOfOfficersResponsibleForTaxMatters.definition.p2.Partnership = For a business with 6 or more partners, someone is a relevant individual if they work for the business and play a significant role in:
+numberOfOfficersResponsibleForTaxMatters.definition.bullet1 = making decisions about how the business manages or organises all of its tax adviser activities, or a substantial part of those activities
+numberOfOfficersResponsibleForTaxMatters.definition.bullet2 = actually managing or organising all of the tax adviser activities for the business, or a substantial part of those activities
+numberOfOfficersResponsibleForTaxMatters.guidanceLink = Read the guidance about how we define ‘relevant individuals’
+numberOfOfficersResponsibleForTaxMatters.question.LimitedCompany = How many directors are also relevant individuals?
+numberOfOfficersResponsibleForTaxMatters.question.LimitedLiabilityPartnership = How many members are also relevant individuals?
+numberOfOfficersResponsibleForTaxMatters.question.Partnership = How many partners are also relevant individuals?
 
 # Incorporated: Update Companies House page
 updateCompaniesHousePage.heading = You need to update Companies House
@@ -910,24 +903,17 @@ updateCompaniesHousePage.p2 = Update your Companies House so the correct details
 updateCompaniesHousePage.p3 = You can then continue with your application for an agent services account.
 updateCompaniesHousePage.p1.LimitedLiabilityPartnership = As part of this application process, we need a verifiable list of the current members of {0}.
 updateCompaniesHousePage.p1.LimitedCompany = As part of this application process, we need a verifiable list of the current directors of {0}.
-updateCompaniesHousePage.p1.LimitedPartnership = As part of this application process, we need a verifiable list of the current partners of {0}.
-updateCompaniesHousePage.p1.ScottishLimitedPartnership = As part of this application process, we need a verifiable list of the current partners of {0}.
+updateCompaniesHousePage.p1.Partnership = As part of this application process, we need a verifiable list of the current partners of {0}.
 
-# LLP Member Name Page - Complex (6+ members from Companies House)
-companiesHouseIndividuaName.complex.title.LimitedLiabilityPartnership = Tell us about the members of {0}
-companiesHouseIndividuaName.complex.title.LimitedCompany = Tell us about the directors of {0}
-companiesHouseIndividuaName.complex.title.LimitedPartnership = Tell us about the partners of {0}
-companiesHouseIndividuaName.complex.title.ScottishLimitedPartnership = Tell us about the partners of {0}
-companiesHouseIndividuaName.complex.p1 = We’ll check this against the business records in Companies House.
-companiesHouseIndividuaName.complex.p2.LimitedLiabilityPartnership = We need the names of all {0} LLP members responsible for tax advice activities.
-companiesHouseIndividuaName.complex.p2.LimitedCompany = We need the names of all {0} directors responsible for tax advice activities.
-companiesHouseIndividuaName.complex.p2.LimitedPartnership = We need the names of all {0} partners responsible for tax advice activities.
-companiesHouseIndividuaName.complex.p2.ScottishLimitedPartnership = We need the names of all {0} partners responsible for tax advice activities.
-companiesHouseIndividuaName.complex.details.summary = What we mean by ‘responsible for tax advice’
-companiesHouseIndividuaName.complex.details.p1.LimitedLiabilityPartnership = An LLP member is responsible for tax advice if they have:
-companiesHouseIndividuaName.complex.details.p1.LimitedCompany = A director is responsible for tax advice if they have:
-companiesHouseIndividuaName.complex.details.p1.LimitedPartnership = A partner is responsible for tax advice if they have:
-companiesHouseIndividuaName.complex.details.p1.ScottishLimitedPartnership = A partner is responsible for tax advice if they have:
+# CH officer Name Page - Complex (6+ officers from Companies House)
+companiesHouseIndividuaName.complex.title.LimitedLiabilityPartnership = Tell us about the LLP members who are relevant individuals
+companiesHouseIndividuaName.complex.title.LimitedCompany = Tell us about the directors who are relevant individuals
+companiesHouseIndividuaName.complex.title.Partnership = Tell us about the partners who are relevant individuals
+companiesHouseIndividuaName.complex.hint = We’ll check this against the business records in Companies House.
+companiesHouseIndividuaName.guidanceLink = Read the guidance about how we define ‘relevant individuals’
+companiesHouseIndividuaName.complex.p1.LimitedLiabilityPartnership = We need the names of all {0} LLP members who meet the definition of relevant individual under <a class="govuk-link" href="{1}" rel="noreferrer noopener">Chapter 226(2) of the Finance Act 2026 (opens in new tab)</a>.
+companiesHouseIndividuaName.complex.p1.LimitedCompany = We need the names of all {0} directors who meet the definition of relevant individual under <a class="govuk-link" href="{1}" rel="noreferrer noopener">Chapter 226(2) of the Finance Act 2026 (opens in new tab)</a>.
+companiesHouseIndividuaName.complex.p1.Partnership = We need the names of all {0} partners who meet the definition of relevant individual under <a class="govuk-link" href="{1}" rel="noreferrer noopener">Chapter 226(2) of the Finance Act 2026 (opens in new tab)</a>.
 companiesHouseIndividuaName.complex.details.bullet1 = material responsibility for tax advice activities
 companiesHouseIndividuaName.complex.details.bullet2 = significant authority over HMRC interactions
 
@@ -945,8 +931,8 @@ companiesHouseIndividuaName.p1 = We’ll check this against the business records
 # Incorporated: Check Your Answers / Add to list summary (LLP)
 addToListSummary.LimitedLiabilityPartnership.title.plural = You have added {0} LLP members
 addToListSummary.LimitedLiabilityPartnership.title.singular = You have added {0} LLP member
-addToListSummary.LimitedLiabilityPartnership.insetText.singular = You need to tell us about 1 more LLP member that deals with tax.
-addToListSummary.LimitedLiabilityPartnership.insetText.plural = You need to tell us about {0} more LLP members that deal with tax.
+addToListSummary.LimitedLiabilityPartnership.insetText.singular = You need to tell us about 1 more LLP member who is a relevant individual.
+addToListSummary.LimitedLiabilityPartnership.insetText.plural = You need to tell us about {0} more LLP members who are relevant individuals.
 addToListSummary.LimitedLiabilityPartnership.addAnother = Add another LLP member
 addToListSummary.LimitedLiabilityPartnership.removeExtra.span1.plural = You told us there are {0} LLP members.
 addToListSummary.LimitedLiabilityPartnership.removeExtra.span1.singular = You told us there is 1 LLP member.
@@ -957,8 +943,8 @@ addToListSummary.LimitedLiabilityPartnership.changeNumber = Change the number of
 # Incorporated: Check Your Answers / Add to list summary (Limited Company)
 addToListSummary.LimitedCompany.title.plural = You have added {0} directors
 addToListSummary.LimitedCompany.title.singular = You have added {0} director
-addToListSummary.LimitedCompany.insetText.singular = You need to tell us about 1 more director that deals with tax.
-addToListSummary.LimitedCompany.insetText.plural = You need to tell us about {0} more directors that deal with tax.
+addToListSummary.LimitedCompany.insetText.singular = You need to tell us about 1 more director who is a relevant individual.
+addToListSummary.LimitedCompany.insetText.plural = You need to tell us about {0} more directors who are relevant individuals.
 addToListSummary.LimitedCompany.addAnother = Add another director
 addToListSummary.LimitedCompany.removeExtra.span1.plural = You told us there are {0} directors.
 addToListSummary.LimitedCompany.removeExtra.span1.singular = You told us there is 1 director.
@@ -966,33 +952,17 @@ addToListSummary.LimitedCompany.removeExtra.span2.plural = Remove {0} directors 
 addToListSummary.LimitedCompany.removeExtra.span2.singular = Remove 1 director from the list before you continue.
 addToListSummary.LimitedCompany.changeNumber = Change the number of directors
 
-# Incorporated: Check Your Answers / Add to list summary (Limited Partnership)
-addToListSummary.LimitedPartnership.title.plural = You have added {0} partners
-addToListSummary.LimitedPartnership.title.singular = You have added {0} partner
-addToListSummary.LimitedPartnership.insetText.singular = You need to tell us about 1 more partner that deals with tax.
-addToListSummary.LimitedPartnership.insetText.plural = You need to tell us about {0} more partners that deal with tax.
-addToListSummary.LimitedPartnership.addAnother = Add another partner
-addToListSummary.LimitedPartnership.removeExtra.span1.plural = You told us there are {0} partners.
-addToListSummary.LimitedPartnership.removeExtra.span1.singular = You told us there is 1 partner.
-addToListSummary.LimitedPartnership.removeExtra.span2.plural = Remove {0} partners from the list before you continue.
-addToListSummary.LimitedPartnership.removeExtra.span2.singular = Remove 1 partner from the list before you continue.
-addToListSummary.LimitedPartnership.changeNumber = Change the number of partners
-
-# Incorporated: Check Your Answers / Add to list summary (Scottish Limited Partnership)
-addToListSummary.ScottishLimitedPartnership.title.plural = You have added {0} partners
-addToListSummary.ScottishLimitedPartnership.title.singular = You have added {0} partner
-addToListSummary.ScottishLimitedPartnership.insetText.singular = You need to tell us about 1 more partner that deals with tax.
-addToListSummary.ScottishLimitedPartnership.insetText.plural = You need to tell us about {0} more partners that deal with tax.
-addToListSummary.ScottishLimitedPartnership.addAnother = Add another partner
-addToListSummary.ScottishLimitedPartnership.removeExtra.span1.plural = You told us there are {0} partners.
-addToListSummary.ScottishLimitedPartnership.removeExtra.span1.singular = You told us there is 1 partner.
-addToListSummary.ScottishLimitedPartnership.removeExtra.span2.plural = Remove {0} partners from the list before you continue.
-addToListSummary.ScottishLimitedPartnership.removeExtra.span2.singular = Remove 1 partner from the list before you continue.
-addToListSummary.ScottishLimitedPartnership.changeNumber = Change the number of partners
-
-lists.caption.title.LimitedPartnership = Partners and other relevant individuals
-lists.caption.title.ScottishLimitedPartnership = Partners and other relevant individuals
-numberOfOfficersResponsibleForTaxMatters.question.ScottishLimitedPartnership = How many partners are responsible for tax advice?
+# Incorporated: Check Your Answers / Add to list summary (Partnerships)
+addToListSummary.Partnership.title.plural = You have added {0} partners
+addToListSummary.Partnership.title.singular = You have added {0} partner
+addToListSummary.Partnership.insetText.singular = You need to tell us about 1 more partner who is a relevant individual.
+addToListSummary.Partnership.insetText.plural = You need to tell us about {0} more partners who are relevant individuals.
+addToListSummary.Partnership.addAnother = Add another partner
+addToListSummary.Partnership.removeExtra.span1.plural = You told us there are {0} partners.
+addToListSummary.Partnership.removeExtra.span1.singular = You told us there is 1 partner.
+addToListSummary.Partnership.removeExtra.span2.plural = Remove {0} partners from the list before you continue.
+addToListSummary.Partnership.removeExtra.span2.singular = Remove 1 partner from the list before you continue.
+addToListSummary.Partnership.changeNumber = Change the number of partners
 
 error.companiesHouseOfficer.nameNotMatched = The name you entered does not match any records in Companies House. Check the name and try again.
 isCompaniesHouseOfficersListCorrect.error.required = Select yes if this list is correct
@@ -1001,87 +971,65 @@ isCompaniesHouseOfficersListCorrect.error.required.LimitedLiabilityPartnership =
 isCompaniesHouseOfficersListCorrect.error.invalid.LimitedLiabilityPartnership = Select yes if this list of members is correct
 isCompaniesHouseOfficersListCorrect.error.required.LimitedCompany = Select yes if this list of directors is correct
 isCompaniesHouseOfficersListCorrect.error.invalid.LimitedCompany = Select yes if this list of directors is correct
-isCompaniesHouseOfficersListCorrect.error.required.LimitedPartnership = Select yes if this list of partners is correct
-isCompaniesHouseOfficersListCorrect.error.invalid.LimitedPartnership = Select yes if this list of partners is correct
-isCompaniesHouseOfficersListCorrect.error.required.ScottishLimitedPartnership = Select yes if this list of partners is correct
-isCompaniesHouseOfficersListCorrect.error.invalid.ScottishLimitedPartnership = Select yes if this list of partners is correct
-
-numberOfOfficersResponsibleForTaxMatters.error.required = Enter how many officers are responsible for tax advice
-numberOfOfficersResponsibleForTaxMatters.error.invalid = Enter a valid number
-numberOfOfficersResponsibleForTaxMatters.error.required.LimitedLiabilityPartnership = Enter how many members are responsible for tax advice
-numberOfOfficersResponsibleForTaxMatters.error.invalid.LimitedLiabilityPartnership = Enter a number between 1 and {0}
-numberOfOfficersResponsibleForTaxMatters.error.required.LimitedCompany = Enter how many directors are responsible for tax advice
-numberOfOfficersResponsibleForTaxMatters.error.invalid.LimitedCompany = Enter a number between 1 and {0}
-numberOfOfficersResponsibleForTaxMatters.error.required.LimitedPartnership = Enter how many partners are responsible for tax advice
-numberOfOfficersResponsibleForTaxMatters.error.invalid.LimitedPartnership = Enter a number between 1 and {0}
-numberOfOfficersResponsibleForTaxMatters.error.required.ScottishLimitedPartnership = Enter how many partners are responsible for tax advice
-numberOfOfficersResponsibleForTaxMatters.error.invalid.ScottishLimitedPartnership = Enter a number between 1 and {0}
+isCompaniesHouseOfficersListCorrect.error.required.Partnership = Select yes if this list of partners is correct
+isCompaniesHouseOfficersListCorrect.error.invalid.Partnership = Select yes if this list of partners is correct
+numberOfOfficersResponsibleForTaxMatters.notANumber = Enter only numbers
+numberOfOfficersResponsibleForTaxMatters.LimitedCompany.error.required = Enter how many directors are also relevant individuals
+numberOfOfficersResponsibleForTaxMatters.LimitedLiabilityPartnership.error.required = Enter how many LLP members are also relevant individuals
+numberOfOfficersResponsibleForTaxMatters.Partnership.error.required = Enter how many partners are also relevant individuals
+numberOfOfficersResponsibleForTaxMatters.LimitedCompany.error.invalid = Enter a number between 1 and {0}
+numberOfOfficersResponsibleForTaxMatters.LimitedLiabilityPartnership.error.invalid = Enter a number between 1 and {0}
+numberOfOfficersResponsibleForTaxMatters.Partnership.error.invalid = Enter a number between 1 and {0}
 
 companiesHouseIndividuaName.remaining.singular.LimitedLiabilityPartnership = You need to tell us about 1 more LLP member.
 companiesHouseIndividuaName.remaining.plural.LimitedLiabilityPartnership = You need to tell us about {0} more LLP members.
 companiesHouseIndividuaName.remaining.singular.LimitedCompany = You need to tell us about 1 more director.
 companiesHouseIndividuaName.remaining.plural.LimitedCompany = You need to tell us about {0} more directors.
-companiesHouseIndividuaName.remaining.singular.LimitedPartnership = You need to tell us about 1 more partner.
-companiesHouseIndividuaName.remaining.plural.LimitedPartnership = You need to tell us about {0} more partners.
-companiesHouseIndividuaName.remaining.singular.ScottishLimitedPartnership = You need to tell us about 1 more partner.
-companiesHouseIndividuaName.remaining.plural.ScottishLimitedPartnership = You need to tell us about {0} more partners.
+companiesHouseIndividuaName.remaining.singular.Partnership = You need to tell us about 1 more partner.
+companiesHouseIndividuaName.remaining.plural.Partnership = You need to tell us about {0} more partners.
 companiesHouseIndividuaName.complex.intro.LimitedLiabilityPartnership = We need the names of:
-companiesHouseIndividuaName.complex.bullet1.singular.LimitedLiabilityPartnership = the LLP member responsible for tax advice
-companiesHouseIndividuaName.complex.bullet1.plural.LimitedLiabilityPartnership = the {0} LLP members responsible for tax advice
+companiesHouseIndividuaName.complex.bullet1.singular.LimitedLiabilityPartnership = the LLP member who meets the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
+companiesHouseIndividuaName.complex.bullet1.plural.LimitedLiabilityPartnership = the {0} LLP members who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
 companiesHouseIndividuaName.complex.bullet2.singular.LimitedLiabilityPartnership = 1 other LLP member
 companiesHouseIndividuaName.complex.bullet2.plural.LimitedLiabilityPartnership = {0} other LLP members
 
 companiesHouseIndividuaName.complex.intro.LimitedCompany = We need the names of:
-companiesHouseIndividuaName.complex.bullet1.singular.LimitedCompany = the director responsible for tax advice
-companiesHouseIndividuaName.complex.bullet1.plural.LimitedCompany = the {0} directors responsible for tax advice
+companiesHouseIndividuaName.complex.bullet1.singular.LimitedCompany = the director who meets the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
+companiesHouseIndividuaName.complex.bullet1.plural.LimitedCompany = the {0} directors who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
 companiesHouseIndividuaName.complex.bullet2.singular.LimitedCompany = 1 other director
 companiesHouseIndividuaName.complex.bullet2.plural.LimitedCompany = {0} other directors
 
-companiesHouseIndividuaName.complex.intro.LimitedPartnership = We need the names of:
-companiesHouseIndividuaName.complex.bullet1.singular.LimitedPartnership = the partner responsible for tax advice
-companiesHouseIndividuaName.complex.bullet1.plural.LimitedPartnership = the {0} partners responsible for tax advice
-companiesHouseIndividuaName.complex.bullet2.singular.LimitedPartnership = 1 other partner
-companiesHouseIndividuaName.complex.bullet2.plural.LimitedPartnership = {0} other partners
-
-companiesHouseIndividuaName.complex.intro.ScottishLimitedPartnership = We need the names of:
-companiesHouseIndividuaName.complex.bullet1.singular.ScottishLimitedPartnership = the partner responsible for tax advice
-companiesHouseIndividuaName.complex.bullet1.plural.ScottishLimitedPartnership = the {0} partners responsible for tax advice
-companiesHouseIndividuaName.complex.bullet2.singular.ScottishLimitedPartnership = 1 other partner
-companiesHouseIndividuaName.complex.bullet2.plural.ScottishLimitedPartnership = {0} other partners
+companiesHouseIndividuaName.complex.intro.Partnership = We need the names of:
+companiesHouseIndividuaName.complex.bullet1.singular.Partnership = the partner who meets the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
+companiesHouseIndividuaName.complex.bullet1.plural.Partnership = the {0} partners who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
+companiesHouseIndividuaName.complex.bullet2.singular.Partnership = any other partner
+companiesHouseIndividuaName.complex.bullet2.plural.Partnership = any other {0} partners
 
 addToListSummary.LimitedLiabilityPartnership.complex.intro = We need the names of:
 addToListSummary.LimitedLiabilityPartnership.complex.bullet1.singular = the LLP member responsible for tax advice at {1}
 addToListSummary.LimitedLiabilityPartnership.complex.bullet1.plural = the {0} LLP members responsible for tax advice at {1}
-addToListSummary.LimitedLiabilityPartnership.complex.bullet2.singular = 1 other LLP member for {1}
-addToListSummary.LimitedLiabilityPartnership.complex.bullet2.plural = {0} other LLP members for {1}
+addToListSummary.LimitedLiabilityPartnership.complex.bullet2.singular = any other LLP member at {1}
+addToListSummary.LimitedLiabilityPartnership.complex.bullet2.plural = any other {0} LLP members at {1}
 
 addToListSummary.LimitedCompany.complex.intro = We need the names of:
-addToListSummary.LimitedCompany.complex.bullet1.singular = the director responsible for tax advice at {1}
-addToListSummary.LimitedCompany.complex.bullet1.plural = the {0} directors responsible for tax advice at {1}
-addToListSummary.LimitedCompany.complex.bullet2.singular = 1 other director for {1}
-addToListSummary.LimitedCompany.complex.bullet2.plural = {0} other directors for {1}
+addToListSummary.LimitedCompany.complex.bullet1.singular = the director who meets the definition of relevant individual because of their senior role in managing or organising tax adviser activities
+addToListSummary.LimitedCompany.complex.bullet1.plural = the {0} directors who meet the definition of relevant individual because of their senior role in managing or organising tax adviser activities
+addToListSummary.LimitedCompany.complex.bullet2.singular = any other director at {1}
+addToListSummary.LimitedCompany.complex.bullet2.plural = any other {0} directors at {1}
 
-addToListSummary.LimitedPartnership.complex.intro = We need the names of:
-addToListSummary.LimitedPartnership.complex.bullet1.singular = the partner responsible for tax advice at {1}
-addToListSummary.LimitedPartnership.complex.bullet1.plural = the {0} partners responsible for tax advice at {1}
-addToListSummary.LimitedPartnership.complex.bullet2.singular = 1 other partner for {1}
-addToListSummary.LimitedPartnership.complex.bullet2.plural = {0} other partners for {1}
-
-addToListSummary.ScottishLimitedPartnership.complex.intro = We need the names of:
-addToListSummary.ScottishLimitedPartnership.complex.bullet1.singular = the partner responsible for tax advice at {1}
-addToListSummary.ScottishLimitedPartnership.complex.bullet1.plural = the {0} partners responsible for tax advice at {1}
-addToListSummary.ScottishLimitedPartnership.complex.bullet2.singular = 1 other partner for {1}
-addToListSummary.ScottishLimitedPartnership.complex.bullet2.plural = {0} other partners for {1}
+addToListSummary.Partnership.complex.intro = We need the names of:
+addToListSummary.Partnership.complex.bullet1.singular = the partner responsible for tax advice
+addToListSummary.Partnership.complex.bullet1.plural = the {0} partners responsible for tax advice
+addToListSummary.Partnership.complex.bullet2.singular = any other partner
+addToListSummary.Partnership.complex.bullet2.plural = any other {0} partners
 
 removeKeyIndividual.title.LimitedLiabilityPartnership = Confirm that you want to remove {0} from the list of LLP members
 removeKeyIndividual.title.LimitedCompany = Confirm that you want to remove {0} from the list of directors
-removeKeyIndividual.title.LimitedPartnership = Confirm that you want to remove {0} from the list of partners
-removeKeyIndividual.title.ScottishLimitedPartnership = Confirm that you want to remove {0} from the list of partners
+removeKeyIndividual.title.Partnership = Confirm that you want to remove {0} from the list of partners
 removeKeyIndividual.title.otherRelevantIndividuals = Confirm that you want to remove {0} from the list of relevant individuals
 removeKeyIndividual.error.required.LimitedLiabilityPartnership = Select yes if you want to remove {0} from the list of LLP members
 removeKeyIndividual.error.required.LimitedCompany = Select yes if you want to remove {0} from the list of directors
-removeKeyIndividual.error.required.LimitedPartnership = Select yes if you want to remove {0} from the list of partners
-removeKeyIndividual.error.required.ScottishLimitedPartnership = Select yes if you want to remove {0} from the list of partners
+removeKeyIndividual.error.required.Partnership = Select yes if you want to remove {0} from the list of partners
 removeKeyIndividual.error.required.otherRelevantIndividuals = Select yes if you want to remove {0} from the list of relevant individuals
 
 # Application outcome

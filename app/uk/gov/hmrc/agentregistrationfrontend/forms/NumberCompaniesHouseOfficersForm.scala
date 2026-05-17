@@ -16,24 +16,45 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.forms
 
-import play.api.data.Forms.mapping
 import play.api.data.Form
-import play.api.data.Forms
+import play.api.data.Forms.mapping
+import play.api.data.Forms.text
+import play.api.data.validation.Constraint
+import play.api.data.validation.Invalid
+import play.api.data.validation.Valid
+import play.api.data.validation.ValidationError
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
-import uk.gov.hmrc.agentregistrationfrontend.forms.mappings.Mappings.numberFromString
 
 object NumberCompaniesHouseOfficersForm:
 
-  // Single input field (the value you want to capture)
   val numberOfOfficersResponsibleForTaxMatters: String = "numberOfOfficersResponsibleForTaxMatters"
 
-  def form(totalCompaniesHouseOfficers: Int): Form[Int] = Form(
+  def form(
+    totalCompaniesHouseOfficers: Int,
+    businessTypeKey: String
+  ): Form[Int] = Form(
     mapping(
       numberOfOfficersResponsibleForTaxMatters ->
-        numberFromString(numberOfOfficersResponsibleForTaxMatters)
+        text
           .verifying(
-            ErrorKeys.invalidInputErrorMessage(numberOfOfficersResponsibleForTaxMatters),
-            n => n >= 1 && n <= totalCompaniesHouseOfficers
+            ErrorKeys.requiredFieldErrorMessage(s"$numberOfOfficersResponsibleForTaxMatters.$businessTypeKey"),
+            _.nonEmpty
+          )
+          .verifying(
+            s"$numberOfOfficersResponsibleForTaxMatters.notANumber",
+            str => str.toIntOption.isDefined
+          )
+          .transform[Int](_.toInt, _.toString)
+          .verifying(
+            Constraint[Int](ErrorKeys.invalidInputErrorMessage(s"$numberOfOfficersResponsibleForTaxMatters.$businessTypeKey")) { n =>
+              if (n >= 1 && n <= totalCompaniesHouseOfficers)
+                Valid
+              else
+                Invalid(ValidationError(
+                  ErrorKeys.invalidInputErrorMessage(s"$numberOfOfficersResponsibleForTaxMatters.$businessTypeKey"),
+                  totalCompaniesHouseOfficers
+                ))
+            }
           )
     )(identity)(Some(_))
   )
