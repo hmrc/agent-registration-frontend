@@ -70,19 +70,11 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
       applicationState = GrsDataReceived
     )
 
-    val afterIsDuplicateAsaFalse: AgentApplicationLlp = afterGrsDataReceived.copy(
-      isDuplicateAsa = Some(false)
-    )
-
-    val afterIsDuplicateAsaTrue: AgentApplicationLlp = afterGrsDataReceived.copy(
-      isDuplicateAsa = Some(true)
-    )
-
-    val afterRefusalToDealWithCheckPass: AgentApplicationLlp = afterIsDuplicateAsaFalse.copy(
+    val afterRefusalToDealWithCheckPass: AgentApplicationLlp = afterGrsDataReceived.copy(
       refusalToDealWithCheckResult = Some(CheckResult.Pass)
     )
 
-    val afterRefusalToDealWithCheckFail: AgentApplicationLlp = afterIsDuplicateAsaFalse.copy(
+    val afterRefusalToDealWithCheckFail: AgentApplicationLlp = afterGrsDataReceived.copy(
       refusalToDealWithCheckResult = Some(CheckResult.Fail)
     )
 
@@ -96,7 +88,15 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
       payeRefs = Some(List.empty)
     )
 
-    val afterContactDetailsComplete: AgentApplicationLlp = afterUnifiedCustomerRegistryUpdateIdentifiers.copy(
+    val afterIsDuplicateAsaFalse: AgentApplicationLlp = afterUnifiedCustomerRegistryUpdateIdentifiers.copy(
+      isDuplicateAsa = Some(false)
+    )
+
+    val afterIsDuplicateAsaTrue: AgentApplicationLlp = afterUnifiedCustomerRegistryUpdateIdentifiers.copy(
+      isDuplicateAsa = Some(true)
+    )
+
+    val afterContactDetailsComplete: AgentApplicationLlp = afterIsDuplicateAsaFalse.copy(
       applicantContactDetails = Some(dependencies.applicantContactDetails),
       agentDetails = None
     )
