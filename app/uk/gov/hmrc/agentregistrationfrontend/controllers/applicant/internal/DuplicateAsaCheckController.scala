@@ -28,6 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendContr
 import uk.gov.hmrc.agentregistrationfrontend.services.SubscriptionService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import com.softwaremill.quicklens.*
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -39,7 +40,8 @@ class DuplicateAsaCheckController @Inject() (
   actions: ApplicantActions,
   enrolmentStoreProxyConnector: EnrolmentStoreProxyConnector,
   subscriptionService: SubscriptionService,
-  agentApplicationService: AgentApplicationService
+  agentApplicationService: AgentApplicationService,
+  appConfig: AppConfig
 )
 extends FrontendController(mcc, actions):
 
@@ -75,10 +77,11 @@ extends FrontendController(mcc, actions):
       )
     yield
       if arnHasPrincipalGroups then Redirect(alreadySubscribedPage)
-      else Redirect(nextCheckEndpoint)
+      else Redirect(asaDashboardUrl)
 
   private def alreadySubscribedPage: Call = AppRoutes.apply.checkfailed.AlreadySubscribedController.show
   private def nextCheckEndpoint: Call = AppRoutes.apply.internal.UnifiedCustomerRegistryController.populateApplicationIdentifiersFromUcr
+  private def asaDashboardUrl: String = appConfig.asaDashboardUrl
 
   extension (agentApplication: AgentApplication)
     private def isDuplicateAsaCheckRequired: Boolean = agentApplication.isDuplicateAsa.isEmpty
