@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.getCrn
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistration.shared.risking.submitforrisking.*
+import uk.gov.hmrc.agentregistrationfrontend.audit.AuditService
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationRiskingConnector
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingServiceHelper.*
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
@@ -36,7 +37,8 @@ import scala.concurrent.Future
 
 @Singleton
 class AgentRegistrationRiskingService @Inject() (
-  agentRegistrationRiskingConnector: AgentRegistrationRiskingConnector
+  agentRegistrationRiskingConnector: AgentRegistrationRiskingConnector,
+  auditService: AuditService
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
@@ -44,16 +46,18 @@ extends RequestAwareLogging:
     agentApplication: AgentApplication,
     individuals: List[IndividualProvidedDetails]
   )(using request: RequestHeader): Future[Unit] =
-
     val submitForRiskingRequest: SubmitForRiskingRequest = SubmitForRiskingRequest(
       applicationData = makeApplicationData(agentApplication),
       individuals = individuals.map(makeIndividualData)
     )
 
-    agentRegistrationRiskingConnector.submitForRisking(submitForRiskingRequest)
+    for
+      _ <- agentRegistrationRiskingConnector.submitForRisking(submitForRiskingRequest)
+      _ = auditService.sendRiskingSubmissionEvent(agentApplication, individuals)
+    yield ()
 
-  def getRiskingProgress(applicationReference: ApplicationReference)(using request: RequestHeader): Future[RiskingProgress] = agentRegistrationRiskingConnector
-    .getRiskingProgressForApplicant(applicationReference)
+  def getRiskingProgress(applicationReference: ApplicationReference)(using request: RequestHeader): Future[RiskingProgress] =
+    agentRegistrationRiskingConnector.getRiskingProgressForApplicant(applicationReference)
 
 object AgentRegistrationRiskingServiceHelper:
 

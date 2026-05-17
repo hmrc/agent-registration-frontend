@@ -18,43 +18,32 @@ package uk.gov.hmrc.agentregistrationfrontend.audit
 
 import play.api.libs.json.Format
 import play.api.libs.json.Json
-import play.api.libs.json.OFormat
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.ApplicationReference
-import uk.gov.hmrc.agentregistration.shared.BusinessType
-import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
-import uk.gov.hmrc.agentregistration.shared.PersonReference
+import play.api.libs.json.OWrites
+import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentDetails
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantContactDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
+import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 
 sealed trait AuditEvent:
 
   val applicationReference: ApplicationReference
   val auditType: String = this.getClass.getSimpleName
 
-// The application does not support non-uk for now so isUkEntity is set to always true
 final case class StartOrContinueApplication(
   applicationReference: ApplicationReference,
   journeyType: StartOrContinueApplication.JourneyType,
   entityType: BusinessType,
-  isUkEntity: Boolean = true
+  isUkEntity: Boolean = true // The application does not support non-uk for now so isUkEntity is set to always true
 )
 extends AuditEvent
 
 object StartOrContinueApplication:
 
-  def make(
-    agentApplication: AgentApplication,
-    journeyType: JourneyType
-  ): StartOrContinueApplication = StartOrContinueApplication(
-    applicationReference = agentApplication.applicationReference,
-    journeyType = journeyType,
-    entityType = agentApplication.businessType
-  )
-
-  given format: Format[StartOrContinueApplication] = Json.format[StartOrContinueApplication]
+  given OWrites[StartOrContinueApplication] = Json.writes[StartOrContinueApplication]
 
   enum JourneyType:
 
@@ -62,7 +51,22 @@ object StartOrContinueApplication:
     case Continue
 
   object JourneyType:
-    given format: Format[JourneyType] = JsonFormatsFactory.makeEnumFormat
+    given Format[JourneyType] = JsonFormatsFactory.makeEnumFormat[JourneyType]
+
+final case class ApplicationSubmitted(
+  applicationReference: ApplicationReference,
+  linkId: LinkId,
+  isResubmission: Boolean,
+  utr: Utr,
+  applicantDetails: ApplicantContactDetails,
+  agentDetails: Option[AgentDetails],
+  amlsSupervisionDetails: Option[AmlsDetails],
+  individualsList: List[IndividualProvidedDetails]
+)
+extends AuditEvent
+
+object ApplicationSubmitted:
+  given OWrites[ApplicationSubmitted] = Json.writes[ApplicationSubmitted]
 
 final case class IndividualSubmission(
   applicationReference: ApplicationReference,
@@ -76,20 +80,4 @@ final case class IndividualSubmission(
 extends AuditEvent
 
 object IndividualSubmission:
-
-  def make(
-    applicationReference: ApplicationReference,
-    individualProvidedDetails: IndividualProvidedDetails,
-    providedByApplicant: Boolean,
-    lastIndividualResponse: Boolean
-  ): IndividualSubmission = IndividualSubmission(
-    applicationReference = applicationReference,
-    personReference = individualProvidedDetails.personReference,
-    fullName = individualProvidedDetails.individualName,
-    providedByApplicant = providedByApplicant,
-    nino = individualProvidedDetails.individualNino,
-    sautr = individualProvidedDetails.individualSaUtr,
-    lastIndividualResponse = lastIndividualResponse
-  )
-
-  given format: Format[IndividualSubmission] = Json.format[IndividualSubmission]
+  given OWrites[IndividualSubmission] = Json.writes[IndividualSubmission]
