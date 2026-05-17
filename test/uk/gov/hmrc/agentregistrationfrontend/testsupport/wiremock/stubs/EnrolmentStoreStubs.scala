@@ -20,11 +20,12 @@ import com.github.tomakehurst.wiremock.client.WireMock as wm
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.Json
+import uk.gov.hmrc.agentregistration.shared.Arn
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
-object EnrolmentStoreStubs {
+object EnrolmentStoreStubs:
 
   def stubQueryEnrolmentsAllocatedToGroup(
     groupId: GroupId,
@@ -59,4 +60,46 @@ object EnrolmentStoreStubs {
     urlPattern = wm.urlMatching(s"/enrolment-store-proxy/enrolment-store/groups/${groupId.value}/enrolments")
   )
 
-}
+  def stubQueryArnHasPrincipalGroups(
+    arn: Arn
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlEqualTo(s"/enrolment-store-proxy/enrolment-store/enrolments/HMRC-AS-AGENT~AgentReferenceNumber~${arn.value}/groups?type=principal"),
+    responseStatus = Status.OK,
+    responseBody = Json.prettyPrint(
+      Json.obj(
+        "principalGroupIds" -> Json.arr("principal-group-id")
+      )
+    )
+  )
+
+  def stubQueryArnHasNoPrincipalGroups(
+    arn: Arn
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlEqualTo(s"/enrolment-store-proxy/enrolment-store/enrolments/HMRC-AS-AGENT~AgentReferenceNumber~${arn.value}/groups?type=principal"),
+    responseStatus = Status.OK,
+    responseBody = Json.prettyPrint(
+      Json.obj(
+        "principalGroupIds" -> Json.arr()
+      )
+    )
+  )
+
+  def stubQueryArnHasPrincipalGroupsNoContent(
+    arn: Arn
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlEqualTo(s"/enrolment-store-proxy/enrolment-store/enrolments/HMRC-AS-AGENT~AgentReferenceNumber~${arn.value}/groups?type=principal"),
+    responseStatus = Status.NO_CONTENT,
+    responseBody = ""
+  )
+
+  def verifyQueryArnHasPrincipalGroups(
+    arn: Arn,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlEqualTo(s"/enrolment-store-proxy/enrolment-store/enrolments/HMRC-AS-AGENT~AgentReferenceNumber~${arn.value}/groups?type=principal"),
+    count = count
+  )
