@@ -22,6 +22,7 @@ import play.api.libs.json.Json
 final case class BusinessPartnerRecord(
   businessPartnerExists: Boolean = false,
   safeId: String,
+  agentReferenceNumber: Option[String] = None, // required for ES1 agent already registered internal check
   uniqueTaxReference: Option[String] = None, // required for DES /registration/personal-details/...
   utr: Option[String] = None, // required for DES /registration/individual/...
   crn: Option[String] = None,

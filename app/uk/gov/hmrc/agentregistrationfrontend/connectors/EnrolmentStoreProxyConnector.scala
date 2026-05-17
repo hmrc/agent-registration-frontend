@@ -58,6 +58,40 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed query for EnrolmentsAllocatedToGroup for $groupId")
 
+  /** ES1: Query groups who have an allocated enrolment
+    * https://confluence.tools.tax.service.gov.uk/pages/viewpage.action?spaceKey=GGWRLS&title=ES1+-+Query+groups+who+have+an+allocated+enrolment
+    */
+  def queryArnHasPrincipleGroups(
+    agentReferenceNumber: Arn
+  )(using RequestHeader): Future[Boolean] =
+    val enrolmentKey = s"HMRC-AS-AGENT~AgentReferenceNumber~${agentReferenceNumber.value}"
+    val url: URL = url"$baseUrl/enrolment-store/enrolments/$enrolmentKey/groups?type=principal"
+
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map(getArnHasPrincipleGroups(url))
+      .andLogOnFailure(s"Failed query for queryGroupsAllocatedToArn for agentReferenceNumber $agentReferenceNumber")
+
+  private def getArnHasPrincipleGroups(url: URL)(response: HttpResponse): Boolean =
+    response.status match
+      case Status.OK if hasPrincipalGroups(response) => true
+      case Status.OK | Status.NO_CONTENT => false
+      case status =>
+        Errors.throwUpstreamErrorResponse(
+          httpMethod = "GET",
+          url = url,
+          status = status,
+          response = response
+        )
+
+  private def hasPrincipalGroups(response: HttpResponse): Boolean =
+    response
+      .json
+      .as[EnrolmentStoreProxyConnector.PrincipalGroupsAllocatedToArn]
+      .principalGroupIds
+      .nonEmpty
+
   private val baseUrl: String = appConfig.enrolmentStoreProxyBaseUrl + "/enrolment-store-proxy"
 
 object EnrolmentStoreProxyConnector:
@@ -73,3 +107,13 @@ object EnrolmentStoreProxyConnector:
         (__ \ "service").read[String] and
           (__ \ "state").read[String]
       )(Enrolment.apply)
+
+  final case class PrincipalGroupsAllocatedToArn(
+    principalGroupIds: List[String]
+  )
+
+  object PrincipalGroupsAllocatedToArn:
+
+    given Reads[PrincipalGroupsAllocatedToArn] = (__ \ "principalGroupIds")
+      .readWithDefault[List[String]](List.empty)
+      .map(PrincipalGroupsAllocatedToArn.apply)

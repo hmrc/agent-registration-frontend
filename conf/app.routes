@@ -21,6 +21,7 @@ GET         /apply/unable-to-confirm-business-details               uk.gov.hmrc.
 GET         /apply/not-agent-credential                             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NotAgentCredentialController.show(continueUrl: Option[RedirectUrl])
 GET         /apply/not-agent-login                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.NotAgentLoginController.show(continueUrl: Option[RedirectUrl])
 GET         /apply/exit                                             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.genericExitPage
+GET         /apply/already-subscribed                               uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.AlreadySubscribedController.show
 
 ## About your business routes
 GET         /apply/about-your-business/agent-type                   uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.AgentTypeController.show
@@ -47,6 +48,7 @@ POST        /apply/about-your-business/start-again                   uk.gov.hmrc
 GET        /apply/internal/initiate-agent-application/:agentType/:businessType/:userRole        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.InitiateAgentApplicationController.initiateAgentApplication(agentType: AgentType, businessType: BusinessType, userRole: UserRole)
 GET        /apply/internal/grs/start-journey                                          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.GrsController.startJourney()
 GET        /apply/internal/grs/journey-callback                                       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.GrsController.journeyCallback(journeyId: Option[grs.JourneyId])
+GET        /apply/internal/duplicate-asa-check                                        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.DuplicateAsaCheckController.check()
 GET        /apply/internal/address-lookup/journey-callback                            uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.AddressLookupCallbackController.journeyCallback(id: Option[addresslookup.JourneyId])
 GET        /apply/internal/refusal-to-deal-with-check                                 uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.RefusalToDealWithController.check()
 GET        /apply/internal/deceased-check                                             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.DeceasedController.check()
