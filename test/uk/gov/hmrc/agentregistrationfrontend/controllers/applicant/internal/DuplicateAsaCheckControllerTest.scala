@@ -31,10 +31,10 @@ extends ControllerSpec:
 
   object agentApplication:
 
-    val afterGrsDataReceived: AgentApplicationLlp =
+    val afterUnifiedCustomerRegistryUpdateIdentifiers: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
-        .afterGrsDataReceived
+        .afterUnifiedCustomerRegistryUpdateIdentifiers
 
     val afterIsDuplicateAsaFalse: AgentApplicationLlp =
       tdAll
@@ -46,10 +46,10 @@ extends ControllerSpec:
         .agentApplicationLlp
         .afterIsDuplicateAsaTrue
 
-  private val arn: Arn = Arn("TARN0000001")
-  private val utr: Utr = agentApplication.afterGrsDataReceived.getUtr
+  private val arn: Arn = tdAll.arn
+  private val utr: Utr = agentApplication.afterUnifiedCustomerRegistryUpdateIdentifiers.getUtr
   private val path: String = "/agent-registration/apply/internal/duplicate-asa-check"
-  private val nextCheckUrl: String = "/agent-registration/apply/internal/unified-customer-registry-identifiers"
+  private val nextUrl: String = "/agent-registration/apply/task-list"
   private val alreadySubscribedPage: String = "/agent-registration/apply/already-subscribed"
   private val asaDashboard: String = "http://localhost:9401/agent-services-account/home"
 
@@ -61,25 +61,26 @@ extends ControllerSpec:
 
   s"GET $path should redirect to unified customer registry when business is not already registered as an agent" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterGrsDataReceived)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterUnifiedCustomerRegistryUpdateIdentifiers)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
       utr = utr,
       responseBody = tdAll.businessPartnerRecordResponse
     )
+    AgentRegistrationStubs.stubUpdateAgentApplication(agentApplication.afterIsDuplicateAsaFalse)
 
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe nextCheckUrl
+    response.header("Location").value shouldBe nextUrl
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyGetBusinessPartnerRecord(utr)
     EnrolmentStoreStubs.verifyQueryArnHasPrincipalGroups(arn, 0)
-    AgentRegistrationStubs.verifyUpdateAgentApplication(0)
+    AgentRegistrationStubs.verifyUpdateAgentApplication()
 
   s"GET $path should set asa duplicate status true and redirect to already subscribed page when principal group ids found" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterGrsDataReceived)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterUnifiedCustomerRegistryUpdateIdentifiers)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
       utr = utr,
       responseBody = tdAll.businessPartnerRecordResponse.copy(
@@ -102,7 +103,7 @@ extends ControllerSpec:
 
   s"GET $path should set asa duplicate status true, update known facts and enrolments and redirect to asa dashboard page when ARN has no found principal groups" in:
     AuthStubs.stubAuthorise()
-    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterGrsDataReceived)
+    AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterUnifiedCustomerRegistryUpdateIdentifiers)
     AgentRegistrationStubs.stubGetBusinessPartnerRecord(
       utr = utr,
       responseBody = tdAll.businessPartnerRecordResponse.copy(
@@ -130,17 +131,13 @@ extends ControllerSpec:
   s"GET $path should redirect to unified customer registry when duplicate ASA check has already been done" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterIsDuplicateAsaFalse)
-    AgentRegistrationStubs.stubGetBusinessPartnerRecord(
-      utr = utr,
-      responseBody = tdAll.businessPartnerRecordResponse
-    )
 
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe nextCheckUrl
+    response.header("Location").value shouldBe nextUrl
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
-    AgentRegistrationStubs.verifyGetBusinessPartnerRecord(utr)
+    AgentRegistrationStubs.verifyGetBusinessPartnerRecord(utr, 0)
     EnrolmentStoreStubs.verifyQueryArnHasPrincipalGroups(arn, 0)
     AgentRegistrationStubs.verifyUpdateAgentApplication(0)
