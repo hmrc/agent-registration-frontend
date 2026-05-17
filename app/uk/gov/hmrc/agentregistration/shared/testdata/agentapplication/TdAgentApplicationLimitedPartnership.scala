@@ -61,26 +61,27 @@ trait TdAgentApplicationLimitedPartnership {
       applicationState = GrsDataReceived
     )
 
-    val afterIsDuplicateAsaFalse: AgentApplicationLimitedPartnership = afterGrsDataReceived.copy(
-      isDuplicateAsa = Some(false)
-    )
-
-    val afterIsDuplicateAsaTrue: AgentApplicationLimitedPartnership = afterGrsDataReceived.copy(
-      isDuplicateAsa = Some(true)
-    )
-
-    val afterRefusalToDealWithCheckPass: AgentApplicationLimitedPartnership = afterIsDuplicateAsaFalse.copy(
+    val afterRefusalToDealWithCheckPass: AgentApplicationLimitedPartnership = afterGrsDataReceived.copy(
       refusalToDealWithCheckResult = Some(CheckResult.Pass)
     )
 
-    val afterRefusalToDealWithCheckFail: AgentApplicationLimitedPartnership = afterIsDuplicateAsaFalse.copy(
+    val afterRefusalToDealWithCheckFail: AgentApplicationLimitedPartnership = afterGrsDataReceived.copy(
       refusalToDealWithCheckResult = Some(CheckResult.Fail)
     )
 
-    val afterContactDetailsComplete: AgentApplicationLimitedPartnership = afterRefusalToDealWithCheckPass.copy(
+    val afterIsDuplicateAsaFalse: AgentApplicationLimitedPartnership = afterRefusalToDealWithCheckPass.copy(
+      isDuplicateAsa = Some(false)
+    )
+
+    val afterIsDuplicateAsaTrue: AgentApplicationLimitedPartnership = afterRefusalToDealWithCheckPass.copy(
+      isDuplicateAsa = Some(true)
+    )
+
+    val afterContactDetailsComplete: AgentApplicationLimitedPartnership = afterIsDuplicateAsaFalse.copy(
       applicantContactDetails = Some(dependencies.applicantContactDetails),
       agentDetails = None
     )
+
 
     val afterAgentDetailsComplete: AgentApplicationLimitedPartnership = afterContactDetailsComplete.copy(
       agentDetails = Some(dependencies.completeAgentDetails)

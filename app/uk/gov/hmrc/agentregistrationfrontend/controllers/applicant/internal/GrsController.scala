@@ -16,11 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal
 
-import play.api.mvc.Action
-import play.api.mvc.AnyContent
-import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.RequestHeader
-import play.api.mvc.Result
+import play.api.mvc.{Action, AnyContent, Call, MessagesControllerComponents, RequestHeader, Result}
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotSoleTrader
 import uk.gov.hmrc.agentregistration.shared.businessdetails.BusinessDetailsGeneralPartnership
@@ -61,7 +57,7 @@ extends FrontendController(mcc, actions):
       resultWhenConditionNotMet =
         implicit request =>
           logger.warn("Data from GRS already exists. Redirecting to verify entity.")
-          Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
+          Redirect(nextCheckEndpoint)
     )
 
   def startJourney(): Action[AnyContent] = baseAction
@@ -157,7 +153,9 @@ extends FrontendController(mcc, actions):
     agentApplicationService
       .upsert(updatedApplication)
       .map: _ =>
-        Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
+        Redirect(nextCheckEndpoint)
+  
+  private val nextCheckEndpoint: Call = AppRoutes.apply.internal.RefusalToDealWithController.check()
 
 object GrsController:
 

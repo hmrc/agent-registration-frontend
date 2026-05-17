@@ -28,6 +28,8 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendContr
 import uk.gov.hmrc.agentregistrationfrontend.services.SubscriptionService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import com.softwaremill.quicklens.*
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 
 import javax.inject.Inject
@@ -47,19 +49,30 @@ extends FrontendController(mcc, actions):
 
   def check(): Action[AnyContent] = actions
     .getApplicationInProgress
-    .getBusinessPartnerRecord
+    .ensure(
+      condition =
+        _.agentApplication
+          .applicationState === ApplicationState.GrsDataReceived,
+      resultWhenConditionNotMet =
+        implicit request =>
+          logger.warn("Missing data from GRS, redirecting to start GRS registration")
+          Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
+    )
     .ensure(
       condition = _.agentApplication.isDuplicateAsaCheckRequired,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("Duplicate ASA verification already done. Redirecting to next check.")
-          Redirect(nextCheckEndpoint)
+          logger.warn("Duplicate ASA verification already done. Redirecting to next endpoint.")
+          Redirect(nextEndpoint)
     )
+    .getBusinessPartnerRecord
     .async:
       implicit request =>
         request.get[BusinessPartnerRecordResponse] match
           case bpr if bpr.isAlreadyRegisteredAsAgent => handleRegisteredAsAgent(bpr.getAgentReferenceNumber)
-          case _ => Future.successful(Redirect(nextCheckEndpoint))
+          case _ =>
+            updateDuplicateAsaStatus(isDuplicateAsa = false)
+              .map(_ => Redirect(nextEndpoint))
 
   private def handleRegisteredAsAgent(
     agentReferenceNumber: Arn
@@ -70,18 +83,22 @@ extends FrontendController(mcc, actions):
         if arnHasPrincipalGroups
         then Future.unit
         else subscriptionService.addKnownFactsAndEnrolUk(agentReferenceNumber)
-      _ <- agentApplicationService.upsert(
-        request.agentApplication
-          .modify(_.isDuplicateAsa)
-          .setTo(Some(arnHasPrincipalGroups))
-      )
+      _ <- updateDuplicateAsaStatus(isDuplicateAsa = true)
     yield
       if arnHasPrincipalGroups then Redirect(alreadySubscribedPage)
       else Redirect(asaDashboardUrl)
 
+  private def updateDuplicateAsaStatus(
+    isDuplicateAsa: Boolean
+  )(using request: RequestWithData[DataWithApplicationAndBpr]): Future[Unit] = agentApplicationService.upsert(
+    request.agentApplication
+      .modify(_.isDuplicateAsa)
+      .setTo(Some(isDuplicateAsa))
+  )
+
   private def alreadySubscribedPage: Call = AppRoutes.apply.checkfailed.AlreadySubscribedController.show
-  private def nextCheckEndpoint: Call = AppRoutes.apply.internal.UnifiedCustomerRegistryController.populateApplicationIdentifiersFromUcr
+  private def nextEndpoint: Call = AppRoutes.apply.TaskListController.show
   private def asaDashboardUrl: String = appConfig.asaDashboardUrl
 
   extension (agentApplication: AgentApplication)
-    private def isDuplicateAsaCheckRequired: Boolean = agentApplication.isDuplicateAsa.isEmpty
+    private def isDuplicateAsaCheckRequired: Boolean = agentApplication.isDuplicateAsa =!= Some(false)

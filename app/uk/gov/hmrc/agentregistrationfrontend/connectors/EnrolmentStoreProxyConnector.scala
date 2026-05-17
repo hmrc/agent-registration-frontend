@@ -70,10 +70,10 @@ extends Connector:
     httpClient
       .get(url)
       .execute[HttpResponse]
-      .map(principalGroupsCheckResult(url))
+      .map(getArnHasPrincipleGroups(url))
       .andLogOnFailure(s"Failed query for queryGroupsAllocatedToArn for agentReferenceNumber $agentReferenceNumber")
 
-  private def principalGroupsCheckResult(url: URL)(response: HttpResponse): Boolean =
+  private def getArnHasPrincipleGroups(url: URL)(response: HttpResponse): Boolean =
     response.status match
       case Status.OK if hasPrincipalGroups(response) => true
       case Status.OK | Status.NO_CONTENT => false
