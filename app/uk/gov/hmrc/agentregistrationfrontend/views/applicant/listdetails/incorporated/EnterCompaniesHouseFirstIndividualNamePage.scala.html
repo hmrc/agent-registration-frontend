@@ -62,7 +62,8 @@
     }
 }
 
-@title = @{messages(s"$key.complex.title.$businessTypeKey")}
+
+@title = @{if(paddingRequired > 0) messages(s"$key.complex.withPadding.title.$businessTypeKey", entityName) else messages(s"$key.title.$businessTypeKey")}
 @numberOfMembers = @{sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters}
 @paddingRequired = @{sixOrMoreOfficers.requiredPadding}
 

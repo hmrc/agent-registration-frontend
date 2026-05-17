@@ -33,7 +33,7 @@ extends ControllerSpec:
   private val getPath = "/agent-registration/apply/list-details/enter-companies-house-officer"
   private val postPath = "/agent-registration/apply/list-details/enter-companies-house-officer"
 
-  private val headingFirst: String = "Tell us about the LLP members who are relevant individuals"
+  private val headingFirst: String = "Tell us about 5 LLP members at Test Company Name"
 
   object agentApplication:
 

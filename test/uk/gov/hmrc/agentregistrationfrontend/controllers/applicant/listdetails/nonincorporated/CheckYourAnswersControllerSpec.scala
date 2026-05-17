@@ -83,7 +83,9 @@ extends ControllerSpec:
       existingIndividuals = List(tdAll.providedDetails.precreated),
       expectedHeading = "You have added 1 partner",
       expectedButtonText = Some("Add another partner Save and come back later"), // there are 2 buttons expected
-      expectedInsetText = Some("We need the names of: the 3 partners responsible for tax advice any other 2 partners")
+      expectedInsetText = Some(
+        "We need the names of: the 3 partners who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities any other 2 partners at Test Company Name"
+      )
     ),
     TestCase(
       description = "list is incomplete and has 1 existing individual",
@@ -116,7 +118,7 @@ extends ControllerSpec:
 
   testCases.foreach: testCase =>
     s"GET $path should return 200 and render page when ${testCase.description}" in:
-      ApplyStubHelper.stubsForAuthAction(testCase.agentApplication)
+      ApplyStubHelper.stubsToSupplyBprToPage(testCase.agentApplication)
       AgentRegistrationStubs.stubFindIndividualsForApplication(
         agentApplicationId = testCase.agentApplication.agentApplicationId,
         individuals = testCase.existingIndividuals
@@ -137,7 +139,7 @@ extends ControllerSpec:
       AgentRegistrationStubs.verifyFindIndividualsForApplication(testCase.agentApplication.agentApplicationId)
 
   s"GET $path when list is empty should redirect to enter a key individual page" in:
-    ApplyStubHelper.stubsForAuthAction(agentApplication.afterOnlyOneKeyIndividual)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterOnlyOneKeyIndividual)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.afterHowManyKeyIndividuals.agentApplicationId,
       individuals = List.empty
@@ -151,7 +153,7 @@ extends ControllerSpec:
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterHowManyKeyIndividuals.agentApplicationId)
 
   s"GET $path when no number of key individuals have been supplied should redirect to number of key individuals page" in:
-    ApplyStubHelper.stubsForAuthAction(agentApplication.beforeHowManyKeyIndividuals)
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeHowManyKeyIndividuals)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.SEE_OTHER

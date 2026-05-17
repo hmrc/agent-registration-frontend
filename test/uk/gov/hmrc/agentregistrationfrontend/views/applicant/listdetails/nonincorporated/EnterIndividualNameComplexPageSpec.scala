@@ -37,7 +37,7 @@ extends ViewSpec:
 
   object ExpectedStrings:
 
-    val heading = "Tell us about the partners of Test Company Name"
+    val heading = "Tell us about 5 partners at Test Company Name"
     val firstPartnerLabel = "What is the full name of the first partner?"
     val nextPartnerLabel = "What is the full name of the next partner?"
 
@@ -53,10 +53,26 @@ extends ViewSpec:
   val ordinalKeys = List(firstPartnerKey, nextPartnerKey)
 
   val paddingCases: List[(Int, String, String)] = List(
-    (1, "the partner responsible for tax advice", "4 other partners"),
-    (2, "the 2 partners responsible for tax advice", "3 other partners"),
-    (3, "the 3 partners responsible for tax advice", "2 other partners"),
-    (4, "the 4 partners responsible for tax advice", "1 other partner")
+    (
+      1,
+      "the partner who meets the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities",
+      "any other 4 partners at Test Company Name"
+    ),
+    (
+      2,
+      "the 2 partners who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities",
+      "any other 3 partners at Test Company Name"
+    ),
+    (
+      3,
+      "the 3 partners who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities",
+      "any other 2 partners at Test Company Name"
+    ),
+    (
+      4,
+      "the 4 partners who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities",
+      "1 other partner at Test Company Name"
+    )
   )
 
   val testCases: List[TestCaseForComplexPage] = ordinalKeys.flatMap: ordinal =>
@@ -91,14 +107,11 @@ extends ViewSpec:
         doc.mainContent shouldContainContent
           s"""
              |Partners and other relevant individuals
-             |Tell us about the partners of Test Company Name
+             |Tell us about 5 partners at Test Company Name
              |We need the names of:
              |${testCase.expectedPaddingBullet1}
              |${testCase.expectedPaddingBullet2}
-             |What we mean by ‘responsible for tax advice’
-             |A partner is responsible for tax advice if they have:
-             |material responsibility for tax advice activities
-             |significant authority over HMRC interactions
+             |Read the guidance about how we define ‘relevant individuals’ (opens in new tab)
              |$expectedLabel
              |Save and continue
              |Save and come back later

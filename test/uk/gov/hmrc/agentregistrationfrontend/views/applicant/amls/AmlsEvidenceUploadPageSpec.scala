@@ -55,7 +55,7 @@ extends ViewSpec:
           |Upload evidence to show that Gambling Commission is your current anti-money laundering supervisor.
           |You can choose what evidence to upload.
           |Suitable evidence might be a letter, email or payment receipt from your supervisory body, confirming you’re covered.
-          |The file must be smaller than 5MB.
+          |The file must be smaller than 6MB.
           |Types of file we can accept
           |These file types are allowed:
           |image (.jpg, .jpeg, .png or .tiff)
@@ -86,7 +86,7 @@ extends ViewSpec:
         .mainContent
         .selectOrFail("#file-upload-progress")
         .selectOnlyOneElementOrFail()
-      progressIndicator.attr("data-max-file-size") shouldBe "5242880" // 5MiB in bytes
+      progressIndicator.attr("data-max-file-size") shouldBe "6291456" // 6MiB in bytes
       progressIndicator.attr("data-check-upload-status-max-attempts") shouldBe "20"
       progressIndicator.attr("data-check-upload-status-interval-ms") shouldBe "1000"
       progressIndicator.attr(

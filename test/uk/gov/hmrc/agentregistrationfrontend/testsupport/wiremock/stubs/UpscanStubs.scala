@@ -34,7 +34,7 @@ object UpscanStubs:
        "callbackUrl": "${ISpec.selfBaseUrl}/api/amls/process-notification-from-upscan/${uploadId.value}",
        "successRedirect": "${ISpec.thisFrontendBaseUrl}/agent-registration/apply/anti-money-laundering/evidence/upload-result",
        "errorRedirect": "${ISpec.thisFrontendBaseUrl}/agent-registration/apply/anti-money-laundering/evidence/error",
-       "maximumFileSize": 5242880
+       "maximumFileSize": 6291456
    }
    """
   }

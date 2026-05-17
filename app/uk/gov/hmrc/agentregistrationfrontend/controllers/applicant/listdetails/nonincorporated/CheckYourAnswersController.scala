@@ -45,10 +45,13 @@ class CheckYourAnswersController @Inject() (
 extends FrontendController(mcc, actions):
 
   private type DataWithLists =
-    List[IndividualProvidedDetails] *: NumberOfRequiredKeyIndividuals *: IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
+    List[
+      IndividualProvidedDetails
+    ] *: NumberOfRequiredKeyIndividuals *: BusinessPartnerRecordResponse *: IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
 
   private val baseAction: ActionBuilderWithData[DataWithLists] = actions
     .getApplicationInProgress
+    .getBusinessPartnerRecord
     .refine:
       implicit request =>
         request.get[AgentApplication] match
@@ -97,5 +100,6 @@ extends FrontendController(mcc, actions):
       val application: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals]
       Ok(view(
         numberOfKeyIndividuals = application.getNumberOfRequiredKeyIndividuals.getOrThrowExpectedDataMissing("NumberOfRequiredKeyIndividuals"),
-        existingList = request.get[List[IndividualProvidedDetails]]
+        existingList = request.get[List[IndividualProvidedDetails]],
+        entityName = request.get[BusinessPartnerRecordResponse].getEntityName
       ))
