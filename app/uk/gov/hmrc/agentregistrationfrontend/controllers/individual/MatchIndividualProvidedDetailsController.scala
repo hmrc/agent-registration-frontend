@@ -211,7 +211,7 @@ extends FrontendController(mcc, actions):
           logger.warn(s"User does not agree with the match to IndividualProvidedDetails record ${request.get[IndividualProvidedDetails]._id} from citizen details for user ${request.get[InternalUserId].value}, redirecting to manual name matching page")
           Future.successful(Redirect(AppRoutes.providedetails.NameMatchingController.show(linkId).url))
 
-  private def currentUrl(implicit request: RequestHeader): String = appConfig.thisFrontendBaseUrl + request.uri
+  private def currentUrl(implicit request: RequestHeader): String = appConfig.thisFrontendRelativeBaseUrl + request.uri
 
   private def redirectToIdentityVerification()(using request: RequestHeader): Result = Redirect(
     uri"""${appConfig.ivUpliftUrl}?${Map(
