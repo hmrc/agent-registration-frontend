@@ -16,19 +16,23 @@
 
 @import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 @import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
 @import uk.gov.hmrc.agentregistrationfrontend.util.MessageKeys.singularOrPlural
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 
 @this(
         layout: Layout,
         govukInput: GovukInput,
         formWithCSRF: FormWithCSRF,
         govukButton: GovukButton,
-        govukDetails: GovukDetails,
-        continueOrSaveForLater: ContinueOrSaveForLater
+        continueOrSaveForLater: ContinueOrSaveForLater,
+        hmrcNewTabLinkHelper: HmrcNewTabLinkHelper,
+        appConfig: AppConfig
 )
 
 @(
@@ -44,13 +48,9 @@
 @key = @{
   IndividualNameForm.key
 }
-@title = @{messages(s"$key.complex.title", entityName)}
-@detailsContent = {
-  <p class="govuk-body">@messages(s"$key.complex.details.p1")</p>
-  <ul class="govuk-list govuk-list--bullet">
-    <li>@messages(s"$key.complex.details.bullet1")</li>
-    <li>@messages(s"$key.complex.details.bullet2")</li>
-  </ul>
+@title = @{
+  if(paddingRequired > 0) messages(s"$key.complex.withPadding.title", entityName)
+  else messages(s"$key.complex.title", entityName)
 }
 @numberOfKeyIndividuals = @{numberOfRequiredKeyIndividuals.numberOfKeyIndividualsResponsibleForTaxMatters}
 @paddingRequired = @{numberOfRequiredKeyIndividuals.requiredPadding}
@@ -64,12 +64,15 @@
   <p class="govuk-body">@messages(s"$key.complex.intro")</p>
   <ul class="govuk-list govuk-list--bullet">
     <li>@messages(s"$key.complex.bullet1.${singularOrPlural(numberOfKeyIndividuals)}", numberOfKeyIndividuals)</li>
-    <li>@messages(s"$key.complex.bullet2.${singularOrPlural(paddingRequired)}", paddingRequired)</li>
+    <li>@messages(s"$key.complex.bullet2.${singularOrPlural(paddingRequired)}", paddingRequired, entityName)</li>
   </ul>
-  @govukDetails(Details(
-    summary = Text(messages(s"$key.complex.details")),
-    content = HtmlContent(detailsContent)
-  ))
+  <p class="govuk-body">
+    @hmrcNewTabLinkHelper(NewTabLinkHelper(
+      text = messages(s"$key.guidanceLink"),
+      href = Some(appConfig.govukDefinitionOfRelevantIndividualsUrl),
+    ))
+  </p>
+
   @formWithCSRF(action = formAction) {
     @govukInput(Input(
       label = Label(

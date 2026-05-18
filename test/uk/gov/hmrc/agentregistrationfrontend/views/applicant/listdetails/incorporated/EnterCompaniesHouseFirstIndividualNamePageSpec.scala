@@ -88,17 +88,17 @@ extends ViewSpec:
   for testCase <- testCases do
     s"EnterCompaniesHouseFirstIndividualNamePage for ${testCase.label}" should:
 
-      val heading = s"Tell us about the ${testCase.headingEntityType} who are relevant individuals"
+      val headingWithPadding = s"Tell us about 5 ${testCase.headingEntityType} at $entityName"
       val doc: Document = render(CompaniesHouseIndividuaNameForm.form, testCase.agentApplication)
 
       "have the correct caption" in:
         doc.mainContent.select(captionL).text() shouldBe testCase.caption
 
       "have the correct heading" in:
-        doc.mainContent.select("h1").text() shouldBe heading
+        doc.mainContent.select("h1").text() shouldBe headingWithPadding
 
       "have the correct title" in:
-        doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
+        doc.title() shouldBe s"$headingWithPadding - Apply for an agent services account - GOV.UK"
 
       "show the correct p1 text" in:
         doc.mainContent.select("p.govuk-body").first().text() shouldBe
@@ -140,7 +140,7 @@ extends ViewSpec:
           field = field,
           errorMessage = errorMessage,
           errorDoc = render(formWithError, testCase.agentApplication),
-          heading = heading
+          heading = headingWithPadding
         )
 
       "render a form error when the lastName field contains an error" in:
@@ -154,5 +154,5 @@ extends ViewSpec:
           field = field,
           errorMessage = errorMessage,
           errorDoc = render(formWithError, testCase.agentApplication),
-          heading = heading
+          heading = headingWithPadding
         )
