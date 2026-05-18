@@ -45,7 +45,7 @@ extends FrontendController(mcc, actions):
     .ensure(
       _.get[AgentApplication].applicationState === ApplicationState.GrsDataReceived,
       implicit request =>
-        logger.warn("Because we don't have business details we are redirecting to where they can be captured")
+        logger.debug("Because we don't have business details we are redirecting to where they can be captured")
         Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show)
     )
 

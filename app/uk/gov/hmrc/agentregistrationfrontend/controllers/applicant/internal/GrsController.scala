@@ -60,7 +60,7 @@ extends FrontendController(mcc, actions):
       condition = !_.agentApplication.isGrsDataReceived,
       resultWhenConditionNotMet =
         implicit request =>
-          logger.warn("Data from GRS already exists. Redirecting to verify entity.")
+          logger.debug("Data from GRS already exists. Redirecting to verify entity.")
           Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
     )
 

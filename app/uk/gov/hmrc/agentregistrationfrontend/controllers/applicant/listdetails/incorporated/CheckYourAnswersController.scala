@@ -49,7 +49,7 @@ extends FrontendController(mcc, actions):
       implicit request =>
         request.agentApplication match
           case _: AgentApplication.IsNotIncorporated =>
-            logger.warn(
+            logger.debug(
               "NotIncorporated businesses do not have the number of key individuals determined by Companies House results, redirecting to task list for the correct links"
             )
             Redirect(AppRoutes.apply.TaskListController.show.url)
@@ -59,7 +59,7 @@ extends FrontendController(mcc, actions):
         request.get[IsIncorporated].getNumberOfCompaniesHouseOfficers match
           case Some(n: SixOrMoreOfficers) => request.add(n)
           case Some(_: FiveOrLessOfficers) =>
-            logger.warn("Number of required key individuals is five or less, redirecting to Companies House officers page")
+            logger.debug("Number of required key individuals is five or less, redirecting to Companies House officers page")
             Redirect(AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show.url)
           case None => Redirect(AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show.url)
     .refine:
@@ -70,7 +70,7 @@ extends FrontendController(mcc, actions):
             agentApplication.agentApplicationId
           ).map[RequestWithData[DataWithLists] | Result]:
             case Nil if request.get[SixOrMoreOfficers].totalListSize > 0 =>
-              logger.warn(
+              logger.debug(
                 "Number of required companies house officers specified in application, but no officers found, redirecting to number of enter companies house officers page"
               )
               Redirect(AppRoutes.apply.listdetails.incoporated.EnterCompaniesHouseOfficerController.show.url)

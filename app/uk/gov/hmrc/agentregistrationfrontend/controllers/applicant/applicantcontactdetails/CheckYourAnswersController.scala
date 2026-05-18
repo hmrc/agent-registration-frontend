@@ -39,12 +39,11 @@ extends FrontendController(mcc, actions):
     .ensure(
       _.agentApplication.applicantContactDetails.exists(_.isComplete),
       implicit request =>
-        logger.warn("Because we don't have complete applicant contact details we are redirecting to where data is missing")
-        request.agentApplication.applicantContactDetails match {
+        logger.debug("Because we don't have complete applicant contact details we are redirecting to where data is missing")
+        request.agentApplication.applicantContactDetails match
           case None => Redirect(AppRoutes.apply.applicantcontactdetails.ApplicantNameController.show)
           case Some(ApplicantContactDetails(_, None, _)) => Redirect(AppRoutes.apply.applicantcontactdetails.TelephoneNumberController.show)
           case Some(ApplicantContactDetails(_, Some(_), _)) => Redirect(AppRoutes.apply.applicantcontactdetails.EmailAddressController.show)
-        }
     )
 
   def show: Action[AnyContent] = baseAction:

@@ -59,7 +59,7 @@ extends FrontendController(mcc, actions):
           .map:
             case Some(individualProvidedDetails) => request.add[IndividualProvidedDetails](individualProvidedDetails)
             case None =>
-              logger.warn("No IndividualProvidedDetails record found for viewing or updating by applicant")
+              logger.debug("No IndividualProvidedDetails record found for viewing or updating by applicant")
               Redirect(AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url)
     .refine:
       implicit request =>
@@ -87,7 +87,7 @@ extends FrontendController(mcc, actions):
           .map:
             case Some(providedByApplicant) => request.add[ProvidedByApplicant](providedByApplicant)
             case None =>
-              logger.warn("No ProvidedByApplicant details found in session when trying to access SaUtr page, redirecting to select individual page")
+              logger.debug("No ProvidedByApplicant details found in session when trying to access SaUtr page, redirecting to select individual page")
               Redirect(AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url)
     .ensure(
       _.get[ProvidedByApplicant].individualDateOfBirth.nonEmpty,
@@ -120,7 +120,7 @@ extends FrontendController(mcc, actions):
         .map:
           case Some(individualProvidedDetails) => request.add[IndividualProvidedDetails](individualProvidedDetails)
           case None =>
-            logger.warn(
+            logger.debug(
               "No IndividualProvidedDetails found when trying to access Check Your Answers page, redirecting to list of individuals who need to provide details"
             )
             Redirect(AppRoutes.apply.listdetails.progress.CheckProgressController.show.url)
