@@ -73,5 +73,5 @@ extends FrontendController(mcc, actions):
               Redirect(AppRoutes.apply.aboutyourbusiness.PartnershipTypeController.show.url)
                 .addToSession(businessType)
             case businessType @ BusinessTypeAnswer.Other =>
-              Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage.url)
+              Redirect(AppRoutes.apply.aboutyourbusiness.OtherBusinessTypeController.show.url)
                 .addToSession(businessType)

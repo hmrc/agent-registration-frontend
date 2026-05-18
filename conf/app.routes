@@ -30,6 +30,7 @@ GET         /apply/about-your-business/non-uk-agent            uk.gov.hmrc.agent
 
 GET         /apply/about-your-business/business-type                uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.BusinessTypeSessionController.show
 POST        /apply/about-your-business/business-type                uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.BusinessTypeSessionController.submit
+GET        /apply/about-your-business/business-type/other           uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.OtherBusinessTypeController.show
 GET         /apply/about-your-business/partnership-type             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.PartnershipTypeController.show
 POST        /apply/about-your-business/partnership-type             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.PartnershipTypeController.submit
 GET         /apply/about-your-business/user-role                    uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.UserRoleController.show
