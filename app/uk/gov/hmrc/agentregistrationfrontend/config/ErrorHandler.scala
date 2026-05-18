@@ -59,6 +59,7 @@ extends FrontendErrorHandler,
 
     logger.error(
       """
+        |
         |! %sInternal server error, for (%s) [%s] ->
         | """
         .stripMargin

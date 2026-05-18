@@ -30,6 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.TaskListPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.util.Random
 
 @Singleton
 class TaskListController @Inject() (
@@ -64,7 +65,6 @@ extends FrontendController(mcc, actions):
     .getBusinessPartnerRecord:
       implicit request =>
         val agentApplication: AgentApplication = request.get
-        logger.info("sialala")
         Ok(taskListPage(
           taskListStatus = agentApplication.taskListStatus(existingList = request.get[List[IndividualProvidedDetails]]),
           entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
