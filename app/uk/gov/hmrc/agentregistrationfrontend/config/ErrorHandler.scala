@@ -16,10 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.config
 
+import play.api.PlayException
 import play.api.i18n.MessagesApi
 import play.api.mvc.RequestHeader
+import play.api.mvc.Result
 import play.twirl.api.Html
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.views.html.ErrorTemplate
+import uk.gov.hmrc.mdc.RequestMdc
 import uk.gov.hmrc.play.bootstrap.frontend.http.FrontendErrorHandler
 
 import javax.inject.Inject
@@ -32,7 +36,8 @@ class ErrorHandler @Inject() (
   errorTemplate: ErrorTemplate,
   override val messagesApi: MessagesApi
 )(using override val ec: ExecutionContext)
-extends FrontendErrorHandler:
+extends FrontendErrorHandler,
+  RequestAwareLogging:
 
   override def standardErrorTemplate(
     pageTitle: String,
@@ -43,3 +48,29 @@ extends FrontendErrorHandler:
     heading,
     message
   ))
+
+  /** Mimics standard error handler, the only difference is that it uses RequestAwareLogger to log request-aware context.
+    */
+  override def onServerError(
+    request: RequestHeader,
+    exception: Throwable
+  ): Future[Result] =
+    RequestMdc.initMdc(request.id)
+
+    logger.error(
+      """
+        |
+        |! %sInternal server error, for (%s) [%s] ->
+        | """
+        .stripMargin
+        .format(
+          exception match {
+            case p: PlayException => "@" + p.id + " - "
+            case _ => ""
+          },
+          request.method,
+          request.uri
+        ),
+      exception
+    )(using request)
+    resolveError(request, exception)

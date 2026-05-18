@@ -19,6 +19,9 @@ package uk.gov.hmrc.agentregistrationfrontend.util
 import play.api.Logger
 import play.api.http.HeaderNames
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.hc
 
 /** A logger which is aware of the request. It will append to the message extra information such as session ID, request ID, user agent, referer, and device ID
@@ -74,9 +77,27 @@ class RequestAwareLogger(
     LogLevel.Error
   )
 
-  private def context(using request: RequestHeader) = s"[Context: ${request.method} ${request.path}] $sessionId $requestId $userAgent $referer $deviceId"
+  private def context(using request: RequestHeader): String =
+    s"[Context: ${request.method} ${request.path}] $applicationContext $individualProvidedDetailsContext $sessionId $requestId $userAgent $referer $deviceId"
 
-  private def sessionId(using request: RequestHeader) = s"[SessionId: ${hc.sessionId.map(_.toString).getOrElse("")}]"
+  private def sessionId(using request: RequestHeader) = s"[SessionId: ${hc.sessionId.map(_.value).getOrElse("")}]"
+
+  private def applicationContext(using request: RequestHeader): String =
+    request match
+      case r: RequestWithDataCt[?, ?] =>
+        r.data.toList.collectFirst:
+          case app: AgentApplication =>
+            s"[applicationReference:${app.applicationReference.value}] [agentApplicationId:${app.agentApplicationId.value}] [businessType:${app.businessType}] "
+        .getOrElse("")
+      case _ => ""
+
+  private def individualProvidedDetailsContext(using request: RequestHeader): String =
+    request match
+      case r: RequestWithDataCt[?, ?] =>
+        r.data.toList.collectFirst:
+          case i: IndividualProvidedDetails => s"[agentApplicationId:${i.agentApplicationId.value}] [personReference:${i.personReference.value}]"
+        .getOrElse("")
+      case _ => ""
 
   private def requestId(using request: RequestHeader) = s"[RequestId: ${hc.requestId.map(_.toString).getOrElse("")}]"
 
