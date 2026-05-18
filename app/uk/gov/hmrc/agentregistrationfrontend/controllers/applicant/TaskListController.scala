@@ -64,6 +64,7 @@ extends FrontendController(mcc, actions):
     .getBusinessPartnerRecord:
       implicit request =>
         val agentApplication: AgentApplication = request.get
+        logger.info("sialala")
         Ok(taskListPage(
           taskListStatus = agentApplication.taskListStatus(existingList = request.get[List[IndividualProvidedDetails]]),
           entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
