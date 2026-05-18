@@ -67,6 +67,14 @@ businessType.LimitedCompany = Limited company
 businessType.PartnershipType = A type of partnership
 businessType.Other = Something else
 
+# Apply / About your application / business type / other business type
+otherBusinessType.title = You cannot create an agent services account
+otherBusinessType.p1 = You can only create an agent services account if your business is one of the following:
+otherBusinessType.SoleTrader = a sole trader business
+otherBusinessType.LimitedCompany = a limited company
+otherBusinessType.PartnershipType = a partnership
+otherBusinessType.LimitedLiabilityPartnership = a limited liability partnership (LLP)
+
 ## Apply / About your business / partnership type
 partnershipType.title = What type of partnership?
 partnershipType.GeneralPartnership = General partnership
