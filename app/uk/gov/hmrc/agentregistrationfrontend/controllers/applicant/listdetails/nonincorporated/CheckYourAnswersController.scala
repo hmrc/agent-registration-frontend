@@ -70,7 +70,7 @@ extends FrontendController(mcc, actions):
         request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].getNumberOfRequiredKeyIndividuals match
           case Some(n: NumberOfRequiredKeyIndividuals) => request.add(n)
           case None =>
-            logger.warn(
+            logger.debug(
               "Number of required key individuals not specified in application, redirecting to number of key individuals page"
             )
             Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url)

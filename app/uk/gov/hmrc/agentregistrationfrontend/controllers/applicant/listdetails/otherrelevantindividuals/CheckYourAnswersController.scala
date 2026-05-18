@@ -55,7 +55,7 @@ extends FrontendController(mcc, actions):
       implicit request =>
         request.get[AgentApplication] match
           case _: AgentApplicationSoleTrader =>
-            logger.warn("Sole traders do not add other relevant individuals to a list, redirecting to task list for the correct links")
+            logger.debug("Sole traders do not add other relevant individuals to a list, redirecting to task list for the correct links")
             Redirect(AppRoutes.apply.TaskListController.show.url)
           case aa: IsNotSoleTrader => request.replace[AgentApplication, IsNotSoleTrader](aa)
     .refine:
@@ -74,7 +74,7 @@ extends FrontendController(mcc, actions):
             DataWithLists
           ] | Result]:
             case Nil =>
-              logger.warn(
+              logger.debug(
                 "Other relevant individuals specified in application, but no other relevant individuals found, redirecting to enter other relevant individual page"
               )
               Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.EnterOtherRelevantIndividualController.show.url)

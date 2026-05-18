@@ -41,7 +41,7 @@ extends FrontendController(mcc, actions):
       .ensure(
         r => r.agentApplication.amlsDetails.exists(_.isComplete),
         implicit request =>
-          logger.warn(s"Cannot display Check Your Answers page - incomplete AMLS details.")
+          logger.debug(s"Cannot display Check Your Answers page - incomplete AMLS details.")
           request.agentApplication.amlsDetails match
             case Some(AmlsDetails(
                   AmlsCode(_),
