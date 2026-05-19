@@ -135,6 +135,7 @@ object AppRoutes:
 
       object link:
 
+        val LinkStartPageController = listdetailsLinkRoutes.LinkStartPageController
         val LinkController = listdetailsLinkRoutes.LinkController
 
       object progress:

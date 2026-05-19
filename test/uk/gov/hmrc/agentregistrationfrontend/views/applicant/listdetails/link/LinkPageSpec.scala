@@ -42,15 +42,13 @@ extends ViewSpec:
     "have expected content" in:
       doc.mainContent shouldContainContent
         s"""
-           |Partners and other relevant individuals
+           |Ask all the relevant individuals to sign in
            |Share this link with everyone on the list
-           |The people on your list need to sign in and provide their details to HMRC.
-           |Share this link with them:
            |$thisFrontendBaseUrl/agent-registration/provide-details/start/link-id-12345
            |Copy link to clipboard
            |Link copied
-           |See the list of people again
-           |This is the list of people you’ve told us about:
+           |List of relevant individuals you told us about
+           |Name
            |Test Name
            |Second Test Name
            |Third Test Name

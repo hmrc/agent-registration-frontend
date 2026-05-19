@@ -45,52 +45,35 @@
 @templateScripts = {
   <script src="@{controllers.routes.Assets.versioned("javascripts/copy-button.js")}" @{CSPNonce.attr}></script>
 }
-@businessTypeKey = @{agentApplication match {
-  case _: AgentApplication.IsSoleTrader => "SoleTrader"
-  case _: AgentApplicationLlp => "LimitedLiabilityPartnership"
-  case _: AgentApplication.IsPartnership => "Partnership"
-  case _: AgentApplication.IsIncorporated => "LimitedCompany"
-}}
 @templateStyles = {
   <link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/copy-button.css")}" @{CSPNonce.attr}>
+  <link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/custom-list-styles.css")}" @{CSPNonce.attr}>
 }
-@detailsContent = {
-  <p class="govuk-body">@messages(s"$key.details.p1")</p>
-  <ul class="govuk-list govuk-list--bullet">
-    @existingList.map { individual =>
-      <li>@{individual.individualName.value}</li>
-    }
-  </ul>
-}
+
 @layout(
     pageTitle = pageTitle,
     templateScripts = Some(templateScripts),
     templateStyles = Some(templateStyles)
 ) {
-  <h2 class="govuk-caption-l">@messages(s"lists.caption.title.$businessTypeKey")</h2>
+  <h2 class="govuk-caption-l">@messages("link.caption")</h2>
   <h1 class="govuk-heading-l">@pageTitle</h1>
-  <p class="govuk-body">
-    @{messages(s"$key.p1")}
-  </p>
-  <p class="govuk-body">
-    @{messages(s"$key.p2")}
-  </p>
-  <p class="govuk-body govuk-!-font-weight-bold">@provideDetailsLink</p>
+  <p class="govuk-inset-text">@provideDetailsLink</p>
   @copyButton(clip = provideDetailsLink)
-  @govukDetails(Details(
-    summary = Text(messages(s"$key.details.summary")),
-    content = HtmlContent(detailsContent)
-  ))
+  <h2 class="govuk-heading-m">@messages(s"$key.h2")</h2>
+  <ul class="govuk-list list-with-borders">
+    <li><strong>@messages(s"$key.name")</strong></li>
+    @existingList.map { individual =>
+      <li>@{individual.individualName.value}</li>
+    }
+  </ul>
   <p class="govuk-body">
-    @{messages(s"$key.p3")}
+    @{messages(s"$key.p")}
   </p>
 
   @formWithCSRF(action = AppRoutes.apply.listdetails.link.LinkController.submit) {
-
     @continueOrSaveForLater(
       continueLabel = Some(messages("common.confirmAndContinue"))
     )
-
   }
 
 }
