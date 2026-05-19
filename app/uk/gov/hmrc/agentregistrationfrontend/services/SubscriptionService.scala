@@ -22,14 +22,15 @@ import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions.RequestWithData
+import uk.gov.hmrc.agentregistrationfrontend.action.Actions.credentials
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions.groupId
-import uk.gov.hmrc.agentregistrationfrontend.action.Actions.internalUserId
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithApplicationAndBpr
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithAuth
 import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.KnownFact
 import uk.gov.hmrc.agentregistrationfrontend.connectors.TaxEnrolmentsConnector
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors.getOrThrowExpectedDataMissing
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,11 +38,13 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
-class SubscriptionService @Inject() (taxEnrolmentsConnector: TaxEnrolmentsConnector)(using ec: ExecutionContext):
+class SubscriptionService @Inject() (taxEnrolmentsConnector: TaxEnrolmentsConnector)(using ec: ExecutionContext)
+extends RequestAwareLogging:
 
   def addKnownFactsAndEnrolUk(
     arn: Arn
   )(using request: RequestWithData[DataWithApplicationAndBpr]): Future[Unit] = {
+    logger.info(s"adding known facts and enrolling for arn $arn")
     val bpr = request.get[BusinessPartnerRecordResponse]
     addKnownFactsAndEnrol(
       arn = arn,
@@ -50,7 +53,7 @@ class SubscriptionService @Inject() (taxEnrolmentsConnector: TaxEnrolmentsConnec
         "BPR postcode missing when trying to update AgencyPostcode known fact"
       ),
       friendlyName = bpr.getEntityName,
-      userId = request.internalUserId,
+      providerId = request.credentials.providerId,
       groupId = request.groupId
     )
   }
@@ -60,11 +63,11 @@ class SubscriptionService @Inject() (taxEnrolmentsConnector: TaxEnrolmentsConnec
     knownFactKey: String,
     knownFactValue: String,
     friendlyName: String,
-    userId: InternalUserId,
+    providerId: String,
     groupId: GroupId
   )(implicit rh: RequestHeader): Future[Unit] =
     val enrolRequest = EnrolmentRequest(
-      userId = userId.value,
+      userId = providerId,
       `type` = "principal",
       friendlyName = friendlyName,
       Seq(KnownFact(knownFactKey, knownFactValue))
