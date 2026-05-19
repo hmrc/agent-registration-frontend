@@ -43,13 +43,12 @@ extends FrontendController(mcc, actions):
       resultWhenConditionNotMet = request => Redirect(AppRoutes.apply.aboutyourbusiness.BusinessTypeSessionController.show.url)
     )
 
-  def show: Action[?] =
-    baseAction:
-      implicit request =>
-        Ok(view(
-          form = UserRoleForm.form.fill(request.readUserRole),
-          userRoleOption = userRoleOptionForBusinessType(request.getBusinessType)
-        ))
+  def show: Action[?] = baseAction:
+    implicit request =>
+      Ok(view(
+        form = UserRoleForm.form.fill(request.readUserRole),
+        userRoleOption = userRoleOptionForBusinessType(request.getBusinessType)
+      ))
 
   def submit: Action[AnyContent] =
     baseAction

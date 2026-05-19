@@ -469,6 +469,7 @@ listProgress.caption = Check who has provided their details
 
 listProgress.title = HMRC needs information from everyone on this list
 listProgress.title.SoleTraderRepresentative = HMRC needs information from the business owner
+listProgress.expiryDate = We need everyone on this list to provide their details by {0}.
 listProgress.h2 = Awaiting details for {0} of {1} people
 listProgress.th.name = Name
 listProgress.th.detailsProvided = Details provided
