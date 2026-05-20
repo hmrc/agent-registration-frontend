@@ -458,12 +458,23 @@ zeroKeyIndividualsCheckYourAnswers.otherRelevantIndividualsNames.label = Relevan
 zeroKeyIndividualsCheckYourAnswers.numberOfKeyIndividuals.Partnership.label = Number of partners
 
 # Link sharing
+link.caption = Ask all the relevant individuals to sign in
+linkStartPage.title = We need information from the people you told us about
+linkStartPage.p1 = You have created a list of people relevant to this application. We now need to hear from them.
+linkStartPage.p2 = Everyone you’ve told us about needs to sign in to confirm their identity.
+linkStartPage.p3 = We’ll give you a link to share with these people.
+linkStartPage.important.h2 = Important to know
+linkStartPage.important.p1 = We need everyone on the list to use the link to sign in by <strong>{0}</strong>.
+linkStartPage.important.p2 = They should use sign in details for their personal taxes, not their business taxes. If they do not have personal sign in details, they can create some.
+linkStartPage.important.p3 = We’ll also ask them to provide some personal information, including:
+linkStartPage.important.bullet1 = name, date of birth, telephone number and email address
+linkStartPage.important.bullet2 = National Insurance number
+linkStartPage.important.bullet3 = Self Assessment Unique Taxpayer Reference
+
 link.title = Share this link with everyone on the list
-link.p1 = The people on your list need to sign in and provide their details to HMRC.
-link.p2 = Share this link with them:
-link.details.summary = See the list of people again
-link.details.p1 = This is the list of people you’ve told us about:
-link.p3 = Select ‘Confirm and continue’ when you have shared the link with everyone on the list.
+link.h2 = List of relevant individuals you told us about
+link.name = Name
+link.p = Select ‘Confirm and continue’ when you have shared the link with everyone on the list.
 
 listProgress.caption = Check who has provided their details
 

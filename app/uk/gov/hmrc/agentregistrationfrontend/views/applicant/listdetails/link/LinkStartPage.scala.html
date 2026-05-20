@@ -1,0 +1,64 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLaterLinks
+
+@import java.time.LocalDate
+
+@this(
+    layout: Layout,
+    govukButton: GovukButton,
+    appConfig: AppConfig,
+        continueOrSaveForLaterLinks: ContinueOrSaveForLaterLinks
+)
+
+@(applicationExpiryDate: LocalDate)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{"linkStartPage"}
+@expiryDate = @{DisplayDate.displayDateForLang(Some(applicationExpiryDate))}
+@title = @{messages(s"$key.title")}
+
+@layout(
+    pageTitle = title
+) {
+  <h2 class="govuk-caption-l">@messages("link.caption")</h2>
+  <h1 class="govuk-heading-l">@title</h1>
+  <p class="govuk-body">@messages(s"$key.p1")</p>
+  <p class="govuk-body">@messages(s"$key.p2")</p>
+  <p class="govuk-body">@messages(s"$key.p3")</p>
+  <h2 class="govuk-heading-m">@messages(s"$key.important.h2")</h2>
+  <p class="govuk-body">@Html(messages(s"$key.important.p1", expiryDate))</p>
+  <p class="govuk-body">@messages(s"$key.important.p2")</p>
+  <p class="govuk-body">@messages(s"$key.important.p3")</p>
+  <ol class="govuk-list govuk-list--bullet">
+    <li>@messages(s"$key.important.bullet1")</li>
+    <li>@messages(s"$key.important.bullet2")</li>
+    <li>@messages(s"$key.important.bullet3")</li>
+  </ol>
+  <p class="govuk-body">
+    @continueOrSaveForLaterLinks(
+      continueHref = AppRoutes.apply.listdetails.link.LinkController.show.url,
+      continueLabel = Some(messages("common.continue"))
+    )
+  </p>
+
+}

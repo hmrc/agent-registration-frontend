@@ -159,6 +159,7 @@ GET         /apply/list-details/provide-details/view/:individualProvidedDetailsI
 POST        /apply/list-details/provide-details/check-your-answers               uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.CheckYourAnswersController.submit
 
 # Lists share link
+GET        /apply/list-details/share-link-start       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.link.LinkStartPageController.show
 GET        /apply/list-details/key-individuals/share-link             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.link.LinkController.show
 POST       /apply/list-details/key-individuals/share-link             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.link.LinkController.submit
 
