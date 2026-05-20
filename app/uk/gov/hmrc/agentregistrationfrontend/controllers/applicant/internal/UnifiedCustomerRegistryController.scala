@@ -48,7 +48,7 @@ class UnifiedCustomerRegistryController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private def nextPage: Call = AppRoutes.apply.TaskListController.show
+  private def nextPage: Call = AppRoutes.apply.internal.AgentAlreadySubscribedCheckController.check()
 
   def populateApplicationIdentifiersFromUcr: Action[AnyContent] = actions
     .getApplicationInProgress

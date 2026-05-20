@@ -21,6 +21,7 @@ GET         /apply/unable-to-confirm-business-details               uk.gov.hmrc.
 GET         /apply/not-agent-credential                             uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NotAgentCredentialController.show(continueUrl: Option[RedirectUrl])
 GET         /apply/not-agent-login                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.NotAgentLoginController.show(continueUrl: Option[RedirectUrl])
 GET         /apply/exit                                             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.genericExitPage
+GET         /apply/agent-already-subscribed                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.AgentAlreadySubscribedController.show
 
 ## About your business routes
 GET         /apply/about-your-business/agent-type                   uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.AgentTypeController.show
@@ -30,7 +31,7 @@ GET         /apply/about-your-business/non-uk-agent            uk.gov.hmrc.agent
 
 GET         /apply/about-your-business/business-type                uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.BusinessTypeSessionController.show
 POST        /apply/about-your-business/business-type                uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.BusinessTypeSessionController.submit
-GET        /apply/about-your-business/business-type/other           uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.OtherBusinessTypeController.show
+GET         /apply/about-your-business/business-type/other           uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.OtherBusinessTypeController.show
 GET         /apply/about-your-business/partnership-type             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.PartnershipTypeController.show
 POST        /apply/about-your-business/partnership-type             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.PartnershipTypeController.submit
 GET         /apply/about-your-business/user-role                    uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.UserRoleController.show
@@ -52,6 +53,7 @@ GET        /apply/internal/address-lookup/journey-callback                      
 GET        /apply/internal/refusal-to-deal-with-check                                 uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.RefusalToDealWithController.check()
 GET        /apply/internal/deceased-check                                             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.DeceasedController.check()
 GET        /apply/internal/unified-customer-registry-identifiers                      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.UnifiedCustomerRegistryController.populateApplicationIdentifiersFromUcr
+GET        /apply/internal/agent-already-subscribed-check                             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.AgentAlreadySubscribedCheckController.check()
 
 ## Applicant contact details routes
 GET         /apply/applicant/applicant-name                        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.applicantcontactdetails.ApplicantNameController.show
