@@ -18,16 +18,20 @@
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLaterLinks
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+@import java.time.Instant
+@import java.time.ZoneId
 
 @this(
         appConfig: AppConfig,
         layout: Layout,
         govukTable: GovukTable,
         continueOrSaveForLaterLinks: ContinueOrSaveForLaterLinks,
-        govukDetails: GovukDetails
+        govukDetails: GovukDetails,
+        govukInsetText: GovukInsetText
 )
 
 @(
@@ -53,12 +57,21 @@
   <p class="govuk-body">@messages(s"$key.details.p3", entityName)</p>
   <p class="govuk-body">@Html(messages(s"$key.details.p4", AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url))</p>
 }
+@expiryDate = @{
+  agentApplication.applicationExpiresAt match {
+    case Some(expiresInstant: Instant) => DisplayDate.displayDateForLang(Some(expiresInstant.atZone(ZoneId.systemDefault()).toLocalDate))
+    case None => ""
+  }
+}
 
 @layout(
     pageTitle = pageTitle
 ) {
   <h2 class="govuk-caption-l">@messages(s"$key.caption")</h2>
   <h1 class="govuk-heading-l">@pageTitle</h1>
+  @govukInsetText(InsetText(
+    content = Text(messages(s"$key.expiryDate", expiryDate))
+  ))
   @govukTable(Table(
     head = Some(Seq(
       HeadCell(

@@ -20,12 +20,18 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
+import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.progress.ListProgressPage
+
+import java.time.LocalDate
+import java.time.ZoneId
 
 class ListProgressPageSpec
 extends ViewSpec:
 
   val viewTemplate: ListProgressPage = app.injector.instanceOf[ListProgressPage]
+  val expiryDate: LocalDate = tdAll.applicationExpiresAtAsInstant.atZone(ZoneId.systemDefault()).toLocalDate
+  val expiryDateDisplay: String = DisplayDate.displayDateForLang(Some(expiryDate))
   val doc: Document = Jsoup.parse(
     viewTemplate(
       agentApplication = tdAll.agentApplicationGeneralPartnership.afterHowManyKeyIndividuals,
@@ -56,6 +62,7 @@ extends ViewSpec:
         s"""
            |Check who has provided their details
            |HMRC needs information from everyone on this list
+           |We need everyone on this list to provide their details by $expiryDateDisplay.
            |Awaiting details for 2 of 3 people
            |Name
            |Details provided
@@ -88,6 +95,7 @@ extends ViewSpec:
         s"""
            |Check who has provided their details
            |HMRC needs information from everyone on this list
+           |We need everyone on this list to provide their details by $expiryDateDisplay.
            |Awaiting details for 0 of 3 people
            |Name
            |Details provided
