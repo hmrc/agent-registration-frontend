@@ -696,6 +696,7 @@ provide-details.llp.title=LLP member confirmation
 provideDetailsStart.title = Sign in and confirm your details
 provideDetailsStart.p1 = You have been nominated as a relevant individual that can support an application to HMRC for an agent services account.
 provideDetailsStart.p2 = We need some information from you before we can process the application.
+provideDetailsStart.p3 = You need to provide this information by <strong>{0}</strong>.
 provideDetailsStart.info.h2 = Why we need this information
 provideDetailsStart.info.p1 = We ask you to sign in so we can:
 provideDetailsStart.info.li1 = confirm who you are
