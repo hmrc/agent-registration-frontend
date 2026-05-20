@@ -18,19 +18,21 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
 import uk.gov.hmrc.agentregistrationfrontend.repository.ProvidedByApplicantSessionStore
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
+import play.api.libs.ws.WSBodyReadables.readableAsString
 
 class SelectIndividualControllerSpec
 extends ControllerSpec:
 
   private val path = "/agent-registration/apply/list-details/provide-details/select-individual"
 
-  val testSessionStore: ProvidedByApplicantSessionStore = app.injector.instanceOf[ProvidedByApplicantSessionStore]
+  val providedByApplicantSessionStore: ProvidedByApplicantSessionStore = app.injector.instanceOf[ProvidedByApplicantSessionStore]
 
   object agentApplication:
 
@@ -40,6 +42,26 @@ extends ControllerSpec:
         .afterHowManyKeyIndividuals
 
   private val agentApplicationId = agentApplication.afterHowManyKeyIndividuals.agentApplicationId
+
+  val completeIndividualDetails: ProvidedByApplicant = ProvidedByApplicant(
+    individualProvidedDetailsId = tdAll.providedDetails.afterAccessConfirmed._id,
+    individualName = tdAll.providedDetails.afterAccessConfirmed.individualName,
+    individualDateOfBirth = Some(tdAll.dateOfBirthProvided),
+    telephoneNumber = Some(tdAll.telephoneNumber),
+    emailAddress = Some(tdAll.individualEmailAddress),
+    individualNino = Some(tdAll.ninoProvided),
+    individualSaUtr = Some(tdAll.saUtrProvided)
+  )
+
+  val listOfIndividuals: List[IndividualProvidedDetails] = List(
+    tdAll.providedDetails.afterAccessConfirmed,
+    TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
+    TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated
+  )
+
+  override def afterEach(): Unit =
+    providedByApplicantSessionStore.delete().futureValue
+    super.afterEach()
 
   "routes should have correct paths and methods" in:
     AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show shouldBe Call(
@@ -56,7 +78,7 @@ extends ControllerSpec:
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplicationId,
       individuals = List(
-        tdAll.providedDetails.precreated,
+        tdAll.providedDetails.afterAccessConfirmed,
         TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
         TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated
       )
@@ -65,6 +87,25 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Which relevant individual do you need to tell us about? - Apply for an agent services account - GOV.UK"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplicationId)
+
+  s"GET $path should show the page correctly and pre-populate if there is data in session" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplicationId,
+      individuals = List(
+        tdAll.providedDetails.afterAccessConfirmed,
+        TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
+        TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated
+      )
+    )
+    providedByApplicantSessionStore.upsert(completeIndividualDetails).futureValue
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe "Which relevant individual do you need to tell us about? - Apply for an agent services account - GOV.UK"
+    response.body should include("Test Name")
     ApplyStubHelper.verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplicationId)
 
@@ -98,11 +139,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplicationId,
-      individuals = List(
-        tdAll.providedDetails.precreated,
-        TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
-        TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated
-      )
+      individuals = listOfIndividuals
     )
     val response: WSResponse = post(path)(Map.empty[String, Seq[String]])
 
@@ -111,25 +148,64 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplicationId)
 
-  s"POST $path should store a valid submission and redirect to the next page" in:
+  s"POST $path should store the selected users details and redirect to the next page" in:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplicationId,
-      individuals = List(
-        tdAll.providedDetails.afterAccessConfirmed,
-        TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.afterAccessConfirmed,
-        TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.afterAccessConfirmed
-      )
+      individuals = listOfIndividuals
     )
     val response: WSResponse =
       post(path)(
         Map("selectIndividual" -> Seq(tdAll.providedDetails.afterAccessConfirmed._id.value))
       )
 
-    testSessionStore.find().futureValue shouldBe Some(
+    providedByApplicantSessionStore.find().futureValue shouldBe Some(
       ProvidedByApplicant(
         individualProvidedDetailsId = tdAll.providedDetails.afterAccessConfirmed._id,
         individualName = tdAll.providedDetails.afterAccessConfirmed.individualName
+      )
+    )
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedDoBController.show.url
+
+  s"POST $path should send users to the check your answers page when the selected individual has data in the cache" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplicationId,
+      individuals = listOfIndividuals
+    )
+    providedByApplicantSessionStore.upsert(completeIndividualDetails).futureValue
+
+    val response: WSResponse =
+      post(path)(
+        Map("selectIndividual" -> Seq(tdAll.providedDetails.afterAccessConfirmed._id.value))
+      )
+
+    providedByApplicantSessionStore.find().futureValue shouldBe Some(completeIndividualDetails)
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.show.url
+
+  s"POST $path should send users to the applicant provided date of birth page when the cache data does not belong to the selected name" in:
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterHowManyKeyIndividuals)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplicationId,
+      individuals = listOfIndividuals
+    )
+    providedByApplicantSessionStore.upsert(completeIndividualDetails).futureValue
+
+    val response: WSResponse =
+      post(path)(
+        Map("selectIndividual" -> Seq(
+          TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.afterAccessConfirmed._id.value
+        ))
+      )
+
+    providedByApplicantSessionStore.find().futureValue shouldBe Some(
+      ProvidedByApplicant(
+        individualProvidedDetailsId = TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.afterAccessConfirmed._id,
+        individualName = TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.afterAccessConfirmed.individualName
       )
     )
 
