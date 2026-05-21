@@ -24,6 +24,8 @@ import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.StartPage
 
+import java.time.Instant
+import java.time.ZoneId
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -42,10 +44,17 @@ extends FrontendController(mcc, actions):
       implicit request =>
         val genericExitPageUrl: String = AppRoutes.apply.AgentApplicationController.genericExitPage.url
         applicationService.find(linkId).map {
-          case Some(app) if app.hasFinished =>
+          case Some(agentApplication) if agentApplication.hasFinished =>
             logger.info(s"the application for linkId $linkId has finished, redirecting to get status")
             Redirect(AppRoutes.providedetails.riskingprogress.RiskingProgressController.show(linkId))
-          case Some(app) => Ok(startPage(linkId: LinkId))
+          case Some(agentApplication) =>
+            val applicationExpiryInstant: Instant = agentApplication
+              .applicationExpiresAt
+              .getOrThrowExpectedDataMissing("Application expiry date is missing from application in progress")
+            Ok(startPage(
+              linkId = linkId,
+              agentApplicationExpiryDate = applicationExpiryInstant.atZone(ZoneId.systemDefault()).toLocalDate
+            ))
           case None =>
             logger.info(s"Application for linkId $linkId not found, redirecting to $genericExitPageUrl")
             Redirect(genericExitPageUrl)

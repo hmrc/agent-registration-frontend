@@ -20,35 +20,45 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
+import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.StartPage
+
+import java.time.LocalDate
+import java.time.ZoneId
 
 class StartPageSpec
 extends ViewSpec:
 
   val viewTemplate: StartPage = app.injector.instanceOf[StartPage]
+  val expiryDate: LocalDate = tdAll.applicationExpiresAtAsInstant.atZone(ZoneId.systemDefault()).toLocalDate
+  val expiryDateDisplay: String = DisplayDate.displayDateForLang(Some(expiryDate))
   private val linkId = LinkId("test-link-id")
 
   val doc: Document = Jsoup.parse(
-    viewTemplate(linkId).body
+    viewTemplate(
+      linkId = linkId,
+      agentApplicationExpiryDate = expiryDate
+    ).body
   )
 
   "ProvideDetailsStartPage" should:
 
     "have expected content" in:
       doc.mainContent shouldContainContent
-        """
-          |Sign in and confirm your details
-          |You have been nominated as a relevant individual that can support an application to HMRC for an agent services account.
-          |We need some information from you before we can process the application.
-          |Why we need this information
-          |We ask you to sign in so we can:
-          |confirm who you are
-          |carry out some checks on your tax and financial background
-          |Use the right sign in details
-          |We need you to sign in using sign in details you created for your personal taxes, not your business taxes.
-          |If you do not have personal sign in details, you can create some.
-          |Start
-          |"""
+        s"""
+           |Sign in and confirm your details
+           |You have been nominated as a relevant individual that can support an application to HMRC for an agent services account.
+           |We need some information from you before we can process the application.
+           |You need to provide this information by $expiryDateDisplay.
+           |Why we need this information
+           |We ask you to sign in so we can:
+           |confirm who you are
+           |carry out some checks on your tax and financial background
+           |Use the right sign in details
+           |We need you to sign in using sign in details you created for your personal taxes, not your business taxes.
+           |If you do not have personal sign in details, you can create some.
+           |Start
+           |"""
           .stripMargin
 
     "have the correct title" in:

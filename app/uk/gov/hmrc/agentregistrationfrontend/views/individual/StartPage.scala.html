@@ -15,7 +15,9 @@
  *@
 
 @import uk.gov.hmrc.agentregistration.shared.LinkId
+@import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import java.time.LocalDate
 
 @this(
         layout: Layout,
@@ -23,7 +25,8 @@
 )
 
 @(
-        linkId: LinkId)(implicit
+        linkId: LinkId,
+        agentApplicationExpiryDate: LocalDate)(implicit
         request: RequestHeader,
         messages: Messages
 )
@@ -38,6 +41,9 @@
     </p>
     <p class="govuk-body">
         @{messages(s"$key.p2")}
+    </p>
+    <p class="govuk-body">
+      @{Html(messages(s"$key.p3", DisplayDate.displayDateForLang(Some(agentApplicationExpiryDate))))}
     </p>
     <h2 class="govuk-heading-m">
         @{messages(s"$key.info.h2")}

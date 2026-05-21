@@ -39,7 +39,7 @@
     if(isSoleTraderOwner) messages(s"$key.title.SoleTrader") else messages(s"$key.title")
 }
 @signOutLink = @{
-  s"${appConfig.basFrontendSignOutUrlBase}?continueUrl=feedback/AGENT_REG_IND_DETAILS"
+  s"${appConfig.basFrontendSignOutUrlBase}?continueUrl=/feedback/AGENT_REG_IND_DETAILS"
 }
 
 @layout(
