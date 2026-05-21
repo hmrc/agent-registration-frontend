@@ -102,7 +102,6 @@ extends FrontendController(mcc, actions):
       val applicantName = request.get[AgentApplication].getApplicantContactDetails.applicantName.value
       IndividualNameSearchForm.form(request.get[List[IndividualProvidedDetails]], applicantName).bindFromRequest().fold(
         formWithErrors =>
-          logger.warn(s"Individual name search form submission had errors: ${formWithErrors.errors}")
           Future.successful(BadRequest(view(
             form = formWithErrors,
             linkId = linkId,
@@ -111,7 +110,7 @@ extends FrontendController(mcc, actions):
         ,
         matchedIndividual =>
           if
-          matchedIndividual.internalUserId.exists(_ === request.get[InternalUserId]) // we already matched before so don't upsert again
+            matchedIndividual.internalUserId.exists(_ === request.get[InternalUserId]) // we already matched before so don't upsert again
           then
             Future.successful(Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url))
           else
