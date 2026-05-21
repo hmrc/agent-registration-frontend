@@ -36,8 +36,8 @@ extends ControllerSpec:
   private val arn: String = tdAll.arn
   private val utr: Utr = agentApplication.afterUnifiedCustomerRegistryUpdateIdentifiers.getUtr
 
-  private val path: String = "/agent-registration/apply/internal/wrong-logged-in-account-check"
-  private val agentAlreadySubscribedPath: String = "/agent-registration/apply/not-correct-login"
+  private val path: String = "/agent-registration/apply/internal/agent-already-subscribed-check"
+  private val agentAlreadySubscribedPath: String = "/agent-registration/apply/agent-already-subscribed"
   private val nextUrl: String = "/agent-registration/apply/task-list"
 
   "routes should have correct paths and methods" in:

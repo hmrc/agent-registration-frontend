@@ -43,7 +43,7 @@ extends ControllerSpec:
         .afterUnifiedCustomerRegistryUpdateEmptyIdentifiers
 
   private val path: String = "/agent-registration/apply/internal/unified-customer-registry-identifiers"
-  private val nextPageUrl: String = "/agent-registration/apply/internal/wrong-logged-in-account-check"
+  private val nextPageUrl: String = "/agent-registration/apply/internal/agent-already-subscribed-check"
 
   "routes should have correct paths and methods" in:
     AppRoutes.apply.internal.UnifiedCustomerRegistryController.populateApplicationIdentifiersFromUcr shouldBe Call(

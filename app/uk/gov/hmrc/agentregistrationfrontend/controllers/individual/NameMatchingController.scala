@@ -106,11 +106,10 @@ extends FrontendController(mcc, actions):
             form = formWithErrors,
             linkId = linkId,
             applicantName = applicantName
-          )))
-        ,
+          ))),
         matchedIndividual =>
           if
-            matchedIndividual.internalUserId.exists(_ === request.get[InternalUserId]) // we already matched before so don't upsert again
+          matchedIndividual.internalUserId.exists(_ === request.get[InternalUserId]) // we already matched before so don't upsert again
           then
             Future.successful(Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url))
           else
