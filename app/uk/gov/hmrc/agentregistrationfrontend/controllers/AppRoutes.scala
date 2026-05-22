@@ -157,6 +157,7 @@ object AppRoutes:
       val CanNotRegisterController = entitycheckfailedRoutes.CanNotRegisterController
       val CanNotConfirmIdentityController = entitycheckfailedRoutes.CanNotConfirmIdentityController
       val UnableToConfirmBusinessDetailsController = entitycheckfailedRoutes.UnableToConfirmBusinessDetailsController
+      val AgentAlreadySubscribedController = entitycheckfailedRoutes.AgentAlreadySubscribedController
 
     object internal:
 
