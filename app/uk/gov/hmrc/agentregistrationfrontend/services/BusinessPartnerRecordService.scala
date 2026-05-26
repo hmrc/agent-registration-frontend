@@ -19,22 +19,35 @@ package uk.gov.hmrc.agentregistrationfrontend.services
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
+import uk.gov.hmrc.agentregistrationfrontend.repository.BusinessPartnerRecordSessionStore
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
 class BusinessPartnerRecordService @Inject() (
-  agentRegistrationConnector: AgentRegistrationConnector
-)
+  agentRegistrationConnector: AgentRegistrationConnector,
+  businessPartnerRecordSessionStore: BusinessPartnerRecordSessionStore
+)(using ExecutionContext)
 extends RequestAwareLogging:
 
   def getBusinessPartnerRecord(utr: Utr)(using request: RequestHeader): Future[Option[BusinessPartnerRecordResponse]] =
-    agentRegistrationConnector.getBusinessPartnerRecord(utr)
+    businessPartnerRecordSessionStore.find().flatMap:
+      case Some(bpr) => Future.successful(Some(bpr))
+      case _ =>
+        agentRegistrationConnector.getBusinessPartnerRecord(utr).flatMap:
+          case Some(bpr) => businessPartnerRecordSessionStore.upsert(bpr).map(_ => Some(bpr))
+          case None => Future.successful(None)
 
   // for use in individual journeys where we want to surface the entity name from the BPR that matches the utr provided
   // by the user in the application
   def getApplicationBusinessPartnerRecord(utr: Utr)(using request: RequestHeader): Future[Option[BusinessPartnerRecordResponse]] =
-    agentRegistrationConnector.getApplicationBusinessPartnerRecord(utr)
+    businessPartnerRecordSessionStore.find().flatMap:
+      case Some(bpr) => Future.successful(Some(bpr))
+      case _ =>
+        agentRegistrationConnector.getApplicationBusinessPartnerRecord(utr).flatMap:
+          case Some(bpr) => businessPartnerRecordSessionStore.upsert(bpr).map(_ => Some(bpr))
+          case None => Future.successful(None)
