@@ -157,6 +157,7 @@ POST        /apply/list-details/provide-details/self-assessment-unique-taxpayer-
 
 GET         /apply/list-details/provide-details/check-your-answers               uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.CheckYourAnswersController.show
 GET         /apply/list-details/provide-details/view/:individualProvidedDetailsId               uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.CheckYourAnswersController.view(individualProvidedDetailsId: IndividualProvidedDetailsId)
+
 POST        /apply/list-details/provide-details/check-your-answers               uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant.CheckYourAnswersController.submit
 
 # Lists share link

@@ -80,6 +80,9 @@ extends ViewSpec:
         s"""
            |Relevant individual details
            |Check your answers
+           |Name
+           |$individualNameValue
+           |Change Name
            |Date of birth
            |1 January 2000
            |Change Date of birth
@@ -112,6 +115,11 @@ extends ViewSpec:
     "render a summary row for each required answer" in:
       val expectedSummaryList: TestSummaryList = TestSummaryList(
         List(
+          summaryRow(
+            key = "Name",
+            value = "Test Name",
+            action = AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url
+          ),
           summaryRow(
             key = "Date of birth",
             value = "1 January 2000",
@@ -162,6 +170,9 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         s"""
            |Check your answers
+           |Name
+           |$individualNameValue
+           |Change Name
            |Date of birth
            |1 January 2000
            |Change Date of birth
@@ -188,6 +199,11 @@ extends ViewSpec:
     "render a summary row for each required answer" in:
       val expectedSummaryList: TestSummaryList = TestSummaryList(
         List(
+          summaryRow(
+            key = "Name",
+            value = "Test Name",
+            action = AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url
+          ),
           summaryRow(
             key = "Date of birth",
             value = "1 January 2000",

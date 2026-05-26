@@ -524,7 +524,7 @@ providedByApplicantSaUtr.saUtr.error.required = Enter the Self Assessment Unique
 providedByApplicantSaUtr.saUtr.error.invalid = Enter a Self Assessment Unique Taxpayer Reference in the correct format
 
 providedByApplicantCheckYourAnswers.title = Check your answers
-providedByApplicantCheckYourAnswers.individualName.label = Name
+providedByApplicantCheckYourAnswers.currentIndividualName.label = Name
 providedByApplicantCheckYourAnswers.telephone.label = Telephone number
 providedByApplicantCheckYourAnswers.email.label = Email address
 providedByApplicantCheckYourAnswers.saUtr.label = Self Assessment Unique Taxpayer Reference

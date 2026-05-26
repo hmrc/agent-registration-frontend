@@ -26,6 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.SelectIndividualForm
@@ -33,6 +34,8 @@ import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
 import uk.gov.hmrc.agentregistrationfrontend.repository.ProvidedByApplicantSessionStore
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.providedbyapplicant.SelectIndividualPage
+
+import scala.concurrent.Future
 
 @Singleton
 class SelectIndividualController @Inject() (
@@ -71,14 +74,20 @@ extends FrontendController(mcc, actions):
             else
               request.add[List[IndividualProvidedDetails]](incompleteIndividuals)
 
-  def show: Action[AnyContent] = baseAction:
+  def show: Action[AnyContent] = baseAction.async:
     implicit request =>
       val incompleteIndividuals: List[IndividualProvidedDetails] = request.get
-      val form = SelectIndividualForm.form(incompleteIndividuals)
-      Ok(view(
-        form = form,
-        incompleteIndividuals = incompleteIndividuals
-      ))
+      val emptyForm = SelectIndividualForm.form(incompleteIndividuals)
+      providedByApplicantSessionStore.find().map: maybeCachedDetails =>
+        val form =
+          maybeCachedDetails match
+            case Some(details) =>
+              incompleteIndividuals
+                .find(_.individualName === details.individualName)
+                .map(emptyForm.fill)
+                .getOrElse(emptyForm)
+            case None => emptyForm
+        Ok(view(form, incompleteIndividuals))
 
   def submit: Action[AnyContent] =
     baseAction
@@ -101,8 +110,12 @@ extends FrontendController(mcc, actions):
             individualProvidedDetailsId = i._id,
             individualName = i.individualName
           )
-          providedByApplicantSessionStore
-            .upsert(providedByApplicant)
-            .map: _ =>
-              Redirect(AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedDoBController.show.url)
+          providedByApplicantSessionStore.find().flatMap:
+            case Some(existing) if existing.individualName === providedByApplicant.individualName =>
+              Future.successful(Redirect(AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.show.url))
+            case _ =>
+              providedByApplicantSessionStore
+                .upsert(providedByApplicant)
+                .map: _ =>
+                  Redirect(AppRoutes.apply.listdetails.providedbyapplicant.ApplicantProvidedDoBController.show.url)
       .redirectIfSaveForLater

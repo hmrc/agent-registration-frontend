@@ -51,6 +51,14 @@
     )
 }
 
+@currentIndividualRow = @{
+    makeSummaryListRow(
+        labelKey = s"$key.currentIndividualName.label",
+        valueText = providedByApplicant.individualName.value,
+        changeHref = AppRoutes.apply.listdetails.providedbyapplicant.SelectIndividualController.show.url
+    )
+}
+
 @telephoneRow = @{
     makeSummaryListRow(
         labelKey = s"$key.telephone.label",
@@ -114,7 +122,7 @@
     case _ => Seq.empty[SummaryListRow]
   }
 
-  val base = dateOfBirthRows ++ Seq(telephoneRow, emailRow)
+  val base = Seq(currentIndividualRow) ++ dateOfBirthRows ++ Seq(telephoneRow, emailRow)
 
   val ninoRows = providedByApplicant.getNino match {
     case IndividualNino.Provided(nino) => Seq(hasNinoRow("Yes"), ninoRow(nino.value))
@@ -122,12 +130,12 @@
     case _: IndividualNino.FromAuth => Seq.empty[SummaryListRow]
   }
 
-    val saUtrRows = providedByApplicant.getSaUtr match {
-      case IndividualSaUtr.Provided(saUtr) => Seq(hasSaUtrRow("Yes"), saUtrRow(saUtr.value))
-      case IndividualSaUtr.NotProvided => Seq(hasSaUtrRow("No"))
-      case _: IndividualSaUtr.FromAuth => Seq.empty[SummaryListRow]
-      case _: IndividualSaUtr.FromCitizenDetails => Seq.empty[SummaryListRow]
-    }
+  val saUtrRows = providedByApplicant.getSaUtr match {
+    case IndividualSaUtr.Provided(saUtr) => Seq(hasSaUtrRow("Yes"), saUtrRow(saUtr.value))
+    case IndividualSaUtr.NotProvided => Seq(hasSaUtrRow("No"))
+    case _: IndividualSaUtr.FromAuth => Seq.empty[SummaryListRow]
+    case _: IndividualSaUtr.FromCitizenDetails => Seq.empty[SummaryListRow]
+  }
 
     base ++ ninoRows ++ saUtrRows
 }
