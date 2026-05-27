@@ -60,7 +60,7 @@ extends ViewSpec:
           |These file types are allowed:
           |image (.jpg, .jpeg, .png or .tiff)
           |PDF (.pdf)
-          |email (.txt or .msg)
+          |email (.txt)
           |Microsoft (Word, Excel or PowerPoint)
           |Open Document Format (ODF)
           |Choose your file
@@ -79,7 +79,7 @@ extends ViewSpec:
         .selectOrFail("form input[type='file']")
         .selectOnlyOneElementOrFail()
       fileInput.attr("name") shouldBe "file"
-      fileInput.attr("accept") shouldBe "image/jpeg,image/png,image/tiff,application/pdf,text/plain,application/vnd.ms-outlook,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.spreadsheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.oasis.opendocument.presentation"
+      fileInput.attr("accept") shouldBe "image/jpeg,image/png,image/tiff,application/pdf,text/plain,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.oasis.opendocument.text,application/vnd.oasis.opendocument.spreadsheet,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.oasis.opendocument.presentation"
 
     "render config values correctly for JavaScript to use when enabled" in:
       val progressIndicator = doc
