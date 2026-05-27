@@ -23,6 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistration.shared.util.EnumExtensions.*
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
+import uk.gov.hmrc.agentregistrationfrontend.repository.BusinessPartnerRecordSessionStore
 
 class ControllerSpec
 extends ISpec,
@@ -39,6 +40,13 @@ extends ISpec,
     val COMPLETED = "Completed"
     val INCOMPLETE = "Incomplete"
     val CANNOT_START_YET = "Cannot start yet"
+
+  /** Delete the BPR session record after each test to ensure tests are independent and don't interfere with each other.
+    */
+  val businessPartnerRecordSessionStore: BusinessPartnerRecordSessionStore = app.injector.instanceOf[BusinessPartnerRecordSessionStore]
+  override def afterEach(): Unit =
+    businessPartnerRecordSessionStore.delete().futureValue
+    super.afterEach()
 
   def addAgentTypeToSession(agentType: AgentType): WSResponse = get(
     s"/agent-registration/test-only/add-agent-type/${agentType.toStringHyphenated}"

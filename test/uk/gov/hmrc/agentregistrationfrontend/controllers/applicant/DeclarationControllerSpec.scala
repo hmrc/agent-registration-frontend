@@ -101,6 +101,22 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterAllOtherTasksComplete.agentApplicationId)
 
+  s"GET $path should not call for BPR when it is available in the session store" in:
+    businessPartnerRecordSessionStore.upsert(tdAll.businessPartnerRecordResponse).futureValue
+    ApplyStubHelper.stubsForAuthAction(agentApplication.afterAllOtherTasksComplete)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterAllOtherTasksComplete.agentApplicationId,
+      individuals = individualsForSubmission
+    )
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.OK
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "Declaration - Apply for an agent services account - GOV.UK"
+    ApplyStubHelper.verifyConnectorsForAuthAction()
+    AgentRegistrationStubs.verifyGetBusinessPartnerRecord(agentApplication.afterAllOtherTasksComplete.getUtr, 0) // verify that BPR connector was not called
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterAllOtherTasksComplete.agentApplicationId)
+
   s"POST $path with accept and send should update the application state and redirect to the submitted page" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(
       application = agentApplication.afterAllOtherTasksComplete,
