@@ -1,5 +1,5 @@
 /*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,14 @@
 package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
+import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestRiskingConnector
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
 
 @Singleton
-class TestApplicationService @Inject() (
-  testAgentRegistrationConnector: TestAgentRegistrationConnector
-)
-extends RequestAwareLogging:
-
-  def makeTestApplication()(using request: RequestHeader): Future[TestOnlyLink] = testAgentRegistrationConnector
-    .makeTestApplication()
-
-  def deleteAll()(using RequestHeader): Future[Unit] = testAgentRegistrationConnector.deleteAllApplications()
+class TestRiskingService @Inject() (
+  testRiskingConnector: TestRiskingConnector
+):
+  def deleteAll()(using RequestHeader): Future[Unit] = testRiskingConnector.deleteAllApplications()

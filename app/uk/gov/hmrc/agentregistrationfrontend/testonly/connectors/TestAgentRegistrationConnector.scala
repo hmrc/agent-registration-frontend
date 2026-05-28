@@ -180,4 +180,21 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to find individuals for application id: ${agentApplicationId.value}")
 
+  def deleteAllApplications()(using RequestHeader): Future[Unit] =
+    val url: URL = url"$baseUrl/applications"
+    httpClient
+      .delete(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.NO_CONTENT => ()
+          case other =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "DELETE",
+              url = url,
+              status = other,
+              response = response
+            )
+      .andLogOnFailure("Failed to delete all Agent Applications")
+
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration/test-only"

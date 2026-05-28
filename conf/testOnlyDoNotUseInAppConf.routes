@@ -46,3 +46,5 @@ GET         /agent-registration/test-only/show-individual-provided-details/:indi
 
 GET         /agent-registration/test-only/find-and-log-in-applicant/:userId/:planetId                                      uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.findAndLogInApplicant(userId: UserId, planetId: PlanetId, redirectUrl: String)
 GET         /agent-registration/test-only/find-or-create-and-log-in-individual/:userId/:planetId/:individualName           uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.findOrCreateAndLogInIndividual(userId: UserId, planetId: PlanetId, individualName: String, redirectUrl: String)
+
+GET         /agent-registration/test-only/reset                                                                             uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.resetDatabase
