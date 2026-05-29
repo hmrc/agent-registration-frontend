@@ -16,11 +16,13 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls
 
-import com.softwaremill.quicklens.*
+import com.softwaremill.quicklens.each
+import com.softwaremill.quicklens.modify
 import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
@@ -51,30 +53,31 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
-      val isHmrc = request.agentApplication.getAmlsDetails.isHmrc
-      val form: Form[AmlsRegistrationNumber] = AmlsRegistrationNumberForm(isHmrc).form.fill(request
-        .agentApplication
-        .getAmlsDetails
-        .amlsRegistrationNumber)
+      val supervisoryBody = request.agentApplication.getAmlsDetails.supervisoryBody
+      val form: Form[AmlsRegistrationNumber] = AmlsRegistrationNumberForm(supervisoryBody)
+        .form
+        .fill:
+          request
+            .agentApplication
+            .getAmlsDetails
+            .amlsRegistrationNumber
       Ok(view(form))
 
   def submit: Action[AnyContent] =
     baseAction
       .ensureValidFormAndRedirectIfSaveForLater(
-        form = r => AmlsRegistrationNumberForm(r.agentApplication.getAmlsDetails.isHmrc).form,
+        form = request => AmlsRegistrationNumberForm(request.get[AgentApplication].getAmlsDetails.supervisoryBody).form,
         resultToServeWhenFormHasErrors = implicit r => view(_)
       )
       .async:
-        implicit request =>
-          val amlsRegistrationNumber: AmlsRegistrationNumber = request.get
-
+        implicit request: RequestWithData[AmlsRegistrationNumber *: DataWithApplication] =>
+          val amlsRegistrationNumber: AmlsRegistrationNumber = request.get[AmlsRegistrationNumber]
           applicationService
             .upsert(
-              request.agentApplication
+              request.get[AgentApplication]
                 .modify(_.amlsDetails.each.amlsRegistrationNumber)
                 .setTo(Some(amlsRegistrationNumber))
             )
-            .map(_ =>
+            .map: _ =>
               Redirect(AppRoutes.apply.amls.CheckYourAnswersController.show.url)
-            )
       .redirectIfSaveForLater

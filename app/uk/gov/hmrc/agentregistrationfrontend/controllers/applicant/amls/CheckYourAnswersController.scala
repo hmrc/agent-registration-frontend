@@ -48,7 +48,7 @@ extends FrontendController(mcc, actions):
                   None,
                   _
                 )) =>
-              Redirect(AppRoutes.apply.amls.AmlsRegistrationNumberController.show)
+              Redirect(AppRoutes.apply.amls.AmlsSupervisorController.show) // because reg number is missing we go to supervisor page as this controls the type of registration number required
             case Some(AmlsDetails(
                   AmlsCode(amlsCode),
                   Some(_),
