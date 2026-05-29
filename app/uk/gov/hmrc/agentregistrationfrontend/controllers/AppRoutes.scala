@@ -130,7 +130,6 @@ object AppRoutes:
         val CompaniesHouseOfficersController = listdetailsIncorporatedRoutes.CompaniesHouseOfficersController
         val EnterCompaniesHouseOfficerController = listdetailsIncorporatedRoutes.EnterCompaniesHouseOfficerController
         val CheckYourAnswersController = listdetailsIncorporatedRoutes.CheckYourAnswersController
-        val ChangeCompaniesHouseOfficerController = listdetailsIncorporatedRoutes.ChangeCompaniesHouseOfficerController
         val RemoveCompaniesHouseOfficerController = listdetailsIncorporatedRoutes.RemoveCompaniesHouseOfficerController
 
       object link:

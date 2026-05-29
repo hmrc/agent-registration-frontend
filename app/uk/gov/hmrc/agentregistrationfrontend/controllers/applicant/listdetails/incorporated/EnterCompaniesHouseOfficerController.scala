@@ -21,16 +21,15 @@ import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer.normaliseOfficerName
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole.getCompaniesHouseOfficerRole
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
-import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuildersWithData.*
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseIndividuaNameForm
-import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.CompaniesHouseService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.NameMatching
@@ -47,16 +46,17 @@ class EnterCompaniesHouseOfficerController @Inject() (
   actions: ApplicantActions,
   enterCompaniesHouseFirstIndividualNamePage: EnterCompaniesHouseFirstIndividualNamePage,
   enterCompaniesHouseNextIndividualNamePage: EnterCompaniesHouseNextIndividualNamePage,
-  businessPartnerRecordService: BusinessPartnerRecordService,
   individualProvideDetailsService: IndividualProvideDetailsService,
   companiesHouseService: CompaniesHouseService
 )
 extends FrontendController(mcc, actions):
 
-  private type CompaniesHouseRequestData = SixOrMoreOfficers *: Seq[IndividualName] *: List[IndividualProvidedDetails] *: IsIncorporated *: DataWithAuth
+  private type CompaniesHouseRequestData =
+    SixOrMoreOfficers *: List[IndividualProvidedDetails] *: BusinessPartnerRecordResponse *: IsIncorporated *: DataWithAuth
 
   private val baseAction: ActionBuilderWithData[CompaniesHouseRequestData] = actions
     .getApplicationInProgress
+    .getBusinessPartnerRecord
     .refine:
       implicit request =>
         request.agentApplication match
@@ -68,26 +68,10 @@ extends FrontendController(mcc, actions):
           case aa: IsIncorporated => request.replace[AgentApplication, IsIncorporated](aa)
     .refine:
       implicit request =>
-        val agentApplication: IsIncorporated = request.get[IsIncorporated]
-        for
-          individualsList <- individualProvideDetailsService
-            .findAllKeyIndividualsByApplicationId(agentApplication.agentApplicationId)
-
-          companiesHouseOfficers <- companiesHouseService
-            .getActiveOfficers(agentApplication.getCrn, agentApplication.getCompaniesHouseOfficerRole)
-
-          allCompaniesHouseOfficersNames = companiesHouseOfficers
-            .map(x => CompaniesHouseOfficer.normaliseOfficerName(x.name))
-            .map(IndividualName(_))
-            .filter(_.isValidName)
-
-          notUsedCompaniesHouseOfficersNames = NameMatching.filterAlreadyUsedNames(
-            allCompaniesHouseOfficersNames,
-            individualsList.map(_.individualName)
-          )
-        yield request
-          .add[List[IndividualProvidedDetails]](individualsList)
-          .add[Seq[IndividualName]](notUsedCompaniesHouseOfficersNames)
+        individualProvideDetailsService
+          .findAllKeyIndividualsByApplicationId(request.get[IsIncorporated].agentApplicationId)
+          .map: individualProvidedDetailsList =>
+            request.add[List[IndividualProvidedDetails]](individualProvidedDetailsList)
     .refine:
       implicit request =>
         request.get[IsIncorporated].getNumberOfCompaniesHouseOfficers match
@@ -101,41 +85,7 @@ extends FrontendController(mcc, actions):
             )
             Redirect(AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show.url)
 
-  private def renderPage(
-    form: Form[IndividualName],
-    resultStatus: Status
-  )(implicit request: RequestWithData[CompaniesHouseRequestData]): Future[Result] =
-    val agentApplication = request.get[IsIncorporated]
-    val individuals = request.get[List[IndividualProvidedDetails]]
-    val sixOrMoreOfficers = request.get[SixOrMoreOfficers]
-    val formAction = AppRoutes.apply.listdetails.incoporated.EnterCompaniesHouseOfficerController.submit
-
-    getEntityName(agentApplication).map: entityName =>
-      individuals match
-        case Nil =>
-          resultStatus(
-            enterCompaniesHouseFirstIndividualNamePage(
-              form = form,
-              entityName = entityName,
-              sixOrMoreOfficers = request.get[SixOrMoreOfficers],
-              ordinalKey = "first",
-              formAction = formAction,
-              agentApplication = agentApplication
-            )
-          )
-        case x if x.size < sixOrMoreOfficers.totalListSize =>
-          resultStatus(
-            enterCompaniesHouseNextIndividualNamePage(
-              form = form,
-              entityName = entityName,
-              ordinalKey = "subsequent",
-              formAction = formAction,
-              agentApplication = agentApplication
-            )
-          )
-        case _ => Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
-
-  def show: Action[AnyContent] = baseAction.async:
+  def show: Action[AnyContent] = baseAction:
     implicit request =>
       renderPage(CompaniesHouseIndividuaNameForm.form, Ok)
 
@@ -148,13 +98,28 @@ extends FrontendController(mcc, actions):
             (formWithErrors: Form[IndividualName]) =>
               renderPage(formWithErrors, BadRequest)
       )
-      .async:
-        implicit request =>
+      .refine:
+        implicit request: RequestWithData[IndividualName *: CompaniesHouseRequestData] =>
           val individualName: IndividualName = request.get
-          val agentApplication = request.get[IsIncorporated]
-          val companiesHouseOfficerList = request.get[Seq[IndividualName]]
-
-          NameMatching.individualNameMatching(individualName, companiesHouseOfficerList) match
+          val agentApplication: IsIncorporated = request.get[IsIncorporated]
+          companiesHouseService
+            .getActiveOfficers(
+              companyRegistrationNumber = agentApplication.getCrn,
+              lastName = individualName.value.split(" ").lastOption.getOrElse(""),
+              expectedRole = getCompaniesHouseOfficerRole(agentApplication)
+            ).map: results =>
+              request.add[Seq[CompaniesHouseOfficer]](results)
+      .async {
+        implicit request: RequestWithData[Seq[CompaniesHouseOfficer] *: IndividualName *: CompaniesHouseRequestData] =>
+          val individualNameFromForm: IndividualName = request.get
+          val agentApplication: IsIncorporated = request.get
+          val existingList: List[IndividualProvidedDetails] = request.get
+          val companiesHouseOfficerList: Seq[CompaniesHouseOfficer] = request.get
+          val availableNames: Seq[IndividualName] = reduceToAvailableNames(
+            existingList = existingList,
+            companiesHouseOfficerList = companiesHouseOfficerList
+          )
+          NameMatching.individualNameMatching(individualNameFromForm, availableNames) match
             case Some(matchedOfficerName) =>
               for
                 individualProvidedDetails: IndividualProvidedDetails <- individualProvideDetailsService.create(
@@ -166,15 +131,71 @@ extends FrontendController(mcc, actions):
               yield Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
 
             case None =>
-              // No match found — re-render the form with an error
-              renderPage(
-                CompaniesHouseIndividuaNameForm.form
-                  .fill(individualName)
-                  .withError(CompaniesHouseIndividuaNameForm.firstNameKey, "error.companiesHouseOfficer.nameNotMatched"),
-                BadRequest
-              )(using request.delete[IndividualName])
+              // No match found — re-render the form with an error instead of an exit page, by design
+              Future.successful(
+                renderPage(
+                  form = CompaniesHouseIndividuaNameForm.form
+                    .fill(individualNameFromForm)
+                    .withError(CompaniesHouseIndividuaNameForm.firstNameKey, "error.companiesHouseOfficer.nameNotMatched"),
+                  resultStatus = BadRequest
+                )(using request.delete[IndividualName].delete[Seq[CompaniesHouseOfficer]])
+              )
+      }
       .redirectIfSaveForLater
 
-  private def getEntityName(agentApplication: IsIncorporated)(using RequestHeader): Future[String] = businessPartnerRecordService
-    .getBusinessPartnerRecord(agentApplication.getUtr)
-    .map(_.map(_.getEntityName).getOrThrowExpectedDataMissing("Business Partner Record is missing"))
+  /** We have abstracted the logic to determine what type of page to render, as it is used in multiple places
+    */
+  private def renderPage(
+    form: Form[IndividualName],
+    resultStatus: Status
+  )(implicit request: RequestWithData[CompaniesHouseRequestData]): Result =
+    val agentApplication: IsIncorporated = request.get
+    val individuals: List[IndividualProvidedDetails] = request.get
+    val sixOrMoreOfficers: SixOrMoreOfficers = request.get
+    val entityName = request.get[BusinessPartnerRecordResponse].getEntityName
+    individuals match
+      case Nil =>
+        resultStatus(
+          enterCompaniesHouseFirstIndividualNamePage(
+            form = form,
+            entityName = entityName,
+            sixOrMoreOfficers = request.get[SixOrMoreOfficers],
+            agentApplication = agentApplication
+          )
+        )
+      case x if x.size < sixOrMoreOfficers.totalListSize =>
+        resultStatus(
+          enterCompaniesHouseNextIndividualNamePage(
+            form = form,
+            entityName = entityName,
+            agentApplication = agentApplication
+          )
+        )
+      case _ => Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
+
+  /** We need to support duplicate names existing on Companies House. This means that if there are 2 or more instances of the same name on Companies House and
+    * the applicant has already provided a name that matches those duplicates, we want to allow them to provide as many as there are on Companies House. We
+    * group the CH list by name and count the occurrences, then for each name in the CH list we check if it exists in the existing list and if so we reduce the
+    * count. If the count is greater than 0, we know there are still unmatched officers with that name on the CH list, and we keep it in the available names
+    * list. Worth noting we may end up using other CH officer values (such as DoB) and this is why we keep the CH officer list as a list of officers not names.
+    */
+  private def reduceToAvailableNames(
+    existingList: List[IndividualProvidedDetails],
+    companiesHouseOfficerList: Seq[CompaniesHouseOfficer]
+  ): Seq[IndividualName] =
+    val existingListGroupedByName: Map[String, Int] =
+      existingList
+        .groupMapReduce(_.individualName.value)(_ => 1)(_ + _)
+    val (unMatchedCompaniesHouseOfficers, _) =
+      companiesHouseOfficerList.foldLeft((Seq.empty[CompaniesHouseOfficer], existingListGroupedByName)):
+        case ((acc, counts), officer) =>
+          val key = normaliseOfficerName(officer.name)
+          val existingForName = counts.getOrElse(key, 0)
+          if existingForName > 0
+          then (acc, counts.updated(key, existingForName - 1).filter(_._2 > 0))
+          else
+            // either not matched by existing list or all existing occurrences consumed therefore keep this officer in the list
+            (acc :+ officer, counts)
+    unMatchedCompaniesHouseOfficers
+      .map(o => normaliseOfficerName(o.name))
+      .map(IndividualName(_))

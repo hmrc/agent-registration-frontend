@@ -25,7 +25,7 @@ import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
 object CompaniesHouseIndividuaNameForm:
 
-  val key: String = "companiesHouseIndividuaName"
+  val key: String = "companiesHouseIndividualName"
   val firstNameKey: String = "firstName"
   val lastNameKey: String = "lastName"
 
@@ -36,14 +36,22 @@ object CompaniesHouseIndividuaNameForm:
       firstNameKey -> Forms.of(TextFormatter(ErrorKeys.requiredFieldErrorMessage(firstNameKey)))
         .transform[String](canonicalise, identity)
         .verifying(
+          ErrorKeys.requiredFieldErrorMessage(firstNameKey),
+          _.nonEmpty
+        )
+        .verifying(
           ErrorKeys.invalidInputErrorMessage(firstNameKey),
-          name => name.isEmpty || name.matches("^[a-zA-Z\\s\\-']+$")
+          _.matches("^[a-zA-Z\\s\\-']+$")
         ),
       lastNameKey -> Forms.of(TextFormatter(ErrorKeys.requiredFieldErrorMessage(lastNameKey)))
         .transform[String](canonicalise, identity)
         .verifying(
+          ErrorKeys.requiredFieldErrorMessage(lastNameKey),
+          _.nonEmpty
+        )
+        .verifying(
           ErrorKeys.invalidInputErrorMessage(lastNameKey),
-          name => name.isEmpty || name.matches("^[a-zA-Z\\s\\-']+$")
+          _.matches("^[a-zA-Z\\s\\-']+$")
         )
     )(
       (
@@ -53,10 +61,7 @@ object CompaniesHouseIndividuaNameForm:
     )(name =>
       name.value.split(" ", 2) match
         case Array(first, last) => Some((first, last))
-        case Array(single) => Some((single, ""))
+        case Array(single) => Some(("", single))
         case _ => Some(("", ""))
-    ).verifying(
-      ErrorKeys.invalidInputErrorMessage(key),
-      _.isValidName
     )
   )

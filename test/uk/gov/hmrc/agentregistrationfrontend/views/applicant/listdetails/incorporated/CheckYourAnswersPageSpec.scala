@@ -106,7 +106,6 @@ extends ViewSpec:
 
         "contain Change and Remove action links" in:
           val actions = doc.mainContent.select(".hmrc-summary-list__actions a")
-          actions.toString should include("Change")
           actions.toString should include("Remove")
 
         "show inset text with correct entity type" in:

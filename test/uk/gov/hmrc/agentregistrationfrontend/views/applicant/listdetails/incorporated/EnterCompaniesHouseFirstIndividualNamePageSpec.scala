@@ -34,8 +34,7 @@ extends ViewSpec:
 
   private val entityName: String = tdAll.companyName
   private val sixOrMoreOfficers: SixOrMoreOfficers = tdAll.sixOrMoreCompaniesHouseOfficers
-  private val ordinalKey: String = "first"
-  private val formAction: play.api.mvc.Call = AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.submitSixOrMore
+  private val formAction: play.api.mvc.Call = AppRoutes.apply.listdetails.incoporated.EnterCompaniesHouseOfficerController.submit
 
   private def render(
     form: play.api.data.Form[IndividualName],
@@ -44,8 +43,6 @@ extends ViewSpec:
     form = form,
     entityName = entityName,
     sixOrMoreOfficers = sixOrMoreOfficers,
-    ordinalKey = ordinalKey,
-    formAction = formAction,
     agentApplication = agentApplication
   ).body)
 
