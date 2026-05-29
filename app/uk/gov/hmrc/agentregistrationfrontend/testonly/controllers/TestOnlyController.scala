@@ -25,6 +25,8 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendControllerBase
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
+import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyHubPage
 
 import javax.inject.Inject
@@ -36,7 +38,9 @@ class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
   defaultActionBuilder: DefaultActionBuilder,
   testOnlyHubPage: TestOnlyHubPage,
-  stubUserService: StubUserService
+  stubUserService: StubUserService,
+  testApplicationService: TestApplicationService,
+  testRiskingService: TestRiskingService
 )
 extends FrontendControllerBase(mcc):
 
@@ -83,3 +87,10 @@ extends FrontendControllerBase(mcc):
                 )
           loginResponse <- stubUserService.signIn(user)
         yield Redirect(redirectUrl).addToSession(loginResponse)
+
+  def resetDatabase: Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      for
+        _ <- testApplicationService.deleteAll()
+        _ <- testRiskingService.deleteAll()
+      yield Ok(Json.toJson("Databases reset"))
