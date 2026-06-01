@@ -25,74 +25,32 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 object CompaniesHouseStubs {
 
   def stubSixOfficers(
-    officerRole: CompaniesHouseOfficerRole = CompaniesHouseOfficerRole.LlpMember
+    officerRole: CompaniesHouseOfficerRole = CompaniesHouseOfficerRole.LlpMember,
+    surname: Option[String] = None,
+    noMatch: Boolean = false
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers"),
+    urlPattern =
+      surname match
+        case Some(s) => urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=$s")
+        case None => urlMatching(s"/companies-house-api-proxy/company/1234567890/officers"),
     responseStatus = 200,
     responseBody =
-      Json.obj(
-        "total_results" -> 6,
-        "items_per_page" -> 35,
-        "etag" -> "c3b8d15615b770cd4fcc27fdc1c959474ae4c03e",
-        "active_count" -> 6,
-        "kind" -> "officer-list",
-        "start_index" -> 0,
-        "resigned_count" -> 1,
-        "links" -> Json.obj(
-          "self" -> "/company/1234567890/appointments"
-        ),
-        "items" -> Json.arr(
-          Json.obj(
-            "name" -> "Tester, John",
-            "date_of_birth" -> Json.obj("month" -> 8, "year" -> 1967),
-            "officer_role" -> officerRole.role
-          ),
-          Json.obj(
-            "name" -> "Tester, John Ian",
-            "date_of_birth" -> Json.obj("month" -> 4, "year" -> 1948),
-            "officer_role" -> officerRole.role
-          ),
-          Json.obj(
-            "name" -> "Tester, Alice",
-            "date_of_birth" -> Json.obj("month" -> 1, "year" -> 1975),
-            "officer_role" -> officerRole.role
-          ),
-          Json.obj(
-            "name" -> "Tester, Bob",
-            "date_of_birth" -> Json.obj("month" -> 12, "year" -> 1982),
-            "officer_role" -> officerRole.role
-          ),
-          Json.obj(
-            "name" -> "Tester, Carol",
-            "date_of_birth" -> Json.obj("month" -> 6, "year" -> 1991),
-            "officer_role" -> officerRole.role
-          ),
-          Json.obj(
-            "name" -> "Tester, Carol",
-            "date_of_birth" -> Json.obj("month" -> 6, "year" -> 1991),
-            "officer_role" -> officerRole.role
-          ),
-          Json.obj(
-            "name" -> "Tester, Dave (Resigned)",
-            "date_of_birth" -> Json.obj("month" -> 2, "year" -> 1980),
-            "resigned_on" -> "2024-01-01",
-            "officer_role" -> officerRole.role
-          ),
-          Json.obj(
-            "name" -> "Corporate Entity",
-            "identification" -> Json.obj(
-              "identification_type" -> "corporate-entity"
-            ),
-            "officer_role" -> officerRole.role
-          )
-        )
-      ).toString
+      surname match
+        case Some(s) if noMatch => Json.obj("items" -> Json.arr()).toString
+        case Some(s) => responseBodyForSurnameSearch(s, officerRole)
+        case None => responseBodyForListingOfficers(officerRole)
   )
 
-  def verifySixOfficersCalls(count: Int = 1): Unit = StubMaker.verify(
+  def verifySixOfficersCalls(
+    surname: Option[String] = None,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers"),
+    urlPattern =
+      surname match
+        case Some(s) => urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=$s")
+        case None => urlMatching(s"/companies-house-api-proxy/company/1234567890/officers"),
     count = count
   )
 
@@ -193,5 +151,113 @@ object CompaniesHouseStubs {
     urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers"),
     count = count
   )
+
+  private def responseBodyForListingOfficers(officerRole: CompaniesHouseOfficerRole) =
+    Json.obj(
+      "total_results" -> 6,
+      "items_per_page" -> 35,
+      "etag" -> "c3b8d15615b770cd4fcc27fdc1c959474ae4c03e",
+      "active_count" -> 6,
+      "kind" -> "officer-list",
+      "start_index" -> 0,
+      "resigned_count" -> 1,
+      "links" -> Json.obj(
+        "self" -> "/company/1234567890/appointments"
+      ),
+      "items" -> Json.arr(
+        Json.obj(
+          "name" -> "Tester, John",
+          "date_of_birth" -> Json.obj("month" -> 8, "year" -> 1967),
+          "officer_role" -> officerRole.role
+        ),
+        Json.obj(
+          "name" -> "Tester, John Ian",
+          "date_of_birth" -> Json.obj("month" -> 4, "year" -> 1948),
+          "officer_role" -> officerRole.role
+        ),
+        Json.obj(
+          "name" -> "Tester, Alice",
+          "date_of_birth" -> Json.obj("month" -> 1, "year" -> 1975),
+          "officer_role" -> officerRole.role
+        ),
+        Json.obj(
+          "name" -> "Tester, Bob",
+          "date_of_birth" -> Json.obj("month" -> 12, "year" -> 1982),
+          "officer_role" -> officerRole.role
+        ),
+        Json.obj(
+          "name" -> "Tester, Carol",
+          "date_of_birth" -> Json.obj("month" -> 6, "year" -> 1991),
+          "officer_role" -> officerRole.role
+        ),
+        Json.obj(
+          "name" -> "Tester, Carol",
+          "date_of_birth" -> Json.obj("month" -> 6, "year" -> 1991),
+          "officer_role" -> officerRole.role
+        ),
+        Json.obj(
+          "name" -> "Tester, Dave (Resigned)",
+          "date_of_birth" -> Json.obj("month" -> 2, "year" -> 1980),
+          "resigned_on" -> "2024-01-01",
+          "officer_role" -> officerRole.role
+        ),
+        Json.obj(
+          "name" -> "Corporate Entity",
+          "identification" -> Json.obj(
+            "identification_type" -> "corporate-entity"
+          ),
+          "officer_role" -> officerRole.role
+        )
+      )
+    ).toString
+
+  private def responseBodyForSurnameSearch(
+    surname: String,
+    officerRole: CompaniesHouseOfficerRole
+  ) =
+    Json.obj(
+      "total_results" -> 6,
+      "items_per_page" -> 35,
+      "etag" -> "c3b8d15615b770cd4fcc27fdc1c959474ae4c03e",
+      "active_count" -> 6,
+      "kind" -> "officer-list",
+      "start_index" -> 0,
+      "resigned_count" -> 1,
+      "links" -> Json.obj(
+        "self" -> "/company/1234567890/appointments"
+      ),
+      "items" -> Json.arr(
+        Json.obj(
+          "name" -> s"$surname, John",
+          "date_of_birth" -> Json.obj("month" -> 8, "year" -> 1967),
+          "officer_role" -> officerRole.role
+        ),
+        Json.obj(
+          "name" -> s"$surname, John Ian",
+          "date_of_birth" -> Json.obj("month" -> 4, "year" -> 1948),
+          "officer_role" -> officerRole.role
+        ),
+        Json.obj(
+          "name" -> s"$surname, Alice",
+          "date_of_birth" -> Json.obj("month" -> 1, "year" -> 1975),
+          "officer_role" -> officerRole.role
+        ),
+        Json.obj(
+          "name" -> s"$surname, Bob",
+          "date_of_birth" -> Json.obj("month" -> 12, "year" -> 1982),
+          "officer_role" -> officerRole.role
+        ),
+        Json.obj(
+          "name" -> s"$surname, Carol",
+          "date_of_birth" -> Json.obj("month" -> 6, "year" -> 1991),
+          "officer_role" -> officerRole.role
+        ),
+        Json.obj(
+          "name" -> s"$surname, Carol",
+          "date_of_birth" -> Json.obj("month" -> 6, "year" -> 1991),
+          "officer_role" -> officerRole.role
+        )
+      )
+    ).toString
 
 }

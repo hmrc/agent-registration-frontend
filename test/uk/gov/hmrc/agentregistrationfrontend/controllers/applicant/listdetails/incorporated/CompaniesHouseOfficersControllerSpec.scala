@@ -267,7 +267,7 @@ extends ControllerSpec:
       AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeCompaniesHouseOfficers.agentApplicationId)
-    CompaniesHouseStubs.verifySixOfficersCalls(1)
+    CompaniesHouseStubs.verifySixOfficersCalls()
 
   s"POST $postFiveOrLessPath with blank inputs should return 400 and show an error" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeCompaniesHouseOfficers)
@@ -377,7 +377,7 @@ extends ControllerSpec:
       .text() should include("Error:")
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeCompaniesHouseOfficers.agentApplicationId)
-    CompaniesHouseStubs.verifySixOfficersCalls(1)
+    CompaniesHouseStubs.verifySixOfficersCalls()
 
   s"POST $postSixOrMorePath with non-numeric input should return 400 and show an error" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.beforeCompaniesHouseOfficers)
@@ -400,7 +400,7 @@ extends ControllerSpec:
       .text() should include("Error:")
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeCompaniesHouseOfficers.agentApplicationId)
-    CompaniesHouseStubs.verifySixOfficersCalls(1)
+    CompaniesHouseStubs.verifySixOfficersCalls()
 
   s"POST $postSixOrMorePath with save for later and valid selection should redirect to save for later" in:
     ApplyStubHelper.stubsForSuccessfulUpdateWithBpr(
@@ -423,4 +423,4 @@ extends ControllerSpec:
     response.header("Location").value shouldBe AppRoutes.apply.SaveForLaterController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.beforeCompaniesHouseOfficers.agentApplicationId)
-    CompaniesHouseStubs.verifySixOfficersCalls(1)
+    CompaniesHouseStubs.verifySixOfficersCalls()

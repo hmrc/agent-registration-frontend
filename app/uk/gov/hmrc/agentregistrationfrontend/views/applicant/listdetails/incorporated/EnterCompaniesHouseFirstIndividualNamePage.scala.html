@@ -44,8 +44,6 @@
         form: Form[IndividualName],
         entityName: String,
         sixOrMoreOfficers: SixOrMoreOfficers,
-        ordinalKey: String,
-        formAction: Call,
         agentApplication: AgentApplication
 )(implicit
         request: RequestHeader,
@@ -63,7 +61,7 @@
 }
 
 
-@title = @{if(paddingRequired > 0) messages(s"$key.complex.withPadding.title.$businessTypeKey", entityName) else messages(s"$key.title.$businessTypeKey")}
+@title = @{if(paddingRequired > 0) messages(s"$key.complex.withPadding.title.$businessTypeKey", entityName) else messages(s"$key.complex.title.$businessTypeKey")}
 @numberOfMembers = @{sixOrMoreOfficers.numberOfOfficersResponsibleForTaxMatters}
 @paddingRequired = @{sixOrMoreOfficers.requiredPadding}
 
@@ -93,9 +91,9 @@
     ))
   </p>
 
-    <h2 class="govuk-heading-m">@messages(s"$key.question.$ordinalKey")</h2>
+  <h2 class="govuk-heading-m">@messages(s"$key.question.first")</h2>
 
-    @formWithCSRF(action = formAction) {
+    @formWithCSRF(action = AppRoutes.apply.listdetails.incoporated.EnterCompaniesHouseOfficerController.submit) {
         @govukInput(Input(
             label = Label(
                 content = Text(messages(s"$key.firstName.label")),

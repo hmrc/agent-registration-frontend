@@ -82,35 +82,7 @@ extends ControllerSpec:
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
     val actions = doc.mainContent.select(".hmrc-summary-list__actions a")
-    val changeLink = actions.asScala.find(_.text().contains("Change"))
     val removeLink = actions.asScala.find(_.text().contains("Remove"))
-    changeLink shouldBe defined
-    removeLink shouldBe defined
-    changeLink.fold(fail("Change link not found"))(link =>
-      link.attr("href") shouldBe
-        AppRoutes.apply.listdetails.incoporated.ChangeCompaniesHouseOfficerController.show(tdAll.individualProvidedDetailsId).url
-    )
-    removeLink.fold(fail("Remove link not found"))(link =>
-      link.attr("href") shouldBe
-        AppRoutes.apply.listdetails.incoporated.RemoveCompaniesHouseOfficerController.show(tdAll.individualProvidedDetailsId).url
-    )
-    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
-
-  s"GET $getPath should only show Remove link for non-precreated individuals" in:
-    val nonPrecreatedIndividual = tdAll.providedDetails.afterStarted
-    ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
-    AgentRegistrationStubs.stubFindIndividualsForApplication(
-      agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
-      individuals = List(nonPrecreatedIndividual)
-    )
-    val response: WSResponse = get(getPath)
-
-    response.status shouldBe Status.OK
-    val doc = response.parseBodyAsJsoupDocument
-    val actions = doc.mainContent.select(".hmrc-summary-list__actions a")
-    val changeLink = actions.asScala.find(_.text().contains("Change"))
-    val removeLink = actions.asScala.find(_.text().contains("Remove"))
-    changeLink shouldBe None
     removeLink shouldBe defined
     removeLink.fold(fail("Remove link not found"))(link =>
       link.attr("href") shouldBe
@@ -168,7 +140,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     val sixIndividuals = (1 to 6).toList.map(i =>
       tdAll.providedDetails.precreated.copy(
-        _id = IndividualProvidedDetailsId(s"test-id-$i"),
+        _id = IndividualProvidedDetailsId(s"individual-provided-details-id-$i"),
         individualName = IndividualName(s"Test Name $i")
       )
     )
@@ -190,7 +162,7 @@ extends ControllerSpec:
     ApplyStubHelper.stubsForAuthAction(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     val fiveIndividuals = (1 to 5).toList.map(i =>
       tdAll.providedDetails.precreated.copy(
-        _id = IndividualProvidedDetailsId(s"test-id-$i"),
+        _id = IndividualProvidedDetailsId(s"individual-provided-details-id-$i"),
         individualName = IndividualName(s"Test Name $i")
       )
     )

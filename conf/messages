@@ -929,30 +929,30 @@ updateCompaniesHousePage.p1.LimitedCompany = As part of this application process
 updateCompaniesHousePage.p1.Partnership = As part of this application process, we need a verifiable list of the current partners of {0}.
 
 # CH officer Name Page - Complex (6+ officers from Companies House)
-companiesHouseIndividuaName.complex.title.LimitedLiabilityPartnership = Tell us about the LLP members who are relevant individuals
-companiesHouseIndividuaName.complex.withPadding.title.LimitedLiabilityPartnership = Tell us about 5 LLP members at {0}
-companiesHouseIndividuaName.complex.title.LimitedCompany = Tell us about the directors who are relevant individuals
-companiesHouseIndividuaName.complex.withPadding.title.LimitedCompany = Tell us about 5 directors at {0}
-companiesHouseIndividuaName.complex.title.Partnership = Tell us about the partners who are relevant individuals
-companiesHouseIndividuaName.complex.withPadding.title.Partnership = Tell us about 5 partners at {0}
-companiesHouseIndividuaName.complex.hint = We’ll check this against the business records in Companies House.
-companiesHouseIndividuaName.guidanceLink = Read the guidance about how we define ‘relevant individuals’
-companiesHouseIndividuaName.complex.p1.LimitedLiabilityPartnership = We need the names of all {0} LLP members who meet the definition of relevant individual under <a class="govuk-link" href="{1}" rel="noreferrer noopener">Chapter 226(2) of the Finance Act 2026 (opens in new tab)</a>.
-companiesHouseIndividuaName.complex.p1.LimitedCompany = We need the names of all {0} directors who meet the definition of relevant individual under <a class="govuk-link" href="{1}" rel="noreferrer noopener">Chapter 226(2) of the Finance Act 2026 (opens in new tab)</a>.
-companiesHouseIndividuaName.complex.p1.Partnership = We need the names of all {0} partners who meet the definition of relevant individual under <a class="govuk-link" href="{1}" rel="noreferrer noopener">Chapter 226(2) of the Finance Act 2026 (opens in new tab)</a>.
-companiesHouseIndividuaName.complex.details.bullet1 = material responsibility for tax advice activities
-companiesHouseIndividuaName.complex.details.bullet2 = significant authority over HMRC interactions
+companiesHouseIndividualName.complex.title.LimitedLiabilityPartnership = Tell us about the LLP members who are relevant individuals
+companiesHouseIndividualName.complex.withPadding.title.LimitedLiabilityPartnership = Tell us about 5 LLP members at {0}
+companiesHouseIndividualName.complex.title.LimitedCompany = Tell us about the directors who are relevant individuals
+companiesHouseIndividualName.complex.withPadding.title.LimitedCompany = Tell us about 5 directors at {0}
+companiesHouseIndividualName.complex.title.Partnership = Tell us about the partners who are relevant individuals
+companiesHouseIndividualName.complex.withPadding.title.Partnership = Tell us about 5 partners at {0}
+companiesHouseIndividualName.complex.hint = We’ll check this against the business records in Companies House.
+companiesHouseIndividualName.guidanceLink = Read the guidance about how we define ‘relevant individuals’
+companiesHouseIndividualName.complex.p1.LimitedLiabilityPartnership = We need the names of all {0} LLP members who meet the definition of relevant individual under <a class="govuk-link" href="{1}" rel="noreferrer noopener">Chapter 226(2) of the Finance Act 2026 (opens in new tab)</a>.
+companiesHouseIndividualName.complex.p1.LimitedCompany = We need the names of all {0} directors who meet the definition of relevant individual under <a class="govuk-link" href="{1}" rel="noreferrer noopener">Chapter 226(2) of the Finance Act 2026 (opens in new tab)</a>.
+companiesHouseIndividualName.complex.p1.Partnership = We need the names of all {0} partners who meet the definition of relevant individual under <a class="govuk-link" href="{1}" rel="noreferrer noopener">Chapter 226(2) of the Finance Act 2026 (opens in new tab)</a>.
+companiesHouseIndividualName.complex.details.bullet1 = material responsibility for tax advice activities
+companiesHouseIndividualName.complex.details.bullet2 = significant authority over HMRC interactions
 
 # LLP Member Name - Question ordinals
-companiesHouseIndividuaName.question.first = What is the name of the first person?
-companiesHouseIndividuaName.question.subsequent = What is the name of the next person?
+companiesHouseIndividualName.question.first = What is the name of the first person?
+companiesHouseIndividualName.question.subsequent = What is the name of the next person?
 
 # LLP Member Name - Field labels
-companiesHouseIndividuaName.firstName.label = First names
-companiesHouseIndividuaName.lastName.label = Last name
+companiesHouseIndividualName.firstName.label = First names
+companiesHouseIndividualName.lastName.label = Last name
 
 # LLP Member Name - Next person page (simpler layout)
-companiesHouseIndividuaName.p1 = We’ll check this against the business records for {0} in Companies House.
+companiesHouseIndividualName.p1 = We’ll check this against the business records for {0} in Companies House.
 
 # Incorporated: Check Your Answers / Add to list summary (LLP)
 addToListSummary.LimitedLiabilityPartnership.title.plural = You have added {0} LLP members
@@ -1007,29 +1007,29 @@ numberOfOfficersResponsibleForTaxMatters.LimitedCompany.error.invalid = Enter a 
 numberOfOfficersResponsibleForTaxMatters.LimitedLiabilityPartnership.error.invalid = Enter a number between 1 and {0}
 numberOfOfficersResponsibleForTaxMatters.Partnership.error.invalid = Enter a number between 1 and {0}
 
-companiesHouseIndividuaName.remaining.singular.LimitedLiabilityPartnership = You need to tell us about 1 more LLP member.
-companiesHouseIndividuaName.remaining.plural.LimitedLiabilityPartnership = You need to tell us about {0} more LLP members.
-companiesHouseIndividuaName.remaining.singular.LimitedCompany = You need to tell us about 1 more director.
-companiesHouseIndividuaName.remaining.plural.LimitedCompany = You need to tell us about {0} more directors.
-companiesHouseIndividuaName.remaining.singular.Partnership = You need to tell us about 1 more partner.
-companiesHouseIndividuaName.remaining.plural.Partnership = You need to tell us about {0} more partners.
-companiesHouseIndividuaName.complex.intro.LimitedLiabilityPartnership = We need the names of:
-companiesHouseIndividuaName.complex.bullet1.singular.LimitedLiabilityPartnership = the LLP member who meets the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
-companiesHouseIndividuaName.complex.bullet1.plural.LimitedLiabilityPartnership = the {0} LLP members who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
-companiesHouseIndividuaName.complex.bullet2.singular.LimitedLiabilityPartnership = 1 other LLP member
-companiesHouseIndividuaName.complex.bullet2.plural.LimitedLiabilityPartnership = {0} other LLP members
+companiesHouseIndividualName.remaining.singular.LimitedLiabilityPartnership = You need to tell us about 1 more LLP member.
+companiesHouseIndividualName.remaining.plural.LimitedLiabilityPartnership = You need to tell us about {0} more LLP members.
+companiesHouseIndividualName.remaining.singular.LimitedCompany = You need to tell us about 1 more director.
+companiesHouseIndividualName.remaining.plural.LimitedCompany = You need to tell us about {0} more directors.
+companiesHouseIndividualName.remaining.singular.Partnership = You need to tell us about 1 more partner.
+companiesHouseIndividualName.remaining.plural.Partnership = You need to tell us about {0} more partners.
+companiesHouseIndividualName.complex.intro.LimitedLiabilityPartnership = We need the names of:
+companiesHouseIndividualName.complex.bullet1.singular.LimitedLiabilityPartnership = the LLP member who meets the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
+companiesHouseIndividualName.complex.bullet1.plural.LimitedLiabilityPartnership = the {0} LLP members who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
+companiesHouseIndividualName.complex.bullet2.singular.LimitedLiabilityPartnership = 1 other LLP member
+companiesHouseIndividualName.complex.bullet2.plural.LimitedLiabilityPartnership = {0} other LLP members
 
-companiesHouseIndividuaName.complex.intro.LimitedCompany = We need the names of:
-companiesHouseIndividuaName.complex.bullet1.singular.LimitedCompany = the director who meets the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
-companiesHouseIndividuaName.complex.bullet1.plural.LimitedCompany = the {0} directors who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
-companiesHouseIndividuaName.complex.bullet2.singular.LimitedCompany = 1 other director
-companiesHouseIndividuaName.complex.bullet2.plural.LimitedCompany = {0} other directors
+companiesHouseIndividualName.complex.intro.LimitedCompany = We need the names of:
+companiesHouseIndividualName.complex.bullet1.singular.LimitedCompany = the director who meets the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
+companiesHouseIndividualName.complex.bullet1.plural.LimitedCompany = the {0} directors who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
+companiesHouseIndividualName.complex.bullet2.singular.LimitedCompany = 1 other director
+companiesHouseIndividualName.complex.bullet2.plural.LimitedCompany = {0} other directors
 
-companiesHouseIndividuaName.complex.intro.Partnership = We need the names of:
-companiesHouseIndividuaName.complex.bullet1.singular.Partnership = the partner who meets the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
-companiesHouseIndividuaName.complex.bullet1.plural.Partnership = the {0} partners who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
-companiesHouseIndividuaName.complex.bullet2.singular.Partnership = any other partner
-companiesHouseIndividuaName.complex.bullet2.plural.Partnership = any other {0} partners
+companiesHouseIndividualName.complex.intro.Partnership = We need the names of:
+companiesHouseIndividualName.complex.bullet1.singular.Partnership = the partner who meets the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
+companiesHouseIndividualName.complex.bullet1.plural.Partnership = the {0} partners who meet the definition of ‘relevant individual’ because of their senior role in managing or organising tax adviser activities
+companiesHouseIndividualName.complex.bullet2.singular.Partnership = any other partner
+companiesHouseIndividualName.complex.bullet2.plural.Partnership = any other {0} partners
 
 addToListSummary.LimitedLiabilityPartnership.complex.intro = We need the names of:
 addToListSummary.LimitedLiabilityPartnership.complex.bullet1.singular = the LLP member responsible for tax advice at {1}

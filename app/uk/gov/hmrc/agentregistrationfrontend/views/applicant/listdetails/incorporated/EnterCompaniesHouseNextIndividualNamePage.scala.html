@@ -36,8 +36,6 @@
 @(
         form: Form[IndividualName],
         entityName: String,
-        ordinalKey: String,
-        formAction: Call,
         agentApplication: AgentApplication
 )(implicit
         request: RequestHeader,
@@ -52,7 +50,7 @@
     }
 }
 
-@title = @{messages(s"companiesHouseIndividuaName.question.$ordinalKey")}
+@title = @{messages(s"companiesHouseIndividualName.question.subsequent")}
 
 @layout(
     pageTitle = title,
@@ -62,19 +60,19 @@
 
     <h1 class="govuk-heading-l">@title</h1>
 
-    <p class="govuk-body">@messages("companiesHouseIndividuaName.p1", entityName)</p>
+    <p class="govuk-body">@messages("companiesHouseIndividualName.p1", entityName)</p>
 
-    @formWithCSRF(action = formAction) {
+    @formWithCSRF(action = AppRoutes.apply.listdetails.incoporated.EnterCompaniesHouseOfficerController.submit) {
         @govukInput(Input(
             label = Label(
-                content = Text(messages("companiesHouseIndividuaName.firstName.label")),
+                content = Text(messages("companiesHouseIndividualName.firstName.label")),
                 classes = "govuk-label"
             )
         ).withFormField(form(CompaniesHouseIndividuaNameForm.firstNameKey)))
 
         @govukInput(Input(
             label = Label(
-                content = Text(messages("companiesHouseIndividuaName.lastName.label")),
+                content = Text(messages("companiesHouseIndividualName.lastName.label")),
                 classes = "govuk-label"
             )
         ).withFormField(form(CompaniesHouseIndividuaNameForm.lastNameKey)))
