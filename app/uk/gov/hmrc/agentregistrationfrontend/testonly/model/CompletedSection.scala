@@ -155,6 +155,10 @@ object CompletedSection:
       override def displayOrder: Int = 6
       override def agentApplication: AgentApplication = TdTestOnly.agentApplicationSoleTrader.afterDeclarationSubmitted
 
+      override def maybeIndividualProvidedDetailsList: Option[List[IndividualProvidedDetails]] = Some(
+        List(TdTestOnly.providedDetails.afterFinished)
+      )
+
     val values: Seq[CompletedSectionSoleTrader] = SealedObjects.all[CompletedSectionSoleTrader]
 
   sealed trait CompletedSectionGeneralPartnership
