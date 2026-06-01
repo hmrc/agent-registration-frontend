@@ -81,7 +81,7 @@ extends ControllerSpec:
   s"GET $applicationStatusPath should render the failed non-fixable page when status is FailedNonFixable" in:
     ApplyStubHelper.stubsForApplicationRiskingResponse(
       application = agentApplication.submitted,
-      riskingProgress = tdAll.applicationRiskingResponse.failedNonFixable
+      riskingProgress = tdAll.applicationRiskingResponse.failedNonFixableIndividualsOnly
     )
 
     val response: WSResponse = get(applicationStatusPath)

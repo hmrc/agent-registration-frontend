@@ -1066,6 +1066,7 @@ failedNonFixable.p2 = This is because:
 
 failedNonFixable.individualFailures.h2 = Relevant individuals who do not meet the registration conditions
 failedNonFixable.individualListIntro = Records indicate that {0}:
+failedNonFixable.individualSingleReason = Records indicate that {0} {1}.
 
 failedNonFixable.decision.h2 = Failure to meet the registration conditions
 failedNonFixable.decision.p1 = {0} will not be given an agent services account on this occasion.
@@ -1141,6 +1142,9 @@ NonFixableOutcomeListForEntityFailures.EntityFailure.8.7.SoleTraderNotOwner = th
 NonFixableOutcomeListForEntityFailures.AnyIndividualFailures = one or more relevant individuals linked to the application do not meet the registration conditions
 NonFixableOutcomeListForEntityFailures.AnyIndividualFailures.SoleTrader = you do not meet the registration conditions
 NonFixableOutcomeListForEntityFailures.AnyIndividualFailures.SoleTraderNotOwner = the business owner does not meet the registration conditions
+NonFixableOutcomeListForEntityFailures.SingleIndividualFailures = This is because one or more relevant individuals linked to the application do not meet the registration conditions.
+NonFixableOutcomeListForEntityFailures.SingleIndividualFailures.SoleTrader = This is because you do not meet the registration conditions
+NonFixableOutcomeListForEntityFailures.SingleIndividualFailures.SoleTraderNotOwner = This is because the business owner does not meet the registration conditions
 NonFixableOutcomeListForIndividualFailures.IndividualFailure.4.1 = has one or more relevant returns outstanding
 NonFixableOutcomeListForIndividualFailures.IndividualFailure.4.1.SoleTrader = has one or more relevant returns outstanding
 NonFixableOutcomeListForIndividualFailures.IndividualFailure.4.1.SoleTraderNotOwner = has one or more relevant returns outstanding
