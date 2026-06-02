@@ -140,6 +140,8 @@ class AppConfig @Inject() (
   // Access objects eagerly to initialize its vals, ensuring config errors are detected at startup
   Upscan
   UploadRepo
+  Stride
+  TestOnly
 
 object ConfigHelper:
 
