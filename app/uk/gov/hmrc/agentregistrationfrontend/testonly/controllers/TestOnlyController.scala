@@ -21,6 +21,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.DefaultActionBuilder
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendControllerBase
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
@@ -40,7 +41,8 @@ class TestOnlyController @Inject() (
   testOnlyHubPage: TestOnlyHubPage,
   stubUserService: StubUserService,
   testApplicationService: TestApplicationService,
-  testRiskingService: TestRiskingService
+  testRiskingService: TestRiskingService,
+  appConfig: AppConfig
 )
 extends FrontendControllerBase(mcc):
 
@@ -90,7 +92,10 @@ extends FrontendControllerBase(mcc):
 
   def resetDatabase: Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
-      for
-        _ <- testApplicationService.deleteAll()
-        _ <- testRiskingService.deleteAll()
-      yield Ok(Json.toJson("Databases reset"))
+      if (appConfig.TestOnly.allowResetDatabase)
+        for
+          _ <- testApplicationService.deleteAll()
+          _ <- testRiskingService.deleteAll()
+        yield Ok(Json.toJson("Databases reset"))
+      else
+        Future.successful(Unauthorized("Reset operation not allowed"))
