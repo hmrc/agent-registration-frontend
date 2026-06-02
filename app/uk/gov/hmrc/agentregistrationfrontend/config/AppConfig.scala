@@ -133,6 +133,9 @@ class AppConfig @Inject() (
     val strideRoleAmls: String = configuration.get[String]("stride.roles.amls")
     val strideRoleSmu: String = configuration.get[String]("stride.roles.smu")
 
+  object TestOnly:
+    val allowResetDatabase: Boolean = configuration.get[Boolean]("test-only.allow-reset-database")
+
   // !!!
   // Access objects eagerly to initialize its vals, ensuring config errors are detected at startup
   Upscan
