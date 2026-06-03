@@ -20,6 +20,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.FailedNonFixablePage
@@ -33,65 +34,69 @@ extends ViewSpec:
       .agentApplicationLlp
       .afterDeclarationSubmitted
 
+  val personReferenceOne = PersonReference("PREF0")
+  val personReferenceTwo = PersonReference("PREF1")
+
   object failedNonFixableResponse:
 
-    // ApplicationReference(APPREF123),
-    // Some(List(EntityFailure.4.1, EntityFailure.4.3, EntityFailure.4.4)),
-    // 0 = {IndividualRiskingResponse@13174} IndividualRiskingResponse(PersonReference(individual-provided-details-id-12345),IndividualName(Steve Austin),FailedNonFixable,Some(List(IndividualFailure.5.1, IndividualFailure.6)))
-    // 1 = {IndividualRiskingResponse@13178} IndividualRiskingResponse(PersonReference(test-individual-2),IndividualName(Beverly Hills),FailedNonFixable,Some(List(IndividualFailure.4.1)))
-    val allIndividualsHaveFailures: RiskingProgress.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixable
-
-    // ApplicationReference(APPREF123)
-    // Some(List(EntityFailure.4.1, EntityFailure.4.3, EntityFailure.4.4))
-    // 0 = {IndividualRiskingResponse@13197} IndividualRiskingResponse(PersonReference(individual-provided-details-id-12345),IndividualName(Steve Austin),FailedNonFixable,Some(List()))
-    // 1 = {IndividualRiskingResponse@13200} IndividualRiskingResponse(PersonReference(test-individual-2),IndividualName(Beverly Hills),FailedNonFixable,Some(List()))
-//    val noIndividualsWithFailures: ApplicationRiskingResponse.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixable.copy(
-//      riskedIndividuals = tdAll.applicationRiskingResponse.failedNonFixable.riskedIndividuals.map(_.copy(failures = List.empty))
-//    )
-
-    val noIndividualsWithFailures: RiskingProgress.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixable_failedApplicant_approvedIndividuls
+    val applicantFailedNoIndividualFailures: RiskingProgress.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixableFailedApplicantOnly
+    val allIndividualsNonFixableFailures: RiskingProgress.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixableIndividualsOnly
+    val allNonFixableFailures: RiskingProgress.FailedNonFixable = tdAll.applicationRiskingResponse.allFailedNonFixable
+    val duplicateEntityFailures: RiskingProgress.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixableWithDuplicates
 
   val entityFailureMessages: Map[String, String] = Map(
-    "duplicatedMessage" -> "the business has missing tax returns in their HMRC record", // all three entity failures have this same failure message
+    "duplicatedMessage" -> "our records show that the business is formally insolvent", // all three entity failures have this same failure message
     "AnyIndividualFailures" -> "one or more relevant individuals linked to the application do not meet the registration conditions"
   )
 
-  val docWithIndividualFailures: Document = Jsoup.parse(
+  val docWithAllNonFixableFailures: Document = Jsoup.parse(
     viewTemplate(
-      failedNonFixable = failedNonFixableResponse.allIndividualsHaveFailures,
+      failedNonFixable = failedNonFixableResponse.allNonFixableFailures,
       agentApplication = agentApplication,
       entityName = "Test Company Name"
     ).body
   )
-  val renderedEntityFailures: Elements = docWithIndividualFailures.selectOrFail("#entity-reasons").select("li")
 
-  val docWithNoIndividualFailures: Document = Jsoup.parse(
+  val docWithIndividualNonFixableFailures: Document = Jsoup.parse(
     viewTemplate(
-      failedNonFixable = failedNonFixableResponse.noIndividualsWithFailures,
+      failedNonFixable = failedNonFixableResponse.allIndividualsNonFixableFailures,
       agentApplication = agentApplication,
       entityName = "Test Company Name"
     ).body
   )
-  val renderedEntityFailuresWithNoIndividualFailures: Elements = docWithNoIndividualFailures.selectOrFail("#entity-reasons").select("li")
+
+  val docWithApplicantOnlyNonFixableFailures: Document = Jsoup.parse(
+    viewTemplate(
+      failedNonFixable = failedNonFixableResponse.applicantFailedNoIndividualFailures,
+      agentApplication = agentApplication,
+      entityName = "Test Company Name"
+    ).body
+  )
+
+  val docWithDuplicateFailures: Document = Jsoup.parse(
+    viewTemplate(
+      failedNonFixable = failedNonFixableResponse.duplicateEntityFailures,
+      agentApplication = agentApplication,
+      entityName = "Test Company Name"
+    ).body
+  )
+
+  val renderedEntityFailuresWithNoIndividualFailures: Elements = docWithDuplicateFailures.selectOrFail("#entity-reasons").select("li")
 
   "FailedNonFixablePage when individuals have failures" should:
-
     "have expected content" in:
-      docWithIndividualFailures.mainContent shouldContainContent
+      docWithIndividualNonFixableFailures.mainContent shouldContainContent
         s"""
            |Application outcome
            |Test Company Name does not meet the registration conditions
            |Your application for an agent services account cannot be approved (refused under Section 230 of the Finance Act 2026).
-           |This is because:
-           |the business has missing tax returns in their HMRC record
-           |one or more relevant individuals linked to the application do not meet the registration conditions
+           |This is because one or more relevant individuals linked to the application do not meet the registration conditions.
            |Relevant individuals who do not meet the registration conditions
            |Steve Austin
            |Records indicate that Steve Austin:
            |has one or more overdue liabilitiesis actively disqualified on Companies house
            |Beverly Hills
-           |Records indicate that Beverly Hills:
-           |has one or more relevant returns outstanding
+           |Records indicate that Beverly Hills has one or more relevant returns outstanding.
            |Failure to meet the registration conditions
            |Test Company Name will not be given an agent services account on this occasion.
            |The application will be deleted 45 days after the date we emailed you about this outcome, to comply with our data retention policy.
@@ -103,36 +108,44 @@ extends ViewSpec:
           .stripMargin
 
     "have the correct title" in:
-      docWithIndividualFailures.title() shouldBe "Test Company Name does not meet the registration conditions - Apply for an agent services account - GOV.UK"
+      docWithIndividualNonFixableFailures.title() shouldBe "Test Company Name does not meet the registration conditions - Apply for an agent services account - GOV.UK"
 
     "have the correct h1" in:
-      docWithIndividualFailures.h1 shouldBe "Test Company Name does not meet the registration conditions"
+      docWithIndividualNonFixableFailures.h1 shouldBe "Test Company Name does not meet the registration conditions"
 
-    "have a failure list item for the entity about individual failures" in:
-      renderedEntityFailures.last().text() shouldBe entityFailureMessages("AnyIndividualFailures")
+    "display each individuals failure with entity failures" in:
+      val paragraphElements = docWithIndividualNonFixableFailures.selectOrFail("p.govuk-body")
+      val personReferenceOne = PersonReference("PREF0")
+      val entityFailure = paragraphElements.get(1)
+      val individualFailuresList = docWithIndividualNonFixableFailures.selectOrFail(s"#${personReferenceOne.value}-reasons").select("li")
+      val individualSingleFailure = paragraphElements.get(3)
 
-    "de-dupe all identical messages" in:
-      renderedEntityFailures.eachText() should contain only (
-        entityFailureMessages("duplicatedMessage"), // this should only appear once even though it is the message for three different failure codes
-        entityFailureMessages("AnyIndividualFailures")
-      )
+      individualFailuresList.size() shouldBe 2
+      individualSingleFailure.text() shouldBe "Records indicate that Beverly Hills has one or more relevant returns outstanding."
+      entityFailure.text() shouldBe "This is because one or more relevant individuals " +
+        "linked to the application do not meet the registration conditions."
 
     "print the heading required when individuals have failures" in:
-      docWithIndividualFailures.mainContent.selectOrFail(
+      docWithIndividualNonFixableFailures.mainContent.selectOrFail(
         "h2#individual-failures"
       ).text() shouldBe "Relevant individuals who do not meet the registration conditions"
 
-    "print a list of unique failures for each individual with failures" in:
-      failedNonFixableResponse.allIndividualsHaveFailures.riskedIndividuals.foreach: individual =>
-        val elements: Elements = docWithIndividualFailures.selectOrFail(
-          s"#${individual.personReference.value}-reasons"
-        )
-        val li: Elements = elements.select("li")
-        li.size shouldBe individual.failures.size withClue elements
+    "correctly print the failures for each individual" in:
+      val personOneFailures = docWithIndividualNonFixableFailures.selectOrFail(s"#${personReferenceOne.value}-reasons")
+      val personTwoFailures = docWithIndividualNonFixableFailures.selectOrFail(s"#${personReferenceTwo.value}-reasons")
+
+      personOneFailures
+        .select("li")
+        .text() shouldBe "has one or more overdue liabilities " +
+        "is actively disqualified on Companies house"
+
+      personTwoFailures
+        .select("p")
+        .text() shouldBe "Records indicate that Beverly Hills has one or more relevant returns outstanding."
 
     "should contain a link to the appeals guidance" in:
       val hmrcStandardLink: TestLink =
-        docWithIndividualFailures
+        docWithIndividualNonFixableFailures
           .mainContent
           .selectOrFail("a.govuk-link")
           .get(0)
@@ -143,17 +156,16 @@ extends ViewSpec:
         href = "https://www.gov.uk/guidance/if-you-disagree-with-hmrcs-decision-about-your-tax-adviser-registration"
       )
 
-  "FailedNonFixablePage when no individuals have failures" should:
-
+  "FailedNonFixablePage when no individuals have failures and the applicant has failed" should:
     "have expected content" in:
-
-      docWithNoIndividualFailures.mainContent shouldContainContent
+      docWithApplicantOnlyNonFixableFailures.mainContent shouldContainContent
         s"""
            |Application outcome
            |Test Company Name does not meet the registration conditions
            |Your application for an agent services account cannot be approved (refused under Section 230 of the Finance Act 2026).
            |This is because:
-           |the business has missing tax returns in their HMRC record
+           |one or more relevant individuals linked to the application do not meet the registration conditions
+           |the business has missing tax returns in their HMRC recordour records show that the business is formally insolvent
            |Failure to meet the registration conditions
            |Test Company Name will not be given an agent services account on this occasion.
            |The application will be deleted 45 days after the date we emailed you about this outcome, to comply with our data retention policy.
@@ -164,16 +176,41 @@ extends ViewSpec:
            |"""
           .stripMargin
 
+    "FailedNonFixablePage when all individuals have non fixable failures and the entity has non fixable failures" should:
+      "have expected content" in:
+        docWithAllNonFixableFailures.mainContent shouldContainContent
+          s"""
+             |Application outcome
+             |Test Company Name does not meet the registration conditions
+             |Your application for an agent services account cannot be approved (refused under Section 230 of the Finance Act 2026).
+             |This is because:
+             |one or more relevant individuals linked to the application do not meet the registration conditions
+             |the business has missing tax returns in their HMRC recordour records show that the business is formally insolvent
+             |Relevant individuals who do not meet the registration conditions
+             |Steve Austin
+             |Records indicate that Steve Austin:
+             |has one or more overdue liabilitiesis actively disqualified on Companies house
+             |Beverly Hills
+             |Records indicate that Beverly Hills:
+             |has one or more overdue liabilitiesis actively disqualified on Companies house
+             |Failure to meet the registration conditions
+             |Test Company Name will not be given an agent services account on this occasion.
+             |The application will be deleted 45 days after the date we emailed you about this outcome, to comply with our data retention policy.
+             |What to do if you disagree
+             |If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can apply again.
+             |If you disagree with the outcome, you can request a review or appeal the decision (opens in a new tab).
+             |Print this page
+             |"""
+            .stripMargin
+
     "have the correct title" in:
-      docWithNoIndividualFailures.title() shouldBe "Test Company Name does not meet the registration conditions - Apply for an agent services account - GOV.UK"
+      docWithApplicantOnlyNonFixableFailures.title() shouldBe "Test Company Name does not meet the registration conditions - Apply for an agent services account - GOV.UK"
 
     "have the correct h1" in:
-      docWithNoIndividualFailures.h1 shouldBe "Test Company Name does not meet the registration conditions"
+      docWithApplicantOnlyNonFixableFailures.h1 shouldBe "Test Company Name does not meet the registration conditions"
 
     "not have a failure list item for the entity about individual failures" in:
       renderedEntityFailuresWithNoIndividualFailures.last().text() should not be entityFailureMessages("AnyIndividualFailures")
 
-    "de-dupe all identical messages" in:
-      renderedEntityFailuresWithNoIndividualFailures.eachText() should contain only (
-        entityFailureMessages("duplicatedMessage") // this should only appear once even though it is the message for three different failure codes
-      )
+    "not display identical messages for separate failure codes" in:
+      renderedEntityFailuresWithNoIndividualFailures.toArray().distinct.length shouldBe renderedEntityFailuresWithNoIndividualFailures.size

@@ -55,7 +55,7 @@ extends ControllerSpec:
     ProvideDetailsStubHelper.stubRiskingProgress(
       agentApplication = completeAgentApplication,
       individualProvidedDetails = individualProvidedDetails.finished,
-      riskingProgress = tdAll.applicationRiskingResponse.failedNonFixable
+      riskingProgress = tdAll.applicationRiskingResponse.failedNonFixableIndividualsOnly
     )
     val response: WSResponse = get(path)
 
