@@ -73,7 +73,7 @@ extends FrontendController(mcc, actions):
               dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
               agentApplication = agentApplication
             ))
-          case RiskingProgress.SubmittedForRisking => // show the in progress screen
+          case RiskingProgress.SubmittedForRisking | _: RiskingProgress.FailedFixable => // TODO: show the in progress screen for fixable failures until fixable failure screens ready
             val localDateSubmitted: LocalDate =
               submittedAt
                 .atZone(ZoneId.systemDefault())
@@ -89,11 +89,6 @@ extends FrontendController(mcc, actions):
               failedNonFixable = failedNonFixable,
               agentApplication = agentApplication,
               entityName = request.get[BusinessPartnerRecordResponse].getEntityName
-            ))
-          case _: RiskingProgress.FailedFixable => // TODO: show the fixable failures page
-            Ok(simplePage(
-              h1 = "Fixable failure placeholder",
-              bodyText = Some("Placeholder for the fixable failures...")
             ))
           case RiskingProgress.Approved =>
             Ok(simplePage(
