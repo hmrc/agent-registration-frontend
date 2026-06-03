@@ -34,10 +34,13 @@ object CompaniesHouseStubs {
       surname match
         case Some(s) => urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=$s")
         case None => urlMatching(s"/companies-house-api-proxy/company/1234567890/officers"),
-    responseStatus = 200,
+    responseStatus =
+      if noMatch
+      then 404
+      else 200,
     responseBody =
       surname match
-        case Some(s) if noMatch => Json.obj("items" -> Json.arr()).toString
+        case Some(s) if noMatch => ""
         case Some(s) => responseBodyForSurnameSearch(s, officerRole)
         case None => responseBodyForListingOfficers(officerRole)
   )

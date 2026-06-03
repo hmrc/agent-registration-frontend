@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
+import play.api.http.Status.NOT_FOUND
 import play.api.libs.functional.syntax.*
 import play.api.libs.json.*
 import uk.gov.hmrc.agentregistration.shared.Crn
@@ -23,6 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseDateOfB
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerIdentification
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.http.client.HttpClientV2
 
@@ -61,6 +63,7 @@ extends Connector:
     .map: response =>
       response.status match
         case status if is2xx(status) => (response.json \ "items").as[Seq[CompaniesHouseOfficer]]
+        case status if status === NOT_FOUND => Seq.empty
         case status =>
           Errors.throwUpstreamErrorResponse(
             httpMethod = "GET",
