@@ -88,11 +88,9 @@ extends FrontendController(mcc, actions):
               ))
             ))
           case failedFixable: RiskingProgress.FailedFixable =>
-            logger.info(s"dates in FailedFixable are ${failedFixable.riskingCompletedDate} and ${failedFixable.correctiveActionExpiryDate}")
             Ok(failedFixableStartPage(
               actualDecisionDate = displayDateForLang(Some(failedFixable.riskingCompletedDate)),
               correctiveActionExpiryDate = displayDateForLang(failedFixable.correctiveActionExpiryDate),
-              agentApplication = agentApplication,
               entityName = request.get[BusinessPartnerRecordResponse].getEntityName
             ))
           case failedNonFixable: RiskingProgress.FailedNonFixable =>

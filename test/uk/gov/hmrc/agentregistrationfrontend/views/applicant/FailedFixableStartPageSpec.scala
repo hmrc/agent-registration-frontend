@@ -26,16 +26,11 @@ class FailedFixableStartPageSpec
 extends ViewSpec:
 
   val viewTemplate: FailedFixableStartPage = app.injector.instanceOf[FailedFixableStartPage]
-  val agentApplication: AgentApplication =
-    tdAll
-      .agentApplicationLlp
-      .afterDeclarationSubmitted
 
   val doc: Document = Jsoup.parse(
     viewTemplate(
       actualDecisionDate = "4 June 2026",
       correctiveActionExpiryDate = "3 August 2026",
-      agentApplication = agentApplication,
       entityName = "Test Company Name"
     ).body
   )
