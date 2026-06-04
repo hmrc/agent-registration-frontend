@@ -50,10 +50,11 @@ class AppConfig @Inject() (
     configuration
   )
   val guidanceForWhatARelevantTaxAdviserIsUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.govuk-guidance-on-relevant-tax-advisers", configuration)
-  val guidanceForFailedNonFixableAppealsUrl: String = ConfigHelper.readConfigAsValidUrlString(
-    "urls.govuk-guidance-failed-non-fixable-review-and-appeals",
+  val guidanceForFailedApplicationAppealsUrl: String = ConfigHelper.readConfigAsValidUrlString(
+    "urls.govuk-guidance-failed-review-and-appeals",
     configuration
   )
+  val govukFinanceAct2026Url: String = ConfigHelper.readConfigAsValidUrlString("urls.govuk-legislation-finance-act-2026", configuration)
   val govukDefinitionOfRelevantIndividualsUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.govuk-definition-of-relevant-individuals", configuration)
   val guidanceForDedicatedHelplinesForAuthorisedAgentsUrl: String = ConfigHelper.readConfigAsValidUrlString(
     "urls.govuk-guidance-dedicated-helplines-for-authorised-agents",
@@ -101,10 +102,6 @@ class AppConfig @Inject() (
   val allowedRedirectHosts: Set[String] = configuration.getOptional[Seq[String]]("allowed-redirect-hosts").getOrElse(Nil).toSet
   // for accessibility, we are registering date fields for use in Layout template to ensure error links go into the first input (day input)
   val accessibleDateFields: Seq[String] = Seq("dateOfBirth", "applicant-provided.date-of-birth")
-  /*
-   * GRS CONFIG START
-   */
-  val enableGrsStub: Boolean = configuration.getOptional[Boolean]("features.grs-stub").getOrElse(false)
 
   val soleTraderIdBaseUrl: String = servicesConfig.baseUrl("sole-trader-identification-frontend")
   val incorpIdBaseUrl: String = servicesConfig.baseUrl("incorporated-entity-identification-frontend")
@@ -136,12 +133,18 @@ class AppConfig @Inject() (
   object TestOnly:
     val allowResetDatabase: Boolean = configuration.get[Boolean]("test-only.allow-reset-database")
 
+  object Features:
+
+    val grsStub: Boolean = configuration.get[Boolean]("features.grs-stub")
+    val fixableFailures: Boolean = configuration.get[Boolean]("features.fixable-failures")
+
   // !!!
   // Access objects eagerly to initialize its vals, ensuring config errors are detected at startup
   Upscan
   UploadRepo
   Stride
   TestOnly
+  Features
 
 object ConfigHelper:
 

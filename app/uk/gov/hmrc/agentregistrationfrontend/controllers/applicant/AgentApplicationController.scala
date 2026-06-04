@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ConfirmationPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.FailedFixableStartPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.FailedNonFixablePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.InProgressPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ViewApplicationPage
@@ -37,6 +38,7 @@ import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.annotation.nowarn
 
 @Singleton
 class AgentApplicationController @Inject() (
@@ -46,6 +48,7 @@ class AgentApplicationController @Inject() (
   confirmationPage: ConfirmationPage,
   inProgressPage: InProgressPage,
   failedNonFixablePage: FailedNonFixablePage,
+  failedFixableStartPage: FailedFixableStartPage,
   viewApplicationPage: ViewApplicationPage,
   appConfig: AppConfig
 )
@@ -59,13 +62,13 @@ extends FrontendController(mcc, actions):
         // which will redirect to the start of registration if needed
         Redirect(AppRoutes.apply.TaskListController.show)
 
+  @nowarn
   def applicationStatus: Action[AnyContent] = actions
     .getRiskingProgress:
       implicit request =>
         val agentApplication: AgentApplication = request.get
         val submittedAt: Instant = agentApplication.getSubmittedAt
         val projectedDecisionDate: LocalDate = calculateDecisionDate(submittedAt)
-
         val riskingProgress: RiskingProgress = request.get
         riskingProgress match
           case RiskingProgress.ReadyForSubmission => // show the confirmation screen
@@ -73,16 +76,24 @@ extends FrontendController(mcc, actions):
               dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
               agentApplication = agentApplication
             ))
-          case RiskingProgress.SubmittedForRisking | _: RiskingProgress.FailedFixable => // TODO: show the in progress screen for fixable failures until fixable failure screens ready
-            val localDateSubmitted: LocalDate =
-              submittedAt
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate
+          case rp if isInProgress(rp) =>
             Ok(inProgressPage(
               entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
               agentApplication = agentApplication,
               dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
-              dateSubmitted = displayDateForLang(Some(localDateSubmitted))
+              dateSubmitted = displayDateForLang(Some(
+                submittedAt
+                  .atZone(ZoneId.systemDefault())
+                  .toLocalDate
+              ))
+            ))
+          case failedFixable: RiskingProgress.FailedFixable =>
+            logger.info(s"dates in FailedFixable are ${failedFixable.riskingCompletedDate} and ${failedFixable.correctiveActionExpiryDate}")
+            Ok(failedFixableStartPage(
+              actualDecisionDate = displayDateForLang(Some(failedFixable.riskingCompletedDate)),
+              correctiveActionExpiryDate = displayDateForLang(failedFixable.correctiveActionExpiryDate),
+              agentApplication = agentApplication,
+              entityName = request.get[BusinessPartnerRecordResponse].getEntityName
             ))
           case failedNonFixable: RiskingProgress.FailedNonFixable =>
             Ok(failedNonFixablePage(
@@ -90,11 +101,7 @@ extends FrontendController(mcc, actions):
               agentApplication = agentApplication,
               entityName = request.get[BusinessPartnerRecordResponse].getEntityName
             ))
-          case RiskingProgress.Approved =>
-            Ok(simplePage(
-              h1 = "RiskingProgress.Approved",
-              bodyText = Some("Placeholder for the RiskingProgress.Approved case...")
-            ))
+          case RiskingProgress.Approved => Redirect(appConfig.asaDashboardUrl) // this shouldn't really happen as the auth action should have done the redirect already
 
   def viewSubmittedApplication: Action[AnyContent] = actions
     .getApplicationSubmitted:
@@ -123,3 +130,12 @@ extends FrontendController(mcc, actions):
       .plus(appConfig.applicationDecisionLeadTime.toMillis, ChronoUnit.MILLIS)
       .atZone(ZoneId.systemDefault())
       .toLocalDate
+
+  /** This method determines if the application is to be considered as still in progress. An application is considered in progress if it has been submitted for
+    * risking or if it has failed with a fixable failure and the fixable failures feature is not enabled.
+    */
+  private def isInProgress(rp: RiskingProgress): Boolean =
+    rp match
+      case RiskingProgress.SubmittedForRisking => true
+      case _: RiskingProgress.FailedFixable => !appConfig.Features.fixableFailures
+      case _ => false
