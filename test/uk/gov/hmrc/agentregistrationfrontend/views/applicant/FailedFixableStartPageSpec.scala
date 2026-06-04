@@ -18,7 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.FailedFixableStartPage
 
