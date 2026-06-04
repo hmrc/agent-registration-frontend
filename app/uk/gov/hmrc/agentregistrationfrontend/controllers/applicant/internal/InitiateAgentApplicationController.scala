@@ -57,7 +57,7 @@ extends FrontendController(mcc, actions):
     businessType: BusinessType,
     userRole: UserRole
   ): Action[AnyContent] = actions
-    .authorised
+    .getMaybeApplicationForInitiation
     .ensure(
       condition =
         implicit request =>
@@ -75,22 +75,27 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         if agentType =!= AgentType.UkTaxAgent then Errors.notImplemented("only UkTaxAgent is supported for now") else ()
-        val nextEndpoint: Call = AppRoutes.apply.internal.GrsController.startJourney()
+        val nextCheckIfApplicationHasGrsData: Call = AppRoutes.apply.internal.RefusalToDealWithController.check()
+        val startGrsJourney: Call = AppRoutes.apply.internal.GrsController.startJourney()
 
-        agentApplicationService.find().flatMap:
-          case Some(agentApplication) =>
-            logger.info("Application already exists, redirecting to task list")
-            Future.successful(Redirect(nextEndpoint))
+        request.get[Option[AgentApplication]] match
+          case Some(application) if application.isGrsDataReceived =>
+            logger.info("Application already has GRS data, redirecting to next check")
+            Future.successful(Redirect(nextCheckIfApplicationHasGrsData))
+          case Some(_) =>
+            logger.info("Application already exists without GRS data, redirecting to GRS journey")
+            Future.successful(Redirect(startGrsJourney))
           case None =>
             logger.info(s"Application does not exist, creating new application: $agentType, $businessType")
+            given RequestWithDataCt[AnyContent, DataWithAuth] = request.delete[Option[AgentApplication]]
             for {
               applicationReference <- agentApplicationService.generateNewApplicationReference()
-              agentApplication = businessType.makeNewAgentApplication(userRole, applicationReference)
+              agentApplication: AgentApplication = businessType.makeNewAgentApplication(userRole, applicationReference)
               result <- agentApplicationService
                 .upsert(agentApplication)
                 .map(_ =>
                   auditService.auditStartApplication(agentApplication)
-                  Redirect(nextEndpoint)
+                  Redirect(startGrsJourney)
                 )
             } yield result
 
