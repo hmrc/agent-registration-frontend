@@ -26,7 +26,7 @@ import javax.inject.Singleton
 @Singleton
 class GrsConfig @Inject() (appConfig: AppConfig):
 
-  val enableGrsStub: Boolean = appConfig.enableGrsStub
+  val enableGrsStub: Boolean = appConfig.Features.grsStub
   val deskProServiceId: String = appConfig.contactFrontendId
   val accessibilityUrl: String = appConfig.accessibilityStatementPath
   val regime: String = "VATC" // previous use of 'ITSA' has been failing in GRS even though it works directly with DES

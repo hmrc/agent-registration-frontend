@@ -1058,7 +1058,30 @@ removeKeyIndividual.error.required.LimitedCompany = Select yes if you want to re
 removeKeyIndividual.error.required.Partnership = Select yes if you want to remove {0} from the list of partners
 removeKeyIndividual.error.required.otherRelevantIndividuals = Select yes if you want to remove {0} from the list of relevant individuals
 
+
+
 # Application outcome
+# Failed Fixable
+failedFixable.caption = Application outcome
+failedFixable.title = {0} does not meet the registration conditions
+failedFixable.decisionDate.h2 = Date of decision: {0}
+failedFixable.decision.h2 = Our decision
+failedFixable.decision.p1 = Your application to register for an agent services account cannot currently be approved.
+failedFixable.decision.p2 = The application is refused under Section 230 (registration conditions) of the <a class="govuk-link" href="{0}" target="_blank" rel="noopener noreferrer">Finance Act 2026 (opens in a new tab)</a>.
+failedFixable.decision.p3 = However, {0} can still meet the registration conditions if you take action by <strong>{1}</strong>.
+failedFixable.fix.h2 = How to meet the registration conditions
+failedFixable.fix.p1 = The actions to take are listed on the next page.
+failedFixable.fix.startButton = View actions to take
+failedFixable.failures.h2 = Failure to meet the registration conditions
+failedFixable.failures.p1 = If you choose not to take action to meet the registration conditions:
+failedFixable.failures.li1 = {0} will not be given an agent services account on this occasion
+failedFixable.failures.li2 = the application will be deleted on {0} to comply with our data retention policy
+failedFixable.appeal.h2 = {0} has the right to review or appeal
+failedFixable.appeal.p1 = Keep a copy of this decision for your records.
+failedFixable.appeal.p2 = If you disagree with our decision to refuse your application, you can <a class="govuk-link" href="{0}" target="_blank" rel="noopener noreferrer">request a review or appeal the decision (opens in a new tab)</a>.
+failedFixable.appeal.p3 = You can ask for a review of our decision or begin the appeal process even if you decide to take the actions we need.
+
+# Failed Non Fixable
 failedNonFixable.caption = Application outcome
 failedNonFixable.title = {0} does not meet the registration conditions
 failedNonFixable.p1 = Your application for an agent services account cannot be approved (refused under Section 230 of the Finance Act 2026).

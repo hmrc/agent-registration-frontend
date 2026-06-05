@@ -90,6 +90,18 @@ extends ControllerSpec:
     response.parseBodyAsJsoupDocument.title() shouldBe "Test Company Name does not meet the registration conditions - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsForApplicationRiskingResponse(agentApplication.submitted)
 
+  s"GET $applicationStatusPath should render the fixable failures start page when status is FailedFixable" in:
+    ApplyStubHelper.stubsForApplicationRiskingResponse(
+      application = agentApplication.submitted,
+      riskingProgress = tdAll.applicationRiskingResponse.failedFixable
+    )
+
+    val response: WSResponse = get(applicationStatusPath)
+
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe "Test Company Name does not meet the registration conditions - Apply for an agent services account - GOV.UK"
+    ApplyStubHelper.verifyConnectorsForApplicationRiskingResponse(agentApplication.submitted)
+
   s"GET $viewApplicationPath should return OK" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.submitted)
     val response: WSResponse = get(viewApplicationPath)

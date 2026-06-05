@@ -60,7 +60,7 @@ extends ViewSpec:
 
     "have a request a review or appeal the decision link to the gov.uk appeals guidance" in:
       val appeal = doc.mainContent.selectOrFail("a.govuk-link").toList.find(_.text() === "request a review or appeal the decision").value
-      appeal.attr("href") shouldBe appConfig.guidanceForFailedNonFixableAppealsUrl
+      appeal.attr("href") shouldBe appConfig.guidanceForFailedApplicationAppealsUrl
 
     "have a finish and sign out link" in:
       val signOut = doc.mainContent.selectOrFail("a.govuk-link").toList.find(_.text() === "Finish and sign out").value
