@@ -62,10 +62,9 @@ extends FrontendController(mcc, actions):
         // which will redirect to the start of registration if needed
         Redirect(AppRoutes.apply.TaskListController.show)
 
-  /**
-   * When we are abstracting combined cases as we do in isInProgress(), incorrect warnings about non-exhaustive
-   * pattern matching appear. So suppressing this warning until we no longer need the fixable failures feature flag
-   */
+  /** When we are abstracting combined cases as we do in isInProgress(), incorrect warnings about non-exhaustive pattern matching appear. So suppressing this
+    * warning until we no longer need the fixable failures feature flag
+    */
   @nowarn
   def applicationStatus: Action[AnyContent] = actions
     .getRiskingProgress:
@@ -133,10 +132,9 @@ extends FrontendController(mcc, actions):
       .atZone(ZoneId.systemDefault())
       .toLocalDate
 
-  /**
-   * An application status is returned as in-progress if it has been submitted for risking or if it has failed with a
-   * fixable failure and the fixable failures feature is not yet enabled.
-   */
+  /** An application status is returned as in-progress if it has been submitted for risking or if it has failed with a fixable failure and the fixable failures
+    * feature is not yet enabled.
+    */
   private def isInProgress(rp: RiskingProgress): Boolean =
     rp match
       case RiskingProgress.SubmittedForRisking => true
