@@ -16,11 +16,30 @@
 
 package uk.gov.hmrc.agentregistration.shared.risking
 
+import play.api.libs.json.Json
+import play.api.libs.json.OFormat
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 
 sealed trait EntityFix
 
 object EntityFix:
+
+  given OFormat[EntityFix] =
+    implicit val AmlsFix: OFormat[AmlsFix] = Json.format[AmlsFix]
+    implicit val `_4._1`: OFormat[_4._1] = Json.format[_4._1]
+    implicit val `_4._2`: OFormat[_4._2] = Json.format[_4._2]
+    implicit val `_4._3`: OFormat[_4._3] = Json.format[_4._3]
+    implicit val `_4._4`: OFormat[_4._4] = Json.format[_4._4]
+    implicit val `_5._1`: OFormat[_5._1] = Json.format[_5._1]
+    implicit val `_5._2`: OFormat[_5._2] = Json.format[_5._2]
+    implicit val `_5._3`: OFormat[_5._3] = Json.format[_5._3]
+    implicit val `_5._4`: OFormat[_5._4] = Json.format[_5._4]
+    implicit val `_5._5`: OFormat[_5._5] = Json.format[_5._5]
+    implicit val `_5._6`: OFormat[_5._6] = Json.format[_5._6]
+    implicit val `_5._7`: OFormat[_5._7] = Json.format[_5._7]
+    implicit val `_8._5`: OFormat[_8._5] = Json.format[_8._5]
+    implicit val `_8._7`: OFormat[_8._7] = Json.format[_8._7]
+    Json.format[EntityFix]
 
   def forFix(f: EntityFailure.Fixable): EntityFix =
     f match

@@ -24,13 +24,10 @@ class ApplicationStateSpec
 extends UnitSpec:
 
   "serialize and deserialize to json" in:
-    ApplicationState.values.foreach:
-      case ApplicationState.Started =>
-        Json.toJson(ApplicationState.Started) shouldBe Json.toJson("Started")
-        Json.fromJson[ApplicationState](Json.toJson("Started")) shouldBe JsSuccess(ApplicationState.Started)
-      case ApplicationState.GrsDataReceived =>
-        Json.toJson(ApplicationState.GrsDataReceived) shouldBe Json.toJson("GrsDataReceived")
-        Json.fromJson[ApplicationState](Json.toJson("GrsDataReceived")) shouldBe JsSuccess(ApplicationState.GrsDataReceived)
-      case ApplicationState.SentForRisking =>
-        Json.toJson(ApplicationState.SentForRisking) shouldBe Json.toJson("SentForRisking")
-        Json.fromJson[ApplicationState](Json.toJson("SentForRisking")) shouldBe JsSuccess(ApplicationState.SentForRisking)
+
+    Json.toJson(ApplicationState.Started: ApplicationState) shouldBe Json.toJson("Started")
+    Json.fromJson[ApplicationState](Json.toJson("Started")) shouldBe JsSuccess(ApplicationState.Started)
+    Json.toJson(ApplicationState.GrsDataReceived: ApplicationState) shouldBe Json.toJson("GrsDataReceived")
+    Json.fromJson[ApplicationState](Json.toJson("GrsDataReceived")) shouldBe JsSuccess(ApplicationState.GrsDataReceived)
+    Json.toJson(ApplicationState.SentForRisking: ApplicationState) shouldBe Json.toJson("SentForRisking")
+    Json.fromJson[ApplicationState](Json.toJson("SentForRisking")) shouldBe JsSuccess(ApplicationState.SentForRisking)

@@ -78,6 +78,8 @@ sealed trait AgentApplication:
       case ApplicationState.Started => false
       case ApplicationState.GrsDataReceived => true
       case ApplicationState.SentForRisking => true
+      case ApplicationState.RiskingInProgress => true
+      case _: ApplicationState.RiskingCompleted => true
 
   def getUserRole: UserRole = userRole.getOrElse(expectedDataNotDefinedError("userRole"))
 
