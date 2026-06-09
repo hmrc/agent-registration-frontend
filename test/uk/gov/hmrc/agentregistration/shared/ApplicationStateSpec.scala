@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.agentregistration.shared
 
-import play.api.libs.json.JsSuccess
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 
@@ -25,6 +24,6 @@ extends UnitSpec:
 
   "read from legacy string format" in:
 
-    Json.fromJson[ApplicationState](Json.toJson("Started")) shouldBe JsSuccess(ApplicationState.Started)
-    Json.fromJson[ApplicationState](Json.toJson("GrsDataReceived")) shouldBe JsSuccess(ApplicationState.GrsDataReceived)
-    Json.fromJson[ApplicationState](Json.toJson("SentForRisking")) shouldBe JsSuccess(ApplicationState.SentForRisking)
+    Json.toJson("Started").as[ApplicationState] shouldBe ApplicationState.Started
+    Json.toJson("GrsDataReceived").as[ApplicationState] shouldBe ApplicationState.GrsDataReceived
+    Json.toJson("SentForRisking").as[ApplicationState] shouldBe ApplicationState.SentForRisking
