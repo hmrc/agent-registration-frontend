@@ -16,9 +16,13 @@
 
 package uk.gov.hmrc.agentregistration.shared
 
+import play.api.libs.json.JsError
+import play.api.libs.json.JsString
+import play.api.libs.json.JsSuccess
 import play.api.libs.json.Json
 import play.api.libs.json.JsonConfiguration
 import play.api.libs.json.OFormat
+import play.api.libs.json.Reads
 import uk.gov.hmrc.agentregistration.shared.risking.EntityFailure
 import uk.gov.hmrc.agentregistration.shared.risking.EntityFix
 import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
@@ -74,7 +78,16 @@ object ApplicationState:
 
     given JsonConfiguration = JsonConfig.jsonConfiguration
 
-    Json.format[ApplicationState]
+    val base: OFormat[ApplicationState] = Json.format[ApplicationState]
+
+    val legacyStringReads: Reads[ApplicationState] = Reads {
+      case JsString("Started") => JsSuccess(Started)
+      case JsString("GrsDataReceived") => JsSuccess(GrsDataReceived)
+      case JsString("SentForRisking") => JsSuccess(SentForRisking)
+      case _ => JsError("Not a legacy string ApplicationState")
+    }
+
+    OFormat(base.orElse(legacyStringReads), base)
 
   extension (as: ApplicationState)
     def sentForRisking: Boolean = as === ApplicationState.SentForRisking

@@ -23,11 +23,8 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 class ApplicationStateSpec
 extends UnitSpec:
 
-  "serialize and deserialize to json" in:
+  "read from legacy string format" in:
 
-    Json.toJson(ApplicationState.Started: ApplicationState) shouldBe Json.toJson("Started")
     Json.fromJson[ApplicationState](Json.toJson("Started")) shouldBe JsSuccess(ApplicationState.Started)
-    Json.toJson(ApplicationState.GrsDataReceived: ApplicationState) shouldBe Json.toJson("GrsDataReceived")
     Json.fromJson[ApplicationState](Json.toJson("GrsDataReceived")) shouldBe JsSuccess(ApplicationState.GrsDataReceived)
-    Json.toJson(ApplicationState.SentForRisking: ApplicationState) shouldBe Json.toJson("SentForRisking")
     Json.fromJson[ApplicationState](Json.toJson("SentForRisking")) shouldBe JsSuccess(ApplicationState.SentForRisking)
