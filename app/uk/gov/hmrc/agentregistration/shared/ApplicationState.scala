@@ -17,8 +17,40 @@
 package uk.gov.hmrc.agentregistration.shared
 
 import play.api.libs.json.Format
+import uk.gov.hmrc.agentregistration.shared.risking.EntityFailure
+import uk.gov.hmrc.agentregistration.shared.risking.EntityFix
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+
+import java.time.LocalDate
+
+sealed trait RiskingProgress
+
+case object SentForRisking
+extends RiskingProgress
+
+case object SubmittedForRisking
+extends RiskingProgress
+
+sealed trait CompletedRisking
+extends RiskingProgress:
+  def riskingCompletedDate: LocalDate
+
+final case class Approved(override val riskingCompletedDate: LocalDate)
+extends CompletedRisking
+
+final case class FailedFixable(
+  fixes: Seq[EntityFix],
+  override val riskingCompletedDate: LocalDate,
+  correctiveActionExpiryDate: Option[LocalDate]
+)
+extends CompletedRisking
+
+final case class FailedNonFixable(
+  failures: Seq[EntityFailure],
+  override val riskingCompletedDate: LocalDate
+)
+extends CompletedRisking
 
 enum ApplicationState:
 
