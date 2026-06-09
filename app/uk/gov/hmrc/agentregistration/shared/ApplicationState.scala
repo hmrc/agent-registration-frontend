@@ -66,7 +66,6 @@ object ApplicationState:
   )
   extends RiskingCompleted
 
-  @scala.annotation.nowarn()
   given format: OFormat[ApplicationState] =
     given OFormat[ApplicationState.Started.type] = Json.format[ApplicationState.Started.type]
     given OFormat[ApplicationState.GrsDataReceived.type] = Json.format[ApplicationState.GrsDataReceived.type]

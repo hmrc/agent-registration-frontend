@@ -75,7 +75,16 @@ extends UnitSpec:
       riskingCompletedDate = date,
       correctiveActionExpiryDate = Some(LocalDate.of(2024, 3, 31))
     )
-    val json: JsValue = Json.toJson[ApplicationState](state)
+    val json: JsValue = Json.parse(
+      // language=JSON
+      """{
+        |"type":"FailedFixable",
+        |"fixes":[{"type":"AmlsFix"}],
+        |"riskingCompletedDate":"2024-01-15",
+        |"correctiveActionExpiryDate":"2024-03-31"
+        |}""".stripMargin
+    )
+    Json.toJson[ApplicationState](state) shouldBe json
     json.as[ApplicationState] shouldBe state
 
   "serialize and deserialize FailedNonFixable" in:
@@ -83,7 +92,15 @@ extends UnitSpec:
       failures = Seq(EntityFailure._3._1),
       riskingCompletedDate = date
     )
-    val json: JsValue = Json.toJson[ApplicationState](state)
+    val json: JsValue = Json.parse(
+      // language=JSON
+      """{
+        |"type":"FailedNonFixable",
+        |"failures":[{"type":"_3._1"}],
+        |"riskingCompletedDate":"2024-01-15"
+        |}""".stripMargin
+    )
+    Json.toJson[ApplicationState](state) shouldBe json
     json.as[ApplicationState] shouldBe state
 
   "read from legacy string format" in:

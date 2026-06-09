@@ -17,14 +17,18 @@
 package uk.gov.hmrc.agentregistration.shared.risking
 
 import play.api.libs.json.Json
+import play.api.libs.json.JsonConfiguration
 import play.api.libs.json.OFormat
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
+import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
 
 sealed trait EntityFix
 
 object EntityFix:
 
   given OFormat[EntityFix] =
+    given JsonConfiguration = JsonConfig.jsonConfiguration
+
     implicit val AmlsFix: OFormat[AmlsFix] = Json.format[AmlsFix]
     implicit val `_4._1`: OFormat[_4._1] = Json.format[_4._1]
     implicit val `_4._2`: OFormat[_4._2] = Json.format[_4._2]
