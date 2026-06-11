@@ -20,6 +20,8 @@ import play.api.libs.json.Json
 import play.api.libs.json.JsonConfiguration
 import play.api.libs.json.OFormat
 import uk.gov.hmrc.agentregistration.shared.AmlsDetails
+import uk.gov.hmrc.agentregistration.shared.risking.EntityFailure.IsAmls
+import uk.gov.hmrc.agentregistration.shared.risking.EntityFailure._3
 import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
 
 sealed trait EntityFix
@@ -28,6 +30,24 @@ object EntityFix:
 
   given OFormat[EntityFix] =
     given JsonConfiguration = JsonConfig.jsonConfiguration
+
+    implicit val isAmlsFormat: OFormat[IsAmls] =
+      import play.api.libs.json.*
+      val reads: Reads[EntityFailure.IsAmls] = EntityFailure.format.flatMap:
+        case f: EntityFailure.IsAmls =>
+          f match
+            case f: EntityFailure._3._1.type => Reads.pure(f)
+            case f: EntityFailure._3._2.type => Reads.pure(f)
+            case f: EntityFailure._3._3.type => Reads.pure(f)
+            case f: EntityFailure._3._4.type => Reads.pure(f)
+            case f: EntityFailure._3._5.type => Reads.pure(f)
+        case f: EntityFailure.IsNotAmls => Reads(_ => JsError(s"Expected an IsAmls type: $f"))
+        case f: EntityFailure.NonFixable => Reads(_ => JsError(s"Expected an IsAmls type: $f"))
+
+      OFormat(
+        r = reads,
+        w = OWrites[IsAmls] { (f: EntityFailure.IsAmls) => EntityFailure.format.writes(f) }
+      )
 
     implicit val AmlsFix: OFormat[AmlsFix] = Json.format[AmlsFix]
     implicit val `_4._1`: OFormat[_4._1] = Json.format[_4._1]
@@ -45,30 +65,31 @@ object EntityFix:
     implicit val `_8._7`: OFormat[_8._7] = Json.format[_8._7]
     Json.format[EntityFix]
 
-  def forFix(f: EntityFailure.Fixable): EntityFix =
-    f match
-      case _: EntityFailure.IsAmls => EntityFix.AmlsFix(None, None)
-      case EntityFailure._4._1 => EntityFix._4._1(None)
-      case EntityFailure._4._2 => EntityFix._4._2(None)
-      case EntityFailure._4._3 => EntityFix._4._3(None)
-      case EntityFailure._4._4 => EntityFix._4._4(None)
-      case _: EntityFailure._5._1 => EntityFix._5._1(None)
-      case _: EntityFailure._5._2 => EntityFix._5._2(None)
-      case _: EntityFailure._5._3 => EntityFix._5._3(None)
-      case _: EntityFailure._5._4 => EntityFix._5._4(None)
-      case _: EntityFailure._5._5 => EntityFix._5._5(None)
-      case _: EntityFailure._5._6 => EntityFix._5._6(None)
-      case _: EntityFailure._5._7 => EntityFix._5._7(None)
-      case EntityFailure._8._5 => EntityFix._8._5(None)
-      case EntityFailure._8._7 => EntityFix._8._7(None)
+//  def forFix(f: EntityFailure.Fixable): EntityFix =
+//    f match
+//      case f: EntityFailure.IsAmls => EntityFix.AmlsFix(f, None, None)
+//      case EntityFailure._4._1 => EntityFix._4._1(None)
+//      case EntityFailure._4._2 => EntityFix._4._2(None)
+//      case EntityFailure._4._3 => EntityFix._4._3(None)
+//      case EntityFailure._4._4 => EntityFix._4._4(None)
+//      case _: EntityFailure._5._1 => EntityFix._5._1(None)
+//      case _: EntityFailure._5._2 => EntityFix._5._2(None)
+//      case _: EntityFailure._5._3 => EntityFix._5._3(None)
+//      case _: EntityFailure._5._4 => EntityFix._5._4(None)
+//      case _: EntityFailure._5._5 => EntityFix._5._5(None)
+//      case _: EntityFailure._5._6 => EntityFix._5._6(None)
+//      case _: EntityFailure._5._7 => EntityFix._5._7(None)
+//      case EntityFailure._8._5 => EntityFix._8._5(None)
+//      case EntityFailure._8._7 => EntityFix._8._7(None)
 
-  def initialFixes(failures: Seq[EntityFailure.Fixable]): Seq[EntityFix] = failures.map(forFix).distinct
+//  def initialFixes(failures: Seq[EntityFailure.Fixable]): Seq[EntityFix] = failures.map(forFix).distinct
 
   /** A fix corresponding to any AMLS entity failure [[EntityFailure.IsAmls]]
     *
     * All AMLS failures collapse into this single fix, which additionally requires [[AmlsDetails]] to be supplied by the user.
     */
   final case class AmlsFix(
+    failure: EntityFailure.IsAmls,
     isConfirmed: Option[Boolean],
     amlsDetails: Option[AmlsDetails]
   )

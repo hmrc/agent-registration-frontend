@@ -115,7 +115,7 @@ extends RequestAwareLogging:
 
   def getApplicationInProgress: ActionBuilderWithData[DataWithApplication] = getApplication
     .ensure(
-      condition = _.get[AgentApplication].isInProgress,
+      condition = _.get[AgentApplication].isBeforeSentForRisking,
       resultWhenConditionNotMet =
         implicit request =>
           val call = AppRoutes.apply.AgentApplicationController.applicationStatus
@@ -130,7 +130,7 @@ extends RequestAwareLogging:
   val getApplicationSubmitted: ActionBuilderWithData[DataWithApplicationAndBpr] =
     getApplication
       .ensure(
-        condition = _.agentApplication.hasFinished,
+        condition = _.agentApplication.isAfterSentForRisking,
         resultWhenConditionNotMet =
           implicit request =>
             // TODO: this is a temporary solution and should be revisited once we have full journey implemented

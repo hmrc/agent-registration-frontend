@@ -58,22 +58,22 @@ object ApplicationState:
   final case class Approved(override val riskingCompletedDate: LocalDate)
   extends RiskingCompleted
 
-//Overall status of the application is failed with fixable failures.
-// Entity and individuals either passed passed risking screening or failed with fixable failures
-// if 'fixes' are empty there are no fixing tasks for this application (only for individuals)
-final case class FailedFixable(
-  fixes: Seq[EntityFix],
-  override val riskingCompletedDate: LocalDate,
-  correctiveActionExpiryDate: Option[LocalDate]
-)
-extends RiskingCompleted
+  // Overall status of the application is failed with fixable failures.
+  // Entity and individuals either passed passed risking screening or failed with fixable failures
+  // if 'fixes' are empty there are no fixing tasks for this application (only for individuals)
+  final case class FailedFixable(
+    fixes: Seq[EntityFix],
+    override val riskingCompletedDate: LocalDate,
+    correctiveActionExpiryDate: Option[LocalDate]
+  )
+  extends RiskingCompleted
 
-//Overall status of the application is failed - this is termianal state
-final case class FailedNonFixable(
-  failures: Seq[EntityFailure], // if empty the Application is approved, but there exist individuals which caused overall status to be failed
-  override val riskingCompletedDate: LocalDate
-)
-extends RiskingCompleted
+  // Overall status of the application is failed - this is termianal state
+  final case class FailedNonFixable(
+    failures: Seq[EntityFailure], // if empty the Application is approved, but there exist individuals which caused overall status to be failed
+    override val riskingCompletedDate: LocalDate
+  )
+  extends RiskingCompleted
 
 given format: OFormat[ApplicationState] =
   given OFormat[ApplicationState.Started.type] = Json.format[ApplicationState.Started.type]
@@ -89,9 +89,9 @@ given format: OFormat[ApplicationState] =
   val base: OFormat[ApplicationState] = Json.format[ApplicationState]
 
   val legacyStringReads: Reads[ApplicationState] = Reads {
-    case JsString("Started") => JsSuccess(Started)
-    case JsString("GrsDataReceived") => JsSuccess(GrsDataReceived)
-    case JsString("SentForRisking") => JsSuccess(SentForRisking)
+    case JsString("Started") => JsSuccess(ApplicationState.Started)
+    case JsString("GrsDataReceived") => JsSuccess(ApplicationState.GrsDataReceived)
+    case JsString("SentForRisking") => JsSuccess(ApplicationState.SentForRisking)
     case _ => JsError("Not a legacy string ApplicationState")
   }
 

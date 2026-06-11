@@ -71,7 +71,11 @@ extends UnitSpec:
 
   "serialize and deserialize FailedFixable" in:
     val state: ApplicationState = ApplicationState.FailedFixable(
-      fixes = Seq(EntityFix.AmlsFix(None, None)),
+      fixes = Seq(EntityFix.AmlsFix(
+        failure = EntityFailure._3._1,
+        isConfirmed = None,
+        amlsDetails = None
+      )),
       riskingCompletedDate = date,
       correctiveActionExpiryDate = Some(LocalDate.of(2024, 3, 31))
     )
@@ -79,7 +83,10 @@ extends UnitSpec:
       // language=JSON
       """{
         |"type":"FailedFixable",
-        |"fixes":[{"type":"AmlsFix"}],
+        |"fixes":[{
+        |  "type":"AmlsFix",
+        |  "failure":{"type":"_3._1"}
+        |}],
         |"riskingCompletedDate":"2024-01-15",
         |"correctiveActionExpiryDate":"2024-03-31"
         |}""".stripMargin

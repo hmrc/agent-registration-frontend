@@ -65,13 +65,15 @@ sealed trait AgentApplication:
   val agentApplicationId: AgentApplicationId = _id
   val lastUpdated: Instant = Instant.now(Clock.systemUTC())
 
-  val hasFinished: Boolean =
+  val isAfterSentForRisking: Boolean =
     applicationState match
-      case ApplicationState.SentForRisking => true
       case ApplicationState.Started => false
       case ApplicationState.GrsDataReceived => false
+      case ApplicationState.SentForRisking => true
+      case ApplicationState.RiskingInProgress => true
+      case _: ApplicationState.RiskingCompleted => true
 
-  val isInProgress: Boolean = !hasFinished
+  val isBeforeSentForRisking: Boolean = !isAfterSentForRisking
 
   def isGrsDataReceived: Boolean =
     applicationState match
