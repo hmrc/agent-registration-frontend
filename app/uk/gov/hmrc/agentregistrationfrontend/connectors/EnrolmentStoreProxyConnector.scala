@@ -58,14 +58,14 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed query for EnrolmentsAllocatedToGroup for $groupId")
 
-  /** ES1: Query groups who have an allocated enrolment
+  /** ES1: Query if arn from bpr has any principal groups
     * https://confluence.tools.tax.service.gov.uk/pages/viewpage.action?spaceKey=GGWRLS&title=ES1+-+Query+groups+who+have+an+allocated+enrolment
     */
   def queryArnHasPrincipleGroups(
     agentReferenceNumber: Arn
   )(using RequestHeader): Future[Boolean] =
     val enrolmentKey = s"HMRC-AS-AGENT~AgentReferenceNumber~${agentReferenceNumber.value}"
-    val url: URL = url"$baseUrl/enrolment-store/enrolments/$enrolmentKey/groups?type=principal"
+    val url: URL = url"$baseUrl/enrolment-store/enrolments/$enrolmentKey/groups?type=principal?ignore-assignments=true"
 
     httpClient
       .get(url)
