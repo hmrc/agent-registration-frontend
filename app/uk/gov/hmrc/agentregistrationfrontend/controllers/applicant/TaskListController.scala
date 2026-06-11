@@ -40,40 +40,32 @@ class TaskListController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] =
-    actions
-      .getApplicationInProgress
-      .ensure(
-        condition = _.agentApplication.isGrsDataReceived,
-        resultWhenConditionNotMet =
-          implicit request =>
-            logger.warn("Missing data from GRS, redirecting to start GRS registration")
-            Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
-      )
-      .ensure(
-        condition = _.agentApplication.hasCheckPassed,
-        resultWhenConditionNotMet =
-          implicit request =>
-            logger.warn("Entity failed or has not been completed, redirecting to entity check.")
-            Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
-      )
-      .refine(implicit request =>
-        val agentApplication: AgentApplication = request.get
-        individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
-          request.add[List[IndividualProvidedDetails]](individualsList)
-      )
-      .getBusinessPartnerRecord
-      .ensure(
-        condition = !_.businessPartnerRecordResponse.isAlreadyRegisteredAsAgent,
-        resultWhenConditionNotMet =
-          implicit request =>
-            logger.warn("Business is already registered as an agent, redirecting to already registered page.")
-            Redirect(AppRoutes.apply.checkfailed.AgentAlreadySubscribedController.show)
-      ):
+  def show: Action[AnyContent] = actions
+    .getApplicationInProgress
+    .ensure(
+      condition = _.agentApplication.isGrsDataReceived,
+      resultWhenConditionNotMet =
         implicit request =>
-          val agentApplication: AgentApplication = request.get
-          Ok(taskListPage(
-            taskListStatus = agentApplication.taskListStatus(existingList = request.get[List[IndividualProvidedDetails]]),
-            entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
-            agentApplication = agentApplication
-          ))
+          logger.warn("Missing data from GRS, redirecting to start GRS registration")
+          Redirect(AppRoutes.apply.AgentApplicationController.startRegistration)
+    )
+    .ensure(
+      condition = _.agentApplication.hasCheckPassed,
+      resultWhenConditionNotMet =
+        implicit request =>
+          logger.warn("Entity failed or has not been completed, redirecting to entity check.")
+          Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
+    )
+    .refine(implicit request =>
+      val agentApplication: AgentApplication = request.get
+      individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
+        request.add[List[IndividualProvidedDetails]](individualsList)
+    )
+    .getBusinessPartnerRecord:
+      implicit request =>
+        val agentApplication: AgentApplication = request.get
+        Ok(taskListPage(
+          taskListStatus = agentApplication.taskListStatus(existingList = request.get[List[IndividualProvidedDetails]]),
+          entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+          agentApplication = agentApplication
+        ))

@@ -43,7 +43,7 @@ extends ControllerSpec:
         .afterUnifiedCustomerRegistryUpdateEmptyIdentifiers
 
   private val path: String = "/agent-registration/apply/internal/unified-customer-registry-identifiers"
-  private val nextPageUrl: String = "/agent-registration/apply/task-list"
+  private val nextPageUrl: String = "/agent-registration/apply/internal/global-asa-enrolment-check"
 
   "routes should have correct paths and methods" in:
     AppRoutes.apply.internal.UnifiedCustomerRegistryController.populateApplicationIdentifiersFromUcr shouldBe Call(
@@ -64,7 +64,7 @@ extends ControllerSpec:
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
 
-  s"GET $path should update application with empty list if vrns/ payeRefs not present and redirect to task list" in:
+  s"GET $path should update application with empty list if vrns/ payeRefs not present and redirect to next check" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetOrganisationIdentifiers(tdAll.saUtr.asUtr, tdAll.emptyUcrIdentifiers)
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRefusalToDealWithCheckPass)
@@ -77,7 +77,7 @@ extends ControllerSpec:
     AgentRegistrationStubs.verifyGetAgentApplication()
     AgentRegistrationStubs.verifyUpdateAgentApplication()
 
-  s"GET $path should update application with empty lists if connector fails and redirect to task list" in:
+  s"GET $path should update application with empty lists if connector fails and redirect to next check" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetOrganisationIdentifiersFails(tdAll.saUtr.asUtr)
     AgentRegistrationStubs.stubGetAgentApplication(agentApplication.afterRefusalToDealWithCheckPass)
