@@ -67,7 +67,13 @@ extends FrontendController(mcc, actions):
     */
   @nowarn
   def applicationStatus: Action[AnyContent] = actions
-    .getRiskingProgress:
+    .getApplicationAfterSentForRisking
+    .refine(implicit request =>
+      agentRegistrationRiskingService
+        .getRiskingProgress(request.agentApplication.applicationReference)
+        .map: riskingProgress =>
+          request.add[RiskingProgress](riskingProgress)
+    ):
       implicit request =>
         val agentApplication: AgentApplication = request.get
         val submittedAt: Instant = agentApplication.getSubmittedAt
@@ -105,7 +111,7 @@ extends FrontendController(mcc, actions):
           case RiskingProgress.Approved => Redirect(appConfig.asaDashboardUrl) // this shouldn't really happen as the auth action should have done the redirect already
 
   def viewSubmittedApplication: Action[AnyContent] = actions
-    .getApplicationSubmitted:
+    .getApplicationAfterSentForRisking:
       implicit request =>
         Ok(viewApplicationPage(
           entityName = request.get[BusinessPartnerRecordResponse].getEntityName,

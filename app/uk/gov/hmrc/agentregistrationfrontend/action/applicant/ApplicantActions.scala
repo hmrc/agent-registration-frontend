@@ -127,7 +127,7 @@ extends RequestAwareLogging:
           Redirect(call.url)
     )
 
-  val getApplicationSubmitted: ActionBuilderWithData[DataWithApplicationAndBpr] =
+  val getApplicationAfterSentForRisking: ActionBuilderWithData[DataWithApplicationAndBpr] =
     getApplication
       .ensure(
         condition = _.agentApplication.isAfterSentForRisking,
@@ -143,14 +143,6 @@ extends RequestAwareLogging:
             Redirect(call.url)
       )
       .getBusinessPartnerRecord
-
-  val getRiskingProgress: ActionBuilderWithData[DataWithRiskingProgress] = getApplicationSubmitted
-    .refine(implicit request =>
-      agentRegistrationRiskingService
-        .getRiskingProgress(request.agentApplication.applicationReference)
-        .map: riskingProgress =>
-          request.add[RiskingProgress](riskingProgress)
-    )
 
   extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
 
