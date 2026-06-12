@@ -56,6 +56,11 @@ final case class IndividualProvidedDetails(
   providedByApplicant: Option[Boolean] = None
 ):
 
+  def passedRisking: Boolean =
+    providedDetailsState match
+      case ProvidedDetailsState.Approved => true
+      case _ => false
+
   val individualProvidedDetailsId: IndividualProvidedDetailsId = _id
 
   val hasFinished: Boolean = providedDetailsState === Finished

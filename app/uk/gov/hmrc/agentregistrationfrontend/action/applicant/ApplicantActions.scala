@@ -40,7 +40,6 @@ import uk.gov.hmrc.agentregistrationfrontend.audit.AuditService
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.getCurrentSessionId
 import uk.gov.hmrc.auth.core.retrieve.Credentials
@@ -75,7 +74,6 @@ class ApplicantActions @Inject() (
   authorisedActionRefiner: ApplicantAuthRefiner,
   agentApplicationService: AgentApplicationService,
   businessPartnerRecordService: BusinessPartnerRecordService,
-  agentRegistrationRiskingService: AgentRegistrationRiskingService,
   auditService: AuditService
 )(using ExecutionContext)
 extends RequestAwareLogging:
