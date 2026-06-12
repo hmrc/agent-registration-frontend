@@ -47,8 +47,8 @@ extends ControllerSpec:
       url = path
     )
 
-  s"GET $path for limited company afterRefusalToDealWithCheckPass should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(tdAll.agentApplicationLimitedCompany.afterRefusalToDealWithCheckPass, List.empty)
+  s"GET $path for limited company afterGlobalAsaEnrolmentCheckPass should render correct status tags" in:
+    ApplyStubHelper.stubsForTaskListPage(tdAll.agentApplicationLimitedCompany.afterGlobalAsaEnrolmentCheckPass, List.empty)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK

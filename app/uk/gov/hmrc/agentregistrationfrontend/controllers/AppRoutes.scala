@@ -164,6 +164,7 @@ object AppRoutes:
       val GrsController = internalRoutes.GrsController
       val AddressLookupCallbackController = internalRoutes.AddressLookupCallbackController
       val RefusalToDealWithController = internalRoutes.RefusalToDealWithController
+      val GlobalAsaEnrolmentCheckController = internalRoutes.GlobalAsaEnrolmentCheckController
       val DeceasedController = internalRoutes.DeceasedController
       val UnifiedCustomerRegistryController = internalRoutes.UnifiedCustomerRegistryController
 
