@@ -60,6 +60,10 @@ object ApplicantActions:
   type RequestWithApplication = RequestWithData[DataWithApplication]
   type RequestWithApplicationCt[A] = RequestWithDataCt[A, DataWithApplication]
 
+  type DataWithMaybeApplication = Option[AgentApplication] *: DataWithAuth
+  type RequestWithMaybeApplication = RequestWithData[DataWithMaybeApplication]
+  type RequestWithMaybeApplicationCt[A] = RequestWithDataCt[A, DataWithMaybeApplication]
+
   type DataWithApplicationAndBpr = BusinessPartnerRecordResponse *: DataWithApplication
   type RequestWithApplicationAndBpr = RequestWithData[DataWithApplicationAndBpr]
   type RequestWithApplicationAndBprCt[A] = RequestWithDataCt[A, DataWithApplicationAndBpr]
@@ -110,6 +114,12 @@ extends RequestAwareLogging:
             request.update(updatedApplication)
           )
         else request
+
+  val getMaybeApplicationForInitiation: ActionBuilderWithData[DataWithMaybeApplication] = authorised
+    .refine:
+      implicit request =>
+        agentApplicationService.find().map: maybeApplication =>
+          request.add(maybeApplication)
 
   def getApplicationInProgress: ActionBuilderWithData[DataWithApplication] = getApplication
     .ensure(

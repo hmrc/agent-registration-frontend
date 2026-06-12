@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.BusinessType.Partnership.LimitedLiabilityPartnership
-import uk.gov.hmrc.agentregistrationfrontend.connectors.EnrolmentStoreProxyConnector
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuditStubs
@@ -77,7 +76,7 @@ extends ControllerSpec:
         url = initiateAgentApplicationUrl
       )
 
-    s"GET $initiateAgentApplicationUrl should create initial agent application" in:
+    s"GET $initiateAgentApplicationUrl should create initial agent application when no application already exists" in:
       AuthStubs.stubAuthorise()
       AgentRegistrationStubs.stubGetAgentApplicationNoContent()
       AgentRegistrationStubs.stubFindApplicationByApplicationReferenceNoContent(tdAll.applicationReference)
@@ -94,18 +93,34 @@ extends ControllerSpec:
       EnrolmentStoreStubs.verifyQueryEnrolmentsAllocatedToGroup(tdAll.groupId)
       AuditStubs.verifyAuditEvent(auditType = "StartOrContinueApplication", journeyType = Some("Start"))
 
-    s"GET $initiateAgentApplicationUrl should redirect to taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment when HmrcAsAgentEnrolment is Allocated to the group" in:
+    s"GET $initiateAgentApplicationUrl should redirect to GRS journey when application already exists without GRS data" in:
       AuthStubs.stubAuthorise()
+      AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterStarted)
+      EnrolmentStoreStubs.stubQueryEnrolmentsAllocatedToGroupNoContent(tdAll.groupId)
       AuditStubs.stubAudit()
-
-      EnrolmentStoreStubs.stubQueryEnrolmentsAllocatedToGroup(
-        tdAll.groupId,
-        EnrolmentStoreProxyConnector.Enrolment(service = "HMRC-AS-AGENT", state = "Activated")
-      )
 
       val response: WSResponse = get(initiateAgentApplicationUrl)
       response.status shouldBe Status.SEE_OTHER
-      // TODO: actual url isn't known yet
-      response.header("Location").value shouldBe "http://localhost:22201/tax-and-scheme-management/users?origin=ASA"
+      response.header("Location").value shouldBe AppRoutes.apply.internal.GrsController.startJourney().url
       AuthStubs.verifyAuthorise()
+      AgentRegistrationStubs.verifyGetAgentApplication()
+      AgentRegistrationStubs.verifyUpdateAgentApplication(count = 0)
       EnrolmentStoreStubs.verifyQueryEnrolmentsAllocatedToGroup(tdAll.groupId)
+
+    s"GET $initiateAgentApplicationUrl should redirect to next check when application already has GRS data" in:
+      AuthStubs.stubAuthorise()
+      AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterGrsDataReceived)
+      EnrolmentStoreStubs.stubQueryEnrolmentsAllocatedToGroupNoContent(tdAll.groupId)
+      AuditStubs.stubAudit()
+
+      val response: WSResponse = get(initiateAgentApplicationUrl)
+      response.status shouldBe Status.SEE_OTHER
+      response.header("Location").value shouldBe AppRoutes.apply.internal.RefusalToDealWithController.check().url
+      AuthStubs.verifyAuthorise()
+      AgentRegistrationStubs.verifyGetAgentApplication()
+      AgentRegistrationStubs.verifyUpdateAgentApplication(count = 0)
+      EnrolmentStoreStubs.verifyQueryEnrolmentsAllocatedToGroup(tdAll.groupId)
+
+    s"GET $initiateAgentApplicationUrl should redirect to taxAndSchemeManagementToSelfServeAssignmentOfAsaEnrolment when HmrcAsAgentEnrolment is Allocated to the group" in:
+      AuthStubs.stubAuthorise()
+      AuditStubs.stubAudit()
