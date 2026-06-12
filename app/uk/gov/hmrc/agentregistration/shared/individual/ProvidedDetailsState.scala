@@ -50,10 +50,10 @@ object ProvidedDetailsState:
   case object Approved
   extends ReceivedRiskingResults
 
-  case class FailedFixable(fixes: Seq[IndividualFix])
+  final case class FailedFixable(fixes: Seq[IndividualFix])
   extends ReceivedRiskingResults
 
-  case class FailedNonFixable(failures: Seq[IndividualFailure])
+  final case class FailedNonFixable(failures: Seq[IndividualFailure])
   extends ReceivedRiskingResults
 
   given Format[ProvidedDetailsState] =
