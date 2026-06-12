@@ -53,7 +53,8 @@
     <p class="govuk-body">
     @formWithCSRF(action = AppRoutes.providedetails.CheckYourAnswersController.submit(linkId)) {
         @govukButton(Button(
-            content = Text(messages("common.confirmAndContinue"))
+            content = Text(messages("common.confirmAndContinue")),
+            preventDoubleClick = Some(true)
         ))
     }
     </p>

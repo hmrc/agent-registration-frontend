@@ -47,7 +47,8 @@
       name = Some("submit"),
       value = Some("DeleteAndStartAgain"),
       content = Text(messages("common.startAgain")),
-      classes = "govuk-!-margin-right-3"
+      classes = "govuk-!-margin-right-3",
+        preventDoubleClick = Some(true)
     ))
     @govukButton(Button(
       href = Some(AppRoutes.apply.aboutyourbusiness.CheckYourAnswersController.show.url),
