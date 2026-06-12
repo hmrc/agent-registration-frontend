@@ -82,7 +82,8 @@
             name = Some("submit"),
             value = Some(messages("AgreeAndContinue")),
             content = Text(messages(s"$key.agree.button")),
-            classes = "govuk-!-margin-right-3"
+            classes = "govuk-!-margin-right-3",
+            preventDoubleClick = Some(true)
         ))
 
     }

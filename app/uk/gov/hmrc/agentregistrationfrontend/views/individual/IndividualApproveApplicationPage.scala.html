@@ -48,7 +48,8 @@
         @govukButton(Button(
             name = Some("submit"),
             value = Some(messages("ApproveAndContinue")),
-            content = Text(messages(s"$key.approve.button"))
+            content = Text(messages(s"$key.approve.button")),
+            preventDoubleClick = Some(true)
         ))
 
     }
