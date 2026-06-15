@@ -20,6 +20,7 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 import play.api.libs.json.Json
 import play.api.libs.json.OFormat
+import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 
 final case class ApplicationData(
   applicationReference: ApplicationReference,
@@ -36,7 +37,8 @@ final case class ApplicationData(
   utr: Utr,
   safeId: SafeId,
   arn: Option[Arn]
-)
+):
+  def getArn: Arn = arn.getOrThrowExpectedDataMissing("arn")
 
 object ApplicationData:
 
