@@ -24,15 +24,15 @@ import play.api.data.validation.Constraint
 import play.api.data.validation.Invalid
 import play.api.data.validation.Valid
 import play.api.data.validation.ValidationError
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsRegistrationNumber
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
 import uk.gov.hmrc.agentregistration.shared.util.StringExtensions.canonicalise
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
 object AmlsRegistrationNumberForm:
   val key: String = "amlsRegistrationNumber"
 
-class AmlsRegistrationNumberForm(supervisoryBody: AmlsCode) {
+class AmlsRegistrationNumberForm(supervisoryBody: AmlsSupervisoryBodyCode):
 
   import AmlsRegistrationNumberForm.*
 
@@ -49,18 +49,10 @@ class AmlsRegistrationNumberForm(supervisoryBody: AmlsCode) {
         s"$key.error.invalid",
         value =>
           val normalisedValue = value.getOrElse("").canonicalise
-          AmlsRegistrationNumber.isValidForChosenSupervisor(
-            value = normalisedValue,
-            supervisor = supervisoryBody
-          )
+          AmlsRegistrationNumber.isValidForChosenSupervisoryBody(value = normalisedValue, supervisoryBody = supervisoryBody)
       )
       .transform[AmlsRegistrationNumber](
         userInput => AmlsRegistrationNumber(userInput.getOrElse("").canonicalise),
         amlsRegistrationNumber => Some(amlsRegistrationNumber.value)
       )
-
-    Form[AmlsRegistrationNumber](
-      key -> mappings
-    )
-
-}
+    Form[AmlsRegistrationNumber](key -> mappings)

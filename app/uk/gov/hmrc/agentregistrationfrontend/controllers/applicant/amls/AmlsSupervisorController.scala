@@ -22,9 +22,9 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsDetails
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
@@ -68,34 +68,30 @@ extends FrontendController(mcc, actions):
         form = amlsCodeForm.form,
         resultToServeWhenFormHasErrors =
           implicit request =>
-            (formWithErrors: Form[AmlsCode]) =>
+            (formWithErrors: Form[AmlsSupervisoryBodyCode]) =>
               view(
                 form = formWithErrors,
                 entityName = request.get[BusinessPartnerRecordResponse].getEntityName
               )
       )
       .async:
-        implicit request: RequestWithData[AmlsCode *: BusinessPartnerRecordResponse *: DataWithApplication] =>
-          val supervisoryBody: AmlsCode = request.get
+        implicit request: RequestWithData[AmlsSupervisoryBodyCode *: BusinessPartnerRecordResponse *: DataWithApplication] =>
+          val supervisoryBody: AmlsSupervisoryBodyCode = request.get
           val agentApplication: AgentApplication = request.get
-          if
-            agentApplication.amlsDetails.exists(_.supervisoryBody === supervisoryBody) &&
+          if agentApplication.amlsDetails.exists(_.supervisoryBody === supervisoryBody) &&
             agentApplication.getAmlsDetails.amlsRegistrationNumber.isDefined
           then
-            // if same body is submitted and there is already a registration number then use CYA for navigation
-            Future.successful(Redirect(AppRoutes.apply.amls.CheckYourAnswersController.show.url))
+            Future.successful(Redirect(AppRoutes.apply.amls.CheckYourAnswersController.show.url)) // if same body is submitted and there is already a registration number then use CYA for navigation
           else
             applicationService
               .upsert(
                 agentApplication
                   .modify(_.amlsDetails)
-                  .using {
-                    case Some(details) =>
+                  .using:
+                    case Some(details: AmlsDetails) =>
                       Some(details
-                        .modify(_.supervisoryBody)
-                        .setTo(supervisoryBody)
-                        .modify(_.amlsRegistrationNumber)
-                        .setTo(None) // Clear AMLS registration number when supervisory body changes as the format is dependent on the body
+                        .modify(_.supervisoryBody).setTo(supervisoryBody)
+                        .modify(_.amlsRegistrationNumber).setTo(None) // Clear AMLS registration number when supervisory body changes as the format is dependent on the body
                       )
                     case None =>
                       Some(AmlsDetails(
@@ -103,7 +99,6 @@ extends FrontendController(mcc, actions):
                         amlsRegistrationNumber = None,
                         amlsEvidence = None
                       ))
-                  }
               )
               .map(_ => Redirect(AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url))
       .redirectIfSaveForLater

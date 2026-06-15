@@ -111,7 +111,7 @@ extends ViewSpec:
           |Association of TaxationTechnicians (ATT)
           |Change Supervisory body
           |Registration number
-          |NONHMRC-REF-AMLS-NUMBER-00001
+          |ATT AML-1234-123456
           |Change Registration number
           |Evidence
           |evidence.pdf
@@ -132,7 +132,7 @@ extends ViewSpec:
           ),
           TestSummaryRow(
             key = "Registration number",
-            value = "NONHMRC-REF-AMLS-NUMBER-00001",
+            value = "ATT AML-1234-123456",
             action = AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url,
             changeLinkAccessibleContent = "Change Registration number"
           ),

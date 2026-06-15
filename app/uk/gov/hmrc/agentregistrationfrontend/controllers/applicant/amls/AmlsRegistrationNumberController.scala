@@ -23,7 +23,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
@@ -70,8 +70,8 @@ extends FrontendController(mcc, actions):
         resultToServeWhenFormHasErrors = implicit r => view(_)
       )
       .async:
-        implicit request: RequestWithData[AmlsRegistrationNumber *: DataWithApplication] =>
-          val amlsRegistrationNumber: AmlsRegistrationNumber = request.get[AmlsRegistrationNumber]
+        implicit request =>
+          val amlsRegistrationNumber = request.get[AmlsRegistrationNumber]
           applicationService
             .upsert(
               request.get[AgentApplication]

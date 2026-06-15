@@ -17,8 +17,8 @@
 package uk.gov.hmrc.agentregistrationfrontend.config
 
 import com.google.inject.AbstractModule
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsName
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsName
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 
 class AmlsCodesSpec
@@ -31,17 +31,17 @@ extends ISpec:
 
   val amlsCodes: AmlsCodes = app.injector.instanceOf[AmlsCodes]
 
-  "AmlsCodes should load prodcution AMLS codes which are defined in /amls.csv resource" in:
+  "AmlsCodes should load production AMLS codes which are defined in /amls.csv resource" in:
     amlsCodes.amlsCodes shouldBe CsvLoader
       .load("/amls.csv")
       .map: kv =>
-        (AmlsCode(kv._1), AmlsName(kv._2))
+        (AmlsSupervisoryBodyCode(kv._1), AmlsName(kv._2))
 
     amlsCodes.amlsCodes.nonEmpty shouldBe true withClue "sanity check that we actually have some options defined in the amls.csv "
 
-  "getSupervisoryName should return corresponding amls name or throw exception" in:
-    amlsCodes.getSupervisoryName(AmlsCode("ACCA")) shouldBe AmlsName("Association of Chartered Certified Accountants (ACCA)")
+  "getSupervisoryName should return corresponding AMLS name or throw exception" in:
+    amlsCodes.getSupervisoryName(AmlsSupervisoryBodyCode("ACCA")) shouldBe AmlsName("Association of Chartered Certified Accountants (ACCA)")
 
-    intercept[RuntimeException](amlsCodes.getSupervisoryName(AmlsCode("sialala")))
+    intercept[RuntimeException](amlsCodes.getSupervisoryName(AmlsSupervisoryBodyCode("sialala")))
       .getMessage should
-      startWith("No supervisory body found for AmlsCode(sialala)")
+      startWith("No supervisory body found for AmlsSupervisoryBodyCode(sialala)")

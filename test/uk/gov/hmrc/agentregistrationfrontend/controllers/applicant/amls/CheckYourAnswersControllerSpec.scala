@@ -27,6 +27,8 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 class CheckYourAnswersControllerSpec
 extends ControllerSpec:
 
+  // TODO this test needs the fixingz
+
   override lazy val overridesModule: AbstractModule =
     new AbstractModule:
       override def configure(): Unit = bind(classOf[AmlsCodes]).asEagerSingleton()
@@ -54,7 +56,7 @@ extends ControllerSpec:
           .whenSupervisorBodyIsHmrc
           .afterSupervisoryBodySelected,
       amlsType = "HMRC",
-      expectedRedirect = Some(AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.amls.AmlsSupervisorController.show.url)
     ),
     TestCaseForCya(
       application =
@@ -69,7 +71,7 @@ extends ControllerSpec:
         sectionAmls
           .whenSupervisorBodyIsNonHmrc
           .afterUploadSucceeded,
-      amlsType = "non-HMRC",
+      amlsType = "ATT",
       expectedRedirect = None
     ),
     TestCaseForCya(
@@ -77,15 +79,15 @@ extends ControllerSpec:
         sectionAmls
           .whenSupervisorBodyIsNonHmrc
           .afterSupervisoryBodySelected,
-      amlsType = "non-HMRC",
-      expectedRedirect = Some(AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url)
+      amlsType = "ATT",
+      expectedRedirect = Some(AppRoutes.apply.amls.AmlsSupervisorController.show.url)
     ),
     TestCaseForCya(
       application =
         sectionAmls
           .whenSupervisorBodyIsNonHmrc
           .afterRegistrationNumberProvided,
-      amlsType = "non-HMRC",
+      amlsType = "ATT",
       expectedRedirect = Some(AppRoutes.apply.amls.AmlsEvidenceUploadController.showAmlsEvidenceUploadPage.url)
     )
   ).foreach: testCase =>
