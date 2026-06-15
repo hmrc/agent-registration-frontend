@@ -42,7 +42,6 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdGrsBusine
       createdAt = dependencies.nowAsInstant,
       applicationExpiresAt = Some(dependencies.applicationExpiresAtAsInstant),
       submittedAt = None,
-      isApplicationReadyToSubmitEmailSent = None,
       applicationState = ApplicationState.Started,
       userRole = Some(UserRole.Authorised),
       businessDetails = None,
@@ -185,14 +184,12 @@ trait TdAgentApplicationGeneralPartnership { dependencies: (TdBase & TdGrsBusine
     val afterDeclarationSubmitted: AgentApplicationGeneralPartnership = afterHmrcStandardForAgentsAgreed.copy(
       applicationState = ApplicationState.SentForRisking,
       submittedAt = Some(dependencies.nowAsInstant),
-      isApplicationReadyToSubmitEmailSent = None,
       applicationExpiresAt = None
     )
 
     val afterDeclarationSubmittedAndTwoIndividualFinished: AgentApplicationGeneralPartnership = afterConfirmTwoIndividuals.copy(
       applicationState = ApplicationState.SentForRisking,
       submittedAt = Some(dependencies.nowAsInstant),
-      isApplicationReadyToSubmitEmailSent = None,
       applicationExpiresAt = None
     )
 
