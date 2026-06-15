@@ -19,9 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.services.applicant
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotIncorporated
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.ApplicationReference
-import uk.gov.hmrc.agentregistration.shared.getCrn
+import uk.gov.hmrc.agentregistration.shared.{AgentApplication, ApplicationReference, Arn, getCrn}
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistration.shared.risking.submitforrisking.*
@@ -44,11 +42,13 @@ extends RequestAwareLogging:
 
   def submitForRisking(
     agentApplication: AgentApplication,
-    individuals: List[IndividualProvidedDetails]
+    individuals: List[IndividualProvidedDetails],
+    maybeArn: Option[Arn]
   )(using request: RequestHeader): Future[Unit] =
     val submitForRiskingRequest: SubmitForRiskingRequest = SubmitForRiskingRequest(
       applicationData = makeApplicationData(agentApplication),
-      individuals = individuals.map(makeIndividualData)
+      individuals = individuals.map(makeIndividualData),
+      maybeArn = maybeArn // the user might be de-enrolled here so already has an ARN.
     )
 
     for

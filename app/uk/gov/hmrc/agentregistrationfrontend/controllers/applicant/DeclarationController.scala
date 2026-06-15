@@ -20,10 +20,8 @@ import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.{AgentApplication, ApplicationState, BusinessPartnerRecordResponse}
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-
 import uk.gov.hmrc.agentregistrationfrontend.model.taskListStatus
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
@@ -80,12 +78,15 @@ extends FrontendController(mcc, actions):
         ))
 
   def submit: Action[AnyContent] = baseAction
+    .getBusinessPartnerRecord
     .async:
       implicit request =>
+        val bpr = request.get[BusinessPartnerRecordResponse]
         for
           _ <- agentRegistrationRiskingService.submitForRisking(
             agentApplication = request.agentApplication,
-            individuals = request.get[List[IndividualProvidedDetails]]
+            individuals = request.get[List[IndividualProvidedDetails]],
+            maybeArn = if (bpr.isAlreadyRegisteredAsAgent) Some(bpr.getAgentReferenceNumber) else None
           )
           _ <- agentApplicationService
             .upsert(

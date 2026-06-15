@@ -17,11 +17,13 @@
 package uk.gov.hmrc.agentregistration.shared.risking.submitforrisking
 
 import play.api.libs.json.*
+import uk.gov.hmrc.agentregistration.shared.Arn
 import uk.gov.hmrc.agentregistration.shared.risking.*
 
 final case class SubmitForRiskingRequest(
   applicationData: ApplicationData,
-  individuals: List[IndividualData]
+  individuals: List[IndividualData],
+  maybeArn: Option[Arn]
 )
 
 object SubmitForRiskingRequest:

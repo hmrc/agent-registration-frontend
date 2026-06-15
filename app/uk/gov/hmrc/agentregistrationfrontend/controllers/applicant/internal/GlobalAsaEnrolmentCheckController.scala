@@ -42,7 +42,18 @@ class GlobalAsaEnrolmentCheckController @Inject() (
   agentApplicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
-
+  /** Check if the BPR associated with the UTR of the user is already subscribed as an agent.
+   *
+   * If the BPR is already subscribed as an agent we call ES1 to check if that enrolment has any
+   * user groups. If it has at least one user group we can be satisfied that the enrolment is 
+   * active but the group of the currently logged-in user does not have that assignment so the
+   * user fails this check and gets sent to the agent-already-subscribed page, they would need to
+   * go to an admin to get that assignment added to their group.
+   * 
+   * If the enrolment has no groups associated with it, we allow the user to continue, they will be
+   * risked, and then we can add the enrolment to their group (assuming they successfully return from
+   * minerva.)
+   */
   def check(): Action[AnyContent] = actions
     .getApplicationInProgress
     .ensure(
