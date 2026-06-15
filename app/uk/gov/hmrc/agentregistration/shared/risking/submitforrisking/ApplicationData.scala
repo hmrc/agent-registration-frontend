@@ -34,7 +34,8 @@ final case class ApplicationData(
   payeRefs: List[PayeRef],
   crn: Option[Crn],
   utr: Utr,
-  safeId: SafeId
+  safeId: SafeId,
+  arn: Option[Arn]
 )
 
 object ApplicationData:
