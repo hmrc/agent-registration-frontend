@@ -163,13 +163,12 @@ extends FrontendController(mcc, applicantActions):
     individuals: List[IndividualProvidedDetails]
   )(using request: Request[?]) =
     if agentApplication.applicationState.sentForRisking
-    then {
+    then
       agentRegistrationRiskingService.submitForRisking(
         agentApplication = agentApplication,
         individuals = individuals,
         arn = None
       )
-    }
     else Future.unit
 
   private def getIndividualName(index: Int): IndividualName = TdTestOnly
