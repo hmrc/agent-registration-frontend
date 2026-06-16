@@ -21,8 +21,8 @@ import com.google.inject.Singleton
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsDetails
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsDetails
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.amls.CheckYourAnswersPage
@@ -44,13 +44,13 @@ extends FrontendController(mcc, actions):
           logger.debug(s"Cannot display Check Your Answers page - incomplete AMLS details.")
           request.agentApplication.amlsDetails match
             case Some(AmlsDetails(
-                  AmlsCode(_),
+                  AmlsSupervisoryBodyCode(_),
                   None,
                   _
                 )) =>
-              Redirect(AppRoutes.apply.amls.AmlsRegistrationNumberController.show)
+              Redirect(AppRoutes.apply.amls.AmlsSupervisorController.show) // because reg number is missing we go to supervisor page as this controls the type of registration number required
             case Some(AmlsDetails(
-                  AmlsCode(amlsCode),
+                  AmlsSupervisoryBodyCode(amlsCode),
                   Some(_),
                   _
                 )) if !amlsCode.contains("HMRC") =>

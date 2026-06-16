@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.amls
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistration.shared.AmlsName
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsName
 import uk.gov.hmrc.agentregistration.shared.upload.FileUploadReference
 import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector.UploadRequest
 import uk.gov.hmrc.agentregistrationfrontend.connectors.UpscanInitiateConnector.UpscanInitiateResponse
