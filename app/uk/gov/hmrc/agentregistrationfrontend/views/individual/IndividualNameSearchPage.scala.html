@@ -61,7 +61,8 @@
     ).withFormField(form(key)))
 
     @govukButton(Button(
-      content = Text(messages("common.continue"))
+      content = Text(messages("common.continue")),
+        preventDoubleClick = Some(true)
     ))
   }
 }

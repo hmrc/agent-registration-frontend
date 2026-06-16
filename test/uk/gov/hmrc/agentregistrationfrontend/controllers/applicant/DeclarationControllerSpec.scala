@@ -132,6 +132,8 @@ extends ControllerSpec:
         individuals = individualDataList
       )
     )
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterAllOtherTasksComplete)
+
     val response: WSResponse =
       post(path)(
         Map("submit" -> Seq("AcceptAndSend"))

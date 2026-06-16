@@ -100,7 +100,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.apply.amls.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdateWithBpr()
 
   s"POST $path when changing value should unset registration number and redirect to the next page" in:
@@ -112,7 +112,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
-    response.header("Location").value shouldBe AppRoutes.apply.amls.CheckYourAnswersController.show.url
+    response.header("Location").value shouldBe AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdateWithBpr()
 
   s"POST $path with save for later and valid selection should redirect to the saved for later page" in:

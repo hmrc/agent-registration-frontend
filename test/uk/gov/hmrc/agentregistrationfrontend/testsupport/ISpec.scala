@@ -29,6 +29,8 @@ import play.api.test.DefaultTestServerFactory
 import play.api.test.TestServerFactory
 import play.core.server.ServerConfig
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsName
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsIdGenerator
 import uk.gov.hmrc.agentregistration.shared.upload.UploadId
@@ -97,8 +99,8 @@ extends AnyWordSpecLike,
         bind(classOf[Clock]).toInstance(clock)
         bind(classOf[AmlsCodes]).toInstance(
           new AmlsCodes {
-            override val amlsCodes: Map[AmlsCode, AmlsName] = CsvLoader.load("/testAmlsCodes.csv").map: kv =>
-              (AmlsCode(kv._1), AmlsName(kv._2))
+            override val amlsCodes: Map[AmlsSupervisoryBodyCode, AmlsName] = CsvLoader.load("/testAmlsCodes.csv").map: kv =>
+              (AmlsSupervisoryBodyCode(kv._1), AmlsName(kv._2))
           }
         )
         bind(classOf[LinkIdGenerator]).toInstance(new LinkIdGenerator {

@@ -21,6 +21,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotIncorporated
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistration.shared.Arn
 import uk.gov.hmrc.agentregistration.shared.getCrn
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
@@ -44,10 +45,11 @@ extends RequestAwareLogging:
 
   def submitForRisking(
     agentApplication: AgentApplication,
-    individuals: List[IndividualProvidedDetails]
+    individuals: List[IndividualProvidedDetails],
+    arn: Option[Arn]
   )(using request: RequestHeader): Future[Unit] =
     val submitForRiskingRequest: SubmitForRiskingRequest = SubmitForRiskingRequest(
-      applicationData = makeApplicationData(agentApplication),
+      applicationData = makeApplicationData(agentApplication, arn),
       individuals = individuals.map(makeIndividualData)
     )
 
@@ -61,7 +63,10 @@ extends RequestAwareLogging:
 
 object AgentRegistrationRiskingServiceHelper:
 
-  def makeApplicationData(agentApplication: AgentApplication) = ApplicationData(
+  def makeApplicationData(
+    agentApplication: AgentApplication,
+    arn: Option[Arn]
+  ) = ApplicationData(
     applicationReference = agentApplication.applicationReference,
     internalUserId = agentApplication.internalUserId,
     applicantCredentials = agentApplication.applicantCredentials,
@@ -95,7 +100,8 @@ object AgentRegistrationRiskingServiceHelper:
         case a: IsNotIncorporated => None
     ,
     utr = agentApplication.getUtr,
-    safeId = agentApplication.getSafeId
+    safeId = agentApplication.getSafeId,
+    arn = arn
   )
 
   def makeIndividualData(i: IndividualProvidedDetails) = IndividualData(

@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.forms
 
 import play.api.data.Form
 import play.api.data.FormError
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 
 class AmlsCodeFormSpec
@@ -27,12 +27,12 @@ extends ISpec:
   "AmlsCodeForm" should:
     val amlsCodeForm: AmlsCodeForm = app.injector.instanceOf[AmlsCodeForm]
     "return a form with data when bind succeeds" in:
-      val formBound: Form[AmlsCode] = amlsCodeForm.form.bind(Map("amlsSupervisoryBody" -> "ATT"))
+      val formBound: Form[AmlsSupervisoryBodyCode] = amlsCodeForm.form.bind(Map("amlsSupervisoryBody" -> "ATT"))
       formBound.errors shouldBe Nil
-      formBound.value.value shouldBe AmlsCode("ATT")
+      formBound.value.value shouldBe AmlsSupervisoryBodyCode("ATT")
 
     "return a form with errors when bind fails" in:
-      val formBound: Form[AmlsCode] = amlsCodeForm.form.bind(Map("amlsSupervisoryBody" -> "NOT_ON_THE_LIST"))
+      val formBound: Form[AmlsSupervisoryBodyCode] = amlsCodeForm.form.bind(Map("amlsSupervisoryBody" -> "NOT_ON_THE_LIST"))
       formBound.errors shouldBe List(FormError(
         "amlsSupervisoryBody",
         List("amlsSupervisoryBody.error.invalid"),
@@ -41,7 +41,7 @@ extends ISpec:
       formBound.value shouldBe None
 
     "return a form with errors when no data in bind" in:
-      val formBound: Form[AmlsCode] = amlsCodeForm.form.bind(Map())
+      val formBound: Form[AmlsSupervisoryBodyCode] = amlsCodeForm.form.bind(Map())
       formBound.errors shouldBe List(FormError(
         "amlsSupervisoryBody",
         List("amlsSupervisoryBody.error.required"),

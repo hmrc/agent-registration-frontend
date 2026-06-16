@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared.risking.submitforrisking
+package uk.gov.hmrc.agentregistration.shared
 
-import play.api.libs.json.Json
-import play.api.libs.json.OFormat
-import uk.gov.hmrc.agentregistration.shared.amls.AmlsRegistrationNumber
-import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
+import play.api.libs.json.Format
+import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 
-final case class AmlsDetailsData(
-  supervisoryBody: AmlsSupervisoryBodyCode,
-  amlsRegistrationNumber: AmlsRegistrationNumber,
-  amlsEvidence: Option[AmlsEvidenceData]
-)
+final case class Arn(value: String)
 
-object AmlsDetailsData:
-  given OFormat[AmlsDetailsData] = Json.format[AmlsDetailsData]
+object Arn:
+
+  given Format[Arn] = JsonFormatsFactory.makeValueClassFormat
+
+  private val arnPattern = "^[A-Z]ARN[0-9]{7}$".r
+
+  def isValid(arn: String): Boolean =
+    arn match
+      case arnPattern(_*) => true
+      case _ => false

@@ -43,8 +43,8 @@ extends ControllerSpec:
       url = path
     )
 
-  s"GET $path for sole trader owner afterDeceasedCheckPass should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(tdAll.agentApplicationSoleTrader.afterDeceasedCheckPass, List.empty)
+  s"GET $path for sole trader owner afterGlobalAsaEnrolmentCheckPass should render correct status tags" in:
+    ApplyStubHelper.stubsForTaskListPage(tdAll.agentApplicationSoleTrader.afterGlobalAsaEnrolmentCheckPass, List.empty)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK

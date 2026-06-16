@@ -27,12 +27,14 @@
     name = Some("submit"),
     value = Some(SaveAndContinue.toString),
     content = Text(continueLabel.getOrElse(messages("common.saveAndContinue"))),
-    classes = "govuk-!-margin-right-3"
+    classes = "govuk-!-margin-right-3",
+    preventDoubleClick = Some(true)
 ))
 
 @govukButton(Button(
     name = Some("submit"),
     value = Some(SaveAndComeBackLater.toString),
     content = Text(messages("common.saveAndComeBackLater")),
-    classes = "govuk-button--secondary"
+    classes = "govuk-button--secondary",
+    preventDoubleClick = Some(true)
 ))

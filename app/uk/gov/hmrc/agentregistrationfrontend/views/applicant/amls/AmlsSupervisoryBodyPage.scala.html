@@ -18,8 +18,8 @@
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.accessibleautocomplete.AccessibleAutocomplete
 @import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 @import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
-@import uk.gov.hmrc.agentregistration.shared.AmlsCode
-@import uk.gov.hmrc.agentregistration.shared.AmlsName
+@import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
+@import uk.gov.hmrc.agentregistration.shared.amls.AmlsName
 
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
@@ -34,7 +34,7 @@
 )
 
 @(
-        form: Form[AmlsCode],
+        form: Form[AmlsSupervisoryBodyCode],
         entityName: String)(implicit
         request: RequestHeader,
         messages: Messages
@@ -63,7 +63,7 @@
                 value = Some(""),
                 text = "")).++(
                 amlsCodes.amlsCodes.flatMap {
-                    case (amlsCode: AmlsCode, amlsName: AmlsName) => Seq(
+                    case (amlsCode: AmlsSupervisoryBodyCode, amlsName: AmlsName) => Seq(
                         SelectItem(
                             value = Some(amlsCode.value),
                             text = amlsName.value,

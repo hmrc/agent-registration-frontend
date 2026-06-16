@@ -18,10 +18,10 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplicat
 
 import com.softwaremill.quicklens.modify
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsDetails
-import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsRegistrationNumber
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 import uk.gov.hmrc.objectstore.client.Path
 
@@ -30,11 +30,10 @@ import scala.util.chaining.scalaUtilChainingOps
 trait TdSectionAmls {
   dependencies: TdBase & TdUpload =>
 
-  private final def amlsCodeHmrc: AmlsCode = AmlsCode("HMRC")
-  private def amlsCodeNonHmrc: AmlsCode = AmlsCode("ATT") /// Association of TaxationTechnicians
-
+  private final def amlsCodeHmrc: AmlsSupervisoryBodyCode = AmlsSupervisoryBodyCode("HMRC")
+  private def amlsCodeNonATT: AmlsSupervisoryBodyCode = AmlsSupervisoryBodyCode("ATT") /// Association of TaxationTechnicians //TODO this is used in the stubs
   private def amlsRegistrationNumberHmrc = AmlsRegistrationNumber("XAML00000123456")
-  private def amlsRegistrationNumberNonHmrc = AmlsRegistrationNumber("NONHMRC-REF-AMLS-NUMBER-00001")
+  private def amlsRegistrationNumberATT = AmlsRegistrationNumber("ATT AML-1234-123456")
 
   class AgentApplicationWithSectionAmls(baseForSectionAmls: AgentApplication):
 
@@ -45,7 +44,7 @@ trait TdSectionAmls {
 
       object whenSupervisorBodyIsHmrc:
 
-        def amlsCode: AmlsCode = amlsCodeHmrc
+        def amlsCode: AmlsSupervisoryBodyCode = amlsCodeHmrc
         def amlsRegistrationNumber: AmlsRegistrationNumber = amlsRegistrationNumberHmrc
 
         private object amlsDetailsHelper:
@@ -72,8 +71,8 @@ trait TdSectionAmls {
 
       object whenSupervisorBodyIsNonHmrc:
 
-        def amlsCode: AmlsCode = amlsCodeNonHmrc
-        def amlsRegistrationNumber: AmlsRegistrationNumber = amlsRegistrationNumberNonHmrc
+        def amlsCode: AmlsSupervisoryBodyCode = amlsCodeNonATT
+        def amlsRegistrationNumber: AmlsRegistrationNumber = amlsRegistrationNumberATT
 
         private object amlsDetailsHelper:
 

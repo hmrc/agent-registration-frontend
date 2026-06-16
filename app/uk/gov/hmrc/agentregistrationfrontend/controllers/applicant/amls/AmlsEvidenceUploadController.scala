@@ -19,9 +19,9 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls
 import com.softwaremill.quicklens.*
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsName
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsName
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
 import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
@@ -84,7 +84,7 @@ extends FrontendController(mcc, actions):
 
   def showAmlsEvidenceUploadPage: Action[AnyContent] = baseAction.async:
     implicit request =>
-      val amlsCode: AmlsCode = request.agentApplication.getAmlsDetails.supervisoryBody
+      val amlsCode: AmlsSupervisoryBodyCode = request.agentApplication.getAmlsDetails.supervisoryBody
       val amlsName: AmlsName = amlsCodes.getSupervisoryName(amlsCode)
       val uploadId: UploadId = uploadIdGenerator.nextUploadId()
       for

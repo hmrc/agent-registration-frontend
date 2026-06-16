@@ -18,16 +18,16 @@ package uk.gov.hmrc.agentregistrationfrontend.config
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsName
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsName
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
 
 @Singleton
 class AmlsCodes @Inject() ():
 
-  val amlsCodes: Map[AmlsCode, AmlsName] = CsvLoader.load("/amls.csv").map: kv =>
-    (AmlsCode(kv._1), AmlsName(kv._2))
+  val amlsCodes: Map[AmlsSupervisoryBodyCode, AmlsName] = CsvLoader.load("/amls.csv").map: kv =>
+    (AmlsSupervisoryBodyCode(kv._1), AmlsName(kv._2))
 
-  def getSupervisoryName(amlsCode: AmlsCode): AmlsName = amlsCodes.getOrElse(
+  def getSupervisoryName(amlsCode: AmlsSupervisoryBodyCode): AmlsName = amlsCodes.getOrElse(
     amlsCode,
     throw new RuntimeException(
       s"""No supervisory body found for $amlsCode\nAvailable options:\n${amlsCodes.map(kv => s"${kv._1} ${kv._2}").mkString("\n")}"""
