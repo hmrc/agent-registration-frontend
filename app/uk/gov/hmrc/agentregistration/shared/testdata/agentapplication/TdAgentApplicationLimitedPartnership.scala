@@ -52,7 +52,8 @@ trait TdAgentApplicationLimitedPartnership {
       hasOtherRelevantIndividuals = None,
       vrns = None,
       payeRefs = None,
-      passedRisking = None
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
 
     val afterGrsDataReceived: AgentApplicationLimitedPartnership = afterStarted.copy(

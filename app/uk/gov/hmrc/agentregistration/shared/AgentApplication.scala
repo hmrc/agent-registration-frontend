@@ -25,6 +25,8 @@ import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfCompaniesHouseOfficers
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfIndividuals
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.util.DisjointUnions
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.auth.core.retrieve.Credentials
@@ -64,10 +66,8 @@ sealed trait AgentApplication:
   def vrns: Option[List[Vrn]]
   def payeRefs: Option[List[PayeRef]]
 
-  /** Indicates whether the entity associated with this application has passed the risking checks. This is set when receiving notification from
-    * agent-registration-risking microservice
-    */
-  def passedRisking: Option[Boolean]
+  def riskingOutcomeApplication: Option[RiskingOutcomeApplication]
+  def riskingOutcomeEntity: Option[RiskingOutcomeEntity]
 
   /* derived stuff: */
   val agentApplicationId: AgentApplicationId = _id
@@ -180,7 +180,8 @@ final case class AgentApplicationSoleTrader(
   override val hasOtherRelevantIndividuals: Option[Boolean],
   override val vrns: Option[List[Vrn]],
   override val payeRefs: Option[List[PayeRef]],
-  override val passedRisking: Option[Boolean]
+  override val riskingOutcomeApplication: Option[RiskingOutcomeApplication],
+  override val riskingOutcomeEntity: Option[RiskingOutcomeEntity]
 )
 extends AgentApplication:
 
@@ -219,7 +220,8 @@ final case class AgentApplicationLlp(
   override val hasOtherRelevantIndividuals: Option[Boolean],
   override val vrns: Option[List[Vrn]],
   override val payeRefs: Option[List[PayeRef]],
-  override val passedRisking: Option[Boolean]
+  override val riskingOutcomeApplication: Option[RiskingOutcomeApplication],
+  override val riskingOutcomeEntity: Option[RiskingOutcomeEntity]
 )
 extends AgentApplication:
 
@@ -254,7 +256,8 @@ final case class AgentApplicationLimitedCompany(
   override val hasOtherRelevantIndividuals: Option[Boolean],
   override val vrns: Option[List[Vrn]],
   override val payeRefs: Option[List[PayeRef]],
-  override val passedRisking: Option[Boolean]
+  override val riskingOutcomeApplication: Option[RiskingOutcomeApplication],
+  override val riskingOutcomeEntity: Option[RiskingOutcomeEntity]
 )
 extends AgentApplication:
 
@@ -289,7 +292,8 @@ final case class AgentApplicationGeneralPartnership(
   override val hasOtherRelevantIndividuals: Option[Boolean],
   override val vrns: Option[List[Vrn]],
   override val payeRefs: Option[List[PayeRef]],
-  override val passedRisking: Option[Boolean]
+  override val riskingOutcomeApplication: Option[RiskingOutcomeApplication],
+  override val riskingOutcomeEntity: Option[RiskingOutcomeEntity]
 )
 extends AgentApplication:
 
@@ -323,7 +327,8 @@ final case class AgentApplicationLimitedPartnership(
   override val hasOtherRelevantIndividuals: Option[Boolean],
   override val vrns: Option[List[Vrn]],
   override val payeRefs: Option[List[PayeRef]],
-  override val passedRisking: Option[Boolean]
+  override val riskingOutcomeApplication: Option[RiskingOutcomeApplication],
+  override val riskingOutcomeEntity: Option[RiskingOutcomeEntity]
 )
 extends AgentApplication:
 
@@ -356,7 +361,8 @@ final case class AgentApplicationScottishLimitedPartnership(
   override val hasOtherRelevantIndividuals: Option[Boolean],
   override val vrns: Option[List[Vrn]],
   override val payeRefs: Option[List[PayeRef]],
-  override val passedRisking: Option[Boolean]
+  override val riskingOutcomeApplication: Option[RiskingOutcomeApplication],
+  override val riskingOutcomeEntity: Option[RiskingOutcomeEntity]
 )
 extends AgentApplication:
 
@@ -389,7 +395,8 @@ final case class AgentApplicationScottishPartnership(
   override val hasOtherRelevantIndividuals: Option[Boolean],
   override val vrns: Option[List[Vrn]],
   override val payeRefs: Option[List[PayeRef]],
-  override val passedRisking: Option[Boolean]
+  override val riskingOutcomeApplication: Option[RiskingOutcomeApplication],
+  override val riskingOutcomeEntity: Option[RiskingOutcomeEntity]
 )
 extends AgentApplication:
 

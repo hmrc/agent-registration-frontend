@@ -49,7 +49,8 @@ trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdGrsBusinessDetail
       hasOtherRelevantIndividuals = None,
       vrns = None,
       payeRefs = None,
-      passedRisking = None
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
 
     val afterGrsDataReceived: AgentApplicationSoleTrader = afterStarted.copy(

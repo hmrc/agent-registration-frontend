@@ -64,7 +64,8 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
       hasOtherRelevantIndividuals = None,
       vrns = None,
       payeRefs = None,
-      passedRisking = None
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
 
     val afterGrsDataReceived: AgentApplicationLlp = afterStarted.copy(

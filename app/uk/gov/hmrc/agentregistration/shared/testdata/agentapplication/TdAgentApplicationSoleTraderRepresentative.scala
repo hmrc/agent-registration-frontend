@@ -49,7 +49,8 @@ trait TdAgentApplicationSoleTraderRepresentative { dependencies: (TdBase & TdGrs
       hasOtherRelevantIndividuals = None,
       vrns = None,
       payeRefs = None,
-      passedRisking = None
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
 
     val afterGrsDataReceived: AgentApplicationSoleTrader = afterStarted.copy(

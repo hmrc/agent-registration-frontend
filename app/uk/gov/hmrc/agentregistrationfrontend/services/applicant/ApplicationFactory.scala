@@ -68,7 +68,8 @@ class ApplicationFactory @Inject() (
       hasOtherRelevantIndividuals = None,
       vrns = None,
       payeRefs = None,
-      passedRisking = None
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
 
   def makeNewAgentApplicationLlp(
@@ -104,7 +105,8 @@ class ApplicationFactory @Inject() (
       hasOtherRelevantIndividuals = None,
       vrns = None,
       payeRefs = None,
-      passedRisking = None
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
 
   def makeNewAgentApplicationLimitedCompany(
@@ -140,7 +142,8 @@ class ApplicationFactory @Inject() (
       hasOtherRelevantIndividuals = None,
       vrns = None,
       payeRefs = None,
-      passedRisking = None
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
 
   def makeNewAgentApplicationGeneralPartnership(
@@ -176,7 +179,8 @@ class ApplicationFactory @Inject() (
       hasOtherRelevantIndividuals = None,
       vrns = None,
       payeRefs = None,
-      passedRisking = None
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
 
   def makeNewAgentApplicationLimitedPartnership(
@@ -212,7 +216,8 @@ class ApplicationFactory @Inject() (
       hasOtherRelevantIndividuals = None,
       vrns = None,
       payeRefs = None,
-      passedRisking = None
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
 
   def makeNewAgentApplicationScottishLimitedPartnership(
@@ -248,7 +253,8 @@ class ApplicationFactory @Inject() (
       hasOtherRelevantIndividuals = None,
       vrns = None,
       payeRefs = None,
-      passedRisking = None
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
 
   def makeNewAgentApplicationScottishPartnership(
@@ -284,5 +290,6 @@ class ApplicationFactory @Inject() (
       hasOtherRelevantIndividuals = None,
       vrns = None,
       payeRefs = None,
-      passedRisking = None
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
