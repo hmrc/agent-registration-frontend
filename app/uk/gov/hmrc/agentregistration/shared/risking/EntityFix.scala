@@ -20,7 +20,7 @@ import play.api.libs.json.Json
 import play.api.libs.json.JsonConfiguration
 import play.api.libs.json.OFormat
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsDetails
-import uk.gov.hmrc.agentregistration.shared.risking.EntityFailure.IsAmls
+import uk.gov.hmrc.agentregistration.shared.risking.EntityFailureHelper.IsAmls
 import uk.gov.hmrc.agentregistration.shared.risking.EntityFailure._3
 import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
 
@@ -36,20 +36,20 @@ object EntityFix:
 
     given isAmlsFormat: OFormat[IsAmls] =
       import play.api.libs.json.*
-      val reads: Reads[EntityFailure.IsAmls] = EntityFailure.format.flatMap:
-        case f: EntityFailure.IsAmls =>
+      val reads: Reads[EntityFailureHelper.IsAmls] = EntityFailure.format.flatMap:
+        case f: EntityFailureHelper.IsAmls =>
           f match
             case f: EntityFailure._3._1.type => Reads.pure(f)
             case f: EntityFailure._3._2.type => Reads.pure(f)
             case f: EntityFailure._3._3.type => Reads.pure(f)
             case f: EntityFailure._3._4.type => Reads.pure(f)
             case f: EntityFailure._3._5.type => Reads.pure(f)
-        case f: EntityFailure.IsNotAmls => Reads(_ => JsError(s"Expected an IsAmls type: $f"))
+        case f: EntityFailureHelper.IsNotAmls => Reads(_ => JsError(s"Expected an IsAmls type: $f"))
         case f: EntityFailure.NonFixable => Reads(_ => JsError(s"Expected an IsAmls type: $f"))
 
       OFormat(
         r = reads,
-        w = OWrites[IsAmls] { (f: EntityFailure.IsAmls) => EntityFailure.format.writes(f) }
+        w = OWrites[IsAmls] { (f: EntityFailureHelper.IsAmls) => EntityFailure.format.writes(f) }
       )
 
     given `_3.AmlsFix`: OFormat[_3.AmlsFix] = Json.format[_3.AmlsFix]
@@ -96,12 +96,12 @@ object EntityFix:
   /** @see [[EntityFailure._3]] */
   object _3:
 
-    /** A fix corresponding to any AMLS entity failure [[EntityFailure.IsAmls]]
+    /** A fix corresponding to any AMLS entity failure [[EntityFailureHelper.IsAmls]]
       *
       * All AMLS failures collapse into this single fix, which additionally requires [[AmlsDetails]] to be supplied by the user.
       */
     final case class AmlsFix(
-      failure: EntityFailure.IsAmls,
+      failure: EntityFailureHelper.IsAmls,
       isConfirmed: Option[Boolean],
       amlsDetails: Option[AmlsDetails]
     )

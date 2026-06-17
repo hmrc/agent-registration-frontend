@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.agentregistration.shared.risking
 
-import uk.gov.hmrc.agentregistration.shared.util.DisjointUnions
-
 import scala.annotation.nowarn
 
 sealed trait EntityFailure
@@ -25,19 +23,6 @@ sealed trait EntityFailure
 object EntityFailure:
 
   export EntityFailureFormats.format
-
-  type IsAmls = (_3._1.type | _3._2.type | _3._3.type | _3._4.type | _3._5.type) & Fixable
-
-  type IsNotAmls =
-    (_4._1.type | _4._2.type | _4._3.type | _4._4.type
-      | _5._1.type | _5._2.type | _5._3.type | _5._4.type | _5._5.type | _5._6.type | _5._7.type
-      | _8._5.type | _8._7.type) & Fixable
-
-  DisjointUnions.prove[
-    Fixable,
-    IsAmls,
-    IsNotAmls
-  ]
 
   sealed trait Fixable
   extends EntityFailure
