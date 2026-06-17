@@ -21,8 +21,6 @@ import play.api.libs.json.JsonConfiguration
 import play.api.libs.json.OFormat
 import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
 
-import java.time.LocalDate
-
 sealed trait RiskingOutcomeEntity
 
 object RiskingOutcomeEntity:
@@ -31,8 +29,7 @@ object RiskingOutcomeEntity:
   extends RiskingOutcomeEntity
 
   final case class FailedFixable(
-    fixes: Seq[EntityFix],
-    correctiveActionExpiryDate: Option[LocalDate]
+    fixes: Seq[EntityFix]
   )
   extends RiskingOutcomeEntity
 

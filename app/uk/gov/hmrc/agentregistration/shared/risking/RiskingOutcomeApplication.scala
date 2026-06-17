@@ -25,7 +25,8 @@ import java.time.LocalDate
 
 final case class RiskingOutcomeApplication(
   riskingCompletedDate: LocalDate,
-  outcome: RiskingOutcomeApplication.Outcome
+  outcome: RiskingOutcomeApplication.Outcome,
+  correctiveActionExpiryDate: Option[LocalDate]
 )
 
 object RiskingOutcomeApplication:

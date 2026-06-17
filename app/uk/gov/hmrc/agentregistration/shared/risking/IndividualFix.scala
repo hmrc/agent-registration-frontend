@@ -110,3 +110,4 @@ object IndividualFix:
       nino: Option[IndividualNino.Provided],
       isConfirmed: Option[Boolean]
     )
+    extends IndividualFix
