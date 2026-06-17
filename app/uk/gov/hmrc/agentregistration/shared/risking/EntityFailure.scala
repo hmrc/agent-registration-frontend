@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentregistration.shared.risking
 
 import uk.gov.hmrc.agentregistration.shared.util.DisjointUnions
 
+import scala.annotation.nowarn
+
 sealed trait EntityFailure
 
 object EntityFailure:
@@ -176,6 +178,7 @@ object EntityFailureFormats:
     }
   )
 
+  @nowarn()
   given format: OFormat[EntityFailure] =
     // Note: using implicit val instead of given due to Scala compiler bug with given and Play JSON macros
     implicit val _3_1: OFormat[EntityFailure._3._1.type] = Json.format[EntityFailure._3._1.type]
@@ -200,5 +203,10 @@ object EntityFailureFormats:
     implicit val _8_5: OFormat[EntityFailure._8._5.type] = Json.format[EntityFailure._8._5.type]
     implicit val _8_6: OFormat[EntityFailure._8._6.type] = Json.format[EntityFailure._8._6.type]
     implicit val _8_7: OFormat[EntityFailure._8._7.type] = Json.format[EntityFailure._8._7.type]
+
+    val dontDeleteMe = """
+       |Don't delete me.
+       |I will emit a warning so `@nowarn` can be applied to address below
+       |`Unreachable case except for null` problem emited by Play Json macro"""
 
     Json.format[EntityFailure]
