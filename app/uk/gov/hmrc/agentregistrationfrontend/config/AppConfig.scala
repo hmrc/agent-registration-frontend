@@ -115,6 +115,8 @@ class AppConfig @Inject() (
   val applicationDecisionLeadTime: FiniteDuration = configuration.get[FiniteDuration]("application-decision-lead-time")
   val daysToSubmitApplication: FiniteDuration = configuration.get[FiniteDuration]("days-to-submit-application")
 
+  val feedbackSurveyGoogleForm: String = ConfigHelper.readConfigAsValidUrlString("urls.feedback-survey-google-form", configuration)
+
   object Upscan:
 
     val maxFileSize: ConfigMemorySize = configuration.underlying.getMemorySize("uploads.max-file-size")
