@@ -203,7 +203,7 @@ object EntityFailureFormats:
     given _8_6: OFormat[EntityFailure._8._6.type] = Json.format[EntityFailure._8._6.type]
     given _8_7: OFormat[EntityFailure._8._7.type] = Json.format[EntityFailure._8._7.type]
 
-    val dontDeleteMe = """
+    """
        |Don't delete me.
        |I will emit a warning so `@nowarn` can be applied to address below
        |`Unreachable case except for null` problem emited by Play Json macro"""
