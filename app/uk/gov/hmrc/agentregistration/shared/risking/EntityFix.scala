@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistration.shared.risking
 import play.api.libs.json.Json
 import play.api.libs.json.JsonConfiguration
 import play.api.libs.json.OFormat
-import uk.gov.hmrc.agentregistration.shared.AmlsDetails
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.risking.EntityFailure.IsAmls
 import uk.gov.hmrc.agentregistration.shared.risking.EntityFailure._3
 import uk.gov.hmrc.agentregistration.shared.util.JsonConfig
@@ -49,7 +49,7 @@ object EntityFix:
         w = OWrites[IsAmls] { (f: EntityFailure.IsAmls) => EntityFailure.format.writes(f) }
       )
 
-    implicit val AmlsFix: OFormat[AmlsFix] = Json.format[AmlsFix]
+    implicit val `_3.AmlsFix`: OFormat[_3.AmlsFix] = Json.format[_3.AmlsFix]
     implicit val `_4._1`: OFormat[_4._1] = Json.format[_4._1]
     implicit val `_4._2`: OFormat[_4._2] = Json.format[_4._2]
     implicit val `_4._3`: OFormat[_4._3] = Json.format[_4._3]
@@ -84,17 +84,20 @@ object EntityFix:
 
 //  def initialFixes(failures: Seq[EntityFailure.Fixable]): Seq[EntityFix] = failures.map(forFix).distinct
 
-  /** A fix corresponding to any AMLS entity failure [[EntityFailure.IsAmls]]
-    *
-    * All AMLS failures collapse into this single fix, which additionally requires [[AmlsDetails]] to be supplied by the user.
-    */
-  final case class AmlsFix(
-    failure: EntityFailure.IsAmls,
-    isConfirmed: Option[Boolean],
-    amlsDetails: Option[AmlsDetails]
-  )
-  extends EntityFix:
-    override def toString = "AmlsFix"
+  /** @see [[EntityFailure._3]] */
+  object _3:
+
+    /** A fix corresponding to any AMLS entity failure [[EntityFailure.IsAmls]]
+      *
+      * All AMLS failures collapse into this single fix, which additionally requires [[AmlsDetails]] to be supplied by the user.
+      */
+    final case class AmlsFix(
+      failure: EntityFailure.IsAmls,
+      isConfirmed: Option[Boolean],
+      amlsDetails: Option[AmlsDetails]
+    )
+    extends EntityFix:
+      override def toString = "AmlsFix"
 
   /** @see [[EntityFailure._4]] */
   object _4:

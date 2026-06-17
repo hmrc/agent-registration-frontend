@@ -98,58 +98,58 @@ extends UnitSpec:
   "serialize and deserialize _5._1" in:
     val json: JsValue = Json.parse(
       // language=JSON
-      """{"type":"_5._1","value":100.0}"""
+      """{"type":"_5._1"}"""
     )
-    Json.toJson[EntityFailure](EntityFailure._5._1(100.0)) shouldBe json
-    json.as[EntityFailure] shouldBe EntityFailure._5._1(100.0)
+    Json.toJson[EntityFailure](EntityFailure._5._1) shouldBe json
+    json.as[EntityFailure] shouldBe EntityFailure._5._1
 
   "serialize and deserialize _5._2" in:
     val json: JsValue = Json.parse(
       // language=JSON
-      """{"type":"_5._2","value":200.0}"""
+      """{"type":"_5._2"}"""
     )
-    Json.toJson[EntityFailure](EntityFailure._5._2(200.0)) shouldBe json
-    json.as[EntityFailure] shouldBe EntityFailure._5._2(200.0)
+    Json.toJson[EntityFailure](EntityFailure._5._2) shouldBe json
+    json.as[EntityFailure] shouldBe EntityFailure._5._2
 
   "serialize and deserialize _5._3" in:
     val json: JsValue = Json.parse(
       // language=JSON
-      """{"type":"_5._3","value":300.0}"""
+      """{"type":"_5._3"}"""
     )
-    Json.toJson[EntityFailure](EntityFailure._5._3(300.0)) shouldBe json
-    json.as[EntityFailure] shouldBe EntityFailure._5._3(300.0)
+    Json.toJson[EntityFailure](EntityFailure._5._3) shouldBe json
+    json.as[EntityFailure] shouldBe EntityFailure._5._3
 
   "serialize and deserialize _5._4" in:
     val json: JsValue = Json.parse(
       // language=JSON
-      """{"type":"_5._4","value":400.0}"""
+      """{"type":"_5._4"}"""
     )
-    Json.toJson[EntityFailure](EntityFailure._5._4(400.0)) shouldBe json
-    json.as[EntityFailure] shouldBe EntityFailure._5._4(400.0)
+    Json.toJson[EntityFailure](EntityFailure._5._4) shouldBe json
+    json.as[EntityFailure] shouldBe EntityFailure._5._4
 
   "serialize and deserialize _5._5" in:
     val json: JsValue = Json.parse(
       // language=JSON
-      """{"type":"_5._5","value":500.0}"""
+      """{"type":"_5._5"}"""
     )
-    Json.toJson[EntityFailure](EntityFailure._5._5(500.0)) shouldBe json
-    json.as[EntityFailure] shouldBe EntityFailure._5._5(500.0)
+    Json.toJson[EntityFailure](EntityFailure._5._5) shouldBe json
+    json.as[EntityFailure] shouldBe EntityFailure._5._5
 
   "serialize and deserialize _5._6" in:
     val json: JsValue = Json.parse(
       // language=JSON
-      """{"type":"_5._6","value":600.0}"""
+      """{"type":"_5._6"}"""
     )
-    Json.toJson[EntityFailure](EntityFailure._5._6(600.0)) shouldBe json
-    json.as[EntityFailure] shouldBe EntityFailure._5._6(600.0)
+    Json.toJson[EntityFailure](EntityFailure._5._6) shouldBe json
+    json.as[EntityFailure] shouldBe EntityFailure._5._6
 
   "serialize and deserialize _5._7" in:
     val json: JsValue = Json.parse(
       // language=JSON
-      """{"type":"_5._7","value":700.0}"""
+      """{"type":"_5._7"}"""
     )
-    Json.toJson[EntityFailure](EntityFailure._5._7(700.0)) shouldBe json
-    json.as[EntityFailure] shouldBe EntityFailure._5._7(700.0)
+    Json.toJson[EntityFailure](EntityFailure._5._7) shouldBe json
+    json.as[EntityFailure] shouldBe EntityFailure._5._7
 
   "serialize and deserialize _7" in:
     val json: JsValue = Json.parse(
