@@ -30,6 +30,7 @@ sealed trait IndividualFix
 
 object IndividualFix:
 
+  @annotation.nowarn("msg=Unreachable case")
   given OFormat[IndividualFix] =
     given JsonConfiguration = JsonConfig.jsonConfiguration
 

@@ -28,6 +28,7 @@ sealed trait EntityFix
 
 object EntityFix:
 
+  @annotation.nowarn("msg=Unreachable case")
   given OFormat[EntityFix] =
     given JsonConfiguration = JsonConfig.jsonConfiguration
 

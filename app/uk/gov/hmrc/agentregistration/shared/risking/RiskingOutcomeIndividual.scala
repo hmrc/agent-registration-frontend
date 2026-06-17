@@ -38,6 +38,7 @@ object RiskingOutcomeIndividual:
   )
   extends RiskingOutcomeIndividual
 
+  @annotation.nowarn("msg=Unreachable case")
   given format: OFormat[RiskingOutcomeIndividual] =
     given JsonConfiguration = JsonConfig.jsonConfiguration
     given OFormat[Approved.type] = Json.format[Approved.type]
