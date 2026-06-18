@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.amls
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.data.Form
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -31,7 +31,7 @@ extends ViewSpec:
 
   val viewTemplate: AmlsSupervisoryBodyPage = app.injector.instanceOf[AmlsSupervisoryBodyPage]
 
-  val form: Form[AmlsCode] = app.injector.instanceOf[AmlsCodeForm].form
+  val form: Form[AmlsSupervisoryBodyCode] = app.injector.instanceOf[AmlsCodeForm].form
 
   def testOptions: Map[String, String] = Map(
     "ATT" -> "Association of TaxationTechnicians (ATT)",

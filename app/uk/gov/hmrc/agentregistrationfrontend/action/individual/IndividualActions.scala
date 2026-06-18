@@ -92,7 +92,7 @@ extends RequestAwareLogging:
       agentApplicationService
         .find(linkId)
         .map:
-          case Some(agentApplication) if agentApplication.hasFinished =>
+          case Some(agentApplication) if agentApplication.isAfterSentForRisking =>
             Redirect(AppRoutes.providedetails.riskingprogress.RiskingProgressController.show(linkId))
           case Some(agentApplication) => request.add[AgentApplication](agentApplication)
           case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
@@ -115,7 +115,7 @@ extends RequestAwareLogging:
       agentApplicationService
         .find(linkId)
         .map:
-          case Some(agentApplication) if agentApplication.hasFinished => request.add[AgentApplication](agentApplication)
+          case Some(agentApplication) if agentApplication.isAfterSentForRisking => request.add[AgentApplication](agentApplication)
           case Some(agentApplication) => Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId))
           case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
     )

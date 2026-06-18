@@ -166,7 +166,8 @@ extends FrontendController(mcc, applicantActions):
     then
       agentRegistrationRiskingService.submitForRisking(
         agentApplication = agentApplication,
-        individuals = individuals
+        individuals = individuals,
+        arn = None
       )
     else Future.unit
 

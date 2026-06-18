@@ -99,8 +99,8 @@ extends ControllerSpec:
     TestCaseForAmlsRegistrationNumber(
       application = agentApplication.nonHmrcAfterSupervisoryBodySelected,
       updatedApplication = agentApplication.nonHmrcAfterRegistrationNumberProvided,
-      amlsType = "non-HMRC",
-      validInput = "NONHMRC-REF-AMLS-NUMBER-00001",
+      amlsType = "ATT",
+      validInput = "ATT AML-1234-123456",
       invalidInput = ";</\\>",
       nextPage = AppRoutes.apply.amls.CheckYourAnswersController.show.url
     )
@@ -213,7 +213,7 @@ extends ControllerSpec:
     doc.title() shouldBe ExpectedStrings.title
     doc
       .select(s"input[name='${AmlsRegistrationNumberForm.key}']")
-      .attr("value") shouldBe "NONHMRC-REF-AMLS-NUMBER-00001"
+      .attr("value") shouldBe "ATT AML-1234-123456"
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path when amls details are missing should redirect to supervisory body page" in:

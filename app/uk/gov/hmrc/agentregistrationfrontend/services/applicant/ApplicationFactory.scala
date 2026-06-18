@@ -67,7 +67,9 @@ class ApplicationFactory @Inject() (
       hmrcStandardForAgentsAgreed = StateOfAgreement.NotSet,
       hasOtherRelevantIndividuals = None,
       vrns = None,
-      payeRefs = None
+      payeRefs = None,
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
 
   def makeNewAgentApplicationLlp(
@@ -102,7 +104,9 @@ class ApplicationFactory @Inject() (
       numberOfIndividuals = None,
       hasOtherRelevantIndividuals = None,
       vrns = None,
-      payeRefs = None
+      payeRefs = None,
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
 
   def makeNewAgentApplicationLimitedCompany(
@@ -137,7 +141,9 @@ class ApplicationFactory @Inject() (
       numberOfIndividuals = None,
       hasOtherRelevantIndividuals = None,
       vrns = None,
-      payeRefs = None
+      payeRefs = None,
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
 
   def makeNewAgentApplicationGeneralPartnership(
@@ -172,7 +178,9 @@ class ApplicationFactory @Inject() (
       numberOfIndividuals = None,
       hasOtherRelevantIndividuals = None,
       vrns = None,
-      payeRefs = None
+      payeRefs = None,
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
 
   def makeNewAgentApplicationLimitedPartnership(
@@ -207,7 +215,9 @@ class ApplicationFactory @Inject() (
       numberOfIndividuals = None,
       hasOtherRelevantIndividuals = None,
       vrns = None,
-      payeRefs = None
+      payeRefs = None,
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
 
   def makeNewAgentApplicationScottishLimitedPartnership(
@@ -242,7 +252,9 @@ class ApplicationFactory @Inject() (
       numberOfIndividuals = None,
       hasOtherRelevantIndividuals = None,
       vrns = None,
-      payeRefs = None
+      payeRefs = None,
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )
 
   def makeNewAgentApplicationScottishPartnership(
@@ -277,5 +289,7 @@ class ApplicationFactory @Inject() (
       numberOfIndividuals = None,
       hasOtherRelevantIndividuals = None,
       vrns = None,
-      payeRefs = None
+      payeRefs = None,
+      riskingOutcomeApplication = None,
+      riskingOutcomeEntity = None
     )

@@ -19,27 +19,29 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.amls
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import play.api.data.Form
-import uk.gov.hmrc.agentregistration.shared.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.amls.AmlsRegistrationNumberPage
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsRegistrationNumber
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
 
 class AmlsRegistrationNumberPageSpec
 extends ViewSpec:
 
   val viewTemplate: AmlsRegistrationNumberPage = app.injector.instanceOf[AmlsRegistrationNumberPage]
+  val testAmlsCode: AmlsSupervisoryBodyCode = AmlsSupervisoryBodyCode("Test-AMLS-Code")
 
   val doc: Document = Jsoup.parse(
     viewTemplate(
-      AmlsRegistrationNumberForm(isHmrc = false).form
+      AmlsRegistrationNumberForm(testAmlsCode).form
     ).body
   )
+
   private val heading: String = "What is the registration number?"
 
   "AmlsRegistrationNumberPage view" should:
-
     "contain expected content" in:
       doc.mainContent shouldContainContent
         """
@@ -78,7 +80,7 @@ extends ViewSpec:
     "render an error message when form has errors" in:
       val field: String = AmlsRegistrationNumberForm.key
       val errorMessage: String = "Enter your registration number"
-      val formWithError: Form[AmlsRegistrationNumber] = AmlsRegistrationNumberForm(isHmrc = false).form
+      val formWithError: Form[AmlsRegistrationNumber] = AmlsRegistrationNumberForm(testAmlsCode).form
         .withError(field, errorMessage)
       val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
       errorDoc.mainContent shouldContainContent

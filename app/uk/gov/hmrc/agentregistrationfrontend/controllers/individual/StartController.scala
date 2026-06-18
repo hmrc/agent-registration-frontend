@@ -44,7 +44,7 @@ extends FrontendController(mcc, actions):
       implicit request =>
         val genericExitPageUrl: String = AppRoutes.apply.AgentApplicationController.genericExitPage.url
         applicationService.find(linkId).map {
-          case Some(agentApplication) if agentApplication.hasFinished =>
+          case Some(agentApplication) if agentApplication.isAfterSentForRisking =>
             logger.info(s"the application for linkId $linkId has finished, redirecting to get status")
             Redirect(AppRoutes.providedetails.riskingprogress.RiskingProgressController.show(linkId))
           case Some(agentApplication) =>

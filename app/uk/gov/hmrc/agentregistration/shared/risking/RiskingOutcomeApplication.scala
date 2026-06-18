@@ -14,20 +14,30 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared
+package uk.gov.hmrc.agentregistration.shared.risking
 
 import play.api.libs.json.Format
+import play.api.libs.json.OFormat
+import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.util.JsonFormatsFactory
 
-final case class Arn(value: String)
+import java.time.LocalDate
 
-object Arn:
+final case class RiskingOutcomeApplication(
+  riskingCompletedDate: LocalDate,
+  outcome: RiskingOutcomeApplication.Outcome,
+  correctiveActionExpiryDate: Option[LocalDate]
+)
 
-  given Format[Arn] = JsonFormatsFactory.makeValueClassFormat
+object RiskingOutcomeApplication:
 
-  private val arnPattern = "^[A-Z]ARN[0-9]{7}$".r
+  enum Outcome:
 
-  def isValid(arn: String): Boolean =
-    arn match
-      case arnPattern(_*) => true
-      case _ => false
+    case Approved
+    case FailedFixable
+    case FailedNonFixable
+
+  object Outcome:
+    given Format[Outcome] = JsonFormatsFactory.makeEnumFormat[Outcome]
+
+  given OFormat[RiskingOutcomeApplication] = Json.format[RiskingOutcomeApplication]

@@ -21,6 +21,9 @@
 @import uk.gov.hmrc.govukfrontend.views.html.components._
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
 @import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.isSignedIn
+@import uk.gov.hmrc.hmrcfrontend.views.config.StandardBetaBanner
+@import views.html.helper.CSPNonce
+
 
 @this(
         appConfig: AppConfig,
@@ -30,7 +33,8 @@
         govukErrorSummary: GovukErrorSummary,
         autocompleteCss: HmrcAccessibleAutocompleteCss,
         autocompleteJavascript: HmrcAccessibleAutocompleteJavascript,
-        govukServiceNavigation: GovukServiceNavigation
+        govukServiceNavigation: GovukServiceNavigation,
+        standardBetaBanner: StandardBetaBanner
 )
 
 @(
@@ -52,6 +56,7 @@
         )
     }
     @autocompleteCss()
+    <style @{CSPNonce.attr}>.govuk-phase-banner__content__tag { display: none!important; }</style>
     @templateStyles.getOrElse(Html(""))
 }
 @additionalScripts = {
@@ -92,6 +97,7 @@
           serviceName = Some(messages("service.name")),
           serviceUrl = Some(appConfig.govukStartPageUrl)
       )),
+    banners = Banners(phaseBanner = Some(standardBetaBanner(url = s"${appConfig.feedbackSurveyGoogleForm}${request.uri}"))),
       templateOverrides = TemplateOverrides(
           additionalHeadBlock = Some(head),
           additionalScriptsBlock = Some(additionalScripts)

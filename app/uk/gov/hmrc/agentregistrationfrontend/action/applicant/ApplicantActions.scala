@@ -40,7 +40,6 @@ import uk.gov.hmrc.agentregistrationfrontend.audit.AuditService
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.getCurrentSessionId
 import uk.gov.hmrc.auth.core.retrieve.Credentials
@@ -79,7 +78,6 @@ class ApplicantActions @Inject() (
   authorisedActionRefiner: ApplicantAuthRefiner,
   agentApplicationService: AgentApplicationService,
   businessPartnerRecordService: BusinessPartnerRecordService,
-  agentRegistrationRiskingService: AgentRegistrationRiskingService,
   auditService: AuditService
 )(using ExecutionContext)
 extends RequestAwareLogging:
@@ -125,7 +123,7 @@ extends RequestAwareLogging:
 
   def getApplicationInProgress: ActionBuilderWithData[DataWithApplication] = getApplication
     .ensure(
-      condition = _.get[AgentApplication].isInProgress,
+      condition = _.get[AgentApplication].isBeforeSentForRisking,
       resultWhenConditionNotMet =
         implicit request =>
           val call = AppRoutes.apply.AgentApplicationController.applicationStatus
@@ -137,10 +135,10 @@ extends RequestAwareLogging:
           Redirect(call.url)
     )
 
-  val getApplicationSubmitted: ActionBuilderWithData[DataWithApplicationAndBpr] =
+  val getApplicationAfterSentForRisking: ActionBuilderWithData[DataWithApplicationAndBpr] =
     getApplication
       .ensure(
-        condition = _.agentApplication.hasFinished,
+        condition = _.agentApplication.isAfterSentForRisking,
         resultWhenConditionNotMet =
           implicit request =>
             // TODO: this is a temporary solution and should be revisited once we have full journey implemented
@@ -153,14 +151,6 @@ extends RequestAwareLogging:
             Redirect(call.url)
       )
       .getBusinessPartnerRecord
-
-  val getRiskingProgress: ActionBuilderWithData[DataWithRiskingProgress] = getApplicationSubmitted
-    .refine(implicit request =>
-      agentRegistrationRiskingService
-        .getRiskingProgress(request.agentApplication.applicationReference)
-        .map: riskingProgress =>
-          request.add[RiskingProgress](riskingProgress)
-    )
 
   extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
 

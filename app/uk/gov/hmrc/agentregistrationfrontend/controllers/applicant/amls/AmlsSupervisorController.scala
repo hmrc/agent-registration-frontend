@@ -21,9 +21,11 @@ import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.AmlsCode
-import uk.gov.hmrc.agentregistration.shared.AmlsDetails
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsDetails
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
@@ -32,6 +34,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.amls.AmlsSuper
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.Future
 
 @Singleton
 class AmlsSupervisorController @Inject() (
@@ -46,13 +49,14 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] = actions
     .getApplicationInProgress
     .getBusinessPartnerRecord:
-      implicit request =>
-        val form: Form[AmlsCode] = amlsCodeForm.form.fill(request
-          .agentApplication
-          .amlsDetails
-          .map(_.supervisoryBody))
+      implicit request: RequestWithData[BusinessPartnerRecordResponse *: DataWithApplication] =>
         Ok(view(
-          form = form,
+          form = amlsCodeForm.form.fill:
+            request
+              .agentApplication
+              .amlsDetails
+              .map(_.supervisoryBody)
+          ,
           entityName = request.get[BusinessPartnerRecordResponse].getEntityName
         ))
 
@@ -61,37 +65,40 @@ extends FrontendController(mcc, actions):
       .getApplicationInProgress
       .getBusinessPartnerRecord
       .ensureValidFormAndRedirectIfSaveForLater(
-        amlsCodeForm.form,
-        implicit request =>
-          formWithErrors =>
-            view(
-              form = formWithErrors,
-              entityName = request.get[BusinessPartnerRecordResponse].getEntityName
-            )
+        form = amlsCodeForm.form,
+        resultToServeWhenFormHasErrors =
+          implicit request =>
+            (formWithErrors: Form[AmlsSupervisoryBodyCode]) =>
+              view(
+                form = formWithErrors,
+                entityName = request.get[BusinessPartnerRecordResponse].getEntityName
+              )
       )
       .async:
-        implicit request =>
-          val supervisoryBody: AmlsCode = request.get
-
-          applicationService
-            .upsert(
-              request.agentApplication
-                .modify(_.amlsDetails)
-                .using {
-                  case Some(details) =>
-                    Some(details
-                      .modify(_.supervisoryBody)
-                      .setTo(supervisoryBody)
-                      .modify(_.amlsRegistrationNumber)
-                      .setTo(None) // Clear AMLS registration number when supervisory body changes as the format is dependent on the body
-                    )
-                  case None =>
-                    Some(AmlsDetails(
-                      supervisoryBody = supervisoryBody,
-                      amlsRegistrationNumber = None,
-                      amlsEvidence = None
-                    ))
-                }
-            )
-            .map(_ => Redirect(AppRoutes.apply.amls.CheckYourAnswersController.show.url))
+        implicit request: RequestWithData[AmlsSupervisoryBodyCode *: BusinessPartnerRecordResponse *: DataWithApplication] =>
+          val supervisoryBody: AmlsSupervisoryBodyCode = request.get
+          val agentApplication: AgentApplication = request.get
+          if agentApplication.amlsDetails.exists(_.supervisoryBody === supervisoryBody) &&
+            agentApplication.getAmlsDetails.amlsRegistrationNumber.isDefined
+          then
+            Future.successful(Redirect(AppRoutes.apply.amls.CheckYourAnswersController.show.url)) // if same body is submitted and there is already a registration number then use CYA for navigation
+          else
+            applicationService
+              .upsert(
+                agentApplication
+                  .modify(_.amlsDetails)
+                  .using:
+                    case Some(details: AmlsDetails) =>
+                      Some(details
+                        .modify(_.supervisoryBody).setTo(supervisoryBody)
+                        .modify(_.amlsRegistrationNumber).setTo(None) // Clear AMLS registration number when supervisory body changes as the format is dependent on the body
+                      )
+                    case None =>
+                      Some(AmlsDetails(
+                        supervisoryBody = supervisoryBody,
+                        amlsRegistrationNumber = None,
+                        amlsEvidence = None
+                      ))
+              )
+              .map(_ => Redirect(AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url))
       .redirectIfSaveForLater
