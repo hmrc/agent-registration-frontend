@@ -98,24 +98,23 @@ object ApplyStubHelper:
     verifyConnectorsToSupplyBprToPage(Some(agentApplication.getUtr))
     AgentRegistrationRiskingStubs.verifyGetApplicationRiskingResponse(agentApplication.applicationReference)
 
-  def stubsForTaskListPage(
+  def stubsForApplicationBprAndIndividuals(
     application: AgentApplication,
     individuals: List[IndividualProvidedDetails]
   ): StubMapping =
     stubsToSupplyBprToPage(application)
     AgentRegistrationStubs.stubFindIndividualsForApplication(application.agentApplicationId, individuals)
 
-  def verifyConnectorsForTaskListPage(agentApplication: AgentApplication): Unit =
+  def verifyConnectorsForApplicationBprAndIndividuals(agentApplication: AgentApplication): Unit =
     verifyConnectorsToSupplyBprToPage(Some(agentApplication.getUtr))
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.agentApplicationId)
 
-  def stubsForApplicationStatus(
-    agentApplication: AgentApplication,
+  def stubsForApplicationBprAndIndividualsAndRisking(
+    application: AgentApplication,
     individuals: List[IndividualProvidedDetails]
   ): StubMapping =
-    stubsToSupplyBprToPage(agentApplication)
-    AgentRegistrationStubs.stubFindIndividualsForApplication(agentApplication.agentApplicationId, individuals)
-    // TODO: remove the risking response stub when we turn on feature flag for FixableFailures
-    //  we don't need this call anymore but the application status page still calls it until we turn on the fixable failures feature
-    //  so we need to stub it - the actual progress value doesn't matter for the application status page so we can just return ReadyForSubmission
-    AgentRegistrationRiskingStubs.stubGetApplicationRiskingResponse(agentApplication.applicationReference, RiskingProgress.ReadyForSubmission)
+    stubsToSupplyBprToPage(application)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(application.agentApplicationId, individuals)
+    // we don't need this when the fixable-failures feature is enabled, but it needs to be part of the request data until we can turn the flag on permanently
+    // the type of risking progress doesn't matter as it's not consumed
+    AgentRegistrationRiskingStubs.stubGetApplicationRiskingResponse(application.applicationReference, RiskingProgress.SubmittedForRisking)

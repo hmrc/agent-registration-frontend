@@ -24,7 +24,6 @@ import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 
 class FixableTaskListControllerSpec
 extends ControllerSpec:
@@ -60,9 +59,8 @@ extends ControllerSpec:
       case _: AmlsFix => true
       case _ => false
     }
-    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.riskingCompletedFixable)
-    AgentRegistrationStubs.stubFindIndividualsForApplication(
-      agentApplicationId = agentApplication.riskingCompletedFixable.agentApplicationId,
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(
+      application = agentApplication.riskingCompletedFixable,
       individuals = List(
         tdAll.providedDetails.afterFinished.copy(riskingOutcomeIndividual =
           Some(RiskingOutcomeIndividual.FailedFixable(
@@ -83,5 +81,4 @@ extends ControllerSpec:
       doc.getTaskStatus(tasks.entityFailures(index + 1)) shouldBe Constants.INCOMPLETE
     doc.getTaskStatus(tasks.checkProgressOfIndividuals) shouldBe Constants.INCOMPLETE
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
-    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
-    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.riskingCompletedFixable.agentApplicationId)
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(agentApplication.riskingCompletedFixable)

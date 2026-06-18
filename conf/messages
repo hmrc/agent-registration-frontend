@@ -1110,14 +1110,36 @@ fixableTaskList.EntityFix.8.5.linkText = Unpaid relevant anti-avoidance penalty 
 fixableTaskList.EntityFix.8.7.linkText = Unpaid relevant anti-avoidance penalty liability
 fixableTaskList.IndividualsHaveFailures.linkText = We are awaiting information from these people
 
-fixableDetails.EntityFailure.3.1.heading = We could not match your details with a current record
-fixableDetails.EntityFailure.3.1.heading.SoleTrader = We could not match your details with a current record
-fixableDetails.EntityFailure.3.2.heading = We have not been able to confirm your anti-money laundering supervision
-fixableDetails.EntityFailure.3.2.heading.SoleTrader = We have not been able to confirm your anti-money laundering supervision
-fixableDetails.EntityFailure.3.3.heading = We could not accept your evidence
-fixableDetails.EntityFailure.3.3.heading.SoleTrader = We could not accept your evidence
-fixableDetails.EntityFailure.3.5.heading = Your membership does not include anti-money laundering supervision
-fixableDetails.EntityFailure.3.5.heading.SoleTrader = Your membership does not include anti-money laundering supervision
+fixableAmlsDetails.EntityFailure.3.1.heading = We could not match your details with a current record
+fixableAmlsDetails.EntityFailure.3.1.p1 = You told us that {0} is supervised by {1} for anti-money laundering.
+fixableAmlsDetails.EntityFailure.3.1.p2 = The registration number you gave was {0}.
+fixableAmlsDetails.EntityFailure.3.1.p3 = However, this number is not in {0}’s register.
+fixableAmlsDetails.EntityFailure.3.1.p4 = Please check your details and try again.
+
+fixableAmlsDetails.EntityFailure.3.2.heading = We have not been able to confirm your anti-money laundering supervision
+fixableAmlsDetails.EntityFailure.3.2.p1 = You gave us these supervisory details for {0}:
+fixableAmlsDetails.EntityFailure.3.2.bullet1 = {0}
+fixableAmlsDetails.EntityFailure.3.2.bullet2 = registration number: {0}
+fixableAmlsDetails.EntityFailure.3.2.p2 = We could not find a record of this supervision.
+fixableAmlsDetails.EntityFailure.3.2.p3 = One or more of the details you provided might be incorrect.
+fixableAmlsDetails.EntityFailure.3.2.p4 = Please check your details and try again.
+
+fixableAmlsDetails.EntityFailure.3.3.heading = We could not accept your evidence
+fixableAmlsDetails.EntityFailure.3.3.p1 = The evidence you uploaded did not meet our requirements.
+fixableAmlsDetails.EntityFailure.3.3.p2 = It did not prove that {0} is the current anti-money laundering supervisor for {1}.
+fixableAmlsDetails.EntityFailure.3.3.p3 = This might be because the document did not contain:
+fixableAmlsDetails.EntityFailure.3.3.bullet1 = the name of your business
+fixableAmlsDetails.EntityFailure.3.3.bullet2 = a date to prove you paid the supervision fee within the last 12 months
+fixableAmlsDetails.EntityFailure.3.3.bullet3 = the name of the supervisory body
+fixableAmlsDetails.EntityFailure.3.3.bullet4 = clear enough writing to be read easily
+fixableAmlsDetails.EntityFailure.3.3.p4 = You need to upload the evidence we require on the next page.
+
+fixableAmlsDetails.EntityFailure.3.5.heading = Your membership does not include anti-money laundering supervision
+fixableAmlsDetails.EntityFailure.3.5.p1 = You gave us these supervisory details for {0}:
+fixableAmlsDetails.EntityFailure.3.5.bullet1 = {0}
+fixableAmlsDetails.EntityFailure.3.5.bullet2 = registration number: {0}
+fixableAmlsDetails.EntityFailure.3.5.p2 = These records are for student membership. A student membership does not provide the level of anti-money laundering supervision you need as an agent with HMRC.
+fixableAmlsDetails.EntityFailure.3.5.p3 = You need to confirm that {0} has membership of a professional body that includes anti-money laundering supervision.
 
 fixableDetails.EntityFix.4.1.heading = Self Assessment returns for {0}
 fixableDetails.EntityFix.4.1.heading.SoleTrader = Your Self Assessment returns

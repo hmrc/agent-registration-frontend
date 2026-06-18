@@ -20,6 +20,7 @@ import play.api.data.Form
 import play.api.data.FormBinding
 import play.api.mvc.*
 import play.api.mvc.Results.BadRequest
+import play.api.mvc.Results.NotFound
 import play.twirl.api.HtmlFormat
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions.*
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.SubmissionHelper
@@ -154,3 +155,8 @@ extends RequestAwareLogging:
           case p => Future.successful(Right(p.asInstanceOf[RequestWithDataCt[A, NewData]]))
       }
     })
+
+    def behindFeatureFlag(featureFlagIsOn: Boolean): ActionBuilderWithData[Data] = ensure(
+      condition = _ => featureFlagIsOn,
+      resultWhenConditionNotMet = _ => NotFound
+    )

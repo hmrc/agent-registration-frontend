@@ -78,8 +78,8 @@ extends ControllerSpec:
     response.header("Location").value shouldBe AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url
 
   s"GET $applicationStatusPath should check the latest status and render the confirmation page when status is SentForRisking" in:
-    ApplyStubHelper.stubsForApplicationStatus(
-      agentApplication = agentApplication.submitted,
+    ApplyStubHelper.stubsForApplicationBprAndIndividualsAndRisking(
+      application = agentApplication.submitted,
       individuals = List(
         tdAll.providedDetails.afterFinished
       )
@@ -91,8 +91,8 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $applicationStatusPath should render the in-progress page when status is SentToMinerva" in:
-    ApplyStubHelper.stubsForApplicationStatus(
-      agentApplication = agentApplication.sentToMinerva,
+    ApplyStubHelper.stubsForApplicationBprAndIndividualsAndRisking(
+      application = agentApplication.sentToMinerva,
       individuals = List(
         tdAll.providedDetails.afterFinished
       )
@@ -103,8 +103,8 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $applicationStatusPath should render the failed non-fixable page when status is RiskingCompleted and overall outcome is FailedNonFixable" in:
-    ApplyStubHelper.stubsForApplicationStatus(
-      agentApplication = agentApplication.riskingCompletedFailedNonFixable,
+    ApplyStubHelper.stubsForApplicationBprAndIndividualsAndRisking(
+      application = agentApplication.riskingCompletedFailedNonFixable,
       individuals = List(
         tdAll.providedDetails.afterFinished
       )
@@ -117,8 +117,8 @@ extends ControllerSpec:
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $applicationStatusPath should render the fixable failures start page when status is FailedFixable" in:
-    ApplyStubHelper.stubsForApplicationStatus(
-      agentApplication = agentApplication.riskingCompletedFixable,
+    ApplyStubHelper.stubsForApplicationBprAndIndividualsAndRisking(
+      application = agentApplication.riskingCompletedFixable,
       individuals = List(
         tdAll.providedDetails.afterFinished.copy(riskingOutcomeIndividual =
           Some(RiskingOutcomeIndividual.FailedFixable(

@@ -76,11 +76,20 @@ object Actions:
       }
 
   extension (a: Action[AnyContent])(using ec: ExecutionContext)
+
     /** Modifies the action result to handle "Save and Come Back Later" functionality. If the form submission contains a "Save and Come Back Later" action,
       * redirects to the Save and Come Back Later page. Otherwise, returns the original result unchanged.
       */
     def redirectIfSaveForLater: Action[AnyContent] = a.mapResult(request =>
       originalResult =>
-        if SubmissionHelper.getSubmitAction(request).isSaveAndComeBackLater then Redirect(AppRoutes.apply.SaveForLaterController.show)
+        if SubmissionHelper.getSubmitAction(request).isSaveAndComeBackLater
+        then Redirect(AppRoutes.apply.SaveForLaterController.show)
+        else originalResult
+    )
+
+    def redirectIfFixableSaveForLater: Action[AnyContent] = a.mapResult(request =>
+      originalResult =>
+        if SubmissionHelper.getSubmitAction(request).isSaveAndComeBackLater
+        then Redirect(AppRoutes.fixablefailures.SaveForLaterController.show)
         else originalResult
     )

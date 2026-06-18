@@ -48,7 +48,7 @@ extends ControllerSpec:
     )
 
   s"GET $path for limited company afterGlobalAsaEnrolmentCheckPass should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(tdAll.agentApplicationGeneralPartnership.afterGlobalAsaEnrolmentCheckPass, List.empty)
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(tdAll.agentApplicationGeneralPartnership.afterGlobalAsaEnrolmentCheckPass, List.empty)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -63,10 +63,10 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.shareLinkWithIndividuals) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.checkProgressOfIndividuals) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
-    ApplyStubHelper.verifyConnectorsForTaskListPage(baseApplication)
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(baseApplication)
 
   s"GET $path for limited company afterContactDetailsComplete should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(tdAll.agentApplicationGeneralPartnership.afterContactDetailsComplete, List.empty)
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(tdAll.agentApplicationGeneralPartnership.afterContactDetailsComplete, List.empty)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -81,10 +81,10 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.shareLinkWithIndividuals) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.checkProgressOfIndividuals) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
-    ApplyStubHelper.verifyConnectorsForTaskListPage(baseApplication)
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(baseApplication)
 
   s"GET $path for limited company afterAgentDetailsComplete should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(tdAll.agentApplicationGeneralPartnership.afterAgentDetailsComplete, List.empty)
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(tdAll.agentApplicationGeneralPartnership.afterAgentDetailsComplete, List.empty)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -99,10 +99,10 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.shareLinkWithIndividuals) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.checkProgressOfIndividuals) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
-    ApplyStubHelper.verifyConnectorsForTaskListPage(baseApplication)
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(baseApplication)
 
   s"GET $path for limited company afterAmlsComplete should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(tdAll.agentApplicationGeneralPartnership.afterAmlsComplete, List.empty)
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(tdAll.agentApplicationGeneralPartnership.afterAmlsComplete, List.empty)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -117,10 +117,10 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.shareLinkWithIndividuals) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.checkProgressOfIndividuals) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
-    ApplyStubHelper.verifyConnectorsForTaskListPage(baseApplication)
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(baseApplication)
 
   s"GET $path for limited company afterHmrcStandardForAgentsAgreed should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(tdAll.agentApplicationGeneralPartnership.afterHmrcStandardForAgentsAgreed, List.empty)
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(tdAll.agentApplicationGeneralPartnership.afterHmrcStandardForAgentsAgreed, List.empty)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -135,10 +135,10 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.shareLinkWithIndividuals) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.checkProgressOfIndividuals) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
-    ApplyStubHelper.verifyConnectorsForTaskListPage(baseApplication)
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(baseApplication)
 
   s"GET $path for limited company after building the list of individuals to sign in should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(
       application = tdAll.agentApplicationGeneralPartnership.afterConfirmOtherRelevantIndividualsNo,
       individuals = List(
         tdAll.providedDetails.precreated.copy(individualName = IndividualName("Steve Austin")),
@@ -160,10 +160,10 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.shareLinkWithIndividuals) shouldBe Constants.INCOMPLETE // becomes INCOMPLETE
     doc.getTaskStatus(tasks.checkProgressOfIndividuals) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
-    ApplyStubHelper.verifyConnectorsForTaskListPage(baseApplication)
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(baseApplication)
 
   s"GET $path for limited company after ask individuals to sign in should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(
       application = tdAll.agentApplicationGeneralPartnership.afterConfirmOtherRelevantIndividualsNo,
       individuals = List(
         tdAll.providedDetails.afterAccessConfirmed.copy(
@@ -191,10 +191,10 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.shareLinkWithIndividuals) shouldBe Constants.COMPLETED // becomes COMPLETED
     doc.getTaskStatus(tasks.checkProgressOfIndividuals) shouldBe Constants.INCOMPLETE // becomes INCOMPLETE
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
-    ApplyStubHelper.verifyConnectorsForTaskListPage(baseApplication)
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(baseApplication)
 
   s"GET $path for limited company after all individuals provided details should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(
       application = tdAll.agentApplicationGeneralPartnership.afterConfirmOtherRelevantIndividualsNo,
       individuals = List(
         tdAll.providedDetails.afterFinished.copy(
@@ -222,4 +222,4 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.shareLinkWithIndividuals) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.checkProgressOfIndividuals) shouldBe Constants.COMPLETED // becomes COMPLETED
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.INCOMPLETE // becomes INCOMPLETE
-    ApplyStubHelper.verifyConnectorsForTaskListPage(baseApplication)
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(baseApplication)

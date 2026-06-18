@@ -62,7 +62,6 @@
     TaskListItemStatus(content = Text(messages("taskList.status.CannotStartYet")))
 }
 
-@amlsStatus = @{incomplete}
 @listTrackingStatus = @{
     if(taskListStatus.individualFailures.exists(_.isComplete)) complete
     else if(taskListStatus.individualFailures.exists(_.canStart)) incomplete
@@ -88,8 +87,8 @@
                 title = TaskListItemTitle(
                   content = Text(messages(s"$key.amlsDetails.linkText"))
                 ),
-                status = amlsStatus,
-                href = Some(AppRoutes.fixablefailures.amls.FixableAmlsDetailsController.show(k).url)
+                status = if(v.isComplete) complete else incomplete,
+                href = Some(AppRoutes.fixablefailures.amlsfailure.FixableAmlsDetailsController.show(k).url)
               )
             },
             idPrefix = "amlsDetails"

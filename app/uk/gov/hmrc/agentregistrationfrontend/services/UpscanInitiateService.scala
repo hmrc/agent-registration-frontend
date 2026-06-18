@@ -35,15 +35,36 @@ class UpscanInitiateService @Inject() (
 )
 extends RequestAwareLogging:
 
-  def initiate(uploadId: UploadId)(using RequestHeader): Future[UpscanInitiateConnector.UpscanInitiateResponse] = upscanInitiateConnector.initiate(
-    redirectOnSuccessUrl = uri"${appConfig.thisFrontendBaseUrl + AppRoutes.apply.amls.AmlsEvidenceUploadController.showUploadResult.url}",
-    redirectOnErrorUrl =
-      uri"${appConfig.thisFrontendBaseUrl + AppRoutes.apply.amls.AmlsEvidenceUploadController.showError(
+  def initiate(
+    uploadId: UploadId,
+    isFix: Boolean
+  )(using RequestHeader): Future[UpscanInitiateConnector.UpscanInitiateResponse] = {
+    val successUrl: String =
+      if isFix
+      then AppRoutes.fixablefailures.amlsfailure.AmlsEvidenceUploadController.showUploadResult.url
+      else AppRoutes.apply.amls.AmlsEvidenceUploadController.showUploadResult.url
+
+    val errorUrl: String =
+      if isFix
+      then
+        AppRoutes.fixablefailures.amlsfailure.AmlsEvidenceUploadController.showError(
           errorCode = None,
           errorMessage = None,
           errorRequestId = None,
           key = None
-        ).url}",
-    callbackUrl = uri"${appConfig.selfBaseUrl + AppRoutes.apply.amls.api.NotificationFromUpscanController.processNotificationFromUpscan(uploadId).url}",
-    maxFileSize = appConfig.Upscan.maxFileSize
-  )
+        ).url
+      else
+        AppRoutes.apply.amls.AmlsEvidenceUploadController.showError(
+          errorCode = None,
+          errorMessage = None,
+          errorRequestId = None,
+          key = None
+        ).url
+
+    upscanInitiateConnector.initiate(
+      redirectOnSuccessUrl = uri"${appConfig.thisFrontendBaseUrl + successUrl}",
+      redirectOnErrorUrl = uri"${appConfig.thisFrontendBaseUrl + errorUrl}",
+      callbackUrl = uri"${appConfig.selfBaseUrl + AppRoutes.apply.amls.api.NotificationFromUpscanController.processNotificationFromUpscan(uploadId).url}",
+      maxFileSize = appConfig.Upscan.maxFileSize
+    )
+  }
