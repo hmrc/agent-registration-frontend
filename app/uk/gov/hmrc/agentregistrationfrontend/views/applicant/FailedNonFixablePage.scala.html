@@ -110,8 +110,8 @@
     @if(entityFailuresResolvedAsSet.size <= 1) {
       <p class="govuk-body">@messages(s"$entityListKey.SingleIndividualFailures$businessTypeSuffix", entityName)</p>
     } else {
+      <p class="govuk-body">@messages(s"$key.p2")</p>
       <ul id="entity-reasons" class="govuk-list govuk-list--bullet">
-        <p class="govuk-body">@messages(s"$key.p2")</p>
         <li>@messages(s"$entityListKey.AnyIndividualFailures$businessTypeSuffix", entityName)</li>
         @entityFailuresResolvedAsSet.map(f => <li>{f}</li>)
       </ul>
