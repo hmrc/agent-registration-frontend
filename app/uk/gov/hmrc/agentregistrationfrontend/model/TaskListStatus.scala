@@ -27,6 +27,13 @@ final case class TaskListStatus(
   declaration: TaskStatus
 )
 
+final case class FixableTaskListStatus(
+  amlsDetails: Map[String, TaskStatus] = Map.empty,
+  entityFailures: Map[String, TaskStatus] = Map.empty,
+  individualFailures: Option[TaskStatus],
+  declaration: TaskStatus
+)
+
 final case class TaskStatus(
   canStart: Boolean,
   isComplete: Boolean

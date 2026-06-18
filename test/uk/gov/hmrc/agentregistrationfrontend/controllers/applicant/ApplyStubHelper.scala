@@ -107,3 +107,14 @@ object ApplyStubHelper:
   def verifyConnectorsForTaskListPage(agentApplication: AgentApplication): Unit =
     verifyConnectorsToSupplyBprToPage(Some(agentApplication.getUtr))
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.agentApplicationId)
+
+  def stubsForApplicationStatus(
+    agentApplication: AgentApplication,
+    individuals: List[IndividualProvidedDetails]
+  ): StubMapping =
+    stubsToSupplyBprToPage(agentApplication)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(agentApplication.agentApplicationId, individuals)
+    // TODO: remove the risking response stub when we turn on feature flag for FixableFailures
+    //  we don't need this call anymore but the application status page still calls it until we turn on the fixable failures feature
+    //  so we need to stub it - the actual progress value doesn't matter for the application status page so we can just return ReadyForSubmission
+    AgentRegistrationRiskingStubs.stubGetApplicationRiskingResponse(agentApplication.applicationReference, RiskingProgress.ReadyForSubmission)

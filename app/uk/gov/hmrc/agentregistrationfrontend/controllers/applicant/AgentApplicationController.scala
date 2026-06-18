@@ -19,12 +19,23 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.RequestHeader
+import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.risking.RiskedEntity
+import uk.gov.hmrc.agentregistration.shared.risking.RiskedIndividual
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication.Outcome
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ConfirmationPage
@@ -39,7 +50,6 @@ import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.annotation.nowarn
 
 @Singleton
 class AgentApplicationController @Inject() (
@@ -52,7 +62,8 @@ class AgentApplicationController @Inject() (
   failedFixableStartPage: FailedFixableStartPage,
   viewApplicationPage: ViewApplicationPage,
   appConfig: AppConfig,
-  agentRegistrationRiskingService: AgentRegistrationRiskingService
+  agentRegistrationRiskingService: AgentRegistrationRiskingService,
+  individualProvideDetailsService: IndividualProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
@@ -64,10 +75,6 @@ extends FrontendController(mcc, actions):
         // which will redirect to the start of registration if needed
         Redirect(AppRoutes.apply.TaskListController.show)
 
-  /** When we are abstracting combined cases as we do in isInProgress(), incorrect warnings about non-exhaustive pattern matching appear. So suppressing this
-    * warning until we no longer need the fixable failures feature flag
-    */
-  @nowarn
   def applicationStatus: Action[AnyContent] =
     actions
       .getApplicationAfterSentForRisking
@@ -76,42 +83,16 @@ extends FrontendController(mcc, actions):
           .getRiskingProgress(request.agentApplication.applicationReference)
           .map: riskingProgress =>
             request.add[RiskingProgress](riskingProgress)
+      )
+      .refine(implicit request =>
+        val agentApplication: AgentApplication = request.get
+        individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
+          request.add[List[IndividualProvidedDetails]](individualsList)
       ):
         implicit request =>
-          val agentApplication: AgentApplication = request.get
-          val submittedAt: Instant = agentApplication.getSubmittedAt
-          val projectedDecisionDate: LocalDate = calculateDecisionDate(submittedAt)
-          val riskingProgress: RiskingProgress = request.get
-          riskingProgress match
-            case RiskingProgress.ReadyForSubmission => // show the confirmation screen
-              Ok(confirmationPage(
-                dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
-                agentApplication = agentApplication
-              ))
-            case rp if isInProgress(rp) =>
-              Ok(inProgressPage(
-                entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
-                agentApplication = agentApplication,
-                dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
-                dateSubmitted = displayDateForLang(Some(
-                  submittedAt
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate
-                ))
-              ))
-            case failedFixable: RiskingProgress.FailedFixable =>
-              Ok(failedFixableStartPage(
-                actualDecisionDate = displayDateForLang(Some(failedFixable.riskingCompletedDate)),
-                correctiveActionExpiryDate = displayDateForLang(failedFixable.correctiveActionExpiryDate),
-                entityName = request.get[BusinessPartnerRecordResponse].getEntityName
-              ))
-            case failedNonFixable: RiskingProgress.FailedNonFixable =>
-              Ok(failedNonFixablePage(
-                failedNonFixable = failedNonFixable,
-                agentApplication = agentApplication,
-                entityName = request.get[BusinessPartnerRecordResponse].getEntityName
-              ))
-            case RiskingProgress.Approved => Redirect(appConfig.asaDashboardUrl) // this shouldn't really happen as the auth action should have done the redirect already
+          if appConfig.Features.fixableFailures
+          then useApplicationForStatus(request)
+          else useRiskingServiceForStatus(request)
 
   def viewSubmittedApplication: Action[AnyContent] = actions
     .getApplicationAfterSentForRisking:
@@ -141,11 +122,107 @@ extends FrontendController(mcc, actions):
       .atZone(ZoneId.systemDefault())
       .toLocalDate
 
-  /** An application status is returned as in-progress if it has been submitted for risking or if it has failed with a fixable failure and the fixable failures
-    * feature is not yet enabled.
+  /** We only need this method for as long as the feature flag for Fixable Failures is turned off.
     */
-  private def isInProgress(rp: RiskingProgress): Boolean =
-    rp match
-      case RiskingProgress.SubmittedForRisking => true
-      case _: RiskingProgress.FailedFixable => !appConfig.Features.fixableFailures
-      case _ => false
+  private def useRiskingServiceForStatus(request: RequestWithData[List[IndividualProvidedDetails] *: RiskingProgress *: DataWithApplicationAndBpr])(using
+    RequestHeader
+  ): Result =
+    val agentApplication: AgentApplication = request.get
+    val submittedAt: Instant = agentApplication.getSubmittedAt
+    val projectedDecisionDate: LocalDate = calculateDecisionDate(submittedAt)
+    val riskingProgress: RiskingProgress = request.get
+    riskingProgress match
+      case RiskingProgress.ReadyForSubmission => // show the confirmation screen
+        Ok(confirmationPage(
+          dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
+          agentApplication = agentApplication
+        ))
+      case RiskingProgress.SubmittedForRisking | _: RiskingProgress.FailedFixable =>
+        Ok(inProgressPage(
+          entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+          agentApplication = agentApplication,
+          dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
+          dateSubmitted = displayDateForLang(Some(
+            submittedAt
+              .atZone(ZoneId.systemDefault())
+              .toLocalDate
+          ))
+        ))
+      case failedNonFixable: RiskingProgress.FailedNonFixable =>
+        Ok(failedNonFixablePage(
+          failedNonFixable = failedNonFixable,
+          agentApplication = agentApplication,
+          entityName = request.get[BusinessPartnerRecordResponse].getEntityName
+        ))
+      case RiskingProgress.Approved => Redirect(appConfig.asaDashboardUrl) // this shouldn't really happen as the auth action should have done the redirect already
+
+  /** This is the method we want to use once the feature flag for Fixable Failures is turned on.
+    */
+  private def useApplicationForStatus(request: RequestWithData[List[IndividualProvidedDetails] *: RiskingProgress *: DataWithApplicationAndBpr])(using
+    RequestHeader
+  ): Result =
+    val agentApplication: AgentApplication = request.get
+    val submittedAt: Instant = agentApplication.getSubmittedAt
+    val projectedDecisionDate: LocalDate = calculateDecisionDate(submittedAt)
+    agentApplication.applicationState match
+      case ApplicationState.Started | ApplicationState.GrsDataReceived =>
+        throw new IllegalStateException(
+          s"Application is in state ${agentApplication.applicationState} but the application status endpoint should only be called after the application has been submitted for risking"
+        )
+      case ApplicationState.SentForRisking =>
+        Ok(confirmationPage(
+          dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
+          agentApplication = agentApplication
+        ))
+      case ApplicationState.SentToMinerva =>
+        Ok(inProgressPage(
+          entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+          agentApplication = agentApplication,
+          dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
+          dateSubmitted = displayDateForLang(Some(
+            submittedAt
+              .atZone(ZoneId.systemDefault())
+              .toLocalDate
+          ))
+        ))
+      case ApplicationState.RiskingCompleted =>
+        val overallOutcome: RiskingOutcomeApplication = agentApplication.riskingOutcomeApplication.getOrThrowExpectedDataMissing(
+          s"Risking completed but no outcome found for application ${agentApplication.applicationReference}"
+        )
+        overallOutcome.outcome match
+          case Outcome.FailedFixable =>
+            Ok(failedFixableStartPage(
+              actualDecisionDate = displayDateForLang(Some(overallOutcome.riskingCompletedDate)),
+              correctiveActionExpiryDate = displayDateForLang(overallOutcome.correctiveActionExpiryDate),
+              entityName = request.get[BusinessPartnerRecordResponse].getEntityName
+            ))
+          case Outcome.FailedNonFixable =>
+            val riskedEntity: RiskingOutcomeEntity = agentApplication.riskingOutcomeEntity.getOrThrowExpectedDataMissing(
+              s"Risking completed but no outcome found for entity ${agentApplication.applicationReference}"
+            )
+            val riskedIndividuals: List[IndividualProvidedDetails] = request.get
+            Ok(failedNonFixablePage(
+              failedNonFixable = RiskingProgress.FailedNonFixable(
+                riskedEntity = RiskedEntity(
+                  applicationReference = agentApplication.applicationReference,
+                  failures =
+                    riskedEntity match
+                      case f: RiskingOutcomeEntity.FailedNonFixable => f.failures
+                      case _ => Seq.empty
+                ),
+                riskedIndividuals = riskedIndividuals.map: individual =>
+                  RiskedIndividual(
+                    personReference = individual.personReference,
+                    individualName = individual.individualName,
+                    failures =
+                      individual.riskingOutcomeIndividual match
+                        case Some(riskedIndividual: RiskingOutcomeIndividual.FailedNonFixable) => riskedIndividual.failures
+                        case _ => Seq.empty
+                  ),
+                riskingCompletedDate = overallOutcome.riskingCompletedDate,
+                correctiveActionExpiryDate = overallOutcome.correctiveActionExpiryDate
+              ),
+              agentApplication = agentApplication,
+              entityName = request.get[BusinessPartnerRecordResponse].getEntityName
+            ))
+          case Outcome.Approved => Redirect(appConfig.asaDashboardUrl) // this shouldn't really happen as the auth action should have done the redirect already

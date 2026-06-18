@@ -1,0 +1,156 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistrationfrontend.model.TaskStatus
+@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
+@import uk.gov.hmrc.agentregistrationfrontend.model.FixableTaskListStatus
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+@import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
+@import java.time.Instant
+@import java.time.ZoneId
+
+@this(
+        layout: Layout,
+        govukTaskList: GovukTaskList,
+        govukWarningText : GovukWarningText,
+        govukButton: GovukButton
+)
+
+@(
+        taskListStatus: FixableTaskListStatus,
+        entityName: String,
+        correctiveActionExpiryDate: String,
+        isSoleTrader: Boolean
+)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{"fixableTaskList"}
+@messagesSuffix = @{if((isSoleTrader)) ".SoleTrader" else ""}
+@title = @{messages(s"$key.title$messagesSuffix", entityName)}
+@incomplete = @{
+    TaskListItemStatus(
+        tag = Some(Tag(
+            content = Text(messages("taskList.status.Incomplete")),
+            classes = "govuk-tag--blue"
+        ))
+    )
+}
+@complete = @{
+    TaskListItemStatus(content = Text(messages("taskList.status.Completed")))
+}
+@cannotStart = @{
+    TaskListItemStatus(content = Text(messages("taskList.status.CannotStartYet")))
+}
+
+@amlsStatus = @{incomplete}
+@listTrackingStatus = @{
+    if(taskListStatus.individualFailures.exists(_.isComplete)) complete
+    else if(taskListStatus.individualFailures.exists(_.canStart)) incomplete
+    else cannotStart
+}
+
+@layout(
+    pageTitle = title,
+    suppressBackLink = true
+) {
+
+    <h1 class="govuk-heading-l">@title</h1>
+    @govukWarningText(WarningText(
+      iconFallbackText = Some(messages("common.warning")),
+      content = Text(messages(s"$key.warning", correctiveActionExpiryDate))
+    ))
+
+    @if(taskListStatus.amlsDetails.nonEmpty) {
+        <h2 class="govuk-heading-m">@messages(s"$key.amlsDetails.heading")</h2>
+        @govukTaskList(TaskList(
+            items = taskListStatus.amlsDetails.toSeq.map { case (k, v) =>
+              TaskListItem(
+                title = TaskListItemTitle(
+                  content = Text(messages(s"$key.amlsDetails.linkText"))
+                ),
+                status = amlsStatus,
+                href = Some(AppRoutes.fixablefailures.amls.FixableAmlsDetailsController.show(k).url)
+              )
+            },
+            idPrefix = "amlsDetails"
+        ))
+    }
+
+  @if(taskListStatus.entityFailures.nonEmpty) {
+    <h2 class="govuk-heading-m">@messages(s"$key.entityFailures.heading")</h2>
+    @govukTaskList(TaskList(
+      items = taskListStatus.entityFailures.toSeq
+      .sortBy(_._1) // stable ordering by key
+      .map { case (k, v) =>
+        TaskListItem(
+          title = TaskListItemTitle(
+            content = Text(messages(s"$key.$k.linkText"))
+          ),
+          status = if (v.isComplete) complete else incomplete,
+          href = Some(AppRoutes.fixablefailures.entityfailures.FixableEntityFailuresController.show(k).url)
+        )
+      },
+      idPrefix = "entityFailures"
+    ))
+  }
+
+   @if(taskListStatus.individualFailures.isDefined) {
+     <h2 class="govuk-heading-m">@messages(s"$key.IndividualsHaveFailures.heading")</h2>
+     @govukTaskList(TaskList(
+       items = Seq(
+         TaskListItem(
+           title = TaskListItemTitle(
+               content = Text(messages(s"$key.IndividualsHaveFailures.linkText"))
+           ),
+           status = listTrackingStatus,
+           href = if(taskListStatus.individualFailures.exists(_.canStart)) Some(AppRoutes.fixablefailures.individualfailures.FixableIndividualsController.show.url) else None
+         )
+       ),
+       idPrefix = "individualFailures"
+     ))
+   }
+
+    <h2 class="govuk-heading-m">@messages(s"$key.declaration.heading")</h2>
+    @govukTaskList(TaskList(
+        items = Seq(
+            TaskListItem(
+                title = TaskListItemTitle(
+                    content = Text(messages(s"$key.declaration.linkText"))
+                ),
+                status = if(taskListStatus.declaration.canStart) incomplete else cannotStart,
+                href = if(taskListStatus.declaration.canStart) Some(AppRoutes.apply.DeclarationController.show.url) else None
+            )
+        ),
+        idPrefix = "declaration"
+    ))
+
+  <p class="govuk-body">
+      @govukButton(Button(
+          href = Some(AppRoutes.fixablefailures.SaveForLaterController.show.url),
+          content = Text(messages("common.saveAndComeBackLater")),
+          classes = "govuk-button--secondary"
+      ))
+  </p>
+
+
+}
