@@ -1,6 +1,9 @@
 service.name = Apply for an agent services account
 service.text = This is your new service
 
+unauthorised.title=Unauthorised
+unauthorised.heading=Unauthorised
+
 common.start = Start
 common.continue = Continue
 common.saveAndContinue = Save and continue

@@ -68,7 +68,7 @@ extends ISpec:
         .futureValue
         .left
         .value
-    contentAsString(Future.successful(result)) should include("unauthorised.heading")
+    contentAsString(Future.successful(result)) should include("Unauthorised")
     result.header.status shouldBe Status.UNAUTHORIZED
     AuthStubs.verifyAuthorise()
 
