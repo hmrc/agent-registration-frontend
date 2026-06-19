@@ -16,14 +16,19 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.individualfailures
 
-import play.api.i18n.Messages
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication.Outcome
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.individualfailures.FixableIndividualsPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -32,18 +37,37 @@ import javax.inject.Singleton
 class FixableIndividualsController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
-  simplePage: SimplePage,
-  appConfig: AppConfig
+  individualProvideDetailsService: IndividualProvideDetailsService,
+  fixableIndividualsPage: FixableIndividualsPage
 )
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] =
-    actions.getApplicationAfterSentForRisking
-      .behindFeatureFlag(appConfig.Features.fixableFailures):
+    actions
+      .getApplicationAfterSentForRisking
+      .ensure(
+        condition =
+          implicit request =>
+            request
+              .get[AgentApplication]
+              .riskingOutcomeApplication
+              .exists(_.outcome === Outcome.FailedFixable),
+        resultWhenConditionNotMet =
+          implicit request =>
+            logger.warn("Risking outcome is not fixable. Redirecting to where outcome can be handled.")
+            Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
+      )
+      .refine(implicit request =>
+        val agentApplication: AgentApplication = request.get
+        individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map:
+          case individualsList if individualsList.forall(_.isFixable) =>
+            request.add[List[IndividualProvidedDetails]](individualsList)
+          case _ =>
+            logger.warn("Individuals risking outcomes are not fixable. Redirecting to where outcome can be handled.")
+            Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
+      ):
         implicit request =>
-          given messages: Messages = messagesApi.preferred(request)
+          Ok(fixableIndividualsPage())
 
-          Ok(simplePage(
-            h1 = "We need to hear from these people before you submit the application again",
-            bodyText = Some("Information, table of individuals with current status and share link with copy button will go here...")
-          ))
+  extension (ipd: IndividualProvidedDetails)
+    private def isFixable: Boolean = !ipd.riskingOutcomeIndividual.contains(RiskingOutcomeIndividual.FailedNonFixable(_))
