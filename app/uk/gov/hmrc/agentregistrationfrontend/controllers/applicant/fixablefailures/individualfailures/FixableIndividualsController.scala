@@ -59,10 +59,11 @@ extends FrontendController(mcc, actions):
       )
       .refine(implicit request =>
         val agentApplication: AgentApplication = request.get
-        individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map:
-          case individualsList if individualsList.forall(_.isFixable) =>
-            request.add[List[IndividualProvidedDetails]](individualsList)
-          case _ =>
+        individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
+          val fixable = individualsList.filter(_.isFixable)
+          if fixable.nonEmpty
+          then request.add[List[IndividualProvidedDetails]](fixable)
+          else
             logger.warn("Individuals risking outcomes are not fixable. Redirecting to where outcome can be handled.")
             Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
       ):
@@ -70,4 +71,4 @@ extends FrontendController(mcc, actions):
           Ok(fixableIndividualsPage())
 
   extension (ipd: IndividualProvidedDetails)
-    private def isFixable: Boolean = !ipd.riskingOutcomeIndividual.contains(RiskingOutcomeIndividual.FailedNonFixable(_))
+    private def isFixable: Boolean = ipd.riskingOutcomeIndividual.contains(RiskingOutcomeIndividual.FailedFixable(_))
