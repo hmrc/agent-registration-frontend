@@ -19,15 +19,16 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
+import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
-class AgentApplicationControllerSpec
+class AgentApplicationWithFixableFailuresControllerSpec
 extends ControllerSpec:
 
   override def configOverrides: Map[String, Any] =
     super.configOverrides ++ Map(
-      "features.fixable-failures" -> false
+      "features.fixable-failures" -> true
     )
 
   private val applyPath: String = "/agent-registration/apply"
@@ -40,6 +41,21 @@ extends ControllerSpec:
       tdAll
         .agentApplicationLlp
         .afterDeclarationSubmitted
+
+    val sentToMinerva: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .afterSentToMinerva
+
+    val riskingCompletedFixable: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .afterRiskingCompletedFixable
+
+    val riskingCompletedFailedNonFixable: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .afterRiskingCompletedNonFixable
 
   "routes should have correct paths and methods" in:
     AppRoutes.apply.AgentApplicationController.startRegistration shouldBe Call(
@@ -61,39 +77,63 @@ extends ControllerSpec:
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url
 
-  s"GET $applicationStatusPath should check the latest status and render the confirmation page when status is ReadyForSubmission" in:
-    ApplyStubHelper.stubsForApplicationRiskingResponse(
-      application = agentApplication.submitted,
-      riskingProgress = RiskingProgress.ReadyForSubmission
+  s"GET $applicationStatusPath should check the latest status and render the confirmation page when status is SentForRisking" in:
+    ApplyStubHelper.stubsForApplicationStatus(
+      agentApplication = agentApplication.submitted,
+      individuals = List(
+        tdAll.providedDetails.afterFinished
+      )
     )
     val response: WSResponse = get(applicationStatusPath)
 
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "You’ve applied for an agent services account - Apply for an agent services account - GOV.UK"
-    ApplyStubHelper.verifyConnectorsForApplicationRiskingResponse(agentApplication.submitted)
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
-  s"GET $applicationStatusPath should render the in-progress page when status is SubmittedForRisking" in:
-    ApplyStubHelper.stubsForApplicationRiskingResponse(
-      application = agentApplication.submitted,
-      riskingProgress = RiskingProgress.SubmittedForRisking
+  s"GET $applicationStatusPath should render the in-progress page when status is SentToMinerva" in:
+    ApplyStubHelper.stubsForApplicationStatus(
+      agentApplication = agentApplication.sentToMinerva,
+      individuals = List(
+        tdAll.providedDetails.afterFinished
+      )
     )
     val response: WSResponse = get(applicationStatusPath)
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe s"Application reference: ${agentApplication.submitted.agentApplicationId.value} - Apply for an agent services account - GOV.UK"
-    ApplyStubHelper.verifyConnectorsForApplicationRiskingResponse(agentApplication.submitted)
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
-  s"GET $applicationStatusPath should render the in-progress page when status is FailedFixable" in:
-    // this is while the feature flag is off for fixable failures
-    ApplyStubHelper.stubsForApplicationRiskingResponse(
-      application = agentApplication.submitted,
-      riskingProgress = tdAll.applicationRiskingResponse.failedFixable
+  s"GET $applicationStatusPath should render the failed non-fixable page when status is RiskingCompleted and overall outcome is FailedNonFixable" in:
+    ApplyStubHelper.stubsForApplicationStatus(
+      agentApplication = agentApplication.riskingCompletedFailedNonFixable,
+      individuals = List(
+        tdAll.providedDetails.afterFinished
+      )
     )
 
     val response: WSResponse = get(applicationStatusPath)
 
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe s"Application reference: ${agentApplication.submitted.agentApplicationId.value} - Apply for an agent services account - GOV.UK"
-    ApplyStubHelper.verifyConnectorsForApplicationRiskingResponse(agentApplication.submitted)
+    response.parseBodyAsJsoupDocument.title() shouldBe "Test Company Name does not meet the registration conditions - Apply for an agent services account - GOV.UK"
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+
+  s"GET $applicationStatusPath should render the fixable failures start page when status is FailedFixable" in:
+    ApplyStubHelper.stubsForApplicationStatus(
+      agentApplication = agentApplication.riskingCompletedFixable,
+      individuals = List(
+        tdAll.providedDetails.afterFinished.copy(riskingOutcomeIndividual =
+          Some(RiskingOutcomeIndividual.FailedFixable(
+            fixes = Seq(
+              IndividualFix._4._1(isConfirmed = None)
+            )
+          ))
+        )
+      )
+    )
+    val response: WSResponse = get(applicationStatusPath)
+
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe "Test Company Name does not meet the registration conditions yet - Apply for an agent services account - GOV.UK"
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $viewApplicationPath should return OK" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.submitted)

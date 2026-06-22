@@ -92,6 +92,7 @@ object ApplyStubHelper:
   ): StubMapping =
     stubsToSupplyBprToPage(application)
     AgentRegistrationRiskingStubs.stubGetApplicationRiskingResponse(application.applicationReference, riskingProgress)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(application.agentApplicationId, List.empty)
 
   def verifyConnectorsForApplicationRiskingResponse(agentApplication: AgentApplication): Unit =
     verifyConnectorsToSupplyBprToPage(Some(agentApplication.getUtr))
