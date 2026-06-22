@@ -21,6 +21,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
@@ -34,13 +35,22 @@ class SaveForLaterController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   saveForLaterPage: SaveForLaterPage,
-  agentRegistrationRiskingService: AgentRegistrationRiskingService
+  agentRegistrationRiskingService: AgentRegistrationRiskingService,
+  appConfig: AppConfig
 )
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] =
     actions
       .getApplicationAfterSentForRisking
+      .ensure(
+        condition =
+          implicit request =>
+            appConfig.Features.fixableFailures,
+        resultWhenConditionNotMet =
+          implicit request =>
+            NotFound
+      )
       .refine(implicit request =>
         agentRegistrationRiskingService
           .getRiskingProgress(request.agentApplication.applicationReference)

@@ -22,6 +22,7 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
@@ -32,14 +33,24 @@ import javax.inject.Singleton
 class FixableEntityFailuresController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
-  simplePage: SimplePage
+  simplePage: SimplePage,
+  appConfig: AppConfig
 )
 extends FrontendController(mcc, actions):
 
-  def show(failureCode: String): Action[AnyContent] = actions.getApplicationAfterSentForRisking:
-    implicit request =>
-      given messages: Messages = messagesApi.preferred(request)
-      Ok(simplePage(
-        h1 = messages(s"fixableDetails.$failureCode.heading", request.get[BusinessPartnerRecordResponse].getEntityName),
-        bodyText = Some(s"$failureCode details and confirmation form will go here...")
-      ))
+  def show(failureCode: String): Action[AnyContent] =
+    actions.getApplicationAfterSentForRisking
+      .ensure(
+        condition =
+          implicit request =>
+            appConfig.Features.fixableFailures,
+        resultWhenConditionNotMet =
+          implicit request =>
+            NotFound
+      ):
+        implicit request =>
+          given messages: Messages = messagesApi.preferred(request)
+          Ok(simplePage(
+            h1 = messages(s"fixableDetails.$failureCode.heading", request.get[BusinessPartnerRecordResponse].getEntityName),
+            bodyText = Some(s"$failureCode details and confirmation form will go here...")
+          ))

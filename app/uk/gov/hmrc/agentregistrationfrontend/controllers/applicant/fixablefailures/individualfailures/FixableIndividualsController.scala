@@ -21,6 +21,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
 
@@ -31,15 +32,25 @@ import javax.inject.Singleton
 class FixableIndividualsController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
-  simplePage: SimplePage
+  simplePage: SimplePage,
+  appConfig: AppConfig
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions.getApplicationAfterSentForRisking:
-    implicit request =>
-      given messages: Messages = messagesApi.preferred(request)
+  def show: Action[AnyContent] =
+    actions.getApplicationAfterSentForRisking
+      .ensure(
+        condition =
+          implicit request =>
+            appConfig.Features.fixableFailures,
+        resultWhenConditionNotMet =
+          implicit request =>
+            NotFound
+      ):
+        implicit request =>
+          given messages: Messages = messagesApi.preferred(request)
 
-      Ok(simplePage(
-        h1 = "We need to hear from these people before you submit the application again",
-        bodyText = Some("Information, table of individuals with current status and share link with copy button will go here...")
-      ))
+          Ok(simplePage(
+            h1 = "We need to hear from these people before you submit the application again",
+            bodyText = Some("Information, table of individuals with current status and share link with copy button will go here...")
+          ))

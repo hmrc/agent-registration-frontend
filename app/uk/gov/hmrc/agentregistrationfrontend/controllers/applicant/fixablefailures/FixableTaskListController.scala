@@ -28,6 +28,7 @@ import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.fixableTaskListStatus
 import uk.gov.hmrc.agentregistrationfrontend.model.isSoleTraderOwner
@@ -43,13 +44,22 @@ class FixableTaskListController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   taskListPage: FixableTaskListPage,
-  individualProvideDetailsService: IndividualProvideDetailsService
+  individualProvideDetailsService: IndividualProvideDetailsService,
+  appConfig: AppConfig
 )
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] =
     actions
       .getApplicationAfterSentForRisking
+      .ensure(
+        condition =
+          implicit request =>
+            appConfig.Features.fixableFailures,
+        resultWhenConditionNotMet =
+          implicit request =>
+            NotFound
+      )
       .refine:
         implicit request =>
           request.get[AgentApplication].riskingOutcomeApplication match
