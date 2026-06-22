@@ -20,12 +20,16 @@ import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfIndividuals
+import uk.gov.hmrc.agentregistration.shared.risking.EntityFix
+import uk.gov.hmrc.agentregistration.shared.risking.EntityFix._3.AmlsFix
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 extension (agentApplication: AgentApplication)
 
-  private def isSoleTraderOwner: Boolean =
+  def isSoleTraderOwner: Boolean =
     agentApplication match
       case a: AgentApplication.IsSoleTrader => a.userRole.contains(UserRole.Owner)
       case _: AgentApplication.IsNotSoleTrader => false
@@ -98,6 +102,58 @@ extension (agentApplication: AgentApplication)
             && agentDetailsIsComplete
             && hmrcStandardForAgentsAgreed
             && listProgressComplete, // Declaration can be started only when all prior tasks are complete
+        isComplete = false // Declaration is never "complete" until submission
+      )
+    )
+  }
+
+  def fixableTaskListStatus(
+    riskingOutcomeEntity: RiskingOutcomeEntity,
+    fixableIndividuals: List[RiskingOutcomeIndividual.FailedFixable]
+  ): FixableTaskListStatus = {
+    val fixableEntity: Option[RiskingOutcomeEntity.FailedFixable] =
+      riskingOutcomeEntity match
+        case f: RiskingOutcomeEntity.FailedFixable => Some(f)
+        case _ => None
+    val hasIndividualFailures: Boolean = fixableIndividuals.nonEmpty
+    val entityFixes: Map[String, TaskStatus] =
+      fixableEntity.map(_.fixes).getOrElse(Nil).filterNot {
+        case _: AmlsFix => true
+        case _ => false
+      }.map(fix =>
+        fix.toString -> TaskStatus(
+          canStart = true,
+          isComplete = fix.isConfirmed.contains(true)
+        )
+      ).toMap
+
+    val amlsFix: Option[AmlsFix] = fixableEntity.flatMap(fe => fe.fixes.collectFirst { case a: AmlsFix => a })
+    val amlsDetailsComplete: Boolean = amlsFix.exists(_.isConfirmed.contains(true))
+
+    FixableTaskListStatus(
+      amlsDetails =
+        amlsFix match
+          case Some(f) =>
+            Map(
+              f.failure.toString -> TaskStatus(
+                canStart = true, // AMLS details can be started at any time
+                isComplete = f.isConfirmed.contains(true)
+              )
+            )
+          case _ => Map.empty, // If there are no AMLS-related failures, we don't show the AMLS details task in the fixable task list
+      entityFailures = entityFixes,
+      individualFailures =
+        if hasIndividualFailures
+        then
+          Some(TaskStatus(
+            canStart = true, // List tracking can be started at any time if there are individual failures
+            isComplete = fixableIndividuals.forall(i => i.fixes.forall(_.isConfirmed.contains(true)))
+          ))
+        else None,
+      declaration = TaskStatus(
+        canStart =
+          (amlsFix.isEmpty | amlsDetailsComplete)
+            && (!hasIndividualFailures), // Declaration can be started only when all prior tasks are complete
         isComplete = false // Declaration is never "complete" until submission
       )
     )

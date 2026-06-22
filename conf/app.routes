@@ -205,3 +205,10 @@ GET         /provide-details/contact-applicant                              uk.g
 
 ## Internal Routes for individuals
 GET        /provide-details/internal/unified-customer-registry-identifiers/:linkId   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.internal.UcrIndividualController.populateIndividualIdentifiersFromUcr(linkId: LinkId)
+
+## Fixable Failures and Resubmissions
+GET        /conditions-not-yet-met/task-list                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.FixableTaskListController.show
+GET        /conditions-not-yet-met/save-and-come-back-later          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.SaveForLaterController.show
+GET        /conditions-not-yet-met/amls-details/:failureCode         uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amls.FixableAmlsDetailsController.show(failureCode: String)
+GET        /conditions-not-yet-met/failure-details/:failureCode      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.entityfailures.FixableEntityFailuresController.show(failureCode: String)
+GET        /conditions-not-yet-met/individuals                       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.individualfailures.FixableIndividualsController.show

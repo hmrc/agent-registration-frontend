@@ -39,7 +39,7 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         s"""
            |Application outcome
-           |Test Company Name does not meet the registration conditions
+           |Test Company Name does not meet the registration conditions yet
            |Date of decision: 4 June 2026
            |Our decision
            |Your application to register for an agent services account cannot currently be approved.
@@ -60,10 +60,10 @@ extends ViewSpec:
           .stripMargin
 
     "have the correct title" in:
-      doc.title() shouldBe "Test Company Name does not meet the registration conditions - Apply for an agent services account - GOV.UK"
+      doc.title() shouldBe "Test Company Name does not meet the registration conditions yet - Apply for an agent services account - GOV.UK"
 
     "have the correct h1" in:
-      doc.h1 shouldBe "Test Company Name does not meet the registration conditions"
+      doc.h1 shouldBe "Test Company Name does not meet the registration conditions yet"
 
     "should contain a link to the appeals guidance" in:
       val appealsLink: TestLink =

@@ -1066,7 +1066,7 @@ removeKeyIndividual.error.required.otherRelevantIndividuals = Select yes if you 
 # Application outcome
 # Failed Fixable
 failedFixable.caption = Application outcome
-failedFixable.title = {0} does not meet the registration conditions
+failedFixable.title = {0} does not meet the registration conditions yet
 failedFixable.decisionDate.h2 = Date of decision: {0}
 failedFixable.decision.h2 = Our decision
 failedFixable.decision.p1 = Your application to register for an agent services account cannot currently be approved.
@@ -1083,6 +1083,68 @@ failedFixable.appeal.h2 = {0} has the right to review or appeal
 failedFixable.appeal.p1 = Keep a copy of this decision for your records.
 failedFixable.appeal.p2 = If you disagree with our decision to refuse your application, you can <a class="govuk-link" href="{0}" target="_blank" rel="noopener noreferrer">request a review or appeal the decision (opens in a new tab)</a>.
 failedFixable.appeal.p3 = You can ask for a review of our decision or begin the appeal process even if you decide to take the actions we need.
+
+# Failed fixable task list
+fixableTaskList.title = Take action: {0} has not met the registration conditions
+fixableTaskList.title.SoleTrader = Take action: You have not met the registration conditions
+fixableTaskList.warning = You can still take action to meet the conditions. Each item on this list needs to be completed by {0} or the application will be deleted.
+fixableTaskList.amlsDetails.heading = Anti-money laundering supervision
+fixableTaskList.amlsDetails.linkText = Provide your supervision details again
+fixableTaskList.entityFailures.heading = Issues with the business
+fixableTaskList.IndividualsHaveFailures.heading = Issues with relevant individuals
+fixableTaskList.declaration.heading = Resubmit application
+fixableTaskList.declaration.linkText = Declare and submit
+
+fixableTaskList.EntityFix.4.1.linkText = Self Assessment - missing returns
+fixableTaskList.EntityFix.4.2.linkText = Company Tax - missing returns
+fixableTaskList.EntityFix.4.3.linkText = VAT - missing returns
+fixableTaskList.EntityFix.4.4.linkText = PAYE - missing returns
+fixableTaskList.EntityFix.5.1.linkText = Self Assessment - overdue liability
+fixableTaskList.EntityFix.5.2.linkText = Corporation Tax - overdue liability
+fixableTaskList.EntityFix.5.3.linkText = VAT - overdue liability
+fixableTaskList.EntityFix.5.4.linkText = PAYE - overdue liability
+fixableTaskList.EntityFix.5.5.linkText = Unpaid civil penalty liability
+fixableTaskList.EntityFix.5.6.linkText = Unpaid Stamp Duty liability
+fixableTaskList.EntityFix.5.7.linkText = Unpaid Capital Gains Tax liability
+fixableTaskList.EntityFix.8.5.linkText = Unpaid relevant anti-avoidance penalty liability
+fixableTaskList.EntityFix.8.7.linkText = Unpaid relevant anti-avoidance penalty liability
+fixableTaskList.IndividualsHaveFailures.linkText = We are awaiting information from these people
+
+fixableDetails.EntityFailure.3.1.heading = We could not match your details with a current record
+fixableDetails.EntityFailure.3.1.heading.SoleTrader = We could not match your details with a current record
+fixableDetails.EntityFailure.3.2.heading = We have not been able to confirm your anti-money laundering supervision
+fixableDetails.EntityFailure.3.2.heading.SoleTrader = We have not been able to confirm your anti-money laundering supervision
+fixableDetails.EntityFailure.3.3.heading = We could not accept your evidence
+fixableDetails.EntityFailure.3.3.heading.SoleTrader = We could not accept your evidence
+fixableDetails.EntityFailure.3.5.heading = Your membership does not include anti-money laundering supervision
+fixableDetails.EntityFailure.3.5.heading.SoleTrader = Your membership does not include anti-money laundering supervision
+
+fixableDetails.EntityFix.4.1.heading = Self Assessment returns for {0}
+fixableDetails.EntityFix.4.1.heading.SoleTrader = Your Self Assessment returns
+fixableDetails.EntityFix.4.2.heading = Company Tax returns for {0}
+fixableDetails.EntityFix.4.2.heading.SoleTrader = Your Company Tax returns
+fixableDetails.EntityFix.4.3.heading = VAT returns for {0}
+fixableDetails.EntityFix.4.3.heading.SoleTrader = Your VAT returns
+fixableDetails.EntityFix.4.4.heading = PAYE reports for {0}
+fixableDetails.EntityFix.4.4.heading.SoleTrader = Your PAYE reports
+fixableDetails.EntityFix.5.1.heading = {0} has an overdue Self Assessment liability
+fixableDetails.EntityFix.5.1.heading.SoleTrader = You have an overdue Self Assessment liability
+fixableDetails.EntityFix.5.2.heading = {0} has an overdue Corporation Tax liability
+fixableDetails.EntityFix.5.3.heading = {0} has an overdue VAT liability
+fixableDetails.EntityFix.5.3.heading.SoleTrader = You have an overdue VAT liability
+fixableDetails.EntityFix.5.4.heading = {0} has an overdue PAYE liability
+fixableDetails.EntityFix.5.4.heading.SoleTrader = You have an overdue PAYE liability
+fixableDetails.EntityFix.5.5.heading = {0} has an overdue civil penalty liability
+fixableDetails.EntityFix.5.5.heading.SoleTrader = You have an overdue civil penalty liability
+fixableDetails.EntityFix.5.6.heading = {0} has an overdue Stamp Duty liability
+fixableDetails.EntityFix.5.6.heading.SoleTrader = You have an overdue Stamp Duty liability
+fixableDetails.EntityFix.5.7.heading = {0} has an overdue Capital Gains Tax liability
+fixableDetails.EntityFix.5.7.heading.SoleTrader = You have an overdue Capital Gains Tax liability
+fixableDetails.EntityFix.8.5.heading = {0} has an overdue penalty liability
+fixableDetails.EntityFix.8.5.heading.SoleTrader = You have an overdue penalty liability
+fixableDetails.EntityFix.8.7.heading = {0} has an overdue penalty liability
+fixableDetails.EntityFix.8.7.heading.SoleTrader = You have an overdue penalty liability
+fixableDetails.amlsDetails.heading = Anti-money laundering supervision details for {0}
 
 # Failed Non Fixable
 failedNonFixable.caption = Application outcome
