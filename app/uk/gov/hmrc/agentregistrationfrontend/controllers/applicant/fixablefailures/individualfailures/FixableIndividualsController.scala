@@ -70,12 +70,15 @@ extends FrontendController(mcc, actions):
             Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
       ):
         implicit request =>
-          // TODO: replace with deadline date
-          val deadlineDate = LocalDate.MAX
+          val application = request.get[AgentApplication]
+          val deadlineDate = application.riskingOutcomeApplication.flatMap(
+            _.correctiveActionExpiryDate
+          ).getOrThrowExpectedDataMissing("correctiveActionExpiryDate")
+
           Ok(fixableIndividualsPage(
             dateOfDeadline = displayDateForLang(Some(deadlineDate)),
             fixableIndividualsList = request.get[List[IndividualProvidedDetails]],
-            agentApplication = request.get[AgentApplication]
+            agentApplication = application
           ))
 
   extension (ipd: IndividualProvidedDetails)

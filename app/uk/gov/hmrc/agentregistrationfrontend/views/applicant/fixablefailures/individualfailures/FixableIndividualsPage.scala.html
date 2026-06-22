@@ -21,6 +21,9 @@
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLaterLinks
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
+@import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual.FailedFixable
+@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 @this(
   appConfig: AppConfig,
@@ -50,10 +53,40 @@
   @copyButton(clip = provideDetailsLink)
 }
 
+@messageFor(fix: IndividualFix) = @{
+  fix match {
+    case _: IndividualFix._4._1 | _: IndividualFix._4._3 | _: IndividualFix._4._4 => messages("key.individualFix.4")
+    case _: IndividualFix._5._1 | _: IndividualFix._5._3 | _: IndividualFix._5._4 | _: IndividualFix._5._5 | _: IndividualFix._5._6 | _: IndividualFix._5._7 => messages("key.individualFix.5")
+    case _: IndividualFix._8._7 => messages("key.individualFix.8")
+    case _: IndividualFix._10.IndividualDetailsFix => messages("key.individualFix.10")
+  }
+}
+
+@actionsList(individual: IndividualProvidedDetails) = {
+  @{individual.riskingOutcomeIndividual match {
+    case Some(FailedFixable(fixes: Seq[IndividualFix])) =>
+      <ul class="govuk-list">
+        {fixes.map { fix =>
+          <li>messageFor(fix))</li>
+        }}
+      </ul>
+    case _ => <!-- -->
+  }}
+}
+
+@checkAllActionsCompleted(individual: IndividualProvidedDetails) = {
+  @{individual.riskingOutcomeIndividual match {
+    case Some(FailedFixable(fixes: Seq[IndividualFix])) =>
+      if (fixes.forall(_.isConfirmed === Some(true))) messages("key.yes")
+      else messages("key.no")
+    case _ => <!-- -->
+  }}
+}
+
 @layout(
   pageTitle = title
 ) {
-  <h1 class="govuk-heading-l">
+   <h1 class="govuk-heading-l">
    <span class="govuk-caption-l">
      @messages("key.titleCaption")
    </span>
@@ -82,10 +115,10 @@
           content = Text(individual.individualName.value)
         ),
         TableRow(
-          content = ???
+          content = HtmlContent(actionsList(individual))
         ),
         TableRow(
-          content = ???
+          content = HtmlContent(checkAllActionsCompleted(individual))
         )
       )
     }
