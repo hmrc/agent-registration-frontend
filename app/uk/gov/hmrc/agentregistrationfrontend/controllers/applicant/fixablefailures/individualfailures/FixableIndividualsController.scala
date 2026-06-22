@@ -28,8 +28,10 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.individualfailures.FixableIndividualsPage
 
+import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -68,7 +70,13 @@ extends FrontendController(mcc, actions):
             Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
       ):
         implicit request =>
-          Ok(fixableIndividualsPage())
+          // TODO: replace with deadline date
+          val deadlineDate = LocalDate.MAX
+          Ok(fixableIndividualsPage(
+            dateOfDeadline = displayDateForLang(Some(deadlineDate)),
+            fixableIndividualsList = request.get[List[IndividualProvidedDetails]],
+            agentApplication = request.get[AgentApplication]
+          ))
 
   extension (ipd: IndividualProvidedDetails)
     private def isFixable: Boolean = ipd.riskingOutcomeIndividual.contains(RiskingOutcomeIndividual.FailedFixable(_))

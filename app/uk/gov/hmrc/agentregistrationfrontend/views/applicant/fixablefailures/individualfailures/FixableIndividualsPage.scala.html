@@ -14,9 +14,91 @@
  * limitations under the License.
  *@
 
-@this()
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.components.CopyButton
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLaterLinks
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
 
-@()(implicit
-request: RequestHeader,
-messages: Messages
+@this(
+  appConfig: AppConfig,
+  layout: Layout,
+  govukTable: GovukTable,
+  continueOrSaveForLaterLinks: ContinueOrSaveForLaterLinks,
+  copyButton: CopyButton,
+  govukDetails : GovukDetails
 )
+
+@(
+  dateOfDeadline: String,
+  fixableIndividualsList: List[IndividualProvidedDetails],
+  agentApplication: AgentApplication
+)(implicit
+  request: RequestHeader,
+  messages: Messages
+)
+
+@key = @{"fixableIndividuals"}
+@title = @{messages(s"$key.title")}
+
+@provideDetailsLink = @{appConfig.applicationLink(agentApplication.linkId.value).toString}
+
+@detailsHtml = {
+  <p class="govuk-body">@messages("key.details.content", provideDetailsLink)</p>
+  @copyButton(clip = provideDetailsLink)
+}
+
+@layout(
+  pageTitle = title
+) {
+  <h1 class="govuk-heading-l">
+   <span class="govuk-caption-l">
+     @messages("key.titleCaption")
+   </span>
+   @title
+  </h1>
+  <p class="govuk-body">@messages("key.p1")</p>
+  <p class="govuk-body">@messages("key.p2")</p>
+  <p class="govuk-body">@Html(messages(s"$key.p3", dateOfDeadline))</p>
+  <h2 class="govuk-heading-m">@messages(s"$key.actions.h2")</h2>
+  @govukTable(Table(
+    head = Some(Seq(
+      HeadCell(
+        content = Text(messages(s"$key.th.name"))
+      ),
+      HeadCell(
+        content = Text(messages(s"$key.th.action"))
+      ),
+      HeadCell(
+        content = Text(messages(s"$key.th.completed"))
+      )
+    )),
+    firstCellIsHeader = true,
+    rows = fixableIndividualsList.map { individual =>
+      Seq(
+        TableRow(
+          content = Text(individual.individualName.value)
+        ),
+        TableRow(
+          content = ???
+        ),
+        TableRow(
+          content = ???
+        )
+      )
+    }
+  ))
+  @govukDetails(Details(
+    summary = Text(messages("key.details.summary")),
+    content = HtmlContent(detailsHtml)
+  ))
+
+  <p class="govuk-body">
+    @continueOrSaveForLaterLinks(
+      continueHref = AppRoutes.apply.TaskListController.show.url,
+      continueLabel = Some(messages("common.returnToTaskList"))
+    )
+  </p>
+}
