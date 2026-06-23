@@ -209,6 +209,16 @@ GET        /provide-details/internal/unified-customer-registry-identifiers/:link
 ## Fixable Failures and Resubmissions
 GET        /conditions-not-yet-met/task-list                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.FixableTaskListController.show
 GET        /conditions-not-yet-met/save-and-come-back-later          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.SaveForLaterController.show
-GET        /conditions-not-yet-met/amls-details/:failureCode         uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amls.FixableAmlsDetailsController.show(failureCode: String)
+GET        /conditions-not-yet-met/anti-money-laundering/failure-details/:failureCode         uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amlsfailure.FixableAmlsDetailsController.show(failureCode: String)
+GET        /conditions-not-yet-met/anti-money-laundering/supervisor-name        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amlsfailure.AmlsSupervisorController.show
+POST       /conditions-not-yet-met/anti-money-laundering/supervisor-name        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amlsfailure.AmlsSupervisorController.submit
+GET        /conditions-not-yet-met/anti-money-laundering/registration-number        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amlsfailure.AmlsRegistrationNumberController.show
+POST       /conditions-not-yet-met/anti-money-laundering/registration-number        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amlsfailure.AmlsRegistrationNumberController.submit
+GET        /conditions-not-yet-met/anti-money-laundering/evidence        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amlsfailure.AmlsEvidenceUploadController.show
+GET        /conditions-not-yet-met/anti-money-laundering/evidence/upload-result        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amlsfailure.AmlsEvidenceUploadController.showUploadResult
+GET        /conditions-not-yet-met/anti-money-laundering/evidence/check-upload-status-js        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amlsfailure.AmlsEvidenceUploadController.checkUploadStatusJs
+GET        /conditions-not-yet-met/anti-money-laundering/evidence/upload-error        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amlsfailure.AmlsEvidenceUploadController.showError(errorCode: Option[String], errorMessage: Option[String], errorRequestId: Option[String], key: Option[String])
+GET        /conditions-not-yet-met/anti-money-laundering/check-your-answers        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amlsfailure.CheckYourAnswersController.show
+POST       /conditions-not-yet-met/anti-money-laundering/check-your-answers        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amlsfailure.CheckYourAnswersController.submit
 GET        /conditions-not-yet-met/failure-details/:failureCode      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.entityfailures.FixableEntityFailuresController.show(failureCode: String)
 GET        /conditions-not-yet-met/individuals                       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.individualfailures.FixableIndividualsController.show

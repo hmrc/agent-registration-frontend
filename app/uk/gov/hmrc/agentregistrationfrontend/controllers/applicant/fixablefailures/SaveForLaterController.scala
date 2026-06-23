@@ -43,14 +43,7 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] =
     actions
       .getApplicationAfterSentForRisking
-      .ensure(
-        condition =
-          implicit request =>
-            appConfig.Features.fixableFailures,
-        resultWhenConditionNotMet =
-          implicit request =>
-            NotFound
-      )
+      .behindFeatureFlag(appConfig.Features.fixableFailures)
       .refine(implicit request =>
         agentRegistrationRiskingService
           .getRiskingProgress(request.agentApplication.applicationReference)

@@ -40,14 +40,7 @@ extends FrontendController(mcc, actions):
 
   def show(failureCode: String): Action[AnyContent] =
     actions.getApplicationAfterSentForRisking
-      .ensure(
-        condition =
-          implicit request =>
-            appConfig.Features.fixableFailures,
-        resultWhenConditionNotMet =
-          implicit request =>
-            NotFound
-      ):
+      .behindFeatureFlag(appConfig.Features.fixableFailures):
         implicit request =>
           given messages: Messages = messagesApi.preferred(request)
           Ok(simplePage(

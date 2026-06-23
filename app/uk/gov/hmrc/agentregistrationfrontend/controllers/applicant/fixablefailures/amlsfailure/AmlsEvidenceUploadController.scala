@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls
+package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amlsfailure
 
 import com.softwaremill.quicklens.*
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
-import uk.gov.hmrc.agentregistration.shared.amls.AmlsName
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsName
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsEvidence
+import uk.gov.hmrc.agentregistration.shared.risking.EntityFix
+import uk.gov.hmrc.agentregistration.shared.risking.EntityFix._3.AmlsFix
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
@@ -38,9 +42,9 @@ import uk.gov.hmrc.agentregistrationfrontend.repository.UploadRepo
 import uk.gov.hmrc.agentregistrationfrontend.services.ObjectStoreService
 import uk.gov.hmrc.agentregistrationfrontend.services.UpscanInitiateService
 import uk.gov.hmrc.agentregistrationfrontend.util.Errors
-import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.amls.AmlsEvidenceUploadPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.amls.AmlsEvidenceUploadProgressPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.amls.UpscanErrorPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.amls.AmlsEvidenceUploadPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.amls.AmlsEvidenceUploadProgressPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.amls.UpscanErrorPage
 
 import java.time.Clock
 import java.time.Instant
@@ -67,30 +71,32 @@ class AmlsEvidenceUploadController @Inject() (
 )(using ec: ExecutionContext)
 extends FrontendController(mcc, actions):
 
-  val baseAction: ActionBuilderWithData[DataWithApplication] = actions
-    .getApplicationInProgress
+  val baseAction: ActionBuilderWithData[DataWithApplicationAndBpr] = actions
+    .getApplicationAfterSentForRisking
+    .behindFeatureFlag(appConfig.Features.fixableFailures)
     .ensure(
-      _.agentApplication.amlsDetails.exists(!_.isHmrc),
-      implicit r =>
-        logger.warn("Uploaded evidence is not required as supervisor is HMRC, redirecting to Check Your Answers")
-        Redirect(AppRoutes.apply.amls.CheckYourAnswersController.show.url)
+      condition = !_.agentApplication.getFixableAmlsDetails.isHmrc,
+      resultWhenConditionNotMet =
+        implicit r =>
+          logger.warn("Uploaded evidence is not required as supervisor is HMRC, redirecting to Check Your Answers")
+          Redirect(AppRoutes.fixablefailures.amlsfailure.CheckYourAnswersController.show.url)
     )
     .ensure(
-      _.agentApplication.getAmlsDetails.amlsRegistrationNumber.isDefined, // safe to getAmlsDetails as ensured above
+      condition = _.agentApplication.getFixableAmlsDetails.amlsRegistrationNumber.isDefined,
       implicit r =>
         logger.warn("Missing AmlsRegistrationNumber, redirecting to AmlsRegistrationNumber page")
-        Redirect(AppRoutes.apply.amls.AmlsRegistrationNumberController.show.url)
+        Redirect(AppRoutes.fixablefailures.amlsfailure.AmlsRegistrationNumberController.show.url)
     )
 
-  def showAmlsEvidenceUploadPage: Action[AnyContent] = baseAction.async:
+  def show: Action[AnyContent] = baseAction.async:
     implicit request =>
-      val amlsCode: AmlsSupervisoryBodyCode = request.agentApplication.getAmlsDetails.supervisoryBody
+      val amlsCode: AmlsSupervisoryBodyCode = request.agentApplication.getFixableAmlsDetails.supervisoryBody
       val amlsName: AmlsName = amlsCodes.getSupervisoryName(amlsCode)
       val uploadId: UploadId = uploadIdGenerator.nextUploadId()
       for
         upscanInitiateResponse: UpscanInitiateConnector.UpscanInitiateResponse <- upscanInitiateService.initiate(
           uploadId = uploadId,
-          isFix = false
+          isFix = true
         )
         upload = Upload(
           _id = uploadId,
@@ -144,42 +150,52 @@ extends FrontendController(mcc, actions):
       case UploadStatus.InProgress => Future.successful(())
       case _: UploadStatus.Failed => Future.successful(())
       case succeeded: UploadStatus.UploadedSuccessfully =>
-        if agentApplication.getAmlsDetails.amlsEvidence.exists(_.fileUploadReference === upload.fileUploadReference)
-        then Future.successful(()) // Evidence already exists for this upload - skipping duplicate transfer to Object Store and database update
-        else
-          for
-            _ <-
-              agentApplication.getAmlsDetails.amlsEvidence.fold(Future.successful(())) {
-                amlsEvidence =>
-                  logger.info(s"Deleting stale evidence from ObjectStore: ${amlsEvidence.objectStoreLocation} (evidence replaced by new upload)")
-                  objectStoreService.deleteObject(amlsEvidence.objectStoreLocation)
-              }
-            objectStoreLocation <-
-              logger.info(s"Transferring AmlsEvidence to ObjectStore: ${succeeded.fileName}")
-              objectStoreService.transferFileToObjectStore(
-                fileReference = upload.fileUploadReference,
-                downloadUrl = succeeded.downloadUrl,
-                mimeType = succeeded.mimeType,
-                checksum = succeeded.checksum,
-                fileName = succeeded.fileName
-              )
-            _ <- agentRegistrationConnector.upsertApplication(
-              agentApplication
-                .modify(_.amlsDetails.each.amlsEvidence)
-                .setTo(
-                  Some(AmlsEvidence(
-                    fileUploadReference = upload.fileUploadReference,
-                    fileName = succeeded.fileName,
-                    objectStoreLocation = objectStoreLocation
-                  ))
-                )
+        for
+          _ <-
+            agentApplication.getFixableAmlsDetails.amlsEvidence.fold(Future.successful(())) {
+              amlsEvidence =>
+                logger.info(s"Deleting stale evidence from ObjectStore: ${amlsEvidence.objectStoreLocation} (evidence replaced by new upload)")
+                objectStoreService.deleteObject(amlsEvidence.objectStoreLocation)
+            }
+          objectStoreLocation <-
+            logger.info(s"Transferring AmlsEvidence to ObjectStore: ${succeeded.fileName}")
+            objectStoreService.transferFileToObjectStore(
+              fileReference = upload.fileUploadReference,
+              downloadUrl = succeeded.downloadUrl,
+              mimeType = succeeded.mimeType,
+              checksum = succeeded.checksum,
+              fileName = succeeded.fileName
             )
-          yield ()
+          updatedAmlsDetails: AmlsDetails = agentApplication.getFixableAmlsDetails
+            .modify(_.amlsEvidence)
+            .setTo(
+              Some(AmlsEvidence(
+                fileUploadReference = upload.fileUploadReference,
+                fileName = succeeded.fileName,
+                objectStoreLocation = objectStoreLocation
+              ))
+            )
+          updatedFixes: Seq[EntityFix] =
+            agentApplication
+              .getRiskingOutcomeEntity match
+              case f: RiskingOutcomeEntity.FailedFixable =>
+                f.fixes.map:
+                  case a: AmlsFix => a.modify(_.amlsDetails).setTo(Some(updatedAmlsDetails))
+                  case other: EntityFix => other
+              case _ => throw new IllegalStateException("Risking outcome is not fixable. Cannot submit Amls registration number.")
+          _ <- agentRegistrationConnector.upsertApplication(
+            agentApplication
+              .modify(_.riskingOutcomeEntity.each)
+              .using:
+                case f: RiskingOutcomeEntity.FailedFixable => f.copy(fixes = updatedFixes)
+                case other => other
+          )
+        yield ()
 
   /** This endpoint is called via JavaScript in a poll loop to check the status of the file upload. The upload status is encoded in the HTTP status response:
     */
   def checkUploadStatusJs: Action[AnyContent] = actions
-    .getApplicationInProgress
+    .getApplicationAfterSentForRisking
     .async:
       implicit request =>
 

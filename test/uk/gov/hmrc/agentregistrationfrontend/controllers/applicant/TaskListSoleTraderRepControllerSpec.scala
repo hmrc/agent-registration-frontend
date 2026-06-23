@@ -45,7 +45,7 @@ extends ControllerSpec:
     )
 
   s"GET $path for sole trader representative afterGlobalAsaEnrolmentCheckPass should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(tdAll.agentApplicationSoleTraderRepresentative.afterGlobalAsaEnrolmentCheckPass, List.empty)
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(tdAll.agentApplicationSoleTraderRepresentative.afterGlobalAsaEnrolmentCheckPass, List.empty)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -59,10 +59,10 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.askBusinessOwnerToSignIn) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.checkBusinessOwnerProgress) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
-    ApplyStubHelper.verifyConnectorsForTaskListPage(baseApplication)
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(baseApplication)
 
   s"GET $path for sole trader representative afterContactDetailsComplete should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(tdAll.agentApplicationSoleTraderRepresentative.afterContactDetailsComplete, List.empty)
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(tdAll.agentApplicationSoleTraderRepresentative.afterContactDetailsComplete, List.empty)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -76,10 +76,10 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.askBusinessOwnerToSignIn) shouldBe Constants.INCOMPLETE // becomes INCOMPLETE
     doc.getTaskStatus(tasks.checkBusinessOwnerProgress) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
-    ApplyStubHelper.verifyConnectorsForTaskListPage(baseApplication)
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(baseApplication)
 
   s"GET $path for sole trader representative afterAgentDetailsComplete should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(tdAll.agentApplicationSoleTraderRepresentative.afterAgentDetailsComplete, List.empty)
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(tdAll.agentApplicationSoleTraderRepresentative.afterAgentDetailsComplete, List.empty)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -93,10 +93,10 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.askBusinessOwnerToSignIn) shouldBe Constants.INCOMPLETE
     doc.getTaskStatus(tasks.checkBusinessOwnerProgress) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
-    ApplyStubHelper.verifyConnectorsForTaskListPage(baseApplication)
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(baseApplication)
 
   s"GET $path for sole trader representative afterAmlsComplete should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(tdAll.agentApplicationSoleTraderRepresentative.afterAmlsComplete, List.empty)
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(tdAll.agentApplicationSoleTraderRepresentative.afterAmlsComplete, List.empty)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -110,10 +110,10 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.askBusinessOwnerToSignIn) shouldBe Constants.INCOMPLETE
     doc.getTaskStatus(tasks.checkBusinessOwnerProgress) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
-    ApplyStubHelper.verifyConnectorsForTaskListPage(baseApplication)
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(baseApplication)
 
   s"GET $path for sole trader representative afterHmrcStandardForAgentsAgreed should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(tdAll.agentApplicationSoleTraderRepresentative.afterHmrcStandardForAgentsAgreed, List.empty)
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(tdAll.agentApplicationSoleTraderRepresentative.afterHmrcStandardForAgentsAgreed, List.empty)
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
@@ -127,10 +127,10 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.askBusinessOwnerToSignIn) shouldBe Constants.INCOMPLETE
     doc.getTaskStatus(tasks.checkBusinessOwnerProgress) shouldBe Constants.CANNOT_START_YET
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
-    ApplyStubHelper.verifyConnectorsForTaskListPage(baseApplication)
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(baseApplication)
 
   s"GET $path for sole trader representative after ask business owner to sign in should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(
       application = tdAll.agentApplicationSoleTraderRepresentative.afterHmrcStandardForAgentsAgreed,
       individuals = List(
         tdAll.providedDetails.afterAccessConfirmed // becomes AccessConfirmed when link is confirmed as having been shared
@@ -149,10 +149,10 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.askBusinessOwnerToSignIn) shouldBe Constants.COMPLETED // becomes COMPLETED
     doc.getTaskStatus(tasks.checkBusinessOwnerProgress) shouldBe Constants.INCOMPLETE // becomes INCOMPLETE
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
-    ApplyStubHelper.verifyConnectorsForTaskListPage(baseApplication)
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(baseApplication)
 
   s"GET $path for sole trader representative after business owner provided details should render correct status tags" in:
-    ApplyStubHelper.stubsForTaskListPage(
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(
       application = tdAll.agentApplicationSoleTraderRepresentative.afterHmrcStandardForAgentsAgreed,
       individuals = List(
         tdAll.providedDetails.afterFinished
@@ -171,4 +171,4 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.askBusinessOwnerToSignIn) shouldBe Constants.COMPLETED
     doc.getTaskStatus(tasks.checkBusinessOwnerProgress) shouldBe Constants.COMPLETED // becomes COMPLETED
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.INCOMPLETE // becomes INCOMPLETE
-    ApplyStubHelper.verifyConnectorsForTaskListPage(baseApplication)
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(baseApplication)

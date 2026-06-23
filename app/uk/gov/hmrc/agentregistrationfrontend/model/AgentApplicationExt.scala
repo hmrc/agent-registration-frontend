@@ -153,6 +153,7 @@ extension (agentApplication: AgentApplication)
       declaration = TaskStatus(
         canStart =
           (amlsFix.isEmpty | amlsDetailsComplete)
+            && (entityFixes.isEmpty | entityFixes.forall(_._2.isComplete))
             && (!hasIndividualFailures), // Declaration can be started only when all prior tasks are complete
         isComplete = false // Declaration is never "complete" until submission
       )

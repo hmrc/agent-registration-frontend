@@ -1,0 +1,63 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistration.shared.amls.AmlsDetails
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.amls.partials.EntityFailure_3_1
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.amls.partials.EntityFailure_3_2
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.amls.partials.EntityFailure_3_3
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.amls.partials.EntityFailure_3_5
+
+@this(
+        layout: Layout,
+        entityFailure_3_1_content: EntityFailure_3_1,
+        entityFailure_3_2_content: EntityFailure_3_2,
+        entityFailure_3_3_content: EntityFailure_3_3,
+        entityFailure_3_5_content: EntityFailure_3_5,
+        govukButton: GovukButton
+)
+
+@(
+        entityName: String,
+        failureCode: String,
+        amlsDetails: AmlsDetails)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{"fixableAmlsDetails"}
+@pageTitle = @{messages(s"$key.$failureCode.heading")}
+@partials = @{
+    Map(
+      "EntityFailure.3.1" -> entityFailure_3_1_content(entityName, amlsDetails),
+      "EntityFailure.3.2" -> entityFailure_3_2_content(entityName, amlsDetails),
+      "EntityFailure.3.3" -> entityFailure_3_3_content(entityName, amlsDetails),
+      "EntityFailure.3.5" -> entityFailure_3_5_content(entityName, amlsDetails)
+    )
+}
+
+@layout(pageTitle = pageTitle) {
+  <h2 class="govuk-caption-l">@messages("amlsDetails.title")</h2>
+  <h1 class="govuk-heading-l">@pageTitle</h1>
+  @{partials.getOrElse(failureCode, Html(""))}
+  <p class="govuk-body">
+    @govukButton(Button(
+      href = Some(AppRoutes.fixablefailures.amlsfailure.CheckYourAnswersController.show.url),
+      content = Text(messages("common.continue"))
+    ))
+  </p>
+
+}

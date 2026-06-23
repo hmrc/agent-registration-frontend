@@ -25,9 +25,6 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls.api.rout
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.routes as entitycheckfailedRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.applicantcontactdetails.routes as applicantcontactdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.agentdetails.routes as agentdetailsRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.ReverseFixableTaskListController
-import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.ReverseSaveForLaterController
-import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amls.ReverseFixableAmlsDetailsController
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.routes as listdetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.soletrader.routes as listdetailsSoleTraderRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.nonincorporated.routes as listdetailsNonIncorporatedRoutes
@@ -44,10 +41,8 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.routes as test
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.routes as testOnlyApplicantRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.individual.routes as testOnlyIndividualRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.routes as fixableFailuresRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amls.routes as fixableAmlsRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.entityfailures.ReverseFixableEntityFailuresController
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amlsfailure.routes as fixableAmlsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.entityfailures.routes as fixableEntityFailuresRoutes
-import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.individualfailures.ReverseFixableIndividualsController
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.individualfailures.routes as fixableIndividualsRoutes
 
 /** All application routes centralized in one place for convenience and clarity. It helps avoid naming conflicts and makes route management easier.
@@ -177,17 +172,22 @@ object AppRoutes:
 
   object fixablefailures:
 
-    val FixableTaskListController: ReverseFixableTaskListController = fixableFailuresRoutes.FixableTaskListController
-    val SaveForLaterController: ReverseSaveForLaterController = fixableFailuresRoutes.SaveForLaterController
+    val FixableTaskListController = fixableFailuresRoutes.FixableTaskListController
+    val SaveForLaterController = fixableFailuresRoutes.SaveForLaterController
 
-    object amls:
-      val FixableAmlsDetailsController: ReverseFixableAmlsDetailsController = fixableAmlsRoutes.FixableAmlsDetailsController
+    object amlsfailure:
+
+      val FixableAmlsDetailsController = fixableAmlsRoutes.FixableAmlsDetailsController
+      val AmlsEvidenceUploadController = fixableAmlsRoutes.AmlsEvidenceUploadController
+      val AmlsSupervisorController = fixableAmlsRoutes.AmlsSupervisorController
+      val AmlsRegistrationNumberController = fixableAmlsRoutes.AmlsRegistrationNumberController
+      val CheckYourAnswersController = fixableAmlsRoutes.CheckYourAnswersController
 
     object entityfailures:
-      val FixableEntityFailuresController: ReverseFixableEntityFailuresController = fixableEntityFailuresRoutes.FixableEntityFailuresController
+      val FixableEntityFailuresController = fixableEntityFailuresRoutes.FixableEntityFailuresController
 
     object individualfailures:
-      val FixableIndividualsController: ReverseFixableIndividualsController = fixableIndividualsRoutes.FixableIndividualsController
+      val FixableIndividualsController = fixableIndividualsRoutes.FixableIndividualsController
 
   object providedetails:
 
