@@ -105,7 +105,6 @@
   <p class="govuk-body">@messages(s"$key.p1")</p>
   <p class="govuk-body">@messages(s"$key.p2")</p>
   <p class="govuk-body">@Html(messages(s"$key.p3", dateOfDeadline))</p>
-  <h2 class="govuk-heading-m">@messages(s"$key.actions.h2")</h2>
   @govukTable(Table(
     head = Some(Seq(
       HeadCell(
@@ -119,6 +118,8 @@
       )
     )),
     firstCellIsHeader = true,
+    caption = Some(messages(s"$key.actions.h2")),
+    captionClasses = "govuk-table__caption--m",
     rows = fixableIndividualsList.map { individual =>
       Seq(
         TableRow(
