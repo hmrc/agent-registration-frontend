@@ -26,6 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication.Outcome
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
@@ -40,13 +41,15 @@ class FixableIndividualsController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   individualProvideDetailsService: IndividualProvideDetailsService,
-  fixableIndividualsPage: FixableIndividualsPage
+  fixableIndividualsPage: FixableIndividualsPage,
+  appConfig: AppConfig
 )
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] =
     actions
       .getApplicationAfterSentForRisking
+      .behindFeatureFlag(appConfig.Features.fixableFailures)
       .ensure(
         condition =
           implicit request =>
@@ -62,11 +65,12 @@ extends FrontendController(mcc, actions):
       .refine(implicit request =>
         val agentApplication: AgentApplication = request.get
         individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
-          val fixable = individualsList.filter(_.isFixable)
-          if fixable.nonEmpty
-          then request.add[List[IndividualProvidedDetails]](fixable)
+          val fixableList = individualsList.filter(_.hasFixableFailure)
+
+          if fixableList.nonEmpty
+          then request.add[List[IndividualProvidedDetails]](fixableList)
           else
-            logger.warn("Individuals risking outcomes are not fixable. Redirecting to where outcome can be handled.")
+            logger.warn("No fixable individuals found. Redirecting to status page.")
             Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
       ):
         implicit request =>
@@ -82,7 +86,6 @@ extends FrontendController(mcc, actions):
           ))
 
   extension (ipd: IndividualProvidedDetails)
-    private def isFixable: Boolean = ipd.riskingOutcomeIndividual.exists {
+    private def hasFixableFailure: Boolean = ipd.riskingOutcomeIndividual.exists:
       case RiskingOutcomeIndividual.FailedFixable(_) => true
       case _ => false
-    }
