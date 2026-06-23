@@ -59,7 +59,7 @@ extends FrontendController(mcc, actions):
                   None,
                   _
                 ) =>
-              Redirect(AppRoutes.fixablefailures.amlsfailure.AmlsRegistrationNumberController.show)
+              Redirect(AppRoutes.fixablefailures.amlsfailure.AmlsSupervisorController.show)
             case AmlsDetails(
                   AmlsSupervisoryBodyCode(amlsCode),
                   Some(_),
@@ -82,7 +82,7 @@ extends FrontendController(mcc, actions):
                 None,
                 _
               ) =>
-            Redirect(AppRoutes.fixablefailures.amlsfailure.AmlsRegistrationNumberController.show)
+            Redirect(AppRoutes.fixablefailures.amlsfailure.AmlsSupervisorController.show)
           case AmlsDetails(
                 AmlsSupervisoryBodyCode(amlsCode),
                 Some(_),

@@ -22,12 +22,13 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
-import uk.gov.hmrc.agentregistration.shared.amls.AmlsDetails
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsDetails
+import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
 import uk.gov.hmrc.agentregistration.shared.risking.EntityFix
 import uk.gov.hmrc.agentregistration.shared.risking.EntityFix._3.AmlsFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
@@ -37,6 +38,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailure
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.Future
 
 @Singleton
 class AmlsSupervisorController @Inject() (
@@ -78,25 +80,31 @@ extends FrontendController(mcc, actions):
       )
       .async:
         implicit request: RequestWithData[AmlsSupervisoryBodyCode *: DataWithApplicationAndBpr] =>
-          val agentApplication: AgentApplication = request.get
           val supervisoryBody: AmlsSupervisoryBodyCode = request.get
-          val updatedAmlsDetails: AmlsDetails = agentApplication.getFixableAmlsDetails
-            .modify(_.supervisoryBody).setTo(supervisoryBody)
-            .modify(_.amlsRegistrationNumber).setTo(None)
-          val updatedFixes: Seq[EntityFix] =
-            agentApplication
-              .getRiskingOutcomeEntity match
-              case f: RiskingOutcomeEntity.FailedFixable =>
-                f.fixes.map:
-                  case a: AmlsFix => a.modify(_.amlsDetails).setTo(Some(updatedAmlsDetails))
-                  case other: EntityFix => other
-              case _ => throw new IllegalStateException("Risking outcome is not fixable. Cannot submit supervisory body.")
-          applicationService.upsert(
-            agentApplication
-              .modify(_.riskingOutcomeEntity.each)
-              .using:
-                case f: RiskingOutcomeEntity.FailedFixable => f.copy(fixes = updatedFixes)
-                case other => other
-          )
-            .map(_ => Redirect(AppRoutes.fixablefailures.amlsfailure.CheckYourAnswersController.show.url))
+          val agentApplication: AgentApplication = request.get
+          val fixableAmlsDetails: AmlsDetails = agentApplication.getFixableAmlsDetails
+          if fixableAmlsDetails.supervisoryBody === supervisoryBody &&
+            fixableAmlsDetails.amlsRegistrationNumber.isDefined
+          then
+            Future.successful(Redirect(AppRoutes.fixablefailures.amlsfailure.CheckYourAnswersController.show.url)) // if same body is submitted and there is already a registration number then use CYA for navigation
+          else
+            val updatedAmlsDetails: AmlsDetails = fixableAmlsDetails
+              .modify(_.supervisoryBody).setTo(supervisoryBody)
+              .modify(_.amlsRegistrationNumber).setTo(None)
+            val updatedFixes: Seq[EntityFix] =
+              agentApplication
+                .getRiskingOutcomeEntity match
+                case f: RiskingOutcomeEntity.FailedFixable =>
+                  f.fixes.map:
+                    case a: AmlsFix => a.modify(_.amlsDetails).setTo(Some(updatedAmlsDetails))
+                    case other: EntityFix => other
+                case _ => throw new IllegalStateException("Risking outcome is not fixable. Cannot submit supervisory body.")
+            applicationService.upsert(
+              agentApplication
+                .modify(_.riskingOutcomeEntity.each)
+                .using:
+                  case f: RiskingOutcomeEntity.FailedFixable => f.copy(fixes = updatedFixes)
+                  case other => other
+            )
+              .map(_ => Redirect(AppRoutes.fixablefailures.amlsfailure.AmlsRegistrationNumberController.show.url))
       .redirectIfFixableSaveForLater

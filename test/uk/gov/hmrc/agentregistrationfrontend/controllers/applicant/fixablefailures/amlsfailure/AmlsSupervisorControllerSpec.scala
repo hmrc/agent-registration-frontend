@@ -83,17 +83,26 @@ extends ControllerSpec:
       .attr("value") shouldBe "HMRC"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
-  s"POST $path with valid selection should redirect to the next page" in:
+  s"POST $path with valid selection to change the supervisor should delete old registration number and redirect to the registration number page" in:
     ApplyStubHelper.stubsForSuccessfulUpdateWithBpr(
       application = agentApplication.riskingCompletedFixable,
       updatedApplication = agentApplication.newSupervisorInFix
     )
+    val response: WSResponse = post(path)(Map(AmlsCodeForm.key -> Seq("ATT")))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe Constants.EMPTY_STRING
+    response.header("Location").value shouldBe AppRoutes.fixablefailures.amlsfailure.AmlsRegistrationNumberController.show.url
+    ApplyStubHelper.verifyConnectorsForSuccessfulUpdateWithBpr()
+
+  s"POST $path with valid selection to keep the same supervisor should not update anything and redirect to the CYA page" in:
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.riskingCompletedFixable)
     val response: WSResponse = post(path)(Map(AmlsCodeForm.key -> Seq("HMRC")))
 
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.fixablefailures.amlsfailure.CheckYourAnswersController.show.url
-    ApplyStubHelper.verifyConnectorsForSuccessfulUpdateWithBpr()
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"POST $path without valid selection should return 400" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.riskingCompletedFixable)
