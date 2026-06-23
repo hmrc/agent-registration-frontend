@@ -107,7 +107,7 @@ extends ViewSpec:
           amlsDetails = agentApplication.withNonHmrcAmls.getAmlsDetails
         ).body
       )
-      s"FailedNonFixablePage when individuals have failures with failure code $failureCode" should:
+      s"FixableAmlsDetailsPage when individuals have failures with failure code $failureCode" should:
         "have expected content" in:
           doc.mainContent shouldContainContent expectedContent
 

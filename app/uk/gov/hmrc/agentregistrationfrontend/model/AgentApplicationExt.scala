@@ -116,6 +116,7 @@ extension (agentApplication: AgentApplication)
         case f: RiskingOutcomeEntity.FailedFixable => Some(f)
         case _ => None
     val hasIndividualFailures: Boolean = fixableIndividuals.nonEmpty
+    val individualsComplete: Boolean = fixableIndividuals.forall(i => i.fixes.forall(_.isConfirmed.contains(true))) | !hasIndividualFailures
     val entityFixes: Map[String, TaskStatus] =
       fixableEntity.map(_.fixes).getOrElse(Nil).filterNot {
         case _: AmlsFix => true
@@ -154,7 +155,7 @@ extension (agentApplication: AgentApplication)
         canStart =
           (amlsFix.isEmpty | amlsDetailsComplete)
             && (entityFixes.isEmpty | entityFixes.forall(_._2.isComplete))
-            && (!hasIndividualFailures), // Declaration can be started only when all prior tasks are complete
+            && individualsComplete, // Declaration can be started only when all prior tasks are complete
         isComplete = false // Declaration is never "complete" until submission
       )
     )
