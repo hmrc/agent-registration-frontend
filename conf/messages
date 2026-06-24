@@ -1185,6 +1185,25 @@ failedNonFixable.appeal.h2 = What to do if you disagree
 failedNonFixable.appeal.li1 = If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can apply again.
 failedNonFixable.appeal.li2 = If you disagree with the outcome, you can <a class="govuk-link" href="{0}" target="_blank" rel="noopener noreferrer">request a review or appeal the decision (opens in a new tab)</a>.
 
+# List for individual fixable failures
+fixableIndividuals.title = We need to hear from these people before you submit the application again
+fixableIndividuals.caption = Relevant individuals: awaiting information
+fixableIndividuals.p1 = We have sent an email to the people on this list to ask for more information.
+fixableIndividuals.p2 = They need to provide this information as soon as possible. You cannot resubmit the application until we hear from them.
+fixableIndividuals.p3 = Your deadline to resubmit the application is {0}
+fixableIndividuals.actions.h2 = Actions to be completed
+fixableIndividuals.th.name = Name
+fixableIndividuals.th.action = Action
+fixableIndividuals.th.completed = Completed
+fixableIndividuals.details.summary = Remind me of the link to send to relevant individuals
+fixableIndividuals.details.content = {0}
+fixableIndividuals.yes = Yes
+fixableIndividuals.no = No
+fixableIndividuals.individualFix.4 = File one or more relevant returns
+fixableIndividuals.individualFix.5 = Pay one or more overdue liabilities
+fixableIndividuals.individualFix.8 = Pay a liability connected to relevant anti-avoidance
+fixableIndividuals.individualFix.10 = Check and update their details
+
 # Failure messages for non-fixable page as shown to entity
 NonFixableOutcomeListForEntityFailures.EntityFailure.3.1 = we could not confirm the anti-money laundering supervision for {0} based on the information you provided
 NonFixableOutcomeListForEntityFailures.EntityFailure.3.1.SoleTrader = we could not confirm the anti-money laundering supervision for {0} based on the information you provided
@@ -1306,7 +1325,6 @@ NonFixableOutcomeListForIndividualFailures.IndividualFailure.10.1.SoleTraderNotO
 NonFixableOutcomeListForIndividualFailures.IndividualFailure.10.2 = We did not get enough information to check that {0} met the registration conditions
 NonFixableOutcomeListForIndividualFailures.IndividualFailure.10.2.SoleTrader = We did not get enough information to check that {0} met the registration conditions
 NonFixableOutcomeListForIndividualFailures.IndividualFailure.10.2.SoleTraderNotOwner = We did not get enough information to check that {0} met the registration conditions
-
 
 # Individual outcome
 NonFixableIndividualListPage.caption = Application outcome

@@ -1,0 +1,146 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.govukfrontend.views.html.components._
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.components.CopyButton
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLaterLinks
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
+@import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual.FailedFixable
+@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+@import views.html.helper.CSPNonce
+
+@this(
+  appConfig: AppConfig,
+  layout: Layout,
+  govukTable: GovukTable,
+  continueOrSaveForLaterLinks: ContinueOrSaveForLaterLinks,
+  copyButton: CopyButton,
+  govukDetails : GovukDetails
+)
+
+@(
+  dateOfDeadline: String,
+  fixableIndividualsList: List[IndividualProvidedDetails],
+  agentApplication: AgentApplication
+)(implicit
+  request: RequestHeader,
+  messages: Messages
+)
+
+@templateScripts = {
+<script src="@{controllers.routes.Assets.versioned("javascripts/copy-button.js")}" @{CSPNonce.attr}></script>
+}
+@templateStyles = {
+<link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/copy-button.css")}" @{CSPNonce.attr}>
+}
+
+@key = @{"fixableIndividuals"}
+@title = @{messages(s"$key.title")}
+
+@caption = @{messages(s"$key.caption")}
+
+@provideDetailsLink = @{appConfig.applicationLink(agentApplication.linkId.value).toString}
+
+@detailsHtml = {
+  <p class="govuk-body">@messages(s"$key.details.content", provideDetailsLink)</p>
+  @copyButton(clip = provideDetailsLink)
+}
+
+@messageFor(fix: IndividualFix) = @{
+  fix match {
+    case _: IndividualFix._4._1 | _: IndividualFix._4._3 | _: IndividualFix._4._4 => messages(s"$key.individualFix.4")
+    case _: IndividualFix._5._1 | _: IndividualFix._5._3 | _: IndividualFix._5._4 | _: IndividualFix._5._5 | _: IndividualFix._5._6 | _: IndividualFix._5._7 => messages(s"$key.individualFix.5")
+    case _: IndividualFix._8._7 => messages(s"$key.individualFix.8")
+    case _: IndividualFix._10.IndividualDetailsFix => messages(s"$key.individualFix.10")
+  }
+}
+
+@actionsList(individual: IndividualProvidedDetails) = {
+  @{individual.riskingOutcomeIndividual match {
+    case Some(FailedFixable(fixes: Seq[IndividualFix])) =>
+      <ul class="govuk-list">
+        {fixes.map { fix =>
+          <li>{messageFor(fix)}</li>
+        }}
+      </ul>
+    case _ => <!-- -->
+  }}
+}
+
+@checkAllActionsCompleted(individual: IndividualProvidedDetails) = {
+  @{individual.riskingOutcomeIndividual match {
+    case Some(FailedFixable(fixes: Seq[IndividualFix])) =>
+      if (fixes.forall(_.isConfirmed === Some(true))) messages(s"$key.yes")
+      else messages(s"$key.no")
+    case _ => <!-- -->
+  }}
+}
+
+@layout(
+  pageTitle = title,
+  templateScripts = Some(templateScripts),
+  templateStyles = Some(templateStyles)
+) {
+  <h2 class="govuk-caption-l">@caption</h2>
+  <h1 class="govuk-heading-l">@title</h1>
+  <p class="govuk-body">@messages(s"$key.p1")</p>
+  <p class="govuk-body">@messages(s"$key.p2")</p>
+  <p class="govuk-body">@Html(messages(s"$key.p3", dateOfDeadline))</p>
+  @govukTable(Table(
+    head = Some(Seq(
+      HeadCell(
+        content = Text(messages(s"$key.th.name"))
+      ),
+      HeadCell(
+        content = Text(messages(s"$key.th.action"))
+      ),
+      HeadCell(
+        content = Text(messages(s"$key.th.completed"))
+      )
+    )),
+    firstCellIsHeader = true,
+    caption = Some(messages(s"$key.actions.h2")),
+    captionClasses = "govuk-table__caption--m",
+    rows = fixableIndividualsList.map { individual =>
+      Seq(
+        TableRow(
+          content = Text(individual.individualName.value)
+        ),
+        TableRow(
+          content = HtmlContent(actionsList(individual))
+        ),
+        TableRow(
+          content = HtmlContent(checkAllActionsCompleted(individual))
+        )
+      )
+    }
+  ))
+  @govukDetails(Details(
+    summary = Text(messages(s"$key.details.summary")),
+    content = HtmlContent(detailsHtml)
+  ))
+
+  <p class="govuk-body">
+    @continueOrSaveForLaterLinks(
+      continueHref = AppRoutes.apply.TaskListController.show.url,
+      continueLabel = Some(messages("common.returnToTaskList"))
+    )
+  </p>
+}

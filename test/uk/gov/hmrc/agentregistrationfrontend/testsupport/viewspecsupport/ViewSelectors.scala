@@ -193,8 +193,8 @@ object ViewSelectors:
         TestTable(
           caption = element.selectOrFail("caption").text(),
           rows = element.selectOrFail("tbody tr").toList.map { row =>
-            for (i <- 0 until numberOfCols)
-              yield row.selectOrFail("td").selectOrFail(i).text()
+            for (i <- 1 to numberOfCols)
+              yield row.selectOrFail("th, td").selectOrFail(i).text()
           }
         )
 
