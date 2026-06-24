@@ -1187,7 +1187,7 @@ failedNonFixable.appeal.li2 = If you disagree with the outcome, you can <a class
 
 # List for individual fixable failures
 fixableIndividuals.title = We need to hear from these people before you submit the application again
-fixableIndividuals.titleCaption = Relevant individuals: awaiting information
+fixableIndividuals.caption = Relevant individuals: awaiting information
 fixableIndividuals.p1 = We have sent an email to the people on this list to ask for more information.
 fixableIndividuals.p2 = They need to provide this information as soon as possible. You cannot resubmit the application until we hear from them.
 fixableIndividuals.p3 = Your deadline to resubmit the application is {0}

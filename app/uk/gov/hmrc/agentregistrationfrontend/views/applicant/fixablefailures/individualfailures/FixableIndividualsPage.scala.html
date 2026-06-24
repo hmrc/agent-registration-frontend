@@ -54,6 +54,8 @@
 @key = @{"fixableIndividuals"}
 @title = @{messages(s"$key.title")}
 
+@caption = @{messages(s"$key.caption")}
+
 @provideDetailsLink = @{appConfig.applicationLink(agentApplication.linkId.value).toString}
 
 @detailsHtml = {
@@ -96,12 +98,8 @@
   templateScripts = Some(templateScripts),
   templateStyles = Some(templateStyles)
 ) {
-   <h1 class="govuk-heading-l">
-   <span class="govuk-caption-l">
-     @messages(s"$key.titleCaption")
-   </span>
-   @title
-  </h1>
+  <h2 class="govuk-caption-l">@caption</h2>
+  <h1 class="govuk-heading-l">@title</h1>
   <p class="govuk-body">@messages(s"$key.p1")</p>
   <p class="govuk-body">@messages(s"$key.p2")</p>
   <p class="govuk-body">@Html(messages(s"$key.p3", dateOfDeadline))</p>
