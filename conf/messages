@@ -1202,7 +1202,7 @@ fixableIndividuals.no = No
 fixableIndividuals.individualFix.4 = File one or more relevant returns
 fixableIndividuals.individualFix.5 = Pay one or more overdue liabilities
 fixableIndividuals.individualFix.8 = Pay a liability connected to relevant anti-avoidance
-fixableIndividuals.individualFix.10 = To do
+fixableIndividuals.individualFix.10 = Check and update their details
 
 # Failure messages for non-fixable page as shown to entity
 NonFixableOutcomeListForEntityFailures.EntityFailure.3.1 = we could not confirm the anti-money laundering supervision for {0} based on the information you provided

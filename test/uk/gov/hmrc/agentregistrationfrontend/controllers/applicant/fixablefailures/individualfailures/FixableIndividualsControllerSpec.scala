@@ -105,7 +105,7 @@ extends ControllerSpec:
         // TODO: Add content for fixable failure 10
         IndexedSeq(
           "Test Name 3",
-          "Pay a liability connected to relevant anti-avoidance To do",
+          "Pay a liability connected to relevant anti-avoidance Check and update their details",
           "Yes"
         )
       )
