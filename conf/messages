@@ -1141,32 +1141,272 @@ fixableAmlsDetails.EntityFailure.3.5.bullet2 = registration number: {0}
 fixableAmlsDetails.EntityFailure.3.5.p2 = These records are for student membership. A student membership does not provide the level of anti-money laundering supervision you need as an agent with HMRC.
 fixableAmlsDetails.EntityFailure.3.5.p3 = You need to confirm that {0} has membership of a professional body that includes anti-money laundering supervision.
 
-fixableDetails.EntityFix.4.1.heading = Self Assessment returns for {0}
-fixableDetails.EntityFix.4.1.heading.SoleTrader = Your Self Assessment returns
-fixableDetails.EntityFix.4.2.heading = Company Tax returns for {0}
-fixableDetails.EntityFix.4.2.heading.SoleTrader = Your Company Tax returns
-fixableDetails.EntityFix.4.3.heading = VAT returns for {0}
-fixableDetails.EntityFix.4.3.heading.SoleTrader = Your VAT returns
-fixableDetails.EntityFix.4.4.heading = PAYE reports for {0}
-fixableDetails.EntityFix.4.4.heading.SoleTrader = Your PAYE reports
-fixableDetails.EntityFix.5.1.heading = {0} has an overdue Self Assessment liability
-fixableDetails.EntityFix.5.1.heading.SoleTrader = You have an overdue Self Assessment liability
-fixableDetails.EntityFix.5.2.heading = {0} has an overdue Corporation Tax liability
-fixableDetails.EntityFix.5.3.heading = {0} has an overdue VAT liability
-fixableDetails.EntityFix.5.3.heading.SoleTrader = You have an overdue VAT liability
-fixableDetails.EntityFix.5.4.heading = {0} has an overdue PAYE liability
-fixableDetails.EntityFix.5.4.heading.SoleTrader = You have an overdue PAYE liability
-fixableDetails.EntityFix.5.5.heading = {0} has an overdue civil penalty liability
-fixableDetails.EntityFix.5.5.heading.SoleTrader = You have an overdue civil penalty liability
-fixableDetails.EntityFix.5.6.heading = {0} has an overdue Stamp Duty liability
-fixableDetails.EntityFix.5.6.heading.SoleTrader = You have an overdue Stamp Duty liability
-fixableDetails.EntityFix.5.7.heading = {0} has an overdue Capital Gains Tax liability
-fixableDetails.EntityFix.5.7.heading.SoleTrader = You have an overdue Capital Gains Tax liability
-fixableDetails.EntityFix.8.5.heading = {0} has an overdue penalty liability
-fixableDetails.EntityFix.8.5.heading.SoleTrader = You have an overdue penalty liability
-fixableDetails.EntityFix.8.7.heading = {0} has an overdue penalty liability
-fixableDetails.EntityFix.8.7.heading.SoleTrader = You have an overdue penalty liability
-fixableDetails.amlsDetails.heading = Anti-money laundering supervision details for {0}
+fixableEntityDetails.title = Issues with the business
+fixableEntityDetails.EntityFix.4.1.heading = Self Assessment returns for {0}
+fixableEntityDetails.EntityFix.4.1.p1 = When we reviewed the application for {0}, we found that one or more returns had not been filed.
+fixableEntityDetails.EntityFix.4.1.p2 = We cannot set up an agent services account for {0} until this has been resolved.
+fixableEntityDetails.EntityFix.4.1.action.h2 = Take action on this issue
+fixableEntityDetails.EntityFix.4.1.action.p1 = All overdue returns must now be filed and any resulting liabilities paid.
+fixableEntityDetails.EntityFix.4.1.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.4.1.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.4.1.action.p4 = Find out more about <a href="https://www.gov.uk/self-assessment-tax-returns" class="govuk-link" rel="noopener noreferrer" target="_blank">Self Assessment tax returns (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.4.1.label = Have all overdue returns been filed?
+isFixed.EntityFix.4.1.error.required = Select yes if all overdue returns have been filed
+isFixed.EntityFix.4.1.error.invalid = Select yes if all overdue returns have been filed
+
+fixableEntityDetails.EntityFix.4.1.heading.SoleTrader = Your Self Assessment returns
+fixableEntityDetails.EntityFix.4.1.p1.SoleTrader = When we reviewed your application, we found that one or more returns had not been filed.
+fixableEntityDetails.EntityFix.4.1.p2.SoleTrader = We cannot set up an agent services account for you until this is resolved.
+fixableEntityDetails.EntityFix.4.1.action.h2.SoleTrader = Take action on this issue
+fixableEntityDetails.EntityFix.4.1.action.p1.SoleTrader = All overdue returns must now be filed and any resulting liabilities paid.
+fixableEntityDetails.EntityFix.4.1.action.p2.SoleTrader = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.4.1.action.p3.SoleTrader = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.4.1.action.p4.SoleTrader = Find out more about <a href="https://www.gov.uk/self-assessment-tax-returns" class="govuk-link" rel="noopener noreferrer" target="_blank">Self Assessment tax returns (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.4.1.label.SoleTrader = Have all overdue returns been filed?
+
+fixableEntityDetails.EntityFix.4.2.heading = Company Tax returns for {0}
+fixableEntityDetails.EntityFix.4.2.p1 = When we reviewed the application for {0}, we found that one or more returns had not been filed.
+fixableEntityDetails.EntityFix.4.2.p2 = We cannot set up an agent services account for {0} until this has been resolved.
+fixableEntityDetails.EntityFix.4.2.action.h2 = Take action on this issue
+fixableEntityDetails.EntityFix.4.2.action.p1 = All overdue returns must now be filed and any resulting liabilities paid.
+fixableEntityDetails.EntityFix.4.2.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.4.2.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.4.2.action.p4 = Find out more about <a href="https://www.gov.uk/file-your-company-accounts-and-tax-return" class="govuk-link" rel="noopener noreferrer" target="_blank">Company Tax returns (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.4.2.label = Have all overdue returns been filed?
+isFixed.EntityFix.4.2.error.required = Select yes if all overdue returns have been filed
+isFixed.EntityFix.4.2.error.invalid = Select yes if all overdue returns have been filed
+
+fixableEntityDetails.EntityFix.4.3.heading = VAT returns for {0}
+fixableEntityDetails.EntityFix.4.3.p1 = When we reviewed the application for {0}, we found that one or more returns had not been filed.
+fixableEntityDetails.EntityFix.4.3.p2 = We cannot set up an agent services account for {0} until this is resolved.
+fixableEntityDetails.EntityFix.4.3.action.h2 = Take action on this issue
+fixableEntityDetails.EntityFix.4.3.action.p1 = All overdue returns must now be filed and any resulting liabilities paid.
+fixableEntityDetails.EntityFix.4.3.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.4.3.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.4.3.action.p4 = Find out more about <a href="https://www.gov.uk/submit-vat-return" class="govuk-link" rel="noopener noreferrer" target="_blank">VAT returns (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.4.3.label = Have all overdue returns been filed?
+isFixed.EntityFix.4.3.error.required = Select yes if all overdue returns have been filed
+isFixed.EntityFix.4.3.error.invalid = Select yes if all overdue returns have been filed
+
+fixableEntityDetails.EntityFix.4.3.heading.SoleTrader = Your VAT returns
+fixableEntityDetails.EntityFix.4.3.p1.SoleTrader = When we reviewed your application, we found that one or more returns had not been filed.
+fixableEntityDetails.EntityFix.4.3.p2.SoleTrader = We cannot set up an agent services account for you until this is resolved.
+fixableEntityDetails.EntityFix.4.3.action.h2.SoleTrader = Take action on this issue
+fixableEntityDetails.EntityFix.4.3.action.p1.SoleTrader = All overdue returns must now be filed and any resulting liabilities paid.
+fixableEntityDetails.EntityFix.4.3.action.p2.SoleTrader = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.4.3.action.p3.SoleTrader = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.4.3.action.p4.SoleTrader = Find out more about <a href="https://www.gov.uk/submit-vat-return" class="govuk-link" rel="noopener noreferrer" target="_blank">VAT returns (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.4.3.label.SoleTrader = Have all overdue returns been filed?
+
+fixableEntityDetails.EntityFix.4.4.heading = PAYE reports for {0}
+fixableEntityDetails.EntityFix.4.4.p1 = When we reviewed the application for {0}, we found that one or more reports had not been filed.
+fixableEntityDetails.EntityFix.4.4.p2 = We cannot set up an agent services account for {0} until this has been resolved.
+fixableEntityDetails.EntityFix.4.4.action.h2 = Take action on this issue
+fixableEntityDetails.EntityFix.4.4.action.p1 = All overdue reports must now be filed and any resulting liabilities paid.
+fixableEntityDetails.EntityFix.4.4.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.4.4.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.4.4.action.p4 = Find out more about <a href="https://www.gov.uk/paye-for-employers" class="govuk-link" rel="noopener noreferrer" target="_blank">PAYE for employers (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.4.4.label = Have all overdue reports been filed?
+isFixed.EntityFix.4.4.error.required = Select yes if all overdue reports have been filed
+isFixed.EntityFix.4.4.error.invalid = Select yes if all overdue reports have been filed
+
+fixableEntityDetails.EntityFix.4.4.heading.SoleTrader = Your PAYE reports
+fixableEntityDetails.EntityFix.4.4.p1.SoleTrader = When we reviewed your application, we found that one or more reports had not been filed.
+fixableEntityDetails.EntityFix.4.4.p2.SoleTrader = We cannot set up an agent services account for you until this is resolved.
+fixableEntityDetails.EntityFix.4.4.action.h2.SoleTrader = Take action on this issue
+fixableEntityDetails.EntityFix.4.4.action.p1.SoleTrader = All overdue reports must now be filed and any resulting liabilities paid.
+fixableEntityDetails.EntityFix.4.4.action.p2.SoleTrader = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.4.4.action.p3.SoleTrader = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.4.4.action.p4.SoleTrader = Find out more about <a href="https://www.gov.uk/paye-for-employers" class="govuk-link" rel="noopener noreferrer" target="_blank">PAYE for employers (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.4.4.label.SoleTrader = Have all overdue reports been filed?
+
+fixableEntityDetails.EntityFix.5.1.heading = {0} has an overdue Self Assessment liability
+fixableEntityDetails.EntityFix.5.1.p1 = When we reviewed the application, we found that {0} has an overdue Self Assessment liability.
+fixableEntityDetails.EntityFix.5.1.p2 = We cannot set up an agent services account for {0} until this has been resolved.
+fixableEntityDetails.EntityFix.5.1.action.h2 = Take action on this issue
+fixableEntityDetails.EntityFix.5.1.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.5.1.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.1.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.5.1.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#self-assessment" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Self Assessment (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.5.1.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.EntityFix.5.1.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.EntityFix.5.1.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableEntityDetails.EntityFix.5.1.heading.SoleTrader = You have an overdue Self Assessment liability
+fixableEntityDetails.EntityFix.5.1.p1.SoleTrader = When we reviewed the application, we found that you have an overdue Self Assessment liability.
+fixableEntityDetails.EntityFix.5.1.p2.SoleTrader = We cannot set up an agent services account for you until this has been resolved.
+fixableEntityDetails.EntityFix.5.1.action.h2.SoleTrader = Take action on this issue
+fixableEntityDetails.EntityFix.5.1.action.p1.SoleTrader = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.5.1.action.p2.SoleTrader = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.1.action.p3.SoleTrader = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.5.1.action.p4.SoleTrader = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#self-assessment" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Self Assessment (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.5.1.label.SoleTrader = Have all overdue liabilities been paid or included in a payment plan?
+
+fixableEntityDetails.EntityFix.5.2.heading = {0} has an overdue Corporation Tax liability
+fixableEntityDetails.EntityFix.5.2.p1 = When we reviewed the application, we found that {0} has an overdue Corporation Tax liability.
+fixableEntityDetails.EntityFix.5.2.p2 = We cannot set up an agent services account for {0} until this has been resolved.
+fixableEntityDetails.EntityFix.5.2.action.h2 = Take action on this issue
+fixableEntityDetails.EntityFix.5.2.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.5.2.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.2.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.5.2.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#corporation-tax" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Corporation Tax (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.5.2.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.EntityFix.5.2.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.EntityFix.5.2.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableEntityDetails.EntityFix.5.3.heading = {0} has an overdue VAT liability
+fixableEntityDetails.EntityFix.5.3.p1 = When we reviewed the application, we found that {0} has an overdue VAT liability.
+fixableEntityDetails.EntityFix.5.3.p2 = We cannot set up an agent services account for {0} until this has been resolved.
+fixableEntityDetails.EntityFix.5.3.action.h2 = Take action on this issue
+fixableEntityDetails.EntityFix.5.3.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.5.3.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.3.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.5.3.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#vat" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay VAT (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.5.3.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.EntityFix.5.3.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.EntityFix.5.3.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableEntityDetails.EntityFix.5.3.heading.SoleTrader = You have an overdue VAT liability
+fixableEntityDetails.EntityFix.5.3.p1.SoleTrader = When we reviewed the application, we found that you have an overdue VAT liability.
+fixableEntityDetails.EntityFix.5.3.p2.SoleTrader = We cannot set up an agent services account for you until this has been resolved.
+fixableEntityDetails.EntityFix.5.3.action.h2.SoleTrader = Take action on this issue
+fixableEntityDetails.EntityFix.5.3.action.p1.SoleTrader = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.5.3.action.p2.SoleTrader = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.3.action.p3.SoleTrader = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.5.3.action.p4.SoleTrader = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#vat" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay VAT (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.5.3.label.SoleTrader = Have all overdue liabilities been paid or included in a payment plan?
+
+fixableEntityDetails.EntityFix.5.4.heading = {0} has an overdue PAYE liability
+fixableEntityDetails.EntityFix.5.4.p1 = When we reviewed the application, we found that {0} has an overdue PAYE liability.
+fixableEntityDetails.EntityFix.5.4.p2 = We cannot set up an agent services account for {0} until this has been resolved.
+fixableEntityDetails.EntityFix.5.4.action.h2 = Take action on this issue
+fixableEntityDetails.EntityFix.5.4.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.5.4.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.4.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.5.4.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#paye" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay PAYE (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.5.4.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.EntityFix.5.4.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.EntityFix.5.4.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableEntityDetails.EntityFix.5.4.heading.SoleTrader = You have an overdue PAYE liability
+fixableEntityDetails.EntityFix.5.4.p1.SoleTrader = When we reviewed the application, we found that you have an overdue PAYE liability.
+fixableEntityDetails.EntityFix.5.4.p2.SoleTrader = We cannot set up an agent services account for you until this has been resolved.
+fixableEntityDetails.EntityFix.5.4.action.h2.SoleTrader = Take action on this issue
+fixableEntityDetails.EntityFix.5.4.action.p1.SoleTrader = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.5.4.action.p2.SoleTrader = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.4.action.p3.SoleTrader = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.5.4.action.p4.SoleTrader = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#paye" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay PAYE (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.5.4.label.SoleTrader = Have all overdue liabilities been paid or included in a payment plan?
+
+fixableEntityDetails.EntityFix.5.5.heading = {0} has an overdue civil penalty liability
+fixableEntityDetails.EntityFix.5.5.p1 = When we reviewed the application, we found that {0} owed an overdue amount relating to one or more civil penalties.
+fixableEntityDetails.EntityFix.5.5.p2 = We cannot set up an agent services account for {0} until this has been resolved.
+fixableEntityDetails.EntityFix.5.5.action.h2 = Take action on this issue
+fixableEntityDetails.EntityFix.5.5.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.5.5.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.5.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.5.5.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.5.5.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.EntityFix.5.5.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.EntityFix.5.5.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableEntityDetails.EntityFix.5.5.heading.SoleTrader = You have an overdue civil penalty liability
+fixableEntityDetails.EntityFix.5.5.p1.SoleTrader = When we reviewed the application, we found that you owed an overdue amount relating to one or more civil penalties.
+fixableEntityDetails.EntityFix.5.5.p2.SoleTrader = We cannot set up an agent services account for you until this has been resolved.
+fixableEntityDetails.EntityFix.5.5.action.h2.SoleTrader = Take action on this issue
+fixableEntityDetails.EntityFix.5.5.action.p1.SoleTrader = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.5.5.action.p2.SoleTrader = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.5.action.p3.SoleTrader = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.5.5.action.p4.SoleTrader = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.5.5.label.SoleTrader = Have all overdue liabilities been paid or included in a payment plan?
+
+fixableEntityDetails.EntityFix.5.6.heading = {0} has an overdue Stamp Duty liability
+fixableEntityDetails.EntityFix.5.6.p1 = When we reviewed the application, we found that {0} owed an overdue amount relating to Stamp Duty.
+fixableEntityDetails.EntityFix.5.6.p2 = We cannot set up an agent services account for {0} until this has been resolved.
+fixableEntityDetails.EntityFix.5.6.action.h2 = Take action on this issue
+fixableEntityDetails.EntityFix.5.6.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.5.6.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.6.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.5.6.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#stamp-duty-and-other-property-taxes" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Stamp Duty (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.5.6.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.EntityFix.5.6.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.EntityFix.5.6.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableEntityDetails.EntityFix.5.6.heading.SoleTrader = You have an overdue Stamp Duty liability
+fixableEntityDetails.EntityFix.5.6.p1.SoleTrader = When we reviewed the application, we found that you owed an overdue amount relating to Stamp Duty.
+fixableEntityDetails.EntityFix.5.6.p2.SoleTrader = We cannot set up an agent services account for you until this has been resolved.
+fixableEntityDetails.EntityFix.5.6.action.h2.SoleTrader = Take action on this issue
+fixableEntityDetails.EntityFix.5.6.action.p1.SoleTrader = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.5.6.action.p2.SoleTrader = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.6.action.p3.SoleTrader = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.5.6.action.p4.SoleTrader = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#stamp-duty-and-other-property-taxes" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Stamp Duty (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.5.6.label.SoleTrader = Have all overdue liabilities been paid or included in a payment plan?
+
+fixableEntityDetails.EntityFix.5.7.heading = {0} has an overdue Capital Gains Tax liability
+fixableEntityDetails.EntityFix.5.7.p1 = When we reviewed the application, we found that {0} owed an overdue amount relating to Capital Gains Tax.
+fixableEntityDetails.EntityFix.5.7.p2 = We cannot set up an agent services account for {0} until this has been resolved.
+fixableEntityDetails.EntityFix.5.7.action.h2 = Take action on this issue
+fixableEntityDetails.EntityFix.5.7.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.5.7.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.7.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.5.7.action.p4 = Find out <a href="https://www.gov.uk/report-and-pay-your-capital-gains-tax" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Capital Gains Tax (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.5.7.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.EntityFix.5.7.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.EntityFix.5.7.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableEntityDetails.EntityFix.5.7.heading.SoleTrader = You have an overdue Capital Gains Tax liability
+fixableEntityDetails.EntityFix.5.7.p1.SoleTrader = When we reviewed the application, we found that you owed an overdue amount relating to Capital Gains Tax.
+fixableEntityDetails.EntityFix.5.7.p2.SoleTrader = We cannot set up an agent services account for you until this has been resolved.
+fixableEntityDetails.EntityFix.5.7.action.h2.SoleTrader = Take action on this issue
+fixableEntityDetails.EntityFix.5.7.action.p1.SoleTrader = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.5.7.action.p2.SoleTrader = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.7.action.p3.SoleTrader = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.5.7.action.p4.SoleTrader = Find out <a href="https://www.gov.uk/report-and-pay-your-capital-gains-tax" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Capital Gains Tax (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.5.7.label.SoleTrader = Have all overdue liabilities been paid or included in a payment plan?
+
+fixableEntityDetails.EntityFix.8.5.heading = {0} has an overdue penalty liability
+fixableEntityDetails.EntityFix.8.5.p1 = When we reviewed the application, we found that {0} owed an overdue amount relating to one or more relevant anti-avoidance penalties.
+fixableEntityDetails.EntityFix.8.5.p2 = We cannot set up an agent services account for {0} until this has been resolved.
+fixableEntityDetails.EntityFix.8.5.action.h2 = Take action on this issue
+fixableEntityDetails.EntityFix.8.5.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.8.5.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.8.5.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.8.5.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.8.5.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.EntityFix.8.5.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.EntityFix.8.5.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableEntityDetails.EntityFix.8.5.heading.SoleTrader = You have an overdue penalty liability
+fixableEntityDetails.EntityFix.8.5.p1.SoleTrader = When we reviewed the application, we found that you owed an overdue amount relating to one or more relevant anti-avoidance penalties.
+fixableEntityDetails.EntityFix.8.5.p2.SoleTrader = We cannot set up an agent services account for you until this has been resolved.
+fixableEntityDetails.EntityFix.8.5.action.h2.SoleTrader = Take action on this issue
+fixableEntityDetails.EntityFix.8.5.action.p1.SoleTrader = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.8.5.action.p2.SoleTrader = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.8.5.action.p3.SoleTrader = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.8.5.action.p4.SoleTrader = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.8.5.label.SoleTrader = Have all overdue liabilities been paid or included in a payment plan?
+
+fixableEntityDetails.EntityFix.8.7.heading = {0} has an overdue penalty liability
+fixableEntityDetails.EntityFix.8.7.p1 = When we reviewed the application, we found that {0} owed an overdue amount relating to one or more relevant anti-avoidance penalties.
+fixableEntityDetails.EntityFix.8.7.p2 = We cannot set up an agent services account for {0} until this has been resolved.
+fixableEntityDetails.EntityFix.8.7.action.h2 = Take action on this issue
+fixableEntityDetails.EntityFix.8.7.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.8.7.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.8.7.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.8.7.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.8.7.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.EntityFix.8.7.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.EntityFix.8.7.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableEntityDetails.EntityFix.8.7.heading.SoleTrader = You have an overdue penalty liability
+fixableEntityDetails.EntityFix.8.7.p1.SoleTrader = When we reviewed the application, we found that you owed an overdue amount relating to one or more relevant anti-avoidance penalties.
+fixableEntityDetails.EntityFix.8.7.p2.SoleTrader = We cannot set up an agent services account for you until this has been resolved.
+fixableEntityDetails.EntityFix.8.7.action.h2.SoleTrader = Take action on this issue
+fixableEntityDetails.EntityFix.8.7.action.p1.SoleTrader = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableEntityDetails.EntityFix.8.7.action.p2.SoleTrader = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.8.7.action.p3.SoleTrader = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableEntityDetails.EntityFix.8.7.action.p4.SoleTrader = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
+fixableEntityDetails.EntityFix.8.7.label.SoleTrader = Have all overdue liabilities been paid or included in a payment plan?
 
 # Failed Non Fixable
 failedNonFixable.caption = Application outcome

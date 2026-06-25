@@ -221,4 +221,5 @@ GET        /conditions-not-yet-met/anti-money-laundering/evidence/upload-error  
 GET        /conditions-not-yet-met/anti-money-laundering/check-your-answers        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amlsfailure.CheckYourAnswersController.show
 POST       /conditions-not-yet-met/anti-money-laundering/check-your-answers        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amlsfailure.CheckYourAnswersController.submit
 GET        /conditions-not-yet-met/failure-details/:failureCode      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.entityfailures.FixableEntityFailuresController.show(failureCode: String)
+POST       /conditions-not-yet-met/failure-details/:failureCode      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.entityfailures.FixableEntityFailuresController.submit(failureCode: String)
 GET        /conditions-not-yet-met/individuals                       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.individualfailures.FixableIndividualsController.show
