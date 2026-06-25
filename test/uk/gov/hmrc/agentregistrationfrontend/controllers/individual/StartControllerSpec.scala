@@ -23,9 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll.agentApplicationId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
 class StartControllerSpec
 extends ControllerSpec:
@@ -60,10 +58,10 @@ extends ControllerSpec:
 
   s"GET $path should return 200 and render the start page when application is still in progress" in:
     AgentRegistrationStubs.stubFindApplicationByLinkId(linkId = linkId, agentApplication = agentApplication.inComplete)
-    AgentRegistrationIndividualProvidedDetailsStubs.stubFindIndividualProvidedDetailsNoContent(agentApplicationId)
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Sign in and confirm your details - Apply for an agent services account - GOV.UK"
+    AgentRegistrationStubs.verifyFindApplicationByLinkId(linkId = linkId)
 
   s"GET $path with complete application should return 303 and redirect to the status page when risking is not complete" in:
     AgentRegistrationStubs.stubFindApplicationByLinkId(linkId = linkId, agentApplication = agentApplication.complete)
@@ -71,9 +69,11 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location") shouldBe Some("/agent-registration/provide-details/outcome/link-id-12345")
+    AgentRegistrationStubs.verifyFindApplicationByLinkId(linkId = linkId)
 
   s"GET $path with complete application should return 200 and render the outcome start page when risking is complete" in:
     AgentRegistrationStubs.stubFindApplicationByLinkId(linkId = linkId, agentApplication = agentApplication.riskingComplete)
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Sign in to see the outcome of the application - Apply for an agent services account - GOV.UK"
+    AgentRegistrationStubs.verifyFindApplicationByLinkId(linkId = linkId)
