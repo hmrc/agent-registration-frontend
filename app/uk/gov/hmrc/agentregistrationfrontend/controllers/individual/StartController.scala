@@ -19,10 +19,13 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.StartPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingoutcome.OutcomeStartPage
 
 import java.time.Instant
 import java.time.ZoneId
@@ -30,10 +33,13 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class StartController @Inject() (
+class StartController @Inject (
+  appConfig: AppConfig
+)(
   actions: IndividualActions,
   mcc: MessagesControllerComponents,
   startPage: StartPage,
+  outcomeStartPage: OutcomeStartPage,
   applicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
@@ -42,11 +48,18 @@ extends FrontendController(mcc, actions):
     .action
     .async:
       implicit request =>
-        val genericExitPageUrl: String = AppRoutes.apply.AgentApplicationController.genericExitPage.url
-        applicationService.find(linkId).map {
+        applicationService.find(linkId).map:
           case Some(agentApplication) if agentApplication.isAfterSentForRisking =>
-            logger.info(s"the application for linkId $linkId has finished, redirecting to get status")
-            Redirect(AppRoutes.providedetails.riskingprogress.RiskingProgressController.show(linkId))
+            if appConfig.Features.fixableFailures
+            then
+              agentApplication.applicationState match
+                case ApplicationState.RiskingCompleted =>
+                  Ok(outcomeStartPage(
+                    linkId: LinkId
+                  ))
+                case _ => Redirect(AppRoutes.providedetails.riskingoutcome.RiskingOutcomeController.show(linkId)) // the 'new world' where we don't call risking but use application for status
+            else
+              Redirect(AppRoutes.providedetails.riskingprogress.RiskingProgressController.show(linkId)) // the 'old world' where we call risking for progress
           case Some(agentApplication) =>
             val applicationExpiryInstant: Instant = agentApplication
               .applicationExpiresAt
@@ -56,6 +69,5 @@ extends FrontendController(mcc, actions):
               agentApplicationExpiryDate = applicationExpiryInstant.atZone(ZoneId.systemDefault()).toLocalDate
             ))
           case None =>
-            logger.info(s"Application for linkId $linkId not found, redirecting to $genericExitPageUrl")
-            Redirect(genericExitPageUrl)
-        }
+            logger.info(s"Application for linkId $linkId not found")
+            NotFound

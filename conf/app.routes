@@ -203,6 +203,9 @@ GET         /provide-details/individual-name-search/:linkId                 uk.g
 POST        /provide-details/individual-name-search/:linkId                 uk.gov.hmrc.agentregistrationfrontend.controllers.individual.NameMatchingController.submit(linkId: LinkId)
 GET         /provide-details/contact-applicant                              uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ContactApplicantController.show
 
+## Risking outcome for individuals
+GET         /provide-details/outcome/:linkId                           uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.RiskingOutcomeController.show(linkId: LinkId)
+
 ## Internal Routes for individuals
 GET        /provide-details/internal/unified-customer-registry-identifiers/:linkId   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.internal.UcrIndividualController.populateIndividualIdentifiersFromUcr(linkId: LinkId)
 
@@ -223,3 +226,4 @@ POST       /conditions-not-yet-met/anti-money-laundering/check-your-answers     
 GET        /conditions-not-yet-met/failure-details/:failureCode      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.entityfailures.FixableEntityFailuresController.show(failureCode: String)
 POST       /conditions-not-yet-met/failure-details/:failureCode      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.entityfailures.FixableEntityFailuresController.submit(failureCode: String)
 GET        /conditions-not-yet-met/individuals                       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.individualfailures.FixableIndividualsController.show
+
