@@ -1614,3 +1614,6 @@ applicant-provided.hasNino.label = Enter their National Insurance Number
 applicant-provided.nino.caption = Relevant individual details
 applicant-provided.nino.error.invalid = Enter their National Insurance number in the correct format
 applicant-provided.nino.error.required = Enter their National Insurance number
+
+riskingOutcomeStart.title = Sign in to see the outcome of the application
+riskingOutcomeStart.p1 = Use sign in details for your personal taxes, not your business taxes.

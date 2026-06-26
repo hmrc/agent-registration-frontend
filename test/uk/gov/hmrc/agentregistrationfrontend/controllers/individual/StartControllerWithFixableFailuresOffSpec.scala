@@ -27,12 +27,15 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll.ag
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
-class StartControllerSpec
+/** This test class is specifically for testing the StartController when the fixable failures feature is turned off, once the feature is turned on we can delete
+  * this test class. It ensures that the controller behaves correctly in this configuration, particularly in terms of routing and response handling.
+  */
+class StartControllerWithFixableFailuresOffSpec
 extends ControllerSpec:
 
   override def configOverrides: Map[String, Any] =
     super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
+      "features.fixable-failures" -> false
     )
 
   private val linkId: LinkId = tdAll.linkId
@@ -48,9 +51,6 @@ extends ControllerSpec:
     val complete: AgentApplication = inComplete
       .modify(_.applicationState)
       .setTo(ApplicationState.SentForRisking)
-    val riskingComplete: AgentApplication = complete
-      .modify(_.applicationState)
-      .setTo(ApplicationState.RiskingCompleted)
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.StartController.start(linkId) shouldBe Call(
@@ -58,22 +58,16 @@ extends ControllerSpec:
       url = path
     )
 
-  s"GET $path should return 200 and render the start page when application is still in progress" in:
+  s"GET $path should return 200 and render the start page" in:
     AgentRegistrationStubs.stubFindApplicationByLinkId(linkId = linkId, agentApplication = agentApplication.inComplete)
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindIndividualProvidedDetailsNoContent(agentApplicationId)
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe "Sign in and confirm your details - Apply for an agent services account - GOV.UK"
 
-  s"GET $path with complete application should return 303 and redirect to the status page when risking is not complete" in:
+  s"GET $path with complete application should return 303 and redirect to the status page" in:
     AgentRegistrationStubs.stubFindApplicationByLinkId(linkId = linkId, agentApplication = agentApplication.complete)
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location") shouldBe Some("/agent-registration/provide-details/outcome/link-id-12345")
-
-  s"GET $path with complete application should return 200 and render the outcome start page when risking is complete" in:
-    AgentRegistrationStubs.stubFindApplicationByLinkId(linkId = linkId, agentApplication = agentApplication.riskingComplete)
-    val response: WSResponse = get(path)
-    response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe "Sign in to see the outcome of the application - Apply for an agent services account - GOV.UK"
+    response.header("Location") shouldBe Some("/agent-registration/provide-details/status/link-id-12345")
