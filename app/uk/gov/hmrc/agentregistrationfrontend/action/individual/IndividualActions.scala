@@ -20,11 +20,14 @@ import play.api.mvc.*
 import play.api.mvc.Results.NotFound
 import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
+import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix._10.IndividualDetailsFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
@@ -34,9 +37,10 @@ import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuildersWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
+import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
-import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 import uk.gov.hmrc.auth.core.retrieve.Credentials
@@ -69,7 +73,9 @@ object IndividualActions:
 
   type DataWithRiskingProgress = RiskingProgress *: DataWithIndividualProvidedDetails
 
-  type DataWithRiskingOutcome = RiskingOutcomeIndividual *: RiskingOutcomeApplication *: DataWithIndividualProvidedDetails
+  type DataWithRiskingOutcome = BusinessPartnerRecordResponse *: RiskingOutcomeIndividual *: RiskingOutcomeApplication *: DataWithIndividualProvidedDetails
+  type DataWithIndividualDetailsFix =
+    IndividualDetailsFix *: BusinessPartnerRecordResponse *: RiskingOutcomeIndividual.FailedFixable *: RiskingOutcomeApplication *: DataWithIndividualProvidedDetails
 
 @Singleton
 class IndividualActions @Inject (
@@ -79,7 +85,8 @@ class IndividualActions @Inject (
   individualAuthorisedRefiner: IndividualAuthRefiner,
   agentApplicationService: AgentApplicationService,
   individualProvideDetailsService: IndividualProvideDetailsService,
-  individualRiskingService: IndividualRiskingService
+  individualRiskingService: IndividualRiskingService,
+  businessPartnerRecordService: BusinessPartnerRecordService
 )(using ExecutionContext)
 extends RequestAwareLogging:
 
@@ -172,11 +179,45 @@ extends RequestAwareLogging:
       val agentApplication: AgentApplication = request.get
       agentApplication.riskingOutcomeApplication match
         case Some(riskingOutcomeApplication) => request.add[RiskingOutcomeApplication](riskingOutcomeApplication)
-        case None => NotFound
+        case None =>
+          logger.info("Risking outcome for application not found.")
+          NotFound
     )
     .refine(implicit request =>
       val individualProvidedDetails: IndividualProvidedDetails = request.get
       individualProvidedDetails.riskingOutcomeIndividual match
         case Some(riskingOutcomeIndividual) => request.add[RiskingOutcomeIndividual](riskingOutcomeIndividual)
-        case None => NotFound
+        case None =>
+          logger.info("Risking outcome for individual not found.")
+          NotFound
     )
+    .refine:
+      implicit request =>
+        businessPartnerRecordService
+          .getApplicationBusinessPartnerRecord(request.agentApplication.getUtr)
+          .map:
+            case Some(bpr) => request.add[BusinessPartnerRecordResponse](bpr)
+            case _ => throw new IllegalStateException(s"Business Partner Record not found for application with UTR: ${request.agentApplication.getUtr}")
+
+  def authorisedWithFixableDetails(linkId: LinkId): ActionBuilderWithData[DataWithIndividualDetailsFix] = authorisedWithRiskingOutcome(linkId)
+    .refine:
+      implicit request: (RequestWithData[DataWithRiskingOutcome]) =>
+        val individualRiskingOutcome: RiskingOutcomeIndividual = request.get
+        individualRiskingOutcome match
+          case outcome @ RiskingOutcomeIndividual.FailedFixable(fixes: Seq[IndividualFix]) =>
+            fixes.collectFirst { case fix: IndividualDetailsFix => fix } match
+              case Some(individualFix) => request.add[IndividualDetailsFix](individualFix)
+              case None =>
+                logger.info("Risking outcome for individual does not require individual details to be provided.")
+                NotFound
+          case _ =>
+            logger.info("Risking outcome for individual is not fixable. Redirecting to where outcome can be handled.")
+            Redirect(AppRoutes.providedetails.riskingoutcome.RiskingOutcomeController.show(linkId))
+    .refine:
+      implicit request: (RequestWithData[IndividualDetailsFix *: DataWithRiskingOutcome]) =>
+        val riskingOutcomeIndividual: RiskingOutcomeIndividual = request.get
+        riskingOutcomeIndividual match
+          case outcome: RiskingOutcomeIndividual.FailedFixable => request.replace[RiskingOutcomeIndividual, RiskingOutcomeIndividual.FailedFixable](outcome)
+          case _ =>
+            logger.info("Risking outcome for individual is not fixable. Redirecting to where outcome can be handled.")
+            Redirect(AppRoutes.providedetails.riskingoutcome.RiskingOutcomeController.show(linkId))

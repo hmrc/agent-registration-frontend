@@ -137,7 +137,7 @@
                     content = Text(messages(s"$key.declaration.linkText"))
                 ),
                 status = if(taskListStatus.declaration.canStart) incomplete else cannotStart,
-                href = if(taskListStatus.declaration.canStart) Some(AppRoutes.apply.DeclarationController.show.url) else None
+                href = if(taskListStatus.declaration.canStart) Some(AppRoutes.fixablefailures.DeclarationController.show.url) else None
             )
         ),
         idPrefix = "declaration"

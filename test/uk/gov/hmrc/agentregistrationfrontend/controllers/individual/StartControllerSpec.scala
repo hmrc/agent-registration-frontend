@@ -68,7 +68,7 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
-    response.header("Location") shouldBe Some("/agent-registration/provide-details/outcome/link-id-12345")
+    response.header("Location") shouldBe Some("/agent-registration/provide-details/outcome-status/link-id-12345")
     AgentRegistrationStubs.verifyFindApplicationByLinkId(linkId = linkId)
 
   s"GET $path with complete application should return 200 and render the outcome start page when risking is complete" in:

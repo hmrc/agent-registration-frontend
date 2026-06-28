@@ -1,0 +1,60 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.LinkId
+@import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix._10.IndividualDetailsFix
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingoutcome.fixablefailures.provideddetails.AnswerSummary
+@import uk.gov.hmrc.govukfrontend.views.html.components.*
+
+@this(
+        layout: Layout,
+        govukButton: GovukButton,
+        answerSummary: AnswerSummary,
+        formWithCSRF: FormWithCSRF
+)
+
+@(
+        individualProvidedDetails: IndividualDetailsFix,
+        linkId: LinkId)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{
+    "individualDetailsCheckYourAnswers"
+}
+@title = @{
+    messages(s"$key.title")
+}
+
+@layout(pageTitle = title) {
+  <h2 class="govuk-caption-l">@messages("relevant-individual.caption")</h2>
+    <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
+    @answerSummary(
+      key,
+      individualProvidedDetails = individualProvidedDetails,
+      linkId = linkId
+    )
+  @formWithCSRF(action = AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.CheckYourAnswersController.submit(linkId)) {
+    <p class="govuk-body">
+    @govukButton(Button(
+      content = Text(messages("common.confirmAndContinue"))
+    ))
+    </p>
+  }
+
+}

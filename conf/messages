@@ -1098,7 +1098,7 @@ fixableTaskList.declaration.linkText = Declare and submit
 fixableTaskList.EntityFix.4.1.linkText = Self Assessment - missing returns
 fixableTaskList.EntityFix.4.2.linkText = Company Tax - missing returns
 fixableTaskList.EntityFix.4.3.linkText = VAT - missing returns
-fixableTaskList.EntityFix.4.4.linkText = PAYE - missing returns
+fixableTaskList.EntityFix.4.4.linkText = PAYE - missing reports
 fixableTaskList.EntityFix.5.1.linkText = Self Assessment - overdue liability
 fixableTaskList.EntityFix.5.2.linkText = Corporation Tax - overdue liability
 fixableTaskList.EntityFix.5.3.linkText = VAT - overdue liability
@@ -1617,3 +1617,201 @@ applicant-provided.nino.error.required = Enter their National Insurance number
 
 riskingOutcomeStart.title = Sign in to see the outcome of the application
 riskingOutcomeStart.p1 = Use sign in details for your personal taxes, not your business taxes.
+
+individualFailedFixable.caption = Application outcome
+individualFailedFixable.title = You do not meet the registration conditions yet
+individualFailedFixable.decisionDate.h2 = Date of decision: {0}
+individualFailedFixable.ourDecision.h2 = Our decision
+individualFailedFixable.ourDecision.p1 = The application by {0} for an agent services account cannot currently be approved.
+individualFailedFixable.ourDecision.p2 = The application is refused under Section 230 (registration conditions) of the <a class="govuk-link" href="{0}" target="_blank" rel="noopener noreferrer">Finance Act 2026 (opens in a new tab)</a>.
+individualFailedFixable.ourDecision.p3 = This is because you, as a relevant individual to the application, have not met one or more conditions of registration.
+individualFailedFixable.ourDecision.p4 = However, you can still meet the registration conditions by taking action before <strong>{0}</strong>
+individualFailedFixable.howToFix.h2 = How to meet the registration conditions
+individualFailedFixable.howToFix.p1 = The actions to take are listed on the next page.
+individualFailedFixable.startButton = View actions to take
+individualFailedFixable.failures.h2 = Failure to meet the registration conditions
+individualFailedFixable.failures.p1 = If you choose not to take action to meet the registration conditions:
+individualFailedFixable.failures.li1 = {0} will not be given an agent services account on this occasion
+individualFailedFixable.failures.li2 = your application will be deleted on {0} to comply with our data retention policy
+individualFailedFixable.appeal.h2 = {0} has the right to review or appeal
+individualFailedFixable.appeal.p1 = Keep a copy of this decision for your records.
+individualFailedFixable.appeal.p2 = If you disagree with our decision to refuse your application, you can <a class="govuk-link" href="{0}" target="_blank" rel="noopener noreferrer">request a review or appeal the decision (opens in a new tab)</a>.
+individualFailedFixable.appeal.p3 = You can ask for a review of our decision or begin the appeal process even if you decide to take the actions we need.
+
+fixableIndividualTaskList.IndividualFix.4.1.linkText = File your missing Self Assessment returns
+fixableIndividualTaskList.IndividualFix.4.3.linkText = File your missing VAT returns
+fixableIndividualTaskList.IndividualFix.4.4.linkText = File your missing PAYE reports
+fixableIndividualTaskList.IndividualFix.5.1.linkText = Pay your Self Assessment liability
+fixableIndividualTaskList.IndividualFix.5.3.linkText = Pay your VAT liability
+fixableIndividualTaskList.IndividualFix.5.4.linkText = Pay your PAYE liability
+fixableIndividualTaskList.IndividualFix.5.5.linkText = Pay your civil penalty liability
+fixableIndividualTaskList.IndividualFix.5.6.linkText = Pay your Stamp Duty liability
+fixableIndividualTaskList.IndividualFix.5.7.linkText = Pay your Capital Gains Tax liability
+fixableIndividualTaskList.IndividualFix.8.5.linkText = Pay your relevant anti-avoidance penalty liability
+fixableIndividualTaskList.IndividualFix.8.7.linkText = Pay your relevant anti-avoidance penalty liability
+fixableIndividualTaskList.IndividualFix.10.IndividualDetailsFix.linkText = Provide more details to prove your identity
+
+fixableIndividualTaskList.title = Take action: You have not met the registration conditions
+fixableIndividualTaskList.warning = You can still take action to meet the conditions. Each item on this list needs to be completed by {0} or the application will be deleted.
+fixableIndividualTaskList.declaration.linkText = Confirm your responses are final
+
+
+fixableIndividualDetails.IndividualFix.4.1.caption = File your missing Self Assessment returns
+fixableIndividualDetails.IndividualFix.4.1.heading = Your Self Assessment returns
+fixableIndividualDetails.IndividualFix.4.1.p1 = When we reviewed your application, we found that one or more returns had not been filed.
+fixableIndividualDetails.IndividualFix.4.1.p2 = We cannot set up an agent services account for {0} until this is resolved.
+fixableIndividualDetails.IndividualFix.4.1.action.h2 = Take action on this issue
+fixableIndividualDetails.IndividualFix.4.1.action.p1 = All overdue returns must now be filed and any resulting liabilities paid.
+fixableIndividualDetails.IndividualFix.4.1.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.4.1.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableIndividualDetails.IndividualFix.4.1.action.p4 = Find out more about <a href="https://www.gov.uk/self-assessment-tax-returns" class="govuk-link" rel="noopener noreferrer" target="_blank">Self Assessment tax returns (opens in a new tab)</a>.
+fixableIndividualDetails.IndividualFix.4.1.label = Have all overdue returns been filed?
+isFixed.IndividualFix.4.1.error.required = Select yes if all overdue returns have been filed
+isFixed.IndividualFix.4.1.error.invalid = Select yes if all overdue returns have been filed
+
+fixableIndividualDetails.IndividualFix.4.3.caption = File your missing VAT returns
+fixableIndividualDetails.IndividualFix.4.3.heading = Your VAT returns
+fixableIndividualDetails.IndividualFix.4.3.p1 = When we reviewed your application, we found that one or more returns had not been filed.
+fixableIndividualDetails.IndividualFix.4.3.p2 = We cannot set up an agent services account for {0} until this is resolved.
+fixableIndividualDetails.IndividualFix.4.3.action.h2 = Take action on this issue
+fixableIndividualDetails.IndividualFix.4.3.action.p1 = All overdue returns must now be filed and any resulting liabilities paid.
+fixableIndividualDetails.IndividualFix.4.3.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.4.3.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableIndividualDetails.IndividualFix.4.3.action.p4 = Find out more about <a href="https://www.gov.uk/submit-vat-return" class="govuk-link" rel="noopener noreferrer" target="_blank">VAT returns (opens in a new tab)</a>.
+fixableIndividualDetails.IndividualFix.4.3.label = Have all overdue returns been filed?
+isFixed.IndividualFix.4.3.error.required = Select yes if all overdue returns have been filed
+isFixed.IndividualFix.4.3.error.invalid = Select yes if all overdue returns have been filed
+
+fixableIndividualDetails.IndividualFix.4.4.caption = File your missing PAYE reports
+fixableIndividualDetails.IndividualFix.4.4.heading = Your PAYE reports
+fixableIndividualDetails.IndividualFix.4.4.p1 = When we reviewed your application, we found that one or more reports had not been filed.
+fixableIndividualDetails.IndividualFix.4.4.p2 = We cannot set up an agent services account for {0} until this is resolved.
+fixableIndividualDetails.IndividualFix.4.4.action.h2 = Take action on this issue
+fixableIndividualDetails.IndividualFix.4.4.action.p1 = All overdue reports must now be filed and any resulting liabilities paid.
+fixableIndividualDetails.IndividualFix.4.4.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.4.4.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableIndividualDetails.IndividualFix.4.4.action.p4 = Find out more about <a href="https://www.gov.uk/paye-for-employers" class="govuk-link" rel="noopener noreferrer" target="_blank">PAYE for employers (opens in a new tab)</a>.
+fixableIndividualDetails.IndividualFix.4.4.label = Have all overdue reports been filed?
+isFixed.IndividualFix.4.4.error.required = Select yes if all overdue reports have been filed
+isFixed.IndividualFix.4.4.error.invalid = Select yes if all overdue reports have been filed
+
+fixableIndividualDetails.IndividualFix.5.1.caption = Pay your Self Assessment liability
+fixableIndividualDetails.IndividualFix.5.1.heading = You have an overdue Self Assessment liability
+fixableIndividualDetails.IndividualFix.5.1.p1 = When we reviewed the application, we found that you owed an overdue amount relating to Self Assessment.
+fixableIndividualDetails.IndividualFix.5.1.p2 = We cannot set up an agent services account for {0} until this is resolved.
+fixableIndividualDetails.IndividualFix.5.1.action.h2 = Take action on this issue
+fixableIndividualDetails.IndividualFix.5.1.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableIndividualDetails.IndividualFix.5.1.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.5.1.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableIndividualDetails.IndividualFix.5.1.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#self-assessment" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Self Assessment (opens in a new tab)</a>.
+fixableIndividualDetails.IndividualFix.5.1.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.IndividualFix.5.1.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.IndividualFix.5.1.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableIndividualDetails.IndividualFix.5.3.caption = Pay your VAT liability
+fixableIndividualDetails.IndividualFix.5.3.heading = You have an overdue VAT liability
+fixableIndividualDetails.IndividualFix.5.3.p1 = When we reviewed the application, we found that you owed an overdue amount relating to VAT.
+fixableIndividualDetails.IndividualFix.5.3.p2 = We cannot set up an agent services account for {0} until this is resolved.
+fixableIndividualDetails.IndividualFix.5.3.action.h2 = Take action on this issue
+fixableIndividualDetails.IndividualFix.5.3.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableIndividualDetails.IndividualFix.5.3.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.5.3.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableIndividualDetails.IndividualFix.5.3.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#vat" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay VAT (opens in a new tab)</a>.
+fixableIndividualDetails.IndividualFix.5.3.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.IndividualFix.5.3.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.IndividualFix.5.3.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableIndividualDetails.IndividualFix.5.4.caption = Pay your PAYE liability
+fixableIndividualDetails.IndividualFix.5.4.heading = You have an overdue PAYE liability
+fixableIndividualDetails.IndividualFix.5.3.p1 = When we reviewed the application, we found that you owed an overdue amount relating to PAYE.
+fixableIndividualDetails.IndividualFix.5.3.p2 = We cannot set up an agent services account for {0} until this is resolved.
+fixableIndividualDetails.IndividualFix.5.3.action.h2 = Take action on this issue
+fixableIndividualDetails.IndividualFix.5.3.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableIndividualDetails.IndividualFix.5.3.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.5.3.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableIndividualDetails.IndividualFix.5.3.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#paye" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay PAYE (opens in a new tab)</a>.
+fixableIndividualDetails.IndividualFix.5.3.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.IndividualFix.5.3.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.IndividualFix.5.3.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableIndividualDetails.IndividualFix.5.5.caption = Pay your civil penalty liability
+fixableIndividualDetails.IndividualFix.5.5.heading = You have an overdue civil penalty liability
+fixableIndividualDetails.IndividualFix.5.3.p1 = When we reviewed the application, we found that you owed an overdue amount relating to one or more civil penalties.
+fixableIndividualDetails.IndividualFix.5.3.p2 = We cannot set up an agent services account for {0} until this is resolved.
+fixableIndividualDetails.IndividualFix.5.3.action.h2 = Take action on this issue
+fixableIndividualDetails.IndividualFix.5.3.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableIndividualDetails.IndividualFix.5.3.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.5.3.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableIndividualDetails.IndividualFix.5.3.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
+fixableIndividualDetails.IndividualFix.5.3.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.IndividualFix.5.3.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.IndividualFix.5.3.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableIndividualDetails.IndividualFix.5.6.caption = Pay your Stamp Duty liability
+fixableIndividualDetails.IndividualFix.5.6.heading = You have an overdue Stamp Duty liability
+fixableIndividualDetails.IndividualFix.5.6.p1 = When we reviewed the application, we found that you owed an overdue amount relating to Stamp Duty.
+fixableIndividualDetails.IndividualFix.5.6.p2 = We cannot set up an agent services account for {0} until this is resolved.
+fixableIndividualDetails.IndividualFix.5.6.action.h2 = Take action on this issue
+fixableIndividualDetails.IndividualFix.5.6.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableIndividualDetails.IndividualFix.5.6.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.5.6.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableIndividualDetails.IndividualFix.5.6.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#stamp-duty-and-other-property-taxes" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Stamp Duty (opens in a new tab)</a>.
+fixableIndividualDetails.IndividualFix.5.6.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.IndividualFix.5.6.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.IndividualFix.5.6.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableIndividualDetails.IndividualFix.5.7.caption = Pay your Capital Gains Tax liability
+fixableIndividualDetails.IndividualFix.5.7.heading = You have an overdue Capital Gains Tax liability
+fixableIndividualDetails.IndividualFix.5.6.p1 = When we reviewed the application, we found that you owed an overdue amount relating to Capital Gains Tax.
+fixableIndividualDetails.IndividualFix.5.6.p2 = We cannot set up an agent services account for {0} until this is resolved.
+fixableIndividualDetails.IndividualFix.5.6.action.h2 = Take action on this issue
+fixableIndividualDetails.IndividualFix.5.6.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableIndividualDetails.IndividualFix.5.6.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.5.6.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableIndividualDetails.IndividualFix.5.6.action.p4 = Find out <a href="https://www.gov.uk/report-and-pay-your-capital-gains-tax" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Capital Gains Tax (opens in a new tab)</a>.
+fixableIndividualDetails.IndividualFix.5.6.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.IndividualFix.5.6.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.IndividualFix.5.6.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableIndividualDetails.IndividualFix.8.5.caption = Pay your relevant anti-avoidance penalty liability
+fixableIndividualDetails.IndividualFix.8.5.heading = You have an overdue relevant anti-avoidance penalty liability
+fixableIndividualDetails.IndividualFix.8.5.p1 = When we reviewed the application, we found that you owed an overdue amount relating to one or more relevant anti-avoidance penalties.
+fixableIndividualDetails.IndividualFix.8.5.p2 = We cannot set up an agent services account for {0} until this is resolved.
+fixableIndividualDetails.IndividualFix.8.5.action.h2 = Take action on this issue
+fixableIndividualDetails.IndividualFix.8.5.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableIndividualDetails.IndividualFix.8.5.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.8.5.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableIndividualDetails.IndividualFix.8.5.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
+fixableIndividualDetails.IndividualFix.8.5.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.IndividualFix.8.5.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.IndividualFix.8.5.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableIndividualDetails.IndividualFix.8.7.caption = Pay your relevant anti-avoidance penalty liability
+fixableIndividualDetails.IndividualFix.8.7.heading = You have an overdue relevant anti-avoidance penalty liability
+fixableIndividualDetails.IndividualFix.8.7.p1 = When we reviewed the application, we found that you owed an overdue amount relating to one or more relevant anti-avoidance penalties.
+fixableIndividualDetails.IndividualFix.8.7.p2 = We cannot set up an agent services account for {0} until this is resolved.
+fixableIndividualDetails.IndividualFix.8.7.action.h2 = Take action on this issue
+fixableIndividualDetails.IndividualFix.8.7.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableIndividualDetails.IndividualFix.8.7.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.8.7.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableIndividualDetails.IndividualFix.8.7.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
+fixableIndividualDetails.IndividualFix.8.7.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.IndividualFix.8.7.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.IndividualFix.8.7.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+
+fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.caption = Provide your details
+fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.heading = We could not match the details your provided with an HMRC record
+fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p1 = This is usually because an answer you gave was incorrect, or you did not provide enough details.
+fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p2 = On the next page, you can review some of your answers.
+fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p3 = Check them, and change anything that is incorrect or missing.
+fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p4 = You need to do this by <strong>{0}</strong>.
+
+individualDetailsDeclaration.caption = Confirm your responses are final
+individualDetailsDeclaration.title = You are about to submit your response
+individualDetailsDeclaration.p1 = Submitting your responses means you believe you have done everything to meet the registration conditions.
+individualDetailsDeclaration.p2 = Once you submit, you will not be able to change your answers.
+
+individualDetailsFixConfirmation.title = You have finished this process
+individualDetailsFixConfirmation.h2 = What happens next
+individualDetailsFixConfirmation.p1 = We’ll ask {0} to resubmit the application for an agent services account, when everyone has provided the information we need.
+individualDetailsFixConfirmation.p2 = We’ll send an email to you at {0} if we need anything else from you.

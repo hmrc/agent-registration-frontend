@@ -37,6 +37,8 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.internal.rout
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.routes as providedetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingprogress.routes as riskingProgressRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.routes as individualRiskingOutcomeRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.routes as individualFixableFailuresRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.provideddetails.routes as fixProvidedDetailsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.internal.routes as internalIndividualRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.routes as testOnlyRoutes
 import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.applicant.routes as testOnlyApplicantRoutes
@@ -175,6 +177,7 @@ object AppRoutes:
 
     val FixableTaskListController = fixableFailuresRoutes.FixableTaskListController
     val SaveForLaterController = fixableFailuresRoutes.SaveForLaterController
+    val DeclarationController = fixableFailuresRoutes.DeclarationController
 
     object amlsfailure:
 
@@ -210,7 +213,23 @@ object AppRoutes:
     val NotAgentCredentialController = providedetailsRoutes.NotAgentCredentialController
 
     object riskingoutcome:
+
       val RiskingOutcomeController = individualRiskingOutcomeRoutes.RiskingOutcomeController
+
+      object fixablefailures:
+
+        val FixableTaskListController = individualFixableFailuresRoutes.FixableTaskListController
+        val FixableIndividualFailureController = individualFixableFailuresRoutes.FixableIndividualFailureController
+        val FixIndividualProvidedDetailsController = individualFixableFailuresRoutes.FixIndividualProvidedDetailsController
+        val DeclarationController = individualFixableFailuresRoutes.DeclarationController
+        val IndividualConfirmationController = individualFixableFailuresRoutes.IndividualConfirmationController
+
+        object provideddetails:
+
+          val CheckYourAnswersController = fixProvidedDetailsRoutes.CheckYourAnswersController
+          val IndividualDateOfBirthController = fixProvidedDetailsRoutes.IndividualDateOfBirthController
+          val IndividualNinoController = fixProvidedDetailsRoutes.IndividualNinoController
+          val IndividualSaUtrController = fixProvidedDetailsRoutes.IndividualSaUtrController
 
     object internal:
       val UcrIndividualController = internalIndividualRoutes.UcrIndividualController
