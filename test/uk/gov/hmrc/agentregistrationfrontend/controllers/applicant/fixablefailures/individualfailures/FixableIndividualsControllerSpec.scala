@@ -102,7 +102,6 @@ extends ControllerSpec:
           "Pay one or more overdue liabilities Pay a liability connected to relevant anti-avoidance",
           "No"
         ),
-        // TODO: Add content for fixable failure 10
         IndexedSeq(
           "Test Name 3",
           "Pay a liability connected to relevant anti-avoidance Check and update their details",
@@ -118,4 +117,51 @@ extends ControllerSpec:
       index = 1,
       numberOfCols = 3
     ) shouldBe testTable
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(agentApplication.riskingCompletedFixable)
+
+  s"GET $path for fixable individuals shouldn't show individuals if details were provided by applicant" in:
+
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(
+      application = agentApplication.riskingCompletedFixable,
+      individuals = List(
+        individualProvidedDetails.afterRiskedFixable,
+        individualProvidedDetails.afterRiskedFixable.copy(
+          individualName = IndividualName("Test Name 2"),
+          riskingOutcomeIndividual = Some(RiskingOutcomeIndividual.FailedFixable(
+            fixes = Seq(
+              IndividualFix._5._1(isConfirmed = None),
+              IndividualFix._8._7(isConfirmed = None)
+            )
+          )),
+          providedByApplicant = Some(true)
+        )
+      )
+    )
+
+    val response: WSResponse = get(path)
+
+    val testTable = TestTable(
+      caption = "Actions to be completed",
+      rows = List(
+        IndexedSeq(
+          "Test Name",
+          "File one or more relevant returns",
+          "No"
+        )
+      )
+    )
+
+    response.status shouldBe Status.OK
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "We need to hear from these people before you submit the application again - Apply for an agent services account - GOV.UK"
+    val expectedTable = doc.extractTable(
+      index = 1,
+      numberOfCols = 3
+    )
+    expectedTable shouldBe testTable
+    expectedTable.rows.contains(IndexedSeq(
+      "Test Name 2",
+      "Pay one or more overdue liabilities Pay a liability connected to relevant anti-avoidance",
+      "No"
+    )) shouldBe false withClue "sanity check"
     ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(agentApplication.riskingCompletedFixable)

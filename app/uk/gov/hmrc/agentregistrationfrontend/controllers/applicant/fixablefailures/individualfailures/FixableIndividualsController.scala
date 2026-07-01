@@ -67,8 +67,18 @@ extends FrontendController(mcc, actions):
         individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
           val fixableList = individualsList.filter(_.hasFixableFailure)
 
-          if fixableList.nonEmpty
-          then request.add[List[IndividualProvidedDetails]](fixableList)
+          if (fixableList.nonEmpty)
+            val detailsNotProvidedByApplicantList = fixableList.filter(_.detailsNotProvidedByApplicant)
+            if (detailsNotProvidedByApplicantList.isEmpty) {
+              throw new IllegalStateException(
+                s"""[
+                   | FixableIndividualsController] All individual details provided by applicant for application ${agentApplication.applicationReference}
+                   | this includes individuals with person references: ${detailsNotProvidedByApplicantList.map(_.personReference.value)}, redirecting to
+                   | error page""".stripMargin
+              )
+            }
+            else
+              request.add[List[IndividualProvidedDetails]](detailsNotProvidedByApplicantList)
           else
             logger.warn("No fixable individuals found. Redirecting to status page.")
             Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
@@ -86,6 +96,8 @@ extends FrontendController(mcc, actions):
           ))
 
   extension (ipd: IndividualProvidedDetails)
+
     private def hasFixableFailure: Boolean = ipd.riskingOutcomeIndividual.exists:
       case RiskingOutcomeIndividual.FailedFixable(_) => true
       case _ => false
+    private def detailsNotProvidedByApplicant: Boolean = ipd.providedByApplicant.contains(false)
