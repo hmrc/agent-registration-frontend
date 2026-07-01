@@ -21,7 +21,6 @@ import org.jsoup.nodes.Document
 import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.amls.AmlsSupervisoryBodyPage
@@ -80,7 +79,7 @@ extends ViewSpec:
       form.attr("method") shouldBe "POST"
       form.attr("action") shouldBe AppRoutes.fixablefailures.amlsfailure.AmlsSupervisorController.submit.url
       form.selectOrFail(s"button[value='${SaveAndContinue.toString}']").selectOnlyOneElementOrFail()
-      form.selectOrFail(s"button[value='${SaveAndComeBackLater.toString}']").selectOnlyOneElementOrFail()
+      form.selectOrFail(s"a[href=${AppRoutes.fixablefailures.SaveForLaterController.show.url}]").selectOnlyOneElementOrFail()
 
     "render an error message when form has errors" in:
       val field = "amlsSupervisoryBody"
