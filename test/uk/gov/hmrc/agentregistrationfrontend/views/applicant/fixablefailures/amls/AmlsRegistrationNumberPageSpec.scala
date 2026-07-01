@@ -22,7 +22,6 @@ import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsRegistrationNumber
 import uk.gov.hmrc.agentregistration.shared.amls.AmlsSupervisoryBodyCode
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
-import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.amls.AmlsRegistrationNumberPage
@@ -70,10 +69,10 @@ extends ViewSpec:
         .selectOnlyOneElementOrFail()
         .text() shouldBe "Save and continue"
 
-    "render a save and come back later button" in:
+    "render a save and come back later button link" in:
       doc
         .mainContent
-        .selectOrFail(s"form button[value=${SaveAndComeBackLater.toString}]")
+        .selectOrFail(s"form a[href=${AppRoutes.fixablefailures.SaveForLaterController.show.url}]")
         .selectOnlyOneElementOrFail()
         .text() shouldBe "Save and come back later"
 
