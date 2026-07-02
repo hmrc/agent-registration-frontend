@@ -61,5 +61,5 @@ extends ViewSpec:
 
       startLink shouldBe TestLink(
         text = "Start",
-        href = s"/agent-registration/provide-details/outcome/${linkId.value}"
+        href = s"/agent-registration/provide-details/outcome-status/${linkId.value}"
       )

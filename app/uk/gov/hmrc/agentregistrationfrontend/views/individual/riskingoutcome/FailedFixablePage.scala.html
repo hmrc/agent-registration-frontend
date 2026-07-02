@@ -1,0 +1,76 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.LinkId
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+
+@this(
+        layout: Layout,
+        govukButton: GovukButton,
+        appConfig: AppConfig
+)
+
+@(
+        linkId: LinkId,
+        entityName: String,
+        correctiveActionExpiryDate: String,
+        actualDecisionDate: String
+)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{"individualFailedFixable"}
+@pageTitle = @{messages(s"$key.title")}
+
+@layout(pageTitle = pageTitle, suppressBackLink = true) {
+  <h2 class="govuk-caption-l">@messages(s"$key.caption")</h2>
+  <h1 class="govuk-heading-l">@pageTitle</h1>
+  <h2 class="govuk-heading-m">@messages(s"$key.decisionDate.h2", actualDecisionDate)</h2>
+  <h2 class="govuk-heading-m">@messages(s"$key.ourDecision.h2")</h2>
+  <p class="govuk-body">@{messages(s"$key.ourDecision.p1", entityName)}</p>
+  <p class="govuk-body">@{Html(messages(s"$key.ourDecision.p2", appConfig.govukFinanceAct2026Url))}</p>
+  <p class="govuk-body">@{messages(s"$key.ourDecision.p3")}</p>
+  <p class="govuk-body">@{Html(messages(s"$key.ourDecision.p4", correctiveActionExpiryDate))}</p>
+  <h2 class="govuk-heading-m">@messages(s"$key.howToFix.h2")</h2>
+  <p class="govuk-body">@messages(s"$key.howToFix.p1")</p>
+    <p class="govuk-body">
+        @govukButton(Button(
+            content = Text(messages(s"$key.startButton")),
+            href= Some(
+              AppRoutes
+                .providedetails
+                .riskingoutcome
+                .fixablefailures
+                .FixableTaskListController
+                .show(linkId)
+                .url
+            ),
+            isStartButton = true
+        ))
+    </p>
+  <h2 class="govuk-heading-m">@messages(s"$key.failures.h2")</h2>
+  <p class="govuk-body">@messages(s"$key.failures.p1")</p>
+  <ul class="govuk-list govuk-list--bullet">
+    <li>@messages(s"$key.failures.li1", entityName)</li>
+    <li>@Html(messages(s"$key.failures.li2", correctiveActionExpiryDate))</li>
+  </ul>
+  <h2 class="govuk-heading-m">@messages(s"$key.appeal.h2", entityName)</h2>
+  <p class="govuk-body">@messages(s"$key.appeal.p1")</p>
+  <p class="govuk-body">@Html(messages(s"$key.appeal.p2", appConfig.guidanceForFailedApplicationAppealsUrl))</p>
+  <p class="govuk-body">@messages(s"$key.appeal.p3")</p>
+}

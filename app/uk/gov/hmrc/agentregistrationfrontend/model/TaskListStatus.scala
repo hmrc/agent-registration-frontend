@@ -34,6 +34,11 @@ final case class FixableTaskListStatus(
   declaration: TaskStatus
 )
 
+final case class FixableIndividualTaskListStatus(
+  fixableTasks: Map[String, TaskStatus] = Map.empty,
+  declaration: TaskStatus
+)
+
 final case class TaskStatus(
   canStart: Boolean,
   isComplete: Boolean

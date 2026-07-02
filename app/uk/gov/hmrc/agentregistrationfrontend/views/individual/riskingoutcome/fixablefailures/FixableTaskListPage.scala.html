@@ -1,0 +1,94 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.model.FixableIndividualTaskListStatus
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistration.shared.LinkId
+
+@this(
+        layout: Layout,
+        govukTaskList: GovukTaskList,
+        govukWarningText : GovukWarningText,
+        govukButton: GovukButton
+)
+
+@(
+        taskListStatus: FixableIndividualTaskListStatus,
+        entityName: String,
+        correctiveActionExpiryDate: String,
+        linkId: LinkId
+)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{"fixableIndividualTaskList"}
+@title = @{messages(s"$key.title", entityName)}
+@incomplete = @{
+    TaskListItemStatus(
+        tag = Some(Tag(
+            content = Text(messages("taskList.status.Incomplete")),
+            classes = "govuk-tag--blue"
+        ))
+    )
+}
+@complete = @{
+    TaskListItemStatus(content = Text(messages("taskList.status.Completed")))
+}
+@cannotStart = @{
+    TaskListItemStatus(content = Text(messages("taskList.status.CannotStartYet")))
+}
+
+@layout(
+    pageTitle = title,
+    suppressBackLink = true
+) {
+
+    <h1 class="govuk-heading-l">@title</h1>
+    @govukWarningText(WarningText(
+      iconFallbackText = Some(messages("common.warning")),
+      content = Text(messages(s"$key.warning", correctiveActionExpiryDate))
+    ))
+
+    @if(taskListStatus.fixableTasks.nonEmpty) {
+        @govukTaskList(TaskList(
+            items = taskListStatus.fixableTasks.toSeq.map { case (k, v) =>
+              TaskListItem(
+                title = TaskListItemTitle(
+                  content = Text(messages(s"$key.$k.linkText"))
+                ),
+                status = if(v.isComplete) complete else incomplete,
+                href = Some(
+                  if k.startsWith("IndividualFix.10.")
+                  then
+                    AppRoutes.providedetails.riskingoutcome.fixablefailures.FixIndividualProvidedDetailsController.show(linkId).url
+                  else
+                    AppRoutes.providedetails.riskingoutcome.fixablefailures.FixableIndividualFailureController.show(k, linkId).url)
+              )
+            } ++ Seq(
+              TaskListItem(
+                title = TaskListItemTitle(
+                  content = Text(messages(s"$key.declaration.linkText"))
+                ),
+                status = if(taskListStatus.declaration.canStart) incomplete else cannotStart,
+                href = if(taskListStatus.declaration.canStart) Some(AppRoutes.providedetails.riskingoutcome.fixablefailures.DeclarationController.show(linkId).url) else None
+              )
+            ),
+            idPrefix = "fixableTasks"
+        ))
+    }
+
+}

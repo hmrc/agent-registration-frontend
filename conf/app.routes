@@ -204,8 +204,22 @@ POST        /provide-details/individual-name-search/:linkId                 uk.g
 GET         /provide-details/contact-applicant                              uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ContactApplicantController.show
 
 ## Risking outcome for individuals
-GET         /provide-details/outcome/:linkId                           uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.RiskingOutcomeController.show(linkId: LinkId)
-
+GET         /provide-details/outcome-status/:linkId                           uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.RiskingOutcomeController.show(linkId: LinkId)
+GET         /provide-details/conditions-not-yet-met/task-list/:linkId                 uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.FixableTaskListController.show(linkId: LinkId)
+GET         /provide-details/conditions-not-yet-met/failure-details/:fixCode/:linkId                 uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.FixableIndividualFailureController.show(fixCode: String, linkId: LinkId)
+POST        /provide-details/conditions-not-yet-met/failure-details/:fixCode/:linkId                 uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.FixableIndividualFailureController.submit(fixCode: String, linkId: LinkId)
+GET         /provide-details/conditions-not-yet-met/identity/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.FixIndividualProvidedDetailsController.show(linkId: LinkId)
+GET         /provide-details/conditions-not-yet-met/check-your-answers/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.provideddetails.CheckYourAnswersController.show(linkId: LinkId)
+POST        /provide-details/conditions-not-yet-met/check-your-answers/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.provideddetails.CheckYourAnswersController.submit(linkId: LinkId)
+GET         /provide-details/conditions-not-yet-met/date-of-birth/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.provideddetails.IndividualDateOfBirthController.show(linkId: LinkId)
+POST        /provide-details/conditions-not-yet-met/date-of-birth/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.provideddetails.IndividualDateOfBirthController.submit(linkId: LinkId)
+GET         /provide-details/conditions-not-yet-met/national-insurance-number/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.provideddetails.IndividualNinoController.show(linkId: LinkId)
+POST        /provide-details/conditions-not-yet-met/national-insurance-number/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.provideddetails.IndividualNinoController.submit(linkId: LinkId)
+GET         /provide-details/conditions-not-yet-met/self-assessment-unique-taxpayer-reference/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.provideddetails.IndividualSaUtrController.show(linkId: LinkId)
+POST        /provide-details/conditions-not-yet-met/self-assessment-unique-taxpayer-reference/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.provideddetails.IndividualSaUtrController.submit(linkId: LinkId)
+GET         /provide-details/conditions-not-yet-met/confirmation/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.IndividualConfirmationController.show(linkId: LinkId)
+GET         /provide-details/conditions-not-yet-met/declaration/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.DeclarationController.show(linkId: LinkId)
+POST        /provide-details/conditions-not-yet-met/declaration/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.DeclarationController.submit(linkId: LinkId)
 ## Internal Routes for individuals
 GET        /provide-details/internal/unified-customer-registry-identifiers/:linkId   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.internal.UcrIndividualController.populateIndividualIdentifiersFromUcr(linkId: LinkId)
 
@@ -226,4 +240,5 @@ POST       /conditions-not-yet-met/anti-money-laundering/check-your-answers     
 GET        /conditions-not-yet-met/failure-details/:failureCode      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.entityfailures.FixableEntityFailuresController.show(failureCode: String)
 POST       /conditions-not-yet-met/failure-details/:failureCode      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.entityfailures.FixableEntityFailuresController.submit(failureCode: String)
 GET        /conditions-not-yet-met/individuals                       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.individualfailures.FixableIndividualsController.show
+GET        /conditions-not-yet-met/declaration                       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.DeclarationController.show
 
