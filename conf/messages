@@ -1762,16 +1762,16 @@ isFixed.IndividualFix.5.6.error.invalid = Select yes if all overdue liabilities 
 
 fixableIndividualDetails.IndividualFix.5.7.caption = Pay your Capital Gains Tax liability
 fixableIndividualDetails.IndividualFix.5.7.heading = You have an overdue Capital Gains Tax liability
-fixableIndividualDetails.IndividualFix.5.6.p1 = When we reviewed the application, we found that you owed an overdue amount relating to Capital Gains Tax.
-fixableIndividualDetails.IndividualFix.5.6.p2 = We cannot set up an agent services account for {0} until this is resolved.
-fixableIndividualDetails.IndividualFix.5.6.action.h2 = Take action on this issue
-fixableIndividualDetails.IndividualFix.5.6.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableIndividualDetails.IndividualFix.5.6.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
-fixableIndividualDetails.IndividualFix.5.6.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
-fixableIndividualDetails.IndividualFix.5.6.action.p4 = Find out <a href="https://www.gov.uk/report-and-pay-your-capital-gains-tax" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Capital Gains Tax (opens in a new tab)</a>.
-fixableIndividualDetails.IndividualFix.5.6.label = Have all overdue liabilities been paid or included in a payment plan?
-isFixed.IndividualFix.5.6.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
-isFixed.IndividualFix.5.6.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+fixableIndividualDetails.IndividualFix.5.7.p1 = When we reviewed the application, we found that you owed an overdue amount relating to Capital Gains Tax.
+fixableIndividualDetails.IndividualFix.5.7.p2 = We cannot set up an agent services account for {0} until this is resolved.
+fixableIndividualDetails.IndividualFix.5.7.action.h2 = Take action on this issue
+fixableIndividualDetails.IndividualFix.5.7.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableIndividualDetails.IndividualFix.5.7.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.5.7.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableIndividualDetails.IndividualFix.5.7.action.p4 = Find out <a href="https://www.gov.uk/report-and-pay-your-capital-gains-tax" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Capital Gains Tax (opens in a new tab)</a>.
+fixableIndividualDetails.IndividualFix.5.7.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.IndividualFix.5.7.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.IndividualFix.5.7.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
 
 fixableIndividualDetails.IndividualFix.8.5.caption = Pay your relevant anti-avoidance penalty liability
 fixableIndividualDetails.IndividualFix.8.5.heading = You have an overdue relevant anti-avoidance penalty liability
