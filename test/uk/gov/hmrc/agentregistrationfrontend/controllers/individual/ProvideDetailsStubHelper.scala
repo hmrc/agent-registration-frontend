@@ -109,3 +109,18 @@ object ProvideDetailsStubHelper:
   def verifyRiskingProgressCalls(personReference: PersonReference): Unit =
     verifyAuthAndFindApplicationAndProvidedDetails()
     AgentRegistrationRiskingStubs.verifyGetIndividualRiskingResponse(personReference = personReference)
+
+  def stubFixableFailureUpdate(
+    agentApplication: AgentApplication,
+    individualProvidedDetails: IndividualProvidedDetails,
+    updatedIndividualProvidedDetails: IndividualProvidedDetails
+  ): StubMapping =
+    stubAuthAndUpdateProvidedDetails(
+      agentApplication,
+      individualProvidedDetails,
+      updatedIndividualProvidedDetails
+    )
+    AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
+      utr = tdAll.saUtr.asUtr,
+      responseBody = tdAll.businessPartnerRecordResponse
+    )
