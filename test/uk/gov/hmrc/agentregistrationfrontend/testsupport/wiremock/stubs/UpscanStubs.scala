@@ -27,17 +27,31 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object UpscanStubs:
 
-  def requestJson(uploadId: UploadId): String = {
-    // language=JSON
-    s"""
-   {
-       "callbackUrl": "${ISpec.selfBaseUrl}/api/amls/process-notification-from-upscan/${uploadId.value}",
-       "successRedirect": "${ISpec.thisFrontendBaseUrl}/agent-registration/apply/anti-money-laundering/evidence/upload-result",
-       "errorRedirect": "${ISpec.thisFrontendBaseUrl}/agent-registration/apply/anti-money-laundering/evidence/error",
-       "maximumFileSize": 6291456
-   }
-   """
-  }
+  def requestJson(
+    uploadId: UploadId,
+    isFix: Boolean = false
+  ): String =
+    if isFix
+    then
+      // language=JSON
+      s"""
+     {
+         "callbackUrl": "${ISpec.selfBaseUrl}/api/amls/process-notification-from-upscan/${uploadId.value}",
+         "successRedirect": "${ISpec.thisFrontendBaseUrl}/agent-registration/conditions-not-yet-met/anti-money-laundering/evidence/upload-result",
+         "errorRedirect": "${ISpec.thisFrontendBaseUrl}/agent-registration/conditions-not-yet-met/anti-money-laundering/evidence/upload-error",
+         "maximumFileSize": 6291456
+     }
+     """
+    else
+      // language=JSON
+      s"""
+     {
+         "callbackUrl": "${ISpec.selfBaseUrl}/api/amls/process-notification-from-upscan/${uploadId.value}",
+         "successRedirect": "${ISpec.thisFrontendBaseUrl}/agent-registration/apply/anti-money-laundering/evidence/upload-result",
+         "errorRedirect": "${ISpec.thisFrontendBaseUrl}/agent-registration/apply/anti-money-laundering/evidence/error",
+         "maximumFileSize": 6291456
+     }
+     """
 
   def responseJson(fileUploadReference: FileUploadReference): String =
     // language=JSON
@@ -63,12 +77,13 @@ object UpscanStubs:
 
   def stubUpscanInitiate(
     fileUploadReference: FileUploadReference = TdAll.tdAll.fileUploadReference,
-    uploadId: UploadId = TdAll.tdAll.uploadId
+    uploadId: UploadId = TdAll.tdAll.uploadId,
+    isFix: Boolean = false
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlEqualTo("/upscan/v2/initiate"),
     requestBody = Some(equalToJson(
-      requestJson(uploadId),
+      requestJson(uploadId, isFix),
       true,
       true
     )),
