@@ -249,7 +249,7 @@ extends ViewSpec:
           linkId = tdAll.linkId
         ).body
       )
-      s"EntityFailureDetailsPage when entity has failure code $individualFixCode" should:
+      s"IndividualFailureDetailsPage when individual has failure code $individualFixCode" should:
         "have expected content" in:
           doc.mainContent shouldContainContent expectedContent
 

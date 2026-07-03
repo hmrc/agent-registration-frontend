@@ -27,7 +27,6 @@
 
 @(
         taskListStatus: FixableIndividualTaskListStatus,
-        entityName: String,
         correctiveActionExpiryDate: String,
         linkId: LinkId
 )(implicit
@@ -36,7 +35,7 @@
 )
 
 @key = @{"fixableIndividualTaskList"}
-@title = @{messages(s"$key.title", entityName)}
+@title = @{messages(s"$key.title")}
 @incomplete = @{
     TaskListItemStatus(
         tag = Some(Tag(
