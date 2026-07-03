@@ -1723,29 +1723,29 @@ isFixed.IndividualFix.5.3.error.invalid = Select yes if all overdue liabilities 
 
 fixableIndividualDetails.IndividualFix.5.4.caption = Pay your PAYE liability
 fixableIndividualDetails.IndividualFix.5.4.heading = You have an overdue PAYE liability
-fixableIndividualDetails.IndividualFix.5.3.p1 = When we reviewed the application, we found that you owed an overdue amount relating to PAYE.
-fixableIndividualDetails.IndividualFix.5.3.p2 = We cannot set up an agent services account for {0} until this is resolved.
-fixableIndividualDetails.IndividualFix.5.3.action.h2 = Take action on this issue
-fixableIndividualDetails.IndividualFix.5.3.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableIndividualDetails.IndividualFix.5.3.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
-fixableIndividualDetails.IndividualFix.5.3.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
-fixableIndividualDetails.IndividualFix.5.3.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#paye" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay PAYE (opens in a new tab)</a>.
-fixableIndividualDetails.IndividualFix.5.3.label = Have all overdue liabilities been paid or included in a payment plan?
-isFixed.IndividualFix.5.3.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
-isFixed.IndividualFix.5.3.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+fixableIndividualDetails.IndividualFix.5.4.p1 = When we reviewed the application, we found that you owed an overdue amount relating to PAYE.
+fixableIndividualDetails.IndividualFix.5.4.p2 = We cannot set up an agent services account for {0} until this is resolved.
+fixableIndividualDetails.IndividualFix.5.4.action.h2 = Take action on this issue
+fixableIndividualDetails.IndividualFix.5.4.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableIndividualDetails.IndividualFix.5.4.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.5.4.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableIndividualDetails.IndividualFix.5.4.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#paye" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay PAYE (opens in a new tab)</a>.
+fixableIndividualDetails.IndividualFix.5.4.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.IndividualFix.5.4.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.IndividualFix.5.4.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
 
 fixableIndividualDetails.IndividualFix.5.5.caption = Pay your civil penalty liability
 fixableIndividualDetails.IndividualFix.5.5.heading = You have an overdue civil penalty liability
-fixableIndividualDetails.IndividualFix.5.3.p1 = When we reviewed the application, we found that you owed an overdue amount relating to one or more civil penalties.
-fixableIndividualDetails.IndividualFix.5.3.p2 = We cannot set up an agent services account for {0} until this is resolved.
-fixableIndividualDetails.IndividualFix.5.3.action.h2 = Take action on this issue
-fixableIndividualDetails.IndividualFix.5.3.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableIndividualDetails.IndividualFix.5.3.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
-fixableIndividualDetails.IndividualFix.5.3.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
-fixableIndividualDetails.IndividualFix.5.3.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
-fixableIndividualDetails.IndividualFix.5.3.label = Have all overdue liabilities been paid or included in a payment plan?
-isFixed.IndividualFix.5.3.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
-isFixed.IndividualFix.5.3.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
+fixableIndividualDetails.IndividualFix.5.5.p1 = When we reviewed the application, we found that you owed an overdue amount relating to one or more civil penalties.
+fixableIndividualDetails.IndividualFix.5.5.p2 = We cannot set up an agent services account for {0} until this is resolved.
+fixableIndividualDetails.IndividualFix.5.5.action.h2 = Take action on this issue
+fixableIndividualDetails.IndividualFix.5.5.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
+fixableIndividualDetails.IndividualFix.5.5.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.5.5.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
+fixableIndividualDetails.IndividualFix.5.5.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
+fixableIndividualDetails.IndividualFix.5.5.label = Have all overdue liabilities been paid or included in a payment plan?
+isFixed.IndividualFix.5.5.error.required = Select yes if all overdue liabilities have been paid or included in a payment plan
+isFixed.IndividualFix.5.5.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
 
 fixableIndividualDetails.IndividualFix.5.6.caption = Pay your Stamp Duty liability
 fixableIndividualDetails.IndividualFix.5.6.heading = You have an overdue Stamp Duty liability
