@@ -1800,7 +1800,7 @@ isFixed.IndividualFix.8.7.error.required = Select yes if all overdue liabilities
 isFixed.IndividualFix.8.7.error.invalid = Select yes if all overdue liabilities have been paid or included in a payment plan
 
 fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.caption = Provide your details
-fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.heading = We could not match the details your provided with an HMRC record
+fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.heading = We could not match the details you provided with an HMRC record
 fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p1 = This is usually because an answer you gave was incorrect, or you did not provide enough details.
 fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p2 = On the next page, you can review some of your answers.
 fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p3 = Check them, and change anything that is incorrect or missing.
