@@ -95,7 +95,7 @@ extends ViewSpec:
           |ATT AML-1-123456
           |Change Registration number
           |Evidence
-          |certificate.pdf
+          |evidence.pdf
           |Change Evidence
           |Confirm and continue
           |Save and come back later
@@ -121,7 +121,7 @@ extends ViewSpec:
           ),
           TestSummaryRow(
             key = "Evidence",
-            value = "certificate.pdf",
+            value = "evidence.pdf",
             action = AppRoutes.fixablefailures.amlsfailure.AmlsEvidenceUploadController.show.url,
             changeLinkAccessibleContent = "Change Evidence"
           )

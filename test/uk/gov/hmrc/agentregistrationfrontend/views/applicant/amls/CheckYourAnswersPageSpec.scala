@@ -20,7 +20,6 @@ import com.google.inject.AbstractModule
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithApplication
 import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.amls.CheckYourAnswersPage
@@ -53,11 +52,8 @@ extends ViewSpec:
   private val heading: String = "Check your answers"
 
   "CheckYourAnswersPage for complete Hmrc Amls Details" should:
-    implicit val agentApplicationHmrcRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(
-      agentApplication.completeHmrcApplication
-    )
 
-    val doc: Document = Jsoup.parse(viewTemplate(agentApplicationHmrcRequest.agentApplication).body)
+    val doc: Document = Jsoup.parse(viewTemplate(agentApplication.completeHmrcApplication).body)
     "contain content" in:
       doc.mainContent shouldContainContent
         """
@@ -97,11 +93,7 @@ extends ViewSpec:
       doc.extractLinkButton(1).text shouldBe "Confirm and continue"
 
   "CheckYourAnswersPage for complete non-Hmrc Amls Details" should:
-    implicit val agentApplicationHmrcRequest: RequestWithData[DataWithApplication] = tdAll.makeAgentApplicationRequest(
-      agentApplication.completeNonHmrcApplication
-    )
-
-    val doc: Document = Jsoup.parse(viewTemplate(agentApplicationHmrcRequest.agentApplication).body)
+    val doc: Document = Jsoup.parse(viewTemplate(agentApplication.completeNonHmrcApplication).body)
     "contain content" in:
       doc.mainContent shouldContainContent
         """
