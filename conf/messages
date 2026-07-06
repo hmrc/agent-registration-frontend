@@ -1633,7 +1633,7 @@ individualFailedFixable.failures.h2 = Failure to meet the registration condition
 individualFailedFixable.failures.p1 = If you choose not to take action to meet the registration conditions:
 individualFailedFixable.failures.li1 = {0} will not be given an agent services account on this occasion
 individualFailedFixable.failures.li2 = your application will be deleted on {0} to comply with our data retention policy
-individualFailedFixable.appeal.h2 = You have the right to review or appeal
+individualFailedFixable.appeal.h2 = Your right to review or appeal
 individualFailedFixable.appeal.p1 = If you disagree with our decision, you should speak to {0}.
 individualFailedFixable.appeal.p2 = If {0} disagrees with our decision to refuse their application, they can <a class="govuk-link" href="{1}" target="_blank" rel="noopener noreferrer">request a review or appeal the decision (opens in a new tab)</a>.
 
