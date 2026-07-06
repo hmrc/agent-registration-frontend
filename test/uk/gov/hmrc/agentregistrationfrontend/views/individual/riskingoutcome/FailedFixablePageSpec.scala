@@ -54,7 +54,7 @@ extends ViewSpec:
            |If you choose not to take action to meet the registration conditions:
            |Test Company Name will not be given an agent services account on this occasion
            |your application will be deleted on 3 August 2026 to comply with our data retention policy
-           |You have the right to review or appeal
+           |Your right to review or appeal
            |If you disagree with our decision, you should speak to Test Company Name.
            |If Test Company Name disagrees with our decision to refuse their application, they can request a review or appeal the decision (opens in a new tab).
            |Is this page not working properly? (opens in new tab)
