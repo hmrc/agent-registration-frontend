@@ -54,10 +54,9 @@ extends ViewSpec:
            |If you choose not to take action to meet the registration conditions:
            |Test Company Name will not be given an agent services account on this occasion
            |your application will be deleted on 3 August 2026 to comply with our data retention policy
-           |Test Company Name has the right to review or appeal
-           |Keep a copy of this decision for your records.
-           |If you disagree with our decision to refuse your application, you can request a review or appeal the decision (opens in a new tab).
-           |You can ask for a review of our decision or begin the appeal process even if you decide to take the actions we need.
+           |You have the right to review or appeal
+           |If you disagree with our decision, you should speak to Test Company Name.
+           |If Test Company Name disagrees with our decision to refuse their application, they can request a review or appeal the decision (opens in a new tab).
            |Is this page not working properly? (opens in new tab)
            |"""
           .stripMargin

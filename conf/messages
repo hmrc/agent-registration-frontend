@@ -1633,10 +1633,9 @@ individualFailedFixable.failures.h2 = Failure to meet the registration condition
 individualFailedFixable.failures.p1 = If you choose not to take action to meet the registration conditions:
 individualFailedFixable.failures.li1 = {0} will not be given an agent services account on this occasion
 individualFailedFixable.failures.li2 = your application will be deleted on {0} to comply with our data retention policy
-individualFailedFixable.appeal.h2 = {0} has the right to review or appeal
-individualFailedFixable.appeal.p1 = Keep a copy of this decision for your records.
-individualFailedFixable.appeal.p2 = If you disagree with our decision to refuse your application, you can <a class="govuk-link" href="{0}" target="_blank" rel="noopener noreferrer">request a review or appeal the decision (opens in a new tab)</a>.
-individualFailedFixable.appeal.p3 = You can ask for a review of our decision or begin the appeal process even if you decide to take the actions we need.
+individualFailedFixable.appeal.h2 = You have the right to review or appeal
+individualFailedFixable.appeal.p1 = If you disagree with our decision, you should speak to {0}.
+individualFailedFixable.appeal.p2 = If {0} disagrees with our decision to refuse their application, they can <a class="govuk-link" href="{1}" target="_blank" rel="noopener noreferrer">request a review or appeal the decision (opens in a new tab)</a>.
 
 fixableIndividualTaskList.IndividualFix.4.1.linkText = File your missing Self Assessment returns
 fixableIndividualTaskList.IndividualFix.4.3.linkText = File your missing VAT returns
