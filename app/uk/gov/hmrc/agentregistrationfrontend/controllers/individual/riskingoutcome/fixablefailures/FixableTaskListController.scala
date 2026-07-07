@@ -55,7 +55,6 @@ extends FrontendController(mcc, actions):
             taskListStatus = fixableIndividualTaskListStatus(
               riskingOutcomeIndividual = riskingOutcomeIndividual
             ),
-            entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
             correctiveActionExpiryDate = displayDateForLang(overallOutcome.correctiveActionExpiryDate),
             linkId = linkId
           ))
