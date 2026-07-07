@@ -20,6 +20,7 @@
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 @import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix._10.IndividualDetailsFix
 @import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
+@import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 
 @import java.time.LocalDate
 
@@ -30,26 +31,35 @@
 @(
         key: String,
         individualProvidedDetails: IndividualDetailsFix,
+        individualName: IndividualName,
         linkId: LinkId)(implicit
         request: RequestHeader,
         messages: Messages
 )
 
-@makeSummaryListRow(labelKey: String, valueText: String, changeHref: String) = @{
+@makeSummaryListRow(labelKey: String, valueText: String, changeHref: Option[String]) = @{
     SummaryListRow(
         key = Key(content = Text(messages(labelKey))),
         value = Value(content = Text(valueText)),
-        actions = Some(
+        actions = if (changeHref.nonEmpty) { Some(
             Actions(
                 items = Seq(
                     ActionItem(
-                        href = changeHref,
+                        href = changeHref.get,
                         content = Text(messages("common.change")),
                         visuallyHiddenText = Some(messages(labelKey))
                     )
                 )
             )
-        )
+        )} else { None }
+    )
+}
+
+@individualNameRow(nameText: String) = @{
+    makeSummaryListRow(
+        labelKey = s"$key.individualName.label",
+        valueText = nameText,
+        changeHref = None
     )
 }
 
@@ -57,7 +67,7 @@
     makeSummaryListRow(
         labelKey = s"$key.dateOfBirth.label",
         valueText = displayDateForLang(Some(dob)),
-        changeHref = AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.IndividualDateOfBirthController.show(linkId).toString
+        changeHref = Some(AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.IndividualDateOfBirthController.show(linkId).toString)
     )
 }
 
@@ -65,7 +75,7 @@
     makeSummaryListRow(
         labelKey = s"$key.hasNino.label",
         valueText = hasNino,
-        changeHref = AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.IndividualNinoController.show(linkId).toString
+        changeHref = Some(AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.IndividualNinoController.show(linkId).toString)
     )
 }
 
@@ -73,7 +83,7 @@
     makeSummaryListRow(
         labelKey = s"$key.nino.label",
         valueText = ninoText,
-        changeHref = AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.IndividualNinoController.show(linkId).toString
+        changeHref = Some(AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.IndividualNinoController.show(linkId).toString)
     )
 }
 
@@ -81,7 +91,7 @@
     makeSummaryListRow(
         labelKey = s"$key.hasSaUtr.label",
         valueText = hasSaUtr,
-        changeHref = AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.IndividualSaUtrController.show(linkId).toString
+        changeHref = Some(AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.IndividualSaUtrController.show(linkId).toString)
     )
 }
 
@@ -89,14 +99,15 @@
     makeSummaryListRow(
         labelKey = s"$key.saUtr.label",
         valueText = saUtrText,
-        changeHref = AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.IndividualSaUtrController.show(linkId).toString
+        changeHref = Some(AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.IndividualSaUtrController.show(linkId).toString)
     )
 }
 
 @rows = @{
     val base = Seq.empty[SummaryListRow]
+    val individualNameRows = Seq(individualNameRow(individualName.value))
 
-  val dateOfBirthRows = individualProvidedDetails.dateOfBirth match {
+    val dateOfBirthRows = individualProvidedDetails.dateOfBirth match {
         case Some(IndividualDateOfBirth.Provided(dob)) => Seq(dateOfBirthRow(dob))
         case _ => Seq.empty[SummaryListRow]
     }
@@ -113,7 +124,7 @@
         case None => Seq.empty[SummaryListRow]
     }
 
-    dateOfBirthRows ++ ninoRows ++ saUtrRows
+    individualNameRows ++ dateOfBirthRows ++ ninoRows ++ saUtrRows
 }
 
 @govukSummaryList(SummaryList(rows = rows))

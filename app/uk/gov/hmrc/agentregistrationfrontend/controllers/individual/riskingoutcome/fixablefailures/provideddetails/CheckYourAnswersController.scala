@@ -64,6 +64,7 @@ extends FrontendController(mcc, actions):
     baseAction(linkId):
       implicit request =>
         Ok(view(
+          individualName = request.get[IndividualProvidedDetails].individualName,
           individualProvidedDetails = request.get[IndividualDetailsFix],
           linkId = linkId
         ))

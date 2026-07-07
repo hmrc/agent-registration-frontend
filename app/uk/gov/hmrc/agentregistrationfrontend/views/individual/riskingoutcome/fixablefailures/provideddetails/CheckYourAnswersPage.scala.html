@@ -19,6 +19,7 @@
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingoutcome.fixablefailures.provideddetails.AnswerSummary
 @import uk.gov.hmrc.govukfrontend.views.html.components.*
+@import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 
 @this(
         layout: Layout,
@@ -28,6 +29,7 @@
 )
 
 @(
+        individualName: IndividualName,
         individualProvidedDetails: IndividualDetailsFix,
         linkId: LinkId)(implicit
         request: RequestHeader,
@@ -46,6 +48,7 @@
     <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
     @answerSummary(
       key,
+      individualName = individualName,
       individualProvidedDetails = individualProvidedDetails,
       linkId = linkId
     )
