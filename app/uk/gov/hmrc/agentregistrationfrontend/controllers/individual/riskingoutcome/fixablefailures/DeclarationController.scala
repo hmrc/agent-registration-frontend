@@ -18,10 +18,11 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutc
 
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.LinkId
-import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingoutcome.fixablefailures.DeclarationPage
 
 import javax.inject.Inject
@@ -31,20 +32,20 @@ import javax.inject.Singleton
 class DeclarationController @Inject() (
   actions: IndividualActions,
   mcc: MessagesControllerComponents,
-  view: DeclarationPage
+  view: DeclarationPage,
+  individualProvideDetailsService: IndividualProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
   private def baseAction(
     linkId: LinkId
-  ): ActionBuilderWithData[DataWithRiskingOutcome] = authorisedWithRiskingOutcome(linkId)
+  ): ActionBuilderWithData[DataWithFailedFixable] = authorisedWithFailedFixable(linkId)
     .ensure(
       condition =
         implicit request =>
-          val individualRiskingOutcome: RiskingOutcomeIndividual = request.get
-          individualRiskingOutcome match
-            case outcome @ RiskingOutcomeIndividual.FailedFixable(fixes: Seq[IndividualFix]) => fixes.forall(_.isConfirmed.contains(true))
-            case _ => false,
+          val individualRiskingOutcome: RiskingOutcomeIndividual.FailedFixable = request.get
+          individualRiskingOutcome.fixes.forall(_.isConfirmed.contains(true)) && !individualRiskingOutcome.declarationAgreed
+      ,
       resultWhenConditionNotMet =
         implicit r =>
           Redirect(AppRoutes.providedetails.riskingoutcome.RiskingOutcomeController.show(linkId))
@@ -57,7 +58,14 @@ extends FrontendController(mcc, actions):
           linkId = linkId
         ))
 
-  def submit(linkId: LinkId): Action[AnyContent] =
-    baseAction(linkId):
+  def submit(linkId: LinkId): Action[AnyContent] = baseAction(linkId)
+    .async:
       implicit request =>
-        Redirect(AppRoutes.providedetails.riskingoutcome.fixablefailures.IndividualConfirmationController.show(linkId))
+        val updatedIndividualProvidedDetails: IndividualProvidedDetails = request.get[IndividualProvidedDetails].copy(
+          riskingOutcomeIndividual = Some(request.get[RiskingOutcomeIndividual.FailedFixable].copy(
+            declarationAgreed = true
+          ))
+        )
+        individualProvideDetailsService
+          .upsert(updatedIndividualProvidedDetails).map: _ =>
+            Redirect(AppRoutes.providedetails.riskingoutcome.fixablefailures.IndividualConfirmationController.show(linkId))

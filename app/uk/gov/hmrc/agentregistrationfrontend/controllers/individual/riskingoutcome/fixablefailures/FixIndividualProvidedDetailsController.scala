@@ -43,9 +43,8 @@ extends FrontendController(mcc, actions):
   ): Action[AnyContent] =
     authorisedWithFixableDetails(linkId):
       implicit request =>
-        val overallOutcome: RiskingOutcomeApplication = request.get
         Ok(view(
           failureCode = request.get[IndividualDetailsFix].toString,
-          correctiveActionExpiryDate = displayDateForLang(overallOutcome.correctiveActionExpiryDate),
+          correctiveActionExpiryDate = displayDateForLang(request.get[RiskingOutcomeApplication].correctiveActionExpiryDate),
           linkId = linkId
         ))

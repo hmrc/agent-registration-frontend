@@ -74,7 +74,7 @@
 
 @actionsList(individual: IndividualProvidedDetails) = {
   @{individual.riskingOutcomeIndividual match {
-    case Some(FailedFixable(fixes: Seq[IndividualFix])) =>
+    case Some(FailedFixable(fixes: Seq[IndividualFix], _)) =>
       <ul class="govuk-list">
         {fixes.map { fix =>
           <li>{messageFor(fix)}</li>
@@ -86,8 +86,8 @@
 
 @checkAllActionsCompleted(individual: IndividualProvidedDetails) = {
   @{individual.riskingOutcomeIndividual match {
-    case Some(FailedFixable(fixes: Seq[IndividualFix])) =>
-      if (fixes.forall(_.isConfirmed === Some(true))) messages(s"$key.yes")
+    case Some(FailedFixable(fixes: Seq[IndividualFix], declarationAgreed: Boolean)) =>
+      if (fixes.forall(_.isConfirmed === Some(true)) && declarationAgreed) messages(s"$key.yes")
       else messages(s"$key.no")
     case _ => <!-- -->
   }}
