@@ -192,7 +192,7 @@ extends FrontendController(mcc, actions):
         overallOutcome.outcome match
           case Outcome.FailedFixable =>
             Ok(failedFixableStartPage(
-              actualDecisionDate = displayDateForLang(Some(overallOutcome.riskingCompletedDate)),
+              actualDecisionDate = displayDateForLang(Some(overallOutcome.actualDecisionDate)),
               correctiveActionExpiryDate = displayDateForLang(overallOutcome.correctiveActionExpiryDate),
               entityName = request.get[BusinessPartnerRecordResponse].getEntityName
             ))
@@ -219,7 +219,7 @@ extends FrontendController(mcc, actions):
                         case Some(riskedIndividual: RiskingOutcomeIndividual.FailedNonFixable) => riskedIndividual.failures
                         case _ => Seq.empty
                   ),
-                riskingCompletedDate = overallOutcome.riskingCompletedDate,
+                riskingCompletedDate = overallOutcome.actualDecisionDate,
                 correctiveActionExpiryDate = overallOutcome.correctiveActionExpiryDate
               ),
               agentApplication = agentApplication,

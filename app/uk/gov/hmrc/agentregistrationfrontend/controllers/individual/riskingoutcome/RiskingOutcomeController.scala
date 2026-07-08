@@ -77,7 +77,7 @@ extends FrontendController(mcc, actions):
                     linkId = linkId,
                     entityName = entityName,
                     correctiveActionExpiryDate = displayDateForLang(riskingOutcomeApplication.correctiveActionExpiryDate),
-                    actualDecisionDate = displayDateForLang(Some(riskingOutcomeApplication.riskingCompletedDate))
+                    actualDecisionDate = displayDateForLang(Some(riskingOutcomeApplication.actualDecisionDate))
                   ))
               case _ => renderConfirmationPage(request.agentApplication, entityName) // this individual has not failed fixable, so render the confirmation page
           case _ => renderConfirmationPage(request.agentApplication, entityName) // any other outcome renders the confirmation page

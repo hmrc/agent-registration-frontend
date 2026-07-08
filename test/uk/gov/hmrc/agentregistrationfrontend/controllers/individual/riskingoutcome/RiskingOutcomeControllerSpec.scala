@@ -49,7 +49,7 @@ extends ControllerSpec:
     .setTo(Some(RiskingOutcomeApplication(
       correctiveActionExpiryDate = Some(tdAll.correctiveActionExpiryDate),
       outcome = RiskingOutcomeApplication.Outcome.FailedFixable,
-      riskingCompletedDate = tdAll.riskingCompletedDate
+      actualDecisionDate = tdAll.riskingCompletedDate
     )))
 
   val failedNonFixableApplication: AgentApplication = failedFixableApplication
@@ -57,7 +57,7 @@ extends ControllerSpec:
     .setTo(Some(RiskingOutcomeApplication(
       correctiveActionExpiryDate = None,
       outcome = RiskingOutcomeApplication.Outcome.FailedNonFixable,
-      riskingCompletedDate = tdAll.riskingCompletedDate
+      actualDecisionDate = tdAll.riskingCompletedDate
     )))
 
   object individualProvidedDetails:
