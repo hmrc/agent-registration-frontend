@@ -57,7 +57,7 @@ extends FrontendController(mcc, actions):
                   Ok(outcomeStartPage(
                     linkId: LinkId
                   ))
-                case _ => Redirect(AppRoutes.providedetails.riskingoutcome.RiskingOutcomeController.show(linkId)) // the 'new world' where we don't call risking but use application for status
+                case _ => Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId)) // this case will only ever be for first time submissions, RiskingCompleted is the status for resubmissions
             else
               Redirect(AppRoutes.providedetails.riskingprogress.RiskingProgressController.show(linkId)) // the 'old world' where we call risking for progress
           case Some(agentApplication) =>
