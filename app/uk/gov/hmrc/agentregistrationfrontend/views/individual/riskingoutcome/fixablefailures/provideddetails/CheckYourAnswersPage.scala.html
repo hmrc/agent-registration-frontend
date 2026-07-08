@@ -45,18 +45,21 @@
 
 @layout(pageTitle = title) {
   <h2 class="govuk-caption-l">@messages("relevant-individual.caption")</h2>
-    <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
-    @answerSummary(
-      key,
-      individualName = individualName,
-      individualProvidedDetails = individualProvidedDetails,
-      linkId = linkId
-    )
+  <h1 class="govuk-heading-l">@messages(s"$key.title")</h1>
+  @answerSummary(
+    key,
+    individualName = individualName,
+    individualProvidedDetails = individualProvidedDetails,
+    linkId = linkId
+  )
+
+  <h3 class="govuk-heading-m">@messages("relevant-individual.resubmit.h3")</h3>
+  <p class="govuk-body">@messages("relevant-individual.resubmit.p")</p>
   @formWithCSRF(action = AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.CheckYourAnswersController.submit(linkId)) {
     <p class="govuk-body">
-    @govukButton(Button(
-      content = Text(messages("common.confirmAndContinue"))
-    ))
+      @govukButton(Button(
+        content = Text(messages("common.confirmAndContinue"))
+      ))
     </p>
   }
 
