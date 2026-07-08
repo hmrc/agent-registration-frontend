@@ -68,13 +68,17 @@ extends FrontendController(mcc, actions):
               case _ => renderConfirmationPage(request.agentApplication, entityName) // this individual has not failed non-fixable, so render the confirmation page
           case RiskingOutcomeApplication.Outcome.FailedFixable =>
             riskingOutcomeIndividual match
-              case _: RiskingOutcomeIndividual.FailedFixable =>
-                Ok(failedFixablePage(
-                  linkId = linkId,
-                  entityName = entityName,
-                  correctiveActionExpiryDate = displayDateForLang(riskingOutcomeApplication.correctiveActionExpiryDate),
-                  actualDecisionDate = displayDateForLang(Some(riskingOutcomeApplication.riskingCompletedDate))
-                ))
+              case f: RiskingOutcomeIndividual.FailedFixable =>
+                if f.declarationAgreed && f.fixes.forall(_.isConfirmed.contains(true))
+                then
+                  Redirect(AppRoutes.providedetails.riskingoutcome.fixablefailures.IndividualConfirmationController.show(linkId)) // this individual has failed fixable, but has fixed everything
+                else
+                  Ok(failedFixablePage(
+                    linkId = linkId,
+                    entityName = entityName,
+                    correctiveActionExpiryDate = displayDateForLang(riskingOutcomeApplication.correctiveActionExpiryDate),
+                    actualDecisionDate = displayDateForLang(Some(riskingOutcomeApplication.riskingCompletedDate))
+                  ))
               case _ => renderConfirmationPage(request.agentApplication, entityName) // this individual has not failed fixable, so render the confirmation page
           case _ => renderConfirmationPage(request.agentApplication, entityName) // any other outcome renders the confirmation page
 

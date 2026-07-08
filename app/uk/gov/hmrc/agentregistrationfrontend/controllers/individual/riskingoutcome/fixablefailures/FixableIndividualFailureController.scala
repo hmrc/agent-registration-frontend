@@ -52,21 +52,15 @@ extends FrontendController(mcc, actions):
   def baseAction(
     fixCode: String,
     linkId: LinkId
-  ): ActionBuilderWithData[IndividualFix *: DataWithRiskingOutcome] = actions
-    .authorisedWithRiskingOutcome(linkId)
+  ): ActionBuilderWithData[IndividualFix *: DataWithFailedFixable] = actions
+    .authorisedWithFailedFixable(linkId)
     .behindFeatureFlag(appConfig.Features.fixableFailures)
     .refine(implicit request =>
-      val individualRiskingOutcome: RiskingOutcomeIndividual = request.get
-      individualRiskingOutcome match
-        case RiskingOutcomeIndividual.FailedFixable(fixes: Seq[IndividualFix]) =>
-          fixes.find(_.toString === fixCode) match
-            case Some(individualFix) => request.add[IndividualFix](individualFix)
-            case None =>
-              logger.warn(s"Risking outcome for individual does not contain a fix with code $fixCode.")
-              NotFound
-        case _ =>
-          logger.warn("Risking outcome for individual is not fixable. Redirecting to where outcome can be handled.")
-          Redirect(AppRoutes.providedetails.riskingoutcome.RiskingOutcomeController.show(linkId))
+      request.get[RiskingOutcomeIndividual.FailedFixable].fixes.find(_.toString === fixCode) match
+        case Some(individualFix) => request.add[IndividualFix](individualFix)
+        case None =>
+          logger.warn(s"Risking outcome for individual does not contain a fix with code $fixCode.")
+          NotFound
     )
 
   def show(
@@ -106,13 +100,9 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         val individualProvidedDetails: IndividualProvidedDetails = request.get
-        val updatedFixes: Seq[IndividualFix] =
-          individualProvidedDetails.riskingOutcomeIndividual match
-            case Some(outcome: RiskingOutcomeIndividual.FailedFixable) =>
-              outcome.fixes.map:
-                case f: IndividualFix if f === request.get[IndividualFix] => f.modify(_.isConfirmed).setTo(Some(request.get[Boolean]))
-                case other => other
-            case _ => throw new IllegalStateException("Risking outcome for individual is not fixable. Cannot update fixes.")
+        val updatedFixes: Seq[IndividualFix] = request.get[RiskingOutcomeIndividual.FailedFixable].fixes.map:
+          case f: IndividualFix if f === request.get[IndividualFix] => f.modify(_.isConfirmed).setTo(Some(request.get[Boolean]))
+          case other => other
         individualProvidedDetailsService.upsert(
           individualProvidedDetails
             .modify(_.riskingOutcomeIndividual.each)

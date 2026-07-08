@@ -81,7 +81,8 @@ extends ControllerSpec:
                 nino = None,
                 isConfirmed = Some(true)
               )
-            )
+            ),
+            declarationAgreed = true
           ))
         )
       )

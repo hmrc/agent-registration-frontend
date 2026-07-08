@@ -53,6 +53,22 @@ object ProvideDetailsStubHelper:
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(updatedIndividualProvidedDetails)
 
+  def stubAuthAndFixIndividualProvidedDetails(
+    agentApplication: AgentApplication,
+    individualProvidedDetails: IndividualProvidedDetails,
+    updatedIndividualProvidedDetails: IndividualProvidedDetails,
+    isScr: Boolean = false
+  ): StubMapping =
+    stubAuthAndUpdateProvidedDetails(
+      agentApplication,
+      individualProvidedDetails,
+      updatedIndividualProvidedDetails
+    )
+    AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
+      utr = tdAll.saUtr.asUtr, // doesn't matter we are using same utr as provided details, there is no conflict
+      responseBody = tdAll.businessPartnerRecordResponse
+    )
+
   def stubAuthAndMatchIndividualProvidedDetails(
     agentApplication: AgentApplication,
     individualProvidedDetails: IndividualProvidedDetails,

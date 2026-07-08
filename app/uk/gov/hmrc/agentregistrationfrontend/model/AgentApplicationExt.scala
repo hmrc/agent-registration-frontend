@@ -115,7 +115,8 @@ extension (agentApplication: AgentApplication)
         case f: RiskingOutcomeEntity.FailedFixable => Some(f)
         case _ => None
     val hasIndividualFailures: Boolean = fixableIndividuals.nonEmpty
-    val individualsComplete: Boolean = fixableIndividuals.forall(i => i.fixes.forall(_.isConfirmed.contains(true))) | !hasIndividualFailures
+    val individualsComplete: Boolean =
+      fixableIndividuals.forall(i => i.fixes.forall(_.isConfirmed.contains(true)) && i.declarationAgreed) | !hasIndividualFailures
     val entityFixes: Map[String, TaskStatus] =
       fixableEntity.map(_.fixes).getOrElse(Nil).filterNot {
         case _: AmlsFix => true
@@ -147,7 +148,7 @@ extension (agentApplication: AgentApplication)
         then
           Some(TaskStatus(
             canStart = true, // List tracking can be started at any time if there are individual failures
-            isComplete = fixableIndividuals.forall(i => i.fixes.forall(_.isConfirmed.contains(true)))
+            isComplete = fixableIndividuals.forall(i => i.fixes.forall(_.isConfirmed.contains(true)) && i.declarationAgreed)
           ))
         else None,
       declaration = TaskStatus(

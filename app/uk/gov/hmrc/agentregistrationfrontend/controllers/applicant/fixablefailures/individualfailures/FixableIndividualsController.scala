@@ -98,6 +98,6 @@ extends FrontendController(mcc, actions):
   extension (ipd: IndividualProvidedDetails)
 
     private def hasFixableFailure: Boolean = ipd.riskingOutcomeIndividual.exists:
-      case RiskingOutcomeIndividual.FailedFixable(_) => true
+      case RiskingOutcomeIndividual.FailedFixable(_, _) => true
       case _ => false
     private def detailsNotProvidedByApplicant: Boolean = ipd.providedByApplicant.contains(false)

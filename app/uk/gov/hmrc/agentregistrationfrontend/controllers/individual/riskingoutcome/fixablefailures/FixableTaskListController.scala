@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutc
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
@@ -46,26 +45,21 @@ extends FrontendController(mcc, actions):
 
   def show(linkId: LinkId): Action[AnyContent] =
     actions
-      .authorisedWithRiskingOutcome(linkId)
+      .authorisedWithFailedFixable(linkId)
       .behindFeatureFlag(appConfig.Features.fixableFailures):
         implicit request =>
-          val overallOutcome: RiskingOutcomeApplication = request.get
-          val riskingOutcomeIndividual: RiskingOutcomeIndividual = request.get
           Ok(taskListPage(
             taskListStatus = fixableIndividualTaskListStatus(
-              riskingOutcomeIndividual = riskingOutcomeIndividual
+              riskingOutcomeIndividual = request.get[RiskingOutcomeIndividual.FailedFixable]
             ),
-            correctiveActionExpiryDate = displayDateForLang(overallOutcome.correctiveActionExpiryDate),
+            correctiveActionExpiryDate = displayDateForLang(request.get[RiskingOutcomeApplication].correctiveActionExpiryDate),
             linkId = linkId
           ))
 
   private def fixableIndividualTaskListStatus(
-    riskingOutcomeIndividual: RiskingOutcomeIndividual
+    riskingOutcomeIndividual: RiskingOutcomeIndividual.FailedFixable
   ): FixableIndividualTaskListStatus =
-    val fixes: Seq[IndividualFix] =
-      riskingOutcomeIndividual match
-        case f: RiskingOutcomeIndividual.FailedFixable => f.fixes
-        case _ => Seq.empty
+    val fixes: Seq[IndividualFix] = riskingOutcomeIndividual.fixes
     val fixesComplete: Boolean = fixes.forall(_.isConfirmed.contains(true)) | fixes.isEmpty
     val fixableTasks: Map[String, TaskStatus] =
       fixes.map(fix =>

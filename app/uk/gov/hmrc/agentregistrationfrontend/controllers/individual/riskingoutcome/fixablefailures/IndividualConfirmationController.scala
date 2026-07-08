@@ -21,7 +21,6 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.FrontendController
@@ -40,14 +39,13 @@ extends FrontendController(mcc, actions):
 
   private def baseAction(
     linkId: LinkId
-  ): ActionBuilderWithData[DataWithRiskingOutcome] = authorisedWithRiskingOutcome(linkId)
+  ): ActionBuilderWithData[DataWithFailedFixable] = authorisedWithFailedFixable(linkId)
     .ensure(
       condition =
         implicit request =>
-          val individualRiskingOutcome: RiskingOutcomeIndividual = request.get
-          individualRiskingOutcome match
-            case outcome @ RiskingOutcomeIndividual.FailedFixable(fixes: Seq[IndividualFix]) => fixes.forall(_.isConfirmed.contains(true))
-            case _ => false,
+          val individualRiskingOutcome: RiskingOutcomeIndividual.FailedFixable = request.get
+          individualRiskingOutcome.fixes.forall(_.isConfirmed.contains(true)) && individualRiskingOutcome.declarationAgreed
+      ,
       resultWhenConditionNotMet =
         implicit r =>
           Redirect(AppRoutes.providedetails.riskingoutcome.RiskingOutcomeController.show(linkId))
