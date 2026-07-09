@@ -79,7 +79,7 @@ extends ControllerSpec:
     )
     val response: WSResponse = get(applicationStatusPath)
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe s"Application reference: ${agentApplication.submitted.agentApplicationId.value} - Apply for an agent services account - GOV.UK"
+    response.parseBodyAsJsoupDocument.title() shouldBe s"Application reference: ${agentApplication.submitted.applicationReference.value} - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsForApplicationRiskingResponse(agentApplication.submitted)
 
   s"GET $applicationStatusPath should render the in-progress page when status is FailedFixable" in:
@@ -92,7 +92,7 @@ extends ControllerSpec:
     val response: WSResponse = get(applicationStatusPath)
 
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe s"Application reference: ${agentApplication.submitted.agentApplicationId.value} - Apply for an agent services account - GOV.UK"
+    response.parseBodyAsJsoupDocument.title() shouldBe s"Application reference: ${agentApplication.submitted.applicationReference.value} - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsForApplicationRiskingResponse(agentApplication.submitted)
 
   s"GET $viewApplicationPath should return OK" in:
