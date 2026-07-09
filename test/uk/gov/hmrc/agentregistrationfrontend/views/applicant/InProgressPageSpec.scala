@@ -46,7 +46,7 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         s"""
            |Check the progress of an application
-           |Application reference: ${agentApplication.agentApplicationId.value}
+           |Application reference: ${agentApplication.applicationReference.value}
            |This is application is for an agent services account for Test Company Name.
            |Some of the information on this page uses real-time data and might change.
            |When to expect a decision
@@ -61,7 +61,7 @@ extends ViewSpec:
           .stripMargin
 
     "have the correct title" in:
-      doc.title() shouldBe s"Application reference: ${agentApplication.agentApplicationId.value} - Apply for an agent services account - GOV.UK"
+      doc.title() shouldBe s"Application reference: ${agentApplication.applicationReference.value} - Apply for an agent services account - GOV.UK"
 
     "have the correct h1" in:
-      doc.h1 shouldBe s"Application reference: ${agentApplication.agentApplicationId.value}"
+      doc.h1 shouldBe s"Application reference: ${agentApplication.applicationReference.value}"

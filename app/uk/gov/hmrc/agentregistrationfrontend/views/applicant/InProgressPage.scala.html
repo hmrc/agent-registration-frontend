@@ -34,7 +34,7 @@
 @key = @{"applicationProgress"}
 
 @caption = @{messages(s"$key.caption")}
-@title = @{messages(s"$key.title", agentApplication.agentApplicationId.value)}
+@title = @{messages(s"$key.title", agentApplication.applicationReference.value)}
 
 @layout(
     pageTitle = title
