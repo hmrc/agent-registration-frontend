@@ -206,7 +206,11 @@ extends RequestAwareLogging:
         val individualRiskingOutcome: RiskingOutcomeIndividual = request.get
         individualRiskingOutcome match
           case outcome @ RiskingOutcomeIndividual.FailedFixable(fixes: Seq[IndividualFix], declarationAgreed: Boolean) =>
-            request.replace[RiskingOutcomeIndividual, RiskingOutcomeIndividual.FailedFixable](outcome)
+            if declarationAgreed && fixes.forall(_.isConfirmed.contains(true)) then
+              logger.info("Risking outcome for individual has already been fixed. Redirecting to confirmation page.")
+              Redirect(AppRoutes.providedetails.riskingoutcome.fixablefailures.IndividualConfirmationController.show(linkId))
+            else
+              request.replace[RiskingOutcomeIndividual, RiskingOutcomeIndividual.FailedFixable](outcome)
           case _ =>
             logger.info("Risking outcome for individual is not fixable. Redirecting to where outcome can be handled.")
             Redirect(AppRoutes.providedetails.riskingoutcome.RiskingOutcomeController.show(linkId))

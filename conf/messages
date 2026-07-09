@@ -1806,7 +1806,7 @@ fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p3 = Check them, 
 fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p4 = You need to do this by <strong>{0}</strong>.
 
 individualDetailsDeclaration.caption = Confirm your responses are final
-individualDetailsDeclaration.title = You are about to submit your response
+individualDetailsDeclaration.title = You are about to submit your responses
 individualDetailsDeclaration.p1 = Submitting your responses means you believe you have done everything to meet the registration conditions.
 individualDetailsDeclaration.p2 = Once you submit, you will not be able to change your answers.
 
