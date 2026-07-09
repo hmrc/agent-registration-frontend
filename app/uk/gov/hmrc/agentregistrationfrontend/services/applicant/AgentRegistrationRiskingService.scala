@@ -46,11 +46,13 @@ extends RequestAwareLogging:
   def submitForRisking(
     agentApplication: AgentApplication,
     individuals: List[IndividualProvidedDetails],
-    arn: Option[Arn]
+    arn: Option[Arn],
+    isResubmission: Boolean
   )(using request: RequestHeader): Future[Unit] =
     val submitForRiskingRequest: SubmitForRiskingRequest = SubmitForRiskingRequest(
       applicationData = makeApplicationData(agentApplication, arn),
-      individuals = individuals.map(makeIndividualData)
+      individuals = individuals.map(makeIndividualData),
+      isResubmission = isResubmission
     )
 
     for

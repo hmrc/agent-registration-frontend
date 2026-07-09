@@ -93,7 +93,8 @@ extends FrontendController(mcc, actions):
               if (bpr.isAlreadyRegisteredAsAgent)
                 Some(bpr.getAgentReferenceNumber)
               else
-                None
+                None,
+            isResubmission = false
           )
           _ <- agentApplicationService
             .upsert(
