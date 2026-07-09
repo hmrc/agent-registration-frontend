@@ -16,8 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.provideddetails
 
+import play.api.http.HeaderNames
 import play.api.libs.ws.WSResponse
 import play.api.mvc.Call
+import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ProvideDetailsStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -30,7 +32,7 @@ extends ControllerSpec:
       "features.fixable-failures" -> true
     )
 
-  val linkId = tdAll.linkId
+  val linkId: LinkId = tdAll.linkId
 
   private val path = s"/agent-registration/provide-details/conditions-not-yet-met/check-your-answers/${linkId.value}"
   private val agentApplication =
@@ -46,6 +48,7 @@ extends ControllerSpec:
 
   private object individualProvideDetails:
 
+    val complete: IndividualProvidedDetails = tdAll.providedDetails.afterRiskedFixableIndividualDetails
     val missingSaUtr: IndividualProvidedDetails = tdAll.providedDetails.AfterNino.afterNinoProvided.copy(riskingOutcomeIndividual =
       Some(tdAll.riskingOutcomeIndividualDetailsFixMissingSaUtr)
     )
@@ -63,6 +66,10 @@ extends ControllerSpec:
   )
 
   List(
+    TestCaseForCya(
+      providedDetails = individualProvideDetails.complete,
+      name = "all details provided"
+    ),
     TestCaseForCya(
       providedDetails = individualProvideDetails.missingSaUtr,
       name = "saUtr",
@@ -90,6 +97,58 @@ extends ControllerSpec:
           response.status shouldBe Status.OK
           val doc = response.parseBodyAsJsoupDocument
           doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
+
+        s"GET $path with ${testCase.name} should render change links pointing to the correct controllers" in:
+          ProvideDetailsStubHelper.stubAuthAndMatchIndividualProvidedDetails(
+            agentApplication,
+            testCase.providedDetails
+          )
+          val response: WSResponse = get(path)
+          response.status shouldBe Status.OK
+          val doc = response.parseBodyAsJsoupDocument
+          val changeLinkHrefs: Seq[String] = doc
+            .mainContent
+            .select(".govuk-summary-list__actions a")
+            .eachAttr("href")
+            .toArray
+            .toSeq
+            .map(_.toString)
+
+          changeLinkHrefs should contain(
+            AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.IndividualDateOfBirthController.show(linkId).url
+          )
+          changeLinkHrefs should contain(
+            AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.IndividualNinoController.show(linkId).url
+          )
+          changeLinkHrefs should contain(
+            AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.IndividualSaUtrController.show(linkId).url
+          )
+
+        s"GET $path with ${testCase.name} should render a submit button posting to the submit route" in:
+          ProvideDetailsStubHelper.stubAuthAndMatchIndividualProvidedDetails(
+            agentApplication,
+            testCase.providedDetails
+          )
+          val response: WSResponse = get(path)
+          response.status shouldBe Status.OK
+          val doc = response.parseBodyAsJsoupDocument
+          val form = doc.mainContent.select("form")
+          form.attr("method") shouldBe "POST"
+          form.attr("action") shouldBe
+            AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.CheckYourAnswersController.submit(linkId).url
+          doc.extractSubmitButtonText shouldBe "Confirm and continue"
+
+        s"POST $path with ${testCase.name} should confirm the individual details fix and redirect to the fixable task list" in:
+          ProvideDetailsStubHelper.stubFixableFailureUpdate(
+            agentApplication = agentApplication,
+            individualProvidedDetails = testCase.providedDetails,
+            updatedIndividualProvidedDetails = testCase.providedDetails
+          )
+          val response: WSResponse = post(path)(Map.empty)
+          response.status shouldBe Status.SEE_OTHER
+          response.header(HeaderNames.LOCATION).value shouldBe
+            AppRoutes.providedetails.riskingoutcome.fixablefailures.FixableTaskListController.show(linkId).url
+
       case Some(expectedRedirect) =>
         s"GET $path with missing ${testCase.name} should redirect to the ${testCase.name} page" in:
           ProvideDetailsStubHelper.stubAuthAndMatchIndividualProvidedDetails(
