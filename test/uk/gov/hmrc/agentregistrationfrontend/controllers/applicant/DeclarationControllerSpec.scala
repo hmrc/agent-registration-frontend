@@ -129,7 +129,8 @@ extends ControllerSpec:
     AgentRegistrationRiskingStubs.stubSubmitAgentApplication(
       SubmitForRiskingRequest(
         applicationData = agentApplication.applicationData,
-        individuals = individualDataList
+        individuals = individualDataList,
+        isResubmission = false
       )
     )
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterAllOtherTasksComplete)
