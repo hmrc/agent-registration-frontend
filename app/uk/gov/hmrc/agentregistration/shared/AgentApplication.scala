@@ -34,10 +34,13 @@ import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 import java.time.Clock
 import java.time.Instant
+import AgentApplicationIntegrityCheck.doDataIntegrityChecks
 
 /** Agent (Registration) Application. This final case class represents the data entered by a user for registering as an agent.
   */
 sealed trait AgentApplication:
+
+  this.doDataIntegrityChecks()
 
   def _id: AgentApplicationId
   def cachedSessionId: SessionId
