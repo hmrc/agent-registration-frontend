@@ -35,12 +35,38 @@ object DataIntegrityChecks:
         case ApplicationState.RiskingCompleted => whenRiskingCompleted()
       agentApplication
 
-    private def whenStarted(): Unit = ()
-    private def whenGrsDataReceived(): Unit = ()
+    private def check(
+      condition: Boolean,
+      message: String
+    ): Unit = if !condition then throw new IllegalStateException(s"integrity check failed: $message")
+
+    private def whenStarted(): Unit =
+      check(agentApplication.applicationExpiresAt.isDefined, "applicationExpiresAt should be defined in Started state")
+      check(agentApplication.submittedAt.isEmpty, "submittedAt should not be defined in Started state")
+      check(agentApplication.applicantContactDetails.isEmpty, "applicantContactDetails should not be defined in Started state")
+      check(agentApplication.amlsDetails.isEmpty, "amlsDetails should not be defined in Started state")
+      check(agentApplication.agentDetails.isEmpty, "agentDetails should not be defined in Started state")
+      check(agentApplication.refusalToDealWithCheckResult.isEmpty, "refusalToDealWithCheckResult should not be defined in Started state")
+      check(agentApplication.globalAsaEnrolmentCheckResult.isEmpty, "globalAsaEnrolmentCheckResult should not be defined in Started state")
+      check(agentApplication.hasOtherRelevantIndividuals.isEmpty, "hasOtherRelevantIndividuals should not be defined in Started state")
+      check(agentApplication.vrns.isEmpty, "vrns should not be defined in Started state")
+      check(agentApplication.payeRefs.isEmpty, "payeRefs should not be defined in Started state")
+      check(agentApplication.riskingOutcomeApplication.isEmpty, "riskingOutcomeApplication should not be defined in Started state")
+      check(agentApplication.riskingOutcomeEntity.isEmpty, "riskingOutcomeEntity should not be defined in Started state")
+
+    private def whenGrsDataReceived(): Unit =
+      // match agent application and for each case verify that businessDetails is defined
+      ()
+
     private def whenSentForRisking(): Unit = ()
+    // verify applicationExpiresAt is NOT defined and all other optional fields ARE defined and complete (for example isComplete is true, ApplicantContactDetails)
+
     private def whenSentToMinerva(): Unit = ()
+    // verify the same way as for whenSentForRisking
 
     private def whenRiskingCompleted(): Unit =
+
+      // verify additionally the same way as for whenSentForRisking
       val roa: RiskingOutcomeApplication = agentApplication.riskingOutcomeApplication.getOrThrowExpectedDataMissing(
         "integrity check failed:riskingOutcomeApplication should be defined in this state"
       )
