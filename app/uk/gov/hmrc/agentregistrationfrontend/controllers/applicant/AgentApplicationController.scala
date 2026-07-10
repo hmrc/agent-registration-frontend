@@ -185,17 +185,17 @@ extends FrontendController(mcc, actions):
           ))
         ))
       case ApplicationState.RiskingCompleted =>
-        val overallOutcome: RiskingOutcomeApplication = agentApplication.riskingOutcomeApplication.getOrThrowExpectedDataMissing(
+        val riskingOutcomeApplication: RiskingOutcomeApplication = agentApplication.riskingOutcomeApplication.getOrThrowExpectedDataMissing(
           s"Risking completed but no outcome found for application ${agentApplication.applicationReference}"
         )
-        overallOutcome match
-          case overallOutcome: RiskingOutcomeApplication.FailedFixable =>
+        riskingOutcomeApplication match
+          case riskingOutcomeApplication: RiskingOutcomeApplication.FailedFixable =>
             Ok(failedFixableStartPage(
-              actualDecisionDate = displayDateForLang(Some(overallOutcome.actualDecisionDate)),
-              correctiveActionExpiryDate = displayDateForLang(overallOutcome.correctiveActionExpiryDate),
+              actualDecisionDate = displayDateForLang(Some(riskingOutcomeApplication.actualDecisionDate)),
+              correctiveActionExpiryDate = displayDateForLang(riskingOutcomeApplication.correctiveActionExpiryDate),
               entityName = request.get[BusinessPartnerRecordResponse].getEntityName
             ))
-          case overallOutcome: RiskingOutcomeApplication.FailedNonFixable =>
+          case riskingOutcomeApplication: RiskingOutcomeApplication.FailedNonFixable =>
             val riskedEntity: RiskingOutcomeEntity = agentApplication.riskingOutcomeEntity.getOrThrowExpectedDataMissing(
               s"Risking completed but no outcome found for entity ${agentApplication.applicationReference}"
             )
@@ -218,13 +218,13 @@ extends FrontendController(mcc, actions):
                         case Some(riskedIndividual: RiskingOutcomeIndividual.FailedNonFixable) => riskedIndividual.failures
                         case _ => Seq.empty
                   ),
-                riskingCompletedDate = overallOutcome.actualDecisionDate,
-                correctiveActionExpiryDate = Some(overallOutcome.correctiveActionExpiryDate)
+                riskingCompletedDate = riskingOutcomeApplication.actualDecisionDate,
+                correctiveActionExpiryDate = Some(riskingOutcomeApplication.correctiveActionExpiryDate)
               ),
               agentApplication = agentApplication,
               entityName = request.get[BusinessPartnerRecordResponse].getEntityName
             ))
-          case overallOutcome: RiskingOutcomeApplication.Approved =>
+          case riskingOutcomeApplication: RiskingOutcomeApplication.Approved =>
             // Fallback case: Application outcome is Approved, but account setup is incomplete.
             // Not sure if this can ever happen.
             // This might occur when risking approval succeeded and BE was notified, but the ASA account provisioning

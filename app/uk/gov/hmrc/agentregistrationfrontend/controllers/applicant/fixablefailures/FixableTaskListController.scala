@@ -66,7 +66,7 @@ extends FrontendController(mcc, actions):
       ):
         implicit request =>
           val agentApplication: AgentApplication = request.get
-          val overallOutcome: RiskingOutcomeApplication.FailedFixable = request.get
+          val riskingOutcomeApplication: RiskingOutcomeApplication.FailedFixable = request.get
           val riskingOutcomeEntity: RiskingOutcomeEntity = agentApplication.getRiskingOutcomeEntity
           val allIndividuals: List[IndividualProvidedDetails] = request.get
           Ok(taskListPage(
@@ -79,6 +79,6 @@ extends FrontendController(mcc, actions):
                   case fixable: RiskingOutcomeIndividual.FailedFixable => fixable
             ),
             entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
-            correctiveActionExpiryDate = displayDateForLang(overallOutcome.correctiveActionExpiryDate),
+            correctiveActionExpiryDate = displayDateForLang(riskingOutcomeApplication.correctiveActionExpiryDate),
             isSoleTrader = agentApplication.isSoleTraderOwner
           ))
