@@ -300,7 +300,7 @@ trait TdBase:
       actualDecisionDate = riskingCompletedDate,
       correctiveActionExpiryDate = correctiveActionExpiryDate
     )
-    def failedNonFixable = RiskingOutcomeApplication.FailedFixable(
+    def failedNonFixable = RiskingOutcomeApplication.FailedNonFixable(
       actualDecisionDate = riskingCompletedDate,
       correctiveActionExpiryDate = correctiveActionExpiryDate
     )
