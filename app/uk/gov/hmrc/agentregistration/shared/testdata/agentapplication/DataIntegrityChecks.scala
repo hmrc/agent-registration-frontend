@@ -19,8 +19,7 @@ package uk.gov.hmrc.agentregistration.shared.testdata.agentapplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.*
 
 object DataIntegrityChecks:
 
@@ -55,8 +54,15 @@ object DataIntegrityChecks:
       check(agentApplication.riskingOutcomeEntity.isEmpty, "riskingOutcomeEntity should not be defined in Started state")
 
     private def whenGrsDataReceived(): Unit =
-      // match agent application and for each case verify that businessDetails is defined
-      ()
+      val isBusinessDetailsDefined = agentApplication match
+        case a: AgentApplicationSoleTrader                 => a.businessDetails.isDefined
+        case a: AgentApplicationLlp                        => a.businessDetails.isDefined
+        case a: AgentApplicationLimitedCompany             => a.businessDetails.isDefined
+        case a: AgentApplicationGeneralPartnership         => a.businessDetails.isDefined
+        case a: AgentApplicationLimitedPartnership         => a.businessDetails.isDefined
+        case a: AgentApplicationScottishLimitedPartnership => a.businessDetails.isDefined
+        case a: AgentApplicationScottishPartnership        => a.businessDetails.isDefined
+      check(isBusinessDetailsDefined, "businessDetails should be defined in GrsDataReceived state")
 
     private def whenSentForRisking(): Unit = ()
     // verify applicationExpiresAt is NOT defined and all other optional fields ARE defined and complete (for example isComplete is true, ApplicantContactDetails)
