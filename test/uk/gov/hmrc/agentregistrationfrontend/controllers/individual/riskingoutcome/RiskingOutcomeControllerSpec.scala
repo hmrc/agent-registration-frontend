@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ProvideDetailsStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -40,9 +41,8 @@ extends ControllerSpec:
   private val linkId = tdAll.linkId
 
   val failedFixableApplication: AgentApplication = tdAll
-    .agentApplicationLlpSections
-    .sectionContactDetails
-    .afterEmailAddressVerified
+    .agentApplicationLlp
+    .afterSentToMinerva
     .modify(_.applicationState)
     .setTo(ApplicationState.RiskingCompleted)
     .modify(_.riskingOutcomeApplication)
@@ -50,6 +50,12 @@ extends ControllerSpec:
       actualDecisionDate = tdAll.riskingCompletedDate,
       correctiveActionExpiryDate = tdAll.correctiveActionExpiryDate
     )))
+    .modify(_.riskingOutcomeEntity)
+    .setTo(Some(RiskingOutcomeEntity.Approved))
+    .modify(_.applicationExpiresAt)
+    .setTo(None)
+    .modify(_.submittedAt)
+    .setTo(Some(tdAll.newInstant))
 
   val failedNonFixableApplication: AgentApplication = failedFixableApplication
     .modify(_.riskingOutcomeApplication)
