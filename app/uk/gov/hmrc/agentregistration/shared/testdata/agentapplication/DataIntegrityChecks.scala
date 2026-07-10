@@ -34,7 +34,7 @@ object DataIntegrityChecks:
         case ApplicationState.RiskingCompleted => whenRiskingCompleted()
       agentApplication
 
-    private def check(
+    private inline def check(
       condition: Boolean,
       message: String
     ): Unit = if !condition then throw new IllegalStateException(s"integrity check failed: $message")
@@ -70,8 +70,11 @@ object DataIntegrityChecks:
       check(agentApplication.submittedAt.isDefined, s"submittedAt should be defined in $state state")
       check(businessDetailsDefined, s"businessDetails should be defined in $state state")
       check(agentApplication.applicantContactDetails.isDefined, s"applicantContactDetails should be defined in $state state")
+      check(agentApplication.getApplicantContactDetails.isComplete, s"applicantContactDetails should be complete in $state state")
       check(agentApplication.amlsDetails.isDefined, s"amlsDetails should be defined in $state state")
+      check(agentApplication.getAmlsDetails.isComplete, s"amlsDetails should be complete in $state state")
       check(agentApplication.agentDetails.isDefined, s"agentDetails should be defined in $state state")
+      check(agentApplication.getAgentDetails.isComplete, s"agentDetails should be complete in $state state")
       check(agentApplication.refusalToDealWithCheckResult.isDefined, s"refusalToDealWithCheckResult should be defined in $state state")
       check(agentApplication.globalAsaEnrolmentCheckResult.isDefined, s"globalAsaEnrolmentCheckResult should be defined in $state state")
       check(agentApplication.vrns.isDefined, s"vrns should be defined in $state state")
