@@ -241,4 +241,5 @@ GET        /conditions-not-yet-met/failure-details/:failureCode      uk.gov.hmrc
 POST       /conditions-not-yet-met/failure-details/:failureCode      uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.entityfailures.FixableEntityFailuresController.submit(failureCode: String)
 GET        /conditions-not-yet-met/individuals                       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.individualfailures.FixableIndividualsController.show
 GET        /conditions-not-yet-met/declaration                       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.DeclarationController.show
+POST       /conditions-not-yet-met/declaration                       uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.DeclarationController.submit
 

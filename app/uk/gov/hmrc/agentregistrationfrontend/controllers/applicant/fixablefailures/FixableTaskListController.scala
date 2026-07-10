@@ -55,7 +55,10 @@ extends FrontendController(mcc, actions):
       .refine:
         implicit request =>
           request.get[AgentApplication].riskingOutcomeApplication match
-            case Some(outcome: RiskingOutcomeApplication.FailedFixable) => request.add[RiskingOutcomeApplication.FailedFixable](outcome)
+            case Some(outcome: RiskingOutcomeApplication.FailedFixable) =>
+              if outcome.reSubmittedAt.isDefined
+              then Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
+              else request.add[RiskingOutcomeApplication.FailedFixable](outcome)
             case outcome =>
               logger.warn(s"Risking outcome is not fixable (or missing). Redirecting to where outcome can be handled: $outcome")
               Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)

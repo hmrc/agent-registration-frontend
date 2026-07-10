@@ -70,6 +70,14 @@ extends RequestAwareLogging:
     individualProvideDetailsConnector
       .upsertForIndividual(individualProvidedDetails)
 
+  def upsert(listOfIndividualProvidedDetails: List[IndividualProvidedDetails])(using request: RequestHeader): Future[Unit] =
+    logger.debug(s"Upserting providedDetails for ${listOfIndividualProvidedDetails.size} individuals")
+    val upsertFutures: List[Future[Unit]] = listOfIndividualProvidedDetails.map: individualProvidedDetails =>
+      logger.debug(s"Upserting new version of providedDetails for user:[${individualProvidedDetails._id}] and applicationId:[${individualProvidedDetails.agentApplicationId}]")
+      individualProvideDetailsConnector.upsert(individualProvidedDetails)
+    Future.sequence(upsertFutures).map: _ =>
+      ()
+
   def findById(individualProvidedDetailsId: IndividualProvidedDetailsId)(using
     RequestHeader
   ): Future[Option[IndividualProvidedDetails]] = individualProvideDetailsConnector

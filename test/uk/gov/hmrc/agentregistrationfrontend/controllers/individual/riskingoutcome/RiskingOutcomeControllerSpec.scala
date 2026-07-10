@@ -48,7 +48,8 @@ extends ControllerSpec:
     .modify(_.riskingOutcomeApplication)
     .setTo(Some(RiskingOutcomeApplication.FailedFixable(
       actualDecisionDate = tdAll.riskingCompletedDate,
-      correctiveActionExpiryDate = tdAll.correctiveActionExpiryDate
+      correctiveActionExpiryDate = tdAll.correctiveActionExpiryDate,
+      reSubmittedAt = None
     )))
     .modify(_.riskingOutcomeEntity)
     .setTo(Some(RiskingOutcomeEntity.Approved))

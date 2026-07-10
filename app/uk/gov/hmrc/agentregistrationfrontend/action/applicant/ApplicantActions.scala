@@ -29,6 +29,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
@@ -40,6 +41,7 @@ import uk.gov.hmrc.agentregistrationfrontend.audit.AuditService
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.getCurrentSessionId
 import uk.gov.hmrc.auth.core.retrieve.Credentials
@@ -78,6 +80,7 @@ class ApplicantActions @Inject() (
   authorisedActionRefiner: ApplicantAuthRefiner,
   agentApplicationService: AgentApplicationService,
   businessPartnerRecordService: BusinessPartnerRecordService,
+  individualProvidedDetailsService: IndividualProvideDetailsService,
   auditService: AuditService
 )(using ExecutionContext)
 extends RequestAwareLogging:
@@ -152,6 +155,12 @@ extends RequestAwareLogging:
       )
       .getBusinessPartnerRecord
 
+  val getApplicationForFailedFixable: ActionBuilderWithData[List[IndividualProvidedDetails] *: DataWithApplicationAndBpr] = getApplicationAfterSentForRisking
+    .refine:
+      implicit request =>
+        individualProvidedDetailsService.findAllByApplicationId(request.get[AgentApplication]._id).map: list =>
+          request.add[List[IndividualProvidedDetails]](list)
+
   extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
 
     inline def getBusinessPartnerRecord(using
@@ -163,6 +172,8 @@ extends RequestAwareLogging:
           .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
           .map(_.getOrThrowExpectedDataMissing(s"Business Partner Record for UTR ${request.get[AgentApplication].getUtr.value}"))
           .map(request.add)
+
+  extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
 
     inline def getMaybeBusinessPartnerRecord(using
       AgentApplication PresentIn Data,
@@ -179,6 +190,7 @@ extends RequestAwareLogging:
       val currentSessionId = getCurrentSessionId
       agentApplication.cachedSessionId =!= currentSessionId
 
+  extension (agentApplication: AgentApplication)
     private def updateCachedSessionId()(using request: RequestHeader): AgentApplication =
       val currentSessionId = getCurrentSessionId
 
