@@ -74,7 +74,7 @@ object DataIntegrityChecks:
       check(agentApplication.amlsDetails.isDefined, s"amlsDetails should be defined in $state state")
       check(agentApplication.getAmlsDetails.isComplete, s"amlsDetails should be complete in $state state")
       check(agentApplication.agentDetails.isDefined, s"agentDetails should be defined in $state state")
-      check(agentApplication.getAgentDetails.isComplete, s"agentDetails should be complete in $state state")
+      check(agentApplication.getAgentDetails.isComplete, s"agentDetails should be complete in $state state ${agentApplication.getAgentDetails}")
       check(agentApplication.refusalToDealWithCheckResult.isDefined, s"refusalToDealWithCheckResult should be defined in $state state")
       check(agentApplication.globalAsaEnrolmentCheckResult.isDefined, s"globalAsaEnrolmentCheckResult should be defined in $state state")
       check(agentApplication.vrns.isDefined, s"vrns should be defined in $state state")
