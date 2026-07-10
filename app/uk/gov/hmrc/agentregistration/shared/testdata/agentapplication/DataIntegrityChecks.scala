@@ -14,28 +14,32 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistration.shared
+package uk.gov.hmrc.agentregistration.shared.testdata.agentapplication
 
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.ApplicationState
 
-object AgentApplicationIntegrityCheck:
+object DataIntegrityChecks:
 
-  extension (agentApplication: AgentApplication)
+  extension [A <: AgentApplication](agentApplication: A)
 
-    def doDataIntegrityChecks(): Unit =
+    def assertDataIntegrity(): A =
       agentApplication.applicationState match
         case ApplicationState.Started => whenStarted()
         case ApplicationState.GrsDataReceived => whenGrsDataReceived()
         case ApplicationState.SentForRisking => whenSentForRisking()
         case ApplicationState.SentToMinerva => whenSentToMinerva()
         case ApplicationState.RiskingCompleted => whenRiskingCompleted()
+      agentApplication
 
     private def whenStarted(): Unit = ()
     private def whenGrsDataReceived(): Unit = ()
     private def whenSentForRisking(): Unit = ()
     private def whenSentToMinerva(): Unit = ()
+
     private def whenRiskingCompleted(): Unit =
       val roa: RiskingOutcomeApplication = agentApplication.riskingOutcomeApplication.getOrThrowExpectedDataMissing(
         "integrity check failed:riskingOutcomeApplication should be defined in this state"
@@ -45,7 +49,9 @@ object AgentApplicationIntegrityCheck:
       )
       (roa.outcome, roe) match
         case (RiskingOutcomeApplication.Outcome.Approved, RiskingOutcomeEntity.Approved) => ()
-        case (RiskingOutcomeApplication.Outcome.Approved, _) =>
+        case (RiskingOutcomeApplication.Outcome.Approved, _: RiskingOutcomeEntity.FailedFixable) =>
+          throw new IllegalStateException("integrity check failed: riskingOutcomeApplication is approved but riskingOutcomeEntity is not")
+        case (RiskingOutcomeApplication.Outcome.Approved, _: RiskingOutcomeEntity.FailedNonFixable) =>
           throw new IllegalStateException("integrity check failed: riskingOutcomeApplication is approved but riskingOutcomeEntity is not")
         case (RiskingOutcomeApplication.Outcome.FailedFixable, RiskingOutcomeEntity.Approved) => ()
         case (RiskingOutcomeApplication.Outcome.FailedFixable, _: RiskingOutcomeEntity.FailedFixable) => ()
