@@ -33,7 +33,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker.Http
 
 object GrsStubs:
 
-  /** The URL which is returned to the browser upon successful creation of a GRS journey in the GRS Service
+  /** The URL that is returned to the browser upon successful creation of a GRS journey in the GRS Service
     */
   def journeyStartRedirectUrl(businessType: BusinessType): String =
     businessType match
