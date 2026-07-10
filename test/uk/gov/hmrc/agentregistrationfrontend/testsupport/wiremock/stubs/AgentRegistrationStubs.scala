@@ -33,6 +33,7 @@ import uk.gov.hmrc.agentregistration.shared.UcrIdentifiers
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
+import uk.gov.hmrc.agentregistration.shared.testdata.agentapplication.DataIntegrityChecks.assertDataIntegrity
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 object AgentRegistrationStubs:
@@ -41,7 +42,7 @@ object AgentRegistrationStubs:
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo("/agent-registration/application"),
     responseStatus = 200,
-    responseBody = Json.toJson(agentApplication).toString
+    responseBody = Json.toJson(agentApplication.assertDataIntegrity()).toString
   )
 
   def stubGetAgentApplicationNoContent(): StubMapping = StubMaker.make(
@@ -61,7 +62,7 @@ object AgentRegistrationStubs:
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlPathEqualTo("/agent-registration/application"),
     responseStatus = 200,
-    requestBody = Some(wm.equalToJson(Json.toJson(agentApplication).toString))
+    requestBody = Some(wm.equalToJson(Json.toJson(agentApplication.assertDataIntegrity()).toString))
   )
 
   def verifyUpdateAgentApplication(count: Int = 1): Unit = StubMaker.verify(
@@ -96,7 +97,7 @@ object AgentRegistrationStubs:
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/linkId/${linkId.value}"),
     responseStatus = 200,
-    responseBody = Json.toJson(agentApplication).toString
+    responseBody = Json.toJson(agentApplication.assertDataIntegrity()).toString
   )
 
   def stubFindApplicationByLinkIdNoContent(
@@ -124,7 +125,7 @@ object AgentRegistrationStubs:
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/by-agent-application-id/${agentApplicationId.value}"),
     responseStatus = 200,
-    responseBody = Json.toJson(agentApplication).toString
+    responseBody = Json.toJson(agentApplication.assertDataIntegrity()).toString
   )
 
   def stubGetBusinessPartnerRecord(
@@ -163,7 +164,7 @@ object AgentRegistrationStubs:
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/by-agent-application-id/${agentApplicationId.value}"),
     responseStatus = 200,
-    responseBody = Json.toJson(agentApplication).toString
+    responseBody = Json.toJson(agentApplication.assertDataIntegrity()).toString
   )
 
   def stubFindApplicationByAgentApplicationIdNoContent(

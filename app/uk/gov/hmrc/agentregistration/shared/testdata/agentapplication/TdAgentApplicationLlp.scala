@@ -38,6 +38,7 @@ import uk.gov.hmrc.agentregistration.shared.risking.submitforrisking.ApplicantCo
 import uk.gov.hmrc.agentregistration.shared.risking.submitforrisking.ApplicationData
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 import uk.gov.hmrc.agentregistration.shared.testdata.TdGrsBusinessDetails
+import DataIntegrityChecks.assertDataIntegrity
 
 trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
 
@@ -69,57 +70,57 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
       payeRefs = None,
       riskingOutcomeApplication = None,
       riskingOutcomeEntity = None
-    )
+    ).assertDataIntegrity()
 
     val afterGrsDataReceived: AgentApplicationLlp = afterStarted.copy(
       businessDetails = Some(
         dependencies.grsBusinessDetails.llp.businessDetails
       ),
       applicationState = GrsDataReceived
-    )
+    ).assertDataIntegrity()
 
     val afterRefusalToDealWithCheckPass: AgentApplicationLlp = afterGrsDataReceived.copy(
       refusalToDealWithCheckResult = Some(CheckResult.Pass)
-    )
+    ).assertDataIntegrity()
 
     val afterRefusalToDealWithCheckFail: AgentApplicationLlp = afterGrsDataReceived.copy(
       refusalToDealWithCheckResult = Some(CheckResult.Fail)
-    )
+    ).assertDataIntegrity()
 
     val afterUnifiedCustomerRegistryUpdateIdentifiers: AgentApplicationLlp = afterRefusalToDealWithCheckPass.copy(
       vrns = Some(List(dependencies.vrn)),
       payeRefs = Some(List(dependencies.payeRef))
-    )
+    ).assertDataIntegrity()
 
     val afterUnifiedCustomerRegistryUpdateEmptyIdentifiers: AgentApplicationLlp = afterRefusalToDealWithCheckPass.copy(
       vrns = Some(List.empty),
       payeRefs = Some(List.empty)
-    )
+    ).assertDataIntegrity()
 
     val afterGlobalAsaEnrolmentCheckPass: AgentApplicationLlp = afterUnifiedCustomerRegistryUpdateIdentifiers.copy(
       globalAsaEnrolmentCheckResult = Some(CheckResult.Pass)
-    )
+    ).assertDataIntegrity()
 
     val afterGlobalAsaEnrolmentCheckFail: AgentApplicationLlp = afterUnifiedCustomerRegistryUpdateIdentifiers.copy(
       globalAsaEnrolmentCheckResult = Some(CheckResult.Fail)
-    )
+    ).assertDataIntegrity()
 
     val afterContactDetailsComplete: AgentApplicationLlp = afterGlobalAsaEnrolmentCheckPass.copy(
       applicantContactDetails = Some(dependencies.applicantContactDetails),
       agentDetails = None
-    )
+    ).assertDataIntegrity()
 
     val afterAgentDetailsComplete: AgentApplicationLlp = afterContactDetailsComplete.copy(
       agentDetails = Some(dependencies.completeAgentDetails)
-    )
+    ).assertDataIntegrity()
 
     val afterAmlsComplete: AgentApplicationLlp = afterAgentDetailsComplete.copy(
       amlsDetails = Some(dependencies.completeAmlsDetails)
-    )
+    ).assertDataIntegrity()
 
     val afterHmrcStandardForAgentsAgreed: AgentApplicationLlp = afterAmlsComplete.copy(
       hmrcStandardForAgentsAgreed = StateOfAgreement.Agreed
-    )
+    ).assertDataIntegrity()
 
     val afterZeroCompaniesHouseOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
@@ -129,53 +130,53 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
         )
       ),
       hasOtherRelevantIndividuals = Some(true)
-    )
+    ).assertDataIntegrity()
 
     val afterConfirmCompaniesHouseOfficersYes: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
         dependencies.fiveOrLessCompaniesHouseOfficers
       )
-    )
+    ).assertDataIntegrity()
 
     val afterNumberOfConfirmCompaniesHouseOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
         dependencies.sixOrMoreCompaniesHouseOfficers
       )
-    )
+    ).assertDataIntegrity()
 
     val afterConfirmTwoChOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
         dependencies.twoCompaniesHouseOfficers
       ),
       hasOtherRelevantIndividuals = Some(false)
-    )
+    ).assertDataIntegrity()
 
     val afterConfirmSixChOfficers: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
         dependencies.sixCompaniesHouseOfficersSelectAll
       ),
       hasOtherRelevantIndividuals = Some(false)
-    )
+    ).assertDataIntegrity()
 
     val afterConfirmCompaniesHouseOfficersNo: AgentApplicationLlp = afterHmrcStandardForAgentsAgreed.copy(
       numberOfIndividuals = Some(
         dependencies.fiveOrLessCompaniesHouseOfficers.copy(isCompaniesHouseOfficersListCorrect = false)
       )
-    )
+    ).assertDataIntegrity()
 
     val afterConfirmOtherRelevantTaxAdvisersNo: AgentApplicationLlp = afterConfirmCompaniesHouseOfficersYes.copy(
       hasOtherRelevantIndividuals = Some(false)
-    )
+    ).assertDataIntegrity()
 
     val afterDeclarationSubmitted: AgentApplicationLlp = afterConfirmTwoChOfficers.copy(
       applicationState = ApplicationState.SentForRisking,
       submittedAt = Some(dependencies.nowAsInstant),
       applicationExpiresAt = None
-    )
+    ).assertDataIntegrity()
 
     val afterSentToMinerva: AgentApplicationLlp = afterDeclarationSubmitted.copy(
       applicationState = ApplicationState.SentToMinerva
-    )
+    ).assertDataIntegrity()
 
     val afterRiskingCompletedApprovedWithFixableIndividuals: AgentApplicationLlp = afterSentToMinerva.copy(
       applicationState = ApplicationState.RiskingCompleted,
@@ -187,31 +188,31 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
       applicationState = ApplicationState.RiskingCompleted,
       riskingOutcomeApplication = Some(dependencies.riskingOutcomeApplication(outcome = RiskingOutcomeApplication.Outcome.FailedFixable)),
       riskingOutcomeEntity = Some(dependencies.riskingOutcomeEntityFixableAmls(failure))
-    )
+    ).assertDataIntegrity()
 
     val afterRiskingCompletedFixable: AgentApplicationLlp = afterSentToMinerva.copy(
       applicationState = ApplicationState.RiskingCompleted,
       riskingOutcomeApplication = Some(dependencies.riskingOutcomeApplication(outcome = RiskingOutcomeApplication.Outcome.FailedFixable)),
       riskingOutcomeEntity = Some(dependencies.riskingOutcomeEntityFailedFixable)
-    )
+    ).assertDataIntegrity()
 
     val afterRiskingCompletedFixableNonHmrcAmls: AgentApplicationLlp = afterSentToMinerva.copy(
       applicationState = ApplicationState.RiskingCompleted,
       riskingOutcomeApplication = Some(dependencies.riskingOutcomeApplication(outcome = RiskingOutcomeApplication.Outcome.FailedFixable)),
       riskingOutcomeEntity = Some(dependencies.riskingOutcomeEntityFixableNonHmrcAmls)
-    )
+    ).assertDataIntegrity()
 
     val afterRiskingCompletedFixableAllCodes: AgentApplicationLlp = afterSentToMinerva.copy(
       applicationState = ApplicationState.RiskingCompleted,
       riskingOutcomeApplication = Some(dependencies.riskingOutcomeApplication(outcome = RiskingOutcomeApplication.Outcome.FailedFixable)),
       riskingOutcomeEntity = Some(dependencies.riskingOutcomeEntityFailedFixableAllCodes)
-    )
+    ).assertDataIntegrity()
 
     val afterRiskingCompletedNonFixable: AgentApplicationLlp = afterSentToMinerva.copy(
       applicationState = ApplicationState.RiskingCompleted,
       riskingOutcomeApplication = Some(dependencies.riskingOutcomeApplication(outcome = RiskingOutcomeApplication.Outcome.FailedNonFixable)),
       riskingOutcomeEntity = Some(dependencies.riskingOutcomeEntityFailedNonFixable)
-    )
+    ).assertDataIntegrity()
 
     val applicationData: ApplicationData =
       val a: AgentApplicationLlp = afterDeclarationSubmitted
@@ -292,7 +293,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
       hasOtherRelevantIndividuals = Some(true),
       vrns = Some(List(Vrn("123456789"), Vrn("123456789"))),
       payeRefs = Some(List(PayeRef("123/AB12345"), PayeRef("123/AB12345")))
-    )
+    ).assertDataIntegrity()
 
     /** Variant of [[afterDeclarationSubmitted]] with every optional agent field populated. Used by encryption tests to exercise paths like
       * `otherAgentBusinessName`, `otherAgentTelephoneNumber`, `otherAgentEmailAddress` which the default fixture leaves as `None`.
@@ -316,6 +317,6 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
         )),
         agentCorrespondenceAddress = Some(dependencies.chroAddress)
       ))
-    )
+    ).assertDataIntegrity()
 
 }
