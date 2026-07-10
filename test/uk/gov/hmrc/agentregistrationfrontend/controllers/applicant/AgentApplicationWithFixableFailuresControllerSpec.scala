@@ -102,7 +102,7 @@ extends ControllerSpec:
     response.parseBodyAsJsoupDocument.title() shouldBe s"Application reference: ${agentApplication.submitted.applicationReference.value} - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
-  s"GET $applicationStatusPath should render the failed non-fixable page when status is RiskingCompleted and overall outcome is FailedNonFixable" in:
+  s"GET applicationStatusPath should render the failed non-fixable page when status is RiskingCompleted and overall outcome is FailedNonFixable" in:
     ApplyStubHelper.stubsForApplicationBprAndIndividualsAndRisking(
       application = agentApplication.riskingCompletedFailedNonFixable,
       individuals = List(
