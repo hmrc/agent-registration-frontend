@@ -39,6 +39,16 @@ object DataIntegrityChecks:
       message: String
     ): Unit = if !condition then throw new IllegalStateException(s"integrity check failed: $message")
 
+    private def businessDetailsDefined: Boolean =
+      agentApplication match
+        case a: AgentApplicationSoleTrader => a.businessDetails.isDefined
+        case a: AgentApplicationLlp => a.businessDetails.isDefined
+        case a: AgentApplicationLimitedCompany => a.businessDetails.isDefined
+        case a: AgentApplicationGeneralPartnership => a.businessDetails.isDefined
+        case a: AgentApplicationLimitedPartnership => a.businessDetails.isDefined
+        case a: AgentApplicationScottishLimitedPartnership => a.businessDetails.isDefined
+        case a: AgentApplicationScottishPartnership => a.businessDetails.isDefined
+
     private def whenStarted(): Unit =
       check(agentApplication.applicationExpiresAt.isDefined, "applicationExpiresAt should be defined in Started state")
       check(agentApplication.submittedAt.isEmpty, "submittedAt should not be defined in Started state")
@@ -53,26 +63,26 @@ object DataIntegrityChecks:
       check(agentApplication.riskingOutcomeApplication.isEmpty, "riskingOutcomeApplication should not be defined in Started state")
       check(agentApplication.riskingOutcomeEntity.isEmpty, "riskingOutcomeEntity should not be defined in Started state")
 
-    private def whenGrsDataReceived(): Unit =
-      val isBusinessDetailsDefined = agentApplication match
-        case a: AgentApplicationSoleTrader                 => a.businessDetails.isDefined
-        case a: AgentApplicationLlp                        => a.businessDetails.isDefined
-        case a: AgentApplicationLimitedCompany             => a.businessDetails.isDefined
-        case a: AgentApplicationGeneralPartnership         => a.businessDetails.isDefined
-        case a: AgentApplicationLimitedPartnership         => a.businessDetails.isDefined
-        case a: AgentApplicationScottishLimitedPartnership => a.businessDetails.isDefined
-        case a: AgentApplicationScottishPartnership        => a.businessDetails.isDefined
-      check(isBusinessDetailsDefined, "businessDetails should be defined in GrsDataReceived state")
+    private def whenGrsDataReceived(): Unit = check(businessDetailsDefined, "businessDetails should be defined in GrsDataReceived state")
 
-    private def whenSentForRisking(): Unit = ()
-    // verify applicationExpiresAt is NOT defined and all other optional fields ARE defined and complete (for example isComplete is true, ApplicantContactDetails)
+    private def checkSentForRiskingOrLater(state: String): Unit =
+      check(agentApplication.applicationExpiresAt.isEmpty, s"applicationExpiresAt should not be defined in $state state")
+      check(agentApplication.submittedAt.isDefined, s"submittedAt should be defined in $state state")
+      check(businessDetailsDefined, s"businessDetails should be defined in $state state")
+      check(agentApplication.applicantContactDetails.isDefined, s"applicantContactDetails should be defined in $state state")
+      check(agentApplication.amlsDetails.isDefined, s"amlsDetails should be defined in $state state")
+      check(agentApplication.agentDetails.isDefined, s"agentDetails should be defined in $state state")
+      check(agentApplication.refusalToDealWithCheckResult.isDefined, s"refusalToDealWithCheckResult should be defined in $state state")
+      check(agentApplication.globalAsaEnrolmentCheckResult.isDefined, s"globalAsaEnrolmentCheckResult should be defined in $state state")
+      check(agentApplication.vrns.isDefined, s"vrns should be defined in $state state")
+      check(agentApplication.payeRefs.isDefined, s"payeRefs should be defined in $state state")
 
-    private def whenSentToMinerva(): Unit = ()
-    // verify the same way as for whenSentForRisking
+    private def whenSentForRisking(): Unit = checkSentForRiskingOrLater("SentForRisking")
+
+    private def whenSentToMinerva(): Unit = checkSentForRiskingOrLater("SentToMinerva")
 
     private def whenRiskingCompleted(): Unit =
-
-      // verify additionally the same way as for whenSentForRisking
+      checkSentForRiskingOrLater("RiskingCompleted")
       val roa: RiskingOutcomeApplication = agentApplication.riskingOutcomeApplication.getOrThrowExpectedDataMissing(
         "integrity check failed:riskingOutcomeApplication should be defined in this state"
       )
