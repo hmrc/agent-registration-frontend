@@ -53,8 +53,6 @@
     linkId = linkId
   )
 
-  <h3 class="govuk-heading-m">@messages("relevant-individual.resubmit.h3")</h3>
-  <p class="govuk-body">@messages("relevant-individual.resubmit.p")</p>
   @formWithCSRF(action = AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.CheckYourAnswersController.submit(linkId)) {
     <p class="govuk-body">
       @govukButton(Button(

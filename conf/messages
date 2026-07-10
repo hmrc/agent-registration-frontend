@@ -697,8 +697,6 @@ timed-out.link = Sign in again
 
 # Individual journeys
 relevant-individual.caption = Relevant individual details
-relevant-individual.resubmit.h3 = Resubmit your details
-relevant-individual.resubmit.p = By resubmitting your details you are confirming they are correct.
 provide-details.llp.title=LLP member confirmation
 
 ## Generic start page
