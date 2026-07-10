@@ -38,9 +38,6 @@
 @pageTitle = @{
     if(isSoleTraderOwner) messages(s"$key.title.SoleTrader") else messages(s"$key.title")
 }
-@signOutLink = @{
-  s"${appConfig.basFrontendSignOutUrlBase}?continueUrl=/feedback/AGENT_REG_IND_DETAILS"
-}
 
 @layout(
     pageTitle = pageTitle,
@@ -84,9 +81,7 @@
     }
     </p>
     <p class="govuk-body govuk-!-display-none-print">
-        <a class="govuk-link" href=@signOutLink>@{
-          messages(s"$key.signOutLink")
-        }</a>
+      <a class="govuk-link" href="@{AppRoutes.SignOutController.signOutWithContinue(continueUrl = RedirectUrl(appConfig.feedbackFrontendBaseUrl + "/feedback/AGENT_REG_IND_DETAILS"))}">@{messages("common.finishAndSignOut")}</a>
     </p>
   }
 }

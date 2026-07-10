@@ -99,7 +99,7 @@ extends ControllerSpec:
     )
     val response: WSResponse = get(applicationStatusPath)
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe s"Application reference: ${agentApplication.submitted.agentApplicationId.value} - Apply for an agent services account - GOV.UK"
+    response.parseBodyAsJsoupDocument.title() shouldBe s"Application reference: ${agentApplication.submitted.applicationReference.value} - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $applicationStatusPath should render the failed non-fixable page when status is RiskingCompleted and overall outcome is FailedNonFixable" in:
