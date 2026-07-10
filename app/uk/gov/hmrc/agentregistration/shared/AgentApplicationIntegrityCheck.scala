@@ -48,7 +48,7 @@ object AgentApplicationIntegrityCheck:
         case (RiskingOutcomeApplication.Outcome.Approved, _) =>
           throw new IllegalStateException("integrity check failed: riskingOutcomeApplication is approved but riskingOutcomeEntity is not")
         case (RiskingOutcomeApplication.Outcome.FailedFixable, RiskingOutcomeEntity.Approved) => ()
-        case (RiskingOutcomeApplication.Outcome.FailedFixable, RiskingOutcomeEntity.FailedFixable) => ()
-        case (RiskingOutcomeApplication.Outcome.FailedFixable, _) =>
-          throw new IllegalStateException("integrity check failed: riskingOutcomeApplication is failed fixable but riskingOutcomeEntity is not")
+        case (RiskingOutcomeApplication.Outcome.FailedFixable, _: RiskingOutcomeEntity.FailedFixable) => ()
+        case (RiskingOutcomeApplication.Outcome.FailedFixable, _: RiskingOutcomeEntity.FailedNonFixable) =>
+          throw new IllegalStateException("integrity check failed: riskingOutcomeApplication is failed fixable but riskingOutcomeEntity is NotFixable")
         case (_, _) => ()
