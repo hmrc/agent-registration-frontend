@@ -71,7 +71,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "You are about to submit your response - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe "You are about to submit your responses - Apply for an agent services account - GOV.UK"
     ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
 
   s"GET $path for an individual without all fixes complete should redirect to the risking outcome page" in:

@@ -31,6 +31,7 @@ import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix._10.Individual
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineFutureEither
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineUnion
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuildersWithData
@@ -203,10 +204,16 @@ extends RequestAwareLogging:
   def authorisedWithFailedFixable(linkId: LinkId): ActionBuilderWithData[DataWithFailedFixable] = authorisedWithRiskingOutcome(linkId)
     .refine:
       implicit request: (RequestWithData[DataWithRiskingOutcome]) =>
+        val confirmationUrl: String = AppRoutes.providedetails.riskingoutcome.fixablefailures.IndividualConfirmationController.show(linkId).url
         val individualRiskingOutcome: RiskingOutcomeIndividual = request.get
         individualRiskingOutcome match
           case outcome @ RiskingOutcomeIndividual.FailedFixable(fixes: Seq[IndividualFix], declarationAgreed: Boolean) =>
-            request.replace[RiskingOutcomeIndividual, RiskingOutcomeIndividual.FailedFixable](outcome)
+            if request.uri =!= confirmationUrl && fixes.forall(_.isConfirmed.contains(true)) && declarationAgreed
+            then
+              logger.info("Risking outcome for individual has already been fixed. Redirecting to confirmation page.")
+              Redirect(AppRoutes.providedetails.riskingoutcome.fixablefailures.IndividualConfirmationController.show(linkId))
+            else
+              request.replace[RiskingOutcomeIndividual, RiskingOutcomeIndividual.FailedFixable](outcome)
           case _ =>
             logger.info("Risking outcome for individual is not fixable. Redirecting to where outcome can be handled.")
             Redirect(AppRoutes.providedetails.riskingoutcome.RiskingOutcomeController.show(linkId))

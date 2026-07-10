@@ -22,6 +22,7 @@ import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
@@ -64,6 +65,7 @@ extends FrontendController(mcc, actions):
     baseAction(linkId):
       implicit request =>
         Ok(view(
+          individualName = request.get[IndividualProvidedDetails].individualName,
           individualProvidedDetails = request.get[IndividualDetailsFix],
           linkId = linkId
         ))

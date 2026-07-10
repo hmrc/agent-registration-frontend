@@ -38,7 +38,7 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         s"""
            |Confirm your responses are final
-           |You are about to submit your response
+           |You are about to submit your responses
            |Submitting your responses means you believe you have done everything to meet the registration conditions.
            |Accept and send
            |Is this page not working properly? (opens in new tab)
@@ -46,10 +46,10 @@ extends ViewSpec:
           .stripMargin
 
     "have the correct title" in:
-      doc.title() shouldBe "You are about to submit your response - Apply for an agent services account - GOV.UK"
+      doc.title() shouldBe "You are about to submit your responses - Apply for an agent services account - GOV.UK"
 
     "have the correct h1" in:
-      doc.h1 shouldBe "You are about to submit your response"
+      doc.h1 shouldBe "You are about to submit your responses"
 
     "should contain a form to submit confirmation of the declaration" in:
       val form: Element = doc.select("form").selectOnlyOneElementOrFail()

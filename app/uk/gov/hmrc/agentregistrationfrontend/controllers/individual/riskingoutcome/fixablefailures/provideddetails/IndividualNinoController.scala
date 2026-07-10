@@ -83,4 +83,4 @@ extends FrontendController(mcc, actions):
               .setTo(Some(updatedRiskingOutcomeIndividual))
           )
           .map: _ =>
-            Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url)
+            Redirect(AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.CheckYourAnswersController.show(linkId).url)

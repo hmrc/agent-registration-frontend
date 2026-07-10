@@ -17,20 +17,32 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
 import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuditStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
 class CheckYourAnswersControllerSpec
 extends ControllerSpec:
 
+  override def configOverrides: Map[String, Any] = Map("auditing.enabled" -> true)
+
   private val linkId = tdAll.linkId
-  private val agentApplication =
+  private val agentApplicationLlp =
     tdAll
       .agentApplicationLlp
       .afterContactDetailsComplete
+  private val agentApplicationSoleTrader =
+    tdAll
+      .agentApplicationSoleTrader
+      .afterContactDetailsComplete
+
   private val path = s"/agent-registration/provide-details/check-your-answers/${linkId.value}"
 
   "route should have correct path and method" in:
+    AuditStubs.stubAudit()
     AppRoutes.providedetails.CheckYourAnswersController.show(linkId) shouldBe Call(
       method = "GET",
       url = path
@@ -53,6 +65,7 @@ extends ControllerSpec:
   private final case class TestCaseForCya(
     providedDetails: IndividualProvidedDetails,
     name: String,
+    application: AgentApplication = agentApplicationLlp,
     expectedRedirect: Option[String] = None
   )
 
@@ -105,26 +118,47 @@ extends ControllerSpec:
       providedDetails = individualProvideDetails.missingTelephone,
       name = "telephone number",
       expectedRedirect = Some(AppRoutes.providedetails.IndividualTelephoneNumberController.show(linkId).url)
+    ),
+    TestCaseForCya(
+      providedDetails = individualProvideDetails.complete,
+      name = "sole trader",
+      application = agentApplicationSoleTrader,
+      expectedRedirect = Some(AppRoutes.providedetails.IndividualConfirmationController.show(linkId).url)
     )
   ).foreach: testCase =>
     testCase.expectedRedirect match
       case None =>
         s"GET $path with ${testCase.name} should return 200 and render page" in:
           ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
-            agentApplication,
+            testCase.application,
             testCase.providedDetails
           )
+          AuditStubs.stubAudit()
           val response: WSResponse = get(path)
           response.status shouldBe Status.OK
           val doc = response.parseBodyAsJsoupDocument
           doc.title() shouldBe "Check your answers - Apply for an agent services account - GOV.UK"
           ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
+      case Some(expectedRedirect) if testCase.application.businessType === BusinessType.SoleTrader =>
+        s"GET $path for ${testCase.name} should redirect to ${testCase.expectedRedirect.value} page" in:
+          ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+            testCase.application,
+            testCase.providedDetails
+          )
+          AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(individualProvideDetails.complete)
+          AuditStubs.stubAudit()
+          val response: WSResponse = get(path)
+          response.status shouldBe Status.SEE_OTHER
+          response.header("Location").value shouldBe expectedRedirect
+          ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvideDetailsWithIndividualSubmissionAuditEvent()
+
       case Some(expectedRedirect) =>
         s"GET $path with missing ${testCase.name} should redirect to the ${testCase.name} page" in:
           ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
-            agentApplication,
+            testCase.application,
             testCase.providedDetails
           )
+          AuditStubs.stubAudit()
           val response: WSResponse = get(path)
           response.status shouldBe Status.SEE_OTHER
           response.header("Location").value shouldBe expectedRedirect
