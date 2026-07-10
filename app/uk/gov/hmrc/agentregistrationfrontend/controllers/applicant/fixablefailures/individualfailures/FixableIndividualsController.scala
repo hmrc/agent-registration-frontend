@@ -23,8 +23,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
-import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication.Outcome
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
@@ -50,17 +49,16 @@ extends FrontendController(mcc, actions):
     actions
       .getApplicationAfterSentForRisking
       .behindFeatureFlag(appConfig.Features.fixableFailures)
-      .ensure(
-        condition =
+      .refine(
+        refineF =
           implicit request =>
             request
               .get[AgentApplication]
-              .riskingOutcomeApplication
-              .exists(_.outcome === Outcome.FailedFixable),
-        resultWhenConditionNotMet =
-          implicit request =>
-            logger.warn("Risking outcome is not fixable. Redirecting to where outcome can be handled.")
-            Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
+              .riskingOutcomeApplication match
+              case Some(outcome: RiskingOutcomeApplication.FailedFixable) => request.add[RiskingOutcomeApplication.FailedFixable](outcome)
+              case outcome =>
+                logger.warn("Risking outcome is not fixable. Redirecting to where outcome can be handled.")
+                Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
       )
       .refine(implicit request =>
         val agentApplication: AgentApplication = request.get
@@ -85,12 +83,10 @@ extends FrontendController(mcc, actions):
       ):
         implicit request =>
           val application = request.get[AgentApplication]
-          val deadlineDate = application.riskingOutcomeApplication.flatMap(
-            _.correctiveActionExpiryDate
-          ).getOrThrowExpectedDataMissing("correctiveActionExpiryDate")
+          val correctiveActionExpiryDate: LocalDate = request.get[RiskingOutcomeApplication.FailedFixable].correctiveActionExpiryDate
 
           Ok(fixableIndividualsPage(
-            dateOfDeadline = displayDateForLang(Some(deadlineDate)),
+            dateOfDeadline = displayDateForLang(correctiveActionExpiryDate),
             fixableIndividualsList = request.get[List[IndividualProvidedDetails]],
             agentApplication = application
           ))

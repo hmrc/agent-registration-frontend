@@ -19,6 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutc
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
@@ -27,6 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.FixableIndividualTaskListStatus
+import uk.gov.hmrc.agentregistrationfrontend.model.getCorrectiveActionExpiryDate
 import uk.gov.hmrc.agentregistrationfrontend.model.TaskStatus
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingoutcome.fixablefailures.FixableTaskListPage
@@ -52,7 +54,7 @@ extends FrontendController(mcc, actions):
             taskListStatus = fixableIndividualTaskListStatus(
               riskingOutcomeIndividual = request.get[RiskingOutcomeIndividual.FailedFixable]
             ),
-            correctiveActionExpiryDate = displayDateForLang(request.get[RiskingOutcomeApplication].correctiveActionExpiryDate),
+            correctiveActionExpiryDate = displayDateForLang(request.get[AgentApplication].getCorrectiveActionExpiryDate),
             linkId = linkId
           ))
 

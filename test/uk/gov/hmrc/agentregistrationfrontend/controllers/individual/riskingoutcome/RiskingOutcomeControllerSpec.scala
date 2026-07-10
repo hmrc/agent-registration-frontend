@@ -46,18 +46,16 @@ extends ControllerSpec:
     .modify(_.applicationState)
     .setTo(ApplicationState.RiskingCompleted)
     .modify(_.riskingOutcomeApplication)
-    .setTo(Some(RiskingOutcomeApplication(
-      correctiveActionExpiryDate = Some(tdAll.correctiveActionExpiryDate),
-      outcome = RiskingOutcomeApplication.Outcome.FailedFixable,
-      actualDecisionDate = tdAll.riskingCompletedDate
+    .setTo(Some(RiskingOutcomeApplication.FailedFixable(
+      actualDecisionDate = tdAll.riskingCompletedDate,
+      correctiveActionExpiryDate = tdAll.correctiveActionExpiryDate
     )))
 
   val failedNonFixableApplication: AgentApplication = failedFixableApplication
     .modify(_.riskingOutcomeApplication)
-    .setTo(Some(RiskingOutcomeApplication(
-      correctiveActionExpiryDate = None,
-      outcome = RiskingOutcomeApplication.Outcome.FailedNonFixable,
-      actualDecisionDate = tdAll.riskingCompletedDate
+    .setTo(Some(RiskingOutcomeApplication.FailedNonFixable(
+      actualDecisionDate = tdAll.riskingCompletedDate,
+      correctiveActionExpiryDate = tdAll.correctiveActionExpiryDate
     )))
 
   object individualProvidedDetails:
@@ -67,7 +65,8 @@ extends ControllerSpec:
       .copy(
         personReference = PersonReference("PREF0"),
         riskingOutcomeIndividual = Some(RiskingOutcomeIndividual.FailedFixable(
-          fixes = Seq(IndividualFix._4._1(isConfirmed = None))
+          fixes = Seq(IndividualFix._4._1(isConfirmed = None)),
+          declarationAgreed = true
         ))
       )
 

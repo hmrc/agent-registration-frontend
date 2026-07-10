@@ -51,36 +51,42 @@ extends FrontendController(mcc, actions):
         val riskingOutcomeApplication: RiskingOutcomeApplication = request.get
         val riskingOutcomeIndividual: RiskingOutcomeIndividual = request.get
         val entityName: String = request.get[BusinessPartnerRecordResponse].getEntityName
-        riskingOutcomeApplication.outcome match
-          case RiskingOutcomeApplication.Outcome.FailedNonFixable =>
+        riskingOutcomeApplication match
+          case applicationOutcome: RiskingOutcomeApplication.FailedNonFixable =>
             riskingOutcomeIndividual match
-              case failedNonFixable: RiskingOutcomeIndividual.FailedNonFixable =>
+              case individualOutcome: RiskingOutcomeIndividual.FailedNonFixable =>
                 val riskedIndividual: RiskedIndividual = RiskedIndividual(
                   personReference = request.get[IndividualProvidedDetails].personReference,
                   individualName = request.get[IndividualProvidedDetails].individualName,
-                  failures = failedNonFixable.failures
+                  failures = individualOutcome.failures
                 )
                 Ok(failedNonFixablePage(
                   riskedIndividual = riskedIndividual,
                   agentApplication = request.agentApplication,
                   entityName = entityName
                 ))
-              case _ => renderConfirmationPage(request.agentApplication, entityName) // this individual has not failed non-fixable, so render the confirmation page
-          case RiskingOutcomeApplication.Outcome.FailedFixable =>
+              case _: RiskingOutcomeIndividual.FailedFixable => renderConfirmationPage(request.agentApplication, entityName) // this individual has not failed non-fixable, so render the confirmation page
+              case RiskingOutcomeIndividual.Approved => renderConfirmationPage(request.agentApplication, entityName) // this individual has not failed non-fixable, so render the confirmation page
+          case riskingOutcomeApplication: RiskingOutcomeApplication.FailedFixable =>
             riskingOutcomeIndividual match
-              case f: RiskingOutcomeIndividual.FailedFixable =>
-                if f.declarationAgreed && f.fixes.forall(_.isConfirmed.contains(true))
+              case individualOutcome: RiskingOutcomeIndividual.FailedFixable =>
+                if individualOutcome.declarationAgreed && individualOutcome.fixes.forall(_.isConfirmed.contains(true))
                 then
+                  logger.debug("This individual has failed fixable, but has fixed everything")
                   Redirect(AppRoutes.providedetails.riskingoutcome.fixablefailures.IndividualConfirmationController.show(linkId)) // this individual has failed fixable, but has fixed everything
                 else
                   Ok(failedFixablePage(
                     linkId = linkId,
                     entityName = entityName,
                     correctiveActionExpiryDate = displayDateForLang(riskingOutcomeApplication.correctiveActionExpiryDate),
-                    actualDecisionDate = displayDateForLang(Some(riskingOutcomeApplication.actualDecisionDate))
+                    actualDecisionDate = displayDateForLang(riskingOutcomeApplication.actualDecisionDate)
                   ))
-              case _ => renderConfirmationPage(request.agentApplication, entityName) // this individual has not failed fixable, so render the confirmation page
-          case _ => renderConfirmationPage(request.agentApplication, entityName) // any other outcome renders the confirmation page
+              case RiskingOutcomeIndividual.Approved => renderConfirmationPage(request.agentApplication, entityName) // this individual has not failed fixable, so render the confirmation page
+              case _: RiskingOutcomeIndividual.FailedNonFixable =>
+                throw new IllegalStateException(
+                  "This individual has failed non-fixable, but the application outcome was failed fixable - this should not be possible"
+                )
+          case riskingOutcomeApplication: RiskingOutcomeApplication.Approved => renderConfirmationPage(request.agentApplication, entityName) // any other outcome renders the confirmation page
 
   private def renderConfirmationPage(
     agentApplication: AgentApplication,

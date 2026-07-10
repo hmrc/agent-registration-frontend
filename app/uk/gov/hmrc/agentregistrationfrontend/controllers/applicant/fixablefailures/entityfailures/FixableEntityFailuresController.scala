@@ -26,7 +26,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.risking.EntityFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
-import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication.Outcome
+
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
@@ -50,38 +50,39 @@ class FixableEntityFailuresController @Inject (agentApplicationService: AgentApp
 )
 extends FrontendController(mcc, actions):
 
-  private def baseAction(failureCode: String): ActionBuilderWithData[EntityFix *: RiskingOutcomeApplication *: DataWithApplicationAndBpr] = actions
-    .getApplicationAfterSentForRisking
-    .behindFeatureFlag(appConfig.Features.fixableFailures)
-    .refine:
-      implicit request =>
-        request.get[AgentApplication].riskingOutcomeApplication match
-          case Some(overallOutcome) if overallOutcome.outcome === Outcome.FailedFixable => request.add[RiskingOutcomeApplication](overallOutcome)
-          case _ =>
-            logger.warn("Risking outcome for application is not fixable. Redirecting to where outcome can be handled.")
-            Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
-    .refine:
-      implicit request =>
-        request.agentApplication.getRiskingOutcomeEntity match
-          case RiskingOutcomeEntity.FailedFixable(fixes: Seq[EntityFix]) =>
-            val fix: Option[EntityFix] = fixes.find((fix: EntityFix) => fix.toString === failureCode)
-            fix match
-              case Some(fix) => request.add[EntityFix](fix)
-              case None =>
-                logger.warn(s"The failure code in the url $failureCode cannot be found in the entity fixes for this application.")
-                NotFound
-          case _ =>
-            logger.warn("Risking outcome for entity is not fixable. Redirecting to where outcome can be handled.")
-            Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
+  private def baseAction(failureCode: String): ActionBuilderWithData[EntityFix *: RiskingOutcomeApplication.FailedFixable *: DataWithApplicationAndBpr] =
+    actions
+      .getApplicationAfterSentForRisking
+      .behindFeatureFlag(appConfig.Features.fixableFailures)
+      .refine:
+        implicit request =>
+          request.get[AgentApplication].riskingOutcomeApplication match
+            case Some(outcome: RiskingOutcomeApplication.FailedFixable) => request.add[RiskingOutcomeApplication.FailedFixable](outcome)
+            case outcome =>
+              logger.warn(s"Risking outcome for application is not fixable (or missing). Redirecting to where outcome can be handled: $outcome")
+              Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
+      .refine:
+        implicit request =>
+          request.agentApplication.getRiskingOutcomeEntity match
+            case RiskingOutcomeEntity.FailedFixable(fixes: Seq[EntityFix]) =>
+              val fix: Option[EntityFix] = fixes.find((fix: EntityFix) => fix.toString === failureCode)
+              fix match
+                case Some(fix) => request.add[EntityFix](fix)
+                case None =>
+                  logger.warn(s"The failure code in the url $failureCode cannot be found in the entity fixes for this application.")
+                  NotFound
+            case _ =>
+              logger.warn("Risking outcome for entity is not fixable. Redirecting to where outcome can be handled.")
+              Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
 
   def show(failureCode: String): Action[AnyContent] =
     baseAction(failureCode):
       implicit request =>
-        val overallOutcome: RiskingOutcomeApplication = request.get
+        val outcome: RiskingOutcomeApplication.FailedFixable = request.get
         Ok(view(
           entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
           failureCode = failureCode,
-          correctiveActionExpiryDate = displayDateForLang(overallOutcome.correctiveActionExpiryDate),
+          correctiveActionExpiryDate = displayDateForLang(outcome.correctiveActionExpiryDate),
           isSoleTraderOwner = request.get[AgentApplication].isSoleTraderOwner,
           form = ConfirmFixForm.form(failureCode).fill:
             request.get[EntityFix].isConfirmed
@@ -96,7 +97,7 @@ extends FrontendController(mcc, actions):
             view(
               entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
               failureCode = failureCode,
-              correctiveActionExpiryDate = displayDateForLang(request.get[RiskingOutcomeApplication].correctiveActionExpiryDate),
+              correctiveActionExpiryDate = displayDateForLang(request.get[RiskingOutcomeApplication.FailedFixable].correctiveActionExpiryDate),
               isSoleTraderOwner = request.get[AgentApplication].isSoleTraderOwner,
               form = formWithErrors
             )

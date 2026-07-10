@@ -22,6 +22,7 @@ import play.api.data.Form
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
@@ -32,6 +33,7 @@ import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.model.getCorrectiveActionExpiryDate
 import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.fixablefailures.ConfirmFixForm
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
@@ -69,11 +71,10 @@ extends FrontendController(mcc, actions):
   ): Action[AnyContent] =
     baseAction(fixCode, linkId):
       implicit request =>
-        val overallOutcome: RiskingOutcomeApplication = request.get
         Ok(view(
           entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
           failureCode = fixCode,
-          correctiveActionExpiryDate = displayDateForLang(overallOutcome.correctiveActionExpiryDate),
+          correctiveActionExpiryDate = displayDateForLang(request.get[AgentApplication].getCorrectiveActionExpiryDate),
           form = ConfirmFixForm.form(fixCode).fill:
             request.get[IndividualFix].isConfirmed
           ,
@@ -92,7 +93,7 @@ extends FrontendController(mcc, actions):
             view(
               entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
               failureCode = fixCode,
-              correctiveActionExpiryDate = displayDateForLang(request.get[RiskingOutcomeApplication].correctiveActionExpiryDate),
+              correctiveActionExpiryDate = displayDateForLang(request.get[AgentApplication].getCorrectiveActionExpiryDate),
               form = formWithErrors,
               linkId = linkId
             )

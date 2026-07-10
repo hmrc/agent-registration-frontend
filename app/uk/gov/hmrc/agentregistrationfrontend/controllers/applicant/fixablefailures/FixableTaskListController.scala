@@ -23,10 +23,9 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
-import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication.Outcome
+
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
@@ -56,9 +55,9 @@ extends FrontendController(mcc, actions):
       .refine:
         implicit request =>
           request.get[AgentApplication].riskingOutcomeApplication match
-            case Some(overallOutcome) if overallOutcome.outcome === Outcome.FailedFixable => request.add[RiskingOutcomeApplication](overallOutcome)
-            case _ =>
-              logger.warn("Risking outcome is not fixable. Redirecting to where outcome can be handled.")
+            case Some(outcome: RiskingOutcomeApplication.FailedFixable) => request.add[RiskingOutcomeApplication.FailedFixable](outcome)
+            case outcome =>
+              logger.warn(s"Risking outcome is not fixable (or missing). Redirecting to where outcome can be handled: $outcome")
               Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
       .refine(implicit request =>
         val agentApplication: AgentApplication = request.get
@@ -67,7 +66,7 @@ extends FrontendController(mcc, actions):
       ):
         implicit request =>
           val agentApplication: AgentApplication = request.get
-          val overallOutcome: RiskingOutcomeApplication = request.get
+          val overallOutcome: RiskingOutcomeApplication.FailedFixable = request.get
           val riskingOutcomeEntity: RiskingOutcomeEntity = agentApplication.getRiskingOutcomeEntity
           val allIndividuals: List[IndividualProvidedDetails] = request.get
           Ok(taskListPage(
