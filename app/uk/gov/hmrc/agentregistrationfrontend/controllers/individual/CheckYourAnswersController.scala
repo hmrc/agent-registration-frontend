@@ -18,21 +18,20 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
+import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import com.softwaremill.quicklens.modify
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
-import uk.gov.hmrc.agentregistration.shared.LinkId
-import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.audit.AuditService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.CheckYourAnswersPage
+import uk.gov.hmrc.auth.core.ConfidenceLevel
+import uk.gov.hmrc.auth.core.retrieve.Credentials
 
 @Singleton
 class CheckYourAnswersController @Inject() (
@@ -91,13 +90,15 @@ extends FrontendController(mcc, actions):
         */
       !_.get[AgentApplication].isSoleTraderOwner,
       implicit request =>
+        val updated = finishedIndividualProvidedDetails(request)
         individualProvideDetailsService.upsert(
-          request.get[IndividualProvidedDetails]
-            .modify(_.providedByApplicant)
-            .setTo(Some(false))
-            .modify(_.providedDetailsState)
-            .setTo(Finished)
+          updated
         ).map: _ =>
+          val applicationReference = request.get[AgentApplication].applicationReference
+          auditService.auditIndividualSubmission(
+            applicationReference = applicationReference,
+            individualProvidedDetails = updated
+          )
           Redirect(AppRoutes.providedetails.IndividualConfirmationController.show(linkId).url)
     )
 
@@ -111,19 +112,15 @@ extends FrontendController(mcc, actions):
 
   def submit(linkId: LinkId): Action[AnyContent] = baseAction(linkId).async:
     implicit request =>
-      val finishedIndividualProvidedDetails = request.get[IndividualProvidedDetails]
-        .modify(_.providedByApplicant)
-        .setTo(Some(false))
-        .modify(_.providedDetailsState)
-        .setTo(Finished)
+      val updated = finishedIndividualProvidedDetails(request)
       val applicationReference = request.get[AgentApplication].applicationReference
       individualProvideDetailsService
         .upsert(
-          finishedIndividualProvidedDetails
+          updated
         ).map: _ =>
           auditService.auditIndividualSubmission(
             applicationReference = applicationReference,
-            individualProvidedDetails = finishedIndividualProvidedDetails
+            individualProvidedDetails = updated
           )
           Redirect(AppRoutes.providedetails.IndividualConfirmationController.show(linkId))
 
@@ -132,3 +129,15 @@ extends FrontendController(mcc, actions):
       agentApplication match
         case a: AgentApplicationSoleTrader => a.isOwner
         case _ => false
+
+  private def finishedIndividualProvidedDetails(request: RequestWithData[(
+    IndividualProvidedDetails,
+    AgentApplication,
+    ConfidenceLevel,
+    InternalUserId,
+    Credentials
+  )]): IndividualProvidedDetails = request.get[IndividualProvidedDetails]
+    .modify(_.providedByApplicant)
+    .setTo(Some(false))
+    .modify(_.providedDetailsState)
+    .setTo(Finished)
