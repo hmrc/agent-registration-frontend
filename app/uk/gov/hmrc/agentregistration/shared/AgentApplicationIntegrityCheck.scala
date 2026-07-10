@@ -38,9 +38,11 @@ object AgentApplicationIntegrityCheck:
     private def whenSentToMinerva(): Unit = ()
     private def whenRiskingCompleted(): Unit =
       val roa: RiskingOutcomeApplication = agentApplication.riskingOutcomeApplication.getOrThrowExpectedDataMissing(
-        "integrity check failed:riskingOutcomeApplication"
+        "integrity check failed:riskingOutcomeApplication should be defined in this state"
       )
-      val roe: RiskingOutcomeEntity = agentApplication.riskingOutcomeEntity.getOrThrowExpectedDataMissing("integrity check failed:riskingOutcomeEntity")
+      val roe: RiskingOutcomeEntity = agentApplication.riskingOutcomeEntity.getOrThrowExpectedDataMissing(
+        "integrity check failed:riskingOutcomeEntity should be defined in this state"
+      )
       (roa.outcome, roe) match
         case (RiskingOutcomeApplication.Outcome.Approved, RiskingOutcomeEntity.Approved) => ()
         case (RiskingOutcomeApplication.Outcome.Approved, _) =>
