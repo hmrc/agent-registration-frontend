@@ -28,7 +28,6 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.RiskedEntity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskedIndividual
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
-import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication.Outcome
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
@@ -186,17 +185,17 @@ extends FrontendController(mcc, actions):
           ))
         ))
       case ApplicationState.RiskingCompleted =>
-        val overallOutcome: RiskingOutcomeApplication = agentApplication.riskingOutcomeApplication.getOrThrowExpectedDataMissing(
+        val riskingOutcomeApplication: RiskingOutcomeApplication = agentApplication.riskingOutcomeApplication.getOrThrowExpectedDataMissing(
           s"Risking completed but no outcome found for application ${agentApplication.applicationReference}"
         )
-        overallOutcome.outcome match
-          case Outcome.FailedFixable =>
+        riskingOutcomeApplication match
+          case riskingOutcomeApplication: RiskingOutcomeApplication.FailedFixable =>
             Ok(failedFixableStartPage(
-              actualDecisionDate = displayDateForLang(Some(overallOutcome.riskingCompletedDate)),
-              correctiveActionExpiryDate = displayDateForLang(overallOutcome.correctiveActionExpiryDate),
+              actualDecisionDate = displayDateForLang(Some(riskingOutcomeApplication.actualDecisionDate)),
+              correctiveActionExpiryDate = displayDateForLang(riskingOutcomeApplication.correctiveActionExpiryDate),
               entityName = request.get[BusinessPartnerRecordResponse].getEntityName
             ))
-          case Outcome.FailedNonFixable =>
+          case riskingOutcomeApplication: RiskingOutcomeApplication.FailedNonFixable =>
             val riskedEntity: RiskingOutcomeEntity = agentApplication.riskingOutcomeEntity.getOrThrowExpectedDataMissing(
               s"Risking completed but no outcome found for entity ${agentApplication.applicationReference}"
             )
@@ -219,10 +218,17 @@ extends FrontendController(mcc, actions):
                         case Some(riskedIndividual: RiskingOutcomeIndividual.FailedNonFixable) => riskedIndividual.failures
                         case _ => Seq.empty
                   ),
-                riskingCompletedDate = overallOutcome.riskingCompletedDate,
-                correctiveActionExpiryDate = overallOutcome.correctiveActionExpiryDate
+                riskingCompletedDate = riskingOutcomeApplication.actualDecisionDate,
+                correctiveActionExpiryDate = Some(riskingOutcomeApplication.correctiveActionExpiryDate)
               ),
               agentApplication = agentApplication,
               entityName = request.get[BusinessPartnerRecordResponse].getEntityName
             ))
-          case Outcome.Approved => Redirect(appConfig.asaDashboardUrl) // this shouldn't really happen as the auth action should have done the redirect already
+          case riskingOutcomeApplication: RiskingOutcomeApplication.Approved =>
+            // Fallback case: Application outcome is Approved, but account setup is incomplete.
+            // Not sure if this can ever happen.
+            // This might occur when risking approval succeeded and BE was notified, but the ASA account provisioning
+            // in agent-registration-risking failed or is still in progress.
+            // Redirect to ASA anyway as in the original implementation
+            logger.warn(s"Application ${agentApplication.applicationReference} approved but ASA account not fully provisioned. Redirecting to ASA dashboard")
+            Redirect(appConfig.asaDashboardUrl)

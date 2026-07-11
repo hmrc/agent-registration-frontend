@@ -19,14 +19,18 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutc
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix._10.IndividualDetailsFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
+import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingoutcome.fixablefailures.FixIndividualProvidedDetailsPage
 
+import java.time.LocalDate
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -43,8 +47,15 @@ extends FrontendController(mcc, actions):
   ): Action[AnyContent] =
     authorisedWithFixableDetails(linkId):
       implicit request =>
+        val correctiveActionExpiryDate: LocalDate =
+          request.get[RiskingOutcomeApplication] match
+            case o: RiskingOutcomeApplication.FailedFixable => o.correctiveActionExpiryDate
+            case o: RiskingOutcomeApplication.FailedNonFixable => o.correctiveActionExpiryDate
+            case o: RiskingOutcomeApplication.Approved =>
+              throw new IllegalStateException("Individual provided details should not be shown for approved applications.")
+
         Ok(view(
           failureCode = request.get[IndividualDetailsFix].toString,
-          correctiveActionExpiryDate = displayDateForLang(request.get[RiskingOutcomeApplication].correctiveActionExpiryDate),
+          correctiveActionExpiryDate = displayDateForLang(correctiveActionExpiryDate),
           linkId = linkId
         ))

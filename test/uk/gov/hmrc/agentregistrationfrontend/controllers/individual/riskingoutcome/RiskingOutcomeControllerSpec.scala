@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ProvideDetailsStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
@@ -40,24 +41,27 @@ extends ControllerSpec:
   private val linkId = tdAll.linkId
 
   val failedFixableApplication: AgentApplication = tdAll
-    .agentApplicationLlpSections
-    .sectionContactDetails
-    .afterEmailAddressVerified
+    .agentApplicationLlp
+    .afterSentToMinerva
     .modify(_.applicationState)
     .setTo(ApplicationState.RiskingCompleted)
     .modify(_.riskingOutcomeApplication)
-    .setTo(Some(RiskingOutcomeApplication(
-      correctiveActionExpiryDate = Some(tdAll.correctiveActionExpiryDate),
-      outcome = RiskingOutcomeApplication.Outcome.FailedFixable,
-      riskingCompletedDate = tdAll.riskingCompletedDate
+    .setTo(Some(RiskingOutcomeApplication.FailedFixable(
+      actualDecisionDate = tdAll.riskingCompletedDate,
+      correctiveActionExpiryDate = tdAll.correctiveActionExpiryDate
     )))
+    .modify(_.riskingOutcomeEntity)
+    .setTo(Some(RiskingOutcomeEntity.Approved))
+    .modify(_.applicationExpiresAt)
+    .setTo(None)
+    .modify(_.submittedAt)
+    .setTo(Some(tdAll.newInstant))
 
   val failedNonFixableApplication: AgentApplication = failedFixableApplication
     .modify(_.riskingOutcomeApplication)
-    .setTo(Some(RiskingOutcomeApplication(
-      correctiveActionExpiryDate = None,
-      outcome = RiskingOutcomeApplication.Outcome.FailedNonFixable,
-      riskingCompletedDate = tdAll.riskingCompletedDate
+    .setTo(Some(RiskingOutcomeApplication.FailedNonFixable(
+      actualDecisionDate = tdAll.riskingCompletedDate,
+      correctiveActionExpiryDate = tdAll.correctiveActionExpiryDate
     )))
 
   object individualProvidedDetails:
@@ -67,7 +71,8 @@ extends ControllerSpec:
       .copy(
         personReference = PersonReference("PREF0"),
         riskingOutcomeIndividual = Some(RiskingOutcomeIndividual.FailedFixable(
-          fixes = Seq(IndividualFix._4._1(isConfirmed = None))
+          fixes = Seq(IndividualFix._4._1(isConfirmed = None)),
+          declarationAgreed = true
         ))
       )
 

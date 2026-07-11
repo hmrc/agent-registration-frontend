@@ -28,6 +28,8 @@ import scala.util.Try
 
 object DisplayDate {
 
+  def displayDateForLang(date: LocalDate)(implicit request: RequestHeader): String = displayDateForLang(Some(date))
+
   def displayDateForLang(date: Option[LocalDate])(implicit request: RequestHeader): String = {
     val lang = request.cookies
       .get("PLAY_LANG")

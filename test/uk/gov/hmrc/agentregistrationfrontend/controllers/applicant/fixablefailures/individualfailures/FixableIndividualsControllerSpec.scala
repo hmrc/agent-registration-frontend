@@ -67,7 +67,8 @@ extends ControllerSpec:
             fixes = Seq(
               IndividualFix._5._1(isConfirmed = None),
               IndividualFix._8._7(isConfirmed = None)
-            )
+            ),
+            declarationAgreed = false
           ))
         ),
         individualProvidedDetails.afterRiskedFixable.copy(
@@ -132,7 +133,8 @@ extends ControllerSpec:
             fixes = Seq(
               IndividualFix._5._1(isConfirmed = None),
               IndividualFix._8._7(isConfirmed = None)
-            )
+            ),
+            declarationAgreed = false
           )),
           providedByApplicant = Some(true)
         )

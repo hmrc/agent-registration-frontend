@@ -66,7 +66,8 @@ extends ControllerSpec:
           Some(RiskingOutcomeIndividual.FailedFixable(
             fixes = Seq(
               IndividualFix._4._1(isConfirmed = None)
-            )
+            ),
+            declarationAgreed = false
           ))
         )
       )
