@@ -109,6 +109,18 @@ object ApplyStubHelper:
     verifyConnectorsToSupplyBprToPage(Some(agentApplication.getUtr))
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.agentApplicationId)
 
+  def stubsForUpdatingApplication(
+    application: AgentApplication,
+    updatedApplication: AgentApplication,
+    individuals: List[IndividualProvidedDetails]
+  ): StubMapping =
+    stubsForApplicationBprAndIndividuals(application, individuals)
+    AgentRegistrationStubs.stubUpdateAgentApplication(updatedApplication)
+
+  def verifyConnectorsForUpdatingApplication(agentApplication: AgentApplication): Unit =
+    verifyConnectorsForApplicationBprAndIndividuals(agentApplication)
+    AgentRegistrationStubs.verifyUpdateAgentApplication()
+
   def stubsForApplicationBprAndIndividualsAndRisking(
     application: AgentApplication,
     individuals: List[IndividualProvidedDetails]

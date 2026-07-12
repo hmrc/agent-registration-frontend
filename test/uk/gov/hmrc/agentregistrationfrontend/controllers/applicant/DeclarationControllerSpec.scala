@@ -143,5 +143,4 @@ extends ControllerSpec:
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.AgentApplicationController.applicationStatus.url
-    AgentRegistrationRiskingStubs.verifySubmitAgentApplication()
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()

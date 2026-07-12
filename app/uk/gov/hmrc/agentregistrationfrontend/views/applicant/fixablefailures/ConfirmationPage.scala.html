@@ -1,0 +1,73 @@
+@*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+
+@this(
+        appConfig: AppConfig,
+        layout: Layout,
+        govukPanel: GovukPanel
+)
+
+@(
+        dateOfDecision: String,
+        agentApplication: AgentApplication
+)(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@key = @{"resubmissionConfirmation"}
+@pageTitle = @{messages(s"$key.title")}
+
+@layout(
+    pageTitle = pageTitle,
+    suppressBackLink = true
+) {
+
+  @govukPanel(Panel(
+    title = Text(pageTitle),
+    content = Text(s"""${messages(s"$key.subtitle")} ${agentApplication.applicationReference.value}""")
+  ))
+
+  <h2 class="govuk-heading-m">
+    @{messages(s"$key.whatNext.h2")}
+  </h2>
+  <p class="govuk-body">
+    @{messages(s"$key.whatNext.p1")}
+  </p>
+  <p class="govuk-body govuk-!-display-none-print">
+    <a class="govuk-link" href="@{AppRoutes.apply.AgentApplicationController.viewSubmittedApplication.url}">@{messages(s"$key.viewLink")}</a>
+  </p>
+
+  <h2 class="govuk-heading-m">@{messages(s"$key.decision.h2")}</h2>
+  <p class="govuk-body">
+    @{messages(s"$key.decision.p1")}
+  </p>
+  <p class="govuk-body">
+  @{Html(messages(s"$key.decision.p2", dateOfDecision))}
+  </p>
+  <p class="govuk-body">
+  @{messages(s"$key.decision.p3", agentApplication.getApplicantContactDetails.getApplicantEmailAddress.emailAddress.value)}
+  </p>
+
+  <p class="govuk-body govuk-!-display-none-print">
+    <a class="govuk-link" href="@{AppRoutes.SignOutController.signOutWithContinue(continueUrl = RedirectUrl(appConfig.feedbackFrontendBaseUrl + "/feedback/AGENT_REG_AGENT"))}">@{messages(s"$key.signOutLink")}</a>
+  </p>
+}

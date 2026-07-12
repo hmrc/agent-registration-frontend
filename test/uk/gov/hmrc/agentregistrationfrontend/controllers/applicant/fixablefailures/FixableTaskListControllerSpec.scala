@@ -55,7 +55,7 @@ extends ControllerSpec:
     )
 
   s"GET $path for fixes including individuals and Amls fix should render correct status tags" in:
-    val expectedEntityFixes: Seq[EntityFix] = tdAll.riskingOutcomeEntityFailedFixable.fixes.filterNot {
+    val expectedEntityFixes: Seq[EntityFix] = tdAll.riskingOutcomeEntityFailedFixable(isFixed = None).fixes.filterNot {
       case _: AmlsFix => true
       case _ => false
     }

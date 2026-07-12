@@ -192,7 +192,13 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
     val afterRiskingCompletedFixable: AgentApplicationLlp = afterSentToMinerva.copy(
       applicationState = ApplicationState.RiskingCompleted,
       riskingOutcomeApplication = Some(dependencies.riskingOutcomeApplication.failedFixable),
-      riskingOutcomeEntity = Some(dependencies.riskingOutcomeEntityFailedFixable)
+      riskingOutcomeEntity = Some(dependencies.riskingOutcomeEntityFailedFixable(isFixed = None))
+    )
+
+    val afterRiskingCompletedFixableFixed: AgentApplicationLlp = afterSentToMinerva.copy(
+      applicationState = ApplicationState.RiskingCompleted,
+      riskingOutcomeApplication = Some(dependencies.riskingOutcomeApplication.failedFixable),
+      riskingOutcomeEntity = Some(dependencies.riskingOutcomeEntityFailedFixable(isFixed = Some(true)))
     )
 
     val afterRiskingCompletedFixableNonHmrcAmls: AgentApplicationLlp = afterSentToMinerva.copy(
@@ -211,6 +217,11 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
       applicationState = ApplicationState.RiskingCompleted,
       riskingOutcomeApplication = Some(dependencies.riskingOutcomeApplication.failedNonFixable),
       riskingOutcomeEntity = Some(dependencies.riskingOutcomeEntityFailedNonFixable)
+    )
+
+    val afterResubmitted: AgentApplicationLlp = afterRiskingCompletedFixableFixed.copy(
+      applicationState = ApplicationState.SentForRisking,
+      riskingOutcomeApplication = Some(dependencies.riskingOutcomeApplication.failedFixable.copy(reSubmittedAt = Some(dependencies.nowAsInstant)))
     )
 
     val applicationData: ApplicationData =
