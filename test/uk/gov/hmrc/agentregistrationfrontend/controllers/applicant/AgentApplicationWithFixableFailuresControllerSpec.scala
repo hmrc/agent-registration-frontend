@@ -42,6 +42,11 @@ extends ControllerSpec:
         .agentApplicationLlp
         .afterDeclarationSubmitted
 
+    val resubmitted: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .afterResubmitted
+
     val sentToMinerva: AgentApplicationLlp =
       tdAll
         .agentApplicationLlp
@@ -77,7 +82,7 @@ extends ControllerSpec:
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url
 
-  s"GET $applicationStatusPath should check the latest status and render the confirmation page when status is SentForRisking" in:
+  s"GET $applicationStatusPath should check the latest status and render the confirmation page when status is SentForRisking for first time applications" in:
     ApplyStubHelper.stubsForApplicationBprAndIndividualsAndRisking(
       application = agentApplication.submitted,
       individuals = List(
@@ -90,7 +95,20 @@ extends ControllerSpec:
     response.parseBodyAsJsoupDocument.title() shouldBe "You’ve applied for an agent services account - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
-  s"GET $applicationStatusPath should render the in-progress page when status is SentToMinerva" in:
+  s"GET $applicationStatusPath should check the latest status and render the resubmission confirmation page when status is SentForRisking for resubmitted applications" in:
+    ApplyStubHelper.stubsForApplicationBprAndIndividualsAndRisking(
+      application = agentApplication.resubmitted,
+      individuals = List(
+        tdAll.providedDetails.afterFinished
+      )
+    )
+    val response: WSResponse = get(applicationStatusPath)
+
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe "You have resubmitted your application for an agent services account - Apply for an agent services account - GOV.UK"
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+
+  s"GET $applicationStatusPath should render the in-progress page when status is SentToMinerva for a first time application" in:
     ApplyStubHelper.stubsForApplicationBprAndIndividualsAndRisking(
       application = agentApplication.sentToMinerva,
       individuals = List(
@@ -100,6 +118,18 @@ extends ControllerSpec:
     val response: WSResponse = get(applicationStatusPath)
     response.status shouldBe Status.OK
     response.parseBodyAsJsoupDocument.title() shouldBe s"Application reference: ${agentApplication.submitted.applicationReference.value} - Apply for an agent services account - GOV.UK"
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+
+  s"GET $applicationStatusPath should render the resubmission confirmation page when status is SentToMinerva for a resubmitted application" in:
+    ApplyStubHelper.stubsForApplicationBprAndIndividualsAndRisking(
+      application = agentApplication.resubmitted,
+      individuals = List(
+        tdAll.providedDetails.afterFinished
+      )
+    )
+    val response: WSResponse = get(applicationStatusPath)
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe "You have resubmitted your application for an agent services account - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $applicationStatusPath should render the failed non-fixable page when status is RiskingCompleted and overall outcome is FailedNonFixable" in:
