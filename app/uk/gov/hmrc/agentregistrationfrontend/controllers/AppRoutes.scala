@@ -223,6 +223,7 @@ object AppRoutes:
         val FixIndividualProvidedDetailsController = individualFixableFailuresRoutes.FixIndividualProvidedDetailsController
         val DeclarationController = individualFixableFailuresRoutes.DeclarationController
         val IndividualConfirmationController = individualFixableFailuresRoutes.IndividualConfirmationController
+        val SaveForLaterController = individualFixableFailuresRoutes.SaveForLaterController
 
         object provideddetails:
 

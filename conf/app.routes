@@ -217,9 +217,10 @@ GET         /provide-details/conditions-not-yet-met/national-insurance-number/:l
 POST        /provide-details/conditions-not-yet-met/national-insurance-number/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.provideddetails.IndividualNinoController.submit(linkId: LinkId)
 GET         /provide-details/conditions-not-yet-met/self-assessment-unique-taxpayer-reference/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.provideddetails.IndividualSaUtrController.show(linkId: LinkId)
 POST        /provide-details/conditions-not-yet-met/self-assessment-unique-taxpayer-reference/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.provideddetails.IndividualSaUtrController.submit(linkId: LinkId)
-GET         /provide-details/conditions-not-yet-met/confirmation/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.IndividualConfirmationController.show(linkId: LinkId)
+GET         /provide-details/conditions-not-yet-met/confirmation/:linkId                        uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.IndividualConfirmationController.show(linkId: LinkId)
 GET         /provide-details/conditions-not-yet-met/declaration/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.DeclarationController.show(linkId: LinkId)
 POST        /provide-details/conditions-not-yet-met/declaration/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.DeclarationController.submit(linkId: LinkId)
+GET         /provide-details/conditions-not-yet-met/save-and-come-back-later/:linkId            uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.SaveForLaterController.show(linkId: LinkId)
 ## Internal Routes for individuals
 GET        /provide-details/internal/unified-customer-registry-identifiers/:linkId   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.internal.UcrIndividualController.populateIndividualIdentifiersFromUcr(linkId: LinkId)
 

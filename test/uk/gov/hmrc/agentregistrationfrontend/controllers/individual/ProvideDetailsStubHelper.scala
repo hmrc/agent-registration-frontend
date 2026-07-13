@@ -112,10 +112,13 @@ object ProvideDetailsStubHelper:
     stubAuthAndMatchIndividualProvidedDetails(agentApplication, individualProvidedDetails)
     AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(updatedIndividualProvidedDetails)
 
-  def verifyAuthAndFindApplicationAndProvidedDetails(): Unit =
+  def verifyAuthAndFindApplicationAndProvidedDetails(withBpr: Boolean = false): Unit =
     IndividualAuthStubs.verifyAuthorise()
     AgentRegistrationIndividualProvidedDetailsStubs.verifyFindAllForApplicationId(tdAll.agentApplicationId)
     AgentRegistrationStubs.verifyFindApplicationByLinkId(tdAll.linkId)
+    if withBpr
+    then AgentRegistrationStubs.verifyGetApplicationBusinessPartnerRecord(utr = tdAll.saUtr.asUtr)
+    else ()
 
   def verifyAuthAndFindApplicationAndProvideDetailsWithIndividualSubmissionAuditEvent(): Unit =
     IndividualAuthStubs.verifyAuthorise()

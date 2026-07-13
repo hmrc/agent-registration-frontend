@@ -56,6 +56,10 @@ extends ViewSpec:
       .selectOnlyOneElementOrFail()
       .text() shouldBe "Save and continue"
 
+  "have a save for later button link" in:
+    doc.select("a.govuk-button--secondary")
+      .attr("href") shouldBe s"${AppRoutes.providedetails.riskingoutcome.fixablefailures.SaveForLaterController.show(tdAll.linkId).url}"
+
   "render the form error correctly when the form contains an error" in:
     val field = IndividualNinoForm.ninoKey
     val errorMessage = "Enter your National Insurance number"

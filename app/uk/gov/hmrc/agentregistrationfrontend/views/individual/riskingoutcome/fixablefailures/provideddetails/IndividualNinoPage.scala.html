@@ -19,7 +19,7 @@
 @import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
 @import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.partials.SaveAndContinue
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingoutcome.fixablefailures.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichRadios
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichInput
 
@@ -29,7 +29,7 @@
         govukInput: GovukInput,
         formWithCSRF: FormWithCSRF,
         govukButton: GovukButton,
-        saveAndContinue: SaveAndContinue
+        continueOrSaveForLater: ContinueOrSaveForLater
 )
 
 @(
@@ -84,6 +84,6 @@
                 )
         ).withFormField(form(key)))
 
-        @saveAndContinue()
+      @continueOrSaveForLater(linkId)
     }
 }

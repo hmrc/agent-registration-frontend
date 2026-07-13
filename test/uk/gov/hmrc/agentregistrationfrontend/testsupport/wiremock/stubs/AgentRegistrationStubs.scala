@@ -152,7 +152,7 @@ object AgentRegistrationStubs:
     count: Int = 1
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = wm.urlPathEqualTo(s"/agent-registration/business-partner-record/utr/${utr.value}"),
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application-business-partner-record/utr/${utr.value}"),
     count = count
   )
 

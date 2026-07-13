@@ -55,8 +55,17 @@
 
   @formWithCSRF(action = AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.CheckYourAnswersController.submit(linkId)) {
     <p class="govuk-body">
+
       @govukButton(Button(
-        content = Text(messages("common.confirmAndContinue"))
+        content = Text(messages("common.confirmAndContinue")),
+        classes = "govuk-!-margin-right-3",
+        preventDoubleClick = Some(true)
+      ))
+
+      @govukButton(Button(
+        href = Some(AppRoutes.providedetails.riskingoutcome.fixablefailures.SaveForLaterController.show(linkId).url),
+        content = Text(messages("common.saveAndComeBackLater")),
+        classes = "govuk-button--secondary"
       ))
     </p>
   }

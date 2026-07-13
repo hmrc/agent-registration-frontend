@@ -693,6 +693,10 @@ saveForLater.finishLink = Finish and sign out
 # Save for later for resubmissions in fixable failures
 fixableSaveForLater.p1 = You need to come back and complete all the actions by {0}.
 
+# Save for later individual variations
+fixableSaveForLater.individual.li1 = Use the original link sent to you by the applicant
+fixableSaveForLater.individual.li2 = Sign in using your details for your personal taxes not your business taxes
+fixableSaveForLater.individual.p3 = If you no longer have the link, ask the applicant to send it to you again.
 
 # Timed out
 timed-out.header = You have been signed out
