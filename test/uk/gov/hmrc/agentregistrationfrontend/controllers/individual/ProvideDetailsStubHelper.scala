@@ -34,10 +34,21 @@ object ProvideDetailsStubHelper:
   def stubAuthAndFindApplicationAndProvidedDetails(
     agentApplication: AgentApplication,
     individualProvideDetails: IndividualProvidedDetails,
-    isScr: Boolean = false
+    isScr: Boolean = false,
+    withBpr: Boolean = false
   ): StubMapping =
-    if isScr then IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
+
+    if isScr
+    then IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
     else IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
+
+    if withBpr
+    then
+      AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
+        utr = tdAll.saUtr.asUtr, // doesn't matter we are using same utr as provided details, there is no conflict
+        responseBody = tdAll.businessPartnerRecordResponse
+      )
+    else ()
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails), agentApplication.agentApplicationId)
     AgentRegistrationStubs.stubFindApplicationByLinkId(tdAll.linkId, agentApplication)
 
@@ -45,12 +56,14 @@ object ProvideDetailsStubHelper:
     agentApplication: AgentApplication,
     individualProvidedDetails: IndividualProvidedDetails,
     updatedIndividualProvidedDetails: IndividualProvidedDetails,
-    isScr: Boolean = false
+    isScr: Boolean = false,
+    withBpr: Boolean = false
   ): StubMapping =
     stubAuthAndFindApplicationAndProvidedDetails(
       agentApplication,
       individualProvidedDetails,
-      isScr
+      isScr,
+      withBpr
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(updatedIndividualProvidedDetails)
 
