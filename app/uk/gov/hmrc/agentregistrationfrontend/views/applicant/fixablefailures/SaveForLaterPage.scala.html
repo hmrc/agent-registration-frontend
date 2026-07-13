@@ -17,6 +17,7 @@
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.controllers.routes
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 @this(
     govukPanel: GovukPanel,
@@ -43,7 +44,7 @@
     ))
 
     <h2 class="govuk-heading-m">@messages(s"$key.h2")</h2>
-    <p class="govuk-body">@messages(s"$key.p1", correctiveActionExpiryDate)</p>
+    <p class="govuk-body">@messages("fixableSaveForLater.p1", correctiveActionExpiryDate)</p>
     <p class="govuk-body">@messages(s"$key.p2")</p>
     <ol class="govuk-list govuk-list--number">
         <li>@Html(messages(s"$key.li1", appConfig.govukStartPageUrl))</li>
@@ -55,8 +56,8 @@
             AppRoutes.fixablefailures.FixableTaskListController.show.url
         }">@messages(s"$key.continueLink")</a>
     </p>
-    <p class="govuk-body">
-        <a class="govuk-link" href="@{routes.SignOutController.signOut.url}">@messages(s"$key.finishLink")</a>
+    <p class="govuk-body govuk-!-display-none-print">
+      <a class="govuk-link" href="@{AppRoutes.SignOutController.signOutWithContinue(continueUrl = RedirectUrl(appConfig.govukStartPageUrl))}">@{messages(s"$key.finishLink")}</a>
     </p>
 
 }

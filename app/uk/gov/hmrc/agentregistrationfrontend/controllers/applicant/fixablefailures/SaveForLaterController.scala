@@ -19,11 +19,11 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailu
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.SaveForLaterPage
 
@@ -35,7 +35,6 @@ class SaveForLaterController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   saveForLaterPage: SaveForLaterPage,
-  agentRegistrationRiskingService: AgentRegistrationRiskingService,
   appConfig: AppConfig
 )
 extends FrontendController(mcc, actions):
@@ -45,18 +44,13 @@ extends FrontendController(mcc, actions):
       .getApplicationAfterSentForRisking
       .behindFeatureFlag(appConfig.Features.fixableFailures)
       .refine(implicit request =>
-        agentRegistrationRiskingService
-          .getRiskingProgress(request.agentApplication.applicationReference)
-          .map: riskingProgress =>
-            request.add[RiskingProgress](riskingProgress)
-      )
-      .refine(implicit request =>
-        request.get[RiskingProgress] match
-          case failedFixable: RiskingProgress.FailedFixable => request.replace[RiskingProgress, RiskingProgress.FailedFixable](failedFixable)
-          case _ => throw new IllegalStateException("Risking progress is not in a failed fixable state")
+        request.get[AgentApplication].riskingOutcomeApplication match
+          case Some(failedFixable: RiskingOutcomeApplication.FailedFixable) if failedFixable.reSubmittedAt.isEmpty =>
+            request.add[RiskingOutcomeApplication.FailedFixable](failedFixable)
+          case _ => Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
       ):
         implicit request =>
-          val failedFixable: RiskingProgress.FailedFixable = request.get
+          val failedFixable: RiskingOutcomeApplication.FailedFixable = request.get
           Ok(saveForLaterPage(
             correctiveActionExpiryDate = displayDateForLang(failedFixable.correctiveActionExpiryDate)
           ))
