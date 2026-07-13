@@ -837,6 +837,7 @@ dateOfBirth.error.month.required = Your date of birth must include a month
 dateOfBirth.error.year.required = Your date of birth must include a year
 dateOfBirth.error.invalid = Your date of birth must be a real date
 dateOfBirth.error.future = Your date of birth must be in the past
+dateOfBirth.error.past = Your date of birth must be after 01 January 1901
 
 # Confirm match to individual provided details record
 confirmMatchToIndividualProvidedDetails.title = Confirm your details

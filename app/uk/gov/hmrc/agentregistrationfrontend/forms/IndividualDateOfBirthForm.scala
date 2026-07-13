@@ -36,6 +36,7 @@ object IndividualDateOfBirthForm:
     mapping(
       key -> Mappings.localDate(key)
         .verifying(s"$key.error.future", date => date.isBefore(LocalDate.now(clock)))
+        .verifying(s"$key.error.past", date => date.isAfter(LocalDate.of(1901, 1, 1)))
     )(date => IndividualDateOfBirth.Provided(date).toUserProvidedDateOfBirth)(
       {
         case IndividualDateOfBirth.Provided(date) => Some(date)
