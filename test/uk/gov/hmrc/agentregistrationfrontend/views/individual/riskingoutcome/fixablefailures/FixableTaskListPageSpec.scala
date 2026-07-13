@@ -81,7 +81,12 @@ extends ViewSpec:
           |Incomplete
           |Confirm your responses are final
           |Cannot start yet
+          |Save and come back later
         """.stripMargin
 
     s"have the correct h1" in:
       doc.h1 shouldBe "Take action: You have not met the registration conditions"
+
+    s"have a save for later button link" in:
+      doc.select("a.govuk-button--secondary")
+        .attr("href") shouldBe s"${AppRoutes.providedetails.riskingoutcome.fixablefailures.SaveForLaterController.show(tdAll.linkId).url}"

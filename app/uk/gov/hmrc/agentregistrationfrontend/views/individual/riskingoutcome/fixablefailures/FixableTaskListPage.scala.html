@@ -90,4 +90,11 @@
         ))
     }
 
+    <p class="govuk-body">
+    @govukButton(Button(
+      href = Some(AppRoutes.providedetails.riskingoutcome.fixablefailures.SaveForLaterController.show(linkId).url),
+      content = Text(messages("common.saveAndComeBackLater")),
+      classes = "govuk-button--secondary"
+    ))
+    </p>
 }
