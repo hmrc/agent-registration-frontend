@@ -20,6 +20,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
 
 class SaveForLaterControllerSpec
 extends ControllerSpec:
@@ -30,6 +31,9 @@ extends ControllerSpec:
     )
 
   private val path = "/agent-registration/conditions-not-yet-met/save-and-come-back-later"
+  private val correctiveActionExpiryDate: String = DisplayDate.displayDateForLang(
+    Some(tdAll.riskingOutcomeApplication.failedFixable.correctiveActionExpiryDate)
+  )
 
   object agentApplication:
 
@@ -60,7 +64,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Your progress will be saved until 27 August 2026 - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe s"Your progress will be saved until $correctiveActionExpiryDate - Apply for an agent services account - GOV.UK"
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
   s"GET $path when application outcome is not failed fixable should redirect to the application status page" in:
