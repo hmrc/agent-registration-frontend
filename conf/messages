@@ -684,7 +684,7 @@ saveForLater.title = Your progress will be saved until {0}
 saveForLater.h2 = What you need to do next
 saveForLater.p1 = You need to come back and complete this application by {0}.
 saveForLater.p2 = To come back to this application:
-saveForLater.li1 = Go to <a class="govuk-link" href="{0}" rel="noreferrer noopener">Apply for an agent services account (opens in a new tab)</a>.
+saveForLater.li1 = Go to <a class="govuk-link" href="{0}" rel="noreferrer noopener" target="_blank">Apply for an agent services account (opens in a new tab)</a>.
 saveForLater.li2 = In the section <strong>How long this process takes</strong> select the link ‘Check the progress of an existing application’.
 saveForLater.li3 = Sign in with the agent details you used when you made this application.
 saveForLater.continueLink = Continue with the application
