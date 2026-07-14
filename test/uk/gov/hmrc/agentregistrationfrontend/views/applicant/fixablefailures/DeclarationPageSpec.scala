@@ -27,7 +27,8 @@ extends ViewSpec:
   val viewTemplate: DeclarationPage = app.injector.instanceOf[DeclarationPage]
   val doc: Document = Jsoup.parse(
     viewTemplate(
-      entityName = "Test Company Name"
+      entityName = "Test Company Name",
+      isSoleTraderOwner = false
     ).body
   )
 

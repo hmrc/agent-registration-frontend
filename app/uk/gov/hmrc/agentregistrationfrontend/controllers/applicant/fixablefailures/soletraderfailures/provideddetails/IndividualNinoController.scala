@@ -14,54 +14,64 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.controllers.individual.riskingoutcome.fixablefailures.provideddetails
+package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.soletraderfailures.provideddetails
 
-import com.google.inject.Inject
-import com.google.inject.Singleton
 import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedNino
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix._10.IndividualDetailsFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
-import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingoutcome.fixablefailures.provideddetails.CheckYourAnswersPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.soletraderfailures.provideddetails.IndividualNinoPage
+
+import javax.inject.Inject
+import javax.inject.Singleton
 
 @Singleton
-class CheckYourAnswersController @Inject() (
+class IndividualNinoController @Inject() (
+  actions: ApplicantActions,
   mcc: MessagesControllerComponents,
-  actions: IndividualActions,
-  view: CheckYourAnswersPage,
+  view: IndividualNinoPage,
   individualProvideDetailsService: IndividualProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
-  private def baseAction(
-    linkId: LinkId
-  ): ActionBuilderWithData[DataWithIndividualDetailsFix] = authorisedWithFixableDetails(linkId)
+  def show: Action[AnyContent] = actions.getSoleTraderIdentityFix:
+    implicit request =>
+      Ok(view(
+        form = IndividualNinoForm.form
+          .fill:
+            request
+              .get[IndividualDetailsFix]
+              .nino
+      ))
 
-  def show(linkId: LinkId): Action[AnyContent] =
-    baseAction(linkId):
-      implicit request =>
-        Ok(view(
-          individualName = request.get[IndividualProvidedDetails].individualName,
-          individualProvidedDetails = request.get[IndividualDetailsFix],
-          linkId = linkId
-        ))
-
-  def submit(linkId: LinkId): Action[AnyContent] = baseAction(linkId)
+  def submit: Action[AnyContent] = actions.getSoleTraderIdentityFix
+    .ensureValidForm[UserProvidedNino](
+      IndividualNinoForm.form,
+      implicit r => view(_)
+    )
     .async:
       implicit request =>
-        val fixableIndividual: RiskingOutcomeIndividual.FailedFixable = request.get
+        val validFormData: UserProvidedNino = request.get
+        val individualProvidedDetails: IndividualProvidedDetails = request.get
+        val fixableIndividual: RiskingOutcomeIndividual.FailedFixable =
+          individualProvidedDetails.riskingOutcomeIndividual match
+            case Some(fixable: RiskingOutcomeIndividual.FailedFixable) => fixable
+            case _ =>
+              throw new IllegalStateException(
+                s"Expected a fixable risking outcome individual for Sole Trader with person ref ${individualProvidedDetails.personReference.value} but got ${individualProvidedDetails.riskingOutcomeIndividual}"
+              )
         val updatedIndividualDetailsFix: IndividualDetailsFix = request.get[IndividualDetailsFix]
-          .modify(_.isConfirmed)
-          .setTo(Some(true))
+          .modify(_.nino)
+          .setTo(Some(validFormData))
         val updatedFixes: Seq[IndividualFix] = fixableIndividual.fixes
           .map:
             case _: IndividualDetailsFix => updatedIndividualDetailsFix
@@ -76,4 +86,4 @@ extends FrontendController(mcc, actions):
               .setTo(Some(updatedRiskingOutcomeIndividual))
           )
           .map: _ =>
-            Redirect(AppRoutes.providedetails.riskingoutcome.fixablefailures.FixableTaskListController.show(linkId).url)
+            Redirect(AppRoutes.fixablefailures.soletraderfailures.provideddetails.CheckYourAnswersController.show.url)
