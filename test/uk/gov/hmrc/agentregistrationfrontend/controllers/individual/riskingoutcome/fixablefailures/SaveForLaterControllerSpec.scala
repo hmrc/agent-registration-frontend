@@ -21,6 +21,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ProvideDetailsStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
 
 class SaveForLaterControllerSpec
 extends ControllerSpec:
@@ -31,6 +32,9 @@ extends ControllerSpec:
     )
 
   private val path = s"/agent-registration/provide-details/conditions-not-yet-met/save-and-come-back-later/${tdAll.linkId.value}"
+  private val correctiveActionExpiryDate: String = DisplayDate.displayDateForLang(
+    Some(tdAll.riskingOutcomeApplication.failedFixable.correctiveActionExpiryDate)
+  )
 
   object riskingOutcomeIndividual:
     val failingFixableAllCodes: RiskingOutcomeIndividual.FailedFixable =
@@ -70,7 +74,7 @@ extends ControllerSpec:
 
     response.status shouldBe Status.OK
     val doc = response.parseBodyAsJsoupDocument
-    doc.title() shouldBe "Your progress will be saved until 27 August 2026 - Apply for an agent services account - GOV.UK"
+    doc.title() shouldBe s"Your progress will be saved until $correctiveActionExpiryDate - Apply for an agent services account - GOV.UK"
     ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails(withBpr = true)
 
   s"GET $path when application outcome is not failed fixable should redirect to the risking outcome page" in:
