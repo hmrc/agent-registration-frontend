@@ -26,7 +26,6 @@
 )
 
 @(
-        entityName: String,
         failureCode: String,
         correctiveActionExpiryDate: String,
         form: Form[Boolean])(implicit
@@ -34,20 +33,22 @@
         messages: Messages
 )
 
-@key = @{"fixableEntityDetails"}
-@pageTitle = @{messages(s"$key.$failureCode.heading", entityName)}
+@key = @{
+  if(failureCode.startsWith("IndividualFix")) "fixableIndividualDetails" else "fixableSoleTraderDetails"
+}
+@pageTitle = @{messages(s"$key.$failureCode.heading")}
 @layout(pageTitle = pageTitle, maybeForm = Some(form)) {
-  <h2 class="govuk-caption-l">@messages(s"$key.title")</h2>
+  <h2 class="govuk-caption-l">@messages("fixableSoleTraderDetails.title")</h2>
   <h1 class="govuk-heading-l">@pageTitle</h1>
-  <p class="govuk-body">@messages(s"$key.$failureCode.p1", entityName)</p>
-  <p class="govuk-body">@messages(s"$key.$failureCode.p2", entityName)</p>
+  <p class="govuk-body">@messages(s"$key.$failureCode.p1")</p>
+  <p class="govuk-body">@messages(s"fixableSoleTraderDetails.$failureCode.p2")</p>
   <h2 class="govuk-heading-m">@messages(s"$key.$failureCode.action.h2")</h2>
-  <p class="govuk-body">@messages(s"$key.$failureCode.action.p1", entityName)</p>
+  <p class="govuk-body">@messages(s"$key.$failureCode.action.p1")</p>
   <p class="govuk-body">@Html(messages(s"$key.$failureCode.action.p2", correctiveActionExpiryDate))</p>
   <p class="govuk-body">@messages(s"$key.$failureCode.action.p3")</p>
   <p class="govuk-body">@Html(messages(s"$key.$failureCode.action.p4"))</p>
 
-  @formWithCSRF(AppRoutes.fixablefailures.entityfailures.FixableEntityFailuresController.submit(failureCode)) {
+  @formWithCSRF(AppRoutes.fixablefailures.soletraderfailures.FixableSoleTraderFailureController.submit(failureCode)) {
     @govukRadios(
       Radios(
         fieldset = Some(

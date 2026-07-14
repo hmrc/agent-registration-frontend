@@ -47,6 +47,8 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailur
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.amlsfailure.routes as fixableAmlsRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.entityfailures.routes as fixableEntityFailuresRoutes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.individualfailures.routes as fixableIndividualsRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.soletraderfailures.routes as fixableSoleTraderFailuresRoutes
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.soletraderfailures.provideddetails.routes as fixableSoleTraderProvidedDetailsRoutes
 
 /** All application routes centralized in one place for convenience and clarity. It helps avoid naming conflicts and makes route management easier.
   *
@@ -192,6 +194,18 @@ object AppRoutes:
 
     object individualfailures:
       val FixableIndividualsController = fixableIndividualsRoutes.FixableIndividualsController
+
+    object soletraderfailures:
+
+      val FixableSoleTraderFailureController = fixableSoleTraderFailuresRoutes.FixableSoleTraderFailureController
+      val FixIndividualProvidedDetailsController = fixableSoleTraderFailuresRoutes.FixIndividualProvidedDetailsController
+
+      object provideddetails:
+
+        val CheckYourAnswersController = fixableSoleTraderProvidedDetailsRoutes.CheckYourAnswersController
+        val IndividualDateOfBirthController = fixableSoleTraderProvidedDetailsRoutes.IndividualDateOfBirthController
+        val IndividualNinoController = fixableSoleTraderProvidedDetailsRoutes.IndividualNinoController
+        val IndividualSaUtrController = fixableSoleTraderProvidedDetailsRoutes.IndividualSaUtrController
 
   object providedetails:
 

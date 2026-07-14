@@ -30,12 +30,22 @@ extends ViewSpec:
     viewTemplate(
       actualDecisionDate = "4 June 2026",
       correctiveActionExpiryDate = "3 August 2026",
-      entityName = "Test Company Name"
+      entityName = "Test Company Name",
+      isSoleTrader = false
     ).body
   )
 
-  "FailedNonFixablePage when individuals have failures" should:
-    "have expected content" in:
+  val soleTraderDoc: Document = Jsoup.parse(
+    viewTemplate(
+      actualDecisionDate = "4 June 2026",
+      correctiveActionExpiryDate = "3 August 2026",
+      entityName = "Test Company Name",
+      isSoleTrader = true
+    ).body
+  )
+
+  "FailedNonFixablePage when not a sole trader" should:
+    "have expected content when not a sole trader" in:
       doc.mainContent shouldContainContent
         s"""
            |Application outcome
@@ -59,11 +69,39 @@ extends ViewSpec:
            |"""
           .stripMargin
 
-    "have the correct title" in:
-      doc.title() shouldBe "Test Company Name does not meet the registration conditions yet - Apply for an agent services account - GOV.UK"
+    "have expected content when a sole trader owner" in:
+      soleTraderDoc.mainContent shouldContainContent
+        s"""
+           |Application outcome
+           |You do not meet the registration conditions yet
+           |Date of decision: 4 June 2026
+           |Our decision
+           |Your application to register for an agent services account cannot currently be approved.
+           |The application is refused under Section 230 (registration conditions) of the Finance Act 2026 (opens in a new tab).
+           |However, you can still meet the registration conditions if you take action by 3 August 2026.
+           |How to meet the registration conditions
+           |The actions to take are listed on the next page.
+           |View actions to take
+           |Failure to meet the registration conditions
+           |If you choose not to take action to meet the registration conditions:
+           |You will not be given an agent services account on this occasion
+           |the application will be deleted on 3 August 2026 to comply with our data retention policy
+           |Your right to review or appeal
+           |Keep a copy of this decision for your records.
+           |If you disagree with our decision to refuse your application, you can request a review or appeal the decision (opens in a new tab).
+           |You can ask for a review of our decision or begin the appeal process even if you decide to take the actions we need.
+           |"""
+          .stripMargin
 
-    "have the correct h1" in:
+    "have the correct title when not a sole trader" in:
+      doc.title() shouldBe "Test Company Name does not meet the registration conditions yet - Apply for an agent services account - GOV.UK"
+    "have the correct title when a sole trader owner" in:
+      soleTraderDoc.title() shouldBe "You do not meet the registration conditions yet - Apply for an agent services account - GOV.UK"
+
+    "have the correct h1 when not a sole trader" in:
       doc.h1 shouldBe "Test Company Name does not meet the registration conditions yet"
+    "have the correct h1 when a sole trader owner" in:
+      soleTraderDoc.h1 shouldBe "You do not meet the registration conditions yet"
 
     "should contain a link to the appeals guidance" in:
       val appealsLink: TestLink =

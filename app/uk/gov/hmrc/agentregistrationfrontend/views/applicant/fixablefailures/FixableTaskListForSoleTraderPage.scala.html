@@ -17,7 +17,7 @@
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistrationfrontend.model.TaskStatus
 @import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
-@import uk.gov.hmrc.agentregistrationfrontend.model.FixableTaskListStatus
+@import uk.gov.hmrc.agentregistrationfrontend.model.FixableSoleTraderTaskListStatus
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
@@ -35,7 +35,7 @@
 )
 
 @(
-        taskListStatus: FixableTaskListStatus,
+        taskListStatus: FixableSoleTraderTaskListStatus,
         entityName: String,
         correctiveActionExpiryDate: String
 )(implicit
@@ -44,7 +44,8 @@
 )
 
 @key = @{"fixableTaskList"}
-@title = @{messages(s"$key.title", entityName)}
+@messagesSuffix = @{".SoleTrader"}
+@title = @{messages(s"$key.title$messagesSuffix", entityName)}
 @incomplete = @{
     TaskListItemStatus(
         tag = Some(Tag(
@@ -58,12 +59,6 @@
 }
 @cannotStart = @{
     TaskListItemStatus(content = Text(messages("taskList.status.CannotStartYet")))
-}
-
-@listTrackingStatus = @{
-    if(taskListStatus.individualFailures.exists(_.isComplete)) complete
-    else if(taskListStatus.individualFailures.exists(_.canStart)) incomplete
-    else cannotStart
 }
 
 @layout(
@@ -93,39 +88,27 @@
         ))
     }
 
-  @if(taskListStatus.entityFailures.nonEmpty) {
-    <h2 class="govuk-heading-m">@messages(s"$key.entityFailures.heading")</h2>
+
+    <h2 class="govuk-heading-m">@messages(s"$key.entityFailures.heading.SoleTrader")</h2>
     @govukTaskList(TaskList(
-      items = taskListStatus.entityFailures.toSeq
-      .sortBy(_._1) // stable ordering by key
+      items = (taskListStatus.entityFixes.toSeq ++ taskListStatus.individualFixes.toSeq)
+      .groupBy { case (k, _) => k.split("\\.", 2)(1) }
+      .map { case (_, seq) => seq.find(_._1.startsWith("IndividualFix")).getOrElse(seq.head) }
       .map { case (k, v) =>
         TaskListItem(
           title = TaskListItemTitle(
-            content = Text(messages(s"$key.$k.linkText"))
+            content = Text(messages(s"fixableIndividualTaskList.IndividualFix.${k.split("\\.").drop(1).mkString(".")}.linkText")) // always use individual texts for sole traders
           ),
           status = if (v.isComplete) complete else incomplete,
-          href = Some(AppRoutes.fixablefailures.entityfailures.FixableEntityFailuresController.show(k).url)
+          href = Some(
+            if k.startsWith("IndividualFix.10") then
+              AppRoutes.fixablefailures.soletraderfailures.FixIndividualProvidedDetailsController.show.url
+            else
+              AppRoutes.fixablefailures.soletraderfailures.FixableSoleTraderFailureController.show(k).url)
         )
-      },
+      }.toSeq,
       idPrefix = "entityFailures"
     ))
-  }
-
-   @if(taskListStatus.individualFailures.isDefined) {
-     <h2 class="govuk-heading-m">@messages(s"$key.IndividualsHaveFailures.heading")</h2>
-     @govukTaskList(TaskList(
-       items = Seq(
-         TaskListItem(
-           title = TaskListItemTitle(
-               content = Text(messages(s"$key.IndividualsHaveFailures.linkText"))
-           ),
-           status = listTrackingStatus,
-           href = if(taskListStatus.individualFailures.exists(_.canStart)) Some(AppRoutes.fixablefailures.individualfailures.FixableIndividualsController.show.url) else None
-         )
-       ),
-       idPrefix = "individualFailures"
-     ))
-   }
 
     <h2 class="govuk-heading-m">@messages(s"$key.declaration.heading")</h2>
     @govukTaskList(TaskList(
