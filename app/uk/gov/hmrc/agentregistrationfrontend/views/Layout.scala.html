@@ -56,7 +56,10 @@
         )
     }
     @autocompleteCss()
-    <style @{CSPNonce.attr}>.govuk-phase-banner__content__tag { display: none!important; }</style>
+    <style @{CSPNonce.attr}>
+      .govuk-phase-banner__content__tag,
+      .not-supported { display: none!important; }
+    </style>
     @templateStyles.getOrElse(Html(""))
 }
 @additionalScripts = {
