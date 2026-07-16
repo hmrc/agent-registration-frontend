@@ -27,16 +27,18 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentReg
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CitizenDetailsStub
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
+import uk.gov.hmrc.auth.core.ConfidenceLevel
 
 object ProvideDetailsStubHelper:
 
   def stubAuthAndFindApplicationAndProvidedDetails(
     agentApplication: AgentApplication,
     individualProvideDetails: IndividualProvidedDetails,
-    isScr: Boolean = false
+    isScr: Boolean = false,
+    cl: ConfidenceLevel = ConfidenceLevel.L250
   ): StubMapping =
     if isScr then IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
-    else IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
+    else IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr(cl)
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(List(individualProvideDetails), agentApplication.agentApplicationId)
     AgentRegistrationStubs.stubFindApplicationByLinkId(tdAll.linkId, agentApplication)
 
@@ -56,12 +58,14 @@ object ProvideDetailsStubHelper:
   def stubAuthAndMatchIndividualProvidedDetails(
     agentApplication: AgentApplication,
     individualProvidedDetails: IndividualProvidedDetails,
-    isScr: Boolean = false
+    isScr: Boolean = false,
+    cl: ConfidenceLevel = ConfidenceLevel.L250
   ): StubMapping =
     stubAuthAndFindApplicationAndProvidedDetails(
       agentApplication,
       individualProvidedDetails,
-      isScr
+      isScr,
+      cl
     )
     CitizenDetailsStub.stubFindSaUtrAndDateOfBirth(
       nino = tdAll.nino,

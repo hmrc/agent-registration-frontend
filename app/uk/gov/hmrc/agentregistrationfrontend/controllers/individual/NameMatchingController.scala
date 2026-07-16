@@ -75,7 +75,7 @@ extends FrontendController(mcc, actions):
     .refine:
       implicit request =>
         (request.get[ConfidenceLevel], request.get[Option[Nino]]) match
-          case (ConfidenceLevel.L250, Some(nino)) =>
+          case (cl, Some(nino)) if cl >= ConfidenceLevel.L250 =>
             citizenDetailsConnector
               .getCitizenDetails(nino)
               .map[RequestWithData[DataWithIndividualProvidedDetailsForSearch]]: details =>
@@ -108,15 +108,14 @@ extends FrontendController(mcc, actions):
             applicantName = applicantName
           ))),
         matchedIndividual =>
-          if
-          matchedIndividual.internalUserId.exists(_ === request.get[InternalUserId]) // we already matched before so don't upsert again
+          if matchedIndividual.internalUserId.exists(_ === request.get[InternalUserId]) // we already matched before so don't upsert again
           then
             Future.successful(Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url))
           else
             individualProvideDetailsService
               .claimIndividualProvidedDetails(
                 individualProvidedDetails = matchedIndividual
-                  .copy(passedIv = Some(request.get[ConfidenceLevel] === ConfidenceLevel.L250)),
+                  .copy(passedIv = Some(request.get[ConfidenceLevel] >= ConfidenceLevel.L250)),
                 internalUserId = request.get[InternalUserId],
                 maybeNino = request.get[Option[Nino]],
                 citizenDetails = request.get[Option[CitizenDetails]]
