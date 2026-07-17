@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
+import uk.gov.hmrc.auth.core.ConfidenceLevel
 
 object IndividualAuthStubs {
 
@@ -61,6 +62,7 @@ object IndividualAuthStubs {
   )
 
   def stubAuthoriseWithNinoAndSaUtr(
+    confidenceLevel: ConfidenceLevel = ConfidenceLevel.L250,
     responseBody: String = responseBodyAsIndividualWithNinoAndSaUtr()
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,

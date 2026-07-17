@@ -100,7 +100,7 @@ extends FrontendController(mcc, actions):
     )
     .refine(implicit request =>
       (request.get[ConfidenceLevel], request.get[Option[Nino]]) match
-        case (ConfidenceLevel.L250, Some(nino)) =>
+        case (cl, Some(nino)) if cl >= ConfidenceLevel.L250 =>
           citizenDetailsConnector
             .getCitizenDetails(nino)
             .map[RequestWithData[DataWithOptionalCitizenDetails]]: (details: CitizenDetails) =>
@@ -199,7 +199,7 @@ extends FrontendController(mcc, actions):
             .claimIndividualProvidedDetails(
               individualProvidedDetails = request.get[IndividualProvidedDetails]
                 .copy(
-                  passedIv = Some(request.get[ConfidenceLevel] === ConfidenceLevel.L250)
+                  passedIv = Some(request.get[ConfidenceLevel] >= ConfidenceLevel.L250)
                 ),
               internalUserId = request.get[InternalUserId],
               maybeNino = request.get[Option[Nino]],
