@@ -27,7 +27,8 @@ object CompaniesHouseStubs {
   def stubSixOfficers(
     officerRole: CompaniesHouseOfficerRole = CompaniesHouseOfficerRole.LlpMember,
     surname: Option[String] = None,
-    noMatch: Boolean = false
+    noMatch: Boolean = false,
+    withTitles: Boolean = false
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
     urlPattern =
@@ -41,8 +42,13 @@ object CompaniesHouseStubs {
     responseBody =
       surname match
         case Some(s) if noMatch => ""
-        case Some(s) => responseBodyForSurnameSearch(s, officerRole)
-        case None => responseBodyForListingOfficers(officerRole)
+        case Some(s) =>
+          responseBodyForSurnameSearch(
+            s,
+            officerRole,
+            withTitles
+          )
+        case None => responseBodyForListingOfficers(officerRole, withTitles)
   )
 
   def verifySixOfficersCalls(
@@ -155,7 +161,11 @@ object CompaniesHouseStubs {
     count = count
   )
 
-  private def responseBodyForListingOfficers(officerRole: CompaniesHouseOfficerRole) =
+  private def responseBodyForListingOfficers(
+    officerRole: CompaniesHouseOfficerRole,
+    withTitles: Boolean = false
+  ) =
+    val title = if withTitles then ", Mr." else ""
     Json.obj(
       "total_results" -> 6,
       "items_per_page" -> 35,
@@ -169,32 +179,32 @@ object CompaniesHouseStubs {
       ),
       "items" -> Json.arr(
         Json.obj(
-          "name" -> "Tester, John",
+          "name" -> s"Tester, John$title",
           "date_of_birth" -> Json.obj("month" -> 8, "year" -> 1967),
           "officer_role" -> officerRole.role
         ),
         Json.obj(
-          "name" -> "Tester, John Ian",
+          "name" -> s"Tester, John Ian$title",
           "date_of_birth" -> Json.obj("month" -> 4, "year" -> 1948),
           "officer_role" -> officerRole.role
         ),
         Json.obj(
-          "name" -> "Tester, Alice",
+          "name" -> s"Tester, Alice$title",
           "date_of_birth" -> Json.obj("month" -> 1, "year" -> 1975),
           "officer_role" -> officerRole.role
         ),
         Json.obj(
-          "name" -> "Tester, Bob",
+          "name" -> s"Tester, Bob$title",
           "date_of_birth" -> Json.obj("month" -> 12, "year" -> 1982),
           "officer_role" -> officerRole.role
         ),
         Json.obj(
-          "name" -> "Tester, Carol",
+          "name" -> s"Tester, Carol$title",
           "date_of_birth" -> Json.obj("month" -> 6, "year" -> 1991),
           "officer_role" -> officerRole.role
         ),
         Json.obj(
-          "name" -> "Tester, Carol",
+          "name" -> s"Tester, Carol$title",
           "date_of_birth" -> Json.obj("month" -> 6, "year" -> 1991),
           "officer_role" -> officerRole.role
         ),
@@ -216,8 +226,10 @@ object CompaniesHouseStubs {
 
   private def responseBodyForSurnameSearch(
     surname: String,
-    officerRole: CompaniesHouseOfficerRole
-  ) =
+    officerRole: CompaniesHouseOfficerRole,
+    withTitles: Boolean = false
+  ) = {
+    val title = if withTitles then ", Mr." else ""
     Json.obj(
       "total_results" -> 6,
       "items_per_page" -> 35,
@@ -231,36 +243,37 @@ object CompaniesHouseStubs {
       ),
       "items" -> Json.arr(
         Json.obj(
-          "name" -> s"$surname, John",
+          "name" -> s"$surname, John$title",
           "date_of_birth" -> Json.obj("month" -> 8, "year" -> 1967),
           "officer_role" -> officerRole.role
         ),
         Json.obj(
-          "name" -> s"$surname, John Ian",
+          "name" -> s"$surname, John Ian$title",
           "date_of_birth" -> Json.obj("month" -> 4, "year" -> 1948),
           "officer_role" -> officerRole.role
         ),
         Json.obj(
-          "name" -> s"$surname, Alice",
+          "name" -> s"$surname, Alice$title",
           "date_of_birth" -> Json.obj("month" -> 1, "year" -> 1975),
           "officer_role" -> officerRole.role
         ),
         Json.obj(
-          "name" -> s"$surname, Bob",
+          "name" -> s"$surname, Bob$title",
           "date_of_birth" -> Json.obj("month" -> 12, "year" -> 1982),
           "officer_role" -> officerRole.role
         ),
         Json.obj(
-          "name" -> s"$surname, Carol",
+          "name" -> s"$surname, Carol$title",
           "date_of_birth" -> Json.obj("month" -> 6, "year" -> 1991),
           "officer_role" -> officerRole.role
         ),
         Json.obj(
-          "name" -> s"$surname, Carol",
+          "name" -> s"$surname, Carol$title",
           "date_of_birth" -> Json.obj("month" -> 6, "year" -> 1991),
           "officer_role" -> officerRole.role
         )
       )
     ).toString
+  }
 
 }
