@@ -22,6 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmMatchToIndividualProvidedDetailsForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
+import uk.gov.hmrc.auth.core.ConfidenceLevel
 
 class MatchIndividualProvidedDetailsControllerSpec
 extends ControllerSpec:
@@ -64,6 +65,17 @@ extends ControllerSpec:
     ProvideDetailsStubHelper.stubAuthAndMatchIndividualProvidedDetails(
       agentApplication,
       individualProvideDetails.unclaimed
+    )
+    val response: WSResponse = get(path)
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe "Confirm your details - Apply for an agent services account - GOV.UK"
+    ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
+
+  s"GET $path should return 200 and render page for a One Login cred (CL600)" in:
+    ProvideDetailsStubHelper.stubAuthAndMatchIndividualProvidedDetails(
+      agentApplication,
+      individualProvideDetails.unclaimed,
+      cl = ConfidenceLevel.L600
     )
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
