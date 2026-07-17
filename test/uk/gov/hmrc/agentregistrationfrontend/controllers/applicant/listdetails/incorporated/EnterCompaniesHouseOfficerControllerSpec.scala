@@ -286,6 +286,30 @@ extends ControllerSpec:
     AgentRegistrationStubs.verifyUpsertIndividualProvidedDetails()
     CompaniesHouseStubs.verifySixOfficersCalls(surname = Some("Tester"))
 
+  s"POST $postPath with valid name matching a Companies House officer (who has a title) should save and redirect" in:
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
+      individuals = List.empty
+    )
+    AgentRegistrationStubs.stubFindIndividualByPersonReferenceNoContent(tdAll.personReference)
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
+      individualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("John Tester"))
+    )
+    CompaniesHouseStubs.stubSixOfficers(surname = Some("Tester"), withTitles = true)
+
+    val response: WSResponse =
+      post(postPath)(Map(
+        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("John"),
+        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("Tester")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
+    AgentRegistrationStubs.verifyUpsertIndividualProvidedDetails()
+    CompaniesHouseStubs.verifySixOfficersCalls(surname = Some("Tester"))
+
   s"POST $postPath with name not matching any Companies House officer should return 400" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
     AgentRegistrationStubs.stubFindIndividualsForApplication(

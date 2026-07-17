@@ -95,7 +95,7 @@ object ProvideDetailsStubHelper:
       agentApplication,
       individualProvidedDetails,
       isScr,
-      cl
+      cl = cl
     )
     CitizenDetailsStub.stubFindSaUtrAndDateOfBirth(
       nino = tdAll.nino,
