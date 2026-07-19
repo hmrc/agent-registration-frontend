@@ -120,6 +120,13 @@
             </div>
         }
         <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Risking data</dt>
+            <dd class="govuk-summary-list__value">
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showApplicationForRisking(agentApplication.applicationReference)">Application-for-risking (JSON)</a> <br>
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showCompletedRisking(agentApplication.applicationReference)">Completed risking (JSON)</a>
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Internal user id</dt>
             <dd class="govuk-summary-list__value">
                 <span>@agentApplication.internalUserId.value</span>
@@ -155,7 +162,7 @@
                 @individuals.map { individual =>
 
                     <li class="govuk-!-margin-bottom-4">
-                        @individualTile(individual)
+                        @individualTile(individual, agentApplication.applicationReference)
                     </li>
                 }
                 </ul>

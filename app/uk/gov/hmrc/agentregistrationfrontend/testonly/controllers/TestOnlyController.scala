@@ -21,6 +21,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.DefaultActionBuilder
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendControllerBase
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
@@ -118,3 +119,21 @@ extends FrontendControllerBase(mcc):
   def viewNextRiskingFileContents: Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
       testRiskingService.viewNextRiskingFileContents().map(Ok(_))
+
+  def showApplicationForRisking(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.findApplicationForRisking(applicationReference).map:
+        case Some(json) => Ok(Json.prettyPrint(json))
+        case None => Ok(s"No application-for-risking found for applicationReference: ${applicationReference.value}")
+
+  def showIndividualsForRisking(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.findIndividualsForRisking(applicationReference).map:
+        case Some(json) => Ok(Json.prettyPrint(json))
+        case None => Ok(s"No individuals-for-risking found for applicationReference: ${applicationReference.value}")
+
+  def showCompletedRisking(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.findCompletedRisking(applicationReference).map:
+        case Some(json) => Ok(Json.prettyPrint(json))
+        case None => Ok(s"No completed risking found for applicationReference: ${applicationReference.value}")

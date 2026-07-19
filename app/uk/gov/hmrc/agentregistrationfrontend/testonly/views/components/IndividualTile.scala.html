@@ -16,6 +16,7 @@
 
 @import play.api.i18n.Messages
 @import play.twirl.api.Html
+@import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
@@ -27,7 +28,8 @@
 )
 
 @(
-        individual: IndividualProvidedDetails)(implicit
+        individual: IndividualProvidedDetails,
+        applicationReference: ApplicationReference)(implicit
         requestHeader: RequestHeader
 )
 
@@ -54,6 +56,13 @@
         UserId.make(individual.individualProvidedDetailsId), PlanetId.make(individual.agentApplicationId), individual.individualName.value, requestHeader.uri
     )"
     >login</a>
+}
+
+@individualsForRiskingLink = {
+    <a
+    class="govuk-link"
+    href="@AppRoutes.testOnly.TestOnlyController.showIndividualsForRisking(applicationReference)"
+    >Individuals-for-risking (JSON)</a>
 }
 
 @rows = @{
@@ -86,6 +95,10 @@
         Some(SummaryListRow(
             key = Key(content = Text("Login")),
             value = Value(content = HtmlContent(loginLink))
+        )),
+        Some(SummaryListRow(
+            key = Key(content = Text("Risking data")),
+            value = Value(content = HtmlContent(individualsForRiskingLink))
         ))
     ).flatten
 }

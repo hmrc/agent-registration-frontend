@@ -16,7 +16,9 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
+import play.api.libs.json.JsValue
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestRiskingConnector
 
 import javax.inject.Inject
@@ -33,3 +35,12 @@ class TestRiskingService @Inject() (
   def runRisking()(using RequestHeader): Future[Unit] = testRiskingConnector.runRisking()
 
   def viewNextRiskingFileContents()(using RequestHeader): Future[String] = testRiskingConnector.viewNextRiskingFileContents()
+
+  def findApplicationForRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =
+    testRiskingConnector.findApplicationForRisking(applicationReference)
+
+  def findIndividualsForRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =
+    testRiskingConnector.findIndividualsForRisking(applicationReference)
+
+  def findCompletedRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =
+    testRiskingConnector.findCompletedRisking(applicationReference)

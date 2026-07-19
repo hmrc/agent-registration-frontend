@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.testonly.connectors
 
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -51,14 +52,15 @@ extends Connector:
             )
       .andLogOnFailure("Failed to delete all risking Agent Applications")
 
-  def findApplicationForRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[JsValue] =
+  def findApplicationForRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =
     val url: URL = url"$baseUrl/application-for-risking/${applicationReference.value}"
     httpClient
       .get(url)
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case status if is2xx(status) => response.json
+          case status if status === Status.OK => Some(response.json)
+          case status if status === Status.NO_CONTENT => None
           case status =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "GET",
@@ -68,14 +70,15 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to find application for risking for applicationReference: ${applicationReference.value}")
 
-  def findIndividualsForRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[JsValue] =
+  def findIndividualsForRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =
     val url: URL = url"$baseUrl/individuals-for-risking/${applicationReference.value}"
     httpClient
       .get(url)
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case status if is2xx(status) => response.json
+          case status if status === Status.OK => Some(response.json)
+          case status if status === Status.NO_CONTENT => None
           case status =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "GET",
@@ -85,14 +88,15 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to find individuals for risking for applicationReference: ${applicationReference.value}")
 
-  def findCompletedRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[JsValue] =
+  def findCompletedRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =
     val url: URL = url"$baseUrl/completed-risking/${applicationReference.value}"
     httpClient
       .get(url)
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case status if is2xx(status) => response.json
+          case status if status === Status.OK => Some(response.json)
+          case status if status === Status.NO_CONTENT => None
           case status =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "GET",
