@@ -30,6 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationSe
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyHubPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ResetDatabaseConfirmationPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.RunRiskingConfirmationPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -41,6 +42,7 @@ class TestOnlyController @Inject() (
   defaultActionBuilder: DefaultActionBuilder,
   testOnlyHubPage: TestOnlyHubPage,
   resetDatabaseConfirmationPage: ResetDatabaseConfirmationPage,
+  runRiskingConfirmationPage: RunRiskingConfirmationPage,
   stubUserService: StubUserService,
   testApplicationService: TestApplicationService,
   testRiskingService: TestRiskingService,
@@ -107,3 +109,8 @@ extends FrontendControllerBase(mcc):
         yield Redirect(AppRoutes.testOnly.TestOnlyController.showTestOnlyHub)
       else
         Future.successful(Unauthorized("Reset operation not allowed"))
+
+  def runRisking: Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.runRisking().map: _ =>
+        Ok(runRiskingConfirmationPage())

@@ -1,0 +1,51 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyLayout
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.KibanaLinks
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+
+@this(
+        layout: TestOnlyLayout,
+        hmrcNewTabLinkHelper: HmrcNewTabLinkHelper
+)
+
+@()(implicit
+        request: RequestHeader,
+        messages: Messages
+)
+
+@layout(
+    pageTitle = "Risking scheduled",
+    suppressBackLink = true
+) {
+    <h1 class="govuk-heading-xl">Risking scheduled</h1>
+
+    <p class="govuk-body">
+        A risking run has been triggered on agent-registration-risking. It will process asynchronously in the background.
+    </p>
+
+    <h2 class="govuk-heading-m">Inspect the logs</h2>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>@hmrcNewTabLinkHelper(NewTabLinkHelper(text = "Kibana logs (QA)", href = Some(KibanaLinks.riskingLogsQa)))</li>
+        <li>@hmrcNewTabLinkHelper(NewTabLinkHelper(text = "Kibana logs (Staging)", href = Some(KibanaLinks.riskingLogsStaging)))</li>
+    </ul>
+
+    <p class="govuk-body">
+        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showTestOnlyHub">Back to Test Only Hub</a>
+    </p>
+}

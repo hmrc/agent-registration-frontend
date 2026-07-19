@@ -49,3 +49,5 @@ GET         /agent-registration/test-only/find-or-create-and-log-in-individual/:
 
 GET         /agent-registration/test-only/reset-confirm                                                                     uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.showResetDatabaseConfirmation
 POST        /agent-registration/test-only/reset                                                                            uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.resetDatabase
+
+GET         /agent-registration/test-only/risking/run                                                                       uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.runRisking

@@ -16,10 +16,14 @@
 
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyLayout
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.KibanaLinks
+@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
 
 @this(
         appConfig: AppConfig,
-        layout: TestOnlyLayout
+        layout: TestOnlyLayout,
+        hmrcNewTabLinkHelper: HmrcNewTabLinkHelper
 )
 
 @(
@@ -54,6 +58,13 @@
         <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplication">Current application (JSON)</a></li>
         <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showIndividualsForApplication">Individuals for current application (JSON)</a></li>
         <li><a class="govuk-link" href="@{appConfig.agentsExternalStubsBaseUrl}/agents-external-stubs/user">Current user in stubs</a></li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Risking</h2>
+    <ul class="govuk-list govuk-list--bullet">
+        <li><a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.runRisking">Run risking</a></li>
+        <li>@hmrcNewTabLinkHelper(NewTabLinkHelper(text = "Kibana logs (QA)", href = Some(KibanaLinks.riskingLogsQa)))</li>
+        <li>@hmrcNewTabLinkHelper(NewTabLinkHelper(text = "Kibana logs (Staging)", href = Some(KibanaLinks.riskingLogsStaging)))</li>
     </ul>
 
     @if(appConfig.TestOnly.allowResetDatabase) {

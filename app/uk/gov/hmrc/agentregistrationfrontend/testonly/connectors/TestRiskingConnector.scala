@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.connectors
 
+import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
 import uk.gov.hmrc.http.client.HttpClientV2
@@ -49,5 +50,90 @@ extends Connector:
               response = response
             )
       .andLogOnFailure("Failed to delete all risking Agent Applications")
+
+  def findApplicationForRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[JsValue] =
+    val url: URL = url"$baseUrl/application-for-risking/${applicationReference.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => response.json
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to find application for risking for applicationReference: ${applicationReference.value}")
+
+  def findIndividualsForRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[JsValue] =
+    val url: URL = url"$baseUrl/individuals-for-risking/${applicationReference.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => response.json
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to find individuals for risking for applicationReference: ${applicationReference.value}")
+
+  def findCompletedRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[JsValue] =
+    val url: URL = url"$baseUrl/completed-risking/${applicationReference.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => response.json
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to find completed risking for applicationReference: ${applicationReference.value}")
+
+  def viewNextRiskingFileContents()(using RequestHeader): Future[String] =
+    val url: URL = url"$baseUrl/view-next-file-contents"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => response.body
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to view next risking file contents")
+
+  def runRisking()(using RequestHeader): Future[Unit] =
+    val url: URL = url"$baseUrl/run-risking"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => ()
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to run risking")
 
   private val baseUrl: String = appConfig.agentRegistrationRiskingBaseUrl + "/agent-registration-risking/test-only"

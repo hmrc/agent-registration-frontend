@@ -27,4 +27,7 @@ import scala.concurrent.Future
 class TestRiskingService @Inject() (
   testRiskingConnector: TestRiskingConnector
 ):
+
   def deleteAll()(using RequestHeader): Future[Unit] = testRiskingConnector.deleteAllApplications()
+
+  def runRisking()(using RequestHeader): Future[Unit] = testRiskingConnector.runRisking()
