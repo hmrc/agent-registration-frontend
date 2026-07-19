@@ -20,6 +20,7 @@
 @import uk.gov.hmrc.agentregistration.shared.ApplicationState
 @import uk.gov.hmrc.agentregistration.shared.BusinessType
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 @import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
@@ -59,6 +60,8 @@
         case _: AgentApplication.IsNotIncorporated => false
     }
 }
+
+@isRiskingCompleted = @{agentApplication.applicationState === ApplicationState.RiskingCompleted}
 
 @stateTagClasses = @{
     agentApplication.applicationState match {
@@ -126,8 +129,12 @@
                     <span class="govuk-hint govuk-!-margin-bottom-0">Not available yet (not yet sent for risking)</span>
                 } else {
                     <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showApplicationForRisking(agentApplication.applicationReference)">Application-for-risking (JSON)</a> <br>
-                    <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showCompletedRisking(agentApplication.applicationReference)">Completed risking (JSON)</a> <br>
-                    <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference)">Select entity failures</a>
+                    <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showCompletedRisking(agentApplication.applicationReference)">Completed risking / archive (JSON)</a> <br>
+                    @if(isRiskingCompleted) {
+                        <span class="govuk-hint govuk-!-margin-bottom-0">Select entity failures not available (risking completed)</span>
+                    } else {
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference)">Select entity failures</a>
+                    }
                 }
             </dd>
         </div>
@@ -167,7 +174,7 @@
                 @individuals.map { individual =>
 
                     <li class="govuk-!-margin-bottom-4">
-                        @individualTile(individual, agentApplication.isBeforeSentForRisking)
+                        @individualTile(individual, agentApplication.isBeforeSentForRisking, isRiskingCompleted)
                     </li>
                 }
                 </ul>

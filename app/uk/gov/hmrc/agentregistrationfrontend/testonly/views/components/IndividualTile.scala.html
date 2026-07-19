@@ -28,7 +28,8 @@
 
 @(
         individual: IndividualProvidedDetails,
-        isBeforeSentForRisking: Boolean)(implicit
+        isBeforeSentForRisking: Boolean,
+        isRiskingCompleted: Boolean)(implicit
         requestHeader: RequestHeader
 )
 
@@ -65,10 +66,14 @@
         class="govuk-link"
         href="@AppRoutes.testOnly.TestOnlyController.showIndividualForRisking(individual.personReference)"
         >Individual-for-risking (JSON)</a> <br>
-        <a
-        class="govuk-link"
-        href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference)"
-        >Select individual failures</a>
+        @if(isRiskingCompleted) {
+            <span class="govuk-hint govuk-!-margin-bottom-0">Select individual failures not available (risking completed)</span>
+        } else {
+            <a
+            class="govuk-link"
+            href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference)"
+            >Select individual failures</a>
+        }
     }
 }
 
