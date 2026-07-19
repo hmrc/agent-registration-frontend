@@ -114,3 +114,7 @@ extends FrontendControllerBase(mcc):
     implicit request =>
       testRiskingService.runRisking().map: _ =>
         Ok(runRiskingConfirmationPage())
+
+  def viewNextRiskingFileContents: Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.viewNextRiskingFileContents().map(Ok(_))

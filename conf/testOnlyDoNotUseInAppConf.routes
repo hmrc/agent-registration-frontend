@@ -51,3 +51,4 @@ GET         /agent-registration/test-only/reset-confirm                         
 POST        /agent-registration/test-only/reset                                                                            uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.resetDatabase
 
 GET         /agent-registration/test-only/risking/run                                                                       uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.runRisking
+GET         /agent-registration/test-only/risking/next-file-contents                                                        uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.TestOnlyController.viewNextRiskingFileContents

@@ -31,3 +31,5 @@ class TestRiskingService @Inject() (
   def deleteAll()(using RequestHeader): Future[Unit] = testRiskingConnector.deleteAllApplications()
 
   def runRisking()(using RequestHeader): Future[Unit] = testRiskingConnector.runRisking()
+
+  def viewNextRiskingFileContents()(using RequestHeader): Future[String] = testRiskingConnector.viewNextRiskingFileContents()
