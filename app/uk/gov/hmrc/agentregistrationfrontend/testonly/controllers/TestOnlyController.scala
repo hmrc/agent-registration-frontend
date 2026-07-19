@@ -22,8 +22,11 @@ import play.api.mvc.AnyContent
 import play.api.mvc.DefaultActionBuilder
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendControllerBase
+import uk.gov.hmrc.agentregistrationfrontend.testonly.forms.SelectEntityFailuresForm
+import uk.gov.hmrc.agentregistrationfrontend.testonly.forms.SelectIndividualFailuresForm
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
@@ -32,6 +35,8 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingServic
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyHubPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ResetDatabaseConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.RunRiskingConfirmationPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectEntityFailuresPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectIndividualFailuresPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -44,6 +49,8 @@ class TestOnlyController @Inject() (
   testOnlyHubPage: TestOnlyHubPage,
   resetDatabaseConfirmationPage: ResetDatabaseConfirmationPage,
   runRiskingConfirmationPage: RunRiskingConfirmationPage,
+  selectEntityFailuresPage: SelectEntityFailuresPage,
+  selectIndividualFailuresPage: SelectIndividualFailuresPage,
   stubUserService: StubUserService,
   testApplicationService: TestApplicationService,
   testRiskingService: TestRiskingService,
@@ -137,3 +144,29 @@ extends FrontendControllerBase(mcc):
       testRiskingService.findCompletedRisking(applicationReference).map:
         case Some(json) => Ok(Json.prettyPrint(json))
         case None => Ok(s"No completed risking found for applicationReference: ${applicationReference.value}")
+
+  def showSelectEntityFailures(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder:
+    implicit request =>
+      Ok(selectEntityFailuresPage(applicationReference, SelectEntityFailuresForm.form))
+
+  def submitEntityFailures(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder:
+    implicit request =>
+      SelectEntityFailuresForm.form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => BadRequest(selectEntityFailuresPage(applicationReference, formWithErrors)),
+          _ => Ok("InProgress")
+        )
+
+  def showSelectIndividualFailures(personReference: PersonReference): Action[AnyContent] = defaultActionBuilder:
+    implicit request =>
+      Ok(selectIndividualFailuresPage(personReference, SelectIndividualFailuresForm.form))
+
+  def submitIndividualFailures(personReference: PersonReference): Action[AnyContent] = defaultActionBuilder:
+    implicit request =>
+      SelectIndividualFailuresForm.form
+        .bindFromRequest()
+        .fold(
+          formWithErrors => BadRequest(selectIndividualFailuresPage(personReference, formWithErrors)),
+          _ => Ok("InProgress")
+        )

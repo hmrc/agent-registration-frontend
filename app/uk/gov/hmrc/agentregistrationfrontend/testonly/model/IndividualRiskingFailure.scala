@@ -16,11 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
-/** Flat, structured catalogue of every possible individual (person) risking failure, mirroring
-  * `uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure` but carrying `checkId`/`reasonCode`/descriptions as
-  * real fields rather than scaladoc, so test-only pages can build the `Failure` JSON objects expected by a risking
-  * results file (see `agent-registration-risking`'s `RiskingResultRecordSpec` for the JSON shape: reasonCode,
-  * reasonDescription, checkId, checkDescription).
+/** Flat, structured catalogue of every possible individual (person) risking failure, mirroring `uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure`
+  * but carrying `checkId`/`reasonCode`/descriptions as real fields rather than scaladoc, so test-only pages can build the `Failure` JSON objects expected by a
+  * risking results file (see `agent-registration-risking`'s `RiskingResultRecordSpec` for the JSON shape: reasonCode, reasonDescription, checkId,
+  * checkDescription).
   */
 enum IndividualRiskingFailure(
   val checkId: String,
