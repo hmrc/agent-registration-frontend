@@ -18,7 +18,10 @@
 @import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.Banners
 @import views.html.helper.CSPNonce
 
-@this(layout: Layout)
+@this(
+        layout: Layout,
+        quickNavigation: components.QuickNavigation
+)
 
 @(
         pageTitle: String,
@@ -34,8 +37,22 @@
 @combinedStyles = {
     <style @{CSPNonce.attr}>
       .govuk-width-container { max-width: 95%; }
+      .test-only-quick-nav ul {
+        display: flex;
+        flex-wrap: wrap;
+        column-gap: 1.5rem;
+        row-gap: 0.5rem;
+      }
+      .test-only-quick-nav li {
+        margin: 0;
+      }
     </style>
     @templateStyles.getOrElse(Html(""))
+}
+
+@contentWithQuickNavigation = {
+    @quickNavigation()
+    @contentBlock
 }
 
 @layout(
@@ -48,4 +65,4 @@
     serviceUrl = Some(AppRoutes.testOnly.TestOnlyController.showTestOnlyHub.url),
     banners = Some(Banners()),
     suppressReportTechnicalIssue = true
-)(contentBlock)
+)(contentWithQuickNavigation)

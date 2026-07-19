@@ -22,7 +22,6 @@
 @this(
         appConfig: AppConfig,
         layout: TestOnlyLayout,
-        quickNavigation: components.QuickNavigation,
         agentApplicationTile: components.AgentApplicationTile
 )
 
@@ -38,10 +37,9 @@
     suppressBackLink = true
 ) {
 
-    @quickNavigation()
     <h1 class="govuk-heading-l">Recent Applications</h1>
 
-    <ul class="govuk-list govuk-list--number"
+    <ul class="govuk-list govuk-list--number">
 
     @agentApplicationsWithIndividuals.map { agentApplicationWithIndividuals =>
 

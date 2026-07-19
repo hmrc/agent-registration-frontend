@@ -29,6 +29,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyHubPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ResetDatabaseConfirmationPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -39,6 +40,7 @@ class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
   defaultActionBuilder: DefaultActionBuilder,
   testOnlyHubPage: TestOnlyHubPage,
+  resetDatabaseConfirmationPage: ResetDatabaseConfirmationPage,
   stubUserService: StubUserService,
   testApplicationService: TestApplicationService,
   testRiskingService: TestRiskingService,
@@ -90,12 +92,18 @@ extends FrontendControllerBase(mcc):
           loginResponse <- stubUserService.signIn(user)
         yield Redirect(redirectUrl).addToSession(loginResponse)
 
+  def showResetDatabaseConfirmation: Action[AnyContent] = defaultActionBuilder:
+    implicit request =>
+      if appConfig.TestOnly.allowResetDatabase
+      then Ok(resetDatabaseConfirmationPage())
+      else Unauthorized("Reset operation not allowed")
+
   def resetDatabase: Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
       if (appConfig.TestOnly.allowResetDatabase)
         for
           _ <- testApplicationService.deleteAll()
           _ <- testRiskingService.deleteAll()
-        yield Ok(Json.toJson("Databases reset"))
+        yield Redirect(AppRoutes.testOnly.TestOnlyController.showTestOnlyHub)
       else
         Future.successful(Unauthorized("Reset operation not allowed"))

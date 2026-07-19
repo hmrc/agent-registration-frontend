@@ -19,8 +19,7 @@
 
 @this(
         appConfig: AppConfig,
-        layout: TestOnlyLayout,
-        quickNavigation: components.QuickNavigation
+        layout: TestOnlyLayout
 )
 
 @(
@@ -35,23 +34,33 @@
     suppressBackLink = true
 ) {
 
-    @quickNavigation()
+    <h1 class="govuk-heading-l">Test Only Hub</h1>
 
-  <h1 class="govuk-heading-l">Test Only Hub</h1>
-  <ul class="govuk-list govuk-list--bullet">
-    <li><a class="govuk-link" href="@AppRoutes.apply.AgentApplicationController.startRegistration">
-      Agent Start Registration</a></li>
-    <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.FastForwardController.show">fast forward links</a></li>
-    <li><a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showPlaySession">showPlaySession</a></li>
-    <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplication">
-      showAgentApplication</a></li>
-    <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showIndividualsForApplication">
-      showIndividualsForApplication</a></li>
-    <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.makeTestSubmittedApplication()">
-      get-link-id</a></li>
+    <h2 class="govuk-heading-m">Start a journey</h2>
+    <ul class="govuk-list govuk-list--bullet">
+        <li><a class="govuk-link" href="@AppRoutes.apply.AgentApplicationController.startRegistration">Agent start registration</a></li>
+        <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.FastForwardController.show">Fast forward to a completed section</a></li>
+        <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.makeTestSubmittedApplication()">Create a submitted test application (get a shareable link)</a></li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Browse applications</h2>
+    <ul class="govuk-list govuk-list--bullet">
+        <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showRecentAgentApplications">Recent applications</a></li>
+    </ul>
+
+    <h2 class="govuk-heading-m">Inspect current session</h2>
+    <ul class="govuk-list govuk-list--bullet">
+        <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplication">Current application (JSON)</a></li>
+        <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showIndividualsForApplication">Individuals for current application (JSON)</a></li>
+    </ul>
+
     @if(appConfig.TestOnly.allowResetDatabase) {
-      <li><a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.resetDatabase">
-          reset all databases </a></li>
-      }
-  </ul>
+        <h2 class="govuk-heading-m">
+            Danger zone
+            <strong class="govuk-tag govuk-tag--red govuk-!-margin-left-2">Destructive</strong>
+        </h2>
+        <ul class="govuk-list govuk-list--bullet">
+            <li><a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showResetDatabaseConfirmation">Reset all databases</a></li>
+        </ul>
+    }
 }
