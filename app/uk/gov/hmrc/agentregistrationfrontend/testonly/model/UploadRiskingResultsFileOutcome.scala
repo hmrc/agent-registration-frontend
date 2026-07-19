@@ -16,9 +16,10 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
-/** Outcome of uploading a risking results file to `agent-registration-risking`'s test-only SDES endpoint. That endpoint
-  * responds `409 Conflict` when a file with the same name already exists, since results files are treated as write-once.
+/** Outcome of uploading a risking results file to `agent-registration-risking`'s test-only SDES endpoint. That endpoint responds `409 Conflict` when a file
+  * with the same name already exists, since results files are treated as write-once.
   */
 enum UploadRiskingResultsFileOutcome:
+
   case Uploaded
   case AlreadyExists

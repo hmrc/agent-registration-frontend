@@ -160,6 +160,23 @@ extends Connector:
             )
       .andLogOnFailure("Failed to run risking")
 
+  def runResultsFileProcessing()(using RequestHeader): Future[Unit] =
+    val url: URL = url"$baseUrl/run-results-file-processing"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => ()
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to run results file processing")
+
   def uploadRiskingResultsFile(
     filename: String,
     body: JsValue

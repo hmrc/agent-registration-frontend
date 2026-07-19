@@ -39,6 +39,8 @@ class TestRiskingService @Inject() (
 
   def runRisking()(using RequestHeader): Future[Unit] = testRiskingConnector.runRisking()
 
+  def runResultsFileProcessing()(using RequestHeader): Future[Unit] = testRiskingConnector.runResultsFileProcessing()
+
   def viewNextRiskingFileContents()(using RequestHeader): Future[String] = testRiskingConnector.viewNextRiskingFileContents()
 
   def findApplicationForRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =

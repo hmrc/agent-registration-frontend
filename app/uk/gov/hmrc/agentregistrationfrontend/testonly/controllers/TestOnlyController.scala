@@ -35,7 +35,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationSe
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyHubPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ResetDatabaseConfirmationPage
-import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.RunRiskingConfirmationPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.RiskingActionConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectEntityFailuresPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectIndividualFailuresPage
 
@@ -49,7 +49,7 @@ class TestOnlyController @Inject() (
   defaultActionBuilder: DefaultActionBuilder,
   testOnlyHubPage: TestOnlyHubPage,
   resetDatabaseConfirmationPage: ResetDatabaseConfirmationPage,
-  runRiskingConfirmationPage: RunRiskingConfirmationPage,
+  riskingActionConfirmationPage: RiskingActionConfirmationPage,
   selectEntityFailuresPage: SelectEntityFailuresPage,
   selectIndividualFailuresPage: SelectIndividualFailuresPage,
   stubUserService: StubUserService,
@@ -122,7 +122,26 @@ extends FrontendControllerBase(mcc):
   def runRisking: Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
       testRiskingService.runRisking().map: _ =>
-        Ok(runRiskingConfirmationPage())
+        Ok(riskingActionConfirmationPage(
+          heading = "Risking scheduled",
+          description =
+            "This collects every application that's in the SentForRisking state, together with their individuals, builds a pipe-separated" +
+              " risking file, and sends it to Minerva. On success, those applications move to the SentToMinerva state. Processing happens" +
+              " asynchronously in the background."
+        ))
+
+  def runResultsFileProcessing: Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.runResultsFileProcessing().map: _ =>
+        Ok(riskingActionConfirmationPage(
+          heading = "Results file processing scheduled",
+          description =
+            "This picks up risking results files uploaded via the SDES test-only endpoint (for example via 'Select entity failures' /" +
+              " 'Select individual failures' on this hub), parses the records in them, and applies the outcomes to the matching" +
+              " applications/individuals in agent-registration-risking. This is what would normally happen when Minerva sends back" +
+              " risking decisions. Once fully processed, an application moves to the RiskingCompleted state and its records are archived" +
+              " into the completed-risking collection. Processing happens asynchronously in the background."
+        ))
 
   def viewNextRiskingFileContents: Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
