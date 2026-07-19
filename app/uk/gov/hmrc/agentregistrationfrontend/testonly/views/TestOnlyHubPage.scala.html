@@ -50,8 +50,10 @@
 
     <h2 class="govuk-heading-m">Inspect current session</h2>
     <ul class="govuk-list govuk-list--bullet">
+        <li><a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showPlaySession">Play session (JSON)</a></li>
         <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplication">Current application (JSON)</a></li>
         <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showIndividualsForApplication">Individuals for current application (JSON)</a></li>
+        <li><a class="govuk-link" href="@{appConfig.agentsExternalStubsBaseUrl}/agents-external-stubs/user">Current user in stubs</a></li>
     </ul>
 
     @if(appConfig.TestOnly.allowResetDatabase) {

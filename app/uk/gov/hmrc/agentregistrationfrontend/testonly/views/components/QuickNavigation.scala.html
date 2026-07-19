@@ -14,9 +14,7 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-
-@this(appConfig: AppConfig)
+@this()
 
 @()
 
@@ -25,7 +23,7 @@
         <li><a class="govuk-link" id="quick-nav-hub" href="@AppRoutes.testOnly.TestOnlyController.showTestOnlyHub">Test Only Hub</a></li>
         <li><a class="govuk-link" id="quick-nav-recent-applications" href="@AppRoutes.testOnly.applicant.TestOnlyController.showRecentAgentApplications">Recent applications</a></li>
         <li><a class="govuk-link" id="quick-nav-fast-forward" href="@AppRoutes.testOnly.applicant.FastForwardController.show">Fast forward</a></li>
-        <li><a class="govuk-link" id="quick-nav-play-session" href="@AppRoutes.testOnly.TestOnlyController.showPlaySession">Play session</a></li>
-        <li><a class="govuk-link" id="quick-nav-external-stubs" href="@{appConfig.agentsExternalStubsBaseUrl}/agents-external-stubs/user">Current user in stubs</a></li>
+        <li><a class="govuk-link" id="quick-nav-start-registration" href="@AppRoutes.apply.AgentApplicationController.startRegistration">Agent start registration</a></li>
+        <li><a class="govuk-link" id="quick-nav-task-list" href="@AppRoutes.apply.TaskListController.show">Task list page</a></li>
     </ul>
 </nav>
