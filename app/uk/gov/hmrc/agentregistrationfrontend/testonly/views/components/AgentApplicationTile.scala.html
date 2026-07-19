@@ -18,9 +18,14 @@
 @import play.twirl.api.Html
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistration.shared.ApplicationState
+@import uk.gov.hmrc.agentregistration.shared.BusinessType
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
+@import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
+@import java.time.Instant
+@import java.time.ZoneId
+@import java.time.format.DateTimeFormatter
 
 @this(
         individualTile: IndividualTile,
@@ -32,6 +37,28 @@
         individuals: Seq[IndividualProvidedDetails])(implicit
         requestHeader: RequestHeader
 )
+
+@instantFormatter = @{DateTimeFormatter.ofPattern("d MMM uuuu, HH:mm").withZone(ZoneId.of("Europe/London"))}
+@formatInstant(instant: Instant) = @{instantFormatter.format(instant)}
+
+@businessTypeLabel = @{
+    agentApplication.businessType match {
+        case BusinessType.SoleTrader => "Sole trader"
+        case BusinessType.LimitedCompany => "Limited company"
+        case BusinessType.Partnership.GeneralPartnership => "General partnership"
+        case BusinessType.Partnership.LimitedLiabilityPartnership => "Limited liability partnership (LLP)"
+        case BusinessType.Partnership.LimitedPartnership => "Limited partnership"
+        case BusinessType.Partnership.ScottishLimitedPartnership => "Scottish limited partnership"
+        case BusinessType.Partnership.ScottishPartnership => "Scottish partnership"
+    }
+}
+
+@isIncorporated = @{
+    agentApplication match {
+        case _: AgentApplication.IsIncorporated => true
+        case _: AgentApplication.IsNotIncorporated => false
+    }
+}
 
 @stateTagClasses = @{
     agentApplication.applicationState match {
@@ -56,14 +83,21 @@
                 </dd>
         </div>
         <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Application reference</dt>
+            <dd class="govuk-summary-list__value">@agentApplication.applicationReference.value</dd>
+        </div>
+        <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">CreatedAt</dt>
-            <dd class="govuk-summary-list__value">
-            @agentApplication.createdAt
-            </dd>
+            <dd class="govuk-summary-list__value">@formatInstant(agentApplication.createdAt)</dd>
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Business type</dt>
-            <dd class="govuk-summary-list__value">@agentApplication.businessType</dd>
+            <dd class="govuk-summary-list__value">
+                @businessTypeLabel
+                @if(isIncorporated) {
+                    <span class="govuk-hint govuk-!-margin-bottom-0">(Incorporated)</span>
+                }
+            </dd>
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">State</dt>
@@ -72,8 +106,19 @@
                     content = Text(agentApplication.applicationState.toString),
                     classes = stateTagClasses
                 ))
+                @if(agentApplication.isAfterSentForRisking) {
+                    @agentApplication.submittedAt.map { submittedAt =>
+                        <span class="govuk-hint govuk-!-margin-bottom-0">Submitted @formatInstant(submittedAt)</span>
+                    }
+                }
             </dd>
         </div>
+        @agentApplication.riskingOutcomeApplication.map { riskingOutcome =>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Decision date</dt>
+                <dd class="govuk-summary-list__value">@DisplayDate.displayDateForLang(riskingOutcome.actualDecisionDate)</dd>
+            </div>
+        }
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Internal user id</dt>
             <dd class="govuk-summary-list__value">
