@@ -42,7 +42,9 @@
         maybeForm: Option[Form[?]] = None,
         suppressBackLink: Boolean = false,
         templateScripts: Option[Html] = None,
-        templateStyles: Option[Html] = None)(
+        templateStyles: Option[Html] = None,
+        serviceName: Option[String] = None,
+        serviceUrl: Option[String] = None)(
         contentBlock: Html)(implicit
         request: RequestHeader,
         messages: Messages
@@ -97,8 +99,8 @@
           signOutUrl = if (isSignedIn) Some(AppRoutes.SignOutController.signOut.url) else None
       ),
       serviceNavigation = Some(ServiceNavigation(
-          serviceName = Some(messages("service.name")),
-          serviceUrl = Some(appConfig.govukStartPageUrl)
+          serviceName = Some(serviceName.getOrElse(messages("service.name"))),
+          serviceUrl = Some(serviceUrl.getOrElse(appConfig.govukStartPageUrl))
       )),
     banners = Banners(phaseBanner = Some(standardBetaBanner(url = s"${appConfig.feedbackSurveyGoogleForm}${request.uri}"))),
       templateOverrides = TemplateOverrides(
