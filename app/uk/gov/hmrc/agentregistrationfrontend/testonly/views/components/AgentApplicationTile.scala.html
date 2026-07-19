@@ -31,11 +31,7 @@
         requestHeader: RequestHeader
 )
 
-<style>
-
-</style>
-
-<div class="govuk-card govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-radius: 4px;">
+<div class="test-only-card govuk-!-padding-4">
 
     <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-2">
         <div class="govuk-summary-list__row">
@@ -79,12 +75,15 @@
             </div>
         }
 
-
-        <a
-        class="govuk-link"
-        href="@AppRoutes.providedetails.StartController.start(agentApplication.linkId)"
-        >/provide-details/start/...</a> <br>
-
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Provide details link</dt>
+            <dd class="govuk-summary-list__value">
+                <a
+                class="govuk-link"
+                href="@AppRoutes.providedetails.StartController.start(agentApplication.linkId)"
+                >/provide-details/start/...</a>
+            </dd>
+        </div>
 
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">@individuals.size individuals</dt>

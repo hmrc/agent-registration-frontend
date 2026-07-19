@@ -46,7 +46,8 @@
         serviceName: Option[String] = None,
         serviceUrl: Option[String] = None,
         banners: Option[Banners] = None,
-        suppressReportTechnicalIssue: Boolean = false)(
+        suppressReportTechnicalIssue: Boolean = false,
+        mainContentLayout: Option[Html => Html] = None)(
         contentBlock: Html)(implicit
         request: RequestHeader,
         messages: Messages
@@ -109,7 +110,8 @@
     banners = banners.getOrElse(Banners(phaseBanner = Some(standardBetaBanner(url = s"${appConfig.feedbackSurveyGoogleForm}${request.uri}")))),
       templateOverrides = TemplateOverrides(
           additionalHeadBlock = Some(head),
-          additionalScriptsBlock = Some(additionalScripts)
+          additionalScriptsBlock = Some(additionalScripts),
+          mainContentLayout = mainContentLayout
       ),
       backLink = if suppressBackLink then None else Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
       isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled

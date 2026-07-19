@@ -20,7 +20,8 @@
 
 @this(
         layout: Layout,
-        quickNavigation: components.QuickNavigation
+        quickNavigation: components.QuickNavigation,
+        fullWidthMainContent: components.FullWidthMainContent
 )
 
 @(
@@ -46,6 +47,10 @@
       .test-only-quick-nav li {
         margin: 0;
       }
+      .test-only-card {
+        border: 1px solid #b1b4b6;
+        border-radius: 4px;
+      }
     </style>
     @templateStyles.getOrElse(Html(""))
 }
@@ -64,5 +69,6 @@
     serviceName = Some("Test Only"),
     serviceUrl = Some(AppRoutes.testOnly.TestOnlyController.showTestOnlyHub.url),
     banners = Some(Banners()),
-    suppressReportTechnicalIssue = true
+    suppressReportTechnicalIssue = true,
+    mainContentLayout = Some(fullWidthMainContent(_))
 )(contentWithQuickNavigation)

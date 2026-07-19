@@ -33,12 +33,17 @@
 )
 
 @layout(
-    pageTitle = "Test Only Hub",
+    pageTitle = "Agent Application Tile",
     suppressBackLink = true
 ) {
 
-    <h1 class="govuk-heading-l">Agent Application Tile</h1>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
 
-    @agentApplicationTile(agentApplication, individuals)
+            <h1 class="govuk-heading-l">Agent Application Tile</h1>
 
+            @agentApplicationTile(agentApplication, individuals)
+
+        </div>
+    </div>
 }
