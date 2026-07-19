@@ -15,6 +15,7 @@
  *@
 
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.hmrcstandardpage.Banners
 @import views.html.helper.CSPNonce
 
 @this(layout: Layout)
@@ -44,5 +45,6 @@
     templateScripts = templateScripts,
     templateStyles = Some(combinedStyles),
     serviceName = Some("Test Only"),
-    serviceUrl = Some(AppRoutes.testOnly.TestOnlyController.showTestOnlyHub.url)
+    serviceUrl = Some(AppRoutes.testOnly.TestOnlyController.showTestOnlyHub.url),
+    banners = Some(Banners())
 )(contentBlock)

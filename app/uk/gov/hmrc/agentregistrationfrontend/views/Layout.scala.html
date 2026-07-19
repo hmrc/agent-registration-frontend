@@ -44,7 +44,8 @@
         templateScripts: Option[Html] = None,
         templateStyles: Option[Html] = None,
         serviceName: Option[String] = None,
-        serviceUrl: Option[String] = None)(
+        serviceUrl: Option[String] = None,
+        banners: Option[Banners] = None)(
         contentBlock: Html)(implicit
         request: RequestHeader,
         messages: Messages
@@ -102,7 +103,7 @@
           serviceName = Some(serviceName.getOrElse(messages("service.name"))),
           serviceUrl = Some(serviceUrl.getOrElse(appConfig.govukStartPageUrl))
       )),
-    banners = Banners(phaseBanner = Some(standardBetaBanner(url = s"${appConfig.feedbackSurveyGoogleForm}${request.uri}"))),
+    banners = banners.getOrElse(Banners(phaseBanner = Some(standardBetaBanner(url = s"${appConfig.feedbackSurveyGoogleForm}${request.uri}")))),
       templateOverrides = TemplateOverrides(
           additionalHeadBlock = Some(head),
           additionalScriptsBlock = Some(additionalScripts)
