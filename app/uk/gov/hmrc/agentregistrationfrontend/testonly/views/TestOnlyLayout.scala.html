@@ -46,5 +46,6 @@
     templateStyles = Some(combinedStyles),
     serviceName = Some("Test Only"),
     serviceUrl = Some(AppRoutes.testOnly.TestOnlyController.showTestOnlyHub.url),
-    banners = Some(Banners())
+    banners = Some(Banners()),
+    suppressReportTechnicalIssue = true
 )(contentBlock)

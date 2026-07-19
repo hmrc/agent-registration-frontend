@@ -45,7 +45,8 @@
         templateStyles: Option[Html] = None,
         serviceName: Option[String] = None,
         serviceUrl: Option[String] = None,
-        banners: Option[Banners] = None)(
+        banners: Option[Banners] = None,
+        suppressReportTechnicalIssue: Boolean = false)(
         contentBlock: Html)(implicit
         request: RequestHeader,
         messages: Messages
@@ -90,7 +91,9 @@
       }
     }
     @contentBlock
-    @hmrcReportTechnicalIssueHelper()
+    @if(!suppressReportTechnicalIssue) {
+        @hmrcReportTechnicalIssueHelper()
+    }
 }
 
 @hmrcStandardPage(
