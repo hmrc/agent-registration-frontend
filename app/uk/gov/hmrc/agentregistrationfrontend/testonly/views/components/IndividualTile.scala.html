@@ -29,7 +29,8 @@
 
 @(
         individual: IndividualProvidedDetails,
-        applicationReference: ApplicationReference)(implicit
+        applicationReference: ApplicationReference,
+        isBeforeSentForRisking: Boolean)(implicit
         requestHeader: RequestHeader
 )
 
@@ -59,10 +60,14 @@
 }
 
 @individualsForRiskingLink = {
-    <a
-    class="govuk-link"
-    href="@AppRoutes.testOnly.TestOnlyController.showIndividualsForRisking(applicationReference)"
-    >Individuals-for-risking (JSON)</a>
+    @if(isBeforeSentForRisking) {
+        <span class="govuk-hint govuk-!-margin-bottom-0">Not available yet (not yet sent for risking)</span>
+    } else {
+        <a
+        class="govuk-link"
+        href="@AppRoutes.testOnly.TestOnlyController.showIndividualsForRisking(applicationReference)"
+        >Individuals-for-risking (JSON)</a>
+    }
 }
 
 @rows = @{
