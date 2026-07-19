@@ -17,12 +17,14 @@
 @import play.api.i18n.Messages
 @import play.twirl.api.Html
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.ApplicationState
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 
 @this(
-        individualTile: IndividualTile
+        individualTile: IndividualTile,
+        govukTag: GovukTag
 )
 
 @(
@@ -30,6 +32,16 @@
         individuals: Seq[IndividualProvidedDetails])(implicit
         requestHeader: RequestHeader
 )
+
+@stateTagClasses = @{
+    agentApplication.applicationState match {
+        case ApplicationState.Started => "govuk-tag--grey"
+        case ApplicationState.GrsDataReceived => "govuk-tag--blue"
+        case ApplicationState.SentForRisking => "govuk-tag--yellow"
+        case ApplicationState.SentToMinerva => "govuk-tag--purple"
+        case ApplicationState.RiskingCompleted => "govuk-tag--green"
+    }
+}
 
 <div class="test-only-card govuk-!-padding-4">
 
@@ -55,7 +67,12 @@
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">State</dt>
-            <dd class="govuk-summary-list__value">@agentApplication.applicationState</dd>
+            <dd class="govuk-summary-list__value">
+                @govukTag(Tag(
+                    content = Text(agentApplication.applicationState.toString),
+                    classes = stateTagClasses
+                ))
+            </dd>
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Internal user id</dt>
