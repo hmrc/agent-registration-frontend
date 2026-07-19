@@ -16,7 +16,6 @@
 
 @import play.api.i18n.Messages
 @import play.twirl.api.Html
-@import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
@@ -29,7 +28,6 @@
 
 @(
         individual: IndividualProvidedDetails,
-        applicationReference: ApplicationReference,
         isBeforeSentForRisking: Boolean)(implicit
         requestHeader: RequestHeader
 )
@@ -65,8 +63,8 @@
     } else {
         <a
         class="govuk-link"
-        href="@AppRoutes.testOnly.TestOnlyController.showIndividualsForRisking(applicationReference)"
-        >Individuals-for-risking (JSON)</a> <br>
+        href="@AppRoutes.testOnly.TestOnlyController.showIndividualForRisking(individual.personReference)"
+        >Individual-for-risking (JSON)</a> <br>
         <a
         class="govuk-link"
         href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference)"

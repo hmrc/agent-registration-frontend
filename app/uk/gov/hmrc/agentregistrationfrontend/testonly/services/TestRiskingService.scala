@@ -17,9 +17,14 @@
 package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
 import play.api.libs.json.JsValue
+import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestRiskingConnector
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.EntityRiskingFailure
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.IndividualRiskingFailure
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UploadRiskingResultsFileOutcome
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -42,5 +47,47 @@ class TestRiskingService @Inject() (
   def findIndividualsForRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =
     testRiskingConnector.findIndividualsForRisking(applicationReference)
 
+  def findIndividualForRisking(
+    personReference: PersonReference
+  )(using RequestHeader): Future[Option[JsValue]] = testRiskingConnector.findIndividualForRisking(personReference)
+
   def findCompletedRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =
     testRiskingConnector.findCompletedRisking(applicationReference)
+
+  def submitEntityFailures(
+    applicationReference: ApplicationReference,
+    failures: Seq[EntityRiskingFailure]
+  )(using RequestHeader): Future[UploadRiskingResultsFileOutcome] =
+    val record = Json.obj(
+      "recordType" -> "Entity",
+      "applicationReference" -> applicationReference.value,
+      "failures" -> failures.map(entityFailureJson)
+    )
+    val filename = s"test-only-entity-${applicationReference.value}"
+    testRiskingConnector.uploadRiskingResultsFile(filename, Json.arr(record))
+
+  def submitIndividualFailures(
+    personReference: PersonReference,
+    failures: Seq[IndividualRiskingFailure]
+  )(using RequestHeader): Future[UploadRiskingResultsFileOutcome] =
+    val record = Json.obj(
+      "recordType" -> "Individual",
+      "personReference" -> personReference.value,
+      "failures" -> failures.map(individualFailureJson)
+    )
+    val filename = s"test-only-individual-${personReference.value}"
+    testRiskingConnector.uploadRiskingResultsFile(filename, Json.arr(record))
+
+  private def entityFailureJson(failure: EntityRiskingFailure): JsValue = Json.obj(
+    "reasonCode" -> failure.reasonCode,
+    "reasonDescription" -> failure.reasonDescription,
+    "checkId" -> failure.checkId,
+    "checkDescription" -> failure.checkDescription
+  )
+
+  private def individualFailureJson(failure: IndividualRiskingFailure): JsValue = Json.obj(
+    "reasonCode" -> failure.reasonCode,
+    "reasonDescription" -> failure.reasonDescription,
+    "checkId" -> failure.checkId,
+    "checkDescription" -> failure.checkDescription
+  )

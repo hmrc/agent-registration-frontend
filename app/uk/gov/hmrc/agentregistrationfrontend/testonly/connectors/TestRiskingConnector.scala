@@ -17,9 +17,11 @@
 package uk.gov.hmrc.agentregistrationfrontend.testonly.connectors
 
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UploadRiskingResultsFileOutcome
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Inject
@@ -88,6 +90,24 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to find individuals for risking for applicationReference: ${applicationReference.value}")
 
+  def findIndividualForRisking(personReference: PersonReference)(using RequestHeader): Future[Option[JsValue]] =
+    val url: URL = url"$baseUrl/individual-for-risking/${personReference.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if status === Status.OK => Some(response.json)
+          case status if status === Status.NO_CONTENT => None
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to find individual for risking for personReference: ${personReference.value}")
+
   def findCompletedRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =
     val url: URL = url"$baseUrl/completed-risking/${applicationReference.value}"
     httpClient
@@ -143,7 +163,7 @@ extends Connector:
   def uploadRiskingResultsFile(
     filename: String,
     body: JsValue
-  )(using RequestHeader): Future[Unit] =
+  )(using RequestHeader): Future[UploadRiskingResultsFileOutcome] =
     val url: URL = url"$baseUrl/risking-results-file/$filename"
     httpClient
       .post(url)
@@ -151,7 +171,8 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case status if is2xx(status) => ()
+          case status if is2xx(status) => UploadRiskingResultsFileOutcome.Uploaded
+          case status if status === Status.CONFLICT => UploadRiskingResultsFileOutcome.AlreadyExists
           case status =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "POST",

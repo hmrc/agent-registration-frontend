@@ -28,6 +28,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendControllerBase
 import uk.gov.hmrc.agentregistrationfrontend.testonly.forms.SelectEntityFailuresForm
 import uk.gov.hmrc.agentregistrationfrontend.testonly.forms.SelectIndividualFailuresForm
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UploadRiskingResultsFileOutcome
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
@@ -139,6 +140,12 @@ extends FrontendControllerBase(mcc):
         case Some(json) => Ok(Json.prettyPrint(json))
         case None => Ok(s"No individuals-for-risking found for applicationReference: ${applicationReference.value}")
 
+  def showIndividualForRisking(personReference: PersonReference): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.findIndividualForRisking(personReference).map:
+        case Some(json) => Ok(Json.prettyPrint(json))
+        case None => Ok(s"No individual-for-risking found for personReference: ${personReference.value}")
+
   def showCompletedRisking(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
       testRiskingService.findCompletedRisking(applicationReference).map:
@@ -149,24 +156,38 @@ extends FrontendControllerBase(mcc):
     implicit request =>
       Ok(selectEntityFailuresPage(applicationReference, SelectEntityFailuresForm.form))
 
-  def submitEntityFailures(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder:
+  def submitEntityFailures(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
       SelectEntityFailuresForm.form
         .bindFromRequest()
         .fold(
-          formWithErrors => BadRequest(selectEntityFailuresPage(applicationReference, formWithErrors)),
-          _ => Ok("InProgress")
+          formWithErrors => Future.successful(BadRequest(selectEntityFailuresPage(applicationReference, formWithErrors))),
+          failures =>
+            testRiskingService.submitEntityFailures(applicationReference, failures).map:
+              case UploadRiskingResultsFileOutcome.Uploaded => Ok("InProgress")
+              case UploadRiskingResultsFileOutcome.AlreadyExists =>
+                val formWithError = SelectEntityFailuresForm.form
+                  .fill(failures)
+                  .withGlobalError(s"Risking results have already been submitted for application reference ${applicationReference.value}.")
+                Conflict(selectEntityFailuresPage(applicationReference, formWithError))
         )
 
   def showSelectIndividualFailures(personReference: PersonReference): Action[AnyContent] = defaultActionBuilder:
     implicit request =>
       Ok(selectIndividualFailuresPage(personReference, SelectIndividualFailuresForm.form))
 
-  def submitIndividualFailures(personReference: PersonReference): Action[AnyContent] = defaultActionBuilder:
+  def submitIndividualFailures(personReference: PersonReference): Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
       SelectIndividualFailuresForm.form
         .bindFromRequest()
         .fold(
-          formWithErrors => BadRequest(selectIndividualFailuresPage(personReference, formWithErrors)),
-          _ => Ok("InProgress")
+          formWithErrors => Future.successful(BadRequest(selectIndividualFailuresPage(personReference, formWithErrors))),
+          failures =>
+            testRiskingService.submitIndividualFailures(personReference, failures).map:
+              case UploadRiskingResultsFileOutcome.Uploaded => Ok("InProgress")
+              case UploadRiskingResultsFileOutcome.AlreadyExists =>
+                val formWithError = SelectIndividualFailuresForm.form
+                  .fill(failures)
+                  .withGlobalError(s"Risking results have already been submitted for person reference ${personReference.value}.")
+                Conflict(selectIndividualFailuresPage(personReference, formWithError))
         )
