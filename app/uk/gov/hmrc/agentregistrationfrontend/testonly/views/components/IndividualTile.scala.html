@@ -19,14 +19,13 @@
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
-@import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
-@import uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure
-@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.IndividualRiskingFailure
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 
 @this(
         govukSummaryList: GovukSummaryList,
+        individualFixesGroup: IndividualFixesGroup,
+        individualFailuresGroup: IndividualFailuresGroup,
         govukTag: GovukTag
 )
 
@@ -59,51 +58,6 @@
         case RiskingOutcomeIndividual.Approved => "govuk-tag--green"
         case _: RiskingOutcomeIndividual.FailedFixable => "govuk-tag--orange"
         case _: RiskingOutcomeIndividual.FailedNonFixable => "govuk-tag--red"
-    }
-}
-
-@individualFixListItem(individualFix: IndividualFix) = {
-    <li class="govuk-hint govuk-!-margin-bottom-0">
-        @govukTag(Tag(
-            content = Text(individualFix.toString),
-            classes = "govuk-tag--orange"
-        ))
-    </li>
-}
-
-@individualFailureListItem(individualRiskingFailure: IndividualRiskingFailure) = {
-    <li class="govuk-hint govuk-!-margin-bottom-0">
-        @govukTag(Tag(
-            content = Text(individualRiskingFailure.reasonCode),
-            classes = if (individualRiskingFailure.fixable) "govuk-tag--orange" else "govuk-tag--red"
-        ))
-        @individualRiskingFailure.checkDescription — @individualRiskingFailure.reasonDescription
-    </li>
-}
-
-@individualFixesGroup(individualFixes: Seq[IndividualFix]) = {
-    @if(individualFixes.nonEmpty) {
-        <div class="govuk-!-margin-top-1">
-            <div class="govuk-!-font-weight-bold">Fixes</div>
-            <ul class="govuk-list govuk-!-margin-bottom-0">
-                @individualFixes.map { individualFix =>
-                    @individualFixListItem(individualFix)
-                }
-            </ul>
-        </div>
-    }
-}
-
-@individualFailuresGroup(individualFailures: Seq[IndividualFailure]) = {
-    @if(individualFailures.nonEmpty) {
-        <div class="govuk-!-margin-top-1">
-            <div class="govuk-!-font-weight-bold">Failures</div>
-            <ul class="govuk-list govuk-!-margin-bottom-0">
-                @individualFailures.map(IndividualRiskingFailure.fromIndividualFailure).map { individualRiskingFailure =>
-                    @individualFailureListItem(individualRiskingFailure)
-                }
-            </ul>
-        </div>
     }
 }
 
