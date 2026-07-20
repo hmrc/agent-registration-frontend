@@ -42,5 +42,12 @@ object ElementSupport:
       else
         fail(s"Attribute '$attributeKey' not found $hints")
 
+    inline def selectShouldFail(selector: String)(using pos: Position): Unit =
+      val selectedElements: Elements = element.select(selector)
+      if (!selectedElements.isEmpty)
+        fail(s"selector '$selector' yielded results when it should have failed $hints")
+      else
+        ()
+
     private def elementHint = s"""\n\nElement text was:\n${element.wholeText().stripSpaces}\n\nElement content was:\n${element.toString}\n"""
     private def hints(using pos: Position): String = s"$positionInfo$elementHint"

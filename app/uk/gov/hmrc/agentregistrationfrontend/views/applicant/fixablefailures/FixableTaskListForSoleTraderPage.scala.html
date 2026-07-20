@@ -101,8 +101,8 @@
             ),
             status = if(v.isComplete) complete else incomplete,
             href = Some(
-              if k.startsWith("IndividualFix.10") then
-                      AppRoutes.fixablefailures.soletraderfailures.FixIndividualProvidedDetailsController.show.url
+              if(k.startsWith("IndividualFix.10"))
+                AppRoutes.fixablefailures.soletraderfailures.FixIndividualProvidedDetailsController.show.url
               else
                 AppRoutes.fixablefailures.soletraderfailures.FixableSoleTraderFailureController.show(k).url)
           )

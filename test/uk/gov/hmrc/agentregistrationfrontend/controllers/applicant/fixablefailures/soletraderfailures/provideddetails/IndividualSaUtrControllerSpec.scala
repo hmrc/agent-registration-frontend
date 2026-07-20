@@ -1,0 +1,134 @@
+/*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.fixablefailures.soletraderfailures.provideddetails
+
+import play.api.libs.ws.DefaultBodyReadables.*
+import play.api.libs.ws.WSResponse
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
+import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualSaUtrForm
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+
+class IndividualSaUtrControllerSpec
+extends ControllerSpec:
+
+  override def configOverrides: Map[String, Any] =
+    super.configOverrides ++ Map(
+      "features.fixable-failures" -> true
+    )
+
+  private val agentApplication =
+    tdAll
+      .agentApplicationLlp
+      .afterRiskingCompletedFixable
+
+  private val path = "/agent-registration/conditions-not-yet-met/sole-trader/self-assessment-unique-taxpayer-reference"
+
+  private object individualProvideDetails:
+
+    val complete: IndividualProvidedDetails = tdAll.providedDetails.afterRiskedFixableIndividualDetails
+    val saUtrNotProvided: IndividualProvidedDetails = tdAll.providedDetails.afterFixableIndividualDetailsWithSaUtrNotProvided
+
+  "routes should have correct paths and methods" in:
+    AppRoutes.fixablefailures.soletraderfailures.provideddetails.IndividualSaUtrController.show shouldBe Call(
+      method = "GET",
+      url = path
+    )
+    AppRoutes.fixablefailures.soletraderfailures.provideddetails.IndividualSaUtrController.submit shouldBe Call(
+      method = "POST",
+      url = path
+    )
+    AppRoutes.fixablefailures.soletraderfailures.provideddetails.IndividualSaUtrController.submit.url shouldBe AppRoutes.fixablefailures.soletraderfailures.provideddetails.IndividualSaUtrController.show.url
+
+  s"GET $path should return 200 and render page when SaUtr is not provided in HMRC systems" in:
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(
+      application = agentApplication,
+      individuals = List(individualProvideDetails.complete)
+    )
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe "Do you have a Self Assessment Unique Taxpayer Reference? - Apply for an agent services account - GOV.UK"
+
+  s"POST $path with selected Yes and valid saUtr should save data and redirect to check your answers" in:
+    ApplyStubHelper.stubFixableFailureUpdate(
+      agentApplication = agentApplication,
+      individualProvidedDetails = individualProvideDetails.complete,
+      updatedIndividualProvidedDetails = Some(individualProvideDetails.complete),
+      updatedApplication = None
+    )
+    val response: WSResponse =
+      post(path)(Map(
+        IndividualSaUtrForm.hasSaUtrKey -> Seq("Yes"),
+        IndividualSaUtrForm.saUtrKey -> Seq(tdAll.saUtrProvided.saUtr.value)
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe Constants.EMPTY_STRING
+    response.header(
+      "Location"
+    ).value shouldBe AppRoutes.fixablefailures.soletraderfailures.provideddetails.CheckYourAnswersController.show.url
+
+  s"POST $path with selected No should save data and redirect to check your answers" in:
+    ApplyStubHelper.stubFixableFailureUpdate(
+      agentApplication = agentApplication,
+      individualProvidedDetails = individualProvideDetails.complete,
+      updatedIndividualProvidedDetails = Some(individualProvideDetails.saUtrNotProvided),
+      updatedApplication = None
+    )
+    val response: WSResponse =
+      post(path)(Map(
+        IndividualSaUtrForm.hasSaUtrKey -> Seq("No")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe Constants.EMPTY_STRING
+    response.header(
+      "Location"
+    ).value shouldBe AppRoutes.fixablefailures.soletraderfailures.provideddetails.CheckYourAnswersController.show.url
+
+  s"POST $path with selected Yes and blank inputs should return 400" in:
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(
+      application = agentApplication,
+      individuals = List(individualProvideDetails.complete)
+    )
+    val response: WSResponse =
+      post(path)(Map(
+        IndividualSaUtrForm.hasSaUtrKey -> Seq("Yes"),
+        IndividualSaUtrForm.saUtrKey -> Seq(Constants.EMPTY_STRING)
+      ))
+
+    response.status shouldBe Status.BAD_REQUEST
+
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "Error: Do you have a Self Assessment Unique Taxpayer Reference? - Apply for an agent services account - GOV.UK"
+    doc.mainContent.select("#individualSaUtr\\.saUtr-error").text() shouldBe "Error: Enter your Self Assessment Unique Taxpayer Reference"
+
+  s"POST $path with selected Yes and invalid characters should return 400" in:
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(
+      application = agentApplication,
+      individuals = List(individualProvideDetails.complete)
+    )
+    val response: WSResponse =
+      post(path)(Map(
+        IndividualSaUtrForm.hasSaUtrKey -> Seq("Yes"),
+        IndividualSaUtrForm.saUtrKey -> Seq("[[)(*%")
+      ))
+    response.status shouldBe Status.BAD_REQUEST
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "Error: Do you have a Self Assessment Unique Taxpayer Reference? - Apply for an agent services account - GOV.UK"
+    doc.mainContent.select("#individualSaUtr\\.saUtr-error").text() shouldBe "Error: Enter a Self Assessment Unique Taxpayer Reference in the correct format"

@@ -37,6 +37,11 @@ object ElementsSupport:
       else
         selectedElements
 
+    inline def selectShouldFail(selector: String)(using pos: Position): Unit =
+      val selectedElements: Elements = elements.select(selector)
+      if (!selectedElements.isEmpty)
+        fail(s"selector '$selector' yielded results when it should have failed $hints")
+
     /** Will find the element by index. Index lookup is 1-indexed, if you want the first element then pass in 1.
       */
     inline def selectOrFail(index: Int)(using pos: Position): Element = elements

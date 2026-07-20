@@ -53,11 +53,10 @@ extends ControllerSpec:
       url = path
     )
 
-  s"GET $path for fixes including individuals and Amls fix should render correct status tags" in:
-    val expectedEntityFixes: Seq[EntityFix] = tdAll.riskingOutcomeEntityFailedFixable(isFixed = None).fixes.filterNot {
+  s"GET $path for fixes including individual fixes and entity fixes with Amls fix and no duplicates should render correct status tags" in:
+    val expectedEntityFixes: Seq[EntityFix] = tdAll.riskingOutcomeEntityFailedFixable(isFixed = None).fixes.filterNot:
       case _: AmlsFix => true
       case _ => false
-    }
     val expectedIndividualFixes: Seq[IndividualFix] = Seq(
       IndividualFix._4._1(isConfirmed = None),
       IndividualFix._4._3(isConfirmed = None)
@@ -81,5 +80,47 @@ extends ControllerSpec:
     doc.getTaskStatus(tasks.amls) shouldBe Constants.INCOMPLETE
     (expectedEntityFixes ++ expectedIndividualFixes).zipWithIndex.map: (_, index) =>
       doc.getTaskStatus(tasks.soleTraderFailures(index + 1)) shouldBe Constants.INCOMPLETE
+    doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
+    ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(agentApplication.riskingCompletedFixable)
+
+  s"GET $path with duplicate fixes in individual fixes and entity fixes with Amls fix should render correct status tags" in:
+    val expectedEntityFixes: Seq[EntityFix] = tdAll.riskingOutcomeEntityFailedFixable(isFixed = None).fixes.filterNot {
+      case _: AmlsFix => true
+      case _ => false
+    }
+    // these duplicate failure reason codes found in the entity fixes
+    val duplicateIndividualFixes: Seq[IndividualFix] = Seq(
+      IndividualFix._4._4(isConfirmed = None),
+      IndividualFix._5._4(isConfirmed = None)
+    )
+    ApplyStubHelper.stubsForApplicationBprAndIndividuals(
+      application = agentApplication.riskingCompletedFixable,
+      individuals = List(
+        tdAll.providedDetails.afterFinished.copy(riskingOutcomeIndividual =
+          Some(RiskingOutcomeIndividual.FailedFixable(
+            fixes = duplicateIndividualFixes,
+            declarationAgreed = false
+          ))
+        )
+      )
+    )
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.OK
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "Take action: You have not met the registration conditions - Apply for an agent services account - GOV.UK"
+    doc.getTaskStatus(tasks.amls) shouldBe Constants.INCOMPLETE
+    (expectedEntityFixes ++ duplicateIndividualFixes).zipWithIndex.foreach:
+      (
+        _,
+        zeroBasedIndex
+      ) =>
+        val oneBasedIndex: Int = zeroBasedIndex + 1
+        val taskId: String = tasks.soleTraderFailures(oneBasedIndex)
+        if oneBasedIndex <= expectedEntityFixes.size then
+          doc.getTaskStatus(taskId) shouldBe Constants.INCOMPLETE
+        else
+          // the duplicate individual fixes should be ignored and not rendered in the task list
+          doc.assertTaskNotRendered(taskId)
     doc.getTaskStatus(tasks.declaration) shouldBe Constants.CANNOT_START_YET
     ApplyStubHelper.verifyConnectorsForApplicationBprAndIndividuals(agentApplication.riskingCompletedFixable)

@@ -130,3 +130,30 @@ object ApplyStubHelper:
     // we don't need this when the fixable-failures feature is enabled, but it needs to be part of the request data until we can turn the flag on permanently
     // the type of risking progress doesn't matter as it's not consumed
     AgentRegistrationRiskingStubs.stubGetApplicationRiskingResponse(application.applicationReference, RiskingProgress.SubmittedForRisking)
+
+  def stubFixableFailureUpdate(
+    agentApplication: AgentApplication,
+    individualProvidedDetails: IndividualProvidedDetails,
+    updatedIndividualProvidedDetails: Option[IndividualProvidedDetails],
+    updatedApplication: Option[AgentApplication]
+  ): StubMapping =
+    updatedApplication.fold(
+      stubsForApplicationBprAndIndividuals(
+        application = agentApplication,
+        individuals = List(individualProvidedDetails)
+      )
+    )(updated =>
+      stubsForUpdatingApplication(
+        application = agentApplication,
+        updatedApplication = updated,
+        individuals = List(individualProvidedDetails)
+      )
+    )
+    updatedIndividualProvidedDetails.map: updated =>
+      AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
+        individualProvidedDetails = updated
+      )
+    AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
+      utr = tdAll.saUtr.asUtr,
+      responseBody = tdAll.businessPartnerRecordResponse
+    )
