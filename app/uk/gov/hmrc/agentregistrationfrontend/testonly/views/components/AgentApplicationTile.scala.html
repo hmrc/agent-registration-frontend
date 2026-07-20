@@ -20,6 +20,7 @@
 @import uk.gov.hmrc.agentregistration.shared.ApplicationState
 @import uk.gov.hmrc.agentregistration.shared.BusinessType
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 @import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
@@ -62,6 +63,23 @@
 }
 
 @isRiskingCompleted = @{agentApplication.applicationState === ApplicationState.RiskingCompleted}
+@isSentToMinerva = @{agentApplication.applicationState === ApplicationState.SentToMinerva}
+
+@riskingOutcomeApplicationLabel(outcome: RiskingOutcomeApplication) = @{
+    outcome match {
+        case _: RiskingOutcomeApplication.Approved => "Approved"
+        case _: RiskingOutcomeApplication.FailedFixable => "Failed (fixable)"
+        case _: RiskingOutcomeApplication.FailedNonFixable => "Failed (non-fixable)"
+    }
+}
+
+@riskingOutcomeApplicationTagClasses(outcome: RiskingOutcomeApplication) = @{
+    outcome match {
+        case _: RiskingOutcomeApplication.Approved => "govuk-tag--green"
+        case _: RiskingOutcomeApplication.FailedFixable => "govuk-tag--yellow"
+        case _: RiskingOutcomeApplication.FailedNonFixable => "govuk-tag--red"
+    }
+}
 
 @stateTagClasses = @{
     agentApplication.applicationState match {
@@ -118,9 +136,39 @@
         </div>
         @agentApplication.riskingOutcomeApplication.map { riskingOutcome =>
             <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Risking outcome</dt>
+                <dd class="govuk-summary-list__value">
+                    @govukTag(Tag(
+                        content = Text(riskingOutcomeApplicationLabel(riskingOutcome)),
+                        classes = riskingOutcomeApplicationTagClasses(riskingOutcome)
+                    ))
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Decision date</dt>
                 <dd class="govuk-summary-list__value">@DisplayDate.displayDateForLang(riskingOutcome.actualDecisionDate)</dd>
             </div>
+            @riskingOutcome match {
+                case fixable: RiskingOutcomeApplication.FailedFixable => {
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Corrective action expiry</dt>
+                        <dd class="govuk-summary-list__value">@DisplayDate.displayDateForLang(fixable.correctiveActionExpiryDate)</dd>
+                    </div>
+                    @fixable.reSubmittedAt.map { reSubmittedAt =>
+                        <div class="govuk-summary-list__row">
+                            <dt class="govuk-summary-list__key">Resubmitted at</dt>
+                            <dd class="govuk-summary-list__value">@formatInstant(reSubmittedAt)</dd>
+                        </div>
+                    }
+                }
+                case nonFixable: RiskingOutcomeApplication.FailedNonFixable => {
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Corrective action expiry</dt>
+                        <dd class="govuk-summary-list__value">@DisplayDate.displayDateForLang(nonFixable.correctiveActionExpiryDate)</dd>
+                    </div>
+                }
+                case _: RiskingOutcomeApplication.Approved => {}
+            }
         }
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Risking data</dt>
@@ -130,10 +178,10 @@
                 } else {
                     <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showApplicationForRisking(agentApplication.applicationReference)">Application-for-risking (JSON)</a> <br>
                     <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showCompletedRisking(agentApplication.applicationReference)">Completed risking / archive (JSON)</a> <br>
-                    @if(isRiskingCompleted) {
-                        <span class="govuk-hint govuk-!-margin-bottom-0">Select entity failures not available (risking completed)</span>
-                    } else {
+                    @if(isSentToMinerva) {
                         <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference)">Select entity failures</a>
+                    } else {
+                        <span class="govuk-hint govuk-!-margin-bottom-0">Select entity failures only available while SentToMinerva</span>
                     }
                 }
             </dd>

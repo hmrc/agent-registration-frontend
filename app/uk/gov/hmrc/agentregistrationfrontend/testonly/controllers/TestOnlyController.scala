@@ -183,7 +183,13 @@ extends FrontendControllerBase(mcc):
           formWithErrors => Future.successful(BadRequest(selectEntityFailuresPage(applicationReference, formWithErrors))),
           failures =>
             testRiskingService.submitEntityFailures(applicationReference, failures).map:
-              case UploadRiskingResultsFileOutcome.Uploaded => Ok("InProgress")
+              case UploadRiskingResultsFileOutcome.Uploaded =>
+                Ok(riskingActionConfirmationPage(
+                  heading = "Risking results submitted",
+                  description =
+                    s"A risking results file has been uploaded for application reference ${applicationReference.value}. " +
+                      "It won't take effect until results file processing is run."
+                ))
               case UploadRiskingResultsFileOutcome.AlreadyExists =>
                 val formWithError = SelectEntityFailuresForm.form
                   .fill(failures)
@@ -203,7 +209,13 @@ extends FrontendControllerBase(mcc):
           formWithErrors => Future.successful(BadRequest(selectIndividualFailuresPage(personReference, formWithErrors))),
           failures =>
             testRiskingService.submitIndividualFailures(personReference, failures).map:
-              case UploadRiskingResultsFileOutcome.Uploaded => Ok("InProgress")
+              case UploadRiskingResultsFileOutcome.Uploaded =>
+                Ok(riskingActionConfirmationPage(
+                  heading = "Risking results submitted",
+                  description =
+                    s"A risking results file has been uploaded for person reference ${personReference.value}. " +
+                      "It won't take effect until results file processing is run."
+                ))
               case UploadRiskingResultsFileOutcome.AlreadyExists =>
                 val formWithError = SelectIndividualFailuresForm.form
                   .fill(failures)
