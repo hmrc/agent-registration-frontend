@@ -21,6 +21,7 @@
 @import uk.gov.hmrc.agentregistration.shared.BusinessType
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
+@import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 @import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
@@ -81,6 +82,22 @@
     }
 }
 
+@riskingOutcomeEntityLabel(riskingOutcomeEntity: RiskingOutcomeEntity) = @{
+    riskingOutcomeEntity match {
+        case RiskingOutcomeEntity.Approved => "Approved"
+        case _: RiskingOutcomeEntity.FailedFixable => "Failed (fixable)"
+        case _: RiskingOutcomeEntity.FailedNonFixable => "Failed (non-fixable)"
+    }
+}
+
+@riskingOutcomeEntityTagClasses(riskingOutcomeEntity: RiskingOutcomeEntity) = @{
+    riskingOutcomeEntity match {
+        case RiskingOutcomeEntity.Approved => "govuk-tag--green"
+        case _: RiskingOutcomeEntity.FailedFixable => "govuk-tag--yellow"
+        case _: RiskingOutcomeEntity.FailedNonFixable => "govuk-tag--red"
+    }
+}
+
 @stateTagClasses = @{
     agentApplication.applicationState match {
         case ApplicationState.Started => "govuk-tag--grey"
@@ -129,46 +146,70 @@
                 ))
                 @if(agentApplication.isAfterSentForRisking) {
                     @agentApplication.submittedAt.map { submittedAt =>
-                        <span class="govuk-hint govuk-!-margin-bottom-0">Submitted @formatInstant(submittedAt)</span>
+                        <div class="govuk-!-margin-top-1">
+                            <div class="govuk-hint govuk-!-margin-bottom-0">Submitted: @formatInstant(submittedAt)</div>
+                        </div>
                     }
                 }
             </dd>
         </div>
         @agentApplication.riskingOutcomeApplication.map { riskingOutcome =>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Risking outcome</dt>
+                <dt class="govuk-summary-list__key">Risking outcome (application)</dt>
                 <dd class="govuk-summary-list__value">
                     @govukTag(Tag(
                         content = Text(riskingOutcomeApplicationLabel(riskingOutcome)),
                         classes = riskingOutcomeApplicationTagClasses(riskingOutcome)
                     ))
+                    <div class="govuk-!-margin-top-1">
+                        <div class="govuk-hint govuk-!-margin-bottom-0">Decision date: @DisplayDate.displayDateForLang(riskingOutcome.actualDecisionDate)</div>
+                        @riskingOutcome match {
+                            case failedFixable: RiskingOutcomeApplication.FailedFixable => {
+                                <div class="govuk-hint govuk-!-margin-bottom-0">Corrective action expiry: @DisplayDate.displayDateForLang(failedFixable.correctiveActionExpiryDate)</div>
+                                @failedFixable.reSubmittedAt.map { reSubmittedAt =>
+                                    <div class="govuk-hint govuk-!-margin-bottom-0">Resubmitted at: @formatInstant(reSubmittedAt)</div>
+                                }
+                            }
+                            case failedNonFixable: RiskingOutcomeApplication.FailedNonFixable => {
+                                <div class="govuk-hint govuk-!-margin-bottom-0">Corrective action expiry: @DisplayDate.displayDateForLang(failedNonFixable.correctiveActionExpiryDate)</div>
+                            }
+                            case _: RiskingOutcomeApplication.Approved => {}
+                        }
+                    </div>
                 </dd>
             </div>
+        }
+        @agentApplication.riskingOutcomeEntity.map { riskingOutcomeEntity =>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Decision date</dt>
-                <dd class="govuk-summary-list__value">@DisplayDate.displayDateForLang(riskingOutcome.actualDecisionDate)</dd>
-            </div>
-            @riskingOutcome match {
-                case fixable: RiskingOutcomeApplication.FailedFixable => {
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Corrective action expiry</dt>
-                        <dd class="govuk-summary-list__value">@DisplayDate.displayDateForLang(fixable.correctiveActionExpiryDate)</dd>
-                    </div>
-                    @fixable.reSubmittedAt.map { reSubmittedAt =>
-                        <div class="govuk-summary-list__row">
-                            <dt class="govuk-summary-list__key">Resubmitted at</dt>
-                            <dd class="govuk-summary-list__value">@formatInstant(reSubmittedAt)</dd>
-                        </div>
+                <dt class="govuk-summary-list__key">Risking outcome (entity)</dt>
+                <dd class="govuk-summary-list__value">
+                    @govukTag(Tag(
+                        content = Text(riskingOutcomeEntityLabel(riskingOutcomeEntity)),
+                        classes = riskingOutcomeEntityTagClasses(riskingOutcomeEntity)
+                    ))
+                    @riskingOutcomeEntity match {
+                        case failedFixable: RiskingOutcomeEntity.FailedFixable => {
+                            <div class="govuk-!-margin-top-1">
+                                <ul class="govuk-list govuk-!-margin-bottom-0">
+                                    @failedFixable.fixes.map { entityFix =>
+                                        <li class="govuk-hint govuk-!-margin-bottom-0">@entityFix.toString</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                        case failedNonFixable: RiskingOutcomeEntity.FailedNonFixable => {
+                            <div class="govuk-!-margin-top-1">
+                                <ul class="govuk-list govuk-!-margin-bottom-0">
+                                    @failedNonFixable.failures.map { entityFailure =>
+                                        <li class="govuk-hint govuk-!-margin-bottom-0">@entityFailure.toString</li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                        case RiskingOutcomeEntity.Approved => {}
                     }
-                }
-                case nonFixable: RiskingOutcomeApplication.FailedNonFixable => {
-                    <div class="govuk-summary-list__row">
-                        <dt class="govuk-summary-list__key">Corrective action expiry</dt>
-                        <dd class="govuk-summary-list__value">@DisplayDate.displayDateForLang(nonFixable.correctiveActionExpiryDate)</dd>
-                    </div>
-                }
-                case _: RiskingOutcomeApplication.Approved => {}
-            }
+                </dd>
+            </div>
         }
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Risking data</dt>
