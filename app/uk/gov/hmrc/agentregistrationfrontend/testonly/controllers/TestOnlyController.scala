@@ -151,6 +151,14 @@ extends FrontendControllerBase(mcc):
               " into the completed-risking collection. Processing happens asynchronously in the background."
         ))
 
+  /** Same underlying action as `runResultsFileProcessing`, but for the quick-nav link: redirects back to the page the user was on instead of showing the
+    * confirmation page, so it can be used as a one-click action from anywhere in the test-only tooling.
+    */
+  def runResultsFileProcessingAndRedirect(redirectUrl: String): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.runResultsFileProcessing().map: _ =>
+        Redirect(redirectUrl)
+
   def viewNextRiskingFileContents: Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
       testRiskingService.viewNextRiskingFileContents().map(Ok(_))
