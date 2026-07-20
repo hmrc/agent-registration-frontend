@@ -1,0 +1,49 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@*
+ * govukButton only renders a real disabled/aria-disabled attribute when it emits a <button> element,
+ * i.e. when no `href` is supplied — an href-style <a> button silently ignores `disabled` entirely
+ * (see GovukButton.scala.html: the disabled attribute is only added by `buttonAttributes`, which the
+ * <a> branch never calls). So this wraps the button in a plain GET form instead of using href, which
+ * is the only way to get a genuinely inert, visually-disabled action out of this component.
+ *@
+
+@this(govukButton: GovukButton)
+
+@(
+        label: String,
+        url: Call,
+        enabled: Boolean,
+        disabledHint: Option[String] = None,
+        id: Option[String] = None
+)
+
+<div class="govuk-!-margin-bottom-3">
+    <form method="get" action="@url" class="govuk-!-display-inline-block govuk-!-margin-bottom-0">
+        @govukButton(Button(
+            content = Text(label),
+            classes = "govuk-button--secondary govuk-!-margin-bottom-0",
+            disabled = !enabled,
+            id = id
+        ))
+    </form>
+    @if(!enabled) {
+        @disabledHint.map { hint =>
+            <p class="govuk-hint govuk-!-margin-bottom-0">@hint</p>
+        }
+    }
+</div>
