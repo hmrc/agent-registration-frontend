@@ -139,16 +139,16 @@ extends FrontendController(mcc, applicantActions):
     individualName: IndividualName
   )(using request: Request[?]): Future[IndividualProvidedDetails] =
     val individualProvidedDetailsId: IndividualProvidedDetailsId = individualProvidedDetailsIdGenerator.nextIndividualProvidedDetailsId()
+    val planetId: PlanetId = PlanetId.make(agentApplicationId) // same across all individuals of this application
+    val userIdIndividual: UserId = UserId.make(individualProvidedDetailsId) // new per individual (derived from the fresh ipdId)
     val individualProvidedDetails = template.copy(
       _id = individualProvidedDetailsId,
       personReference = personReferenceGenerator.generatePersonReference(),
       individualName = individualName,
       agentApplicationId = agentApplicationId,
-      internalUserId = template.internalUserId.map(_ => internalUserIdGenerator.nextInternalUserId()),
+      internalUserId = template.internalUserId.map(_ => internalUserIdGenerator.nextInternalUserId(userIdIndividual, planetId)),
       createdAt = Instant.now(clock)
     )
-    val planetId: PlanetId = PlanetId.make(agentApplicationId)
-    val userIdIndividual: UserId = UserId.make(individualProvidedDetailsId)
     for
       userIndividual <- stubUserService.createUserIndividual(
         userId = userIdIndividual,
