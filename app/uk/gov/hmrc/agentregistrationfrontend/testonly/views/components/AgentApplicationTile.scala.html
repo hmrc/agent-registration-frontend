@@ -24,6 +24,7 @@
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 @import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestRiskingResultsFilename
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 @import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
@@ -75,9 +76,24 @@
 
 @provideDetailsLink = @{appConfig.applicationLink(agentApplication.linkId.value)}
 
-@entityResultsFilename = @{s"test-only-entity-${agentApplication.applicationReference.value}"}
+@reSubmittedAt = @{
+    agentApplication.riskingOutcomeApplication.flatMap {
+        case failedFixable: RiskingOutcomeApplication.FailedFixable => failedFixable.reSubmittedAt
+        case _ => None
+    }
+}
+@entityWasFailedFixable = @{
+    agentApplication.riskingOutcomeEntity.exists {
+        case _: RiskingOutcomeEntity.FailedFixable => true
+        case _ => false
+    }
+}
+@entityResultsFilename = @{
+    TestRiskingResultsFilename.entity(agentApplication.applicationReference, if (entityWasFailedFixable) reSubmittedAt else None)
+}
 @isEntityResultsFileSubmitted = @{submittedRiskingResultsFilenames.contains(entityResultsFilename)}
 
+@reSubmittedAtMillis = @{reSubmittedAt.map(_.toEpochMilli)}
 @redirectUrlWithAnchor = @{s"${requestHeader.uri}#entity-minerva-simulator"}
 
 @nonBusinessIdentifiers = @{
@@ -284,11 +300,11 @@
                 } else if (isSentToMinerva) {
                     <p class="govuk-hint govuk-!-margin-bottom-2">Emulate uploading risking results from Minerva</p>
                     <p class="govuk-body govuk-!-margin-bottom-1">
-                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference)">Choose entity failures</a>
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference, reSubmittedAtMillis)">Choose entity failures</a>
                         or just quickly
-                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresApproved(agentApplication.applicationReference, redirectUrlWithAnchor)">approve</a>,
-                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresFixable(agentApplication.applicationReference, redirectUrlWithAnchor)">fail-fixable</a>,
-                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresMixed(agentApplication.applicationReference, redirectUrlWithAnchor)">fail-non-fixable</a>
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresApproved(agentApplication.applicationReference, redirectUrlWithAnchor, reSubmittedAtMillis)">approve</a>,
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresFixable(agentApplication.applicationReference, redirectUrlWithAnchor, reSubmittedAtMillis)">fail-fixable</a>,
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresMixed(agentApplication.applicationReference, redirectUrlWithAnchor, reSubmittedAtMillis)">fail-non-fixable</a>
                     </p>
                 } else {
                     <span class="govuk-hint">Only available once the application is SentToMinerva (currently: @agentApplication.applicationState)</span>
@@ -304,7 +320,7 @@
                     <ul class="govuk-list">
                         @individuals.map { individual =>
                             <li class="govuk-!-margin-bottom-4">
-                                @individualTile(individual, isSentToMinerva, submittedRiskingResultsFilenames)
+                                @individualTile(individual, isSentToMinerva, reSubmittedAt, submittedRiskingResultsFilenames)
                             </li>
                         }
                     </ul>

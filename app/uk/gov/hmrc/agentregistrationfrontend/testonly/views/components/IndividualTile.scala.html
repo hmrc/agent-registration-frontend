@@ -21,6 +21,7 @@
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 @import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestRiskingResultsFilename
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 @import java.time.Instant
@@ -39,6 +40,7 @@
 @(
         individual: IndividualProvidedDetails,
         isSentToMinerva: Boolean,
+        reSubmittedAt: Option[Instant],
         submittedRiskingResultsFilenames: Set[String])(implicit
         requestHeader: RequestHeader
 )
@@ -46,9 +48,18 @@
 @instantFormatter = @{DateTimeFormatter.ofPattern("d MMM uuuu, HH:mm").withZone(ZoneId.of("Europe/London"))}
 @formatInstant(instant: Instant) = @{instantFormatter.format(instant)}
 
-@individualResultsFilename = @{s"test-only-individual-${individual.personReference.value}"}
+@individualWasFailedFixable = @{
+    individual.riskingOutcomeIndividual.exists {
+        case _: RiskingOutcomeIndividual.FailedFixable => true
+        case _ => false
+    }
+}
+@individualResultsFilename = @{
+    TestRiskingResultsFilename.individual(individual.personReference, if (individualWasFailedFixable) reSubmittedAt else None)
+}
 @isIndividualResultsFileSubmitted = @{submittedRiskingResultsFilenames.contains(individualResultsFilename)}
 
+@reSubmittedAtMillis = @{reSubmittedAt.map(_.toEpochMilli)}
 @individualCardId = @{s"individual-${individual.personReference.value}"}
 @redirectUrlWithAnchor = @{s"${requestHeader.uri}#$individualCardId"}
 
@@ -154,11 +165,11 @@
     } else if (isSentToMinerva) {
         <p class="govuk-hint govuk-!-margin-bottom-2">Emulate uploading risking results from Minerva</p>
         <p class="govuk-body govuk-!-margin-bottom-1">
-            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference)">Choose individual failures</a>
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference, reSubmittedAtMillis)">Choose individual failures</a>
             or just quickly
-            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, redirectUrlWithAnchor)">approve</a>,
-            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, redirectUrlWithAnchor)">fail-fixable</a>,
-            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresMixed(individual.personReference, redirectUrlWithAnchor)">fail-non-fixable</a>
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, redirectUrlWithAnchor, reSubmittedAtMillis)">approve</a>,
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, redirectUrlWithAnchor, reSubmittedAtMillis)">fail-fixable</a>,
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresMixed(individual.personReference, redirectUrlWithAnchor, reSubmittedAtMillis)">fail-non-fixable</a>
         </p>
     } else {
         <span class="govuk-hint">Only available once the application is SentToMinerva</span>

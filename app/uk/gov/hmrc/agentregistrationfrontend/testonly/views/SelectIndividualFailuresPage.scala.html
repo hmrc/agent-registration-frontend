@@ -20,6 +20,8 @@
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyLayout
 @import uk.gov.hmrc.govukfrontend.views.Implicits.RichCheckboxes
 
+@import java.time.Instant
+
 @this(
         layout: TestOnlyLayout,
         formWithCSRF: FormWithCSRF,
@@ -29,6 +31,7 @@
 
 @(
         personReference: PersonReference,
+        reSubmittedAt: Option[Instant],
         form: Form[Seq[IndividualRiskingFailure]])(implicit
         request: RequestHeader,
         messages: Messages
@@ -70,7 +73,7 @@
     <h1 class="govuk-heading-xl">Select individual failures</h1>
     <p class="govuk-body">Person reference: @personReference.value</p>
 
-    @formWithCSRF(action = AppRoutes.testOnly.TestOnlyController.submitIndividualFailures(personReference)) {
+    @formWithCSRF(action = AppRoutes.testOnly.TestOnlyController.submitIndividualFailures(personReference, reSubmittedAt.map(_.toEpochMilli))) {
         <h2 class="govuk-heading-l">Fixable failures</h2>
         @groupedByCheckId(IndividualRiskingFailure.values.toIndexedSeq.filter(_.fixable)).map { case (checkId, failures) =>
             @checkboxGroup(s"individual-failures-fixable-$checkId", checkId, failures.head.checkDescription, failures)
