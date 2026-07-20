@@ -24,6 +24,7 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendControllerBase
@@ -46,6 +47,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectIndividua
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
+import scala.util.Random
 
 @Singleton
 class TestOnlyController @Inject() (
@@ -239,7 +241,7 @@ extends FrontendControllerBase(mcc):
     implicit request =>
       submitEntityFailuresQuickAction(
         applicationReference,
-        Seq(EntityRiskingFailure.Check_4_1),
+        randomFixableEntityFailures(1 + Random.nextInt(3)),
         redirectUrl
       )
 
@@ -253,7 +255,7 @@ extends FrontendControllerBase(mcc):
     implicit request =>
       submitEntityFailuresQuickAction(
         applicationReference,
-        Seq(EntityRiskingFailure.Check_4_1, EntityRiskingFailure.Check_8_1),
+        randomNonFixableEntityFailures(),
         redirectUrl
       )
 
@@ -264,6 +266,29 @@ extends FrontendControllerBase(mcc):
   )(using RequestHeader): Future[Result] =
     // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to where the link was clicked from.
     testRiskingService.submitEntityFailures(applicationReference, failures).map(_ => Redirect(redirectUrl))
+
+  /** A random non-empty subset (1 to 3) of the fixable entity checks, so repeated clicks of the "fail-fixable" quick action produce varied test data instead of
+    * always the exact same single failure.
+    */
+  /** A random selection of `count` fixable entity failures containing at most one AMLS (Check 3) failure — the real risking model only ever produces a single
+    * `EntityFix._3.AmlsFix` per application (see `SelectEntityFailuresForm`'s equivalent validation), so picking from the raw fixable catalogue directly could
+    * easily select two or more AMLS checks and build test data that could never occur for real.
+    */
+  private def randomFixableEntityFailures(count: Int): Seq[EntityRiskingFailure] =
+    val allFixableFailures: Seq[EntityRiskingFailure] = EntityRiskingFailure.values.filter(_.fixable).toSeq
+    val (amlsFailures, otherFixableFailures) = allFixableFailures.partition(_.checkId === "3")
+    val pool = otherFixableFailures ++ Random.shuffle(amlsFailures).take(1)
+    Random.shuffle(pool).take(count)
+
+  /** A random selection guaranteed to contain at least one non-fixable entity check (so the resulting outcome is genuinely FailedNonFixable), plus a random 0-2
+    * fixable checks (with the same at-most-one-AMLS rule as `randomFixableEntityFailures`) bundled alongside it — exercising the "Failures" + "Fixes" split
+    * rendering on a genuinely mixed set.
+    */
+  private def randomNonFixableEntityFailures(): Seq[EntityRiskingFailure] =
+    val nonFixableFailures: Seq[EntityRiskingFailure] = EntityRiskingFailure.values.filterNot(_.fixable).toSeq
+    val randomNonFixable = Random.shuffle(nonFixableFailures).take(1 + Random.nextInt(3))
+    val randomFixable = randomFixableEntityFailures(Random.nextInt(3))
+    randomNonFixable ++ randomFixable
 
   def showSelectIndividualFailures(personReference: PersonReference): Action[AnyContent] = defaultActionBuilder:
     implicit request =>
@@ -313,7 +338,7 @@ extends FrontendControllerBase(mcc):
     implicit request =>
       submitIndividualFailuresQuickAction(
         personReference,
-        Seq(IndividualRiskingFailure.Check_4_1),
+        randomFixableIndividualFailures(),
         redirectUrl
       )
 
@@ -327,7 +352,7 @@ extends FrontendControllerBase(mcc):
     implicit request =>
       submitIndividualFailuresQuickAction(
         personReference,
-        Seq(IndividualRiskingFailure.Check_4_1, IndividualRiskingFailure.Check_8_1),
+        randomNonFixableIndividualFailures(),
         redirectUrl
       )
 
@@ -338,3 +363,20 @@ extends FrontendControllerBase(mcc):
   )(using RequestHeader): Future[Result] =
     // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to where the link was clicked from.
     testRiskingService.submitIndividualFailures(personReference, failures).map(_ => Redirect(redirectUrl))
+
+  /** A random non-empty subset (1 to 3) of the fixable individual checks, so repeated clicks of the "fail-fixable" quick action produce varied test data
+    * instead of always the exact same single failure.
+    */
+  private def randomFixableIndividualFailures(): Seq[IndividualRiskingFailure] =
+    val fixableFailures: Seq[IndividualRiskingFailure] = IndividualRiskingFailure.values.filter(_.fixable).toSeq
+    Random.shuffle(fixableFailures).take(1 + Random.nextInt(3))
+
+  /** A random selection guaranteed to contain at least one non-fixable individual check (so the resulting outcome is genuinely FailedNonFixable), plus a random
+    * 0-2 fixable checks bundled alongside it — exercising the "Failures" + "Fixes" split rendering on a genuinely mixed set.
+    */
+  private def randomNonFixableIndividualFailures(): Seq[IndividualRiskingFailure] =
+    val nonFixableFailures: Seq[IndividualRiskingFailure] = IndividualRiskingFailure.values.filterNot(_.fixable).toSeq
+    val fixableFailures: Seq[IndividualRiskingFailure] = IndividualRiskingFailure.values.filter(_.fixable).toSeq
+    val randomNonFixable = Random.shuffle(nonFixableFailures).take(1 + Random.nextInt(3))
+    val randomFixable = Random.shuffle(fixableFailures).take(Random.nextInt(3))
+    randomNonFixable ++ randomFixable
