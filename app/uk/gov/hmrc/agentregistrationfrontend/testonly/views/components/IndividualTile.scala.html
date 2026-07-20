@@ -16,7 +16,9 @@
 
 @import play.api.i18n.Messages
 @import play.twirl.api.Html
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 @import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
@@ -30,6 +32,7 @@
         individualFixesGroup: IndividualFixesGroup,
         individualFailuresGroup: IndividualFailuresGroup,
         compactLink: CompactLink,
+        identifier: Identifier,
         govukTag: GovukTag
 )
 
@@ -45,6 +48,36 @@
 
 @individualResultsFilename = @{s"test-only-individual-${individual.personReference.value}"}
 @isIndividualResultsFileSubmitted = @{submittedRiskingResultsFilenames.contains(individualResultsFilename)}
+
+@strongText(value: String) = {<strong>@value</strong>}
+
+@ninoValue = @{
+    individual.individualNino.flatMap {
+        case IndividualNino.NotProvided => None
+        case IndividualNino.Provided(nino) => Some(nino.value)
+        case IndividualNino.FromAuth(nino) => Some(nino.value)
+    }
+}
+
+@saUtrValue = @{
+    individual.individualSaUtr.flatMap {
+        case IndividualSaUtr.NotProvided => None
+        case IndividualSaUtr.Provided(saUtr) => Some(saUtr.value)
+        case IndividualSaUtr.FromAuth(saUtr) => Some(saUtr.value)
+        case IndividualSaUtr.FromCitizenDetails(saUtr) => Some(saUtr.value)
+    }
+}
+
+@identifierEntries = @{
+    Seq(
+        Some(("Individual ID", individual.individualProvidedDetailsId.value)),
+        individual.internalUserId.map(v => ("Internal User ID", v.value)),
+        ninoValue.map(v => ("NINO", v)),
+        saUtrValue.map(v => ("SA UTR", v)),
+        individual.vrns.map(list => ("VRNs", if (list.isEmpty) "" else list.map(_.value).mkString(", "))),
+        individual.payeRefs.map(list => ("PAYE refs", if (list.isEmpty) "" else list.map(_.value).mkString(", ")))
+    ).flatten
+}
 
 @tagClasses = @{
     individual.providedDetailsState match {
@@ -133,14 +166,14 @@
     Seq(
         Some(SummaryListRow(
             key = Key(content = Text("Person reference")),
-            value = Value(content = Text(individual.personReference.value))
+            value = Value(content = HtmlContent(strongText(individual.personReference.value)))
         )),
         Some(SummaryListRow(
             key = Key(content = Text("Name")),
             value = Value(content = Text(individual.individualName.value))
         )),
         Some(SummaryListRow(
-            key = Key(content = Text("Status")),
+            key = Key(content = Text("State")),
             value = Value(content = HtmlContent(govukTag(Tag(
                 content = Text(individual.providedDetailsState.toString),
                 classes = tagClasses
@@ -157,18 +190,12 @@
             value = Value(content = Text(formatInstant(individual.createdAt)))
         )),
         Some(SummaryListRow(
-            key = Key(content = Text("Individual ID")),
-            value = Value(content = Text(individual.individualProvidedDetailsId.value))
-        )),
-        individual.internalUserId.map { internalUserId =>
-            SummaryListRow(
-                key = Key(content = Text("Internal User ID")),
-                value = Value(content = Text(internalUserId.value))
-            )
-        },
-        Some(SummaryListRow(
             key = Key(content = Text("Person of control")),
             value = Value(content = Text(individual.isPersonOfControl.toString))
+        )),
+        Some(SummaryListRow(
+            key = Key(content = Text("Identifiers")),
+            value = Value(content = HtmlContent(identifier(identifierEntries)))
         )),
         Some(SummaryListRow(
             key = Key(content = Text("View data")),
