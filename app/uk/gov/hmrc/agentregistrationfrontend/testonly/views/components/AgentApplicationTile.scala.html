@@ -22,6 +22,7 @@
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.EntityRiskingFailure
 @import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
@@ -77,7 +78,7 @@
 @riskingOutcomeApplicationTagClasses(outcome: RiskingOutcomeApplication) = @{
     outcome match {
         case _: RiskingOutcomeApplication.Approved => "govuk-tag--green"
-        case _: RiskingOutcomeApplication.FailedFixable => "govuk-tag--yellow"
+        case _: RiskingOutcomeApplication.FailedFixable => "govuk-tag--orange"
         case _: RiskingOutcomeApplication.FailedNonFixable => "govuk-tag--red"
     }
 }
@@ -93,8 +94,35 @@
 @riskingOutcomeEntityTagClasses(riskingOutcomeEntity: RiskingOutcomeEntity) = @{
     riskingOutcomeEntity match {
         case RiskingOutcomeEntity.Approved => "govuk-tag--green"
-        case _: RiskingOutcomeEntity.FailedFixable => "govuk-tag--yellow"
+        case _: RiskingOutcomeEntity.FailedFixable => "govuk-tag--orange"
         case _: RiskingOutcomeEntity.FailedNonFixable => "govuk-tag--red"
+    }
+}
+
+@entityRiskingFailureTagClasses(entityRiskingFailure: EntityRiskingFailure) = @{
+    if (entityRiskingFailure.fixable) "govuk-tag--orange" else "govuk-tag--red"
+}
+
+@entityRiskingFailureListItem(entityRiskingFailure: EntityRiskingFailure) = {
+    <li class="govuk-hint govuk-!-margin-bottom-0">
+        @govukTag(Tag(
+            content = Text(entityRiskingFailure.reasonCode),
+            classes = entityRiskingFailureTagClasses(entityRiskingFailure)
+        ))
+        @entityRiskingFailure.checkDescription — @entityRiskingFailure.reasonDescription
+    </li>
+}
+
+@entityRiskingFailureGroup(heading: String, entityRiskingFailures: Seq[EntityRiskingFailure]) = {
+    @if(entityRiskingFailures.nonEmpty) {
+        <div class="govuk-!-margin-top-1">
+            <div class="govuk-!-font-weight-bold">@heading</div>
+            <ul class="govuk-list govuk-!-margin-bottom-0">
+                @entityRiskingFailures.map { entityRiskingFailure =>
+                    @entityRiskingFailureListItem(entityRiskingFailure)
+                }
+            </ul>
+        </div>
     }
 }
 
@@ -189,22 +217,11 @@
                     ))
                     @riskingOutcomeEntity match {
                         case failedFixable: RiskingOutcomeEntity.FailedFixable => {
-                            <div class="govuk-!-margin-top-1">
-                                <ul class="govuk-list govuk-!-margin-bottom-0">
-                                    @failedFixable.fixes.map { entityFix =>
-                                        <li class="govuk-hint govuk-!-margin-bottom-0">@entityFix.toString</li>
-                                    }
-                                </ul>
-                            </div>
+                            @entityRiskingFailureGroup("Failures", failedFixable.fixes.map(EntityRiskingFailure.fromEntityFix))
                         }
                         case failedNonFixable: RiskingOutcomeEntity.FailedNonFixable => {
-                            <div class="govuk-!-margin-top-1">
-                                <ul class="govuk-list govuk-!-margin-bottom-0">
-                                    @failedNonFixable.failures.map { entityFailure =>
-                                        <li class="govuk-hint govuk-!-margin-bottom-0">@entityFailure.toString</li>
-                                    }
-                                </ul>
-                            </div>
+                            @entityRiskingFailureGroup("Failures", EntityRiskingFailure.nonFixableFailures(failedNonFixable.failures))
+                            @entityRiskingFailureGroup("Fixes", EntityRiskingFailure.fixableFailures(failedNonFixable.failures))
                         }
                         case RiskingOutcomeEntity.Approved => {}
                     }
