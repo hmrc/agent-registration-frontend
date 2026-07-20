@@ -22,6 +22,8 @@
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
+@import uk.gov.hmrc.agentregistration.shared.risking.EntityFix
+@import uk.gov.hmrc.agentregistration.shared.risking.EntityFailure
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.EntityRiskingFailure
 @import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
@@ -99,27 +101,45 @@
     }
 }
 
-@entityRiskingFailureTagClasses(entityRiskingFailure: EntityRiskingFailure) = @{
-    if (entityRiskingFailure.fixable) "govuk-tag--orange" else "govuk-tag--red"
+@entityFixListItem(entityFix: EntityFix) = {
+    <li class="govuk-hint govuk-!-margin-bottom-0">
+        @govukTag(Tag(
+            content = Text(entityFix.toString),
+            classes = "govuk-tag--orange"
+        ))
+    </li>
 }
 
-@entityRiskingFailureListItem(entityRiskingFailure: EntityRiskingFailure) = {
+@entityFailureListItem(entityRiskingFailure: EntityRiskingFailure) = {
     <li class="govuk-hint govuk-!-margin-bottom-0">
         @govukTag(Tag(
             content = Text(entityRiskingFailure.reasonCode),
-            classes = entityRiskingFailureTagClasses(entityRiskingFailure)
+            classes = if (entityRiskingFailure.fixable) "govuk-tag--orange" else "govuk-tag--red"
         ))
         @entityRiskingFailure.checkDescription — @entityRiskingFailure.reasonDescription
     </li>
 }
 
-@entityRiskingFailureGroup(heading: String, entityRiskingFailures: Seq[EntityRiskingFailure]) = {
-    @if(entityRiskingFailures.nonEmpty) {
+@entityFixesGroup(entityFixes: Seq[EntityFix]) = {
+    @if(entityFixes.nonEmpty) {
         <div class="govuk-!-margin-top-1">
-            <div class="govuk-!-font-weight-bold">@heading</div>
+            <div class="govuk-!-font-weight-bold">Fixes</div>
             <ul class="govuk-list govuk-!-margin-bottom-0">
-                @entityRiskingFailures.map { entityRiskingFailure =>
-                    @entityRiskingFailureListItem(entityRiskingFailure)
+                @entityFixes.map { entityFix =>
+                    @entityFixListItem(entityFix)
+                }
+            </ul>
+        </div>
+    }
+}
+
+@entityFailuresGroup(entityFailures: Seq[EntityFailure]) = {
+    @if(entityFailures.nonEmpty) {
+        <div class="govuk-!-margin-top-1">
+            <div class="govuk-!-font-weight-bold">Failures</div>
+            <ul class="govuk-list govuk-!-margin-bottom-0">
+                @entityFailures.map(EntityRiskingFailure.fromEntityFailure).map { entityRiskingFailure =>
+                    @entityFailureListItem(entityRiskingFailure)
                 }
             </ul>
         </div>
@@ -217,11 +237,10 @@
                     ))
                     @riskingOutcomeEntity match {
                         case failedFixable: RiskingOutcomeEntity.FailedFixable => {
-                            @entityRiskingFailureGroup("Failures", failedFixable.fixes.map(EntityRiskingFailure.fromEntityFix))
+                            @entityFixesGroup(failedFixable.fixes)
                         }
                         case failedNonFixable: RiskingOutcomeEntity.FailedNonFixable => {
-                            @entityRiskingFailureGroup("Failures", EntityRiskingFailure.nonFixableFailures(failedNonFixable.failures))
-                            @entityRiskingFailureGroup("Fixes", EntityRiskingFailure.fixableFailures(failedNonFixable.failures))
+                            @entityFailuresGroup(failedNonFixable.failures)
                         }
                         case RiskingOutcomeEntity.Approved => {}
                     }

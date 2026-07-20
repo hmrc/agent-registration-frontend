@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
 import uk.gov.hmrc.agentregistration.shared.risking.EntityFailure
-import uk.gov.hmrc.agentregistration.shared.risking.EntityFix
 
 /** Flat, structured catalogue of every possible entity (application) risking failure, mirroring `uk.gov.hmrc.agentregistration.shared.risking.EntityFailure`
   * but carrying `checkId`/`reasonCode`/descriptions as real fields rather than scaladoc, so test-only pages can build the `Failure` JSON objects expected by a
@@ -237,7 +236,9 @@ enum EntityRiskingFailure(
 
 object EntityRiskingFailure:
 
-  /** Maps a canonical `EntityFailure` (as carried on `RiskingOutcomeEntity.FailedNonFixable`) to its richer, descriptive counterpart here. */
+  /** Maps a canonical `EntityFailure` (as carried on `RiskingOutcomeEntity.FailedNonFixable`) to its richer, descriptive counterpart here — a clean 1:1
+    * mapping, unlike `EntityFix` (see `EntityFix._3.AmlsFix`, which collapses several distinct failures into one fix type).
+    */
   def fromEntityFailure(entityFailure: EntityFailure): EntityRiskingFailure =
     entityFailure match
       case EntityFailure._3._1 => Check_3_1
@@ -262,28 +263,3 @@ object EntityRiskingFailure:
       case EntityFailure._8._5 => Check_8_5
       case EntityFailure._8._6 => Check_8_6
       case EntityFailure._8._7 => Check_8_7
-
-  /** Maps a canonical `EntityFix` (as carried on `RiskingOutcomeEntity.FailedFixable`) to its richer, descriptive counterpart here. */
-  def fromEntityFix(entityFix: EntityFix): EntityRiskingFailure =
-    entityFix match
-      case amlsFix: EntityFix._3.AmlsFix => fromEntityFailure(amlsFix.failure)
-      case _: EntityFix._4._1 => Check_4_1
-      case _: EntityFix._4._2 => Check_4_2
-      case _: EntityFix._4._3 => Check_4_3
-      case _: EntityFix._4._4 => Check_4_4
-      case _: EntityFix._5._1 => Check_5_1
-      case _: EntityFix._5._2 => Check_5_2
-      case _: EntityFix._5._3 => Check_5_3
-      case _: EntityFix._5._4 => Check_5_4
-      case _: EntityFix._5._5 => Check_5_5
-      case _: EntityFix._5._6 => Check_5_6
-      case _: EntityFix._5._7 => Check_5_7
-      case _: EntityFix._8._5 => Check_8_5
-      case _: EntityFix._8._7 => Check_8_7
-
-  /** Splits a `RiskingOutcomeEntity.FailedNonFixable`'s `failures` into the ones that actually block the application (non-fixable) and any fixable ones bundled
-    * alongside them — the overall outcome is non-fixable as soon as one failure is, even if others in the same list are fixable.
-    */
-  def nonFixableFailures(entityFailures: Seq[EntityFailure]): Seq[EntityRiskingFailure] = entityFailures.map(fromEntityFailure).filterNot(_.fixable)
-
-  def fixableFailures(entityFailures: Seq[EntityFailure]): Seq[EntityRiskingFailure] = entityFailures.map(fromEntityFailure).filter(_.fixable)

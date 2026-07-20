@@ -18,6 +18,10 @@
 @import play.twirl.api.Html
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
+@import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
+@import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
+@import uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.IndividualRiskingFailure
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 
@@ -39,6 +43,83 @@
         case ProvidedDetailsState.AccessConfirmed => "govuk-tag--blue"
         case ProvidedDetailsState.Started => "govuk-tag--yellow"
         case ProvidedDetailsState.Finished => "govuk-tag--green"
+    }
+}
+
+@riskingOutcomeIndividualLabel(riskingOutcomeIndividual: RiskingOutcomeIndividual) = @{
+    riskingOutcomeIndividual match {
+        case RiskingOutcomeIndividual.Approved => "Approved"
+        case _: RiskingOutcomeIndividual.FailedFixable => "Failed (fixable)"
+        case _: RiskingOutcomeIndividual.FailedNonFixable => "Failed (non-fixable)"
+    }
+}
+
+@riskingOutcomeIndividualTagClasses(riskingOutcomeIndividual: RiskingOutcomeIndividual) = @{
+    riskingOutcomeIndividual match {
+        case RiskingOutcomeIndividual.Approved => "govuk-tag--green"
+        case _: RiskingOutcomeIndividual.FailedFixable => "govuk-tag--orange"
+        case _: RiskingOutcomeIndividual.FailedNonFixable => "govuk-tag--red"
+    }
+}
+
+@individualFixListItem(individualFix: IndividualFix) = {
+    <li class="govuk-hint govuk-!-margin-bottom-0">
+        @govukTag(Tag(
+            content = Text(individualFix.toString),
+            classes = "govuk-tag--orange"
+        ))
+    </li>
+}
+
+@individualFailureListItem(individualRiskingFailure: IndividualRiskingFailure) = {
+    <li class="govuk-hint govuk-!-margin-bottom-0">
+        @govukTag(Tag(
+            content = Text(individualRiskingFailure.reasonCode),
+            classes = if (individualRiskingFailure.fixable) "govuk-tag--orange" else "govuk-tag--red"
+        ))
+        @individualRiskingFailure.checkDescription — @individualRiskingFailure.reasonDescription
+    </li>
+}
+
+@individualFixesGroup(individualFixes: Seq[IndividualFix]) = {
+    @if(individualFixes.nonEmpty) {
+        <div class="govuk-!-margin-top-1">
+            <div class="govuk-!-font-weight-bold">Fixes</div>
+            <ul class="govuk-list govuk-!-margin-bottom-0">
+                @individualFixes.map { individualFix =>
+                    @individualFixListItem(individualFix)
+                }
+            </ul>
+        </div>
+    }
+}
+
+@individualFailuresGroup(individualFailures: Seq[IndividualFailure]) = {
+    @if(individualFailures.nonEmpty) {
+        <div class="govuk-!-margin-top-1">
+            <div class="govuk-!-font-weight-bold">Failures</div>
+            <ul class="govuk-list govuk-!-margin-bottom-0">
+                @individualFailures.map(IndividualRiskingFailure.fromIndividualFailure).map { individualRiskingFailure =>
+                    @individualFailureListItem(individualRiskingFailure)
+                }
+            </ul>
+        </div>
+    }
+}
+
+@riskingOutcomeIndividualContent(riskingOutcomeIndividual: RiskingOutcomeIndividual) = {
+    @govukTag(Tag(
+        content = Text(riskingOutcomeIndividualLabel(riskingOutcomeIndividual)),
+        classes = riskingOutcomeIndividualTagClasses(riskingOutcomeIndividual)
+    ))
+    @riskingOutcomeIndividual match {
+        case failedFixable: RiskingOutcomeIndividual.FailedFixable => {
+            @individualFixesGroup(failedFixable.fixes)
+        }
+        case failedNonFixable: RiskingOutcomeIndividual.FailedNonFixable => {
+            @individualFailuresGroup(failedNonFixable.failures)
+        }
+        case RiskingOutcomeIndividual.Approved => {}
     }
 }
 
@@ -108,6 +189,12 @@
             key = Key(content = Text("Login")),
             value = Value(content = HtmlContent(loginLink))
         )),
+        individual.riskingOutcomeIndividual.map { riskingOutcomeIndividual =>
+            SummaryListRow(
+                key = Key(content = Text("Risking outcome")),
+                value = Value(content = HtmlContent(riskingOutcomeIndividualContent(riskingOutcomeIndividual)))
+            )
+        },
         Some(SummaryListRow(
             key = Key(content = Text("Risking data")),
             value = Value(content = HtmlContent(individualsForRiskingLink))

@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
+import uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure
+
 /** Flat, structured catalogue of every possible individual (person) risking failure, mirroring `uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure`
   * but carrying `checkId`/`reasonCode`/descriptions as real fields rather than scaladoc, so test-only pages can build the `Failure` JSON objects expected by a
   * risking results file (see `agent-registration-risking`'s `RiskingResultRecordSpec` for the JSON shape: reasonCode, reasonDescription, checkId,
@@ -188,3 +190,28 @@ enum IndividualRiskingFailure(
     reasonDescription = "Unable to match Name and DOB against references and Missing SA-UTR",
     fixable = true
   )
+
+object IndividualRiskingFailure:
+
+  /** Maps a canonical `IndividualFailure` (as carried on `RiskingOutcomeIndividual.FailedNonFixable`) to its richer, descriptive counterpart here — a clean 1:1
+    * mapping, unlike `IndividualFix` (see `IndividualFix._10.IndividualDetailsFix`, which collapses 10.1/10.2 into one fix type).
+    */
+  def fromIndividualFailure(individualFailure: IndividualFailure): IndividualRiskingFailure =
+    individualFailure match
+      case IndividualFailure._4._1 => Check_4_1
+      case IndividualFailure._4._3 => Check_4_3
+      case IndividualFailure._4._4 => Check_4_4
+      case IndividualFailure._5._1 => Check_5_1
+      case IndividualFailure._5._3 => Check_5_3
+      case IndividualFailure._5._4 => Check_5_4
+      case IndividualFailure._5._5 => Check_5_5
+      case IndividualFailure._5._6 => Check_5_6
+      case IndividualFailure._5._7 => Check_5_7
+      case IndividualFailure._6 => Check_6
+      case IndividualFailure._7 => Check_7
+      case IndividualFailure._8._1 => Check_8_1
+      case IndividualFailure._8._6 => Check_8_6
+      case IndividualFailure._8._7 => Check_8_7
+      case IndividualFailure._9 => Check_9
+      case IndividualFailure._10._1 => Check_10_1
+      case IndividualFailure._10._2 => Check_10_2
