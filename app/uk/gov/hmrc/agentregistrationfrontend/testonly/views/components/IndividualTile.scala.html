@@ -193,6 +193,12 @@
             key = Key(content = Text("Person of control")),
             value = Value(content = Text(individual.isPersonOfControl.toString))
         )),
+        individual.providedByApplicant.filter(identity).map { _ =>
+            SummaryListRow(
+                key = Key(content = Text("Provided by")),
+                value = Value(content = Text("Applicant"))
+            )
+        },
         Some(SummaryListRow(
             key = Key(content = Text("Identifiers")),
             value = Value(content = HtmlContent(identifier(identifierEntries)))
