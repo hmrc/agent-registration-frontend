@@ -210,11 +210,11 @@
                     <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showApplicationForRisking(agentApplication.applicationReference)">Application-for-risking (JSON)</a> <br>
                     <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showCompletedRisking(agentApplication.applicationReference)">Completed risking / archive (JSON)</a> <br>
                     @if(isSentToMinerva) {
-                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference)">Select entity failures</a> <br>
-                        <span class="govuk-hint govuk-!-margin-bottom-0">Quick actions:</span>
-                        <a class="govuk-link" id="quick-action-approved" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresApproved(agentApplication.applicationReference, requestHeader.uri)">Approved</a>,
-                        <a class="govuk-link" id="quick-action-fixable" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresFixable(agentApplication.applicationReference, requestHeader.uri)">fixable</a>,
-                        <a class="govuk-link" id="quick-action-mixed" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresMixed(agentApplication.applicationReference, requestHeader.uri)">mixed</a>
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference)">Select entity failures</a>
+                        (or just quickly
+                        <a class="govuk-link" id="quick-action-approved" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresApproved(agentApplication.applicationReference, requestHeader.uri)">approve</a>,
+                        <a class="govuk-link" id="quick-action-fixable" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresFixable(agentApplication.applicationReference, requestHeader.uri)">fail-fixable</a>,
+                        <a class="govuk-link" id="quick-action-mixed" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresMixed(agentApplication.applicationReference, requestHeader.uri)">fail-non-fixable</a>)
                     } else {
                         <span class="govuk-hint govuk-!-margin-bottom-0">Select entity failures only available while SentToMinerva</span>
                     }
