@@ -16,11 +16,16 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.util
 
-import org.bson.types.ObjectId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 
 import javax.inject.Singleton
 
 @Singleton
 class InternalUserIdGenerator:
-  def nextInternalUserId(): InternalUserId = InternalUserId(ObjectId.get().toHexString)
+
+  def nextInternalUserId(
+    userId: UserId,
+    planetId: PlanetId
+  ): InternalUserId = InternalUserId(s"${userId.value}@${planetId.value}")
