@@ -22,18 +22,22 @@ import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
-
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
+import uk.gov.hmrc.agentregistrationfrontend.model.FixableSoleTraderTaskListStatus
+import uk.gov.hmrc.agentregistrationfrontend.model.FixableTaskListStatus
+import uk.gov.hmrc.agentregistrationfrontend.model.TaskStatus
 import uk.gov.hmrc.agentregistrationfrontend.model.fixableTaskListStatus
 import uk.gov.hmrc.agentregistrationfrontend.model.isSoleTraderOwner
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.FixableTaskListPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.FixableTaskListForSoleTraderPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -43,6 +47,7 @@ class FixableTaskListController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   taskListPage: FixableTaskListPage,
+  soleTraderTaskListPage: FixableTaskListForSoleTraderPage,
   individualProvideDetailsService: IndividualProvideDetailsService,
   appConfig: AppConfig
 )
@@ -72,16 +77,53 @@ extends FrontendController(mcc, actions):
           val riskingOutcomeApplication: RiskingOutcomeApplication.FailedFixable = request.get
           val riskingOutcomeEntity: RiskingOutcomeEntity = agentApplication.getRiskingOutcomeEntity
           val allIndividuals: List[IndividualProvidedDetails] = request.get
-          Ok(taskListPage(
-            taskListStatus = agentApplication.fixableTaskListStatus(
-              riskingOutcomeEntity = riskingOutcomeEntity,
-              fixableIndividuals = allIndividuals
-                .filter(!_.providedByApplicant.contains(true))
-                .map(_.getRiskingOutcomeIndividual)
-                .collect:
-                  case fixable: RiskingOutcomeIndividual.FailedFixable => fixable
-            ),
-            entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
-            correctiveActionExpiryDate = displayDateForLang(riskingOutcomeApplication.correctiveActionExpiryDate),
-            isSoleTrader = agentApplication.isSoleTraderOwner
-          ))
+          val fixableIndividuals: List[RiskingOutcomeIndividual.FailedFixable] = allIndividuals
+            .filter(!_.providedByApplicant.contains(true))
+            .map(_.getRiskingOutcomeIndividual)
+            .collect:
+              case fixable: RiskingOutcomeIndividual.FailedFixable => fixable
+          val entityTaskListStatus: FixableTaskListStatus = agentApplication.fixableTaskListStatus(
+            riskingOutcomeEntity = riskingOutcomeEntity,
+            fixableIndividuals = fixableIndividuals
+          )
+          if agentApplication.isSoleTraderOwner
+          then
+            Ok(soleTraderTaskListPage(
+              taskListStatus = makeSoleTraderTaskListStatus(
+                riskingOutcomeIndividual = fixableIndividuals.headOption,
+                entityTaskListStatus = entityTaskListStatus
+              ),
+              entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+              correctiveActionExpiryDate = displayDateForLang(riskingOutcomeApplication.correctiveActionExpiryDate)
+            ))
+          else
+            Ok(taskListPage(
+              taskListStatus = entityTaskListStatus,
+              entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+              correctiveActionExpiryDate = displayDateForLang(riskingOutcomeApplication.correctiveActionExpiryDate)
+            ))
+
+  private def makeSoleTraderTaskListStatus(
+    riskingOutcomeIndividual: Option[RiskingOutcomeIndividual.FailedFixable],
+    entityTaskListStatus: FixableTaskListStatus
+  ): FixableSoleTraderTaskListStatus =
+    val individualFixes: Seq[IndividualFix] = riskingOutcomeIndividual.fold(Seq.empty)(_.fixes)
+    val individualFixableTasks: Map[String, TaskStatus] =
+      individualFixes.map(fix =>
+        fix.toString -> TaskStatus(
+          canStart = true,
+          isComplete = fix.isConfirmed.contains(true)
+        )
+      ).toMap
+
+    FixableSoleTraderTaskListStatus(
+      amlsDetails = entityTaskListStatus.amlsDetails,
+      entityFixes = entityTaskListStatus.entityFailures,
+      individualFixes = individualFixableTasks,
+      declaration = TaskStatus(
+        canStart =
+          entityTaskListStatus.declaration.canStart &&
+            (individualFixes.forall(_.isConfirmed.contains(true)) | individualFixes.isEmpty),
+        isComplete = false
+      )
+    )

@@ -39,6 +39,13 @@ final case class FixableIndividualTaskListStatus(
   declaration: TaskStatus
 )
 
+final case class FixableSoleTraderTaskListStatus(
+  amlsDetails: Map[String, TaskStatus] = Map.empty,
+  entityFixes: Map[String, TaskStatus] = Map.empty,
+  individualFixes: Map[String, TaskStatus] = Map.empty,
+  declaration: TaskStatus
+)
+
 final case class TaskStatus(
   canStart: Boolean,
   isComplete: Boolean

@@ -61,20 +61,6 @@ extends ControllerSpec:
     "EntityFix.8" -> "Select yes if all overdue liabilities have been paid or included in a payment plan"
   )
 
-  private val soleTraderEntityFixFailureCodeHeadings: Map[String, String] = Map(
-    "EntityFix.4.1" -> "Your Self Assessment returns",
-    "EntityFix.4.3" -> "Your VAT returns",
-    "EntityFix.4.4" -> "Your PAYE reports",
-    "EntityFix.5.1" -> "You have an overdue Self Assessment liability",
-    "EntityFix.5.3" -> "You have an overdue VAT liability",
-    "EntityFix.5.4" -> "You have an overdue PAYE liability",
-    "EntityFix.5.5" -> "You have an overdue civil penalty liability",
-    "EntityFix.5.6" -> "You have an overdue Stamp Duty liability",
-    "EntityFix.5.7" -> "You have an overdue Capital Gains Tax liability",
-    "EntityFix.8.5" -> "You have an overdue penalty liability",
-    "EntityFix.8.7" -> "You have an overdue penalty liability"
-  )
-
   private val entityFixFailureCodeHeadings: Map[String, String] = Map(
     "EntityFix.4.1" -> "Self Assessment returns for Test Company Name",
     "EntityFix.4.2" -> "Company Tax returns for Test Company Name",
@@ -99,11 +85,6 @@ extends ControllerSpec:
         .agentApplicationLlp
         .afterRiskingCompletedFixableAllCodes
 
-    def riskingCompletedFailedFixableSoleTraderAllCodes: AgentApplicationSoleTrader =
-      tdAll
-        .agentApplicationSoleTrader
-        .riskingOutcomeEntityFailedFixableAllSoleTraderCodes
-
   final case class TestCase(
     name: String,
     application: AgentApplication,
@@ -111,12 +92,6 @@ extends ControllerSpec:
     headings: Map[String, String]
   )
   List(
-    TestCase(
-      name = "Sole trader owner",
-      application = agentApplication.riskingCompletedFailedFixableSoleTraderAllCodes,
-      fixes = tdAll.riskingOutcomeEntityFailedFixableAllSoleTraderCodes.fixes,
-      headings = soleTraderEntityFixFailureCodeHeadings
-    ),
     TestCase(
       name = "Not sole trader owner",
       application = agentApplication.riskingCompletedFailedFixableAllCodes,

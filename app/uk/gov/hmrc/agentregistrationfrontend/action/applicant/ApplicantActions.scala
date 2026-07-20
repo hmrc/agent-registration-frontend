@@ -30,6 +30,9 @@ import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix._10.IndividualDetailsFix
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
@@ -73,6 +76,8 @@ object ApplicantActions:
   type DataWithRiskingProgress = RiskingProgress *: DataWithApplicationAndBpr
   type RequestWithRiskingProgress = RequestWithData[DataWithRiskingProgress]
   type RequestWithRiskingProgressCt[A] = RequestWithDataCt[A, DataWithRiskingProgress]
+
+  type DataWithSoleTraderIdentityFix = IndividualDetailsFix *: RiskingOutcomeApplication.FailedFixable *: IndividualProvidedDetails *: DataWithApplicationAndBpr
 
 @Singleton
 class ApplicantActions @Inject() (
@@ -160,6 +165,35 @@ extends RequestAwareLogging:
       implicit request =>
         individualProvidedDetailsService.findAllByApplicationId(request.get[AgentApplication]._id).map: list =>
           request.add[List[IndividualProvidedDetails]](list)
+
+  val getSoleTraderIdentityFix: ActionBuilderWithData[DataWithSoleTraderIdentityFix] = getApplicationAfterSentForRisking
+    .refine:
+      implicit request =>
+        individualProvidedDetailsService.findAllByApplicationId(request.get[AgentApplication]._id).map:
+          case soleTrader :: Nil => request.add[IndividualProvidedDetails](soleTrader)
+          case _ =>
+            logger.warn(s"Unexpected variation on sole trader individuals for application ${request.get[AgentApplication]._id}, redirecting to where outcome can be handled.")
+            Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
+    .refine:
+      implicit request =>
+        request.get[AgentApplication].riskingOutcomeApplication match
+          case Some(outcome: RiskingOutcomeApplication.FailedFixable) => request.add[RiskingOutcomeApplication.FailedFixable](outcome)
+          case outcome =>
+            logger.warn(s"Risking outcome for application is not fixable (or missing). Redirecting to where outcome can be handled: $outcome")
+            Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
+    .refine:
+      implicit request =>
+        val individualProvidedDetails: IndividualProvidedDetails = request.get
+        individualProvidedDetails.getRiskingOutcomeIndividual match
+          case outcome: RiskingOutcomeIndividual.FailedFixable =>
+            outcome.fixes.collectFirst { case fix: IndividualDetailsFix => fix } match
+              case Some(individualFix) => request.add[IndividualDetailsFix](individualFix)
+              case None =>
+                logger.info("Risking outcome for individual does not require individual details to be provided, redirecting to fixable task list.")
+                Redirect(AppRoutes.fixablefailures.FixableTaskListController.show)
+          case _ =>
+            logger.info("Risking outcome for individual is not fixable, redirecting to application status to get latest status.")
+            Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
 
   extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
 

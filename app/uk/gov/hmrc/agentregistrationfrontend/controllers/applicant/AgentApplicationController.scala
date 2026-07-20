@@ -33,6 +33,7 @@ import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.model.isSoleTraderOwner
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
@@ -210,7 +211,8 @@ extends FrontendController(mcc, actions):
             Ok(failedFixableStartPage(
               actualDecisionDate = displayDateForLang(Some(riskingOutcomeApplication.actualDecisionDate)),
               correctiveActionExpiryDate = displayDateForLang(riskingOutcomeApplication.correctiveActionExpiryDate),
-              entityName = request.get[BusinessPartnerRecordResponse].getEntityName
+              entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+              isSoleTrader = request.agentApplication.isSoleTraderOwner
             ))
           case riskingOutcomeApplication: RiskingOutcomeApplication.FailedNonFixable =>
             val riskedEntity: RiskingOutcomeEntity = agentApplication.riskingOutcomeEntity.getOrThrowExpectedDataMissing(

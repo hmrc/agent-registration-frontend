@@ -27,16 +27,17 @@
 @(
         actualDecisionDate: String,
         correctiveActionExpiryDate: String,
-        entityName: String
+        entityName: String,
+        isSoleTrader: Boolean
 )(implicit
         request: RequestHeader,
         messages: Messages
 )
 
 @key = @{"failedFixable"}
-
+@withSoleTraderVariant = @{if((isSoleTrader)) ".SoleTrader" else ""}
 @caption = @{messages(s"$key.caption")}
-@title = @{messages(s"$key.title", entityName)}
+@title = @{messages(s"$key.title$withSoleTraderVariant", entityName)}
 
 @layout(
   pageTitle = title,
@@ -48,7 +49,7 @@
   <h2 class="govuk-heading-m">@messages(s"$key.decision.h2")</h2>
   <p class="govuk-body">@messages(s"$key.decision.p1", entityName)</p>
   <p class="govuk-body">@Html(messages(s"$key.decision.p2", appConfig.govukFinanceAct2026Url))</p>
-  <p class="govuk-body">@Html(messages(s"$key.decision.p3", entityName, correctiveActionExpiryDate))</p>
+  <p class="govuk-body">@Html(messages(s"$key.decision.p3$withSoleTraderVariant", entityName, correctiveActionExpiryDate))</p>
   <h2 class="govuk-heading-m">@messages(s"$key.fix.h2")</h2>
   <p class="govuk-body">@messages(s"$key.fix.p1")</p>
   <p class="govuk-body">
@@ -61,10 +62,10 @@
   <h2 class="govuk-heading-m">@messages(s"$key.failures.h2")</h2>
   <p class="govuk-body">@messages(s"$key.failures.p1")</p>
   <ul class="govuk-list govuk-list--bullet">
-    <li>@messages(s"$key.failures.li1", entityName)</li>
+    <li>@messages(s"$key.failures.li1$withSoleTraderVariant", entityName)</li>
     <li>@Html(messages(s"$key.failures.li2", correctiveActionExpiryDate))</li>
   </ul>
-  <h2 class="govuk-heading-m">@messages(s"$key.appeal.h2", entityName)</h2>
+  <h2 class="govuk-heading-m">@messages(s"$key.appeal.h2$withSoleTraderVariant", entityName)</h2>
   <p class="govuk-body">@messages(s"$key.appeal.p1")</p>
   <p class="govuk-body">@Html(messages(s"$key.appeal.p2", appConfig.guidanceForFailedApplicationAppealsUrl))</p>
   <p class="govuk-body">@messages(s"$key.appeal.p3")</p>

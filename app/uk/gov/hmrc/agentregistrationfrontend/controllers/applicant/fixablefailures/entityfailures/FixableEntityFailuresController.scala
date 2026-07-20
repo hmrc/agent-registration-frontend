@@ -26,14 +26,12 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.risking.EntityFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
-
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.fixablefailures.ConfirmFixForm
-import uk.gov.hmrc.agentregistrationfrontend.model.isSoleTraderOwner
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.entityfailures.EntityFailureDetailsPage
@@ -83,7 +81,6 @@ extends FrontendController(mcc, actions):
           entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
           failureCode = failureCode,
           correctiveActionExpiryDate = displayDateForLang(outcome.correctiveActionExpiryDate),
-          isSoleTraderOwner = request.get[AgentApplication].isSoleTraderOwner,
           form = ConfirmFixForm.form(failureCode).fill:
             request.get[EntityFix].isConfirmed
         ))
@@ -98,7 +95,6 @@ extends FrontendController(mcc, actions):
               entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
               failureCode = failureCode,
               correctiveActionExpiryDate = displayDateForLang(request.get[RiskingOutcomeApplication.FailedFixable].correctiveActionExpiryDate),
-              isSoleTraderOwner = request.get[AgentApplication].isSoleTraderOwner,
               form = formWithErrors
             )
     )

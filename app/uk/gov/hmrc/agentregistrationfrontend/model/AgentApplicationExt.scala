@@ -125,8 +125,12 @@ extension (agentApplication: AgentApplication)
         case f: RiskingOutcomeEntity.FailedFixable => Some(f)
         case _ => None
     val hasIndividualFailures: Boolean = fixableIndividuals.nonEmpty
+    // sole trader owners do not submit the individual declaration, they submit the application declaration
+    // so agreement of the individual declaration is not part of sole trader owners' completeness test
     val individualsComplete: Boolean =
-      fixableIndividuals.forall(i => i.fixes.forall(_.isConfirmed.contains(true)) && i.declarationAgreed) | !hasIndividualFailures
+      fixableIndividuals.forall(i =>
+        i.fixes.forall(_.isConfirmed.contains(true)) && (i.declarationAgreed || agentApplication.isSoleTraderOwner)
+      ) | !hasIndividualFailures
     val entityFixes: Map[String, TaskStatus] =
       fixableEntity.map(_.fixes).getOrElse(Nil).filterNot {
         case _: AmlsFix => true
