@@ -20,6 +20,7 @@ import play.api.data.Form
 import play.api.data.Forms.of
 import play.api.data.Forms.seq
 import play.api.data.Forms.single
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.EntityRiskingFailure
 
@@ -30,5 +31,9 @@ object SelectEntityFailuresForm:
   val form: Form[Seq[EntityRiskingFailure]] = Form(
     single(
       key -> seq(of(FormatterFactory.makeEnumFormatter[EntityRiskingFailure]()))
+        .verifying(
+          "Only one AMLS (Check 3) failure can be selected at a time.",
+          failures => failures.count(_.checkId === "3") <= 1
+        )
     )
   )

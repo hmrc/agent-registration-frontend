@@ -21,12 +21,16 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.DefaultActionBuilder
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.RequestHeader
+import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendControllerBase
 import uk.gov.hmrc.agentregistrationfrontend.testonly.forms.SelectEntityFailuresForm
 import uk.gov.hmrc.agentregistrationfrontend.testonly.forms.SelectIndividualFailuresForm
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.EntityRiskingFailure
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.IndividualRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UploadRiskingResultsFileOutcome
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
@@ -213,6 +217,54 @@ extends FrontendControllerBase(mcc):
                 Conflict(selectEntityFailuresPage(applicationReference, formWithError))
         )
 
+  /** Quick action: submits with no failures at all, i.e. an Approved outcome, without having to manually leave every checkbox unticked. Redirects back to
+    * `redirectUrl` (the page the link was clicked from) instead of showing a confirmation page.
+    */
+  def submitEntityFailuresApproved(
+    applicationReference: ApplicationReference,
+    redirectUrl: String
+  ): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      submitEntityFailuresQuickAction(
+        applicationReference,
+        Seq.empty,
+        redirectUrl
+      )
+
+  /** Quick action: submits a single fixable failure, i.e. a FailedFixable outcome. */
+  def submitEntityFailuresFixable(
+    applicationReference: ApplicationReference,
+    redirectUrl: String
+  ): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      submitEntityFailuresQuickAction(
+        applicationReference,
+        Seq(EntityRiskingFailure.Check_4_1),
+        redirectUrl
+      )
+
+  /** Quick action: submits a mix of one fixable and one non-fixable failure, i.e. a FailedNonFixable outcome whose failures still include a fixable one bundled
+    * alongside the blocking one.
+    */
+  def submitEntityFailuresMixed(
+    applicationReference: ApplicationReference,
+    redirectUrl: String
+  ): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      submitEntityFailuresQuickAction(
+        applicationReference,
+        Seq(EntityRiskingFailure.Check_4_1, EntityRiskingFailure.Check_8_1),
+        redirectUrl
+      )
+
+  private def submitEntityFailuresQuickAction(
+    applicationReference: ApplicationReference,
+    failures: Seq[EntityRiskingFailure],
+    redirectUrl: String
+  )(using RequestHeader): Future[Result] =
+    // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to where the link was clicked from.
+    testRiskingService.submitEntityFailures(applicationReference, failures).map(_ => Redirect(redirectUrl))
+
   def showSelectIndividualFailures(personReference: PersonReference): Action[AnyContent] = defaultActionBuilder:
     implicit request =>
       Ok(selectIndividualFailuresPage(personReference, SelectIndividualFailuresForm.form))
@@ -238,3 +290,51 @@ extends FrontendControllerBase(mcc):
                   .withGlobalError(s"Risking results have already been submitted for person reference ${personReference.value}.")
                 Conflict(selectIndividualFailuresPage(personReference, formWithError))
         )
+
+  /** Quick action from `SelectIndividualFailuresPage`: submits with no failures at all, i.e. an Approved outcome, without having to manually leave every
+    * checkbox unticked. Redirects back to `redirectUrl` (the page the link was clicked from) instead of showing a confirmation page.
+    */
+  def submitIndividualFailuresApproved(
+    personReference: PersonReference,
+    redirectUrl: String
+  ): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      submitIndividualFailuresQuickAction(
+        personReference,
+        Seq.empty,
+        redirectUrl
+      )
+
+  /** Quick action from `SelectIndividualFailuresPage`: submits a single fixable failure, i.e. a FailedFixable outcome. */
+  def submitIndividualFailuresFixable(
+    personReference: PersonReference,
+    redirectUrl: String
+  ): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      submitIndividualFailuresQuickAction(
+        personReference,
+        Seq(IndividualRiskingFailure.Check_4_1),
+        redirectUrl
+      )
+
+  /** Quick action from `SelectIndividualFailuresPage`: submits a mix of one fixable and one non-fixable failure, i.e. a FailedNonFixable outcome whose failures
+    * still include a fixable one bundled alongside the blocking one.
+    */
+  def submitIndividualFailuresMixed(
+    personReference: PersonReference,
+    redirectUrl: String
+  ): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      submitIndividualFailuresQuickAction(
+        personReference,
+        Seq(IndividualRiskingFailure.Check_4_1, IndividualRiskingFailure.Check_8_1),
+        redirectUrl
+      )
+
+  private def submitIndividualFailuresQuickAction(
+    personReference: PersonReference,
+    failures: Seq[IndividualRiskingFailure],
+    redirectUrl: String
+  )(using RequestHeader): Future[Result] =
+    // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to where the link was clicked from.
+    testRiskingService.submitIndividualFailures(personReference, failures).map(_ => Redirect(redirectUrl))
