@@ -274,7 +274,6 @@ extends ViewSpec:
           entityName = "Test Company Name",
           failureCode = entityFixCode,
           correctiveActionExpiryDate = "17 August 2026",
-          isSoleTraderOwner = false,
           form = ConfirmFixForm.form(entityFixCode)
         ).body
       )
@@ -311,7 +310,6 @@ extends ViewSpec:
             entityName = "Test Company Name",
             failureCode = entityFixCode,
             correctiveActionExpiryDate = "17 August 2026",
-            isSoleTraderOwner = false,
             form = formWithError
           ).body
         )

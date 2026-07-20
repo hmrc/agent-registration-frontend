@@ -14,18 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.testonly.util
+package uk.gov.hmrc.agentregistrationfrontend.model
 
-import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
+import uk.gov.hmrc.agentregistration.shared.risking.EntityFix
+import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
 
-import javax.inject.Singleton
-
-@Singleton
-class InternalUserIdGenerator:
-
-  def nextInternalUserId(
-    userId: UserId,
-    planetId: PlanetId
-  ): InternalUserId = InternalUserId(s"${userId.value}@${planetId.value}")
+final case class SoleTraderFix(
+  entityFix: Option[EntityFix],
+  individualFix: Option[IndividualFix]
+):
+  def isConfirmed: Option[Boolean] = entityFix.flatMap(_.isConfirmed).orElse(individualFix.flatMap(_.isConfirmed))

@@ -96,6 +96,9 @@ extends ControllerSpec:
     s"GET $initiateAgentApplicationUrl should redirect to GRS journey when application already exists without GRS data" in:
       AuthStubs.stubAuthorise()
       AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterStarted)
+      AgentRegistrationStubs.stubDeleteAgentApplication
+      AgentRegistrationStubs.stubFindApplicationByApplicationReferenceNoContent(tdAll.applicationReference)
+      AgentRegistrationStubs.stubUpdateAgentApplication(tdAll.agentApplicationLlp.afterStarted)
       EnrolmentStoreStubs.stubQueryEnrolmentsAllocatedToGroupNoContent(tdAll.groupId)
       AuditStubs.stubAudit()
 
@@ -104,7 +107,7 @@ extends ControllerSpec:
       response.header("Location").value shouldBe AppRoutes.apply.internal.GrsController.startJourney().url
       AuthStubs.verifyAuthorise()
       AgentRegistrationStubs.verifyGetAgentApplication()
-      AgentRegistrationStubs.verifyUpdateAgentApplication(count = 0)
+      AgentRegistrationStubs.verifyUpdateAgentApplication()
       EnrolmentStoreStubs.verifyQueryEnrolmentsAllocatedToGroup(tdAll.groupId)
 
     s"GET $initiateAgentApplicationUrl should redirect to next check when application already has GRS data" in:

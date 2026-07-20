@@ -82,22 +82,17 @@ extends FrontendController(mcc, actions):
           case Some(application) if application.isGrsDataReceived =>
             logger.info("Application already has GRS data, redirecting to next check")
             Future.successful(Redirect(nextCheckIfApplicationHasGrsData))
-          case Some(_) =>
-            logger.info("Application already exists without GRS data, redirecting to GRS journey")
-            Future.successful(Redirect(startGrsJourney))
-          case None =>
-            logger.info(s"Application does not exist, creating new application: $agentType, $businessType")
+          case Some(application) =>
+            logger.info("Application found without GRS data, throwing away. Creating a new application and redirecting to GRS journey.")
             given RequestWithDataCt[AnyContent, DataWithAuth] = request.delete[Option[AgentApplication]]
             for {
-              applicationReference <- agentApplicationService.generateNewApplicationReference()
-              agentApplication: AgentApplication = businessType.makeNewAgentApplication(userRole, applicationReference)
-              result <- agentApplicationService
-                .upsert(agentApplication)
-                .map(_ =>
-                  auditService.auditStartApplication(agentApplication)
-                  Redirect(startGrsJourney)
-                )
-            } yield result
+              _ <- agentApplicationService.deleteAndStartAgain()
+              _ <- startNewApplication(businessType, userRole)
+            } yield Redirect(startGrsJourney)
+          case None =>
+            logger.info("No application found. Creating a new application and redirecting to GRS journey.")
+            given RequestWithDataCt[AnyContent, DataWithAuth] = request.delete[Option[AgentApplication]]
+            startNewApplication(businessType, userRole).map(_ => Redirect(startGrsJourney))
 
   extension (businessType: BusinessType)
     private def makeNewAgentApplication(
@@ -170,3 +165,17 @@ extends FrontendController(mcc, actions):
             applicationReference = applicationReference
           )
     }
+
+  private def startNewApplication(
+    businessType: BusinessType,
+    userRole: UserRole
+  )(using request: RequestWithDataCt[AnyContent, DataWithAuth]): Future[Unit] =
+    for {
+      applicationReference <- agentApplicationService.generateNewApplicationReference()
+      agentApplication: AgentApplication = businessType.makeNewAgentApplication(userRole, applicationReference)
+      result <- agentApplicationService
+        .upsert(agentApplication)
+        .map(_ =>
+          auditService.auditStartApplication(agentApplication)
+        )
+    } yield result

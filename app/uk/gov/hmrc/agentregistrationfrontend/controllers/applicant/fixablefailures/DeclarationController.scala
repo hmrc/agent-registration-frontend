@@ -37,6 +37,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.fixableTaskListStatus
+import uk.gov.hmrc.agentregistrationfrontend.model.isSoleTraderOwner
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
@@ -113,7 +114,8 @@ extends FrontendController(mcc, actions):
   def show: Action[AnyContent] = baseAction:
     implicit request =>
       Ok(declarationPage(
-        entityName = request.get[BusinessPartnerRecordResponse].getEntityName
+        entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
+        isSoleTraderOwner = request.get[AgentApplication].isSoleTraderOwner
       ))
 
   def submit: Action[AnyContent] = baseAction.async:
