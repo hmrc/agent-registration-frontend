@@ -27,7 +27,8 @@
 
 @(
         agentApplication: AgentApplication,
-        individuals: List[IndividualProvidedDetails])(implicit
+        individuals: List[IndividualProvidedDetails],
+        submittedRiskingResultsFilenames: Set[String])(implicit
         request: RequestHeader,
         messages: Messages
 )
@@ -42,7 +43,7 @@
 
             <h1 class="govuk-heading-l">Agent Application Tile</h1>
 
-            @agentApplicationTile(agentApplication, individuals)
+            @agentApplicationTile(agentApplication, individuals, submittedRiskingResultsFilenames)
 
         </div>
     </div>

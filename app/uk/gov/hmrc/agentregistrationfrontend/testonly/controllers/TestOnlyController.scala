@@ -169,6 +169,10 @@ extends FrontendControllerBase(mcc):
     implicit request =>
       testRiskingService.viewNextRiskingFileContents().map(Ok(_))
 
+  def showRiskingResultsFile(filename: String): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.viewRiskingResultsFile(filename).map(Ok(_))
+
   def showApplicationForRisking(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
       testRiskingService.findApplicationForRisking(applicationReference).map:

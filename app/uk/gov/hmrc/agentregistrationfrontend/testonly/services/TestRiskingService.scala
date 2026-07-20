@@ -43,6 +43,14 @@ class TestRiskingService @Inject() (
 
   def viewNextRiskingFileContents()(using RequestHeader): Future[String] = testRiskingConnector.viewNextRiskingFileContents()
 
+  def listSubmittedRiskingResultsFilenames()(using RequestHeader): Future[Set[String]] = testRiskingConnector.listSubmittedRiskingResultsFilenames()
+
+  def viewRiskingResultsFile(filename: String)(using RequestHeader): Future[String] = testRiskingConnector.viewRiskingResultsFile(filename)
+
+  def entityResultsFilename(applicationReference: ApplicationReference): String = s"test-only-entity-${applicationReference.value}"
+
+  def individualResultsFilename(personReference: PersonReference): String = s"test-only-individual-${personReference.value}"
+
   def findApplicationForRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =
     testRiskingConnector.findApplicationForRisking(applicationReference)
 
@@ -65,8 +73,7 @@ class TestRiskingService @Inject() (
       "applicationReference" -> applicationReference.value,
       "failures" -> failures.map(entityFailureJson)
     )
-    val filename = s"test-only-entity-${applicationReference.value}"
-    testRiskingConnector.uploadRiskingResultsFile(filename, Json.arr(record))
+    testRiskingConnector.uploadRiskingResultsFile(entityResultsFilename(applicationReference), Json.arr(record))
 
   def submitIndividualFailures(
     personReference: PersonReference,
@@ -77,8 +84,7 @@ class TestRiskingService @Inject() (
       "personReference" -> personReference.value,
       "failures" -> failures.map(individualFailureJson)
     )
-    val filename = s"test-only-individual-${personReference.value}"
-    testRiskingConnector.uploadRiskingResultsFile(filename, Json.arr(record))
+    testRiskingConnector.uploadRiskingResultsFile(individualResultsFilename(personReference), Json.arr(record))
 
   private def entityFailureJson(failure: EntityRiskingFailure): JsValue = Json.obj(
     "reasonCode" -> failure.reasonCode,

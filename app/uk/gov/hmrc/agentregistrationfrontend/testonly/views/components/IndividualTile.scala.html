@@ -32,9 +32,13 @@
 @(
         individual: IndividualProvidedDetails,
         isBeforeSentForRisking: Boolean,
-        isRiskingCompleted: Boolean)(implicit
+        isRiskingCompleted: Boolean,
+        submittedRiskingResultsFilenames: Set[String])(implicit
         requestHeader: RequestHeader
 )
+
+@individualResultsFilename = @{s"test-only-individual-${individual.personReference.value}"}
+@isIndividualResultsFileSubmitted = @{submittedRiskingResultsFilenames.contains(individualResultsFilename)}
 
 @tagClasses = @{
     individual.providedDetailsState match {
@@ -104,14 +108,18 @@
         @if(isRiskingCompleted) {
             <span class="govuk-hint govuk-!-margin-bottom-0">Select individual failures not available (risking completed)</span>
         } else {
-            <a
-            class="govuk-link"
-            href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference)"
-            >Select individual failures</a>
-            (or just quickly
-            <a class="govuk-link" id="quick-action-approved" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, requestHeader.uri)">approve</a>,
-            <a class="govuk-link" id="quick-action-fixable" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, requestHeader.uri)">fail-fixable</a>,
-            <a class="govuk-link" id="quick-action-mixed" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresMixed(individual.personReference, requestHeader.uri)">fail-non-fixable</a>)
+            @if(isIndividualResultsFileSubmitted) {
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(individualResultsFilename)">View submitted individual risking results file</a>
+            } else {
+                <a
+                class="govuk-link"
+                href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference)"
+                >Select individual failures</a>
+                (or just quickly
+                <a class="govuk-link" id="quick-action-approved" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, requestHeader.uri)">approve</a>,
+                <a class="govuk-link" id="quick-action-fixable" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, requestHeader.uri)">fail-fixable</a>,
+                <a class="govuk-link" id="quick-action-mixed" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresMixed(individual.personReference, requestHeader.uri)">fail-non-fixable</a>)
+            }
         }
     }
 }

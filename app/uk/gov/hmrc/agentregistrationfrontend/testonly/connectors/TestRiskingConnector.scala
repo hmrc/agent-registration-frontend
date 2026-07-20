@@ -177,6 +177,40 @@ extends Connector:
             )
       .andLogOnFailure("Failed to run results file processing")
 
+  def listSubmittedRiskingResultsFilenames()(using RequestHeader): Future[Set[String]] =
+    val url: URL = url"${appConfig.agentRegistrationRiskingBaseUrl}/files-available/list/informationTypePlaceholder"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => response.json.as[Seq[JsValue]].map(file => (file \ "filename").as[String]).toSet
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to list submitted risking results filenames")
+
+  def viewRiskingResultsFile(filename: String)(using RequestHeader): Future[String] =
+    val url: URL = url"$baseUrl/risking-results-file/$filename"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => response.body
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to view risking results file: $filename")
+
   def uploadRiskingResultsFile(
     filename: String,
     body: JsValue

@@ -33,6 +33,7 @@ import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowRecentApplicationsPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowAgentApplicationsTilePage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestLinkPage
@@ -52,7 +53,8 @@ class TestOnlyController @Inject() (
   testLinkPage: TestLinkPage,
   showRecentApplicationsPage: ShowRecentApplicationsPage,
   showAgentApplicationsTilePage: ShowAgentApplicationsTilePage,
-  individualProvidedDetailsConnector: IndividualProvidedDetailsConnector
+  individualProvidedDetailsConnector: IndividualProvidedDetailsConnector,
+  testRiskingService: TestRiskingService
 )
 extends FrontendController(mcc, actions):
 
@@ -71,7 +73,8 @@ extends FrontendController(mcc, actions):
               testAgentRegistrationConnector
                 .findIndividuals(agentApplication.agentApplicationId)
                 .map(individuals => (agentApplication, individuals))
-        yield Ok(showRecentApplicationsPage(applicationsWithIndividuals))
+          submittedRiskingResultsFilenames <- testRiskingService.listSubmittedRiskingResultsFilenames()
+        yield Ok(showRecentApplicationsPage(applicationsWithIndividuals, submittedRiskingResultsFilenames))
 
   def showAgentApplicationById(agentApplicationId: AgentApplicationId): Action[AnyContent] = actions
     .action
@@ -96,11 +99,17 @@ extends FrontendController(mcc, actions):
         testAgentRegistrationConnector
           .findIndividuals(request.get[AgentApplication].agentApplicationId)
           .map[Result | RequestWithData[List[IndividualProvidedDetails] *: AgentApplication *: EmptyData]](request.add)
-    .apply:
+    .async:
       implicit request =>
         val agentApplication: AgentApplication = request.get[AgentApplication]
         val individuals: List[IndividualProvidedDetails] = request.get[List[IndividualProvidedDetails]]
-        Ok(showAgentApplicationsTilePage(agentApplication, individuals))
+        testRiskingService.listSubmittedRiskingResultsFilenames().map { submittedRiskingResultsFilenames =>
+          Ok(showAgentApplicationsTilePage(
+            agentApplication,
+            individuals,
+            submittedRiskingResultsFilenames
+          ))
+        }
 
   def showIndividualsForApplication: Action[AnyContent] = actions
     .getApplication
