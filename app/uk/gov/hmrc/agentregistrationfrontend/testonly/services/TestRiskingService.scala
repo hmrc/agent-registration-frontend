@@ -45,7 +45,7 @@ class TestRiskingService @Inject() (
 
   def listSubmittedRiskingResultsFilenames()(using RequestHeader): Future[Set[String]] = testRiskingConnector.listSubmittedRiskingResultsFilenames()
 
-  def viewRiskingResultsFile(filename: String)(using RequestHeader): Future[String] = testRiskingConnector.viewRiskingResultsFile(filename)
+  def viewRiskingResultsFile(filename: String)(using RequestHeader): Future[Option[String]] = testRiskingConnector.viewRiskingResultsFile(filename)
 
   def entityResultsFilename(applicationReference: ApplicationReference): String = s"test-only-entity-${applicationReference.value}"
 

@@ -21,21 +21,27 @@
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
+@import java.time.Instant
+@import java.time.ZoneId
+@import java.time.format.DateTimeFormatter
 
 @this(
         govukSummaryList: GovukSummaryList,
         individualFixesGroup: IndividualFixesGroup,
         individualFailuresGroup: IndividualFailuresGroup,
+        compactLink: CompactLink,
         govukTag: GovukTag
 )
 
 @(
         individual: IndividualProvidedDetails,
-        isBeforeSentForRisking: Boolean,
-        isRiskingCompleted: Boolean,
+        isSentToMinerva: Boolean,
         submittedRiskingResultsFilenames: Set[String])(implicit
         requestHeader: RequestHeader
 )
+
+@instantFormatter = @{DateTimeFormatter.ofPattern("d MMM uuuu, HH:mm").withZone(ZoneId.of("Europe/London"))}
+@formatInstant(instant: Instant) = @{instantFormatter.format(instant)}
 
 @individualResultsFilename = @{s"test-only-individual-${individual.personReference.value}"}
 @isIndividualResultsFileSubmitted = @{submittedRiskingResultsFilenames.contains(individualResultsFilename)}
@@ -81,51 +87,54 @@
     }
 }
 
-@individualIdLink = {
-    <a
-    class="govuk-link"
-    href="@AppRoutes.testOnly.individual.TestOnlyController.showIndividualProvidedDetails(individual.individualProvidedDetailsId)"
-    >@individual.individualProvidedDetailsId.value</a>
+@viewDataLinks = {
+    @compactLink(
+        label = "View individual (JSON)",
+        url = AppRoutes.testOnly.individual.TestOnlyController.showIndividualProvidedDetails(individual.individualProvidedDetailsId),
+        hint = Some("full internal representation of this individual")
+    )
+    @compactLink(
+        label = "View individual-for-risking (JSON)",
+        url = AppRoutes.testOnly.TestOnlyController.showIndividualForRisking(individual.personReference),
+        hint = Some("internal representation of this individual in the risking microservice")
+    )
 }
 
-@loginLink = {
-    <a
-    class="govuk-link"
-    href="@AppRoutes.testOnly.TestOnlyController.findOrCreateAndLogInIndividual(
-        UserId.make(individual.individualProvidedDetailsId), PlanetId.make(individual.agentApplicationId), individual.individualName.value, requestHeader.uri
-    )"
-    >login</a>
+@accessLink = {
+    @compactLink(
+        label = "Log in as individual",
+        url = AppRoutes.testOnly.TestOnlyController.findOrCreateAndLogInIndividual(
+            UserId.make(individual.individualProvidedDetailsId), PlanetId.make(individual.agentApplicationId), individual.individualName.value, requestHeader.uri
+        )
+    )
 }
 
-@individualsForRiskingLink = {
-    @if(isBeforeSentForRisking) {
-        <span class="govuk-hint govuk-!-margin-bottom-0">Not available yet (not yet sent for risking)</span>
+@manageRiskingResultsLinks = {
+    @if(isIndividualResultsFileSubmitted) {
+        @compactLink(
+            label = "View submitted individual risking results file",
+            url = AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(individualResultsFilename)
+        )
+    } else if (isSentToMinerva) {
+        <p class="govuk-hint govuk-!-margin-bottom-2">Emulate uploading risking results from Minerva</p>
+        <p class="govuk-body govuk-!-margin-bottom-1">
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference)">Choose individual failures</a>
+            or just quickly
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, requestHeader.uri)">approve</a>,
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, requestHeader.uri)">fail-fixable</a>,
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresMixed(individual.personReference, requestHeader.uri)">fail-non-fixable</a>
+        </p>
     } else {
-        <a
-        class="govuk-link"
-        href="@AppRoutes.testOnly.TestOnlyController.showIndividualForRisking(individual.personReference)"
-        >Individual-for-risking (JSON)</a> <br>
-        @if(isRiskingCompleted) {
-            <span class="govuk-hint govuk-!-margin-bottom-0">Select individual failures not available (risking completed)</span>
-        } else {
-            @if(isIndividualResultsFileSubmitted) {
-                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(individualResultsFilename)">View submitted individual risking results file</a>
-            } else {
-                <a
-                class="govuk-link"
-                href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference)"
-                >Select individual failures</a>
-                (or just quickly
-                <a class="govuk-link" id="quick-action-approved" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, requestHeader.uri)">approve</a>,
-                <a class="govuk-link" id="quick-action-fixable" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, requestHeader.uri)">fail-fixable</a>,
-                <a class="govuk-link" id="quick-action-mixed" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresMixed(individual.personReference, requestHeader.uri)">fail-non-fixable</a>)
-            }
-        }
+        <span class="govuk-hint">Only available once the application is SentToMinerva</span>
     }
 }
 
 @rows = @{
     Seq(
+        Some(SummaryListRow(
+            key = Key(content = Text("Person reference")),
+            value = Value(content = Text(individual.personReference.value))
+        )),
         Some(SummaryListRow(
             key = Key(content = Text("Name")),
             value = Value(content = Text(individual.individualName.value))
@@ -137,9 +146,19 @@
                 classes = tagClasses
             ))))
         )),
+        individual.riskingOutcomeIndividual.map { riskingOutcomeIndividual =>
+            SummaryListRow(
+                key = Key(content = Text("Risking outcome")),
+                value = Value(content = HtmlContent(riskingOutcomeIndividualContent(riskingOutcomeIndividual)))
+            )
+        },
+        Some(SummaryListRow(
+            key = Key(content = Text("Created at")),
+            value = Value(content = Text(formatInstant(individual.createdAt)))
+        )),
         Some(SummaryListRow(
             key = Key(content = Text("Individual ID")),
-            value = Value(content = HtmlContent(individualIdLink))
+            value = Value(content = Text(individual.individualProvidedDetailsId.value))
         )),
         individual.internalUserId.map { internalUserId =>
             SummaryListRow(
@@ -152,18 +171,16 @@
             value = Value(content = Text(individual.isPersonOfControl.toString))
         )),
         Some(SummaryListRow(
-            key = Key(content = Text("Login")),
-            value = Value(content = HtmlContent(loginLink))
+            key = Key(content = Text("View data")),
+            value = Value(content = HtmlContent(viewDataLinks))
         )),
-        individual.riskingOutcomeIndividual.map { riskingOutcomeIndividual =>
-            SummaryListRow(
-                key = Key(content = Text("Risking outcome")),
-                value = Value(content = HtmlContent(riskingOutcomeIndividualContent(riskingOutcomeIndividual)))
-            )
-        },
         Some(SummaryListRow(
-            key = Key(content = Text("Risking data")),
-            value = Value(content = HtmlContent(individualsForRiskingLink))
+            key = Key(content = Text("Access")),
+            value = Value(content = HtmlContent(accessLink))
+        )),
+        Some(SummaryListRow(
+            key = Key(content = Text("Minerva simulator")),
+            value = Value(content = HtmlContent(manageRiskingResultsLinks))
         ))
     ).flatten
 }

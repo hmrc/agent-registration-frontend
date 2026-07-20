@@ -23,6 +23,7 @@
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 @import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 @import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
@@ -34,7 +35,9 @@
         individualTile: IndividualTile,
         entityFixesGroup: EntityFixesGroup,
         entityFailuresGroup: EntityFailuresGroup,
-        govukTag: GovukTag
+        compactLink: CompactLink,
+        govukTag: GovukTag,
+        appConfig: AppConfig
 )
 
 @(
@@ -66,8 +69,9 @@
     }
 }
 
-@isRiskingCompleted = @{agentApplication.applicationState === ApplicationState.RiskingCompleted}
 @isSentToMinerva = @{agentApplication.applicationState === ApplicationState.SentToMinerva}
+
+@provideDetailsLink = @{appConfig.applicationLink(agentApplication.linkId.value)}
 
 @entityResultsFilename = @{s"test-only-entity-${agentApplication.applicationReference.value}"}
 @isEntityResultsFileSubmitted = @{submittedRiskingResultsFilenames.contains(entityResultsFilename)}
@@ -116,32 +120,10 @@
 
 <div class="test-only-card govuk-!-padding-4">
 
-    <dl class="govuk-summary-list govuk-summary-list--no-border test-only-narrow-key govuk-!-margin-bottom-2">
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">AgentApplicationId</dt>
-            <dd class="govuk-summary-list__value">
-                <a
-                class="govuk-link"
-                href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationById(agentApplication.agentApplicationId)"
-                >@agentApplication.agentApplicationId.value</a>
-                </dd>
-        </div>
+    <dl class="govuk-summary-list govuk-summary-list--no-border test-only-narrow-key govuk-!-margin-bottom-4">
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Application reference</dt>
             <dd class="govuk-summary-list__value">@agentApplication.applicationReference.value</dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">CreatedAt</dt>
-            <dd class="govuk-summary-list__value">@formatInstant(agentApplication.createdAt)</dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Business type</dt>
-            <dd class="govuk-summary-list__value">
-                @businessTypeLabel
-                @if(isIncorporated) {
-                    <span class="govuk-hint govuk-!-margin-bottom-0">(Incorporated)</span>
-                }
-            </dd>
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">State</dt>
@@ -206,38 +188,12 @@
             </div>
         }
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Risking data</dt>
+            <dt class="govuk-summary-list__key">Business type</dt>
             <dd class="govuk-summary-list__value">
-                @if(agentApplication.isBeforeSentForRisking) {
-                    <span class="govuk-hint govuk-!-margin-bottom-0">Not available yet (not yet sent for risking)</span>
-                } else {
-                    <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showApplicationForRisking(agentApplication.applicationReference)">Application-for-risking (JSON)</a> <br>
-                    <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showCompletedRisking(agentApplication.applicationReference)">Completed risking / archive (JSON)</a> <br>
-                    @if(isSentToMinerva) {
-                        @if(isEntityResultsFileSubmitted) {
-                            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(entityResultsFilename)">View submitted entity risking results file</a>
-                        } else {
-                            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference)">Select entity failures</a>
-                            (or just quickly
-                            <a class="govuk-link" id="quick-action-approved" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresApproved(agentApplication.applicationReference, requestHeader.uri)">approve</a>,
-                            <a class="govuk-link" id="quick-action-fixable" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresFixable(agentApplication.applicationReference, requestHeader.uri)">fail-fixable</a>,
-                            <a class="govuk-link" id="quick-action-mixed" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresMixed(agentApplication.applicationReference, requestHeader.uri)">fail-non-fixable</a>)
-                        }
-                    } else {
-                        <span class="govuk-hint govuk-!-margin-bottom-0">Select entity failures only available while SentToMinerva</span>
-                    }
+                @businessTypeLabel
+                @if(isIncorporated) {
+                    <span class="govuk-hint govuk-!-margin-bottom-0">(Incorporated)</span>
                 }
-            </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Internal user id</dt>
-            <dd class="govuk-summary-list__value">
-                <span>@agentApplication.internalUserId.value</span>
-
-                <a
-                class="govuk-link"
-                href="@AppRoutes.testOnly.TestOnlyController.findAndLogInApplicant(UserId.make(agentApplication.agentApplicationId), PlanetId.make(agentApplication.agentApplicationId), requestHeader.uri)"
-                >login</a> <br>
             </dd>
         </div>
         @agentApplication.applicantContactDetails.map { contactDetails =>
@@ -246,34 +202,92 @@
                 <dd class="govuk-summary-list__value">@contactDetails.applicantName.value</dd>
             </div>
         }
-
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Created at</dt>
+            <dd class="govuk-summary-list__value">@formatInstant(agentApplication.createdAt)</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">AgentApplicationId</dt>
+            <dd class="govuk-summary-list__value">@agentApplication.agentApplicationId.value</dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Internal user id</dt>
+            <dd class="govuk-summary-list__value">@agentApplication.internalUserId.value</dd>
+        </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">Provide details link</dt>
             <dd class="govuk-summary-list__value">
-                <a
-                class="govuk-link"
-                href="@AppRoutes.providedetails.StartController.start(agentApplication.linkId)"
-                >/provide-details/start/...</a>
+                <a class="govuk-link" href="@provideDetailsLink">@provideDetailsLink</a>
+                <div class="govuk-hint govuk-!-margin-bottom-0">Given to the applicant, then shared by them with individuals</div>
             </dd>
         </div>
-
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">@individuals.size individuals</dt>
+            <dt class="govuk-summary-list__key">View data</dt>
             <dd class="govuk-summary-list__value">
-                <ul class="govuk-list govuk-list--number">
-
-                @individuals.map { individual =>
-
-                    <li class="govuk-!-margin-bottom-4">
-                        @individualTile(individual, agentApplication.isBeforeSentForRisking, isRiskingCompleted, submittedRiskingResultsFilenames)
-                    </li>
+                @compactLink(
+                    label = "View application (JSON)",
+                    url = AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationById(agentApplication.agentApplicationId),
+                    hint = Some("full internal representation of this application")
+                )
+                @compactLink(
+                    label = "View individuals-for-risking (JSON)",
+                    url = AppRoutes.testOnly.TestOnlyController.showIndividualsForRisking(agentApplication.applicationReference),
+                    hint = Some("internal representation of this application's individuals in the risking microservice")
+                )
+                @compactLink(
+                    label = "View completed risking / archive (JSON)",
+                    url = AppRoutes.testOnly.TestOnlyController.showCompletedRisking(agentApplication.applicationReference),
+                    hint = Some("populated once risking has fully completed for this application")
+                )
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Access</dt>
+            <dd class="govuk-summary-list__value">
+                @compactLink(
+                    label = "Log in as applicant",
+                    url = AppRoutes.testOnly.TestOnlyController.findAndLogInApplicant(UserId.make(agentApplication.agentApplicationId), PlanetId.make(agentApplication.agentApplicationId), requestHeader.uri)
+                )
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Minerva simulator</dt>
+            <dd class="govuk-summary-list__value">
+                @if(isEntityResultsFileSubmitted) {
+                    @compactLink(
+                        label = "View submitted entity risking results file",
+                        url = AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(entityResultsFilename)
+                    )
+                } else if (isSentToMinerva) {
+                    <p class="govuk-hint govuk-!-margin-bottom-2">Emulate uploading risking results from Minerva</p>
+                    <p class="govuk-body govuk-!-margin-bottom-1">
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference)">Choose entity failures</a>
+                        or just quickly
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresApproved(agentApplication.applicationReference, requestHeader.uri)">approve</a>,
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresFixable(agentApplication.applicationReference, requestHeader.uri)">fail-fixable</a>,
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresMixed(agentApplication.applicationReference, requestHeader.uri)">fail-non-fixable</a>
+                    </p>
+                } else {
+                    <span class="govuk-hint">Only available once the application is SentToMinerva (currently: @agentApplication.applicationState)</span>
                 }
-                </ul>
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Individuals</dt>
+            <dd class="govuk-summary-list__value">
+                @if(individuals.isEmpty) {
+                    <span class="govuk-hint">Individuals have not been created yet</span>
+                } else {
+                    <ul class="govuk-list">
+                        @individuals.map { individual =>
+                            <li class="govuk-!-margin-bottom-4">
+                                @individualTile(individual, isSentToMinerva, submittedRiskingResultsFilenames)
+                            </li>
+                        }
+                    </ul>
+                }
             </dd>
         </div>
     </dl>
-
-
-
 
 </div>

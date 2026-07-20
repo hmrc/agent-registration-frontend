@@ -194,14 +194,15 @@ extends Connector:
             )
       .andLogOnFailure("Failed to list submitted risking results filenames")
 
-  def viewRiskingResultsFile(filename: String)(using RequestHeader): Future[String] =
+  def viewRiskingResultsFile(filename: String)(using RequestHeader): Future[Option[String]] =
     val url: URL = url"$baseUrl/risking-results-file/$filename"
     httpClient
       .get(url)
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case status if is2xx(status) => response.body
+          case status if is2xx(status) => Some(response.body)
+          case status if status === Status.NOT_FOUND => None
           case status =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "GET",

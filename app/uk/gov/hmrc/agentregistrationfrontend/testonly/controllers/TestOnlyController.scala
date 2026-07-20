@@ -171,7 +171,9 @@ extends FrontendControllerBase(mcc):
 
   def showRiskingResultsFile(filename: String): Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
-      testRiskingService.viewRiskingResultsFile(filename).map(Ok(_))
+      testRiskingService.viewRiskingResultsFile(filename).map:
+        case Some(content) => Ok(content)
+        case None => Ok(s"No risking results file found for filename: $filename")
 
   def showApplicationForRisking(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
