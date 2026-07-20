@@ -78,6 +78,8 @@
 @entityResultsFilename = @{s"test-only-entity-${agentApplication.applicationReference.value}"}
 @isEntityResultsFileSubmitted = @{submittedRiskingResultsFilenames.contains(entityResultsFilename)}
 
+@redirectUrlWithAnchor = @{s"${requestHeader.uri}#entity-minerva-simulator"}
+
 @nonBusinessIdentifiers = @{
     Seq(
         Some(("AgentApplicationId", agentApplication.agentApplicationId.value)),
@@ -267,11 +269,11 @@
             <dd class="govuk-summary-list__value">
                 @compactLink(
                     label = "Log in as applicant",
-                    url = AppRoutes.testOnly.TestOnlyController.findAndLogInApplicant(UserId.make(agentApplication.agentApplicationId), PlanetId.make(agentApplication.agentApplicationId), requestHeader.uri)
+                    url = AppRoutes.testOnly.TestOnlyController.findAndLogInApplicant(UserId.make(agentApplication.agentApplicationId), PlanetId.make(agentApplication.agentApplicationId), redirectUrlWithAnchor)
                 )
             </dd>
         </div>
-        <div class="govuk-summary-list__row">
+        <div class="govuk-summary-list__row" id="entity-minerva-simulator">
             <dt class="govuk-summary-list__key">Minerva simulator</dt>
             <dd class="govuk-summary-list__value">
                 @if(isEntityResultsFileSubmitted) {
@@ -284,9 +286,9 @@
                     <p class="govuk-body govuk-!-margin-bottom-1">
                         <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference)">Choose entity failures</a>
                         or just quickly
-                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresApproved(agentApplication.applicationReference, requestHeader.uri)">approve</a>,
-                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresFixable(agentApplication.applicationReference, requestHeader.uri)">fail-fixable</a>,
-                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresMixed(agentApplication.applicationReference, requestHeader.uri)">fail-non-fixable</a>
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresApproved(agentApplication.applicationReference, redirectUrlWithAnchor)">approve</a>,
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresFixable(agentApplication.applicationReference, redirectUrlWithAnchor)">fail-fixable</a>,
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresMixed(agentApplication.applicationReference, redirectUrlWithAnchor)">fail-non-fixable</a>
                     </p>
                 } else {
                     <span class="govuk-hint">Only available once the application is SentToMinerva (currently: @agentApplication.applicationState)</span>

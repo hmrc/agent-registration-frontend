@@ -49,6 +49,9 @@
 @individualResultsFilename = @{s"test-only-individual-${individual.personReference.value}"}
 @isIndividualResultsFileSubmitted = @{submittedRiskingResultsFilenames.contains(individualResultsFilename)}
 
+@individualCardId = @{s"individual-${individual.personReference.value}"}
+@redirectUrlWithAnchor = @{s"${requestHeader.uri}#$individualCardId"}
+
 @strongText(value: String) = {<strong>@value</strong>}
 
 @ninoValue = @{
@@ -137,7 +140,7 @@
     @compactLink(
         label = "Log in as individual",
         url = AppRoutes.testOnly.TestOnlyController.findOrCreateAndLogInIndividual(
-            UserId.make(individual.individualProvidedDetailsId), PlanetId.make(individual.agentApplicationId), individual.individualName.value, requestHeader.uri
+            UserId.make(individual.individualProvidedDetailsId), PlanetId.make(individual.agentApplicationId), individual.individualName.value, redirectUrlWithAnchor
         )
     )
 }
@@ -153,9 +156,9 @@
         <p class="govuk-body govuk-!-margin-bottom-1">
             <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference)">Choose individual failures</a>
             or just quickly
-            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, requestHeader.uri)">approve</a>,
-            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, requestHeader.uri)">fail-fixable</a>,
-            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresMixed(individual.personReference, requestHeader.uri)">fail-non-fixable</a>
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, redirectUrlWithAnchor)">approve</a>,
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, redirectUrlWithAnchor)">fail-fixable</a>,
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresMixed(individual.personReference, redirectUrlWithAnchor)">fail-non-fixable</a>
         </p>
     } else {
         <span class="govuk-hint">Only available once the application is SentToMinerva</span>
@@ -218,7 +221,7 @@
     ).flatten
 }
 
-<div class="test-only-card govuk-!-padding-4">
+<div class="test-only-card govuk-!-padding-4" id="@individualCardId">
     @govukSummaryList(SummaryList(
         rows = rows,
         classes = "govuk-summary-list--no-border test-only-narrow-key govuk-!-margin-bottom-0"
