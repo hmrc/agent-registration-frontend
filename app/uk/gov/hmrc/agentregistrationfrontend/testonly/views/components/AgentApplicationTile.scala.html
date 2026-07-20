@@ -21,6 +21,7 @@
 @import uk.gov.hmrc.agentregistration.shared.BusinessType
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
+@import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 @import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
@@ -78,6 +79,22 @@
         case _: RiskingOutcomeApplication.Approved => "govuk-tag--green"
         case _: RiskingOutcomeApplication.FailedFixable => "govuk-tag--yellow"
         case _: RiskingOutcomeApplication.FailedNonFixable => "govuk-tag--red"
+    }
+}
+
+@riskingOutcomeEntityLabel(outcome: RiskingOutcomeEntity) = @{
+    outcome match {
+        case RiskingOutcomeEntity.Approved => "Approved"
+        case _: RiskingOutcomeEntity.FailedFixable => "Failed (fixable)"
+        case _: RiskingOutcomeEntity.FailedNonFixable => "Failed (non-fixable)"
+    }
+}
+
+@riskingOutcomeEntityTagClasses(outcome: RiskingOutcomeEntity) = @{
+    outcome match {
+        case RiskingOutcomeEntity.Approved => "govuk-tag--green"
+        case _: RiskingOutcomeEntity.FailedFixable => "govuk-tag--yellow"
+        case _: RiskingOutcomeEntity.FailedNonFixable => "govuk-tag--red"
     }
 }
 
@@ -168,6 +185,44 @@
                     </div>
                 }
                 case _: RiskingOutcomeApplication.Approved => {}
+            }
+        }
+        @agentApplication.riskingOutcomeEntity.map { riskingOutcomeEntity =>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Risking outcome (entity)</dt>
+                <dd class="govuk-summary-list__value">
+                    @govukTag(Tag(
+                        content = Text(riskingOutcomeEntityLabel(riskingOutcomeEntity)),
+                        classes = riskingOutcomeEntityTagClasses(riskingOutcomeEntity)
+                    ))
+                </dd>
+            </div>
+            @riskingOutcomeEntity match {
+                case fixable: RiskingOutcomeEntity.FailedFixable => {
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Fixes</dt>
+                        <dd class="govuk-summary-list__value">
+                            <ul class="govuk-list govuk-!-margin-bottom-0">
+                                @fixable.fixes.map { fix =>
+                                    <li>@fix.toString</li>
+                                }
+                            </ul>
+                        </dd>
+                    </div>
+                }
+                case nonFixable: RiskingOutcomeEntity.FailedNonFixable => {
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">Failures</dt>
+                        <dd class="govuk-summary-list__value">
+                            <ul class="govuk-list govuk-!-margin-bottom-0">
+                                @nonFixable.failures.map { failure =>
+                                    <li>@failure.toString</li>
+                                }
+                            </ul>
+                        </dd>
+                    </div>
+                }
+                case RiskingOutcomeEntity.Approved => {}
             }
         }
         <div class="govuk-summary-list__row">
