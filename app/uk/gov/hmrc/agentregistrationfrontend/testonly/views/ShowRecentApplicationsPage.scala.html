@@ -32,16 +32,32 @@
 @this(
         appConfig: AppConfig,
         layout: TestOnlyLayout,
-        govukTag: GovukTag
+        govukTag: GovukTag,
+        govukPagination: GovukPagination
 )
 
 @(
         agentApplicationsWithIndividuals: Seq[(AgentApplication, List[IndividualProvidedDetails])],
-        submittedRiskingResultsFilenames: Set[String]
+        submittedRiskingResultsFilenames: Set[String],
+        page: Int,
+        pageSize: Int
 )(implicit
         request: RequestHeader,
         messages: Messages
 )
+
+@hasNextPage = @{agentApplicationsWithIndividuals.size >= pageSize}
+
+@pagination = @{
+    Pagination(
+        previous =
+            if (page > 1) Some(PaginationLink(href = AppRoutes.testOnly.applicant.TestOnlyController.showRecentAgentApplications(page - 1, pageSize).url, text = Some("Previous")))
+            else None,
+        next =
+            if (hasNextPage) Some(PaginationLink(href = AppRoutes.testOnly.applicant.TestOnlyController.showRecentAgentApplications(page + 1, pageSize).url, text = Some("Next")))
+            else None
+    )
+}
 
 @instantFormatter = @{DateTimeFormatter.ofPattern("d MMM uuuu, HH:mm").withZone(ZoneId.of("Europe/London"))}
 @formatInstant(instant: Instant) = @{instantFormatter.format(instant)}
@@ -148,7 +164,7 @@
             @agentApplicationsWithIndividuals.map { case (agentApplication, individuals) =>
                 <tr class="govuk-table__row">
                     <td class="govuk-table__cell">
-                        <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationTile(agentApplication.agentApplicationId)">
+                        <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationDetailsByReference(agentApplication.applicationReference)">
                             <strong>@agentApplication.applicationReference.value</strong>
                         </a>
                     </td>
@@ -206,4 +222,8 @@
             }
         </tbody>
     </table>
+
+    @if(pagination.previous.isDefined || pagination.next.isDefined) {
+        @govukPagination(pagination)
+    }
 }

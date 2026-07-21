@@ -61,7 +61,7 @@
     <h2 class="govuk-heading-m govuk-!-margin-top-6">Browse applications</h2>
     @compactLink(
         label = "Recent applications",
-        url = AppRoutes.testOnly.applicant.TestOnlyController.showRecentAgentApplications,
+        url = AppRoutes.testOnly.applicant.TestOnlyController.showRecentAgentApplications(1, 15),
         hint = Some("a table of recently created applications with their state, business type, risking outcomes and individuals")
     )
 
