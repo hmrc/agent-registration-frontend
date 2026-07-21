@@ -21,6 +21,8 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.DefaultActionBuilder
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendControllerBase
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
@@ -89,6 +91,34 @@ extends FrontendControllerBase(mcc):
                 )
           loginResponse <- stubUserService.signIn(user)
         yield Redirect(redirectUrl).addToSession(loginResponse)
+
+  def runRiskingAndRedirect(redirectUrl: String): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.runRisking().map: _ =>
+        Redirect(redirectUrl)
+
+  def triggerRiskingResultsProcessingAndRedirect(redirectUrl: String): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.triggerRiskingResultsProcessing().map: _ =>
+        Redirect(redirectUrl)
+
+  def showRiskingResultsFile(filename: String): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.viewRiskingResultsFile(filename).map:
+        case Some(content) => Ok(content)
+        case None => Ok(s"No risking results file found for filename: $filename")
+
+  def showApplicationForRisking(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.findApplicationForRisking(applicationReference).map:
+        case Some(json) => Ok(Json.prettyPrint(json))
+        case None => Ok(s"No application-for-risking found for applicationReference: ${applicationReference.value}")
+
+  def showIndividualForRisking(personReference: PersonReference): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.findIndividualForRisking(personReference).map:
+        case Some(json) => Ok(Json.prettyPrint(json))
+        case None => Ok(s"No individual-for-risking found for personReference: ${personReference.value}")
 
   def resetDatabase: Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>

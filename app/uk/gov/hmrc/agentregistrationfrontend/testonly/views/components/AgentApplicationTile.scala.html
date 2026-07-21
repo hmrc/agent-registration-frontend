@@ -27,9 +27,16 @@
 
 @(
         agentApplication: AgentApplication,
-        individuals: Seq[IndividualProvidedDetails])(implicit
+        individuals: Seq[IndividualProvidedDetails],
+        submittedRiskingResultsFilenames: Set[String])(implicit
         requestHeader: RequestHeader
 )
+
+@entityResultsFilename = @{
+    submittedRiskingResultsFilenames
+        .filter(_.startsWith(s"test-only-${agentApplication.applicationReference.value}-"))
+        .maxOption
+}
 
 <style>
 
@@ -85,6 +92,26 @@
         href="@AppRoutes.providedetails.StartController.start(agentApplication.linkId)"
         >/provide-details/start/...</a> <br>
 
+        @entityResultsFilename match {
+            case Some(filename) => {
+                <a
+                class="govuk-link"
+                href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(filename)"
+                >View submitted entity risking results file</a> <br>
+            }
+            case None => {
+                <a
+                class="govuk-link"
+                href="@AppRoutes.testOnly.applicant.TestOnlyController.selectRiskingFailures(agentApplication.agentApplicationId)"
+                >Select entity failures / upload risking results</a> <br>
+            }
+        }
+
+        <a
+        class="govuk-link"
+        href="@AppRoutes.testOnly.TestOnlyController.showApplicationForRisking(agentApplication.applicationReference)"
+        >View application-for-risking (JSON)</a> <br>
+
 
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">@individuals.size individuals</dt>
@@ -94,7 +121,7 @@
                 @individuals.map { individual =>
 
                     <li class="govuk-!-margin-bottom-4">
-                        @individualTile(individual)
+                        @individualTile(individual, submittedRiskingResultsFilenames)
                     </li>
                 }
                 </ul>

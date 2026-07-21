@@ -23,9 +23,16 @@
 @this()
 
 @(
-        individual: IndividualProvidedDetails)(implicit
+        individual: IndividualProvidedDetails,
+        submittedRiskingResultsFilenames: Set[String])(implicit
         requestHeader: RequestHeader
 )
+
+@individualResultsFilename = @{
+    submittedRiskingResultsFilenames
+        .filter(_.startsWith(s"test-only-${individual.personReference.value}-"))
+        .maxOption
+}
 
 <style>
     .individual-tile {
@@ -137,7 +144,27 @@
         href="@AppRoutes.testOnly.TestOnlyController.findOrCreateAndLogInIndividual(
             UserId.make(individual.individualProvidedDetailsId), PlanetId.make(individual.agentApplicationId), individual.individualName.value, requestHeader.uri
         )"
-        >login</a>
+        >login</a> <br>
+
+        @individualResultsFilename match {
+            case Some(filename) => {
+                <a
+                class="govuk-link"
+                href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(filename)"
+                >View submitted individual risking results file</a>
+            }
+            case None => {
+                <a
+                class="govuk-link"
+                href="@AppRoutes.testOnly.applicant.TestOnlyController.selectIndividualRiskingFailures(individual.individualProvidedDetailsId)"
+                >Select risking failures / upload risking results</a>
+            }
+        } <br>
+
+        <a
+        class="govuk-link"
+        href="@AppRoutes.testOnly.TestOnlyController.showIndividualForRisking(individual.personReference)"
+        >View individual-for-risking (JSON)</a>
     </div>
 
     <div class="individual-tile__footer">

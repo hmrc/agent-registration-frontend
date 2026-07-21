@@ -18,7 +18,9 @@
 @import play.twirl.api.Html
 @this()
 
-@()
+@()(implicit
+        request: RequestHeader
+)
 
 <style>
         #top-nav-bar a:first-of-type {
@@ -78,6 +80,18 @@
     class="govuk-link"
     id="goto-task-list-page"
     href="@AppRoutes.apply.TaskListController.show"
-    >task list page</a> <br>
+    >task list page</a>
+
+    <a
+    class="govuk-link"
+    id="run-risking"
+    href="@AppRoutes.testOnly.TestOnlyController.runRiskingAndRedirect(request.uri)"
+    >run risking</a>
+
+    <a
+    class="govuk-link"
+    id="process-risking-results"
+    href="@AppRoutes.testOnly.TestOnlyController.triggerRiskingResultsProcessingAndRedirect(request.uri)"
+    >process risking results</a> <br>
 
 </nav>

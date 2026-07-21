@@ -27,7 +27,8 @@
 )
 
 @(
-        agentApplicationsWithIndividuals: Seq[(AgentApplication, List[IndividualProvidedDetails])]
+        agentApplicationsWithIndividuals: Seq[(AgentApplication, List[IndividualProvidedDetails])],
+        submittedRiskingResultsFilenames: Set[String]
 )(implicit
         request: RequestHeader,
         messages: Messages
@@ -48,7 +49,7 @@
             <li class="govuk-!-margin-bottom-4">
                 <a href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationTile(agentApplicationWithIndividuals._1.agentApplicationId)"
                 >show tile</a>
-                @agentApplicationTile(agentApplicationWithIndividuals._1, agentApplicationWithIndividuals._2)
+                @agentApplicationTile(agentApplicationWithIndividuals._1, agentApplicationWithIndividuals._2, submittedRiskingResultsFilenames)
             </li>
     }
 
