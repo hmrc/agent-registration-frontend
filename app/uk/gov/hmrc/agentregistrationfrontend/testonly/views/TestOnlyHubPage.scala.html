@@ -14,11 +14,9 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 
 @this(
-        appConfig: AppConfig,
         layout: Layout,
         quickNavigation: components.QuickNavigation
 )
@@ -49,9 +47,5 @@
       showIndividualsForApplication</a></li>
     <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.makeTestSubmittedApplication()">
       get-link-id</a></li>
-    @if(appConfig.TestOnly.allowResetDatabase) {
-      <li><a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.resetDatabase">
-          reset all databases </a></li>
-      }
   </ul>
 }
