@@ -50,4 +50,25 @@ extends Connector:
             )
       .andLogOnFailure("Failed to delete all risking Agent Applications")
 
+  def uploadRiskingResultsFile(
+    filename: String,
+    body: JsValue
+  )(using RequestHeader): Future[Unit] =
+    val url: URL = url"$baseUrl/risking-results-file/$filename"
+    httpClient
+      .post(url)
+      .withBody(body)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => ()
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to upload risking results file: $filename")
+
   private val baseUrl: String = appConfig.agentRegistrationRiskingBaseUrl + "/agent-registration-risking/test-only"

@@ -25,6 +25,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistration.shared.BusinessType
+import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
@@ -33,8 +34,10 @@ import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
+import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowRecentApplicationsPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowAgentApplicationsTilePage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectRiskingFailuresPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestLinkPage
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
@@ -48,10 +51,12 @@ class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   testApplicationService: TestApplicationService,
+  testRiskingService: TestRiskingService,
   testAgentRegistrationConnector: TestAgentRegistrationConnector,
   testLinkPage: TestLinkPage,
   showRecentApplicationsPage: ShowRecentApplicationsPage,
   showAgentApplicationsTilePage: ShowAgentApplicationsTilePage,
+  selectRiskingFailuresPage: SelectRiskingFailuresPage,
   individualProvidedDetailsConnector: IndividualProvidedDetailsConnector
 )
 extends FrontendController(mcc, actions):
@@ -101,6 +106,40 @@ extends FrontendController(mcc, actions):
         val agentApplication: AgentApplication = request.get[AgentApplication]
         val individuals: List[IndividualProvidedDetails] = request.get[List[IndividualProvidedDetails]]
         Ok(showAgentApplicationsTilePage(agentApplication, individuals))
+
+  def selectRiskingFailures(agentApplicationId: AgentApplicationId): Action[AnyContent] = actions
+    .action
+    .async:
+      implicit request =>
+        for
+          maybeApplication <- testAgentRegistrationConnector.findApplication(agentApplicationId)
+          individuals <- testAgentRegistrationConnector.findIndividuals(agentApplicationId)
+        yield maybeApplication match
+          case Some(agentApplication) => Ok(selectRiskingFailuresPage(agentApplication, individuals))
+          case None => InternalServerError(s"There is no application under given agentApplicationId: $agentApplicationId")
+
+  def submitRiskingFailures(agentApplicationId: AgentApplicationId): Action[AnyContent] = actions
+    .action
+    .async:
+      implicit request =>
+        val formData: Map[String, Seq[String]] = request.body.asFormUrlEncoded.getOrElse(Map.empty)
+        for
+          maybeApplication <- testAgentRegistrationConnector.findApplication(agentApplicationId)
+          individuals <- testAgentRegistrationConnector.findIndividuals(agentApplicationId)
+          agentApplication = maybeApplication.getOrElse(
+            throw new RuntimeException(s"There is no application under given agentApplicationId: $agentApplicationId")
+          )
+          entityFailureCodes: Seq[String] = formData.getOrElse("entityFailure", Seq.empty)
+          individualFailureCodesByPersonReference: Map[PersonReference, Seq[String]] =
+            individuals.map: individual =>
+              individual.personReference -> formData.getOrElse(s"individualFailure_${individual.personReference.value}", Seq.empty)
+            .toMap
+          _ <- testRiskingService.submitFailures(
+            agentApplication.applicationReference,
+            entityFailureCodes,
+            individualFailureCodesByPersonReference
+          )
+        yield Redirect(AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationTile(agentApplicationId))
 
   def showIndividualsForApplication: Action[AnyContent] = actions
     .getApplication
