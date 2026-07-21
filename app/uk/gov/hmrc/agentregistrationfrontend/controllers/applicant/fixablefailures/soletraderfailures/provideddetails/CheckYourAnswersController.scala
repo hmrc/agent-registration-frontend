@@ -69,7 +69,7 @@ extends FrontendController(mcc, actions):
           .modify(_.fixes)
           .setTo(updatedFixes)
         individualProvideDetailsService
-          .upsert(
+          .upsertForApplication(
             request.get[IndividualProvidedDetails]
               .modify(_.riskingOutcomeIndividual)
               .setTo(Some(updatedRiskingOutcomeIndividual))

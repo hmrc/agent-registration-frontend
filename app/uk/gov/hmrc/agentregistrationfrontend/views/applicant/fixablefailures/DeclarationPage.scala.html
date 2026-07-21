@@ -40,11 +40,18 @@
 
 @layout(pageTitle = pageTitle) {
     <h1 class="govuk-heading-l">@pageTitle</h1>
+    <p class="govuk-body">
     @if(!isSoleTraderOwner) {
-      <p class="govuk-body">
-        @{messages(s"$key.p1", entityName)}
-      </p>
+      @{
+        messages(s"$key.p1", entityName)
+      }
+    } else {
+      @{
+        messages(s"$key.p1.SoleTrader")
+      }
     }
+    </p>
+
     <p class="govuk-body">
         @{messages(s"$key.p2")}
     </p>
