@@ -21,24 +21,44 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.DefaultActionBuilder
 import play.api.mvc.MessagesControllerComponents
+import play.api.mvc.RequestHeader
+import play.api.mvc.Result
+import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.FrontendControllerBase
+import uk.gov.hmrc.agentregistrationfrontend.testonly.forms.SelectEntityFailuresForm
+import uk.gov.hmrc.agentregistrationfrontend.testonly.forms.SelectIndividualFailuresForm
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.EntityRiskingFailure
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.IndividualRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UploadRiskingResultsFileOutcome
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyHubPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ResetDatabaseConfirmationPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.RiskingActionConfirmationPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectEntityFailuresPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectIndividualFailuresPage
 
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
+import scala.util.Random
 
 @Singleton
 class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
   defaultActionBuilder: DefaultActionBuilder,
   testOnlyHubPage: TestOnlyHubPage,
+  resetDatabaseConfirmationPage: ResetDatabaseConfirmationPage,
+  riskingActionConfirmationPage: RiskingActionConfirmationPage,
+  selectEntityFailuresPage: SelectEntityFailuresPage,
+  selectIndividualFailuresPage: SelectIndividualFailuresPage,
   stubUserService: StubUserService,
   testApplicationService: TestApplicationService,
   testRiskingService: TestRiskingService,
@@ -90,12 +110,350 @@ extends FrontendControllerBase(mcc):
           loginResponse <- stubUserService.signIn(user)
         yield Redirect(redirectUrl).addToSession(loginResponse)
 
+  def showResetDatabaseConfirmation: Action[AnyContent] = defaultActionBuilder:
+    implicit request =>
+      if appConfig.TestOnly.allowResetDatabase
+      then Ok(resetDatabaseConfirmationPage())
+      else Unauthorized("Reset operation not allowed")
+
   def resetDatabase: Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
       if (appConfig.TestOnly.allowResetDatabase)
         for
           _ <- testApplicationService.deleteAll()
           _ <- testRiskingService.deleteAll()
-        yield Ok(Json.toJson("Databases reset"))
+        yield Redirect(AppRoutes.testOnly.TestOnlyController.showTestOnlyHub)
       else
         Future.successful(Unauthorized("Reset operation not allowed"))
+
+  def runRisking: Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.runRisking().map: _ =>
+        Ok(riskingActionConfirmationPage(
+          heading = "Risking scheduled",
+          description =
+            "This collects every application that's in the SentForRisking state, together with their individuals, builds a pipe-separated" +
+              " risking file, and sends it to Minerva. On success, those applications move to the SentToMinerva state. Processing happens" +
+              " asynchronously in the background."
+        ))
+
+  /** Same underlying action as `runRisking`, but for the quick-nav link: redirects back to the page the user was on instead of showing the confirmation page,
+    * so it can be used as a one-click action from anywhere in the test-only tooling.
+    */
+  def runRiskingAndRedirect(redirectUrl: String): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.runRisking().map: _ =>
+        Redirect(redirectUrl)
+
+  def runResultsFileProcessing: Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.runResultsFileProcessing().map: _ =>
+        Ok(riskingActionConfirmationPage(
+          heading = "Results file processing scheduled",
+          description =
+            "This picks up risking results files uploaded via the SDES test-only endpoint (for example via 'Select entity failures' /" +
+              " 'Select individual failures' on this hub), parses the records in them, and applies the outcomes to the matching" +
+              " applications/individuals in agent-registration-risking. This is what would normally happen when Minerva sends back" +
+              " risking decisions. Once fully processed, an application moves to the RiskingCompleted state and its records are archived" +
+              " into the completed-risking collection. Processing happens asynchronously in the background."
+        ))
+
+  /** Same underlying action as `runResultsFileProcessing`, but for the quick-nav link: redirects back to the page the user was on instead of showing the
+    * confirmation page, so it can be used as a one-click action from anywhere in the test-only tooling.
+    */
+  def runResultsFileProcessingAndRedirect(redirectUrl: String): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.runResultsFileProcessing().map: _ =>
+        Redirect(redirectUrl)
+
+  def viewNextRiskingFileContents: Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.viewNextRiskingFileContents().map(Ok(_))
+
+  def showRiskingResultsFile(filename: String): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.viewRiskingResultsFile(filename).map:
+        case Some(content) => Ok(content)
+        case None => Ok(s"No risking results file found for filename: $filename")
+
+  def showApplicationForRisking(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.findApplicationForRisking(applicationReference).map:
+        case Some(json) => Ok(Json.prettyPrint(json))
+        case None => Ok(s"No application-for-risking found for applicationReference: ${applicationReference.value}")
+
+  def showIndividualsForRisking(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.findIndividualsForRisking(applicationReference).map:
+        case Some(json) => Ok(Json.prettyPrint(json))
+        case None => Ok(s"No individuals-for-risking found for applicationReference: ${applicationReference.value}")
+
+  def showIndividualForRisking(personReference: PersonReference): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.findIndividualForRisking(personReference).map:
+        case Some(json) => Ok(Json.prettyPrint(json))
+        case None => Ok(s"No individual-for-risking found for personReference: ${personReference.value}")
+
+  def showCompletedRisking(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.findCompletedRisking(applicationReference).map:
+        case Some(json) => Ok(Json.prettyPrint(json))
+        case None => Ok(s"No completed risking found for applicationReference: ${applicationReference.value}")
+
+  def showSelectEntityFailures(
+    applicationReference: ApplicationReference,
+    reSubmittedAt: Option[Long]
+  ): Action[AnyContent] = defaultActionBuilder:
+    implicit request =>
+      Ok(selectEntityFailuresPage(
+        applicationReference,
+        reSubmittedAt.map(Instant.ofEpochMilli),
+        SelectEntityFailuresForm.form
+      ))
+
+  def submitEntityFailures(
+    applicationReference: ApplicationReference,
+    reSubmittedAt: Option[Long]
+  ): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      val reSubmittedAtInstant = reSubmittedAt.map(Instant.ofEpochMilli)
+      SelectEntityFailuresForm.form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(BadRequest(selectEntityFailuresPage(
+              applicationReference,
+              reSubmittedAtInstant,
+              formWithErrors
+            ))),
+          failures =>
+            testRiskingService.submitEntityFailures(
+              applicationReference,
+              failures,
+              reSubmittedAtInstant
+            ).map:
+              case UploadRiskingResultsFileOutcome.Uploaded =>
+                Ok(riskingActionConfirmationPage(
+                  heading = "Risking results submitted",
+                  description =
+                    s"A risking results file has been uploaded for application reference ${applicationReference.value}. " +
+                      "It won't take effect until results file processing is run."
+                ))
+              case UploadRiskingResultsFileOutcome.AlreadyExists =>
+                val formWithError = SelectEntityFailuresForm.form
+                  .fill(failures)
+                  .withGlobalError(s"Risking results have already been submitted for application reference ${applicationReference.value}.")
+                Conflict(selectEntityFailuresPage(
+                  applicationReference,
+                  reSubmittedAtInstant,
+                  formWithError
+                ))
+        )
+
+  /** Quick action: submits with no failures at all, i.e. an Approved outcome, without having to manually leave every checkbox unticked. Redirects back to
+    * `redirectUrl` (the page the link was clicked from) instead of showing a confirmation page.
+    */
+  def submitEntityFailuresApproved(
+    applicationReference: ApplicationReference,
+    redirectUrl: String,
+    reSubmittedAt: Option[Long]
+  ): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      submitEntityFailuresQuickAction(
+        applicationReference,
+        Seq.empty,
+        redirectUrl,
+        reSubmittedAt
+      )
+
+  /** Quick action: submits a single fixable failure, i.e. a FailedFixable outcome. */
+  def submitEntityFailuresFixable(
+    applicationReference: ApplicationReference,
+    redirectUrl: String,
+    reSubmittedAt: Option[Long]
+  ): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      submitEntityFailuresQuickAction(
+        applicationReference,
+        randomFixableEntityFailures(1 + Random.nextInt(3)),
+        redirectUrl,
+        reSubmittedAt
+      )
+
+  /** Quick action: submits a mix of one fixable and one non-fixable failure, i.e. a FailedNonFixable outcome whose failures still include a fixable one bundled
+    * alongside the blocking one.
+    */
+  def submitEntityFailuresMixed(
+    applicationReference: ApplicationReference,
+    redirectUrl: String,
+    reSubmittedAt: Option[Long]
+  ): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      submitEntityFailuresQuickAction(
+        applicationReference,
+        randomNonFixableEntityFailures(),
+        redirectUrl,
+        reSubmittedAt
+      )
+
+  private def submitEntityFailuresQuickAction(
+    applicationReference: ApplicationReference,
+    failures: Seq[EntityRiskingFailure],
+    redirectUrl: String,
+    reSubmittedAt: Option[Long]
+  )(using RequestHeader): Future[Result] =
+    // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to where the link was clicked from.
+    testRiskingService.submitEntityFailures(
+      applicationReference,
+      failures,
+      reSubmittedAt.map(Instant.ofEpochMilli)
+    ).map(_ => Redirect(redirectUrl))
+
+  /** A random non-empty subset (1 to 3) of the fixable entity checks, so repeated clicks of the "fail-fixable" quick action produce varied test data instead of
+    * always the exact same single failure.
+    */
+  /** A random selection of `count` fixable entity failures containing at most one AMLS (Check 3) failure — the real risking model only ever produces a single
+    * `EntityFix._3.AmlsFix` per application (see `SelectEntityFailuresForm`'s equivalent validation), so picking from the raw fixable catalogue directly could
+    * easily select two or more AMLS checks and build test data that could never occur for real.
+    */
+  private def randomFixableEntityFailures(count: Int): Seq[EntityRiskingFailure] =
+    val allFixableFailures: Seq[EntityRiskingFailure] = EntityRiskingFailure.values.filter(_.fixable).toSeq
+    val (amlsFailures, otherFixableFailures) = allFixableFailures.partition(_.checkId === "3")
+    val pool = otherFixableFailures ++ Random.shuffle(amlsFailures).take(1)
+    Random.shuffle(pool).take(count)
+
+  /** A random selection guaranteed to contain at least one non-fixable entity check (so the resulting outcome is genuinely FailedNonFixable), plus a random 0-2
+    * fixable checks (with the same at-most-one-AMLS rule as `randomFixableEntityFailures`) bundled alongside it — exercising the "Failures" + "Fixes" split
+    * rendering on a genuinely mixed set.
+    */
+  private def randomNonFixableEntityFailures(): Seq[EntityRiskingFailure] =
+    val nonFixableFailures: Seq[EntityRiskingFailure] = EntityRiskingFailure.values.filterNot(_.fixable).toSeq
+    val randomNonFixable = Random.shuffle(nonFixableFailures).take(1 + Random.nextInt(3))
+    val randomFixable = randomFixableEntityFailures(Random.nextInt(3))
+    randomNonFixable ++ randomFixable
+
+  def showSelectIndividualFailures(
+    personReference: PersonReference,
+    reSubmittedAt: Option[Long]
+  ): Action[AnyContent] = defaultActionBuilder:
+    implicit request =>
+      Ok(selectIndividualFailuresPage(
+        personReference,
+        reSubmittedAt.map(Instant.ofEpochMilli),
+        SelectIndividualFailuresForm.form
+      ))
+
+  def submitIndividualFailures(
+    personReference: PersonReference,
+    reSubmittedAt: Option[Long]
+  ): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      val reSubmittedAtInstant = reSubmittedAt.map(Instant.ofEpochMilli)
+      SelectIndividualFailuresForm.form
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(BadRequest(selectIndividualFailuresPage(
+              personReference,
+              reSubmittedAtInstant,
+              formWithErrors
+            ))),
+          failures =>
+            testRiskingService.submitIndividualFailures(
+              personReference,
+              failures,
+              reSubmittedAtInstant
+            ).map:
+              case UploadRiskingResultsFileOutcome.Uploaded =>
+                Ok(riskingActionConfirmationPage(
+                  heading = "Risking results submitted",
+                  description =
+                    s"A risking results file has been uploaded for person reference ${personReference.value}. " +
+                      "It won't take effect until results file processing is run."
+                ))
+              case UploadRiskingResultsFileOutcome.AlreadyExists =>
+                val formWithError = SelectIndividualFailuresForm.form
+                  .fill(failures)
+                  .withGlobalError(s"Risking results have already been submitted for person reference ${personReference.value}.")
+                Conflict(selectIndividualFailuresPage(
+                  personReference,
+                  reSubmittedAtInstant,
+                  formWithError
+                ))
+        )
+
+  /** Quick action from `SelectIndividualFailuresPage`: submits with no failures at all, i.e. an Approved outcome, without having to manually leave every
+    * checkbox unticked. Redirects back to `redirectUrl` (the page the link was clicked from) instead of showing a confirmation page.
+    */
+  def submitIndividualFailuresApproved(
+    personReference: PersonReference,
+    redirectUrl: String,
+    reSubmittedAt: Option[Long]
+  ): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      submitIndividualFailuresQuickAction(
+        personReference,
+        Seq.empty,
+        redirectUrl,
+        reSubmittedAt
+      )
+
+  /** Quick action from `SelectIndividualFailuresPage`: submits a single fixable failure, i.e. a FailedFixable outcome. */
+  def submitIndividualFailuresFixable(
+    personReference: PersonReference,
+    redirectUrl: String,
+    reSubmittedAt: Option[Long]
+  ): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      submitIndividualFailuresQuickAction(
+        personReference,
+        randomFixableIndividualFailures(),
+        redirectUrl,
+        reSubmittedAt
+      )
+
+  /** Quick action from `SelectIndividualFailuresPage`: submits a mix of one fixable and one non-fixable failure, i.e. a FailedNonFixable outcome whose failures
+    * still include a fixable one bundled alongside the blocking one.
+    */
+  def submitIndividualFailuresMixed(
+    personReference: PersonReference,
+    redirectUrl: String,
+    reSubmittedAt: Option[Long]
+  ): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      submitIndividualFailuresQuickAction(
+        personReference,
+        randomNonFixableIndividualFailures(),
+        redirectUrl,
+        reSubmittedAt
+      )
+
+  private def submitIndividualFailuresQuickAction(
+    personReference: PersonReference,
+    failures: Seq[IndividualRiskingFailure],
+    redirectUrl: String,
+    reSubmittedAt: Option[Long]
+  )(using RequestHeader): Future[Result] =
+    // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to where the link was clicked from.
+    testRiskingService.submitIndividualFailures(
+      personReference,
+      failures,
+      reSubmittedAt.map(Instant.ofEpochMilli)
+    ).map(_ => Redirect(redirectUrl))
+
+  /** A random non-empty subset (1 to 3) of the fixable individual checks, so repeated clicks of the "fail-fixable" quick action produce varied test data
+    * instead of always the exact same single failure.
+    */
+  private def randomFixableIndividualFailures(): Seq[IndividualRiskingFailure] =
+    val fixableFailures: Seq[IndividualRiskingFailure] = IndividualRiskingFailure.values.filter(_.fixable).toSeq
+    Random.shuffle(fixableFailures).take(1 + Random.nextInt(3))
+
+  /** A random selection guaranteed to contain at least one non-fixable individual check (so the resulting outcome is genuinely FailedNonFixable), plus a random
+    * 0-2 fixable checks bundled alongside it — exercising the "Failures" + "Fixes" split rendering on a genuinely mixed set.
+    */
+  private def randomNonFixableIndividualFailures(): Seq[IndividualRiskingFailure] =
+    val nonFixableFailures: Seq[IndividualRiskingFailure] = IndividualRiskingFailure.values.filterNot(_.fixable).toSeq
+    val fixableFailures: Seq[IndividualRiskingFailure] = IndividualRiskingFailure.values.filter(_.fixable).toSeq
+    val randomNonFixable = Random.shuffle(nonFixableFailures).take(1 + Random.nextInt(3))
+    val randomFixable = Random.shuffle(fixableFailures).take(Random.nextInt(3))
+    randomNonFixable ++ randomFixable

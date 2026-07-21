@@ -14,37 +14,39 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyLayout
-@import uk.gov.hmrc.agentregistration.shared.AgentApplication
-@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 
 @this(
-        appConfig: AppConfig,
         layout: TestOnlyLayout,
-        agentApplicationTile: components.AgentApplicationTile
+        formWithCSRF: FormWithCSRF,
+        govukWarningText: GovukWarningText,
+        govukButton: GovukButton
 )
 
-@(
-        agentApplication: AgentApplication,
-        individuals: List[IndividualProvidedDetails],
-        submittedRiskingResultsFilenames: Set[String])(implicit
+@()(implicit
         request: RequestHeader,
         messages: Messages
 )
 
 @layout(
-    pageTitle = "Agent Application Tile",
+    pageTitle = "Reset all databases",
     suppressBackLink = true
 ) {
+    <h1 class="govuk-heading-xl">Reset all databases</h1>
 
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
+    @govukWarningText(WarningText(
+        iconFallbackText = Some("Warning"),
+        content = Text("This will permanently delete all test data from the agent-registration and risking databases. This cannot be undone.")
+    ))
 
-            <h1 class="govuk-heading-l">Agent Application Tile</h1>
+    @formWithCSRF(action = AppRoutes.testOnly.TestOnlyController.resetDatabase) {
+        @govukButton(Button(
+            content = Text("Reset all databases"),
+            classes = "govuk-button--warning"
+        ))
+    }
 
-            @agentApplicationTile(agentApplication, individuals, submittedRiskingResultsFilenames)
-
-        </div>
-    </div>
+    <p class="govuk-body">
+        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showTestOnlyHub">Cancel</a>
+    </p>
 }

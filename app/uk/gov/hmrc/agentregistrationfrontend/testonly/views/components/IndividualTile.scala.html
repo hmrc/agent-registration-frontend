@@ -16,131 +16,225 @@
 
 @import play.api.i18n.Messages
 @import play.twirl.api.Html
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
+@import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
+@import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestRiskingResultsFilename
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
+@import java.time.Instant
+@import java.time.ZoneId
+@import java.time.format.DateTimeFormatter
 
-@this()
+@this(
+        govukSummaryList: GovukSummaryList,
+        individualFixesGroup: IndividualFixesGroup,
+        individualFailuresGroup: IndividualFailuresGroup,
+        compactLink: CompactLink,
+        identifier: Identifier,
+        govukTag: GovukTag
+)
 
 @(
-        individual: IndividualProvidedDetails)(implicit
+        individual: IndividualProvidedDetails,
+        isSentToMinerva: Boolean,
+        reSubmittedAt: Option[Instant],
+        submittedRiskingResultsFilenames: Set[String])(implicit
         requestHeader: RequestHeader
 )
 
-<style>
-    .individual-tile {
-        border: 1px solid #b1b4b6;
-        border-radius: 4px;
+@instantFormatter = @{DateTimeFormatter.ofPattern("d MMM uuuu, HH:mm").withZone(ZoneId.of("Europe/London"))}
+@formatInstant(instant: Instant) = @{instantFormatter.format(instant)}
+
+@individualWasFailedFixable = @{
+    individual.riskingOutcomeIndividual.exists {
+        case _: RiskingOutcomeIndividual.FailedFixable => true
+        case _ => false
     }
+}
+@individualResultsFilename = @{
+    TestRiskingResultsFilename.individual(individual.personReference, if (individualWasFailedFixable) reSubmittedAt else None)
+}
+@isIndividualResultsFileSubmitted = @{submittedRiskingResultsFilenames.contains(individualResultsFilename)}
 
-    .individual-tile__header {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-        margin-bottom: 0.75rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 1px solid #f3f2f1;
+@reSubmittedAtMillis = @{reSubmittedAt.map(_.toEpochMilli)}
+@individualCardId = @{s"individual-${individual.personReference.value}"}
+@redirectUrlWithAnchor = @{s"${requestHeader.uri}#$individualCardId"}
+
+@strongText(value: String) = {<strong>@value</strong>}
+
+@ninoValue = @{
+    individual.individualNino.flatMap {
+        case IndividualNino.NotProvided => None
+        case IndividualNino.Provided(nino) => Some(nino.value)
+        case IndividualNino.FromAuth(nino) => Some(nino.value)
     }
+}
 
-    .individual-tile__name {
-        font-size: 1.1875rem;
-        font-weight: bold;
-        margin: 0;
+@saUtrValue = @{
+    individual.individualSaUtr.flatMap {
+        case IndividualSaUtr.NotProvided => None
+        case IndividualSaUtr.Provided(saUtr) => Some(saUtr.value)
+        case IndividualSaUtr.FromAuth(saUtr) => Some(saUtr.value)
+        case IndividualSaUtr.FromCitizenDetails(saUtr) => Some(saUtr.value)
     }
+}
 
-    .individual-tile__badge {
-        display: inline-block;
-        padding: 0.25rem 0.5rem;
-        font-size: 0.875rem;
-        font-weight: bold;
-        text-transform: uppercase;
-        border-radius: 2px;
+@identifierEntries = @{
+    Seq(
+        Some(("Individual ID", individual.individualProvidedDetailsId.value)),
+        individual.internalUserId.map(v => ("Internal User ID", v.value)),
+        ninoValue.map(v => ("NINO", v)),
+        saUtrValue.map(v => ("SA UTR", v)),
+        individual.vrns.map(list => ("VRNs", if (list.isEmpty) "" else list.map(_.value).mkString(", "))),
+        individual.payeRefs.map(list => ("PAYE refs", if (list.isEmpty) "" else list.map(_.value).mkString(", ")))
+    ).flatten
+}
+
+@tagClasses = @{
+    individual.providedDetailsState match {
+        case ProvidedDetailsState.Precreated => "govuk-tag--grey"
+        case ProvidedDetailsState.AccessConfirmed => "govuk-tag--blue"
+        case ProvidedDetailsState.Started => "govuk-tag--yellow"
+        case ProvidedDetailsState.Finished => "govuk-tag--green"
     }
+}
 
-    .individual-tile__badge--finished {
-        background-color: #00703c;
-        color: #ffffff;
+@riskingOutcomeIndividualLabel(riskingOutcomeIndividual: RiskingOutcomeIndividual) = @{
+    riskingOutcomeIndividual match {
+        case RiskingOutcomeIndividual.Approved => "Approved"
+        case _: RiskingOutcomeIndividual.FailedFixable => "Failed (fixable)"
+        case _: RiskingOutcomeIndividual.FailedNonFixable => "Failed (non-fixable)"
     }
+}
 
-    .individual-tile__badge--in-progress {
-        background-color: #1d70b8;
-        color: #ffffff;
+@riskingOutcomeIndividualTagClasses(riskingOutcomeIndividual: RiskingOutcomeIndividual) = @{
+    riskingOutcomeIndividual match {
+        case RiskingOutcomeIndividual.Approved => "govuk-tag--green"
+        case _: RiskingOutcomeIndividual.FailedFixable => "govuk-tag--orange"
+        case _: RiskingOutcomeIndividual.FailedNonFixable => "govuk-tag--red"
     }
+}
 
-    .individual-tile__badge--precreated {
-        background-color: #f3f2f1;
-        color: #0b0c0c;
-    }
-
-    .individual-tile__info {
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-        font-size: 0.875rem;
-    }
-
-    .individual-tile__info-item {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .individual-tile__info-label {
-        color: #505a5f;
-        font-size: 0.8125rem;
-    }
-
-    .individual-tile__info-value {
-        font-weight: 600;
-        word-break: break-all;
-    }
-
-    .individual-tile__footer {
-        margin-top: 0.75rem;
-        padding-top: 0.5rem;
-        border-top: 1px solid #f3f2f1;
-    }
-</style>
-
-<div class="govuk-!-padding-4 individual-tile">
-    <div class="individual-tile__header">
-
-        <h3 class="individual-tile__name">@individual.individualName.value</h3>
-
-        <span class="individual-tile__badge individual-tile__badge--@{individual.providedDetailsState.toString.toLowerCase}">
-            @individual.providedDetailsState
-        </span>
-    </div>
-
-    <div class="individual-tile__info">
-        <div class="individual-tile__info-item">
-            <span class="individual-tile__info-label">Individual ID</span>
-            <span class="individual-tile__info-value">
-                <a
-                class="govuk-link"
-                href="@AppRoutes.testOnly.individual.TestOnlyController.showIndividualProvidedDetails(individual.individualProvidedDetailsId)"
-                >@individual.individualProvidedDetailsId.value</a>
-            </span>
-        </div>
-        @individual.internalUserId.map { internalUserId =>
-            <div class="individual-tile__info-item">
-                <span class="individual-tile__info-label">Internal User ID</span>
-                <span class="individual-tile__info-value">@internalUserId.value</span>
-            </div>
+@riskingOutcomeIndividualContent(riskingOutcomeIndividual: RiskingOutcomeIndividual) = {
+    @govukTag(Tag(
+        content = Text(riskingOutcomeIndividualLabel(riskingOutcomeIndividual)),
+        classes = riskingOutcomeIndividualTagClasses(riskingOutcomeIndividual)
+    ))
+    @riskingOutcomeIndividual match {
+        case failedFixable: RiskingOutcomeIndividual.FailedFixable => {
+            @individualFixesGroup(failedFixable.fixes)
         }
+        case failedNonFixable: RiskingOutcomeIndividual.FailedNonFixable => {
+            @individualFailuresGroup(failedNonFixable.failures)
+        }
+        case RiskingOutcomeIndividual.Approved => {}
+    }
+}
 
-        <div class="individual-tile__info-item">
-            <span class="individual-tile__info-label">Person of Control</span>
-            <span class="individual-tile__info-value">@individual.isPersonOfControl</span>
-        </div>
-        <a
-        class="govuk-link"
-        href="@AppRoutes.testOnly.TestOnlyController.findOrCreateAndLogInIndividual(
-            UserId.make(individual.individualProvidedDetailsId), PlanetId.make(individual.agentApplicationId), individual.individualName.value, requestHeader.uri
-        )"
-        >login</a>
-    </div>
+@viewDataLinks = {
+    @compactLink(
+        label = "View individual (JSON)",
+        url = AppRoutes.testOnly.individual.TestOnlyController.showIndividualProvidedDetails(individual.individualProvidedDetailsId),
+        hint = Some("full internal representation of this individual")
+    )
+    @compactLink(
+        label = "View individual-for-risking (JSON)",
+        url = AppRoutes.testOnly.TestOnlyController.showIndividualForRisking(individual.personReference),
+        hint = Some("internal representation of this individual in the risking microservice")
+    )
+}
 
-    <div class="individual-tile__footer">
+@accessLink = {
+    @compactLink(
+        label = "Log in as individual",
+        url = AppRoutes.testOnly.TestOnlyController.findOrCreateAndLogInIndividual(
+            UserId.make(individual.individualProvidedDetailsId), PlanetId.make(individual.agentApplicationId), individual.individualName.value, redirectUrlWithAnchor
+        )
+    )
+}
 
-    </div>
+@manageRiskingResultsLinks = {
+    @if(isIndividualResultsFileSubmitted) {
+        @compactLink(
+            label = "View submitted individual risking results file",
+            url = AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(individualResultsFilename)
+        )
+    } else if (isSentToMinerva) {
+        <p class="govuk-hint govuk-!-margin-bottom-2">Emulate uploading risking results from Minerva</p>
+        <p class="govuk-body govuk-!-margin-bottom-1">
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference, reSubmittedAtMillis)">Choose individual failures</a>
+            or just quickly
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, redirectUrlWithAnchor, reSubmittedAtMillis)">approve</a>,
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, redirectUrlWithAnchor, reSubmittedAtMillis)">fail-fixable</a>,
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresMixed(individual.personReference, redirectUrlWithAnchor, reSubmittedAtMillis)">fail-non-fixable</a>
+        </p>
+    } else {
+        <span class="govuk-hint">Only available once the application is SentToMinerva</span>
+    }
+}
+
+@rows = @{
+    Seq(
+        Some(SummaryListRow(
+            key = Key(content = Text("Person reference")),
+            value = Value(content = HtmlContent(strongText(individual.personReference.value)))
+        )),
+        Some(SummaryListRow(
+            key = Key(content = Text("Name")),
+            value = Value(content = Text(individual.individualName.value))
+        )),
+        Some(SummaryListRow(
+            key = Key(content = Text("State")),
+            value = Value(content = HtmlContent(govukTag(Tag(
+                content = Text(individual.providedDetailsState.toString),
+                classes = tagClasses
+            ))))
+        )),
+        individual.riskingOutcomeIndividual.map { riskingOutcomeIndividual =>
+            SummaryListRow(
+                key = Key(content = Text("Risking outcome")),
+                value = Value(content = HtmlContent(riskingOutcomeIndividualContent(riskingOutcomeIndividual)))
+            )
+        },
+        Some(SummaryListRow(
+            key = Key(content = Text("Created at")),
+            value = Value(content = Text(formatInstant(individual.createdAt)))
+        )),
+        Some(SummaryListRow(
+            key = Key(content = Text("Person of control")),
+            value = Value(content = Text(individual.isPersonOfControl.toString))
+        )),
+        individual.providedByApplicant.filter(identity).map { _ =>
+            SummaryListRow(
+                key = Key(content = Text("Provided by")),
+                value = Value(content = Text("Applicant"))
+            )
+        },
+        Some(SummaryListRow(
+            key = Key(content = Text("Identifiers")),
+            value = Value(content = HtmlContent(identifier(identifierEntries)))
+        )),
+        Some(SummaryListRow(
+            key = Key(content = Text("View data")),
+            value = Value(content = HtmlContent(viewDataLinks))
+        )),
+        Some(SummaryListRow(
+            key = Key(content = Text("Access")),
+            value = Value(content = HtmlContent(accessLink))
+        )),
+        Some(SummaryListRow(
+            key = Key(content = Text("Minerva simulator")),
+            value = Value(content = HtmlContent(manageRiskingResultsLinks))
+        ))
+    ).flatten
+}
+
+<div class="test-only-card govuk-!-padding-4" id="@individualCardId">
+    @govukSummaryList(SummaryList(
+        rows = rows,
+        classes = "govuk-summary-list--no-border test-only-narrow-key govuk-!-margin-bottom-0"
+    ))
 </div>

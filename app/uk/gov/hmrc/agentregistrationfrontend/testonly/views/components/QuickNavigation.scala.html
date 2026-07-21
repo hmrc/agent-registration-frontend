@@ -1,5 +1,5 @@
 @*
- * Copyright 2023 HM Revenue & Customs
+ * Copyright 2025 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,70 +14,19 @@
  * limitations under the License.
  *@
 
-@import play.api.i18n.Messages
-@import play.twirl.api.Html
 @this()
 
-@()
+@()(implicit
+        requestHeader: RequestHeader
+)
 
-<style>
-        #top-nav-bar a:first-of-type {
-            padding-left: 0;
-        }
-        #top-nav-bar {
-            display: flex;
-            justify-content: flex-start; /* or center, depending on preference */
-            gap: 0; /* optional: add gap between items */
-        }
-
-        #top-nav-bar a {
-            border-right: 2px solid gray;
-            text-align: center;
-            margin: 0;
-            padding: 0 1rem; /* optional: add some padding for spacing */
-        }
-
-        #top-nav-bar a:last-of-type {
-            border: none;
-        }
-</style>
-
-<nav class="govuk-!-margin-bottom-5" id="top-nav-bar" aria-label="Section navigation">
-
-    <a
-    class="govuk-link"
-    id="show-recent-applications"
-    href="@AppRoutes.testOnly.applicant.TestOnlyController.showRecentAgentApplications"
-    >recent applications</a>
-
-    <a
-    class="govuk-link"
-    id="show-recent-applications"
-    href="@AppRoutes.testOnly.applicant.FastForwardController.show"
-    >fast forward</a>
-
-    <a
-    class="govuk-link"
-    id="goto-agents-external-stubs"
-    href="http://localhost:9099/agents-external-stubs/user"
-    >show current user in stubs</a>
-
-    <a
-    class="govuk-link"
-    id="goto-agents-external-stubs"
-    href="@AppRoutes.testOnly.TestOnlyController.showPlaySession"
-    >play session</a>
-
-    <a
-    class="govuk-link"
-    id="goto-agents-external-stubs"
-    href="@AppRoutes.apply.AgentApplicationController.startRegistration"
-    >start registration page</a>
-
-    <a
-    class="govuk-link"
-    id="goto-task-list-page"
-    href="@AppRoutes.apply.TaskListController.show"
-    >task list page</a> <br>
-
+<nav class="test-only-quick-nav govuk-!-margin-bottom-5" aria-label="Quick navigation">
+    <ul class="govuk-list govuk-!-margin-bottom-0">
+        <li><a class="govuk-link" id="quick-nav-recent-applications" href="@AppRoutes.testOnly.applicant.TestOnlyController.showRecentAgentApplications">Recent applications</a></li>
+        <li><a class="govuk-link" id="quick-nav-fast-forward" href="@AppRoutes.testOnly.applicant.FastForwardController.show">Fast forward</a></li>
+        <li class="test-only-quick-nav-group-start"><a class="govuk-link" id="quick-nav-start-registration" href="@AppRoutes.apply.AgentApplicationController.startRegistration">Agent start registration</a></li>
+        <li><a class="govuk-link" id="quick-nav-task-list" href="@AppRoutes.apply.TaskListController.show">Task list page</a></li>
+        <li class="test-only-quick-nav-group-start"><a class="govuk-link" id="quick-nav-run-risking" href="@AppRoutes.testOnly.TestOnlyController.runRiskingAndRedirect(requestHeader.uri)">Run risking</a></li>
+        <li><a class="govuk-link" id="quick-nav-run-results-file-processing" href="@AppRoutes.testOnly.TestOnlyController.runResultsFileProcessingAndRedirect(requestHeader.uri)">Run results file processing</a></li>
+    </ul>
 </nav>

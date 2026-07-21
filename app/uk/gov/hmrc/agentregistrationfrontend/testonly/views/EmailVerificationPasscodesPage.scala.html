@@ -15,14 +15,14 @@
  *@
 
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyLayout
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.controllers.EmailVerificationPasscodesController.Passcode
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.components.CopyButton
 @import views.html.helper.CSPNonce
 
 @this(
         appConfig: AppConfig,
-        layout: Layout,
+        layout: TestOnlyLayout,
         copyButton: CopyButton,
         govukButton: GovukButton,
         govukNotificationBanner: GovukNotificationBanner

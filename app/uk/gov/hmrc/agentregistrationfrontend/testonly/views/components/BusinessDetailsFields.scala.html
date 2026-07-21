@@ -1,0 +1,81 @@
+@*
+ * Copyright 2026 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@*
+ * Every field on an AgentApplication's business-type-specific `businessDetails` (not just the
+ * identifiers) — matched once per subtype so adding a field to a BusinessDetails* case class only
+ * means touching one branch here, not every call site that wants "this application's business
+ * details". Deliberately excludes `CompanyProfile.unsanitisedCHROAddress` — too large/nested to be
+ * worth flattening into this list.
+ *@
+
+@import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedPartnership
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
+@import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishPartnership
+@import uk.gov.hmrc.agentregistration.shared.businessdetails.CompanyProfile
+@import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
+
+@this(identifier: Identifier)
+
+@(agentApplication: AgentApplication)(implicit requestHeader: RequestHeader)
+
+@companyProfileEntries(safeId: String, utr: String, companyProfile: CompanyProfile) = @{
+    Seq(
+        ("SafeId", safeId),
+        ("UTR", utr),
+        ("CRN", companyProfile.companyNumber.value),
+        ("Company name", companyProfile.companyName)
+    ) ++ companyProfile.dateOfIncorporation.map(d => ("Date of incorporation", DisplayDate.displayDateForLang(d))).toSeq
+}
+
+@entries = @{
+    agentApplication match {
+        case a: AgentApplicationSoleTrader =>
+            a.businessDetails.toSeq.flatMap { bd =>
+                Seq(
+                    Some(("SafeId", bd.safeId.value)),
+                    Some(("UTR", bd.saUtr.value)),
+                    Some(("Full name", bd.fullName.toStringFull)),
+                    Some(("Date of birth", DisplayDate.displayDateForLang(bd.dateOfBirth))),
+                    bd.nino.map(nino => ("NINO", nino.value)),
+                    bd.trn.map(trn => ("TRN", trn))
+                ).flatten
+            }
+        case a: AgentApplicationLlp =>
+            a.businessDetails.toSeq.flatMap(bd => companyProfileEntries(bd.safeId.value, bd.saUtr.value, bd.companyProfile))
+        case a: AgentApplicationLimitedCompany =>
+            a.businessDetails.toSeq.flatMap(bd => companyProfileEntries(bd.safeId.value, bd.ctUtr.value, bd.companyProfile))
+        case a: AgentApplicationGeneralPartnership =>
+            a.businessDetails.toSeq.flatMap(bd => Seq(("SafeId", bd.safeId.value), ("UTR", bd.saUtr.value), ("Postcode", bd.postcode)))
+        case a: AgentApplicationLimitedPartnership =>
+            a.businessDetails.toSeq.flatMap(bd => companyProfileEntries(bd.safeId.value, bd.saUtr.value, bd.companyProfile) :+ ("Postcode", bd.postcode))
+        case a: AgentApplicationScottishLimitedPartnership =>
+            a.businessDetails.toSeq.flatMap(bd => companyProfileEntries(bd.safeId.value, bd.saUtr.value, bd.companyProfile) :+ ("Postcode", bd.postcode))
+        case a: AgentApplicationScottishPartnership =>
+            a.businessDetails.toSeq.flatMap(bd => Seq(("SafeId", bd.safeId.value), ("UTR", bd.saUtr.value), ("Postcode", bd.postcode)))
+    }
+}
+
+@if(entries.isEmpty) {
+    <span class="govuk-hint">Not available yet</span>
+} else {
+    @identifier(entries)
+}

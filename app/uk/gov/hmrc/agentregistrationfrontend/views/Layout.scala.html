@@ -42,7 +42,12 @@
         maybeForm: Option[Form[?]] = None,
         suppressBackLink: Boolean = false,
         templateScripts: Option[Html] = None,
-        templateStyles: Option[Html] = None)(
+        templateStyles: Option[Html] = None,
+        serviceName: Option[String] = None,
+        serviceUrl: Option[String] = None,
+        banners: Option[Banners] = None,
+        suppressReportTechnicalIssue: Boolean = false,
+        mainContentLayout: Option[Html => Html] = None)(
         contentBlock: Html)(implicit
         request: RequestHeader,
         messages: Messages
@@ -87,7 +92,9 @@
       }
     }
     @contentBlock
-    @hmrcReportTechnicalIssueHelper()
+    @if(!suppressReportTechnicalIssue) {
+        @hmrcReportTechnicalIssueHelper()
+    }
 }
 
 @hmrcStandardPage(
@@ -97,13 +104,14 @@
           signOutUrl = if (isSignedIn) Some(AppRoutes.SignOutController.signOut.url) else None
       ),
       serviceNavigation = Some(ServiceNavigation(
-          serviceName = Some(messages("service.name")),
-          serviceUrl = Some(appConfig.govukStartPageUrl)
+          serviceName = Some(serviceName.getOrElse(messages("service.name"))),
+          serviceUrl = Some(serviceUrl.getOrElse(appConfig.govukStartPageUrl))
       )),
-    banners = Banners(phaseBanner = Some(standardBetaBanner(url = s"${appConfig.feedbackSurveyGoogleForm}${request.uri}"))),
+    banners = banners.getOrElse(Banners(phaseBanner = Some(standardBetaBanner(url = s"${appConfig.feedbackSurveyGoogleForm}${request.uri}")))),
       templateOverrides = TemplateOverrides(
           additionalHeadBlock = Some(head),
-          additionalScriptsBlock = Some(additionalScripts)
+          additionalScriptsBlock = Some(additionalScripts),
+          mainContentLayout = mainContentLayout
       ),
       backLink = if suppressBackLink then None else Some(BackLink.mimicsBrowserBackButtonViaJavaScript),
       isWelshTranslationAvailable = appConfig.welshLanguageSupportEnabled

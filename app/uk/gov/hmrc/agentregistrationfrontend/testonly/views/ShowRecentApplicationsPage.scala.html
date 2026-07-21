@@ -15,42 +15,195 @@
  *@
 
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyLayout
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.ApplicationState
+@import uk.gov.hmrc.agentregistration.shared.BusinessType
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
+@import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
+@import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
+@import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
+
+@import java.time.Instant
+@import java.time.ZoneId
+@import java.time.format.DateTimeFormatter
 
 @this(
         appConfig: AppConfig,
-        layout: Layout,
-        quickNavigation: components.QuickNavigation,
-        agentApplicationTile: components.AgentApplicationTile
+        layout: TestOnlyLayout,
+        govukTag: GovukTag
 )
 
 @(
-        agentApplicationsWithIndividuals: Seq[(AgentApplication, List[IndividualProvidedDetails])]
+        agentApplicationsWithIndividuals: Seq[(AgentApplication, List[IndividualProvidedDetails])],
+        submittedRiskingResultsFilenames: Set[String]
 )(implicit
         request: RequestHeader,
         messages: Messages
 )
 
+@instantFormatter = @{DateTimeFormatter.ofPattern("d MMM uuuu, HH:mm").withZone(ZoneId.of("Europe/London"))}
+@formatInstant(instant: Instant) = @{instantFormatter.format(instant)}
+
+@businessTypeLabel(businessType: BusinessType) = @{
+    businessType match {
+        case BusinessType.SoleTrader => "Sole trader"
+        case BusinessType.LimitedCompany => "Limited company"
+        case BusinessType.Partnership.GeneralPartnership => "General partnership"
+        case BusinessType.Partnership.LimitedLiabilityPartnership => "LLP"
+        case BusinessType.Partnership.LimitedPartnership => "Limited partnership"
+        case BusinessType.Partnership.ScottishLimitedPartnership => "Scottish limited partnership"
+        case BusinessType.Partnership.ScottishPartnership => "Scottish partnership"
+    }
+}
+
+@applicationStateTagClasses(applicationState: ApplicationState) = @{
+    applicationState match {
+        case ApplicationState.Started => "govuk-tag--grey"
+        case ApplicationState.GrsDataReceived => "govuk-tag--blue"
+        case ApplicationState.SentForRisking => "govuk-tag--yellow"
+        case ApplicationState.SentToMinerva => "govuk-tag--purple"
+        case ApplicationState.RiskingCompleted => "govuk-tag--green"
+    }
+}
+
+@individualStateTagClasses(providedDetailsState: ProvidedDetailsState) = @{
+    providedDetailsState match {
+        case ProvidedDetailsState.Precreated => "govuk-tag--grey"
+        case ProvidedDetailsState.AccessConfirmed => "govuk-tag--blue"
+        case ProvidedDetailsState.Started => "govuk-tag--yellow"
+        case ProvidedDetailsState.Finished => "govuk-tag--green"
+    }
+}
+
+@riskingOutcomeApplicationLabel(outcome: RiskingOutcomeApplication) = @{
+    outcome match {
+        case _: RiskingOutcomeApplication.Approved => "Approved"
+        case _: RiskingOutcomeApplication.FailedFixable => "Failed (fixable)"
+        case _: RiskingOutcomeApplication.FailedNonFixable => "Failed (non-fixable)"
+    }
+}
+
+@riskingOutcomeApplicationTagClasses(outcome: RiskingOutcomeApplication) = @{
+    outcome match {
+        case _: RiskingOutcomeApplication.Approved => "govuk-tag--green"
+        case _: RiskingOutcomeApplication.FailedFixable => "govuk-tag--orange"
+        case _: RiskingOutcomeApplication.FailedNonFixable => "govuk-tag--red"
+    }
+}
+
+@riskingOutcomeEntityLabel(outcome: RiskingOutcomeEntity) = @{
+    outcome match {
+        case RiskingOutcomeEntity.Approved => "Approved"
+        case _: RiskingOutcomeEntity.FailedFixable => "Failed (fixable)"
+        case _: RiskingOutcomeEntity.FailedNonFixable => "Failed (non-fixable)"
+    }
+}
+
+@riskingOutcomeEntityTagClasses(outcome: RiskingOutcomeEntity) = @{
+    outcome match {
+        case RiskingOutcomeEntity.Approved => "govuk-tag--green"
+        case _: RiskingOutcomeEntity.FailedFixable => "govuk-tag--orange"
+        case _: RiskingOutcomeEntity.FailedNonFixable => "govuk-tag--red"
+    }
+}
+
+@riskingOutcomeIndividualLabel(outcome: RiskingOutcomeIndividual) = @{
+    outcome match {
+        case RiskingOutcomeIndividual.Approved => "Approved"
+        case _: RiskingOutcomeIndividual.FailedFixable => "Failed (fixable)"
+        case _: RiskingOutcomeIndividual.FailedNonFixable => "Failed (non-fixable)"
+    }
+}
+
+@riskingOutcomeIndividualTagClasses(outcome: RiskingOutcomeIndividual) = @{
+    outcome match {
+        case RiskingOutcomeIndividual.Approved => "govuk-tag--green"
+        case _: RiskingOutcomeIndividual.FailedFixable => "govuk-tag--orange"
+        case _: RiskingOutcomeIndividual.FailedNonFixable => "govuk-tag--red"
+    }
+}
+
 @layout(
-    pageTitle = "Test Only Hub",
+    pageTitle = "Recent Applications",
     suppressBackLink = true
 ) {
 
-    @quickNavigation()
     <h1 class="govuk-heading-l">Recent Applications</h1>
 
-    <ul class="govuk-list govuk-list--number"
-
-    @agentApplicationsWithIndividuals.map { agentApplicationWithIndividuals =>
-
-            <li class="govuk-!-margin-bottom-4">
-                <a href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationTile(agentApplicationWithIndividuals._1.agentApplicationId)"
-                >show tile</a>
-                @agentApplicationTile(agentApplicationWithIndividuals._1, agentApplicationWithIndividuals._2)
-            </li>
-    }
-
-    </ul>
+    <table class="govuk-table test-only-table--auto-width">
+        <thead class="govuk-table__head">
+            <tr class="govuk-table__row">
+                <th scope="col" class="govuk-table__header">Application Reference</th>
+                <th scope="col" class="govuk-table__header">Created</th>
+                <th scope="col" class="govuk-table__header">Business type</th>
+                <th scope="col" class="govuk-table__header">State</th>
+                <th scope="col" class="govuk-table__header">Risking (application)</th>
+                <th scope="col" class="govuk-table__header">Risking (entity)</th>
+                <th scope="col" class="govuk-table__header">Individuals</th>
+            </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+            @agentApplicationsWithIndividuals.map { case (agentApplication, individuals) =>
+                <tr class="govuk-table__row">
+                    <td class="govuk-table__cell">
+                        <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationTile(agentApplication.agentApplicationId)">
+                            <strong>@agentApplication.applicationReference.value</strong>
+                        </a>
+                    </td>
+                    <td class="govuk-table__cell">@formatInstant(agentApplication.createdAt)</td>
+                    <td class="govuk-table__cell">@businessTypeLabel(agentApplication.businessType)</td>
+                    <td class="govuk-table__cell">
+                        @govukTag(Tag(
+                            content = Text(agentApplication.applicationState.toString),
+                            classes = applicationStateTagClasses(agentApplication.applicationState)
+                        ))
+                    </td>
+                    <td class="govuk-table__cell">
+                        @agentApplication.riskingOutcomeApplication.map { outcome =>
+                            @govukTag(Tag(
+                                content = Text(riskingOutcomeApplicationLabel(outcome)),
+                                classes = riskingOutcomeApplicationTagClasses(outcome)
+                            ))
+                        }
+                    </td>
+                    <td class="govuk-table__cell">
+                        @agentApplication.riskingOutcomeEntity.map { outcome =>
+                            @govukTag(Tag(
+                                content = Text(riskingOutcomeEntityLabel(outcome)),
+                                classes = riskingOutcomeEntityTagClasses(outcome)
+                            ))
+                        }
+                    </td>
+                    <td class="govuk-table__cell">
+                        @if(individuals.isEmpty) {
+                            <span class="govuk-hint">None yet</span>
+                        } else {
+                            <ul class="govuk-list govuk-!-margin-bottom-0">
+                                @individuals.map { individual =>
+                                    <li class="govuk-!-margin-bottom-1">
+                                        @individual.personReference.value
+                                        @govukTag(Tag(
+                                            content = Text(individual.providedDetailsState.toString),
+                                            classes = individualStateTagClasses(individual.providedDetailsState)
+                                        ))
+                                        @individual.riskingOutcomeIndividual.map { outcome =>
+                                            @govukTag(Tag(
+                                                content = Text(riskingOutcomeIndividualLabel(outcome)),
+                                                classes = riskingOutcomeIndividualTagClasses(outcome)
+                                            ))
+                                        }
+                                        @if(individual.providedByApplicant.contains(true)) {
+                                            <span class="govuk-hint">Provided by applicant</span>
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }

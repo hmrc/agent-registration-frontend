@@ -17,59 +17,224 @@
 @import play.api.i18n.Messages
 @import play.twirl.api.Html
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.ApplicationState
+@import uk.gov.hmrc.agentregistration.shared.BusinessType
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+@import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
+@import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
+@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestRiskingResultsFilename
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
+@import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
+@import java.time.Instant
+@import java.time.ZoneId
+@import java.time.format.DateTimeFormatter
 
 @this(
-        individualTile: IndividualTile
+        individualTile: IndividualTile,
+        entityFixesGroup: EntityFixesGroup,
+        entityFailuresGroup: EntityFailuresGroup,
+        compactLink: CompactLink,
+        identifier: Identifier,
+        businessDetailsFields: BusinessDetailsFields,
+        govukTag: GovukTag,
+        appConfig: AppConfig
 )
 
 @(
         agentApplication: AgentApplication,
-        individuals: Seq[IndividualProvidedDetails])(implicit
+        individuals: Seq[IndividualProvidedDetails],
+        submittedRiskingResultsFilenames: Set[String])(implicit
         requestHeader: RequestHeader
 )
 
-<style>
+@instantFormatter = @{DateTimeFormatter.ofPattern("d MMM uuuu, HH:mm").withZone(ZoneId.of("Europe/London"))}
+@formatInstant(instant: Instant) = @{instantFormatter.format(instant)}
 
-</style>
+@businessTypeLabel = @{
+    agentApplication.businessType match {
+        case BusinessType.SoleTrader => "Sole trader"
+        case BusinessType.LimitedCompany => "Limited company"
+        case BusinessType.Partnership.GeneralPartnership => "General partnership"
+        case BusinessType.Partnership.LimitedLiabilityPartnership => "Limited liability partnership (LLP)"
+        case BusinessType.Partnership.LimitedPartnership => "Limited partnership"
+        case BusinessType.Partnership.ScottishLimitedPartnership => "Scottish limited partnership"
+        case BusinessType.Partnership.ScottishPartnership => "Scottish partnership"
+    }
+}
 
-<div class="govuk-card govuk-!-padding-4" style="border: 1px solid #b1b4b6; border-radius: 4px;">
+@isIncorporated = @{
+    agentApplication match {
+        case _: AgentApplication.IsIncorporated => true
+        case _: AgentApplication.IsNotIncorporated => false
+    }
+}
 
-    <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-2">
+@isSentToMinerva = @{agentApplication.applicationState === ApplicationState.SentToMinerva}
+
+@provideDetailsLink = @{appConfig.applicationLink(agentApplication.linkId.value)}
+
+@reSubmittedAt = @{
+    agentApplication.riskingOutcomeApplication.flatMap {
+        case failedFixable: RiskingOutcomeApplication.FailedFixable => failedFixable.reSubmittedAt
+        case _ => None
+    }
+}
+@entityWasFailedFixable = @{
+    agentApplication.riskingOutcomeEntity.exists {
+        case _: RiskingOutcomeEntity.FailedFixable => true
+        case _ => false
+    }
+}
+@entityResultsFilename = @{
+    TestRiskingResultsFilename.entity(agentApplication.applicationReference, if (entityWasFailedFixable) reSubmittedAt else None)
+}
+@isEntityResultsFileSubmitted = @{submittedRiskingResultsFilenames.contains(entityResultsFilename)}
+
+@reSubmittedAtMillis = @{reSubmittedAt.map(_.toEpochMilli)}
+@redirectUrlWithAnchor = @{s"${requestHeader.uri}#entity-minerva-simulator"}
+
+@nonBusinessIdentifiers = @{
+    Seq(
+        Some(("AgentApplicationId", agentApplication.agentApplicationId.value)),
+        Some(("Internal user id", agentApplication.internalUserId.value)),
+        agentApplication.vrns.map(list => ("VRNs", if (list.isEmpty) "" else list.map(_.value).mkString(", "))),
+        agentApplication.payeRefs.map(list => ("PAYE refs", if (list.isEmpty) "" else list.map(_.value).mkString(", ")))
+    ).flatten
+}
+
+@riskingOutcomeApplicationLabel(outcome: RiskingOutcomeApplication) = @{
+    outcome match {
+        case _: RiskingOutcomeApplication.Approved => "Approved"
+        case _: RiskingOutcomeApplication.FailedFixable => "Failed (fixable)"
+        case _: RiskingOutcomeApplication.FailedNonFixable => "Failed (non-fixable)"
+    }
+}
+
+@riskingOutcomeApplicationTagClasses(outcome: RiskingOutcomeApplication) = @{
+    outcome match {
+        case _: RiskingOutcomeApplication.Approved => "govuk-tag--green"
+        case _: RiskingOutcomeApplication.FailedFixable => "govuk-tag--orange"
+        case _: RiskingOutcomeApplication.FailedNonFixable => "govuk-tag--red"
+    }
+}
+
+@riskingOutcomeEntityLabel(riskingOutcomeEntity: RiskingOutcomeEntity) = @{
+    riskingOutcomeEntity match {
+        case RiskingOutcomeEntity.Approved => "Approved"
+        case _: RiskingOutcomeEntity.FailedFixable => "Failed (fixable)"
+        case _: RiskingOutcomeEntity.FailedNonFixable => "Failed (non-fixable)"
+    }
+}
+
+@riskingOutcomeEntityTagClasses(riskingOutcomeEntity: RiskingOutcomeEntity) = @{
+    riskingOutcomeEntity match {
+        case RiskingOutcomeEntity.Approved => "govuk-tag--green"
+        case _: RiskingOutcomeEntity.FailedFixable => "govuk-tag--orange"
+        case _: RiskingOutcomeEntity.FailedNonFixable => "govuk-tag--red"
+    }
+}
+
+@stateTagClasses = @{
+    agentApplication.applicationState match {
+        case ApplicationState.Started => "govuk-tag--grey"
+        case ApplicationState.GrsDataReceived => "govuk-tag--blue"
+        case ApplicationState.SentForRisking => "govuk-tag--yellow"
+        case ApplicationState.SentToMinerva => "govuk-tag--purple"
+        case ApplicationState.RiskingCompleted => "govuk-tag--green"
+    }
+}
+
+<div class="test-only-card govuk-!-padding-4">
+
+    <dl class="govuk-summary-list govuk-summary-list--no-border test-only-narrow-key govuk-!-margin-bottom-4">
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">AgentApplicationId</dt>
-            <dd class="govuk-summary-list__value">
-                <a
-                class="govuk-link"
-                href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationById(agentApplication.agentApplicationId)"
-                >@agentApplication.agentApplicationId.value</a>
-                </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">CreatedAt</dt>
-            <dd class="govuk-summary-list__value">
-            @agentApplication.createdAt
-            </dd>
-        </div>
-        <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Business type</dt>
-            <dd class="govuk-summary-list__value">@agentApplication.businessType</dd>
+            <dt class="govuk-summary-list__key">Application reference</dt>
+            <dd class="govuk-summary-list__value"><strong>@agentApplication.applicationReference.value</strong></dd>
         </div>
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">State</dt>
-            <dd class="govuk-summary-list__value">@agentApplication.applicationState</dd>
+            <dd class="govuk-summary-list__value">
+                @govukTag(Tag(
+                    content = Text(agentApplication.applicationState.toString),
+                    classes = stateTagClasses
+                ))
+                @if(agentApplication.isAfterSentForRisking) {
+                    @agentApplication.submittedAt.map { submittedAt =>
+                        <div class="govuk-!-margin-top-1">
+                            <div class="govuk-hint govuk-!-margin-bottom-0">Submitted: @formatInstant(submittedAt)</div>
+                        </div>
+                    }
+                }
+            </dd>
+        </div>
+        @agentApplication.riskingOutcomeApplication.map { riskingOutcome =>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Risking outcome (application)</dt>
+                <dd class="govuk-summary-list__value">
+                    @govukTag(Tag(
+                        content = Text(riskingOutcomeApplicationLabel(riskingOutcome)),
+                        classes = riskingOutcomeApplicationTagClasses(riskingOutcome)
+                    ))
+                    <div class="govuk-!-margin-top-1">
+                        <div class="govuk-hint govuk-!-margin-bottom-0">Decision date: @DisplayDate.displayDateForLang(riskingOutcome.actualDecisionDate)</div>
+                        @riskingOutcome match {
+                            case failedFixable: RiskingOutcomeApplication.FailedFixable => {
+                                <div class="govuk-hint govuk-!-margin-bottom-0">Corrective action expiry: @DisplayDate.displayDateForLang(failedFixable.correctiveActionExpiryDate)</div>
+                                @failedFixable.reSubmittedAt.map { reSubmittedAt =>
+                                    <div class="govuk-hint govuk-!-margin-bottom-0">Resubmitted at: @formatInstant(reSubmittedAt)</div>
+                                }
+                            }
+                            case failedNonFixable: RiskingOutcomeApplication.FailedNonFixable => {
+                                <div class="govuk-hint govuk-!-margin-bottom-0">Corrective action expiry: @DisplayDate.displayDateForLang(failedNonFixable.correctiveActionExpiryDate)</div>
+                            }
+                            case _: RiskingOutcomeApplication.Approved => {}
+                        }
+                    </div>
+                </dd>
+            </div>
+        }
+        @agentApplication.riskingOutcomeEntity.map { riskingOutcomeEntity =>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Risking outcome (entity)</dt>
+                <dd class="govuk-summary-list__value">
+                    @govukTag(Tag(
+                        content = Text(riskingOutcomeEntityLabel(riskingOutcomeEntity)),
+                        classes = riskingOutcomeEntityTagClasses(riskingOutcomeEntity)
+                    ))
+                    @riskingOutcomeEntity match {
+                        case failedFixable: RiskingOutcomeEntity.FailedFixable => {
+                            @entityFixesGroup(failedFixable.fixes)
+                        }
+                        case failedNonFixable: RiskingOutcomeEntity.FailedNonFixable => {
+                            @entityFailuresGroup(failedNonFixable.failures)
+                        }
+                        case RiskingOutcomeEntity.Approved => {}
+                    }
+                </dd>
+            </div>
+        }
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Business type</dt>
+            <dd class="govuk-summary-list__value">
+                @businessTypeLabel
+                @if(isIncorporated) {
+                    <span class="govuk-hint govuk-!-margin-bottom-0">(Incorporated)</span>
+                }
+            </dd>
         </div>
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">Internal user id</dt>
+            <dt class="govuk-summary-list__key">Business details</dt>
             <dd class="govuk-summary-list__value">
-                <span>@agentApplication.internalUserId.value</span>
-
-                <a
-                class="govuk-link"
-                href="@AppRoutes.testOnly.TestOnlyController.findAndLogInApplicant(UserId.make(agentApplication.agentApplicationId), PlanetId.make(agentApplication.agentApplicationId), requestHeader.uri)"
-                >login</a> <br>
+                @businessDetailsFields(agentApplication)
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Identifiers</dt>
+            <dd class="govuk-summary-list__value">
+                @identifier(nonBusinessIdentifiers)
             </dd>
         </div>
         @agentApplication.applicantContactDetails.map { contactDetails =>
@@ -78,31 +243,90 @@
                 <dd class="govuk-summary-list__value">@contactDetails.applicantName.value</dd>
             </div>
         }
-
-
-        <a
-        class="govuk-link"
-        href="@AppRoutes.providedetails.StartController.start(agentApplication.linkId)"
-        >/provide-details/start/...</a> <br>
-
-
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">@individuals.size individuals</dt>
+            <dt class="govuk-summary-list__key">Created at</dt>
+            <dd class="govuk-summary-list__value">@formatInstant(agentApplication.createdAt)</dd>
+        </div>
+        @agentApplication.applicationExpiresAt.map { expiresAt =>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Application expires at</dt>
+                <dd class="govuk-summary-list__value">@formatInstant(expiresAt)</dd>
+            </div>
+        }
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Provide details link</dt>
             <dd class="govuk-summary-list__value">
-                <ul class="govuk-list govuk-list--number">
-
-                @individuals.map { individual =>
-
-                    <li class="govuk-!-margin-bottom-4">
-                        @individualTile(individual)
-                    </li>
+                <a class="govuk-link" href="@provideDetailsLink">@provideDetailsLink</a>
+                <div class="govuk-hint govuk-!-margin-bottom-0">Given to the applicant, then shared by them with individuals</div>
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">View data</dt>
+            <dd class="govuk-summary-list__value">
+                @compactLink(
+                    label = "View application (JSON)",
+                    url = AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationById(agentApplication.agentApplicationId),
+                    hint = Some("full internal representation of this application")
+                )
+                @compactLink(
+                    label = "View application-for-risking (JSON)",
+                    url = AppRoutes.testOnly.TestOnlyController.showApplicationForRisking(agentApplication.applicationReference),
+                    hint = Some("internal representation of this application in the risking microservice")
+                )
+                @compactLink(
+                    label = "View completed risking / archive (JSON)",
+                    url = AppRoutes.testOnly.TestOnlyController.showCompletedRisking(agentApplication.applicationReference),
+                    hint = Some("populated once risking has fully completed for this application")
+                )
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Access</dt>
+            <dd class="govuk-summary-list__value">
+                @compactLink(
+                    label = "Log in as applicant",
+                    url = AppRoutes.testOnly.TestOnlyController.findAndLogInApplicant(UserId.make(agentApplication.agentApplicationId), PlanetId.make(agentApplication.agentApplicationId), redirectUrlWithAnchor)
+                )
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row" id="entity-minerva-simulator">
+            <dt class="govuk-summary-list__key">Minerva simulator</dt>
+            <dd class="govuk-summary-list__value">
+                @if(isEntityResultsFileSubmitted) {
+                    @compactLink(
+                        label = "View submitted entity risking results file",
+                        url = AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(entityResultsFilename)
+                    )
+                } else if (isSentToMinerva) {
+                    <p class="govuk-hint govuk-!-margin-bottom-2">Emulate uploading risking results from Minerva</p>
+                    <p class="govuk-body govuk-!-margin-bottom-1">
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference, reSubmittedAtMillis)">Choose entity failures</a>
+                        or just quickly
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresApproved(agentApplication.applicationReference, redirectUrlWithAnchor, reSubmittedAtMillis)">approve</a>,
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresFixable(agentApplication.applicationReference, redirectUrlWithAnchor, reSubmittedAtMillis)">fail-fixable</a>,
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresMixed(agentApplication.applicationReference, redirectUrlWithAnchor, reSubmittedAtMillis)">fail-non-fixable</a>
+                    </p>
+                } else {
+                    <span class="govuk-hint">Only available once the application is SentToMinerva (currently: @agentApplication.applicationState)</span>
                 }
-                </ul>
+            </dd>
+        </div>
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Individuals</dt>
+            <dd class="govuk-summary-list__value">
+                @if(individuals.isEmpty) {
+                    <span class="govuk-hint">Individuals have not been created yet</span>
+                } else {
+                    <ul class="govuk-list">
+                        @individuals.map { individual =>
+                            <li class="govuk-!-margin-bottom-4">
+                                @individualTile(individual, isSentToMinerva, reSubmittedAt, submittedRiskingResultsFilenames)
+                            </li>
+                        }
+                    </ul>
+                }
             </dd>
         </div>
     </dl>
-
-
-
 
 </div>
