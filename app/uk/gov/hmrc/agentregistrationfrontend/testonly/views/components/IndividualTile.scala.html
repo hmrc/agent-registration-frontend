@@ -165,7 +165,7 @@
     } else if (isSentToMinerva) {
         <p class="govuk-hint govuk-!-margin-bottom-2">Emulate uploading risking results from Minerva</p>
         <p class="govuk-body govuk-!-margin-bottom-1">
-            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference, reSubmittedAtMillis)">Choose individual failures</a>
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference, reSubmittedAtMillis, redirectUrlWithAnchor)">Choose individual failures</a>
             or just quickly
             <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, redirectUrlWithAnchor, reSubmittedAtMillis)">approve</a>,
             <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, redirectUrlWithAnchor, reSubmittedAtMillis)">fail-fixable</a>,

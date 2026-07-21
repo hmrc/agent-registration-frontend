@@ -16,14 +16,12 @@
 
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyLayout
-@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.KibanaLinks
-@import uk.gov.hmrc.hmrcfrontend.views.html.helpers.HmrcNewTabLinkHelper
-@import uk.gov.hmrc.hmrcfrontend.views.viewmodels.newtablinkhelper.NewTabLinkHelper
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.components.CompactLink
 
 @this(
         appConfig: AppConfig,
         layout: TestOnlyLayout,
-        hmrcNewTabLinkHelper: HmrcNewTabLinkHelper
+        compactLink: CompactLink
 )
 
 @(
@@ -38,68 +36,80 @@
     suppressBackLink = true
 ) {
 
-    <h1 class="govuk-heading-l">Test Only Hub</h1>
+    <p class="govuk-body">
+        This test aid only works if this application is integrated with <code class="govuk-!-font-size-16">agents-stubs</code> and
+        <code class="govuk-!-font-size-16">agents-external-stubs</code>.
+    </p>
 
     <h2 class="govuk-heading-m">Start a journey</h2>
-    <ul class="govuk-list govuk-list--bullet">
-        <li><a class="govuk-link" href="@AppRoutes.apply.AgentApplicationController.startRegistration">Agent start registration</a></li>
-        <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.FastForwardController.show">Fast forward to a completed section</a></li>
-        <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.makeTestSubmittedApplication()">Create a submitted test application (get a shareable link)</a></li>
-    </ul>
+    @compactLink(
+        label = "Agent start registration",
+        url = AppRoutes.apply.AgentApplicationController.startRegistration,
+        hint = Some("starts the real applicant registration journey from the very beginning")
+    )
+    @compactLink(
+        label = "Fast forward to a completed section",
+        url = AppRoutes.testOnly.applicant.FastForwardController.show,
+        hint = Some("jumps straight to a chosen point in the registration journey, skipping the steps before it")
+    )
+    @compactLink(
+        label = "Create a submitted test application (get a shareable link)",
+        url = AppRoutes.testOnly.applicant.TestOnlyController.makeTestSubmittedApplication(),
+        hint = Some("deprecated — use the Fast forward links above instead")
+    )
 
-    <h2 class="govuk-heading-m">Browse applications</h2>
-    <ul class="govuk-list govuk-list--bullet">
-        <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showRecentAgentApplications">Recent applications</a></li>
-    </ul>
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">Browse applications</h2>
+    @compactLink(
+        label = "Recent applications",
+        url = AppRoutes.testOnly.applicant.TestOnlyController.showRecentAgentApplications,
+        hint = Some("a table of recently created applications with their state, business type, risking outcomes and individuals")
+    )
 
-    <h2 class="govuk-heading-m">Inspect current session</h2>
-    <ul class="govuk-list govuk-list--bullet">
-        <li><a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showPlaySession">Play session (JSON)</a></li>
-        <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplication">Current application (JSON)</a></li>
-        <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.showIndividualsForApplication">Individuals for current application (JSON)</a></li>
-        <li><a class="govuk-link" href="@{appConfig.agentsExternalStubsBaseUrl}/agents-external-stubs/user">Current user in stubs</a></li>
-    </ul>
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">Inspect current session</h2>
+    @compactLink(
+        label = "Play session (JSON)",
+        url = AppRoutes.testOnly.TestOnlyController.showPlaySession,
+        hint = Some("the raw Play session data stored in your browser's cookie")
+    )
+    @compactLink(
+        label = "Current application (JSON)",
+        url = AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplication,
+        hint = Some("the application tied to your current session")
+    )
+    @compactLink(
+        label = "Individuals for current application (JSON)",
+        url = AppRoutes.testOnly.applicant.TestOnlyController.showIndividualsForApplication,
+        hint = Some("the individuals tied to the application in your current session")
+    )
 
-    <h2 class="govuk-heading-m">Risking</h2>
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">Risking</h2>
     <p class="govuk-body">
         These trigger background processing jobs on <code class="govuk-!-font-size-16">agent-registration-risking</code>.
     </p>
-    <ul class="govuk-list govuk-list--bullet">
-        <li>
-            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.runRisking">Run risking</a>
-            <p class="govuk-hint govuk-!-margin-bottom-1">
-                <strong class="govuk-tag govuk-tag--blue">Outbound</strong>
-                Sends SentForRisking applications to Minerva as a risking file. Moves them to SentToMinerva.
-            </p>
-            <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-3">
-                <li>
-                    <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.viewNextRiskingFileContents">View next risking file contents</a>
-                    <p class="govuk-hint govuk-!-margin-bottom-0">
-                        Preview only — shows what the risking file would contain if you ran risking now. Doesn't send anything or change
-                        any state.
-                    </p>
-                </li>
-            </ul>
-        </li>
-        <li>
-            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.runResultsFileProcessing">Run results file processing</a>
-            <p class="govuk-hint govuk-!-margin-bottom-3">
-                <strong class="govuk-tag govuk-tag--purple">Inbound</strong>
-                Processes results files uploaded via "Select entity/individual failures" (standing in for Minerva's reply). Moves
-                applications to RiskingCompleted.
-            </p>
-        </li>
-        <li>@hmrcNewTabLinkHelper(NewTabLinkHelper(text = "Kibana logs (QA)", href = Some(KibanaLinks.riskingLogsQa)))</li>
-        <li>@hmrcNewTabLinkHelper(NewTabLinkHelper(text = "Kibana logs (Staging)", href = Some(KibanaLinks.riskingLogsStaging)))</li>
-    </ul>
-
+    @compactLink(
+        label = "Run risking",
+        url = AppRoutes.testOnly.TestOnlyController.runRisking,
+        hint = Some("sends SentForRisking applications to Minerva as a risking file. Moves them to SentToMinerva.")
+    )
+    @compactLink(
+        label = "View next risking file contents",
+        url = AppRoutes.testOnly.TestOnlyController.viewNextRiskingFileContents,
+        hint = Some("preview only — shows what the risking file would contain if you ran risking now. Doesn't send anything or change any state.")
+    )
+    @compactLink(
+        label = "Run results file processing",
+        url = AppRoutes.testOnly.TestOnlyController.runResultsFileProcessing,
+        hint = Some("processes results files uploaded via \"Select entity/individual failures\" (standing in for Minerva's reply). Moves applications to RiskingCompleted.")
+    )
     @if(appConfig.TestOnly.allowResetDatabase) {
-        <h2 class="govuk-heading-m">
+        <h2 class="govuk-heading-m govuk-!-margin-top-6">
             Danger zone
             <strong class="govuk-tag govuk-tag--red govuk-!-margin-left-2">Destructive</strong>
         </h2>
-        <ul class="govuk-list govuk-list--bullet">
-            <li><a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showResetDatabaseConfirmation">Reset all databases</a></li>
-        </ul>
+        @compactLink(
+            label = "Reset all databases",
+            url = AppRoutes.testOnly.TestOnlyController.showResetDatabaseConfirmation,
+            hint = Some("wipes all test data — applications, individuals and risking records")
+        )
     }
 }
