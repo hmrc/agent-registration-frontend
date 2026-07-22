@@ -49,6 +49,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegist
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
+import scala.util.Random
 
 @Singleton
 class TestOnlyController @Inject() (
@@ -146,6 +147,71 @@ extends FrontendController(mcc, actions):
 
   private def parseEntityFailure(value: String): Option[EntityRiskingFailure] = EntityRiskingFailure.values.find(_.toString === value)
 
+  /** Quick action: submits with no failures at all, i.e. an Approved outcome, without having to manually leave every checkbox unticked. */
+  def submitEntityFailuresApproved(
+    agentApplicationId: AgentApplicationId,
+    redirectUrl: String
+  ): Action[AnyContent] = submitEntityFailuresQuickAction(
+    agentApplicationId,
+    redirectUrl,
+    Seq.empty
+  )
+
+  /** Quick action: submits a random 1-3 fixable failures, i.e. a FailedFixable outcome. */
+  def submitEntityFailuresFixable(
+    agentApplicationId: AgentApplicationId,
+    redirectUrl: String
+  ): Action[AnyContent] = submitEntityFailuresQuickAction(
+    agentApplicationId,
+    redirectUrl,
+    randomFixableEntityFailures(1 + Random.nextInt(3))
+  )
+
+  /** Quick action: submits a random mix of non-fixable (and possibly some fixable) failures, i.e. a FailedNonFixable outcome. */
+  def submitEntityFailuresNonFixable(
+    agentApplicationId: AgentApplicationId,
+    redirectUrl: String
+  ): Action[AnyContent] = submitEntityFailuresQuickAction(
+    agentApplicationId,
+    redirectUrl,
+    randomNonFixableEntityFailures()
+  )
+
+  private def submitEntityFailuresQuickAction(
+    agentApplicationId: AgentApplicationId,
+    redirectUrl: String,
+    failures: Seq[EntityRiskingFailure]
+  ): Action[AnyContent] = actions
+    .action
+    .async:
+      implicit request =>
+        for
+          maybeApplication <- testAgentRegistrationConnector.findApplication(agentApplicationId)
+          agentApplication = maybeApplication.getOrElse(
+            throw new RuntimeException(s"There is no application under given agentApplicationId: $agentApplicationId")
+          )
+          _ <- testRiskingService.submitEntityFailures(agentApplication.applicationReference, failures)
+        yield Redirect(redirectUrl)
+
+  /** A random selection of `count` fixable entity failures containing at most one AMLS (Check 3) failure — the real risking model only ever produces a single
+    * AMLS fix per application, so picking from the raw fixable catalogue directly could easily select two or more AMLS checks and build test data that could
+    * never occur for real.
+    */
+  private def randomFixableEntityFailures(count: Int): Seq[EntityRiskingFailure] =
+    val allFixableFailures: Seq[EntityRiskingFailure] = EntityRiskingFailure.values.filter(_.fixable).toSeq
+    val (amlsFailures, otherFixableFailures) = allFixableFailures.partition(_.checkId === "3")
+    val pool = otherFixableFailures ++ Random.shuffle(amlsFailures).take(1)
+    Random.shuffle(pool).take(count)
+
+  /** A random selection guaranteed to contain at least one non-fixable entity check, plus a random 0-2 fixable checks (with the same at-most-one-AMLS rule as
+    * `randomFixableEntityFailures`) bundled alongside it.
+    */
+  private def randomNonFixableEntityFailures(): Seq[EntityRiskingFailure] =
+    val nonFixableFailures: Seq[EntityRiskingFailure] = EntityRiskingFailure.values.filterNot(_.fixable).toSeq
+    val randomNonFixable = Random.shuffle(nonFixableFailures).take(1 + Random.nextInt(3))
+    val randomFixable = randomFixableEntityFailures(Random.nextInt(3))
+    randomNonFixable ++ randomFixable
+
   def selectIndividualRiskingFailures(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = actions
     .action
     .async:
@@ -171,6 +237,65 @@ extends FrontendController(mcc, actions):
         yield Redirect(AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationTile(individual.agentApplicationId))
 
   private def parseIndividualFailure(value: String): Option[IndividualRiskingFailure] = IndividualRiskingFailure.values.find(_.toString === value)
+
+  /** Quick action: submits with no failures at all, i.e. an Approved outcome, without having to manually leave every checkbox unticked. */
+  def submitIndividualFailuresApproved(
+    individualProvidedDetailsId: IndividualProvidedDetailsId,
+    redirectUrl: String
+  ): Action[AnyContent] = submitIndividualFailuresQuickAction(
+    individualProvidedDetailsId,
+    redirectUrl,
+    Seq.empty
+  )
+
+  /** Quick action: submits a random 1-3 fixable failures, i.e. a FailedFixable outcome. */
+  def submitIndividualFailuresFixable(
+    individualProvidedDetailsId: IndividualProvidedDetailsId,
+    redirectUrl: String
+  ): Action[AnyContent] = submitIndividualFailuresQuickAction(
+    individualProvidedDetailsId,
+    redirectUrl,
+    randomFixableIndividualFailures()
+  )
+
+  /** Quick action: submits a random mix of non-fixable (and possibly some fixable) failures, i.e. a FailedNonFixable outcome. */
+  def submitIndividualFailuresNonFixable(
+    individualProvidedDetailsId: IndividualProvidedDetailsId,
+    redirectUrl: String
+  ): Action[AnyContent] = submitIndividualFailuresQuickAction(
+    individualProvidedDetailsId,
+    redirectUrl,
+    randomNonFixableIndividualFailures()
+  )
+
+  private def submitIndividualFailuresQuickAction(
+    individualProvidedDetailsId: IndividualProvidedDetailsId,
+    redirectUrl: String,
+    failures: Seq[IndividualRiskingFailure]
+  ): Action[AnyContent] = actions
+    .action
+    .async:
+      implicit request =>
+        for
+          maybeIndividual <- testAgentRegistrationConnector.findIndividual(individualProvidedDetailsId)
+          individual = maybeIndividual.getOrElse(
+            throw new RuntimeException(s"There is no individual under given individualProvidedDetailsId: $individualProvidedDetailsId")
+          )
+          _ <- testRiskingService.submitIndividualFailures(individual.personReference, failures)
+        yield Redirect(redirectUrl)
+
+  /** A random non-empty subset (1-3) of the fixable individual checks. */
+  private def randomFixableIndividualFailures(): Seq[IndividualRiskingFailure] =
+    val fixableFailures: Seq[IndividualRiskingFailure] = IndividualRiskingFailure.values.filter(_.fixable).toSeq
+    Random.shuffle(fixableFailures).take(1 + Random.nextInt(3))
+
+  /** A random selection guaranteed to contain at least one non-fixable individual check, plus a random 0-2 fixable checks bundled alongside it. */
+  private def randomNonFixableIndividualFailures(): Seq[IndividualRiskingFailure] =
+    val nonFixableFailures: Seq[IndividualRiskingFailure] = IndividualRiskingFailure.values.filterNot(_.fixable).toSeq
+    val fixableFailures: Seq[IndividualRiskingFailure] = IndividualRiskingFailure.values.filter(_.fixable).toSeq
+    val randomNonFixable = Random.shuffle(nonFixableFailures).take(1 + Random.nextInt(3))
+    val randomFixable = Random.shuffle(fixableFailures).take(Random.nextInt(3))
+    randomNonFixable ++ randomFixable
 
   def showIndividualsForApplication: Action[AnyContent] = actions
     .getApplication

@@ -34,6 +34,9 @@
         .maxOption
 }
 
+@individualCardId = @{s"individual-${individual.personReference.value}"}
+@redirectUrlWithAnchor = @{s"${requestHeader.uri}#$individualCardId"}
+
 <style>
     .individual-tile {
         border: 1px solid #b1b4b6;
@@ -108,7 +111,7 @@
     }
 </style>
 
-<div class="govuk-!-padding-4 individual-tile">
+<div class="govuk-!-padding-4 individual-tile" id="@individualCardId">
     <div class="individual-tile__header">
 
         <h3 class="individual-tile__name">@individual.individualName.value</h3>
@@ -158,6 +161,10 @@
                 class="govuk-link"
                 href="@AppRoutes.testOnly.applicant.TestOnlyController.selectIndividualRiskingFailures(individual.individualProvidedDetailsId)"
                 >Select risking failures / upload risking results</a>
+                or just quickly
+                <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitIndividualFailuresApproved(individual.individualProvidedDetailsId, redirectUrlWithAnchor)">approve</a>,
+                <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitIndividualFailuresFixable(individual.individualProvidedDetailsId, redirectUrlWithAnchor)">fail-fixable</a>,
+                <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitIndividualFailuresNonFixable(individual.individualProvidedDetailsId, redirectUrlWithAnchor)">fail-non-fixable</a>
             }
         } <br>
 

@@ -38,6 +38,8 @@
         .maxOption
 }
 
+@redirectUrlWithAnchor = @{s"${requestHeader.uri}#entity-risking-actions"}
+
 <style>
 
 </style>
@@ -92,6 +94,7 @@
         href="@AppRoutes.providedetails.StartController.start(agentApplication.linkId)"
         >/provide-details/start/...</a> <br>
 
+        <span id="entity-risking-actions"></span>
         @entityResultsFilename match {
             case Some(filename) => {
                 <a
@@ -103,7 +106,11 @@
                 <a
                 class="govuk-link"
                 href="@AppRoutes.testOnly.applicant.TestOnlyController.selectRiskingFailures(agentApplication.agentApplicationId)"
-                >Select entity failures / upload risking results</a> <br>
+                >Select entity failures / upload risking results</a>
+                or just quickly
+                <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitEntityFailuresApproved(agentApplication.agentApplicationId, redirectUrlWithAnchor)">approve</a>,
+                <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitEntityFailuresFixable(agentApplication.agentApplicationId, redirectUrlWithAnchor)">fail-fixable</a>,
+                <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitEntityFailuresNonFixable(agentApplication.agentApplicationId, redirectUrlWithAnchor)">fail-non-fixable</a> <br>
             }
         }
 
