@@ -88,43 +88,59 @@
             </div>
         }
 
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">Actions</dt>
+            <dd class="govuk-summary-list__value">
+                <p class="govuk-body govuk-!-margin-bottom-3">
+                    <a
+                    class="govuk-link"
+                    href="@AppRoutes.providedetails.StartController.start(agentApplication.linkId)"
+                    >/provide-details/start/...</a>
+                </p>
 
-        <a
-        class="govuk-link"
-        href="@AppRoutes.providedetails.StartController.start(agentApplication.linkId)"
-        >/provide-details/start/...</a> <br>
+                <span id="entity-risking-actions"></span>
+                @entityResultsFilename match {
+                    case Some(filename) => {
+                        <p class="govuk-body govuk-!-margin-bottom-3">
+                            <a
+                            class="govuk-link"
+                            href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(filename)"
+                            >View submitted entity risking results file</a>
+                        </p>
+                    }
+                    case None => {
+                        <p class="govuk-body govuk-!-margin-bottom-1">
+                            <a
+                            class="govuk-link"
+                            href="@AppRoutes.testOnly.applicant.TestOnlyController.selectRiskingFailures(agentApplication.agentApplicationId)"
+                            >Select entity failures / upload risking results</a>
+                            or just quickly:
+                        </p>
+                        <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-3">
+                            <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitEntityFailuresApproved(agentApplication.agentApplicationId, redirectUrlWithAnchor)">approve</a></li>
+                            <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitEntityFailuresFixable(agentApplication.agentApplicationId, redirectUrlWithAnchor)">fail-fixable</a></li>
+                            <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitEntityFailuresNonFixable(agentApplication.agentApplicationId, redirectUrlWithAnchor)">fail-non-fixable</a></li>
+                        </ul>
+                    }
+                }
 
-        <span id="entity-risking-actions"></span>
-        @entityResultsFilename match {
-            case Some(filename) => {
-                <a
-                class="govuk-link"
-                href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(filename)"
-                >View submitted entity risking results file</a> <br>
-            }
-            case None => {
-                <a
-                class="govuk-link"
-                href="@AppRoutes.testOnly.applicant.TestOnlyController.selectRiskingFailures(agentApplication.agentApplicationId)"
-                >Select entity failures / upload risking results</a>
-                or just quickly
-                <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitEntityFailuresApproved(agentApplication.agentApplicationId, redirectUrlWithAnchor)">approve</a>,
-                <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitEntityFailuresFixable(agentApplication.agentApplicationId, redirectUrlWithAnchor)">fail-fixable</a>,
-                <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitEntityFailuresNonFixable(agentApplication.agentApplicationId, redirectUrlWithAnchor)">fail-non-fixable</a> <br>
-            }
-        }
+                <p class="govuk-body govuk-!-margin-bottom-3">
+                    <a
+                    class="govuk-link"
+                    href="@AppRoutes.testOnly.TestOnlyController.showApplicationForRisking(agentApplication.applicationReference)"
+                    >View application-for-risking (JSON)</a>
+                </p>
 
-        <a
-        class="govuk-link"
-        href="@AppRoutes.testOnly.TestOnlyController.showApplicationForRisking(agentApplication.applicationReference)"
-        >View application-for-risking (JSON)</a> <br>
-
-        <a
-        class="govuk-link"
-        href="@AppRoutes.testOnly.TestOnlyController.showRiskingProgress(agentApplication.applicationReference)"
-        >View Risking Progress (JSON)</a>
-        <span class="govuk-hint govuk-!-margin-bottom-0">Requires auth &mdash; log in as applicant first (see "login" above), otherwise this errors</span> <br>
-
+                <p class="govuk-body govuk-!-margin-bottom-0">
+                    <a
+                    class="govuk-link"
+                    href="@AppRoutes.testOnly.TestOnlyController.showRiskingProgress(agentApplication.applicationReference)"
+                    >View Risking Progress (JSON)</a>
+                    <br>
+                    <span class="govuk-hint govuk-!-margin-bottom-0">Requires auth &mdash; log in as applicant first (see "login" above), otherwise this errors</span>
+                </p>
+            </dd>
+        </div>
 
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">@individuals.size individuals</dt>

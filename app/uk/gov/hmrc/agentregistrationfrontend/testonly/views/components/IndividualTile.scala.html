@@ -142,36 +142,46 @@
             <span class="individual-tile__info-label">Person of Control</span>
             <span class="individual-tile__info-value">@individual.isPersonOfControl</span>
         </div>
-        <a
-        class="govuk-link"
-        href="@AppRoutes.testOnly.TestOnlyController.findOrCreateAndLogInIndividual(
-            UserId.make(individual.individualProvidedDetailsId), PlanetId.make(individual.agentApplicationId), individual.individualName.value, requestHeader.uri
-        )"
-        >login</a> <br>
+        <div class="individual-tile__info-item">
+            <a
+            class="govuk-link"
+            href="@AppRoutes.testOnly.TestOnlyController.findOrCreateAndLogInIndividual(
+                UserId.make(individual.individualProvidedDetailsId), PlanetId.make(individual.agentApplicationId), individual.individualName.value, requestHeader.uri
+            )"
+            >login</a>
+        </div>
 
-        @individualResultsFilename match {
-            case Some(filename) => {
-                <a
-                class="govuk-link"
-                href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(filename)"
-                >View submitted individual risking results file</a>
+        <div class="individual-tile__info-item">
+            @individualResultsFilename match {
+                case Some(filename) => {
+                    <a
+                    class="govuk-link"
+                    href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(filename)"
+                    >View submitted individual risking results file</a>
+                }
+                case None => {
+                    <p class="govuk-body govuk-!-margin-bottom-1">
+                        <a
+                        class="govuk-link"
+                        href="@AppRoutes.testOnly.applicant.TestOnlyController.selectIndividualRiskingFailures(individual.individualProvidedDetailsId)"
+                        >Select risking failures / upload risking results</a>
+                        or just quickly:
+                    </p>
+                    <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-0">
+                        <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitIndividualFailuresApproved(individual.individualProvidedDetailsId, redirectUrlWithAnchor)">approve</a></li>
+                        <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitIndividualFailuresFixable(individual.individualProvidedDetailsId, redirectUrlWithAnchor)">fail-fixable</a></li>
+                        <li><a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitIndividualFailuresNonFixable(individual.individualProvidedDetailsId, redirectUrlWithAnchor)">fail-non-fixable</a></li>
+                    </ul>
+                }
             }
-            case None => {
-                <a
-                class="govuk-link"
-                href="@AppRoutes.testOnly.applicant.TestOnlyController.selectIndividualRiskingFailures(individual.individualProvidedDetailsId)"
-                >Select risking failures / upload risking results</a>
-                or just quickly
-                <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitIndividualFailuresApproved(individual.individualProvidedDetailsId, redirectUrlWithAnchor)">approve</a>,
-                <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitIndividualFailuresFixable(individual.individualProvidedDetailsId, redirectUrlWithAnchor)">fail-fixable</a>,
-                <a class="govuk-link" href="@AppRoutes.testOnly.applicant.TestOnlyController.submitIndividualFailuresNonFixable(individual.individualProvidedDetailsId, redirectUrlWithAnchor)">fail-non-fixable</a>
-            }
-        } <br>
+        </div>
 
-        <a
-        class="govuk-link"
-        href="@AppRoutes.testOnly.TestOnlyController.showIndividualForRisking(individual.personReference)"
-        >View individual-for-risking (JSON)</a>
+        <div class="individual-tile__info-item">
+            <a
+            class="govuk-link"
+            href="@AppRoutes.testOnly.TestOnlyController.showIndividualForRisking(individual.personReference)"
+            >View individual-for-risking (JSON)</a>
+        </div>
     </div>
 
     <div class="individual-tile__footer">
