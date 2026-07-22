@@ -29,17 +29,29 @@ import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.LinkId
+import uk.gov.hmrc.agentregistration.shared.SafeId
 
 import java.time.Instant
 
 extension (a: AgentApplication)
+  /** `safeId` must match whatever `registeredBusinessPartnerId` the caller separately stores in agents-external-stubs' BPR record (see `FastForwardController`)
+    * — the two are looked up together later when risking subscribes the agent, so a fresh random value must be threaded through both places consistently rather
+    * than reusing the fixed value baked into the canned fixture.
+    *
+    * `providerId` must match the `userId` of the stub user actually signed in for this run (see `FastForwardController`) — agents-external-stubs' `/auth`
+    * responses set `credId`/`credentials.gatewayId` to exactly `user.userId` (see `AuthStubController.Authority.prepareAuthorityResponse`), and risking later
+    * uses `applicantCredentials.providerId` as the `userId` when allocating the new HMRC-AS-AGENT enrolment (`SubscriptionService.enrolAgent`) — a fixed,
+    * unrelated providerId would allocate the enrolment to a user that was never actually signed in.
+    */
   def withUpdatedIdentifiers(
     id: AgentApplicationId,
     internalUserId: InternalUserId,
     linkId: LinkId,
     groupId: GroupId,
     applicationReference: ApplicationReference,
-    createdAt: Instant
+    createdAt: Instant,
+    safeId: SafeId,
+    providerId: String
   ): AgentApplication =
     a match
       case a: AgentApplicationSoleTrader =>
@@ -49,7 +61,9 @@ extension (a: AgentApplication)
           linkId = linkId,
           groupId = groupId,
           applicationReference = applicationReference,
-          createdAt = createdAt
+          createdAt = createdAt,
+          businessDetails = a.businessDetails.map(_.copy(safeId = safeId)),
+          applicantCredentials = a.applicantCredentials.copy(providerId = providerId)
         )
       case a: AgentApplicationLlp =>
         a.copy(
@@ -58,7 +72,9 @@ extension (a: AgentApplication)
           linkId = linkId,
           groupId = groupId,
           applicationReference = applicationReference,
-          createdAt = createdAt
+          createdAt = createdAt,
+          businessDetails = a.businessDetails.map(_.copy(safeId = safeId)),
+          applicantCredentials = a.applicantCredentials.copy(providerId = providerId)
         )
       case a: AgentApplicationLimitedCompany =>
         a.copy(
@@ -67,7 +83,9 @@ extension (a: AgentApplication)
           linkId = linkId,
           groupId = groupId,
           applicationReference = applicationReference,
-          createdAt = createdAt
+          createdAt = createdAt,
+          businessDetails = a.businessDetails.map(_.copy(safeId = safeId)),
+          applicantCredentials = a.applicantCredentials.copy(providerId = providerId)
         )
       case a: AgentApplicationGeneralPartnership =>
         a.copy(
@@ -76,7 +94,9 @@ extension (a: AgentApplication)
           linkId = linkId,
           groupId = groupId,
           applicationReference = applicationReference,
-          createdAt = createdAt
+          createdAt = createdAt,
+          businessDetails = a.businessDetails.map(_.copy(safeId = safeId)),
+          applicantCredentials = a.applicantCredentials.copy(providerId = providerId)
         )
       case a: AgentApplicationLimitedPartnership =>
         a.copy(
@@ -85,7 +105,9 @@ extension (a: AgentApplication)
           linkId = linkId,
           groupId = groupId,
           applicationReference = applicationReference,
-          createdAt = createdAt
+          createdAt = createdAt,
+          businessDetails = a.businessDetails.map(_.copy(safeId = safeId)),
+          applicantCredentials = a.applicantCredentials.copy(providerId = providerId)
         )
       case a: AgentApplicationScottishLimitedPartnership =>
         a.copy(
@@ -94,7 +116,9 @@ extension (a: AgentApplication)
           linkId = linkId,
           groupId = groupId,
           applicationReference = applicationReference,
-          createdAt = createdAt
+          createdAt = createdAt,
+          businessDetails = a.businessDetails.map(_.copy(safeId = safeId)),
+          applicantCredentials = a.applicantCredentials.copy(providerId = providerId)
         )
       case a: AgentApplicationScottishPartnership =>
         a.copy(
@@ -103,5 +127,7 @@ extension (a: AgentApplication)
           linkId = linkId,
           groupId = groupId,
           applicationReference = applicationReference,
-          createdAt = createdAt
+          createdAt = createdAt,
+          businessDetails = a.businessDetails.map(_.copy(safeId = safeId)),
+          applicantCredentials = a.applicantCredentials.copy(providerId = providerId)
         )
