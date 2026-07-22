@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.connectors
 
+import play.api.libs.json.JsNull
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
@@ -189,5 +190,27 @@ extends Connector:
               response = response
             )
       .andLogOnFailure(s"Failed to find individual for risking for personReference: ${personReference.value}")
+
+  /** Not a test-only endpoint — this is the real, authenticated risking-progress endpoint the individual journey itself uses (see
+    * AgentRegistrationRiskingConnector.getRiskingProgressForApplicant). It's authorised on the backend, so this call relies on the current request's own
+    * session/auth being forwarded via the implicit HeaderCarrier.
+    */
+  def findRiskingProgress(applicationReference: ApplicationReference)(using RequestHeader): Future[JsValue] =
+    val url: URL = url"${appConfig.agentRegistrationRiskingBaseUrl}/agent-registration-risking/risking-progress/for-applicant/${applicationReference.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if status === Status.OK => response.json
+          case status if status === Status.NO_CONTENT => JsNull
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to find risking progress for applicationReference: ${applicationReference.value}")
 
   private val baseUrl: String = appConfig.agentRegistrationRiskingBaseUrl + "/agent-registration-risking/test-only"

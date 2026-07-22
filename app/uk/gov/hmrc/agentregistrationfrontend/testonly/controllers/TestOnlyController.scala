@@ -120,6 +120,11 @@ extends FrontendControllerBase(mcc):
         case Some(json) => Ok(Json.prettyPrint(json))
         case None => Ok(s"No individual-for-risking found for personReference: ${personReference.value}")
 
+  def showRiskingProgress(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder.async:
+    implicit request =>
+      testRiskingService.findRiskingProgress(applicationReference).map: json =>
+        Ok(Json.prettyPrint(json))
+
   def resetDatabase: Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
       if (appConfig.TestOnly.allowResetDatabase)

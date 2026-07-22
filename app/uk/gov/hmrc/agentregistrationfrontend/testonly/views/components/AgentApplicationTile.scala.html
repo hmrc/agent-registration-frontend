@@ -119,6 +119,12 @@
         href="@AppRoutes.testOnly.TestOnlyController.showApplicationForRisking(agentApplication.applicationReference)"
         >View application-for-risking (JSON)</a> <br>
 
+        <a
+        class="govuk-link"
+        href="@AppRoutes.testOnly.TestOnlyController.showRiskingProgress(agentApplication.applicationReference)"
+        >View Risking Progress (JSON)</a>
+        <span class="govuk-hint govuk-!-margin-bottom-0">Requires auth &mdash; log in as applicant first (see "login" above), otherwise this errors</span> <br>
+
 
         <div class="govuk-summary-list__row">
             <dt class="govuk-summary-list__key">@individuals.size individuals</dt>

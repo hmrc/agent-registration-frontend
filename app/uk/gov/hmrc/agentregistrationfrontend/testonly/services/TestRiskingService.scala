@@ -52,6 +52,10 @@ class TestRiskingService @Inject() (
     personReference: PersonReference
   )(using RequestHeader): Future[Option[JsValue]] = testRiskingConnector.findIndividualForRisking(personReference)
 
+  def findRiskingProgress(
+    applicationReference: ApplicationReference
+  )(using RequestHeader): Future[JsValue] = testRiskingConnector.findRiskingProgress(applicationReference)
+
   /** Builds a risking results file (matching what agent-registration-risking's SdesTestOnlyController expects: a JSON array of records) containing a single
     * Entity record for the selected failures and uploads it, simulating Minerva sending back results — independent of any individual's submission.
     */
