@@ -40,6 +40,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendContr
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.*
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.RegistrationStatus.*
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.SafeIdGenerator
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.GrsStub
 import uk.gov.hmrc.domain.NinoGenerator
@@ -279,7 +280,7 @@ extends FrontendController(mcc, actions):
     identifiersMatch = true,
     registration = Registration(
       registrationStatus = GrsRegistered,
-      registeredBusinessPartnerId = Some(SafeId("XA0001234512345"))
+      registeredBusinessPartnerId = Some(SafeIdGenerator.generateSafeId())
     ),
     fullName = if businessType === SoleTrader then Some(FullName("Test", "User")) else None,
     dateOfBirth = if businessType === SoleTrader then Some(LocalDate.now().minusYears(20)) else None,

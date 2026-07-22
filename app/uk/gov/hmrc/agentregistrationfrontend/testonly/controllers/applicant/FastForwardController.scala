@@ -30,6 +30,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistratio
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.CompletedSection
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.SafeIdGenerator
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.withUpdatedIdentifiers
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.GrsStubService
@@ -103,19 +104,23 @@ extends FrontendController(mcc, applicantActions):
           case Right(data: RequestWithData[DataWithAuth]) => data
           case Left(r) => throw new RuntimeException(s"ApplicantAuthRefiner didn't fetch DataWithAuth: $r")
 
+      safeId = SafeIdGenerator.generateSafeId()
       agentApplication = section.agentApplication.withUpdatedIdentifiers(
         id = agentApplicationId,
         internalUserId = loggedInAsUserApplicantRequestWithAuthData.get[InternalUserId],
         linkId = linkIdGenerator.nextLinkId(),
         groupId = loggedInAsUserApplicantRequestWithAuthData.get[GroupId],
         applicationReference = applicationReferenceGenerator.generateApplicationReference(),
-        createdAt = Instant.now(clock)
+        createdAt = Instant.now(clock),
+        safeId = safeId,
+        // agents-external-stubs' /auth responses set credId/credentials.gatewayId to exactly the stub user's userId, so that's what providerId must match
+        providerId = userIdApplicant.value
       )
       _ <- testAgentRegistrationConnector.upsertAgentApplication(agentApplication)
       _ <-
         grsStubService.storeStubsData(
           businessType = section.businessType,
-          journeyData = journeyDataFor(section.businessType),
+          journeyData = journeyDataFor(section.businessType, safeId),
           deceased = false
         )(using loggedInAsUserApplicantRequest)
 
@@ -177,13 +182,16 @@ extends FrontendController(mcc, applicantActions):
     .getOrThrowExpectedDataMissing(s"No identity stubbed at index $index")
 
   private def journeyDataFor(
-    bt: BusinessType
+    bt: BusinessType,
+    safeId: SafeId
   ): JourneyData =
-    bt match
-      case BusinessType.Partnership.LimitedLiabilityPartnership => TdTestOnly.grsJourneyData.llp.journeyData
-      case BusinessType.Partnership.GeneralPartnership => TdTestOnly.grsJourneyData.generalPartnership.journeyData
-      case BusinessType.Partnership.ScottishPartnership => TdTestOnly.grsJourneyData.scottishPartnership.journeyData
-      case BusinessType.Partnership.ScottishLimitedPartnership => TdTestOnly.grsJourneyData.scottishLtdPartnership.journeyData
-      case BusinessType.Partnership.LimitedPartnership => TdTestOnly.grsJourneyData.ltdPartnership.journeyData
-      case BusinessType.SoleTrader => TdTestOnly.grsJourneyData.soleTrader.journeyData
-      case BusinessType.LimitedCompany => TdTestOnly.grsJourneyData.ltd.journeyData
+    val journeyData =
+      bt match
+        case BusinessType.Partnership.LimitedLiabilityPartnership => TdTestOnly.grsJourneyData.llp.journeyData
+        case BusinessType.Partnership.GeneralPartnership => TdTestOnly.grsJourneyData.generalPartnership.journeyData
+        case BusinessType.Partnership.ScottishPartnership => TdTestOnly.grsJourneyData.scottishPartnership.journeyData
+        case BusinessType.Partnership.ScottishLimitedPartnership => TdTestOnly.grsJourneyData.scottishLtdPartnership.journeyData
+        case BusinessType.Partnership.LimitedPartnership => TdTestOnly.grsJourneyData.ltdPartnership.journeyData
+        case BusinessType.SoleTrader => TdTestOnly.grsJourneyData.soleTrader.journeyData
+        case BusinessType.LimitedCompany => TdTestOnly.grsJourneyData.ltd.journeyData
+    journeyData.copy(registration = journeyData.registration.copy(registeredBusinessPartnerId = Some(safeId)))
