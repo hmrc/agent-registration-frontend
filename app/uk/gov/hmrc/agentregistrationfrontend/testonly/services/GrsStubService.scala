@@ -20,6 +20,7 @@ import play.api.mvc.Request
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.BusinessType.*
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.AgentsExternalStubsConnector
@@ -60,6 +61,7 @@ class GrsStubService @Inject() (
         utr = Some(utr),
         safeId = journeyData.registration.registeredBusinessPartnerId.map(_.value).getOrElse(""),
         isAnIndividual = businessType === SoleTrader,
+        isAnOrganisation = businessType =!= SoleTrader,
         individual =
           if businessType === SoleTrader then
             Some(
@@ -75,6 +77,11 @@ class GrsStubService @Inject() (
             case BusinessType.Partnership.LimitedLiabilityPartnership | BusinessType.LimitedCompany | BusinessType.Partnership.LimitedPartnership | BusinessType.Partnership.ScottishLimitedPartnership =>
               Some(Organisation(
                 organisationName = journeyData.companyProfile.map(_.companyName).getOrElse("BPR Test Org"),
+                organisationType = "5T"
+              ))
+            case Partnership.GeneralPartnership | BusinessType.Partnership.ScottishPartnership =>
+              Some(Organisation(
+                organisationName = "Electronicsson Group", // hard coded to avoid random generation of name - we don't get this from GRS
                 organisationType = "5T"
               ))
             case _ => None,
