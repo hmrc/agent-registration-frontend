@@ -14,24 +14,21 @@
  * limitations under the License.
  *@
 
-@import uk.gov.hmrc.agentregistration.shared.BusinessType
-@import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.LimitedCompany.{AnswerSummary as AnswerSummaryLimitedCompany}
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.Llp.{AnswerSummary as AnswerSummaryLlp}
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.SoleTrader.{AnswerSummary as AnswerSummarySoleTrader}
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.GeneralPartnership.{AnswerSummary as AnswerSummaryGeneralPartnership}
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.LimitedPartnership.{AnswerSummary as AnswerSummaryLimitedPartnership}
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.ScottishLimitedPartnership.{AnswerSummary as AnswerSummaryScottishLimitedPartnership}
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.ScottishPartnership.{AnswerSummary as AnswerSummaryScottishPartnership}
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.applicantcontactdetails.{AnswerSummary as ContactAnswers}
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.agentdetails.{AnswerSummary as AgentDetailsAnswers}
-@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.amls.{AnswerSummary as AmlsAnswers}
 @import uk.gov.hmrc.agentregistration.shared.*
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.GeneralPartnership.AnswerSummary as AnswerSummaryGeneralPartnership
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.LimitedCompany.AnswerSummary as AnswerSummaryLimitedCompany
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.LimitedPartnership.AnswerSummary as AnswerSummaryLimitedPartnership
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.Llp.AnswerSummary as AnswerSummaryLlp
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.ScottishLimitedPartnership.AnswerSummary as AnswerSummaryScottishLimitedPartnership
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.ScottishPartnership.AnswerSummary as AnswerSummaryScottishPartnership
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.SoleTrader.AnswerSummary as AnswerSummarySoleTrader
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.agentdetails.AnswerSummary as AgentDetailsAnswers
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.amls.AnswerSummary as AmlsAnswers
+@import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.applicantcontactdetails.AnswerSummary as ContactAnswers
 @import views.html.helper.CSPNonce
 
 @this(
-        appConfig: AppConfig,
         layout: Layout,
         govukButton: GovukButton,
         govukSummaryList: GovukSummaryList,
@@ -60,7 +57,6 @@
 @title = @{
     messages(s"$key.title", entityName)
 }
-@provideDetailsLink = @{appConfig.applicationLink(agentApplication.linkId.value).toString}
 @aboutYourBusinessAnswers =  @{
   agentApplication match {
     case agentApplication: AgentApplicationSoleTrader =>
@@ -132,7 +128,7 @@
   templateStyles = Some(templateStyles)
 ) {
   <h1 class="govuk-heading-l">@title</h1>
-  <h2 class="govuk-heading-m">@{messages(s"$key.subHeading", "HDJ2123F")}</h2>
+  <h2 class="govuk-heading-m">@{messages(s"$key.subHeading", agentApplication.applicationReference.value)}</h2>
 
   <h2 class="govuk-heading-m">@{messages("about-your-business.title")}</h2>
   @aboutYourBusinessAnswers

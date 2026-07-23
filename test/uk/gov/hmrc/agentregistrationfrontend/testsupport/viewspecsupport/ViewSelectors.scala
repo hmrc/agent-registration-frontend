@@ -42,6 +42,10 @@ object ViewSelectors:
       .selectOnlyOneElementOrFail()
       .text()
 
+    def assertTaskNotRendered(taskId: String)(using pos: Position): Unit = element
+      .mainContent
+      .selectShouldFail(s"#$taskId")
+
     inline def toLink(using pos: Position): TestLink = {
       element.tagName() shouldBe "a"
       TestLink(text = element.text(), href = element.selectAttrOrFail("href"))

@@ -1843,6 +1843,7 @@ individualDetailsFixConfirmation.p2 = We’ll send an email to you at {0} if we 
 
 fixableFailuresDeclaration.title = Declaration
 fixableFailuresDeclaration.p1 = I am authorised by {0} to apply for an agent services account with HMRC.
+fixableFailuresDeclaration.p1.SoleTrader = I have taken all action needed to meet the registration conditions.
 fixableFailuresDeclaration.p2 = The information I have given in this application is accurate to the best of my knowledge.
 
 # Apply / Confirmation of submission

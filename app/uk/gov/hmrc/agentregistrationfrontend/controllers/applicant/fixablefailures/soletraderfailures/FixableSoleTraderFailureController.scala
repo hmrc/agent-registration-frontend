@@ -168,7 +168,7 @@ extends FrontendController(mcc, actions):
         val updatedFixes: Seq[IndividualFix] = outcome.fixes.map:
           case f: IndividualFix if f === individualFix => f.modify(_.isConfirmed).setTo(Some(request.get[Boolean]))
           case other => other
-        individualProvideDetailsService.upsert(
+        individualProvideDetailsService.upsertForApplication(
           individualProvidedDetails
             .modify(_.riskingOutcomeIndividual.each)
             .using:

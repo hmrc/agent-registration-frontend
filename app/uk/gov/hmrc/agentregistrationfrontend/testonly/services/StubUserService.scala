@@ -61,7 +61,8 @@ extends RequestAwareLogging:
   ): Future[User] =
     val user: User = User(
       userId = userId,
-      planetId = Some(planetId)
+      planetId = Some(planetId),
+      assignedPrincipalEnrolments = Seq(EnrolmentKey("HMCE-VAT-AGNT")) // using this as a default ensures no unwanted BPRs are generated
     )
     agentsExternalStubsConnector.createUser(
       user = user,

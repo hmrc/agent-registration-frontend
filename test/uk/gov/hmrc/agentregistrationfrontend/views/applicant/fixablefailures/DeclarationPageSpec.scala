@@ -31,14 +31,30 @@ extends ViewSpec:
       isSoleTraderOwner = false
     ).body
   )
+  val soleTraderDoc: Document = Jsoup.parse(
+    viewTemplate(
+      entityName = "Test Company Name",
+      isSoleTraderOwner = true
+    ).body
+  )
 
   "DeclarationPage" should:
 
-    "have expected content" in:
+    "have expected content when not a sole trader owner" in:
       doc.mainContent shouldContainContent
         """
           |Declaration
           |I am authorised by Test Company Name to apply for an agent services account with HMRC.
+          |The information I have given in this application is accurate to the best of my knowledge.
+          |Accept and send
+          |"""
+          .stripMargin
+
+    "have expected content when a sole trader owner" in:
+      soleTraderDoc.mainContent shouldContainContent
+        """
+          |Declaration
+          |I have taken all action needed to meet the registration conditions.
           |The information I have given in this application is accurate to the best of my knowledge.
           |Accept and send
           |"""
