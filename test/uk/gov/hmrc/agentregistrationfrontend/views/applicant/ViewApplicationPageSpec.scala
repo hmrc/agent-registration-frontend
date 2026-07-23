@@ -46,7 +46,7 @@ extends ViewSpec:
       doc.mainContent shouldContainContent
         s"""
            |Application for Test Partnership
-           |Application reference: HDJ2123F
+           |Application reference: ${agentApplicationRequest.agentApplication.applicationReference.value}
            |About your business
            |UK-based agent
            |Yes
