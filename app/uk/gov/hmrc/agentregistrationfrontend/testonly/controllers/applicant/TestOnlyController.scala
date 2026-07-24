@@ -20,7 +20,6 @@ import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
-import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentType
@@ -37,10 +36,9 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationSe
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowRecentApplicationsPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowAgentApplicationsTilePage
-import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestLinkPage
-import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
+import uk.gov.hmrc.agentregistrationfrontend.testonly.action.TestOnlyActions
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
 
 import javax.inject.Inject
@@ -53,11 +51,10 @@ class TestOnlyController @Inject() (
   actions: ApplicantActions,
   testApplicationService: TestApplicationService,
   testAgentRegistrationConnector: TestAgentRegistrationConnector,
-  agentRegistrationConnector: AgentRegistrationConnector,
+  testOnlyActions: TestOnlyActions,
   testLinkPage: TestLinkPage,
   showRecentApplicationsPage: ShowRecentApplicationsPage,
   showAgentApplicationsTilePage: ShowAgentApplicationsTilePage,
-  simplePage: SimplePage,
   individualProvidedDetailsConnector: IndividualProvidedDetailsConnector,
   testRiskingService: TestRiskingService
 )
@@ -89,51 +86,30 @@ extends FrontendController(mcc, actions):
           pageSize
         ))
 
-  def showAgentApplicationById(agentApplicationId: AgentApplicationId): Action[AnyContent] = actions
-    .action
-    .async:
-      implicit request =>
-        testAgentRegistrationConnector
-          .findApplication(agentApplicationId)
-          .map:
-            case Some(application) => Ok(Json.prettyPrint(Json.toJson(application)))
-            case None => Ok(s"No application with such id: $agentApplicationId")
+  def showAgentApplicationById(agentApplicationId: AgentApplicationId): Action[AnyContent] =
+    testOnlyActions
+      .getApplication(agentApplicationId):
+        implicit request: RequestWithData[TestOnlyActions.DataWithApplication] =>
+          Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))
 
   /** Kept only so old bookmarked/shared links keep working — resolves the application's reference and redirects to `showAgentApplicationDetailsByReference`,
     * which is now the actual details page.
     */
-  def showAgentApplicationTile(agentApplicationId: AgentApplicationId): Action[AnyContent] = actions
-    .action
-    .async:
-      implicit request =>
-        testAgentRegistrationConnector.findApplication(agentApplicationId).map:
-          case Some(agentApplication) =>
-            Redirect(AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationDetailsByReference(agentApplication.applicationReference))
-          case None =>
-            InternalServerError(simplePage(
-              h1 = "Application not found",
-              bodyText = Some(s"There is no application under given agentApplicationId: ${agentApplicationId.value}")
-            ))
+  def showAgentApplicationTile(agentApplicationId: AgentApplicationId): Action[AnyContent] =
+    testOnlyActions
+      .getApplication(agentApplicationId):
+        implicit request: RequestWithData[TestOnlyActions.DataWithApplication] =>
+          Redirect(AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationDetailsByReference(request.agentApplication.applicationReference))
 
-  def showAgentApplicationDetailsByReference(applicationReference: ApplicationReference): Action[AnyContent] = actions
-    .action
+  def showAgentApplicationDetailsByReference(applicationReference: ApplicationReference): Action[AnyContent] = testOnlyActions
+    .getApplication(applicationReference)
     .refine:
-      implicit request =>
-        agentRegistrationConnector.findApplication(applicationReference)
-          .map[Result | RequestWithData[AgentApplication *: EmptyData]]:
-            case Some(agentApplication) => request.add(agentApplication)
-            case None =>
-              InternalServerError(simplePage(
-                h1 = "Application not found",
-                bodyText = Some(s"There is no application under given applicationReference: ${applicationReference.value}")
-              ))
-    .refine:
-      implicit request =>
+      implicit request: RequestWithData[TestOnlyActions.DataWithApplication] =>
         testAgentRegistrationConnector
           .findIndividuals(request.get[AgentApplication].agentApplicationId)
-          .map[Result | RequestWithData[List[IndividualProvidedDetails] *: AgentApplication *: EmptyData]](request.add)
+          .map(request.add)
     .async:
-      implicit request =>
+      implicit request: RequestWithData[List[IndividualProvidedDetails] *: TestOnlyActions.DataWithApplication] =>
         val agentApplication: AgentApplication = request.get[AgentApplication]
         val individuals: List[IndividualProvidedDetails] = request.get[List[IndividualProvidedDetails]]
         testRiskingService.listSubmittedRiskingResultsFilenames().map { submittedRiskingResultsFilenames =>
@@ -155,14 +131,14 @@ extends FrontendController(mcc, actions):
 
   def addAgentTypeToSession(
     agentType: AgentType
-  ): Action[AnyContent] = Action:
+  ): Action[AnyContent] = actions.action:
     implicit request =>
       Ok("agent type added to session")
         .addToSession(agentType)
 
   def addBusinessTypeToSession(
     businessType: BusinessTypeAnswer
-  ): Action[AnyContent] = Action:
+  ): Action[AnyContent] = actions.action:
     implicit request =>
       Ok("business type added to session")
         .addToSession(AgentType.UkTaxAgent)
@@ -170,7 +146,7 @@ extends FrontendController(mcc, actions):
 
   def addPartnershipTypeToSession(
     partnershipType: BusinessType.Partnership
-  ): Action[AnyContent] = Action:
+  ): Action[AnyContent] = actions.action:
     implicit request =>
       Ok("partnership type added to session")
         .addToSession(AgentType.UkTaxAgent)
@@ -179,7 +155,7 @@ extends FrontendController(mcc, actions):
 
   def addUserRoleToSession(
     userRole: UserRole
-  ): Action[AnyContent] = Action:
+  ): Action[AnyContent] = actions.action:
     implicit request =>
       Ok("user role added to session")
         .addToSession(AgentType.UkTaxAgent)
@@ -188,7 +164,7 @@ extends FrontendController(mcc, actions):
 
   def addAgentApplicationIdToSession(
     agentApplicationId: AgentApplicationId
-  ): Action[AnyContent] = Action:
+  ): Action[AnyContent] = actions.action:
     implicit request =>
       Ok("agent applicationId added to session")
         .addToSession(agentApplicationId)
@@ -197,7 +173,7 @@ extends FrontendController(mcc, actions):
 
   // as we add more types of entity support we may want to specify which business type to create
   // possibly as part of the url, for now we only create an LLP application
-  def makeTestSubmittedApplication(): Action[AnyContent] = Action
+  def makeTestSubmittedApplication(): Action[AnyContent] = actions.action
     .async:
       implicit request =>
         testApplicationService

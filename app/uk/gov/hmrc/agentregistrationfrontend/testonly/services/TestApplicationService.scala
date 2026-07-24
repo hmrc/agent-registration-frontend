@@ -18,7 +18,10 @@ package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
@@ -42,3 +45,9 @@ extends RequestAwareLogging:
 
   def findApplication(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[AgentApplication]] =
     agentRegistrationConnector.findApplication(applicationReference)
+
+  def findApplication(agentApplicationId: AgentApplicationId)(using RequestHeader): Future[Option[AgentApplication]] =
+    testAgentRegistrationConnector.findApplication(agentApplicationId)
+
+  def findIndividual(individualProvidedDetailsId: IndividualProvidedDetailsId)(using RequestHeader): Future[Option[IndividualProvidedDetails]] =
+    testAgentRegistrationConnector.findIndividual(individualProvidedDetailsId)

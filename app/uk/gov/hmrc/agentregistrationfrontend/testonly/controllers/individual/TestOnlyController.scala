@@ -31,7 +31,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
+import uk.gov.hmrc.agentregistrationfrontend.testonly.action.TestOnlyActions
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -42,7 +42,7 @@ class TestOnlyController @Inject() (
   actions: IndividualActions,
   individualProvideDetailsService: IndividualProvideDetailsService,
   agentApplicationService: AgentApplicationService,
-  testAgentRegistrationConnector: TestAgentRegistrationConnector
+  testOnlyActions: TestOnlyActions
 )
 extends FrontendController(mcc, actions):
 
@@ -73,15 +73,13 @@ extends FrontendController(mcc, actions):
       implicit request =>
         Ok(Json.prettyPrint(Json.toJson(request.get[IndividualProvidedDetails])))
 
-  def showIndividualProvidedDetails(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] = actions
-    .action
-    .async:
-      implicit request =>
-        testAgentRegistrationConnector.findIndividual(individualProvidedDetailsId).map:
-          case Some(individualProvidedDetails) => Ok(Json.prettyPrint(Json.toJson(individualProvidedDetails)))
-          case None => Ok("There is no individual under the given ID")
+  def showIndividualProvidedDetails(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] =
+    testOnlyActions
+      .getIndividual(individualProvidedDetailsId):
+        implicit request: RequestWithData[TestOnlyActions.DataWithIndividual] =>
+          Ok(Json.prettyPrint(Json.toJson(request.individualProvidedDetails)))
 
-  def addIndividualNameToSession(individualName: String): Action[AnyContent] = Action:
+  def addIndividualNameToSession(individualName: String): Action[AnyContent] = actions.action:
     implicit request =>
       Ok("individual name added to session").addingToSession(
         "agent-registration-frontend.individualName" -> individualName

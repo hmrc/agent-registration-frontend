@@ -114,14 +114,14 @@ extends FrontendController(mcc, actions):
     .flatMap(_.get("deceased").flatMap(_.headOption))
     .exists(v => v.equalsIgnoreCase("true") || v.equalsIgnoreCase("on"))
 
-  def retrieveGrsData(journeyId: JourneyId): Action[AnyContent] = Action: request =>
+  def retrieveGrsData(journeyId: JourneyId): Action[AnyContent] = actions.action: request =>
     request.session.get(journeyId.value) match {
       case Some(data) => Ok(data)
       case None => NotFound
     }
 
   def setupGrsJourney(businessType: BusinessType): Action[JourneyConfig] =
-    Action(parse.json[JourneyConfig]): (_: Request[JourneyConfig]) =>
+    actions.action(parse.json[JourneyConfig]): (_: Request[JourneyConfig]) =>
       Created(Json.obj(
         "journeyStartUrl" -> AppRoutes.testOnly.applicant.GrsStubController.showGrsData(businessType, randomJourneyId()).url
       ))

@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.testonly.controllers
 import play.api.libs.json.Json
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
-import play.api.mvc.DefaultActionBuilder
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
@@ -36,6 +35,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.model.EntityRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.IndividualRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
+import uk.gov.hmrc.agentregistrationfrontend.testonly.action.TestOnlyActions
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService
@@ -54,7 +54,6 @@ import scala.util.Random
 @Singleton
 class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
-  defaultActionBuilder: DefaultActionBuilder,
   testOnlyHubPage: TestOnlyHubPage,
   resetDatabaseConfirmationPage: ResetDatabaseConfirmationPage,
   riskingActionConfirmationPage: RiskingActionConfirmationPage,
@@ -63,22 +62,25 @@ class TestOnlyController @Inject() (
   stubUserService: StubUserService,
   testApplicationService: TestApplicationService,
   testRiskingService: TestRiskingService,
+  testOnlyActions: TestOnlyActions,
   appConfig: AppConfig
 )
 extends FrontendControllerBase(mcc):
 
-  def showTestOnlyHub: Action[AnyContent] = defaultActionBuilder:
+  export testOnlyActions.*
+
+  def showTestOnlyHub: Action[AnyContent] = action:
     implicit request =>
       Ok(testOnlyHubPage())
 
-  def showPlaySession: Action[AnyContent] = defaultActionBuilder: request =>
+  def showPlaySession: Action[AnyContent] = action: request =>
     Ok(Json.prettyPrint(Json.toJson(request.session.data)))
 
   def findAndLogInApplicant(
     userId: UserId,
     planetId: PlanetId,
     redirectUrl: String
-  ): Action[AnyContent] = defaultActionBuilder
+  ): Action[AnyContent] = action
     .async:
       implicit request =>
 
@@ -93,7 +95,7 @@ extends FrontendControllerBase(mcc):
     planetId: PlanetId,
     individualName: String,
     redirectUrl: String
-  ): Action[AnyContent] = defaultActionBuilder
+  ): Action[AnyContent] = action
     .async:
       implicit request =>
         import StubUserService.addToSession
@@ -111,13 +113,13 @@ extends FrontendControllerBase(mcc):
           loginResponse <- stubUserService.signIn(user)
         yield Redirect(redirectUrl).addToSession(loginResponse)
 
-  def showResetDatabaseConfirmation: Action[AnyContent] = defaultActionBuilder:
+  def showResetDatabaseConfirmation: Action[AnyContent] = action:
     implicit request =>
       if appConfig.TestOnly.allowResetDatabase
       then Ok(resetDatabaseConfirmationPage())
       else Unauthorized("Reset operation not allowed")
 
-  def resetDatabase: Action[AnyContent] = defaultActionBuilder.async:
+  def resetDatabase: Action[AnyContent] = action.async:
     implicit request =>
       if (appConfig.TestOnly.allowResetDatabase)
         for
@@ -127,7 +129,7 @@ extends FrontendControllerBase(mcc):
       else
         Future.successful(Unauthorized("Reset operation not allowed"))
 
-  def runRisking: Action[AnyContent] = defaultActionBuilder.async:
+  def runRisking: Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.runRisking().map: _ =>
         Ok(riskingActionConfirmationPage(
@@ -141,12 +143,12 @@ extends FrontendControllerBase(mcc):
   /** Same underlying action as `runRisking`, but for the quick-nav link: redirects back to the page the user was on instead of showing the confirmation page,
     * so it can be used as a one-click action from anywhere in the test-only tooling.
     */
-  def runRiskingAndRedirect(redirectUrl: String): Action[AnyContent] = defaultActionBuilder.async:
+  def runRiskingAndRedirect(redirectUrl: String): Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.runRisking().map: _ =>
         Redirect(redirectUrl)
 
-  def runResultsFileProcessing: Action[AnyContent] = defaultActionBuilder.async:
+  def runResultsFileProcessing: Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.runResultsFileProcessing().map: _ =>
         Ok(riskingActionConfirmationPage(
@@ -162,40 +164,40 @@ extends FrontendControllerBase(mcc):
   /** Same underlying action as `runResultsFileProcessing`, but for the quick-nav link: redirects back to the page the user was on instead of showing the
     * confirmation page, so it can be used as a one-click action from anywhere in the test-only tooling.
     */
-  def runResultsFileProcessingAndRedirect(redirectUrl: String): Action[AnyContent] = defaultActionBuilder.async:
+  def runResultsFileProcessingAndRedirect(redirectUrl: String): Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.runResultsFileProcessing().map: _ =>
         Redirect(redirectUrl)
 
-  def viewNextRiskingFileContents: Action[AnyContent] = defaultActionBuilder.async:
+  def viewNextRiskingFileContents: Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.viewNextRiskingFileContents().map(Ok(_))
 
-  def showRiskingResultsFile(filename: String): Action[AnyContent] = defaultActionBuilder.async:
+  def showRiskingResultsFile(filename: String): Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.viewRiskingResultsFile(filename).map:
         case Some(content) => Ok(content)
         case None => Ok(s"No risking results file found for filename: $filename")
 
-  def showApplicationForRisking(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder.async:
+  def showApplicationForRisking(applicationReference: ApplicationReference): Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.findApplicationForRisking(applicationReference).map:
         case Some(json) => Ok(Json.prettyPrint(json))
         case None => Ok(s"No application-for-risking found for applicationReference: ${applicationReference.value}")
 
-  def showIndividualsForRisking(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder.async:
+  def showIndividualsForRisking(applicationReference: ApplicationReference): Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.findIndividualsForRisking(applicationReference).map:
         case Some(json) => Ok(Json.prettyPrint(json))
         case None => Ok(s"No individuals-for-risking found for applicationReference: ${applicationReference.value}")
 
-  def showIndividualForRisking(personReference: PersonReference): Action[AnyContent] = defaultActionBuilder.async:
+  def showIndividualForRisking(personReference: PersonReference): Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.findIndividualForRisking(personReference).map:
         case Some(json) => Ok(Json.prettyPrint(json))
         case None => Ok(s"No individual-for-risking found for personReference: ${personReference.value}")
 
-  def showCompletedRisking(applicationReference: ApplicationReference): Action[AnyContent] = defaultActionBuilder.async:
+  def showCompletedRisking(applicationReference: ApplicationReference): Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.findCompletedRisking(applicationReference).map:
         case Some(json) => Ok(Json.prettyPrint(json))
@@ -205,44 +207,41 @@ extends FrontendControllerBase(mcc):
     applicationReference: ApplicationReference,
     reSubmittedAt: Option[Long],
     redirectUrl: String
-  ): Action[AnyContent] = defaultActionBuilder.async:
-    implicit request =>
-      testApplicationService.findApplication(applicationReference).map: maybeAgentApplication =>
-        val agentApplication = maybeAgentApplication.getOrThrowExpectedDataMissing("agentApplication")
+  ): Action[AnyContent] =
+    getApplication(applicationReference):
+      implicit request =>
         Ok(selectEntityFailuresPage(
           applicationReference,
           reSubmittedAt.map(Instant.ofEpochMilli),
           redirectUrl,
-          SelectEntityFailuresForm(agentApplication)
+          SelectEntityFailuresForm(request.agentApplication)
         ))
 
   def submitEntityFailures(
     applicationReference: ApplicationReference,
     reSubmittedAt: Option[Long],
     redirectUrl: String
-  ): Action[AnyContent] = defaultActionBuilder.async:
+  ): Action[AnyContent] = getApplication(applicationReference).async:
     implicit request =>
       val reSubmittedAtInstant = reSubmittedAt.map(Instant.ofEpochMilli)
-      testApplicationService.findApplication(applicationReference).flatMap: maybeAgentApplication =>
-        val agentApplication = maybeAgentApplication.getOrThrowExpectedDataMissing("agentApplication")
-        SelectEntityFailuresForm(agentApplication)
-          .bindFromRequest()
-          .fold(
-            formWithErrors =>
-              Future.successful(BadRequest(selectEntityFailuresPage(
-                applicationReference,
-                reSubmittedAtInstant,
-                redirectUrl,
-                formWithErrors
-              ))),
-            failures =>
-              // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to the application details page.
-              testRiskingService.submitEntityFailures(
-                applicationReference,
-                failures,
-                reSubmittedAtInstant
-              ).map(_ => Redirect(redirectUrl))
-          )
+      SelectEntityFailuresForm(request.agentApplication)
+        .bindFromRequest()
+        .fold(
+          formWithErrors =>
+            Future.successful(BadRequest(selectEntityFailuresPage(
+              applicationReference,
+              reSubmittedAtInstant,
+              redirectUrl,
+              formWithErrors
+            ))),
+          failures =>
+            // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to the application details page.
+            testRiskingService.submitEntityFailures(
+              applicationReference,
+              failures,
+              reSubmittedAtInstant
+            ).map(_ => Redirect(redirectUrl))
+        )
 
   /** Quick action: submits with no failures at all, i.e. an Approved outcome, without having to manually leave every checkbox unticked. Redirects back to
     * `redirectUrl` (the page the link was clicked from) instead of showing a confirmation page.
@@ -251,7 +250,7 @@ extends FrontendControllerBase(mcc):
     applicationReference: ApplicationReference,
     redirectUrl: String,
     reSubmittedAt: Option[Long]
-  ): Action[AnyContent] = defaultActionBuilder.async:
+  ): Action[AnyContent] = action.async:
     implicit request =>
       submitEntityFailuresQuickAction(
         applicationReference,
@@ -265,16 +264,14 @@ extends FrontendControllerBase(mcc):
     applicationReference: ApplicationReference,
     redirectUrl: String,
     reSubmittedAt: Option[Long]
-  ): Action[AnyContent] = defaultActionBuilder.async:
+  ): Action[AnyContent] = getApplication(applicationReference).async:
     implicit request =>
-      testApplicationService.findApplication(applicationReference).flatMap: maybeAgentApplication =>
-        val agentApplication = maybeAgentApplication.getOrThrowExpectedDataMissing("agentApplication")
-        submitEntityFailuresQuickAction(
-          applicationReference,
-          randomFixableEntityFailures(1 + Random.nextInt(3), agentApplication),
-          redirectUrl,
-          reSubmittedAt
-        )
+      submitEntityFailuresQuickAction(
+        applicationReference,
+        randomFixableEntityFailures(1 + Random.nextInt(3), request.agentApplication),
+        redirectUrl,
+        reSubmittedAt
+      )
 
   /** Quick action: submits a mix of one fixable and one non-fixable failure, i.e. a FailedNonFixable outcome whose failures still include a fixable one bundled
     * alongside the blocking one.
@@ -283,16 +280,14 @@ extends FrontendControllerBase(mcc):
     applicationReference: ApplicationReference,
     redirectUrl: String,
     reSubmittedAt: Option[Long]
-  ): Action[AnyContent] = defaultActionBuilder.async:
+  ): Action[AnyContent] = getApplication(applicationReference).async:
     implicit request =>
-      testApplicationService.findApplication(applicationReference).flatMap: maybeAgentApplication =>
-        val agentApplication = maybeAgentApplication.getOrThrowExpectedDataMissing("agentApplication")
-        submitEntityFailuresQuickAction(
-          applicationReference,
-          randomNonFixableEntityFailures(agentApplication),
-          redirectUrl,
-          reSubmittedAt
-        )
+      submitEntityFailuresQuickAction(
+        applicationReference,
+        randomNonFixableEntityFailures(request.agentApplication),
+        redirectUrl,
+        reSubmittedAt
+      )
 
   private def submitEntityFailuresQuickAction(
     applicationReference: ApplicationReference,
@@ -342,7 +337,7 @@ extends FrontendControllerBase(mcc):
     personReference: PersonReference,
     reSubmittedAt: Option[Long],
     redirectUrl: String
-  ): Action[AnyContent] = defaultActionBuilder:
+  ): Action[AnyContent] = action:
     implicit request =>
       Ok(selectIndividualFailuresPage(
         personReference,
@@ -355,7 +350,7 @@ extends FrontendControllerBase(mcc):
     personReference: PersonReference,
     reSubmittedAt: Option[Long],
     redirectUrl: String
-  ): Action[AnyContent] = defaultActionBuilder.async:
+  ): Action[AnyContent] = action.async:
     implicit request =>
       val reSubmittedAtInstant = reSubmittedAt.map(Instant.ofEpochMilli)
       SelectIndividualFailuresForm.form
@@ -384,7 +379,7 @@ extends FrontendControllerBase(mcc):
     personReference: PersonReference,
     redirectUrl: String,
     reSubmittedAt: Option[Long]
-  ): Action[AnyContent] = defaultActionBuilder.async:
+  ): Action[AnyContent] = action.async:
     implicit request =>
       submitIndividualFailuresQuickAction(
         personReference,
@@ -398,7 +393,7 @@ extends FrontendControllerBase(mcc):
     personReference: PersonReference,
     redirectUrl: String,
     reSubmittedAt: Option[Long]
-  ): Action[AnyContent] = defaultActionBuilder.async:
+  ): Action[AnyContent] = action.async:
     implicit request =>
       submitIndividualFailuresQuickAction(
         personReference,
@@ -414,7 +409,7 @@ extends FrontendControllerBase(mcc):
     personReference: PersonReference,
     redirectUrl: String,
     reSubmittedAt: Option[Long]
-  ): Action[AnyContent] = defaultActionBuilder.async:
+  ): Action[AnyContent] = action.async:
     implicit request =>
       submitIndividualFailuresQuickAction(
         personReference,
