@@ -17,6 +17,9 @@
 package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
@@ -27,7 +30,8 @@ import scala.concurrent.Future
 
 @Singleton
 class TestApplicationService @Inject() (
-  testAgentRegistrationConnector: TestAgentRegistrationConnector
+  testAgentRegistrationConnector: TestAgentRegistrationConnector,
+  agentRegistrationConnector: AgentRegistrationConnector
 )
 extends RequestAwareLogging:
 
@@ -35,3 +39,6 @@ extends RequestAwareLogging:
     .makeTestApplication()
 
   def deleteAll()(using RequestHeader): Future[Unit] = testAgentRegistrationConnector.deleteAllApplications()
+
+  def findApplication(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[AgentApplication]] =
+    agentRegistrationConnector.findApplication(applicationReference)

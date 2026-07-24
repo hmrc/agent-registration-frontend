@@ -23,7 +23,9 @@ import play.api.mvc.DefaultActionBuilder
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
@@ -203,14 +205,16 @@ extends FrontendControllerBase(mcc):
     applicationReference: ApplicationReference,
     reSubmittedAt: Option[Long],
     redirectUrl: String
-  ): Action[AnyContent] = defaultActionBuilder:
+  ): Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
-      Ok(selectEntityFailuresPage(
-        applicationReference,
-        reSubmittedAt.map(Instant.ofEpochMilli),
-        redirectUrl,
-        SelectEntityFailuresForm.form
-      ))
+      testApplicationService.findApplication(applicationReference).map: maybeAgentApplication =>
+        val agentApplication = maybeAgentApplication.getOrThrowExpectedDataMissing("agentApplication")
+        Ok(selectEntityFailuresPage(
+          applicationReference,
+          reSubmittedAt.map(Instant.ofEpochMilli),
+          redirectUrl,
+          SelectEntityFailuresForm(agentApplication)
+        ))
 
   def submitEntityFailures(
     applicationReference: ApplicationReference,
@@ -219,24 +223,26 @@ extends FrontendControllerBase(mcc):
   ): Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
       val reSubmittedAtInstant = reSubmittedAt.map(Instant.ofEpochMilli)
-      SelectEntityFailuresForm.form
-        .bindFromRequest()
-        .fold(
-          formWithErrors =>
-            Future.successful(BadRequest(selectEntityFailuresPage(
-              applicationReference,
-              reSubmittedAtInstant,
-              redirectUrl,
-              formWithErrors
-            ))),
-          failures =>
-            // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to the application details page.
-            testRiskingService.submitEntityFailures(
-              applicationReference,
-              failures,
-              reSubmittedAtInstant
-            ).map(_ => Redirect(redirectUrl))
-        )
+      testApplicationService.findApplication(applicationReference).flatMap: maybeAgentApplication =>
+        val agentApplication = maybeAgentApplication.getOrThrowExpectedDataMissing("agentApplication")
+        SelectEntityFailuresForm(agentApplication)
+          .bindFromRequest()
+          .fold(
+            formWithErrors =>
+              Future.successful(BadRequest(selectEntityFailuresPage(
+                applicationReference,
+                reSubmittedAtInstant,
+                redirectUrl,
+                formWithErrors
+              ))),
+            failures =>
+              // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to the application details page.
+              testRiskingService.submitEntityFailures(
+                applicationReference,
+                failures,
+                reSubmittedAtInstant
+              ).map(_ => Redirect(redirectUrl))
+          )
 
   /** Quick action: submits with no failures at all, i.e. an Approved outcome, without having to manually leave every checkbox unticked. Redirects back to
     * `redirectUrl` (the page the link was clicked from) instead of showing a confirmation page.
@@ -261,12 +267,14 @@ extends FrontendControllerBase(mcc):
     reSubmittedAt: Option[Long]
   ): Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
-      submitEntityFailuresQuickAction(
-        applicationReference,
-        randomFixableEntityFailures(1 + Random.nextInt(3)),
-        redirectUrl,
-        reSubmittedAt
-      )
+      testApplicationService.findApplication(applicationReference).flatMap: maybeAgentApplication =>
+        val agentApplication = maybeAgentApplication.getOrThrowExpectedDataMissing("agentApplication")
+        submitEntityFailuresQuickAction(
+          applicationReference,
+          randomFixableEntityFailures(1 + Random.nextInt(3), agentApplication),
+          redirectUrl,
+          reSubmittedAt
+        )
 
   /** Quick action: submits a mix of one fixable and one non-fixable failure, i.e. a FailedNonFixable outcome whose failures still include a fixable one bundled
     * alongside the blocking one.
@@ -277,12 +285,14 @@ extends FrontendControllerBase(mcc):
     reSubmittedAt: Option[Long]
   ): Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
-      submitEntityFailuresQuickAction(
-        applicationReference,
-        randomNonFixableEntityFailures(),
-        redirectUrl,
-        reSubmittedAt
-      )
+      testApplicationService.findApplication(applicationReference).flatMap: maybeAgentApplication =>
+        val agentApplication = maybeAgentApplication.getOrThrowExpectedDataMissing("agentApplication")
+        submitEntityFailuresQuickAction(
+          applicationReference,
+          randomNonFixableEntityFailures(agentApplication),
+          redirectUrl,
+          reSubmittedAt
+        )
 
   private def submitEntityFailuresQuickAction(
     applicationReference: ApplicationReference,
@@ -302,11 +312,19 @@ extends FrontendControllerBase(mcc):
     */
   /** A random selection of `count` fixable entity failures containing at most one AMLS (Check 3) failure — the real risking model only ever produces a single
     * `EntityFix._3.AmlsFix` per application (see `SelectEntityFailuresForm`'s equivalent validation), so picking from the raw fixable catalogue directly could
-    * easily select two or more AMLS checks and build test data that could never occur for real.
+    * easily select two or more AMLS checks and build test data that could never occur for real. Also excludes checks 4.2/5.2 (Corporation Tax) for sole
+    * traders, matching `SelectEntityFailuresForm`'s validation rule.
     */
-  private def randomFixableEntityFailures(count: Int): Seq[EntityRiskingFailure] =
+  private def randomFixableEntityFailures(
+    count: Int,
+    agentApplication: AgentApplication
+  ): Seq[EntityRiskingFailure] =
     val allFixableFailures: Seq[EntityRiskingFailure] = EntityRiskingFailure.values.filter(_.fixable).toSeq
-    val (amlsFailures, otherFixableFailures) = allFixableFailures.partition(_.checkId === "3")
+    val applicableFailures =
+      if agentApplication.businessType === BusinessType.SoleTrader
+      then allFixableFailures.filterNot(SelectEntityFailuresForm.soleTraderInapplicableFailures.contains)
+      else allFixableFailures
+    val (amlsFailures, otherFixableFailures) = applicableFailures.partition(_.checkId === "3")
     val pool = otherFixableFailures ++ Random.shuffle(amlsFailures).take(1)
     Random.shuffle(pool).take(count)
 
@@ -314,10 +332,10 @@ extends FrontendControllerBase(mcc):
     * fixable checks (with the same at-most-one-AMLS rule as `randomFixableEntityFailures`) bundled alongside it — exercising the "Failures" + "Fixes" split
     * rendering on a genuinely mixed set.
     */
-  private def randomNonFixableEntityFailures(): Seq[EntityRiskingFailure] =
+  private def randomNonFixableEntityFailures(agentApplication: AgentApplication): Seq[EntityRiskingFailure] =
     val nonFixableFailures: Seq[EntityRiskingFailure] = EntityRiskingFailure.values.filterNot(_.fixable).toSeq
     val randomNonFixable = Random.shuffle(nonFixableFailures).take(1 + Random.nextInt(3))
-    val randomFixable = randomFixableEntityFailures(Random.nextInt(3))
+    val randomFixable = randomFixableEntityFailures(Random.nextInt(3), agentApplication)
     randomNonFixable ++ randomFixable
 
   def showSelectIndividualFailures(
