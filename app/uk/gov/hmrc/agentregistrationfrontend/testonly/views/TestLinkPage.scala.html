@@ -20,7 +20,8 @@
 
 @this(
     appConfig: AppConfig,
-    layout: TestOnlyLayout
+    layout: TestOnlyLayout,
+    govukWarningText: GovukWarningText
 )
 
 @(
@@ -37,6 +38,10 @@
     suppressBackLink = true
 ) {
     <h1 class="govuk-heading-xl">Test link</h1>
+    @govukWarningText(WarningText(
+        iconFallbackText = Some("Warning"),
+        content = Text("Deprecated — use the Fast forward links on the Test Only Hub instead.")
+    ))
     <p class="govuk-body">
         The link to share for accessing the newly created test application:
     </p>

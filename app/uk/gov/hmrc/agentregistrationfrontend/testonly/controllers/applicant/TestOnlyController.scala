@@ -24,6 +24,7 @@ import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentType
+import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
@@ -36,7 +37,9 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationSe
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowRecentApplicationsPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowAgentApplicationsTilePage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SimplePage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestLinkPage
+import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
 
@@ -50,9 +53,11 @@ class TestOnlyController @Inject() (
   actions: ApplicantActions,
   testApplicationService: TestApplicationService,
   testAgentRegistrationConnector: TestAgentRegistrationConnector,
+  agentRegistrationConnector: AgentRegistrationConnector,
   testLinkPage: TestLinkPage,
   showRecentApplicationsPage: ShowRecentApplicationsPage,
   showAgentApplicationsTilePage: ShowAgentApplicationsTilePage,
+  simplePage: SimplePage,
   individualProvidedDetailsConnector: IndividualProvidedDetailsConnector,
   testRiskingService: TestRiskingService
 )
@@ -62,19 +67,27 @@ extends FrontendController(mcc, actions):
     .getApplication: request =>
       Ok(Json.prettyPrint(Json.toJson(request.agentApplication)))
 
-  def showRecentAgentApplications: Action[AnyContent] = actions
+  def showRecentAgentApplications(
+    page: Int,
+    pageSize: Int
+  ): Action[AnyContent] = actions
     .action
     .async:
       implicit request =>
         for
-          applications <- testAgentRegistrationConnector.getRecentApplications()
+          applications <- testAgentRegistrationConnector.getRecentApplications(page, pageSize)
           applicationsWithIndividuals: Seq[(AgentApplication, List[IndividualProvidedDetails])] <- Future.sequence:
             applications.map: agentApplication =>
               testAgentRegistrationConnector
                 .findIndividuals(agentApplication.agentApplicationId)
                 .map(individuals => (agentApplication, individuals))
           submittedRiskingResultsFilenames <- testRiskingService.listSubmittedRiskingResultsFilenames()
-        yield Ok(showRecentApplicationsPage(applicationsWithIndividuals, submittedRiskingResultsFilenames))
+        yield Ok(showRecentApplicationsPage(
+          applicationsWithIndividuals,
+          submittedRiskingResultsFilenames,
+          page,
+          pageSize
+        ))
 
   def showAgentApplicationById(agentApplicationId: AgentApplicationId): Action[AnyContent] = actions
     .action
@@ -86,14 +99,34 @@ extends FrontendController(mcc, actions):
             case Some(application) => Ok(Json.prettyPrint(Json.toJson(application)))
             case None => Ok(s"No application with such id: $agentApplicationId")
 
+  /** Kept only so old bookmarked/shared links keep working — resolves the application's reference and redirects to `showAgentApplicationDetailsByReference`,
+    * which is now the actual details page.
+    */
   def showAgentApplicationTile(agentApplicationId: AgentApplicationId): Action[AnyContent] = actions
+    .action
+    .async:
+      implicit request =>
+        testAgentRegistrationConnector.findApplication(agentApplicationId).map:
+          case Some(agentApplication) =>
+            Redirect(AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationDetailsByReference(agentApplication.applicationReference))
+          case None =>
+            InternalServerError(simplePage(
+              h1 = "Application not found",
+              bodyText = Some(s"There is no application under given agentApplicationId: ${agentApplicationId.value}")
+            ))
+
+  def showAgentApplicationDetailsByReference(applicationReference: ApplicationReference): Action[AnyContent] = actions
     .action
     .refine:
       implicit request =>
-        testAgentRegistrationConnector.findApplication(agentApplicationId)
+        agentRegistrationConnector.findApplication(applicationReference)
           .map[Result | RequestWithData[AgentApplication *: EmptyData]]:
             case Some(agentApplication) => request.add(agentApplication)
-            case None => InternalServerError(s"There is no application under given agentApplicationId: $agentApplicationId")
+            case None =>
+              InternalServerError(simplePage(
+                h1 = "Application not found",
+                bodyText = Some(s"There is no application under given applicationReference: ${applicationReference.value}")
+              ))
     .refine:
       implicit request =>
         testAgentRegistrationConnector

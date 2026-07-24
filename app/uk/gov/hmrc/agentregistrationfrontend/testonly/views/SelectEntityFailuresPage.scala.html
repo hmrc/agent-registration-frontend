@@ -32,6 +32,7 @@
 @(
         applicationReference: ApplicationReference,
         reSubmittedAt: Option[Instant],
+        redirectUrl: String,
         form: Form[Seq[EntityRiskingFailure]])(implicit
         request: RequestHeader,
         messages: Messages
@@ -73,7 +74,7 @@
     <h1 class="govuk-heading-xl">Select entity failures</h1>
     <p class="govuk-body">Application reference: @applicationReference.value</p>
 
-    @formWithCSRF(action = AppRoutes.testOnly.TestOnlyController.submitEntityFailures(applicationReference, reSubmittedAt.map(_.toEpochMilli))) {
+    @formWithCSRF(action = AppRoutes.testOnly.TestOnlyController.submitEntityFailures(applicationReference, reSubmittedAt.map(_.toEpochMilli), redirectUrl)) {
         <h2 class="govuk-heading-l">Fixable failures</h2>
         @groupedByCheckId(EntityRiskingFailure.values.toIndexedSeq.filter(_.fixable)).map { case (checkId, failures) =>
             @checkboxGroup(s"entity-failures-fixable-$checkId", checkId, failures.head.checkDescription, failures)

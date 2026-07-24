@@ -102,10 +102,13 @@ extends Connector:
             )
       .andLogOnFailure("Failed to upsert application")
 
-  def getRecentApplications()(using
+  def getRecentApplications(
+    page: Int,
+    pageSize: Int
+  )(using
     request: RequestHeader
   ): Future[List[AgentApplication]] =
-    val url: URL = url"$baseUrl/recent-applications"
+    val url: URL = url"$baseUrl/recent-applications?page=$page&pageSize=$pageSize"
     httpClient
       .get(url)
       .execute[HttpResponse]

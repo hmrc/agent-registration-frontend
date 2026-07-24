@@ -33,7 +33,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.forms.SelectIndividualFail
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.EntityRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.IndividualRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UploadRiskingResultsFileOutcome
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
@@ -202,18 +201,21 @@ extends FrontendControllerBase(mcc):
 
   def showSelectEntityFailures(
     applicationReference: ApplicationReference,
-    reSubmittedAt: Option[Long]
+    reSubmittedAt: Option[Long],
+    redirectUrl: String
   ): Action[AnyContent] = defaultActionBuilder:
     implicit request =>
       Ok(selectEntityFailuresPage(
         applicationReference,
         reSubmittedAt.map(Instant.ofEpochMilli),
+        redirectUrl,
         SelectEntityFailuresForm.form
       ))
 
   def submitEntityFailures(
     applicationReference: ApplicationReference,
-    reSubmittedAt: Option[Long]
+    reSubmittedAt: Option[Long],
+    redirectUrl: String
   ): Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
       val reSubmittedAtInstant = reSubmittedAt.map(Instant.ofEpochMilli)
@@ -224,30 +226,16 @@ extends FrontendControllerBase(mcc):
             Future.successful(BadRequest(selectEntityFailuresPage(
               applicationReference,
               reSubmittedAtInstant,
+              redirectUrl,
               formWithErrors
             ))),
           failures =>
+            // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to the application details page.
             testRiskingService.submitEntityFailures(
               applicationReference,
               failures,
               reSubmittedAtInstant
-            ).map:
-              case UploadRiskingResultsFileOutcome.Uploaded =>
-                Ok(riskingActionConfirmationPage(
-                  heading = "Risking results submitted",
-                  description =
-                    s"A risking results file has been uploaded for application reference ${applicationReference.value}. " +
-                      "It won't take effect until results file processing is run."
-                ))
-              case UploadRiskingResultsFileOutcome.AlreadyExists =>
-                val formWithError = SelectEntityFailuresForm.form
-                  .fill(failures)
-                  .withGlobalError(s"Risking results have already been submitted for application reference ${applicationReference.value}.")
-                Conflict(selectEntityFailuresPage(
-                  applicationReference,
-                  reSubmittedAtInstant,
-                  formWithError
-                ))
+            ).map(_ => Redirect(redirectUrl))
         )
 
   /** Quick action: submits with no failures at all, i.e. an Approved outcome, without having to manually leave every checkbox unticked. Redirects back to
@@ -334,18 +322,21 @@ extends FrontendControllerBase(mcc):
 
   def showSelectIndividualFailures(
     personReference: PersonReference,
-    reSubmittedAt: Option[Long]
+    reSubmittedAt: Option[Long],
+    redirectUrl: String
   ): Action[AnyContent] = defaultActionBuilder:
     implicit request =>
       Ok(selectIndividualFailuresPage(
         personReference,
         reSubmittedAt.map(Instant.ofEpochMilli),
+        redirectUrl,
         SelectIndividualFailuresForm.form
       ))
 
   def submitIndividualFailures(
     personReference: PersonReference,
-    reSubmittedAt: Option[Long]
+    reSubmittedAt: Option[Long],
+    redirectUrl: String
   ): Action[AnyContent] = defaultActionBuilder.async:
     implicit request =>
       val reSubmittedAtInstant = reSubmittedAt.map(Instant.ofEpochMilli)
@@ -356,30 +347,16 @@ extends FrontendControllerBase(mcc):
             Future.successful(BadRequest(selectIndividualFailuresPage(
               personReference,
               reSubmittedAtInstant,
+              redirectUrl,
               formWithErrors
             ))),
           failures =>
+            // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to the application details page.
             testRiskingService.submitIndividualFailures(
               personReference,
               failures,
               reSubmittedAtInstant
-            ).map:
-              case UploadRiskingResultsFileOutcome.Uploaded =>
-                Ok(riskingActionConfirmationPage(
-                  heading = "Risking results submitted",
-                  description =
-                    s"A risking results file has been uploaded for person reference ${personReference.value}. " +
-                      "It won't take effect until results file processing is run."
-                ))
-              case UploadRiskingResultsFileOutcome.AlreadyExists =>
-                val formWithError = SelectIndividualFailuresForm.form
-                  .fill(failures)
-                  .withGlobalError(s"Risking results have already been submitted for person reference ${personReference.value}.")
-                Conflict(selectIndividualFailuresPage(
-                  personReference,
-                  reSubmittedAtInstant,
-                  formWithError
-                ))
+            ).map(_ => Redirect(redirectUrl))
         )
 
   /** Quick action from `SelectIndividualFailuresPage`: submits with no failures at all, i.e. an Approved outcome, without having to manually leave every
