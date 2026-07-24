@@ -71,6 +71,11 @@
     maybeForm = Some(form),
     suppressBackLink = true
 ) {
+    @* Test-only pages suppress TestOnlyLayout's default (JS browser-history) back link, since it doesn't reliably
+     * return to the right page across this tooling's redirect-heavy navigation. `redirectUrl` is already the exact,
+     * known page this link was clicked from, so link straight to it instead. *@
+    <a href="@redirectUrl" class="govuk-back-link">Back</a>
+
     <h1 class="govuk-heading-xl">Select entity failures</h1>
     <p class="govuk-body">Application reference: @applicationReference.value</p>
 
