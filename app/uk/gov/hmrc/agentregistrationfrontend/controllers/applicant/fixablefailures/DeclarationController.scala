@@ -174,7 +174,7 @@ extends FrontendController(mcc, actions):
           individuals = individualsForResubmission,
           arn = arnToEnrolIfApproved,
           isResubmission = true,
-          entityAlreadyApproved = agentApplication.riskingOutcomeEntity.contains(RiskingOutcomeEntity.Approved)
+          entityAlreadyApproved = agentApplication.getRiskingOutcomeEntity === RiskingOutcomeEntity.Approved
         )
         _ <- agentApplicationService.upsert(agentApplication
           .modify(_.applicationState)
