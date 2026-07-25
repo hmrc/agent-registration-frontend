@@ -130,7 +130,8 @@ extends ControllerSpec:
       SubmitForRiskingRequest(
         applicationData = agentApplication.applicationData,
         individuals = individualDataList,
-        isResubmission = false
+        isResubmission = false,
+        entityAlreadyApproved = false
       )
     )
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterAllOtherTasksComplete)
