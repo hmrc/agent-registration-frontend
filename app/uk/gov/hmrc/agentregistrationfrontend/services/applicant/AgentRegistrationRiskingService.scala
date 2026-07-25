@@ -47,12 +47,14 @@ extends RequestAwareLogging:
     agentApplication: AgentApplication,
     individuals: List[IndividualProvidedDetails],
     arn: Option[Arn],
-    isResubmission: Boolean
+    isResubmission: Boolean,
+    entityAlreadyApproved: Boolean
   )(using request: RequestHeader): Future[Unit] =
     val submitForRiskingRequest: SubmitForRiskingRequest = SubmitForRiskingRequest(
       applicationData = makeApplicationData(agentApplication, arn),
       individuals = individuals.map(makeIndividualData),
-      isResubmission = isResubmission
+      isResubmission = isResubmission,
+      entityAlreadyApproved = entityAlreadyApproved
     )
 
     for

@@ -20,6 +20,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistration.shared.risking.submitforrisking.ApplicationData
 import uk.gov.hmrc.agentregistration.shared.risking.submitforrisking.SubmitForRiskingRequest
@@ -111,7 +112,8 @@ extends ControllerSpec:
       SubmitForRiskingRequest(
         applicationData = applicationData,
         individuals = List(tdAll.providedDetails.individualData),
-        isResubmission = true
+        isResubmission = true,
+        entityAlreadyApproved = false
       )
     )
     val response: WSResponse = post(path)(Map("submit" -> Seq("AcceptAndSend")))
@@ -121,4 +123,32 @@ extends ControllerSpec:
       AppRoutes.apply.AgentApplicationController.applicationStatus.url
     )
     ApplyStubHelper.verifyConnectorsForUpdatingApplication(agentApplication.afterResubmitted)
+    AgentRegistrationRiskingStubs.verifySubmitAgentApplication()
+
+  s"POST $path when entity outcome was Approved should send entityAlreadyApproved = true" in:
+    val approvedEntityWithFixedIndividuals: AgentApplicationLlp = agentApplication.riskingCompletedFixableFixed.copy(riskingOutcomeEntity =
+      Some(RiskingOutcomeEntity.Approved)
+    )
+    val afterResubmittedApprovedEntity: AgentApplicationLlp = agentApplication.afterResubmitted.copy(riskingOutcomeEntity = Some(RiskingOutcomeEntity.Approved))
+
+    ApplyStubHelper.stubsForUpdatingApplication(
+      application = approvedEntityWithFixedIndividuals,
+      updatedApplication = afterResubmittedApprovedEntity,
+      individuals = fixedIndividuals
+    )
+    AgentRegistrationRiskingStubs.stubSubmitAgentApplication(
+      SubmitForRiskingRequest(
+        applicationData = applicationData,
+        individuals = List(tdAll.providedDetails.individualData),
+        isResubmission = true,
+        entityAlreadyApproved = true
+      )
+    )
+    val response: WSResponse = post(path)(Map("submit" -> Seq("AcceptAndSend")))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location") shouldBe Some(
+      AppRoutes.apply.AgentApplicationController.applicationStatus.url
+    )
+    ApplyStubHelper.verifyConnectorsForUpdatingApplication(afterResubmittedApprovedEntity)
     AgentRegistrationRiskingStubs.verifySubmitAgentApplication()
