@@ -16,8 +16,13 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
+import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.PersonReference
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 
 import java.time.Instant
 import java.time.ZoneOffset
@@ -35,16 +40,84 @@ import java.time.format.DateTimeFormatter
   */
 object TestRiskingResultsFilename:
 
+  /** All filenames ever submitted for a given entity/individual (oldest — the canonical, no-suffix round-1 name — first), plus which one of them is the
+    * filename the application's current state would actually use/expect next.
+    */
+  final case class RiskingResultFiles(
+    all: Seq[RiskingResultsFilename],
+    current: RiskingResultsFilename
+  )
+
   private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("uuuuMMdd'T'HHmmssSSS'Z'").withZone(ZoneOffset.UTC)
 
-  def entity(
+  /** The filename the entity's current round of risking results is/would be submitted under, derived entirely from the application's own persisted state: the
+    * canonical (no-suffix) name unless the entity is currently FailedFixable and a real resubmission (`RiskingOutcomeApplication.FailedFixable.reSubmittedAt`)
+    * has happened, in which case that resubmission's own timestamp is used.
+    */
+  def entity(agentApplication: AgentApplication): RiskingResultsFilename = entity(
+    agentApplication.applicationReference,
+    currentReSubmittedAtFor(agentApplication.riskingOutcomeEntity.exists(isFailedFixable), agentApplication)
+  )
+
+  /** As [[entity]], but for one of the application's individuals. */
+  def individual(
+    individualProvidedDetails: IndividualProvidedDetails,
+    agentApplication: AgentApplication
+  ): RiskingResultsFilename = individual(
+    individualProvidedDetails.personReference,
+    currentReSubmittedAtFor(individualProvidedDetails.riskingOutcomeIndividual.exists(isFailedFixable), agentApplication)
+  )
+
+  /** Every filename submitted so far for this entity (any round), oldest first, plus which one is current. */
+  def entityFiles(
+    agentApplication: AgentApplication,
+    submittedRiskingResultsFilenames: Set[RiskingResultsFilename]
+  ): RiskingResultFiles =
+    val canonicalName = entity(agentApplication.applicationReference, None)
+    RiskingResultFiles(
+      all = submittedRiskingResultsFilenames.filter(_.value.startsWith(canonicalName.value)).toSeq.sortBy(_.value),
+      current = entity(agentApplication)
+    )
+
+  /** Every filename submitted so far for this individual (any round), oldest first, plus which one is current. */
+  def individualFiles(
+    individualProvidedDetails: IndividualProvidedDetails,
+    agentApplication: AgentApplication,
+    submittedRiskingResultsFilenames: Set[RiskingResultsFilename]
+  ): RiskingResultFiles =
+    val canonicalName = individual(individualProvidedDetails.personReference, None)
+    RiskingResultFiles(
+      all = submittedRiskingResultsFilenames.filter(_.value.startsWith(canonicalName.value)).toSeq.sortBy(_.value),
+      current = individual(individualProvidedDetails, agentApplication)
+    )
+
+  private def isFailedFixable(outcome: RiskingOutcomeEntity): Boolean =
+    outcome match
+      case _: RiskingOutcomeEntity.FailedFixable => true
+      case _ => false
+
+  private def isFailedFixable(outcome: RiskingOutcomeIndividual): Boolean =
+    outcome match
+      case _: RiskingOutcomeIndividual.FailedFixable => true
+      case _ => false
+
+  private def currentReSubmittedAtFor(
+    wasFailedFixable: Boolean,
+    agentApplication: AgentApplication
+  ): Option[Instant] =
+    if wasFailedFixable then
+      agentApplication.riskingOutcomeApplication.collect { case f: RiskingOutcomeApplication.FailedFixable => f.reSubmittedAt }.flatten
+    else
+      None
+
+  private def entity(
     applicationReference: ApplicationReference,
     reSubmittedAt: Option[Instant]
-  ): String = s"test-only-entity-${applicationReference.value}${suffix(reSubmittedAt)}"
+  ): RiskingResultsFilename = RiskingResultsFilename(s"test-only-entity-${applicationReference.value}${suffix(reSubmittedAt)}")
 
-  def individual(
+  private def individual(
     personReference: PersonReference,
     reSubmittedAt: Option[Instant]
-  ): String = s"test-only-individual-${personReference.value}${suffix(reSubmittedAt)}"
+  ): RiskingResultsFilename = RiskingResultsFilename(s"test-only-individual-${personReference.value}${suffix(reSubmittedAt)}")
 
   private def suffix(reSubmittedAt: Option[Instant]): String = reSubmittedAt.map(instant => s"-${formatter.format(instant)}").getOrElse("")

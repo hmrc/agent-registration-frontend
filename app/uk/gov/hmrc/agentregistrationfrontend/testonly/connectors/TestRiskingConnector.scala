@@ -21,6 +21,7 @@ import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsFilename
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UploadRiskingResultsFileOutcome
 import uk.gov.hmrc.http.client.HttpClientV2
 
@@ -177,14 +178,14 @@ extends Connector:
             )
       .andLogOnFailure("Failed to run results file processing")
 
-  def listSubmittedRiskingResultsFilenames()(using RequestHeader): Future[Set[String]] =
+  def listSubmittedRiskingResultsFilenames()(using RequestHeader): Future[Set[RiskingResultsFilename]] =
     val url: URL = url"${appConfig.agentRegistrationRiskingBaseUrl}/files-available/list/informationTypePlaceholder"
     httpClient
       .get(url)
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case status if is2xx(status) => response.json.as[Seq[JsValue]].map(file => (file \ "filename").as[String]).toSet
+          case status if is2xx(status) => response.json.as[Seq[JsValue]].map(file => RiskingResultsFilename((file \ "filename").as[String])).toSet
           case status =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "GET",
@@ -194,8 +195,8 @@ extends Connector:
             )
       .andLogOnFailure("Failed to list submitted risking results filenames")
 
-  def viewRiskingResultsFile(filename: String)(using RequestHeader): Future[Option[String]] =
-    val url: URL = url"$baseUrl/risking-results-file/$filename"
+  def viewRiskingResultsFile(filename: RiskingResultsFilename)(using RequestHeader): Future[Option[String]] =
+    val url: URL = url"$baseUrl/risking-results-file/${filename.value}"
     httpClient
       .get(url)
       .execute[HttpResponse]
@@ -210,13 +211,13 @@ extends Connector:
               status = status,
               response = response
             )
-      .andLogOnFailure(s"Failed to view risking results file: $filename")
+      .andLogOnFailure(s"Failed to view risking results file: ${filename.value}")
 
   def uploadRiskingResultsFile(
-    filename: String,
+    filename: RiskingResultsFilename,
     body: JsValue
   )(using RequestHeader): Future[UploadRiskingResultsFileOutcome] =
-    val url: URL = url"$baseUrl/risking-results-file/$filename"
+    val url: URL = url"$baseUrl/risking-results-file/${filename.value}"
     httpClient
       .post(url)
       .withBody(body)
@@ -232,6 +233,6 @@ extends Connector:
               status = status,
               response = response
             )
-      .andLogOnFailure(s"Failed to upload risking results file: $filename")
+      .andLogOnFailure(s"Failed to upload risking results file: ${filename.value}")
 
   private val baseUrl: String = appConfig.agentRegistrationRiskingBaseUrl + "/agent-registration-risking/test-only"

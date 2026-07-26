@@ -32,6 +32,7 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendContr
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestRiskingResultsFilename
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowRecentApplicationsPage
@@ -113,10 +114,22 @@ extends FrontendController(mcc, actions):
         val agentApplication: AgentApplication = request.get[AgentApplication]
         val individuals: List[IndividualProvidedDetails] = request.get[List[IndividualProvidedDetails]]
         testRiskingService.listSubmittedRiskingResultsFilenames().map { submittedRiskingResultsFilenames =>
+          val entityResultFiles = TestRiskingResultsFilename.entityFiles(agentApplication, submittedRiskingResultsFilenames)
+          val individualResultFiles =
+            individuals
+              .map(individual =>
+                individual.personReference -> TestRiskingResultsFilename.individualFiles(
+                  individual,
+                  agentApplication,
+                  submittedRiskingResultsFilenames
+                )
+              )
+              .toMap
           Ok(showAgentApplicationsTilePage(
             agentApplication,
             individuals,
-            submittedRiskingResultsFilenames
+            entityResultFiles,
+            individualResultFiles
           ))
         }
 

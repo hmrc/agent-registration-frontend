@@ -16,11 +16,13 @@
 
 @import play.api.i18n.Messages
 @import play.twirl.api.Html
+@import uk.gov.hmrc.agentregistration.shared.ApplicationState
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 @import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
+@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestRiskingResultsFilename
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
@@ -39,9 +41,8 @@
 
 @(
         individual: IndividualProvidedDetails,
-        isSentToMinerva: Boolean,
-        reSubmittedAt: Option[Instant],
-        submittedRiskingResultsFilenames: Set[String])(implicit
+        applicationState: ApplicationState,
+        resultFiles: TestRiskingResultsFilename.RiskingResultFiles)(implicit
         requestHeader: RequestHeader
 )
 
@@ -54,12 +55,17 @@
         case _ => false
     }
 }
-@individualResultsFilename = @{
-    TestRiskingResultsFilename.individual(individual.personReference, if (individualWasFailedFixable) reSubmittedAt else None)
-}
-@isIndividualResultsFileSubmitted = @{submittedRiskingResultsFilenames.contains(individualResultsFilename)}
 
-@reSubmittedAtMillis = @{reSubmittedAt.map(_.toEpochMilli)}
+@filesList(files: TestRiskingResultsFilename.RiskingResultFiles) = {
+    <ul class="govuk-list govuk-!-margin-bottom-2">
+        @files.all.map { filename =>
+            <li>
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(filename)">@filename.value</a>@if(filename === files.current) {<strong> (current)</strong>}
+            </li>
+        }
+    </ul>
+}
+
 @individualCardId = @{s"individual-${individual.personReference.value}"}
 @redirectUrlWithAnchor = @{s"${requestHeader.uri}#$individualCardId"}
 
@@ -157,22 +163,34 @@
 }
 
 @manageRiskingResultsLinks = {
-    @if(isIndividualResultsFileSubmitted) {
-        @compactLink(
-            label = "View submitted individual risking results file",
-            url = AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(individualResultsFilename)
-        )
-    } else if (isSentToMinerva) {
-        <p class="govuk-hint govuk-!-margin-bottom-2">Emulate uploading risking results from Minerva</p>
-        <p class="govuk-body govuk-!-margin-bottom-1">
-            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference, reSubmittedAtMillis, redirectUrlWithAnchor)">Choose individual failures</a>
-            or just quickly
-            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, redirectUrlWithAnchor, reSubmittedAtMillis)">approve</a>,
-            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, redirectUrlWithAnchor, reSubmittedAtMillis)">fail-fixable</a>,
-            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresMixed(individual.personReference, redirectUrlWithAnchor, reSubmittedAtMillis)">fail-non-fixable</a>
-        </p>
-    } else {
-        <span class="govuk-hint">Only available once the application is SentToMinerva</span>
+    @applicationState match {
+        case ApplicationState.SentToMinerva if resultFiles.all.isEmpty => {
+            <p class="govuk-hint govuk-!-margin-bottom-2">Emulate uploading risking results from Minerva</p>
+            <p class="govuk-body govuk-!-margin-bottom-1">
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference, resultFiles.current, redirectUrlWithAnchor)">Choose individual failures</a>
+                or just quickly
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, redirectUrlWithAnchor, resultFiles.current)">approve</a>,
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, redirectUrlWithAnchor, resultFiles.current)">fail-fixable</a>,
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresMixed(individual.personReference, redirectUrlWithAnchor, resultFiles.current)">fail-non-fixable</a>
+            </p>
+        }
+        case ApplicationState.RiskingCompleted if individualWasFailedFixable && resultFiles.all.size <= 1 => {
+            @filesList(resultFiles)
+            <p class="govuk-hint govuk-!-margin-bottom-2">Risking has completed and this individual is still Failed (fixable) — define a new round of results without a real resubmission</p>
+            <p class="govuk-body govuk-!-margin-bottom-1">
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference, resultFiles.current, redirectUrlWithAnchor)">Choose individual failures</a>
+                or just quickly
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, redirectUrlWithAnchor, resultFiles.current)">approve</a>,
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, redirectUrlWithAnchor, resultFiles.current)">fail-fixable</a>,
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresMixed(individual.personReference, redirectUrlWithAnchor, resultFiles.current)">fail-non-fixable</a>
+            </p>
+        }
+        case ApplicationState.SentToMinerva | ApplicationState.RiskingCompleted if resultFiles.all.nonEmpty => {
+            @filesList(resultFiles)
+        }
+        case _ => {
+            <span class="govuk-hint">Only available once the application is SentToMinerva, or RiskingCompleted with this individual still Failed (fixable)</span>
+        }
     }
 }
 

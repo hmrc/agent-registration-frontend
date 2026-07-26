@@ -40,3 +40,4 @@ object RoutesExports:
 
   export uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
   export uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
+  export uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsFilename

@@ -34,6 +34,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.forms.SelectIndividualFail
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.EntityRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.IndividualRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsFilename
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.action.TestOnlyActions
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
@@ -45,7 +46,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.RiskingActionCo
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectEntityFailuresPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectIndividualFailuresPage
 
-import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
@@ -173,11 +173,11 @@ extends FrontendControllerBase(mcc):
     implicit request =>
       testRiskingService.viewNextRiskingFileContents().map(Ok(_))
 
-  def showRiskingResultsFile(filename: String): Action[AnyContent] = action.async:
+  def showRiskingResultsFile(filename: RiskingResultsFilename): Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.viewRiskingResultsFile(filename).map:
         case Some(content) => Ok(content)
-        case None => Ok(s"No risking results file found for filename: $filename")
+        case None => Ok(s"No risking results file found for filename: ${filename.value}")
 
   def showApplicationForRisking(applicationReference: ApplicationReference): Action[AnyContent] = action.async:
     implicit request =>
@@ -205,32 +205,31 @@ extends FrontendControllerBase(mcc):
 
   def showSelectEntityFailures(
     applicationReference: ApplicationReference,
-    reSubmittedAt: Option[Long],
+    fileName: RiskingResultsFilename,
     redirectUrl: String
   ): Action[AnyContent] =
     getApplication(applicationReference):
       implicit request =>
         Ok(selectEntityFailuresPage(
           applicationReference,
-          reSubmittedAt.map(Instant.ofEpochMilli),
+          fileName,
           redirectUrl,
           SelectEntityFailuresForm(request.agentApplication)
         ))
 
   def submitEntityFailures(
     applicationReference: ApplicationReference,
-    reSubmittedAt: Option[Long],
+    fileName: RiskingResultsFilename,
     redirectUrl: String
   ): Action[AnyContent] = getApplication(applicationReference).async:
     implicit request =>
-      val reSubmittedAtInstant = reSubmittedAt.map(Instant.ofEpochMilli)
       SelectEntityFailuresForm(request.agentApplication)
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future.successful(BadRequest(selectEntityFailuresPage(
               applicationReference,
-              reSubmittedAtInstant,
+              fileName,
               redirectUrl,
               formWithErrors
             ))),
@@ -239,7 +238,7 @@ extends FrontendControllerBase(mcc):
             testRiskingService.submitEntityFailures(
               applicationReference,
               failures,
-              reSubmittedAtInstant
+              fileName
             ).map(_ => Redirect(redirectUrl))
         )
 
@@ -249,28 +248,28 @@ extends FrontendControllerBase(mcc):
   def submitEntityFailuresApproved(
     applicationReference: ApplicationReference,
     redirectUrl: String,
-    reSubmittedAt: Option[Long]
+    fileName: RiskingResultsFilename
   ): Action[AnyContent] = action.async:
     implicit request =>
       submitEntityFailuresQuickAction(
         applicationReference,
         Seq.empty,
         redirectUrl,
-        reSubmittedAt
+        fileName
       )
 
   /** Quick action: submits a single fixable failure, i.e. a FailedFixable outcome. */
   def submitEntityFailuresFixable(
     applicationReference: ApplicationReference,
     redirectUrl: String,
-    reSubmittedAt: Option[Long]
+    fileName: RiskingResultsFilename
   ): Action[AnyContent] = getApplication(applicationReference).async:
     implicit request =>
       submitEntityFailuresQuickAction(
         applicationReference,
         randomFixableEntityFailures(1 + Random.nextInt(3), request.agentApplication),
         redirectUrl,
-        reSubmittedAt
+        fileName
       )
 
   /** Quick action: submits a mix of one fixable and one non-fixable failure, i.e. a FailedNonFixable outcome whose failures still include a fixable one bundled
@@ -279,27 +278,27 @@ extends FrontendControllerBase(mcc):
   def submitEntityFailuresMixed(
     applicationReference: ApplicationReference,
     redirectUrl: String,
-    reSubmittedAt: Option[Long]
+    fileName: RiskingResultsFilename
   ): Action[AnyContent] = getApplication(applicationReference).async:
     implicit request =>
       submitEntityFailuresQuickAction(
         applicationReference,
         randomNonFixableEntityFailures(request.agentApplication),
         redirectUrl,
-        reSubmittedAt
+        fileName
       )
 
   private def submitEntityFailuresQuickAction(
     applicationReference: ApplicationReference,
     failures: Seq[EntityRiskingFailure],
     redirectUrl: String,
-    reSubmittedAt: Option[Long]
+    fileName: RiskingResultsFilename
   )(using RequestHeader): Future[Result] =
     // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to where the link was clicked from.
     testRiskingService.submitEntityFailures(
       applicationReference,
       failures,
-      reSubmittedAt.map(Instant.ofEpochMilli)
+      fileName
     ).map(_ => Redirect(redirectUrl))
 
   /** A random non-empty subset (1 to 3) of the fixable entity checks, so repeated clicks of the "fail-fixable" quick action produce varied test data instead of
@@ -335,31 +334,30 @@ extends FrontendControllerBase(mcc):
 
   def showSelectIndividualFailures(
     personReference: PersonReference,
-    reSubmittedAt: Option[Long],
+    fileName: RiskingResultsFilename,
     redirectUrl: String
   ): Action[AnyContent] = action:
     implicit request =>
       Ok(selectIndividualFailuresPage(
         personReference,
-        reSubmittedAt.map(Instant.ofEpochMilli),
+        fileName,
         redirectUrl,
         SelectIndividualFailuresForm.form
       ))
 
   def submitIndividualFailures(
     personReference: PersonReference,
-    reSubmittedAt: Option[Long],
+    fileName: RiskingResultsFilename,
     redirectUrl: String
   ): Action[AnyContent] = action.async:
     implicit request =>
-      val reSubmittedAtInstant = reSubmittedAt.map(Instant.ofEpochMilli)
       SelectIndividualFailuresForm.form
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future.successful(BadRequest(selectIndividualFailuresPage(
               personReference,
-              reSubmittedAtInstant,
+              fileName,
               redirectUrl,
               formWithErrors
             ))),
@@ -368,7 +366,7 @@ extends FrontendControllerBase(mcc):
             testRiskingService.submitIndividualFailures(
               personReference,
               failures,
-              reSubmittedAtInstant
+              fileName
             ).map(_ => Redirect(redirectUrl))
         )
 
@@ -378,28 +376,28 @@ extends FrontendControllerBase(mcc):
   def submitIndividualFailuresApproved(
     personReference: PersonReference,
     redirectUrl: String,
-    reSubmittedAt: Option[Long]
+    fileName: RiskingResultsFilename
   ): Action[AnyContent] = action.async:
     implicit request =>
       submitIndividualFailuresQuickAction(
         personReference,
         Seq.empty,
         redirectUrl,
-        reSubmittedAt
+        fileName
       )
 
   /** Quick action from `SelectIndividualFailuresPage`: submits a single fixable failure, i.e. a FailedFixable outcome. */
   def submitIndividualFailuresFixable(
     personReference: PersonReference,
     redirectUrl: String,
-    reSubmittedAt: Option[Long]
+    fileName: RiskingResultsFilename
   ): Action[AnyContent] = action.async:
     implicit request =>
       submitIndividualFailuresQuickAction(
         personReference,
         randomFixableIndividualFailures(),
         redirectUrl,
-        reSubmittedAt
+        fileName
       )
 
   /** Quick action from `SelectIndividualFailuresPage`: submits a mix of one fixable and one non-fixable failure, i.e. a FailedNonFixable outcome whose failures
@@ -408,27 +406,27 @@ extends FrontendControllerBase(mcc):
   def submitIndividualFailuresMixed(
     personReference: PersonReference,
     redirectUrl: String,
-    reSubmittedAt: Option[Long]
+    fileName: RiskingResultsFilename
   ): Action[AnyContent] = action.async:
     implicit request =>
       submitIndividualFailuresQuickAction(
         personReference,
         randomNonFixableIndividualFailures(),
         redirectUrl,
-        reSubmittedAt
+        fileName
       )
 
   private def submitIndividualFailuresQuickAction(
     personReference: PersonReference,
     failures: Seq[IndividualRiskingFailure],
     redirectUrl: String,
-    reSubmittedAt: Option[Long]
+    fileName: RiskingResultsFilename
   )(using RequestHeader): Future[Result] =
     // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to where the link was clicked from.
     testRiskingService.submitIndividualFailures(
       personReference,
       failures,
-      reSubmittedAt.map(Instant.ofEpochMilli)
+      fileName
     ).map(_ => Redirect(redirectUrl))
 
   /** A random non-empty subset (1 to 3) of the fixable individual checks, so repeated clicks of the "fail-fixable" quick action produce varied test data
