@@ -94,7 +94,8 @@ extends FrontendController(mcc, actions):
                 Some(bpr.getAgentReferenceNumber)
               else
                 None,
-            isResubmission = false
+            isResubmission = false,
+            entityAlreadyApproved = false
           )
           _ <- agentApplicationService
             .upsert(

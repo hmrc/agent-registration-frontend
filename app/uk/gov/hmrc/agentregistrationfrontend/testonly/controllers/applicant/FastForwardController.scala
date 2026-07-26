@@ -173,7 +173,8 @@ extends FrontendController(mcc, applicantActions):
         agentApplication = agentApplication,
         individuals = individuals,
         arn = None,
-        isResubmission = false
+        isResubmission = false,
+        entityAlreadyApproved = false
       )
     else Future.unit
 
