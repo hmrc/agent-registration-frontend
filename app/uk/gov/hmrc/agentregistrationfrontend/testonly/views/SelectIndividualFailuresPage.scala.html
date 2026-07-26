@@ -73,7 +73,7 @@
     <h1 class="govuk-heading-xl">Select individual failures</h1>
     <p class="govuk-body">Person reference: @personReference.value</p>
 
-    @formWithCSRF(action = AppRoutes.testOnly.TestOnlyController.submitIndividualFailures(personReference, fileName, redirectUrl)) {
+    @formWithCSRF(action = AppRoutes.testOnly.TestOnlyController.submitIndividualFailures(personReference, fileName)) {
         <h2 class="govuk-heading-l">Fixable failures</h2>
         @groupedByCheckId(IndividualRiskingFailure.values.toIndexedSeq.filter(_.fixable)).map { case (checkId, failures) =>
             @checkboxGroup(s"individual-failures-fixable-$checkId", checkId, failures.head.checkDescription, failures)

@@ -169,9 +169,9 @@
             <p class="govuk-body govuk-!-margin-bottom-1">
                 <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference, resultFiles.current, redirectUrlWithAnchor)">Choose individual failures</a>
                 or just quickly
-                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, redirectUrlWithAnchor, resultFiles.current)">approve</a>,
-                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, redirectUrlWithAnchor, resultFiles.current)">fail-fixable</a>,
-                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresMixed(individual.personReference, redirectUrlWithAnchor, resultFiles.current)">fail-non-fixable</a>
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, resultFiles.current)">approve</a>,
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, resultFiles.current)">fail-fixable</a>,
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresNonFixable(individual.personReference, resultFiles.current)">fail-non-fixable</a>
             </p>
         }
         case ApplicationState.RiskingCompleted if individualWasFailedFixable && resultFiles.all.size <= 1 => {
@@ -180,9 +180,9 @@
             <p class="govuk-body govuk-!-margin-bottom-1">
                 <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference, resultFiles.current, redirectUrlWithAnchor)">Choose individual failures</a>
                 or just quickly
-                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, redirectUrlWithAnchor, resultFiles.current)">approve</a>,
-                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, redirectUrlWithAnchor, resultFiles.current)">fail-fixable</a>,
-                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresMixed(individual.personReference, redirectUrlWithAnchor, resultFiles.current)">fail-non-fixable</a>
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, resultFiles.current)">approve</a>,
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, resultFiles.current)">fail-fixable</a>,
+                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresNonFixable(individual.personReference, resultFiles.current)">fail-non-fixable</a>
             </p>
         }
         case ApplicationState.SentToMinerva | ApplicationState.RiskingCompleted if resultFiles.all.nonEmpty => {

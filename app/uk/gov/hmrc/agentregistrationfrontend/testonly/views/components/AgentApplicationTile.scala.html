@@ -297,9 +297,9 @@
                         <p class="govuk-body govuk-!-margin-bottom-1">
                             <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference, entityResultFiles.current, redirectUrlWithAnchor)">Choose entity failures</a>
                             or just quickly
-                            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresApproved(agentApplication.applicationReference, redirectUrlWithAnchor, entityResultFiles.current)">approve</a>,
-                            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresFixable(agentApplication.applicationReference, redirectUrlWithAnchor, entityResultFiles.current)">fail-fixable</a>,
-                            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresMixed(agentApplication.applicationReference, redirectUrlWithAnchor, entityResultFiles.current)">fail-non-fixable</a>
+                            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresApproved(agentApplication.applicationReference, entityResultFiles.current)">approve</a>,
+                            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresFixable(agentApplication.applicationReference, entityResultFiles.current)">fail-fixable</a>,
+                            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresNonFixable(agentApplication.applicationReference, entityResultFiles.current)">fail-non-fixable</a>
                         </p>
                     }
                     case ApplicationState.RiskingCompleted if entityWasFailedFixable && entityResultFiles.all.size <= 1 => {
@@ -308,9 +308,9 @@
                         <p class="govuk-body govuk-!-margin-bottom-1">
                             <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference, entityResultFiles.current, redirectUrlWithAnchor)">Choose entity failures</a>
                             or just quickly
-                            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresApproved(agentApplication.applicationReference, redirectUrlWithAnchor, entityResultFiles.current)">approve</a>,
-                            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresFixable(agentApplication.applicationReference, redirectUrlWithAnchor, entityResultFiles.current)">fail-fixable</a>,
-                            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresMixed(agentApplication.applicationReference, redirectUrlWithAnchor, entityResultFiles.current)">fail-non-fixable</a>
+                            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresApproved(agentApplication.applicationReference, entityResultFiles.current)">approve</a>,
+                            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresFixable(agentApplication.applicationReference, entityResultFiles.current)">fail-fixable</a>,
+                            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresNonFixable(agentApplication.applicationReference, entityResultFiles.current)">fail-non-fixable</a>
                         </p>
                     }
                     case ApplicationState.SentToMinerva | ApplicationState.RiskingCompleted if entityResultFiles.all.nonEmpty => {
