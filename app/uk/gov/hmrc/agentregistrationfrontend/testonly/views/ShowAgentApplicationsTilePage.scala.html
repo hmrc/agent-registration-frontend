@@ -17,9 +17,8 @@
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyLayout
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
-@import uk.gov.hmrc.agentregistration.shared.PersonReference
 @import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestRiskingResultsFilename
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsFilename
 
 @this(
         appConfig: AppConfig,
@@ -30,8 +29,7 @@
 @(
         agentApplication: AgentApplication,
         individuals: List[IndividualProvidedDetails],
-        entityResultFiles: TestRiskingResultsFilename.RiskingResultFiles,
-        individualResultFiles: Map[PersonReference, TestRiskingResultsFilename.RiskingResultFiles])(implicit
+        submittedRiskingResultsFilenames: List[RiskingResultsFilename])(implicit
         request: RequestHeader,
         messages: Messages
 )
@@ -46,7 +44,7 @@
 
             <h1 class="govuk-heading-l">Agent Application Details</h1>
 
-            @agentApplicationTile(agentApplication, individuals, entityResultFiles, individualResultFiles)
+            @agentApplicationTile(agentApplication, individuals, submittedRiskingResultsFilenames)
 
         </div>
     </div>

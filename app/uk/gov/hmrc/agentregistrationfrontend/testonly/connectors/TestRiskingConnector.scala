@@ -178,14 +178,14 @@ extends Connector:
             )
       .andLogOnFailure("Failed to run results file processing")
 
-  def listSubmittedRiskingResultsFilenames()(using RequestHeader): Future[Set[RiskingResultsFilename]] =
+  def listSubmittedRiskingResultsFilenames()(using RequestHeader): Future[List[RiskingResultsFilename]] =
     val url: URL = url"${appConfig.agentRegistrationRiskingBaseUrl}/files-available/list/informationTypePlaceholder"
     httpClient
       .get(url)
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case status if is2xx(status) => response.json.as[Seq[JsValue]].map(file => RiskingResultsFilename((file \ "filename").as[String])).toSet
+          case status if is2xx(status) => response.json.as[Seq[JsValue]].map(file => RiskingResultsFilename((file \ "filename").as[String])).toList
           case status =>
             Errors.throwUpstreamErrorResponse(
               httpMethod = "GET",

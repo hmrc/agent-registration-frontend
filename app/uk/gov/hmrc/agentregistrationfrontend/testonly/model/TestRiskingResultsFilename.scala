@@ -17,8 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.testonly.model
 
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.ApplicationReference
-import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
@@ -34,19 +32,8 @@ import java.time.format.DateTimeFormatter
   * the application is resubmitted after a FailedFixable risking outcome (`RiskingOutcomeApplication.FailedFixable.reSubmittedAt`), a *new* filename is needed
   * so a second results file can be uploaded — but only for the entity/individual(s) that were actually FailedFixable last time; anything already Approved keeps
   * pointing at its original (already-submitted) filename, since there's nothing new to send for it.
-  *
-  * `reSubmittedAt` is used as the filename suffix itself rather than "now" at submit time, so the expected filename for the current cycle can be computed
-  * identically wherever it's needed (view rendering, submission) without listing and parsing existing filenames to find "the latest".
   */
 object TestRiskingResultsFilename:
-
-  /** All filenames ever submitted for a given entity/individual (oldest — the canonical, no-suffix round-1 name — first), plus which one of them is the
-    * filename the application's current state would actually use/expect next.
-    */
-  final case class RiskingResultFiles(
-    all: Seq[RiskingResultsFilename],
-    current: RiskingResultsFilename
-  )
 
   private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("uuuuMMdd'T'HHmmssSSS'Z'").withZone(ZoneOffset.UTC)
 
@@ -54,42 +41,17 @@ object TestRiskingResultsFilename:
     * canonical (no-suffix) name unless the entity is currently FailedFixable and a real resubmission (`RiskingOutcomeApplication.FailedFixable.reSubmittedAt`)
     * has happened, in which case that resubmission's own timestamp is used.
     */
-  def entity(agentApplication: AgentApplication): RiskingResultsFilename = entity(
-    agentApplication.applicationReference,
-    currentReSubmittedAtFor(agentApplication.riskingOutcomeEntity.exists(isFailedFixable), agentApplication)
-  )
+  def entity(agentApplication: AgentApplication): RiskingResultsFilename =
+    val reSubmittedAt = currentReSubmittedAtFor(agentApplication.riskingOutcomeEntity.exists(isFailedFixable), agentApplication)
+    RiskingResultsFilename(s"test-only-entity-${agentApplication.applicationReference.value}${suffix(reSubmittedAt)}")
 
   /** As [[entity]], but for one of the application's individuals. */
   def individual(
     individualProvidedDetails: IndividualProvidedDetails,
     agentApplication: AgentApplication
-  ): RiskingResultsFilename = individual(
-    individualProvidedDetails.personReference,
-    currentReSubmittedAtFor(individualProvidedDetails.riskingOutcomeIndividual.exists(isFailedFixable), agentApplication)
-  )
-
-  /** Every filename submitted so far for this entity (any round), oldest first, plus which one is current. */
-  def entityFiles(
-    agentApplication: AgentApplication,
-    submittedRiskingResultsFilenames: Set[RiskingResultsFilename]
-  ): RiskingResultFiles =
-    val canonicalName = entity(agentApplication.applicationReference, None)
-    RiskingResultFiles(
-      all = submittedRiskingResultsFilenames.filter(_.value.startsWith(canonicalName.value)).toSeq.sortBy(_.value),
-      current = entity(agentApplication)
-    )
-
-  /** Every filename submitted so far for this individual (any round), oldest first, plus which one is current. */
-  def individualFiles(
-    individualProvidedDetails: IndividualProvidedDetails,
-    agentApplication: AgentApplication,
-    submittedRiskingResultsFilenames: Set[RiskingResultsFilename]
-  ): RiskingResultFiles =
-    val canonicalName = individual(individualProvidedDetails.personReference, None)
-    RiskingResultFiles(
-      all = submittedRiskingResultsFilenames.filter(_.value.startsWith(canonicalName.value)).toSeq.sortBy(_.value),
-      current = individual(individualProvidedDetails, agentApplication)
-    )
+  ): RiskingResultsFilename =
+    val reSubmittedAt = currentReSubmittedAtFor(individualProvidedDetails.riskingOutcomeIndividual.exists(isFailedFixable), agentApplication)
+    RiskingResultsFilename(s"test-only-individual-${individualProvidedDetails.personReference.value}${suffix(reSubmittedAt)}")
 
   private def isFailedFixable(outcome: RiskingOutcomeEntity): Boolean =
     outcome match
@@ -109,15 +71,5 @@ object TestRiskingResultsFilename:
       agentApplication.riskingOutcomeApplication.collect { case f: RiskingOutcomeApplication.FailedFixable => f.reSubmittedAt }.flatten
     else
       None
-
-  private def entity(
-    applicationReference: ApplicationReference,
-    reSubmittedAt: Option[Instant]
-  ): RiskingResultsFilename = RiskingResultsFilename(s"test-only-entity-${applicationReference.value}${suffix(reSubmittedAt)}")
-
-  private def individual(
-    personReference: PersonReference,
-    reSubmittedAt: Option[Instant]
-  ): RiskingResultsFilename = RiskingResultsFilename(s"test-only-individual-${personReference.value}${suffix(reSubmittedAt)}")
 
   private def suffix(reSubmittedAt: Option[Instant]): String = reSubmittedAt.map(instant => s"-${formatter.format(instant)}").getOrElse("")

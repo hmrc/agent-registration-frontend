@@ -44,7 +44,7 @@ class TestRiskingService @Inject() (
 
   def viewNextRiskingFileContents()(using RequestHeader): Future[String] = testRiskingConnector.viewNextRiskingFileContents()
 
-  def listSubmittedRiskingResultsFilenames()(using RequestHeader): Future[Set[RiskingResultsFilename]] =
+  def listSubmittedRiskingResultsFilenames()(using RequestHeader): Future[List[RiskingResultsFilename]] =
     testRiskingConnector.listSubmittedRiskingResultsFilenames()
 
   def viewRiskingResultsFile(
