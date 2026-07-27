@@ -101,6 +101,11 @@
         url = AppRoutes.testOnly.TestOnlyController.runResultsFileProcessing,
         hint = Some("processes results files uploaded via \"Select entity/individual failures\" (standing in for Minerva's reply). Moves applications to RiskingCompleted.")
     )
+    @compactLink(
+        label = "View risking results files",
+        url = AppRoutes.testOnly.TestOnlyController.showSubmittedRiskingResultsFiles,
+        hint = Some("every risking results file currently held by the test-only stub in the risking microservice, across all applications")
+    )
     @if(appConfig.TestOnly.allowResetDatabase) {
         <h2 class="govuk-heading-m govuk-!-margin-top-6">
             Danger zone

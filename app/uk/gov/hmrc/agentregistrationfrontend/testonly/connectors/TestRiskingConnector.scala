@@ -195,6 +195,23 @@ extends Connector:
             )
       .andLogOnFailure("Failed to list submitted risking results filenames")
 
+  def getUnprocessedAvailableFiles()(using RequestHeader): Future[List[RiskingResultsFilename]] =
+    val url: URL = url"$baseUrl/unprocessed-available-files"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => response.json.as[Seq[JsValue]].map(file => RiskingResultsFilename((file \ "filename").as[String])).toList
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to get unprocessed available files")
+
   def viewRiskingResultsFile(filename: RiskingResultsFilename)(using RequestHeader): Future[Option[String]] =
     val url: URL = url"$baseUrl/risking-results-file/${filename.value}"
     httpClient

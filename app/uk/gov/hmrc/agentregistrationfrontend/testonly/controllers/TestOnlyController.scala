@@ -45,6 +45,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ResetDatabaseCo
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.RiskingActionConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectEntityFailuresPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectIndividualFailuresPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SubmittedRiskingResultsFilesPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -59,6 +60,7 @@ class TestOnlyController @Inject() (
   riskingActionConfirmationPage: RiskingActionConfirmationPage,
   selectEntityFailuresPage: SelectEntityFailuresPage,
   selectIndividualFailuresPage: SelectIndividualFailuresPage,
+  submittedRiskingResultsFilesPage: SubmittedRiskingResultsFilesPage,
   stubUserService: StubUserService,
   testApplicationService: TestApplicationService,
   testRiskingService: TestRiskingService,
@@ -179,6 +181,13 @@ extends FrontendControllerBase(mcc):
         case Some(content) => Ok(content)
         case None => Ok(s"No risking results file found for filename: ${filename.value}")
 
+  def showSubmittedRiskingResultsFiles: Action[AnyContent] = action.async:
+    implicit request =>
+      for
+        filenames <- testRiskingService.listSubmittedRiskingResultsFilenames()
+        unprocessedFilenames <- testRiskingService.getUnprocessedAvailableFiles()
+      yield Ok(submittedRiskingResultsFilesPage(filenames, unprocessedFilenames))
+
   def showApplicationForRisking(applicationReference: ApplicationReference): Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.findApplicationForRisking(applicationReference).map:
@@ -238,7 +247,7 @@ extends FrontendControllerBase(mcc):
               applicationReference,
               failures,
               fileName
-            ).map(_ => Redirect(AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationDetailsByReference(applicationReference)))
+            ).map(_ => Redirect(applicationDetailsUrlWithEntityAnchor(applicationReference)))
         )
 
   /** Quick action: submits with no failures at all, i.e. an Approved outcome, without having to manually leave every checkbox unticked. */
@@ -289,10 +298,24 @@ extends FrontendControllerBase(mcc):
       applicationReference,
       failures,
       fileName
-    ).map(_ => Redirect(AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationDetailsByReference(applicationReference)))
+    ).map(_ => Redirect(applicationDetailsUrlWithEntityAnchor(applicationReference)))
 
   private def applicationDetailsUrl(applicationReference: ApplicationReference): String =
     AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationDetailsByReference(applicationReference).url
+
+  /** Matches the `id` on the entity's Minerva-simulator row in `AgentApplicationTile`, so redirecting here after a quick action scrolls the browser straight
+    * back to it instead of the top of the page.
+    */
+  private def applicationDetailsUrlWithEntityAnchor(applicationReference: ApplicationReference): String =
+    s"${applicationDetailsUrl(applicationReference)}#entity-minerva-simulator"
+
+  /** Matches the `id` on the individual's Minerva-simulator block in `IndividualTile`, so redirecting here after a quick action scrolls the browser straight
+    * back to it instead of the top of the page.
+    */
+  private def applicationDetailsUrlWithIndividualAnchor(
+    applicationReference: ApplicationReference,
+    personReference: PersonReference
+  ): String = s"${applicationDetailsUrl(applicationReference)}#individual-${personReference.value}-minerva-simulator"
 
   /** A random non-empty subset (1 to 3) of the fixable entity checks, so repeated clicks of the "fail-fixable" quick action produce varied test data instead of
     * always the exact same single failure.
@@ -428,7 +451,7 @@ extends FrontendControllerBase(mcc):
   private def redirectToApplicationDetails(
     personReference: PersonReference
   )(using RequestHeader): Future[Result] = applicationReferenceFor(personReference).map: applicationReference =>
-    Redirect(AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationDetailsByReference(applicationReference))
+    Redirect(applicationDetailsUrlWithIndividualAnchor(applicationReference, personReference))
 
   /** A random non-empty subset (1 to 3) of the fixable individual checks, so repeated clicks of the "fail-fixable" quick action produce varied test data
     * instead of always the exact same single failure.

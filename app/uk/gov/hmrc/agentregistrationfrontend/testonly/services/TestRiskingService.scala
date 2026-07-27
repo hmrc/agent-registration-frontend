@@ -47,6 +47,8 @@ class TestRiskingService @Inject() (
   def listSubmittedRiskingResultsFilenames()(using RequestHeader): Future[List[RiskingResultsFilename]] =
     testRiskingConnector.listSubmittedRiskingResultsFilenames()
 
+  def getUnprocessedAvailableFiles()(using RequestHeader): Future[List[RiskingResultsFilename]] = testRiskingConnector.getUnprocessedAvailableFiles()
+
   def viewRiskingResultsFile(
     filename: RiskingResultsFilename
   )(using RequestHeader): Future[Option[String]] = testRiskingConnector.viewRiskingResultsFile(filename)

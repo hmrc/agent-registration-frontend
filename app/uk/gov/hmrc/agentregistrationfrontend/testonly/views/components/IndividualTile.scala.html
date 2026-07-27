@@ -43,7 +43,8 @@
 @(
         individual: IndividualProvidedDetails,
         agentApplication: AgentApplication,
-        submittedRiskingResultsFilenames: List[RiskingResultsFilename])(implicit
+        submittedRiskingResultsFilenames: List[RiskingResultsFilename],
+        unprocessedRiskingResultsFilenames: List[RiskingResultsFilename])(implicit
         requestHeader: RequestHeader
 )
 
@@ -52,7 +53,20 @@
 
 @individualCurrentFilename = @{TestRiskingResultsFilename.individual(individual, agentApplication)}
 
+@individualSubmittedFiles = @{
+    submittedRiskingResultsFilenames.filter(_.value.startsWith(s"test-only-individual-${individual.personReference.value}"))
+}
+
 @individualCurrentFileSubmitted = @{submittedRiskingResultsFilenames.contains(individualCurrentFilename)}
+
+@unprocessedRiskingResultsFilenamesSet = @{unprocessedRiskingResultsFilenames.toSet}
+
+@fileStatusTag(filename: RiskingResultsFilename) = @{
+    if (unprocessedRiskingResultsFilenamesSet.contains(filename))
+        govukTag(Tag(content = Text("Unprocessed"), classes = "govuk-tag--yellow"))
+    else
+        govukTag(Tag(content = Text("Processed"), classes = "govuk-tag--green"))
+}
 
 @individualOutcomeAllowsLinks = @{
     individual.riskingOutcomeIndividual.forall {
@@ -61,7 +75,15 @@
     }
 }
 
+@showIndividualActionLinks = @{
+    agentApplication.applicationState match {
+        case ApplicationState.SentToMinerva => !individualCurrentFileSubmitted && individualOutcomeAllowsLinks
+        case _ => false
+    }
+}
+
 @individualCardId = @{s"individual-${individual.personReference.value}"}
+@individualMinervaSimulatorId = @{s"$individualCardId-minerva-simulator"}
 @redirectUrlWithAnchor = @{s"${requestHeader.uri}#$individualCardId"}
 
 @strongText(value: String) = {<strong>@value</strong>}
@@ -158,27 +180,29 @@
 }
 
 @manageRiskingResultsLinks = {
-    @agentApplication.applicationState match {
-        case ApplicationState.SentToMinerva if individualCurrentFileSubmitted => {
-            @compactLink(
-                label = "View submitted individual risking results file",
-                url = AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(individualCurrentFilename)
-            )
-        }
-        case ApplicationState.SentToMinerva if individualOutcomeAllowsLinks => {
-            <p class="govuk-hint govuk-!-margin-bottom-2">Emulate uploading risking results from Minerva</p>
-            <p class="govuk-body govuk-!-margin-bottom-1">
-                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference, individualCurrentFilename, redirectUrlWithAnchor)">Choose individual failures</a>
-                or just quickly
-                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, individualCurrentFilename)">approve</a>,
-                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, individualCurrentFilename)">fail-fixable</a>,
-                <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresNonFixable(individual.personReference, individualCurrentFilename)">fail-non-fixable</a>
-            </p>
-        }
-        case _ => {
-            <span class="govuk-hint">Only available once the application state is <code>@ApplicationState.SentToMinerva</code> (currently: <code>@agentApplication.applicationState</code>)</span>
-        }
+    <div id="@individualMinervaSimulatorId">
+    @if(showIndividualActionLinks) {
+        <p class="govuk-hint govuk-!-margin-bottom-2">Emulate uploading risking results from Minerva</p>
+        <p class="govuk-body govuk-!-margin-bottom-1">
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference, individualCurrentFilename, redirectUrlWithAnchor)">Choose individual failures</a>
+            or just quickly
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, individualCurrentFilename)">approve</a>,
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, individualCurrentFilename)">fail-fixable</a>,
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresNonFixable(individual.personReference, individualCurrentFilename)">fail-non-fixable</a>
+        </p>
     }
+    @if(individualSubmittedFiles.nonEmpty) {
+        <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Risking results files</h3>
+        <ul class="govuk-list govuk-!-margin-bottom-2">
+            @individualSubmittedFiles.map { filename =>
+                <li>
+                    <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showRiskingResultsFile(filename)"><code>@filename.value</code></a>
+                    @fileStatusTag(filename)
+                </li>
+            }
+        </ul>
+    }
+    </div>
 }
 
 @rows = @{
