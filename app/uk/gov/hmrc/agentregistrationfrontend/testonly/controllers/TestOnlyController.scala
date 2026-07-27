@@ -34,6 +34,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.forms.SelectIndividualFail
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.EntityRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.IndividualRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsFilename
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
 import uk.gov.hmrc.agentregistrationfrontend.testonly.action.TestOnlyActions
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
@@ -45,7 +46,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.RiskingActionCo
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectEntityFailuresPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectIndividualFailuresPage
 
-import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.Future
@@ -173,11 +173,11 @@ extends FrontendControllerBase(mcc):
     implicit request =>
       testRiskingService.viewNextRiskingFileContents().map(Ok(_))
 
-  def showRiskingResultsFile(filename: String): Action[AnyContent] = action.async:
+  def showRiskingResultsFile(filename: RiskingResultsFilename): Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.viewRiskingResultsFile(filename).map:
         case Some(content) => Ok(content)
-        case None => Ok(s"No risking results file found for filename: $filename")
+        case None => Ok(s"No risking results file found for filename: ${filename.value}")
 
   def showApplicationForRisking(applicationReference: ApplicationReference): Action[AnyContent] = action.async:
     implicit request =>
@@ -205,33 +205,31 @@ extends FrontendControllerBase(mcc):
 
   def showSelectEntityFailures(
     applicationReference: ApplicationReference,
-    reSubmittedAt: Option[Long],
+    fileName: RiskingResultsFilename,
     redirectUrl: String
   ): Action[AnyContent] =
     getApplication(applicationReference):
       implicit request =>
         Ok(selectEntityFailuresPage(
           applicationReference,
-          reSubmittedAt.map(Instant.ofEpochMilli),
+          fileName,
           redirectUrl,
           SelectEntityFailuresForm(request.agentApplication)
         ))
 
   def submitEntityFailures(
     applicationReference: ApplicationReference,
-    reSubmittedAt: Option[Long],
-    redirectUrl: String
+    fileName: RiskingResultsFilename
   ): Action[AnyContent] = getApplication(applicationReference).async:
     implicit request =>
-      val reSubmittedAtInstant = reSubmittedAt.map(Instant.ofEpochMilli)
       SelectEntityFailuresForm(request.agentApplication)
         .bindFromRequest()
         .fold(
           formWithErrors =>
             Future.successful(BadRequest(selectEntityFailuresPage(
               applicationReference,
-              reSubmittedAtInstant,
-              redirectUrl,
+              fileName,
+              applicationDetailsUrl(applicationReference),
               formWithErrors
             ))),
           failures =>
@@ -239,68 +237,62 @@ extends FrontendControllerBase(mcc):
             testRiskingService.submitEntityFailures(
               applicationReference,
               failures,
-              reSubmittedAtInstant
-            ).map(_ => Redirect(redirectUrl))
+              fileName
+            ).map(_ => Redirect(AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationDetailsByReference(applicationReference)))
         )
 
-  /** Quick action: submits with no failures at all, i.e. an Approved outcome, without having to manually leave every checkbox unticked. Redirects back to
-    * `redirectUrl` (the page the link was clicked from) instead of showing a confirmation page.
-    */
+  /** Quick action: submits with no failures at all, i.e. an Approved outcome, without having to manually leave every checkbox unticked. */
   def submitEntityFailuresApproved(
     applicationReference: ApplicationReference,
-    redirectUrl: String,
-    reSubmittedAt: Option[Long]
+    fileName: RiskingResultsFilename
   ): Action[AnyContent] = action.async:
     implicit request =>
       submitEntityFailuresQuickAction(
         applicationReference,
         Seq.empty,
-        redirectUrl,
-        reSubmittedAt
+        fileName
       )
 
   /** Quick action: submits a single fixable failure, i.e. a FailedFixable outcome. */
   def submitEntityFailuresFixable(
     applicationReference: ApplicationReference,
-    redirectUrl: String,
-    reSubmittedAt: Option[Long]
+    fileName: RiskingResultsFilename
   ): Action[AnyContent] = getApplication(applicationReference).async:
     implicit request =>
       submitEntityFailuresQuickAction(
         applicationReference,
         randomFixableEntityFailures(1 + Random.nextInt(3), request.agentApplication),
-        redirectUrl,
-        reSubmittedAt
+        fileName
       )
 
   /** Quick action: submits a mix of one fixable and one non-fixable failure, i.e. a FailedNonFixable outcome whose failures still include a fixable one bundled
     * alongside the blocking one.
     */
-  def submitEntityFailuresMixed(
+  def submitEntityFailuresNonFixable(
     applicationReference: ApplicationReference,
-    redirectUrl: String,
-    reSubmittedAt: Option[Long]
+    fileName: RiskingResultsFilename
   ): Action[AnyContent] = getApplication(applicationReference).async:
     implicit request =>
       submitEntityFailuresQuickAction(
         applicationReference,
         randomNonFixableEntityFailures(request.agentApplication),
-        redirectUrl,
-        reSubmittedAt
+        fileName
       )
 
   private def submitEntityFailuresQuickAction(
     applicationReference: ApplicationReference,
     failures: Seq[EntityRiskingFailure],
-    redirectUrl: String,
-    reSubmittedAt: Option[Long]
+    fileName: RiskingResultsFilename
   )(using RequestHeader): Future[Result] =
-    // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to where the link was clicked from.
+    // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to the application details page.
     testRiskingService.submitEntityFailures(
       applicationReference,
       failures,
-      reSubmittedAt.map(Instant.ofEpochMilli)
-    ).map(_ => Redirect(redirectUrl))
+      fileName
+    ).map(_ => Redirect(AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationDetailsByReference(applicationReference)))
+
+  private def applicationDetailsUrl(applicationReference: ApplicationReference): String =
+    AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationDetailsByReference(applicationReference).url
 
   /** A random non-empty subset (1 to 3) of the fixable entity checks, so repeated clicks of the "fail-fixable" quick action produce varied test data instead of
     * always the exact same single failure.
@@ -335,101 +327,108 @@ extends FrontendControllerBase(mcc):
 
   def showSelectIndividualFailures(
     personReference: PersonReference,
-    reSubmittedAt: Option[Long],
+    fileName: RiskingResultsFilename,
     redirectUrl: String
   ): Action[AnyContent] = action:
     implicit request =>
       Ok(selectIndividualFailuresPage(
         personReference,
-        reSubmittedAt.map(Instant.ofEpochMilli),
+        fileName,
         redirectUrl,
         SelectIndividualFailuresForm.form
       ))
 
   def submitIndividualFailures(
     personReference: PersonReference,
-    reSubmittedAt: Option[Long],
-    redirectUrl: String
+    fileName: RiskingResultsFilename
   ): Action[AnyContent] = action.async:
     implicit request =>
-      val reSubmittedAtInstant = reSubmittedAt.map(Instant.ofEpochMilli)
       SelectIndividualFailuresForm.form
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            Future.successful(BadRequest(selectIndividualFailuresPage(
-              personReference,
-              reSubmittedAtInstant,
-              redirectUrl,
-              formWithErrors
-            ))),
+            applicationReferenceFor(personReference).map: applicationReference =>
+              BadRequest(selectIndividualFailuresPage(
+                personReference,
+                fileName,
+                applicationDetailsUrl(applicationReference),
+                formWithErrors
+              )),
           failures =>
             // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to the application details page.
             testRiskingService.submitIndividualFailures(
               personReference,
               failures,
-              reSubmittedAtInstant
-            ).map(_ => Redirect(redirectUrl))
+              fileName
+            ).flatMap(_ => redirectToApplicationDetails(personReference))
         )
 
   /** Quick action from `SelectIndividualFailuresPage`: submits with no failures at all, i.e. an Approved outcome, without having to manually leave every
-    * checkbox unticked. Redirects back to `redirectUrl` (the page the link was clicked from) instead of showing a confirmation page.
+    * checkbox unticked.
     */
   def submitIndividualFailuresApproved(
     personReference: PersonReference,
-    redirectUrl: String,
-    reSubmittedAt: Option[Long]
+    fileName: RiskingResultsFilename
   ): Action[AnyContent] = action.async:
     implicit request =>
       submitIndividualFailuresQuickAction(
         personReference,
         Seq.empty,
-        redirectUrl,
-        reSubmittedAt
+        fileName
       )
 
   /** Quick action from `SelectIndividualFailuresPage`: submits a single fixable failure, i.e. a FailedFixable outcome. */
   def submitIndividualFailuresFixable(
     personReference: PersonReference,
-    redirectUrl: String,
-    reSubmittedAt: Option[Long]
+    fileName: RiskingResultsFilename
   ): Action[AnyContent] = action.async:
     implicit request =>
       submitIndividualFailuresQuickAction(
         personReference,
         randomFixableIndividualFailures(),
-        redirectUrl,
-        reSubmittedAt
+        fileName
       )
 
   /** Quick action from `SelectIndividualFailuresPage`: submits a mix of one fixable and one non-fixable failure, i.e. a FailedNonFixable outcome whose failures
     * still include a fixable one bundled alongside the blocking one.
     */
-  def submitIndividualFailuresMixed(
+  def submitIndividualFailuresNonFixable(
     personReference: PersonReference,
-    redirectUrl: String,
-    reSubmittedAt: Option[Long]
+    fileName: RiskingResultsFilename
   ): Action[AnyContent] = action.async:
     implicit request =>
       submitIndividualFailuresQuickAction(
         personReference,
         randomNonFixableIndividualFailures(),
-        redirectUrl,
-        reSubmittedAt
+        fileName
       )
 
   private def submitIndividualFailuresQuickAction(
     personReference: PersonReference,
     failures: Seq[IndividualRiskingFailure],
-    redirectUrl: String,
-    reSubmittedAt: Option[Long]
+    fileName: RiskingResultsFilename
   )(using RequestHeader): Future[Result] =
-    // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to where the link was clicked from.
+    // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to the application details page.
     testRiskingService.submitIndividualFailures(
       personReference,
       failures,
-      reSubmittedAt.map(Instant.ofEpochMilli)
-    ).map(_ => Redirect(redirectUrl))
+      fileName
+    ).flatMap(_ => redirectToApplicationDetails(personReference))
+
+  private def applicationReferenceFor(personReference: PersonReference)(using RequestHeader): Future[ApplicationReference] =
+    for
+      individual <- testApplicationService.findIndividualByPersonReference(personReference).map(_.getOrThrowExpectedDataMissing(
+        s"IndividualProvidedDetails for personReference: ${personReference.value}"
+      ))
+      application <- testApplicationService.findApplication(individual.agentApplicationId).map(_.getOrThrowExpectedDataMissing(
+        s"AgentApplication for agentApplicationId: ${individual.agentApplicationId.value}"
+      ))
+    yield application.applicationReference
+
+  private def redirectToApplicationDetails(
+    personReference: PersonReference
+  )(using RequestHeader): Future[Result] = applicationReferenceFor(personReference).map: applicationReference =>
+    Redirect(AppRoutes.testOnly.applicant.TestOnlyController.showAgentApplicationDetailsByReference(applicationReference))
 
   /** A random non-empty subset (1 to 3) of the fixable individual checks, so repeated clicks of the "fail-fixable" quick action produce varied test data
     * instead of always the exact same single failure.

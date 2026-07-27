@@ -24,6 +24,7 @@
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsFilename
 
 @import java.time.Instant
 @import java.time.ZoneId
@@ -38,7 +39,7 @@
 
 @(
         agentApplicationsWithIndividuals: Seq[(AgentApplication, List[IndividualProvidedDetails])],
-        submittedRiskingResultsFilenames: Set[String],
+        submittedRiskingResultsFilenames: List[RiskingResultsFilename],
         page: Int,
         pageSize: Int
 )(implicit

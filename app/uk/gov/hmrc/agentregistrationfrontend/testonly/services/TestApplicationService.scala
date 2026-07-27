@@ -20,6 +20,7 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
 import uk.gov.hmrc.agentregistration.shared.ApplicationReference
+import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
@@ -51,3 +52,6 @@ extends RequestAwareLogging:
 
   def findIndividual(individualProvidedDetailsId: IndividualProvidedDetailsId)(using RequestHeader): Future[Option[IndividualProvidedDetails]] =
     testAgentRegistrationConnector.findIndividual(individualProvidedDetailsId)
+
+  def findIndividualByPersonReference(personReference: PersonReference)(using RequestHeader): Future[Option[IndividualProvidedDetails]] =
+    testAgentRegistrationConnector.findIndividualByPersonReference(personReference)

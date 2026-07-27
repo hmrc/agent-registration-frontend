@@ -23,6 +23,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
+import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 
@@ -163,6 +164,26 @@ extends Connector:
               response = response
             )
       .andLogOnFailure("Failed to find IndividualProvidedDetails")
+
+  def findIndividualByPersonReference(personReference: PersonReference)(using
+    request: RequestHeader
+  ): Future[Option[IndividualProvidedDetails]] =
+    val url: URL = url"$baseUrl/individuals/by-person-reference/${personReference.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if status === Status.OK => Some(response.json.as[IndividualProvidedDetails])
+          case status if status === Status.NO_CONTENT => None
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to find IndividualProvidedDetails by person reference")
 
   def findIndividuals(agentApplicationId: AgentApplicationId)(using
     request: RequestHeader
