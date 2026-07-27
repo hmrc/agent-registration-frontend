@@ -38,11 +38,6 @@
 
     <h1 class="govuk-heading-l">View risking results files</h1>
 
-    <p class="govuk-body">
-        Every risking results file currently held by the test-only stub in the risking microservice
-        (<code class="govuk-!-font-size-16">agent-registration-risking</code>), across all applications.
-    </p>
-
     @if(filenames.isEmpty) {
         <p class="govuk-body">No risking results files have been submitted yet.</p>
     } else {
@@ -59,8 +54,4 @@
             }
         </ul>
     }
-
-    <p class="govuk-body">
-        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showTestOnlyHub">Back to Test Only Hub</a>
-    </p>
 }

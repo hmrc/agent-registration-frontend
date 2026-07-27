@@ -29,14 +29,21 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UploadRiskingResults
 
 import javax.inject.Inject
 import javax.inject.Singleton
+import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
 
 @Singleton
 class TestRiskingService @Inject() (
   testRiskingConnector: TestRiskingConnector
-):
+)(using ExecutionContext):
 
-  def deleteAll()(using RequestHeader): Future[Unit] = testRiskingConnector.deleteAllApplications()
+  def deleteAll()(using RequestHeader): Future[Unit] =
+    for
+      _ <- testRiskingConnector.deleteAllApplications()
+      _ <- testRiskingConnector.deleteAllRiskingResultsFiles()
+    yield ()
+
+  def deleteAllRiskingResultsFiles()(using RequestHeader): Future[Unit] = testRiskingConnector.deleteAllRiskingResultsFiles()
 
   def runRisking()(using RequestHeader): Future[Unit] = testRiskingConnector.runRisking()
 

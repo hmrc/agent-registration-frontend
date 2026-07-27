@@ -116,5 +116,10 @@
             url = AppRoutes.testOnly.TestOnlyController.showResetDatabaseConfirmation,
             hint = Some("wipes all test data — applications, individuals and risking records")
         )
+        @compactLink(
+            label = "Delete all risking results files",
+            url = AppRoutes.testOnly.TestOnlyController.showDeleteAllRiskingResultsFilesConfirmation,
+            hint = Some("wipes only the risking results files held by the test-only stub in the risking microservice — applications and individuals are untouched")
+        )
     }
 }

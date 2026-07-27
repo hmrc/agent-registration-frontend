@@ -55,6 +55,23 @@ extends Connector:
             )
       .andLogOnFailure("Failed to delete all risking Agent Applications")
 
+  def deleteAllRiskingResultsFiles()(using RequestHeader): Future[Unit] =
+    val url: URL = url"$baseUrl/delete-all-risking-results-files"
+    httpClient
+      .post(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case status if is2xx(status) => ()
+          case status =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = status,
+              response = response
+            )
+      .andLogOnFailure("Failed to delete all risking results files")
+
   def findApplicationForRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =
     val url: URL = url"$baseUrl/application-for-risking/${applicationReference.value}"
     httpClient

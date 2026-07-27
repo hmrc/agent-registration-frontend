@@ -42,6 +42,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationSe
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyHubPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ResetDatabaseConfirmationPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.DeleteRiskingResultsFilesConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.RiskingActionConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectEntityFailuresPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectIndividualFailuresPage
@@ -57,6 +58,7 @@ class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
   testOnlyHubPage: TestOnlyHubPage,
   resetDatabaseConfirmationPage: ResetDatabaseConfirmationPage,
+  deleteRiskingResultsFilesConfirmationPage: DeleteRiskingResultsFilesConfirmationPage,
   riskingActionConfirmationPage: RiskingActionConfirmationPage,
   selectEntityFailuresPage: SelectEntityFailuresPage,
   selectIndividualFailuresPage: SelectIndividualFailuresPage,
@@ -128,6 +130,19 @@ extends FrontendControllerBase(mcc):
           _ <- testApplicationService.deleteAll()
           _ <- testRiskingService.deleteAll()
         yield Redirect(AppRoutes.testOnly.TestOnlyController.showTestOnlyHub)
+      else
+        Future.successful(Unauthorized("Reset operation not allowed"))
+
+  def showDeleteAllRiskingResultsFilesConfirmation: Action[AnyContent] = action:
+    implicit request =>
+      if appConfig.TestOnly.allowResetDatabase
+      then Ok(deleteRiskingResultsFilesConfirmationPage())
+      else Unauthorized("Reset operation not allowed")
+
+  def deleteAllRiskingResultsFiles: Action[AnyContent] = action.async:
+    implicit request =>
+      if (appConfig.TestOnly.allowResetDatabase)
+        testRiskingService.deleteAllRiskingResultsFiles().map(_ => Redirect(AppRoutes.testOnly.TestOnlyController.showTestOnlyHub))
       else
         Future.successful(Unauthorized("Reset operation not allowed"))
 
