@@ -110,13 +110,15 @@ extends FrontendController(mcc, actions):
           .map(request.add)
     .async:
       implicit request: RequestWithData[List[IndividualProvidedDetails] *: TestOnlyActions.DataWithApplication] =>
-        testRiskingService.listSubmittedRiskingResultsFilenames().map { submittedRiskingResultsFilenames =>
-          Ok(showAgentApplicationsTilePage(
-            agentApplication = request.get[AgentApplication],
-            individuals = request.get[List[IndividualProvidedDetails]],
-            submittedRiskingResultsFilenames = submittedRiskingResultsFilenames
-          ))
-        }
+        for
+          submittedRiskingResultsFilenames <- testRiskingService.listSubmittedRiskingResultsFilenames()
+          unprocessedRiskingResultsFilenames <- testRiskingService.getUnprocessedAvailableFiles()
+        yield Ok(showAgentApplicationsTilePage(
+          agentApplication = request.get[AgentApplication],
+          individuals = request.get[List[IndividualProvidedDetails]],
+          submittedRiskingResultsFilenames = submittedRiskingResultsFilenames,
+          unprocessedRiskingResultsFilenames = unprocessedRiskingResultsFilenames
+        ))
 
   def showIndividualsForApplication: Action[AnyContent] = actions
     .getApplication
