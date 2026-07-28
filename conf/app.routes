@@ -15,6 +15,7 @@ GET         /view-application                                          uk.gov.hm
 GET         /apply                                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.startRegistration
 GET         /apply/task-list                                        uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.TaskListController.show
 GET         /apply/save-and-come-back-later                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.SaveForLaterController.show
+GET         /apply/sole-trader-has-no-utr                           uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.SoleTraderHasNoSaUtrController.show
 GET         /apply/cannot-confirm-identity                          uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.CanNotConfirmIdentityController.show
 GET         /apply/cannot-register                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.CanNotRegisterController.show
 GET         /apply/unable-to-confirm-business-details               uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.UnableToConfirmBusinessDetailsController.show

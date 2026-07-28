@@ -110,7 +110,8 @@ class AppConfig @Inject() (
   val upscanInitiateBaseUrl: String = servicesConfig.baseUrl("upscan-initiate")
 
   val companiesHouseUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.companies-house", configuration)
-  val contacHmrctUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.contact-hmrc", configuration)
+  val contactHmrcUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.contact-hmrc", configuration)
+  val findLostUtrUrl: String = ConfigHelper.readConfigAsValidUrlString("urls.govuk-find-lost-utr", configuration)
 
   val applicationDecisionLeadTime: FiniteDuration = configuration.get[FiniteDuration]("application-decision-lead-time")
   val daysToSubmitApplication: FiniteDuration = configuration.get[FiniteDuration]("days-to-submit-application")

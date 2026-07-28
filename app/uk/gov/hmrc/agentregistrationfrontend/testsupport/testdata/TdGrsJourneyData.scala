@@ -65,6 +65,8 @@ trait TdGrsJourneyData {
         )
       )
 
+      val journeyDataWithoutSaUtr: JourneyData = journeyData.copy(sautr = None)
+
     object ltd:
 
       val journeyData: JourneyData = JourneyData(

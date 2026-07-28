@@ -1,5 +1,5 @@
 @*
- * Copyright 2025 HM Revenue & Customs
+ * Copyright 2026 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,36 +18,30 @@
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 
 @this(
-        appConfig: AppConfig,
-        layout: Layout,
-        formWithCSRF: FormWithCSRF,
-        govukButton: GovukButton
+ appConfig: AppConfig,
+ layout: Layout
 )
 
 @()(implicit
-        request: RequestHeader,
-        messages: Messages
+ request: RequestHeader,
+ messages: Messages
 )
 
-@key = @{"cannotConfirmIdentity"}
+@key = @{"soleTraderHasNoSaUtr"}
 @pageTitle = @{messages(s"$key.title")}
 
 @layout(pageTitle = pageTitle) {
-    <h1 class="govuk-heading-xl">@pageTitle</h1>
-
-    <p class="govuk-body">
-        @Html(messages(s"$key.p1", appConfig.contactHmrcUrl))
-    </p>
-    <p class="govuk-body">
-        @{messages(s"$key.p2")}
-    </p>
-
-    <p class="govuk-body govuk-!-display-none-print">
-    @govukButton(Button(
-        href = Some(appConfig.govukStartPageUrl),
-        classes = "govuk-link",
-        content = Text(messages(s"$key.tryAgain.button"))
-    ))
-    </p>
-
+ <h1 class="govuk-heading-xl">@pageTitle</h1>
+ <p class="govuk-body">
+  @messages(s"$key.p1")
+ </p>
+ <p class="govuk-body">
+ @Html(messages(s"$key.p2", AppRoutes.apply.aboutyourbusiness.AgentTypeController.show))
+ </p>
+ <p class="govuk-body">
+ @Html(messages(s"$key.p3", appConfig.findLostUtrUrl))
+ </p>
+ <p class="govuk-body">
+ @Html(messages(s"$key.p4", appConfig.contactHmrcUrl))
+ </p>
 }
