@@ -140,6 +140,19 @@ extends FrontendController(mcc, actions):
       errorMessageIfEnumError = "Registration status invalid"
     ))
 
+    def sautrMapping(businessType: BusinessType): play.api.data.Mapping[Option[String]] =
+      val partnershipTypes = Seq(
+        GeneralPartnership,
+        LimitedLiabilityPartnership,
+        LimitedPartnership,
+        ScottishLimitedPartnership,
+        ScottishPartnership
+      )
+      if (partnershipTypes.contains(businessType))
+        mandatoryIf(_ => true, nonEmptyText) // always mandatory for partnership types
+      else
+        optional(nonEmptyText) // optional (SoleTrader/others)
+
     Form(mapping(
       "registrationStatus" -> registrationStatusMapping,
       "safeId" -> mandatoryIf(
@@ -166,17 +179,7 @@ extends FrontendController(mcc, actions):
         isEqual("nino", "").and(_ => businessType === SoleTrader),
         nonEmptyText
       ),
-      "sautr" -> mandatoryIf(
-        _ =>
-          Seq(
-            GeneralPartnership,
-            LimitedLiabilityPartnership,
-            LimitedPartnership,
-            ScottishLimitedPartnership,
-            ScottishPartnership
-          ).contains(businessType),
-        nonEmptyText
-      ),
+      "sautr" -> sautrMapping(businessType),
       "companyNumber" -> mandatoryIf(
         _ =>
           Seq(
