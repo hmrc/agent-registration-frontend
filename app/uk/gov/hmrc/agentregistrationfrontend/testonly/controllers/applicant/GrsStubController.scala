@@ -169,7 +169,6 @@ extends FrontendController(mcc, actions):
       "sautr" -> mandatoryIf(
         _ =>
           Seq(
-            SoleTrader,
             GeneralPartnership,
             LimitedLiabilityPartnership,
             LimitedPartnership,
