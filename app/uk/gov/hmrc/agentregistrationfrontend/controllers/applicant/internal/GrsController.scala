@@ -96,12 +96,24 @@ extends FrontendController(mcc, actions):
           result <-
             journeyData.registration.registrationStatus match
               case RegistrationStatus.GrsRegistered =>
-                if journeyData.identifiersMatch
-                then onGrsRegisteredAndIdentifiersMatch(request.agentApplication, journeyData)
-                else Future.successful(Redirect(AppRoutes.apply.checkfailed.UnableToConfirmBusinessDetailsController.show))
+                if isSoleTraderWithNoSaUtr(journeyData, request.agentApplication) then
+                  Future.successful(Redirect(AppRoutes.apply.checkfailed.SoleTraderHasNoSaUtrController.show))
+                else if journeyData.identifiersMatch
+                then
+                  onGrsRegisteredAndIdentifiersMatch(request.agentApplication, journeyData)
+                else
+                  Future.successful(Redirect(AppRoutes.apply.checkfailed.UnableToConfirmBusinessDetailsController.show))
               case RegistrationStatus.GrsFailed => Future.successful(Redirect(AppRoutes.apply.checkfailed.UnableToConfirmBusinessDetailsController.show))
               case RegistrationStatus.GrsNotCalled => Future.successful(Redirect(AppRoutes.apply.checkfailed.UnableToConfirmBusinessDetailsController.show))
         yield result
+
+  private def isSoleTraderWithNoSaUtr(
+    journeyData: JourneyData,
+    agentApplication: AgentApplication
+  ): Boolean =
+    agentApplication match
+      case _: AgentApplicationSoleTrader => journeyData.sautr.isEmpty
+      case _: IsNotSoleTrader => false
 
   private def onGrsRegisteredAndIdentifiersMatch(
     agentApplication: AgentApplication,

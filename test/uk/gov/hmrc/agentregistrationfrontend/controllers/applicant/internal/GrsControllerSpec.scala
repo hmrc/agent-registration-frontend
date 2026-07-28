@@ -56,6 +56,10 @@ extends ControllerSpec:
     TestCase(
       agentApplicationAfterStarted = tdAll.agentApplicationLlp.afterStarted,
       agentApplicationAfterGrsDataReceived = tdAll.agentApplicationLlp.afterGrsDataReceived
+    ),
+    TestCase(
+      agentApplicationAfterStarted = tdAll.agentApplicationSoleTrader.afterStarted,
+      agentApplicationAfterGrsDataReceived = tdAll.agentApplicationSoleTrader.afterGrsDataReceived
     )
   )
 
@@ -110,3 +114,20 @@ extends ControllerSpec:
 
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
+
+  s"GET $journeyCallbackPath for Sole Trader without SaUtr should retrieve JourneyData from GRS and redirect to the SoleTraderHasNoUtr page" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationSoleTrader.afterStarted)
+    GrsStubs.stubGetJourneyData(
+      businessType = BusinessType.SoleTrader,
+      journeyId = journeyId,
+      tdAll = tdAll,
+      withoutUtr = true
+    )
+
+    val response: WSResponse = get(journeyCallbackPath)
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.checkfailed.SoleTraderHasNoSaUtrController.show.url
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetAgentApplication()
+    GrsStubs.verifyGetJourneyData(BusinessType.SoleTrader, journeyId)

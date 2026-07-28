@@ -62,7 +62,8 @@ object GrsStubs:
   def stubGetJourneyData(
     businessType: BusinessType,
     journeyId: JourneyId,
-    tdAll: TdAll = TdAll.tdAll
+    tdAll: TdAll = TdAll.tdAll,
+    withoutUtr: Boolean = false
   ): StubMapping =
 
     val journeyData: JourneyData =
@@ -72,7 +73,10 @@ object GrsStubs:
         case bt @ BusinessType.Partnership.LimitedPartnership => throw NotImplementedError(s"$bt not implemented yet")
         case bt @ BusinessType.Partnership.ScottishLimitedPartnership => throw NotImplementedError(s"$bt not implemented yet")
         case bt @ BusinessType.Partnership.ScottishPartnership => throw NotImplementedError(s"$bt not implemented yet")
-        case bt @ BusinessType.SoleTrader => throw NotImplementedError(s"$bt not implemented yet")
+        case bt @ BusinessType.SoleTrader =>
+          if withoutUtr
+          then tdAll.grsJourneyData.soleTrader.journeyDataWithoutSaUtr
+          else tdAll.grsJourneyData.soleTrader.journeyData
         case bt @ BusinessType.LimitedCompany => throw NotImplementedError(s"$bt not implemented yet")
 
     StubMaker.make(
