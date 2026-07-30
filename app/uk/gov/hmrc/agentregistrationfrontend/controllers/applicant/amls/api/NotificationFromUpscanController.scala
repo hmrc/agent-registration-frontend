@@ -17,7 +17,6 @@
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls.api
 
 import play.api.libs.json.JsValue
-import play.api.libs.json.Json
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
@@ -49,8 +48,7 @@ extends FrontendController(mcc, actions):
       .action
       .async(parse.json):
         implicit request =>
-          val notificationRequestJson: JsValue = request.body
-          logger.info(s"Upscan notification received for uploadId: $uploadId:\n ${Json.prettyPrint(notificationRequestJson)}")
+          logger.info(s"Upscan notification received for uploadId: $uploadId")
           val notificationRequest: UploadNotificationRequest = request.body.as[UploadNotificationRequest]
 
           uploadRepo.findById(uploadId).flatMap:
