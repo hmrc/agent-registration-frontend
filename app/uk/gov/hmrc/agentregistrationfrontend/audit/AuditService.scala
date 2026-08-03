@@ -73,11 +73,12 @@ extends RequestAwareLogging:
 
   def sendRiskingSubmissionEvent(
     agentApplication: AgentApplication,
-    individualDetails: List[IndividualProvidedDetails]
+    individualDetails: List[IndividualProvidedDetails],
+    isResubmission: Boolean
   )(using RequestHeader): Unit = sendEvent(ApplicationSubmitted(
     applicationReference = agentApplication.applicationReference,
     linkId = agentApplication.linkId,
-    isResubmission = false, // TODO Will need changing when risking resubmissions are added
+    isResubmission = isResubmission,
     utr = agentApplication.getUtr,
     applicantDetails = agentApplication.getApplicantContactDetails,
     agentDetails = Some(agentApplication.getAgentDetails),

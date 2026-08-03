@@ -35,6 +35,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs
 import com.github.tomakehurst.wiremock.client.WireMock.equalTo
 import com.github.tomakehurst.wiremock.client.WireMock.matchingJsonPath
 import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
+import com.github.tomakehurst.wiremock.matching.StringValuePattern
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
@@ -48,14 +49,28 @@ object AuditStubs:
     responseStatus = 204
   )
 
+  def verifyStartOrContinueApplicationAuditEvent(
+    journeyType: String,
+    count: Int = 1
+  ): Unit =
+    val requestBodyPattern = matchingJsonPath("*.journeyType", equalTo(journeyType))
+    verifyAuditEvent("StartOrContinueApplication", Some(requestBodyPattern))
+
+  def verifyApplicationSubmittedAuditEvent(
+    isResubmission: Boolean,
+    count: Int = 1
+  ): Unit =
+    val requestBodyPattern = matchingJsonPath("*.isResubmission", equalTo(isResubmission.toString))
+    verifyAuditEvent("ApplicationSubmitted", Some(requestBodyPattern))
+
   def verifyAuditEvent(
     auditType: String,
-    journeyType: Option[String] = None,
+    maybeRequestBody: Option[StringValuePattern] = None,
     count: Int = 1
-  ): Unit = {
+  ): Unit =
     val requestBody =
-      journeyType match
-        case Some(jt) => matchingJsonPath("$.auditType", equalTo(auditType)).and(matchingJsonPath("*.journeyType", equalTo(jt)))
+      maybeRequestBody match
+        case Some(rbPattern) => matchingJsonPath("$.auditType", equalTo(auditType)).and(rbPattern)
         case None => matchingJsonPath("$.auditType", equalTo(auditType))
     StubMaker.verify(
       httpMethod = StubMaker.HttpMethod.POST,
@@ -63,4 +78,3 @@ object AuditStubs:
       count = count,
       requestBody = Some(requestBody)
     )
-  }

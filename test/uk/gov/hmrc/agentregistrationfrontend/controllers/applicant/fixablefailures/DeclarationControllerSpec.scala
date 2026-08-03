@@ -27,13 +27,15 @@ import uk.gov.hmrc.agentregistration.shared.risking.submitforrisking.SubmitForRi
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationRiskingStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuditStubs
 
 class DeclarationControllerSpec
 extends ControllerSpec:
 
   override def configOverrides: Map[String, Any] =
     super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
+      "features.fixable-failures" -> true,
+      "auditing.enabled" -> true
     )
 
   private val path = "/agent-registration/conditions-not-yet-met/declaration"
@@ -116,6 +118,8 @@ extends ControllerSpec:
         entityAlreadyApproved = false
       )
     )
+    AuditStubs.stubAudit()
+
     val response: WSResponse = post(path)(Map("submit" -> Seq("AcceptAndSend")))
 
     response.status shouldBe Status.SEE_OTHER
@@ -124,6 +128,7 @@ extends ControllerSpec:
     )
     ApplyStubHelper.verifyConnectorsForUpdatingApplication(agentApplication.afterResubmitted)
     AgentRegistrationRiskingStubs.verifySubmitAgentApplication()
+    AuditStubs.verifyApplicationSubmittedAuditEvent(isResubmission = true)
 
   s"POST $path when entity outcome was Approved should send entityAlreadyApproved = true" in:
     val approvedEntityWithFixedIndividuals: AgentApplicationLlp = agentApplication.riskingCompletedFixableFixed.copy(riskingOutcomeEntity =
@@ -144,6 +149,7 @@ extends ControllerSpec:
         entityAlreadyApproved = true
       )
     )
+    AuditStubs.stubAudit()
     val response: WSResponse = post(path)(Map("submit" -> Seq("AcceptAndSend")))
 
     response.status shouldBe Status.SEE_OTHER
@@ -152,3 +158,4 @@ extends ControllerSpec:
     )
     ApplyStubHelper.verifyConnectorsForUpdatingApplication(afterResubmittedApprovedEntity)
     AgentRegistrationRiskingStubs.verifySubmitAgentApplication()
+    AuditStubs.verifyApplicationSubmittedAuditEvent(isResubmission = true)
