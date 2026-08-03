@@ -24,12 +24,15 @@ import uk.gov.hmrc.agentregistration.shared.risking.submitforrisking.*
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationRiskingStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuditStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
 
 class DeclarationControllerSpec
 extends ControllerSpec:
 
   private val path = "/agent-registration/apply/agent-declaration/confirm-declaration"
+
+  override def configOverrides: Map[String, Any] = Map("auditing.enabled" -> true)
 
   "route should have correct path and method" in:
     AppRoutes.apply.DeclarationController.show shouldBe Call(
@@ -135,6 +138,7 @@ extends ControllerSpec:
       )
     )
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterAllOtherTasksComplete)
+    AuditStubs.stubAudit()
 
     val response: WSResponse =
       post(path)(
@@ -145,3 +149,4 @@ extends ControllerSpec:
     response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.apply.AgentApplicationController.applicationStatus.url
     ApplyStubHelper.verifyConnectorsForSuccessfulUpdate()
+    AuditStubs.verifyApplicationSubmittedAuditEvent(isResubmission = false)

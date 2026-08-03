@@ -59,7 +59,11 @@ extends RequestAwareLogging:
 
     for
       _ <- agentRegistrationRiskingConnector.submitForRisking(submitForRiskingRequest)
-      _ = auditService.sendRiskingSubmissionEvent(agentApplication, individuals)
+      _ = auditService.sendRiskingSubmissionEvent(
+        agentApplication,
+        individuals,
+        isResubmission
+      )
     yield ()
 
   def getRiskingProgress(applicationReference: ApplicationReference)(using request: RequestHeader): Future[RiskingProgress] =

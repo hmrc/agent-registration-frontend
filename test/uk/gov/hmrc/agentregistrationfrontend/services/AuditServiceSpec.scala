@@ -65,7 +65,7 @@ extends ISpec:
 
       AgentRegistrationStubs.verifyGetAgentApplication()
       AgentRegistrationStubs.verifyUpdateAgentApplication()
-      AuditStubs.verifyAuditEvent(auditType = "StartOrContinueApplication", journeyType = Some("Continue"))
+      AuditStubs.verifyStartOrContinueApplicationAuditEvent(journeyType = "Continue")
 
   private def runGetApplication(
     request: RequestWithData[EmptyTuple]

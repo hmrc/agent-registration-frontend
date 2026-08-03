@@ -91,7 +91,7 @@ extends ControllerSpec:
       AgentRegistrationStubs.verifyGetAgentApplication()
       AgentRegistrationStubs.verifyUpdateAgentApplication()
       EnrolmentStoreStubs.verifyQueryEnrolmentsAllocatedToGroup(tdAll.groupId)
-      AuditStubs.verifyAuditEvent(auditType = "StartOrContinueApplication", journeyType = Some("Start"))
+      AuditStubs.verifyStartOrContinueApplicationAuditEvent(journeyType = "Start")
 
     s"GET $initiateAgentApplicationUrl should redirect to GRS journey when application already exists without GRS data" in:
       AuthStubs.stubAuthorise()
