@@ -16,11 +16,9 @@
 
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
-@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedPartnership
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-@import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
-@import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
-@import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseIndividuaNameForm
+@import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
+@import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
 @import uk.gov.hmrc.govukfrontend.views.html.components.implicits.RichInput
@@ -34,7 +32,7 @@
 )
 
 @(
-        form: Form[IndividualName],
+        form: Form[CompaniesHouseNameQuery],
         entityName: String,
         agentApplication: AgentApplication
 )(implicit
@@ -68,14 +66,14 @@
                 content = Text(messages("companiesHouseIndividualName.firstName.label")),
                 classes = "govuk-label"
             )
-        ).withFormField(form(CompaniesHouseIndividuaNameForm.firstNameKey)))
+        ).withFormField(form(CompaniesHouseNameQueryForm.firstNameKey)))
 
         @govukInput(Input(
             label = Label(
                 content = Text(messages("companiesHouseIndividualName.lastName.label")),
                 classes = "govuk-label"
             )
-        ).withFormField(form(CompaniesHouseIndividuaNameForm.lastNameKey)))
+        ).withFormField(form(CompaniesHouseNameQueryForm.lastNameKey)))
 
         @continueOrSaveForLater()
     }

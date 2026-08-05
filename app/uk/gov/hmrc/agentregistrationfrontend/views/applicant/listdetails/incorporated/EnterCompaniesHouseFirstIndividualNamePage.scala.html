@@ -16,13 +16,11 @@
 
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
-@import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedPartnership
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
-@import uk.gov.hmrc.agentregistration.shared.AgentApplicationScottishLimitedPartnership
-@import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
+@import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 @import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
-@import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseIndividuaNameForm
+@import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 @import uk.gov.hmrc.agentregistrationfrontend.util.MessageKeys
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
@@ -41,7 +39,7 @@
 )
 
 @(
-        form: Form[IndividualName],
+        form: Form[CompaniesHouseNameQuery],
         entityName: String,
         sixOrMoreOfficers: SixOrMoreOfficers,
         agentApplication: AgentApplication
@@ -50,7 +48,7 @@
         messages: Messages
 )
 
-@key = @{ CompaniesHouseIndividuaNameForm.key }
+@key = @{ "companiesHouseIndividualName" }
 
 @businessTypeKey = @{
     agentApplication match {
@@ -99,14 +97,14 @@
                 content = Text(messages(s"$key.firstName.label")),
                 classes = "govuk-label"
             )
-        ).withFormField(form(CompaniesHouseIndividuaNameForm.firstNameKey)))
+        ).withFormField(form(CompaniesHouseNameQueryForm.firstNameKey)))
 
         @govukInput(Input(
             label = Label(
                 content = Text(messages(s"$key.lastName.label")),
                 classes = "govuk-label"
             )
-        ).withFormField(form(CompaniesHouseIndividuaNameForm.lastNameKey)))
+        ).withFormField(form(CompaniesHouseNameQueryForm.lastNameKey)))
 
         @continueOrSaveForLater()
     }

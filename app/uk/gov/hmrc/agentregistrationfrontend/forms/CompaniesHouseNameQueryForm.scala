@@ -17,20 +17,23 @@
 package uk.gov.hmrc.agentregistrationfrontend.forms
 
 import play.api.data.Form
+import play.api.data.Forms
 import play.api.data.Forms.mapping
-import play.api.data.Forms.text
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
+import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.TextFormatter
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
 
 object CompaniesHouseNameQueryForm:
 
   val firstNameKey: String = "firstName"
   val lastNameKey: String = "lastName"
-  private val nameRegex = "^[a-zA-Z\\-' ]+$"
+  private val nameRegex = "^[a-zA-Z\\s\\-']+$"
+  private def canonicalise(name: String): String = name.trim.replaceAll("\\s+", " ")
 
   val form: Form[CompaniesHouseNameQuery] = Form[CompaniesHouseNameQuery](
     mapping(
-      firstNameKey -> text
+      firstNameKey -> Forms.of(TextFormatter(ErrorKeys.requiredFieldErrorMessage(firstNameKey)))
+        .transform[String](canonicalise, identity)
         .verifying(
           ErrorKeys.requiredFieldErrorMessage(firstNameKey),
           _.nonEmpty
@@ -39,7 +42,8 @@ object CompaniesHouseNameQueryForm:
           ErrorKeys.invalidInputErrorMessage(firstNameKey),
           _.matches(nameRegex)
         ),
-      lastNameKey -> text
+      lastNameKey -> Forms.of(TextFormatter(ErrorKeys.requiredFieldErrorMessage(lastNameKey)))
+        .transform[String](canonicalise, identity)
         .verifying(
           ErrorKeys.requiredFieldErrorMessage(lastNameKey),
           _.nonEmpty
