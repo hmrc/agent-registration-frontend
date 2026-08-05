@@ -20,6 +20,7 @@ import play.api.data.Form
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer.normaliseOfficerName
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole.getCompaniesHouseOfficerRole
@@ -29,7 +30,7 @@ import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
-import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseIndividuaNameForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.services.CompaniesHouseService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.NameMatching
@@ -87,31 +88,31 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
-      renderPage(CompaniesHouseIndividuaNameForm.form, Ok)
+      renderPage(CompaniesHouseNameQueryForm.form, Ok)
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
-        form = CompaniesHouseIndividuaNameForm.form,
+      .ensureValidFormAndRedirectIfSaveForLater[CompaniesHouseNameQuery](
+        form = CompaniesHouseNameQueryForm.form,
         resultToServeWhenFormHasErrors =
           implicit request =>
-            (formWithErrors: Form[IndividualName]) =>
+            (formWithErrors: Form[CompaniesHouseNameQuery]) =>
               renderPage(formWithErrors, BadRequest)
       )
       .refine:
-        implicit request: RequestWithData[IndividualName *: CompaniesHouseRequestData] =>
-          val individualName: IndividualName = request.get
+        implicit request: RequestWithData[CompaniesHouseNameQuery *: CompaniesHouseRequestData] =>
+          val companiesHouseNameQuery: CompaniesHouseNameQuery = request.get
           val agentApplication: IsIncorporated = request.get[IsIncorporated]
           companiesHouseService
             .getActiveOfficers(
               companyRegistrationNumber = agentApplication.getCrn,
-              lastName = individualName.value.split(" ").lastOption.getOrElse(""),
+              lastName = companiesHouseNameQuery.lastName,
               expectedRole = getCompaniesHouseOfficerRole(agentApplication)
             ).map: results =>
               request.add[Seq[CompaniesHouseOfficer]](results)
       .async {
-        implicit request: RequestWithData[Seq[CompaniesHouseOfficer] *: IndividualName *: CompaniesHouseRequestData] =>
-          val individualNameFromForm: IndividualName = request.get
+        implicit request: RequestWithData[Seq[CompaniesHouseOfficer] *: CompaniesHouseNameQuery *: CompaniesHouseRequestData] =>
+          val companiesHouseNameQuery: CompaniesHouseNameQuery = request.get
           val agentApplication: IsIncorporated = request.get
           val existingList: List[IndividualProvidedDetails] = request.get
           val companiesHouseOfficerList: Seq[CompaniesHouseOfficer] = request.get
@@ -119,7 +120,7 @@ extends FrontendController(mcc, actions):
             existingList = existingList,
             companiesHouseOfficerList = companiesHouseOfficerList
           )
-          NameMatching.individualNameMatching(individualNameFromForm, availableNames) match
+          NameMatching.individualNameMatching(IndividualName(s"${companiesHouseNameQuery.firstName} ${companiesHouseNameQuery.lastName}"), availableNames) match
             case Some(matchedOfficerName) =>
               for
                 individualProvidedDetails: IndividualProvidedDetails <- individualProvideDetailsService.create(
@@ -134,11 +135,11 @@ extends FrontendController(mcc, actions):
               // No match found — re-render the form with an error instead of an exit page, by design
               Future.successful(
                 renderPage(
-                  form = CompaniesHouseIndividuaNameForm.form
-                    .fill(individualNameFromForm)
-                    .withError(CompaniesHouseIndividuaNameForm.firstNameKey, "error.companiesHouseOfficer.nameNotMatched"),
+                  form = CompaniesHouseNameQueryForm.form
+                    .fill(companiesHouseNameQuery)
+                    .withError(CompaniesHouseNameQueryForm.firstNameKey, "error.companiesHouseOfficer.nameNotMatched"),
                   resultStatus = BadRequest
-                )(using request.delete[IndividualName].delete[Seq[CompaniesHouseOfficer]])
+                )(using request.delete[CompaniesHouseNameQuery].delete[Seq[CompaniesHouseOfficer]])
               )
       }
       .redirectIfSaveForLater
@@ -146,7 +147,7 @@ extends FrontendController(mcc, actions):
   /** We have abstracted the logic to determine what type of page to render, as it is used in multiple places
     */
   private def renderPage(
-    form: Form[IndividualName],
+    form: Form[CompaniesHouseNameQuery],
     resultStatus: Status
   )(implicit request: RequestWithData[CompaniesHouseRequestData]): Result =
     val agentApplication: IsIncorporated = request.get

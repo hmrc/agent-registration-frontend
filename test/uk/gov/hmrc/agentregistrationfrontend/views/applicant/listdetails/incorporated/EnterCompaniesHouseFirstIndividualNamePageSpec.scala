@@ -19,9 +19,9 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.incorp
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
-import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseIndividuaNameForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -37,7 +37,7 @@ extends ViewSpec:
   private val formAction: play.api.mvc.Call = AppRoutes.apply.listdetails.incoporated.EnterCompaniesHouseOfficerController.submit
 
   private def render(
-    form: play.api.data.Form[IndividualName],
+    form: play.api.data.Form[CompaniesHouseNameQuery],
     agentApplication: AgentApplication
   ): Document = Jsoup.parse(viewTemplate(
     form = form,
@@ -86,7 +86,7 @@ extends ViewSpec:
     s"EnterCompaniesHouseFirstIndividualNamePage for ${testCase.label}" should:
 
       val headingWithPadding = s"Tell us about 5 ${testCase.headingEntityType} at $entityName"
-      val doc: Document = render(CompaniesHouseIndividuaNameForm.form, testCase.agentApplication)
+      val doc: Document = render(CompaniesHouseNameQueryForm.form, testCase.agentApplication)
 
       "have the correct caption" in:
         doc.mainContent.select(captionL).text() shouldBe testCase.caption
@@ -127,9 +127,9 @@ extends ViewSpec:
           .text() shouldBe "Save and come back later"
 
       "render a form error when the firstName field contains an error" in:
-        val field = CompaniesHouseIndividuaNameForm.firstNameKey
+        val field = CompaniesHouseNameQueryForm.firstNameKey
         val errorMessage = "Enter first name"
-        val formWithError = CompaniesHouseIndividuaNameForm
+        val formWithError = CompaniesHouseNameQueryForm
           .form
           .withError(field, errorMessage)
 
@@ -141,9 +141,9 @@ extends ViewSpec:
         )
 
       "render a form error when the lastName field contains an error" in:
-        val field = CompaniesHouseIndividuaNameForm.lastNameKey
+        val field = CompaniesHouseNameQueryForm.lastNameKey
         val errorMessage = "Enter last name"
-        val formWithError = CompaniesHouseIndividuaNameForm
+        val formWithError = CompaniesHouseNameQueryForm
           .form
           .withError(field, errorMessage)
 

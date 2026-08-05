@@ -26,19 +26,6 @@ common.cancel = Cancel
 button.copy=Copy link to clipboard
 button.copied=Link copied
 
-months.1 = January
-months.2 = February
-months.3 = March
-months.4 = April
-months.5 = May
-months.6 = June
-months.7 = July
-months.8 = August
-months.9 = September
-months.10 = October
-months.11 = November
-months.12 = December
-
 address.lookup.title=What correspondence address should we use for your agent services account? - Apply for an agent services account - GOV.UK
 address.lookup.header=What correspondence address should we use for your agent services account?
 address.lookup.editPageLabels.title=Enter your correspondence address - Apply for an agent services account - GOV.UK
@@ -301,9 +288,6 @@ fileUploadProgress.virus=A virus has been detected in your uploaded file, try up
 
 upscanError.EntityTooLarge.title = Your upload is too large
 upscanError.EntityTooLarge.message = The file you are trying to upload is too large. The maximum file size is 6MB. Try uploading a smaller file.
-upscanError.Unknown.title = TODO
-upscanError.Unknown.message = TODO
-
 
 ## Apply / Meet the HMRC standard for agents / AmlsDetails / Check your answers
 amlsCheckYourAnswers.title = Check your answers

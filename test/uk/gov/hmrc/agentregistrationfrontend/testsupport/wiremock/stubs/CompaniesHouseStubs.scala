@@ -16,11 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs
 
+import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
 import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.libs.json.Json
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
+
+import java.net.URLEncoder
 
 object CompaniesHouseStubs {
 
@@ -88,7 +91,7 @@ object CompaniesHouseStubs {
     officerRole: CompaniesHouseOfficerRole = CompaniesHouseOfficerRole.LlpMember
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=$lastName"),
+    urlPattern = urlEqualTo(s"/companies-house-api-proxy/company/1234567890/officers?surname=${URLEncoder.encode(lastName, "UTF-8")}"),
     responseStatus = 200,
     responseBody =
       Json.obj(
@@ -140,7 +143,7 @@ object CompaniesHouseStubs {
     count: Int = 1
   ): Unit = StubMaker.verify(
     httpMethod = StubMaker.HttpMethod.GET,
-    urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers\\?surname=$lastName"),
+    urlPattern = urlEqualTo(s"/companies-house-api-proxy/company/1234567890/officers?surname=${URLEncoder.encode(lastName, "UTF-8")}"),
     count = count
   )
 

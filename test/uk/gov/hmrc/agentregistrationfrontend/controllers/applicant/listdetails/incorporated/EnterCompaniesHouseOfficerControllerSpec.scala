@@ -18,11 +18,12 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
+import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
-import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseIndividuaNameForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CompaniesHouseStubs
@@ -69,8 +70,8 @@ extends ControllerSpec:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.soleTraderInProgress)
     val response: WSResponse =
       post(postPath)(Map(
-        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("John"),
-        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("Tester")
+        CompaniesHouseNameQueryForm.firstNameKey -> Seq("John"),
+        CompaniesHouseNameQueryForm.lastNameKey -> Seq("Tester")
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -178,8 +179,8 @@ extends ControllerSpec:
 
     val response: WSResponse =
       post(postPath)(Map(
-        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq(""),
-        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("Tester")
+        CompaniesHouseNameQueryForm.firstNameKey -> Seq(""),
+        CompaniesHouseNameQueryForm.lastNameKey -> Seq("Tester")
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -202,8 +203,8 @@ extends ControllerSpec:
 
     val response: WSResponse =
       post(postPath)(Map(
-        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("Carol"),
-        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("Tester")
+        CompaniesHouseNameQueryForm.firstNameKey -> Seq("Carol"),
+        CompaniesHouseNameQueryForm.lastNameKey -> Seq("Tester")
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -227,8 +228,8 @@ extends ControllerSpec:
 
     val response: WSResponse =
       post(postPath)(Map(
-        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("Carol"),
-        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("Tester")
+        CompaniesHouseNameQueryForm.firstNameKey -> Seq("Carol"),
+        CompaniesHouseNameQueryForm.lastNameKey -> Seq("Tester")
       ))
 
     response.status shouldBe Status.BAD_REQUEST
@@ -254,8 +255,8 @@ extends ControllerSpec:
 
     val response: WSResponse =
       post(postPath)(Map(
-        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("john"),
-        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("tester")
+        CompaniesHouseNameQueryForm.firstNameKey -> Seq("john"),
+        CompaniesHouseNameQueryForm.lastNameKey -> Seq("tester")
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -276,8 +277,8 @@ extends ControllerSpec:
 
     val response: WSResponse =
       post(postPath)(Map(
-        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("John"),
-        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("Tester")
+        CompaniesHouseNameQueryForm.firstNameKey -> Seq("John"),
+        CompaniesHouseNameQueryForm.lastNameKey -> Seq("Tester")
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -285,6 +286,30 @@ extends ControllerSpec:
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
     AgentRegistrationStubs.verifyUpsertIndividualProvidedDetails()
     CompaniesHouseStubs.verifySixOfficersCalls(surname = Some("Tester"))
+
+  s"POST $postPath with valid name including multiple last names that matches a Companies House officer should save and redirect" in:
+    ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
+    AgentRegistrationStubs.stubFindIndividualsForApplication(
+      agentApplicationId = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId,
+      individuals = List.empty
+    )
+    CompaniesHouseStubs.stubSingleMatch(lastName = "Tester Smith")
+    AgentRegistrationStubs.stubFindIndividualByPersonReferenceNoContent(tdAll.personReference)
+    AgentRegistrationStubs.stubUpsertIndividualProvidedDetails(
+      individualProvidedDetails = tdAll.providedDetails.precreated.copy(individualName = IndividualName("Taylor Tester Smith"))
+    )
+
+    val response: WSResponse =
+      post(postPath)(Map(
+        CompaniesHouseNameQueryForm.firstNameKey -> Seq("Taylor"),
+        CompaniesHouseNameQueryForm.lastNameKey -> Seq("Tester Smith")
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+    AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
+    AgentRegistrationStubs.verifyUpsertIndividualProvidedDetails()
+    CompaniesHouseStubs.verifySingleMatchCalls(lastName = "Tester Smith")
 
   s"POST $postPath with valid name matching a Companies House officer (who has a title) should save and redirect" in:
     ApplyStubHelper.stubsToSupplyBprToPage(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers)
@@ -300,8 +325,8 @@ extends ControllerSpec:
 
     val response: WSResponse =
       post(postPath)(Map(
-        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("John"),
-        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("Tester")
+        CompaniesHouseNameQueryForm.firstNameKey -> Seq("John"),
+        CompaniesHouseNameQueryForm.lastNameKey -> Seq("Tester")
       ))
 
     response.status shouldBe Status.SEE_OTHER
@@ -323,8 +348,8 @@ extends ControllerSpec:
 
     val response: WSResponse =
       post(postPath)(Map(
-        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("Unknown"),
-        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("Person")
+        CompaniesHouseNameQueryForm.firstNameKey -> Seq("Unknown"),
+        CompaniesHouseNameQueryForm.lastNameKey -> Seq("Person")
       ))
 
     response.status shouldBe Status.BAD_REQUEST
@@ -347,7 +372,7 @@ extends ControllerSpec:
     val doc = response.parseBodyAsJsoupDocument
     doc.title() should startWith("Error:")
     doc.mainContent
-      .select(s"#${CompaniesHouseIndividuaNameForm.firstNameKey}-error")
+      .select(s"#${CompaniesHouseNameQueryForm.firstNameKey}-error")
       .text() should include("Error:")
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplication.afterNumberOfConfirmCompaniesHouseOfficers.agentApplicationId)
@@ -366,8 +391,8 @@ extends ControllerSpec:
 
     val response: WSResponse =
       post(postPath)(Map(
-        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("John"),
-        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("Tester"),
+        CompaniesHouseNameQueryForm.firstNameKey -> Seq("John"),
+        CompaniesHouseNameQueryForm.lastNameKey -> Seq("Tester"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
@@ -391,8 +416,8 @@ extends ControllerSpec:
 
     val response: WSResponse =
       post(postPath)(Map(
-        CompaniesHouseIndividuaNameForm.firstNameKey -> Seq("Unknown"),
-        CompaniesHouseIndividuaNameForm.lastNameKey -> Seq("Person"),
+        CompaniesHouseNameQueryForm.firstNameKey -> Seq("Unknown"),
+        CompaniesHouseNameQueryForm.lastNameKey -> Seq("Person"),
         "submit" -> Seq("SaveAndComeBackLater")
       ))
 
