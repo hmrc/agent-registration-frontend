@@ -33,7 +33,7 @@ object IndividualSaUtr:
   extends IndividualSaUtr,
     UserProvidedSaUtr
 
-  case object NotProvided
+  case object NotProvided // SCR
   extends IndividualSaUtr,
     UserProvidedSaUtr
 
