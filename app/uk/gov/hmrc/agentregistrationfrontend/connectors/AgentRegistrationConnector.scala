@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.dataintegrity.DataIntegrityChecks.logDataIntegrityViolations
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.http.client.HttpClientV2
 
@@ -55,6 +56,7 @@ extends Connector:
       .andLogOnFailure(s"Failed to find Agent Application")
 
   def upsertApplication(application: AgentApplication)(using RequestHeader): Future[Unit] =
+    application.logDataIntegrityViolations
     val url: URL = url"$baseUrl/application"
     httpClient
       .post(url)

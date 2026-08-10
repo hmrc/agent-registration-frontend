@@ -163,17 +163,19 @@ extends RequestAwareLogging:
   val getApplicationForFailedFixable: ActionBuilderWithData[List[IndividualProvidedDetails] *: DataWithApplicationAndBpr] = getApplicationAfterSentForRisking
     .refine:
       implicit request =>
-        individualProvidedDetailsService.findAllByApplicationId(request.get[AgentApplication]._id).map: list =>
-          request.add[List[IndividualProvidedDetails]](list)
+        individualProvidedDetailsService.findAllByApplicationId(request.get[AgentApplication]._id)
+          .map: list =>
+            request.add[List[IndividualProvidedDetails]](list)
 
   val getSoleTraderIdentityFix: ActionBuilderWithData[DataWithSoleTraderIdentityFix] = getApplicationAfterSentForRisking
     .refine:
       implicit request =>
-        individualProvidedDetailsService.findAllByApplicationId(request.get[AgentApplication]._id).map:
-          case soleTrader :: Nil => request.add[IndividualProvidedDetails](soleTrader)
-          case _ =>
-            logger.warn(s"Unexpected variation on sole trader individuals for application ${request.get[AgentApplication]._id}, redirecting to where outcome can be handled.")
-            Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
+        individualProvidedDetailsService.findAllByApplicationId(request.get[AgentApplication]._id)
+          .map:
+            case soleTrader :: Nil => request.add[IndividualProvidedDetails](soleTrader)
+            case _ =>
+              logger.warn(s"Unexpected variation on sole trader individuals for application ${request.get[AgentApplication]._id}, redirecting to where outcome can be handled.")
+              Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
     .refine:
       implicit request =>
         request.get[AgentApplication].riskingOutcomeApplication match

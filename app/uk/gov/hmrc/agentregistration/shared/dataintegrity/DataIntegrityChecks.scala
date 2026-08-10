@@ -1,0 +1,220 @@
+/*
+ * Copyright 2025 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package uk.gov.hmrc.agentregistration.shared.dataintegrity
+
+import play.api.mvc.RequestHeader
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
+import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogger
+
+object DataIntegrityChecks:
+
+  extension [A <: AgentApplication](agentApplication: A)
+
+    def logDataIntegrityViolations(using
+      logger: RequestAwareLogger,
+      request: RequestHeader
+    ): A =
+      dataIntegrityViolations(agentApplication).foreach(msg => logger.error(msg))
+      agentApplication
+
+  def dataIntegrityViolations(agentApplication: AgentApplication): Seq[String] =
+    agentApplication.riskingOutcomeApplication match
+      case Some(fixable: RiskingOutcomeApplication.FailedFixable) if fixable.reSubmittedAt.isDefined => Resubmission.runDataIntegrityChecks(agentApplication)
+      case _ => Submission.runDataIntegrityChecks(agentApplication)
+
+  private inline def fault(
+    agentApplication: AgentApplication,
+    condition: Boolean,
+    message: String
+  ): Seq[String] =
+    if !condition
+    then Seq(s"integrity check failed [applicationReference=${agentApplication.applicationReference.value}]: $message")
+    else Seq.empty
+
+  private def preSubmitFaults(agentApplication: AgentApplication)(using state: ApplicationState): Seq[String] =
+    fault(
+      agentApplication,
+      agentApplication.applicationExpiresAt.isDefined,
+      s"applicationExpiresAt should be defined in $state state"
+    ) ++
+      fault(
+        agentApplication,
+        agentApplication.submittedAt.isEmpty,
+        s"submittedAt should not be defined in $state state"
+      ) ++
+      fault(
+        agentApplication,
+        agentApplication.riskingOutcomeApplication.isEmpty,
+        s"riskingOutcomeApplication should not be defined in $state state"
+      ) ++
+      fault(
+        agentApplication,
+        agentApplication.riskingOutcomeEntity.isEmpty,
+        s"riskingOutcomeEntity should not be defined in $state state"
+      )
+
+  private def postSubmitFaults(agentApplication: AgentApplication)(using state: ApplicationState): Seq[String] =
+    fault(
+      agentApplication,
+      agentApplication.applicationExpiresAt.isEmpty,
+      s"applicationExpiresAt should not be defined in $state state"
+    ) ++
+      fault(
+        agentApplication,
+        agentApplication.submittedAt.isDefined,
+        s"submittedAt should be defined in $state state"
+      ) ++
+      fault(
+        agentApplication,
+        businessDetailsDefinedCheck(agentApplication),
+        s"businessDetails should be defined in $state state"
+      ) ++
+      fault(
+        agentApplication,
+        agentApplication.applicantContactDetails.isDefined,
+        s"applicantContactDetails should be defined in $state state"
+      ) ++
+      fault(
+        agentApplication,
+        agentApplication.applicantContactDetails.forall(_.isComplete),
+        s"applicantContactDetails should be complete in $state state"
+      ) ++
+      fault(
+        agentApplication,
+        agentApplication.amlsDetails.isDefined,
+        s"amlsDetails should be defined in $state state"
+      ) ++
+      fault(
+        agentApplication,
+        agentApplication.amlsDetails.forall(_.isComplete),
+        s"amlsDetails should be complete in $state state"
+      ) ++
+      fault(
+        agentApplication,
+        agentApplication.agentDetails.isDefined,
+        s"agentDetails should be defined in $state state"
+      ) ++
+      fault(
+        agentApplication,
+        agentApplication.agentDetails.forall(_.isComplete),
+        s"agentDetails should be complete in $state state"
+      ) ++
+      fault(
+        agentApplication,
+        agentApplication.refusalToDealWithCheckResult.isDefined,
+        s"refusalToDealWithCheckResult should be defined in $state state"
+      ) ++
+      fault(
+        agentApplication,
+        agentApplication.globalAsaEnrolmentCheckResult.isDefined,
+        s"globalAsaEnrolmentCheckResult should be defined in $state state"
+      ) ++
+      fault(
+        agentApplication,
+        agentApplication.vrns.isDefined,
+        s"vrns should be defined in $state state"
+      ) ++
+      fault(
+        agentApplication,
+        agentApplication.payeRefs.isDefined,
+        s"payeRefs should be defined in $state state"
+      )
+
+  private object Submission:
+
+    def runDataIntegrityChecks(agentApplication: AgentApplication): Seq[String] =
+      agentApplication.applicationState match
+        case ApplicationState.Started => whenStarted(agentApplication)
+        case ApplicationState.GrsDataReceived => whenGrsDataReceived(agentApplication)
+        case ApplicationState.SentForRisking | ApplicationState.SentToMinerva => whenAwaitingRiskingOutcome(agentApplication)
+        case ApplicationState.RiskingCompleted => whenRiskingCompleted(agentApplication)
+
+    private def whenStarted(agentApplication: AgentApplication): Seq[String] =
+      given ApplicationState = ApplicationState.Started
+      preSubmitFaults(agentApplication)
+
+    private def whenGrsDataReceived(agentApplication: AgentApplication): Seq[String] =
+      given ApplicationState = ApplicationState.GrsDataReceived
+      preSubmitFaults(agentApplication) ++
+        fault(
+          agentApplication,
+          businessDetailsDefinedCheck(agentApplication),
+          "businessDetails should be defined in GrsDataReceived state"
+        )
+
+    private def whenAwaitingRiskingOutcome(agentApplication: AgentApplication): Seq[String] =
+      given state: ApplicationState = agentApplication.applicationState
+      postSubmitFaults(agentApplication) ++
+        fault(
+          agentApplication,
+          agentApplication.riskingOutcomeApplication.isEmpty,
+          s"riskingOutcomeApplication should not be defined in $state state during first submission"
+        ) ++
+        fault(
+          agentApplication,
+          agentApplication.riskingOutcomeEntity.isEmpty,
+          s"riskingOutcomeEntity should not be defined in $state state during first submission"
+        )
+
+  private object Resubmission:
+
+    def runDataIntegrityChecks(agentApplication: AgentApplication): Seq[String] =
+      agentApplication.applicationState match
+        case ApplicationState.SentForRisking | ApplicationState.SentToMinerva => whenAwaitingRiskingOutcome(agentApplication)
+        case ApplicationState.RiskingCompleted => whenRiskingCompleted(agentApplication)
+        case other =>
+          fault(
+            agentApplication,
+            false,
+            s"resubmission-in-flight is only valid in SentForRisking, SentToMinerva or RiskingCompleted, found $other"
+          )
+
+    private def whenAwaitingRiskingOutcome(agentApplication: AgentApplication): Seq[String] =
+      given state: ApplicationState = agentApplication.applicationState
+      // `riskingOutcomeApplication.isDefined` is guaranteed by the top-level dispatch (this object is only entered when roa is Some(FailedFixable) with
+      // reSubmittedAt defined), so it is not re-asserted here. `riskingOutcomeEntity` is not guaranteed by the dispatch, hence the check below.
+      postSubmitFaults(agentApplication) ++
+        fault(
+          agentApplication,
+          agentApplication.riskingOutcomeEntity.isDefined,
+          s"riskingOutcomeEntity should be preserved in $state state during resubmission"
+        )
+
+  private def whenRiskingCompleted(agentApplication: AgentApplication): Seq[String] =
+    given ApplicationState = ApplicationState.RiskingCompleted
+    postSubmitFaults(agentApplication) ++
+      fault(
+        agentApplication,
+        agentApplication.riskingOutcomeApplication.isDefined,
+        "riskingOutcomeApplication should be defined in RiskingCompleted state"
+      ) ++
+      fault(
+        agentApplication,
+        agentApplication.riskingOutcomeEntity.isDefined,
+        "riskingOutcomeEntity should be defined in RiskingCompleted state"
+      )
+
+  private def businessDetailsDefinedCheck(agentApplication: AgentApplication): Boolean =
+    agentApplication match
+      case a: AgentApplicationSoleTrader => a.businessDetails.isDefined
+      case a: AgentApplicationLlp => a.businessDetails.isDefined
+      case a: AgentApplicationLimitedCompany => a.businessDetails.isDefined
+      case a: AgentApplicationGeneralPartnership => a.businessDetails.isDefined
+      case a: AgentApplicationLimitedPartnership => a.businessDetails.isDefined
+      case a: AgentApplicationScottishLimitedPartnership => a.businessDetails.isDefined
+      case a: AgentApplicationScottishPartnership => a.businessDetails.isDefined

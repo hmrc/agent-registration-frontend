@@ -82,8 +82,9 @@ extends FrontendController(mcc, actions):
     .getApplicationAfterSentForRisking
     .refine(implicit request =>
       val agentApplication: AgentApplication = request.get
-      individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
-        request.add[List[IndividualProvidedDetails]](individualsList)
+      individualProvideDetailsService
+        .findAllByApplicationId(agentApplication.agentApplicationId)
+        .map(request.add[List[IndividualProvidedDetails]])
     )
     .async:
       implicit request =>

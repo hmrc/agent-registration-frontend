@@ -58,7 +58,8 @@ extends FrontendController(mcc, actions):
       implicit request =>
         val agentApplication: IsNotSoleTrader = request.get
         individualProvideDetailsService
-          .findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
+          .findAllByApplicationId(agentApplication.agentApplicationId)
+          .map: individualsList =>
             request.add[List[IndividualProvidedDetails]](individualsList.filterNot(_.isPersonOfControl))
     .refine:
       implicit request =>

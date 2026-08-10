@@ -62,24 +62,26 @@ extends FrontendController(mcc, actions):
       )
       .refine(implicit request =>
         val agentApplication: AgentApplication = request.get
-        individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
-          val fixableList = individualsList.filter(_.hasFixableFailure)
+        individualProvideDetailsService
+          .findAllByApplicationId(agentApplication.agentApplicationId)
+          .map: individualsList =>
+            val fixableList = individualsList.filter(_.hasFixableFailure)
 
-          if (fixableList.nonEmpty)
-            val detailsNotProvidedByApplicantList = fixableList.filter(_.detailsNotProvidedByApplicant)
-            if (detailsNotProvidedByApplicantList.isEmpty) {
-              throw new IllegalStateException(
-                s"""[
-                   | FixableIndividualsController] All individual details provided by applicant for application ${agentApplication.applicationReference}
-                   | this includes individuals with person references: ${detailsNotProvidedByApplicantList.map(_.personReference.value)}, redirecting to
-                   | error page""".stripMargin
-              )
-            }
+            if (fixableList.nonEmpty)
+              val detailsNotProvidedByApplicantList = fixableList.filter(_.detailsNotProvidedByApplicant)
+              if (detailsNotProvidedByApplicantList.isEmpty) {
+                throw new IllegalStateException(
+                  s"""[
+                     | FixableIndividualsController] All individual details provided by applicant for application ${agentApplication.applicationReference}
+                     | this includes individuals with person references: ${detailsNotProvidedByApplicantList.map(_.personReference.value)}, redirecting to
+                     | error page""".stripMargin
+                )
+              }
+              else
+                request.add[List[IndividualProvidedDetails]](detailsNotProvidedByApplicantList)
             else
-              request.add[List[IndividualProvidedDetails]](detailsNotProvidedByApplicantList)
-          else
-            logger.warn("No fixable individuals found. Redirecting to status page.")
-            Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
+              logger.warn("No fixable individuals found. Redirecting to status page.")
+              Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
       ):
         implicit request =>
           val application = request.get[AgentApplication]
