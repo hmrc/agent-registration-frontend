@@ -65,10 +65,8 @@ extends FrontendController(mcc, actions):
     )
     .refine(implicit request =>
       val agentApplication: AgentApplicationSoleTrader = request.get
-      individualProvideDetailsService
-        .findAllByApplicationId(agentApplication.agentApplicationId)
-        .map: individualsList =>
-          request.add[List[IndividualProvidedDetails]](individualsList)
+      individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
+        request.add[List[IndividualProvidedDetails]](individualsList)
     )
     .refine(implicit request =>
       val existingList: List[IndividualProvidedDetails] = request.get

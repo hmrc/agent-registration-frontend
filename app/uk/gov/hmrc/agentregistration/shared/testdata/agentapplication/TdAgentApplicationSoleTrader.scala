@@ -132,18 +132,18 @@ trait TdAgentApplicationSoleTrader { dependencies: (TdBase & TdGrsBusinessDetail
       applicationState = ApplicationState.RiskingCompleted,
       riskingOutcomeApplication = Some(dependencies.riskingOutcomeApplication.failedFixable),
       riskingOutcomeEntity = Some(dependencies.riskingOutcomeEntitySoleTraderDuplicateFixes)
-    )
+    ).assertDataIntegrity()
 
     val riskingOutcomeSoleTraderAmls: AgentApplicationSoleTrader = afterSentToMinerva.copy(
       applicationState = ApplicationState.RiskingCompleted,
       riskingOutcomeApplication = Some(dependencies.riskingOutcomeApplication.failedFixable),
       riskingOutcomeEntity = Some(dependencies.riskingOutcomeEntityFailedFixable(isFixed = None))
-    )
+    ).assertDataIntegrity()
 
     val riskingOutcomeEntityFailedFixableNoEntityFailures: AgentApplicationSoleTrader = afterSentToMinerva.copy(
       applicationState = ApplicationState.RiskingCompleted,
       riskingOutcomeApplication = Some(dependencies.riskingOutcomeApplication.failedFixable),
       riskingOutcomeEntity = Some(RiskingOutcomeEntity.Approved)
-    )
+    ).assertDataIntegrity()
 
 }

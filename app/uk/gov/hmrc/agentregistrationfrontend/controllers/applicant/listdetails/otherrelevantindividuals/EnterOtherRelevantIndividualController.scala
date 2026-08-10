@@ -63,10 +63,8 @@ extends FrontendController(mcc, actions):
     .refine:
       implicit request =>
         val agentApplication: IsNotSoleTrader = request.get
-        individualProvideDetailsService
-          .findAllByApplicationId(agentApplication.agentApplicationId)
-          .map: individualsList =>
-            request.add[List[IndividualProvidedDetails]](individualsList)
+        individualProvideDetailsService.findAllByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
+          request.add[List[IndividualProvidedDetails]](individualsList)
 
   def show: Action[AnyContent] = baseAction
     .async:

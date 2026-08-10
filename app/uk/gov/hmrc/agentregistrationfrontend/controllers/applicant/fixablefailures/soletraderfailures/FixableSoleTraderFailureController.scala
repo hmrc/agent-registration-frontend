@@ -66,13 +66,11 @@ extends FrontendController(mcc, actions):
     .behindFeatureFlag(appConfig.Features.fixableFailures)
     .refine:
       implicit request =>
-        individualProvideDetailsService
-          .findAllByApplicationId(request.get[AgentApplication].agentApplicationId)
-          .map:
-            case soleTrader :: Nil => request.add[IndividualProvidedDetails](soleTrader)
-            case _ =>
-              logger.warn(s"Unexpected variation on sole trader individuals for failure code $failureCode, redirecting to where outcome can be handled.")
-              Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
+        individualProvideDetailsService.findAllByApplicationId(request.get[AgentApplication].agentApplicationId).map:
+          case soleTrader :: Nil => request.add[IndividualProvidedDetails](soleTrader)
+          case _ =>
+            logger.warn(s"Unexpected variation on sole trader individuals for failure code $failureCode, redirecting to where outcome can be handled.")
+            Redirect(AppRoutes.apply.AgentApplicationController.applicationStatus)
     .refine:
       implicit request: RequestWithData[IndividualProvidedDetails *: DataWithApplicationAndBpr] =>
         request.get[AgentApplication].riskingOutcomeApplication match

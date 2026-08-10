@@ -182,7 +182,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
       applicationState = ApplicationState.RiskingCompleted,
       riskingOutcomeApplication = Some(dependencies.riskingOutcomeApplication.failedFixable),
       riskingOutcomeEntity = Some(Approved)
-    )
+    ).assertDataIntegrity()
 
     def afterRiskingCompletedWithFixableAmls(failure: EntityFailure.IsAmls): AgentApplicationLlp = afterSentToMinerva.copy(
       applicationState = ApplicationState.RiskingCompleted,
@@ -223,7 +223,7 @@ trait TdAgentApplicationLlp { dependencies: (TdBase & TdGrsBusinessDetails) =>
     val afterResubmitted: AgentApplicationLlp = afterRiskingCompletedFixableFixed.copy(
       applicationState = ApplicationState.SentForRisking,
       riskingOutcomeApplication = Some(dependencies.riskingOutcomeApplication.failedFixable.copy(reSubmittedAt = Some(dependencies.nowAsInstant)))
-    )
+    ).assertDataIntegrity()
 
     val applicationData: ApplicationData =
       val a: AgentApplicationLlp = afterDeclarationSubmitted
