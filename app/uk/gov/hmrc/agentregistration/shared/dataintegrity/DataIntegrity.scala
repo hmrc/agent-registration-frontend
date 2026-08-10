@@ -21,23 +21,23 @@ import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogger
 
-object DataIntegrityChecks:
+object DataIntegrity:
 
   extension [A <: AgentApplication](agentApplication: A)
 
-    def logDataIntegrityViolations(using
+    def logViolations(using
       logger: RequestAwareLogger,
       request: RequestHeader
     ): A =
-      dataIntegrityViolations(agentApplication).foreach(msg => logger.error(msg))
+      violations(agentApplication).foreach(msg => logger.error(msg))
       agentApplication
 
-  def dataIntegrityViolations(agentApplication: AgentApplication): Seq[String] =
+  def violations(agentApplication: AgentApplication): Seq[String] =
     agentApplication.riskingOutcomeApplication match
-      case Some(fixable: RiskingOutcomeApplication.FailedFixable) if fixable.reSubmittedAt.isDefined => Resubmission.runDataIntegrityChecks(agentApplication)
-      case _ => Submission.runDataIntegrityChecks(agentApplication)
+      case Some(fixable: RiskingOutcomeApplication.FailedFixable) if fixable.reSubmittedAt.isDefined => Resubmission.violations(agentApplication)
+      case _ => Submission.violations(agentApplication)
 
-  private inline def fault(
+  private inline def violation(
     agentApplication: AgentApplication,
     condition: Boolean,
     message: String
@@ -46,90 +46,90 @@ object DataIntegrityChecks:
     then Seq(s"integrity check failed [applicationReference=${agentApplication.applicationReference.value}]: $message")
     else Seq.empty
 
-  private def preSubmitFaults(agentApplication: AgentApplication)(using state: ApplicationState): Seq[String] =
-    fault(
+  private def preSubmitViolations(agentApplication: AgentApplication)(using state: ApplicationState): Seq[String] =
+    violation(
       agentApplication,
       agentApplication.applicationExpiresAt.isDefined,
       s"applicationExpiresAt should be defined in $state state"
     ) ++
-      fault(
+      violation(
         agentApplication,
         agentApplication.submittedAt.isEmpty,
         s"submittedAt should not be defined in $state state"
       ) ++
-      fault(
+      violation(
         agentApplication,
         agentApplication.riskingOutcomeApplication.isEmpty,
         s"riskingOutcomeApplication should not be defined in $state state"
       ) ++
-      fault(
+      violation(
         agentApplication,
         agentApplication.riskingOutcomeEntity.isEmpty,
         s"riskingOutcomeEntity should not be defined in $state state"
       )
 
-  private def postSubmitFaults(agentApplication: AgentApplication)(using state: ApplicationState): Seq[String] =
-    fault(
+  private def postSubmitViolations(agentApplication: AgentApplication)(using state: ApplicationState): Seq[String] =
+    violation(
       agentApplication,
       agentApplication.applicationExpiresAt.isEmpty,
       s"applicationExpiresAt should not be defined in $state state"
     ) ++
-      fault(
+      violation(
         agentApplication,
         agentApplication.submittedAt.isDefined,
         s"submittedAt should be defined in $state state"
       ) ++
-      fault(
+      violation(
         agentApplication,
-        businessDetailsDefinedCheck(agentApplication),
+        businessDetailsDefined(agentApplication),
         s"businessDetails should be defined in $state state"
       ) ++
-      fault(
+      violation(
         agentApplication,
         agentApplication.applicantContactDetails.isDefined,
         s"applicantContactDetails should be defined in $state state"
       ) ++
-      fault(
+      violation(
         agentApplication,
         agentApplication.applicantContactDetails.forall(_.isComplete),
         s"applicantContactDetails should be complete in $state state"
       ) ++
-      fault(
+      violation(
         agentApplication,
         agentApplication.amlsDetails.isDefined,
         s"amlsDetails should be defined in $state state"
       ) ++
-      fault(
+      violation(
         agentApplication,
         agentApplication.amlsDetails.forall(_.isComplete),
         s"amlsDetails should be complete in $state state"
       ) ++
-      fault(
+      violation(
         agentApplication,
         agentApplication.agentDetails.isDefined,
         s"agentDetails should be defined in $state state"
       ) ++
-      fault(
+      violation(
         agentApplication,
         agentApplication.agentDetails.forall(_.isComplete),
         s"agentDetails should be complete in $state state"
       ) ++
-      fault(
+      violation(
         agentApplication,
         agentApplication.refusalToDealWithCheckResult.isDefined,
         s"refusalToDealWithCheckResult should be defined in $state state"
       ) ++
-      fault(
+      violation(
         agentApplication,
         agentApplication.globalAsaEnrolmentCheckResult.isDefined,
         s"globalAsaEnrolmentCheckResult should be defined in $state state"
       ) ++
-      fault(
+      violation(
         agentApplication,
         agentApplication.vrns.isDefined,
         s"vrns should be defined in $state state"
       ) ++
-      fault(
+      violation(
         agentApplication,
         agentApplication.payeRefs.isDefined,
         s"payeRefs should be defined in $state state"
@@ -137,7 +137,7 @@ object DataIntegrityChecks:
 
   private object Submission:
 
-    def runDataIntegrityChecks(agentApplication: AgentApplication): Seq[String] =
+    def violations(agentApplication: AgentApplication): Seq[String] =
       agentApplication.applicationState match
         case ApplicationState.Started => whenStarted(agentApplication)
         case ApplicationState.GrsDataReceived => whenGrsDataReceived(agentApplication)
@@ -146,26 +146,26 @@ object DataIntegrityChecks:
 
     private def whenStarted(agentApplication: AgentApplication): Seq[String] =
       given ApplicationState = ApplicationState.Started
-      preSubmitFaults(agentApplication)
+      preSubmitViolations(agentApplication)
 
     private def whenGrsDataReceived(agentApplication: AgentApplication): Seq[String] =
       given ApplicationState = ApplicationState.GrsDataReceived
-      preSubmitFaults(agentApplication) ++
-        fault(
+      preSubmitViolations(agentApplication) ++
+        violation(
           agentApplication,
-          businessDetailsDefinedCheck(agentApplication),
+          businessDetailsDefined(agentApplication),
           "businessDetails should be defined in GrsDataReceived state"
         )
 
     private def whenAwaitingRiskingOutcome(agentApplication: AgentApplication): Seq[String] =
       given state: ApplicationState = agentApplication.applicationState
-      postSubmitFaults(agentApplication) ++
-        fault(
+      postSubmitViolations(agentApplication) ++
+        violation(
           agentApplication,
           agentApplication.riskingOutcomeApplication.isEmpty,
           s"riskingOutcomeApplication should not be defined in $state state during first submission"
         ) ++
-        fault(
+        violation(
           agentApplication,
           agentApplication.riskingOutcomeEntity.isEmpty,
           s"riskingOutcomeEntity should not be defined in $state state during first submission"
@@ -173,12 +173,12 @@ object DataIntegrityChecks:
 
   private object Resubmission:
 
-    def runDataIntegrityChecks(agentApplication: AgentApplication): Seq[String] =
+    def violations(agentApplication: AgentApplication): Seq[String] =
       agentApplication.applicationState match
         case ApplicationState.SentForRisking | ApplicationState.SentToMinerva => whenAwaitingRiskingOutcome(agentApplication)
         case ApplicationState.RiskingCompleted => whenRiskingCompleted(agentApplication)
         case other =>
-          fault(
+          violation(
             agentApplication,
             false,
             s"resubmission-in-flight is only valid in SentForRisking, SentToMinerva or RiskingCompleted, found $other"
@@ -188,8 +188,8 @@ object DataIntegrityChecks:
       given state: ApplicationState = agentApplication.applicationState
       // `riskingOutcomeApplication.isDefined` is guaranteed by the top-level dispatch (this object is only entered when roa is Some(FailedFixable) with
       // reSubmittedAt defined), so it is not re-asserted here. `riskingOutcomeEntity` is not guaranteed by the dispatch, hence the check below.
-      postSubmitFaults(agentApplication) ++
-        fault(
+      postSubmitViolations(agentApplication) ++
+        violation(
           agentApplication,
           agentApplication.riskingOutcomeEntity.isDefined,
           s"riskingOutcomeEntity should be preserved in $state state during resubmission"
@@ -197,19 +197,19 @@ object DataIntegrityChecks:
 
   private def whenRiskingCompleted(agentApplication: AgentApplication): Seq[String] =
     given ApplicationState = ApplicationState.RiskingCompleted
-    postSubmitFaults(agentApplication) ++
-      fault(
+    postSubmitViolations(agentApplication) ++
+      violation(
         agentApplication,
         agentApplication.riskingOutcomeApplication.isDefined,
         "riskingOutcomeApplication should be defined in RiskingCompleted state"
       ) ++
-      fault(
+      violation(
         agentApplication,
         agentApplication.riskingOutcomeEntity.isDefined,
         "riskingOutcomeEntity should be defined in RiskingCompleted state"
       )
 
-  private def businessDetailsDefinedCheck(agentApplication: AgentApplication): Boolean =
+  private def businessDetailsDefined(agentApplication: AgentApplication): Boolean =
     agentApplication match
       case a: AgentApplicationSoleTrader => a.businessDetails.isDefined
       case a: AgentApplicationLlp => a.businessDetails.isDefined

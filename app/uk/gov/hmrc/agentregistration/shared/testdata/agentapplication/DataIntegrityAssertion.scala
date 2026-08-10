@@ -17,13 +17,13 @@
 package uk.gov.hmrc.agentregistration.shared.testdata.agentapplication
 
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.dataintegrity.DataIntegrityChecks.dataIntegrityViolations
+import uk.gov.hmrc.agentregistration.shared.dataintegrity.DataIntegrity
 
 object DataIntegrityAssertion:
 
   extension [A <: AgentApplication](agentApplication: A)
 
     def assertDataIntegrity(): A =
-      val violations = dataIntegrityViolations(agentApplication)
+      val violations = DataIntegrity.violations(agentApplication)
       if violations.nonEmpty then throw new IllegalStateException(violations.mkString("; "))
       agentApplication

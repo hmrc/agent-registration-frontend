@@ -17,7 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.model
 
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.dataintegrity.DataIntegrityChecks.dataIntegrityViolations
+import uk.gov.hmrc.agentregistration.shared.dataintegrity.DataIntegrity
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.UnitSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll
 
@@ -68,7 +68,7 @@ extends UnitSpec:
       )
 
       val violations: Seq[String] = snapshots.flatMap: (name, app) =>
-        dataIntegrityViolations(app).map(v => s"$name -> $v")
+        DataIntegrity.violations(app).map(v => s"$name -> $v")
 
       withClue(s"${violations.size} snapshot(s) drifted:\n${violations.mkString("\n")}\n"):
         violations shouldBe empty
