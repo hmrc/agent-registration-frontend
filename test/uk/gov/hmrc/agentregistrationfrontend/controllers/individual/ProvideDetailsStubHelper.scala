@@ -40,8 +40,8 @@ object ProvideDetailsStubHelper:
   ): StubMapping =
 
     if isScr
-    then IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
-    else IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr(cl)
+    then IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyWithCl(internalUserId = agentApplication.internalUserId, cl = cl))
+    else IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
 
     if withBpr
     then
@@ -77,7 +77,8 @@ object ProvideDetailsStubHelper:
     stubAuthAndUpdateProvidedDetails(
       agentApplication,
       individualProvidedDetails,
-      updatedIndividualProvidedDetails
+      updatedIndividualProvidedDetails,
+      isScr
     )
     AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
       utr = tdAll.saUtr.asUtr, // doesn't matter we are using same utr as provided details, there is no conflict

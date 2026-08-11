@@ -94,8 +94,7 @@ object CitizenDetailsStub:
     )
 
   def stubDesignatoryDetailsNotFound(
-    nino: Nino,
-    deceased: Boolean = false
+    nino: Nino
   ): StubMapping =
 
     StubMaker.make(

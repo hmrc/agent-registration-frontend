@@ -45,7 +45,7 @@ object CompaniesHouseStubs {
       else 200,
     responseBody =
       surname match
-        case Some(s) if noMatch => ""
+        case Some(_) if noMatch => ""
         case Some(s) =>
           responseBodyForSurnameSearch(
             s,
