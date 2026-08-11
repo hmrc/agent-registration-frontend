@@ -21,8 +21,8 @@ import uk.gov.hmrc.agentregistration.shared.*
 
 /** Runtime data integrity checks for [[AgentApplication]].
   *
-  * Deliberately free of any Play or frontend dependency so this file remains valid in every repo which shares this package
-  * (agent-registration, agent-registration-frontend, agent-registration-risking). Logging of the violations it returns lives in
+  * Deliberately free of any Play or frontend dependency so this file remains valid in every repo which shares this package (agent-registration,
+  * agent-registration-frontend, agent-registration-risking). Logging of the violations it returns lives in
   * `uk.gov.hmrc.agentregistrationfrontend.dataintegrity.DataIntegrityLogging`.
   */
 object DataIntegrity:
