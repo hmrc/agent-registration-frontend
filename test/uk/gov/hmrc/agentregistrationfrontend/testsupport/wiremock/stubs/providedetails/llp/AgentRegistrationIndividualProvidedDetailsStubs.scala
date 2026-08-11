@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp
 
+import com.github.tomakehurst.wiremock.client.WireMock as wm
 import com.github.tomakehurst.wiremock.client.WireMock.urlMatching
 import com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
@@ -75,7 +76,8 @@ object AgentRegistrationIndividualProvidedDetailsStubs {
   def stubUpsertIndividualProvidedDetails(individualProvidedDetails: IndividualProvidedDetails): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.PUT,
     urlPattern = urlMatching(s"$base/for-individual"),
-    responseStatus = Status.OK
+    responseStatus = Status.OK,
+    requestBody = Some(wm.equalToJson(Json.prettyPrint(Json.toJson(individualProvidedDetails))))
   )
 
   def stubGetBusinessPartnerRecord(
