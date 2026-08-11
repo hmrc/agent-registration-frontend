@@ -25,20 +25,11 @@ import scala.util.Failure
 import scala.util.Success
 import scala.util.Try
 
-/** Logs the violations reported by [[DataIntegrity]].
-  *
-  * Kept out of the `shared` package on purpose: `shared` is copied verbatim into agent-registration and agent-registration-risking by syncSharedFiles.sh, and
-  * this depends on frontend-only types (`RequestAwareLogger`) which do not exist there.
-  */
 object DataIntegrityLogging:
 
   extension (agentApplication: AgentApplication)
 
-    /** Logs every data integrity violation found on this application, one line per violation.
-      *
-      * Never throws. Integrity checking is diagnostic only, so a fault in a check (or in the data it inspects) must not be able to fail the user's journey - a
-      * check which blows up is itself reported as an error and otherwise ignored.
-      */
+    // Never throws: integrity checking is diagnostic and must not be able to fail a user's journey.
     def logViolations(using
       logger: RequestAwareLogger,
       request: RequestHeader
