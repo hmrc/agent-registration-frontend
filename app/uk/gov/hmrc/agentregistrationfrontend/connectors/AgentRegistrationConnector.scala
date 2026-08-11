@@ -44,7 +44,7 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => Some(parseApplication(response))
+          case Status.OK => Some(parseApplication(response, url))
           case Status.NO_CONTENT => None
           case other =>
             Errors.throwUpstreamErrorResponse(
@@ -57,8 +57,8 @@ extends Connector:
       .andLogOnFailure(s"Failed to find Agent Application")
 
   def upsertApplication(application: AgentApplication)(using RequestHeader): Future[Unit] =
-    application.logViolations
     val url: URL = url"$baseUrl/application"
+    application.logViolations(s"before POST $url")
     httpClient
       .post(url)
       .withBody(Json.toJson(application))
@@ -83,7 +83,7 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => Some(parseApplication(response))
+          case Status.OK => Some(parseApplication(response, url))
           case Status.NO_CONTENT => None
           case other =>
             Errors.throwUpstreamErrorResponse(
@@ -101,7 +101,7 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => Some(parseApplication(response))
+          case Status.OK => Some(parseApplication(response, url))
           case Status.NO_CONTENT => None
           case other =>
             Errors.throwUpstreamErrorResponse(
@@ -119,7 +119,7 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => Some(parseApplication(response))
+          case Status.OK => Some(parseApplication(response, url))
           case Status.NO_CONTENT => None
           case other =>
             Errors.throwUpstreamErrorResponse(
@@ -183,9 +183,12 @@ extends Connector:
             )
       .andLogOnFailure("Failed to delete user's Agent Application")
 
-  private def parseApplication(response: HttpResponse)(using RequestHeader): AgentApplication = response
+  private inline def parseApplication(
+    response: HttpResponse,
+    url: URL
+  )(using RequestHeader): AgentApplication = response
     .json
     .as[AgentApplication]
-    .tap(_.logViolations)
+    .tap(_.logViolations(s"after GET $url"))
 
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration"

@@ -29,15 +29,15 @@ object DataIntegrityLogging:
 
   extension (agentApplication: AgentApplication)
 
-    // Never throws: integrity checking is diagnostic and must not be able to fail a user's journey.
-    def logViolations(using
+    inline def logViolations(context: String = "")(using
       logger: RequestAwareLogger,
       request: RequestHeader
     ): Unit =
+      val suffix: String = if context.isEmpty then "" else s" [context=$context]"
       Try(DataIntegrity.violations(agentApplication)) match
-        case Success(violations) => violations.foreach(violation => logger.error(violation))
+        case Success(violations) => violations.foreach(violation => logger.error(s"$violation$suffix", new RuntimeException("data integrity violation")))
         case Failure(exception) =>
           logger.error(
-            s"data integrity check could not be run [applicationReference=${agentApplication.applicationReference.value}]",
+            s"data integrity check could not be run [applicationReference=${agentApplication.applicationReference.value}]$suffix",
             exception
           )
