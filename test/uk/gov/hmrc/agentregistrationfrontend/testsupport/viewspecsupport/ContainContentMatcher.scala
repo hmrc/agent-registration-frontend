@@ -48,7 +48,7 @@ extends Matcher[Element]:
 
 object ContainContentMatcher:
 
-  def containContent(expectedLines: String)(using pos: Position): ContainContentMatcher = new ContainContentMatcher(expectedLines)
+  def containContent(expectedLines: String): ContainContentMatcher = new ContainContentMatcher(expectedLines)
 
   extension (element: Element)
     infix def shouldContainContent(expectedLines: String)(using pos: Position) = element should containContent(expectedLines)

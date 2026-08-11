@@ -73,7 +73,7 @@ object GrsStubs:
         case bt @ BusinessType.Partnership.LimitedPartnership => throw NotImplementedError(s"$bt not implemented yet")
         case bt @ BusinessType.Partnership.ScottishLimitedPartnership => throw NotImplementedError(s"$bt not implemented yet")
         case bt @ BusinessType.Partnership.ScottishPartnership => throw NotImplementedError(s"$bt not implemented yet")
-        case bt @ BusinessType.SoleTrader =>
+        case _ @BusinessType.SoleTrader =>
           if withoutUtr
           then tdAll.grsJourneyData.soleTrader.journeyDataWithoutSaUtr
           else tdAll.grsJourneyData.soleTrader.journeyData
