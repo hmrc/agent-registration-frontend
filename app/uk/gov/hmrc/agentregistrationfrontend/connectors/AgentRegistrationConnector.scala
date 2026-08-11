@@ -24,6 +24,7 @@ import uk.gov.hmrc.http.client.HttpClientV2
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
+import scala.util.chaining.scalaUtilChainingOps
 
 /** Connector to the companion backend microservice
   */
@@ -43,7 +44,7 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => Some(response.json.as[AgentApplication])
+          case Status.OK => Some(parseApplication(response))
           case Status.NO_CONTENT => None
           case other =>
             Errors.throwUpstreamErrorResponse(
@@ -82,7 +83,7 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => Some(response.json.as[AgentApplication])
+          case Status.OK => Some(parseApplication(response))
           case Status.NO_CONTENT => None
           case other =>
             Errors.throwUpstreamErrorResponse(
@@ -100,7 +101,7 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => Some(response.json.as[AgentApplication])
+          case Status.OK => Some(parseApplication(response))
           case Status.NO_CONTENT => None
           case other =>
             Errors.throwUpstreamErrorResponse(
@@ -118,7 +119,7 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => Some(response.json.as[AgentApplication])
+          case Status.OK => Some(parseApplication(response))
           case Status.NO_CONTENT => None
           case other =>
             Errors.throwUpstreamErrorResponse(
@@ -181,5 +182,10 @@ extends Connector:
               response = response
             )
       .andLogOnFailure("Failed to delete user's Agent Application")
+
+  private def parseApplication(response: HttpResponse)(using RequestHeader): AgentApplication = response
+    .json
+    .as[AgentApplication]
+    .tap(_.logViolations)
 
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration"
