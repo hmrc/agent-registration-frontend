@@ -16,21 +16,16 @@
 
 package uk.gov.hmrc.agentregistration.shared.dataintegrity
 
-import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogger
 
+/** Runtime data integrity checks for [[AgentApplication]].
+  *
+  * Deliberately free of any Play or frontend dependency so this file remains valid in every repo which shares this package
+  * (agent-registration, agent-registration-frontend, agent-registration-risking). Logging of the violations it returns lives in
+  * `uk.gov.hmrc.agentregistrationfrontend.dataintegrity.DataIntegrityLogging`.
+  */
 object DataIntegrity:
-
-  extension [A <: AgentApplication](agentApplication: A)
-
-    def logViolations(using
-      logger: RequestAwareLogger,
-      request: RequestHeader
-    ): A =
-      violations(agentApplication).foreach(msg => logger.error(msg))
-      agentApplication
 
   def violations(agentApplication: AgentApplication): Seq[String] =
     agentApplication.riskingOutcomeApplication match

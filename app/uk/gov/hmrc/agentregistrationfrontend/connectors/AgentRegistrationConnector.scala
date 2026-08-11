@@ -17,8 +17,8 @@
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.dataintegrity.DataIntegrity.logViolations
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.dataintegrity.DataIntegrityLogging.logViolations
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Inject
