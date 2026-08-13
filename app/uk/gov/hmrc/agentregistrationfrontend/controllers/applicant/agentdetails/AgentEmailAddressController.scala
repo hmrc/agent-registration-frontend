@@ -167,16 +167,16 @@ extends FrontendController(mcc, actions):
           email = emailToVerify
         ).flatMap {
           case EmailVerificationStatus.Verified =>
-            logger.info(s"[checkEmailVerificationStatus] Verified status received for applicantEmail using credId $credId and email $emailToVerify")
+            logger.info(s"[checkEmailVerificationStatus] Verified status received for applicantEmail using credId $credId")
             onEmailVerified()
           case EmailVerificationStatus.Unverified =>
-            logger.info(s"[checkEmailVerificationStatus] Unverified status received for applicantEmail using credId $credId and email $emailToVerify")
+            logger.info(s"[checkEmailVerificationStatus] Unverified status received for applicantEmail using credId $credId")
             onEmailUnverified(credId, emailToVerify)
           case EmailVerificationStatus.Locked =>
-            logger.info(s"[checkEmailVerificationStatus] Locked status received for applicantEmail using credId $credId and email $emailToVerify")
+            logger.info(s"[checkEmailVerificationStatus] Locked status received for applicantEmail using credId $credId")
             onEmailLocked()
           case EmailVerificationStatus.Error =>
-            logger.info(s"[checkEmailVerificationStatus] Error received for applicantEmail using credId $credId and email $emailToVerify")
+            logger.info(s"[checkEmailVerificationStatus] Error received for applicantEmail using credId $credId")
             onEmailError()
         }
 
