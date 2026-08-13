@@ -18,11 +18,13 @@ package uk.gov.hmrc.agentregistrationfrontend.connectors
 
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+import uk.gov.hmrc.agentregistrationfrontend.dataintegrity.DataIntegrityLogging.logViolations
 import uk.gov.hmrc.http.client.HttpClientV2
 
 import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
+import scala.util.chaining.scalaUtilChainingOps
 
 /** Connector to the companion backend microservice
   */
@@ -42,7 +44,7 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => Some(response.json.as[AgentApplication])
+          case Status.OK => Some(parseApplication(response, url))
           case Status.NO_CONTENT => None
           case other =>
             Errors.throwUpstreamErrorResponse(
@@ -56,6 +58,7 @@ extends Connector:
 
   def upsertApplication(application: AgentApplication)(using RequestHeader): Future[Unit] =
     val url: URL = url"$baseUrl/application"
+    application.logViolations(s"before POST $url")
     httpClient
       .post(url)
       .withBody(Json.toJson(application))
@@ -80,7 +83,7 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => Some(response.json.as[AgentApplication])
+          case Status.OK => Some(parseApplication(response, url))
           case Status.NO_CONTENT => None
           case other =>
             Errors.throwUpstreamErrorResponse(
@@ -98,7 +101,7 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => Some(response.json.as[AgentApplication])
+          case Status.OK => Some(parseApplication(response, url))
           case Status.NO_CONTENT => None
           case other =>
             Errors.throwUpstreamErrorResponse(
@@ -116,7 +119,7 @@ extends Connector:
       .execute[HttpResponse]
       .map: response =>
         response.status match
-          case Status.OK => Some(response.json.as[AgentApplication])
+          case Status.OK => Some(parseApplication(response, url))
           case Status.NO_CONTENT => None
           case other =>
             Errors.throwUpstreamErrorResponse(
@@ -179,5 +182,13 @@ extends Connector:
               response = response
             )
       .andLogOnFailure("Failed to delete user's Agent Application")
+
+  private inline def parseApplication(
+    response: HttpResponse,
+    url: URL
+  )(using RequestHeader): AgentApplication = response
+    .json
+    .as[AgentApplication]
+    .tap(_.logViolations(s"after GET $url"))
 
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration"
