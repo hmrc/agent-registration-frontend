@@ -19,9 +19,6 @@ package uk.gov.hmrc.agentregistration.shared.dataintegrity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.*
 
-/** Must stay free of Play and frontend dependencies: this package is copied verbatim into agent-registration and agent-registration-risking by
-  * syncSharedFiles.sh.
-  */
 object DataIntegrity:
 
   def violations(agentApplication: AgentApplication): Seq[String] =
