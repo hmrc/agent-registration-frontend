@@ -134,7 +134,7 @@ extends UnitSpec:
 
     "accept a valid ICAS registration number" in:
       AmlsRegistrationNumber.isValidForChosenSupervisoryBody(
-        "A123456",
+        "F1234",
         AmlsSupervisoryBodyCode("ICAS")
       ) shouldBe true
 
