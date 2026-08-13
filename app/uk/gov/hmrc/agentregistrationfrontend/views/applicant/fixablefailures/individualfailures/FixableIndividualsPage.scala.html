@@ -49,6 +49,7 @@
 }
 @templateStyles = {
 <link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/copy-button.css")}" @{CSPNonce.attr}>
+<link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/custom-list-styles.css")}" @{CSPNonce.attr}>
 }
 
 @key = @{"fixableIndividuals"}
@@ -59,7 +60,7 @@
 @provideDetailsLink = @{appConfig.applicationLink(agentApplication.linkId.value).toString}
 
 @detailsHtml = {
-  <p class="govuk-body">@messages(s"$key.details.content", provideDetailsLink)</p>
+  <p class="govuk-body wrap-link">@messages(s"$key.details.content", provideDetailsLink)</p>
   @copyButton(clip = provideDetailsLink)
 }
 
