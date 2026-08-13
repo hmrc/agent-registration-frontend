@@ -49,6 +49,7 @@ extends ControllerSpec:
   private object individualProvideDetails:
 
     val complete: IndividualProvidedDetails = tdAll.providedDetails.afterRiskedFixableIndividualDetails
+    val completeAndConfirmed: IndividualProvidedDetails = tdAll.providedDetails.afterRiskedFixableIndividualDetailsAndConfirmed
     val missingSaUtr: IndividualProvidedDetails = tdAll.providedDetails.AfterNino.afterNinoProvided.copy(riskingOutcomeIndividual =
       Some(tdAll.riskingOutcomeIndividualDetailsFixMissingSaUtr)
     )
@@ -61,6 +62,7 @@ extends ControllerSpec:
 
   private final case class TestCaseForCya(
     providedDetails: IndividualProvidedDetails,
+    updatedProvidedDetails: IndividualProvidedDetails,
     name: String
   )
   // in the fixable failures journeys the CYA page always begins with all required values provided,
@@ -68,6 +70,7 @@ extends ControllerSpec:
   List(
     TestCaseForCya(
       providedDetails = individualProvideDetails.complete,
+      updatedProvidedDetails = individualProvideDetails.completeAndConfirmed,
       name = "all details provided"
     )
   ).foreach: testCase =>
@@ -124,8 +127,8 @@ extends ControllerSpec:
     s"POST $path with ${testCase.name} should confirm the individual details fix and redirect to the fixable task list" in:
       ProvideDetailsStubHelper.stubFixableFailureUpdate(
         agentApplication = agentApplication,
-        individualProvidedDetails = testCase.providedDetails,
-        updatedIndividualProvidedDetails = testCase.providedDetails
+        individualProvidedDetails = testCase.updatedProvidedDetails,
+        updatedIndividualProvidedDetails = testCase.updatedProvidedDetails
       )
       val response: WSResponse = post(path)(Map.empty)
       response.status shouldBe Status.SEE_OTHER

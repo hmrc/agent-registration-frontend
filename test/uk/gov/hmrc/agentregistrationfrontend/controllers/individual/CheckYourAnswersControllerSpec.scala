@@ -116,7 +116,7 @@ extends ControllerSpec:
       expectedRedirect = Some(AppRoutes.providedetails.IndividualTelephoneNumberController.show(linkId).url)
     ),
     TestCaseForCya(
-      providedDetails = individualProvideDetails.complete,
+      providedDetails = individualProvideDetails.completeAndConfirmed,
       name = "sole trader",
       application = agentApplicationSoleTrader,
       expectedRedirect = Some(AppRoutes.providedetails.IndividualConfirmationController.show(linkId).url)
@@ -140,7 +140,7 @@ extends ControllerSpec:
             testCase.application,
             testCase.providedDetails
           )
-          AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(individualProvideDetails.complete)
+          AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(testCase.providedDetails)
           val response: WSResponse = get(path)
           response.status shouldBe Status.SEE_OTHER
           response.header("Location").value shouldBe expectedRedirect

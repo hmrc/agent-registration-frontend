@@ -41,7 +41,7 @@ extends ControllerSpec:
   private object individualProvideDetails:
 
     val afterNinoProvided: IndividualProvidedDetails = tdAll.providedDetails.afterRiskedFixableIndividualDetails
-    val afterNinoNotProvided: IndividualProvidedDetails = tdAll.providedDetails.afterRiskedFixableIndividualDetailsWithoutIds
+    val afterNinoNotProvided: IndividualProvidedDetails = tdAll.providedDetails.afterFixableIndividualDetailsWithNinoNotProvided
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.IndividualNinoController.show(linkId) shouldBe Call(
