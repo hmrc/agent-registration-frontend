@@ -4,3 +4,8 @@ ul.govuk-list.list-with-borders {
     border-bottom: 1px solid #b1b4b6;
   }
 }
+
+.wrap-link {
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
