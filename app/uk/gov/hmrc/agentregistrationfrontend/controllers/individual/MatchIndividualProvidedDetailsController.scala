@@ -21,7 +21,6 @@ import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.RequestHeader
 import play.api.mvc.Result
-import play.api.mvc.Results.Redirect
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
@@ -105,7 +104,7 @@ extends FrontendController(mcc, actions):
             .getCitizenDetails(nino)
             .map[RequestWithData[DataWithOptionalCitizenDetails]]: (details: CitizenDetails) =>
               request.add[Option[CitizenDetails]](Some(details))
-        case (cl, Some(nino)) =>
+        case (cl, Some(_)) =>
           logger.warn(s"Insufficient confidence level found in session (${cl}), we cannot trust the nino to use in citizen details, redirecting to manual name matching page")
           Future.successful(Redirect(AppRoutes.providedetails.NameMatchingController.show(linkId).url))
         case (_, None) =>
@@ -225,7 +224,7 @@ extends FrontendController(mcc, actions):
   extension (list: List[IndividualProvidedDetails])
     private def matchCitizenDetailsName(
       maybeCitizenDetails: Option[CitizenDetails]
-    )(using request: RequestHeader): Option[IndividualProvidedDetails] =
+    ): Option[IndividualProvidedDetails] =
       maybeCitizenDetails match
         case Some(citizenDetails) =>
           val fullName: String = s"${citizenDetails.firstName.getOrElse("")} ${citizenDetails.lastName.getOrElse("")}"

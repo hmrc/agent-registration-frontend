@@ -39,7 +39,7 @@ extends ControllerSpec:
 
   s"GET $endpoint" should:
     "return OK and download url when evidence exists" in:
-      AuthStubs.stubStrideAuth()
+      AuthStubs.stubStrideAuth
       ObjectStoreStubs.stubObjectStoreListObjects(
         fileUploadReference = fileReference,
         fileName = fileName
@@ -55,7 +55,7 @@ extends ControllerSpec:
       ObjectStoreStubs.verifyObjectStorePresignedDownloadUrl()
 
     "return NOT_FOUND when evidence does not exist" in:
-      AuthStubs.stubStrideAuth()
+      AuthStubs.stubStrideAuth
       ObjectStoreStubs.stubObjectStoreListObjectsNotFound(fileUploadReference = fileReference)
 
       val response: WSResponse = get(endpoint)

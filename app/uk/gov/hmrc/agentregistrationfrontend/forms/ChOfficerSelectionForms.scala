@@ -20,7 +20,6 @@ import play.api.data.FieldMapping
 import play.api.data.Form
 import play.api.data.Forms
 import play.api.data.Mapping
-import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.FormatterFactory
 import uk.gov.hmrc.agentregistrationfrontend.forms.helpers.ErrorKeys
@@ -36,17 +35,19 @@ object ChOfficerSelectionForms:
   val formType: Form[ChOfficerSelectionFormType] = Form(
     mapping =
       Forms.mapping(
-        ChOfficerSelectionFormType.key -> Forms.of(FormatterFactory.makeEnumFormatter[ChOfficerSelectionFormType]())
+        ChOfficerSelectionFormType.key -> Forms.of(using FormatterFactory.makeEnumFormatter[ChOfficerSelectionFormType]())
       )(identity)(Some(_))
   )
 
   val key: String = "companiesHouseOfficer"
 
   val yesNoForm: Form[YesNo] =
-    val fieldMapping: FieldMapping[YesNo] = Forms.of(FormatterFactory.makeEnumFormatter[YesNo](
-      errorMessageIfMissing = s"$key.single.error.required",
-      errorMessageIfEnumError = ErrorKeys.invalidInputErrorMessage(ChOfficerSelectionForms.key)
-    ))
+    val fieldMapping: FieldMapping[YesNo] = Forms.of(using
+      FormatterFactory.makeEnumFormatter[YesNo](
+        errorMessageIfMissing = s"$key.single.error.required",
+        errorMessageIfEnumError = ErrorKeys.invalidInputErrorMessage(ChOfficerSelectionForms.key)
+      )
+    )
     Form(
       mapping =
         Forms.mapping(
@@ -54,7 +55,7 @@ object ChOfficerSelectionForms:
         )(identity)(Some(_))
     )
 
-  def officerSelectionForm(officers: Seq[CompaniesHouseOfficer])(using request: RequestHeader): Form[OfficerSelection] =
+  def officerSelectionForm(officers: Seq[CompaniesHouseOfficer]): Form[OfficerSelection] =
     Errors.require(officers.size > 1, s"This form is suitable for multiple officers: ${officers.size}")
     val mapping: Mapping[OfficerSelection] = Mappings.textFromOptions(
       formMessageKey = ChOfficerSelectionForms.key,

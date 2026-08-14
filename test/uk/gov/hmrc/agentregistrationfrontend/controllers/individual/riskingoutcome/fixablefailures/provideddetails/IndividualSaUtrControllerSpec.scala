@@ -42,7 +42,7 @@ extends ControllerSpec:
   private object individualProvideDetails:
 
     val afterSaUtrProvided: IndividualProvidedDetails = tdAll.providedDetails.afterRiskedFixableIndividualDetails
-    val afterSaUtrNotProvided: IndividualProvidedDetails = tdAll.providedDetails.afterRiskedFixableIndividualDetailsWithoutIds
+    val afterSaUtrNotProvided: IndividualProvidedDetails = tdAll.providedDetails.afterFixableIndividualDetailsWithSaUtrNotProvided
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.riskingoutcome.fixablefailures.provideddetails.IndividualSaUtrController.show(linkId) shouldBe Call(

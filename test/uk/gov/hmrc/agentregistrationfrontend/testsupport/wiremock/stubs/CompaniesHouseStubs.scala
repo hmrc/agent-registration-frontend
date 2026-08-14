@@ -24,6 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
 import java.net.URLEncoder
+import scala.annotation.nowarn
 
 object CompaniesHouseStubs {
 
@@ -44,7 +45,7 @@ object CompaniesHouseStubs {
       else 200,
     responseBody =
       surname match
-        case Some(s) if noMatch => ""
+        case Some(_) if noMatch => ""
         case Some(s) =>
           responseBodyForSurnameSearch(
             s,
@@ -163,7 +164,7 @@ object CompaniesHouseStubs {
     urlPattern = urlMatching(s"/companies-house-api-proxy/company/1234567890/officers"),
     count = count
   )
-
+  @nowarn
   private def responseBodyForListingOfficers(
     officerRole: CompaniesHouseOfficerRole,
     withTitles: Boolean = false
@@ -227,6 +228,7 @@ object CompaniesHouseStubs {
       )
     ).toString
 
+  @nowarn
   private def responseBodyForSurnameSearch(
     surname: String,
     officerRole: CompaniesHouseOfficerRole,

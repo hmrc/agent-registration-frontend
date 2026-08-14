@@ -54,14 +54,22 @@ object AuditStubs:
     count: Int = 1
   ): Unit =
     val requestBodyPattern = matchingJsonPath("*.journeyType", equalTo(journeyType))
-    verifyAuditEvent("StartOrContinueApplication", Some(requestBodyPattern))
+    verifyAuditEvent(
+      "StartOrContinueApplication",
+      Some(requestBodyPattern),
+      count
+    )
 
   def verifyApplicationSubmittedAuditEvent(
     isResubmission: Boolean,
     count: Int = 1
   ): Unit =
     val requestBodyPattern = matchingJsonPath("*.isResubmission", equalTo(isResubmission.toString))
-    verifyAuditEvent("ApplicationSubmitted", Some(requestBodyPattern))
+    verifyAuditEvent(
+      "ApplicationSubmitted",
+      Some(requestBodyPattern),
+      count
+    )
 
   def verifyAuditEvent(
     auditType: String,

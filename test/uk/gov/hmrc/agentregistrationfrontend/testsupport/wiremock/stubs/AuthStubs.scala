@@ -167,9 +167,7 @@ object AuthStubs {
       |""".stripMargin
   )
 
-  def stubStrideAuth(
-    role: String = "maintain_agent_manually_assure"
-  ): StubMapping = StubMaker.make(
+  def stubStrideAuth: StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
     urlPattern = wm.urlMatching("/auth/authorise"),
     responseBody =

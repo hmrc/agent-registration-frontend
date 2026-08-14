@@ -37,7 +37,11 @@ extends ControllerSpec:
   private object individualProvideDetails:
 
     val unclaimed: IndividualProvidedDetails = tdAll.providedDetails.precreated
-    val afterStarted: IndividualProvidedDetails = tdAll.providedDetails.afterStarted
+    val updatedDetails: IndividualProvidedDetails = tdAll.providedDetails.afterStarted.copy(
+      individualDateOfBirth = Some(tdAll.dateOfBirthFromCitizenDetails),
+      individualNino = Some(tdAll.ninoFromAuth),
+      individualSaUtr = Some(tdAll.saUtrFromCitizenDetails)
+    )
     val providedByApplicant: IndividualProvidedDetails = tdAll.providedDetails.AfterSaUtr.afterSaUtrProvided.copy(
       internalUserId = None,
       passedIv = Some(false),
@@ -117,7 +121,7 @@ extends ControllerSpec:
     ProvideDetailsStubHelper.stubAuthAndClaimMatchedIndividualProvidedDetails(
       agentApplication = agentApplication,
       individualProvidedDetails = individualProvideDetails.unclaimed,
-      updatedIndividualProvidedDetails = individualProvideDetails.afterStarted
+      updatedIndividualProvidedDetails = individualProvideDetails.updatedDetails
     )
     val response: WSResponse =
       post(path)(Map(

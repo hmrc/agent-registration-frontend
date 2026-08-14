@@ -21,7 +21,6 @@ import com.github.tomakehurst.wiremock.matching.StringValuePattern
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 import play.api.libs.json.Json
-import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.SaUtr
@@ -62,7 +61,6 @@ object IndividualAuthStubs {
   )
 
   def stubAuthoriseWithNinoAndSaUtr(
-    confidenceLevel: ConfidenceLevel = ConfidenceLevel.L250,
     responseBody: String = responseBodyAsIndividualWithNinoAndSaUtr()
   ): StubMapping = StubMaker.make(
     httpMethod = StubMaker.HttpMethod.POST,
@@ -87,8 +85,7 @@ object IndividualAuthStubs {
   )
 
   def responseBodyAsCleanIndividual(
-    internalUserId: InternalUserId = TdAll.tdAll.internalUserId,
-    groupId: GroupId = TdAll.tdAll.groupId
+    internalUserId: InternalUserId = TdAll.tdAll.internalUserId
   ): String =
     // language=JSON
     s"""
@@ -117,9 +114,23 @@ object IndividualAuthStubs {
       "allEnrolments" -> Json.arr()
     ).toString
 
+  def responseBodyWithCl(
+    internalUserId: InternalUserId = TdAll.tdAll.internalUserId,
+    cl: ConfidenceLevel = ConfidenceLevel.L250
+  ): String =
+    Json.obj(
+      "internalId" -> internalUserId.value,
+      "affinityGroup" -> "Individual",
+      "confidenceLevel" -> cl.level,
+      "optionalCredentials" -> Json.obj(
+        "providerId" -> "cred-id-12345",
+        "providerType" -> "GovernmentGateway"
+      ),
+      "allEnrolments" -> Json.arr()
+    ).toString
+
   def responseBodyAsIndividualWithNino(
     internalUserId: InternalUserId = TdAll.tdAll.internalUserId,
-    groupId: GroupId = TdAll.tdAll.groupId,
     nino: Nino = TdAll.tdAll.nino
   ): String =
     // language=JSON
@@ -149,7 +160,6 @@ object IndividualAuthStubs {
 
   def responseBodyAsIndividualWithSaUtr(
     internalUserId: InternalUserId = TdAll.tdAll.internalUserId,
-    groupId: GroupId = TdAll.tdAll.groupId,
     saUtr: SaUtr = TdAll.tdAll.saUtr
   ): String =
     // language=JSON
@@ -179,7 +189,6 @@ object IndividualAuthStubs {
 
   def responseBodyAsIndividualWithNinoAndSaUtr(
     internalUserId: InternalUserId = TdAll.tdAll.internalUserId,
-    groupId: GroupId = TdAll.tdAll.groupId,
     nino: Nino = TdAll.tdAll.nino,
     saUtr: SaUtr = TdAll.tdAll.saUtr
   ): String =
