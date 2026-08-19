@@ -58,7 +58,7 @@
     </p>
     <p class="govuk-body">
     @{
-        messages(s"$key.p2", individualEmailAddress.value)
+        Html(messages(s"$key.p2", individualEmailAddress.value))
     }
     </p>
 
