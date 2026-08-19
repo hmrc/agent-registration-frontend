@@ -87,7 +87,7 @@ extends ViewSpec:
 
   testCases.foreach: testCase =>
     val heading = testCase.expectedRadioGroup.legend
-    val form = UserRoleForm.form(testCase.userRole.toString)
+    val form = UserRoleForm.form(testCase.userRole)
     val doc: Document = Jsoup.parse(viewTemplate(form, testCase.userRole).body)
     s"UserRolePage for ${testCase.userRole.toString}" should:
 
@@ -103,7 +103,7 @@ extends ViewSpec:
       "render a form error when the form contains an error" in:
         val field = "userRole"
         val errorMessage = testCase.expectedErrorMessage
-        val formWithError = UserRoleForm.form(testCase.userRole.toString)
+        val formWithError = UserRoleForm.form(testCase.userRole)
           .withError(field, errorMessage)
         behavesLikePageWithErrorHandling(
           field = field,
