@@ -46,13 +46,16 @@ extends FrontendController(mcc, actions):
   def show: Action[?] = baseAction:
     implicit request =>
       Ok(view(
-        form = UserRoleForm.form.fill(request.readUserRole),
+        form = UserRoleForm.form(userRoleOptionForBusinessType(request.getBusinessType)).fill(request.readUserRole),
         userRoleOption = userRoleOptionForBusinessType(request.getBusinessType)
       ))
 
   def submit: Action[AnyContent] =
     baseAction
-      .ensureValidForm(UserRoleForm.form, implicit request => view(_, userRoleOptionForBusinessType(request.getBusinessType))):
+      .ensureValidForm(
+        implicit request => UserRoleForm.form(userRoleOptionForBusinessType(request.getBusinessType)),
+        implicit request => view(_, userRoleOptionForBusinessType(request.getBusinessType))
+      ):
         implicit request =>
           Redirect(AppRoutes.apply.aboutyourbusiness.TypeOfSignInController.show.url).addToSession(request.get[UserRole])
 
