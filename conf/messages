@@ -1829,7 +1829,7 @@ individualDetailsDeclaration.p2 = Once you submit, you will not be able to chang
 individualDetailsFixConfirmation.title = You have finished this process
 individualDetailsFixConfirmation.h2 = What happens next
 individualDetailsFixConfirmation.p1 = We’ll ask {0} to resubmit the application for an agent services account, when everyone has provided the information we need.
-individualDetailsFixConfirmation.p2 = We’ll send an email to you at {0} if we need anything else from you.
+individualDetailsFixConfirmation.p2 = We’ll send an email to you at <span class="govuk-!-text-break-word">{0}</span> if we need anything else from you.
 
 fixableFailuresDeclaration.title = Declaration
 fixableFailuresDeclaration.p1 = I am authorised by {0} to apply for an agent services account with HMRC.
@@ -1845,7 +1845,7 @@ resubmissionConfirmation.viewLink = View or print your application
 resubmissionConfirmation.decision.h2 = Our decision
 resubmissionConfirmation.decision.p1 = We’ll carry out some checks based on the information you’ve given us. If we need any more information we’ll contact you.
 resubmissionConfirmation.decision.p2 = We aim to make a decision by <strong>{0}</strong>.
-resubmissionConfirmation.decision.p3 = We’ll send an email to {0} to let you know the outcome.
+resubmissionConfirmation.decision.p3 = We’ll send an email to <span class="govuk-!-text-break-word">{0}</span> to let you know the outcome.
 
 resubmissionConfirmation.signOutLink = Finish and sign out
 
