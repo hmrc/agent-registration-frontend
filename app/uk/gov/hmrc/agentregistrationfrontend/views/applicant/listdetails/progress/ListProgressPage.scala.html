@@ -22,6 +22,7 @@
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLaterLinks
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+@import views.html.helper.CSPNonce
 @import java.time.Instant
 @import java.time.ZoneId
 
@@ -63,16 +64,21 @@
     case None => ""
   }
 }
+@templateStyles = {
+  <link rel="stylesheet" href="@{controllers.routes.Assets.versioned("stylesheets/custom-list-styles.css")}" @{CSPNonce.attr}>
+}
 
 @layout(
-    pageTitle = pageTitle
+  pageTitle = pageTitle,
+  templateStyles = Some(templateStyles)
 ) {
   <h2 class="govuk-caption-l">@messages(s"$key.caption")</h2>
   <h1 class="govuk-heading-l">@pageTitle</h1>
   @govukInsetText(InsetText(
     content = Text(messages(s"$key.expiryDate", expiryDate))
   ))
-  @govukTable(Table(
+  <div class="responsive-table">
+    @govukTable(Table(
     head = Some(Seq(
       HeadCell(
         content = Text(messages(s"$key.th.name"))
@@ -99,7 +105,7 @@
       )
     }
   ))
-
+  </div>
   @if(numberOfUsersYetToProvideDetails > 0) {
     @govukDetails(Details(
       summary = Text(messages(s"$key.details.summary")),
