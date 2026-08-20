@@ -451,7 +451,7 @@ linkStartPage.p1 = You have created a list of people relevant to this applicatio
 linkStartPage.p2 = Everyone you’ve told us about needs to sign in to confirm their identity.
 linkStartPage.p3 = We’ll give you a link to share with these people.
 linkStartPage.important.h2 = Important to know
-linkStartPage.important.p1 = We need everyone on the list to use the link to sign in by <strong>{0}</strong>.
+linkStartPage.important.p1 = We need everyone on the list to use the link to sign in by <span class="govuk-!-font-weight-bold">{0}</span>.
 linkStartPage.important.p2 = They should use sign in details for their personal taxes, not their business taxes. If they do not have personal sign in details, they can create some.
 linkStartPage.important.p3 = We’ll also ask them to provide some personal information, including:
 linkStartPage.important.bullet1 = name, date of birth, telephone number and email address
@@ -545,12 +545,12 @@ confirmation.signOutLink = Finish and sign out
 # Apply / InProgress / SubmittedForRisking status
 applicationProgress.caption = Check the progress of an application
 applicationProgress.title = Application reference: {0}
-applicationProgress.p1 = This is application is for an agent services account for <strong>{0}</strong>.
+applicationProgress.p1 = This is application is for an agent services account for <span class="govuk-!-font-weight-bold">{0}</span>.
 applicationProgress.p2 = Some of the information on this page uses real-time data and might change.
 applicationProgress.decision.h2 = When to expect a decision
 applicationProgress.decision.p1 = It’s currently taking up to 8 weeks to process applications for an agent services account.
 applicationProgress.decision.p2 = If we need further information to help us make a decision, we will contact you.
-applicationProgress.decision.p3 = We expect to reach a decision by <strong>{0}</strong> and will not be able to give you an update before this date.
+applicationProgress.decision.p3 = We expect to reach a decision by <span class="govuk-!-font-weight-bold">{0}</span> and will not be able to give you an update before this date.
 applicationProgress.decision.p4 = We’ll send you an email as soon as we’ve reached a decision.
 applicationProgress.submitted.h2 = Date submitted
 applicationProgress.viewLink = View or print your application (opens in a new tab)
@@ -665,7 +665,7 @@ viewApplication.hmrcStandard.h2 = HMRC standard for agents
 viewApplication.hmrcStandard.label = Agreed to meet the HMRC standard for agents
 viewApplication.whatNext.h2 = What to do next
 viewApplication.whatNext.p1 = The members of {0} need to sign in and provide some personal details.
-viewApplication.whatNext.p2 = Send this link to all members <strong>{0}</strong>
+viewApplication.whatNext.p2 = Send this link to all members <span class="govuk-!-font-weight-bold">{0}</span>
 viewApplication.whatNext.p3 = Your can check the progress of your application by clicking the link on the GOV.UK page “Apply for an agent services account”.
 viewApplication.print = Print this page
 
@@ -675,7 +675,7 @@ saveForLater.h2 = What you need to do next
 saveForLater.p1 = You need to come back and complete this application by {0}.
 saveForLater.p2 = To come back to this application:
 saveForLater.li1 = Go to <a class="govuk-link" href="{0}" rel="noreferrer noopener" target="_blank">Apply for an agent services account (opens in a new tab)</a>.
-saveForLater.li2 = In the section <strong>How long this process takes</strong> select the link ‘Check the progress of an existing application’.
+saveForLater.li2 = In the section <span class="govuk-!-font-weight-bold">How long this process takes</span> select the link ‘Check the progress of an existing application’.
 saveForLater.li3 = Sign in with the agent details you used when you made this application.
 saveForLater.continueLink = Continue with the application
 saveForLater.finishLink = Finish and sign out
@@ -701,7 +701,7 @@ provide-details.llp.title=LLP member confirmation
 provideDetailsStart.title = Sign in and confirm your details
 provideDetailsStart.p1 = You have been nominated as a relevant individual that can support an application to HMRC for an agent services account.
 provideDetailsStart.p2 = We need some information from you before we can process the application.
-provideDetailsStart.p3 = You need to provide this information by <strong>{0}</strong>.
+provideDetailsStart.p3 = You need to provide this information by <span class="govuk-!-font-weight-bold">{0}</span>.
 provideDetailsStart.info.h2 = Why we need this information
 provideDetailsStart.info.p1 = We ask you to sign in so we can:
 provideDetailsStart.info.li1 = confirm who you are
@@ -1071,8 +1071,8 @@ failedFixable.decisionDate.h2 = Date of decision: {0}
 failedFixable.decision.h2 = Our decision
 failedFixable.decision.p1 = Your application to register for an agent services account cannot currently be approved.
 failedFixable.decision.p2 = The application is refused under Section 230 (registration conditions) of the <a class="govuk-link" href="{0}" target="_blank" rel="noopener noreferrer">Finance Act 2026 (opens in a new tab)</a>.
-failedFixable.decision.p3 = However, {0} can still meet the registration conditions if you take action by <strong>{1}</strong>.
-failedFixable.decision.p3.SoleTrader = However, you can still meet the registration conditions if you take action by <strong>{1}</strong>.
+failedFixable.decision.p3 = However, {0} can still meet the registration conditions if you take action by <span class="govuk-!-font-weight-bold">{1}</span>.
+failedFixable.decision.p3.SoleTrader = However, you can still meet the registration conditions if you take action by <span class="govuk-!-font-weight-bold">{1}</span>.
 failedFixable.fix.h2 = How to meet the registration conditions
 failedFixable.fix.p1 = The actions to take are listed on the next page.
 failedFixable.fix.startButton = View actions to take
@@ -1151,7 +1151,7 @@ fixableEntityDetails.EntityFix.4.1.p1 = When we reviewed the application for {0}
 fixableEntityDetails.EntityFix.4.1.p2 = We cannot set up an agent services account for {0} until this has been resolved.
 fixableEntityDetails.EntityFix.4.1.action.h2 = Take action on this issue
 fixableEntityDetails.EntityFix.4.1.action.p1 = All overdue returns must now be filed and any resulting liabilities paid.
-fixableEntityDetails.EntityFix.4.1.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.4.1.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableEntityDetails.EntityFix.4.1.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableEntityDetails.EntityFix.4.1.action.p4 = Find out more about <a href="https://www.gov.uk/self-assessment-tax-returns" class="govuk-link" rel="noopener noreferrer" target="_blank">Self Assessment tax returns (opens in a new tab)</a>.
 fixableEntityDetails.EntityFix.4.1.label = Have all overdue returns been filed?
@@ -1164,7 +1164,7 @@ fixableSoleTraderDetails.EntityFix.4.1.p1 = When we reviewed your application, w
 fixableSoleTraderDetails.EntityFix.4.1.p2 = We cannot set up an agent services account for you until this is resolved.
 fixableSoleTraderDetails.EntityFix.4.1.action.h2 = Take action on this issue
 fixableSoleTraderDetails.EntityFix.4.1.action.p1 = All overdue returns must now be filed and any resulting liabilities paid.
-fixableSoleTraderDetails.EntityFix.4.1.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableSoleTraderDetails.EntityFix.4.1.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableSoleTraderDetails.EntityFix.4.1.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableSoleTraderDetails.EntityFix.4.1.action.p4 = Find out more about <a href="https://www.gov.uk/self-assessment-tax-returns" class="govuk-link" rel="noopener noreferrer" target="_blank">Self Assessment tax returns (opens in a new tab)</a>.
 fixableSoleTraderDetails.EntityFix.4.1.label = Have all overdue returns been filed?
@@ -1174,7 +1174,7 @@ fixableEntityDetails.EntityFix.4.2.p1 = When we reviewed the application for {0}
 fixableEntityDetails.EntityFix.4.2.p2 = We cannot set up an agent services account for {0} until this has been resolved.
 fixableEntityDetails.EntityFix.4.2.action.h2 = Take action on this issue
 fixableEntityDetails.EntityFix.4.2.action.p1 = All overdue returns must now be filed and any resulting liabilities paid.
-fixableEntityDetails.EntityFix.4.2.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.4.2.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableEntityDetails.EntityFix.4.2.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableEntityDetails.EntityFix.4.2.action.p4 = Find out more about <a href="https://www.gov.uk/file-your-company-accounts-and-tax-return" class="govuk-link" rel="noopener noreferrer" target="_blank">Company Tax returns (opens in a new tab)</a>.
 fixableEntityDetails.EntityFix.4.2.label = Have all overdue returns been filed?
@@ -1186,7 +1186,7 @@ fixableEntityDetails.EntityFix.4.3.p1 = When we reviewed the application for {0}
 fixableEntityDetails.EntityFix.4.3.p2 = We cannot set up an agent services account for {0} until this is resolved.
 fixableEntityDetails.EntityFix.4.3.action.h2 = Take action on this issue
 fixableEntityDetails.EntityFix.4.3.action.p1 = All overdue returns must now be filed and any resulting liabilities paid.
-fixableEntityDetails.EntityFix.4.3.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.4.3.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableEntityDetails.EntityFix.4.3.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableEntityDetails.EntityFix.4.3.action.p4 = Find out more about <a href="https://www.gov.uk/submit-vat-return" class="govuk-link" rel="noopener noreferrer" target="_blank">VAT returns (opens in a new tab)</a>.
 fixableEntityDetails.EntityFix.4.3.label = Have all overdue returns been filed?
@@ -1198,7 +1198,7 @@ fixableSoleTraderDetails.EntityFix.4.3.p1 = When we reviewed your application, w
 fixableSoleTraderDetails.EntityFix.4.3.p2 = We cannot set up an agent services account for you until this is resolved.
 fixableSoleTraderDetails.EntityFix.4.3.action.h2 = Take action on this issue
 fixableSoleTraderDetails.EntityFix.4.3.action.p1 = All overdue returns must now be filed and any resulting liabilities paid.
-fixableSoleTraderDetails.EntityFix.4.3.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableSoleTraderDetails.EntityFix.4.3.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableSoleTraderDetails.EntityFix.4.3.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableSoleTraderDetails.EntityFix.4.3.action.p4 = Find out more about <a href="https://www.gov.uk/submit-vat-return" class="govuk-link" rel="noopener noreferrer" target="_blank">VAT returns (opens in a new tab)</a>.
 fixableSoleTraderDetails.EntityFix.4.3.label = Have all overdue returns been filed?
@@ -1208,7 +1208,7 @@ fixableEntityDetails.EntityFix.4.4.p1 = When we reviewed the application for {0}
 fixableEntityDetails.EntityFix.4.4.p2 = We cannot set up an agent services account for {0} until this has been resolved.
 fixableEntityDetails.EntityFix.4.4.action.h2 = Take action on this issue
 fixableEntityDetails.EntityFix.4.4.action.p1 = All overdue reports must now be filed and any resulting liabilities paid.
-fixableEntityDetails.EntityFix.4.4.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.4.4.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableEntityDetails.EntityFix.4.4.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableEntityDetails.EntityFix.4.4.action.p4 = Find out more about <a href="https://www.gov.uk/paye-for-employers" class="govuk-link" rel="noopener noreferrer" target="_blank">PAYE for employers (opens in a new tab)</a>.
 fixableEntityDetails.EntityFix.4.4.label = Have all overdue reports been filed?
@@ -1220,7 +1220,7 @@ fixableSoleTraderDetails.EntityFix.4.4.p1 = When we reviewed your application, w
 fixableSoleTraderDetails.EntityFix.4.4.p2 = We cannot set up an agent services account for you until this is resolved.
 fixableSoleTraderDetails.EntityFix.4.4.action.h2 = Take action on this issue
 fixableSoleTraderDetails.EntityFix.4.4.action.p1 = All overdue reports must now be filed and any resulting liabilities paid.
-fixableSoleTraderDetails.EntityFix.4.4.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableSoleTraderDetails.EntityFix.4.4.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableSoleTraderDetails.EntityFix.4.4.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableSoleTraderDetails.EntityFix.4.4.action.p4 = Find out more about <a href="https://www.gov.uk/paye-for-employers" class="govuk-link" rel="noopener noreferrer" target="_blank">PAYE for employers (opens in a new tab)</a>.
 fixableSoleTraderDetails.EntityFix.4.4.label = Have all overdue reports been filed?
@@ -1230,7 +1230,7 @@ fixableEntityDetails.EntityFix.5.1.p1 = When we reviewed the application, we fou
 fixableEntityDetails.EntityFix.5.1.p2 = We cannot set up an agent services account for {0} until this has been resolved.
 fixableEntityDetails.EntityFix.5.1.action.h2 = Take action on this issue
 fixableEntityDetails.EntityFix.5.1.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableEntityDetails.EntityFix.5.1.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.1.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableEntityDetails.EntityFix.5.1.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableEntityDetails.EntityFix.5.1.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#self-assessment" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Self Assessment (opens in a new tab)</a>.
 fixableEntityDetails.EntityFix.5.1.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1242,7 +1242,7 @@ fixableSoleTraderDetails.EntityFix.5.1.p1 = When we reviewed the application, we
 fixableSoleTraderDetails.EntityFix.5.1.p2 = We cannot set up an agent services account for you until this has been resolved.
 fixableSoleTraderDetails.EntityFix.5.1.action.h2 = Take action on this issue
 fixableSoleTraderDetails.EntityFix.5.1.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableSoleTraderDetails.EntityFix.5.1.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableSoleTraderDetails.EntityFix.5.1.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableSoleTraderDetails.EntityFix.5.1.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableSoleTraderDetails.EntityFix.5.1.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#self-assessment" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Self Assessment (opens in a new tab)</a>.
 fixableSoleTraderDetails.EntityFix.5.1.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1252,7 +1252,7 @@ fixableEntityDetails.EntityFix.5.2.p1 = When we reviewed the application, we fou
 fixableEntityDetails.EntityFix.5.2.p2 = We cannot set up an agent services account for {0} until this has been resolved.
 fixableEntityDetails.EntityFix.5.2.action.h2 = Take action on this issue
 fixableEntityDetails.EntityFix.5.2.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableEntityDetails.EntityFix.5.2.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.2.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableEntityDetails.EntityFix.5.2.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableEntityDetails.EntityFix.5.2.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#corporation-tax" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Corporation Tax (opens in a new tab)</a>.
 fixableEntityDetails.EntityFix.5.2.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1264,7 +1264,7 @@ fixableEntityDetails.EntityFix.5.3.p1 = When we reviewed the application, we fou
 fixableEntityDetails.EntityFix.5.3.p2 = We cannot set up an agent services account for {0} until this has been resolved.
 fixableEntityDetails.EntityFix.5.3.action.h2 = Take action on this issue
 fixableEntityDetails.EntityFix.5.3.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableEntityDetails.EntityFix.5.3.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.3.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableEntityDetails.EntityFix.5.3.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableEntityDetails.EntityFix.5.3.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#vat" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay VAT (opens in a new tab)</a>.
 fixableEntityDetails.EntityFix.5.3.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1276,7 +1276,7 @@ fixableSoleTraderDetails.EntityFix.5.3.p1 = When we reviewed the application, we
 fixableSoleTraderDetails.EntityFix.5.3.p2 = We cannot set up an agent services account for you until this has been resolved.
 fixableSoleTraderDetails.EntityFix.5.3.action.h2 = Take action on this issue
 fixableSoleTraderDetails.EntityFix.5.3.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableSoleTraderDetails.EntityFix.5.3.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableSoleTraderDetails.EntityFix.5.3.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableSoleTraderDetails.EntityFix.5.3.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableSoleTraderDetails.EntityFix.5.3.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#vat" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay VAT (opens in a new tab)</a>.
 fixableSoleTraderDetails.EntityFix.5.3.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1286,7 +1286,7 @@ fixableEntityDetails.EntityFix.5.4.p1 = When we reviewed the application, we fou
 fixableEntityDetails.EntityFix.5.4.p2 = We cannot set up an agent services account for {0} until this has been resolved.
 fixableEntityDetails.EntityFix.5.4.action.h2 = Take action on this issue
 fixableEntityDetails.EntityFix.5.4.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableEntityDetails.EntityFix.5.4.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.4.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableEntityDetails.EntityFix.5.4.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableEntityDetails.EntityFix.5.4.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#paye" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay PAYE (opens in a new tab)</a>.
 fixableEntityDetails.EntityFix.5.4.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1298,7 +1298,7 @@ fixableSoleTraderDetails.EntityFix.5.4.p1 = When we reviewed the application, we
 fixableSoleTraderDetails.EntityFix.5.4.p2 = We cannot set up an agent services account for you until this has been resolved.
 fixableSoleTraderDetails.EntityFix.5.4.action.h2 = Take action on this issue
 fixableSoleTraderDetails.EntityFix.5.4.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableSoleTraderDetails.EntityFix.5.4.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableSoleTraderDetails.EntityFix.5.4.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableSoleTraderDetails.EntityFix.5.4.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableSoleTraderDetails.EntityFix.5.4.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#paye" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay PAYE (opens in a new tab)</a>.
 fixableSoleTraderDetails.EntityFix.5.4.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1308,7 +1308,7 @@ fixableEntityDetails.EntityFix.5.5.p1 = When we reviewed the application, we fou
 fixableEntityDetails.EntityFix.5.5.p2 = We cannot set up an agent services account for {0} until this has been resolved.
 fixableEntityDetails.EntityFix.5.5.action.h2 = Take action on this issue
 fixableEntityDetails.EntityFix.5.5.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableEntityDetails.EntityFix.5.5.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.5.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableEntityDetails.EntityFix.5.5.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableEntityDetails.EntityFix.5.5.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
 fixableEntityDetails.EntityFix.5.5.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1320,7 +1320,7 @@ fixableSoleTraderDetails.EntityFix.5.5.p1 = When we reviewed the application, we
 fixableSoleTraderDetails.EntityFix.5.5.p2 = We cannot set up an agent services account for you until this has been resolved.
 fixableSoleTraderDetails.EntityFix.5.5.action.h2 = Take action on this issue
 fixableSoleTraderDetails.EntityFix.5.5.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableSoleTraderDetails.EntityFix.5.5.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableSoleTraderDetails.EntityFix.5.5.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableSoleTraderDetails.EntityFix.5.5.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableSoleTraderDetails.EntityFix.5.5.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
 fixableSoleTraderDetails.EntityFix.5.5.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1330,7 +1330,7 @@ fixableEntityDetails.EntityFix.5.6.p1 = When we reviewed the application, we fou
 fixableEntityDetails.EntityFix.5.6.p2 = We cannot set up an agent services account for {0} until this has been resolved.
 fixableEntityDetails.EntityFix.5.6.action.h2 = Take action on this issue
 fixableEntityDetails.EntityFix.5.6.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableEntityDetails.EntityFix.5.6.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.6.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableEntityDetails.EntityFix.5.6.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableEntityDetails.EntityFix.5.6.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#stamp-duty-and-other-property-taxes" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Stamp Duty (opens in a new tab)</a>.
 fixableEntityDetails.EntityFix.5.6.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1342,7 +1342,7 @@ fixableSoleTraderDetails.EntityFix.5.6.p1 = When we reviewed the application, we
 fixableSoleTraderDetails.EntityFix.5.6.p2 = We cannot set up an agent services account for you until this has been resolved.
 fixableSoleTraderDetails.EntityFix.5.6.action.h2 = Take action on this issue
 fixableSoleTraderDetails.EntityFix.5.6.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableSoleTraderDetails.EntityFix.5.6.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableSoleTraderDetails.EntityFix.5.6.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableSoleTraderDetails.EntityFix.5.6.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableSoleTraderDetails.EntityFix.5.6.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#stamp-duty-and-other-property-taxes" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Stamp Duty (opens in a new tab)</a>.
 fixableSoleTraderDetails.EntityFix.5.6.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1352,7 +1352,7 @@ fixableEntityDetails.EntityFix.5.7.p1 = When we reviewed the application, we fou
 fixableEntityDetails.EntityFix.5.7.p2 = We cannot set up an agent services account for {0} until this has been resolved.
 fixableEntityDetails.EntityFix.5.7.action.h2 = Take action on this issue
 fixableEntityDetails.EntityFix.5.7.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableEntityDetails.EntityFix.5.7.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.5.7.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableEntityDetails.EntityFix.5.7.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableEntityDetails.EntityFix.5.7.action.p4 = Find out <a href="https://www.gov.uk/report-and-pay-your-capital-gains-tax" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Capital Gains Tax (opens in a new tab)</a>.
 fixableEntityDetails.EntityFix.5.7.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1364,7 +1364,7 @@ fixableSoleTraderDetails.EntityFix.5.7.p1 = When we reviewed the application, we
 fixableSoleTraderDetails.EntityFix.5.7.p2 = We cannot set up an agent services account for you until this has been resolved.
 fixableSoleTraderDetails.EntityFix.5.7.action.h2 = Take action on this issue
 fixableSoleTraderDetails.EntityFix.5.7.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableSoleTraderDetails.EntityFix.5.7.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableSoleTraderDetails.EntityFix.5.7.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableSoleTraderDetails.EntityFix.5.7.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableSoleTraderDetails.EntityFix.5.7.action.p4 = Find out <a href="https://www.gov.uk/report-and-pay-your-capital-gains-tax" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Capital Gains Tax (opens in a new tab)</a>.
 fixableSoleTraderDetails.EntityFix.5.7.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1374,7 +1374,7 @@ fixableEntityDetails.EntityFix.8.5.p1 = When we reviewed the application, we fou
 fixableEntityDetails.EntityFix.8.5.p2 = We cannot set up an agent services account for {0} until this has been resolved.
 fixableEntityDetails.EntityFix.8.5.action.h2 = Take action on this issue
 fixableEntityDetails.EntityFix.8.5.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableEntityDetails.EntityFix.8.5.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.8.5.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableEntityDetails.EntityFix.8.5.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableEntityDetails.EntityFix.8.5.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
 fixableEntityDetails.EntityFix.8.5.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1386,7 +1386,7 @@ fixableSoleTraderDetails.EntityFix.8.5.p1 = When we reviewed the application, we
 fixableSoleTraderDetails.EntityFix.8.5.p2 = We cannot set up an agent services account for you until this has been resolved.
 fixableSoleTraderDetails.EntityFix.8.5.action.h2 = Take action on this issue
 fixableSoleTraderDetails.EntityFix.8.5.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableSoleTraderDetails.EntityFix.8.5.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableSoleTraderDetails.EntityFix.8.5.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableSoleTraderDetails.EntityFix.8.5.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableSoleTraderDetails.EntityFix.8.5.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
 fixableSoleTraderDetails.EntityFix.8.5.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1396,7 +1396,7 @@ fixableEntityDetails.EntityFix.8.7.p1 = When we reviewed the application, we fou
 fixableEntityDetails.EntityFix.8.7.p2 = We cannot set up an agent services account for {0} until this has been resolved.
 fixableEntityDetails.EntityFix.8.7.action.h2 = Take action on this issue
 fixableEntityDetails.EntityFix.8.7.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableEntityDetails.EntityFix.8.7.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableEntityDetails.EntityFix.8.7.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableEntityDetails.EntityFix.8.7.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableEntityDetails.EntityFix.8.7.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
 fixableEntityDetails.EntityFix.8.7.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1408,7 +1408,7 @@ fixableSoleTraderDetails.EntityFix.8.7.p1 = When we reviewed the application, we
 fixableSoleTraderDetails.EntityFix.8.7.p2 = We cannot set up an agent services account for you until this has been resolved.
 fixableSoleTraderDetails.EntityFix.8.7.action.h2 = Take action on this issue
 fixableSoleTraderDetails.EntityFix.8.7.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableSoleTraderDetails.EntityFix.8.7.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableSoleTraderDetails.EntityFix.8.7.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableSoleTraderDetails.EntityFix.8.7.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableSoleTraderDetails.EntityFix.8.7.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
 fixableSoleTraderDetails.EntityFix.8.7.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1630,7 +1630,7 @@ individualFailedFixable.ourDecision.h2 = Our decision
 individualFailedFixable.ourDecision.p1 = The application by {0} for an agent services account cannot currently be approved.
 individualFailedFixable.ourDecision.p2 = The application is refused under Section 230 (registration conditions) of the <a class="govuk-link" href="{0}" target="_blank" rel="noopener noreferrer">Finance Act 2026 (opens in a new tab)</a>.
 individualFailedFixable.ourDecision.p3 = This is because you, as a relevant individual to the application, have not met one or more conditions of registration.
-individualFailedFixable.ourDecision.p4 = However, you can still meet the registration conditions by taking action before <strong>{0}</strong>
+individualFailedFixable.ourDecision.p4 = However, you can still meet the registration conditions by taking action before <span class="govuk-!-font-weight-bold">{0}</span>
 individualFailedFixable.howToFix.h2 = How to meet the registration conditions
 individualFailedFixable.howToFix.p1 = The actions to take are listed on the next page.
 individualFailedFixable.startButton = View actions to take
@@ -1667,7 +1667,7 @@ fixableIndividualDetails.IndividualFix.4.1.p2 = We cannot set up an agent servic
 fixableSoleTraderDetails.IndividualFix.4.1.p2 = We cannot set up an agent services account for you until this is resolved.
 fixableIndividualDetails.IndividualFix.4.1.action.h2 = Take action on this issue
 fixableIndividualDetails.IndividualFix.4.1.action.p1 = All overdue returns must now be filed and any resulting liabilities paid.
-fixableIndividualDetails.IndividualFix.4.1.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.4.1.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableIndividualDetails.IndividualFix.4.1.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableIndividualDetails.IndividualFix.4.1.action.p4 = Find out more about <a href="https://www.gov.uk/self-assessment-tax-returns" class="govuk-link" rel="noopener noreferrer" target="_blank">Self Assessment tax returns (opens in a new tab)</a>.
 fixableIndividualDetails.IndividualFix.4.1.label = Have all overdue returns been filed?
@@ -1681,7 +1681,7 @@ fixableIndividualDetails.IndividualFix.4.3.p2 = We cannot set up an agent servic
 fixableSoleTraderDetails.IndividualFix.4.3.p2 = We cannot set up an agent services account for you until this is resolved.
 fixableIndividualDetails.IndividualFix.4.3.action.h2 = Take action on this issue
 fixableIndividualDetails.IndividualFix.4.3.action.p1 = All overdue returns must now be filed and any resulting liabilities paid.
-fixableIndividualDetails.IndividualFix.4.3.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.4.3.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableIndividualDetails.IndividualFix.4.3.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableIndividualDetails.IndividualFix.4.3.action.p4 = Find out more about <a href="https://www.gov.uk/submit-vat-return" class="govuk-link" rel="noopener noreferrer" target="_blank">VAT returns (opens in a new tab)</a>.
 fixableIndividualDetails.IndividualFix.4.3.label = Have all overdue returns been filed?
@@ -1695,7 +1695,7 @@ fixableIndividualDetails.IndividualFix.4.4.p2 = We cannot set up an agent servic
 fixableSoleTraderDetails.IndividualFix.4.4.p2 = We cannot set up an agent services account for you until this is resolved.
 fixableIndividualDetails.IndividualFix.4.4.action.h2 = Take action on this issue
 fixableIndividualDetails.IndividualFix.4.4.action.p1 = All overdue reports must now be filed and any resulting liabilities paid.
-fixableIndividualDetails.IndividualFix.4.4.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.4.4.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableIndividualDetails.IndividualFix.4.4.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableIndividualDetails.IndividualFix.4.4.action.p4 = Find out more about <a href="https://www.gov.uk/paye-for-employers" class="govuk-link" rel="noopener noreferrer" target="_blank">PAYE for employers (opens in a new tab)</a>.
 fixableIndividualDetails.IndividualFix.4.4.label = Have all overdue reports been filed?
@@ -1709,7 +1709,7 @@ fixableIndividualDetails.IndividualFix.5.1.p2 = We cannot set up an agent servic
 fixableSoleTraderDetails.IndividualFix.5.1.p2 = We cannot set up an agent services account for you until this is resolved.
 fixableIndividualDetails.IndividualFix.5.1.action.h2 = Take action on this issue
 fixableIndividualDetails.IndividualFix.5.1.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableIndividualDetails.IndividualFix.5.1.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.5.1.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableIndividualDetails.IndividualFix.5.1.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableIndividualDetails.IndividualFix.5.1.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#self-assessment" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Self Assessment (opens in a new tab)</a>.
 fixableIndividualDetails.IndividualFix.5.1.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1723,7 +1723,7 @@ fixableIndividualDetails.IndividualFix.5.3.p2 = We cannot set up an agent servic
 fixableSoleTraderDetails.IndividualFix.5.3.p2 = We cannot set up an agent services account for you until this is resolved.
 fixableIndividualDetails.IndividualFix.5.3.action.h2 = Take action on this issue
 fixableIndividualDetails.IndividualFix.5.3.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableIndividualDetails.IndividualFix.5.3.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.5.3.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableIndividualDetails.IndividualFix.5.3.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableIndividualDetails.IndividualFix.5.3.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#vat" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay VAT (opens in a new tab)</a>.
 fixableIndividualDetails.IndividualFix.5.3.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1737,7 +1737,7 @@ fixableIndividualDetails.IndividualFix.5.4.p2 = We cannot set up an agent servic
 fixableSoleTraderDetails.IndividualFix.5.4.p2 = We cannot set up an agent services account for you until this is resolved.
 fixableIndividualDetails.IndividualFix.5.4.action.h2 = Take action on this issue
 fixableIndividualDetails.IndividualFix.5.4.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableIndividualDetails.IndividualFix.5.4.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.5.4.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableIndividualDetails.IndividualFix.5.4.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableIndividualDetails.IndividualFix.5.4.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#paye" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay PAYE (opens in a new tab)</a>.
 fixableIndividualDetails.IndividualFix.5.4.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1751,7 +1751,7 @@ fixableIndividualDetails.IndividualFix.5.5.p2 = We cannot set up an agent servic
 fixableSoleTraderDetails.IndividualFix.5.5.p2 = We cannot set up an agent services account for you until this is resolved.
 fixableIndividualDetails.IndividualFix.5.5.action.h2 = Take action on this issue
 fixableIndividualDetails.IndividualFix.5.5.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableIndividualDetails.IndividualFix.5.5.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.5.5.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableIndividualDetails.IndividualFix.5.5.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableIndividualDetails.IndividualFix.5.5.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
 fixableIndividualDetails.IndividualFix.5.5.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1765,7 +1765,7 @@ fixableIndividualDetails.IndividualFix.5.6.p2 = We cannot set up an agent servic
 fixableSoleTraderDetails.IndividualFix.5.6.p2 = We cannot set up an agent services account for you until this is resolved.
 fixableIndividualDetails.IndividualFix.5.6.action.h2 = Take action on this issue
 fixableIndividualDetails.IndividualFix.5.6.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableIndividualDetails.IndividualFix.5.6.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.5.6.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableIndividualDetails.IndividualFix.5.6.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableIndividualDetails.IndividualFix.5.6.action.p4 = Find out <a href="https://www.gov.uk/government/collections/paying-hmrc-detailed-information#stamp-duty-and-other-property-taxes" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Stamp Duty (opens in a new tab)</a>.
 fixableIndividualDetails.IndividualFix.5.6.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1779,7 +1779,7 @@ fixableIndividualDetails.IndividualFix.5.7.p2 = We cannot set up an agent servic
 fixableSoleTraderDetails.IndividualFix.5.7.p2 = We cannot set up an agent services account for you until this is resolved.
 fixableIndividualDetails.IndividualFix.5.7.action.h2 = Take action on this issue
 fixableIndividualDetails.IndividualFix.5.7.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableIndividualDetails.IndividualFix.5.7.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.5.7.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableIndividualDetails.IndividualFix.5.7.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableIndividualDetails.IndividualFix.5.7.action.p4 = Find out <a href="https://www.gov.uk/report-and-pay-your-capital-gains-tax" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay Capital Gains Tax (opens in a new tab)</a>.
 fixableIndividualDetails.IndividualFix.5.7.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1793,7 +1793,7 @@ fixableIndividualDetails.IndividualFix.8.5.p2 = We cannot set up an agent servic
 fixableSoleTraderDetails.IndividualFix.8.5.p2 = We cannot set up an agent services account for you until this is resolved.
 fixableIndividualDetails.IndividualFix.8.5.action.h2 = Take action on this issue
 fixableIndividualDetails.IndividualFix.8.5.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableIndividualDetails.IndividualFix.8.5.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.8.5.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableIndividualDetails.IndividualFix.8.5.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableIndividualDetails.IndividualFix.8.5.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
 fixableIndividualDetails.IndividualFix.8.5.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1807,7 +1807,7 @@ fixableIndividualDetails.IndividualFix.8.7.p2 = We cannot set up an agent servic
 fixableSoleTraderDetails.IndividualFix.8.7.p2 = We cannot set up an agent services account for you until this is resolved.
 fixableIndividualDetails.IndividualFix.8.7.action.h2 = Take action on this issue
 fixableIndividualDetails.IndividualFix.8.7.action.p1 = All overdue liabilities must now be paid in full or included in a payment plan.
-fixableIndividualDetails.IndividualFix.8.7.action.p2 = You need to confirm by <strong>{0}</strong> that this has been done.
+fixableIndividualDetails.IndividualFix.8.7.action.p2 = You need to confirm by <span class="govuk-!-font-weight-bold">{0}</span> that this has been done.
 fixableIndividualDetails.IndividualFix.8.7.action.p3 = If you do not confirm this, we will delete the application for an agent services account. This is to comply with our data retention policy.
 fixableIndividualDetails.IndividualFix.8.7.action.p4 = Find out <a href="https://www.gov.uk/guidance/pay-taxes-penalties-or-enquiry-settlements" class="govuk-link" rel="noopener noreferrer" target="_blank">how to pay taxes and penalties (opens in a new tab)</a>.
 fixableIndividualDetails.IndividualFix.8.7.label = Have all overdue liabilities been paid or included in a payment plan?
@@ -1819,7 +1819,7 @@ fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.heading = We coul
 fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p1 = This is usually because an answer you gave was incorrect, or you did not provide enough details.
 fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p2 = On the next page, you can review some of your answers.
 fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p3 = Check them, and change anything that is incorrect or missing.
-fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p4 = You need to do this by <strong>{0}</strong>.
+fixableIndividualDetails.IndividualFix.10.IndividualDetailsFix.p4 = You need to do this by <span class="govuk-!-font-weight-bold">{0}</span>.
 
 individualDetailsDeclaration.caption = Confirm your responses are final
 individualDetailsDeclaration.title = You are about to submit your responses
@@ -1844,7 +1844,7 @@ resubmissionConfirmation.whatNext.p1 = We’ll send you an email to confirm your
 resubmissionConfirmation.viewLink = View or print your application
 resubmissionConfirmation.decision.h2 = Our decision
 resubmissionConfirmation.decision.p1 = We’ll carry out some checks based on the information you’ve given us. If we need any more information we’ll contact you.
-resubmissionConfirmation.decision.p2 = We aim to make a decision by <strong>{0}</strong>.
+resubmissionConfirmation.decision.p2 = We aim to make a decision by <span class="govuk-!-font-weight-bold">{0}</span>.
 resubmissionConfirmation.decision.p3 = We’ll send an email to <span class="govuk-!-text-break-word">{0}</span> to let you know the outcome.
 
 resubmissionConfirmation.signOutLink = Finish and sign out

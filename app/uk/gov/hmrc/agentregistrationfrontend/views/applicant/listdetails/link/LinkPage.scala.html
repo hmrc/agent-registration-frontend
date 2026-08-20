@@ -61,7 +61,7 @@
   @copyButton(clip = provideDetailsLink)
   <h2 class="govuk-heading-m">@messages(s"$key.h2")</h2>
   <ul class="govuk-list list-with-borders">
-    <li><strong>@messages(s"$key.name")</strong></li>
+    <li><span class="govuk-!-font-weight-bold">@messages(s"$key.name")</span></li>
     @existingList.map { individual =>
       <li>@{individual.individualName.value}</li>
     }
