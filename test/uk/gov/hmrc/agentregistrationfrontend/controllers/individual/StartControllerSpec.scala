@@ -46,6 +46,8 @@ extends ControllerSpec:
     val complete: AgentApplication = inComplete
       .modify(_.applicationState)
       .setTo(ApplicationState.SentForRisking)
+      .modify(_.submittedAt)
+      .setTo(Some(tdAll.nowAsInstant))
     val riskingComplete: AgentApplication = complete
       .modify(_.applicationState)
       .setTo(ApplicationState.RiskingCompleted)

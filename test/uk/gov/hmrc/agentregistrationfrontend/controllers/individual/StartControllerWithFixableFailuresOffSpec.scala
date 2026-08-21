@@ -51,6 +51,8 @@ extends ControllerSpec:
     val complete: AgentApplication = inComplete
       .modify(_.applicationState)
       .setTo(ApplicationState.SentForRisking)
+      .modify(_.submittedAt)
+      .setTo(Some(tdAll.nowAsInstant))
 
   "routes should have correct paths and methods" in:
     AppRoutes.providedetails.StartController.start(linkId) shouldBe Call(
