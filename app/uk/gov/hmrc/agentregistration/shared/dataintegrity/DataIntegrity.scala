@@ -46,7 +46,7 @@ object DataIntegrity:
   /** deployment of v0.335.0 of agent-registration-frontend on 15 June 2026 13:57 added the global ASA enrolment check so we don't log errors if it's missing
     * for application submitted before that date
     */
-  private def globalAsaEnrolmentCheckDeployed: Instant = Instant.parse("2025-06-15T13:57:00Z")
+  private def globalAsaEnrolmentCheckDeployed: Instant = Instant.parse("2026-06-15T13:57:00Z")
 
   private def violationsAfterSubmission(agentApplication: AgentApplication)(using state: ApplicationState): Seq[String] =
     Seq(
