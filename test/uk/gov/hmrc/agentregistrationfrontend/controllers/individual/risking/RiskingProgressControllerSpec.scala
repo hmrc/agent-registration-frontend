@@ -36,6 +36,8 @@ extends ControllerSpec:
     .afterEmailAddressVerified
     .modify(_.applicationState)
     .setTo(ApplicationState.SentForRisking)
+    .modify(_.submittedAt)
+    .setTo(Some(tdAll.nowAsInstant))
 
   object individualProvidedDetails:
     val finished: IndividualProvidedDetails = tdAll
