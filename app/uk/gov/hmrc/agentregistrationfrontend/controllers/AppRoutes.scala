@@ -219,7 +219,6 @@ object AppRoutes:
     val IndividualSaUtrController = providedetailsRoutes.IndividualSaUtrController
     val IndividualApproveApplicantController = providedetailsRoutes.IndividualApproveApplicantController
     val IndividualHmrcStandardForAgentsController = providedetailsRoutes.IndividualHmrcStandardForAgentsController
-    val IndividualConfirmStopController = providedetailsRoutes.IndividualConfirmStopController
     val CheckYourAnswersController = providedetailsRoutes.CheckYourAnswersController
     val IndividualConfirmationController = providedetailsRoutes.IndividualConfirmationController
     val MatchIndividualProvidedDetailsController = providedetailsRoutes.MatchIndividualProvidedDetailsController
