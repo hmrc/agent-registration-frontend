@@ -160,6 +160,7 @@ object AppRoutes:
 
     object checkfailed:
 
+      val UtrAlreadyInUseController = entitycheckfailedRoutes.UtrAlreadyInUseController
       val SoleTraderHasNoSaUtrController = entitycheckfailedRoutes.SoleTraderHasNoSaUtrController
       val CanNotRegisterController = entitycheckfailedRoutes.CanNotRegisterController
       val CanNotConfirmIdentityController = entitycheckfailedRoutes.CanNotConfirmIdentityController

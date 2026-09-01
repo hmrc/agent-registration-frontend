@@ -83,6 +83,7 @@ extends ControllerSpec:
         journeyId,
         tdAll
       )
+      AgentRegistrationStubs.stubFindApplicationByUtrNoContent(tdAll.saUtr.asUtr)
       AgentRegistrationStubs.stubUpdateAgentApplication(t.agentApplicationAfterGrsDataReceived)
 
       val response: WSResponse = get(journeyCallbackPath)
@@ -95,6 +96,7 @@ extends ControllerSpec:
 
   s"GET $startJourneyPath should skip GRS journey if GrsJourneyData are already retrieved and redirect to the TaskList page" in:
     AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubFindApplicationByUtrNoContent(tdAll.saUtr.asUtr)
     AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterGrsDataReceived)
 
     val response: WSResponse = get(startJourneyPath)
@@ -107,8 +109,7 @@ extends ControllerSpec:
   s"GET $journeyCallbackPath should skip GRS journey if GrsJourneyData are already retrieved and redirect to the TaskList page" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterGrsDataReceived)
-
-    val response: WSResponse = get(startJourneyPath)
+    val response: WSResponse = get(journeyCallbackPath)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe AppRoutes.apply.internal.RefusalToDealWithController.check().url
 
@@ -124,10 +125,28 @@ extends ControllerSpec:
       tdAll = tdAll,
       withoutUtr = true
     )
-
     val response: WSResponse = get(journeyCallbackPath)
     response.status shouldBe Status.SEE_OTHER
     response.header("Location").value shouldBe AppRoutes.apply.checkfailed.SoleTraderHasNoSaUtrController.show.url
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
     GrsStubs.verifyGetJourneyData(BusinessType.SoleTrader, journeyId)
+
+  s"GET $journeyCallbackPath for applicant with UTR already in use should retrieve JourneyData from GRS and redirect to the UtrAlreadyInUse page" in:
+    AuthStubs.stubAuthorise()
+    AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationSoleTrader.afterStarted)
+    GrsStubs.stubGetJourneyData(
+      businessType = BusinessType.SoleTrader,
+      journeyId = journeyId,
+      tdAll = tdAll,
+      withoutUtr = false
+    )
+    AgentRegistrationStubs.stubFindApplicationByUtr(tdAll.saUtr.asUtr, tdAll.agentApplicationSoleTrader.afterGrsDataReceived)
+
+    val response: WSResponse = get(journeyCallbackPath)
+    response.status shouldBe Status.SEE_OTHER
+    response.header("Location").value shouldBe AppRoutes.apply.checkfailed.UtrAlreadyInUseController.show.url
+    AuthStubs.verifyAuthorise()
+    AgentRegistrationStubs.verifyGetAgentApplication()
+    GrsStubs.verifyGetJourneyData(BusinessType.SoleTrader, journeyId)
+    AgentRegistrationStubs.verifyFindApplicationByUtr(tdAll.saUtr.asUtr)

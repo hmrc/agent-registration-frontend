@@ -23,6 +23,7 @@ GET         /apply/not-agent-credential                             uk.gov.hmrc.
 GET         /apply/not-agent-login                                  uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.NotAgentLoginController.show(continueUrl: Option[RedirectUrl])
 GET         /apply/exit                                             uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.AgentApplicationController.genericExitPage
 GET         /apply/agent-already-subscribed                         uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.AgentAlreadySubscribedController.show
+GET         /apply/utr-already-in-use                               uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.checkfailed.UtrAlreadyInUseController.show
 
 ## About your business routes
 GET         /apply/about-your-business/agent-type                   uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness.AgentTypeController.show
