@@ -350,3 +350,30 @@ object AgentRegistrationStubs:
     responseStatus = Status.NO_CONTENT,
     responseBody = ""
   )
+
+  def stubFindApplicationByUtr(
+    utr: Utr,
+    agentApplication: AgentApplication
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/by-utr/${utr.value}"),
+    responseStatus = 200,
+    responseBody = Json.toJson(agentApplication).toString
+  )
+
+  def stubFindApplicationByUtrNoContent(
+    utr: Utr
+  ): StubMapping = StubMaker.make(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/by-utr/${utr.value}"),
+    responseStatus = Status.NO_CONTENT
+  )
+
+  def verifyFindApplicationByUtr(
+    utr: Utr,
+    count: Int = 1
+  ): Unit = StubMaker.verify(
+    httpMethod = StubMaker.HttpMethod.GET,
+    urlPattern = wm.urlPathEqualTo(s"/agent-registration/application/by-utr/${utr.value}"),
+    count = count
+  )

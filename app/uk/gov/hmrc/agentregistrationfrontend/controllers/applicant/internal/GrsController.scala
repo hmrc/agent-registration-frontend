@@ -127,6 +127,18 @@ extends FrontendController(mcc, actions):
       journeyData.identifiersMatch,
       "this function is meant to be called when identifiers match"
     )
+    val utr: Utr =
+      journeyData.sautr match {
+        case Some(sautr) => sautr.asUtr
+        case None =>
+          journeyData.ctutr match
+            case Some(ctutr) => ctutr.asUtr
+            case None =>
+              throw Errors.throwServerErrorException(
+                "Neither SAUTR nor CTUTR is present in the GRS journey data for a registered business."
+              )
+      }
+
     val updatedApplication: AgentApplication =
       agentApplication match
         case aa: AgentApplicationSoleTrader =>
@@ -166,10 +178,15 @@ extends FrontendController(mcc, actions):
             businessDetails = Some(journeyData.asBusinessScottishPartnership)
           )
 
-    agentApplicationService
-      .upsert(updatedApplication)
-      .map: _ =>
-        Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
+    agentApplicationService.find(utr).flatMap:
+      case Some(existingApplication) =>
+        logger.warn(s"UTR $utr is already in use by another application ${existingApplication.agentApplicationId}.")
+        Future.successful(Redirect(AppRoutes.apply.checkfailed.UtrAlreadyInUseController.show.url))
+      case None =>
+        agentApplicationService
+          .upsert(updatedApplication)
+          .map: _ =>
+            Redirect(AppRoutes.apply.internal.RefusalToDealWithController.check())
 
 object GrsController:
 

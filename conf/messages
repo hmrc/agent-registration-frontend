@@ -1855,3 +1855,9 @@ soleTraderHasNoSaUtr.p1 = You need to be registered for Self Assessment and have
 soleTraderHasNoSaUtr.p2 = If you already have a UTR, you can provide it by <a href="{0}" class="govuk-link">confirming your business details again</a>.
 soleTraderHasNoSaUtr.p3 = If you are registered for Self Assessment, you can <a href="{0}" class="govuk-link">get help to find your UTR here</a>.
 soleTraderHasNoSaUtr.p4 = Alternatively you can <a href="{0}" class="govuk-link">contact HMRC</a>.
+
+# UTR found in use by another application
+utrAlreadyInUse.title = Your Unique Taxpayer Reference (UTR) is already in use
+utrAlreadyInUse.p1 = We cannot create a new application for you because the UTR you provided is already in use by another application.
+utrAlreadyInUse.p2 = If you are the owner of this other application, you can continue it by signing in with the sign details used to create it in the first place.
+utrAlreadyInUse.p3 = If you are not the owner of this other application, you can <a href="{0}" class="govuk-link">contact HMRC</a> to discuss the situation.

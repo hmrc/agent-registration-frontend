@@ -54,7 +54,7 @@ extends Connector:
               response = response,
               info = "findApplication problem"
             )
-      .andLogOnFailure(s"Failed to find Agent Application")
+      .andLogOnFailure("Failed to search for an Agent Application by internalUserId")
 
   def upsertApplication(application: AgentApplication)(using RequestHeader): Future[Unit] =
     val url: URL = url"$baseUrl/application"
@@ -92,7 +92,7 @@ extends Connector:
               status = other,
               response = response
             )
-      .andLogOnFailure(s"Failed to find Agent Application by link-id: $linkId")
+      .andLogOnFailure(s"Failed to search for an Agent Application by link-id: $linkId")
 
   def findApplication(agentApplicationId: AgentApplicationId)(using RequestHeader): Future[Option[AgentApplication]] =
     val url: URL = url"$baseUrl/application/by-agent-application-id/${agentApplicationId.value}"
@@ -110,7 +110,7 @@ extends Connector:
               status = other,
               response = response
             )
-      .andLogOnFailure(s"Failed to find Agent Application by agentApplicationId: $agentApplicationId")
+      .andLogOnFailure(s"Failed to search for an Agent Application by agentApplicationId: $agentApplicationId")
 
   def findApplication(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[AgentApplication]] =
     val url: URL = url"$baseUrl/application/by-application-reference/${applicationReference.value}"
@@ -129,6 +129,24 @@ extends Connector:
               response = response
             )
       .andLogOnFailure(s"Failed to find Agent Application by applicationReference: $applicationReference")
+
+  def findApplication(utr: Utr)(using RequestHeader): Future[Option[AgentApplication]] =
+    val url: URL = url"$baseUrl/application/by-utr/${utr.value}"
+    httpClient
+      .get(url)
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => Some(parseApplication(response, url))
+          case Status.NO_CONTENT => None
+          case other =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "GET",
+              url = url,
+              status = other,
+              response = response
+            )
+      .andLogOnFailure(s"Failed to search for an Agent Application by utr: $utr")
 
   def getBusinessPartnerRecord(utr: Utr)(using RequestHeader): Future[Option[BusinessPartnerRecordResponse]] =
     val url: URL = url"$baseUrl/business-partner-record/utr/${utr.value}"

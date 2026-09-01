@@ -42,6 +42,10 @@ extends RequestAwareLogging:
     agentApplicationId: AgentApplicationId
   )(using RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector.findApplication(agentApplicationId)
 
+  def find(
+    utr: Utr
+  )(using RequestHeader): Future[Option[AgentApplication]] = agentRegistrationConnector.findApplication(utr)
+
   inline def upsert(
     agentApplication: AgentApplication
   )(using RequestHeader): Future[Unit] = agentRegistrationConnector.upsertApplication(agentApplication)
