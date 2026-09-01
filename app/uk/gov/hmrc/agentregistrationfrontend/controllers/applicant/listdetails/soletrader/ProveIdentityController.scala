@@ -90,8 +90,9 @@ extends FrontendController(mcc, actions):
           newIndividualProvidedDetails.map(individualProvidedDetails => request.add[IndividualProvidedDetails](individualProvidedDetails))
         case soleTrader :: Nil => request.add[IndividualProvidedDetails](soleTrader) // we have already visited this page and the record has been created
         case _ =>
-          logger.warn(s"Unexpected multiple provided details records for sole trader application, applicationId:[${agentApplication.agentApplicationId}], cannot recover from this state so exiting")
-          Redirect(AppRoutes.apply.AgentApplicationController.genericExitPage)
+          throwServerErrorException(
+            s"Unexpected multiple provided details records for sole trader application, applicationId:[${agentApplication.agentApplicationId}], cannot recover from this state"
+          )
     )
 
   def show: Action[AnyContent] = baseAction:

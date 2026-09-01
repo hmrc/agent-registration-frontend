@@ -195,7 +195,6 @@ GET         /provide-details/approve-applicant/:linkId                      uk.g
 POST        /provide-details/approve-applicant/:linkId                      uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualApproveApplicantController.submit(linkId: LinkId)
 GET         /provide-details/agree-standard/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualHmrcStandardForAgentsController.show(linkId: LinkId)
 POST        /provide-details/agree-standard/:linkId                         uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualHmrcStandardForAgentsController.submit(linkId: LinkId)
-GET         /provide-details/confirm-stop                                   uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualConfirmStopController.show
 GET         /provide-details/check-your-answers/:linkId                     uk.gov.hmrc.agentregistrationfrontend.controllers.individual.CheckYourAnswersController.show(linkId: LinkId)
 POST        /provide-details/check-your-answers/:linkId                     uk.gov.hmrc.agentregistrationfrontend.controllers.individual.CheckYourAnswersController.submit(linkId: LinkId)
 GET         /provide-details/confirmation/:linkId                           uk.gov.hmrc.agentregistrationfrontend.controllers.individual.IndividualConfirmationController.show(linkId: LinkId)
