@@ -116,12 +116,12 @@ object IndividualAuthStubs {
 
   def responseBodyWithCl(
     internalUserId: InternalUserId = TdAll.tdAll.internalUserId,
-    cl: ConfidenceLevel = ConfidenceLevel.L250
+    confidenceLevel: ConfidenceLevel
   ): String =
     Json.obj(
       "internalId" -> internalUserId.value,
       "affinityGroup" -> "Individual",
-      "confidenceLevel" -> cl.level,
+      "confidenceLevel" -> confidenceLevel.level,
       "optionalCredentials" -> Json.obj(
         "providerId" -> "cred-id-12345",
         "providerType" -> "GovernmentGateway"

@@ -57,8 +57,7 @@ extends ControllerSpec:
       agentApplication = agentApplication.riskingCompletedFixable,
       individualProvidedDetails = tdAll.providedDetails.afterFinished.copy(
         riskingOutcomeIndividual = Some(riskingOutcomeIndividual.failingFixableAllCodes)
-      ),
-      isScr = false
+      )
     )
     val response: WSResponse = get(path)
 

@@ -74,13 +74,13 @@ extends FrontendController(mcc, actions):
             ))
     .refine:
       implicit request =>
-        (request.get[ConfidenceLevel], request.get[Option[Nino]]) match
-          case (cl, Some(nino)) if cl >= ConfidenceLevel.L250 =>
+        request.get[Option[Nino]] match
+          case Some(nino) =>
             citizenDetailsConnector
-              .getCitizenDetails(nino)
-              .map[RequestWithData[DataWithIndividualProvidedDetailsForSearch]]: details =>
-                request.add[Option[CitizenDetails]](Some(details))
-          case _ => request.add[Option[CitizenDetails]](None)
+              .getCitizenDetails(nino).map:
+                case Some(details) => request.add[Option[CitizenDetails]](Some(details))
+                case None => request.add[Option[CitizenDetails]](None)
+          case None => request.add[Option[CitizenDetails]](None)
 
   def show(
     linkId: LinkId
@@ -115,7 +115,7 @@ extends FrontendController(mcc, actions):
             individualProvideDetailsService
               .claimIndividualProvidedDetails(
                 individualProvidedDetails = matchedIndividual
-                  .copy(passedIv = Some(request.get[ConfidenceLevel] >= ConfidenceLevel.L250)),
+                  .copy(passedIv = Some((request.get[ConfidenceLevel] >= ConfidenceLevel.L250) && request.get[Option[CitizenDetails]].isDefined)),
                 internalUserId = request.get[InternalUserId],
                 maybeNino = request.get[Option[Nino]],
                 citizenDetails = request.get[Option[CitizenDetails]]

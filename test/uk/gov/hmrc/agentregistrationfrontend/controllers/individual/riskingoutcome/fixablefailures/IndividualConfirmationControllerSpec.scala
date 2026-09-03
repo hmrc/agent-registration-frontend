@@ -60,8 +60,7 @@ extends ControllerSpec:
       agentApplication = agentApplication.riskingCompletedFixable,
       individualProvidedDetails = tdAll.providedDetails.afterFinished.copy(
         riskingOutcomeIndividual = Some(riskingOutcomeIndividual.afterDeclaration)
-      ),
-      isScr = false
+      )
     )
     val response: WSResponse = get(path)
 
@@ -75,8 +74,7 @@ extends ControllerSpec:
       agentApplication = agentApplication.riskingCompletedFixable,
       individualProvidedDetails = tdAll.providedDetails.afterFinished.copy(
         riskingOutcomeIndividual = Some(riskingOutcomeIndividual.withUnfixedFixes)
-      ),
-      isScr = false
+      )
     )
     val response: WSResponse = get(path)
 

@@ -40,9 +40,21 @@ extends Connector:
 
   def getCitizenDetails(
     nino: Nino
-  )(using RequestHeader): Future[CitizenDetails] = httpClient
+  )(using RequestHeader): Future[Option[CitizenDetails]] = httpClient
     .get(url"${baseUrl}/citizen-details/nino/${nino.value.replaceAll(" ", "")}")
-    .execute[CitizenDetails]
+    .execute[HttpResponse]
+    .map: response =>
+      response.status match
+        case Status.OK => Some(response.json.as[CitizenDetails])
+        case Status.NOT_FOUND => None
+        case status =>
+          Errors.throwUpstreamErrorResponse(
+            httpMethod = "GET",
+            url = url"${baseUrl}/citizen-details/nino/${nino.value.replaceAll(" ", "")}",
+            status = status,
+            response = response
+          )
+    .andLogOnFailure("Failed to get citizen details")
 
   /** See https://github.com/hmrc/citizen-details?tab=readme-ov-file#get-citizen-detailsninodesignatory-details
     */

@@ -58,6 +58,21 @@ object CitizenDetailsStub:
     count = count
   )
 
+  def stubFindNotFound(
+    nino: Nino
+  ): StubMapping =
+
+    StubMaker.make(
+      httpMethod = StubMaker.HttpMethod.GET,
+      urlPattern = urlMatching(s"/citizen-details/nino/${nino.value}"),
+      responseStatus = 404,
+      responseBody =
+        Json.obj(
+          "code" -> "INVALID_NINO",
+          "message" -> s"Provided NINO $nino is not valid"
+        ).toString
+    )
+
   def stubDesignatoryDetailsFound(
     nino: Nino,
     deceased: Boolean = false

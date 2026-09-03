@@ -34,13 +34,18 @@ object ProvideDetailsStubHelper:
   def stubAuthAndFindApplicationAndProvidedDetails(
     agentApplication: AgentApplication,
     individualProvideDetails: IndividualProvidedDetails,
-    isScr: Boolean = false,
-    withBpr: Boolean = false,
-    cl: ConfidenceLevel = ConfidenceLevel.L250
+    confidenceLevel: ConfidenceLevel = ConfidenceLevel.L250,
+    withBpr: Boolean = false
   ): StubMapping =
 
-    if isScr
-    then IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyWithCl(internalUserId = agentApplication.internalUserId, cl = cl))
+    if confidenceLevel < ConfidenceLevel.L250
+    then
+      IndividualAuthStubs.stubAuthorise(responseBody =
+        IndividualAuthStubs.responseBodyWithCl(
+          internalUserId = agentApplication.internalUserId,
+          confidenceLevel = confidenceLevel
+        )
+      )
     else IndividualAuthStubs.stubAuthoriseWithNinoAndSaUtr()
 
     if withBpr
@@ -57,13 +62,13 @@ object ProvideDetailsStubHelper:
     agentApplication: AgentApplication,
     individualProvidedDetails: IndividualProvidedDetails,
     updatedIndividualProvidedDetails: IndividualProvidedDetails,
-    isScr: Boolean = false,
+    confidenceLevel: ConfidenceLevel = ConfidenceLevel.L250,
     withBpr: Boolean = false
   ): StubMapping =
     stubAuthAndFindApplicationAndProvidedDetails(
       agentApplication,
       individualProvidedDetails,
-      isScr,
+      confidenceLevel,
       withBpr
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(updatedIndividualProvidedDetails)
@@ -71,14 +76,12 @@ object ProvideDetailsStubHelper:
   def stubAuthAndFixIndividualProvidedDetails(
     agentApplication: AgentApplication,
     individualProvidedDetails: IndividualProvidedDetails,
-    updatedIndividualProvidedDetails: IndividualProvidedDetails,
-    isScr: Boolean = false
+    updatedIndividualProvidedDetails: IndividualProvidedDetails
   ): StubMapping =
     stubAuthAndUpdateProvidedDetails(
       agentApplication,
       individualProvidedDetails,
-      updatedIndividualProvidedDetails,
-      isScr
+      updatedIndividualProvidedDetails
     )
     AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
       utr = tdAll.saUtr.asUtr, // doesn't matter we are using same utr as provided details, there is no conflict
@@ -88,14 +91,12 @@ object ProvideDetailsStubHelper:
   def stubAuthAndMatchIndividualProvidedDetails(
     agentApplication: AgentApplication,
     individualProvidedDetails: IndividualProvidedDetails,
-    isScr: Boolean = false,
-    cl: ConfidenceLevel = ConfidenceLevel.L250
+    confidenceLevel: ConfidenceLevel = ConfidenceLevel.L250
   ): StubMapping =
     stubAuthAndFindApplicationAndProvidedDetails(
       agentApplication,
       individualProvidedDetails,
-      isScr,
-      cl = cl
+      confidenceLevel = confidenceLevel
     )
     CitizenDetailsStub.stubFindSaUtrAndDateOfBirth(
       nino = tdAll.nino,
@@ -139,7 +140,11 @@ object ProvideDetailsStubHelper:
     individualProvidedDetails: IndividualProvidedDetails,
     riskingProgress: RiskingProgress
   ): StubMapping =
-    stubAuthAndFindApplicationAndProvidedDetails(agentApplication, individualProvidedDetails)
+    stubAuthAndFindApplicationAndProvidedDetails(
+      agentApplication,
+      individualProvidedDetails,
+      confidenceLevel = ConfidenceLevel.L250
+    )
     AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
       utr = tdAll.saUtr.asUtr,
       responseBody = tdAll.businessPartnerRecordResponse
@@ -161,7 +166,8 @@ object ProvideDetailsStubHelper:
     stubAuthAndUpdateProvidedDetails(
       agentApplication,
       individualProvidedDetails,
-      updatedIndividualProvidedDetails
+      updatedIndividualProvidedDetails,
+      confidenceLevel = ConfidenceLevel.L250
     )
     AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
       utr = tdAll.saUtr.asUtr,

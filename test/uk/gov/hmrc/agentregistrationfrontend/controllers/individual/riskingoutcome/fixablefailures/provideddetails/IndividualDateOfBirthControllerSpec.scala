@@ -22,6 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualDateOfBirthForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ProvideDetailsStubHelper
+import uk.gov.hmrc.auth.core.ConfidenceLevel
 
 class IndividualDateOfBirthControllerSpec
 extends ControllerSpec:
@@ -60,7 +61,8 @@ extends ControllerSpec:
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
       agentApplication = agentApplication,
       individualProvideDetails = individualProvideDetails.afterDateOfBirthProvidedHmrc,
-      withBpr = true
+      withBpr = true,
+      confidenceLevel = ConfidenceLevel.L250
     )
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
@@ -70,7 +72,8 @@ extends ControllerSpec:
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
       agentApplication = agentApplication,
       individualProvideDetails = individualProvideDetails.afterDateOfBirthProvidedApplicant,
-      withBpr = true
+      withBpr = true,
+      confidenceLevel = ConfidenceLevel.L250
     )
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
@@ -81,7 +84,8 @@ extends ControllerSpec:
       agentApplication = agentApplication,
       individualProvidedDetails = individualProvideDetails.afterDateOfBirthProvidedHmrc,
       updatedIndividualProvidedDetails = individualProvideDetails.afterDateOfBirthProvidedApplicant,
-      withBpr = true
+      withBpr = true,
+      confidenceLevel = ConfidenceLevel.L250
     )
     val response: WSResponse =
       post(path)(Map(
@@ -100,7 +104,8 @@ extends ControllerSpec:
       agentApplication = agentApplication,
       individualProvidedDetails = individualProvideDetails.afterDateOfBirthProvidedHmrc,
       updatedIndividualProvidedDetails = individualProvideDetails.afterDateOfBirthProvidedApplicant,
-      withBpr = true
+      withBpr = true,
+      confidenceLevel = ConfidenceLevel.L250
     )
     val response: WSResponse =
       post(path)(Map(
@@ -120,7 +125,8 @@ extends ControllerSpec:
       agentApplication = agentApplication,
       individualProvidedDetails = individualProvideDetails.afterDateOfBirthProvidedHmrc,
       updatedIndividualProvidedDetails = individualProvideDetails.afterDateOfBirthProvidedApplicant,
-      withBpr = true
+      withBpr = true,
+      confidenceLevel = ConfidenceLevel.L250
     )
     val response: WSResponse =
       post(path)(Map(
