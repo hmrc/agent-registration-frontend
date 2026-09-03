@@ -2,6 +2,7 @@ object ScalaCompilerFlags {
 
   val scalaCompilerOptions: Seq[String] = Seq(
 //    "-explain",
+    "-explain-cyclic",
     "-language:implicitConversions",
     "-language:reflectiveCalls",
     "-Wconf:msg=While parsing annotations in:silent",

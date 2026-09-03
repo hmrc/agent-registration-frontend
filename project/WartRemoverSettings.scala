@@ -23,7 +23,6 @@ object WartRemoverSettings {
           Wart.Product,
           Wart.JavaSerializable,
           Wart.Serializable,
-          Wart.ListUnapply,
           Wart.Any // Disabled: causes false positives with string interpolators
         )
       else
