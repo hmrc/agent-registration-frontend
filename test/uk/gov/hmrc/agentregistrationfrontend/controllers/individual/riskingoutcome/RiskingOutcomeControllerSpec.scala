@@ -92,8 +92,7 @@ extends ControllerSpec:
         riskingOutcomeIndividual = Some(RiskingOutcomeIndividual.FailedNonFixable(
           failures = Seq(IndividualFailure._7)
         ))
-      ),
-      isScr = false
+      )
     )
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
@@ -102,8 +101,7 @@ extends ControllerSpec:
   s"GET $path when risking outcome is FailedFixable should return 200 and render failed fixable page" in:
     ProvideDetailsStubHelper.stubAuthAndMatchIndividualProvidedDetails(
       agentApplication = failedFixableApplication,
-      individualProvidedDetails = individualProvidedDetails.finished,
-      isScr = false
+      individualProvidedDetails = individualProvidedDetails.finished
     )
     val response: WSResponse = get(path)
 

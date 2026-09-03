@@ -22,6 +22,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.ProvideDetailsStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.auth.core.ConfidenceLevel
 
 class IndividualNinoControllerSpec
 extends ControllerSpec:
@@ -60,7 +61,8 @@ extends ControllerSpec:
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
       agentApplication = agentApplication,
       individualProvideDetails = individualProvideDetails.afterNinoProvided,
-      withBpr = true
+      withBpr = true,
+      confidenceLevel = ConfidenceLevel.L250
     )
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
@@ -70,7 +72,8 @@ extends ControllerSpec:
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
       agentApplication = agentApplication,
       individualProvideDetails = individualProvideDetails.afterNinoNotProvided,
-      withBpr = true
+      withBpr = true,
+      confidenceLevel = ConfidenceLevel.L250
     )
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
@@ -81,7 +84,8 @@ extends ControllerSpec:
       agentApplication = agentApplication,
       individualProvidedDetails = individualProvideDetails.afterNinoProvided,
       updatedIndividualProvidedDetails = individualProvideDetails.afterNinoProvided,
-      withBpr = true
+      withBpr = true,
+      confidenceLevel = ConfidenceLevel.L250
     )
     val response: WSResponse =
       post(path)(Map(
@@ -114,7 +118,8 @@ extends ControllerSpec:
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
       agentApplication = agentApplication,
       individualProvideDetails = individualProvideDetails.afterNinoNotProvided,
-      withBpr = true
+      withBpr = true,
+      confidenceLevel = ConfidenceLevel.L250
     )
     val response: WSResponse =
       post(path)(Map(
@@ -130,7 +135,8 @@ extends ControllerSpec:
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
       agentApplication = agentApplication,
       individualProvideDetails = individualProvideDetails.afterNinoNotProvided,
-      withBpr = true
+      withBpr = true,
+      confidenceLevel = ConfidenceLevel.L250
     )
     val response: WSResponse =
       post(path)(Map(

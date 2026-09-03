@@ -21,6 +21,8 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmMatchToIndividualProvidedDetailsForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
+import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CitizenDetailsStub
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 
@@ -79,7 +81,7 @@ extends ControllerSpec:
     ProvideDetailsStubHelper.stubAuthAndMatchIndividualProvidedDetails(
       agentApplication,
       individualProvideDetails.unclaimed,
-      cl = ConfidenceLevel.L600
+      confidenceLevel = ConfidenceLevel.L600
     )
     val response: WSResponse = get(path)
     response.status shouldBe Status.OK
@@ -98,13 +100,33 @@ extends ControllerSpec:
     ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
       agentApplication,
       individualProvideDetails.unclaimed,
-      isScr = true
+      confidenceLevel = ConfidenceLevel.L50
     )
     val response: WSResponse = get(path + "?fromIv=true")
     response.status shouldBe Status.SEE_OTHER
     response.body[String] shouldBe ""
     response.header("Location").value shouldBe AppRoutes.providedetails.NameMatchingController.show(linkId).url
     ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
+
+  s"GET $path when CL250 user has no Citizen Details match should redirect to manual name matching page" in:
+    ProvideDetailsStubHelper.stubAuthAndFindApplicationAndProvidedDetails(
+      agentApplication,
+      individualProvideDetails.unclaimed,
+      confidenceLevel = ConfidenceLevel.L250
+    )
+    CitizenDetailsStub.stubFindNotFound(
+      nino = tdAll.nino
+    )
+    AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
+      utr = tdAll.saUtr.asUtr,
+      responseBody = tdAll.businessPartnerRecordResponse
+    )
+    val response: WSResponse = get(path + "?fromIv=true")
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe ""
+    response.header("Location").value shouldBe AppRoutes.providedetails.NameMatchingController.show(linkId).url
+    ProvideDetailsStubHelper.verifyAuthAndFindApplicationAndProvidedDetails()
+    CitizenDetailsStub.verifyFind(tdAll.nino)
 
   s"GET $path when details already provided by applicant should redirect to dedicated exit page" in:
     ProvideDetailsStubHelper.stubAuthAndMatchIndividualProvidedDetails(

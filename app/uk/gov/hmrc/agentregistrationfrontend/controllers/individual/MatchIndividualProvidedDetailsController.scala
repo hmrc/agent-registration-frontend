@@ -69,7 +69,7 @@ extends FrontendController(mcc, actions):
     .authorisedWithAdditionalIdentifiers
     .refine(implicit request =>
       fromIv match
-        case Some(_) => Future.successful(request) // we have been through IV uplift
+        case Some(_) => Future.successful(request) // we have been through IV uplift even if failed, we don't go through again
         case None =>
           if
             request.get[ConfidenceLevel] < ConfidenceLevel.L250
@@ -98,22 +98,19 @@ extends FrontendController(mcc, actions):
           case list: List[IndividualProvidedDetails] => request.add[List[IndividualProvidedDetails]](list)
     )
     .refine(implicit request =>
-      (request.get[ConfidenceLevel], request.get[Option[Nino]]) match
-        case (cl, Some(nino)) if cl >= ConfidenceLevel.L250 =>
+      request.get[Option[Nino]] match
+        case Some(nino) =>
           citizenDetailsConnector
-            .getCitizenDetails(nino)
-            .map[RequestWithData[DataWithOptionalCitizenDetails]]: (details: CitizenDetails) =>
-              request.add[Option[CitizenDetails]](Some(details))
-        case (cl, Some(_)) =>
-          logger.warn(s"Insufficient confidence level found in session (${cl}), we cannot trust the nino to use in citizen details, redirecting to manual name matching page")
-          Future.successful(Redirect(AppRoutes.providedetails.NameMatchingController.show(linkId).url))
-        case (_, None) =>
+            .getCitizenDetails(nino).map:
+              case Some(details) => request.add[Option[CitizenDetails]](Some(details))
+              case None => request.add[Option[CitizenDetails]](None)
+        case None =>
           logger.warn("No NINO found in session, cannot match to citizen details, redirecting to manual name matching page")
           Future.successful(Redirect(AppRoutes.providedetails.NameMatchingController.show(linkId).url))
     )
     .refine(implicit request =>
       val list: List[IndividualProvidedDetails] = request.get
-      val maybeCitizenDetails: Option[CitizenDetails] = request.get[Option[CitizenDetails]]
+      val maybeCitizenDetails: Option[CitizenDetails] = request.get
       val listOfUnclaimedIndividualProvidedDetails: List[IndividualProvidedDetails] = list.filter(_.internalUserId.isEmpty)
       listOfUnclaimedIndividualProvidedDetails.matchCitizenDetailsName(maybeCitizenDetails) match
         case Some(individualProvidedDetails) => request.add[IndividualProvidedDetails](individualProvidedDetails)
@@ -183,7 +180,7 @@ extends FrontendController(mcc, actions):
                   view(
                     form = formWithErrors,
                     individualProvidedDetails = request.get[IndividualProvidedDetails],
-                    entityName = optBpr.map(_.getEntityName).getOrThrowExpectedDataMissing("BPR is missing for application"), // TODO work out whether we call BPR or change to put it into application
+                    entityName = optBpr.map(_.getEntityName).getOrThrowExpectedDataMissing("BPR is missing for application"),
                     businessTypeKey = businessTypeKey,
                     linkId = linkId,
                     fromIv = fromIv
@@ -193,16 +190,22 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         val confirmMatchToIndividualProvidedDetails: YesNo = request.get
+        val citizenDetails: Option[CitizenDetails] = request.get
+
+        /** [[IndividualProvidedDetails.passedIv]] can only be set to true if we have citizen details in addition to the confidence level (CL) being L250 or
+          * above. This is because we have learned that SCR cases can have a high legacy CL but no citizen details due to their status. Details in
+          * https://jira.tools.tax.service.gov.uk/browse/APB-12206
+          */
         if confirmMatchToIndividualProvidedDetails.toBoolean then
           individualProvideDetailsService
             .claimIndividualProvidedDetails(
               individualProvidedDetails = request.get[IndividualProvidedDetails]
                 .copy(
-                  passedIv = Some(request.get[ConfidenceLevel] >= ConfidenceLevel.L250)
+                  passedIv = Some((request.get[ConfidenceLevel] >= ConfidenceLevel.L250) && citizenDetails.isDefined)
                 ),
               internalUserId = request.get[InternalUserId],
               maybeNino = request.get[Option[Nino]],
-              citizenDetails = request.get[Option[CitizenDetails]]
+              citizenDetails = citizenDetails
             )
             .map: _ =>
               Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url)

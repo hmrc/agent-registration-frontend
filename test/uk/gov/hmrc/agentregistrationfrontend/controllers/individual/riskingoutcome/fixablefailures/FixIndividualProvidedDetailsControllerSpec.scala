@@ -75,8 +75,7 @@ extends ControllerSpec:
           agentApplication = testCase.application,
           individualProvidedDetails = tdAll.providedDetails.afterFinished.copy(
             riskingOutcomeIndividual = Some(riskingOutcomeIndividual.failingFixableAllCodes)
-          ),
-          isScr = false
+          )
         )
         val response: WSResponse = get(path)
 

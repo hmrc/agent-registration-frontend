@@ -122,8 +122,7 @@ extends ControllerSpec:
           agentApplication = testCase.application,
           individualProvidedDetails = tdAll.providedDetails.afterFinished.copy(
             riskingOutcomeIndividual = Some(tdAll.riskingOutcomeIndividualFailedFixableAllCodes)
-          ),
-          isScr = false
+          )
         )
         val response: WSResponse = get(pathForFailureCode(individualFixCode))
 
@@ -153,8 +152,7 @@ extends ControllerSpec:
           agentApplication = testCase.application,
           individualProvidedDetails = tdAll.providedDetails.afterFinished.copy(
             riskingOutcomeIndividual = Some(tdAll.riskingOutcomeIndividualFailedFixableAllCodes)
-          ),
-          isScr = false
+          )
         )
         val response: WSResponse = post(pathForFailureCode(individualFixCode))(Map(ConfirmFixForm.key -> Seq("")))
 
