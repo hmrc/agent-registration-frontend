@@ -24,7 +24,6 @@ lazy val microservice = Project("agent-registration-frontend", file("."))
       else
         Nil
     },
-    pipelineStages := Seq(gzip),
     Test / parallelExecution := true,
     routesImport ++= Seq(
       "uk.gov.hmrc.agentregistrationfrontend",
