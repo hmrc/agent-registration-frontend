@@ -94,7 +94,8 @@
             attributes = Map(
                 "accept" -> appConfig.Upscan.acceptMimeTypes,
                 "required" -> "true"
-            )
+            ),
+            javascript = Some(true)
         ))
 
         <div id="upload-handling">
