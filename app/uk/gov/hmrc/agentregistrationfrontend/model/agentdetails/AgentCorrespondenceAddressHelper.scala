@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.model.agentdetails
 
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
+import uk.gov.hmrc.agentregistration.shared.companieshouse.ChroAddress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistration.shared.util.StringExtensions.replaceCommasWithSpaces
 import uk.gov.hmrc.agentregistrationfrontend.model.addresslookup.GetConfirmedAddressResponse
@@ -113,3 +114,19 @@ object AgentCorrespondenceAddressHelper:
       postalCode = address.postcode,
       countryCode = address.country.code
     )
+
+  /** We need to ensure that we only show valid addresses to the user that wouldn't get rejected by ETMP, i.e. if we get back an address from
+   * companies house that would yield a line 1 greater than 35 characters, we can't show that to the user as it would throw an error when sent downstream.
+   *
+   * The schema for CHRO addresses from Companies House allows for the postal code to be missing, but subscription requires a postal code for UK addresses - it
+   * is optional in the subscription API but the rule is, if it's UK then it's required. To work around this we treat CHRO addresses with missing postal codes
+   * as invalid options for pre-filling.
+   */
+  def validateChroAddressAgainstSubscriptionApi(chroAddressOption: Option[ChroAddress]): Option[ChroAddress] = chroAddressOption
+    .filter(_.postal_code.isDefined)
+    .filter: chroAddress =>
+      val agentCorrespondenceAddress: AgentCorrespondenceAddress = fromValueString(chroAddress.toValueString)
+      agentCorrespondenceAddress.addressLine1.length <= 35 &&
+      agentCorrespondenceAddress.addressLine2.forall(_.length <= 35) &&
+      agentCorrespondenceAddress.addressLine3.forall(_.length <= 35) &&
+      agentCorrespondenceAddress.addressLine4.forall(_.length <= 35)
