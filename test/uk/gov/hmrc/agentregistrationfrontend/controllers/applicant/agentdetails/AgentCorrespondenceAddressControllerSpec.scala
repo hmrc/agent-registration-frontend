@@ -162,6 +162,29 @@ extends ControllerSpec:
     firstRadio.attr("value") shouldBe tdAll.bprRegisteredAddress.toValueString // NOT the chro address
     ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
+  s"GET $path when CHRO address doesn't pass the schema validation then the option does not exist on the page" in:
+    val applicationWithChroWithoutPostcode = agentApplication.afterEmailAddressSelected.asLlpApplication
+      .modify(_.businessDetails.each.companyProfile.unsanitisedCHROAddress)
+      .setTo(Some(ChroAddress(
+        care_of = Some("Care of some very long name"),
+        po_box = Some("PO box"),
+        premises = Some("Very long premises name"),
+        address_line_1 = Some("23 Great Portland Street"),
+        address_line_2 = Some("London"),
+        locality = None,
+        postal_code = None,
+        country = Some("GB")
+      )))
+    ApplyStubHelper.stubsToSupplyBprToPage(applicationWithChroWithoutPostcode)
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.OK
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe ExpectedStrings.documentTitle
+    val firstRadio = doc.mainContent.select(s"input#${AgentCorrespondenceAddressForm.key}") // the first radio button
+    firstRadio.attr("value") shouldBe tdAll.bprRegisteredAddress.toValueString // NOT the chro address
+    ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
+
   s"POST $path with selection of BPR address should save data and redirect to CYA page" in:
     ApplyStubHelper.stubsForSuccessfulUpdate(
       application = agentApplication.afterEmailAddressSelected,
