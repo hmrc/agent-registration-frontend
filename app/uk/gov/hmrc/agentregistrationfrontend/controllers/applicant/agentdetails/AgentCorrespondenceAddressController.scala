@@ -151,7 +151,7 @@ extends FrontendController(mcc, actions):
             .getCompanyProfile
             .unsanitisedCHROAddress
 
-    val validChroAddressOption: Option[ChroAddress] = validateChroAddressAgainstSubscriptionApi(chroAddressOption)
+    val validChroAddressOption: Option[ChroAddress] = validateChroAddressAgainstSubscriptionApiV2(chroAddressOption)
 
     AddressOptions(
       chroAddress = validChroAddressOption,
@@ -165,26 +165,34 @@ extends FrontendController(mcc, actions):
       )
     )
 
-  /**
-   * We need to ensure at this point that we only show valid addresses to the user that wouldn't get rejected by ETMP, i.e. if we get back an address from
-   * companies house that would yield a line 1 greater than 35 characters, we can't show that to the user as it would throw an error when sent downstream.
-   *
-   * The schema for CHRO addresses from Companies House allows for the postal code to be missing, but subscription requires a postal code for UK addresses -
-   * it is optional in the subscription API but the rule is, if it's UK then it's required To work around this we treat CHRO addresses with missing postal
-   * codes as invalid options for pre-filling.
-   */
-  private def validateChroAddressAgainstSubscriptionApi(chroAddressOption: Option[ChroAddress]): Option[ChroAddress] =
-    chroAddressOption match
-      case Some(chroAddress) =>
-        val agentCorrespondenceAddress: AgentCorrespondenceAddress = AgentCorrespondenceAddressHelper.fromValueString(chroAddress.toValueString)
-        if (
-          agentCorrespondenceAddress.addressLine1.length > 35 ||
-          agentCorrespondenceAddress.addressLine2.exists(_.length > 35) ||
-          agentCorrespondenceAddress.addressLine3.exists(_.length > 35) ||
-          agentCorrespondenceAddress.addressLine4.exists(_.length > 35) ||
-          chroAddress.postal_code.isEmpty
-        )
-          None
-        else
-          chroAddressOption
-      case _ => chroAddressOption
+//  private def validateChroAddressAgainstSubscriptionApi(chroAddressOption: Option[ChroAddress]): Option[ChroAddress] =
+//    chroAddressOption match
+//      case Some(chroAddress) if chroAddress.postal_code.isEmpty => None
+//      case Some(chroAddress) =>
+//        val agentCorrespondenceAddress: AgentCorrespondenceAddress = AgentCorrespondenceAddressHelper.fromValueString(chroAddress.toValueString)
+//        if (
+//          agentCorrespondenceAddress.addressLine1.length > 35 ||
+//          agentCorrespondenceAddress.addressLine2.exists(_.length > 35) ||
+//          agentCorrespondenceAddress.addressLine3.exists(_.length > 35) ||
+//          agentCorrespondenceAddress.addressLine4.exists(_.length > 35)
+//        )
+//          None
+//        else
+//          chroAddressOption
+//      case _ => chroAddressOption
+
+  /** We need to ensure at this point that we only show valid addresses to the user that wouldn't get rejected by ETMP, i.e. if we get back an address from
+    * companies house that would yield a line 1 greater than 35 characters, we can't show that to the user as it would throw an error when sent downstream.
+    *
+    * The schema for CHRO addresses from Companies House allows for the postal code to be missing, but subscription requires a postal code for UK addresses - it
+    * is optional in the subscription API but the rule is, if it's UK then it's required. To work around this we treat CHRO addresses with missing postal codes
+    * as invalid options for pre-filling.
+    */
+  private def validateChroAddressAgainstSubscriptionApiV2(chroAddressOption: Option[ChroAddress]): Option[ChroAddress] = chroAddressOption
+    .filter(_.postal_code.isDefined)
+    .filter: chroAddress =>
+      val agentCorrespondenceAddress: AgentCorrespondenceAddress = AgentCorrespondenceAddressHelper.fromValueString(chroAddress.toValueString)
+      agentCorrespondenceAddress.addressLine1.length <= 35 &&
+      agentCorrespondenceAddress.addressLine2.forall(_.length <= 35) &&
+      agentCorrespondenceAddress.addressLine3.forall(_.length <= 35) &&
+      agentCorrespondenceAddress.addressLine4.forall(_.length <= 35)
