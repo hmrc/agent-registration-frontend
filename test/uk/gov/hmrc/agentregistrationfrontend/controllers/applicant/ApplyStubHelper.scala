@@ -20,9 +20,7 @@ import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationRiskingStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStubs
 
@@ -86,18 +84,6 @@ object ApplyStubHelper:
     verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyGetBusinessPartnerRecord(utr.getOrElse(tdAll.saUtr.asUtr))
 
-  def stubsForApplicationRiskingResponse(
-    application: AgentApplication,
-    riskingProgress: RiskingProgress
-  ): StubMapping =
-    stubsToSupplyBprToPage(application)
-    AgentRegistrationRiskingStubs.stubGetApplicationRiskingResponse(application.applicationReference, riskingProgress)
-    AgentRegistrationStubs.stubFindIndividualsForApplication(application.agentApplicationId, List.empty)
-
-  def verifyConnectorsForApplicationRiskingResponse(agentApplication: AgentApplication): Unit =
-    verifyConnectorsToSupplyBprToPage(Some(agentApplication.getUtr))
-    AgentRegistrationRiskingStubs.verifyGetApplicationRiskingResponse(agentApplication.applicationReference)
-
   def stubsForApplicationBprAndIndividuals(
     application: AgentApplication,
     individuals: List[IndividualProvidedDetails]
@@ -120,16 +106,6 @@ object ApplyStubHelper:
   def verifyConnectorsForUpdatingApplication(agentApplication: AgentApplication): Unit =
     verifyConnectorsForApplicationBprAndIndividuals(agentApplication)
     AgentRegistrationStubs.verifyUpdateAgentApplication()
-
-  def stubsForApplicationBprAndIndividualsAndRisking(
-    application: AgentApplication,
-    individuals: List[IndividualProvidedDetails]
-  ): StubMapping =
-    stubsToSupplyBprToPage(application)
-    AgentRegistrationStubs.stubFindIndividualsForApplication(application.agentApplicationId, individuals)
-    // we don't need this when the fixable-failures feature is enabled, but it needs to be part of the request data until we can turn the flag on permanently
-    // the type of risking progress doesn't matter as it's not consumed
-    AgentRegistrationRiskingStubs.stubGetApplicationRiskingResponse(application.applicationReference, RiskingProgress.SubmittedForRisking)
 
   def stubFixableFailureUpdate(
     agentApplication: AgentApplication,

@@ -34,7 +34,6 @@ extends ControllerSpec:
 
   override def configOverrides: Map[String, Any] =
     super.configOverrides ++ Map(
-      "features.fixable-failures" -> true,
       "auditing.enabled" -> true
     )
 

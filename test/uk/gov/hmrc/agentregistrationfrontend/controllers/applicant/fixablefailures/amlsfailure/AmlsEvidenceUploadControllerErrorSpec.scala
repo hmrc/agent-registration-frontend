@@ -25,11 +25,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 class AmlsEvidenceUploadControllerErrorSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   private val uploadErrorPath = "/agent-registration/conditions-not-yet-met/anti-money-laundering/evidence/upload-error"
 
   private object agentApplication:

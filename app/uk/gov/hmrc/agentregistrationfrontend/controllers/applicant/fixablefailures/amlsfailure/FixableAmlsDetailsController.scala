@@ -25,7 +25,6 @@ import uk.gov.hmrc.agentregistration.shared.risking.EntityFix._3.AmlsFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.amls.FixableAmlsDetailsPage
 
@@ -36,14 +35,12 @@ import javax.inject.Singleton
 class FixableAmlsDetailsController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
-  detailsPage: FixableAmlsDetailsPage,
-  appConfig: AppConfig
+  detailsPage: FixableAmlsDetailsPage
 )
 extends FrontendController(mcc, actions):
 
   def show(failureCode: String): Action[AnyContent] =
     actions.getApplicationAfterSentForRisking
-      .behindFeatureFlag(appConfig.Features.fixableFailures)
       .ensure(
         implicit request =>
           request.agentApplication.getRiskingOutcomeEntity match

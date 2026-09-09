@@ -139,7 +139,6 @@ class AppConfig @Inject() (
   object Features:
 
     val grsStub: Boolean = configuration.get[Boolean]("features.grs-stub")
-    val fixableFailures: Boolean = configuration.get[Boolean]("features.fixable-failures")
 
   // !!!
   // Access objects eagerly to initialize its vals, ensuring config errors are detected at startup

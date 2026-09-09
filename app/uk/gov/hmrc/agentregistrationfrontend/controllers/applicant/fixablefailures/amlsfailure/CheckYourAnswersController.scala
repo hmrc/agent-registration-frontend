@@ -29,7 +29,6 @@ import uk.gov.hmrc.agentregistration.shared.risking.EntityFix
 import uk.gov.hmrc.agentregistration.shared.risking.EntityFix._3.AmlsFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.fixablefailures.amls.CheckYourAnswersPage
@@ -40,15 +39,13 @@ class CheckYourAnswersController @Inject (
 )(
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
-  view: CheckYourAnswersPage,
-  appConfig: AppConfig
+  view: CheckYourAnswersPage
 )
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] =
     actions
       .getApplicationAfterSentForRisking
-      .behindFeatureFlag(appConfig.Features.fixableFailures)
       .ensure(
         r => r.agentApplication.getFixableAmlsDetails.isComplete,
         implicit request =>

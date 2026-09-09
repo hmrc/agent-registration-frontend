@@ -27,11 +27,6 @@ import uk.gov.hmrc.auth.core.ConfidenceLevel
 class IndividualDateOfBirthControllerSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   private val linkId = tdAll.linkId
   private val agentApplication =
     tdAll

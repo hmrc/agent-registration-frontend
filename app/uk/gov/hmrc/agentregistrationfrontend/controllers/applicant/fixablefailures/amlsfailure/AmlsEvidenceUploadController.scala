@@ -73,7 +73,6 @@ extends FrontendController(mcc, actions):
 
   val baseAction: ActionBuilderWithData[DataWithApplicationAndBpr] = actions
     .getApplicationAfterSentForRisking
-    .behindFeatureFlag(appConfig.Features.fixableFailures)
     .ensure(
       condition = !_.agentApplication.getFixableAmlsDetails.isHmrc,
       resultWhenConditionNotMet =

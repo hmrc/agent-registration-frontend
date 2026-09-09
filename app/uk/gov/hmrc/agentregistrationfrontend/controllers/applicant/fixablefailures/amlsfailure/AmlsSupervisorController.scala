@@ -30,7 +30,6 @@ import uk.gov.hmrc.agentregistration.shared.risking.EntityFix._3.AmlsFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsCodeForm
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
@@ -46,25 +45,22 @@ class AmlsSupervisorController @Inject() (
   actions: ApplicantActions,
   view: AmlsSupervisoryBodyPage,
   applicationService: AgentApplicationService,
-  amlsCodeForm: AmlsCodeForm,
-  appConfig: AppConfig
+  amlsCodeForm: AmlsCodeForm
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] =
-    actions
-      .getApplicationAfterSentForRisking
-      .behindFeatureFlag(appConfig.Features.fixableFailures):
-        implicit request =>
-          val form: Form[AmlsSupervisoryBodyCode] = amlsCodeForm.form.fill:
-            request
-              .agentApplication
-              .getFixableAmlsDetails
-              .supervisoryBody
-          Ok(view(
-            form = form,
-            entityName = request.get[BusinessPartnerRecordResponse].getEntityName
-          ))
+  def show: Action[AnyContent] = actions
+    .getApplicationAfterSentForRisking:
+      implicit request =>
+        val form: Form[AmlsSupervisoryBodyCode] = amlsCodeForm.form.fill:
+          request
+            .agentApplication
+            .getFixableAmlsDetails
+            .supervisoryBody
+        Ok(view(
+          form = form,
+          entityName = request.get[BusinessPartnerRecordResponse].getEntityName
+        ))
 
   def submit: Action[AnyContent] =
     actions

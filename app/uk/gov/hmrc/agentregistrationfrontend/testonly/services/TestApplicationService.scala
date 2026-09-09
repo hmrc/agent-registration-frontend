@@ -25,7 +25,6 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 
 import javax.inject.Inject
@@ -38,9 +37,6 @@ class TestApplicationService @Inject() (
   agentRegistrationConnector: AgentRegistrationConnector
 )
 extends RequestAwareLogging:
-
-  def makeTestApplication()(using request: RequestHeader): Future[TestOnlyLink] = testAgentRegistrationConnector
-    .makeTestApplication()
 
   def deleteAll()(using RequestHeader): Future[Unit] = testAgentRegistrationConnector.deleteAllApplications()
 

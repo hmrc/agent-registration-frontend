@@ -34,7 +34,6 @@ import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.isSoleTraderOwner
-import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
@@ -65,7 +64,6 @@ class AgentApplicationController @Inject() (
   failedFixableStartPage: FailedFixableStartPage,
   viewApplicationPage: ViewApplicationPage,
   appConfig: AppConfig,
-  agentRegistrationRiskingService: AgentRegistrationRiskingService,
   individualProvideDetailsService: IndividualProvideDetailsService
 )
 extends FrontendController(mcc, actions):
@@ -87,9 +85,7 @@ extends FrontendController(mcc, actions):
     )
     .async:
       implicit request =>
-        if appConfig.Features.fixableFailures
-        then Future.successful(useApplicationForStatus(request))
-        else useRiskingServiceForStatus(request)
+        Future.successful(useApplicationForStatus(request))
 
   def viewSubmittedApplication: Action[AnyContent] = actions
     .getApplicationAfterSentForRisking:
@@ -119,44 +115,6 @@ extends FrontendController(mcc, actions):
       .atZone(ZoneId.systemDefault())
       .toLocalDate
 
-  /** We only need this method for as long as the feature flag for Fixable Failures is turned off. So we've moved the call to the risking service out of the
-    * action refiners and into this method instead
-    */
-  private def useRiskingServiceForStatus(request: RequestWithData[List[IndividualProvidedDetails] *: DataWithApplicationAndBpr])(using
-    RequestHeader
-  ): Future[Result] =
-    val agentApplication: AgentApplication = request.get
-    val submittedAt: Instant = agentApplication.getSubmittedAt
-    val projectedDecisionDate: LocalDate = calculateDecisionDate(submittedAt)
-    agentRegistrationRiskingService
-      .getRiskingProgress(request.agentApplication.applicationReference)
-      .map:
-        case RiskingProgress.ReadyForSubmission => // show the confirmation screen
-          Ok(confirmationPage(
-            dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
-            agentApplication = agentApplication
-          ))
-        case RiskingProgress.SubmittedForRisking | _: RiskingProgress.FailedFixable =>
-          Ok(inProgressPage(
-            entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
-            agentApplication = agentApplication,
-            dateOfDecision = displayDateForLang(Some(projectedDecisionDate)),
-            dateSubmitted = displayDateForLang(Some(
-              submittedAt
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate
-            ))
-          ))
-        case failedNonFixable: RiskingProgress.FailedNonFixable =>
-          Ok(failedNonFixablePage(
-            failedNonFixable = failedNonFixable,
-            agentApplication = agentApplication,
-            entityName = request.get[BusinessPartnerRecordResponse].getEntityName
-          ))
-        case RiskingProgress.Approved => Redirect(appConfig.asaDashboardUrl) // this shouldn't really happen as the auth action should have done the redirect already
-
-  /** This is the method we want to use once the feature flag for Fixable Failures is turned on.
-    */
   private def useApplicationForStatus(request: RequestWithData[List[IndividualProvidedDetails] *: DataWithApplicationAndBpr])(using
     RequestHeader
   ): Result =

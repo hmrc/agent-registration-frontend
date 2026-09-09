@@ -27,11 +27,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 class FixIndividualProvidedDetailsControllerSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   private val path = s"/agent-registration/provide-details/conditions-not-yet-met/identity/${tdAll.linkId.value}"
 
   object riskingOutcomeIndividual:

@@ -27,11 +27,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 class CheckYourAnswersControllerSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   val linkId: LinkId = tdAll.linkId
 
   private val path = s"/agent-registration/provide-details/conditions-not-yet-met/check-your-answers/${linkId.value}"

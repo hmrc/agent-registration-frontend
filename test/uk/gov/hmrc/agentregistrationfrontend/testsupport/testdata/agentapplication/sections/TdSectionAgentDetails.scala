@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.agentapplicat
 
 import com.softwaremill.quicklens.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.EmailAddress
 import uk.gov.hmrc.agentregistration.shared.agentdetails.*
 import uk.gov.hmrc.agentregistration.shared.testdata.TdBase
 import uk.gov.hmrc.agentregistration.shared.util.Errors.*
@@ -133,7 +134,7 @@ trait TdSectionAgentDetails {
 
       val afterContactEmailAddressSelected: AgentVerifiedEmailAddress = AgentVerifiedEmailAddress(
         emailAddress = AgentEmailAddress(
-          agentEmailAddress = dependencies.applicantEmailAddress.value,
+          agentEmailAddress = dependencies.applicantEmailAddress,
           otherAgentEmailAddress = None
         ),
         isVerified = true
@@ -141,7 +142,7 @@ trait TdSectionAgentDetails {
 
       val afterBprEmailAddressSelected: AgentVerifiedEmailAddress = AgentVerifiedEmailAddress(
         emailAddress = AgentEmailAddress(
-          agentEmailAddress = dependencies.bprEmailAddress,
+          agentEmailAddress = EmailAddress(dependencies.bprEmailAddress),
           otherAgentEmailAddress = None
         ),
         isVerified = true
@@ -149,16 +150,16 @@ trait TdSectionAgentDetails {
 
       val afterOtherEmailAddressSelected: AgentVerifiedEmailAddress = AgentVerifiedEmailAddress(
         emailAddress = AgentEmailAddress(
-          agentEmailAddress = "other",
-          otherAgentEmailAddress = Some(dependencies.newEmailAddress)
+          agentEmailAddress = EmailAddress("other"),
+          otherAgentEmailAddress = Some(EmailAddress(dependencies.newEmailAddress))
         ),
         isVerified = false
       )
 
       val afterVerifiedEmailAddressSelected: AgentVerifiedEmailAddress = AgentVerifiedEmailAddress(
         emailAddress = AgentEmailAddress(
-          agentEmailAddress = "other",
-          otherAgentEmailAddress = Some(dependencies.newEmailAddress)
+          agentEmailAddress = EmailAddress("other"),
+          otherAgentEmailAddress = Some(EmailAddress(dependencies.newEmailAddress))
         ),
         isVerified = true
       )

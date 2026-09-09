@@ -34,11 +34,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 class FixableSoleTraderFailureControllerSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   private def applyIndividualFix: Seq[IndividualFix] => String => Seq[IndividualFix] =
     fixes =>
       failureCode =>

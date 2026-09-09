@@ -21,23 +21,12 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfIndividuals
 import uk.gov.hmrc.agentregistration.shared.risking.EntityFix._3.AmlsFix
-import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
-import java.time.LocalDate
-
 extension (agentApplication: AgentApplication)
-
-  // TODO: refactor it, better is to call `.refine` in actions and verify outcome is correct and redirect to the correct place if not
-  def getCorrectiveActionExpiryDate: LocalDate =
-    agentApplication.riskingOutcomeApplication match
-      case Some(outcome: RiskingOutcomeApplication.FailedFixable) => outcome.correctiveActionExpiryDate
-      case Some(outcome: RiskingOutcomeApplication.FailedNonFixable) => outcome.correctiveActionExpiryDate
-      case other =>
-        throw new IllegalStateException(s"Risking outcome for application is not fixable (or missing). Redirecting to where outcome can be handled: $other")
 
   def isSoleTraderOwner: Boolean =
     agentApplication match

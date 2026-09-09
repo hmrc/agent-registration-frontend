@@ -27,11 +27,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.ObjectSt
 class AmlsEvidenceUploadControllerGetUploadResultSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   private val uploadResultPath = "/agent-registration/conditions-not-yet-met/anti-money-laundering/evidence/upload-result"
 
   private object agentApplication:

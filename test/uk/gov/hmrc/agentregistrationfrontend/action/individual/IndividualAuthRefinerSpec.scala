@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.action.individual
 
 import play.api.mvc.Results.*
 import uk.gov.hmrc.agentregistrationfrontend.action.Actions.RequestWithData
-import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions.RequestWithAuthAndCl
+import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions.DataWithAuthAndCl
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ISpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
@@ -124,7 +124,7 @@ extends ISpec:
     "successfully authorise and enrich request with InternalUserId and Credentials" in:
       val individualAuthorisedRefiner: IndividualAuthRefiner = app.injector.instanceOf[IndividualAuthRefiner]
       IndividualAuthStubs.stubAuthorise()
-      val request: RequestWithAuthAndCl =
+      val request: RequestWithData[DataWithAuthAndCl] =
         individualAuthorisedRefiner
           .refineIntoRequestWithAuth(tdAll.requestLoggedIn)
           .futureValue

@@ -26,11 +26,6 @@ import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
 class SaveForLaterControllerSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   private val path = s"/agent-registration/provide-details/conditions-not-yet-met/save-and-come-back-later/${tdAll.linkId.value}"
   private val correctiveActionExpiryDate: String = DisplayDate.displayDateForLang(
     Some(tdAll.riskingOutcomeApplication.failedFixable.correctiveActionExpiryDate)

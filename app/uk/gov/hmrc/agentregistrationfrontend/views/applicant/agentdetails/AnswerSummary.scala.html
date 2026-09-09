@@ -72,7 +72,7 @@
       content = Text(messages(s"$key.email.label"))
     ),
     value = Value(
-      content = Text(answers.getAgentEmailAddress.getEmailAddress)
+      content = Text(answers.getAgentEmailAddress.getEmailAddress.value)
     ),
     actions = if(!canChange) None else Some(Actions(
       items = Seq(

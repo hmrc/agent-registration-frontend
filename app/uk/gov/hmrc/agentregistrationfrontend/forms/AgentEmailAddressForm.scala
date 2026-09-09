@@ -20,6 +20,7 @@ import play.api.data.Form
 import play.api.data.Forms
 import play.api.data.Forms.mapping
 import play.api.data.Forms.text
+import uk.gov.hmrc.agentregistration.shared.EmailAddress
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentEmailAddress
 import uk.gov.hmrc.agentregistration.shared.util.StringExtensions.stripAllWhiteSpace
 import uk.gov.hmrc.agentregistrationfrontend.forms.formatters.TextFormatter
@@ -53,8 +54,17 @@ object AgentEmailAddressForm:
             )
             .verifying(
               ErrorKeys.invalidInputErrorMessage(otherKey),
-              value => AgentEmailAddress.isValid(value)
+              value => EmailAddress(value).isValid
             )
         )
-      )(AgentEmailAddress.apply)(a => Some((a.agentEmailAddress, a.otherAgentEmailAddress)))
+      )(
+        (
+          agentEmailAddress,
+          otherAgentEmailAddress
+        ) =>
+          AgentEmailAddress(
+            agentEmailAddress = EmailAddress(agentEmailAddress),
+            otherAgentEmailAddress = otherAgentEmailAddress.map(EmailAddress(_))
+          )
+      )(a => Some((a.agentEmailAddress.value, a.otherAgentEmailAddress.map(_.value))))
   )

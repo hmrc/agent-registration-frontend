@@ -31,12 +31,9 @@ import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.BusinessTypeAnswer
 import uk.gov.hmrc.agentregistrationfrontend.services.SessionService.*
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
-import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowRecentApplicationsPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ShowAgentApplicationsTilePage
-import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestLinkPage
 import uk.gov.hmrc.agentregistrationfrontend.connectors.IndividualProvidedDetailsConnector
 import uk.gov.hmrc.agentregistrationfrontend.testonly.action.TestOnlyActions
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
@@ -49,10 +46,8 @@ import scala.concurrent.Future
 class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
-  testApplicationService: TestApplicationService,
   testAgentRegistrationConnector: TestAgentRegistrationConnector,
   testOnlyActions: TestOnlyActions,
-  testLinkPage: TestLinkPage,
   showRecentApplicationsPage: ShowRecentApplicationsPage,
   showAgentApplicationsTilePage: ShowAgentApplicationsTilePage,
   individualProvidedDetailsConnector: IndividualProvidedDetailsConnector,
@@ -168,16 +163,3 @@ extends FrontendController(mcc, actions):
     implicit request =>
       Ok("agent applicationId added to session")
         .addToSession(agentApplicationId)
-
-  // TODO: remove this once FF links can handle this
-
-  // as we add more types of entity support we may want to specify which business type to create
-  // possibly as part of the url, for now we only create an LLP application
-  def makeTestSubmittedApplication(): Action[AnyContent] = actions.action
-    .async:
-      implicit request =>
-        testApplicationService
-          .makeTestApplication()
-          .map((linkId: TestOnlyLink) =>
-            Ok(testLinkPage(linkId))
-          )

@@ -165,7 +165,7 @@ extends FrontendController(mcc, actions):
             onEmailError()
         }
 
-  private def onEmailVerified()(implicit request: RequestWithApplication): Future[Result] =
+  private def onEmailVerified()(implicit request: RequestWithData[DataWithApplication]): Future[Result] =
     val updatedApplication = request
       .agentApplication
       .modify(
@@ -182,7 +182,7 @@ extends FrontendController(mcc, actions):
   private def onEmailUnverified(
     credId: String,
     emailToVerify: String
-  )(implicit request: RequestWithApplication): Future[Result] = emailVerificationService.verifyEmail(
+  )(implicit request: RequestWithData[DataWithApplication]): Future[Result] = emailVerificationService.verifyEmail(
     credId = credId,
     maybeEmail = Some(
       Email(
@@ -196,10 +196,10 @@ extends FrontendController(mcc, actions):
     lang = messagesApi.preferred(request).lang.code
   )
 
-  private def onEmailLocked()(implicit request: RequestWithApplication): Future[Result] = Future.successful(
+  private def onEmailLocked()(implicit request: RequestWithData[DataWithApplication]): Future[Result] = Future.successful(
     Ok(placeholder(h1 = "Email address locked", bodyText = Some("placeholder for Your email address has been locked")))
   )
 
-  private def onEmailError()(implicit request: RequestWithApplication): Future[Result] = Future.successful(
+  private def onEmailError()(implicit request: RequestWithData[DataWithApplication]): Future[Result] = Future.successful(
     Ok(placeholder(h1 = "Email address verification error", bodyText = Some("placeholder for error during email verification")))
   )

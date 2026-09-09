@@ -33,7 +33,6 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix._10.IndividualDetailsFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
-import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineFutureEither
@@ -57,26 +56,21 @@ object ApplicantActions:
 
   export uk.gov.hmrc.agentregistrationfrontend.action.Actions.*
 
+  /** Checkpoints of the applicant journey, one alias per stage a controller can be at. Each alias extends its parent in the tree below (rightmost element =
+    * added earliest); controllers pick single elements with `request.get[T]`.
+    *
+    * {{{
+    * DataWithAuth                        InternalUserId, GroupId, Credentials
+    * ├ DataWithMaybeApplication          + Option[AgentApplication]
+    * └ DataWithApplication               + AgentApplication
+    *   └ DataWithApplicationAndBpr       + BusinessPartnerRecordResponse
+    *     └ DataWithSoleTraderIdentityFix + IndividualProvidedDetails, RiskingOutcomeApplication.FailedFixable, IndividualDetailsFix
+    * }}}
+    */
   type DataWithAuth = (InternalUserId, GroupId, Credentials)
-  type RequestWithAuth = RequestWithData[DataWithAuth]
-  type RequestWithAuthCt[ContentType] = RequestWithDataCt[ContentType, DataWithAuth]
-
-  type DataWithApplication = AgentApplication *: DataWithAuth
-  type RequestWithApplication = RequestWithData[DataWithApplication]
-  type RequestWithApplicationCt[A] = RequestWithDataCt[A, DataWithApplication]
-
   type DataWithMaybeApplication = Option[AgentApplication] *: DataWithAuth
-  type RequestWithMaybeApplication = RequestWithData[DataWithMaybeApplication]
-  type RequestWithMaybeApplicationCt[A] = RequestWithDataCt[A, DataWithMaybeApplication]
-
+  type DataWithApplication = AgentApplication *: DataWithAuth
   type DataWithApplicationAndBpr = BusinessPartnerRecordResponse *: DataWithApplication
-  type RequestWithApplicationAndBpr = RequestWithData[DataWithApplicationAndBpr]
-  type RequestWithApplicationAndBprCt[A] = RequestWithDataCt[A, DataWithApplicationAndBpr]
-
-  type DataWithRiskingProgress = RiskingProgress *: DataWithApplicationAndBpr
-  type RequestWithRiskingProgress = RequestWithData[DataWithRiskingProgress]
-  type RequestWithRiskingProgressCt[A] = RequestWithDataCt[A, DataWithRiskingProgress]
-
   type DataWithSoleTraderIdentityFix = IndividualDetailsFix *: RiskingOutcomeApplication.FailedFixable *: IndividualProvidedDetails *: DataWithApplicationAndBpr
 
 @Singleton
@@ -104,14 +98,14 @@ extends RequestAwareLogging:
       implicit request: RequestWithData[DataWithAuth] =>
         agentApplicationService
           .find()
-          .map[Result | RequestWithApplication]:
+          .map[Result | RequestWithData[DataWithApplication]]:
             case Some(agentApplication) => request.add(agentApplication)
             case None =>
               val redirect = AppRoutes.apply.AgentApplicationController.startRegistration
               logger.error(s"[Unexpected State] No agent application found for authenticated user ${request.get[InternalUserId].value}. Redirecting to startRegistration page ($redirect)")
               Redirect(redirect)
     .refine:
-      implicit request: RequestWithApplication =>
+      implicit request =>
         val aa: AgentApplication = request.agentApplication
         if aa.continueJourney()
         then
