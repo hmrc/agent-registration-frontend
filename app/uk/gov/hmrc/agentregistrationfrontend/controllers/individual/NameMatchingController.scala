@@ -47,8 +47,7 @@ class NameMatchingController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithIndividualProvidedDetailsForSearch =
-    Option[CitizenDetails] *: List[IndividualProvidedDetails] *: AgentApplication *: DataWithAdditionalIdentifiers
+  private type DataWithIndividualProvidedDetailsForSearch = Option[CitizenDetails] *: List[IndividualProvidedDetails] *: AgentApplication *: DataWithTaxIds
 
   def baseAction(
     linkId: LinkId

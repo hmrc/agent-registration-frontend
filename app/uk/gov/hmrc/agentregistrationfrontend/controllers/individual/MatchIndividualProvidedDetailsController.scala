@@ -58,7 +58,7 @@ class MatchIndividualProvidedDetailsController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithOptionalCitizenDetails = Option[CitizenDetails] *: List[IndividualProvidedDetails] *: AgentApplication *: DataWithAdditionalIdentifiers
+  private type DataWithOptionalCitizenDetails = Option[CitizenDetails] *: List[IndividualProvidedDetails] *: AgentApplication *: DataWithTaxIds
 
   private type DataWithMatchedIndividualProvidedDetails = IndividualProvidedDetails *: DataWithOptionalCitizenDetails
 

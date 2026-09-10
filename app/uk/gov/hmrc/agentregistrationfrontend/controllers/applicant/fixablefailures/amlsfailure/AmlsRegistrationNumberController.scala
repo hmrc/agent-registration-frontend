@@ -29,7 +29,6 @@ import uk.gov.hmrc.agentregistration.shared.risking.EntityFix
 import uk.gov.hmrc.agentregistration.shared.risking.EntityFix._3.AmlsFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.AmlsRegistrationNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
@@ -43,25 +42,22 @@ class AmlsRegistrationNumberController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   view: AmlsRegistrationNumberPage,
-  applicationService: AgentApplicationService,
-  appConfig: AppConfig
+  applicationService: AgentApplicationService
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] =
-    actions
-      .getApplicationAfterSentForRisking
-      .behindFeatureFlag(appConfig.Features.fixableFailures):
-        implicit request =>
-          val supervisoryBody = request.agentApplication.getFixableAmlsDetails.supervisoryBody
-          val form: Form[AmlsRegistrationNumber] = AmlsRegistrationNumberForm(supervisoryBody)
-            .form
-            .fill:
-              request
-                .agentApplication
-                .getFixableAmlsDetails
-                .amlsRegistrationNumber
-          Ok(view(form))
+  def show: Action[AnyContent] = actions
+    .getApplicationAfterSentForRisking:
+      implicit request =>
+        val supervisoryBody = request.agentApplication.getFixableAmlsDetails.supervisoryBody
+        val form: Form[AmlsRegistrationNumber] = AmlsRegistrationNumberForm(supervisoryBody)
+          .form
+          .fill:
+            request
+              .agentApplication
+              .getFixableAmlsDetails
+              .amlsRegistrationNumber
+        Ok(view(form))
 
   def submit: Action[AnyContent] =
     actions

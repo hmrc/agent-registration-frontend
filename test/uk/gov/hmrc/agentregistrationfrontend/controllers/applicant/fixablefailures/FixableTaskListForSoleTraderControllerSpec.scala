@@ -28,11 +28,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 class FixableTaskListForSoleTraderControllerSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   private val path = "/agent-registration/conditions-not-yet-met/task-list"
   object agentApplication:
     val riskingCompletedFixable: AgentApplicationSoleTrader =

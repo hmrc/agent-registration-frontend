@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.testonly.connectors
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.connectors.Connector
-import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestOnlyLink
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationId
@@ -41,25 +40,6 @@ class TestAgentRegistrationConnector @Inject() (
   ec: ExecutionContext
 )
 extends Connector:
-
-  def makeTestApplication()(using
-    request: RequestHeader
-  ): Future[TestOnlyLink] =
-    val url: URL = url"$baseUrl/create-submitted-application"
-    httpClient
-      .get(url)
-      .execute[HttpResponse]
-      .map: response =>
-        response.status match
-          case status if is2xx(status) => response.json.as[TestOnlyLink]
-          case status =>
-            Errors.throwUpstreamErrorResponse(
-              httpMethod = "GET",
-              url = url,
-              status = status,
-              response = response
-            )
-      .andLogOnFailure("Failed to created submitted application")
 
   def upsertAgentApplication(agentApplication: AgentApplication)(using
     request: RequestHeader

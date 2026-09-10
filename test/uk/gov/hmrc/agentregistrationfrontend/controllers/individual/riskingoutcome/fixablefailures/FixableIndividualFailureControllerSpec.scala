@@ -31,11 +31,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 class FixableIndividualFailureControllerSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   private def applyFix: Seq[IndividualFix] => String => Seq[IndividualFix] =
     fixes =>
       failureCode =>

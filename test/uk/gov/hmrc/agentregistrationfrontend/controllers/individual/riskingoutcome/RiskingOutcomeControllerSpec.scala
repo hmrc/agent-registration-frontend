@@ -33,11 +33,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 class RiskingOutcomeControllerSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   private val linkId = tdAll.linkId
 
   val failedFixableApplication: AgentApplication = tdAll

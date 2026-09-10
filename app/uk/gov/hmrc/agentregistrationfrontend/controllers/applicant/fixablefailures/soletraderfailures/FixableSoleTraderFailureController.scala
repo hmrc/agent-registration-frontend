@@ -32,7 +32,6 @@ import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.fixablefailures.ConfirmFixForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SoleTraderFix
@@ -52,8 +51,7 @@ class FixableSoleTraderFailureController @Inject (
 )(
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
-  soleTraderFailurePage: SoleTraderFailureDetailsPage,
-  appConfig: AppConfig
+  soleTraderFailurePage: SoleTraderFailureDetailsPage
 )
 extends FrontendController(mcc, actions):
 
@@ -63,7 +61,6 @@ extends FrontendController(mcc, actions):
     failureCode: String
   ): ActionBuilderWithData[DataWithSoleTraderFix] = actions
     .getApplicationAfterSentForRisking
-    .behindFeatureFlag(appConfig.Features.fixableFailures)
     .refine:
       implicit request =>
         individualProvideDetailsService.findAllByApplicationId(request.get[AgentApplication].agentApplicationId).map:

@@ -26,11 +26,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 class AmlsSupervisorControllerSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   private val path = "/agent-registration/conditions-not-yet-met/anti-money-laundering/supervisor-name"
 
   object agentApplication:

@@ -36,7 +36,6 @@ import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineFutureE
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineUnion
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuildersWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
@@ -54,35 +53,33 @@ object IndividualActions:
 
   export uk.gov.hmrc.agentregistrationfrontend.action.Actions.*
 
+  /** Checkpoints of the individual journey, one alias per stage a controller can be at. Each alias extends its parent in the tree below (rightmost element =
+    * added earliest); controllers pick single elements with `request.get[T]`.
+    *
+    * {{{
+    * DataWithAuth                            InternalUserId, Credentials
+    * └ DataWithAuthAndCl                     + ConfidenceLevel
+    *   ├ DataWithTaxIds                      + Option[SaUtr], Option[Nino]
+    *   └ DataWithIndividualProvidedDetails   + AgentApplication, IndividualProvidedDetails
+    *     ├ DataWithRiskingProgress           + RiskingProgress
+    *     └ DataWithRiskingOutcomes           + RiskingOutcomeApplication, RiskingOutcomeIndividual, BusinessPartnerRecordResponse
+    *       └ DataWithFixableOutcomes         both outcomes narrowed to FailedFixable
+    *         └ DataWithIndividualDetailsFix  + IndividualDetailsFix
+    * }}}
+    */
   type DataWithAuth = (InternalUserId, Credentials)
-  type RequestWithAuth = RequestWithData[DataWithAuth]
-  type RequestWithAuthCt[ContentType] = RequestWithDataCt[ContentType, DataWithAuth]
-
   type DataWithAuthAndCl = ConfidenceLevel *: DataWithAuth
-  type RequestWithAuthAndCl = RequestWithData[DataWithAuthAndCl]
-  type RequestWithAuthAndClCt[ContentType] = RequestWithDataCt[ContentType, DataWithAuthAndCl]
-
-  type DataWithAdditionalIdentifiers = Option[Nino] *: Option[SaUtr] *: DataWithAuthAndCl
-  type RequestWithAdditionalIdentifiers = RequestWithData[DataWithAdditionalIdentifiers]
-  type RequestWithAdditionalIdentifiersCt[ContentType] = RequestWithDataCt[ContentType, DataWithAdditionalIdentifiers]
-
-  private type DataWithApplicationFromLinkId = AgentApplication *: DataWithAuthAndCl
-
-  type DataWithIndividualProvidedDetails = IndividualProvidedDetails *: DataWithApplicationFromLinkId
-  type RequestWithIndividualProvidedDetails = RequestWithData[DataWithIndividualProvidedDetails]
-  type DataWithIndividualProvidedDetailsCt[ContentType] = RequestWithDataCt[ContentType, DataWithIndividualProvidedDetails]
-
+  type DataWithTaxIds = Option[Nino] *: Option[SaUtr] *: DataWithAuthAndCl
+  type DataWithIndividualProvidedDetails = IndividualProvidedDetails *: AgentApplication *: DataWithAuthAndCl
   type DataWithRiskingProgress = RiskingProgress *: DataWithIndividualProvidedDetails
-
-  type DataWithRiskingOutcome = BusinessPartnerRecordResponse *: RiskingOutcomeIndividual *: RiskingOutcomeApplication *: DataWithIndividualProvidedDetails
-  type DataWithFailedFixable =
-    BusinessPartnerRecordResponse *: RiskingOutcomeIndividual.FailedFixable *: RiskingOutcomeApplication *: DataWithIndividualProvidedDetails
-  type DataWithIndividualDetailsFix = IndividualDetailsFix *: DataWithFailedFixable
+  type DataWithRiskingOutcomes = BusinessPartnerRecordResponse *: RiskingOutcomeIndividual *: RiskingOutcomeApplication *: DataWithIndividualProvidedDetails
+  type DataWithFixableOutcomes =
+    BusinessPartnerRecordResponse *: RiskingOutcomeIndividual.FailedFixable *: RiskingOutcomeApplication.FailedFixable *: DataWithIndividualProvidedDetails
+  type DataWithIndividualDetailsFix = IndividualDetailsFix *: DataWithFixableOutcomes
 
 @Singleton
-class IndividualActions @Inject (
-  appConfig: AppConfig
-)(
+class IndividualActions @Inject(
+) (
   defaultActionBuilder: DefaultActionBuilder,
   individualAuthorisedRefiner: IndividualAuthRefiner,
   agentApplicationService: AgentApplicationService,
@@ -101,7 +98,7 @@ extends RequestAwareLogging:
   val authorised: ActionBuilderWithData[DataWithAuthAndCl] = action
     .refineFutureEither(individualAuthorisedRefiner.refineIntoRequestWithAuth)
 
-  val authorisedWithAdditionalIdentifiers: ActionBuilderWithData[DataWithAdditionalIdentifiers] = action
+  val authorisedWithAdditionalIdentifiers: ActionBuilderWithData[DataWithTaxIds] = action
     .refineFutureEither(individualAuthorisedRefiner.refineIntoRequestWithAdditionalIdentifiers)
 
   def authorisedWithIndividualProvidedDetails(linkId: LinkId): ActionBuilderWithData[DataWithIndividualProvidedDetails] = authorised
@@ -155,8 +152,7 @@ extends RequestAwareLogging:
           request.add[RiskingProgress](riskingProgress)
     )
 
-  def authorisedWithRiskingOutcome(linkId: LinkId): ActionBuilderWithData[DataWithRiskingOutcome] = authorised
-    .behindFeatureFlag(appConfig.Features.fixableFailures)
+  def authorisedWithRiskingOutcome(linkId: LinkId): ActionBuilderWithData[DataWithRiskingOutcomes] = authorised
     .refine(implicit request =>
       agentApplicationService
         .find(linkId)
@@ -201,9 +197,17 @@ extends RequestAwareLogging:
             case Some(bpr) => request.add[BusinessPartnerRecordResponse](bpr)
             case _ => throw new IllegalStateException(s"Business Partner Record not found for application with UTR: ${request.agentApplication.getUtr}")
 
-  def authorisedWithFailedFixable(linkId: LinkId): ActionBuilderWithData[DataWithFailedFixable] = authorisedWithRiskingOutcome(linkId)
+  def authorisedWithFailedFixable(linkId: LinkId): ActionBuilderWithData[DataWithFixableOutcomes] = authorisedWithRiskingOutcome(linkId)
     .refine:
-      implicit request: (RequestWithData[DataWithRiskingOutcome]) =>
+      implicit request =>
+        val riskingOutcomeApplication: RiskingOutcomeApplication = request.get
+        riskingOutcomeApplication match
+          case outcome: RiskingOutcomeApplication.FailedFixable => request.replace[RiskingOutcomeApplication, RiskingOutcomeApplication.FailedFixable](outcome)
+          case _ =>
+            logger.warn(s"Risking outcome for application is not fixable, was: $riskingOutcomeApplication. Redirecting to where outcome can be handled.")
+            Redirect(AppRoutes.providedetails.riskingoutcome.RiskingOutcomeController.show(linkId))
+    .refine:
+      implicit request =>
         val confirmationUrl: String = AppRoutes.providedetails.riskingoutcome.fixablefailures.IndividualConfirmationController.show(linkId).url
         val individualRiskingOutcome: RiskingOutcomeIndividual = request.get
         individualRiskingOutcome match
@@ -220,7 +224,7 @@ extends RequestAwareLogging:
 
   def authorisedWithFixableDetails(linkId: LinkId): ActionBuilderWithData[DataWithIndividualDetailsFix] = authorisedWithFailedFixable(linkId)
     .refine:
-      implicit request: (RequestWithData[DataWithFailedFixable]) =>
+      implicit request =>
         val individualRiskingOutcome: RiskingOutcomeIndividual.FailedFixable = request.get
         individualRiskingOutcome.fixes.collectFirst { case fix: IndividualDetailsFix => fix } match
           case Some(individualFix) => request.add[IndividualDetailsFix](individualFix)

@@ -25,7 +25,6 @@ import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
@@ -40,15 +39,13 @@ class FixableIndividualsController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   individualProvideDetailsService: IndividualProvideDetailsService,
-  fixableIndividualsPage: FixableIndividualsPage,
-  appConfig: AppConfig
+  fixableIndividualsPage: FixableIndividualsPage
 )
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] =
     actions
       .getApplicationAfterSentForRisking
-      .behindFeatureFlag(appConfig.Features.fixableFailures)
       .refine(
         refineF =
           implicit request =>

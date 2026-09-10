@@ -39,7 +39,7 @@ extends FrontendController(mcc, actions):
 
   private def baseAction(
     linkId: LinkId
-  ): ActionBuilderWithData[DataWithFailedFixable] = authorisedWithFailedFixable(linkId)
+  ): ActionBuilderWithData[DataWithFixableOutcomes] = authorisedWithFailedFixable(linkId)
     .ensure(
       condition =
         implicit request =>

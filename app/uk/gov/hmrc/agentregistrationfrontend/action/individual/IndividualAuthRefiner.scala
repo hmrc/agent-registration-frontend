@@ -84,7 +84,7 @@ extends RequestAwareLogging:
 
   def refineIntoRequestWithAdditionalIdentifiers(
     request: RequestWithData[EmptyData]
-  ): Future[Either[Result, RequestWithData[DataWithAdditionalIdentifiers]]] =
+  ): Future[Either[Result, RequestWithData[DataWithTaxIds]]] =
     given RequestWithData[EmptyData] = request
     af.authorised(
       AuthProviders(GovernmentGateway)

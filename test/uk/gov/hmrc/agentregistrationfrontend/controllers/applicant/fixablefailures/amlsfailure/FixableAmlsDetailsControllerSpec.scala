@@ -25,11 +25,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 class FixableAmlsDetailsControllerSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   private val amlsFailureCodeHeadings: Map[String, String] = Map(
     "EntityFailure.3.1" -> "We could not match your details with a current record",
     "EntityFailure.3.2" -> "We have not been able to confirm your anti-money laundering supervision",

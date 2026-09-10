@@ -27,7 +27,6 @@ import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.FixableSoleTraderTaskListStatus
 import uk.gov.hmrc.agentregistrationfrontend.model.FixableTaskListStatus
@@ -48,15 +47,13 @@ class FixableTaskListController @Inject() (
   actions: ApplicantActions,
   taskListPage: FixableTaskListPage,
   soleTraderTaskListPage: FixableTaskListForSoleTraderPage,
-  individualProvideDetailsService: IndividualProvideDetailsService,
-  appConfig: AppConfig
+  individualProvideDetailsService: IndividualProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] =
     actions
       .getApplicationAfterSentForRisking
-      .behindFeatureFlag(appConfig.Features.fixableFailures)
       .refine:
         implicit request =>
           request.get[AgentApplication].riskingOutcomeApplication match

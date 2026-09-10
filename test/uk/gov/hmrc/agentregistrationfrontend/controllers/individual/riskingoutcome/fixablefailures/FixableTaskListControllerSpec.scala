@@ -25,11 +25,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 class FixableTaskListControllerSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   private val path = s"/agent-registration/provide-details/conditions-not-yet-met/task-list/${tdAll.linkId.value}"
   object riskingOutcomeIndividual:
     val failingFixableAllCodes: RiskingOutcomeIndividual.FailedFixable =

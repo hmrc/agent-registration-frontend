@@ -28,11 +28,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 class CheckYourAnswersControllerSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   override lazy val overridesModule: AbstractModule =
     new AbstractModule:
       override def configure(): Unit = bind(classOf[AmlsCodes]).asEagerSingleton()

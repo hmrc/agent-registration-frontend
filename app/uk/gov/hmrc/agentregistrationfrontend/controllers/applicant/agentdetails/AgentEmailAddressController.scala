@@ -161,6 +161,7 @@ extends FrontendController(mcc, actions):
             .getAgentDetails
             .getAgentEmailAddress
             .getEmailAddress
+            .value
         val credId = request.credentials.providerId
         emailVerificationService.checkEmailVerificationStatus(
           credId = credId,

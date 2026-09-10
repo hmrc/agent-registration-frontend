@@ -50,10 +50,7 @@ object TestOnlyActions:
   export uk.gov.hmrc.agentregistrationfrontend.action.Actions.*
 
   type DataWithApplication = AgentApplication *: EmptyData
-  type RequestWithApplication = RequestWithData[DataWithApplication]
-
   type DataWithIndividual = IndividualProvidedDetails *: EmptyData
-  type RequestWithIndividual = RequestWithData[DataWithIndividual]
 
 @Singleton
 class TestOnlyActions @Inject() (

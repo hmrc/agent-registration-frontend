@@ -28,11 +28,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentReg
 class StartControllerSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   private val linkId: LinkId = tdAll.linkId
   private val path: String = s"/agent-registration/provide-details/start/${linkId.value}"
 

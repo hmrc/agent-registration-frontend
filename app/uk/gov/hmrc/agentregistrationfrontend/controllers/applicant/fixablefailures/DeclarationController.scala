@@ -34,7 +34,6 @@ import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
-import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.fixableTaskListStatus
 import uk.gov.hmrc.agentregistrationfrontend.model.isSoleTraderOwner
@@ -54,7 +53,6 @@ class DeclarationController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
   declarationPage: DeclarationPage,
-  appConfig: AppConfig,
   agentRegistrationRiskingService: AgentRegistrationRiskingService,
   agentApplicationService: AgentApplicationService,
   individualProvideDetailsService: IndividualProvideDetailsService
@@ -67,7 +65,6 @@ extends FrontendController(mcc, actions):
     ] *: DataWithApplicationAndBpr
 
   private val baseAction: ActionBuilderWithData[RequestWithCompleteFixableFailures] = actions.getApplicationForFailedFixable
-    .behindFeatureFlag(appConfig.Features.fixableFailures)
     .refine(implicit request =>
       val agentApplication: AgentApplication = request.get
       agentApplication.riskingOutcomeApplication match

@@ -26,11 +26,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 class IndividualSaUtrControllerSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   private val agentApplication =
     tdAll
       .agentApplicationLlp

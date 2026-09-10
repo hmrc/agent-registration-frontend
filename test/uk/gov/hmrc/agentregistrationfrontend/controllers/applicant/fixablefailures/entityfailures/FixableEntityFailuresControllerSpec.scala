@@ -32,11 +32,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 class FixableEntityFailuresControllerSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   private def applyFix: Seq[EntityFix] => String => Seq[EntityFix] =
     fixes =>
       failureCode =>

@@ -34,11 +34,6 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 class AmlsRegistrationNumberControllerSpec
 extends ControllerSpec:
 
-  override def configOverrides: Map[String, Any] =
-    super.configOverrides ++ Map(
-      "features.fixable-failures" -> true
-    )
-
   private val path = "/agent-registration/conditions-not-yet-met/anti-money-laundering/registration-number"
 
   private def updateFixableAmls(): Seq[EntityFix] => AmlsDetails => Seq[EntityFix] =
