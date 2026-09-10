@@ -29,6 +29,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.Nino
+import uk.gov.hmrc.agentregistration.shared.SaUtr
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
@@ -58,9 +59,11 @@ class MatchIndividualProvidedDetailsController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithOptionalCitizenDetails = Option[CitizenDetails] *: List[IndividualProvidedDetails] *: AgentApplication *: DataWithTaxIds
+  // DataWithTaxIds with its Option[Nino] narrowed to Nino: past baseAction's citizen-details step
+  // a NINO is guaranteed (users without one are diverted to manual name matching)
+  private type DataWithCitizenDetails = CitizenDetails *: List[IndividualProvidedDetails] *: AgentApplication *: Nino *: Option[SaUtr] *: DataWithAuthAndCl
 
-  private type DataWithMatchedIndividualProvidedDetails = IndividualProvidedDetails *: DataWithOptionalCitizenDetails
+  private type DataWithMatchedIndividualProvidedDetails = IndividualProvidedDetails *: DataWithCitizenDetails
 
   private def baseAction(
     linkId: LinkId,
@@ -101,18 +104,24 @@ extends FrontendController(mcc, actions):
       request.get[Option[Nino]] match
         case Some(nino) =>
           citizenDetailsConnector
-            .getCitizenDetails(nino).map:
-              case Some(details) => request.add[Option[CitizenDetails]](Some(details))
-              case None => request.add[Option[CitizenDetails]](None)
+            .getCitizenDetails(nino)
+            .map:
+              case Some(details) =>
+                request
+                  .replace[Option[Nino], Nino](nino)
+                  .add[CitizenDetails](details)
+              case None =>
+                logger.warn("No citizen details found for user's NINO, cannot match by name from citizen details, redirecting to manual name matching page")
+                Redirect(AppRoutes.providedetails.NameMatchingController.show(linkId).url)
         case None =>
           logger.warn("No NINO found in session, cannot match to citizen details, redirecting to manual name matching page")
           Future.successful(Redirect(AppRoutes.providedetails.NameMatchingController.show(linkId).url))
     )
     .refine(implicit request =>
       val list: List[IndividualProvidedDetails] = request.get
-      val maybeCitizenDetails: Option[CitizenDetails] = request.get
+      val citizenDetails: CitizenDetails = request.get
       val listOfUnclaimedIndividualProvidedDetails: List[IndividualProvidedDetails] = list.filter(_.internalUserId.isEmpty)
-      listOfUnclaimedIndividualProvidedDetails.matchCitizenDetailsName(maybeCitizenDetails) match
+      listOfUnclaimedIndividualProvidedDetails.matchCitizenDetailsName(citizenDetails) match
         case Some(individualProvidedDetails) => request.add[IndividualProvidedDetails](individualProvidedDetails)
         case None =>
           logger.warn(s"No matching IndividualProvidedDetails record found for citizen details name, redirecting to manual name matching page")
@@ -190,22 +199,22 @@ extends FrontendController(mcc, actions):
     .async:
       implicit request =>
         val confirmMatchToIndividualProvidedDetails: YesNo = request.get
-        val citizenDetails: Option[CitizenDetails] = request.get
 
-        /** [[IndividualProvidedDetails.passedIv]] can only be set to true if we have citizen details in addition to the confidence level (CL) being L250 or
-          * above. This is because we have learned that SCR cases can have a high legacy CL but no citizen details due to their status. Details in
-          * https://jira.tools.tax.service.gov.uk/browse/APB-12206
-          */
         if confirmMatchToIndividualProvidedDetails.toBoolean then
+
+          /** Computes the value stored as [[IndividualProvidedDetails.passedIv]] in this citizen-details match flow. "Passed IV" means we trust the user's
+            * identity. That needs two things: the sign-in confidence level is L250 or higher, and a citizen-details record exists for the user. The confidence
+            * level alone is not proof. APB-12206 found real users with CL250 for whom citizen details has no record, for example SCR (Special Customer Records)
+            * users. See https://jira.tools.tax.service.gov.uk/browse/APB-12206. On this path the citizen-details record always exists, because `baseAction`
+            * sends users without one to the manual name-matching page. That is why ONLY the confidence level is checked here.
+            */
+          val passedIv: Boolean = request.get[ConfidenceLevel] >= ConfidenceLevel.L250
           individualProvideDetailsService
-            .claimIndividualProvidedDetails(
-              individualProvidedDetails = request.get[IndividualProvidedDetails]
-                .copy(
-                  passedIv = Some((request.get[ConfidenceLevel] >= ConfidenceLevel.L250) && citizenDetails.isDefined)
-                ),
+            .claimMatchedByCitizenDetails(
+              individualProvidedDetails = request.get[IndividualProvidedDetails].copy(passedIv = Some(passedIv)),
               internalUserId = request.get[InternalUserId],
-              maybeNino = request.get[Option[Nino]],
-              citizenDetails = citizenDetails
+              nino = request.get[Nino],
+              citizenDetails = request.get[CitizenDetails]
             )
             .map: _ =>
               Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url)
@@ -226,27 +235,24 @@ extends FrontendController(mcc, actions):
 
   extension (list: List[IndividualProvidedDetails])
     private def matchCitizenDetailsName(
-      maybeCitizenDetails: Option[CitizenDetails]
+      citizenDetails: CitizenDetails
     ): Option[IndividualProvidedDetails] =
-      maybeCitizenDetails match
-        case Some(citizenDetails) =>
-          val fullName: String = s"${citizenDetails.firstName.getOrElse("")} ${citizenDetails.lastName.getOrElse("")}"
-          val maybeExactMatch: Option[IndividualProvidedDetails] = list.find(individualProvidedDetails =>
-            individualProvidedDetails.individualName.value.toLowerCase === fullName.toLowerCase
+      val fullName: String = s"${citizenDetails.firstName.getOrElse("")} ${citizenDetails.lastName.getOrElse("")}"
+      val maybeExactMatch: Option[IndividualProvidedDetails] = list.find(individualProvidedDetails =>
+        individualProvidedDetails.individualName.value.toLowerCase === fullName.toLowerCase
+      )
+      maybeExactMatch match
+        case Some(individualProvidedDetails) => Some(individualProvidedDetails)
+        case None =>
+          val surnameMatches: List[IndividualProvidedDetails] = list.filter(individualProvidedDetails =>
+            individualProvidedDetails.individualName.value.split(" ")
+              .lastOption.exists(_.toLowerCase === citizenDetails.lastName.getOrElse("").toLowerCase)
           )
-          maybeExactMatch match
-            case Some(individualProvidedDetails) => Some(individualProvidedDetails)
-            case None =>
-              val surnameMatches: List[IndividualProvidedDetails] = list.filter(individualProvidedDetails =>
+          surnameMatches match
+            case individualProvidedDetails :: Nil => Some(individualProvidedDetails)
+            case Nil => None
+            case surnameList: List[IndividualProvidedDetails] =>
+              surnameList.find(individualProvidedDetails =>
                 individualProvidedDetails.individualName.value.split(" ")
-                  .lastOption.exists(_.toLowerCase === citizenDetails.lastName.getOrElse("").toLowerCase)
+                  .headOption.exists(_.toLowerCase === citizenDetails.firstName.getOrElse("").toLowerCase)
               )
-              surnameMatches match
-                case individualProvidedDetails :: Nil => Some(individualProvidedDetails)
-                case Nil => None
-                case surnameList: List[IndividualProvidedDetails] =>
-                  surnameList.find(individualProvidedDetails =>
-                    individualProvidedDetails.individualName.value.split(" ")
-                      .headOption.exists(_.toLowerCase === citizenDetails.firstName.getOrElse("").toLowerCase)
-                  )
-        case None => None
