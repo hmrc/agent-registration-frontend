@@ -112,7 +112,7 @@ extends FrontendController(mcc, actions):
             Future.successful(Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url))
           else
             individualProvideDetailsService
-              .claimIndividualProvidedDetails(
+              .claimMatchedByName(
                 individualProvidedDetails = matchedIndividual
                   .copy(passedIv = Some((request.get[ConfidenceLevel] >= ConfidenceLevel.L250) && request.get[Option[CitizenDetails]].isDefined)),
                 internalUserId = request.get[InternalUserId],

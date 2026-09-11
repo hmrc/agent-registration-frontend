@@ -117,7 +117,41 @@ extends RequestAwareLogging:
       ()
   }
 
-  def claimIndividualProvidedDetails(
+  /** Claims a provided-details record for the signed-in user after an automatic match via citizen details.
+    *
+    * Takes the nino and the citizen details as plain values, not Options: this claim only happens when both exist, because the match itself was made from the
+    * citizen-details record that was looked up by that nino. Callers without them are sent down the manual name-matching path instead. Stores the nino from
+    * auth, and the date of birth and SA UTR from citizen details.
+    */
+  def claimMatchedByCitizenDetails(
+    individualProvidedDetails: IndividualProvidedDetails,
+    internalUserId: InternalUserId,
+    nino: Nino,
+    citizenDetails: CitizenDetails
+  )(using request: RequestHeader): Future[Unit] = {
+    logger.debug(s"Claiming IndividualProvidedDetails for user:[${internalUserId.value}] and applicationId:[${individualProvidedDetails.agentApplicationId.value}]")
+    individualProvideDetailsConnector
+      .upsertForIndividual(
+        individualProvidedDetails
+          .modify(_.internalUserId)
+          .setTo(Some(internalUserId))
+          .modify(_.individualNino)
+          .setTo(Some(FromAuth(nino)))
+          .modify(_.individualDateOfBirth)
+          .setTo(citizenDetails.dateOfBirth.map(IndividualDateOfBirth.FromCitizensDetails(_)))
+          .modify(_.individualSaUtr)
+          .setTo(citizenDetails.saUtr.map(IndividualSaUtr.FromCitizenDetails(_)))
+          .modify(_.providedDetailsState)
+          .setTo(ProvidedDetailsState.Started)
+      )
+  }
+
+  /** Claims a provided-details record for the signed-in user after a manual match by name.
+    *
+    * Here the nino and the citizen details really can be missing: some users sign in without a nino, and an SCR user has a nino but no citizen-details record.
+    * Whatever is available gets stored.
+    */
+  def claimMatchedByName(
     individualProvidedDetails: IndividualProvidedDetails,
     internalUserId: InternalUserId,
     maybeNino: Option[Nino],
@@ -130,7 +164,7 @@ extends RequestAwareLogging:
           .modify(_.internalUserId)
           .setTo(Some(internalUserId))
           .modify(_.individualNino)
-          .setTo(maybeNino.map(FromAuth(_))) // TODO: Should probably use a concrete nino given we expect CitizenDetails
+          .setTo(maybeNino.map(FromAuth(_)))
           .modify(_.individualDateOfBirth)
           .setTo(citizenDetails.flatMap(_.dateOfBirth.map(IndividualDateOfBirth.FromCitizensDetails(_))))
           .modify(_.individualSaUtr)
@@ -139,18 +173,6 @@ extends RequestAwareLogging:
           .setTo(ProvidedDetailsState.Started)
       )
   }
-
-  def claimIndividualNonCiDProvidedDetails(
-    individualProvidedDetails: IndividualProvidedDetails,
-    internalUserId: InternalUserId
-  )(using request: RequestHeader): Future[Unit] = individualProvideDetailsConnector
-    .upsertForIndividual(
-      individualProvidedDetails
-        .modify(_.internalUserId)
-        .setTo(Some(internalUserId))
-        .modify(_.providedDetailsState)
-        .setTo(ProvidedDetailsState.Started)
-    )
 
   @SuppressWarnings(Array("org.wartremover.warts.Recursion"))
   def generateNewPersonReference()(using RequestHeader): Future[PersonReference] =
