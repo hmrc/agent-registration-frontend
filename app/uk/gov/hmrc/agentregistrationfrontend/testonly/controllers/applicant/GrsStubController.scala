@@ -49,6 +49,7 @@ import uk.gov.voa.play.form.ConditionalMappings.isEqual
 import uk.gov.voa.play.form.ConditionalMappings.mandatoryIf
 import uk.gov.voa.play.form.conditionOpts
 
+import java.security.SecureRandom
 import java.time.LocalDate
 import java.util.UUID
 import javax.inject.Inject
@@ -126,13 +127,14 @@ extends FrontendController(mcc, actions):
         "journeyStartUrl" -> AppRoutes.testOnly.applicant.GrsStubController.showGrsData(businessType, randomJourneyId()).url
       ))
 
-  val seed = 123456
-  val utrGenerator = SaUtrGenerator(seed) // for our test-only purposes we can use SaUtrGenerator to generate both SA UTRs and CT UTRs
-  val ninoGenerator = NinoGenerator(seed)
-  def randomSaUtr(): SaUtr = SaUtr(utrGenerator.nextSaUtr.utr)
-  def randomCtUtr(): CtUtr = CtUtr(utrGenerator.nextSaUtr.utr)
-  def randomJourneyId(): JourneyId = JourneyId(UUID.randomUUID().toString)
-  def randomNino(): Nino = Nino(ninoGenerator.nextNino.nino)
+  private val secure = new SecureRandom()
+  private val seed: Int = secure.nextInt()
+  private val utrGenerator = SaUtrGenerator(seed) // for our test-only purposes we can use SaUtrGenerator to generate both SA UTRs and CT UTRs
+  private val ninoGenerator = NinoGenerator(seed)
+  private def randomSaUtr(): SaUtr = SaUtr(utrGenerator.nextSaUtr.utr)
+  private def randomCtUtr(): CtUtr = CtUtr(utrGenerator.nextSaUtr.utr)
+  private def randomJourneyId(): JourneyId = JourneyId(UUID.randomUUID().toString)
+  private def randomNino(): Nino = Nino(ninoGenerator.nextNino.nino)
 
   private def form(businessType: BusinessType): Form[JourneyData] =
     val registrationStatusMapping: FieldMapping[RegistrationStatus] = Forms.of(using
