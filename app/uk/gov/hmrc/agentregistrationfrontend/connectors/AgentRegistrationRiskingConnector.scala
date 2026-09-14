@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.connectors
 
-import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistration.shared.risking.submitforrisking.SubmitForRiskingRequest
@@ -56,24 +55,6 @@ extends Connector:
               info = "submit for risking problem"
             )
       .andLogOnFailure(s"Failed to submit agent application for risking: ${submitForRiskingRequest.applicationData.applicationReference}")
-
-  def getRiskingProgressForApplicant(applicationReference: ApplicationReference)(using RequestHeader): Future[RiskingProgress] =
-    val url: URL = url"$baseUrl/risking-progress/for-applicant/${applicationReference.value}"
-    httpClient
-      .get(url)
-      .execute[HttpResponse]
-      .map: response =>
-        response.status match
-          case Status.OK => response.json.as[RiskingProgress] // at the point of calling this endpoint the Application must be at risking microservice
-          case other =>
-            Errors.throwUpstreamErrorResponse(
-              httpMethod = "GET",
-              url = url,
-              status = other,
-              response = response,
-              info = "getRiskingProgressForApplicant problem"
-            )
-      .andLogOnFailure(s"Failed to get riskingProgressForApplicant: ${applicationReference.value}")
 
   def getRiskingProgressForIndividual(personReference: PersonReference)(using RequestHeader): Future[RiskingProgress] =
     val url: URL = url"$baseUrl/risking-progress/for-individual/${personReference.value}"
