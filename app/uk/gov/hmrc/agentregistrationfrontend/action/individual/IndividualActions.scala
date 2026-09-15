@@ -30,7 +30,6 @@ import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix._10.IndividualDetailsFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
-import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineFutureEither
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineUnion
@@ -40,7 +39,6 @@ import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualRiskingService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 import uk.gov.hmrc.auth.core.retrieve.Credentials
@@ -71,7 +69,6 @@ object IndividualActions:
   type DataWithAuthAndCl = ConfidenceLevel *: DataWithAuth
   type DataWithTaxIds = Option[Nino] *: Option[SaUtr] *: DataWithAuthAndCl
   type DataWithIndividualProvidedDetails = IndividualProvidedDetails *: AgentApplication *: DataWithAuthAndCl
-  type DataWithRiskingProgress = RiskingProgress *: DataWithIndividualProvidedDetails
   type DataWithRiskingOutcomes = BusinessPartnerRecordResponse *: RiskingOutcomeIndividual *: RiskingOutcomeApplication *: DataWithIndividualProvidedDetails
   type DataWithFixableOutcomes =
     BusinessPartnerRecordResponse *: RiskingOutcomeIndividual.FailedFixable *: RiskingOutcomeApplication.FailedFixable *: DataWithIndividualProvidedDetails
@@ -84,7 +81,6 @@ class IndividualActions @Inject(
   individualAuthorisedRefiner: IndividualAuthRefiner,
   agentApplicationService: AgentApplicationService,
   individualProvideDetailsService: IndividualProvideDetailsService,
-  individualRiskingService: IndividualRiskingService,
   businessPartnerRecordService: BusinessPartnerRecordService
 )(using ExecutionContext)
 extends RequestAwareLogging:
@@ -107,7 +103,7 @@ extends RequestAwareLogging:
         .find(linkId)
         .map:
           case Some(agentApplication) if agentApplication.isAfterSentForRisking =>
-            Redirect(AppRoutes.providedetails.riskingprogress.RiskingProgressController.show(linkId))
+            Redirect(AppRoutes.providedetails.riskingoutcome.RiskingOutcomeController.show(linkId))
           case Some(agentApplication) => request.add[AgentApplication](agentApplication)
           case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
     )
@@ -122,34 +118,6 @@ extends RequestAwareLogging:
               .getOrElse(
                 Redirect(AppRoutes.providedetails.MatchIndividualProvidedDetailsController.show(linkId, fromIv = None))
               )
-    )
-
-  def authorisedWithRiskingProgress(linkId: LinkId): ActionBuilderWithData[DataWithRiskingProgress] = authorised
-    .refine(implicit request =>
-      agentApplicationService
-        .find(linkId)
-        .map:
-          case Some(agentApplication) if agentApplication.isAfterSentForRisking => request.add[AgentApplication](agentApplication)
-          case Some(_) => Redirect(AppRoutes.providedetails.CheckYourAnswersController.show(linkId))
-          case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)
-    )
-    .refine(implicit request =>
-      individualProvideDetailsService
-        .findAllForMatchingWithApplication(request.get[AgentApplication].agentApplicationId)
-        .map[RequestWithData[DataWithIndividualProvidedDetails] | Result]:
-          case list: List[IndividualProvidedDetails] =>
-            list
-              .find(_.internalUserId.contains(request.get[InternalUserId]))
-              .map(request.add[IndividualProvidedDetails])
-              .getOrElse(
-                Redirect(AppRoutes.providedetails.MatchIndividualProvidedDetailsController.show(linkId, fromIv = None))
-              )
-    )
-    .refine(implicit request =>
-      individualRiskingService
-        .getRiskingProgress(request.get[IndividualProvidedDetails].personReference)
-        .map: (riskingProgress: RiskingProgress) =>
-          request.add[RiskingProgress](riskingProgress)
     )
 
   def authorisedWithRiskingOutcome(linkId: LinkId): ActionBuilderWithData[DataWithRiskingOutcomes] = authorised

@@ -18,11 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.individual
 
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.PersonReference
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdAll.tdAll
-import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationRiskingStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.CitizenDetailsStub
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.IndividualAuthStubs
@@ -134,29 +131,6 @@ object ProvideDetailsStubHelper:
   def verifyAuthAndUpdateProvidedDetails(): Unit =
     verifyAuthAndFindApplicationAndProvidedDetails()
     AgentRegistrationIndividualProvidedDetailsStubs.verifyUpsertIndividualProvidedDetails()
-
-  def stubRiskingProgress(
-    agentApplication: AgentApplication,
-    individualProvidedDetails: IndividualProvidedDetails,
-    riskingProgress: RiskingProgress
-  ): StubMapping =
-    stubAuthAndFindApplicationAndProvidedDetails(
-      agentApplication,
-      individualProvidedDetails,
-      confidenceLevel = ConfidenceLevel.L250
-    )
-    AgentRegistrationStubs.stubGetApplicationBusinessPartnerRecord(
-      utr = tdAll.saUtr.asUtr,
-      responseBody = tdAll.businessPartnerRecordResponse
-    )
-    AgentRegistrationRiskingStubs.stubGetIndividualRiskingResponse(
-      personReference = individualProvidedDetails.personReference,
-      riskingProgress = riskingProgress
-    )
-
-  def verifyRiskingProgressCalls(personReference: PersonReference): Unit =
-    verifyAuthAndFindApplicationAndProvidedDetails()
-    AgentRegistrationRiskingStubs.verifyGetIndividualRiskingResponse(personReference = personReference)
 
   def stubFixableFailureUpdate(
     agentApplication: AgentApplication,
