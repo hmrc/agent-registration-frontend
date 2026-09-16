@@ -45,6 +45,11 @@ extends FrontendController(mcc, actions):
 
   private def baseAction(linkId: LinkId): ActionBuilderWithData[DataWithIndividualProvidedDetails] = authorisedWithIndividualProvidedDetails(linkId)
     .ensure(
+      _.get[IndividualProvidedDetails].isInProgress,
+      implicit request =>
+        Redirect(AppRoutes.providedetails.IndividualConfirmationController.show(linkId).url)
+    )
+    .ensure(
       _.get[IndividualProvidedDetails].telephoneNumber.isDefined,
       implicit request =>
         Redirect(AppRoutes.providedetails.IndividualTelephoneNumberController.show(linkId))

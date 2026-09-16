@@ -20,11 +20,9 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsNotIncorporated
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.ApplicationReference
 import uk.gov.hmrc.agentregistration.shared.Arn
 import uk.gov.hmrc.agentregistration.shared.getCrn
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistration.shared.risking.submitforrisking.*
 import uk.gov.hmrc.agentregistrationfrontend.audit.AuditService
 import uk.gov.hmrc.agentregistrationfrontend.connectors.AgentRegistrationRiskingConnector
@@ -65,9 +63,6 @@ extends RequestAwareLogging:
         isResubmission
       )
     yield ()
-
-  def getRiskingProgress(applicationReference: ApplicationReference)(using request: RequestHeader): Future[RiskingProgress] =
-    agentRegistrationRiskingConnector.getRiskingProgressForApplicant(applicationReference)
 
 object AgentRegistrationRiskingServiceHelper:
 

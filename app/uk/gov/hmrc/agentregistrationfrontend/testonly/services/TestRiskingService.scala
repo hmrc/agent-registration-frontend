@@ -63,9 +63,6 @@ class TestRiskingService @Inject() (
   def findApplicationForRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =
     testRiskingConnector.findApplicationForRisking(applicationReference)
 
-  def findIndividualsForRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =
-    testRiskingConnector.findIndividualsForRisking(applicationReference)
-
   def findIndividualForRisking(
     personReference: PersonReference
   )(using RequestHeader): Future[Option[JsValue]] = testRiskingConnector.findIndividualForRisking(personReference)
