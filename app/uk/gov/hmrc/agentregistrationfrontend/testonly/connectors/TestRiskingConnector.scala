@@ -90,24 +90,6 @@ extends Connector:
             )
       .andLogOnFailure(s"Failed to find application for risking for applicationReference: ${applicationReference.value}")
 
-  def findIndividualsForRisking(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[JsValue]] =
-    val url: URL = url"$baseUrl/individuals-for-risking/${applicationReference.value}"
-    httpClient
-      .get(url)
-      .execute[HttpResponse]
-      .map: response =>
-        response.status match
-          case status if status === Status.OK => Some(response.json)
-          case status if status === Status.NO_CONTENT => None
-          case status =>
-            Errors.throwUpstreamErrorResponse(
-              httpMethod = "GET",
-              url = url,
-              status = status,
-              response = response
-            )
-      .andLogOnFailure(s"Failed to find individuals for risking for applicationReference: ${applicationReference.value}")
-
   def findIndividualForRisking(personReference: PersonReference)(using RequestHeader): Future[Option[JsValue]] =
     val url: URL = url"$baseUrl/individual-for-risking/${personReference.value}"
     httpClient

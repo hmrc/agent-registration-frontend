@@ -209,12 +209,6 @@ extends FrontendControllerBase(mcc):
         case Some(json) => Ok(Json.prettyPrint(json))
         case None => Ok(s"No application-for-risking found for applicationReference: ${applicationReference.value}")
 
-  def showIndividualsForRisking(applicationReference: ApplicationReference): Action[AnyContent] = action.async:
-    implicit request =>
-      testRiskingService.findIndividualsForRisking(applicationReference).map:
-        case Some(json) => Ok(Json.prettyPrint(json))
-        case None => Ok(s"No individuals-for-risking found for applicationReference: ${applicationReference.value}")
-
   def showIndividualForRisking(personReference: PersonReference): Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.findIndividualForRisking(personReference).map:
