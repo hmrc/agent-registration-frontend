@@ -102,7 +102,7 @@ extends RequestAwareLogging:
       agentApplicationService
         .find(linkId)
         .map:
-          case Some(agentApplication) if agentApplication.isAfterSentForRisking =>
+          case Some(agentApplication) if agentApplication.riskingOutcomeApplication.isDefined =>
             Redirect(AppRoutes.providedetails.riskingoutcome.RiskingOutcomeController.show(linkId))
           case Some(agentApplication) => request.add[AgentApplication](agentApplication)
           case None => Redirect(AppRoutes.providedetails.ExitController.genericExitPage.url)

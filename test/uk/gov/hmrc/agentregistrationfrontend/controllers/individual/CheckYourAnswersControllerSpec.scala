@@ -20,6 +20,7 @@ import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.BusinessType
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.ProvidedDetailsState.Finished
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.providedetails.llp.AgentRegistrationIndividualProvidedDetailsStubs
 
@@ -116,9 +117,14 @@ extends ControllerSpec:
       expectedRedirect = Some(AppRoutes.providedetails.IndividualTelephoneNumberController.show(linkId).url)
     ),
     TestCaseForCya(
-      providedDetails = individualProvideDetails.completeAndConfirmed,
+      providedDetails = individualProvideDetails.complete,
       name = "sole trader",
       application = agentApplicationSoleTrader,
+      expectedRedirect = Some(AppRoutes.providedetails.IndividualConfirmationController.show(linkId).url)
+    ),
+    TestCaseForCya(
+      providedDetails = individualProvideDetails.completeAndConfirmed,
+      name = "confirmed details",
       expectedRedirect = Some(AppRoutes.providedetails.IndividualConfirmationController.show(linkId).url)
     )
   ).foreach: testCase =>
@@ -140,7 +146,10 @@ extends ControllerSpec:
             testCase.application,
             testCase.providedDetails
           )
-          AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(testCase.providedDetails)
+          AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(testCase.providedDetails.copy(
+            providedDetailsState = Finished,
+            providedByApplicant = Some(false)
+          ))
           val response: WSResponse = get(path)
           response.status shouldBe Status.SEE_OTHER
           response.header("Location").value shouldBe expectedRedirect
