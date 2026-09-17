@@ -18,7 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsUnincorporatedPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
@@ -43,7 +43,7 @@ class RemoveKeyIndividualController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithIsAgentForDeclaringNumberOfKeyIndividuals = IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
+  private type DataWithIsAgentForDeclaringNumberOfKeyIndividuals = IsUnincorporatedPartnership *: DataWithAuth
 
   private type DataWithIndividual = IndividualProvidedDetails *: DataWithIsAgentForDeclaringNumberOfKeyIndividuals
 
@@ -60,8 +60,7 @@ extends FrontendController(mcc, actions):
           case _: AgentApplicationSoleTrader =>
             logger.warn("Sole traders do not add individuals to a list, redirecting to task list for the correct links")
             Redirect(AppRoutes.apply.TaskListController.show.url)
-          case aa: IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
-            request.replace[AgentApplication, IsAgentApplicationForDeclaringNumberOfKeyIndividuals](aa)
+          case aa: IsUnincorporatedPartnership => request.replace[AgentApplication, IsUnincorporatedPartnership](aa)
     .refine:
       implicit request =>
         individualProvideDetailsService

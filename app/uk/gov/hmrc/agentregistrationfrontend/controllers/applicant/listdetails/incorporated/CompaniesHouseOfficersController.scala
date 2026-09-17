@@ -58,35 +58,20 @@ extends FrontendController(mcc, actions):
   private val baseAction: ActionBuilderWithData[
     Seq[IndividualName] *: List[IndividualProvidedDetails] *: BusinessPartnerRecordResponse *: IsIncorporated *: DataWithAuth
   ] = actions
-    .getApplicationInProgress
-    .getBusinessPartnerRecord
-    .refine:
-      implicit request =>
-        request.agentApplication match
-          case _: AgentApplication.IsNotIncorporated =>
-            logger.warn(
-              "NotIncorporated businesses do not have the number of key individuals determined by Companies House results, redirecting to task list for the correct links"
-            )
-            Redirect(AppRoutes.apply.TaskListController.show.url)
-
-          case aa: IsIncorporated => request.replace[AgentApplication, IsIncorporated](aa)
+    .getIncorporatedApplicationAndBpr
+    .getCompaniesHouseKeyIndividuals
     .refine:
       implicit request =>
         val agentApplication: IsIncorporated = request.get[IsIncorporated]
-        for
-          individualsList <- individualProvideDetailsService
-            .findAllKeyIndividualsByApplicationId(agentApplication.agentApplicationId)
-
-          companiesHouseOfficers <- companiesHouseService
-            .getActiveOfficers(agentApplication.getCrn, agentApplication.getCompaniesHouseOfficerRole)
-
-          companiesHouseOfficersNames = companiesHouseOfficers
-            .map(x => CompaniesHouseOfficer.normaliseOfficerName(x.name))
-            .map(IndividualName(_))
-            .filter(_.isValidName)
-        yield request
-          .add[List[IndividualProvidedDetails]](individualsList.filter(_.isPersonOfControl)) // important we don't include other relevant individuals
-          .add[Seq[IndividualName]](companiesHouseOfficersNames)
+        companiesHouseService
+          .getActiveOfficers(agentApplication.getCrn, agentApplication.getCompaniesHouseOfficerRole)
+          .map: companiesHouseOfficers =>
+            request.add[Seq[IndividualName]](
+              companiesHouseOfficers
+                .map(x => CompaniesHouseOfficer.normaliseOfficerName(x.name))
+                .map(IndividualName(_))
+                .filter(_.isValidName)
+            )
 
   def show: Action[AnyContent] = baseAction
     .async:

@@ -18,121 +18,54 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 
 import play.api.data.Form
 import play.api.mvc.*
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
-import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLess
-import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
-import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
-import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsUnincorporatedPartnership
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-import uk.gov.hmrc.agentregistration.shared.*
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
-import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
-import uk.gov.hmrc.agentregistrationfrontend.util.MessageKeys
-import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.nonincorporated.EnterIndividualNameComplexPage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.nonincorporated.EnterIndividualNamePage
 
 import javax.inject.Inject
 import javax.inject.Singleton
-import scala.concurrent.Future
 
 @Singleton
 class EnterKeyIndividualController @Inject() (
   mcc: MessagesControllerComponents,
   actions: ApplicantActions,
-  enterIndividualNameSimplePage: EnterIndividualNamePage,
-  enterIndividualNameComplexPage: EnterIndividualNameComplexPage,
-  businessPartnerRecordService: BusinessPartnerRecordService,
+  enterIndividualNamePageRenderer: EnterIndividualNamePageRenderer,
   individualProvideDetailsService: IndividualProvideDetailsService
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithList =
-    List[IndividualProvidedDetails] *: NumberOfRequiredKeyIndividuals *: IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
+  /** A `def`, not a `val`: reverse routes read the router prefix, which Play only sets after the controllers are built, so a `val` here would drop the
+    * `/agent-registration` prefix.
+    */
+  private def formAction: Call = AppRoutes.apply.listdetails.nonincorporated.EnterKeyIndividualController.submit
 
-  private val baseAction: ActionBuilderWithData[DataWithList] = actions
-    .getApplicationInProgress
-    .refine:
-      implicit request =>
-        request.get[AgentApplication] match
-          case _: IsIncorporated =>
-            logger.warn(
-              "Incorporated businesses should be name matching key individuals against Companies House results, redirecting to task list for the correct links"
-            )
-            Redirect(AppRoutes.apply.TaskListController.show.url)
-          case _: AgentApplicationSoleTrader =>
-            logger.warn("Sole traders do not add individuals to a list, redirecting to task list for the correct links")
-            Redirect(AppRoutes.apply.TaskListController.show.url)
-          case aa: IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
-            request.replace[AgentApplication, IsAgentApplicationForDeclaringNumberOfKeyIndividuals](aa)
-    .refine:
-      implicit request =>
-        request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].getNumberOfRequiredKeyIndividuals match
-          case Some(n: NumberOfRequiredKeyIndividuals) => request.add(n)
-          case None =>
-            logger.warn(
-              "Number of required key individuals not specified in application, redirecting to number of key individuals page"
-            )
-            Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url)
-    .refine:
-      implicit request =>
-        val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
-        individualProvideDetailsService.findAllKeyIndividualsByApplicationId(agentApplication.agentApplicationId).map: individualsList =>
-          request.add[List[IndividualProvidedDetails]](individualsList)
-
-  // TODO: extract logic of choosing view and rendering it based on NumberOfRequiredKeyIndividuals, Form[] and businessPartnerRecord
-
-  def show: Action[AnyContent] = baseAction
+  def show: Action[AnyContent] = actions
+    .getKeyIndividualsForUnincorporatedPartnership
     .async:
-      implicit request: RequestWithData[DataWithList] =>
-        val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.EnterKeyIndividualController.submit
-        request.get[NumberOfRequiredKeyIndividuals] match
-          case n: SixOrMore =>
-            whenSixOrMore(
-              request = request,
-              sixOrMore = n,
-              form = IndividualNameForm.form,
-              formAction = formAction,
-              resultStatus = Ok
-            )
-          case n: FiveOrLess =>
-            whenFiveOrLess(
-              request = request,
-              fiveOrLess = n,
-              form = IndividualNameForm.form,
-              formAction = formAction,
-              resultStatus = Ok
-            )
+      implicit request =>
+        enterIndividualNamePageRenderer
+          .render(
+            form = IndividualNameForm.form,
+            formAction = formAction
+          )
+          .map(Ok(_))
 
   def submit: Action[AnyContent] =
-    baseAction
+    actions
+      .getKeyIndividualsForUnincorporatedPartnership
       .ensureValidFormAndRedirectIfSaveForLater[IndividualName](
         form = IndividualNameForm.form,
         resultToServeWhenFormHasErrors =
           implicit request =>
             (formWithErrors: Form[IndividualName]) =>
-              val formAction: Call = AppRoutes.apply.listdetails.nonincorporated.EnterKeyIndividualController.submit
-              request.get[NumberOfRequiredKeyIndividuals] match
-                case n: SixOrMore =>
-                  whenSixOrMore(
-                    request = request,
-                    sixOrMore = n,
-                    form = formWithErrors,
-                    formAction = formAction,
-                    resultStatus = BadRequest
-                  )
-                case n: FiveOrLess =>
-                  whenFiveOrLess(
-                    request = request,
-                    fiveOrLess = n,
-                    form = formWithErrors,
-                    formAction = formAction,
-                    resultStatus = BadRequest
-                  )
+              enterIndividualNamePageRenderer.render(
+                form = formWithErrors,
+                formAction = formAction
+              )
       )
       .async:
         implicit request =>
@@ -141,65 +74,8 @@ extends FrontendController(mcc, actions):
             individualProvidedDetails: IndividualProvidedDetails <- individualProvideDetailsService.create(
               individualName = individualName,
               isPersonOfControl = true,
-              agentApplicationId = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].agentApplicationId
+              agentApplicationId = request.get[IsUnincorporatedPartnership].agentApplicationId
             )
             _ <- individualProvideDetailsService.upsertForApplication(individualProvidedDetails)
           yield Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
       .redirectIfSaveForLater
-
-  private def whenSixOrMore(
-    request: RequestWithData[DataWithList],
-    sixOrMore: SixOrMore,
-    form: Form[IndividualName],
-    formAction: Call,
-    resultStatus: Status
-  ): Future[Result] =
-    given RequestWithData[DataWithList] = request
-    val existingList: List[IndividualProvidedDetails] = request.get
-    val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
-    if (existingList.isEmpty && (sixOrMore.numberOfKeyIndividualsResponsibleForTaxMatters > 0))
-    then
-      businessPartnerRecordService
-        .getBusinessPartnerRecord(agentApplication.getUtr)
-        .map: bprOpt =>
-          resultStatus(enterIndividualNameComplexPage(
-            form = form,
-            ordinalKey = MessageKeys.ordinalKey(
-              existingSize = existingList.size,
-              isOnlyOne = false // list size here can never be 1
-            ),
-            numberOfRequiredKeyIndividuals = sixOrMore,
-            entityName = bprOpt
-              .map(_.getEntityName)
-              .getOrThrowExpectedDataMissing(
-                "Business Partner Record is missing"
-              ),
-            formAction = formAction
-          ))
-    else
-      Future.successful(resultStatus(enterIndividualNameSimplePage(
-        form = form,
-        ordinalKey = MessageKeys.ordinalKey(
-          existingSize = existingList.size,
-          isOnlyOne = sixOrMore.numberOfKeyIndividualsResponsibleForTaxMatters === 1
-        ),
-        formAction = formAction
-      )))
-
-  private def whenFiveOrLess(
-    request: RequestWithData[DataWithList],
-    fiveOrLess: FiveOrLess,
-    form: Form[IndividualName],
-    formAction: Call,
-    resultStatus: Status
-  ): Future[Result] =
-    given RequestWithData[DataWithList] = request
-    val existingList: List[IndividualProvidedDetails] = request.get
-    Future.successful(resultStatus(enterIndividualNameSimplePage(
-      form = form,
-      ordinalKey = MessageKeys.ordinalKey(
-        existingSize = existingList.size,
-        isOnlyOne = fiveOrLess.numberOfKeyIndividuals === 1
-      ),
-      formAction = formAction
-    )))

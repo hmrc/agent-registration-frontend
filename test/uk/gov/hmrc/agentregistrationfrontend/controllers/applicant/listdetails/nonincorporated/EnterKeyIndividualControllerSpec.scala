@@ -78,7 +78,9 @@ extends ControllerSpec:
     val response: WSResponse = get(path)
 
     response.status shouldBe Status.OK
-    response.parseBodyAsJsoupDocument.title() shouldBe "What is the full name of the first partner? - Apply for an agent services account - GOV.UK"
+    val doc = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "What is the full name of the first partner? - Apply for an agent services account - GOV.UK"
+    doc.mainContent.select("form").attr("action") shouldBe path
     ApplyStubHelper.verifyConnectorsForAuthAction()
 
   s"GET $path should return 200, fetch the BPR and render page for entering next partner" in:

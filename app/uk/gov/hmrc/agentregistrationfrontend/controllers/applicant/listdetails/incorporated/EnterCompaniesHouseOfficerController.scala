@@ -25,7 +25,6 @@ import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficer.normaliseOfficerName
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseOfficerRole.getCompaniesHouseOfficerRole
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
@@ -56,35 +55,9 @@ extends FrontendController(mcc, actions):
     SixOrMoreOfficers *: List[IndividualProvidedDetails] *: BusinessPartnerRecordResponse *: IsIncorporated *: DataWithAuth
 
   private val baseAction: ActionBuilderWithData[CompaniesHouseRequestData] = actions
-    .getApplicationInProgress
-    .getBusinessPartnerRecord
-    .refine:
-      implicit request =>
-        request.agentApplication match
-          case _: AgentApplication.IsNotIncorporated =>
-            logger.warn(
-              "NotIncorporated businesses do not have the number of key individuals determined by Companies House results, redirecting to task list for the correct links"
-            )
-            Redirect(AppRoutes.apply.TaskListController.show.url)
-          case aa: IsIncorporated => request.replace[AgentApplication, IsIncorporated](aa)
-    .refine:
-      implicit request =>
-        individualProvideDetailsService
-          .findAllKeyIndividualsByApplicationId(request.get[IsIncorporated].agentApplicationId)
-          .map: individualProvidedDetailsList =>
-            request.add[List[IndividualProvidedDetails]](individualProvidedDetailsList)
-    .refine:
-      implicit request =>
-        request.get[IsIncorporated].getNumberOfCompaniesHouseOfficers match
-          case Some(n: SixOrMoreOfficers) => request.add(n)
-          case Some(_: FiveOrLessOfficers) =>
-            logger.warn("Number of required key individuals is five or less, redirecting to CYA page")
-            Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show.url)
-          case None =>
-            logger.warn(
-              "Number of required key individuals not specified in application, redirecting to number of key individuals page"
-            )
-            Redirect(AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show.url)
+    .getIncorporatedApplicationAndBpr
+    .getCompaniesHouseKeyIndividuals
+    .getSixOrMoreOfficers(redirectWhenFiveOrLess = AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>

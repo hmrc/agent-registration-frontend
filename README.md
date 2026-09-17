@@ -1,7 +1,37 @@
 # Overview agent-registration-frontend
 
-TODO
-This is a new service. No overview yet.
+The user-facing part of agent registration. A business applies to become an HMRC agent here; the application itself is
+stored by the agent-registration backend, and agent-registration-risking decides the outcome.
+
+Two journeys live in this service.
+
+The applicant journey (`controllers/applicant`) is for the person registering the business. It starts by identifying
+the business through GRS, then works through a task list: agent details, contact details, the HMRC standard for agents,
+AMLS supervision details with evidence uploaded via upscan, the list of individuals, and the declaration. The
+application is saved after every page, so the applicant can leave and come back.
+
+The list of individuals is the part with the most logic. Every person who runs the business has to be named and has to
+provide their own details. How many are needed depends on the business type: a sole trader has one, an incorporated
+business takes its officers from Companies House, and a partnership relies on numbers the applicant declares. See
+individuals.md.
+
+The individual journey (`controllers/individual`) is for those named people. The applicant shares one link; each person
+signs in, is matched to the record held for them (by Citizen Details where possible, by name otherwise), and provides
+their date of birth, National Insurance number, SA UTR, phone number and verified email. The applicant can also provide
+someone else's details on their behalf. Once everyone has finished, the applicant declares and submits the
+application, and the individual journey then shows risking progress and the outcome.
+
+Test-only controllers under `testonly` (a GRS stub, fast-forward links into any journey state) are wired only through
+testOnlyDoNotUseInAppConf.routes and exist to make local testing possible.
+
+## Documentation
+
+- [Individuals on an application](individuals.md) - how key individuals and other relevant individuals are created,
+  with a page per business type: [sole trader](individuals-sole-trader.md),
+  [incorporated business](individuals-incorporated.md), [partnership](individuals-partnership.md)
+- [Glossary](glossary.md) - domain terms used across these documents
+- [Individual journey](individual-journey.md) - how an individual signs in and is matched to their record
+- [AMLS evidence upload](upscan-mermaid.md) - the upscan flow for AMLS evidence files
 
 # Running the Service
 
@@ -96,4 +126,4 @@ sbt> clean test
 ### License
 
 This code is open source software licensed under
-the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
+the [Apache 2.0 License](http://www.apache.org/licenses/LICENSE-2.0.html).

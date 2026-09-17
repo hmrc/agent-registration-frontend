@@ -68,7 +68,6 @@ class AgentApplicationController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  // TODO: is this endpoint really needed?
   def landing: Action[AnyContent] = actions
     .getApplicationInProgress:
       implicit request =>

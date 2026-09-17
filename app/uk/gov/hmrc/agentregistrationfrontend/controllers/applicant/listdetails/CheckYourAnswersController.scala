@@ -66,14 +66,13 @@ extends FrontendController(mcc, actions):
         implicit request =>
           val numberOfKeyIndividuals: Int = request.get[List[IndividualProvidedDetails]].count(_.isPersonOfControl)
           request.get[IsNotSoleTrader] match
-            case a: AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
+            case a: AgentApplication.IsUnincorporatedPartnership =>
               NumberOfIndividuals.isKeyIndividualListComplete(numberOfKeyIndividuals, a.numberOfIndividuals)
             case a: AgentApplication.IsIncorporated => NumberOfIndividuals.isKeyIndividualListComplete(numberOfKeyIndividuals, a.numberOfIndividuals),
       resultWhenConditionNotMet =
         implicit request =>
           request.get[IsNotSoleTrader] match
-            case _: AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
-              Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
+            case _: AgentApplication.IsUnincorporatedPartnership => Redirect(AppRoutes.apply.listdetails.nonincorporated.CheckYourAnswersController.show)
             case _: AgentApplication.IsIncorporated => Redirect(AppRoutes.apply.listdetails.incoporated.CheckYourAnswersController.show)
     )
     .ensure(

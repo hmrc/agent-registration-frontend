@@ -47,7 +47,7 @@ extension (agentApplication: AgentApplication)
 
     def listDetailsCompleted(existingList: List[IndividualProvidedDetails]): Boolean =
       agentApplication match
-        case a: AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
+        case a: AgentApplication.IsUnincorporatedPartnership =>
           NumberOfIndividuals.isKeyIndividualListComplete(existingList.count(_.isPersonOfControl), a.numberOfIndividuals)
           && otherRelevantIndividualsComplete(existingList)
         case a: AgentApplication.IsIncorporated =>
