@@ -24,7 +24,7 @@ import play.api.mvc.MessagesControllerComponents
 import play.api.mvc.Result
 import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsUnincorporatedPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
@@ -45,7 +45,7 @@ extends FrontendController(mcc, actions):
   private type DataWithLists =
     List[
       IndividualProvidedDetails
-    ] *: NumberOfRequiredKeyIndividuals *: BusinessPartnerRecordResponse *: IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
+    ] *: NumberOfRequiredKeyIndividuals *: BusinessPartnerRecordResponse *: IsUnincorporatedPartnership *: DataWithAuth
 
   private val baseAction: ActionBuilderWithData[DataWithLists] = actions
     .getApplicationInProgress
@@ -61,11 +61,10 @@ extends FrontendController(mcc, actions):
           case _: AgentApplicationSoleTrader =>
             logger.warn("Sole traders do not add individuals to a list, redirecting to task list for the correct links")
             Redirect(AppRoutes.apply.TaskListController.show.url)
-          case aa: IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
-            request.replace[AgentApplication, IsAgentApplicationForDeclaringNumberOfKeyIndividuals](aa)
+          case aa: IsUnincorporatedPartnership => request.replace[AgentApplication, IsUnincorporatedPartnership](aa)
     .refine:
       implicit request =>
-        request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals].getNumberOfRequiredKeyIndividuals match
+        request.get[IsUnincorporatedPartnership].getNumberOfRequiredKeyIndividuals match
           case Some(n: NumberOfRequiredKeyIndividuals) => request.add(n)
           case None =>
             logger.debug(
@@ -74,7 +73,7 @@ extends FrontendController(mcc, actions):
             Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url)
     .refine:
       implicit request =>
-        val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
+        val agentApplication: IsUnincorporatedPartnership = request.get
         individualProvideDetailsService
           .findAllKeyIndividualsByApplicationId(
             agentApplication.agentApplicationId
@@ -95,7 +94,7 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
-      val application: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals]
+      val application: IsUnincorporatedPartnership = request.get[IsUnincorporatedPartnership]
       Ok(view(
         numberOfKeyIndividuals = application.getNumberOfRequiredKeyIndividuals.getOrThrowExpectedDataMissing("NumberOfRequiredKeyIndividuals"),
         existingList = request.get[List[IndividualProvidedDetails]],

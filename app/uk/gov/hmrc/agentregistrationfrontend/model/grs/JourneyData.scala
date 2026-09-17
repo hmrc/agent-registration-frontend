@@ -23,11 +23,8 @@ import uk.gov.hmrc.agentregistration.shared.businessdetails.FullName
 
 import java.time.LocalDate
 
-// TODO sole trader responses can also contain an overseas address and an overseas taxIdentifier, do we do anything about this?
-
 /** This represents uber class to hold all cases of journey data for various business types. In reality many fields are set only for specific business types,
-  * others are left none. TODO: consider creating dedicated classes for each endpoint with specified fields, e.g. SoleTraderJourneyData, PartnershipJourneyData,
-  * etc.
+  * others are left none.
   */
 final case class JourneyData(
   fullName: Option[FullName], // sole trader

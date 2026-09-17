@@ -21,6 +21,7 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.StateOfAgreement
+import uk.gov.hmrc.agentregistration.shared.contactdetails.ApplicantName
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
@@ -49,7 +50,7 @@ extends FrontendController(mcc, actions):
   def show(linkId: LinkId): Action[AnyContent] = baseAction(linkId).async:
     implicit request =>
       val agentApplication: AgentApplication = request.get
-      val applicantName = agentApplication.getApplicantContactDetails.applicantName // TODO: do we really need this? It means task list must ensure contact details complete before we can unlock this task
+      val applicantName: ApplicantName = agentApplication.getApplicantContactDetails.applicantName
       businessPartnerRecordService
         .getApplicationBusinessPartnerRecord(agentApplication.getUtr)
         .map: optBpr =>

@@ -41,21 +41,10 @@ class RemoveCompaniesHouseOfficerController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  private type DataWithIsIncorporated = IsIncorporated *: DataWithAuth
-
-  private type DataWithIndividual = IndividualProvidedDetails *: DataWithIsIncorporated
+  private type DataWithIndividual = IndividualProvidedDetails *: IsIncorporated *: DataWithAuth
 
   private def baseAction(individualProvidedDetailsId: IndividualProvidedDetailsId): ActionBuilderWithData[DataWithIndividual] = actions
-    .getApplicationInProgress
-    .refine:
-      implicit request =>
-        request.agentApplication match
-          case _: AgentApplication.IsNotIncorporated =>
-            logger.warn(
-              "NotIncorporated businesses do not have the number of key individuals determined by Companies House results, redirecting to task list for the correct links"
-            )
-            Redirect(AppRoutes.apply.TaskListController.show.url)
-          case aa: IsIncorporated => request.replace[AgentApplication, IsIncorporated](aa)
+    .getIncorporatedApplication
     .refine:
       implicit request =>
         individualProvideDetailsService

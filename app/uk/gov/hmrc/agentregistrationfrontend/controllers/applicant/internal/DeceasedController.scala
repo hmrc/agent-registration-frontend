@@ -74,7 +74,10 @@ extends FrontendController(mcc, actions):
                     if designatoryDetailsResponse.deceased
                     then CheckResult.Fail
                     else CheckResult.Pass
-              case None => Future.successful(CheckResult.Pass) // TODO - confirm this is correct
+              case None =>
+                // NINO is not available for this sole trader, so there is nothing to check against the deceased records.
+                // We treat this as a pass.
+                Future.successful(CheckResult.Pass)
 
           _ <- agentApplicationService
             .upsert(request.agentApplicationSoleTrader

@@ -72,7 +72,7 @@ extends RequestAwareLogging:
     playObjectStoreClient.uploadFromUrl(
       from = downloadUrl.toJavaUri.toURL,
       to = fileLocation,
-      retentionPeriod = RetentionPeriod.SixMonths, // TODO: how long do we need to keep these files?
+      retentionPeriod = RetentionPeriod.SixMonths,
       contentType = Some(mimeType),
       contentSha256 = Some(contentSha256)
     )

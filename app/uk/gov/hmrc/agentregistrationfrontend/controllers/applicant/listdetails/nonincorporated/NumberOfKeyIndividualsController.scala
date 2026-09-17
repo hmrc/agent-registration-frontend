@@ -19,7 +19,7 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.
 import com.softwaremill.quicklens.modify
 import play.api.mvc.*
 import uk.gov.hmrc.agentregistration.shared.*
-import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsAgentApplicationForDeclaringNumberOfKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsUnincorporatedPartnership
 import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
@@ -40,7 +40,7 @@ class NumberOfKeyIndividualsController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  type DataWithValidApplicationAndBpr = BusinessPartnerRecordResponse *: IsAgentApplicationForDeclaringNumberOfKeyIndividuals *: DataWithAuth
+  type DataWithValidApplicationAndBpr = BusinessPartnerRecordResponse *: IsUnincorporatedPartnership *: DataWithAuth
 
   private val baseAction: ActionBuilderWithData[
     DataWithValidApplicationAndBpr
@@ -58,12 +58,11 @@ extends FrontendController(mcc, actions):
           case _: AgentApplication.IsSoleTrader =>
             logger.warn("Sole traders cannot specify number of key individuals, redirecting to task list for the correct links")
             Redirect(AppRoutes.apply.TaskListController.show.url)
-          case aa: IsAgentApplicationForDeclaringNumberOfKeyIndividuals =>
-            request.replace[AgentApplication, IsAgentApplicationForDeclaringNumberOfKeyIndividuals](aa)
+          case aa: IsUnincorporatedPartnership => request.replace[AgentApplication, IsUnincorporatedPartnership](aa)
 
   def show: Action[AnyContent] = baseAction:
     implicit request =>
-      val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
+      val agentApplication: IsUnincorporatedPartnership = request.get
       Ok(numberOfKeyIndividualsPage(
         form = NumberOfKeyIndividualsForm.form
           .fill:
@@ -80,7 +79,7 @@ extends FrontendController(mcc, actions):
         resultToServeWhenFormHasErrors =
           implicit request =>
             formWithErrors =>
-              val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get[IsAgentApplicationForDeclaringNumberOfKeyIndividuals]
+              val agentApplication: IsUnincorporatedPartnership = request.get[IsUnincorporatedPartnership]
               numberOfKeyIndividualsPage(
                 form = formWithErrors,
                 entityName = request.get[BusinessPartnerRecordResponse].getEntityName,
@@ -89,7 +88,7 @@ extends FrontendController(mcc, actions):
       )
       .async:
         implicit request =>
-          val agentApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals = request.get
+          val agentApplication: IsUnincorporatedPartnership = request.get
           val numberOfRequiredKeyIndividuals: NumberOfRequiredKeyIndividuals = request.get[NumberOfRequiredKeyIndividuals]
 
           /** When zero key individuals (partners) has been specified then user must supply at least one other relevant individual, we infer Some(true) for
@@ -102,7 +101,7 @@ extends FrontendController(mcc, actions):
             else if agentApplication.hasOtherRelevantIndividuals.isDefined
             then agentApplication.hasOtherRelevantIndividuals
             else None
-          val updatedApplication: IsAgentApplicationForDeclaringNumberOfKeyIndividuals =
+          val updatedApplication: IsUnincorporatedPartnership =
             agentApplication match
               case application: AgentApplicationScottishPartnership =>
                 application

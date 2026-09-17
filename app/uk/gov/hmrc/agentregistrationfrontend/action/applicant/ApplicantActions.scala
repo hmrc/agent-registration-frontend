@@ -18,7 +18,10 @@ package uk.gov.hmrc.agentregistrationfrontend.action.applicant
 
 import play.api.mvc.*
 import play.api.mvc.Results.Redirect
+import uk.gov.hmrc.agentregistration.shared.*
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsUnincorporatedPartnership
+import uk.gov.hmrc.agentregistration.shared.AgentApplication.IsIncorporated
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedCompany
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLimitedPartnership
@@ -30,6 +33,9 @@ import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.GroupId
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.lists.FiveOrLessOfficers
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
+import uk.gov.hmrc.agentregistration.shared.lists.SixOrMoreOfficers
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix._10.IndividualDetailsFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
@@ -39,6 +45,9 @@ import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineFutureE
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineUnion
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuildersWithData
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.AbsentIn
+import uk.gov.hmrc.agentregistrationfrontend.util.UniqueTuple.PresentIn
 import uk.gov.hmrc.agentregistrationfrontend.audit.AuditService
 import uk.gov.hmrc.agentregistrationfrontend.controllers.AppRoutes
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
@@ -72,6 +81,8 @@ object ApplicantActions:
   type DataWithApplication = AgentApplication *: DataWithAuth
   type DataWithApplicationAndBpr = BusinessPartnerRecordResponse *: DataWithApplication
   type DataWithSoleTraderIdentityFix = IndividualDetailsFix *: RiskingOutcomeApplication.FailedFixable *: IndividualProvidedDetails *: DataWithApplicationAndBpr
+  type DataWithUnincorporatedPartnershipKeyIndividuals =
+    List[IndividualProvidedDetails] *: NumberOfRequiredKeyIndividuals *: IsUnincorporatedPartnership *: DataWithAuth
 
 @Singleton
 class ApplicantActions @Inject() (
@@ -143,8 +154,7 @@ extends RequestAwareLogging:
         condition = _.agentApplication.isAfterSentForRisking,
         resultWhenConditionNotMet =
           implicit request =>
-            // TODO: this is a temporary solution and should be revisited once we have full journey implemented
-            val call = AppRoutes.apply.AgentApplicationController.landing // or task list
+            val call: Call = AppRoutes.apply.AgentApplicationController.landing
             logger.warn(
               s"The application is not in the final state" +
                 s" (current application state: ${request.agentApplication.applicationState.toString}), " +
@@ -159,6 +169,45 @@ extends RequestAwareLogging:
       implicit request =>
         individualProvidedDetailsService.findAllByApplicationId(request.get[AgentApplication]._id).map: list =>
           request.add[List[IndividualProvidedDetails]](list)
+
+  def getIncorporatedApplication: ActionBuilderWithData[IsIncorporated *: DataWithAuth] =
+    getApplicationInProgress
+      .narrowToIncorporated
+
+  def getIncorporatedApplicationAndBpr: ActionBuilderWithData[BusinessPartnerRecordResponse *: IsIncorporated *: DataWithAuth] =
+    getApplicationInProgress
+      .getBusinessPartnerRecord
+      .narrowToIncorporated
+
+  def getKeyIndividualsForUnincorporatedPartnership: ActionBuilderWithData[DataWithUnincorporatedPartnershipKeyIndividuals] = getApplicationInProgress
+    .refine:
+      implicit request =>
+        request.get[AgentApplication] match
+          case _: IsIncorporated =>
+            logger.warn(
+              "Incorporated businesses should be name matching key individuals against Companies House results, redirecting to task list for the correct links"
+            )
+            Redirect(AppRoutes.apply.TaskListController.show.url)
+          case _: AgentApplicationSoleTrader =>
+            logger.warn("Sole traders do not add individuals to a list, redirecting to task list for the correct links")
+            Redirect(AppRoutes.apply.TaskListController.show.url)
+          case unincorporatedPartnership: IsUnincorporatedPartnership =>
+            request.replace[AgentApplication, IsUnincorporatedPartnership](unincorporatedPartnership)
+    .refine:
+      implicit request =>
+        request.get[IsUnincorporatedPartnership].getNumberOfRequiredKeyIndividuals match
+          case Some(numberOfRequiredKeyIndividuals: NumberOfRequiredKeyIndividuals) =>
+            request.add[NumberOfRequiredKeyIndividuals](numberOfRequiredKeyIndividuals)
+          case None =>
+            logger.warn(
+              "Number of required key individuals not specified in application, redirecting to number of key individuals page"
+            )
+            Redirect(AppRoutes.apply.listdetails.nonincorporated.NumberOfKeyIndividualsController.show.url)
+    .refine:
+      implicit request =>
+        individualProvidedDetailsService
+          .findAllKeyIndividualsByApplicationId(request.get[IsUnincorporatedPartnership].agentApplicationId)
+          .map(request.add[List[IndividualProvidedDetails]])
 
   val getSoleTraderIdentityFix: ActionBuilderWithData[DataWithSoleTraderIdentityFix] = getApplicationAfterSentForRisking
     .refine:
@@ -200,6 +249,56 @@ extends RequestAwareLogging:
           .getBusinessPartnerRecord(request.get[AgentApplication].getUtr)
           .map(_.getOrThrowExpectedDataMissing(s"Business Partner Record for UTR ${request.get[AgentApplication].getUtr.value}"))
           .map(request.add)
+
+  extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
+
+    inline def narrowToIncorporated(using
+      AgentApplication PresentIn Data,
+      IsIncorporated AbsentIn Data
+    ): ActionBuilderWithData[UniqueTuple.Replace[
+      AgentApplication,
+      IsIncorporated,
+      Data
+    ]] = ab.refine:
+      implicit request =>
+        request.get[AgentApplication] match
+          case _: AgentApplication.IsNotIncorporated =>
+            logger.warn(
+              "NotIncorporated businesses do not have the number of key individuals determined by Companies House results, redirecting to task list for the correct links"
+            )
+            Redirect(AppRoutes.apply.TaskListController.show.url)
+          case incorporated: IsIncorporated => request.replace[AgentApplication, IsIncorporated](incorporated)
+
+  extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
+
+    /** The key individuals named on the application so far, without the other relevant individuals. */
+    inline def getCompaniesHouseKeyIndividuals(using
+      IsIncorporated PresentIn Data,
+      List[IndividualProvidedDetails] AbsentIn Data
+    ): ActionBuilderWithData[List[IndividualProvidedDetails] *: Data] = ab.refine:
+      implicit request =>
+        individualProvidedDetailsService
+          .findAllKeyIndividualsByApplicationId(request.get[IsIncorporated].agentApplicationId)
+          .map(request.add[List[IndividualProvidedDetails]])
+
+  extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
+
+    /** The declared number of officers, for the pages that only exist when the company has six or more of them. `redirectWhenFiveOrLess` is where an
+      * application with five or fewer officers belongs instead.
+      */
+    inline def getSixOrMoreOfficers(redirectWhenFiveOrLess: Call)(using
+      IsIncorporated PresentIn Data,
+      SixOrMoreOfficers AbsentIn Data
+    ): ActionBuilderWithData[SixOrMoreOfficers *: Data] = ab.refine:
+      implicit request =>
+        request.get[IsIncorporated].getNumberOfCompaniesHouseOfficers match
+          case Some(sixOrMoreOfficers: SixOrMoreOfficers) => request.add[SixOrMoreOfficers](sixOrMoreOfficers)
+          case Some(_: FiveOrLessOfficers) =>
+            logger.debug("Number of required key individuals is five or less, redirecting away from the six or more pages")
+            Redirect(redirectWhenFiveOrLess.url)
+          case None =>
+            logger.debug("Number of required key individuals not specified in application, redirecting to Companies House officers page")
+            Redirect(AppRoutes.apply.listdetails.incoporated.CompaniesHouseOfficersController.show.url)
 
   extension [Data <: Tuple](ab: ActionBuilderWithData[Data])
 
