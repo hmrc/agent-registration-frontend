@@ -30,6 +30,7 @@
 @import java.time.Instant
 @import java.time.ZoneId
 @import java.time.format.DateTimeFormatter
+@import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 @this(
         govukSummaryList: GovukSummaryList,
@@ -174,7 +175,7 @@
     @compactLink(
         label = "Log in as individual",
         url = AppRoutes.testOnly.TestOnlyController.findOrCreateAndLogInIndividual(
-            UserId.make(individual.individualProvidedDetailsId), PlanetId.make(individual.agentApplicationId), individual.individualName.value, redirectUrlWithAnchor
+            UserId.make(individual.individualProvidedDetailsId), PlanetId.make(individual.agentApplicationId), individual.individualName.value, RedirectUrl(redirectUrlWithAnchor)
         )
     )
 }
@@ -184,7 +185,7 @@
     @if(showIndividualActionLinks) {
         <p class="govuk-hint govuk-!-margin-bottom-2">Emulate uploading risking results from Minerva</p>
         <p class="govuk-body govuk-!-margin-bottom-1">
-            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference, individualCurrentFilename, redirectUrlWithAnchor)">Choose individual failures</a>
+            <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectIndividualFailures(individual.personReference, individualCurrentFilename)">Choose individual failures</a>
             or just quickly
             <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresApproved(individual.personReference, individualCurrentFilename)">approve</a>,
             <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitIndividualFailuresFixable(individual.personReference, individualCurrentFilename)">fail-fixable</a>,

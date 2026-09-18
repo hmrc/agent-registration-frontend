@@ -47,6 +47,8 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.RiskingActionCo
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectEntityFailuresPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SelectIndividualFailuresPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.SubmittedRiskingResultsFilesPage
+import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.validateRedirectUrl
+import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -83,7 +85,7 @@ extends FrontendControllerBase(mcc):
   def findAndLogInApplicant(
     userId: UserId,
     planetId: PlanetId,
-    redirectUrl: String
+    redirectUrl: RedirectUrl
   ): Action[AnyContent] = action
     .async:
       implicit request =>
@@ -92,13 +94,13 @@ extends FrontendControllerBase(mcc):
         for
           user <- stubUserService.findUser(userId, planetId).map(_.getOrThrowExpectedDataMissing("user"))
           loginResponse <- stubUserService.signIn(user)
-        yield Redirect(redirectUrl).addToSession(loginResponse)
+        yield Redirect(validateRedirectUrl(redirectUrl, appConfig.allowedRedirectHosts)).addToSession(loginResponse)
 
   def findOrCreateAndLogInIndividual(
     userId: UserId,
     planetId: PlanetId,
     individualName: String,
-    redirectUrl: String
+    redirectUrl: RedirectUrl
   ): Action[AnyContent] = action
     .async:
       implicit request =>
@@ -115,7 +117,7 @@ extends FrontendControllerBase(mcc):
                   individualName
                 )
           loginResponse <- stubUserService.signIn(user)
-        yield Redirect(redirectUrl).addToSession(loginResponse)
+        yield Redirect(validateRedirectUrl(redirectUrl, appConfig.allowedRedirectHosts)).addToSession(loginResponse)
 
   def showResetDatabaseConfirmation: Action[AnyContent] = action:
     implicit request =>
@@ -160,10 +162,10 @@ extends FrontendControllerBase(mcc):
   /** Same underlying action as `runRisking`, but for the quick-nav link: redirects back to the page the user was on instead of showing the confirmation page,
     * so it can be used as a one-click action from anywhere in the test-only tooling.
     */
-  def runRiskingAndRedirect(redirectUrl: String): Action[AnyContent] = action.async:
+  def runRiskingAndRedirect(redirectUrl: RedirectUrl): Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.runRisking().map: _ =>
-        Redirect(redirectUrl)
+        Redirect(validateRedirectUrl(redirectUrl, appConfig.allowedRedirectHosts))
 
   def runResultsFileProcessing: Action[AnyContent] = action.async:
     implicit request =>
@@ -181,10 +183,10 @@ extends FrontendControllerBase(mcc):
   /** Same underlying action as `runResultsFileProcessing`, but for the quick-nav link: redirects back to the page the user was on instead of showing the
     * confirmation page, so it can be used as a one-click action from anywhere in the test-only tooling.
     */
-  def runResultsFileProcessingAndRedirect(redirectUrl: String): Action[AnyContent] = action.async:
+  def runResultsFileProcessingAndRedirect(redirectUrl: RedirectUrl): Action[AnyContent] = action.async:
     implicit request =>
       testRiskingService.runResultsFileProcessing().map: _ =>
-        Redirect(redirectUrl)
+        Redirect(validateRedirectUrl(redirectUrl, appConfig.allowedRedirectHosts))
 
   def viewNextRiskingFileContents: Action[AnyContent] = action.async:
     implicit request =>
@@ -224,14 +226,14 @@ extends FrontendControllerBase(mcc):
   def showSelectEntityFailures(
     applicationReference: ApplicationReference,
     fileName: RiskingResultsFilename,
-    redirectUrl: String
+    backLinkUrl: String
   ): Action[AnyContent] =
     getApplication(applicationReference):
       implicit request =>
         Ok(selectEntityFailuresPage(
           applicationReference,
           fileName,
-          redirectUrl,
+          backLinkUrl,
           SelectEntityFailuresForm(request.agentApplication)
         ))
 
@@ -359,14 +361,12 @@ extends FrontendControllerBase(mcc):
 
   def showSelectIndividualFailures(
     personReference: PersonReference,
-    fileName: RiskingResultsFilename,
-    redirectUrl: String
+    fileName: RiskingResultsFilename
   ): Action[AnyContent] = action:
     implicit request =>
       Ok(selectIndividualFailuresPage(
         personReference,
         fileName,
-        redirectUrl,
         SelectIndividualFailuresForm.form
       ))
 
@@ -379,13 +379,13 @@ extends FrontendControllerBase(mcc):
         .bindFromRequest()
         .fold(
           formWithErrors =>
-            applicationReferenceFor(personReference).map: applicationReference =>
+            Future.successful(
               BadRequest(selectIndividualFailuresPage(
                 personReference,
                 fileName,
-                applicationDetailsUrl(applicationReference),
                 formWithErrors
-              )),
+              ))
+            ),
           failures =>
             // Uploaded or AlreadyExists — either way, the results file exists now, so just go back to the application details page.
             testRiskingService.submitIndividualFailures(
