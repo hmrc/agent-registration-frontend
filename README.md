@@ -26,12 +26,12 @@ testOnlyDoNotUseInAppConf.routes and exist to make local testing possible.
 
 ## Documentation
 
-- [Individuals on an application](individuals.md) - how key individuals and other relevant individuals are created,
-  with a page per business type: [sole trader](individuals-sole-trader.md),
-  [incorporated business](individuals-incorporated.md), [partnership](individuals-partnership.md)
-- [Glossary](glossary.md) - domain terms used across these documents
-- [Individual journey](individual-journey.md) - how an individual signs in and is matched to their record
-- [AMLS evidence upload](upscan-mermaid.md) - the upscan flow for AMLS evidence files
+- [Individuals on an application](docs/individuals.md) - how key individuals and other relevant individuals are created,
+  with a page per business type: [sole trader](docs/individuals-sole-trader.md),
+  [incorporated business](docs/individuals-incorporated.md), [partnership](docs/individuals-partnership.md)
+- [Glossary](docs/glossary.md) - domain terms used across these documents
+- [Individual journey](docs/individual-journey.md) - how an individual signs in and is matched to their record
+- [AMLS evidence upload](docs/upscan-mermaid.md) - the upscan flow for AMLS evidence files
 
 # Running the Service
 
