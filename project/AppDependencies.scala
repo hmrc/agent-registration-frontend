@@ -6,11 +6,11 @@ import sbt._
 object AppDependencies {
 
   private val bootstrapVersion = "10.8.0"
-  private val hmrcMongoVersion = "2.13.0"
+  private val hmrcMongoVersion = "2.14.0"
 
   val compile: Seq[ModuleID] = Seq(
     "uk.gov.hmrc" %% "bootstrap-frontend-play-30" % bootstrapVersion,
-    "uk.gov.hmrc" %% "play-frontend-hmrc-play-30" % "13.13.0",
+    "uk.gov.hmrc" %% "play-frontend-hmrc-play-30" % "13.14.0",
     "uk.gov.hmrc.mongo" %% "hmrc-mongo-play-30" % hmrcMongoVersion,
     "com.softwaremill.quicklens" %% "quicklens" % "1.9.15", // Updated for Scala 3 compatibility
     "uk.gov.hmrc" %% "play-conditional-form-mapping-play-30" % "3.5.0",

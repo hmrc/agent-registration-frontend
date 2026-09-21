@@ -14,8 +14,6 @@
  * limitations under the License.
  *@
 
-@import play.api.i18n.Messages
-@import play.twirl.api.Html
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistration.shared.ApplicationState
 @import uk.gov.hmrc.agentregistration.shared.BusinessType
@@ -23,11 +21,13 @@
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
+@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsFilename
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestRiskingResultsFilename
 @import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UserId
-@import uk.gov.hmrc.agentregistrationfrontend.testonly.model.PlanetId
 @import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate
+@import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
+
 @import java.time.Instant
 @import java.time.ZoneId
 @import java.time.format.DateTimeFormatter
@@ -297,7 +297,7 @@
             <dd class="govuk-summary-list__value">
                 @compactLink(
                     label = "Log in as applicant",
-                    url = AppRoutes.testOnly.TestOnlyController.findAndLogInApplicant(UserId.make(agentApplication.agentApplicationId), PlanetId.make(agentApplication.agentApplicationId), redirectUrlWithAnchor)
+                    url = AppRoutes.testOnly.TestOnlyController.findAndLogInApplicant(UserId.make(agentApplication.agentApplicationId), PlanetId.make(agentApplication.agentApplicationId), RedirectUrl(redirectUrlWithAnchor))
                 )
             </dd>
         </div>
@@ -307,7 +307,7 @@
                 @if(showEntityActionLinks) {
                     <p class="govuk-hint govuk-!-margin-bottom-2">Emulate uploading risking results from Minerva</p>
                     <p class="govuk-body govuk-!-margin-bottom-1">
-                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference, entityCurrentFilename, redirectUrlWithAnchor)">Choose entity failures</a>
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference, entityCurrentFilename, RedirectUrl(redirectUrlWithAnchor))">Choose entity failures</a>
                         or just quickly
                         <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresApproved(agentApplication.applicationReference, entityCurrentFilename)">approve</a>,
                         <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresFixable(agentApplication.applicationReference, entityCurrentFilename)">fail-fixable</a>,
