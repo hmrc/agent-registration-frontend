@@ -1427,7 +1427,7 @@ failedNonFixable.decision.h2 = Failure to meet the registration conditions
 failedNonFixable.decision.p1 = {0} will not be given an agent services account on this occasion.
 failedNonFixable.decision.p2 = The application will be deleted 45 days after the date we emailed you about this outcome, to comply with our data retention policy.
 failedNonFixable.appeal.h2 = What to do if you disagree
-failedNonFixable.appeal.li1 = If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can apply again.
+failedNonFixable.appeal.li1 = If the information in your application was incorrect, or your circumstances change and you think you now meet the registration conditions, you can <a class="govuk-link" href="{0}">delete this application and apply again</a>.
 failedNonFixable.appeal.li2 = If you disagree with the outcome, you can <a class="govuk-link" href="{0}" target="_blank" rel="noopener noreferrer">request a review or appeal the decision (opens in a new tab)</a>.
 
 # List for individual fixable failures
@@ -1855,3 +1855,14 @@ soleTraderHasNoSaUtr.p1 = You need to be registered for Self Assessment and have
 soleTraderHasNoSaUtr.p2 = If you already have a UTR, you can provide it by <a href="{0}" class="govuk-link">confirming your business details again</a>.
 soleTraderHasNoSaUtr.p3 = If you are registered for Self Assessment, you can <a href="{0}" class="govuk-link">get help to find your UTR here</a>.
 soleTraderHasNoSaUtr.p4 = Alternatively you can <a href="{0}" class="govuk-link">contact HMRC</a>.
+
+# Applicant deletes application to start again after decision
+confirmDeleteDecisionAndStartAgain.title = Delete your application
+confirmDeleteDecisionAndStartAgain.p1 = This action will happen immediately. You will no longer be able to access details about your current application, including our decision.
+confirmDeleteDecisionAndStartAgain.p2 = You can choose to start a new application when you are ready.
+confirmDeleteDecisionAndStartAgain.p3 = HMRC carries out checks against all applications and any relevant individuals.
+
+confirmationOfDeletion.title = We have deleted your application
+confirmationOfDeletion.whatNext.h2 = What happens next
+confirmationOfDeletion.whatNext.p1 = If you want to apply for an agent services account again, you can <a class="govuk-link" href="{0}">start a new application</a>.
+

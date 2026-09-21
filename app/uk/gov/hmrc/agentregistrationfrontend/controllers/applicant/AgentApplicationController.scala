@@ -34,6 +34,7 @@ import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.isSoleTraderOwner
+import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 import uk.gov.hmrc.agentregistrationfrontend.views.html.SimplePage
@@ -43,6 +44,7 @@ import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.FailedFixableS
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.FailedNonFixablePage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.InProgressPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ViewApplicationPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.ConfirmationOfDeletionPage
 
 import java.time.Instant
 import java.time.LocalDate
@@ -64,7 +66,9 @@ class AgentApplicationController @Inject() (
   failedFixableStartPage: FailedFixableStartPage,
   viewApplicationPage: ViewApplicationPage,
   appConfig: AppConfig,
-  individualProvideDetailsService: IndividualProvideDetailsService
+  individualProvideDetailsService: IndividualProvideDetailsService,
+  agentApplicationService: AgentApplicationService,
+  confirmationOfDeletionPage: ConfirmationOfDeletionPage
 )
 extends FrontendController(mcc, actions):
 
@@ -98,6 +102,24 @@ extends FrontendController(mcc, actions):
     implicit request =>
       // if we use an endpoint like this, we can later change the flow without changing the URL
       Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show)
+
+  def applicationDeleted: Action[AnyContent] =
+    actions.authorised
+      .ensure(
+        condition =
+          implicit request =>
+            agentApplicationService
+              .find()
+              .map:
+                case Some(_) => false
+                case None => true,
+        resultWhenConditionNotMet =
+          implicit request =>
+            logger.info("User with an application tried to access the application deleted page")
+            Redirect(AppRoutes.apply.AgentApplicationController.landing)
+      ):
+        implicit request =>
+          Ok(confirmationOfDeletionPage())
 
   def genericExitPage: Action[AnyContent] = actions.action:
     implicit request =>

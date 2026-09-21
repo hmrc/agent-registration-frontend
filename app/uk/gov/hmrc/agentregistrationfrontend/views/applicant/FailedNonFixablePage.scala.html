@@ -128,7 +128,7 @@
   <p class="govuk-body">@messages(s"$key.decision.p2")</p>
   <h2 class="govuk-heading-m">@messages(s"$key.appeal.h2")</h2>
   <ul class="govuk-list govuk-list--bullet">
-    <li>@messages(s"$key.appeal.li1")</li>
+    <li>@Html(messages(s"$key.appeal.li1", AppRoutes.apply.ConfirmDeleteAndStartAgainController.show.url))</li>
     <li>@Html(messages(s"$key.appeal.li2", appConfig.guidanceForFailedApplicationAppealsUrl))</li>
   </ul>
 
