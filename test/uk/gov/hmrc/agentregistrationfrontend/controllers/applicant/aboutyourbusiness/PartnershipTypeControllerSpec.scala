@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness
 
+import org.jsoup.nodes.Document
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.BusinessType
@@ -85,4 +86,6 @@ extends ControllerSpec:
       )(Map(PartnershipTypeForm.key -> Seq("")))
 
     response.status shouldBe Status.BAD_REQUEST
-    response.parseBodyAsJsoupDocument.title() shouldBe "Error: What type of partnership? - Apply for an agent services account - GOV.UK"
+    val doc: Document = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "Error: What type of partnership? - Apply for an agent services account - GOV.UK"
+    doc.mainContent.select(s"#${PartnershipTypeForm.key}-error").text() shouldBe "Error: Tell us what type of partnership"

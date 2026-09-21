@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.agentdetails
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
+import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentEmailAddress
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions.DataWithApplication
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
@@ -94,12 +96,11 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render a form error when the form contains an error" in:
-      val field = AgentEmailAddressForm.key
-      val errorMessage = "Enter the email address for your agent services account"
-      val formWithError = AgentEmailAddressForm.form
-        .withError(field, errorMessage)
+      val errorMessage: String = "Enter the email address for your agent services account"
+      val formWithError: Form[AgentEmailAddress] = AgentEmailAddressForm.form
+        .bind(Map.empty[String, String])
       behavesLikePageWithErrorHandling(
-        field = field,
+        field = AgentEmailAddressForm.key,
         errorMessage = errorMessage,
         errorDoc = Jsoup.parse(viewTemplate(
           form = formWithError,

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness
 
+import org.jsoup.nodes.Document
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistrationfrontend.forms.UserRoleForm
@@ -62,7 +63,9 @@ extends ControllerSpec:
       )(Map(UserRoleForm.key -> Seq("")))
 
     response.status shouldBe Status.BAD_REQUEST
-    response.parseBodyAsJsoupDocument.title() shouldBe "Error: Are you the owner of the business? - Apply for an agent services account - GOV.UK"
+    val doc: Document = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "Error: Are you the owner of the business? - Apply for an agent services account - GOV.UK"
+    doc.mainContent.select(s"#${UserRoleForm.key}-error").text() shouldBe "Error: Select yes if you are the owner of the business"
 
   s"POST $path with valid selection should return 303 and redirect to type of sign in page when unauthenticated" in:
     val response: WSResponse =

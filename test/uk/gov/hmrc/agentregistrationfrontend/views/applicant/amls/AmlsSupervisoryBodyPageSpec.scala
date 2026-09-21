@@ -44,6 +44,8 @@ extends ViewSpec:
 
   private val heading: String = "What is the name of the supervisory body for Test Company?"
 
+  private val requiredError: String = "Enter a name and choose your supervisor from the list"
+
   "AmlsSupervisoryBodyPage view" should:
 
     "contain expected content" in:
@@ -90,10 +92,8 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render an error message when form has errors" in:
-      val field = "amlsSupervisoryBody"
-      val errorMessage = "Enter a name and choose your supervisor from the list"
-      // TODO: form is duplicated, not really testing that such form with this particular error will be used in controller
-      val formWithError = form.withError(field, errorMessage)
+      // bind the empty selection the applicant can submit, so the error comes from the form the controller uses
+      val formWithError: Form[AmlsSupervisoryBodyCode] = form.bind(Map(AmlsCodeForm.key -> ""))
       val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError, "Test Company").body)
       errorDoc.mainContent shouldContainContent
         """
@@ -111,8 +111,8 @@ extends ViewSpec:
           |""".stripMargin
 
       behavesLikePageWithErrorHandling(
-        field = field,
-        errorMessage = errorMessage,
+        field = AmlsCodeForm.key,
+        errorMessage = requiredError,
         errorDoc = errorDoc,
         heading = heading
       )

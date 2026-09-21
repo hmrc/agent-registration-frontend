@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.provid
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
+import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedSaUtr
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.providedbyapplicant.SaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
@@ -88,12 +90,14 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render the form error correctly when the form contains an error" in:
-      val field = SaUtrForm.saUtrKey
-      val errorMessage = "Enter their National Insurance number"
-      val formWithError = SaUtrForm.form
-        .withError(field, errorMessage)
+      val errorMessage: String = "Enter the Self Assessment Unique Taxpayer Reference"
+      val formWithError: Form[UserProvidedSaUtr] = SaUtrForm.form
+        .bind(Map(
+          SaUtrForm.hasSaUtrKey -> YesNo.Yes.toString,
+          SaUtrForm.saUtrKey -> ""
+        ))
       behavesLikePageWithErrorHandling(
-        field = field,
+        field = SaUtrForm.saUtrKey,
         errorMessage = errorMessage,
         errorDoc = Jsoup.parse(viewTemplate(formWithError, applicantProvidedDetails.individualName).body),
         heading = heading

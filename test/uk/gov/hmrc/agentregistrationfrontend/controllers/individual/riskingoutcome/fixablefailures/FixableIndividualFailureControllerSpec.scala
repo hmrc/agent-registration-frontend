@@ -151,6 +151,7 @@ extends ControllerSpec:
         )
         val response: WSResponse = post(pathForFailureCode(individualFixCode))(Map(ConfirmFixForm.key -> Seq("")))
 
+        response.status shouldBe Status.BAD_REQUEST
         val doc = response.parseBodyAsJsoupDocument
         doc.title() shouldBe s"Error: $individualFixHeading - Apply for an agent services account - GOV.UK"
         doc.mainContent.select(

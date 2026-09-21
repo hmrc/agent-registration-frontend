@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
+import uk.gov.hmrc.agentregistration.shared.EmailAddress
 
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualEmailAddressForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -58,12 +60,11 @@ extends ViewSpec:
         .text() shouldBe "Save and continue"
 
     "render the form error correctly when the form contains an error" in:
-      val field = IndividualEmailAddressForm.key
-      val errorMessage = "Enter your email address"
-      val formWithError = IndividualEmailAddressForm.form
-        .withError(field, errorMessage)
+      val errorMessage: String = "Enter your email address"
+      val formWithError: Form[EmailAddress] = IndividualEmailAddressForm.form
+        .bind(Map(IndividualEmailAddressForm.key -> ""))
       behavesLikePageWithErrorHandling(
-        field = field,
+        field = IndividualEmailAddressForm.key,
         errorMessage = errorMessage,
         errorDoc = Jsoup.parse(viewTemplate(formWithError, linkId).body),
         heading = heading

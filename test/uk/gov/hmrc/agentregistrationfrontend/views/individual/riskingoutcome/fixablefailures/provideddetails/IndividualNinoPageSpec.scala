@@ -18,7 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.views.individual.riskingoutcome.fi
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.LinkId
+import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedNino
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -61,12 +63,14 @@ extends ViewSpec:
       .attr("href") shouldBe s"${AppRoutes.providedetails.riskingoutcome.fixablefailures.SaveForLaterController.show(tdAll.linkId).url}"
 
   "render the form error correctly when the form contains an error" in:
-    val field = IndividualNinoForm.ninoKey
-    val errorMessage = "Enter your National Insurance number"
-    val formWithError = IndividualNinoForm.form
-      .withError(field, errorMessage)
+    val errorMessage: String = "Enter your National Insurance number"
+    val formWithError: Form[UserProvidedNino] = IndividualNinoForm.form
+      .bind(Map(
+        IndividualNinoForm.hasNinoKey -> YesNo.Yes.toString,
+        IndividualNinoForm.ninoKey -> ""
+      ))
     behavesLikePageWithErrorHandling(
-      field = field,
+      field = IndividualNinoForm.ninoKey,
       errorMessage = errorMessage,
       errorDoc = Jsoup.parse(viewTemplate(formWithError, linkId).body),
       heading = heading

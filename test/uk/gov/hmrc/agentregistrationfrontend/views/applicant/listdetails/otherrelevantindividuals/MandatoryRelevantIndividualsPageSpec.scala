@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.otherr
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.forms.OtherRelevantIndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -80,13 +82,13 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render a form error when the form contains an error" in:
-      val field = OtherRelevantIndividualNameForm.key
-      val errorMessage = "Enter the full name of the person"
-
-      val formWithError = OtherRelevantIndividualNameForm.form.withError(field, errorMessage)
+      val errorMessage: String = "Enter the full name of the person"
+      val formWithError: Form[IndividualName] = OtherRelevantIndividualNameForm
+        .form
+        .bind(Map(OtherRelevantIndividualNameForm.key -> ""))
 
       behavesLikePageWithErrorHandling(
-        field = field,
+        field = OtherRelevantIndividualNameForm.key,
         errorMessage = errorMessage,
         errorDoc = Jsoup.parse(viewTemplate(
           form = formWithError,

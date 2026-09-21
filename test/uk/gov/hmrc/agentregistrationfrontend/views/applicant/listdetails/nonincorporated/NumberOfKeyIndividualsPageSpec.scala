@@ -18,7 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.noninc
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.lists.NumberOfRequiredKeyIndividuals
 import uk.gov.hmrc.agentregistrationfrontend.forms.NumberOfKeyIndividualsForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -91,12 +93,12 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render a form error when the form contains an error" in:
-      val field = NumberOfKeyIndividualsForm.howManyIndividualsOption
-      val errorMessage = "Select how many partners there are"
-      val formWithError = NumberOfKeyIndividualsForm.form
-        .withError(field, errorMessage)
+      val errorMessage: String = "Select how many partners there are"
+      val formWithError: Form[NumberOfRequiredKeyIndividuals] = NumberOfKeyIndividualsForm
+        .form
+        .bind(Map.empty[String, String])
       behavesLikePageWithErrorHandling(
-        field = field,
+        field = NumberOfKeyIndividualsForm.howManyIndividualsOption,
         errorMessage = errorMessage,
         errorDoc = Jsoup.parse(viewTemplate(
           form = formWithError,

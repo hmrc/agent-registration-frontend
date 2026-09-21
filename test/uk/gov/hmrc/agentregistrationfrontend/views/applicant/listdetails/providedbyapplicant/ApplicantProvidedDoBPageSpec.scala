@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.provid
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
+import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedDateOfBirth
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualDateOfBirthForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.providedbyapplicant.ApplicantProvidedDoBForm
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
@@ -76,9 +78,8 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render a form errors correctly when the form contains an error" in:
-      val field = ApplicantProvidedDoBForm.key
-      val errorMessage = messages("applicant-provided.date-of-birth.error.required")
-      val formWithError = ApplicantProvidedDoBForm.form.withError(ApplicantProvidedDoBForm.key, errorMessage)
+      val errorMessage: String = messages("applicant-provided.date-of-birth.error.required")
+      val formWithError: Form[UserProvidedDateOfBirth] = ApplicantProvidedDoBForm.form.bind(Map.empty[String, String])
 
       val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError, Some(name)).body)
 
@@ -100,7 +101,7 @@ extends ViewSpec:
           |""".stripMargin
 
       behavesLikePageWithErrorHandling(
-        field = field,
+        field = ApplicantProvidedDoBForm.key,
         errorMessage = errorMessage,
         errorDoc = errorDoc,
         heading = heading,

@@ -18,12 +18,14 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.provid
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
+import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedNino
+import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.providedbyapplicant.ApplicantProvidedNinoForm
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.listdetails.providedbyapplicant.ApplicantProvidedNinoPage
-import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 
 class ApplicantProvidedNinoPageSpec
 extends ViewSpec:
@@ -88,12 +90,14 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render the form error correctly when the form contains an error" in:
-      val field = ApplicantProvidedNinoForm.ninoKey
-      val errorMessage = "Enter their National Insurance number"
-      val formWithError = ApplicantProvidedNinoForm.form
-        .withError(field, errorMessage)
+      val errorMessage: String = "Enter their National Insurance number"
+      val formWithError: Form[UserProvidedNino] = ApplicantProvidedNinoForm.form
+        .bind(Map(
+          ApplicantProvidedNinoForm.hasNino -> YesNo.Yes.toString,
+          ApplicantProvidedNinoForm.ninoKey -> ""
+        ))
       behavesLikePageWithErrorHandling(
-        field = field,
+        field = ApplicantProvidedNinoForm.ninoKey,
         errorMessage = errorMessage,
         errorDoc = Jsoup.parse(viewTemplate(formWithError, Some(applicantProvidedDetails.individualName.value)).body),
         heading = heading

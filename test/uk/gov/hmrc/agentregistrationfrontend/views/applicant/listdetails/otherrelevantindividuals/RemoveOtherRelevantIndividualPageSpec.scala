@@ -18,7 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.otherr
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
 import uk.gov.hmrc.agentregistrationfrontend.forms.RemoveKeyIndividualForm
+import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -75,12 +77,11 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render a form error when the form contains an error" in:
-      val field = RemoveKeyIndividualForm.key
-      val errorMessage = "Select yes if you want to remove Test Name from the list of relevant individuals"
-      val formWithError = RemoveKeyIndividualForm.form(tdAll.providedDetails.precreated.individualName.value)
-        .withError(field, errorMessage)
+      val errorMessage: String = "Select yes if you want to remove Test Name from the list"
+      val formWithError: Form[YesNo] = RemoveKeyIndividualForm.form(tdAll.providedDetails.precreated.individualName.value)
+        .bind(Map.empty[String, String])
       behavesLikePageWithErrorHandling(
-        field = field,
+        field = RemoveKeyIndividualForm.key,
         errorMessage = errorMessage,
         errorDoc = Jsoup.parse(viewTemplate(
           form = formWithError,

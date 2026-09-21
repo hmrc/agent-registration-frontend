@@ -142,6 +142,7 @@ extends ControllerSpec:
         ApplyStubHelper.stubsToSupplyBprToPage(application = application)
         val response: WSResponse = post(pathForFailureCode(entityFixCode))(Map(ConfirmFixForm.key -> Seq("")))
 
+        response.status shouldBe Status.BAD_REQUEST
         val doc = response.parseBodyAsJsoupDocument
         doc.title() shouldBe s"Error: $entityFixHeading - Apply for an agent services account - GOV.UK"
         doc.mainContent.select(

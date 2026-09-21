@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmMatchToIndividualProvidedDetailsForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
@@ -65,12 +66,11 @@ extends ViewSpec:
       .text() shouldBe "Save and continue"
 
   "render the form error correctly when the form contains an error" in:
-    val field = ConfirmMatchToIndividualProvidedDetailsForm.key
-    val errorMessage = "Select yes if these are your details"
-    val formWithError = ConfirmMatchToIndividualProvidedDetailsForm.form
-      .withError(field, errorMessage)
+    val errorMessage: String = "Select yes if these details are correct"
+    val formWithError: Form[YesNo] = ConfirmMatchToIndividualProvidedDetailsForm.form
+      .bind(Map.empty[String, String])
     behavesLikePageWithErrorHandling(
-      field = field,
+      field = ConfirmMatchToIndividualProvidedDetailsForm.key,
       errorMessage = errorMessage,
       errorDoc = Jsoup.parse(viewTemplate(
         form = formWithError,

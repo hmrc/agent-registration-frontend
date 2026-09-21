@@ -19,6 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.noninc
 import com.softwaremill.quicklens.modify
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistration.shared.lists.SixOrMore
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualNameForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
@@ -155,12 +157,11 @@ extends ViewSpec:
           .text() shouldBe "Save and come back later"
 
       s"render a form error when the form contains an error for $n individuals using ordinal key '${testCase.ordinalKey}'" in:
-        val field = IndividualNameForm.key
-        val errorMessage = "Enter the full name of the partner"
-        val formWithError = IndividualNameForm.form
-          .withError(field, errorMessage)
+        val errorMessage: String = "Enter the full name of the partner"
+        val formWithError: Form[IndividualName] = IndividualNameForm.form
+          .bind(Map.empty[String, String])
         behavesLikePageWithErrorHandling(
-          field = field,
+          field = IndividualNameForm.key,
           errorMessage = errorMessage,
           errorDoc = Jsoup.parse(viewTemplate(
             form = formWithError,
