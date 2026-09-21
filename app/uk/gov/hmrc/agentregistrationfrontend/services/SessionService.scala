@@ -39,6 +39,7 @@ object SessionService:
   private val agentApplicationId: String = s"$microserviceName.agentApplicationId"
   private val userRoleKey: String = s"$microserviceName.userRole"
   private val individualNameKey: String = s"$microserviceName.individualName"
+  private val hasDeletedApplication: String = s"$microserviceName.hasDeletedApplication"
 
   extension (r: Result)
 
@@ -51,6 +52,7 @@ object SessionService:
     def removePartnershipTypeFromSession(using request: RequestHeader): Result = r.removingFromSession(partnershipTypeKey)
 
     def addToSession(in: IndividualName)(using request: RequestHeader): Result = r.addingToSession(individualNameKey -> in.value)
+    def addToSession(hasDeleted: Boolean)(using request: RequestHeader): Result = r.addingToSession(hasDeletedApplication -> hasDeleted.toString)
 
   extension (r: Request[?])
 
@@ -109,3 +111,5 @@ object SessionService:
 
     def readIndividualName: Option[IndividualName] = r.session.get(individualNameKey)
       .map(name => IndividualName(name))
+
+    def readHasDeletedApplication: Option[Boolean] = r.session.get(hasDeletedApplication).map(_.toBoolean)

@@ -69,4 +69,11 @@
   <p class="govuk-body">@messages(s"$key.appeal.p1")</p>
   <p class="govuk-body">@Html(messages(s"$key.appeal.p2", appConfig.guidanceForFailedApplicationAppealsUrl))</p>
   <p class="govuk-body">@messages(s"$key.appeal.p3")</p>
+  <p class="govuk-body">
+    @govukButton(Button(
+      href = Some(AppRoutes.apply.ConfirmDeleteAndStartAgainController.show.url),
+      content = Text(messages(s"$key.deleteAndStartAgainButton")),
+      classes = "govuk-button--secondary"
+    ))
+  </p>
 }
