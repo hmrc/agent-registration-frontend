@@ -307,7 +307,7 @@
                 @if(showEntityActionLinks) {
                     <p class="govuk-hint govuk-!-margin-bottom-2">Emulate uploading risking results from Minerva</p>
                     <p class="govuk-body govuk-!-margin-bottom-1">
-                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference, entityCurrentFilename, redirectUrlWithAnchor)">Choose entity failures</a>
+                        <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.showSelectEntityFailures(agentApplication.applicationReference, entityCurrentFilename, RedirectUrl(redirectUrlWithAnchor))">Choose entity failures</a>
                         or just quickly
                         <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresApproved(agentApplication.applicationReference, entityCurrentFilename)">approve</a>,
                         <a class="govuk-link" href="@AppRoutes.testOnly.TestOnlyController.submitEntityFailuresFixable(agentApplication.applicationReference, entityCurrentFilename)">fail-fixable</a>,

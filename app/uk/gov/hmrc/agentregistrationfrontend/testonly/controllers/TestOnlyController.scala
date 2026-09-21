@@ -226,14 +226,15 @@ extends FrontendControllerBase(mcc):
   def showSelectEntityFailures(
     applicationReference: ApplicationReference,
     fileName: RiskingResultsFilename,
-    backLinkUrl: String
+    backLinkUrl: RedirectUrl
   ): Action[AnyContent] =
     getApplication(applicationReference):
       implicit request =>
+        val redirectUrl = validateRedirectUrl(backLinkUrl, appConfig.allowedRedirectHosts)
         Ok(selectEntityFailuresPage(
           applicationReference,
           fileName,
-          backLinkUrl,
+          redirectUrl,
           SelectEntityFailuresForm(request.agentApplication)
         ))
 
