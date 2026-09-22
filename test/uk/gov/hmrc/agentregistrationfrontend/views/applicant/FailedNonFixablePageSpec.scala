@@ -83,7 +83,7 @@ extends ViewSpec:
 
   val renderedEntityFailuresWithNoIndividualFailures: Elements = docWithDuplicateFailures.selectOrFail("#entity-reasons").select("li")
 
-  "FailedNonFixablePage when individuals have failures" should:
+  "FailedNonFixablePage when only individuals have failures" should:
     "have expected content" in:
       docWithIndividualNonFixableFailures.mainContent shouldContainContent
         s"""
@@ -164,7 +164,6 @@ extends ViewSpec:
            |Test Company Name does not meet the registration conditions
            |Your application for an agent services account cannot be approved (refused under Section 230 of the Finance Act 2026).
            |This is because:
-           |one or more relevant individuals linked to the application do not meet the registration conditions
            |the business has missing tax returns in their HMRC recordour records show that the business is formally insolvent
            |Failure to meet the registration conditions
            |Test Company Name will not be given an agent services account on this occasion.
@@ -184,8 +183,8 @@ extends ViewSpec:
              |Test Company Name does not meet the registration conditions
              |Your application for an agent services account cannot be approved (refused under Section 230 of the Finance Act 2026).
              |This is because:
-             |one or more relevant individuals linked to the application do not meet the registration conditions
              |the business has missing tax returns in their HMRC recordour records show that the business is formally insolvent
+             |one or more relevant individuals linked to the application do not meet the registration conditions
              |Relevant individuals who do not meet the registration conditions
              |Steve Austin
              |Records indicate that Steve Austin:
