@@ -53,8 +53,6 @@ extends ViewSpec:
     "AnyIndividualFailures" -> "one or more relevant individuals linked to the application do not meet the registration conditions"
   )
 
-  private val insolvencyFailureMessage: String = "our records show that the business is formally insolvent"
-
   private def render(
     failedNonFixable: RiskingProgress.FailedNonFixable,
     agentApplication: AgentApplication
@@ -150,8 +148,6 @@ extends ViewSpec:
 
   "FailedNonFixablePage when no individuals have failures and the applicant has failed" should:
 
-    // APB-12352: the individuals bullet is always the first reason in the list, although both
-    // individuals here passed risking. Asserted as the page renders it today.
     "have expected content" in:
       docWithApplicantOnlyNonFixableFailures.mainContent shouldContainContent
         s"""
@@ -159,7 +155,6 @@ extends ViewSpec:
            |Test Company Name does not meet the registration conditions
            |Your application for an agent services account cannot be approved (refused under Section 230 of the Finance Act 2026).
            |This is because:
-           |one or more relevant individuals linked to the application do not meet the registration conditions
            |the business has missing tax returns in their HMRC recordour records show that the business is formally insolvent
            |Failure to meet the registration conditions
            |Test Company Name will not be given an agent services account on this occasion.
@@ -191,8 +186,8 @@ extends ViewSpec:
            |Test Company Name does not meet the registration conditions
            |Your application for an agent services account cannot be approved (refused under Section 230 of the Finance Act 2026).
            |This is because:
-           |one or more relevant individuals linked to the application do not meet the registration conditions
            |the business has missing tax returns in their HMRC recordour records show that the business is formally insolvent
+           |one or more relevant individuals linked to the application do not meet the registration conditions
            |Relevant individuals who do not meet the registration conditions
            |Steve Austin
            |Records indicate that Steve Austin:
@@ -210,40 +205,34 @@ extends ViewSpec:
            |"""
           .stripMargin
 
-  // With one entity failure the page shows a single sentence instead of the list, and that
-  // sentence blames the individuals. See APB-12352 - the two blocks below assert what the page
-  // does today, not what it should do.
   "FailedNonFixablePage when the business has a single failure and every individual passed" should:
-
-    "blame the individuals and not name the business failure - APB-12352" in:
+    "have expected content" in:
       docWithSingleEntityFailureApplicantOnly.mainContent shouldContainContent
         s"""
            |Application outcome
            |Test Company Name does not meet the registration conditions
            |Your application for an agent services account cannot be approved (refused under Section 230 of the Finance Act 2026).
-           |This is because one or more relevant individuals linked to the application do not meet the registration conditions.
+           |This is because our records show that the business is formally insolvent.
            |Failure to meet the registration conditions
            |"""
           .stripMargin
 
-    "not mention the insolvency anywhere on the page - APB-12352" in:
-      docWithSingleEntityFailureApplicantOnly.mainContent.wholeText() should not include insolvencyFailureMessage
-
-    "not render the entity reasons list" in:
+    "not render the entity reasons list as there is only one failure" in:
       docWithSingleEntityFailureApplicantOnly.mainContent.select("#entity-reasons").size() shouldBe 0
 
-    "not render the individual failures section" in:
+    "not render the individual failures section as there are not individual failures" in:
       docWithSingleEntityFailureApplicantOnly.mainContent.select("h2#individual-failures").size() shouldBe 0
 
   "FailedNonFixablePage when the business has a single failure and an individual also failed" should:
-
-    "name the individual and still not name the business failure - APB-12352" in:
+    "have expected content" in:
       docWithSingleEntityFailureAndIndividuals.mainContent shouldContainContent
         s"""
            |Application outcome
            |Test Company Name does not meet the registration conditions
            |Your application for an agent services account cannot be approved (refused under Section 230 of the Finance Act 2026).
-           |This is because one or more relevant individuals linked to the application do not meet the registration conditions.
+           |This is because:
+           |our records show that the business is formally insolvent
+           |one or more relevant individuals linked to the application do not meet the registration conditions
            |Relevant individuals who do not meet the registration conditions
            |Steve Austin
            |Records indicate that Steve Austin:
@@ -251,9 +240,6 @@ extends ViewSpec:
            |Failure to meet the registration conditions
            |"""
           .stripMargin
-
-    "not mention the insolvency anywhere on the page - APB-12352" in:
-      docWithSingleEntityFailureAndIndividuals.mainContent.wholeText() should not include insolvencyFailureMessage
 
     "list the failures of the individual who failed" in:
       docWithSingleEntityFailureAndIndividuals
@@ -275,20 +261,20 @@ extends ViewSpec:
     BusinessTypeTestCase(
       description = "an LLP",
       agentApplication = tdAll.agentApplicationLlp.afterDeclarationSubmitted,
-      expectedSingleReason = "This is because one or more relevant individuals linked to the application do not meet the registration conditions.",
-      expectedFirstReason = "one or more relevant individuals linked to the application do not meet the registration conditions"
+      expectedSingleReason = "This is because our records show that the business is formally insolvent.",
+      expectedFirstReason = "the business has missing tax returns in their HMRC record"
     ),
     BusinessTypeTestCase(
       description = "a sole trader applying for themselves",
       agentApplication = tdAll.agentApplicationSoleTrader.afterDeclarationSubmitted,
-      expectedSingleReason = "This is because you do not meet the registration conditions",
-      expectedFirstReason = "you do not meet the registration conditions"
+      expectedSingleReason = "This is because our records show that the business is formally insolvent.",
+      expectedFirstReason = "the business has missing tax returns in their HMRC record"
     ),
     BusinessTypeTestCase(
       description = "someone applying on behalf of a sole trader",
       agentApplication = tdAll.agentApplicationSoleTraderRepresentative.afterDeclarationSubmitted,
-      expectedSingleReason = "This is because the business owner does not meet the registration conditions",
-      expectedFirstReason = "the business owner does not meet the registration conditions"
+      expectedSingleReason = "This is because our records show that the business is formally insolvent.",
+      expectedFirstReason = "the business has missing tax returns in their HMRC record"
     )
   ).foreach: testCase =>
     s"FailedNonFixablePage for ${testCase.description}" should:
