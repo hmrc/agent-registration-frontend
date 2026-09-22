@@ -100,6 +100,20 @@
         url = AppRoutes.testOnly.TestOnlyController.showSubmittedRiskingResultsFiles,
         hint = Some("every risking results file currently held by the test-only stub in the risking microservice, across all applications")
     )
+
+    <h2 class="govuk-heading-m govuk-!-margin-top-6">Schedulers</h2>
+    <p class="govuk-body">
+        These trigger background scheduled jobs on <code class="govuk-!-font-size-16">agent-registration</code>.
+        In prod they run on a timer; here you can fire them on demand.
+        To exercise the whole flow locally, drop <code class="govuk-!-font-size-16">days-to-submit-application</code>
+        and <code class="govuk-!-font-size-16">post-expiry-grace-period</code> in config to short values (e.g. minutes).
+    </p>
+    @compactLink(
+        label = "Run expiry scheduler",
+        url = AppRoutes.testOnly.TestOnlyController.runExpiryScheduler,
+        hint = Some("finds Started and GrsDataReceived applications past applicationExpiresAt, moves them to Expired and stamps gracePeriodEndsAt = now + post-expiry-grace-period")
+    )
+
     @if(appConfig.TestOnly.allowResetDatabase) {
         <h2 class="govuk-heading-m govuk-!-margin-top-6">
             Danger zone
