@@ -16,12 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.listdetails.providedbyapplicant
 
+import org.jsoup.nodes.Document
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationGeneralPartnership
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.model.ProvidedByApplicant
 import uk.gov.hmrc.agentregistrationfrontend.repository.ProvidedByApplicantSessionStore
+import uk.gov.hmrc.agentregistrationfrontend.forms.SelectIndividualForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.testdata.TdTestOnly
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AgentRegistrationStubs
@@ -144,7 +146,9 @@ extends ControllerSpec:
     val response: WSResponse = post(path)(Map.empty[String, Seq[String]])
 
     response.status shouldBe Status.BAD_REQUEST
-    response.parseBodyAsJsoupDocument.title() shouldBe "Error: Which relevant individual do you need to tell us about? - Apply for an agent services account - GOV.UK"
+    val doc: Document = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "Error: Which relevant individual do you need to tell us about? - Apply for an agent services account - GOV.UK"
+    doc.mainContent.select(s"#${SelectIndividualForm.key}-error").text() shouldBe "Error: Select which relevant individual you need to tell us about"
     ApplyStubHelper.verifyConnectorsForAuthAction()
     AgentRegistrationStubs.verifyFindIndividualsForApplication(agentApplicationId)
 

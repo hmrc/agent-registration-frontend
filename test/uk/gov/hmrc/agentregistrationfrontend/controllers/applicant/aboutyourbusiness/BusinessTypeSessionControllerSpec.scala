@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness
 
+import org.jsoup.nodes.Document
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentType.UkTaxAgent
@@ -62,4 +63,6 @@ extends ControllerSpec:
       )(Map(BusinessTypeSessionForm.key -> Seq("")))
 
     response.status shouldBe Status.BAD_REQUEST
-    response.parseBodyAsJsoupDocument.title() shouldBe "Error: How is your business set up? - Apply for an agent services account - GOV.UK"
+    val doc: Document = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "Error: How is your business set up? - Apply for an agent services account - GOV.UK"
+    doc.mainContent.select(s"#${BusinessTypeSessionForm.key}-error").text() shouldBe "Error: Tell us how your business is set up"

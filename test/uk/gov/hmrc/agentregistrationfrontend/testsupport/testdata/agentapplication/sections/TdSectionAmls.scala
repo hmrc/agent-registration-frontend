@@ -31,9 +31,9 @@ trait TdSectionAmls {
   dependencies: TdBase & TdUpload =>
 
   private final def amlsCodeHmrc: AmlsSupervisoryBodyCode = AmlsSupervisoryBodyCode("HMRC")
-  private def amlsCodeNonATT: AmlsSupervisoryBodyCode = AmlsSupervisoryBodyCode("ATT") /// Association of TaxationTechnicians //TODO this is used in the stubs
-  private def amlsRegistrationNumberHmrc = AmlsRegistrationNumber("XAML00000123456")
-  private def amlsRegistrationNumberATT = AmlsRegistrationNumber("ATT AML-1234-123456")
+  private def amlsCodeAtt: AmlsSupervisoryBodyCode = AmlsSupervisoryBodyCode("ATT") // Association of Taxation Technicians
+  private def amlsRegistrationNumberHmrc: AmlsRegistrationNumber = AmlsRegistrationNumber("XAML00000123456")
+  private def amlsRegistrationNumberAtt: AmlsRegistrationNumber = AmlsRegistrationNumber("ATT AML-1234-123456")
 
   class AgentApplicationWithSectionAmls(baseForSectionAmls: AgentApplication):
 
@@ -71,8 +71,8 @@ trait TdSectionAmls {
 
       object whenSupervisorBodyIsNonHmrc:
 
-        def amlsCode: AmlsSupervisoryBodyCode = amlsCodeNonATT
-        def amlsRegistrationNumber: AmlsRegistrationNumber = amlsRegistrationNumberATT
+        def amlsCode: AmlsSupervisoryBodyCode = amlsCodeAtt
+        def amlsRegistrationNumber: AmlsRegistrationNumber = amlsRegistrationNumberAtt
 
         private object amlsDetailsHelper:
 

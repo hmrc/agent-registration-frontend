@@ -141,11 +141,13 @@ trait WsHelper:
     .withSession(sessionHeaders.toSeq*)
     .withFormUrlEncodedBody()
 
-  def mockSessionCookie: WSCookie =
+  def mockSessionCookie: WSCookie = sessionCookie(Session(sessionHeaders))
+
+  def sessionCookie(session: Session): WSCookie =
 
     val cookieCrypto = app.injector.instanceOf[SessionCookieCrypto]
     val cookieBaker = app.injector.instanceOf[SessionCookieBaker]
-    val sessionCookie = cookieBaker.encodeAsCookie(Session(sessionHeaders))
+    val sessionCookie = cookieBaker.encodeAsCookie(session)
     val encryptedValue = cookieCrypto.crypto.encrypt(PlainText(sessionCookie.value))
     val cookie = sessionCookie.copy(value = encryptedValue.value)
 

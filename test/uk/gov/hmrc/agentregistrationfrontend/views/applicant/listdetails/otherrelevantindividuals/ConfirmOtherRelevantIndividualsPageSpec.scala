@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.otherr
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmOtherRelevantIndividualsForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
@@ -102,12 +103,13 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render a form error when the form contains an error" in:
-      val field = ConfirmOtherRelevantIndividualsForm.hasOtherRelevantIndividuals
-      val errorMessage = "Select yes if there are any other relevant individuals"
-      val formWithError = ConfirmOtherRelevantIndividualsForm.form.withError(field, errorMessage)
+      val errorMessage: String = "Select yes if there are any other relevant individuals"
+      val formWithError: Form[Boolean] = ConfirmOtherRelevantIndividualsForm
+        .form
+        .bind(Map.empty[String, String])
 
       behavesLikePageWithErrorHandling(
-        field = field,
+        field = ConfirmOtherRelevantIndividualsForm.hasOtherRelevantIndividuals,
         errorMessage = errorMessage,
         errorDoc = render(formWithError),
         heading = heading

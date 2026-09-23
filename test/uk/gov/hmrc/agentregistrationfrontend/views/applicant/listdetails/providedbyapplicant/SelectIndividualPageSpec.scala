@@ -95,19 +95,18 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render an error message when form has errors" in:
-      val field = "selectIndividual"
-      val errorMessage = "Select which relevant individual you want to provide details for"
-      val formWithError = form.withError(field, errorMessage)
+      val errorMessage: String = "Select which relevant individual you need to tell us about"
+      val formWithError: Form[IndividualProvidedDetails] = form.bind(Map.empty[String, String])
       val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError, incompleteIndividuals).body)
       errorDoc.mainContent shouldContainContent
         """
           |There is a problem
-          |Select which relevant individual you want to provide details for
+          |Select which relevant individual you need to tell us about
           |Relevant individual details
           |Which relevant individual do you need to tell us about?
           |Start to enter their name and choose it from the list.
           |Error:
-          |Select which relevant individual you want to provide details for
+          |Select which relevant individual you need to tell us about
           |Test Name
           |Save and continue
           |Save and come back later
@@ -115,7 +114,7 @@ extends ViewSpec:
           |""".stripMargin
 
       behavesLikePageWithErrorHandling(
-        field = field,
+        field = SelectIndividualForm.key,
         errorMessage = errorMessage,
         errorDoc = errorDoc,
         heading = heading

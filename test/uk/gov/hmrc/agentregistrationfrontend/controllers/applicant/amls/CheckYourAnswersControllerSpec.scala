@@ -16,22 +16,14 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.amls
 
-import com.google.inject.AbstractModule
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistrationfrontend.config.AmlsCodes
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.ApplyStubHelper
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ControllerSpec
 
 class CheckYourAnswersControllerSpec
 extends ControllerSpec:
-
-  // TODO this test needs the fixingz
-
-  override lazy val overridesModule: AbstractModule =
-    new AbstractModule:
-      override def configure(): Unit = bind(classOf[AmlsCodes]).asEagerSingleton()
 
   private val path = "/agent-registration/apply/anti-money-laundering/check-your-answers"
 

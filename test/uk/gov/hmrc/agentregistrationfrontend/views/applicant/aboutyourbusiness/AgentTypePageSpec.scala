@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.aboutyourbusiness
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
+import uk.gov.hmrc.agentregistration.shared.AgentType
 import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTypeForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.aboutyourbusiness.AgentTypePage
@@ -49,12 +51,12 @@ extends ViewSpec:
       doc.select("button[type=submit]").text() shouldBe "Continue"
 
     "render a form error when the form contains an error" in:
-      val field = "agentType"
-      val errorMessage = "Select yes if your agent business is based in the UK"
-      val formWithError = AgentTypeForm.form
-        .withError(field, errorMessage)
+      val errorMessage: String = "Select yes if your agent business is based in the UK"
+      val formWithError: Form[AgentType] = AgentTypeForm
+        .form
+        .bind(Map.empty[String, String])
       behavesLikePageWithErrorHandling(
-        field = field,
+        field = AgentTypeForm.key,
         errorMessage = errorMessage,
         errorDoc = Jsoup.parse(viewTemplate(formWithError).body),
         heading = heading

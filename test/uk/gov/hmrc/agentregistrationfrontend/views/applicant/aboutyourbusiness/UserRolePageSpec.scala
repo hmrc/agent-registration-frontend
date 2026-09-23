@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.aboutyourbusiness
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.UserRole
 import uk.gov.hmrc.agentregistrationfrontend.forms.UserRoleForm
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -45,7 +46,7 @@ extends ViewSpec:
         ),
         hint = None
       ),
-      expectedErrorMessage = "Select yes if you are the business owner"
+      expectedErrorMessage = "Select yes if you are the owner of the business"
     ),
     TestCase(
       userRole = UserRole.Director,
@@ -101,12 +102,12 @@ extends ViewSpec:
         doc.select("button[type=submit]").text() shouldBe "Continue"
 
       "render a form error when the form contains an error" in:
-        val field = "userRole"
-        val errorMessage = testCase.expectedErrorMessage
-        val formWithError = UserRoleForm.form(testCase.userRole)
-          .withError(field, errorMessage)
+        val errorMessage: String = testCase.expectedErrorMessage
+        val formWithError: Form[UserRole] = UserRoleForm
+          .form(testCase.userRole)
+          .bind(Map.empty[String, String])
         behavesLikePageWithErrorHandling(
-          field = field,
+          field = UserRoleForm.key,
           errorMessage = errorMessage,
           errorDoc = Jsoup.parse(viewTemplate(formWithError, testCase.userRole).body),
           heading = heading

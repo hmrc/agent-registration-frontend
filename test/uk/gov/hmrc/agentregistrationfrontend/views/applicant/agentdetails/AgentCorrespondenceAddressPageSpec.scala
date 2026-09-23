@@ -17,6 +17,7 @@
 package uk.gov.hmrc.agentregistrationfrontend.views.applicant.agentdetails
 
 import org.jsoup.Jsoup
+import play.api.data.Form
 import org.jsoup.nodes.Document
 import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentCorrespondenceAddress
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
@@ -133,12 +134,12 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render a form error when the form contains an error" in:
-      val field = AgentCorrespondenceAddressForm.key
-      val errorMessage = "Enter the correspondence address you want to use on your agent services account"
-      val formWithError = AgentCorrespondenceAddressForm.form
-        .withError(field, errorMessage)
+      val errorMessage: String = "Enter the correspondence address you want to use on your agent services account"
+      val formWithError: Form[String] = AgentCorrespondenceAddressForm
+        .form
+        .bind(Map.empty[String, String])
       behavesLikePageWithErrorHandling(
-        field = field,
+        field = AgentCorrespondenceAddressForm.key,
         errorMessage = errorMessage,
         errorDoc = Jsoup.parse(viewTemplate(formWithError, addressOptions).body),
         heading = heading

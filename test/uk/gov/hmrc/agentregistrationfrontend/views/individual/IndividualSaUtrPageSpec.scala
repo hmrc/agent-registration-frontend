@@ -18,7 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.LinkId
+import uk.gov.hmrc.agentregistration.shared.individual.UserProvidedSaUtr
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualSaUtrForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -57,12 +59,14 @@ extends ViewSpec:
       .text() shouldBe "Save and continue"
 
   "render the form error correctly when the form contains an error" in:
-    val field = IndividualSaUtrForm.saUtrKey
-    val errorMessage = "Enter your Self Assessment Unique Taxpayer Reference"
-    val formWithError = IndividualSaUtrForm.form
-      .withError(field, errorMessage)
+    val errorMessage: String = "Enter your Self Assessment Unique Taxpayer Reference"
+    val formWithError: Form[UserProvidedSaUtr] = IndividualSaUtrForm.form
+      .bind(Map(
+        IndividualSaUtrForm.hasSaUtrKey -> YesNo.Yes.toString,
+        IndividualSaUtrForm.saUtrKey -> ""
+      ))
     behavesLikePageWithErrorHandling(
-      field = field,
+      field = IndividualSaUtrForm.saUtrKey,
       errorMessage = errorMessage,
       errorDoc = Jsoup.parse(viewTemplate(formWithError, linkId).body),
       heading = heading

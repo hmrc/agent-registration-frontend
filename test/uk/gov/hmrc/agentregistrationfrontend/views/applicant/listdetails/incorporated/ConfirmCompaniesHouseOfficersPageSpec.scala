@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.incorp
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmCompaniesHouseOfficersForm
@@ -142,10 +143,10 @@ extends ViewSpec:
 
       "render a form error when the form contains an error" in:
         val field = key
-        val errorMessage = "Select yes if this list is correct"
-        val formWithError = ConfirmCompaniesHouseOfficersForm
+        val errorMessage: String = "Select yes if this list is correct"
+        val formWithError: Form[Boolean] = ConfirmCompaniesHouseOfficersForm
           .form
-          .withError(field, errorMessage)
+          .bind(Map.empty[String, String])
 
         behavesLikePageWithErrorHandling(
           field = field,

@@ -24,6 +24,7 @@
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import views.html.helper.CSPNonce
 @import uk.gov.hmrc.agentregistration.shared.risking.RiskedIndividual
+@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 @this(
         appConfig: AppConfig,
@@ -76,7 +77,7 @@
       riskedIndividual.individualName.value
     }</h3>
 
-    @if(individualFailuresResolvedAsSet(riskedIndividual).size == 1) {
+    @if(individualFailuresResolvedAsSet(riskedIndividual).size === 1) {
         <p class="govuk-body" id="@{riskedIndividual.personReference.value}-reasons">
             @messages(s"$key.individualSingleReason", riskedIndividual.individualName.value, individualFailuresResolvedAsSet(riskedIndividual).head)
         </p>
@@ -107,18 +108,24 @@
   <h2 class="govuk-caption-l">@caption</h2>
   <h1 class="govuk-heading-l">@title</h1>
   <p class="govuk-body">@messages(s"$key.p1")</p>
-    @if(entityFailuresResolvedAsSet.size <= 1) {
-      <p class="govuk-body">@messages(s"$entityListKey.SingleIndividualFailures$businessTypeSuffix", entityName)</p>
-    } else {
-      <p class="govuk-body">@messages(s"$key.p2")</p>
-      <ul id="entity-reasons" class="govuk-list govuk-list--bullet">
+  @if(entityFailuresResolvedAsSet.size === 1 && !hasIndividualFailures) {
+    <p class="govuk-body">
+      @{s"${messages(s"$key.p2")} ${entityFailuresResolvedAsSet.head}"}.
+    </p>
+  } else if(entityFailuresResolvedAsSet.isEmpty && hasIndividualFailures) {
+    <p class="govuk-body">@messages(s"$entityListKey.SingleIndividualFailures$businessTypeSuffix", entityName)</p>
+  } else {
+    <p class="govuk-body">@messages(s"$key.p2"):</p>
+    <ul id="entity-reasons" class="govuk-list govuk-list--bullet">
+      @entityFailuresResolvedAsSet.map(f => <li>{f}</li>)
+      @if(hasIndividualFailures) {
         <li>@messages(s"$entityListKey.AnyIndividualFailures$businessTypeSuffix", entityName)</li>
-        @entityFailuresResolvedAsSet.map(f => <li>{f}</li>)
-      </ul>
-    }
+      }
+    </ul>
+  }
 
-@if(hasIndividualFailures) {
-<h2 id="individual-failures" class="govuk-heading-m">@messages(s"$key.individualFailures.h2")</h2>
+  @if(hasIndividualFailures) {
+    <h2 id="individual-failures" class="govuk-heading-m">@messages(s"$key.individualFailures.h2")</h2>
   }
 
   @failedNonFixable.riskedIndividuals.map(individualFailures)

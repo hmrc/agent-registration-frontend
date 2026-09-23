@@ -83,10 +83,8 @@ extends ViewSpec:
 
     "render an error message when form has errors" in:
       val field = "amlsSupervisoryBody"
-      // we are not testing if this is correct error message content,
-      // we are testing how any given error is rendered in this template
-      val errorMessage = "Enter a name and choose your supervisor from the list"
-      val formWithError = form.withError(field, errorMessage)
+      val errorMessage: String = "Enter a name and choose your supervisor from the list"
+      val formWithError: Form[AmlsSupervisoryBodyCode] = form.bind(Map(AmlsCodeForm.key -> ""))
       val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError, "Test Company").body)
       errorDoc.mainContent shouldContainContent
         """

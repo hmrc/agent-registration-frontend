@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.incorp
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
 import uk.gov.hmrc.agentregistrationfrontend.forms.NumberCompaniesHouseOfficersForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndComeBackLater
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
@@ -117,14 +118,13 @@ extends ViewSpec:
           .text() shouldBe "Save and come back later"
 
       "render a form error when the form contains an error" in:
-        val field = NumberCompaniesHouseOfficersForm.numberOfOfficersResponsibleForTaxMatters
-        val errorMessage = s"Enter how many ${testCase.officerType} are also relevant individuals"
-        val formWithError = NumberCompaniesHouseOfficersForm
+        val errorMessage: String = s"Enter how many ${testCase.officerType} are also relevant individuals"
+        val formWithError: Form[Int] = NumberCompaniesHouseOfficersForm
           .form(companiesHouseOfficersCount, testCase.label)
-          .withError(field, errorMessage)
+          .bind(Map(NumberCompaniesHouseOfficersForm.numberOfOfficersResponsibleForTaxMatters -> ""))
 
         behavesLikePageWithErrorHandling(
-          field = field,
+          field = NumberCompaniesHouseOfficersForm.numberOfOfficersResponsibleForTaxMatters,
           errorMessage = errorMessage,
           errorDoc = render(formWithError, testCase.label),
           heading = testCase.heading

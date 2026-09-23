@@ -77,25 +77,25 @@ extends ViewSpec:
         .text() shouldBe "Save and come back later"
 
     "render an error message when form has errors" in:
-      val field: String = AmlsRegistrationNumberForm.key
-      val errorMessage: String = "Enter your registration number"
-      val formWithError: Form[AmlsRegistrationNumber] = AmlsRegistrationNumberForm(testAmlsCode).form
-        .withError(field, errorMessage)
+      val errorMessage: String = "Enter the registration number"
+      val formWithError: Form[AmlsRegistrationNumber] = AmlsRegistrationNumberForm(testAmlsCode)
+        .form
+        .bind(Map.empty[String, String])
       val errorDoc: Document = Jsoup.parse(viewTemplate(formWithError).body)
       errorDoc.mainContent shouldContainContent
         """
           |There is a problem
-          |Enter your registration number
+          |Enter the registration number
           |Anti-money laundering supervision details
           |What is the registration number?
           |Error:
-          |Enter your registration number
+          |Enter the registration number
           |Save and continue
           |Save and come back later
           |""".stripMargin
 
       behavesLikePageWithErrorHandling(
-        field = field,
+        field = AmlsRegistrationNumberForm.key,
         errorMessage = errorMessage,
         errorDoc = errorDoc,
         heading = heading

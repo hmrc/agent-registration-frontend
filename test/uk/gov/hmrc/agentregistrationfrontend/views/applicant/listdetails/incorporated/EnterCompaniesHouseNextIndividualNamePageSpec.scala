@@ -18,6 +18,7 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.listdetails.incorp
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.companieshouse.CompaniesHouseNameQuery
 import uk.gov.hmrc.agentregistrationfrontend.forms.CompaniesHouseNameQueryForm
@@ -111,28 +112,32 @@ extends ViewSpec:
           .text() shouldBe "Save and come back later"
 
       "render a form error when the firstName field contains an error" in:
-        val field = CompaniesHouseNameQueryForm.firstNameKey
-        val errorMessage = "Enter first name"
-        val formWithError = CompaniesHouseNameQueryForm
+        val errorMessage: String = "Enter your first names"
+        val formWithError: Form[CompaniesHouseNameQuery] = CompaniesHouseNameQueryForm
           .form
-          .withError(field, errorMessage)
+          .bind(Map(
+            CompaniesHouseNameQueryForm.firstNameKey -> "",
+            CompaniesHouseNameQueryForm.lastNameKey -> "Smith"
+          ))
 
         behavesLikePageWithErrorHandling(
-          field = field,
+          field = CompaniesHouseNameQueryForm.firstNameKey,
           errorMessage = errorMessage,
           errorDoc = render(formWithError, testCase.agentApplication),
           heading = heading
         )
 
       "render a form error when the lastName field contains an error" in:
-        val field = CompaniesHouseNameQueryForm.lastNameKey
-        val errorMessage = "Enter last name"
-        val formWithError = CompaniesHouseNameQueryForm
+        val errorMessage: String = "Enter your last name"
+        val formWithError: Form[CompaniesHouseNameQuery] = CompaniesHouseNameQueryForm
           .form
-          .withError(field, errorMessage)
+          .bind(Map(
+            CompaniesHouseNameQueryForm.firstNameKey -> "John",
+            CompaniesHouseNameQueryForm.lastNameKey -> ""
+          ))
 
         behavesLikePageWithErrorHandling(
-          field = field,
+          field = CompaniesHouseNameQueryForm.lastNameKey,
           errorMessage = errorMessage,
           errorDoc = render(formWithError, testCase.agentApplication),
           heading = heading

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.aboutyourbusiness
 
+import org.jsoup.nodes.Document
 import play.api.libs.ws.DefaultBodyReadables.*
 import play.api.libs.ws.WSResponse
 
@@ -62,4 +63,6 @@ extends ControllerSpec:
     val response: WSResponse = post(path)(Map(AgentTypeForm.key -> Seq("")))
 
     response.status shouldBe Status.BAD_REQUEST
-    response.parseBodyAsJsoupDocument.title() shouldBe "Error: Is your agent business based in the UK? - Apply for an agent services account - GOV.UK"
+    val doc: Document = response.parseBodyAsJsoupDocument
+    doc.title() shouldBe "Error: Is your agent business based in the UK? - Apply for an agent services account - GOV.UK"
+    doc.mainContent.select(s"#${AgentTypeForm.key}-error").text() shouldBe "Error: Select yes if your agent business is based in the UK"

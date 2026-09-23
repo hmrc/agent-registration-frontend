@@ -18,6 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.views.applicant.fixablefailures.en
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import org.jsoup.select.Elements
+import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
 import uk.gov.hmrc.agentregistrationfrontend.forms.applicant.fixablefailures.ConfirmFixForm
@@ -285,7 +287,7 @@ extends ViewSpec:
           doc.h1 shouldBe entityFixFailureCodeHeadings.getOrElse(entityFixCode, "")
 
         s"have a form for confirming the fix for $entityFixCode" in:
-          val form = doc.select("form")
+          val form: Elements = doc.select("form")
           form.attr("action") shouldBe s"/agent-registration/conditions-not-yet-met/failure-details/$entityFixCode"
           form.attr("method") shouldBe ("POST")
           val expectedRadioGroup: TestRadioGroup = TestRadioGroup(
@@ -302,9 +304,10 @@ extends ViewSpec:
           form.select("button[type=submit]").selectOnlyOneElementOrFail().text() shouldBe "Save and continue"
 
       s"render any given form error for $entityFixCode correctly" in:
-        val field = ConfirmFixForm.key
-        val errorMessage = "Select yes if all overdue returns have been filed"
-        val formWithError = ConfirmFixForm.form(entityFixCode).withError(field, "Select yes if all overdue returns have been filed")
+        val errorMessage: String = expectedRequiredError(entityFixCode)
+        val formWithError: Form[Boolean] = ConfirmFixForm
+          .form(entityFixCode)
+          .bind(Map.empty[String, String])
         val docWithError: Document = Jsoup.parse(
           viewTemplate(
             entityName = "Test Company Name",
@@ -314,8 +317,13 @@ extends ViewSpec:
           ).body
         )
         behavesLikePageWithErrorHandling(
-          field = "isFixed",
+          field = ConfirmFixForm.key,
           errorMessage = errorMessage,
           errorDoc = docWithError,
           heading = entityFixFailureCodeHeadings(entityFixCode)
         )
+
+  private def expectedRequiredError(failureCode: String): String =
+    if failureCode.endsWith(".4.4") then "Select yes if all overdue reports have been filed"
+    else if failureCode.contains(".4.") then "Select yes if all overdue returns have been filed"
+    else "Select yes if all overdue liabilities have been paid or included in a payment plan"

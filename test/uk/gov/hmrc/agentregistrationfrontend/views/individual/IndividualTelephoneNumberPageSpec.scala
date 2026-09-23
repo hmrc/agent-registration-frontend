@@ -18,7 +18,9 @@ package uk.gov.hmrc.agentregistrationfrontend.views.individual
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
+import play.api.data.Form
 import uk.gov.hmrc.agentregistration.shared.LinkId
+import uk.gov.hmrc.agentregistration.shared.TelephoneNumber
 import uk.gov.hmrc.agentregistrationfrontend.forms.IndividualTelephoneNumberForm
 import uk.gov.hmrc.agentregistrationfrontend.model.SubmitAction.SaveAndContinue
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
@@ -57,12 +59,11 @@ extends ViewSpec:
         .text() shouldBe "Save and continue"
 
     "render the form error correctly when the form contains an error" in:
-      val field = IndividualTelephoneNumberForm.key
-      val errorMessage = "Enter the number we should call to speak to you about this application"
-      val formWithError = IndividualTelephoneNumberForm.form
-        .withError(field, errorMessage)
+      val errorMessage: String = "Enter the number we should call to speak to you about this application"
+      val formWithError: Form[TelephoneNumber] = IndividualTelephoneNumberForm.form
+        .bind(Map(IndividualTelephoneNumberForm.key -> ""))
       behavesLikePageWithErrorHandling(
-        field = field,
+        field = IndividualTelephoneNumberForm.key,
         errorMessage = errorMessage,
         errorDoc = Jsoup.parse(viewTemplate(formWithError, linkId).body),
         heading = heading
