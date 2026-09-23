@@ -25,12 +25,9 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.risking.RiskedEntity
-import uk.gov.hmrc.agentregistration.shared.risking.RiskedIndividual
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
-import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.isSoleTraderOwner
@@ -175,28 +172,14 @@ extends FrontendController(mcc, actions):
             val riskedEntity: RiskingOutcomeEntity = agentApplication.riskingOutcomeEntity.getOrThrowExpectedDataMissing(
               s"Risking completed but no outcome found for entity ${agentApplication.applicationReference}"
             )
-            val riskedIndividuals: List[IndividualProvidedDetails] = request.get
+            val nonFixableIndividuals: List[IndividualProvidedDetails] = request.get[List[IndividualProvidedDetails]]
+              .filter(_.riskingOutcomeIndividual match
+                case Some(RiskingOutcomeIndividual.FailedNonFixable(_)) => true
+                case _ => false
+              )
             Ok(failedNonFixablePage(
-              failedNonFixable = RiskingProgress.FailedNonFixable(
-                riskedEntity = RiskedEntity(
-                  applicationReference = agentApplication.applicationReference,
-                  failures =
-                    riskedEntity match
-                      case f: RiskingOutcomeEntity.FailedNonFixable => f.failures
-                      case _ => Seq.empty
-                ),
-                riskedIndividuals = riskedIndividuals.map: individual =>
-                  RiskedIndividual(
-                    personReference = individual.personReference,
-                    individualName = individual.individualName,
-                    failures =
-                      individual.riskingOutcomeIndividual match
-                        case Some(riskedIndividual: RiskingOutcomeIndividual.FailedNonFixable) => riskedIndividual.failures
-                        case _ => Seq.empty
-                  ),
-                riskingCompletedDate = riskingOutcomeApplication.actualDecisionDate,
-                correctiveActionExpiryDate = Some(riskingOutcomeApplication.correctiveActionExpiryDate)
-              ),
+              riskingOutcomeEntity = riskedEntity,
+              nonFixableIndividuals = nonFixableIndividuals,
               agentApplication = agentApplication,
               entityName = request.get[BusinessPartnerRecordResponse].getEntityName
             ))
