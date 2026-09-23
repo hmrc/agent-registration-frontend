@@ -50,6 +50,7 @@ extension (a: AgentApplication)
     groupId: GroupId,
     applicationReference: ApplicationReference,
     createdAt: Instant,
+    applicationExpiresAt: Instant,
     safeId: SafeId,
     providerId: String
   ): AgentApplication =
@@ -62,6 +63,7 @@ extension (a: AgentApplication)
           groupId = groupId,
           applicationReference = applicationReference,
           createdAt = createdAt,
+          applicationExpiresAt = Some(applicationExpiresAt),
           businessDetails = a.businessDetails.map(_.copy(safeId = safeId)),
           applicantCredentials = a.applicantCredentials.copy(providerId = providerId)
         )
@@ -73,6 +75,7 @@ extension (a: AgentApplication)
           groupId = groupId,
           applicationReference = applicationReference,
           createdAt = createdAt,
+          applicationExpiresAt = Some(applicationExpiresAt),
           businessDetails = a.businessDetails.map(_.copy(safeId = safeId)),
           applicantCredentials = a.applicantCredentials.copy(providerId = providerId)
         )
@@ -84,6 +87,7 @@ extension (a: AgentApplication)
           groupId = groupId,
           applicationReference = applicationReference,
           createdAt = createdAt,
+          applicationExpiresAt = Some(applicationExpiresAt),
           businessDetails = a.businessDetails.map(_.copy(safeId = safeId)),
           applicantCredentials = a.applicantCredentials.copy(providerId = providerId)
         )
@@ -95,6 +99,7 @@ extension (a: AgentApplication)
           groupId = groupId,
           applicationReference = applicationReference,
           createdAt = createdAt,
+          applicationExpiresAt = Some(applicationExpiresAt),
           businessDetails = a.businessDetails.map(_.copy(safeId = safeId)),
           applicantCredentials = a.applicantCredentials.copy(providerId = providerId)
         )
@@ -106,6 +111,7 @@ extension (a: AgentApplication)
           groupId = groupId,
           applicationReference = applicationReference,
           createdAt = createdAt,
+          applicationExpiresAt = Some(applicationExpiresAt),
           businessDetails = a.businessDetails.map(_.copy(safeId = safeId)),
           applicantCredentials = a.applicantCredentials.copy(providerId = providerId)
         )
@@ -117,6 +123,7 @@ extension (a: AgentApplication)
           groupId = groupId,
           applicationReference = applicationReference,
           createdAt = createdAt,
+          applicationExpiresAt = Some(applicationExpiresAt),
           businessDetails = a.businessDetails.map(_.copy(safeId = safeId)),
           applicantCredentials = a.applicantCredentials.copy(providerId = providerId)
         )
@@ -128,6 +135,7 @@ extension (a: AgentApplication)
           groupId = groupId,
           applicationReference = applicationReference,
           createdAt = createdAt,
+          applicationExpiresAt = Some(applicationExpiresAt),
           businessDetails = a.businessDetails.map(_.copy(safeId = safeId)),
           applicantCredentials = a.applicantCredentials.copy(providerId = providerId)
         )
