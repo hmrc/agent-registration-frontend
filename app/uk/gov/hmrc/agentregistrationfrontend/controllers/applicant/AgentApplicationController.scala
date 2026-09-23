@@ -26,7 +26,6 @@ import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
-import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
@@ -169,16 +168,11 @@ extends FrontendController(mcc, actions):
               isSoleTrader = request.agentApplication.isSoleTraderOwner
             ))
           case riskingOutcomeApplication: RiskingOutcomeApplication.FailedNonFixable =>
-            val riskedEntity: RiskingOutcomeEntity = agentApplication.riskingOutcomeEntity.getOrThrowExpectedDataMissing(
-              s"Risking completed but no outcome found for entity ${agentApplication.applicationReference}"
-            )
             val nonFixableIndividuals: List[IndividualProvidedDetails] = request.get[List[IndividualProvidedDetails]]
               .filter(_.riskingOutcomeIndividual match
                 case Some(RiskingOutcomeIndividual.FailedNonFixable(_)) => true
-                case _ => false
-              )
+                case _ => false)
             Ok(failedNonFixablePage(
-              riskingOutcomeEntity = riskedEntity,
               nonFixableIndividuals = nonFixableIndividuals,
               agentApplication = agentApplication,
               entityName = request.get[BusinessPartnerRecordResponse].getEntityName
