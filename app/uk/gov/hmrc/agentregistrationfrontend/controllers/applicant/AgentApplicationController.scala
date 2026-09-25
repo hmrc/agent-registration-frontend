@@ -125,7 +125,7 @@ extends FrontendController(mcc, actions):
         case _ => None
     val projectedDecisionDate: LocalDate = calculateDecisionDate(submittedAt)
     agentApplication.applicationState match
-      case ApplicationState.Started | ApplicationState.GrsDataReceived =>
+      case ApplicationState.Started | ApplicationState.GrsDataReceived | ApplicationState.Expired =>
         throw new IllegalStateException(
           s"Application is in state ${agentApplication.applicationState} but the application status endpoint should only be called after the application has been submitted for risking"
         )
