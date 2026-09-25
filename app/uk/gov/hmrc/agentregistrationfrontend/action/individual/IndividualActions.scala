@@ -25,12 +25,16 @@ import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.Nino
 import uk.gov.hmrc.agentregistration.shared.SaUtr
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino.FromAuth
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino.Provided
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix._10.IndividualDetailsFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineFutureEither
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineUnion
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuildersWithData
@@ -40,6 +44,7 @@ import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordServi
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestAwareLogging
+import uk.gov.hmrc.auth.core
 import uk.gov.hmrc.auth.core.ConfidenceLevel
 import uk.gov.hmrc.auth.core.retrieve.Credentials
 
@@ -135,7 +140,10 @@ extends RequestAwareLogging:
         .map[RequestWithData[DataWithIndividualProvidedDetails] | Result]:
           case list: List[IndividualProvidedDetails] =>
             list
-              .find(_.internalUserId.contains(request.get[InternalUserId]))
+              .find(individual =>
+                individual.internalUserId.contains(request.get[InternalUserId]) ||
+                  matchSafeNino(request.get[Option[Nino]], request.get[ConfidenceLevel], individual.individualNino)
+              )
               .map(request.add[IndividualProvidedDetails])
               .getOrElse(
                 NotFound
@@ -199,3 +207,15 @@ extends RequestAwareLogging:
           case None =>
             logger.info("Risking outcome for individual does not require individual details to be provided, redirecting to fixable task list.")
             Redirect(AppRoutes.providedetails.riskingoutcome.fixablefailures.FixableTaskListController.show(linkId))
+
+  private def matchSafeNino(
+    ninoFromAuth: Option[Nino],
+    confidenceLevel: ConfidenceLevel,
+    individualNino: Option[IndividualNino]
+  ): Boolean =
+    (confidenceLevel, ninoFromAuth, individualNino) match
+      case (cl, Some(nino), Some(Provided(individualNino))) if cl >= ConfidenceLevel.L250 =>
+        nino.value.take(8) === individualNino.value.take(8) // compare without suffix letter, as auth nino may not have suffix letter
+      case (cl, Some(nino), Some(FromAuth(individualNino))) if cl >= ConfidenceLevel.L250 =>
+        nino.value.take(8) === individualNino.value.take(8) // compare without suffix letter, as auth nino may not have suffix letter
+      case _ => false
