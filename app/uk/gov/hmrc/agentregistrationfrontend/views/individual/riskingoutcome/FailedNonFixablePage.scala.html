@@ -18,8 +18,10 @@
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 @import uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure
+@import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 @import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
-@import uk.gov.hmrc.agentregistration.shared.risking.RiskedIndividual
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import views.html.helper.CSPNonce
 
@@ -29,8 +31,7 @@
 )
 
 @(
-        riskedIndividual: RiskedIndividual,
-        agentApplication: AgentApplication,
+        nonFixableIndividual: IndividualProvidedDetails,
         entityName: String
 )(implicit
         request: RequestHeader,
@@ -42,9 +43,11 @@
 @caption = @{messages(s"$key.caption")}
 @title = @{messages(s"$key.title", entityName)}
 @individualFailuresResolvedAsSet = @{
-  riskedIndividual.failures
-    .map(failure => messages(s"$key.${failure.toString}", riskedIndividual.individualName.value))
-    .toSet
+  nonFixableIndividual.riskingOutcomeIndividual match {
+    case Some(RiskingOutcomeIndividual.FailedNonFixable(failures)) =>
+      failures.map(failure =>  messages(s"$key.${failure.toString}", nonFixableIndividual.individualName.value)).toSet
+    case _ => Set.empty
+  }
 }
 
 @templateScripts = {
@@ -66,7 +69,7 @@
     <p class="govuk-body">@messages(s"$key.p1", entityName) @individualFailuresResolvedAsSet.map(f => s"$f.")</p>
   } else {
     <p class="govuk-body">@messages(s"$key.p1", entityName):</p>
-    <ul id="@{riskedIndividual.personReference.value}-reasons" class="govuk-list govuk-list--bullet">
+    <ul id="@{nonFixableIndividual.personReference.value}-reasons" class="govuk-list govuk-list--bullet">
       @individualFailuresResolvedAsSet.map(f => <li>{f}</li>)
     </ul>
   }

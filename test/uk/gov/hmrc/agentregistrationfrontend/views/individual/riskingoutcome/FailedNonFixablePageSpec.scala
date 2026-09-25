@@ -14,46 +14,40 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.views.individual.riskingprogress
+package uk.gov.hmrc.agentregistrationfrontend.views.individual.riskingoutcome
 
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.PersonReference
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure
-import uk.gov.hmrc.agentregistration.shared.risking.RiskedIndividual
+import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingprogress.FailedNonFixablePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingoutcome.FailedNonFixablePage
 
 class FailedNonFixablePageSpec
 extends ViewSpec:
 
   val viewTemplate: FailedNonFixablePage = app.injector.instanceOf[FailedNonFixablePage]
-  val agentApplication: AgentApplication =
-    tdAll
-      .agentApplicationLlp
-      .afterDeclarationSubmitted
 
-  val riskedIndividualFailedNonFixable = RiskedIndividual(
-    personReference = PersonReference("PREF0"),
-    individualName = tdAll.individualName,
-    failures = Seq(IndividualFailure._6)
-  )
+  val riskedIndividualFailedNonFixable: IndividualProvidedDetails =
+    tdAll
+      .providedDetails
+      .afterRiskedNonFixable
 
   val doc: Document = Jsoup.parse(
     viewTemplate(
-      riskedIndividual = riskedIndividualFailedNonFixable,
-      agentApplication = agentApplication,
+      nonFixableIndividual = riskedIndividualFailedNonFixable,
       entityName = "Test Company Name"
     ).body
   )
 
   val docWithMoreThanOneFailure: Document = Jsoup.parse(
     viewTemplate(
-      riskedIndividual = riskedIndividualFailedNonFixable.copy(
-        failures = Seq(IndividualFailure._6, IndividualFailure._7)
+      nonFixableIndividual = riskedIndividualFailedNonFixable.copy(
+        riskingOutcomeIndividual = Some(RiskingOutcomeIndividual.FailedNonFixable(
+          failures = Seq(IndividualFailure._6, IndividualFailure._7)
+        ))
       ),
-      agentApplication = agentApplication,
       entityName = "Test Company Name"
     ).body
   )

@@ -22,15 +22,14 @@ import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
-import uk.gov.hmrc.agentregistration.shared.risking.RiskedIndividual
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.util.DisplayDate.displayDateForLang
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingoutcome.FailedFixablePage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingprogress.FailedNonFixablePage
-import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingprogress.IndividualConfirmationPage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingoutcome.FailedNonFixablePage
+import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.IndividualConfirmationPage
 
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -54,20 +53,14 @@ extends FrontendController(mcc, actions):
         riskingOutcomeApplication match
           case _: RiskingOutcomeApplication.FailedNonFixable =>
             riskingOutcomeIndividual match
-              case individualOutcome: RiskingOutcomeIndividual.FailedNonFixable =>
-                val riskedIndividual: RiskedIndividual = RiskedIndividual(
-                  personReference = request.get[IndividualProvidedDetails].personReference,
-                  individualName = request.get[IndividualProvidedDetails].individualName,
-                  failures = individualOutcome.failures
-                )
+              case _: RiskingOutcomeIndividual.FailedNonFixable =>
                 Ok(failedNonFixablePage(
-                  riskedIndividual = riskedIndividual,
-                  agentApplication = request.agentApplication,
+                  nonFixableIndividual = request.get[IndividualProvidedDetails],
                   entityName = entityName
                 ))
               case _: RiskingOutcomeIndividual.FailedFixable => renderConfirmationPage(request.agentApplication, entityName) // this individual has not failed non-fixable, so render the confirmation page
               case RiskingOutcomeIndividual.Approved => renderConfirmationPage(request.agentApplication, entityName) // this individual has not failed non-fixable, so render the confirmation page
-          case riskingOutcomeApplication: RiskingOutcomeApplication.FailedFixable =>
+          case failedFixable: RiskingOutcomeApplication.FailedFixable =>
             riskingOutcomeIndividual match
               case individualOutcome: RiskingOutcomeIndividual.FailedFixable =>
                 if individualOutcome.declarationAgreed && individualOutcome.fixes.forall(_.isConfirmed.contains(true))
@@ -78,15 +71,15 @@ extends FrontendController(mcc, actions):
                   Ok(failedFixablePage(
                     linkId = linkId,
                     entityName = entityName,
-                    correctiveActionExpiryDate = displayDateForLang(riskingOutcomeApplication.correctiveActionExpiryDate),
-                    actualDecisionDate = displayDateForLang(riskingOutcomeApplication.actualDecisionDate)
+                    correctiveActionExpiryDate = displayDateForLang(failedFixable.correctiveActionExpiryDate),
+                    actualDecisionDate = displayDateForLang(failedFixable.actualDecisionDate)
                   ))
               case RiskingOutcomeIndividual.Approved => renderConfirmationPage(request.agentApplication, entityName) // this individual has not failed fixable, so render the confirmation page
               case _: RiskingOutcomeIndividual.FailedNonFixable =>
                 throw new IllegalStateException(
                   "This individual has failed non-fixable, but the application outcome was failed fixable - this should not be possible"
                 )
-          case riskingOutcomeApplication: RiskingOutcomeApplication.Approved => renderConfirmationPage(request.agentApplication, entityName) // any other outcome renders the confirmation page
+          case _: RiskingOutcomeApplication.Approved => renderConfirmationPage(request.agentApplication, entityName) // any other outcome renders the confirmation page
 
   private def renderConfirmationPage(
     agentApplication: AgentApplication,

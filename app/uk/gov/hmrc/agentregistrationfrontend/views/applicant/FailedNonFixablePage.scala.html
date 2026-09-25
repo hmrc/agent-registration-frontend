@@ -17,13 +17,14 @@
 @import play.twirl.api.Html
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
 @import uk.gov.hmrc.agentregistration.shared.AgentApplicationSoleTrader
+@import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 @import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
-@import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
+@import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeEntity
+@import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 @import uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 @import views.html.helper.CSPNonce
-@import uk.gov.hmrc.agentregistration.shared.risking.RiskedIndividual
 @import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 
 @this(
@@ -33,7 +34,7 @@
 )
 
 @(
-        failedNonFixable: RiskingProgress.FailedNonFixable,
+        nonFixableIndividuals: List[IndividualProvidedDetails],
         agentApplication: AgentApplication,
         entityName: String
 )(implicit
@@ -55,39 +56,42 @@
   }
 }
 @entityFailuresResolvedAsSet = @{
-  failedNonFixable
-  .riskedEntity
-  .failures
-  .map(f => messages(s"$entityListKey.${f.toString}$businessTypeSuffix", entityName))
-  .toSet
+  agentApplication.riskingOutcomeEntity match {
+    case Some(RiskingOutcomeEntity.FailedNonFixable(failures)) =>
+      failures
+      .map(f => messages(s"$entityListKey.${f.toString}$businessTypeSuffix", entityName))
+      .toSet
+    case _ => Set.empty
+  }
 }
-@hasIndividualFailures = @{failedNonFixable.riskedIndividuals.exists(_.failures.nonEmpty)}
+@hasIndividualFailures = @{nonFixableIndividuals.nonEmpty}
 @individualFailureToMessage(failure: IndividualFailure, providedName: IndividualName) = @{
   messages(s"$individualListKey.${failure.toString}$businessTypeSuffix", providedName.value)
 }
-@individualFailuresResolvedAsSet(riskedIndividual: RiskedIndividual) = @{
-  riskedIndividual
-  .failures
-    .map(individualFailure => individualFailureToMessage(individualFailure, riskedIndividual.individualName))
-    .toSet
+@individualFailuresResolvedAsSet(individual: IndividualProvidedDetails) = @{
+    individual.riskingOutcomeIndividual match {
+      case Some(RiskingOutcomeIndividual.FailedNonFixable(failures)) =>
+        failures.map(individualFailure => individualFailureToMessage(individualFailure, individual.individualName)).toSet
+      case _ => Set.empty
+    }
 }
-@individualFailures(riskedIndividual: RiskedIndividual) = {
-  @if(individualFailuresResolvedAsSet(riskedIndividual).nonEmpty) {
+@individualFailures(individual: IndividualProvidedDetails) = {
+  @if(individualFailuresResolvedAsSet(individual).nonEmpty) {
     <h3 class="govuk-heading-s">@{
-      riskedIndividual.individualName.value
+      individual.individualName.value
     }</h3>
 
-    @if(individualFailuresResolvedAsSet(riskedIndividual).size === 1) {
-        <p class="govuk-body" id="@{riskedIndividual.personReference.value}-reasons">
-            @messages(s"$key.individualSingleReason", riskedIndividual.individualName.value, individualFailuresResolvedAsSet(riskedIndividual).head)
+    @if(individualFailuresResolvedAsSet(individual).size === 1) {
+        <p class="govuk-body" id="@{individual.personReference.value}-reasons">
+            @messages(s"$key.individualSingleReason", individual.individualName.value, individualFailuresResolvedAsSet(individual).head)
         </p>
     } else {
         <p class="govuk-body">
-            @messages(s"$key.individualListIntro", riskedIndividual.individualName.value)
+            @messages(s"$key.individualListIntro", individual.individualName.value)
         </p>
-        <ul id="@{riskedIndividual.personReference.value}-reasons"
+        <ul id="@{individual.personReference.value}-reasons"
             class="govuk-list govuk-list--bullet">
-            @individualFailuresResolvedAsSet(riskedIndividual).map(f => <li>{f}</li>)
+            @individualFailuresResolvedAsSet(individual).map(f => <li>{f}</li>)
         </ul>
     }
   }
@@ -128,7 +132,7 @@
     <h2 id="individual-failures" class="govuk-heading-m">@messages(s"$key.individualFailures.h2")</h2>
   }
 
-  @failedNonFixable.riskedIndividuals.map(individualFailures)
+  @nonFixableIndividuals.map(individualFailures)
 
   <h2 class="govuk-heading-m">@messages(s"$key.decision.h2")</h2>
   <p class="govuk-body">@messages(s"$key.decision.p1", entityName)</p>
