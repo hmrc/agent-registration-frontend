@@ -119,7 +119,7 @@ extends ViewSpec:
         s"""
            |Application outcome
            |Test Company Name does not meet the registration conditions
-           |Your application for an agent services account cannot be approved (refused under Section 230 of the Finance Act 2026).
+           |Your application for an agent services account cannot be approved. It is refused under Section 230 of the Finance Act 2026 (opens in a new tab).
            |This is because one or more relevant individuals linked to the application do not meet the registration conditions.
            |Relevant individuals who do not meet the registration conditions
            |Steve Austin
@@ -177,7 +177,7 @@ extends ViewSpec:
       val hmrcStandardLink: TestLink =
         docWithIndividualNonFixableFailures
           .mainContent
-          .selectOrFail("a.govuk-link")
+          .select("li#appeal-guidance > a")
           .get(0)
           .toLink
 
@@ -193,7 +193,7 @@ extends ViewSpec:
         s"""
            |Application outcome
            |Test Company Name does not meet the registration conditions
-           |Your application for an agent services account cannot be approved (refused under Section 230 of the Finance Act 2026).
+           |Your application for an agent services account cannot be approved. It is refused under Section 230 of the Finance Act 2026 (opens in a new tab).
            |This is because:
            |the business has missing tax returns in their HMRC recordour records show that the business is formally insolvent
            |Failure to meet the registration conditions
@@ -224,7 +224,7 @@ extends ViewSpec:
         s"""
            |Application outcome
            |Test Company Name does not meet the registration conditions
-           |Your application for an agent services account cannot be approved (refused under Section 230 of the Finance Act 2026).
+           |Your application for an agent services account cannot be approved. It is refused under Section 230 of the Finance Act 2026 (opens in a new tab).
            |This is because:
            |the business has missing tax returns in their HMRC recordour records show that the business is formally insolvent
            |one or more relevant individuals linked to the application do not meet the registration conditions
@@ -250,7 +250,7 @@ extends ViewSpec:
         s"""
            |Application outcome
            |Test Company Name does not meet the registration conditions
-           |Your application for an agent services account cannot be approved (refused under Section 230 of the Finance Act 2026).
+           |Your application for an agent services account cannot be approved. It is refused under Section 230 of the Finance Act 2026 (opens in a new tab).
            |This is because our records show that the business is formally insolvent.
            |Failure to meet the registration conditions
            |"""
@@ -268,7 +268,7 @@ extends ViewSpec:
         s"""
            |Application outcome
            |Test Company Name does not meet the registration conditions
-           |Your application for an agent services account cannot be approved (refused under Section 230 of the Finance Act 2026).
+           |Your application for an agent services account cannot be approved. It is refused under Section 230 of the Finance Act 2026 (opens in a new tab).
            |This is because:
            |our records show that the business is formally insolvent
            |one or more relevant individuals linked to the application do not meet the registration conditions
