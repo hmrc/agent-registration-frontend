@@ -1416,7 +1416,7 @@ fixableSoleTraderDetails.EntityFix.8.7.label = Have all overdue liabilities been
 # Failed Non Fixable
 failedNonFixable.caption = Application outcome
 failedNonFixable.title = {0} does not meet the registration conditions
-failedNonFixable.p1 = Your application for an agent services account cannot be approved. It is refused under <a href="https://www.legislation.gov.uk/ukpga/2026/11/section/230" class="govuk-link" rel="noopener noreferrer" target="_blank">Section 230 of the Finance Act 2026 (opens in a new tab)</a>.
+failedNonFixable.p1 = Your application for an agent services account cannot be approved. It is refused under <a href="{0}" class="govuk-link" rel="noopener noreferrer" target="_blank">Section 230 of the Finance Act 2026 (opens in a new tab)</a>.
 failedNonFixable.p2 = This is because
 
 failedNonFixable.individualFailures.h2 = Relevant individuals who do not meet the registration conditions

@@ -111,7 +111,7 @@
 ) {
   <h2 class="govuk-caption-l">@caption</h2>
   <h1 class="govuk-heading-l">@title</h1>
-  <p class="govuk-body">@Html(messages(s"$key.p1"))</p>
+  <p class="govuk-body">@Html(messages(s"$key.p1", appConfig.govukFinanceAct2026Url))</p>
   @if(entityFailuresResolvedAsSet.size === 1 && !hasIndividualFailures) {
     <p class="govuk-body">
       @{s"${messages(s"$key.p2")} ${entityFailuresResolvedAsSet.head}"}.
