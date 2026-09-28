@@ -20,8 +20,10 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
+import uk.gov.hmrc.agentregistration.shared.AgentApplicationLlp
 import uk.gov.hmrc.agentregistration.shared.PersonReference
-import uk.gov.hmrc.agentregistration.shared.risking.RiskingProgress
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.lists.IndividualName
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.ViewSpec
 import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.FailedNonFixablePage
 
@@ -29,24 +31,62 @@ class FailedNonFixablePageSpec
 extends ViewSpec:
 
   val viewTemplate: FailedNonFixablePage = app.injector.instanceOf[FailedNonFixablePage]
-  val agentApplication: AgentApplication =
-    tdAll
-      .agentApplicationLlp
-      .afterDeclarationSubmitted
 
   val personReferenceOne = PersonReference("PREF0")
   val personReferenceTwo = PersonReference("PREF1")
 
-  object failedNonFixableResponse:
+  object nonFixableApplication:
 
-    val applicantFailedNoIndividualFailures: RiskingProgress.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixableFailedApplicantOnly
-    val allIndividualsNonFixableFailures: RiskingProgress.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixableIndividualsOnly
-    val allNonFixableFailures: RiskingProgress.FailedNonFixable = tdAll.applicationRiskingResponse.allFailedNonFixable
-    val duplicateEntityFailures: RiskingProgress.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixableWithDuplicates
+    val baseApplication: AgentApplicationLlp =
+      tdAll
+        .agentApplicationLlp
+        .afterRiskingCompletedNonFixable
 
-    val singleEntityFailureApplicantOnly: RiskingProgress.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixableSingleEntityFailureApplicantOnly
+    val entityNonFixable: AgentApplication = baseApplication
+      .copy(
+        riskingOutcomeEntity = Some(tdAll.entityRiskingOutcome.failedNonFixable)
+      )
+    val entityNonFixableSingleFailure: AgentApplication = baseApplication
+      .copy(
+        riskingOutcomeEntity = Some(tdAll.entityRiskingOutcome.singleNonFixableFailure)
+      )
+    val entityApproved: AgentApplication = baseApplication
+      .copy(
+        riskingOutcomeEntity = Some(tdAll.entityRiskingOutcome.approved)
+      )
 
-    val singleEntityFailureAndIndividuals: RiskingProgress.FailedNonFixable = tdAll.applicationRiskingResponse.failedNonFixableSingleEntityFailureAndIndividuals
+    val withDuplicates: AgentApplication = baseApplication
+      .copy(
+        riskingOutcomeEntity = Some(tdAll.entityRiskingOutcome.failedNonFixableWithDuplicates)
+      )
+
+  object nonFixableIndividuals:
+
+    val baseIndividual: IndividualProvidedDetails =
+      tdAll
+        .providedDetails
+        .afterFinished
+
+    val allNonFixable: List[IndividualProvidedDetails] = List(
+      baseIndividual.copy(
+        personReference = personReferenceOne,
+        individualName = IndividualName("Steve Austin"),
+        riskingOutcomeIndividual = Some(tdAll.individualRiskingOutcome.failedNonFixable)
+      ),
+      baseIndividual.copy(
+        personReference = personReferenceTwo,
+        individualName = IndividualName("Beverly Hills"),
+        riskingOutcomeIndividual = Some(tdAll.individualRiskingOutcome.singleNonFixableFailure)
+      )
+    )
+
+    val onlyOneNonFixable: List[IndividualProvidedDetails] = List(
+      baseIndividual.copy(
+        personReference = personReferenceOne,
+        individualName = IndividualName("Steve Austin"),
+        riskingOutcomeIndividual = Some(tdAll.individualRiskingOutcome.failedNonFixable)
+      )
+    )
 
   val entityFailureMessages: Map[String, String] = Map(
     "duplicatedMessage" -> "our records show that the business is formally insolvent", // all three entity failures have this same failure message
@@ -54,22 +94,22 @@ extends ViewSpec:
   )
 
   private def render(
-    failedNonFixable: RiskingProgress.FailedNonFixable,
+    nonFixableIndividuals: List[IndividualProvidedDetails],
     agentApplication: AgentApplication
   ): Document = Jsoup.parse(
     viewTemplate(
-      failedNonFixable = failedNonFixable,
+      nonFixableIndividuals = nonFixableIndividuals,
       agentApplication = agentApplication,
       entityName = "Test Company Name"
     ).body
   )
 
-  val docWithAllNonFixableFailures: Document = render(failedNonFixableResponse.allNonFixableFailures, agentApplication)
-  val docWithIndividualNonFixableFailures: Document = render(failedNonFixableResponse.allIndividualsNonFixableFailures, agentApplication)
-  val docWithApplicantOnlyNonFixableFailures: Document = render(failedNonFixableResponse.applicantFailedNoIndividualFailures, agentApplication)
-  val docWithDuplicateFailures: Document = render(failedNonFixableResponse.duplicateEntityFailures, agentApplication)
-  val docWithSingleEntityFailureApplicantOnly: Document = render(failedNonFixableResponse.singleEntityFailureApplicantOnly, agentApplication)
-  val docWithSingleEntityFailureAndIndividuals: Document = render(failedNonFixableResponse.singleEntityFailureAndIndividuals, agentApplication)
+  val docWithAllNonFixableFailures: Document = render(nonFixableIndividuals.allNonFixable, nonFixableApplication.entityNonFixable)
+  val docWithIndividualNonFixableFailures: Document = render(nonFixableIndividuals.allNonFixable, nonFixableApplication.entityApproved)
+  val docWithApplicantOnlyNonFixableFailures: Document = render(List.empty, nonFixableApplication.entityNonFixable)
+  val docWithDuplicateFailures: Document = render(List.empty, nonFixableApplication.withDuplicates)
+  val docWithSingleEntityFailureApplicantOnly: Document = render(List.empty, nonFixableApplication.entityNonFixableSingleFailure)
+  val docWithSingleEntityFailureAndIndividuals: Document = render(nonFixableIndividuals.onlyOneNonFixable, nonFixableApplication.entityNonFixableSingleFailure)
 
   val renderedEntityFailuresWithNoIndividualFailures: Elements = docWithDuplicateFailures.selectOrFail("#entity-reasons").select("li")
 
@@ -193,8 +233,7 @@ extends ViewSpec:
            |Records indicate that Steve Austin:
            |has one or more overdue liabilitiesis actively disqualified on Companies house
            |Beverly Hills
-           |Records indicate that Beverly Hills:
-           |has one or more overdue liabilitiesis actively disqualified on Companies house
+           |Records indicate that Beverly Hills has a relevant unspent criminal conviction.
            |Failure to meet the registration conditions
            |Test Company Name will not be given an agent services account on this occasion.
            |The application will be deleted 45 days after the date we emailed you about this outcome, to comply with our data retention policy.
@@ -252,7 +291,8 @@ extends ViewSpec:
 
   final case class BusinessTypeTestCase(
     description: String,
-    agentApplication: AgentApplication,
+    agentApplicationMultipleFailures: AgentApplication,
+    agentApplicationSingleFailure: AgentApplication,
     expectedSingleReason: String,
     expectedFirstReason: String
   )
@@ -260,27 +300,34 @@ extends ViewSpec:
   Seq(
     BusinessTypeTestCase(
       description = "an LLP",
-      agentApplication = tdAll.agentApplicationLlp.afterDeclarationSubmitted,
+      agentApplicationMultipleFailures = nonFixableApplication.entityNonFixable,
+      agentApplicationSingleFailure = tdAll.agentApplicationLlp.afterRiskingCompletedNonFixable,
       expectedSingleReason = "This is because our records show that the business is formally insolvent.",
       expectedFirstReason = "the business has missing tax returns in their HMRC record"
     ),
     BusinessTypeTestCase(
       description = "a sole trader applying for themselves",
-      agentApplication = tdAll.agentApplicationSoleTrader.afterDeclarationSubmitted,
+      agentApplicationMultipleFailures = tdAll.agentApplicationSoleTrader.afterFailedNonFixable,
+      agentApplicationSingleFailure = tdAll.agentApplicationSoleTrader.afterFailedNonFixable.copy(
+        riskingOutcomeEntity = Some(tdAll.entityRiskingOutcome.singleNonFixableFailure)
+      ),
       expectedSingleReason = "This is because our records show that the business is formally insolvent.",
       expectedFirstReason = "the business has missing tax returns in their HMRC record"
     ),
     BusinessTypeTestCase(
       description = "someone applying on behalf of a sole trader",
-      agentApplication = tdAll.agentApplicationSoleTraderRepresentative.afterDeclarationSubmitted,
+      agentApplicationMultipleFailures = tdAll.agentApplicationSoleTraderRepresentative.afterFailedNonFixable,
+      agentApplicationSingleFailure = tdAll.agentApplicationSoleTraderRepresentative.afterFailedNonFixable.copy(
+        riskingOutcomeEntity = Some(tdAll.entityRiskingOutcome.singleNonFixableFailure)
+      ),
       expectedSingleReason = "This is because our records show that the business is formally insolvent.",
       expectedFirstReason = "the business has missing tax returns in their HMRC record"
     )
   ).foreach: testCase =>
     s"FailedNonFixablePage for ${testCase.description}" should:
 
-      "name who failed when the business has one failure" in:
-        val doc: Document = render(failedNonFixableResponse.singleEntityFailureApplicantOnly, testCase.agentApplication)
+      "not render a list when the business has only one failure" in:
+        val doc: Document = render(List.empty, testCase.agentApplicationSingleFailure)
 
         doc.mainContent.select("#entity-reasons").size() shouldBe 0 // one reason, so no list
         doc
@@ -289,8 +336,8 @@ extends ViewSpec:
           .get(1) // the paragraph after the introduction
           .text() shouldBe testCase.expectedSingleReason
 
-      "name who failed in the first reason when the business has several failures" in:
-        render(failedNonFixableResponse.applicantFailedNoIndividualFailures, testCase.agentApplication)
+      "render a list of failures when the business has several failures" in:
+        render(List.empty, testCase.agentApplicationMultipleFailures)
           .mainContent
           .selectOrFail("#entity-reasons")
           .select("li")
