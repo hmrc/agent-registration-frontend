@@ -111,7 +111,7 @@
 ) {
   <h2 class="govuk-caption-l">@caption</h2>
   <h1 class="govuk-heading-l">@title</h1>
-  <p class="govuk-body">@messages(s"$key.p1")</p>
+  <p class="govuk-body">@Html(messages(s"$key.p1"))</p>
   @if(entityFailuresResolvedAsSet.size === 1 && !hasIndividualFailures) {
     <p class="govuk-body">
       @{s"${messages(s"$key.p2")} ${entityFailuresResolvedAsSet.head}"}.
@@ -140,7 +140,7 @@
   <h2 class="govuk-heading-m">@messages(s"$key.appeal.h2")</h2>
   <ul class="govuk-list govuk-list--bullet">
     <li>@messages(s"$key.appeal.li1")</li>
-    <li>@Html(messages(s"$key.appeal.li2", appConfig.guidanceForFailedApplicationAppealsUrl))</li>
+    <li id="appeal-guidance">@Html(messages(s"$key.appeal.li2", appConfig.guidanceForFailedApplicationAppealsUrl))</li>
   </ul>
 
   <p class="govuk-body govuk-!-display-none-print govuk-!-margin-top-6">
