@@ -200,7 +200,7 @@ extends ControllerSpec:
   s"POST $postFiveOrLessPath with 'No' selection should display update Companies House advice page" in:
     ApplyStubHelper.stubsForSuccessfulUpdateWithBpr(
       application = agentApplication.beforeCompaniesHouseOfficers,
-      updatedApplication = agentApplication.afterFiveOrLessCompaniesHouseOfficersNo
+      updatedApplication = agentApplication.beforeCompaniesHouseOfficers
     )
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.beforeCompaniesHouseOfficers.agentApplicationId,
@@ -223,8 +223,8 @@ extends ControllerSpec:
 
   s"POST $postFiveOrLessPath with 'No' selection and existing individuals should delete individuals and display update Companies House advice page" in:
     ApplyStubHelper.stubsForSuccessfulUpdateWithBpr(
-      application = agentApplication.beforeCompaniesHouseOfficers,
-      updatedApplication = agentApplication.afterFiveOrLessCompaniesHouseOfficersNo
+      application = agentApplication.afterNumberOfConfirmCompaniesHouseOfficers,
+      updatedApplication = agentApplication.beforeCompaniesHouseOfficers
     )
     AgentRegistrationStubs.stubFindIndividualsForApplication(
       agentApplicationId = agentApplication.beforeCompaniesHouseOfficers.agentApplicationId,

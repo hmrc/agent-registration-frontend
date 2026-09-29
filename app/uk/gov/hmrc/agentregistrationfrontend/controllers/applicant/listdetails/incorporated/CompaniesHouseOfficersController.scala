@@ -128,10 +128,7 @@ extends FrontendController(mcc, actions):
             case false =>
               val updatedApplication = updateApplicationWithOfficerCount(
                 agentApplication = agentApplication,
-                numberOfCompaniesHouseOfficers = FiveOrLessOfficers(
-                  numberOfCompaniesHouseOfficers = companiesHouseOfficers.size,
-                  isCompaniesHouseOfficersListCorrect = isCompaniesHouseOfficersListCorrect
-                )
+                numberOfCompaniesHouseOfficers = None // we cannot impose what the list should be if user says it's not right
               )
 
               val deleteIndividualProvideDetails =
@@ -153,10 +150,10 @@ extends FrontendController(mcc, actions):
             case true =>
               val updatedApplication = updateApplicationWithOfficerCount(
                 agentApplication = agentApplication,
-                numberOfCompaniesHouseOfficers = FiveOrLessOfficers(
+                numberOfCompaniesHouseOfficers = Some(FiveOrLessOfficers(
                   numberOfCompaniesHouseOfficers = companiesHouseOfficers.size,
                   isCompaniesHouseOfficersListCorrect = isCompaniesHouseOfficersListCorrect
-                )
+                ))
               )
 
               val insertIndividualProvideDetails =
@@ -217,7 +214,7 @@ extends FrontendController(mcc, actions):
 
           val updatedApplication = updateApplicationWithOfficerCount(
             agentApplication,
-            numberOfCompaniesHouseOfficers
+            Some(numberOfCompaniesHouseOfficers)
           )
 
           for _ <- agentApplicationService.upsert(updatedApplication)
@@ -272,13 +269,13 @@ extends FrontendController(mcc, actions):
 
   private def updateApplicationWithOfficerCount(
     agentApplication: IsIncorporated,
-    numberOfCompaniesHouseOfficers: NumberOfCompaniesHouseOfficers
+    numberOfCompaniesHouseOfficers: Option[NumberOfCompaniesHouseOfficers]
   ): IsIncorporated =
     agentApplication match
-      case application: AgentApplicationLimitedCompany => application.modify(_.numberOfIndividuals).setTo(Some(numberOfCompaniesHouseOfficers))
-      case application: AgentApplicationLimitedPartnership => application.modify(_.numberOfIndividuals).setTo(Some(numberOfCompaniesHouseOfficers))
-      case application: AgentApplicationLlp => application.modify(_.numberOfIndividuals).setTo(Some(numberOfCompaniesHouseOfficers))
-      case application: AgentApplicationScottishLimitedPartnership => application.modify(_.numberOfIndividuals).setTo(Some(numberOfCompaniesHouseOfficers))
+      case application: AgentApplicationLimitedCompany => application.modify(_.numberOfIndividuals).setTo(numberOfCompaniesHouseOfficers)
+      case application: AgentApplicationLimitedPartnership => application.modify(_.numberOfIndividuals).setTo(numberOfCompaniesHouseOfficers)
+      case application: AgentApplicationLlp => application.modify(_.numberOfIndividuals).setTo(numberOfCompaniesHouseOfficers)
+      case application: AgentApplicationScottishLimitedPartnership => application.modify(_.numberOfIndividuals).setTo(numberOfCompaniesHouseOfficers)
 
   private def updateApplicationWithZeroOfficers(
     agentApplication: IsIncorporated
