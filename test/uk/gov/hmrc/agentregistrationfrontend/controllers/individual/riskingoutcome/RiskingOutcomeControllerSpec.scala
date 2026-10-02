@@ -20,8 +20,12 @@ import com.softwaremill.quicklens.modify
 import play.api.libs.ws.WSResponse
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
 import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.PersonReference
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualDateOfBirth
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualNino
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualSaUtr
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFailure
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
@@ -61,6 +65,7 @@ extends ControllerSpec:
     )))
 
   object individualProvidedDetails:
+
     val finished: IndividualProvidedDetails = tdAll
       .providedDetails
       .afterFinished
@@ -71,6 +76,28 @@ extends ControllerSpec:
           declarationAgreed = true
         ))
       )
+
+    val finishedWithCl50IndividualFix: IndividualProvidedDetails = finished
+      .modify(_.internalUserId)
+      .setTo(Some(InternalUserId("internal-user-id-999"))) // different internal user id to our authenticated user
+      .modify(_.individualSaUtr)
+      .setTo(Some(IndividualSaUtr.NotProvided))
+      .modify(_.individualNino)
+      .setTo(Some(IndividualNino.Provided(tdAll.nino)))
+      .modify(_.individualDateOfBirth)
+      .setTo(Some(IndividualDateOfBirth.Provided(tdAll.dateOfBirth)))
+      .modify(_.passedIv)
+      .setTo(Some(false))
+      .modify(_.riskingOutcomeIndividual)
+      .setTo(Some(RiskingOutcomeIndividual.FailedFixable(
+        fixes = Seq(IndividualFix._10.IndividualDetailsFix(
+          isConfirmed = None,
+          saUtr = Some(IndividualSaUtr.NotProvided),
+          nino = Some(IndividualNino.Provided(tdAll.nino)),
+          dateOfBirth = Some(IndividualDateOfBirth.Provided(tdAll.dateOfBirth))
+        )),
+        declarationAgreed = true
+      )))
 
   private val path = s"/agent-registration/provide-details/outcome-status/${linkId.value}"
 
@@ -97,6 +124,16 @@ extends ControllerSpec:
     ProvideDetailsStubHelper.stubAuthAndMatchIndividualProvidedDetails(
       agentApplication = failedFixableApplication,
       individualProvidedDetails = individualProvidedDetails.finished
+    )
+    val response: WSResponse = get(path)
+
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe "You do not meet the registration conditions yet - Apply for an agent services account - GOV.UK"
+
+  s"GET $path when risking outcome has IndividualDetailsFix on different creds but same Nino should return 200 and render failed fixable page" in:
+    ProvideDetailsStubHelper.stubAuthAndMatchIndividualProvidedDetails(
+      agentApplication = failedFixableApplication,
+      individualProvidedDetails = individualProvidedDetails.finishedWithCl50IndividualFix
     )
     val response: WSResponse = get(path)
 

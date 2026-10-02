@@ -9,7 +9,7 @@ flowchart TD
     R --> A
     A[Sign in with Creds] --> B{are creds with Agent affinity?}
     B -->|Yes| C[Show Cannot Sign in As Agent page]
-    B -->|No| E{Does InternalUserId match existing Person Record?}
+    B -->|No| E{Does InternalUserId or verified Nino match existing Person Record?}
     E --> |Yes| F[Resume Journey with Person Record]
     E --> |No| G{Are there any unlinked Person Records?}
     G --> |Yes| H{Does user have Nino?}

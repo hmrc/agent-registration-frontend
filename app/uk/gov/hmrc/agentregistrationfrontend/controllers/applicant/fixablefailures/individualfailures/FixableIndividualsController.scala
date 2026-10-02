@@ -68,7 +68,7 @@ extends FrontendController(mcc, actions):
               throw new IllegalStateException(
                 s"""[
                    | FixableIndividualsController] All individual details provided by applicant for application ${agentApplication.applicationReference}
-                   | this includes individuals with person references: ${detailsNotProvidedByApplicantList.map(_.personReference.value)}, redirecting to
+                   | this includes individuals with person references: ${fixableList.map(_.personReference.value)}, redirecting to
                    | error page""".stripMargin
               )
             }
