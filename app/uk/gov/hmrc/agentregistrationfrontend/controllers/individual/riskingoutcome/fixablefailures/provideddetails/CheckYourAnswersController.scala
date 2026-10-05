@@ -22,6 +22,7 @@ import com.softwaremill.quicklens.modify
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.risking.IndividualFix
@@ -31,6 +32,7 @@ import uk.gov.hmrc.agentregistrationfrontend.action.individual.IndividualActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.individual.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.individual.IndividualProvideDetailsService
 import uk.gov.hmrc.agentregistrationfrontend.views.html.individual.riskingoutcome.fixablefailures.provideddetails.CheckYourAnswersPage
+import uk.gov.hmrc.auth.core.ConfidenceLevel
 
 @Singleton
 class CheckYourAnswersController @Inject() (
@@ -71,6 +73,10 @@ extends FrontendController(mcc, actions):
         individualProvideDetailsService
           .upsert(
             request.get[IndividualProvidedDetails]
+              .modify(_.internalUserId)
+              .setTo(Some(request.get[InternalUserId]))
+              .modify(_.passedIv)
+              .setTo(Some(request.get[ConfidenceLevel] >= ConfidenceLevel.L250))
               .modify(_.riskingOutcomeIndividual)
               .setTo(Some(updatedRiskingOutcomeIndividual))
           )
