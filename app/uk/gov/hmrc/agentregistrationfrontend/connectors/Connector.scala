@@ -56,7 +56,8 @@ extends RequestAwareLogging:
   export uk.gov.hmrc.http.HttpErrorFunctions.is2xx
 
   // this project:
-  export uk.gov.hmrc.agentregistration.shared.AgentApplicationFormat.restFormat
+  export uk.gov.hmrc.agentregistration.shared.AgentApplicationFormat.restFormat as agentApplicationRestFormat
+  export uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsFormat.restFormat as individualProvidedDetailsRestFormat
   export uk.gov.hmrc.agentregistrationfrontend.util.FutureUtil.*
   export uk.gov.hmrc.agentregistrationfrontend.util.Errors
   export Errors.getOrThrowExpectedDataMissing

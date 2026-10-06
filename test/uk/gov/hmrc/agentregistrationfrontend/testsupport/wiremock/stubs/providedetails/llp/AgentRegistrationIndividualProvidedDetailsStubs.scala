@@ -27,6 +27,7 @@ import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
 import uk.gov.hmrc.agentregistration.shared.LinkId
 import uk.gov.hmrc.agentregistration.shared.Utr
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
+import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsFormat.restFormat
 import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetailsId
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.StubMaker
 
