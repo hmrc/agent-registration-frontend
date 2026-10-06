@@ -14,25 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.upscan
+package uk.gov.hmrc.agentregistrationfrontend.repository
 
 import play.api.libs.json.Format
-import play.api.libs.json.Json
-import play.api.libs.json.OFormat
-import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistration.shared.upload.FileUploadReference
-import uk.gov.hmrc.agentregistration.shared.upload.UploadId
+import play.api.libs.json.Reads
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.time.Instant
 
-final case class Upload(
-  private val _id: UploadId,
-  internalUserId: InternalUserId,
-  createdAt: Instant,
-  fileUploadReference: FileUploadReference,
-  uploadStatus: UploadStatus
-):
-  val uploadId: UploadId = _id
+/** Date formats for Mongo storage: BSON dates. */
+object MongoDateFormats:
 
-object Upload:
-  def makeFormat(using Format[Instant]): OFormat[Upload] = Json.format[Upload]
+  // reads also accept the ISO string shape of data written before the migration to BSON Date
+  val instantFormat: Format[Instant] = Format(
+    // TODO: remove the ISO-string fallback once the dates migration has run in every environment
+    MongoJavatimeFormats.instantReads.orElse(Reads.DefaultInstantReads),
+    MongoJavatimeFormats.instantWrites
+  )
