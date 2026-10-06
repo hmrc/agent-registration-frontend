@@ -40,6 +40,8 @@ extends RequestAwareLogging:
 
   def deleteAll()(using RequestHeader): Future[Unit] = testAgentRegistrationConnector.deleteAllApplications()
 
+  def runExpiryScheduler()(using RequestHeader): Future[Unit] = testAgentRegistrationConnector.runExpiryScheduler()
+
   def findApplication(applicationReference: ApplicationReference)(using RequestHeader): Future[Option[AgentApplication]] =
     agentRegistrationConnector.findApplication(applicationReference)
 

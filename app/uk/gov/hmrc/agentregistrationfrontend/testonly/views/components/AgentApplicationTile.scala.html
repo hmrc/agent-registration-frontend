@@ -151,7 +151,7 @@
 
 @stateTagClasses = @{
     agentApplication.applicationState match {
-        case ApplicationState.Started => "govuk-tag--grey"
+        case ApplicationState.Started | ApplicationState.Expired => "govuk-tag--grey"
         case ApplicationState.GrsDataReceived => "govuk-tag--blue"
         case ApplicationState.SentForRisking => "govuk-tag--yellow"
         case ApplicationState.SentToMinerva => "govuk-tag--purple"
