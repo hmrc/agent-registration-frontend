@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.agentregistrationfrontend.model.upscan
+package uk.gov.hmrc.agentregistration.shared.util
 
 import play.api.libs.json.Format
-import play.api.libs.json.Json
-import play.api.libs.json.OFormat
-import uk.gov.hmrc.agentregistration.shared.InternalUserId
-import uk.gov.hmrc.agentregistration.shared.upload.FileUploadReference
-import uk.gov.hmrc.agentregistration.shared.upload.UploadId
+import play.api.libs.json.Reads
+import play.api.libs.json.Writes
 
 import java.time.Instant
+import java.time.LocalDate
 
-final case class Upload(
-  private val _id: UploadId,
-  internalUserId: InternalUserId,
-  createdAt: Instant,
-  fileUploadReference: FileUploadReference,
-  uploadStatus: UploadStatus
-):
-  val uploadId: UploadId = _id
+/** Date formats for REST data exchange: ISO strings. */
+object RestDateFormats:
 
-object Upload:
-  def makeFormat(using Format[Instant]): OFormat[Upload] = Json.format[Upload]
+  val instantFormat: Format[Instant] = Format(Reads.DefaultInstantReads, Writes.DefaultInstantWrites)
+
+  val localDateFormat: Format[LocalDate] = Format(Reads.DefaultLocalDateReads, Writes.DefaultLocalDateWrites)
