@@ -22,8 +22,11 @@ import org.mongodb.scala.SingleObservableFuture
 import org.mongodb.scala.model.Filters
 import org.mongodb.scala.model.Updates
 import uk.gov.hmrc.agentregistration.shared.util.RestDateFormats
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.MongoISpec
+
+import scala.concurrent.duration.*
 
 class DatesMigratorSpec
 extends MongoISpec:
@@ -70,8 +73,18 @@ extends MongoISpec:
 
       createdAtType shouldBe BsonType.STRING
 
+    "pause between the runs" in:
+      val startedAt: Long = System.nanoTime()
+
+      migrator.migrate().futureValue shouldBe 0L
+
+      val elapsed: FiniteDuration = (System.nanoTime() - startedAt).nanos
+      // the collection is empty: two quiet runs, so one pause
+      elapsed should be >= appConfig.DatesMigrator.delayBetweenRuns
+
   private lazy val uploadRepo: UploadRepo = app.injector.instanceOf[UploadRepo]
   private lazy val migrator: DatesMigrator = app.injector.instanceOf[DatesMigrator]
+  private lazy val appConfig: AppConfig = app.injector.instanceOf[AppConfig]
 
   private lazy val upload: Upload = tdAll.uploadUploadedSuccessfully
 

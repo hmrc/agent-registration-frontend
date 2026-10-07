@@ -23,7 +23,9 @@ import org.mongodb.scala.MongoCollection
 import org.mongodb.scala.SingleObservableFuture
 import org.mongodb.scala.model.Filters
 import play.api.Logging
+import play.api.libs.concurrent.Futures
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.repository.DatesMigrator.*
 
 import javax.inject.Inject
@@ -34,7 +36,11 @@ import scala.concurrent.Future
 // TODO: remove, with DatesMigratorStarter and the dates-migrator config, once the dates migration has run in every environment
 /** Converts the dates that `upload` records hold as ISO strings into BSON dates. */
 @Singleton
-class DatesMigrator @Inject() (uploadRepo: UploadRepo)(using ExecutionContext)
+class DatesMigrator @Inject() (
+  uploadRepo: UploadRepo,
+  appConfig: AppConfig,
+  futures: Futures
+)(using ExecutionContext)
 extends Logging:
 
   /** @return the number of documents converted; none if the migration failed */
@@ -74,11 +80,12 @@ extends Logging:
         if quietRunsNow === 2
         then Future.successful(converted)
         else
-          run(
-            runNumber = runNumber + 1,
-            quietRuns = quietRunsNow,
-            converted = converted + convertedInRun
-          )
+          futures.delayed(appConfig.DatesMigrator.delayBetweenRuns):
+            run(
+              runNumber = runNumber + 1,
+              quietRuns = quietRunsNow,
+              converted = converted + convertedInRun
+            )
 
     run(
       runNumber = 1,

@@ -129,7 +129,9 @@ class AppConfig @Inject() (
     val ttl: FiniteDuration = ConfigHelper.readFiniteDuration("mongodb.upload-repo-ttl", servicesConfig)
 
   object DatesMigrator:
+
     val enabled: Boolean = configuration.get[Boolean]("dates-migrator.enabled")
+    val delayBetweenRuns: FiniteDuration = configuration.get[FiniteDuration]("dates-migrator.delay-between-runs")
 
   object Stride:
 
