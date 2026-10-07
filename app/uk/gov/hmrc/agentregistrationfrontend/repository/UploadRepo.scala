@@ -21,6 +21,7 @@ import org.mongodb.scala.model.IndexModel
 import org.mongodb.scala.model.IndexOptions
 import org.mongodb.scala.model.Indexes
 import org.mongodb.scala.model.Sorts
+import play.api.libs.json.OFormat
 import uk.gov.hmrc.agentregistration.shared.InternalUserId
 import uk.gov.hmrc.agentregistration.shared.upload.UploadId
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
@@ -44,12 +45,12 @@ final class UploadRepo @Inject() (
   appConfig: AppConfig
 )(using ec: ExecutionContext)
 extends Repo[UploadId, Upload](
-  collectionName = "upload",
+  collectionName = UploadRepo.collectionName,
   mongoComponent = mongoComponent,
   indexes = UploadRepoHelp.indexes(appConfig.UploadRepo.ttl),
-  extraCodecs = Seq(Codecs.playFormatCodec(Upload.format)),
+  extraCodecs = Seq(Codecs.playFormatCodec(UploadRepo.mongoFormat)),
   replaceIndexes = true
-):
+)(using domainFormat = UploadRepo.mongoFormat):
 
   def findLatestByInternalUserId(internalUserId: InternalUserId): Future[Option[Upload]] = collection
     .find(
@@ -57,6 +58,11 @@ extends Repo[UploadId, Upload](
     )
     .sort(Sorts.descending("createdAt"))
     .headOption()
+
+object UploadRepo:
+
+  val collectionName: String = "upload"
+  val mongoFormat: OFormat[Upload] = Upload.makeFormat(using MongoDateFormats.instantFormat)
 
 // when named it UploadRepo, Scala 3 compiler complains
 // about cyclic reference error during compilation ...
