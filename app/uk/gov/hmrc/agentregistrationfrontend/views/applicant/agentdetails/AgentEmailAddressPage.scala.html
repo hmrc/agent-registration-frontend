@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentEmailAddress
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 @import uk.gov.hmrc.agentregistrationfrontend.forms.AgentEmailAddressForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
@@ -51,7 +52,7 @@
     .getVerifiedEmail
 }
 @bprRadio = @{
-  if(bprEmailAddress.isDefined)
+  if(bprEmailAddress.isDefined && (bprEmailAddress.get =!= contactEmail.value))
     Seq(
         RadioItem(
             content = Text(bprEmailAddress.get),

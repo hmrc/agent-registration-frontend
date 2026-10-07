@@ -16,6 +16,7 @@
 
 @import uk.gov.hmrc.agentregistration.shared.agentdetails.AgentTelephoneNumber
 @import uk.gov.hmrc.agentregistration.shared.AgentApplication
+@import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
 @import uk.gov.hmrc.agentregistrationfrontend.forms.AgentTelephoneNumberForm
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.Layout
 @import uk.gov.hmrc.agentregistrationfrontend.views.html.applicant.partials.ContinueOrSaveForLater
@@ -51,7 +52,7 @@
     .getTelephoneNumber
 }
 @bprRadio = @{
-  if(bprTelephoneNumber.isDefined)
+  if(bprTelephoneNumber.isDefined && (bprTelephoneNumber.get =!= contactTelephone.value))
     Seq(
         RadioItem(
             content = Text(bprTelephoneNumber.get),

@@ -44,11 +44,16 @@ extends ViewSpec:
     bprEmailAddress = Some(tdAll.bprEmailAddress),
     agentApplication = agentApplicationRequest.agentApplication
   ).body)
+  val docWithDuplicates: Document = Jsoup.parse(viewTemplate(
+    form = AgentEmailAddressForm.form,
+    bprEmailAddress = Some(tdAll.applicantEmailAddress.value), // this is the same as the agentApplication contact email address
+    agentApplication = agentApplicationRequest.agentApplication
+  ).body)
   private val heading: String = "What email address should we use for your agent services account?"
 
-  "AgentTelephoneNumberPage" should:
+  "AgentEmailAddressPage" should:
 
-    "contain expected content" in:
+    "contain expected content when unique values exist for each option" in:
       doc.mainContent shouldContainContent
         """
           |Account contact details
@@ -66,10 +71,26 @@ extends ViewSpec:
           |Is this page not working properly? (opens in new tab)
           |""".stripMargin
 
+    "contain expected content when duplicate values exist" in:
+      docWithDuplicates.mainContent shouldContainContent
+        """
+          |Account contact details
+          |What email address should we use for your agent services account?
+          |user@test.com
+          |This is the email address you have given us.
+          |or
+          |Something else
+          |Enter the email address you want to use
+          |We will send a confirmation code to this email address.
+          |Save and continue
+          |Save and come back later
+          |Is this page not working properly? (opens in new tab)
+          |""".stripMargin
+
     "have the correct title" in:
       doc.title() shouldBe s"$heading - Apply for an agent services account - GOV.UK"
 
-    "render a radio button for each option" in:
+    "render a radio button for each unique option" in:
       val expectedRadioGroup: TestRadioGroup = TestRadioGroup(
         legend = heading,
         options = List(
@@ -80,6 +101,17 @@ extends ViewSpec:
         hint = None
       )
       doc.mainContent.extractRadioGroup() shouldBe expectedRadioGroup
+
+    "not render a radio button for duplicate values" in:
+      val expectedRadioGroup: TestRadioGroup = TestRadioGroup(
+        legend = heading,
+        options = List(
+          tdAll.applicantEmailAddress.value -> tdAll.applicantEmailAddress.value,
+          "Something else" -> "other"
+        ),
+        hint = None
+      )
+      docWithDuplicates.mainContent.extractRadioGroup() shouldBe expectedRadioGroup
 
     "render a save and continue button" in:
       doc
