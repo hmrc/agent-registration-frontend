@@ -128,9 +128,6 @@ class AppConfig @Inject() (
   object UploadRepo:
     val ttl: FiniteDuration = ConfigHelper.readFiniteDuration("mongodb.upload-repo-ttl", servicesConfig)
 
-  object DatesMigrator:
-    val enabled: Boolean = configuration.get[Boolean]("dates-migrator.enabled")
-
   object Stride:
 
     val strideRoleAmls: String = configuration.get[String]("stride.roles.amls")
@@ -147,7 +144,6 @@ class AppConfig @Inject() (
   // Access objects eagerly to initialize its vals, ensuring config errors are detected at startup
   Upscan
   UploadRepo
-  DatesMigrator
   Stride
   TestOnly
   Features
