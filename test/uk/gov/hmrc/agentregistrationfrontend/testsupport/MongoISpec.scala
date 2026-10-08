@@ -23,7 +23,7 @@ trait MongoISpec
 extends ISpec,
   MongoSupport:
 
-  // Specs in other services can have the same name (e.g. DatesMigratorSpec), so the prefix keeps their test databases apart.
+  // Specs in other services can have the same name, so the prefix keeps their test databases apart.
   override protected def databaseName: String = s"test-fe-${getClass.getSimpleName}"
 
   override protected def configOverrides: Map[String, Any] = Map[String, Any]("mongodb.uri" -> mongoUri)

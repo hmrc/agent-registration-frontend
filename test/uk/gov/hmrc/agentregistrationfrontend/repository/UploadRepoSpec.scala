@@ -18,10 +18,8 @@ package uk.gov.hmrc.agentregistrationfrontend.repository
 
 import org.bson.BsonDocument
 import org.bson.BsonType
-import org.mongodb.scala.SingleObservableFuture
 import org.mongodb.scala.model.Filters
 import uk.gov.hmrc.agentregistration.shared.upload.UploadId
-import uk.gov.hmrc.agentregistration.shared.util.RestDateFormats
 import uk.gov.hmrc.agentregistrationfrontend.model.upscan.Upload
 import uk.gov.hmrc.agentregistrationfrontend.testsupport.MongoISpec
 
@@ -35,14 +33,6 @@ extends MongoISpec:
 
       rawUpload.get("createdAt").getBsonType shouldBe BsonType.DATE_TIME
 
-  "findById" should:
-
-    // TODO: remove with the ISO-string fallback in MongoDateFormats once the dates migration has run in every environment
-    "read an upload stored before its date was migrated to a BSON date" in:
-      storeWithIsoStringDate(upload)
-
-      uploadRepo.findById(upload.uploadId).futureValue.value shouldBe upload
-
   "findLatestByInternalUserId" should:
 
     "return the upload created last" in:
@@ -55,16 +45,6 @@ extends MongoISpec:
   private lazy val uploadRepo: UploadRepo = app.injector.instanceOf[UploadRepo]
 
   private lazy val upload: Upload = tdAll.uploadUploadedSuccessfully
-
-  // stores the upload as written before the migration: with its date as an ISO string
-  private def storeWithIsoStringDate(upload: Upload): Unit =
-    uploadRepo
-      .collection
-      .withDocumentClass[BsonDocument]()
-      .insertOne(BsonDocument.parse(Upload.makeFormat(using RestDateFormats.instantFormat).writes(upload).toString))
-      .toFuture()
-      .futureValue
-    ()
 
   private def rawUpload: BsonDocument =
     uploadRepo

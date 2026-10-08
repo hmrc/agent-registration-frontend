@@ -19,7 +19,6 @@ package uk.gov.hmrc.agentregistrationfrontend.config
 import com.google.inject.AbstractModule
 import com.google.inject.Provides
 import com.google.inject.Singleton
-import uk.gov.hmrc.agentregistrationfrontend.repository.DatesMigratorStarter
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.auth.core.AuthorisedFunctions
 
@@ -32,7 +31,6 @@ extends AbstractModule:
   override def configure(): Unit =
     bind(classOf[AppConfig]).asEagerSingleton() // Initialize eagerly to detect any misconfiguration at startup
     bind(classOf[AmlsCodes]).asEagerSingleton() // Initialize eagerly to detect any AmlsCodes misconfiguration at startup
-    bind(classOf[DatesMigratorStarter]).asEagerSingleton()
 
   @Provides
   @Singleton

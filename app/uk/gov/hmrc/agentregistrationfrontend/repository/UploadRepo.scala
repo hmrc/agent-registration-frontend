@@ -31,6 +31,7 @@ import uk.gov.hmrc.agentregistrationfrontend.repository.Repo.IdString
 import uk.gov.hmrc.agentregistrationfrontend.repository.UploadRepoHelp.given
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs
+import uk.gov.hmrc.mongo.play.json.formats.MongoJavatimeFormats
 
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -62,7 +63,7 @@ extends Repo[UploadId, Upload](
 object UploadRepo:
 
   val collectionName: String = "upload"
-  val mongoFormat: OFormat[Upload] = Upload.makeFormat(using MongoDateFormats.instantFormat)
+  val mongoFormat: OFormat[Upload] = Upload.makeFormat(using MongoJavatimeFormats.instantFormat)
 
 // when named it UploadRepo, Scala 3 compiler complains
 // about cyclic reference error during compilation ...
