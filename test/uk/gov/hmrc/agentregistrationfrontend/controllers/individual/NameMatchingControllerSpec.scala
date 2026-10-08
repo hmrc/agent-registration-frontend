@@ -50,7 +50,7 @@ extends ControllerSpec:
         .providedDetails
         .afterStarted
 
-  val listOfAgentProvidedDetails: List[IndividualProvidedDetails] = List(
+  val listOfIndividualProvidedDetails: List[IndividualProvidedDetails] = List(
     tdAll.providedDetails.precreated,
     TdTestOnly.additionalIndividuals.secondIndividual.providedDetails.precreated,
     TdTestOnly.additionalIndividuals.thirdIndividual.providedDetails.precreated
@@ -77,7 +77,7 @@ extends ControllerSpec:
       agentApplication = completeAgentApplication
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
-      listOfAgentProvidedDetails,
+      listOfIndividualProvidedDetails,
       tdAll.agentApplicationId
     )
     val response: WSResponse = get(path)
@@ -91,7 +91,7 @@ extends ControllerSpec:
       linkId = linkId
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
-      listOfAgentProvidedDetails,
+      listOfIndividualProvidedDetails,
       agentApplicationId
     )
     val response: WSResponse = get(path)
@@ -108,7 +108,34 @@ extends ControllerSpec:
       agentApplication = completeAgentApplication
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
-      listOfAgentProvidedDetails,
+      listOfIndividualProvidedDetails,
+      agentApplicationId
+    )
+    AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(
+      individualProvidedDetails = providedDetails.providedDetails.copy(
+        internalUserId = Some(tdAll.internalUserId),
+        passedIv = Some(false)
+      )
+    )
+
+    val response: WSResponse =
+      post(path)(Map(
+        IndividualNameSearchForm.key -> Seq(testIndividualName)
+      ))
+
+    response.status shouldBe Status.SEE_OTHER
+    response.body[String] shouldBe Constants.EMPTY_STRING
+    response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url
+
+  s"POST $path with a case insensitive matching name should send the user to CYA controller for navigation" in :
+    val testIndividualName: String = "teSt nAmE"
+    IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
+    AgentRegistrationStubs.stubFindApplicationByLinkId(
+      linkId = linkId,
+      agentApplication = completeAgentApplication
+    )
+    AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
+      listOfIndividualProvidedDetails,
       agentApplicationId
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubUpsertIndividualProvidedDetails(
@@ -135,7 +162,7 @@ extends ControllerSpec:
       agentApplication = completeAgentApplication
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
-      listOfAgentProvidedDetails,
+      listOfIndividualProvidedDetails,
       agentApplicationId
     )
 
@@ -159,7 +186,7 @@ extends ControllerSpec:
       agentApplication = completeAgentApplication
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
-      listOfAgentProvidedDetails,
+      listOfIndividualProvidedDetails,
       agentApplicationId
     )
     val response: WSResponse =
@@ -182,7 +209,7 @@ extends ControllerSpec:
       agentApplication = completeAgentApplication
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
-      listOfAgentProvidedDetails,
+      listOfIndividualProvidedDetails,
       agentApplicationId
     )
     val response: WSResponse =
@@ -205,7 +232,7 @@ extends ControllerSpec:
       agentApplication = completeAgentApplication
     )
     AgentRegistrationIndividualProvidedDetailsStubs.stubFindAllIndividualProvidedDetails(
-      listOfAgentProvidedDetails,
+      listOfIndividualProvidedDetails,
       agentApplicationId
     )
 

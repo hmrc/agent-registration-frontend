@@ -41,7 +41,7 @@ object IndividualNameSearchForm:
   ): Form[IndividualProvidedDetails] =
     val existsConstraint: Constraint[String] =
       Constraint[String]("constraint.exists") { in =>
-        if (individuals.exists(_.individualName.value === in))
+        if (individuals.exists(_.individualName.value.toLowerCase() === in.toLowerCase()))
           Valid
         else
           Invalid(s"$key.error.nameNotFound", applicantName)
@@ -61,7 +61,7 @@ object IndividualNameSearchForm:
     )
       .transform[IndividualProvidedDetails](
         (name: IndividualName) =>
-          individuals.find(_.individualName.value === name.value).getOrElse(
+          individuals.find(_.individualName.value.toLowerCase() === name.value.toLowerCase()).getOrElse(
             throw new RuntimeException(
               s"[IndividualNameSearchForm] This should not happen, the constraint should have matched the name to an individual already."
             )
