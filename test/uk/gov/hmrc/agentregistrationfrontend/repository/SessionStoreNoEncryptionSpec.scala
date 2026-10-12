@@ -30,7 +30,7 @@ import uk.gov.hmrc.mongo.cache.DataKey
 class SessionStoreNoEncryptionSpec
 extends ISpec:
 
-  override protected def configOverrides: Map[String, Any] = Map("fieldLevelEncryption.enable" -> false)
+  override protected def configOverrides: Map[String, Any] = Map("fieldLevelEncryption.enabled" -> false)
 
   val sessionStore: SessionStore = app.injector.instanceOf[SessionStore]
   val mongo: MongoComponent = app.injector.instanceOf[MongoComponent]
