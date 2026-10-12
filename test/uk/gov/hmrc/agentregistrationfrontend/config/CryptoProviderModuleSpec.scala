@@ -28,7 +28,7 @@ extends ISpec:
   private val fieldLevelEncryptionKey = "edkOOwt7uvzw1TXnFIN6aRVHkfWcgiOrbBvkEQvO65g="
   override def configOverrides: Map[String, Any] =
     super.configOverrides ++ Map(
-      "fieldLevelEncryption.enable" -> true,
+      "fieldLevelEncryption.enabled" -> true,
       "fieldLevelEncryption.key" -> fieldLevelEncryptionKey
     )
 
