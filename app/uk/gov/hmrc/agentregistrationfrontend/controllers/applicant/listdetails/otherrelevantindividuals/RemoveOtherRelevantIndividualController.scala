@@ -62,10 +62,13 @@ extends FrontendController(mcc, actions):
             request.add[List[IndividualProvidedDetails]](individualsList.filterNot(_.isPersonOfControl))
     .refine:
       implicit request =>
-        val individualProvidedDetails: IndividualProvidedDetails = request.get[List[IndividualProvidedDetails]]
-          .find(_._id === individualProvidedDetailsId)
-          .getOrThrowExpectedDataMissing("Individual to remove is not in the list of other relevant individuals")
-        request.add[IndividualProvidedDetails](individualProvidedDetails)
+        request.get[List[IndividualProvidedDetails]].find(_._id === individualProvidedDetailsId) match
+          case Some(individualProvidedDetails) => request.add[IndividualProvidedDetails](individualProvidedDetails)
+          case None =>
+            logger.warn(
+              s"Individual provided details record not found for the provided id ${individualProvidedDetailsId.value} - redirecting as this may be due to a stale link or an attempt to access another record that does not belong to the current application"
+            )
+            Redirect(AppRoutes.apply.listdetails.otherrelevantindividuals.CheckYourAnswersController.show.url)
 
   def show(individualProvidedDetailsId: IndividualProvidedDetailsId): Action[AnyContent] =
     baseAction(individualProvidedDetailsId):
