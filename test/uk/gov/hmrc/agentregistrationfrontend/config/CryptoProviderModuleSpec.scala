@@ -21,7 +21,6 @@ import uk.gov.hmrc.crypto.Crypted
 import uk.gov.hmrc.crypto.Decrypter
 import uk.gov.hmrc.crypto.Encrypter
 import uk.gov.hmrc.crypto.PlainText
-import uk.gov.hmrc.crypto.SymmetricCryptoFactory
 
 class CryptoProviderModuleSpec
 extends ISpec:
@@ -29,13 +28,13 @@ extends ISpec:
   private val fieldLevelEncryptionKey = "edkOOwt7uvzw1TXnFIN6aRVHkfWcgiOrbBvkEQvO65g="
   override def configOverrides: Map[String, Any] =
     super.configOverrides ++ Map(
-      "fieldLevelEncryption.enable" -> true,
+      "fieldLevelEncryption.enabled" -> true,
       "fieldLevelEncryption.key" -> fieldLevelEncryptionKey
     )
 
   def crypto: Encrypter & Decrypter = app.injector.instanceOf[Encrypter & Decrypter]
 
-  "aesCryptoInstance should encrypt new values with AES-GCM from field level encryption config" in:
+  "crypto instance should encrypt new values with AES-GCM from field level encryption config" in:
     val firstEncrypted: Crypted = crypto.encrypt(PlainText("user-answer"))
     val secondEncrypted: Crypted = crypto.encrypt(PlainText("user-answer"))
     firstEncrypted.value should not be "user-answer"
@@ -44,7 +43,8 @@ extends ISpec:
     crypto.decrypt(firstEncrypted).value shouldBe "user-answer"
     crypto.decrypt(secondEncrypted).value shouldBe "user-answer"
 
-  "aesCryptoInstance should decrypt old AES values using the same field level encryption key as fallback" in:
-    val oldAesCrypto: Encrypter & Decrypter = SymmetricCryptoFactory.aesCrypto(fieldLevelEncryptionKey)
-    val oldAesEncrypted: Crypted = oldAesCrypto.encrypt(PlainText("pre-migration-answer"))
-    crypto.decrypt(oldAesEncrypted).value shouldBe "pre-migration-answer"
+  "the crypto should be able to read pre-migration plain text values as fallback" in:
+    val plainTextValue = PlainText("pre-migration-user-answer")
+    val encryptedValue = NoCrypto.encrypt(plainTextValue)
+    // here we use crypto.decrypt to decrypt a value that was encrypted with NoCrypto, which simulates a pre-migration value
+    crypto.decrypt(encryptedValue).value shouldBe "pre-migration-user-answer"

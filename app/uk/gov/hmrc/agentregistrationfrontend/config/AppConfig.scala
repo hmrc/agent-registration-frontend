@@ -142,7 +142,7 @@ class AppConfig @Inject() (
 
   object FieldLevelEncryption:
 
-    val enable: Boolean = configuration.get[Boolean]("fieldLevelEncryption.enable")
+    val enabled: Boolean = configuration.get[Boolean]("fieldLevelEncryption.enabled")
     val key: String = configuration.get[String]("fieldLevelEncryption.key")
 
   // !!!
