@@ -140,6 +140,11 @@ class AppConfig @Inject() (
 
     val grsStub: Boolean = configuration.get[Boolean]("features.grs-stub")
 
+  object FieldLevelEncryption:
+
+    val enable: Boolean = configuration.get[Boolean]("fieldLevelEncryption.enable")
+    val key: String = configuration.get[String]("fieldLevelEncryption.key")
+
   // !!!
   // Access objects eagerly to initialize its vals, ensuring config errors are detected at startup
   Upscan
@@ -147,6 +152,7 @@ class AppConfig @Inject() (
   Stride
   TestOnly
   Features
+  FieldLevelEncryption
 
 object ConfigHelper:
 

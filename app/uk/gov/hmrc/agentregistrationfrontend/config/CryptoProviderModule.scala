@@ -18,8 +18,6 @@ package uk.gov.hmrc.agentregistrationfrontend.config
 
 import com.google.inject.AbstractModule
 import com.google.inject.Provides
-import com.google.inject.name.Named
-import com.typesafe.config.Config
 import uk.gov.hmrc.crypto.Crypted
 import uk.gov.hmrc.crypto.Decrypter
 import uk.gov.hmrc.crypto.Encrypter
@@ -37,10 +35,9 @@ extends AbstractModule:
 
   @Provides
   @Singleton
-  @Named("fieldLevelEncryption")
-  def crypto(config: Config): Encrypter & Decrypter =
-    if (config.getBoolean("fieldLevelEncryption.enable"))
-    then aesGcmCryptoWithAesFallback(config)
+  def crypto(appConfig: AppConfig): Encrypter & Decrypter =
+    if (appConfig.FieldLevelEncryption.enable)
+    then aesGcmCryptoWithAesFallback(appConfig.FieldLevelEncryption.key)
     else NoCrypto
 
   /** Provides an Encrypter/Decrypter that uses AES-GCM for encryption, but falls back to AES for decryption of previously encrypted data to avoid breaking
@@ -51,15 +48,10 @@ extends AbstractModule:
     * next day is probably safest. Timeout information here
     * https://confluence.tools.tax.service.gov.uk/spaces/GG/pages/1017053367/Timeouts+across+MDTP+elsewhere
     */
-  private def aesGcmCryptoWithAesFallback(config: Config): Encrypter
-    & Decrypter = {
-    val aesGcmKey = config.getString("fieldLevelEncryption.key")
-
-    SymmetricCryptoFactory.composeCrypto(
-      currentCrypto = SymmetricCryptoFactory.aesGcmCrypto(aesGcmKey),
-      previousDecrypters = Seq(SymmetricCryptoFactory.aesCrypto(aesGcmKey))
-    )
-  }
+  private def aesGcmCryptoWithAesFallback(aesGcmKey: String): Encrypter & Decrypter = SymmetricCryptoFactory.composeCrypto(
+    currentCrypto = SymmetricCryptoFactory.aesGcmCrypto(aesGcmKey),
+    previousDecrypters = Seq(SymmetricCryptoFactory.aesCrypto(aesGcmKey))
+  )
 
 /** Encrypter/decrypter that does nothing (i.e. leaves content in plaintext). Only to be used for debugging.
   */
