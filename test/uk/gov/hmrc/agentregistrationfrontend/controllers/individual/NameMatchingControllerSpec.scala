@@ -127,7 +127,7 @@ extends ControllerSpec:
     response.body[String] shouldBe Constants.EMPTY_STRING
     response.header("Location").value shouldBe AppRoutes.providedetails.CheckYourAnswersController.show(linkId).url
 
-  s"POST $path with a case insensitive matching name should send the user to CYA controller for navigation" in :
+  s"POST $path with a case insensitive matching name should send the user to CYA controller for navigation" in:
     val testIndividualName: String = "teSt nAmE"
     IndividualAuthStubs.stubAuthorise(responseBody = IndividualAuthStubs.responseBodyAsCl50())
     AgentRegistrationStubs.stubFindApplicationByLinkId(

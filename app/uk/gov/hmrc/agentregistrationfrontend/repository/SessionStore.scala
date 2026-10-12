@@ -33,7 +33,6 @@ import uk.gov.hmrc.mongo.cache.DataKey
 import uk.gov.hmrc.mongo.cache.SessionCacheRepository
 
 import javax.inject.Inject
-import javax.inject.Named
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
@@ -50,7 +49,7 @@ class SessionStore @Inject() (
   appConfig: AppConfig
 )(using
   ec: ExecutionContext,
-  @Named("fieldLevelEncryption") val crypto: Encrypter & Decrypter
+  val crypto: Encrypter & Decrypter
 )
 extends SessionCacheRepository(
   mongoComponent = mongoComponent,

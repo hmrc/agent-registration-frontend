@@ -87,7 +87,7 @@ extends AnyWordSpecLike,
       "play.filters.csrf.header.bypassHeaders.Csrf-Token" -> "nocheck",
       "features.grs-stub" -> false,
       "inject-email-verification-passcodes-page" -> false, // false to match production behavior where email verification is performed without injected test only page
-      "fieldLevelEncryption.enabled" -> true,
+      "fieldLevelEncryption.enable" -> true,
       "fieldLevelEncryption.key" -> "edkOOwt7uvzw1TXnFIN6aRVHkfWcgiOrbBvkEQvO65g=" // use base64 even for tests
     ) ++ configOverrides
 
