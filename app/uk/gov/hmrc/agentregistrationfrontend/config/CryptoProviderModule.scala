@@ -36,7 +36,7 @@ extends AbstractModule:
   @Provides
   @Singleton
   def crypto(appConfig: AppConfig): Encrypter & Decrypter =
-    if (appConfig.FieldLevelEncryption.enable)
+    if (appConfig.FieldLevelEncryption.enabled)
     then aesGcmCryptoWithPlainTextFallback(appConfig.FieldLevelEncryption.key)
     else NoCrypto
 
