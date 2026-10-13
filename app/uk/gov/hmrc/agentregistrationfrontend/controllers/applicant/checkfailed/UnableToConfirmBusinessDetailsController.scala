@@ -36,7 +36,7 @@ extends FrontendController(mcc, actions):
 
   def show: Action[AnyContent] =
     actions
-      .getApplicationInProgress
+      .getApplication
       .ensure(
         condition = !_.agentApplication.isGrsDataReceived,
         resultWhenConditionNotMet =

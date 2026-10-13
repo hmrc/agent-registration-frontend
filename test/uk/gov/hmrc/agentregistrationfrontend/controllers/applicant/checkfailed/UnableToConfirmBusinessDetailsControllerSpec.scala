@@ -33,15 +33,15 @@ extends ControllerSpec:
       url = path
     )
 
-  // this test is actually testing the action getApplicationInProgress that's used to ensure we have a UTR to check RTDW with
-  s"GET $path should redirect to registration start when the application has not yet received GRS data" in:
+  s"GET $path should return 200 and render the GRS exception page when the application has not yet received GRS data" in:
     AuthStubs.stubAuthorise()
     AgentRegistrationStubs.stubGetAgentApplication(tdAll.agentApplicationLlp.afterStarted)
 
     val response: WSResponse = get(path)
 
-    response.status shouldBe Status.SEE_OTHER
-    response.header("Location").value shouldBe AppRoutes.apply.AgentApplicationController.startRegistration.url
+    response.status shouldBe Status.OK
+    response.parseBodyAsJsoupDocument.title() shouldBe
+      "We cannot confirm your business details - Apply for an agent services account - GOV.UK"
     AuthStubs.verifyAuthorise()
     AgentRegistrationStubs.verifyGetAgentApplication()
 
