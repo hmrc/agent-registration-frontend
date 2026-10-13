@@ -31,7 +31,7 @@ extends ControllerSpec:
 
   private val path = s"/agent-registration/apply/list-details/provide-details/national-insurance-number"
 
-  val application: AgentApplication = tdAll.agentApplicationLimitedPartnership.afterStarted
+  val application: AgentApplication = tdAll.agentApplicationLimitedPartnership.afterGrsDataReceived
 
   val name: String = tdAll.providedDetails.afterAccessConfirmed.individualName.value
 

@@ -31,7 +31,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testsupport.wiremock.stubs.AuthStub
 class ApplicantProvidedDoBControllerSpec
 extends ControllerSpec:
 
-  val application: AgentApplication = tdAll.agentApplicationLimitedPartnership.afterStarted
+  val application: AgentApplication = tdAll.agentApplicationLimitedPartnership.afterGrsDataReceived
 
   val name: String = tdAll.providedDetails.afterAccessConfirmed.individualName.value
 

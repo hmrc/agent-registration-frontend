@@ -45,7 +45,7 @@ extends ControllerSpec:
     )
     AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.submit.url shouldBe AppRoutes.apply.listdetails.providedbyapplicant.CheckYourAnswersController.show.url
 
-  val agentApplication: AgentApplication = tdAll.agentApplicationLimitedPartnership.afterStarted
+  val agentApplication: AgentApplication = tdAll.agentApplicationLimitedPartnership.afterGrsDataReceived
   val individualName: IndividualName = tdAll.providedDetails.afterAccessConfirmed.individualName
   val individualNameValue: String = individualName.value
   val providedByApplicantSessionStore: ProvidedByApplicantSessionStore = app.injector.instanceOf[ProvidedByApplicantSessionStore]

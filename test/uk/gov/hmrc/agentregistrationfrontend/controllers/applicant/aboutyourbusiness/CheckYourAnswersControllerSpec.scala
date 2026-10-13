@@ -56,7 +56,7 @@ extends ControllerSpec:
     ),
     TestCaseForCya(
       application = agentApplication.beforeGrsDataReceived,
-      expectedRedirect = Some(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show.url)
+      expectedRedirect = Some(AppRoutes.apply.AgentApplicationController.startRegistration.url)
     )
   ).foreach: testCase =>
     testCase.expectedRedirect match
@@ -73,7 +73,7 @@ extends ControllerSpec:
           ApplyStubHelper.verifyConnectorsToSupplyBprToPage()
 
       case Some(expectedRedirect) =>
-        s"GET $path with missing GRS data should redirect to the agent type page" in:
+        s"GET $path with missing GRS data should redirect to the registration start page" in:
           ApplyStubHelper.stubsForAuthAction(testCase.application)
           val response: WSResponse = get(path)
 
