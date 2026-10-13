@@ -22,9 +22,7 @@ import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
 import uk.gov.hmrc.agentregistration.shared.AgentApplication
-import uk.gov.hmrc.agentregistration.shared.ApplicationState
 import uk.gov.hmrc.agentregistration.shared.BusinessPartnerRecordResponse
-import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.services.BusinessPartnerRecordService
@@ -39,17 +37,8 @@ class CheckYourAnswersController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  // this CYA page is only viewable once business details have been captured from GRS, the task list provides a link
-  private val baseAction: ActionBuilderWithData[DataWithApplication] = actions
+  def show: Action[AnyContent] = actions
     .getApplicationInProgress
-    .ensure(
-      _.get[AgentApplication].applicationState === ApplicationState.GrsDataReceived,
-      implicit request =>
-        logger.debug("Because we don't have business details we are redirecting to where they can be captured")
-        Redirect(AppRoutes.apply.aboutyourbusiness.AgentTypeController.show)
-    )
-
-  def show: Action[AnyContent] = baseAction
     .refine:
       implicit request =>
         businessPartnerRecordService
