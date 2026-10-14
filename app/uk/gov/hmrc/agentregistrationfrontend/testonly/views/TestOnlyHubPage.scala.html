@@ -111,7 +111,7 @@
     @compactLink(
         label = "Run expiry scheduler",
         url = AppRoutes.testOnly.TestOnlyController.runExpiryScheduler,
-        hint = Some("finds Started and GrsDataReceived applications past applicationExpiresAt, moves them to Expired and stamps gracePeriodEndsAt = now + post-expiry-grace-period")
+        hint = Some("finds Started and GrsDataReceived applications past applicationExpiresAt, moves them to Expired and stamps postExpiryGracePeriodEndsAt = now + post-expiry-grace-period")
     )
 
     @if(appConfig.TestOnly.allowResetDatabase) {
