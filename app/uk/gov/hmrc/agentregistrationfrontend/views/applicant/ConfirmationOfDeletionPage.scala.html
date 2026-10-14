@@ -53,6 +53,6 @@
     }
     </p>
     <p class="govuk-body govuk-!-display-none-print">
-      <a class="govuk-link" href="@{AppRoutes.SignOutController.signOutWithContinue(continueUrl = RedirectUrl(appConfig.feedbackFrontendBaseUrl + "/feedback/AGENT_REG_AGENT"))}">@{messages("common.finishAndSignOut")}</a>
+      <a class="govuk-link" href="@{AppRoutes.SignOutController.signOutWithContinue(continueUrl = RedirectUrl(appConfig.thisFrontendBaseUrl + AppRoutes.SignOutController.signedOut.url))}">@{messages("common.finishAndSignOut")}</a>
     </p>
 }

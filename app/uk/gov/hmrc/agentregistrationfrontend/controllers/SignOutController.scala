@@ -23,6 +23,7 @@ import play.api.mvc.MessagesControllerComponents
 import sttp.model.Uri.UriContext
 import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.util.RequestSupport.validateRedirectUrl
+import uk.gov.hmrc.agentregistrationfrontend.views.html.SignedOutPage
 import uk.gov.hmrc.agentregistrationfrontend.views.html.TimedOutPage
 import uk.gov.hmrc.play.bootstrap.binders.RedirectUrl
 
@@ -33,6 +34,7 @@ import javax.inject.Singleton
 class SignOutController @Inject() (
   mcc: MessagesControllerComponents,
   defaultActionBuilder: DefaultActionBuilder,
+  signedOutPage: SignedOutPage,
   timedOutPage: TimedOutPage,
   appConfig: AppConfig
 )
@@ -46,6 +48,10 @@ extends FrontendControllerBase(mcc):
   def signOut: Action[AnyContent] = defaultActionBuilder:
     val continueUrl = uri"${appConfig.thisFrontendBaseUrl + AppRoutes.apply.AgentApplicationController.landing.url}"
     Redirect(AppRoutes.SignOutController.signOutWithContinue(RedirectUrl(continueUrl.toString)))
+
+  def signedOut: Action[AnyContent] = defaultActionBuilder:
+    implicit request =>
+      Ok(signedOutPage())
 
   def timeOut: Action[AnyContent] = defaultActionBuilder:
     val continueUrl = uri"${appConfig.thisFrontendBaseUrl + AppRoutes.SignOutController.timedOut.url}"

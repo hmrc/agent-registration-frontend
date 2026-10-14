@@ -1872,3 +1872,5 @@ confirmationOfDeletion.title = We have deleted your application
 confirmationOfDeletion.whatNext.h2 = What happens next
 confirmationOfDeletion.whatNext.p1 = If you want to apply for an agent services account again, you can <a class="govuk-link" href="{0}">start a new application</a>.
 
+signedOut.title = You have signed out
+signedOut.link = Sign in again
