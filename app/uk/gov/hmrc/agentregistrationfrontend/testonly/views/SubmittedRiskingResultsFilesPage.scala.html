@@ -19,7 +19,8 @@
 
 @this(
         layout: TestOnlyLayout,
-        govukTag: GovukTag
+        govukNotificationBanner: GovukNotificationBanner,
+        govukTag: GovukTag,
 )
 
 @(
@@ -37,6 +38,14 @@
 ) {
 
     <h1 class="govuk-heading-l">View risking results files</h1>
+
+    @request.flash.get("success").map { message =>
+        @govukNotificationBanner(NotificationBanner(
+            content = Text(message),
+            title = Text("Update")
+        ))
+    }
+
 
     @if(filenames.isEmpty) {
         <p class="govuk-body">No risking results files have been submitted yet.</p>

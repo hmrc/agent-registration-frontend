@@ -37,6 +37,9 @@ object TestRiskingResultsFilename:
 
   private val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("uuuuMMdd'T'HHmmssSSS'Z'").withZone(ZoneOffset.UTC)
 
+  /** Filename for a synthetic test-only results file that combines multiple unprocessed entity/individual results into one larger file. */
+  def combined(now: Instant = Instant.now()): RiskingResultsFilename = RiskingResultsFilename(s"test-only-combined-${formatter.format(now)}")
+
   /** The filename the entity's current round of risking results is/would be submitted under, derived entirely from the application's own persisted state: the
     * canonical (no-suffix) name unless the entity is currently FailedFixable and a real resubmission (`RiskingOutcomeApplication.FailedFixable.reSubmittedAt`)
     * has happened, in which case that resubmission's own timestamp is used.

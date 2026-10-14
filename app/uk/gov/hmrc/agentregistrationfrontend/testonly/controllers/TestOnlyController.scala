@@ -40,7 +40,9 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.action.TestOnlyActions
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.StubUserService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestApplicationService
 import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService
+import uk.gov.hmrc.agentregistrationfrontend.testonly.services.TestRiskingService.CombinedRiskingResultsFile
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.TestOnlyHubPage
+import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.CombineRiskingResultsFilesConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.ResetDatabaseConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.DeleteRiskingResultsFilesConfirmationPage
 import uk.gov.hmrc.agentregistrationfrontend.testonly.views.html.RiskingActionConfirmationPage
@@ -59,6 +61,7 @@ import scala.util.Random
 class TestOnlyController @Inject() (
   mcc: MessagesControllerComponents,
   testOnlyHubPage: TestOnlyHubPage,
+  combineRiskingResultsFilesConfirmationPage: CombineRiskingResultsFilesConfirmationPage,
   resetDatabaseConfirmationPage: ResetDatabaseConfirmationPage,
   deleteRiskingResultsFilesConfirmationPage: DeleteRiskingResultsFilesConfirmationPage,
   riskingActionConfirmationPage: RiskingActionConfirmationPage,
@@ -141,6 +144,12 @@ extends FrontendControllerBase(mcc):
       then Ok(deleteRiskingResultsFilesConfirmationPage())
       else Unauthorized("Reset operation not allowed")
 
+  def showCombineRiskingResultsFilesConfirmation: Action[AnyContent] = action:
+    implicit request =>
+      if appConfig.TestOnly.allowResetDatabase
+      then Ok(combineRiskingResultsFilesConfirmationPage())
+      else Unauthorized("Reset operation not allowed")
+
   def deleteAllRiskingResultsFiles: Action[AnyContent] = action.async:
     implicit request =>
       if (appConfig.TestOnly.allowResetDatabase)
@@ -204,6 +213,28 @@ extends FrontendControllerBase(mcc):
         filenames <- testRiskingService.listSubmittedRiskingResultsFilenames()
         unprocessedFilenames <- testRiskingService.getUnprocessedAvailableFiles()
       yield Ok(submittedRiskingResultsFilesPage(filenames, unprocessedFilenames))
+
+  def combineUnprocessedRiskingResultsFiles: Action[AnyContent] = action.async:
+    implicit request =>
+      if appConfig.TestOnly.allowResetDatabase then
+        testRiskingService.combineUnprocessedRiskingResultsFiles().map:
+          case Some(CombinedRiskingResultsFile(
+                filename,
+                sourceFileCount,
+                recordCount
+              )) =>
+            Redirect(AppRoutes.testOnly.TestOnlyController.showSubmittedRiskingResultsFiles).flashing(
+              "success" -> (
+                s"Created combined risking results file '${filename.value}' from $sourceFileCount unprocessed file(s) containing $recordCount record(s). " +
+                  "All previous risking results files were replaced so you can now run results file processing against just that one file."
+              )
+            )
+          case None =>
+            Redirect(AppRoutes.testOnly.TestOnlyController.showSubmittedRiskingResultsFiles).flashing(
+              "success" -> "There are no unprocessed risking results files to combine."
+            )
+      else
+        Future.successful(Unauthorized("Reset operation not allowed"))
 
   def showApplicationForRisking(applicationReference: ApplicationReference): Action[AnyContent] = action.async:
     implicit request =>

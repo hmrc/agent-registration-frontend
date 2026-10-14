@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.agentregistrationfrontend.testonly.services
 
+import play.api.libs.json.JsArray
+import play.api.libs.json.JsError
 import play.api.libs.json.JsValue
 import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
@@ -25,6 +27,7 @@ import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestRiskingConn
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.EntityRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.IndividualRiskingFailure
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.RiskingResultsFilename
+import uk.gov.hmrc.agentregistrationfrontend.testonly.model.TestRiskingResultsFilename
 import uk.gov.hmrc.agentregistrationfrontend.testonly.model.UploadRiskingResultsFileOutcome
 
 import javax.inject.Inject
@@ -36,6 +39,8 @@ import scala.concurrent.Future
 class TestRiskingService @Inject() (
   testRiskingConnector: TestRiskingConnector
 )(using ExecutionContext):
+
+  import TestRiskingService.CombinedRiskingResultsFile
 
   def deleteAll()(using RequestHeader): Future[Unit] =
     for
@@ -55,6 +60,32 @@ class TestRiskingService @Inject() (
     testRiskingConnector.listSubmittedRiskingResultsFilenames()
 
   def getUnprocessedAvailableFiles()(using RequestHeader): Future[List[RiskingResultsFilename]] = testRiskingConnector.getUnprocessedAvailableFiles()
+
+  def combineUnprocessedRiskingResultsFiles()(using RequestHeader): Future[Option[CombinedRiskingResultsFile]] =
+    testRiskingConnector.getUnprocessedAvailableFiles().flatMap:
+      case Nil => Future.successful(None)
+      case unprocessedFilenames =>
+        for
+          fileContents <-
+            Future.traverse(unprocessedFilenames): filename =>
+              testRiskingConnector.viewRiskingResultsFile(filename).map: maybeContent =>
+                filename -> maybeContent.getOrElse(
+                  throw new IllegalStateException(s"Expected unprocessed risking results file '${filename.value}' to exist")
+                )
+          combinedFilename = TestRiskingResultsFilename.combined()
+          combinedRecords = TestRiskingService.combineResultsJson(fileContents)
+          _ <- testRiskingConnector.deleteAllRiskingResultsFiles()
+          uploadOutcome <- testRiskingConnector.uploadRiskingResultsFile(combinedFilename, combinedRecords)
+          _ =
+            uploadOutcome match
+              case UploadRiskingResultsFileOutcome.Uploaded => ()
+              case UploadRiskingResultsFileOutcome.AlreadyExists =>
+                throw new IllegalStateException(s"Combined risking results file already exists: ${combinedFilename.value}")
+        yield Some(CombinedRiskingResultsFile(
+          filename = combinedFilename,
+          sourceFileCount = unprocessedFilenames.size,
+          recordCount = combinedRecords.value.size
+        ))
 
   def viewRiskingResultsFile(
     filename: RiskingResultsFilename
@@ -107,3 +138,23 @@ class TestRiskingService @Inject() (
     "checkId" -> failure.checkId,
     "checkDescription" -> failure.checkDescription
   )
+
+object TestRiskingService:
+
+  final case class CombinedRiskingResultsFile(
+    filename: RiskingResultsFilename,
+    sourceFileCount: Int,
+    recordCount: Int
+  )
+
+  private[testonly] def combineResultsJson(fileContents: Seq[(RiskingResultsFilename, String)]): JsArray = JsArray(fileContents.flatMap(parseRecords))
+
+  private def parseRecords(file: (RiskingResultsFilename, String)): scala.collection.immutable.IndexedSeq[JsValue] =
+    val (filename, content) = file
+    Json.parse(content).validate[JsArray].fold(
+      errors =>
+        throw new IllegalArgumentException(
+          s"Risking results file '${filename.value}' did not contain a JSON array: ${Json.stringify(JsError.toJson(errors))}"
+        ),
+      _.value.toIndexedSeq
+    )
