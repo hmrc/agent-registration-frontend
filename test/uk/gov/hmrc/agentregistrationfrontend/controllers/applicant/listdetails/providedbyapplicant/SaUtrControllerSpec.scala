@@ -30,7 +30,7 @@ extends ControllerSpec:
 
   private val path = s"/agent-registration/apply/list-details/provide-details/self-assessment-unique-taxpayer-reference"
 
-  val agentApplication: AgentApplication = tdAll.agentApplicationLimitedPartnership.afterStarted
+  val agentApplication: AgentApplication = tdAll.agentApplicationLimitedPartnership.afterGrsDataReceived
 
   val individualName: String = tdAll.providedDetails.afterAccessConfirmed.individualName.value
 

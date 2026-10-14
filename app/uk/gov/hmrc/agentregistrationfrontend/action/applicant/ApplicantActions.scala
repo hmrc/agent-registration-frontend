@@ -41,6 +41,7 @@ import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeApplication
 import uk.gov.hmrc.agentregistration.shared.risking.RiskingOutcomeIndividual
 import uk.gov.hmrc.agentregistration.shared.util.Errors.getOrThrowExpectedDataMissing
 import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.=!=
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineFutureEither
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuilders.refineUnion
 import uk.gov.hmrc.agentregistrationfrontend.action.ActionBuildersWithData
@@ -136,14 +137,17 @@ extends RequestAwareLogging:
 
   def getApplicationInProgress: ActionBuilderWithData[DataWithApplication] = getApplication
     .ensure(
-      condition = _.get[AgentApplication].isBeforeSentForRisking,
+      condition = _.get[AgentApplication].applicationState === ApplicationState.GrsDataReceived,
       resultWhenConditionNotMet =
         implicit request =>
-          val call = AppRoutes.apply.AgentApplicationController.applicationStatus
+          val call: Call =
+            request.get[AgentApplication].applicationState match
+              case ApplicationState.Started => AppRoutes.apply.AgentApplicationController.startRegistration // we don't yet have business details from GRS
+              case _ => AppRoutes.apply.AgentApplicationController.applicationStatus // all other states are handled by this endpoint
           logger.warn(
             s"The application is not in progress" +
               s" (current application state: ${request.get[AgentApplication].applicationState.toString}), " +
-              s"redirecting to [${call.url}]. User might have used back or history to get to ${request.path} from previous page."
+              s"redirecting to [${call.url}]. User might have used a bookmark, pasted link, back or history to get to ${request.path}."
           )
           Redirect(call.url)
     )
