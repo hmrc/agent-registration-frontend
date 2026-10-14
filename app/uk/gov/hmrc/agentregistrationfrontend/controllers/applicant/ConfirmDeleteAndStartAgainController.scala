@@ -19,6 +19,8 @@ package uk.gov.hmrc.agentregistrationfrontend.controllers.applicant
 import play.api.mvc.Action
 import play.api.mvc.AnyContent
 import play.api.mvc.MessagesControllerComponents
+import uk.gov.hmrc.agentregistration.shared.ApplicationState
+import uk.gov.hmrc.agentregistration.shared.util.SafeEquals.===
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.forms.ConfirmDeleteApplicationForm
 import uk.gov.hmrc.agentregistrationfrontend.forms.YesNo
@@ -39,14 +41,18 @@ class ConfirmDeleteAndStartAgainController @Inject() (
 )
 extends FrontendController(mcc, actions):
 
-  def show: Action[AnyContent] = actions
-    .getApplicationAfterSentForRisking
+  private val baseAction: ActionBuilderWithData[DataWithApplicationAndBpr] = actions.getApplicationAfterSentForRisking
+    .ensure(
+      condition = request => request.agentApplication.applicationState === ApplicationState.RiskingCompleted,
+      resultWhenConditionNotMet = _ => Redirect(AppRoutes.apply.AgentApplicationController.landing.url)
+    )
+
+  def show: Action[AnyContent] = baseAction
     .apply:
       implicit request =>
         Ok(view(ConfirmDeleteApplicationForm.form))
 
-  def submit: Action[AnyContent] = actions
-    .getApplicationAfterSentForRisking
+  def submit: Action[AnyContent] = baseAction
     .ensureValidForm[YesNo](
       form = ConfirmDeleteApplicationForm.form,
       resultToServeWhenFormHasErrors = implicit request => formWithErrors => BadRequest(view(formWithErrors))
