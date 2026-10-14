@@ -201,4 +201,22 @@ extends Connector:
             )
       .andLogOnFailure("Failed to delete all Agent Applications")
 
+  def runExpiryScheduler()(using RequestHeader): Future[Unit] =
+    val url: URL = url"$baseUrl/run-expiry-scheduler"
+    httpClient
+      .post(url)
+      .withBody(Json.obj())
+      .execute[HttpResponse]
+      .map: response =>
+        response.status match
+          case Status.OK => ()
+          case other =>
+            Errors.throwUpstreamErrorResponse(
+              httpMethod = "POST",
+              url = url,
+              status = other,
+              response = response
+            )
+      .andLogOnFailure("Failed to run expiry scheduler")
+
   private val baseUrl: String = appConfig.agentRegistrationBaseUrl + "/agent-registration/test-only"
