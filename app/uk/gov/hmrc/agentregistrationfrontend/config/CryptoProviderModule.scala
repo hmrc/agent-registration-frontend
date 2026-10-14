@@ -36,23 +36,9 @@ extends AbstractModule:
   @Provides
   @Singleton
   def crypto(appConfig: AppConfig): Encrypter & Decrypter =
-    if (appConfig.FieldLevelEncryption.enabled)
-    then aesGcmCryptoWithPlainTextFallback(appConfig.FieldLevelEncryption.key)
+    if appConfig.FieldLevelEncryption.enabled
+    then SymmetricCryptoFactory.aesGcmCrypto(appConfig.FieldLevelEncryption.key)
     else NoCrypto
-
-  /** Provides an Encrypter/Decrypter that uses AES-GCM for encryption, but falls back to plain text for decryption of previously encrypted data to avoid
-    * breaking existing data in the same session when deployed. TODO: This method can be replaced with one that solely implements AES-GCM once all existing data
-    * has been migrated to AES-GCM which, in this service where only session store is encrypted, should be once all sessions using no encryption have expired,
-    * even though sessions only last 15 minutes from last activity it is technically possible for sessions to be maintained with constant activity for up to the
-    * maximum total session time of 4 hours if the user keeps the browser open and active, so we should wait at least 4 hours before removing this fallback,
-    * next day is probably safest. Timeout information here
-    * https://confluence.tools.tax.service.gov.uk/spaces/GG/pages/1017053367/Timeouts+across+MDTP+elsewhere
-    */
-  @SuppressWarnings(Array("org.wartremover.warts.AsInstanceOf"))
-  private def aesGcmCryptoWithPlainTextFallback(aesGcmKey: String): Encrypter & Decrypter = SymmetricCryptoFactory.composeCrypto(
-    currentCrypto = SymmetricCryptoFactory.aesGcmCrypto(aesGcmKey),
-    previousDecrypters = Seq(NoCrypto.asInstanceOf[Encrypter & Decrypter])
-  )
 
 /** Encrypter/decrypter that does nothing (i.e. leaves content in plaintext).
   */
