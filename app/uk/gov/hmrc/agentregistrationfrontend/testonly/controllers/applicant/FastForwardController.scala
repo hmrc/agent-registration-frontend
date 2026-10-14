@@ -24,6 +24,7 @@ import uk.gov.hmrc.agentregistration.shared.individual.IndividualProvidedDetails
 import uk.gov.hmrc.agentregistration.shared.lists.*
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantActions
 import uk.gov.hmrc.agentregistrationfrontend.action.applicant.ApplicantAuthRefiner
+import uk.gov.hmrc.agentregistrationfrontend.config.AppConfig
 import uk.gov.hmrc.agentregistrationfrontend.controllers.applicant.FrontendController
 import uk.gov.hmrc.agentregistrationfrontend.model.grs.JourneyData
 import uk.gov.hmrc.agentregistrationfrontend.services.applicant.AgentRegistrationRiskingService
@@ -44,6 +45,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import scala.concurrent.ExecutionContext
 import scala.concurrent.Future
+import scala.jdk.DurationConverters.*
 import scala.util.chaining.scalaUtilChainingOps
 import uk.gov.hmrc.agentregistrationfrontend.action.RequestWithDataCt
 import uk.gov.hmrc.agentregistrationfrontend.testonly.connectors.TestAgentRegistrationConnector
@@ -64,7 +66,8 @@ class FastForwardController @Inject() (
   individualProvidedDetailsIdGenerator: IndividualProvidedDetailsIdGenerator,
   testAgentRegistrationConnector: TestAgentRegistrationConnector,
   applicationReferenceGenerator: ApplicationReferenceGenerator,
-  personReferenceGenerator: PersonReferenceGenerator
+  personReferenceGenerator: PersonReferenceGenerator,
+  appConfig: AppConfig
 )(using
   clock: Clock,
   ex: ExecutionContext
@@ -103,13 +106,15 @@ extends FrontendController(mcc, applicantActions):
           case Left(r) => throw new RuntimeException(s"ApplicantAuthRefiner didn't fetch DataWithAuth: $r")
 
       safeId = SafeIdGenerator.generateSafeId()
+      createdAt = Instant.now(clock)
       agentApplication = section.agentApplication.withUpdatedIdentifiers(
         id = agentApplicationId,
         internalUserId = loggedInAsUserApplicantRequestWithAuthData.get[InternalUserId],
         linkId = linkIdGenerator.nextLinkId(),
         groupId = loggedInAsUserApplicantRequestWithAuthData.get[GroupId],
         applicationReference = applicationReferenceGenerator.generateApplicationReference(),
-        createdAt = Instant.now(clock),
+        createdAt = createdAt,
+        applicationExpiresAt = createdAt.plus(appConfig.daysToSubmitApplication.toJava),
         safeId = safeId,
         // agents-external-stubs' /auth responses set credId/credentials.gatewayId to exactly the stub user's userId, so that's what providerId must match
         providerId = userIdApplicant.value
