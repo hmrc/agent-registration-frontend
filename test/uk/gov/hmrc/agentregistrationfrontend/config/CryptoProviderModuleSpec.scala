@@ -43,8 +43,7 @@ extends ISpec:
     crypto.decrypt(firstEncrypted).value shouldBe "user-answer"
     crypto.decrypt(secondEncrypted).value shouldBe "user-answer"
 
-  "the crypto should be able to read pre-migration plain text values as fallback" in:
-    val plainTextValue = PlainText("pre-migration-user-answer")
-    val encryptedValue = NoCrypto.encrypt(plainTextValue)
-    // here we use crypto.decrypt to decrypt a value that was encrypted with NoCrypto, which simulates a pre-migration value
-    crypto.decrypt(encryptedValue).value shouldBe "pre-migration-user-answer"
+  "the crypto instance should throw an exception when asked to read NoCrypto encrypted plain text values" in:
+    val plainTextValue: PlainText = PlainText("pre-migration-user-answer")
+    val encryptedWithNoCryptoValue: Crypted = NoCrypto.encrypt(plainTextValue)
+    intercept[Exception](crypto.decrypt(encryptedWithNoCryptoValue))
